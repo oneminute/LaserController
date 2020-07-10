@@ -1,4 +1,5 @@
 #include "ui/MainWindow.h"
+#include "ui/LaserControllerWindow.h"
 #include "state/StateController.h"
 
 #include <QApplication>
@@ -18,8 +19,7 @@ int main(int argc, char *argv[])
         qDebug() << "load translation file." << a.applicationName() << QLocale::system().bcp47Name();
     }
 
-
-    MainWindow w;
+    LaserControllerWindow w;
     w.show();
     int ret = a.exec();
 

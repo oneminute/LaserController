@@ -908,35 +908,35 @@ static bool constructColor(const QStringRef &colorStr, const QStringRef &opacity
 }
 
 template <class String> // QString/QStringRef
-static qreal parseLength(const String &str, QSvgHandler::LengthType &type,
+static qreal parseLength(const String &str, LengthType &type,
                          QSvgHandler *handler, bool *ok = NULL)
 {
     String numStr = str.trimmed();
 
     if (numStr.endsWith(QLatin1Char('%'))) {
         numStr.chop(1);
-        type = QSvgHandler::LT_PERCENT;
+        type = LengthType::LT_PERCENT;
     } else if (numStr.endsWith(QLatin1String("px"))) {
         numStr.chop(2);
-        type = QSvgHandler::LT_PX;
+        type = LengthType::LT_PX;
     } else if (numStr.endsWith(QLatin1String("pc"))) {
         numStr.chop(2);
-        type = QSvgHandler::LT_PC;
+        type = LengthType::LT_PC;
     } else if (numStr.endsWith(QLatin1String("pt"))) {
         numStr.chop(2);
-        type = QSvgHandler::LT_PT;
+        type = LengthType::LT_PT;
     } else if (numStr.endsWith(QLatin1String("mm"))) {
         numStr.chop(2);
-        type = QSvgHandler::LT_MM;
+        type = LengthType::LT_MM;
     } else if (numStr.endsWith(QLatin1String("cm"))) {
         numStr.chop(2);
-        type = QSvgHandler::LT_CM;
+        type = LengthType::LT_CM;
     } else if (numStr.endsWith(QLatin1String("in"))) {
         numStr.chop(2);
-        type = QSvgHandler::LT_IN;
+        type = LengthType::LT_IN;
     } else {
         type = handler->defaultCoordinateSystem();
-        //type = QSvgHandler::LT_OTHER;
+        //type = LengthType::LT_OTHER;
     }
     qreal len = toDouble(numStr, ok);
     //qDebug()<<"len is "<<len<<", from '"<<numStr << "'";
@@ -945,9 +945,9 @@ static qreal parseLength(const String &str, QSvgHandler::LengthType &type,
 
 static inline qreal convertToNumber(const QStringRef &str, QSvgHandler *handler, bool *ok = NULL)
 {
-    QSvgHandler::LengthType type;
+    LengthType type;
     qreal num = parseLength(str, type, handler, ok);
-    if (type == QSvgHandler::LT_PERCENT) {
+    if (type == LT_PERCENT) {
         num = num/100.0;
     }
     return num;
@@ -972,29 +972,29 @@ static bool createSvgGlyph(QSvgFont *font, const QXmlStreamAttributes &attribute
 
 // this should really be called convertToDefaultCoordinateSystem
 // and convert when type != QSvgHandler::defaultCoordinateSystem
-static qreal convertToPixels(qreal len, bool , QSvgHandler::LengthType type)
+static qreal convertToPixels(qreal len, bool , LengthType type)
 {
 
     switch (type) {
-    case QSvgHandler::LT_PERCENT:
+    case LengthType::LT_PERCENT:
         break;
-    case QSvgHandler::LT_PX:
+    case LengthType::LT_PX:
         break;
-    case QSvgHandler::LT_PC:
+    case LengthType::LT_PC:
         break;
-    case QSvgHandler::LT_PT:
+    case LengthType::LT_PT:
         return len * 1.25;
         break;
-    case QSvgHandler::LT_MM:
+    case LengthType::LT_MM:
         return len * 3.543307;
         break;
-    case QSvgHandler::LT_CM:
+    case LengthType::LT_CM:
         return len * 35.43307;
         break;
-    case QSvgHandler::LT_IN:
+    case LengthType::LT_IN:
         return len * 90;
         break;
-    case QSvgHandler::LT_OTHER:
+    case LengthType::LT_OTHER:
         break;
     default:
         break;
@@ -1237,7 +1237,7 @@ static void parsePen(QSvgNode *node,
 
         //stroke-width handling
         if (!attributes.strokeWidth.isEmpty() && attributes.strokeWidth != QT_INHERIT) {
-            QSvgHandler::LengthType lt;
+            LengthType lt;
             prop->setWidth(parseLength(attributes.strokeWidth, lt, handler));
         }
 
@@ -1371,7 +1371,7 @@ static void parseFont(QSvgNode *node,
         case FontSizeNone:
             break;
         case FontSizeValue: {
-            QSvgHandler::LengthType dummy; // should always be pixel size
+            LengthType dummy; // should always be pixel size
             fontStyle->setSize(parseLength(attributes.fontSize, dummy, handler));
         }
             break;
@@ -2751,7 +2751,7 @@ static QSvgNode *createImageNode(QSvgNode *parent,
     QString filename = attributes.value(QLatin1String("xlink:href")).toString();
     qreal nx = toDouble(x);
     qreal ny = toDouble(y);
-    QSvgHandler::LengthType type;
+    LengthType type;
     qreal nwidth = parseLength(width, type, handler);
     nwidth = convertToPixels(nwidth, true, type);
 
@@ -3057,7 +3057,7 @@ static QSvgNode *createRectNode(QSvgNode *parent,
     const QStringRef rx      = attributes.value(QLatin1String("rx"));
     const QStringRef ry      = attributes.value(QLatin1String("ry"));
 
-    QSvgHandler::LengthType type;
+    LengthType type;
     qreal nwidth = parseLength(width, type, handler);
     nwidth = convertToPixels(nwidth, true, type);
 
@@ -3241,20 +3241,21 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
     const QStringRef heightStr = attributes.value(QLatin1String("height"));
     QString viewBoxStr = attributes.value(QLatin1String("viewBox")).toString();
 
-    QSvgHandler::LengthType type = QSvgHandler::LT_PX; // FIXME: is the default correct?
+    LengthType type = LT_PX; // FIXME: is the default correct?
+    node->setLengthType(type);
     qreal width = 0;
     if (!widthStr.isEmpty()) {
         width = parseLength(widthStr, type, handler);
-        if (type != QSvgHandler::LT_PT)
-            width = convertToPixels(width, true, type);
-        node->setWidth(int(width), type == QSvgHandler::LT_PERCENT);
+        //if (type != QSvgHandler::LT_PT)
+            //width = convertToPixels(width, true, type);
+        node->setWidth(int(width), type == LT_PERCENT);
     }
     qreal height = 0;
     if (!heightStr.isEmpty()) {
         height = parseLength(heightStr, type, handler);
-        if (type != QSvgHandler::LT_PT)
-            height = convertToPixels(height, false, type);
-        node->setHeight(int(height), type == QSvgHandler::LT_PERCENT);
+        //if (type != QSvgHandler::LT_PT)
+            //height = convertToPixels(height, false, type);
+        node->setHeight(int(height), type == LT_PERCENT);
     }
 
     QStringList viewBoxValues;
@@ -3271,7 +3272,7 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
         QString widthStr  = viewBoxValues.at(2).trimmed();
         QString heightStr = viewBoxValues.at(3).trimmed();
 
-        QSvgHandler::LengthType lt;
+        LengthType lt;
         qreal x = parseLength(xStr, lt, handler);
         qreal y = parseLength(yStr, lt, handler);
         qreal w = parseLength(widthStr, lt, handler);
@@ -3280,13 +3281,13 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
         node->setViewBox(QRectF(x, y, w, h));
 
     } else if (width && height) {
-        if (type == QSvgHandler::LT_PT) {
+        if (type == LT_PT) {
             width = convertToPixels(width, false, type);
             height = convertToPixels(height, false, type);
         }
         node->setViewBox(QRectF(0, 0, width, height));
     }
-    handler->setDefaultCoordinateSystem(QSvgHandler::LT_PX);
+    handler->setDefaultCoordinateSystem(LT_PX);
 
     return node;
 }
@@ -3317,7 +3318,7 @@ static QSvgNode *createTextNode(QSvgNode *parent,
     const QStringRef x = attributes.value(QLatin1String("x"));
     const QStringRef y = attributes.value(QLatin1String("y"));
     //### editable and rotate not handled
-    QSvgHandler::LengthType type;
+    LengthType type;
     qreal nx = parseLength(x, type, handler);
     qreal ny = parseLength(y, type, handler);
 
@@ -3331,7 +3332,7 @@ static QSvgNode *createTextAreaNode(QSvgNode *parent,
 {
     QSvgText *node = static_cast<QSvgText *>(createTextNode(parent, attributes, handler));
     if (node) {
-        QSvgHandler::LengthType type;
+        LengthType type;
         qreal width = parseLength(attributes.value(QLatin1String("width")), type, handler);
         qreal height = parseLength(attributes.value(QLatin1String("height")), type, handler);
         node->setTextArea(QSizeF(width, height));
@@ -3379,7 +3380,7 @@ static QSvgNode *createUseNode(QSvgNode *parent,
     if (group) {
         QPointF pt;
         if (!xStr.isNull() || !yStr.isNull()) {
-            QSvgHandler::LengthType type;
+            LengthType type;
             qreal nx = parseLength(xStr, type, handler);
             nx = convertToPixels(nx, true, type);
 
@@ -3949,7 +3950,7 @@ QSvgTinyDocument * QSvgHandler::document() const
     return m_doc;
 }
 
-QSvgHandler::LengthType QSvgHandler::defaultCoordinateSystem() const
+LengthType QSvgHandler::defaultCoordinateSystem() const
 {
     return m_defaultCoords;
 }

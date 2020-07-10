@@ -57,8 +57,14 @@ FILE(GLOB BASE_SOURCES src/*.cpp)
 FILE(GLOB COMMON_HEADERS src/common/*.h)
 FILE(GLOB COMMON_SOURCES src/common/*.cpp)
 
+FILE(GLOB IMPORT_HEADERS src/import/*.h)
+FILE(GLOB IMPORT_SOURCES src/import/*.cpp)
+
 FILE(GLOB LASER_HEADERS src/laser/*.h)
 FILE(GLOB LASER_SOURCES src/laser/*.cpp)
+
+FILE(GLOB SCENE_HEADERS src/scene/*.h)
+FILE(GLOB SCENE_SOURCES src/scene/*.cpp)
 
 FILE(GLOB STATE_HEADERS src/state/*.h)
 FILE(GLOB STATE_SOURCES src/state/*.cpp)
@@ -72,6 +78,9 @@ FILE(GLOB UI_FILES src/ui/*.ui)
 
 FILE(GLOB UTIL_HEADERS src/util/*.h)
 FILE(GLOB UTIL_SOURCES src/util/*.cpp)
+
+FILE(GLOB WIDGET_HEADERS src/widget/*.h)
+FILE(GLOB WIDGET_SOURCES src/widget/*.cpp)
 
 FILE(GLOB MOCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_autogen/*.cpp)
 
@@ -88,23 +97,29 @@ set(HEADER_FILES
     ${HEADER_FILES}
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
+    ${IMPORT_HEADERS}
     ${LASER_HEADERS}
+	${SCENE_HEADERS}
     ${STATE_HEADERS}
     ${SVG_HEADERS}
     ${UI_HEADERS}
     ${UTIL_HEADERS}
+    ${WIDGET_HEADERS}
 )
 
 set(SRC_FILES
     ${SRC_FILES}
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
+    ${IMPORT_SOURCES}
     ${LASER_SOURCES}
+	${SCENE_SOURCES}
     ${STATE_SOURCES}
     ${SVG_SOURCES}
     ${UI_SOURCES}
     ${UI_FILES}
     ${UTIL_SOURCES}
+    ${WIDGET_SOURCES}
 )
 
 IF(MSVC)
@@ -112,6 +127,10 @@ IF(MSVC)
     source_group("header\\common" FILES ${COMMON_HEADERS})
     source_group("source\\laser" FILES ${LASER_SOURCES})
     source_group("header\\laser" FILES ${LASER_HEADERS})
+    source_group("source\\import" FILES ${IMPORT_SOURCES})
+    source_group("header\\import" FILES ${IMPORT_HEADERS})
+	source_group("source\\scene" FILES ${SCENE_SOURCES})
+	source_group("header\\scene" FILES ${SCENE_HEADERS})
     source_group("header\\state" FILES ${STATE_HEADERS})
     source_group("source\\state" FILES ${STATE_SOURCES})
     source_group("source\\svg" FILES ${SVG_SOURCES})
@@ -120,6 +139,8 @@ IF(MSVC)
     source_group("header\\ui" FILES ${UI_HEADERS})
     source_group("source\\util" FILES ${UTIL_SOURCES})
     source_group("header\\util" FILES ${UTIL_HEADERS})
+    source_group("header\\widget" FILES ${WIDGET_HEADERS})
+    source_group("source\\widget" FILES ${WIDGET_SOURCES})
     source_group("source\\mocs" FILES ${MOCS})
     source_group("source" FILES ${BASE_SOURCES})
 ENDIF(MSVC)

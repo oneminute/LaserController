@@ -51,6 +51,7 @@
 // We mean it.
 //
 
+#include "common/common.h"
 #include "qsvgstructure.h"
 //#include "qtsvgglobal.h"
 
@@ -86,6 +87,16 @@ public:
     int height() const;
     bool widthPercent() const;
     bool heightPercent() const;
+
+    LengthType lengthType() const
+    {
+        return m_lengthType;
+    }
+
+    void setLengthType(LengthType type)
+    {
+        m_lengthType = type;
+    }
 
     bool preserveAspectRatio() const;
 
@@ -124,6 +135,7 @@ private:
     QSize  m_size;
     bool   m_widthPercent;
     bool   m_heightPercent;
+    LengthType m_lengthType;
 
     mutable QRectF m_viewBox;
 

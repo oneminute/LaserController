@@ -51,6 +51,7 @@
 // We mean it.
 //
 
+#include "common/common.h"
 #include "QtCore/qxmlstream.h"
 #include "QtCore/qhash.h"
 #include "QtCore/qstack.h"
@@ -81,18 +82,6 @@ struct QSvgCssAttribute
 
 class  QSvgHandler
 {
-public:
-    enum LengthType {
-        LT_PERCENT,
-        LT_PX,
-        LT_PC,
-        LT_PT,
-        LT_MM,
-        LT_CM,
-        LT_IN,
-        LT_OTHER
-    };
-
 public:
     QSvgHandler(QIODevice *device);
     QSvgHandler(const QByteArray &data);

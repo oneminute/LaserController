@@ -50,6 +50,55 @@ Would you like to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>LaserControllerWindow</name>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="14"/>
+        <source>Laser Controller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="28"/>
+        <source>&amp;File</source>
+        <translation type="unfinished">文件(&amp;F)</translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="37"/>
+        <source>toolBar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="49"/>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="58"/>
+        <source>Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="67"/>
+        <source>Layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="76"/>
+        <source>Propergies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="85"/>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="90"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="93"/>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="src/ui/MainWindow.ui" line="1291"/>
@@ -999,6 +1048,11 @@ Coordinate</source>
     <message>
         <location filename="src/ui/MainWindow.ui" line="3204"/>
         <source>Page Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/MainWindow.cpp" line="60"/>
+        <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
