@@ -16,16 +16,36 @@ public:
     explicit ImportSVGDialog(QWidget* parent = nullptr);
     ~ImportSVGDialog();
 
-    LengthType lengthType() const { return m_lengthType; }
+    bool pageUnitFromSVG() const { return m_pageUnitFromSVG; }
+    LengthType pageLengthType() const { return m_pageLengthType; }
     qreal pageWidth() const { return m_pageWidth; }
     qreal pageHeight() const { return m_pageHeight; }
+    bool shapeUnitFromSVG() const { return m_shapeUnitFromSVG; }
+    LengthType shapeLengthType() const { return m_shapeLengthType; }
+    bool useDocumentOrigin() const { return m_useDocumentOrigin; }
+    PageType pageType() const { return m_pageType; }
+
+protected slots:
+    void onPageUnitFromSVGStateChanged(int state);
+    void onPageUnitIndexChanged(int index);
+    void onShapeUnitFromSVGStateChanged(int state);
+    void onShapeUnitIndexChanged(int index);
+    void onUseDocumentOriginStateChanged(int state);
+    void onUseDocumentPageSizeStateChanged(int state);
+    void onUsePresetPageSizeStateChanged(int state);
+    void onPresetPageSizeIndexChanged(const QString& text);
 
 private:
     QScopedPointer<Ui::ImportSVGDialog> m_ui;
-    LengthType m_lengthType;
+    bool m_pageUnitFromSVG;
+    LengthType m_pageLengthType;
     qreal m_pageWidth;
     qreal m_pageHeight;
+    bool m_shapeUnitFromSVG;
+    LengthType m_shapeLengthType;
     bool m_useDocumentOrigin;
+    bool m_useDocumentPageSize;
+    PageType m_pageType;
 };
 
 #endif // IMPORTSVGDIALOG_H

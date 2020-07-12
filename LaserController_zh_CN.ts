@@ -50,6 +50,142 @@ Would you like to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>ImportSVGDialog</name>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="14"/>
+        <source>Import SVG Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="20"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="46"/>
+        <source>Page Unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="29"/>
+        <source>Page&apos;s unit from SVG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="53"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="77"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="162"/>
+        <source>mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="57"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="142"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="62"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="147"/>
+        <source>px</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="67"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="152"/>
+        <source>pc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="72"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="157"/>
+        <source>pt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="82"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="138"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="167"/>
+        <source>mm/100</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="87"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="172"/>
+        <source>cm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="92"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="177"/>
+        <source>in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="97"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="182"/>
+        <source>other</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="108"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="131"/>
+        <source>Shape Unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="117"/>
+        <source>Shapes&apos; unit from SVG file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="193"/>
+        <source>Page Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="202"/>
+        <source>Use document&apos;s origin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="216"/>
+        <source>Page size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="225"/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="232"/>
+        <source>210</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="239"/>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="246"/>
+        <source>297</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="255"/>
+        <source>Use preset page size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="269"/>
+        <source>Preset page size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="277"/>
+        <source>A4(210mm x 297mm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LaserControllerWindow</name>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="14"/>
@@ -62,39 +198,45 @@ Would you like to overwrite it?</source>
         <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="37"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="38"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="49"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="50"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="58"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="59"/>
         <source>Items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="67"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="68"/>
         <source>Layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="76"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="77"/>
         <source>Propergies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="85"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="86"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="90"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="93"/>
-        <source>Import</source>
+        <location filename="src/ui/LaserControllerWindow.ui" line="91"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="94"/>
+        <source>Import SVG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="32"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="41"/>
+        <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

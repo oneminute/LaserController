@@ -13,7 +13,7 @@ public:
     {}
 
 private:
-    QList<LaserItem> items;
+    QList<LaserItem*> items;
     PageInformation pageInfo;
 
     friend class LaserDocument;
@@ -38,6 +38,11 @@ LaserDocument::~LaserDocument()
 }
 
 void LaserDocument::addItem(const LaserItem & item)
+{
+    //d_ptr->items.append(item);
+}
+
+void LaserDocument::addItem(LaserItem * item)
 {
     d_ptr->items.append(item);
 }

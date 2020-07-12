@@ -89,6 +89,7 @@ public:
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
+    QRectF bounds() { return m_bounds; }
 private:
     QRectF m_bounds;
 };

@@ -19,6 +19,7 @@ public:
     ~LaserDocument();
 
     void addItem(const LaserItem& item);
+    void addItem(LaserItem* item);
 
     PageInformation pageInformation() const;
 
