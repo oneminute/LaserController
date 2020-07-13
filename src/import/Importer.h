@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 
-#include "scene/LaserDocument.h"
+class LaserDocument;
 
 class Importer : public QObject
 {
@@ -17,7 +17,7 @@ public:
 
     Importer(QObject* parent = nullptr);
 
-    virtual LaserDocument import(const QString& filename) = 0;
+    virtual LaserDocument* import(const QString& filename) = 0;
     
     static QSharedPointer<Importer> getImporter(Types type);
 

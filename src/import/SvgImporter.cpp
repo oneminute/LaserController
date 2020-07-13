@@ -8,6 +8,7 @@
 #include "svg/qsvggraphics.h"
 #include "ui/ImportSVGDialog.h"
 #include "scene/LaserItem.h"
+#include "scene/LaserDocument.h"
 
 SvgImporter::SvgImporter(QObject* parent)
     : Importer(parent)
@@ -19,7 +20,7 @@ SvgImporter::~SvgImporter()
 {
 }
 
-LaserDocument SvgImporter::import(const QString & filename)
+LaserDocument* SvgImporter::import(const QString & filename)
 {
     LaserDocument* ldoc = new LaserDocument;
     ImportSVGDialog dialog;
@@ -27,7 +28,24 @@ LaserDocument SvgImporter::import(const QString & filename)
 
     QSvgTinyDocument* doc = QSvgTinyDocument::load(filename);
     QSize svgSize = doc->size();
-    qDebug() << svgSize;
+    qDebug() << "document size:" << svgSize;
+
+    SizeUnit docUnit;
+    SizeUnit shapeUnit = SU_MM100;
+
+    if (dialog.pageUnitFromSVG())
+    {
+        docUnit = doc->sizeUnit();
+    }
+    else
+    {
+        docUnit = dialog.pageSizeUnit();
+    }
+
+    if (!dialog.shapeUnitFromSVG())
+    {
+        shapeUnit = dialog.shapeSizeUnit();
+    }
 
     QList<QSvgNode*> nodes = doc->renderers();
     QStack<QSvgNode*> stack;
@@ -69,7 +87,7 @@ LaserDocument SvgImporter::import(const QString & filename)
         case QSvgNode::ELLIPSE:
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
-            item = new LaserEllipseItem(svgEllipseNode->bounds(), ldoc);
+            item = new LaserEllipseItem(svgEllipseNode->bounds(), ldoc, shapeUnit);
         }
             break;
         case QSvgNode::LINE:
@@ -104,7 +122,7 @@ LaserDocument SvgImporter::import(const QString & filename)
         }
         if (item)
         {
-            ldoc.addItem(item);
+            ldoc->addItem(item);
         }
     }
     
