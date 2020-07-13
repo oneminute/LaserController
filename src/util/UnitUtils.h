@@ -10,6 +10,8 @@ namespace unitUtils
     QList<QPageSize::PageSizeId>& presetPageSizes();
 
     QString pageSizeName(QPageSize::PageSizeId id);
+
+    qreal unitToMM(SizeUnit other);
 }
 
 #endif // UNITUTILS_H

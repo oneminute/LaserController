@@ -44,4 +44,23 @@ namespace unitUtils
         QString item = QString("%1 (%2 x %3)").arg(ps.name()).arg(ps.size(QPageSize::Unit::Millimeter).width()).arg(ps.size(QPageSize::Unit::Millimeter).height());
         return item;
     }
+    qreal unitToMM(SizeUnit other)
+    {
+        qreal ratio = 1.0f;
+        switch (other)
+        {
+        case SU_MM:
+            ratio = 1.f;
+            break;
+        case SU_MM100:
+            ratio = 0.01f;
+            break;
+        case SU_CM:
+            ratio = 10.f;
+            break;
+        default:
+            break;
+        }
+        return ratio;
+    }
 }
