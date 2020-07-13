@@ -98,8 +98,8 @@ public:
     inline QString errorString() const { return xml->errorString(); }
     inline int lineNumber() const { return xml->lineNumber(); }
 
-    void setDefaultCoordinateSystem(LengthType type);
-    LengthType defaultCoordinateSystem() const;
+    void setDefaultCoordinateSystem(SizeUnit type);
+    SizeUnit defaultCoordinateSystem() const;
 
     void pushColor(const QColor &color);
     void pushColorCopy();
@@ -153,7 +153,7 @@ private:
 
     QSvgRefCounter<QSvgStyleProperty> m_style;
 
-    LengthType m_defaultCoords;
+    SizeUnit m_defaultCoords;
 
     QStack<QColor> m_colorStack;
     QStack<int>    m_colorTagCount;

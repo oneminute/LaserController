@@ -88,14 +88,14 @@ public:
     bool widthPercent() const;
     bool heightPercent() const;
 
-    LengthType lengthType() const
+    SizeUnit sizeUnit() const
     {
-        return m_lengthType;
+        return m_sizeUnit;
     }
 
-    void setLengthType(LengthType type)
+    void setSizeUnit(SizeUnit type)
     {
-        m_lengthType = type;
+        m_sizeUnit = type;
     }
 
     bool preserveAspectRatio() const;
@@ -135,7 +135,7 @@ private:
     QSize  m_size;
     bool   m_widthPercent;
     bool   m_heightPercent;
-    LengthType m_lengthType;
+    SizeUnit m_sizeUnit;
 
     mutable QRectF m_viewBox;
 
