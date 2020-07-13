@@ -39,7 +39,7 @@ void ImportSVGDialog::onPageUnitFromSVGStateChanged(int state)
     {
     case Qt::Unchecked:
         m_ui->comboBoxPageUnit->setEnabled(true);
-        m_pageLengthType = (LengthType)m_ui->comboBoxPageUnit->currentIndex();
+        m_pageSizeUnit = (SizeUnit)m_ui->comboBoxPageUnit->currentIndex();
         m_pageUnitFromSVG = false;
         break;
     case Qt::Checked:
@@ -53,7 +53,7 @@ void ImportSVGDialog::onPageUnitFromSVGStateChanged(int state)
 
 void ImportSVGDialog::onPageUnitIndexChanged(int index)
 {
-    m_pageLengthType = (LengthType)m_ui->comboBoxPageUnit->currentIndex();
+    m_pageSizeUnit = (SizeUnit)m_ui->comboBoxPageUnit->currentIndex();
 }
 
 void ImportSVGDialog::onShapeUnitFromSVGStateChanged(int state)
@@ -63,7 +63,7 @@ void ImportSVGDialog::onShapeUnitFromSVGStateChanged(int state)
     case Qt::Unchecked:
         m_ui->comboBoxShapeUnit->setEnabled(true);
         m_shapeUnitFromSVG = false;
-        m_shapeLengthType = (LengthType)m_ui->comboBoxShapeUnit->currentIndex();
+        m_shapeSizeUnit = (SizeUnit)m_ui->comboBoxShapeUnit->currentIndex();
         break;
     case Qt::Checked:
         m_ui->comboBoxShapeUnit->setEnabled(false);
@@ -76,7 +76,7 @@ void ImportSVGDialog::onShapeUnitFromSVGStateChanged(int state)
 
 void ImportSVGDialog::onShapeUnitIndexChanged(int index)
 {
-    m_shapeLengthType = (LengthType)m_ui->comboBoxShapeUnit->currentIndex();
+    m_shapeSizeUnit = (SizeUnit)m_ui->comboBoxShapeUnit->currentIndex();
 }
 
 void ImportSVGDialog::onUseDocumentOriginStateChanged(int state)

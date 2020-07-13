@@ -3,16 +3,16 @@
 
 #include <QDebug>
 
-enum LengthType {
-    LT_PERCENT,
-    LT_PX,
-    LT_PC,
-    LT_PT,
-    LT_MM,
-    LT_MM100,
-    LT_CM,
-    LT_IN,
-    LT_OTHER
+enum SizeUnit {
+    SU_PERCENT,
+    SU_PX,
+    SU_PC,
+    SU_PT,
+    SU_MM,
+    SU_MM100,
+    SU_CM,
+    SU_IN,
+    SU_OTHER
 };
 
 enum PageType {

@@ -17,11 +17,11 @@ public:
     ~ImportSVGDialog();
 
     bool pageUnitFromSVG() const { return m_pageUnitFromSVG; }
-    LengthType pageLengthType() const { return m_pageLengthType; }
+    SizeUnit pageSizeUnit() const { return m_pageSizeUnit; }
     qreal pageWidth() const { return m_pageWidth; }
     qreal pageHeight() const { return m_pageHeight; }
     bool shapeUnitFromSVG() const { return m_shapeUnitFromSVG; }
-    LengthType shapeLengthType() const { return m_shapeLengthType; }
+    SizeUnit shapeSizeUnit() const { return m_shapeSizeUnit; }
     bool useDocumentOrigin() const { return m_useDocumentOrigin; }
     PageType pageType() const { return m_pageType; }
 
@@ -38,11 +38,11 @@ protected slots:
 private:
     QScopedPointer<Ui::ImportSVGDialog> m_ui;
     bool m_pageUnitFromSVG;
-    LengthType m_pageLengthType;
+    SizeUnit m_pageSizeUnit;
     qreal m_pageWidth;
     qreal m_pageHeight;
     bool m_shapeUnitFromSVG;
-    LengthType m_shapeLengthType;
+    SizeUnit m_shapeSizeUnit;
     bool m_useDocumentOrigin;
     bool m_useDocumentPageSize;
     PageType m_pageType;
