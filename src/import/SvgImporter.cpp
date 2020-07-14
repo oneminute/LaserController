@@ -9,6 +9,7 @@
 #include "ui/ImportSVGDialog.h"
 #include "scene/LaserItem.h"
 #include "scene/LaserDocument.h"
+#include "util/UnitUtils.h"
 
 SvgImporter::SvgImporter(QObject* parent)
     : Importer(parent)
@@ -91,13 +92,44 @@ LaserDocument* SvgImporter::import(const QString & filename)
         }
             break;
         case QSvgNode::LINE:
+        {
+            QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
+            item = new LaserLineItem(svgLineNode->line(), ldoc, shapeUnit);
+        }
+            break;
         case QSvgNode::PATH:
+        {
+            QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
+            item = new LaserPathItem(svgPathNode->path(), ldoc, shapeUnit);
+        }
+            break;
         case QSvgNode::POLYGON:
+        {
+            QSvgPolygon* svgPolygon = reinterpret_cast<QSvgPolygon*>(node);
+            item = new LaserPolygonItem(svgPolygon->polygon(), ldoc, shapeUnit);
+        }
+            break;
         case QSvgNode::POLYLINE:
+        {
+            QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
+            item = new LaserPolylineItem(svgPolylineNode->polyline(), ldoc, shapeUnit);
+        }
+            break;
         case QSvgNode::RECT:
+        {
+            if (node->hasStyle())
+            {
+                QSvgRect* svgRectNode = reinterpret_cast<QSvgRect*>(node);
+                qreal area = svgRectNode->rect().width() * svgRectNode->rect().height();
+                qDebug() << "svg rect's area:" << area;
+                if (area > 0)
+                    item = new LaserRectItem(svgRectNode->rect(), ldoc, shapeUnit);
+            }
+            break;
+        }
         case QSvgNode::TEXT:
         case QSvgNode::TEXTAREA:
-        {
+        /*{
             if (node->hasStyle())
             {
                 qDebug() << "    type:" << node->type() << ", display:" << node->displayMode() 
@@ -105,23 +137,39 @@ LaserDocument* SvgImporter::import(const QString & filename)
                     << node->transformedBounds();
                 renderer = new QSvgRenderer(node);
             }
-        }
+        }*/
             break;
         case QSvgNode::IMAGE:
         {
-            renderer = new QSvgRenderer(node);
+            //renderer = new QSvgRenderer(node);
         }
             break;
         default:
             break;
         }
 
-        if (renderer)
+        /*if (renderer)
         {
             renderers.append(renderer);
-        }
+        }*/
         if (item)
         {
+            QTransform t;
+            qreal ratio = unitUtils::unitToMM(item->unit());
+            if (node->hasStyle())
+            {
+                QSvgStyleProperty* style = node->styleProperty(QSvgStyleProperty::TRANSFORM);
+                if (style)
+                {
+                    QSvgTransformStyle* tStyle = reinterpret_cast<QSvgTransformStyle*>(style);
+                    t = tStyle->qtransform();
+                }
+            }
+            qreal scaleX = ratio;
+            qreal scaleY = ratio;
+            
+            QTransform tt = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * ratio, t.dy() * ratio).scale(scaleX, scaleY);
+            item->setTransform(tt);
             ldoc->addItem(item);
         }
     }

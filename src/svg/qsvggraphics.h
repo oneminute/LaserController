@@ -121,6 +121,7 @@ public:
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
+    QLineF line() const { return m_line; }
 private:
     QLineF m_line;
 };
@@ -133,8 +134,8 @@ public:
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
 
-    QPainterPath *qpath() {
-        return &m_path;
+    QPainterPath path() {
+        return m_path;
     }
 private:
     QPainterPath m_path;
@@ -147,6 +148,7 @@ public:
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
+    QPolygonF polygon() const { return m_poly; }
 private:
     QPolygonF m_poly;
 };
@@ -158,6 +160,7 @@ public:
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
+    QPolygonF polyline() const { return m_poly; }
 private:
     QPolygonF m_poly;
 };
@@ -169,6 +172,7 @@ public:
     Type type() const override;
     void draw(QPainter *p, QSvgExtraStates &states) override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
+    QRectF rect() { return m_rect; }
 private:
     QRectF m_rect;
     int m_rx, m_ry;

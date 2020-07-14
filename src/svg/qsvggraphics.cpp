@@ -255,7 +255,7 @@ QSvgRect::QSvgRect(QSvgNode *node, const QRectF &rect, int rx, int ry)
     setX(m_rect.x());
     setY(m_rect.y());
 
-    m_rect.moveTo(0, 0);
+    //m_rect.moveTo(0, 0);
 }
 
 QRectF QSvgRect::bounds(QPainter *p, QSvgExtraStates &) const

@@ -18,10 +18,13 @@ public:
     LaserDocument(const LaserDocument& other, QObject* parent = nullptr);
     ~LaserDocument();
 
-    void addItem(const LaserItem& item);
     void addItem(LaserItem* item);
 
     PageInformation pageInformation() const;
+    QList<LaserItem*> items() const;
+
+    qreal scale() const;
+    void setScale(qreal scale);
 
 private:
     QSharedDataPointer<LaserDocumentPrivate> d_ptr;

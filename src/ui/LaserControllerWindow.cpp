@@ -10,6 +10,7 @@
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::LaserControllerWindow)
+    , m_scene(new LaserScene)
 {
     m_ui->setupUi(this);
 
@@ -42,5 +43,6 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     if (filename.isEmpty())
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
-    importer->import(filename);
+    LaserDocument* doc = importer->import(filename);
+    m_scene->updateDocument(doc);
 }
