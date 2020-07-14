@@ -144,10 +144,10 @@ QSvgImage::QSvgImage(QSvgNode *parent, const QImage &image,
     if (m_bounds.height() == 0.0)
         m_bounds.setHeight(static_cast<qreal>(m_image.height()));
 
-    setX(bounds.x());
-    setY(bounds.y());
+    //setX(bounds.x());
+    //setY(bounds.y());
 
-    m_bounds.moveTo(0, 0);
+    //m_bounds.moveTo(0, 0);
 }
 
 void QSvgImage::draw(QPainter *p, QSvgExtraStates &states)

@@ -26,14 +26,12 @@ void LaserItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * optio
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
 
     // 绘制外框
-    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
+    painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
     QRectF bounds = boundingRect();
     painter->drawRect(bounds);
 
     // 绘制图元
     painter->setPen(QPen(Qt::blue, 50, Qt::SolidLine));
-    //QTransform t = m_transform.scale(m_doc->scale(), m_doc->scale());
-    //QTransform t = m_transform.scale(m_doc->scale(), m_doc->scale());
     QTransform t = m_transform * painter->worldTransform();
     painter->setTransform(t);
     draw(painter);
@@ -43,9 +41,7 @@ void LaserItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * optio
 
 QRectF LaserItem::boundingRect() const
 {
-    QTransform t(m_transform);
-    //t = t.scale(m_doc->scale(), m_doc->scale());
-    QRectF bounds = t.mapRect(m_boundingRect);
+    QRectF bounds = m_transform.mapRect(m_boundingRect);
     return bounds;
 }
 
@@ -142,4 +138,15 @@ void LaserPolygonItem::draw(QPainter * painter)
     painter->drawPolygon(m_poly);
 }
 
+LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, LaserDocument * doc, SizeUnit unit)
+    : LaserItem(doc, unit)
+    , m_image(image)
+    , m_bounds(bounds)
+{
+    m_boundingRect = m_bounds;
+}
 
+void LaserBitmapItem::draw(QPainter * painter)
+{
+    painter->drawImage(m_bounds, m_image);
+}

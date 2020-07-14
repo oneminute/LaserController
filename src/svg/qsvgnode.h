@@ -155,6 +155,8 @@ public:
     QString xmlClass() const;
     void setXmlClass(const QString &str);
 
+    QTransform getCascadeTransform() const;
+
     qreal x() const { return m_x; }
     void setX(qreal _x) { m_x = _x; }
 

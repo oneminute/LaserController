@@ -164,4 +164,20 @@ private:
     Q_DISABLE_COPY(LaserPolygonItem);
 };
 
+class LaserBitmapItem : public LaserItem
+{
+public:
+    LaserBitmapItem(const QImage& image, const QRectF& bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+
+    QImage image() const { return m_image; }
+    void setImage(const QImage& image) { m_image = m_image; }
+
+    virtual void draw(QPainter* painter);
+
+private:
+    QImage m_image;
+    QRectF m_bounds;
+    Q_DISABLE_COPY(LaserBitmapItem);
+};
+
 #endif // LASERITEM_H

@@ -109,6 +109,10 @@ public:
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
+
+    QImage image() const { return m_image; }
+    QRectF imageBounds() const { return m_bounds; }
+
 private:
     QImage m_image;
     QRectF m_bounds;

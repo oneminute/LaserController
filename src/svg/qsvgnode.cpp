@@ -346,6 +346,26 @@ void QSvgNode::setXmlClass(const QString &str)
     m_class = str;
 }
 
+QTransform QSvgNode::getCascadeTransform() const
+{
+    QTransform t;
+    const QSvgNode* node = this;
+    while (node)
+    {
+        if (node->hasStyle())
+        {
+            QSvgStyleProperty* style = node->styleProperty(QSvgStyleProperty::TRANSFORM);
+            if (style)
+            {
+                QSvgTransformStyle* tStyle = reinterpret_cast<QSvgTransformStyle*>(style);
+                t = t * tStyle->qtransform();
+            }
+        }
+        node = node->parent();
+    }
+    return t;
+}
+
 void QSvgNode::setDisplayMode(DisplayMode mode)
 {
     m_displayMode = mode;

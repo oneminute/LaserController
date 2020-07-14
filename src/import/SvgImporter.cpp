@@ -142,6 +142,8 @@ LaserDocument* SvgImporter::import(const QString & filename)
         case QSvgNode::IMAGE:
         {
             //renderer = new QSvgRenderer(node);
+            QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
+            item = new LaserBitmapItem(svgImageNode->image(), svgImageNode->imageBounds(), ldoc, shapeUnit);
         }
             break;
         default:
@@ -156,7 +158,7 @@ LaserDocument* SvgImporter::import(const QString & filename)
         {
             QTransform t;
             qreal ratio = unitUtils::unitToMM(item->unit());
-            if (node->hasStyle())
+            /*if (node->hasStyle())
             {
                 QSvgStyleProperty* style = node->styleProperty(QSvgStyleProperty::TRANSFORM);
                 if (style)
@@ -164,7 +166,8 @@ LaserDocument* SvgImporter::import(const QString & filename)
                     QSvgTransformStyle* tStyle = reinterpret_cast<QSvgTransformStyle*>(style);
                     t = tStyle->qtransform();
                 }
-            }
+            }*/
+            t = node->getCascadeTransform();
             qreal scaleX = ratio;
             qreal scaleY = ratio;
             
