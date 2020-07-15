@@ -6,6 +6,7 @@
 #include <QSharedDataPointer>
 
 #include "PageInformation.h"
+#include "LaserLayer.h"
 
 class LaserDocumentPrivate;
 class LaserItem;
@@ -21,7 +22,15 @@ public:
     void addItem(LaserItem* item);
 
     PageInformation pageInformation() const;
+
     QList<LaserItem*> items() const;
+
+    QList<LaserLayer> layers() const;
+    QList<LaserLayer> engravingLayers() const;
+    QList<LaserLayer> cuttingLayers() const;
+    void addLayer(const LaserLayer& layer);
+
+    QString newLayerName(LaserLayer::LayerType type) const;
 
     qreal scale() const;
     void setScale(qreal scale);

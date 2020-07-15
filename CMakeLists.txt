@@ -43,12 +43,15 @@ find_package(ZLib REQUIRED QUIET)
 
 set(TS_FILES LaserController_zh_CN.ts)
 
+#add_subdirectory(widgets)
+
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
     ./src
     ${Boost_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
+    ./third/CustomWidgets/include
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)
@@ -146,9 +149,17 @@ IF(MSVC)
 ENDIF(MSVC)
 
 include_directories(${INCLUDE_DIRS})
-
+SET(CustomWidgets_LIBRARY
+  debug ${CMAKE_CURRENT_SOURCE_DIR}/third/CustomWidgets/lib/CustomWidgetsd.lib
+  optimized ${CMAKE_CURRENT_SOURCE_DIR}/third/CustomWidgets/lib/CustomWidgets.lib
+)
+message(${CustomWidgets_LIBRARY})
 set(LINK_LIBRARIES 
-    Qt5::Widgets Qt5::Charts Qt5::OpenGL ${OpenCV_LIBRARIES} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES}
+    Qt5::Widgets Qt5::Charts Qt5::OpenGL 
+    ${OpenCV_LIBRARIES} 
+    ${Boost_LIBRARIES} 
+    ${ZLIB_LIBRARIES}
+    ${CustomWidgets_LIBRARY}
 )
 
 if(ANDROID)

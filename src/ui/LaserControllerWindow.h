@@ -21,6 +21,10 @@ public:
 
 public slots:
     void onActionImportSVG(bool checked = false);
+    void onToolButtonAddEngravingLayer(bool checked = false);
+    void onToolButtonAddCuttingLayer(bool checked = false);
+
+    void updateLayers();
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);

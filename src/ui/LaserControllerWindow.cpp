@@ -5,7 +5,9 @@
 
 #include "widget/LaserViewer.h"
 #include "scene/LaserScene.h"
+#include "scene/LaserDocument.h"
 #include "import/Importer.h"
+#include "ui/LaserLayerDialog.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -18,11 +20,37 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     this->setCentralWidget(m_viewer);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
+    connect(m_ui->toolButtonAddEngravingLayer, &QToolButton::clicked, this, &LaserControllerWindow::onToolButtonAddEngravingLayer);
+    connect(m_ui->toolButtonAddCuttingLayer, &QToolButton::clicked, this, &LaserControllerWindow::onToolButtonAddCuttingLayer);
 }
 
 LaserControllerWindow::~LaserControllerWindow()
 {
 
+}
+
+void LaserControllerWindow::onToolButtonAddEngravingLayer(bool)
+{
+    QString newName = m_scene->document()->newLayerName(LaserLayer::LLT_ENGRAVING);
+    LaserLayerDialog dialog(newName, LaserLayer::LLT_ENGRAVING);
+    dialog.exec();
+
+    LaserLayer layer = dialog.layer();
+    m_scene->document()->addLayer(layer);
+}
+
+void LaserControllerWindow::onToolButtonAddCuttingLayer(bool checked)
+{
+    QString newName = m_scene->document()->newLayerName(LaserLayer::LLT_CUTTING);
+    LaserLayerDialog dialog(newName, LaserLayer::LLT_CUTTING);
+    dialog.exec();
+
+    LaserLayer layer = dialog.layer();
+    m_scene->document()->addLayer(layer);
+}
+
+void LaserControllerWindow::updateLayers()
+{
 }
 
 QString LaserControllerWindow::getFilename(const QString& title, const QStringList & mime)

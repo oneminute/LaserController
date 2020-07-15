@@ -68,120 +68,125 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="53"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="77"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="162"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="56"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="80"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="165"/>
         <source>mm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="57"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="142"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="60"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="145"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="62"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="147"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="65"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="150"/>
         <source>px</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="67"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="152"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="70"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="155"/>
         <source>pc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="72"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="157"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="75"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="160"/>
         <source>pt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="82"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="138"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="167"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="85"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="141"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="170"/>
         <source>mm/100</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="87"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="172"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="90"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="175"/>
         <source>cm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="92"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="177"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="95"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="180"/>
         <source>in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="97"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="182"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="100"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="185"/>
         <source>other</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="108"/>
-        <location filename="src/ui/ImportSVGDialog.ui" line="131"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="111"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="134"/>
         <source>Shape Unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="117"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="120"/>
         <source>Shapes&apos; unit from SVG file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="193"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="196"/>
         <source>Page Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="202"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="205"/>
         <source>Use document&apos;s origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="216"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="222"/>
         <source>Page size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="225"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="231"/>
         <source>Width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="232"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="241"/>
         <source>210</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="239"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="248"/>
         <source>Height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="246"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="258"/>
         <source>297</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="255"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="267"/>
         <source>Use preset page size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="269"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="284"/>
         <source>Preset page size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/ImportSVGDialog.ui" line="277"/>
+        <location filename="src/ui/ImportSVGDialog.ui" line="295"/>
         <source>A4(210mm x 297mm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ImportSVGDialog.ui" line="303"/>
+        <source>Use document&apos;s page size</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -218,25 +223,99 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="77"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="89"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="96"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="103"/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="127"/>
         <source>Propergies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="86"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="136"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="91"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="94"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="141"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="144"/>
         <source>Import SVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="32"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="41"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="33"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="42"/>
         <source>Open SVG File</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LaserLayerDialog</name>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="14"/>
+        <source>Laser Layer Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="20"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="26"/>
+        <source>Layer Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="36"/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="45"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="183"/>
+        <source>Engraving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="52"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="224"/>
+        <source>Cutting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="74"/>
+        <source>Min Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="108"/>
+        <source>Run Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="146"/>
+        <source>Laser Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="189"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="230"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="196"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="199"/>
+        <source>A widget combined Horizontal Slider and Line Edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="208"/>
+        <source>70</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
