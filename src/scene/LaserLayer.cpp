@@ -163,3 +163,13 @@ int LaserLayer::runSpeedPower() const { return d_ptr->m_runSpeedPower; }
 
 void LaserLayer::setRunSpeedPower(int runSpeedPower) { d_ptr->m_runSpeedPower = runSpeedPower; }
 
+void LaserLayer::addItem(LaserItem * item)
+{
+    d_ptr->m_items.append(item);
+}
+
+QList<LaserItem*>& LaserLayer::items()
+{
+    return d_ptr->m_items;
+}
+

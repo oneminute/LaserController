@@ -64,6 +64,7 @@ void LaserArcItem::draw(QPainter* painter)
 LaserShapeItem::LaserShapeItem(LaserDocument* doc, SizeUnit unit)
     : LaserItem(doc, unit)
 {
+    m_type = LIT_SHAPE;
 }
 
 LaserEllipseItem::LaserEllipseItem(const QRectF bounds, LaserDocument * doc, SizeUnit unit)
@@ -144,6 +145,7 @@ LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, Las
     , m_bounds(bounds)
 {
     m_boundingRect = m_bounds;
+    m_type = LIT_BITMAP;
 }
 
 void LaserBitmapItem::draw(QPainter * painter)

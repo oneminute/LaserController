@@ -73,10 +73,20 @@
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QTreeWidget" name="treeWidget">
+      <widget class="QTreeWidget" name="treeWidgetLayers">
        <column>
         <property name="text">
-         <string notr="true">1</string>
+         <string notr="true">T</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>V</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Name</string>
         </property>
        </column>
       </widget>

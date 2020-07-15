@@ -32,14 +32,14 @@ LaserDocument::LaserDocument(QObject* parent)
     : QObject(parent)
     , d_ptr(new LaserDocumentPrivate)
 {
-
+    init();
 }
 
 LaserDocument::LaserDocument(const LaserDocument& other, QObject* parent)
     : QObject(parent)
     , d_ptr(other.d_ptr)
 {
-
+    init();
 }
 
 LaserDocument::~LaserDocument()
@@ -49,6 +49,15 @@ LaserDocument::~LaserDocument()
 void LaserDocument::addItem(LaserItem * item)
 {
     d_ptr->items.append(item);
+
+    if (item->isShape())
+    {
+        d_ptr->cuttingLayers[0].addItem(item);
+    }
+    else if (item->isBitmap())
+    {
+        d_ptr->engravingLayers[0].addItem(item);
+    }
 }
 
 PageInformation LaserDocument::pageInformation() const
@@ -132,5 +141,14 @@ qreal LaserDocument::scale() const
 void LaserDocument::setScale(qreal scale)
 {
     d_ptr->scale = scale;
+}
+
+void LaserDocument::init()
+{
+    QString layerName = newLayerName(LaserLayer::LLT_ENGRAVING);
+    addLayer(LaserLayer(layerName, LaserLayer::LLT_ENGRAVING));
+
+    layerName = newLayerName(LaserLayer::LLT_CUTTING);
+    addLayer(LaserLayer(layerName, LaserLayer::LLT_CUTTING));
 }
 

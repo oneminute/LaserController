@@ -35,6 +35,9 @@ public:
     qreal scale() const;
     void setScale(qreal scale);
 
+protected:
+    void init();
+
 private:
     QSharedDataPointer<LaserDocumentPrivate> d_ptr;
     friend class LaserDocumentPrivate;

@@ -64,4 +64,10 @@ enum PageType {
     PT_UNDEFINED
 };
 
+enum LaserItemType
+{
+    LIT_SHAPE,
+    LIT_BITMAP
+};
+
 #endif // COMMON_H

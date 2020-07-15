@@ -73,6 +73,9 @@ public:
     int runSpeedPower() const;
     void setRunSpeedPower(int runSpeedPower);
 
+    void addItem(LaserItem* item);
+    QList<LaserItem*>& items();
+
 protected:
     QSharedDataPointer<LaserLayerPrivate> d_ptr;
     friend class LaserLayerPrivate;

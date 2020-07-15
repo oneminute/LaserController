@@ -33,11 +33,16 @@ public:
 
     qreal unitToMM() const;
 
+    LaserItemType laserItemType() const { return m_type; }
+    bool isShape() const { return m_type == LIT_SHAPE; }
+    bool isBitmap() const { return m_type == LIT_BITMAP; }
+
 protected:
     LaserDocument* m_doc;
     SizeUnit m_unit;
     QTransform m_transform;
     QRectF m_boundingRect;
+    LaserItemType m_type;
 
 private:
     Q_DISABLE_COPY(LaserItem);

@@ -5,6 +5,8 @@
 #include <QMainWindow>
 #include <QScopedPointer>
 
+#include "scene/LaserLayer.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
@@ -28,6 +30,7 @@ public slots:
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
+    void fillLayersTree(QList<LaserLayer> &layers, const QString& type);
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
