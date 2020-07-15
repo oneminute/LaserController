@@ -32,21 +32,6 @@ protected:
 protected slots:
     virtual void accept();
 
-    void onLayerNameChanged(const QString& name);
-    void onMinSpeedChanged(int value);
-    void onRunSpeedChanged(int value);
-    void onLaserPowerChanged(int value);
-    void onEngravingForwardChanged(int state);
-    void onEngravingStyleChanged(bool checked);
-    void onLineSpacingChanged(int value);
-    void onColumnSpacingChanged(int value);
-    void onStartXChanged(int value);
-    void onStartYChanged(int value);
-    void onErrorXChanged(int value);
-    void onMoveSpeedChanged(int value);
-    void onMinSpeedPowerChanged(int value);
-    void onRunSpeedPowerChanged(int value);
-
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;
     LaserLayer m_layer;

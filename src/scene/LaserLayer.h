@@ -5,6 +5,7 @@
 #include <QPointF>
 #include <QList>
 #include <QSharedDataPointer>
+#include <QExplicitlySharedDataPointer>
 
 class LaserItem;
 class LaserLayerPrivate;
@@ -18,6 +19,7 @@ public:
         LLT_CUTTING
     };
 
+    LaserLayer();
     LaserLayer(const QString& id, LayerType type);
     LaserLayer(const LaserLayer& other);
     ~LaserLayer();
@@ -77,7 +79,7 @@ public:
     QList<LaserItem*>& items();
 
 protected:
-    QSharedDataPointer<LaserLayerPrivate> d_ptr;
+    QExplicitlySharedDataPointer<LaserLayerPrivate> d_ptr;
     friend class LaserLayerPrivate;
 };
 

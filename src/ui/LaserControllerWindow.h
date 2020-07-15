@@ -13,6 +13,7 @@ QT_END_NAMESPACE
 
 class LaserViewer;
 class LaserScene;
+class QTreeWidgetItem;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -21,10 +22,11 @@ public:
     LaserControllerWindow(QWidget* parent = nullptr);
     ~LaserControllerWindow();
 
-public slots:
+protected slots:
     void onActionImportSVG(bool checked = false);
     void onToolButtonAddEngravingLayer(bool checked = false);
     void onToolButtonAddCuttingLayer(bool checked = false);
+    void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
 
     void updateLayers();
 

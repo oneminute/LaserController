@@ -43,20 +43,6 @@ void LaserLayerDialog::initUi(bool editing)
         
     }
 
-    /*connect(m_ui->lineEditLayerName, &QLineEdit::textChanged, this, &LaserLayerDialog::onLayerNameChanged);
-    connect(m_ui->horizontalEditSliderMinSpeed, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onMinSpeedChanged);
-    connect(m_ui->horizontalEditSliderRunSpeed, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onRunSpeedChanged);
-    connect(m_ui->horizontalEditSliderLaserPower, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onLaserPowerChanged);
-    connect(m_ui->checkBoxEngravingForward, &QCheckBox::stateChanged, this, &LaserLayerDialog::onEngravingForwardChanged);
-    connect(m_ui->radioButtonByRow, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingStyleChanged);
-    connect(m_ui->horizontalEditSliderLineSpacing, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onLineSpacingChanged);
-    connect(m_ui->horizontalEditSliderColumnSpacing, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onColumnSpacingChanged);
-    connect(m_ui->horizontalEditSliderStartX, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onStartXChanged);
-    connect(m_ui->horizontalEditSliderStartY, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onStartYChanged);
-    connect(m_ui->horizontalEditSliderErrorX, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onErrorXChanged);
-    connect(m_ui->horizontalEditSliderMoveSpeed, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onMoveSpeedChanged);
-    connect(m_ui->horizontalEditSliderMinSpeedPower, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onMinSpeedPowerChanged);
-    connect(m_ui->horizontalEditSliderRunSpeedPower, &HorizontalEditSlider::valueChanged, this, &LaserLayerDialog::onRunSpeedPowerChanged);*/
 }
 
 void LaserLayerDialog::accept()
@@ -80,72 +66,3 @@ void LaserLayerDialog::accept()
     QDialog::accept();
 }
 
-void LaserLayerDialog::onLayerNameChanged(const QString& name)
-{
-    m_layer.setId(name);
-}
-
-void LaserLayerDialog::onMinSpeedChanged(int value)
-{
-    m_layer.setMinSpeed(value);
-}
-
-void LaserLayerDialog::onRunSpeedChanged(int value)
-{
-    m_layer.setRunSpeed(value);
-}
-
-void LaserLayerDialog::onLaserPowerChanged(int value)
-{
-    m_layer.setLaserPower(value);
-}
-
-void LaserLayerDialog::onEngravingForwardChanged(int state)
-{
-    m_layer.setEngravingForward(state == Qt::CheckState::Checked);
-}
-
-void LaserLayerDialog::onEngravingStyleChanged(bool checked)
-{
-    m_layer.setEngravingStyle(m_ui->radioButtonByRow->isChecked() ? 0 : 1);
-}
-
-void LaserLayerDialog::onLineSpacingChanged(int value)
-{
-    m_layer.setLineSpacing(value);
-}
-
-void LaserLayerDialog::onColumnSpacingChanged(int value)
-{
-    m_layer.setColumnSpacing(value);
-}
-
-void LaserLayerDialog::onStartXChanged(int value)
-{
-    m_layer.setStartX(value);
-}
-
-void LaserLayerDialog::onStartYChanged(int value)
-{
-    m_layer.setStartY(value);
-}
-
-void LaserLayerDialog::onErrorXChanged(int value)
-{
-    m_layer.setErrorX(value);
-}
-
-void LaserLayerDialog::onMoveSpeedChanged(int value)
-{
-    m_layer.setMoveSpeed(value);
-}
-
-void LaserLayerDialog::onMinSpeedPowerChanged(int value)
-{
-    m_layer.setMinSpeed(value);
-}
-
-void LaserLayerDialog::onRunSpeedPowerChanged(int value)
-{
-    m_layer.setRunSpeedPower(value);
-}

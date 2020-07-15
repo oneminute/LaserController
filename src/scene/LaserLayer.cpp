@@ -50,6 +50,10 @@ public:
     friend class LaserLayer;
 };
 
+LaserLayer::LaserLayer()
+    : d_ptr(new LaserLayerPrivate)
+{}
+
 LaserLayer::LaserLayer(const QString& id, LayerType type)
     : d_ptr(new LaserLayerPrivate)
 {
