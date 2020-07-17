@@ -45,6 +45,30 @@ int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector
     return count;
 }
 
+int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& points, cv::Mat& canvas)
+{
+    qreal length = path.length();
+    QPointF lastPt;
+    for (int i = 0; i < length + 1; i++)
+    {
+        QPointF pt = path.pointAtPercent(i / length);
+        if (pt != lastPt)
+        {
+            cv::Point2f cvPt(pt.x(), pt.y());
+            if (!canvas.empty() && pt.x() >= 0 && pt.x() < canvas.cols && pt.y() >= 0 && pt.y() < canvas.rows)
+            {
+                canvas.at<uchar>(cvPt) = 0;
+            }
+            points.push_back(cvPt);
+        }
+    }
+    if (points[0] != points[points.size() - 1])
+    {
+        points.push_back(points[0]);
+    }
+    return points.size();
+}
+
 QByteArray pltUtils::points2Plt(const std::vector<cv::Point2f>& points)
 {
     QByteArray buffer;

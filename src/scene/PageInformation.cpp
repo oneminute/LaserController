@@ -33,6 +33,12 @@ PageInformation::PageInformation(const PageInformation& other, QObject* parent)
 
 }
 
+PageInformation & PageInformation::operator=(const PageInformation & other)
+{
+    d_ptr = other.d_ptr;
+    return *this;
+}
+
 PageInformation::~PageInformation()
 {
 }

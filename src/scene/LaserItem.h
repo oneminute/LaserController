@@ -35,7 +35,7 @@ public:
 
     virtual void draw(QPainter* painter) = 0;
 
-    virtual std::vector<cv::Point2f> cuttingPoints() { return std::vector<cv::Point2f>(); }
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat()) { return std::vector<cv::Point2f>(); }
     virtual QByteArray engravingImage() { return QByteArray(); }
 
     qreal unitToMM() const;
@@ -73,6 +73,7 @@ public:
     QRectF bounds() const { return m_bounds; }
     void setBounds(const QRectF& bounds) { m_bounds = bounds; }
 
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
 private:
@@ -89,7 +90,7 @@ public:
     void setRect(const QRectF& rect) { m_rect = rect; }
 
     virtual void draw(QPainter* painter);
-    virtual std::vector<cv::Point2f> cuttingPoints();
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
 
 private:
     QRectF m_rect;
@@ -119,7 +120,7 @@ public:
     QPainterPath path() const { return m_path; }
     void setPath(const QPainterPath& path) { m_path = path; }
 
-    virtual std::vector<cv::Point2f> cuttingPoints();
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
 private:
@@ -135,6 +136,7 @@ public:
     QPolygonF polyline() const { return m_poly; }
     void setPolyline(const QPolygonF& poly) { m_poly = poly; }
 
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
 private:
@@ -150,6 +152,7 @@ public:
     QPolygonF polyline() const { return m_poly; }
     void setPolyline(const QPolygonF& poly) { m_poly = poly; }
 
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
 private:

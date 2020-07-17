@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include <QtMath>
+#include <QSaveFile>
 
 #include <opencv2/opencv.hpp>
 
@@ -72,6 +73,11 @@ void LaserDocument::addItem(LaserItem * item)
 PageInformation LaserDocument::pageInformation() const
 {
     return d_ptr->pageInfo;
+}
+
+void LaserDocument::setPageInformation(const PageInformation & page)
+{
+    d_ptr->pageInfo = page;
 }
 
 QList<LaserItem*> LaserDocument::items() const
@@ -154,6 +160,8 @@ void LaserDocument::setScale(qreal scale)
 
 void LaserDocument::exportJSON()
 {
+    QFile saveFile("export.json");
+
     QJsonObject jsonObj;
 
     QJsonObject laserDocumentInfo;
@@ -161,6 +169,7 @@ void LaserDocument::exportJSON()
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
+    cv::Mat canvas(d_ptr->pageInfo.height() * 40, d_ptr->pageInfo.width() * 40, CV_8U, cv::Scalar(255));
     QJsonObject dataInfo;
     {
         QJsonObject incisionInfo;
@@ -189,7 +198,7 @@ void LaserDocument::exportJSON()
                 QJsonObject itemObj;
                 itemObj["Layer"] = i;
                 itemObj["PrinterDrawUnit"] = 1016;
-                std::vector<cv::Point2f> points = laserItem->cuttingPoints();
+                std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
                 if (!points.empty())
                 {
                     itemObj["Points"] = QString(pltUtils::points2Plt(points));
@@ -252,11 +261,23 @@ void LaserDocument::exportJSON()
         carveInfo["Image"] = imageObj;
         dataInfo["CarveInfo"] = carveInfo;
     }
+    QJsonObject actionObj;
+    actionObj["FinishRun"] = 0;
+    dataInfo["Action"] = actionObj;
 
     jsonObj["DataInfo"] = dataInfo;
 
     QJsonDocument jsonDoc(jsonObj);
-    qDebug().noquote() << jsonDoc.toJson(QJsonDocument::Indented);
+
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    {
+        qWarning("Couldn't open save file.");
+        return;
+    }
+
+    saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
+
+    cv::imwrite("canvas_test.png", canvas);
 }
 
 void LaserDocument::init()

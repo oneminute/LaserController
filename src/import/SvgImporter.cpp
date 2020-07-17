@@ -43,6 +43,11 @@ LaserDocument* SvgImporter::import(const QString & filename)
         docUnit = dialog.pageSizeUnit();
     }
 
+    PageInformation page;
+    page.setWidth(svgSize.width());
+    page.setHeight(svgSize.height());
+    ldoc->setPageInformation(page);
+
     if (!dialog.shapeUnitFromSVG())
     {
         shapeUnit = dialog.shapeSizeUnit();

@@ -2,7 +2,7 @@
 #define PAGEINFORMATION_H
 
 #include <QObject>
-#include <QSharedDataPointer>
+#include <QExplicitlySharedDataPointer>
 
 class PageInformationPrivate;
 
@@ -17,6 +17,7 @@ public:
     };
     explicit PageInformation(QObject* parent = nullptr);
     PageInformation(const PageInformation& other, QObject* parent = nullptr);
+    PageInformation& operator=(const PageInformation& other);
     virtual ~PageInformation();
 
     qreal width() const;
@@ -29,7 +30,7 @@ public:
     void setSetOrientation(Orientation orientation);
 
 private:
-    QSharedDataPointer<PageInformationPrivate> d_ptr;
+    QExplicitlySharedDataPointer<PageInformationPrivate> d_ptr;
     friend class PageInformationPrivate;
 };
 

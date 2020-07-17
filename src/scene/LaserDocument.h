@@ -22,6 +22,7 @@ public:
     void addItem(LaserItem* item);
 
     PageInformation pageInformation() const;
+    void setPageInformation(const PageInformation& page);
 
     QList<LaserItem*> items() const;
 

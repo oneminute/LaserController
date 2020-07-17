@@ -73,6 +73,19 @@ LaserEllipseItem::LaserEllipseItem(const QRectF bounds, LaserDocument * doc, Siz
     m_boundingRect = m_bounds;
 }
 
+std::vector<cv::Point2f> LaserEllipseItem::cuttingPoints(cv::Mat& mat)
+{
+    QPainterPath path;
+
+    path.addEllipse(m_transform.mapRect(m_bounds));
+
+    QTransform transform = QTransform::fromScale(40, 40);
+
+    std::vector<cv::Point2f> points;
+    pltUtils::pathPoints(path, points, mat);
+    return points;
+}
+
 void LaserEllipseItem::draw(QPainter* painter)
 {
     painter->drawEllipse(m_bounds);
@@ -90,10 +103,24 @@ void LaserRectItem::draw(QPainter* painter)
     painter->drawRect(m_rect);
 }
 
-std::vector<cv::Point2f> LaserRectItem::cuttingPoints()
+std::vector<cv::Point2f> LaserRectItem::cuttingPoints(cv::Mat& mat)
 {
     std::vector<cv::Point2f> points;
-    Eigen::Matrix3d transform;
+    QPainterPath path;
+    QPolygonF poly;
+    poly.append(m_transform.map(m_rect.topLeft()));
+    poly.append(m_transform.map(m_rect.topRight()));
+    poly.append(m_transform.map(m_rect.bottomRight()));
+    poly.append(m_transform.map(m_rect.bottomLeft()));
+    poly.append(m_transform.map(m_rect.topLeft()));
+    path.addPolygon(poly);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+
+    pltUtils::pathPoints(path, points, mat);
+
+    /*Eigen::Matrix3d transform;
     transform << m_transform.m11(), m_transform.m21(), m_transform.m31(),
         m_transform.m12(), m_transform.m22(), m_transform.m32(),
         m_transform.m13(), m_transform.m23(), m_transform.m33();
@@ -104,7 +131,7 @@ std::vector<cv::Point2f> LaserRectItem::cuttingPoints()
     points.push_back(points[0]);
     std::cout << points[count - 1] << std::endl;
     std::cout << points[count] << std::endl;
-    std::cout << points[0] << std::endl;
+    std::cout << points[0] << std::endl;*/
 
     return points;
 }
@@ -128,29 +155,17 @@ LaserPathItem::LaserPathItem(const QPainterPath & path, LaserDocument * doc, Siz
     m_boundingRect = path.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPathItem::cuttingPoints()
+std::vector<cv::Point2f> LaserPathItem::cuttingPoints(cv::Mat& mat)
 {
-    //qDebug() << "LaserPathItem:" << m_path.elementCount();
-    //cv::Mat canvas(270 * 40, 210 * 40, CV_8U, cv::Scalar(0));
-
     std::vector<cv::Point2f> points;
-    QTransform transform = m_transform.scale(40, 40);
-    QPainterPath path = transform.map(m_path);
+    if (m_path.pointAtPercent(0) != m_path.pointAtPercent(1))
+        m_path.lineTo(m_path.pointAtPercent(0));
+    QPainterPath path = m_transform.map(m_path);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
     
-    qreal length = path.length();
-    QPointF lastPt;
-    for (int i = 0; i < length + 1; i++)
-    {
-        QPointF pt = path.pointAtPercent(i / length);
-        if (pt != lastPt)
-        {
-            points.push_back(cv::Point2f(pt.x(), pt.y()));
-        }
-    }
-    if (points[0] != points[points.size() - 1])
-    {
-        points.push_back(points[0]);
-    }
+    pltUtils::pathPoints(path, points, mat);
     
     return points;
 }
@@ -167,6 +182,24 @@ LaserPolylineItem::LaserPolylineItem(const QPolygonF & poly, LaserDocument * doc
     m_boundingRect = m_poly.boundingRect();
 }
 
+std::vector<cv::Point2f> LaserPolylineItem::cuttingPoints(cv::Mat & mat)
+{
+    std::vector<cv::Point2f> points;
+    QPolygonF poly(m_poly);
+    if (poly.first() != poly.last())
+        poly.append(poly.first());
+    QPainterPath path;
+    path.addPolygon(poly);
+    path = m_transform.map(path);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+    
+    pltUtils::pathPoints(path, points, mat);
+    
+    return points;
+}
+
 void LaserPolylineItem::draw(QPainter * painter)
 {
     painter->drawPolyline(m_poly);
@@ -177,6 +210,24 @@ LaserPolygonItem::LaserPolygonItem(const QPolygonF & poly, LaserDocument * doc, 
     , m_poly(poly)
 {
     m_boundingRect = m_poly.boundingRect();
+}
+
+std::vector<cv::Point2f> LaserPolygonItem::cuttingPoints(cv::Mat & mat)
+{
+    std::vector<cv::Point2f> points;
+    QPolygonF poly(m_poly);
+    if (poly.first() != poly.last())
+        poly.append(poly.first());
+    QPainterPath path;
+    path.addPolygon(poly);
+    path = m_transform.map(path);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+    
+    pltUtils::pathPoints(path, points, mat);
+    
+    return points;
 }
 
 void LaserPolygonItem::draw(QPainter * painter)
