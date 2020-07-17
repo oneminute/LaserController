@@ -23,6 +23,7 @@ public:
 
     PageInformation pageInformation() const;
     void setPageInformation(const PageInformation& page);
+    QRectF pageBounds() const;
 
     QList<LaserItem*> items() const;
 

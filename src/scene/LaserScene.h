@@ -18,13 +18,13 @@ public:
     void updateDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
 
-    //void draw(LaserViewer* view, QPaintEvent* event);
     LaserDocument* document() { return m_doc; }
 
 private:
 
 private:
     LaserDocument* m_doc;
+    QGraphicsRectItem* m_background;
 };
 
 #endif // LASERSCENE_H

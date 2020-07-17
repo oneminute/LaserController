@@ -80,6 +80,11 @@ void LaserDocument::setPageInformation(const PageInformation & page)
     d_ptr->pageInfo = page;
 }
 
+QRectF LaserDocument::pageBounds() const
+{
+    return QRectF(0, 0, d_ptr->pageInfo.width(), d_ptr->pageInfo.height());
+}
+
 QList<LaserItem*> LaserDocument::items() const
 {
     return d_ptr->items;

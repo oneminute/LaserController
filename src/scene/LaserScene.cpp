@@ -33,6 +33,8 @@ void LaserScene::updateDocument(LaserDocument * doc)
         this->addItem(*i);
     }
     m_doc = doc;
+
+    m_background = addRect(m_doc->pageBounds(), QPen(Qt::gray, 0.2f, Qt::SolidLine));
 }
 
 void LaserScene::clearDocument(bool delDoc)
@@ -46,14 +48,3 @@ void LaserScene::clearDocument(bool delDoc)
     }
 }
 
-//void LaserScene::draw(LaserViewer* view, QPaintEvent * event)
-//{
-//    if (!m_doc)
-//        return;
-//
-//    QList<LaserItem*> items = m_doc->items();
-//    /*for (QList<LaserItem*>::iterator i = items.begin(); i != items.end(); i++)
-//    {
-//        (*i)->draw(view, event);
-//    }*/
-//}
