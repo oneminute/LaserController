@@ -3,6 +3,7 @@
 #include <QSharedData>
 #include <QPaintEvent>
 #include <QBuffer>
+#include <QtMath>
 
 #include <opencv2/opencv.hpp>
 #include <Eigen/Core>
@@ -58,20 +59,6 @@ QPointF LaserItem::laserStartPos() const
 }
 
 qreal LaserItem::unitToMM() const { return unitUtils::unitToMM(m_unit); }
-
-//LaserArcItem::LaserArcItem(const QPainterPath & path, LaserDocument* doc, SizeUnit unit)
-//    : LaserShapeItem(doc, unit)
-//    , m_path(path)
-//{
-//}
-//
-//LaserArcItem::~LaserArcItem()
-//{
-//}
-//
-//void LaserArcItem::draw(QPainter* painter)
-//{
-//}
 
 LaserShapeItem::LaserShapeItem(LaserDocument* doc, SizeUnit unit)
     : LaserItem(doc, unit)
@@ -139,13 +126,33 @@ LaserPathItem::LaserPathItem(const QPainterPath & path, LaserDocument * doc, Siz
     , m_path(path)
 {
     m_boundingRect = path.boundingRect();
+}
 
-    qDebug() << "LaserPathItem:" << path.elementCount();
-    for (int i = 0; i < path.elementCount(); i++)
+std::vector<cv::Point2f> LaserPathItem::cuttingPoints()
+{
+    //qDebug() << "LaserPathItem:" << m_path.elementCount();
+    //cv::Mat canvas(270 * 40, 210 * 40, CV_8U, cv::Scalar(0));
+
+    std::vector<cv::Point2f> points;
+    QTransform transform = m_transform.scale(40, 40);
+    QPainterPath path = transform.map(m_path);
+    
+    qreal length = path.length();
+    QPointF lastPt;
+    for (int i = 0; i < length + 1; i++)
     {
-        QPainterPath::Element element = path.elementAt(i);
-        qDebug() << i << element.type << element.x << element.y;
+        QPointF pt = path.pointAtPercent(i / length);
+        if (pt != lastPt)
+        {
+            points.push_back(cv::Point2f(pt.x(), pt.y()));
+        }
     }
+    if (points[0] != points[points.size() - 1])
+    {
+        points.push_back(points[0]);
+    }
+    
+    return points;
 }
 
 void LaserPathItem::draw(QPainter * painter)

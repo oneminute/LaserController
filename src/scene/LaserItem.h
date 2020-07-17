@@ -64,22 +64,6 @@ private:
     Q_DISABLE_COPY(LaserShapeItem);
 };
 
-//class LaserArcItem : public LaserShapeItem
-//{
-//public:
-//    LaserArcItem(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
-//    virtual ~LaserArcItem();
-//
-//    QPainterPath path() const { return m_path; }
-//    void setPath(const QPainterPath& path) { m_path = path; }
-//
-//    virtual void draw(QPainter* painter);
-//
-//private:
-//    QPainterPath m_path;
-//    Q_DISABLE_COPY(LaserArcItem);
-//};
-
 class LaserEllipseItem : public LaserShapeItem
 {
 public:
@@ -135,6 +119,7 @@ public:
     QPainterPath path() const { return m_path; }
     void setPath(const QPainterPath& path) { m_path = path; }
 
+    virtual std::vector<cv::Point2f> cuttingPoints();
     virtual void draw(QPainter* painter);
 
 private:
