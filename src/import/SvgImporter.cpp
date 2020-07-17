@@ -83,7 +83,6 @@ LaserDocument* SvgImporter::import(const QString & filename)
             }
         }
             break;
-        case QSvgNode::ARC:
         case QSvgNode::CIRCLE:
         case QSvgNode::ELLIPSE:
         {
@@ -97,6 +96,7 @@ LaserDocument* SvgImporter::import(const QString & filename)
             item = new LaserLineItem(svgLineNode->line(), ldoc, shapeUnit);
         }
             break;
+        case QSvgNode::ARC:
         case QSvgNode::PATH:
         {
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
@@ -129,19 +129,9 @@ LaserDocument* SvgImporter::import(const QString & filename)
         }
         case QSvgNode::TEXT:
         case QSvgNode::TEXTAREA:
-        /*{
-            if (node->hasStyle())
-            {
-                qDebug() << "    type:" << node->type() << ", display:" << node->displayMode() 
-                    << node->styleProperty(QSvgStyleProperty::STROKE)
-                    << node->transformedBounds();
-                renderer = new QSvgRenderer(node);
-            }
-        }*/
             break;
         case QSvgNode::IMAGE:
         {
-            //renderer = new QSvgRenderer(node);
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
             item = new LaserBitmapItem(svgImageNode->image(), svgImageNode->imageBounds(), ldoc, shapeUnit);
         }
@@ -150,23 +140,11 @@ LaserDocument* SvgImporter::import(const QString & filename)
             break;
         }
 
-        /*if (renderer)
-        {
-            renderers.append(renderer);
-        }*/
         if (item)
         {
             QTransform t;
             qreal ratio = unitUtils::unitToMM(item->unit());
-            /*if (node->hasStyle())
-            {
-                QSvgStyleProperty* style = node->styleProperty(QSvgStyleProperty::TRANSFORM);
-                if (style)
-                {
-                    QSvgTransformStyle* tStyle = reinterpret_cast<QSvgTransformStyle*>(style);
-                    t = tStyle->qtransform();
-                }
-            }*/
+            
             t = node->getCascadeTransform();
             qreal scaleX = ratio;
             qreal scaleY = ratio;

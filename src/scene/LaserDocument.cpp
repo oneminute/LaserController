@@ -2,9 +2,18 @@
 
 #include <QSharedData>
 #include <QList>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QDateTime>
+#include <QtMath>
+
+#include <opencv2/opencv.hpp>
 
 #include "LaserItem.h"
 #include "PageInformation.h"
+#include "laser/LaserDriver.h"
+#include "util/PltUtils.h"
 
 class LaserDocumentPrivate: public QSharedData
 {
@@ -141,6 +150,113 @@ qreal LaserDocument::scale() const
 void LaserDocument::setScale(qreal scale)
 {
     d_ptr->scale = scale;
+}
+
+void LaserDocument::exportJSON()
+{
+    QJsonObject jsonObj;
+
+    QJsonObject laserDocumentInfo;
+    laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
+    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
+
+    QJsonObject dataInfo;
+    {
+        QJsonObject incisionInfo;
+        QJsonArray layerInfo;
+        QJsonObject polygonObj;
+        QJsonArray elementsArray;
+        for (int i = 0; i < d_ptr->cuttingLayers.size(); i++)
+        {
+            LaserLayer layer = d_ptr->cuttingLayers[i];
+            //QString layerId = "Layer" + QString::number(i + 1);
+            QJsonObject layerObj;
+            layerObj["LayerId"] = i;
+            layerObj["MinSpeed"] = layer.minSpeed();
+            layerObj["RunSpeed"] = layer.runSpeed();
+            layerObj["MoveSpeed"] = layer.moveSpeed();
+            layerObj["LaserPower"] = layer.laserPower();
+            layerObj["MinSpeedPower"] = layer.minSpeedPower();
+            layerObj["RunSpeedPower"] = layer.runSpeedPower();
+            //layerInfo[layerId] = layerObj;
+            layerInfo.append(layerObj);
+
+            QList<LaserItem*> laserItems = layer.items();
+            for (int li = 0; li < laserItems.size(); li++)
+            {
+                LaserItem* laserItem = laserItems[li];
+                QJsonObject itemObj;
+                itemObj["Layer"] = i;
+                itemObj["PrinterDrawUnit"] = 1016;
+                std::vector<cv::Point2f> points = laserItem->cuttingPoints();
+                if (!points.empty())
+                {
+                    itemObj["Points"] = QString(pltUtils::points2Plt(points));
+                    elementsArray.append(itemObj);
+                }
+            }
+        }
+        polygonObj["Elements"] = elementsArray;
+        incisionInfo["LayerInfo"] = layerInfo;
+        incisionInfo["Polygon"] = polygonObj;
+        dataInfo["IncisionInfo"] = incisionInfo;
+    }
+    {
+        QJsonObject carveInfo;
+        QJsonArray layerInfo;
+        QJsonObject imageObj;
+        QJsonArray elementsArray;
+        for (int i = 0; i < d_ptr->engravingLayers.size(); i++)
+        {
+            LaserLayer layer = d_ptr->engravingLayers[i];
+            //QString layerId = "Layer" + QString::number(i + 1);
+            QJsonObject layerObj;
+            layerObj["CarveForward"] = layer.engravingForward();
+            layerObj["CarveStyle"] = layer.engravingStyle();
+            layerObj["MinSpeed"] = layer.minSpeed();
+            layerObj["RunSpeed"] = layer.runSpeed();
+            layerObj["LaserPower"] = layer.laserPower();
+
+            layerObj["HStep"] = layer.lineSpacing();
+            layerObj["LStep"] = layer.columnSpacing();
+            //layerObj["StartX"] = layer.startX();
+            //layerObj["StartY"] = layer.startY();
+            layerObj["ErrorX"] = layer.errorX();
+            layerObj["ErrorY"] = layer.errorY();
+            //layerInfo[layerId] = layerObj;
+            layerInfo.append(layerObj);
+
+            QList<LaserItem*> laserItems = layer.items();
+            for (int li = 0; li < laserItems.size(); li++)
+            {
+                LaserItem* laserItem = laserItems[li];
+                QJsonObject itemObj;
+
+                itemObj["Layer"] = i;
+                itemObj["ImageFormat"] = "png";
+                QPointF pos = laserItem->laserStartPos();
+                itemObj["StartX"] = qFloor(pos.x());
+                itemObj["StartY"] = qFloor(pos.y());
+                
+                QByteArray data = laserItem->engravingImage();
+                if (!data.isEmpty())
+                {
+                    itemObj["ImageData"] = QString(data.toBase64());
+                    elementsArray.append(itemObj);
+                }
+            }
+        }
+        imageObj["Elements"] = elementsArray;
+        carveInfo["LayerInfo"] = layerInfo;
+        carveInfo["Image"] = imageObj;
+        dataInfo["CarveInfo"] = carveInfo;
+    }
+
+    jsonObj["DataInfo"] = dataInfo;
+
+    QJsonDocument jsonDoc(jsonObj);
+    qDebug().noquote() << jsonDoc.toJson(QJsonDocument::Indented);
 }
 
 void LaserDocument::init()

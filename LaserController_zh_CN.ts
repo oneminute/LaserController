@@ -203,52 +203,87 @@ Would you like to overwrite it?</source>
         <translation type="unfinished">文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="38"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="39"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="50"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="52"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="59"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="61"/>
         <source>Items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="68"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="70"/>
         <source>Layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="89"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="96"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="103"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="86"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="29"/>
+        <source>V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="91"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="29"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="101"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="108"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="115"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="127"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="139"/>
         <source>Propergies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="136"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="148"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="141"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="144"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="153"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="156"/>
         <source>Import SVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="33"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="42"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="161"/>
+        <source>Export JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="29"/>
+        <source>T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="149"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="158"/>
         <source>Open SVG File</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LaserDocument</name>
+    <message>
+        <location filename="src/scene/LaserDocument.cpp" line="114"/>
+        <source>Engraving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserDocument.cpp" line="118"/>
+        <source>Cutting</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -265,57 +300,131 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="26"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="38"/>
         <source>Layer Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="36"/>
-        <source>Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="45"/>
-        <location filename="src/ui/LaserLayerDialog.ui" line="183"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="123"/>
         <source>Engraving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="52"/>
-        <location filename="src/ui/LaserLayerDialog.ui" line="224"/>
-        <source>Cutting</source>
+        <location filename="src/ui/LaserLayerDialog.ui" line="135"/>
+        <source>Line Spacing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="74"/>
-        <source>Min Speed</source>
+        <location filename="src/ui/LaserLayerDialog.ui" line="157"/>
+        <source>10</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="108"/>
-        <source>Run Speed</source>
+        <location filename="src/ui/LaserLayerDialog.ui" line="170"/>
+        <source>Engraving Forward</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="146"/>
-        <source>Laser Power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="189"/>
-        <location filename="src/ui/LaserLayerDialog.ui" line="230"/>
-        <source>TextLabel</source>
+        <location filename="src/ui/LaserLayerDialog.ui" line="187"/>
+        <source>Engraving Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/ui/LaserLayerDialog.ui" line="196"/>
-        <location filename="src/ui/LaserLayerDialog.ui" line="199"/>
-        <source>A widget combined Horizontal Slider and Line Edit.</source>
+        <source>By Row</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserLayerDialog.ui" line="208"/>
-        <source>70</source>
+        <location filename="src/ui/LaserLayerDialog.ui" line="206"/>
+        <source>By Column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="228"/>
+        <source>Column Spacing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="251"/>
+        <source>Start X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="271"/>
+        <source>Start Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="291"/>
+        <source>Error X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="329"/>
+        <source>Error Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="367"/>
+        <source>Cutting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="385"/>
+        <source>Move Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="408"/>
+        <source>Min Speed Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="415"/>
+        <source>Run Speed Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="48"/>
+        <source>Min Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="71"/>
+        <source>Run Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="94"/>
+        <source>Laser Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserLayerDialog.ui" line="55"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="58"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="78"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="81"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="101"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="104"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="142"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="145"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="235"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="238"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="258"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="261"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="278"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="281"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="298"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="301"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="336"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="339"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="392"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="395"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="422"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="425"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="438"/>
+        <location filename="src/ui/LaserLayerDialog.ui" line="441"/>
+        <source>A widget combined Horizontal Slider and Line Edit.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -11,6 +11,8 @@
 #include <QPolygonF>
 #include <QPainterPath>
 
+#include <opencv2/opencv.hpp>
+
 class LaserDocument;
 class LaserScene;
 class QPaintEvent;
@@ -29,7 +31,12 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
     virtual QRectF boundingRect() const override;
+    QPointF laserStartPos() const;
+
     virtual void draw(QPainter* painter) = 0;
+
+    virtual std::vector<cv::Point2f> cuttingPoints() { return std::vector<cv::Point2f>(); }
+    virtual QByteArray engravingImage() { return QByteArray(); }
 
     qreal unitToMM() const;
 
@@ -57,21 +64,21 @@ private:
     Q_DISABLE_COPY(LaserShapeItem);
 };
 
-class LaserArcItem : public LaserShapeItem
-{
-public:
-    LaserArcItem(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
-    virtual ~LaserArcItem();
-
-    QPainterPath path() const { return m_path; }
-    void setPath(const QPainterPath& path) { m_path = path; }
-
-    virtual void draw(QPainter* painter);
-
-private:
-    QPainterPath m_path;
-    Q_DISABLE_COPY(LaserArcItem);
-};
+//class LaserArcItem : public LaserShapeItem
+//{
+//public:
+//    LaserArcItem(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+//    virtual ~LaserArcItem();
+//
+//    QPainterPath path() const { return m_path; }
+//    void setPath(const QPainterPath& path) { m_path = path; }
+//
+//    virtual void draw(QPainter* painter);
+//
+//private:
+//    QPainterPath m_path;
+//    Q_DISABLE_COPY(LaserArcItem);
+//};
 
 class LaserEllipseItem : public LaserShapeItem
 {
@@ -97,8 +104,8 @@ public:
     QRectF rect() const { return m_rect; }
     void setRect(const QRectF& rect) { m_rect = rect; }
 
-    //virtual QRectF boundingRect() const override;
     virtual void draw(QPainter* painter);
+    virtual std::vector<cv::Point2f> cuttingPoints();
 
 private:
     QRectF m_rect;
@@ -113,7 +120,6 @@ public:
     QLineF line() const { return m_line; }
     void setLine(const QLineF& line) { m_line = line; }
 
-    //virtual QRectF boundingRect() const override;
     virtual void draw(QPainter* painter);
 
 private:
@@ -129,7 +135,6 @@ public:
     QPainterPath path() const { return m_path; }
     void setPath(const QPainterPath& path) { m_path = path; }
 
-    //virtual QRectF boundingRect() const override;
     virtual void draw(QPainter* painter);
 
 private:
@@ -145,7 +150,6 @@ public:
     QPolygonF polyline() const { return m_poly; }
     void setPolyline(const QPolygonF& poly) { m_poly = poly; }
 
-    //virtual QRectF boundingRect() const override;
     virtual void draw(QPainter* painter);
 
 private:
@@ -161,7 +165,6 @@ public:
     QPolygonF polyline() const { return m_poly; }
     void setPolyline(const QPolygonF& poly) { m_poly = poly; }
 
-    //virtual QRectF boundingRect() const override;
     virtual void draw(QPainter* painter);
 
 private:
@@ -177,6 +180,9 @@ public:
     QImage image() const { return m_image; }
     void setImage(const QImage& image) { m_image = m_image; }
 
+    QRectF bounds() const { return m_bounds; }
+
+    virtual QByteArray engravingImage();
     virtual void draw(QPainter* painter);
 
 private:

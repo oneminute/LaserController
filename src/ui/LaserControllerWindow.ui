@@ -29,6 +29,7 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionImportSVG"/>
+    <addaction name="actionExportJSON"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -44,6 +45,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionImportSVG"/>
+   <addaction name="actionExportJSON"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetTools">
    <property name="windowTitle">
@@ -152,6 +155,11 @@
    </property>
    <property name="toolTip">
     <string>Import SVG</string>
+   </property>
+  </action>
+  <action name="actionExportJSON">
+   <property name="text">
+    <string>Export JSON</string>
    </property>
   </action>
  </widget>

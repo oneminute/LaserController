@@ -2,8 +2,13 @@
 
 #include <QSharedData>
 #include <QPaintEvent>
+#include <QBuffer>
+
+#include <opencv2/opencv.hpp>
+#include <Eigen/Core>
 
 #include "LaserScene.h"
+#include "util/PltUtils.h"
 #include "util/UnitUtils.h"
 #include "widget/LaserViewer.h"
 #include "scene/LaserDocument.h"
@@ -45,21 +50,28 @@ QRectF LaserItem::boundingRect() const
     return bounds;
 }
 
+QPointF LaserItem::laserStartPos() const
+{
+    QPointF pos = boundingRect().topLeft();
+    pos *= 40;
+    return pos;
+}
+
 qreal LaserItem::unitToMM() const { return unitUtils::unitToMM(m_unit); }
 
-LaserArcItem::LaserArcItem(const QPainterPath & path, LaserDocument* doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
-    , m_path(path)
-{
-}
-
-LaserArcItem::~LaserArcItem()
-{
-}
-
-void LaserArcItem::draw(QPainter* painter)
-{
-}
+//LaserArcItem::LaserArcItem(const QPainterPath & path, LaserDocument* doc, SizeUnit unit)
+//    : LaserShapeItem(doc, unit)
+//    , m_path(path)
+//{
+//}
+//
+//LaserArcItem::~LaserArcItem()
+//{
+//}
+//
+//void LaserArcItem::draw(QPainter* painter)
+//{
+//}
 
 LaserShapeItem::LaserShapeItem(LaserDocument* doc, SizeUnit unit)
     : LaserItem(doc, unit)
@@ -91,6 +103,25 @@ void LaserRectItem::draw(QPainter* painter)
     painter->drawRect(m_rect);
 }
 
+std::vector<cv::Point2f> LaserRectItem::cuttingPoints()
+{
+    std::vector<cv::Point2f> points;
+    Eigen::Matrix3d transform;
+    transform << m_transform.m11(), m_transform.m21(), m_transform.m31(),
+        m_transform.m12(), m_transform.m22(), m_transform.m32(),
+        m_transform.m13(), m_transform.m23(), m_transform.m33();
+    int count = pltUtils::linePoints(m_rect.topLeft().x(), m_rect.topLeft().y(), m_rect.topRight().x(), m_rect.topRight().y(), points, 40, transform);
+    count += pltUtils::linePoints(m_rect.topRight().x(), m_rect.topRight().y(), m_rect.bottomRight().x(), m_rect.bottomRight().y(), points, 40, transform);
+    count += pltUtils::linePoints(m_rect.bottomRight().x(), m_rect.bottomRight().y(), m_rect.bottomLeft().x(), m_rect.bottomLeft().y(), points, 40, transform);
+    count += pltUtils::linePoints(m_rect.bottomLeft().x(), m_rect.bottomLeft().y(), m_rect.topLeft().x(), m_rect.topLeft().y(), points, 40, transform);
+    points.push_back(points[0]);
+    std::cout << points[count - 1] << std::endl;
+    std::cout << points[count] << std::endl;
+    std::cout << points[0] << std::endl;
+
+    return points;
+}
+
 LaserLineItem::LaserLineItem(const QLineF & line, LaserDocument * doc, SizeUnit unit)
     : LaserShapeItem(doc, unit)
     , m_line(line)
@@ -108,6 +139,13 @@ LaserPathItem::LaserPathItem(const QPainterPath & path, LaserDocument * doc, Siz
     , m_path(path)
 {
     m_boundingRect = path.boundingRect();
+
+    qDebug() << "LaserPathItem:" << path.elementCount();
+    for (int i = 0; i < path.elementCount(); i++)
+    {
+        QPainterPath::Element element = path.elementAt(i);
+        qDebug() << i << element.type << element.x << element.y;
+    }
 }
 
 void LaserPathItem::draw(QPainter * painter)
@@ -146,6 +184,15 @@ LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, Las
 {
     m_boundingRect = m_bounds;
     m_type = LIT_BITMAP;
+}
+
+QByteArray LaserBitmapItem::engravingImage() 
+{ 
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    m_image.save(&buffer, "PNG");
+    return ba; 
 }
 
 void LaserBitmapItem::draw(QPainter * painter)

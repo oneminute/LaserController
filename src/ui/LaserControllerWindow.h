@@ -27,6 +27,7 @@ protected slots:
     void onToolButtonAddEngravingLayer(bool checked = false);
     void onToolButtonAddCuttingLayer(bool checked = false);
     void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onActionExportJson(bool checked = false);
 
     void updateLayers();
 

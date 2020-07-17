@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QTreeWidgetItem>
 
+#include "laser/LaserDriver.h"
 #include "import/Importer.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
@@ -32,6 +33,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->toolButtonAddEngravingLayer, &QToolButton::clicked, this, &LaserControllerWindow::onToolButtonAddEngravingLayer);
     connect(m_ui->toolButtonAddCuttingLayer, &QToolButton::clicked, this, &LaserControllerWindow::onToolButtonAddCuttingLayer);
     connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
+    connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
+
+    LaserDriver::instance().load();
+    LaserDriver::instance().init(this->winId());
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -91,6 +96,11 @@ void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem 
         LaserItemType type = (LaserItemType)item->data(1, Qt::UserRole).toInt();
         qDebug() << type;
     }
+}
+
+void LaserControllerWindow::onActionExportJson(bool checked)
+{
+    m_scene->document()->exportJSON();
 }
 
 void LaserControllerWindow::updateLayers()
