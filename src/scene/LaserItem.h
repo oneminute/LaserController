@@ -34,6 +34,8 @@ public:
     QPointF laserStartPos() const;
 
     virtual void draw(QPainter* painter) = 0;
+    virtual LaserItemType type() = 0;
+    virtual QString typeName() = 0;
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat()) { return std::vector<cv::Point2f>(); }
     virtual QByteArray engravingImage() { return QByteArray(); }
@@ -41,7 +43,7 @@ public:
     qreal unitToMM() const;
 
     LaserItemType laserItemType() const { return m_type; }
-    bool isShape() const { return m_type == LIT_SHAPE; }
+    bool isShape() const { return (int)m_type <= (int)LIT_SHAPE; }
     bool isBitmap() const { return m_type == LIT_BITMAP; }
 
 protected:
@@ -75,6 +77,8 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
+    virtual LaserItemType type() { return LIT_ELLIPSE; }
+    virtual QString typeName() { return "Ellipse"; }
 
 private:
     QRectF m_bounds;
@@ -91,6 +95,8 @@ public:
 
     virtual void draw(QPainter* painter);
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
+    virtual LaserItemType type() { return LIT_RECT; }
+    virtual QString typeName() { return "Rect"; }
 
 private:
     QRectF m_rect;
@@ -106,6 +112,8 @@ public:
     void setLine(const QLineF& line) { m_line = line; }
 
     virtual void draw(QPainter* painter);
+    virtual LaserItemType type() { return LIT_LINE; }
+    virtual QString typeName() { return "Line"; }
 
 private:
     QLineF m_line;
@@ -122,6 +130,8 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
+    virtual LaserItemType type() { return LIT_PATH; }
+    virtual QString typeName() { return "Path"; }
 
 private:
     QPainterPath m_path;
@@ -138,6 +148,8 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
+    virtual LaserItemType type() { return LIT_POLYLINE; }
+    virtual QString typeName() { return "Polyline"; }
 
 private:
     QPolygonF m_poly;
@@ -154,6 +166,8 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
+    virtual LaserItemType type() { return LIT_POLYGON; }
+    virtual QString typeName() { return "Polygon"; }
 
 private:
     QPolygonF m_poly;
@@ -172,6 +186,8 @@ public:
 
     virtual QByteArray engravingImage();
     virtual void draw(QPainter* painter);
+    virtual LaserItemType type() { return LIT_BITMAP; }
+    virtual QString typeName() { return "Bitmap"; }
 
 private:
     QImage m_image;

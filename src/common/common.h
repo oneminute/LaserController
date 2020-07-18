@@ -66,6 +66,13 @@ enum PageType {
 
 enum LaserItemType
 {
+    LIT_LINE,
+    LIT_CIRCLE,
+    LIT_ELLIPSE,
+    LIT_RECT,
+    LIT_POLYLINE,
+    LIT_POLYGON,
+    LIT_PATH,
     LIT_SHAPE,
     LIT_BITMAP
 };

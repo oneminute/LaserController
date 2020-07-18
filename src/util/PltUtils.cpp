@@ -2,6 +2,7 @@
 
 #include <QtMath>
 
+#include "TypeUtils.h"
 //void pltUtils::linePoints(const Eigen::Vector2d & p1, const Eigen::Vector2d & p2, QVector<Eigen::Vector2d> points, qreal factor)
 //{
 //    Eigen::Vector2d ptBegin = p1 * factor;
@@ -48,20 +49,46 @@ int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector
 int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& points, cv::Mat& canvas)
 {
     qreal length = path.length();
-    QPointF lastPt;
-    for (int i = 0; i < length + 1; i++)
+    QPointF lastAnchor;
+    QPointF lastPt = path.pointAtPercent(0);
+    lastAnchor = lastPt;
+    points.push_back(typeUtils::qtPointF2CVPoint2f(lastPt));
+    QPointF pt;
+
+    int count = 1;
+
+    for (int i = 1; i < length; i++)
     {
-        QPointF pt = path.pointAtPercent(i / length);
-        if (pt != lastPt)
+        pt = path.pointAtPercent(i / length);
+
+        if (qFloor(pt.x()) == qFloor(lastPt.x()) && qFloor(pt.y()) == qFloor(lastPt.y()))
         {
-            cv::Point2f cvPt(pt.x(), pt.y());
-            if (!canvas.empty() && pt.x() >= 0 && pt.x() < canvas.cols && pt.y() >= 0 && pt.y() < canvas.rows)
-            {
-                canvas.at<uchar>(cvPt) = 0;
-            }
-            points.push_back(cvPt);
+            continue;
         }
+
+        if (qFloor(pt.x()) == qFloor(lastAnchor.x()) || qFloor(pt.y()) == qFloor(lastAnchor.y()))
+        {
+            lastPt = pt;
+            count++;
+            continue;
+        }
+
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastAnchor), typeUtils::qtPointF2CVPoint2f(lastPt), cv::Scalar(0));
+        if (count > 1)
+        {
+            points.push_back(typeUtils::qtPointF2CVPoint2f(lastPt));
+        }
+        points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
+        lastAnchor = pt;
+        lastPt = pt;
+        count = 1;
     }
+
+    pt = path.pointAtPercent(1.0);
+    points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
+    cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastAnchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
+    cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
+
     if (points[0] != points[points.size() - 1])
     {
         points.push_back(points[0]);
@@ -76,11 +103,11 @@ QByteArray pltUtils::points2Plt(const std::vector<cv::Point2f>& points)
         return buffer;
 
     cv::Point2f pt = points[0];
-    buffer.append(QString("PU%1 %2;").arg(qFloor(pt.x)).arg(qFloor(pt.y)));
+    buffer.append(QString("PU%1 %2;").arg(qFloor(pt.x)).arg(-qFloor(pt.y)));
     for (int i = 0; i < points.size(); i++)
     {
         pt = points[i];
-        buffer.append(QString("PD%1 %2;").arg(qFloor(pt.x)).arg(qFloor(pt.y)));
+        buffer.append(QString("PD%1 %2;").arg(qFloor(pt.x)).arg(-qFloor(pt.y)));
     }
     return buffer;
 }
