@@ -116,7 +116,6 @@ std::vector<cv::Point2f> LaserRectItem::cuttingPoints(cv::Mat& mat)
     points.push_back(pt2);
     points.push_back(pt3);
     points.push_back(pt4);
-    points.push_back(pt1);
 
     cv::line(mat, pt1, pt2, cv::Scalar(0));
     cv::line(mat, pt2, pt3, cv::Scalar(0));

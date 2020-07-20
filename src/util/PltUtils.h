@@ -19,6 +19,8 @@ namespace pltUtils
     QByteArray points2Plt(const std::vector<cv::Point2f>& points);
 
     QByteArray image2Plt(const QImage& image);
+
+    bool pointsEql(const QPointF& pt1, const QPointF& pt2);
 }
 
 #endif // PLTUTILS_H

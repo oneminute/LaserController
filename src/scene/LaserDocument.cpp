@@ -175,7 +175,7 @@ void LaserDocument::exportJSON()
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layerInfo;
-    cv::Mat canvas(d_ptr->pageInfo.height() * 40, d_ptr->pageInfo.width() * 40, CV_8U, cv::Scalar(255));
+    cv::Mat canvas(d_ptr->pageInfo.height() * 40, d_ptr->pageInfo.width() * 40, CV_8UC3, cv::Scalar(255, 255, 255));
     int layerId = 0;
     QJsonObject dataInfo;
     {
@@ -234,7 +234,6 @@ void LaserDocument::exportJSON()
             layerObj["MinSpeed"] = layer.minSpeed();
             layerObj["RunSpeed"] = layer.runSpeed();
             layerObj["LaserPower"] = layer.laserPower();
-
             layerObj["HStep"] = layer.lineSpacing();
             layerObj["LStep"] = layer.columnSpacing();
             layerObj["ErrorX"] = layer.errorX();
@@ -273,7 +272,6 @@ void LaserDocument::exportJSON()
             }
         }
         imageObj["Elements"] = elementsArray;
-        //carveInfo["LayerInfo"] = layerInfo;
         carveInfo["Image"] = imageObj;
         dataInfo["CarveInfo"] = carveInfo;
         layerId++;

@@ -49,50 +49,54 @@ int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector
 int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& points, cv::Mat& canvas)
 {
     qreal length = path.length();
-    QPointF lastAnchor;
-    QPointF lastPt = path.pointAtPercent(0);
-    lastAnchor = lastPt;
-    points.push_back(typeUtils::qtPointF2CVPoint2f(lastPt));
-    QPointF pt;
 
-    int count = 1;
+    QPointF pt = path.pointAtPercent(0);
+    qreal slope = path.slopeAtPercent(0);
+    qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
+
+    QPointF startPt = pt;
+    std::cout << std::setw(8) << slope << radians << std::endl;
+
+    QPointF anchor = pt;
+    qreal anchorSlope = slope;
+    qreal anchorRadians = radians;
+
+    points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
+    cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
 
     for (int i = 1; i < length; i++)
     {
-        pt = path.pointAtPercent(i / length);
+        qreal percent = i / length;
+        pt = path.pointAtPercent(percent);
+        slope = path.slopeAtPercent(percent);
+        radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
 
-        if (qFloor(pt.x()) == qFloor(lastPt.x()) && qFloor(pt.y()) == qFloor(lastPt.y()))
-        {
-            continue;
-        }
+        std::cout << std::setw(8) << slope << radians << std::endl;
 
-        if (qFloor(pt.x()) == qFloor(lastAnchor.x()) || qFloor(pt.y()) == qFloor(lastAnchor.y()))
-        {
-            lastPt = pt;
-            count++;
-            continue;
-        }
+        qreal diff = qAbs(qAbs(radians) - qAbs(anchorRadians));
 
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastAnchor), typeUtils::qtPointF2CVPoint2f(lastPt), cv::Scalar(0));
-        if (count > 1)
+        diff = qRadiansToDegrees(diff);
+        if (diff >= 5.0 || radians * anchorRadians < 0)
         {
-            points.push_back(typeUtils::qtPointF2CVPoint2f(lastPt));
+            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(255, 0, 0));
+            cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+            points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
+            anchor = pt;
+            anchorSlope = slope;
+            anchorRadians = radians;
         }
-        points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
-        lastAnchor = pt;
-        lastPt = pt;
-        count = 1;
     }
 
     pt = path.pointAtPercent(1.0);
-    points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
-    cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastAnchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
-    cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
+    cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
 
-    if (points[0] != points[points.size() - 1])
+    QPointF endPt = pt;
+    if (!pointsEql(startPt, endPt))
     {
-        points.push_back(points[0]);
+        points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
+        cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     }
+    
     return points.size();
 }
 
@@ -102,7 +106,7 @@ QByteArray pltUtils::points2Plt(const std::vector<cv::Point2f>& points)
     if (points.empty())
         return buffer;
 
-    cv::Point2f pt = points[0];
+    cv::Point2f pt = points[points.size() - 1];
     buffer.append(QString("PU%1 %2;").arg(qFloor(pt.x)).arg(-qFloor(pt.y)));
     for (int i = 0; i < points.size(); i++)
     {
@@ -115,4 +119,9 @@ QByteArray pltUtils::points2Plt(const std::vector<cv::Point2f>& points)
 QByteArray pltUtils::image2Plt(const QImage & image)
 {
     return QByteArray();
+}
+
+bool pltUtils::pointsEql(const QPointF & pt1, const QPointF & pt2)
+{
+    return qFloor(pt1.x()) == qFloor(pt2.x()) && qFloor(pt1.y()) == qFloor(pt2.y());
 }
