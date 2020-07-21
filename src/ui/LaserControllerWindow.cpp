@@ -100,7 +100,17 @@ void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem 
 
 void LaserControllerWindow::onActionExportJson(bool checked)
 {
-    m_scene->document()->exportJSON();
+    QFileDialog dialog(this);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setMimeTypeFilters(QStringList() << "application/json");
+    dialog.setWindowTitle(tr("Export"));
+    if (dialog.exec() == QFileDialog::AcceptSave)
+    {
+        QString filename = dialog.selectedFiles().constFirst();
+        if (!filename.isEmpty() && !filename.isNull())
+            m_scene->document()->exportJSON(filename);
+
+    }
 }
 
 void LaserControllerWindow::updateLayers()

@@ -1,14 +1,13 @@
-#include <gtest/gtest.h>
+#include "TestLaserDriver.h"
 
-#include <laser/LaserDriver.h>
 #include <QWidget>
 #include <QDebug>
 #include <QThread>
 
-TEST(test_LaserDriver, Load)
+void TestLaserDriver::laserDriverTestCase()
 {
     LaserDriver& driver = LaserDriver::instance();
-    ASSERT_TRUE(driver.load());
+    QVERIFY(driver.load());
     QWidget w;
     w.setWindowTitle("test");
     w.show();
@@ -18,9 +17,9 @@ TEST(test_LaserDriver, Load)
     qDebug() << compileInfo;
     driver.init(w.winId());
     QList<int> ports = driver.getPortList();
-    ASSERT_GT(ports.length(), 0);
-    ASSERT_TRUE(driver.initComPort(ports[0]));
-    ASSERT_TRUE(driver.unInitComPort());
+    QVERIFY(ports.length() > 0);
+    QVERIFY(driver.initComPort(ports[0]));
+    QVERIFY(driver.unInitComPort());
     driver.setTransTimeOutInterval(20);
     driver.setSoftwareInitialization(1016, 10, 10, 210, 297);
     driver.setHardwareInitialization(0.2, 300, 2, 1);
@@ -28,13 +27,13 @@ TEST(test_LaserDriver, Load)
     QList<double> values;
     addrs << 3 << 5 << 6;
     values << 0.003 << 0.004 << 0.005;
-    ASSERT_TRUE(driver.writeSysParamToCard(addrs, values));
-    ASSERT_TRUE(driver.readSysParamFromCard(addrs));
+    QVERIFY(driver.writeSysParamToCard(addrs, values));
+    QVERIFY(driver.readSysParamFromCard(addrs));
     //driver.showAboutWindow();
     driver.lPenMoveToOriginalPoint(0.1);
     driver.lPenQuickMoveTo(0, true, 30, 30, 1, 0.1, 0.1);
     driver.controlHDAction(1);
-    ASSERT_FALSE(driver.getMainCardID().isEmpty());
+    QVERIFY(!driver.getMainCardID().isEmpty());
     qDebug() << "GetCurrentLaserPos:" << driver.GetCurrentLaserPos();
     driver.smallScaleMovement(true, false, 2, 100, 200, 300);
     driver.startMachining(true);

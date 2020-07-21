@@ -163,9 +163,9 @@ void LaserDocument::setScale(qreal scale)
     d_ptr->scale = scale;
 }
 
-void LaserDocument::exportJSON()
+void LaserDocument::exportJSON(const QString& filename)
 {
-    QFile saveFile("export.json");
+    QFile saveFile(filename);
 
     QJsonObject jsonObj;
 

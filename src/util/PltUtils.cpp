@@ -71,7 +71,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
         slope = path.slopeAtPercent(percent);
         radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
 
-        std::cout << std::setw(8) << slope << radians << std::endl;
+        //std::cout << std::setw(8) << slope << radians << std::endl;
 
         qreal diff = qAbs(qAbs(radians) - qAbs(anchorRadians));
 

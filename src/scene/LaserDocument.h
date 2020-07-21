@@ -37,7 +37,7 @@ public:
     qreal scale() const;
     void setScale(qreal scale);
 
-    void exportJSON();
+    void exportJSON(const QString& filename);
 
 protected:
     void init();

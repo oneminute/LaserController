@@ -155,7 +155,7 @@ SET(CustomWidgets_LIBRARY
 )
 message(${CustomWidgets_LIBRARY})
 set(LINK_LIBRARIES 
-    Qt5::Widgets Qt5::Charts Qt5::OpenGL 
+    Qt5::Widgets Qt5::Charts Qt5::OpenGL
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
     ${ZLIB_LIBRARIES}
@@ -173,6 +173,5 @@ target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
-enable_testing()
 add_subdirectory(test)
 

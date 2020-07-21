@@ -22,6 +22,12 @@ public:
     QState& documentState() { return m_stateDocument; }
     QState& machiningState() { return m_stateMachining; }
 
+Q_SIGNALS:
+    void initToMain();
+    void mainToDocument();
+    void documentToMachining();
+    void machiningToDocument();
+
 private:
     QStateMachine m_fsm;
     QState m_stateInit;

@@ -1,19 +1,32 @@
-find_package(GTest REQUIRED)
+enable_testing()
 
-list(APPEND INCLUDE_DIRS ${GTEST_INCLUDE_DIRS} ../include)
+#find_package(GTest REQUIRED)
+
+find_package(Qt5Test REQUIRED)
+list(APPEND LINK_LIBRARIES Qt5::Test)
+
 include_directories(
     ${INCLUDE_DIRS}
 )
-list(APPEND LINK_LIBRARIES ${GTEST_BOTH_LIBRARIES})
+
 
 list(REMOVE_ITEM SRC_FILES ${BASE_SOURCES})
 
-add_executable(LaserControllerTest 
-    main.cpp 
-    TestLaserDriver.cpp 
-    ${SRC_FILES}
+set(TESTING_FILES
+    TestLaserDriver.h
+    TestLaserDriver.cpp
 )
 
-target_link_libraries(LaserControllerTest ${LINK_LIBRARIES})
+source_group("target_sources" FILES ${SRC_FILES})
+source_group("testing_sources" FILES ${TESTING_FILES})
 
-gtest_discover_tests(LaserControllerTest)
+add_executable(LaserControllerTest 
+    main.cpp
+    ${TESTING_FILES}
+    ${SRC_FILES}
+)
+add_test(NAME LaserControllerTest COMMAND LaserControllerTest)
+
+target_link_libraries(LaserControllerTest ${LINK_LIBRARIES} Qt5::Test)
+
+#gtest_discover_tests(LaserControllerTest)

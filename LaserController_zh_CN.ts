@@ -208,57 +208,57 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="52"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="53"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="61"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="62"/>
         <source>Items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="70"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="71"/>
         <source>Layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="86"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="87"/>
         <location filename="src/ui/LaserControllerWindow.cpp" line="29"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="91"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="92"/>
         <location filename="src/ui/LaserControllerWindow.cpp" line="29"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="101"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="108"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="115"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="102"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="109"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="116"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="139"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="140"/>
         <source>Propergies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="148"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="149"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="153"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="156"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="154"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="157"/>
         <source>Import SVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="161"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="162"/>
         <source>Export JSON</source>
         <translation type="unfinished"></translation>
     </message>
@@ -268,8 +268,13 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="149"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="158"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="106"/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="159"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="168"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -277,12 +282,12 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="src/scene/LaserDocument.cpp" line="114"/>
+        <location filename="src/scene/LaserDocument.cpp" line="129"/>
         <source>Engraving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/scene/LaserDocument.cpp" line="118"/>
+        <location filename="src/scene/LaserDocument.cpp" line="133"/>
         <source>Cutting</source>
         <translation type="unfinished"></translation>
     </message>
