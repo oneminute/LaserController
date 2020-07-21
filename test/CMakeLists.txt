@@ -15,6 +15,8 @@ list(REMOVE_ITEM SRC_FILES ${BASE_SOURCES})
 set(TESTING_FILES
     TestLaserDriver.h
     TestLaserDriver.cpp
+    TestStateController.h
+    TestStateController.cpp
 )
 
 source_group("target_sources" FILES ${SRC_FILES})

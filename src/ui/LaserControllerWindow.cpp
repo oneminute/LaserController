@@ -35,8 +35,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
 
-    LaserDriver::instance().load();
-    LaserDriver::instance().init(this->winId());
 }
 
 LaserControllerWindow::~LaserControllerWindow()

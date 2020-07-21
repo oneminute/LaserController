@@ -1,6 +1,8 @@
 #include "ui/MainWindow.h"
 #include "ui/LaserControllerWindow.h"
 #include "state/StateController.h"
+#include "laser/LaserDriver.h"
+#include "state/StateController.h"
 
 #include <QApplication>
 #include <qstylefactory.h>
@@ -19,7 +21,11 @@ int main(int argc, char *argv[])
         qDebug() << "load translation file." << a.applicationName() << QLocale::system().bcp47Name();
     }
 
+    StateController::start();
+
     LaserControllerWindow w;
+    LaserDriver::instance().load();
+    LaserDriver::instance().init(w.winId());
     w.show();
     int ret = a.exec();
 
