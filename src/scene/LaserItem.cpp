@@ -19,7 +19,9 @@ LaserItem::LaserItem(LaserDocument* doc, SizeUnit unit)
     : m_doc(doc)
     , m_unit(unit)
 {
-
+    this->setFlag(ItemIsMovable, true);
+    this->setFlag(ItemIsSelectable, true);
+    this->setFlag(ItemIsFocusable, true);
 }
 
 LaserItem::~LaserItem()
@@ -78,7 +80,8 @@ std::vector<cv::Point2f> LaserEllipseItem::cuttingPoints(cv::Mat& mat)
 {
     QPainterPath path;
 
-    path.addEllipse(m_transform.mapRect(m_bounds));
+    QTransform t = m_transform * sceneTransform();
+    path.addEllipse(t.mapRect(m_bounds));
 
     QTransform transform = QTransform::fromScale(40, 40);
     path = transform.map(path);
@@ -107,11 +110,12 @@ void LaserRectItem::draw(QPainter* painter)
 
 std::vector<cv::Point2f> LaserRectItem::cuttingPoints(cv::Mat& mat)
 {
+    QTransform t = m_transform * sceneTransform();
     std::vector<cv::Point2f> points;
-    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(m_transform.map(m_rect.topLeft()) * 40);
-    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(m_transform.map(m_rect.topRight()) * 40);
-    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(m_transform.map(m_rect.bottomRight()) * 40);
-    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(m_transform.map(m_rect.bottomLeft()) * 40);
+    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(t.map(m_rect.topLeft()) * 40);
+    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(t.map(m_rect.topRight()) * 40);
+    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(t.map(m_rect.bottomRight()) * 40);
+    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(t.map(m_rect.bottomLeft()) * 40);
     points.push_back(pt1);
     points.push_back(pt2);
     points.push_back(pt3);
@@ -149,7 +153,8 @@ std::vector<cv::Point2f> LaserPathItem::cuttingPoints(cv::Mat& mat)
     std::vector<cv::Point2f> points;
     if (m_path.pointAtPercent(0) != m_path.pointAtPercent(1))
         m_path.lineTo(m_path.pointAtPercent(0));
-    QPainterPath path = m_transform.map(m_path);
+    QTransform t = m_transform * sceneTransform();
+    QPainterPath path = t.map(m_path);
 
     QTransform transform = QTransform::fromScale(40, 40);
     path = transform.map(path);
@@ -175,9 +180,10 @@ std::vector<cv::Point2f> LaserPolylineItem::cuttingPoints(cv::Mat & mat)
 {
     std::vector<cv::Point2f> points;
     cv::Point2f lastPt;
+    QTransform t = m_transform * sceneTransform();
     for (int i = 0; i < m_poly.size(); i++)
     {
-        QPointF pt = m_transform.map(m_poly[i]) * 40;
+        QPointF pt = t.map(m_poly[i]) * 40;
         cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
         if (i > 0)
         {
@@ -207,9 +213,10 @@ std::vector<cv::Point2f> LaserPolygonItem::cuttingPoints(cv::Mat & mat)
 {
     std::vector<cv::Point2f> points;
     cv::Point2f lastPt;
+    QTransform t = m_transform * sceneTransform();
     for (int i = 0; i < m_poly.size(); i++)
     {
-        QPointF pt = m_transform.map(m_poly[i]) * 40;
+        QPointF pt = t.map(m_poly[i]) * 40;
         cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
         if (i > 0)
         {

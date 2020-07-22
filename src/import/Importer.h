@@ -21,7 +21,8 @@ public:
     
     static QSharedPointer<Importer> getImporter(Types type);
 
-private:
+signals:
+    void imported();
 };
 
 #endif // IMPORTER_H

@@ -83,10 +83,10 @@ bool LaserDriver::load()
     m_fnControlMotor = (FN_INT_BOOL)m_library.resolve("ControlMotor");
     m_fnTestLaserLight = (FN_INT_BOOL)m_library.resolve("TestLaserLight");
 
-    qDebug() << m_fnGetAPILibVersion;
-    qDebug() << m_fnGetAPILibCompileInfo;
-    qDebug() << m_fnInitLib;
-    qDebug() << m_fnUnInitLib;
+    //qDebug() << m_fnGetAPILibVersion;
+    //qDebug() << m_fnGetAPILibCompileInfo;
+    //qDebug() << m_fnInitLib;
+    //qDebug() << m_fnUnInitLib;
 
     m_isLoaded = true;
     return true;

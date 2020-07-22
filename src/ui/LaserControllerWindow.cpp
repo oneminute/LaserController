@@ -3,6 +3,7 @@
 
 #include <QFileDialog>
 #include <QTreeWidgetItem>
+#include <QTimer>
 
 #include "laser/LaserDriver.h"
 #include "import/Importer.h"
@@ -11,11 +12,13 @@
 #include "scene/LaserScene.h"
 #include "ui/LaserLayerDialog.h"
 #include "widget/LaserViewer.h"
+#include "state/StateController.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::LaserControllerWindow)
     , m_scene(new LaserScene)
+    , m_created(false)
 {
     m_ui->setupUi(this);
 
@@ -29,12 +32,21 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->treeWidgetLayers->setHeaderLabels(QStringList() << tr("Name") << tr("T") << tr("V"));
     m_ui->treeWidgetLayers->header()->moveSection(0, 2);
 
+    m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
+    m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
+    //m_ui->toolButtonRemoveLayer->addAction(m_ui->actionRemoveLayer);
+    m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
+
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
-    connect(m_ui->toolButtonAddEngravingLayer, &QToolButton::clicked, this, &LaserControllerWindow::onToolButtonAddEngravingLayer);
-    connect(m_ui->toolButtonAddCuttingLayer, &QToolButton::clicked, this, &LaserControllerWindow::onToolButtonAddCuttingLayer);
+    connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
+    connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
+    connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
 
+    StateControllerInst.initState().addTransition(this, SIGNAL(windowCreated()), &StateControllerInst.normalState());
+
+    bindWidgetsProperties();
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -42,7 +54,7 @@ LaserControllerWindow::~LaserControllerWindow()
 
 }
 
-void LaserControllerWindow::onToolButtonAddEngravingLayer(bool)
+void LaserControllerWindow::onActionAddEngravingLayer(bool)
 {
     QString newName = m_scene->document()->newLayerName(LaserLayer::LLT_ENGRAVING);
     LaserLayerDialog dialog(newName, LaserLayer::LLT_ENGRAVING);
@@ -54,7 +66,7 @@ void LaserControllerWindow::onToolButtonAddEngravingLayer(bool)
     }
 }
 
-void LaserControllerWindow::onToolButtonAddCuttingLayer(bool checked)
+void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
 {
     QString newName = m_scene->document()->newLayerName(LaserLayer::LLT_CUTTING);
     LaserLayerDialog dialog(newName, LaserLayer::LLT_CUTTING);
@@ -64,6 +76,11 @@ void LaserControllerWindow::onToolButtonAddCuttingLayer(bool checked)
         m_scene->document()->addLayer(layer);
         updateLayers();
     }
+}
+
+void LaserControllerWindow::onActionRemoveLayer(bool checked)
+{
+    qDebug() << "removing layer.";
 }
 
 void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem * item, int column)
@@ -149,6 +166,58 @@ void LaserControllerWindow::fillLayersTree(QList<LaserLayer> &layers, const QStr
     m_ui->treeWidgetLayers->insertTopLevelItems(0, treeWidgetItems);
 }
 
+void LaserControllerWindow::bindWidgetsProperties()
+{
+    StateControllerInst.initState().assignProperty(m_ui->actionOpen, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->actionOpen, "enabled", true);
+    StateControllerInst.mainState().assignProperty(m_ui->actionOpen, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->actionOpen, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->actionSave, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->actionSave, "enabled", false);
+    StateControllerInst.mainState().assignProperty(m_ui->actionSave, "enabled", false);
+    StateControllerInst.machiningState().assignProperty(m_ui->actionSave, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->actionImportSVG, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->actionImportSVG, "enabled", true);
+    StateControllerInst.mainState().assignProperty(m_ui->actionImportSVG, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->actionImportSVG, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->actionExportJSON, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->actionExportJSON, "enabled", false);
+    StateControllerInst.mainState().assignProperty(m_ui->actionExportJSON, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->actionExportJSON, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->toolButtonAddLayer, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->toolButtonAddLayer, "enabled", false);
+    StateControllerInst.mainState().assignProperty(m_ui->toolButtonAddLayer, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->toolButtonAddLayer, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", false);
+    StateControllerInst.mainState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", false);
+    StateControllerInst.mainState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", false);
+
+    StateControllerInst.initState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", false);
+    StateControllerInst.normalState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", false);
+    StateControllerInst.mainState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", true);
+    StateControllerInst.machiningState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", false);
+}
+
+void LaserControllerWindow::showEvent(QShowEvent * event)
+{
+    if (!m_created)
+    {
+        m_created = true;
+        QTimer::singleShot(100, this, &LaserControllerWindow::windowCreated);
+    }
+}
+
 QString LaserControllerWindow::getFilename(const QString& title, const QStringList & mime)
 {
     QFileDialog dialog(this);
@@ -167,7 +236,12 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     if (filename.isEmpty())
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
+    QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
     LaserDocument* doc = importer->import(filename);
-    m_scene->updateDocument(doc);
-    updateLayers();
+    if (doc)
+    {
+        m_scene->updateDocument(doc);
+        updateLayers();
+    }
+    StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }

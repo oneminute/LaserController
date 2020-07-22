@@ -97,23 +97,25 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QToolButton" name="toolButtonAddEngravingLayer">
+        <widget class="QToolButton" name="toolButtonAddLayer">
          <property name="text">
-          <string>...</string>
+          <string>+Layer</string>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::InstantPopup</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+         <property name="arrowType">
+          <enum>Qt::NoArrow</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButtonAddCuttingLayer">
+        <widget class="QToolButton" name="toolButtonRemoveLayer">
          <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="toolButton_3">
-         <property name="text">
-          <string>...</string>
+          <string>-Layer</string>
          </property>
         </widget>
        </item>
@@ -148,6 +150,9 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionImportSVG">
    <property name="text">
@@ -160,6 +165,48 @@
   <action name="actionExportJSON">
    <property name="text">
     <string>Export JSON</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="toolTip">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionAddEngravingLayer">
+   <property name="text">
+    <string>Add Engraving Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Engraving Layer</string>
+   </property>
+  </action>
+  <action name="actionAddCuttingLayer">
+   <property name="text">
+    <string>Add Cutting Layer</string>
+   </property>
+  </action>
+  <action name="actionRemoveLayer">
+   <property name="text">
+    <string>Remove Layer</string>
    </property>
   </action>
  </widget>

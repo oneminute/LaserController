@@ -26,7 +26,7 @@ public:
 
     LaserDocument* doc() const { return m_doc; }
     SizeUnit unit() const { return m_unit; }
-    QTransform transform() { return m_transform; }
+    QTransform extraTransform() { return m_transform; }
     void setTransform(const QTransform& transform) { m_transform = transform; }
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 

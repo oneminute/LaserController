@@ -24,8 +24,9 @@ public:
 
 protected slots:
     void onActionImportSVG(bool checked = false);
-    void onToolButtonAddEngravingLayer(bool checked = false);
-    void onToolButtonAddCuttingLayer(bool checked = false);
+    void onActionAddEngravingLayer(bool checked = false);
+    void onActionAddCuttingLayer(bool checked = false);
+    void onActionRemoveLayer(bool checked = false);
     void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onActionExportJson(bool checked = false);
 
@@ -34,11 +35,17 @@ protected slots:
 private:
     QString getFilename(const QString& title, const QStringList& mime);
     void fillLayersTree(QList<LaserLayer> &layers, const QString& type);
+    void bindWidgetsProperties();
+    virtual void showEvent(QShowEvent *event);
+
+signals:
+    void windowCreated();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
     LaserViewer* m_viewer;
     QScopedPointer<LaserScene> m_scene;
+    bool m_created;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

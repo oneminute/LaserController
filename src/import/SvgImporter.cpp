@@ -28,6 +28,10 @@ LaserDocument* SvgImporter::import(const QString & filename)
     dialog.exec();
 
     QSvgTinyDocument* doc = QSvgTinyDocument::load(filename);
+    if (doc == nullptr)
+    {
+        return nullptr;
+    }
     QSize svgSize = doc->size();
     qDebug() << "document size:" << svgSize;
 
@@ -160,6 +164,6 @@ LaserDocument* SvgImporter::import(const QString & filename)
         }
     }
     
-    
+    emit imported();
     return ldoc;
 }

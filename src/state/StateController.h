@@ -11,6 +11,8 @@
 #define STATE_DOCUMENT 200
 #define STATE_MACHINING 300
 
+#define StateControllerInst StateController::instance()
+
 class StateController : public QObject
 {
     Q_OBJECT
@@ -23,20 +25,42 @@ public:
     QStateMachine& fsm() { return m_fsm; }
 
     QState& initState() { return m_stateInit; }
+
+    QState& normalState() { return m_stateNormal; }
+
     QState& mainState() { return m_stateMain; }
-    QState& documentState() { return m_stateDocument; }
+    QState& mainNormalState() { return m_stateMainNormal; }
+    QState& mainSingleSelectedState() { return m_stateMainSingleSelected; }
+    QState& mainMultiSelectedState() { return m_stateMainMultiSelected; }
+    QState& mainLayerSelectedState() { return m_stateMainLayerSelected; }
+    QState& mainNewShapeState() { return m_stateMainNewShape; }
+
     QState& machiningState() { return m_stateMachining; }
-    QFinalState& finishedState() { return m_stateFinished; }
+
+    QFinalState& finalState() { return m_stateFinal; }
 
     static void start() { instance().fsm().start(); }
+
+private slots:
+    void onInitStateEntered();
+    void onInitStateExited();
+    void onNormalStateEntered();
+    void onNormalStateExited();
 
 private:
     QStateMachine m_fsm;
     QState m_stateInit;
+    QState m_stateNormal;
     QState m_stateMain;
-    QState m_stateDocument;
     QState m_stateMachining;
-    QFinalState m_stateFinished;
+
+    QState m_stateMainNormal;
+    QState m_stateMainSingleSelected;
+    QState m_stateMainMultiSelected;
+    QState m_stateMainLayerSelected;
+    QState m_stateMainNewShape;
+
+    QFinalState m_stateFinal;
 };
 
 #endif // STATECONTROLLER_H

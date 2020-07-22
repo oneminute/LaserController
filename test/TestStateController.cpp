@@ -13,21 +13,21 @@ void TestStateController::initTestCase()
     m_toMachiningAction = new QAction();
     m_toFinishedAction = new QAction();
 
-    StateController::instance().initState().addTransition(m_toMainAction, SIGNAL(triggered()), &StateController::instance().mainState());
-    StateController::instance().mainState().addTransition(m_toDocumentAction, SIGNAL(triggered()), &StateController::instance().documentState());
-    StateController::instance().documentState().addTransition(m_toMachiningAction, SIGNAL(triggered()), &StateController::instance().machiningState());
-    StateController::instance().machiningState().addTransition(m_toDocumentAction, SIGNAL(triggered()), &StateController::instance().documentState());
-    StateController::instance().documentState().addTransition(m_toFinishedAction, SIGNAL(triggered()), &StateController::instance().finishedState());
+    StateController::instance().initState().addTransition(m_toMainAction, SIGNAL(triggered()), &StateController::instance().normalState());
+    StateController::instance().normalState().addTransition(m_toDocumentAction, SIGNAL(triggered()), &StateController::instance().mainState());
+    StateController::instance().mainState().addTransition(m_toMachiningAction, SIGNAL(triggered()), &StateController::instance().machiningState());
+    StateController::instance().machiningState().addTransition(m_toDocumentAction, SIGNAL(triggered()), &StateController::instance().mainState());
+    StateController::instance().mainState().addTransition(m_toFinishedAction, SIGNAL(triggered()), &StateController::instance().finalState());
 }
 
 void TestStateController::transitionTestCase()
 {
     QSignalSpy spyStateMachineStarted(&StateController::instance().fsm(), SIGNAL(started()));
     QSignalSpy spyInitStateEntered(&StateController::instance().initState(), SIGNAL(entered()));
-    QSignalSpy spyMainStateEntered(&StateController::instance().mainState(), SIGNAL(entered()));
-    QSignalSpy spyDocumentStateEntered(&StateController::instance().documentState(), SIGNAL(entered()));
+    QSignalSpy spyMainStateEntered(&StateController::instance().normalState(), SIGNAL(entered()));
+    QSignalSpy spyDocumentStateEntered(&StateController::instance().mainState(), SIGNAL(entered()));
     QSignalSpy spyMachiningStateEntered(&StateController::instance().machiningState(), SIGNAL(entered()));
-    QSignalSpy spyFinishedStateEntered(&StateController::instance().finishedState(), SIGNAL(entered()));
+    QSignalSpy spyFinishedStateEntered(&StateController::instance().finalState(), SIGNAL(entered()));
     QSignalSpy spyStateMachineFinished(&StateController::instance().fsm(), SIGNAL(finished()));
 
     StateController::instance().fsm().start();
