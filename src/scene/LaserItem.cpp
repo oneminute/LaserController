@@ -15,18 +15,35 @@
 #include "widget/LaserViewer.h"
 #include "scene/LaserDocument.h"
 
-LaserItem::LaserItem(LaserDocument* doc, SizeUnit unit)
+QMap<int, int> LaserItem::g_itemsMaxIndex;
+
+LaserItem::LaserItem(LaserDocument* doc, LaserItemType type, SizeUnit unit)
     : m_doc(doc)
     , m_unit(unit)
+    , m_isHover(false)
+    , m_type(type)
 {
+    Q_ASSERT(doc);
+    setParent(doc);
+
     this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
     this->setFlag(ItemIsFocusable, true);
+    //this->setFlag(ItemAcceptsInputMethod, true);
+
+    this->setAcceptHoverEvents(true);
+
+    if (!g_itemsMaxIndex.contains(m_type))
+    {
+        g_itemsMaxIndex.insert(m_type, 0);
+    }
+    int index = ++g_itemsMaxIndex[m_type];
+    setObjectName(QString("%1_%2").arg(typeName(m_type)).arg(index));
 }
 
 LaserItem::~LaserItem()
 {
-    
+    qDebug() << objectName();
 }
 
 void LaserItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -35,9 +52,21 @@ void LaserItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * optio
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
 
     // 绘制外框
-    painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
     QRectF bounds = boundingRect();
-    painter->drawRect(bounds);
+    QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
+    QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
+    bounds = QRectF(topLeft, bottomRight);
+    if (isSelected())
+    {
+        painter->setPen(QPen(Qt::gray, 0.2f, Qt::SolidLine));
+        painter->drawRect(bounds);
+    }
+    else if (isUnderMouse())
+    {
+        painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
+        painter->drawRect(bounds);
+    }
+    
 
     // 绘制图元
     painter->setPen(QPen(Qt::blue, 50, Qt::SolidLine));
@@ -63,14 +92,34 @@ QPointF LaserItem::laserStartPos() const
 
 qreal LaserItem::unitToMM() const { return unitUtils::unitToMM(m_unit); }
 
-LaserShapeItem::LaserShapeItem(LaserDocument* doc, SizeUnit unit)
-    : LaserItem(doc, unit)
+QString LaserItem::typeName()
+{
+    return typeName(m_type);
+}
+
+QString LaserItem::typeName(LaserItemType typeId)
+{
+    static QMap<LaserItemType, QString> TypeNamesMap{
+        { LIT_BITMAP, tr("Bitmap") },
+        { LIT_CIRCLE, tr("Circle") },
+        { LIT_ELLIPSE, tr("Ellipse") },
+        { LIT_LINE, tr("Line") },
+        { LIT_PATH, tr("Path") },
+        { LIT_POLYGON, tr("Polygon") },
+        { LIT_POLYLINE, tr("Polyline") },
+        { LIT_RECT, tr("Rect") }
+    };
+    return TypeNamesMap[typeId];
+}
+
+LaserShapeItem::LaserShapeItem(LaserDocument* doc, LaserItemType type, SizeUnit unit)
+    : LaserItem(doc, type, unit)
 {
     m_type = LIT_SHAPE;
 }
 
 LaserEllipseItem::LaserEllipseItem(const QRectF bounds, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
+    : LaserShapeItem(doc, LIT_ELLIPSE, unit)
     , m_bounds(bounds)
 {
     m_boundingRect = m_bounds;
@@ -97,7 +146,7 @@ void LaserEllipseItem::draw(QPainter* painter)
 }
 
 LaserRectItem::LaserRectItem(const QRectF rect, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
+    : LaserShapeItem(doc, LIT_RECT, unit)
     , m_rect(rect)
 {
     m_boundingRect = m_rect;
@@ -130,7 +179,7 @@ std::vector<cv::Point2f> LaserRectItem::cuttingPoints(cv::Mat& mat)
 }
 
 LaserLineItem::LaserLineItem(const QLineF & line, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
+    : LaserShapeItem(doc, LIT_LINE, unit)
     , m_line(line)
 {
     m_boundingRect = QRectF(m_line.p1(), m_line.p2());
@@ -142,7 +191,7 @@ void LaserLineItem::draw(QPainter * painter)
 }
 
 LaserPathItem::LaserPathItem(const QPainterPath & path, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
+    : LaserShapeItem(doc, LIT_PATH, unit)
     , m_path(path)
 {
     m_boundingRect = path.boundingRect();
@@ -170,7 +219,7 @@ void LaserPathItem::draw(QPainter * painter)
 }
 
 LaserPolylineItem::LaserPolylineItem(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
+    : LaserShapeItem(doc, LIT_POLYLINE, unit)
     , m_poly(poly)
 {
     m_boundingRect = m_poly.boundingRect();
@@ -203,7 +252,7 @@ void LaserPolylineItem::draw(QPainter * painter)
 }
 
 LaserPolygonItem::LaserPolygonItem(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, unit)
+    : LaserShapeItem(doc, LIT_POLYGON, unit)
     , m_poly(poly)
 {
     m_boundingRect = m_poly.boundingRect();
@@ -236,7 +285,7 @@ void LaserPolygonItem::draw(QPainter * painter)
 }
 
 LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, LaserDocument * doc, SizeUnit unit)
-    : LaserItem(doc, unit)
+    : LaserItem(doc, LIT_BITMAP, unit)
     , m_image(image)
     , m_bounds(bounds)
 {

@@ -30,11 +30,8 @@ protected slots:
     void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onActionExportJson(bool checked = false);
 
-    void updateLayers();
-
 private:
     QString getFilename(const QString& title, const QStringList& mime);
-    void fillLayersTree(QList<LaserLayer> &layers, const QString& type);
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
 

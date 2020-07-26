@@ -13,6 +13,8 @@ include_directories(
 list(REMOVE_ITEM SRC_FILES ${BASE_SOURCES})
 
 set(TESTING_FILES
+    TestLaserDocument.h
+    TestLaserDocument.cpp
     TestLaserDriver.h
     TestLaserDriver.cpp
     TestStateController.h

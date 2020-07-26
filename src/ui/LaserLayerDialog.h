@@ -6,9 +6,8 @@
 #include <QDialog>
 #include <QScopedPointer>
 
-#include "scene/LaserLayer.h"
-
 class QCloseEvent;
+class LaserLayer;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserLayerDialog; }
@@ -18,11 +17,11 @@ class LaserLayerDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit LaserLayerDialog(const QString& id, LaserLayer::LayerType type, QWidget* parent = nullptr);
-    explicit LaserLayerDialog(const LaserLayer& layer, QWidget* parent = nullptr);
+    explicit LaserLayerDialog(const QString& id, LayerType type, QWidget* parent = nullptr);
+    explicit LaserLayerDialog(LaserLayer* layer, QWidget* parent = nullptr);
     ~LaserLayerDialog();
 
-    LaserLayer layer() const { return m_layer; }
+    LaserLayer* layer() const { return m_layer; }
 
 private:
     void initUi(bool editing);
@@ -34,7 +33,7 @@ protected slots:
 
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;
-    LaserLayer m_layer;
+    LaserLayer* m_layer;
 };
 
 #endif // LASERLAYERDIALOG_H

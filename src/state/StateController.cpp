@@ -12,6 +12,11 @@ StateController::StateController(QObject* parent)
     m_stateMainNewShape.setParent(&m_stateMain);
     m_stateMain.setInitialState(&m_stateMainNormal);
 
+    m_stateMainSingleSelectedNormal.setParent(&m_stateMainSingleSelected);
+    m_stateMainSingleSelectedScaling.setParent(&m_stateMainSingleSelected);
+    m_stateMainSingleSelectedRotating.setParent(&m_stateMainSingleSelected);
+    m_stateMainSingleSelected.setInitialState(&m_stateMainSingleSelectedNormal);
+
     m_fsm.addState(&m_stateInit);
     m_fsm.addState(&m_stateNormal);
     m_fsm.addState(&m_stateMain);

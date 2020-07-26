@@ -160,6 +160,10 @@ LaserDocument* SvgImporter::import(const QString & filename)
             
             QTransform tt = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * ratio, t.dy() * ratio).scale(scaleX, scaleY);
             item->setTransform(tt);
+
+            if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
+                item->setObjectName(node->nodeId());
+
             ldoc->addItem(item);
         }
     }

@@ -2,178 +2,165 @@
 
 #include <QSharedData>
 
-class LaserLayerPrivate : public QSharedData
+#include "LaserDocument.h"
+
+LaserLayer::LaserLayer(LaserDocument* document)
+    : QObject(document)
+    , m_type(LLT_ENGRAVING)
+    , m_minSpeed(60)
+    , m_runSpeed(300)
+    , m_laserPower(60)
+    , m_engravingForward(true)
+    , m_engravingStyle(0)
+    , m_lineSpacing(10)
+    , m_columnSpacing(10)
+    , m_startX(10)
+    , m_startY(10)
+    , m_errorX(0)
+    , m_errorY(0)
+    , m_moveSpeed(0)
+    , m_minSpeedPower(60)
+    , m_runSpeedPower(60)
+    , m_doc(document)
 {
-public:
-    LaserLayerPrivate()
-        : m_id("")
-        , m_type(LaserLayer::LLT_ENGRAVING)
-        , m_minSpeed(60)
-        , m_runSpeed(300)
-        , m_laserPower(60)
-        , m_engravingForward(true)
-        , m_engravingStyle(0)
-        , m_lineSpacing(10)
-        , m_columnSpacing(10)
-        , m_startX(10)
-        , m_startY(10)
-        , m_errorX(0)
-        , m_errorY(0)
-        , m_moveSpeed(0)
-        , m_minSpeedPower(60)
-        , m_runSpeedPower(60)
-    {}
-    QString m_id;
-    LaserLayer::LayerType m_type;
-
-    int m_minSpeed;
-    int m_runSpeed;
-    int m_laserPower;
-
-    // engraving fields
-    bool m_engravingForward;
-    int m_engravingStyle;
-    int m_lineSpacing;
-    int m_columnSpacing;
-    int m_startX;
-    int m_startY;
-    int m_errorX;
-    int m_errorY;
-
-    // cutting fields
-    int m_moveSpeed;
-    int m_minSpeedPower;
-    int m_runSpeedPower;
-
-    QList<LaserItem*> m_items;
-
-    friend class LaserLayer;
-};
-
-LaserLayer::LaserLayer()
-    : d_ptr(new LaserLayerPrivate)
-{}
-
-LaserLayer::LaserLayer(const QString& id, LayerType type)
-    : d_ptr(new LaserLayerPrivate)
-{
-    d_ptr->m_id = id;
-    d_ptr->m_type = type;
+    Q_ASSERT(document);
 }
 
-LaserLayer::LaserLayer(const LaserLayer & other)
-    : d_ptr(other.d_ptr)
+LaserLayer::LaserLayer(const QString& id, LayerType type, LaserDocument* document)
+    : QObject(document)
+    , m_type(type)
+    , m_minSpeed(60)
+    , m_runSpeed(300)
+    , m_laserPower(60)
+    , m_engravingForward(true)
+    , m_engravingStyle(0)
+    , m_lineSpacing(10)
+    , m_columnSpacing(10)
+    , m_startX(10)
+    , m_startY(10)
+    , m_errorX(0)
+    , m_errorY(0)
+    , m_moveSpeed(0)
+    , m_minSpeedPower(60)
+    , m_runSpeedPower(60)
+    , m_doc(document)
 {
+    Q_ASSERT(document);
+    setObjectName(id);
 }
 
 LaserLayer::~LaserLayer()
 {
+    qDebug() << objectName();
 }
 
-LaserLayer & LaserLayer::operator=(const LaserLayer & other)
+QString LaserLayer::id() const 
 {
-    d_ptr = other.d_ptr;
-    return *this;
+    return objectName(); 
 }
-
-QString LaserLayer::id() const { return d_ptr->m_id; }
 
 void LaserLayer::setId(const QString & id)
 {
-    d_ptr->m_id = id;
+    setObjectName(id);
 }
 
-LaserLayer::LayerType LaserLayer::type() const { return d_ptr->m_type; }
+LayerType LaserLayer::type() const { return m_type; }
 
-int LaserLayer::minSpeed() const { return d_ptr->m_minSpeed; }
+int LaserLayer::minSpeed() const { return m_minSpeed; }
 
-void LaserLayer::setMinSpeed(int minSpeed) { d_ptr->m_minSpeed = minSpeed; }
+void LaserLayer::setMinSpeed(int minSpeed) { m_minSpeed = minSpeed; }
 
-int LaserLayer::runSpeed() const { return d_ptr->m_runSpeed; }
+int LaserLayer::runSpeed() const { return m_runSpeed; }
 
-void LaserLayer::setRunSpeed(int runSpeed) { d_ptr->m_runSpeed = runSpeed; }
+void LaserLayer::setRunSpeed(int runSpeed) { m_runSpeed = runSpeed; }
 
-int LaserLayer::laserPower() const { return d_ptr->m_laserPower; }
+int LaserLayer::laserPower() const { return m_laserPower; }
 
-void LaserLayer::setLaserPower(int laserPower) { d_ptr->m_laserPower = laserPower; }
+void LaserLayer::setLaserPower(int laserPower) { m_laserPower = laserPower; }
 
-bool LaserLayer::engravingForward() const { return d_ptr->m_engravingForward; }
+bool LaserLayer::engravingForward() const { return m_engravingForward; }
 
-void LaserLayer::setEngravingForward(bool engravingForward) { d_ptr->m_engravingForward = engravingForward; }
+void LaserLayer::setEngravingForward(bool engravingForward) { m_engravingForward = engravingForward; }
 
-int LaserLayer::engravingStyle() const { return d_ptr->m_engravingStyle; }
+int LaserLayer::engravingStyle() const { return m_engravingStyle; }
 
-void LaserLayer::setEngravingStyle(int engravingStyle) { d_ptr->m_engravingStyle = engravingStyle; }
+void LaserLayer::setEngravingStyle(int engravingStyle) { m_engravingStyle = engravingStyle; }
 
-int LaserLayer::lineSpacing() const { return d_ptr->m_lineSpacing; }
+int LaserLayer::lineSpacing() const { return m_lineSpacing; }
 
-void LaserLayer::setLineSpacing(int lineSpacing) { d_ptr->m_lineSpacing = lineSpacing; }
+void LaserLayer::setLineSpacing(int lineSpacing) { m_lineSpacing = lineSpacing; }
 
-int LaserLayer::columnSpacing() const { return d_ptr->m_columnSpacing; }
+int LaserLayer::columnSpacing() const { return m_columnSpacing; }
 
-void LaserLayer::setColumnSpacing(int columnSpacing) { d_ptr->m_columnSpacing = columnSpacing; }
+void LaserLayer::setColumnSpacing(int columnSpacing) { m_columnSpacing = columnSpacing; }
 
-QPoint LaserLayer::startPos() const { return QPoint(d_ptr->m_startX, d_ptr->m_startY); }
+QPoint LaserLayer::startPos() const { return QPoint(m_startX, m_startY); }
 
 void LaserLayer::setStartPos(const QPoint & startPos) 
 { 
-    d_ptr->m_startX = startPos.x(); 
-    d_ptr->m_startY = startPos.y();
+    m_startX = startPos.x(); 
+    m_startY = startPos.y();
 }
 
 int LaserLayer::startX() const
 {
-    return d_ptr->m_startX;
+    return m_startX;
 }
 
 void LaserLayer::setStartX(int x)
 {
-    d_ptr->m_startX = x;
+    m_startX = x;
 }
 
 int LaserLayer::startY() const
 {
-    return d_ptr->m_startY;
+    return m_startY;
 }
 
 void LaserLayer::setStartY(int y)
 {
-    d_ptr->m_startY = y;
+    m_startY = y;
 }
 
-int LaserLayer::errorX() const { return d_ptr->m_errorX; }
+int LaserLayer::errorX() const { return m_errorX; }
 
-void LaserLayer::setErrorX(int errorX) { d_ptr->m_errorX = errorX; }
+void LaserLayer::setErrorX(int errorX) { m_errorX = errorX; }
 
 int LaserLayer::errorY() const
 {
-    return d_ptr->m_errorY;
+    return m_errorY;
 }
 
 void LaserLayer::setErrorY(int errorY)
 {
-    d_ptr->m_errorY = errorY;
+    m_errorY = errorY;
 }
 
-int LaserLayer::moveSpeed() const { return d_ptr->m_moveSpeed; }
+int LaserLayer::moveSpeed() const { return m_moveSpeed; }
 
-void LaserLayer::setMoveSpeed(int moveSpeed) { d_ptr->m_moveSpeed = moveSpeed; }
+void LaserLayer::setMoveSpeed(int moveSpeed) { m_moveSpeed = moveSpeed; }
 
-int LaserLayer::minSpeedPower() const { return d_ptr->m_minSpeedPower; }
+int LaserLayer::minSpeedPower() const { return m_minSpeedPower; }
 
-void LaserLayer::setMinSpeedPower(int minSpeedPower) { d_ptr->m_minSpeedPower = minSpeedPower; }
+void LaserLayer::setMinSpeedPower(int minSpeedPower) { m_minSpeedPower = minSpeedPower; }
 
-int LaserLayer::runSpeedPower() const { return d_ptr->m_runSpeedPower; }
+int LaserLayer::runSpeedPower() const { return m_runSpeedPower; }
 
-void LaserLayer::setRunSpeedPower(int runSpeedPower) { d_ptr->m_runSpeedPower = runSpeedPower; }
+void LaserLayer::setRunSpeedPower(int runSpeedPower) { m_runSpeedPower = runSpeedPower; }
 
 void LaserLayer::addItem(LaserItem * item)
 {
-    d_ptr->m_items.append(item);
+    m_items.append(item);
+    m_doc->updateLayersStructure();
 }
 
 QList<LaserItem*>& LaserLayer::items()
 {
-    return d_ptr->m_items;
+    return m_items;
+}
+
+LaserDocument * LaserLayer::document() const
+{
+    return m_doc;
 }
 

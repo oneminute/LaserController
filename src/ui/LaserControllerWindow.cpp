@@ -5,14 +5,15 @@
 #include <QTreeWidgetItem>
 #include <QTimer>
 
-#include "laser/LaserDriver.h"
 #include "import/Importer.h"
+#include "laser/LaserDriver.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
+#include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
+#include "state/StateController.h"
 #include "ui/LaserLayerDialog.h"
 #include "widget/LaserViewer.h"
-#include "state/StateController.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -29,7 +30,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->treeWidgetLayers->setColumnWidth(0, 90);
     m_ui->treeWidgetLayers->setColumnWidth(1, 15);
     m_ui->treeWidgetLayers->setColumnWidth(2, 15);
-    m_ui->treeWidgetLayers->setHeaderLabels(QStringList() << tr("Name") << tr("T") << tr("V"));
+    m_ui->treeWidgetLayers->setColumnWidth(3, 15);
+    m_ui->treeWidgetLayers->setHeaderLabels(QStringList() << tr("Name") << tr("C") << tr("T") << tr("V"));
     m_ui->treeWidgetLayers->header()->moveSection(0, 2);
 
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
@@ -56,25 +58,23 @@ LaserControllerWindow::~LaserControllerWindow()
 
 void LaserControllerWindow::onActionAddEngravingLayer(bool)
 {
-    QString newName = m_scene->document()->newLayerName(LaserLayer::LLT_ENGRAVING);
-    LaserLayerDialog dialog(newName, LaserLayer::LLT_ENGRAVING);
+    QString newName = m_scene->document()->newLayerName(LLT_ENGRAVING);
+    LaserLayerDialog dialog(newName, LLT_ENGRAVING);
     if (dialog.exec() == QDialog::Accepted)
     {
-        LaserLayer layer = dialog.layer();
+        LaserLayer* layer = dialog.layer();
         m_scene->document()->addLayer(layer);
-        updateLayers();
     }
 }
 
 void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
 {
-    QString newName = m_scene->document()->newLayerName(LaserLayer::LLT_CUTTING);
-    LaserLayerDialog dialog(newName, LaserLayer::LLT_CUTTING);
+    QString newName = m_scene->document()->newLayerName(LLT_CUTTING);
+    LaserLayerDialog dialog(newName, LLT_CUTTING);
     if (dialog.exec() == QDialog::Accepted)
     {
-        LaserLayer layer = dialog.layer();
+        LaserLayer* layer = dialog.layer();
         m_scene->document()->addLayer(layer);
-        updateLayers();
     }
 }
 
@@ -89,22 +89,22 @@ void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem 
     qDebug() << i;
     if (item->parent() == nullptr)
     {
-        LaserLayer::LayerType type = (LaserLayer::LayerType)item->data(1, Qt::UserRole).toInt();
-        LaserLayer layer;
-        if (type == LaserLayer::LLT_CUTTING)
+        LayerType type = (LayerType)item->data(1, Qt::UserRole).toInt();
+        LaserLayer* layer = nullptr;
+        if (type == LLT_CUTTING)
         {
             layer = m_scene->document()->cuttingLayers()[i];
         }
-        else if (type == LaserLayer::LLT_ENGRAVING)
+        else if (type == LLT_ENGRAVING)
         {
             layer = m_scene->document()->engravingLayers()[i];
         }
         LaserLayerDialog dialog(layer);
         if (dialog.exec() == QDialog::Accepted)
         {
-            updateLayers();
+            m_ui->treeWidgetLayers->updateItems();
         }
-        qDebug() << type << layer.id();
+        qDebug() << type << layer->id();
     }
     else
     {
@@ -126,44 +126,6 @@ void LaserControllerWindow::onActionExportJson(bool checked)
             m_scene->document()->exportJSON(filename);
 
     }
-}
-
-void LaserControllerWindow::updateLayers()
-{
-    m_ui->treeWidgetLayers->clear();
-
-    QList<LaserLayer> layers = m_scene->document()->cuttingLayers();
-    fillLayersTree(layers, "C");
-    layers = m_scene->document()->engravingLayers();
-    fillLayersTree(layers, "E");
-}
-
-void LaserControllerWindow::fillLayersTree(QList<LaserLayer> &layers, const QString& type)
-{
-    QList<QTreeWidgetItem*> treeWidgetItems;
-    for (int i = 0; i < layers.size(); i++)
-    {
-        LaserLayer layer = layers[i];
-        QList<LaserItem*> laserItems = layer.items();
-        QTreeWidgetItem* layerWidgetItem = new QTreeWidgetItem((QTreeWidgetItem*)nullptr, 0);
-        layerWidgetItem->setText(0, layer.id());
-        layerWidgetItem->setText(1, type);
-        layerWidgetItem->setText(2, "V");
-        layerWidgetItem->setData(0, Qt::UserRole, i);
-        layerWidgetItem->setData(1, Qt::UserRole, layer.type());
-        for (int li = 0; li != laserItems.size(); li++)
-        {
-            LaserItem* laserItem = laserItems[li];
-            QTreeWidgetItem* itemWidgetItem = new QTreeWidgetItem(layerWidgetItem);
-            itemWidgetItem->setText(0, "Item");
-            itemWidgetItem->setText(1, "S");
-            itemWidgetItem->setText(2, "V");
-            itemWidgetItem->setData(0, Qt::UserRole, li);
-            itemWidgetItem->setData(1, Qt::UserRole, laserItem->laserItemType());
-        }
-        treeWidgetItems.append(layerWidgetItem);
-    }
-    m_ui->treeWidgetLayers->insertTopLevelItems(0, treeWidgetItems);
 }
 
 void LaserControllerWindow::bindWidgetsProperties()
@@ -241,7 +203,8 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     if (doc)
     {
         m_scene->updateDocument(doc);
-        updateLayers();
+        m_ui->treeWidgetLayers->setDocument(doc);
+        m_ui->treeWidgetLayers->updateItems();
     }
     StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }

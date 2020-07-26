@@ -20,11 +20,12 @@ class LaserViewer;
 
 class LaserItem : public QGraphicsObject
 {
+    Q_OBJECT
 public:
-    LaserItem(LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserItem(LaserDocument* doc, LaserItemType type, SizeUnit unit = SizeUnit::SU_MM100);
     virtual ~LaserItem();
 
-    LaserDocument* doc() const { return m_doc; }
+    LaserDocument* document() const { return m_doc; }
     SizeUnit unit() const { return m_unit; }
     QTransform extraTransform() { return m_transform; }
     void setTransform(const QTransform& transform) { m_transform = transform; }
@@ -34,8 +35,6 @@ public:
     QPointF laserStartPos() const;
 
     virtual void draw(QPainter* painter) = 0;
-    virtual LaserItemType type() = 0;
-    virtual QString typeName() = 0;
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat()) { return std::vector<cv::Point2f>(); }
     virtual QByteArray engravingImage() { return QByteArray(); }
@@ -43,8 +42,12 @@ public:
     qreal unitToMM() const;
 
     LaserItemType laserItemType() const { return m_type; }
+    QString typeName();
     bool isShape() const { return (int)m_type <= (int)LIT_SHAPE; }
     bool isBitmap() const { return m_type == LIT_BITMAP; }
+
+protected:
+    QString typeName(LaserItemType typeId);
 
 protected:
     LaserDocument* m_doc;
@@ -53,14 +56,21 @@ protected:
     QRectF m_boundingRect;
     LaserItemType m_type;
 
+    bool m_isHover;
+
+    static QMap<int, int> g_itemsMaxIndex;
+
 private:
     Q_DISABLE_COPY(LaserItem);
+
+    friend class LaserDocument;
 };
 
 class LaserShapeItem : public LaserItem
 {
+    Q_OBJECT
 public:
-    LaserShapeItem(LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserShapeItem(LaserDocument* doc, LaserItemType type, SizeUnit unit = SizeUnit::SU_MM100);
 
 private:
     Q_DISABLE_COPY(LaserShapeItem);
@@ -68,6 +78,7 @@ private:
 
 class LaserEllipseItem : public LaserShapeItem
 {
+    Q_OBJECT
 public:
     LaserEllipseItem(const QRectF bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
     virtual ~LaserEllipseItem() {}
@@ -77,8 +88,6 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
-    virtual LaserItemType type() { return LIT_ELLIPSE; }
-    virtual QString typeName() { return "Ellipse"; }
 
 private:
     QRectF m_bounds;
@@ -87,16 +96,15 @@ private:
 
 class LaserRectItem : public LaserShapeItem
 {
+    Q_OBJECT
 public:
-    LaserRectItem(const QRectF rect, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserRectItem(const QRectF rect, LaserDocument* doc,  SizeUnit unit = SizeUnit::SU_MM100);
 
     QRectF rect() const { return m_rect; }
     void setRect(const QRectF& rect) { m_rect = rect; }
 
     virtual void draw(QPainter* painter);
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
-    virtual LaserItemType type() { return LIT_RECT; }
-    virtual QString typeName() { return "Rect"; }
 
 private:
     QRectF m_rect;
@@ -105,6 +113,7 @@ private:
 
 class LaserLineItem : public LaserShapeItem
 {
+    Q_OBJECT
 public:
     LaserLineItem(const QLineF& line, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
@@ -112,8 +121,6 @@ public:
     void setLine(const QLineF& line) { m_line = line; }
 
     virtual void draw(QPainter* painter);
-    virtual LaserItemType type() { return LIT_LINE; }
-    virtual QString typeName() { return "Line"; }
 
 private:
     QLineF m_line;
@@ -122,6 +129,7 @@ private:
 
 class LaserPathItem : public LaserShapeItem
 {
+    Q_OBJECT
 public:
     LaserPathItem(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
@@ -130,8 +138,6 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
-    virtual LaserItemType type() { return LIT_PATH; }
-    virtual QString typeName() { return "Path"; }
 
 private:
     QPainterPath m_path;
@@ -140,6 +146,7 @@ private:
 
 class LaserPolylineItem : public LaserShapeItem
 {
+    Q_OBJECT
 public:
     LaserPolylineItem(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
@@ -148,8 +155,6 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
-    virtual LaserItemType type() { return LIT_POLYLINE; }
-    virtual QString typeName() { return "Polyline"; }
 
 private:
     QPolygonF m_poly;
@@ -158,6 +163,7 @@ private:
 
 class LaserPolygonItem : public LaserShapeItem
 {
+    Q_OBJECT
 public:
     LaserPolygonItem(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
@@ -166,8 +172,6 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
-    virtual LaserItemType type() { return LIT_POLYGON; }
-    virtual QString typeName() { return "Polygon"; }
 
 private:
     QPolygonF m_poly;
@@ -176,6 +180,7 @@ private:
 
 class LaserBitmapItem : public LaserItem
 {
+    Q_OBJECT
 public:
     LaserBitmapItem(const QImage& image, const QRectF& bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
@@ -187,7 +192,7 @@ public:
     virtual QByteArray engravingImage();
     virtual void draw(QPainter* painter);
     virtual LaserItemType type() { return LIT_BITMAP; }
-    virtual QString typeName() { return "Bitmap"; }
+    virtual QString typeName() { return tr("Bitmap"); }
 
 private:
     QImage m_image;

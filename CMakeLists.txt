@@ -46,12 +46,12 @@ set(TS_FILES LaserController_zh_CN.ts)
 #add_subdirectory(widgets)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
-    ./src
+    src
     ${Boost_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
-    ./third/CustomWidgets/include
+    third/CustomWidgets/include
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)

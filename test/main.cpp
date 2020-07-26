@@ -3,6 +3,7 @@
 
 #include "TestLaserDriver.h"
 #include "TestStateController.h"
+#include "TestLaserDocument.h"
 
 QT_BEGIN_NAMESPACE 
 QTEST_ADD_GPU_BLACKLIST_SUPPORT_DEFS 
@@ -16,13 +17,17 @@ int main(int argc, char *argv[])
 
     TestLaserDriver testLaserDriver; 
     TestStateController testStateController;
+    TestLaserDocument testLaserDocument;
 
     QTEST_SET_MAIN_SOURCE_PATH
 
     int ret = 0;
-    ret += QTest::qExec(&testLaserDriver, argc, argv);
+    //ret += QTest::qExec(&testLaserDriver, argc, argv);
     ret += QTest::qExec(&testStateController, argc, argv);
+    ret += QTest::qExec(&testLaserDocument, argc, argv);
 
+    //ret += app.exec();
+    QTest::qWait(1000);
     return ret;
 }
 

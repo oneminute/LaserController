@@ -77,4 +77,10 @@ enum LaserItemType
     LIT_BITMAP
 };
 
+enum LayerType
+{
+    LLT_ENGRAVING,
+    LLT_CUTTING
+};
+
 #endif // COMMON_H

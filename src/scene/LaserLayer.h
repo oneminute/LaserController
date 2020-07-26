@@ -1,6 +1,7 @@
 #ifndef LASERLAYER_H
 #define LASERLAYER_H
 
+#include "common/common.h"
 #include <QObject>
 #include <QPointF>
 #include <QList>
@@ -9,22 +10,15 @@
 
 class LaserItem;
 class LaserLayerPrivate;
+class LaserDocument;
 
-class LaserLayer
+class LaserLayer : public QObject
 {
+    Q_OBJECT
 public:
-    enum LayerType
-    {
-        LLT_ENGRAVING,
-        LLT_CUTTING
-    };
-
-    LaserLayer();
-    LaserLayer(const QString& id, LayerType type);
-    LaserLayer(const LaserLayer& other);
+    explicit LaserLayer(LaserDocument* document);
+    LaserLayer(const QString& id, LayerType type, LaserDocument* document);
     ~LaserLayer();
-
-    LaserLayer& operator=(const LaserLayer& other);
 
     QString id() const;
     void setId(const QString& id);
@@ -78,9 +72,34 @@ public:
     void addItem(LaserItem* item);
     QList<LaserItem*>& items();
 
+    LaserDocument* document() const;
+
 protected:
-    QExplicitlySharedDataPointer<LaserLayerPrivate> d_ptr;
-    friend class LaserLayerPrivate;
+    LayerType m_type;
+
+    int m_minSpeed;
+    int m_runSpeed;
+    int m_laserPower;
+
+    // engraving fields
+    bool m_engravingForward;
+    int m_engravingStyle;
+    int m_lineSpacing;
+    int m_columnSpacing;
+    int m_startX;
+    int m_startY;
+    int m_errorX;
+    int m_errorY;
+
+    // cutting fields
+    int m_moveSpeed;
+    int m_minSpeedPower;
+    int m_runSpeedPower;
+
+    LaserDocument* m_doc;
+
+    QList<LaserItem*> m_items;
+    Q_DISABLE_COPY(LaserLayer)
 };
 
 #endif // LASERLAYER_H

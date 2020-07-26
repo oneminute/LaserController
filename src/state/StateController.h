@@ -35,6 +35,10 @@ public:
     QState& mainLayerSelectedState() { return m_stateMainLayerSelected; }
     QState& mainNewShapeState() { return m_stateMainNewShape; }
 
+    QState& mainSingleSelectedNormalState() { return m_stateMainSingleSelectedNormal; }
+    QState& mainSingleSelectedScalingState() { return m_stateMainSingleSelectedScaling; }
+    QState& mainSingleSelectedRotatingState() { return m_stateMainSingleSelectedRotating; }
+
     QState& machiningState() { return m_stateMachining; }
 
     QFinalState& finalState() { return m_stateFinal; }
@@ -59,6 +63,11 @@ private:
     QState m_stateMainMultiSelected;
     QState m_stateMainLayerSelected;
     QState m_stateMainNewShape;
+    QState m_stateMainAreaSelecting;
+
+    QState m_stateMainSingleSelectedNormal;
+    QState m_stateMainSingleSelectedScaling;
+    QState m_stateMainSingleSelectedRotating;
 
     QFinalState m_stateFinal;
 };

@@ -76,7 +76,15 @@
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QTreeWidget" name="treeWidgetLayers">
+      <widget class="LaserLayerTreeWidget" name="treeWidgetLayers">
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::DragDrop</enum>
+       </property>
+       <column>
+        <property name="text">
+         <string>S</string>
+        </property>
+       </column>
        <column>
         <property name="text">
          <string notr="true">T</string>
@@ -99,7 +107,7 @@
        <item>
         <widget class="QToolButton" name="toolButtonAddLayer">
          <property name="text">
-          <string>+Layer</string>
+          <string>Add Layer</string>
          </property>
          <property name="popupMode">
           <enum>QToolButton::InstantPopup</enum>
@@ -115,7 +123,7 @@
        <item>
         <widget class="QToolButton" name="toolButtonRemoveLayer">
          <property name="text">
-          <string>-Layer</string>
+          <string>Remove Layer</string>
          </property>
         </widget>
        </item>
@@ -209,7 +217,24 @@
     <string>Remove Layer</string>
    </property>
   </action>
+  <action name="actionAreaSelection">
+   <property name="text">
+    <string>Area Selection</string>
+   </property>
+  </action>
+  <action name="actionCancelSelection">
+   <property name="text">
+    <string>Cancel Selection</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>LaserLayerTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header location="global">ui/LaserLayerTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
