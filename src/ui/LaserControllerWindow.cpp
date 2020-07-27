@@ -59,7 +59,7 @@ LaserControllerWindow::~LaserControllerWindow()
 void LaserControllerWindow::onActionAddEngravingLayer(bool)
 {
     QString newName = m_scene->document()->newLayerName(LLT_ENGRAVING);
-    LaserLayerDialog dialog(newName, LLT_ENGRAVING);
+    LaserLayerDialog dialog(m_scene->document(), LLT_ENGRAVING);
     if (dialog.exec() == QDialog::Accepted)
     {
         LaserLayer* layer = dialog.layer();
@@ -69,8 +69,7 @@ void LaserControllerWindow::onActionAddEngravingLayer(bool)
 
 void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
 {
-    QString newName = m_scene->document()->newLayerName(LLT_CUTTING);
-    LaserLayerDialog dialog(newName, LLT_CUTTING);
+    LaserLayerDialog dialog(m_scene->document(), LLT_CUTTING);
     if (dialog.exec() == QDialog::Accepted)
     {
         LaserLayer* layer = dialog.layer();
@@ -85,31 +84,32 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 
 void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem * item, int column)
 {
-    int i = item->data(0, Qt::UserRole).toInt();
-    qDebug() << i;
+    //int i = item->data(0, Qt::UserRole).toInt();
+    //qDebug() << i;
     if (item->parent() == nullptr)
     {
-        LayerType type = (LayerType)item->data(1, Qt::UserRole).toInt();
-        LaserLayer* layer = nullptr;
-        if (type == LLT_CUTTING)
+        //LaserLayerType type = (LaserLayerType)item->data(1, Qt::UserRole).toInt();
+        //LaserLayer* layer = nullptr;
+        LaserLayer* layer = item->data(0, Qt::UserRole).value<LaserLayer*>();
+        /*if (type == LLT_CUTTING)
         {
             layer = m_scene->document()->cuttingLayers()[i];
         }
         else if (type == LLT_ENGRAVING)
         {
             layer = m_scene->document()->engravingLayers()[i];
-        }
+        }*/
         LaserLayerDialog dialog(layer);
         if (dialog.exec() == QDialog::Accepted)
         {
             m_ui->treeWidgetLayers->updateItems();
         }
-        qDebug() << type << layer->id();
+        //qDebug() << type << layer->name();
     }
     else
     {
-        LaserItemType type = (LaserItemType)item->data(1, Qt::UserRole).toInt();
-        qDebug() << type;
+        LaserPrimitive* laserPrimitive = item->data(0, Qt::UserRole).value<LaserPrimitive*>();
+        //qDebug() << type;
     }
 }
 

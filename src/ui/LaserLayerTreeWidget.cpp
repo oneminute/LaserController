@@ -46,23 +46,23 @@ void LaserLayerTreeWidget::fillLayersTree(QList<LaserLayer*>& layers, const QStr
     for (int i = 0; i < layers.size(); i++)
     {
         LaserLayer* layer = layers[i];
-        QList<LaserItem*> laserItems = layer->items();
+        QList<LaserPrimitive*> laserItems = layer->items();
         QTreeWidgetItem* layerWidgetItem = new QTreeWidgetItem((QTreeWidgetItem*)nullptr, 0);
-        layerWidgetItem->setText(0, layer->id());
+        layerWidgetItem->setText(0, layer->name());
         layerWidgetItem->setCheckState(1, Qt::Unchecked);
         layerWidgetItem->setText(2, type);
         layerWidgetItem->setText(3, "V");
-        layerWidgetItem->setData(0, Qt::UserRole, i);
+        layerWidgetItem->setData(0, Qt::UserRole, QVariant::fromValue<LaserLayer*>(layer));
         layerWidgetItem->setData(1, Qt::UserRole, layer->type());
         for (int li = 0; li != laserItems.size(); li++)
         {
-            LaserItem* laserItem = laserItems[li];
+            LaserPrimitive* laserItem = laserItems[li];
             QTreeWidgetItem* itemWidgetItem = new QTreeWidgetItem(layerWidgetItem);
-            itemWidgetItem->setText(0, laserItem->objectName());
+            itemWidgetItem->setText(0, laserItem->name());
             itemWidgetItem->setCheckState(1, Qt::Unchecked);
             itemWidgetItem->setText(2, "S");
             itemWidgetItem->setText(3, "V");
-            itemWidgetItem->setData(0, Qt::UserRole, li);
+            itemWidgetItem->setData(0, Qt::UserRole, QVariant::fromValue<LaserPrimitive*>(laserItem));
             itemWidgetItem->setData(1, Qt::UserRole, laserItem->laserItemType());
         }
         treeWidgetItems.append(layerWidgetItem);

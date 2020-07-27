@@ -26,8 +26,9 @@ void LaserScene::updateDocument(LaserDocument * doc)
         clearDocument(true);
     }
 
-    QList<LaserItem*> items = doc->items();
-    for (QList<LaserItem*>::iterator i = items.begin(); i != items.end(); i++)
+    doc->setParent(this);
+    QList<LaserPrimitive*> items = doc->items();
+    for (QList<LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {
         //(*i)->bindGraphicsItem(this);
         this->addItem(*i);
@@ -43,7 +44,7 @@ void LaserScene::clearDocument(bool delDoc)
 
     if (delDoc && m_doc)
     {
-        delete m_doc;
+        m_doc->destroy();
         m_doc = nullptr;
     }
 }

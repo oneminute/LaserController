@@ -18,12 +18,12 @@ class LaserScene;
 class QPaintEvent;
 class LaserViewer;
 
-class LaserItem : public QGraphicsObject
+class LaserPrimitive : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    LaserItem(LaserDocument* doc, LaserItemType type, SizeUnit unit = SizeUnit::SU_MM100);
-    virtual ~LaserItem();
+    LaserPrimitive(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+    virtual ~LaserPrimitive();
 
     LaserDocument* document() const { return m_doc; }
     SizeUnit unit() const { return m_unit; }
@@ -41,36 +41,40 @@ public:
 
     qreal unitToMM() const;
 
-    LaserItemType laserItemType() const { return m_type; }
+    LaserPrimitiveType laserItemType() const { return m_type; }
     QString typeName();
-    bool isShape() const { return (int)m_type <= (int)LIT_SHAPE; }
-    bool isBitmap() const { return m_type == LIT_BITMAP; }
+    bool isShape() const { return (int)m_type <= (int)LPT_SHAPE; }
+    bool isBitmap() const { return m_type == LPT_BITMAP; }
+
+    QString name() const { return m_name; }
+    void setName(const QString& name) { m_name = name; }
 
 protected:
-    QString typeName(LaserItemType typeId);
+    QString typeName(LaserPrimitiveType typeId);
 
 protected:
     LaserDocument* m_doc;
     SizeUnit m_unit;
     QTransform m_transform;
     QRectF m_boundingRect;
-    LaserItemType m_type;
+    LaserPrimitiveType m_type;
+    QString m_name;
 
     bool m_isHover;
 
     static QMap<int, int> g_itemsMaxIndex;
 
 private:
-    Q_DISABLE_COPY(LaserItem);
+    Q_DISABLE_COPY(LaserPrimitive);
 
     friend class LaserDocument;
 };
 
-class LaserShapeItem : public LaserItem
+class LaserShapeItem : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserShapeItem(LaserDocument* doc, LaserItemType type, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserShapeItem(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
 
 private:
     Q_DISABLE_COPY(LaserShapeItem);
@@ -178,7 +182,7 @@ private:
     Q_DISABLE_COPY(LaserPolygonItem);
 };
 
-class LaserBitmapItem : public LaserItem
+class LaserBitmapItem : public LaserPrimitive
 {
     Q_OBJECT
 public:
@@ -191,7 +195,7 @@ public:
 
     virtual QByteArray engravingImage();
     virtual void draw(QPainter* painter);
-    virtual LaserItemType type() { return LIT_BITMAP; }
+    virtual LaserPrimitiveType type() { return LPT_BITMAP; }
     virtual QString typeName() { return tr("Bitmap"); }
 
 private:

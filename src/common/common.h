@@ -64,20 +64,20 @@ enum PageType {
     PT_UNDEFINED
 };
 
-enum LaserItemType
+enum LaserPrimitiveType
 {
-    LIT_LINE,
-    LIT_CIRCLE,
-    LIT_ELLIPSE,
-    LIT_RECT,
-    LIT_POLYLINE,
-    LIT_POLYGON,
-    LIT_PATH,
-    LIT_SHAPE,
-    LIT_BITMAP
+    LPT_LINE,
+    LPT_CIRCLE,
+    LPT_ELLIPSE,
+    LPT_RECT,
+    LPT_POLYLINE,
+    LPT_POLYGON,
+    LPT_PATH,
+    LPT_SHAPE,
+    LPT_BITMAP
 };
 
-enum LayerType
+enum LaserLayerType
 {
     LLT_ENGRAVING,
     LLT_CUTTING

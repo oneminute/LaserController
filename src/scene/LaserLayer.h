@@ -8,7 +8,7 @@
 #include <QSharedDataPointer>
 #include <QExplicitlySharedDataPointer>
 
-class LaserItem;
+class LaserPrimitive;
 class LaserLayerPrivate;
 class LaserDocument;
 
@@ -16,13 +16,12 @@ class LaserLayer : public QObject
 {
     Q_OBJECT
 public:
-    explicit LaserLayer(LaserDocument* document);
-    LaserLayer(const QString& id, LayerType type, LaserDocument* document);
-    ~LaserLayer();
+    explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document);
+    virtual ~LaserLayer();
 
-    QString id() const;
-    void setId(const QString& id);
-    LayerType type() const;
+    QString name() const;
+    void setName(const QString& name);
+    LaserLayerType type() const;
 
     int minSpeed() const;
     void setMinSpeed(int minSpeed);
@@ -69,13 +68,14 @@ public:
     int runSpeedPower() const;
     void setRunSpeedPower(int runSpeedPower);
 
-    void addItem(LaserItem* item);
-    QList<LaserItem*>& items();
+    void addItem(LaserPrimitive* item);
+    QList<LaserPrimitive*>& items();
 
     LaserDocument* document() const;
 
 protected:
-    LayerType m_type;
+    LaserLayerType m_type;
+    QString m_name;
 
     int m_minSpeed;
     int m_runSpeed;
@@ -98,7 +98,7 @@ protected:
 
     LaserDocument* m_doc;
 
-    QList<LaserItem*> m_items;
+    QList<LaserPrimitive*> m_items;
     Q_DISABLE_COPY(LaserLayer)
 };
 

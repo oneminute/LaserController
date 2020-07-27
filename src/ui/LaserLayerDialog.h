@@ -8,6 +8,7 @@
 
 class QCloseEvent;
 class LaserLayer;
+class LaserDocument;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserLayerDialog; }
@@ -17,7 +18,7 @@ class LaserLayerDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit LaserLayerDialog(const QString& id, LayerType type, QWidget* parent = nullptr);
+    explicit LaserLayerDialog(LaserDocument* doc, LaserLayerType type, QWidget* parent = nullptr);
     explicit LaserLayerDialog(LaserLayer* layer, QWidget* parent = nullptr);
     ~LaserLayerDialog();
 
@@ -33,7 +34,9 @@ protected slots:
 
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;
+    LaserDocument* m_doc;
     LaserLayer* m_layer;
+    LaserLayerType m_type;
 };
 
 #endif // LASERLAYERDIALOG_H

@@ -69,7 +69,7 @@ LaserDocument* SvgImporter::import(const QString & filename)
     {
         QSvgNode* node = stack.pop();
         QSvgRenderer* renderer = nullptr;
-        LaserItem* item = nullptr;
+        LaserPrimitive* item = nullptr;
         qDebug() << node->nodeId() << node->type();
         switch (node->type())
         {

@@ -19,6 +19,7 @@
 
 LaserDocument::LaserDocument(QObject* parent)
     : QObject(parent)
+    , m_blockSignals(false)
 {
     init();
 }
@@ -27,7 +28,7 @@ LaserDocument::~LaserDocument()
 {
 }
 
-void LaserDocument::addItem(LaserItem * item)
+void LaserDocument::addItem(LaserPrimitive * item)
 {
     m_items.append(item);
 
@@ -43,11 +44,11 @@ void LaserDocument::addItem(LaserItem * item)
     updateLayersStructure();
 }
 
-void LaserDocument::addItem(LaserItem * item, LaserLayer * layer)
+void LaserDocument::addItem(LaserPrimitive * item, LaserLayer * layer)
 {
 }
 
-void LaserDocument::removeItem(LaserItem * item)
+void LaserDocument::removeItem(LaserPrimitive * item)
 {
 }
 
@@ -66,7 +67,7 @@ QRectF LaserDocument::pageBounds() const
     return QRectF(0, 0, m_pageInfo.width(), m_pageInfo.height());
 }
 
-QList<LaserItem*> LaserDocument::items() const
+QList<LaserPrimitive*> LaserDocument::items() const
 {
     return m_items;
 }
@@ -101,7 +102,7 @@ void LaserDocument::addLayer(LaserLayer* layer)
     updateLayersStructure();
 }
 
-QString LaserDocument::newLayerName(LayerType type) const
+QString LaserDocument::newLayerName(LaserLayerType type) const
 {
     QList<LaserLayer*> layers;
     QString prefix;
@@ -125,7 +126,7 @@ QString LaserDocument::newLayerName(LayerType type) const
         name = prefix + QString::number(n);
         for (QList<LaserLayer*>::iterator i = layers.begin(); i != layers.end(); i++)
         {
-            if ((*i)->id() == name)
+            if ((*i)->name() == name)
             {
                 used = true;
                 break;
@@ -180,10 +181,10 @@ void LaserDocument::exportJSON(const QString& filename)
             //layerInfo[layerId] = layerObj;
             layerInfo.append(layerObj);
 
-            QList<LaserItem*> laserItems = layer->items();
+            QList<LaserPrimitive*> laserItems = layer->items();
             for (int li = 0; li < laserItems.size(); li++)
             {
-                LaserItem* laserItem = laserItems[li];
+                LaserPrimitive* laserItem = laserItems[li];
                 QJsonObject itemObj;
                 itemObj["Layer"] = layerId;
                 itemObj["PrinterDrawUnit"] = 1016;
@@ -223,10 +224,10 @@ void LaserDocument::exportJSON(const QString& filename)
             layerObj["ErrorY"] = layer->errorY();
             layerInfo.append(layerObj);
 
-            QList<LaserItem*> laserItems = layer->items();
+            QList<LaserPrimitive*> laserItems = layer->items();
             for (int li = 0; li < laserItems.size(); li++)
             {
-                LaserItem* laserItem = laserItems[li];
+                LaserPrimitive* laserItem = laserItems[li];
                 QJsonObject itemObj;
 
                 itemObj["Layer"] = layerId;

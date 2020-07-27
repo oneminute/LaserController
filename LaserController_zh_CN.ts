@@ -193,7 +193,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmapItem</name>
     <message>
-        <location filename="src/scene/LaserItem.h" line="193"/>
+        <location filename="src/scene/LaserItem.h" line="195"/>
         <source>Bitmap</source>
         <translation type="unfinished"></translation>
     </message>
@@ -237,13 +237,13 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="95"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="33"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="100"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="33"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -332,23 +332,23 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="33"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
         <source>T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="33"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
         <source>C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="120"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="121"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="187"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="196"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="188"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="197"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -356,56 +356,13 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="src/scene/LaserDocument.cpp" line="139"/>
+        <location filename="src/scene/LaserDocument.cpp" line="112"/>
         <source>Engraving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/scene/LaserDocument.cpp" line="143"/>
+        <location filename="src/scene/LaserDocument.cpp" line="116"/>
         <source>Cutting</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LaserItem</name>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="100"/>
-        <source>Bitmap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="101"/>
-        <source>Circle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="102"/>
-        <source>Ellipse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="103"/>
-        <source>Line</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="104"/>
-        <source>Path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="105"/>
-        <source>Polygon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="106"/>
-        <source>Polyline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/scene/LaserItem.cpp" line="107"/>
-        <source>Rect</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -547,6 +504,49 @@ Would you like to overwrite it?</source>
         <location filename="src/ui/LaserLayerDialog.ui" line="438"/>
         <location filename="src/ui/LaserLayerDialog.ui" line="441"/>
         <source>A widget combined Horizontal Slider and Line Edit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LaserPrimitive</name>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="103"/>
+        <source>Bitmap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="104"/>
+        <source>Circle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="105"/>
+        <source>Ellipse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="106"/>
+        <source>Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="107"/>
+        <source>Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="108"/>
+        <source>Polygon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="109"/>
+        <source>Polyline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/scene/LaserItem.cpp" line="110"/>
+        <source>Rect</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

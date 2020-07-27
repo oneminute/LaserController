@@ -2,33 +2,13 @@
 
 #include <QSharedData>
 
+#include "util/Utils.h"
 #include "LaserDocument.h"
 
-LaserLayer::LaserLayer(LaserDocument* document)
-    : QObject(document)
-    , m_type(LLT_ENGRAVING)
-    , m_minSpeed(60)
-    , m_runSpeed(300)
-    , m_laserPower(60)
-    , m_engravingForward(true)
-    , m_engravingStyle(0)
-    , m_lineSpacing(10)
-    , m_columnSpacing(10)
-    , m_startX(10)
-    , m_startY(10)
-    , m_errorX(0)
-    , m_errorY(0)
-    , m_moveSpeed(0)
-    , m_minSpeedPower(60)
-    , m_runSpeedPower(60)
-    , m_doc(document)
-{
-    Q_ASSERT(document);
-}
-
-LaserLayer::LaserLayer(const QString& id, LayerType type, LaserDocument* document)
+LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document)
     : QObject(document)
     , m_type(type)
+    , m_name(name)
     , m_minSpeed(60)
     , m_runSpeed(300)
     , m_laserPower(60)
@@ -46,7 +26,8 @@ LaserLayer::LaserLayer(const QString& id, LayerType type, LaserDocument* documen
     , m_doc(document)
 {
     Q_ASSERT(document);
-    setObjectName(id);
+    setParent(document);
+    setObjectName(utils::createUUID("layer_"));
 }
 
 LaserLayer::~LaserLayer()
@@ -54,17 +35,17 @@ LaserLayer::~LaserLayer()
     qDebug() << objectName();
 }
 
-QString LaserLayer::id() const 
+QString LaserLayer::name() const 
 {
-    return objectName(); 
+    return m_name; 
 }
 
-void LaserLayer::setId(const QString & id)
+void LaserLayer::setName(const QString & name)
 {
-    setObjectName(id);
+    m_name = name;
 }
 
-LayerType LaserLayer::type() const { return m_type; }
+LaserLayerType LaserLayer::type() const { return m_type; }
 
 int LaserLayer::minSpeed() const { return m_minSpeed; }
 
@@ -148,13 +129,13 @@ int LaserLayer::runSpeedPower() const { return m_runSpeedPower; }
 
 void LaserLayer::setRunSpeedPower(int runSpeedPower) { m_runSpeedPower = runSpeedPower; }
 
-void LaserLayer::addItem(LaserItem * item)
+void LaserLayer::addItem(LaserPrimitive * item)
 {
     m_items.append(item);
     m_doc->updateLayersStructure();
 }
 
-QList<LaserItem*>& LaserLayer::items()
+QList<LaserPrimitive*>& LaserLayer::items()
 {
     return m_items;
 }

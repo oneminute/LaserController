@@ -10,7 +10,7 @@
 #include "PageInformation.h"
 
 class LaserDocumentPrivate;
-class LaserItem;
+class LaserPrimitive;
 class LaserLayer;
 
 class LaserDocument : public QObject
@@ -20,22 +20,22 @@ public:
     explicit LaserDocument(QObject* parent = nullptr);
     ~LaserDocument();
 
-    void addItem(LaserItem* item);
-    void addItem(LaserItem* item, LaserLayer* layer);
-    void removeItem(LaserItem* item);
+    void addItem(LaserPrimitive* item);
+    void addItem(LaserPrimitive* item, LaserLayer* layer);
+    void removeItem(LaserPrimitive* item);
 
     PageInformation pageInformation() const;
     void setPageInformation(const PageInformation& page);
     QRectF pageBounds() const;
 
-    QList<LaserItem*> items() const;
+    QList<LaserPrimitive*> items() const;
 
     QList<LaserLayer*> layers() const;
     QList<LaserLayer*> engravingLayers() const;
     QList<LaserLayer*> cuttingLayers() const;
     void addLayer(LaserLayer* layer);
 
-    QString newLayerName(LayerType type) const;
+    QString newLayerName(LaserLayerType type) const;
 
     qreal scale() const;
     void setScale(qreal scale);
@@ -55,7 +55,7 @@ signals:
     void readyToDestroyed();
 
 private:
-    QList<LaserItem*> m_items;
+    QList<LaserPrimitive*> m_items;
     QList<LaserLayer*> m_engravingLayers;
     QList<LaserLayer*> m_cuttingLayers;
     PageInformation m_pageInfo;

@@ -19,7 +19,7 @@ private slots:
 private:
     LaserDocument* m_doc;
     QList<LaserLayer*> m_layers;
-    QList<LaserItem*> m_items;
+    QList<LaserPrimitive*> m_items;
 };
 
 #endif // TESTLASERDOCUMENT_H
