@@ -66,6 +66,8 @@ FILE(GLOB IMPORT_SOURCES src/import/*.cpp)
 FILE(GLOB LASER_HEADERS src/laser/*.h)
 FILE(GLOB LASER_SOURCES src/laser/*.cpp)
 
+FILE(GLOB RES src/res/*.qrc)
+
 FILE(GLOB SCENE_HEADERS src/scene/*.h)
 FILE(GLOB SCENE_SOURCES src/scene/*.cpp)
 
@@ -116,6 +118,7 @@ set(SRC_FILES
     ${COMMON_SOURCES}
     ${IMPORT_SOURCES}
     ${LASER_SOURCES}
+    ${RES}
 	${SCENE_SOURCES}
     ${STATE_SOURCES}
     ${SVG_SOURCES}
@@ -146,6 +149,7 @@ IF(MSVC)
     source_group("source\\widget" FILES ${WIDGET_SOURCES})
     source_group("source\\mocs" FILES ${MOCS})
     source_group("source" FILES ${BASE_SOURCES})
+    source_group("res" FILES ${RES})
 ENDIF(MSVC)
 
 include_directories(${INCLUDE_DIRS})
@@ -175,3 +179,35 @@ qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 add_subdirectory(test)
 
+get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
+function(WIN_DEPLOY_QT target)
+
+    # POST_BUILD step
+    # - after build, we have a bin/lib for analyzing qt dependencies
+    # - we run windeployqt on target and deploy Qt libs
+
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND "${QT_BIN_DIR}/windeployqt.exe"         
+                --dir ${CMAKE_INSTALL_PREFIX}
+                --verbose 1
+                --release
+                \"$<TARGET_FILE:${target}>\"
+        COMMENT "Deploying Qt libraries using windeployqt for compilation target '${target}' ..."
+    )
+
+endfunction()
+message(${QMAKE_EXECUTABLE})
+message(${QT_BIN_DIR})
+
+INSTALL(TARGETS LaserController
+        DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime)
+
+INSTALL(FILES 
+            "${CMAKE_SOURCE_DIR}/third/bin/CustomWidgets.dll"
+            "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
+        DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+
+
+WIN_DEPLOY_QT(LaserController)

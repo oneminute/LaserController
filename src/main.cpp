@@ -11,6 +11,7 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication::addLibraryPath("./bin");
     QApplication a(argc, argv);
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
     LaserControllerWindow w;
     LaserDriver::instance().load();
     LaserDriver::instance().init(w.winId());
-    w.show();
+    w.showMaximized();
     int ret = a.exec();
 
     StateController::instance().fsm().stop();

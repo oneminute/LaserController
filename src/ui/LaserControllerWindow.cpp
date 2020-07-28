@@ -39,6 +39,37 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //m_ui->toolButtonRemoveLayer->addAction(m_ui->actionRemoveLayer);
     m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
 
+    // set up tools buttons
+    QToolButton* toolButtonSelectionTool = new QToolButton();
+    QToolButton* toolButtonRectangleTool = new QToolButton();
+    QToolButton* toolButtonEllipseTool = new QToolButton();
+    QToolButton* toolButtonPolygonTool = new QToolButton();
+    QToolButton* toolButtonTextTool = new QToolButton();
+    QToolButton* toolButtonLineTool = new QToolButton();
+    QToolButton* toolButtonSplineTool = new QToolButton();
+    QToolButton* toolButtonBitmapTool = new QToolButton();
+
+    //QBoxLayout* toolBarToolsLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom);
+    //m_ui->toolBarTools->setLayout(toolBarToolsLayout);
+
+    toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
+    toolButtonRectangleTool->setDefaultAction(m_ui->actionRectangleTool);
+    toolButtonEllipseTool->setDefaultAction(m_ui->actionEllipseTool);
+    toolButtonPolygonTool->setDefaultAction(m_ui->actionPolygonTool);
+    toolButtonTextTool->setDefaultAction(m_ui->actionTextTool);
+    toolButtonLineTool->setDefaultAction(m_ui->actionLineTool);
+    toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
+    toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
+
+    m_ui->toolBarTools->addWidget(toolButtonSelectionTool);
+    m_ui->toolBarTools->addWidget(toolButtonRectangleTool);
+    m_ui->toolBarTools->addWidget(toolButtonEllipseTool);
+    m_ui->toolBarTools->addWidget(toolButtonPolygonTool);
+    m_ui->toolBarTools->addWidget(toolButtonTextTool);
+    m_ui->toolBarTools->addWidget(toolButtonLineTool);
+    m_ui->toolBarTools->addWidget(toolButtonSplineTool);
+    m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
+
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
     connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);

@@ -51,6 +51,9 @@ public:
 
 protected:
     QString typeName(LaserPrimitiveType typeId);
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 protected:
     LaserDocument* m_doc;

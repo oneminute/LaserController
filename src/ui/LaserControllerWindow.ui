@@ -48,24 +48,6 @@
    <addaction name="actionImportSVG"/>
    <addaction name="actionExportJSON"/>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetTools">
-   <property name="windowTitle">
-    <string>Tools</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents"/>
-  </widget>
-  <widget class="QDockWidget" name="dockWidgetItems">
-   <property name="windowTitle">
-    <string>Items</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2"/>
-  </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">
    <property name="windowTitle">
     <string>Layers</string>
@@ -77,6 +59,12 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="LaserLayerTreeWidget" name="treeWidgetLayers">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="dragDropMode">
         <enum>QAbstractItemView::DragDrop</enum>
        </property>
@@ -154,6 +142,32 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4"/>
   </widget>
+  <widget class="QToolBar" name="toolBarTools">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
@@ -227,14 +241,88 @@
     <string>Cancel Selection</string>
    </property>
   </action>
+  <action name="actionSelectionTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Selection.png</normaloff>:/ui/icons/images/Selection.png</iconset>
+   </property>
+   <property name="text">
+    <string>Selection Tool</string>
+   </property>
+  </action>
+  <action name="actionRectangleTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Rectangle.png</normaloff>:/ui/icons/images/Rectangle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rectangle Tool</string>
+   </property>
+  </action>
+  <action name="actionEllipseTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Ellipse.png</normaloff>:/ui/icons/images/Ellipse.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ellipse Tool</string>
+   </property>
+  </action>
+  <action name="actionPolygonTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Polygon.png</normaloff>:/ui/icons/images/Polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Polygon Tool</string>
+   </property>
+  </action>
+  <action name="actionTextTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Text.png</normaloff>:/ui/icons/images/Text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Text Tool</string>
+   </property>
+  </action>
+  <action name="actionLineTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Line.png</normaloff>:/ui/icons/images/Line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Line Tool</string>
+   </property>
+  </action>
+  <action name="actionBitmapTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Image.png</normaloff>:/ui/icons/images/Image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bitmap Tool</string>
+   </property>
+  </action>
+  <action name="actionSplineTool">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Spline.png</normaloff>:/ui/icons/images/Spline.png</iconset>
+   </property>
+   <property name="text">
+    <string>Spline Tool</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>LaserLayerTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header location="global">ui/LaserLayerTreeWidget.h</header>
+   <header location="global">widget/LaserLayerTreeWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../res/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

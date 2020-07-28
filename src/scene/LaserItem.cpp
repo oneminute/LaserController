@@ -63,13 +63,14 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         painter->setPen(QPen(Qt::gray, 0.2f, Qt::SolidLine));
         painter->drawRect(bounds);
     }
-    else if (isUnderMouse())
+    //else if (isUnderMouse())
+    else if (m_isHover)
     {
+        qDebug() << name() << "redrawing under mouse.";
         painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
         painter->drawRect(bounds);
     }
     
-
     // »æÖÆÍ¼Ôª
     painter->setPen(QPen(Qt::blue, 50, Qt::SolidLine));
     QTransform t = m_transform * painter->worldTransform();
@@ -77,6 +78,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     draw(painter);
 
     painter->restore();
+    this->scene()->update();
 }
 
 QRectF LaserPrimitive::boundingRect() const
@@ -112,6 +114,24 @@ QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
         { LPT_RECT, tr("Rect") }
     };
     return TypeNamesMap[typeId];
+}
+
+void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    qDebug() << name() << "hover enter.";
+    m_isHover = true;
+    update();
+}
+
+void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_isHover = false;
+    update();
+}
+
+void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    update();
 }
 
 LaserShapeItem::LaserShapeItem(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit)
