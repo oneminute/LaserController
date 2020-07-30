@@ -71,6 +71,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
+    connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
     connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
     connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
@@ -85,6 +86,37 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 LaserControllerWindow::~LaserControllerWindow()
 {
 
+}
+
+void LaserControllerWindow::onActionImportSVG(bool checked)
+{
+    QString filename = getFilename(tr("Open SVG File"), QStringList() << "image/svg+xml" << "image/svg+xml-compressed");
+    if (filename.isEmpty())
+        return;
+    QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
+    QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
+    LaserDocument* doc = importer->import(filename);
+    if (doc)
+    {
+        m_scene->updateDocument(doc);
+        m_ui->treeWidgetLayers->setDocument(doc);
+        m_ui->treeWidgetLayers->updateItems();
+    }
+    StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
+}
+
+void LaserControllerWindow::onActionImportCorelDraw(bool checked)
+{
+    QSharedPointer<Importer> importer = Importer::getImporter(Importer::CORELDRAW);
+    QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
+    LaserDocument* doc = importer->import();
+    if (doc)
+    {
+        m_scene->updateDocument(doc);
+        m_ui->treeWidgetLayers->setDocument(doc);
+        m_ui->treeWidgetLayers->updateItems();
+    }
+    StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }
 
 void LaserControllerWindow::onActionAddEngravingLayer(bool)
@@ -115,21 +147,10 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 
 void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem * item, int column)
 {
-    //int i = item->data(0, Qt::UserRole).toInt();
-    //qDebug() << i;
     if (item->parent() == nullptr)
     {
-        //LaserLayerType type = (LaserLayerType)item->data(1, Qt::UserRole).toInt();
-        //LaserLayer* layer = nullptr;
         LaserLayer* layer = item->data(0, Qt::UserRole).value<LaserLayer*>();
-        /*if (type == LLT_CUTTING)
-        {
-            layer = m_scene->document()->cuttingLayers()[i];
-        }
-        else if (type == LLT_ENGRAVING)
-        {
-            layer = m_scene->document()->engravingLayers()[i];
-        }*/
+        
         LaserLayerDialog dialog(layer);
         if (dialog.exec() == QDialog::Accepted)
         {
@@ -223,19 +244,4 @@ QString LaserControllerWindow::getFilename(const QString& title, const QStringLi
         return "";
 }
 
-void LaserControllerWindow::onActionImportSVG(bool checked)
-{
-    QString filename = getFilename(tr("Open SVG File"), QStringList() << "image/svg+xml" << "image/svg+xml-compressed");
-    if (filename.isEmpty())
-        return;
-    QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
-    QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
-    LaserDocument* doc = importer->import(filename);
-    if (doc)
-    {
-        m_scene->updateDocument(doc);
-        m_ui->treeWidgetLayers->setDocument(doc);
-        m_ui->treeWidgetLayers->updateItems();
-    }
-    StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
-}
+

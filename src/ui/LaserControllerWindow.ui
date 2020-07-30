@@ -27,9 +27,16 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>Import</string>
+     </property>
+     <addaction name="actionImportSVG"/>
+     <addaction name="actionImportCorelDraw"/>
+    </widget>
     <addaction name="actionOpen"/>
-    <addaction name="actionImportSVG"/>
     <addaction name="actionExportJSON"/>
+    <addaction name="menuImport"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -46,6 +53,7 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionImportSVG"/>
+   <addaction name="actionImportCorelDraw"/>
    <addaction name="actionExportJSON"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">
@@ -311,6 +319,14 @@
    </property>
    <property name="text">
     <string>Spline Tool</string>
+   </property>
+  </action>
+  <action name="actionImportCorelDraw">
+   <property name="text">
+    <string>Import CorelDraw</string>
+   </property>
+   <property name="toolTip">
+    <string>Import CorelDraw</string>
    </property>
   </action>
  </widget>

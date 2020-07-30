@@ -12,12 +12,13 @@ class Importer : public QObject
 public:
     enum Types
     {
-        SVG = 0
+        SVG = 0,
+        CORELDRAW
     };
 
     Importer(QObject* parent = nullptr);
 
-    virtual LaserDocument* import(const QString& filename) = 0;
+    virtual LaserDocument* import(const QString& filename = "") = 0;
     
     static QSharedPointer<Importer> getImporter(Types type);
 
