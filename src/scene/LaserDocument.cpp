@@ -222,7 +222,8 @@ void LaserDocument::exportJSON(const QString& filename)
             layerObj["LStep"] = layer->columnSpacing();
             layerObj["ErrorX"] = layer->errorX();
             layerObj["ErrorY"] = layer->errorY();
-            layerInfo.append(layerObj);
+            layerObj["MinSpeedPower"] = layer->minSpeedPower();
+            layerObj["RunSpeedPower"] = layer->runSpeedPower();
 
             QList<LaserPrimitive*> laserItems = layer->items();
             for (int li = 0; li < laserItems.size(); li++)
@@ -245,6 +246,10 @@ void LaserDocument::exportJSON(const QString& filename)
                 QPointF pos = laserItem->laserStartPos();
                 itemObj["StartX"] = qFloor(pos.x());
                 itemObj["StartY"] = qFloor(pos.y());
+                layerObj["StartX"] = qFloor(pos.x());
+                layerObj["StartY"] = qFloor(pos.x());
+                layerObj["Width"] = laserItem->boundingRect().width();
+                layerObj["Height"] = laserItem->boundingRect().height();
                 
                 QByteArray data = laserItem->engravingImage();
                 if (!data.isEmpty())
@@ -254,6 +259,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     elementsArray.append(itemObj);
                 }
             }
+            layerInfo.append(layerObj);
         }
         imageObj["Elements"] = elementsArray;
         carveInfo["Image"] = imageObj;
@@ -262,6 +268,7 @@ void LaserDocument::exportJSON(const QString& filename)
     }
     QJsonObject actionObj;
     actionObj["FinishRun"] = 0;
+    actionObj["CarveFirst"] = true;
     dataInfo["Action"] = actionObj;
 
     jsonObj["LayerInfo"] = layerInfo;

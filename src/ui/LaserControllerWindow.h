@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMainWindow>
 #include <QScopedPointer>
+#include <QDir>
 
 #include "scene/LaserLayer.h"
 
@@ -30,6 +31,9 @@ protected slots:
     void onActionRemoveLayer(bool checked = false);
     void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onActionExportJson(bool checked = false);
+    void onActionMechining(bool checked = false);
+    void onActionPauseMechining(bool checked = false);
+    void onActionStopMechining(bool checked = false);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
@@ -44,6 +48,7 @@ private:
     LaserViewer* m_viewer;
     QScopedPointer<LaserScene> m_scene;
     bool m_created;
+    QDir m_tmpDir;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

@@ -105,6 +105,7 @@ public:
     void stopMachining();
     int controlMotor(bool open);
     int testLaserLight(bool open);
+    int loadDataFromFile(const QString& filename);
 
 private:
     bool m_isLoaded;
@@ -144,6 +145,10 @@ private:
     FN_VOID_VOID m_fnStopMachining;
     FN_INT_BOOL m_fnControlMotor;
     FN_INT_BOOL m_fnTestLaserLight;
+
+    FN_INT_WCHART m_fnLoadDataFromFile;
+
+    wchar_t m_wcharBuffer[2048];
 };
 
 #endif // LASERCONTROLLER_H

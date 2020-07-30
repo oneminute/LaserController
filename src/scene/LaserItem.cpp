@@ -66,7 +66,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     //else if (isUnderMouse())
     else if (m_isHover)
     {
-        qDebug() << name() << "redrawing under mouse.";
+        //qDebug() << name() << "redrawing under mouse.";
         painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
         painter->drawRect(bounds);
     }
@@ -118,7 +118,7 @@ QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
-    qDebug() << name() << "hover enter.";
+    //qDebug() << name() << "hover enter.";
     m_isHover = true;
     update();
 }

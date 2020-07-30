@@ -1,16 +1,9 @@
 #include "PltUtils.h"
 
 #include <QtMath>
+#include <QDebug>
 
 #include "TypeUtils.h"
-//void pltUtils::linePoints(const Eigen::Vector2d & p1, const Eigen::Vector2d & p2, QVector<Eigen::Vector2d> points, qreal factor)
-//{
-//    Eigen::Vector2d ptBegin = p1 * factor;
-//    Eigen::Vector2d ptEnd = p2 * factor;
-//    Eigen::Vector2d line = ptEnd - ptBegin;
-//
-//
-//}
 
 int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
 {
@@ -55,7 +48,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
 
     QPointF startPt = pt;
-    std::cout << std::setw(8) << slope << radians << std::endl;
+    qDebug() << "Slope:" << slope << ", Angle degrees: " << qRadiansToDegrees(radians);
 
     QPointF anchor = pt;
     qreal anchorSlope = slope;
@@ -70,8 +63,6 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
         pt = path.pointAtPercent(percent);
         slope = path.slopeAtPercent(percent);
         radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
-
-        //std::cout << std::setw(8) << slope << radians << std::endl;
 
         qreal diff = qAbs(qAbs(radians) - qAbs(anchorRadians));
 

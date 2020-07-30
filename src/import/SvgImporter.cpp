@@ -70,7 +70,7 @@ LaserDocument* SvgImporter::import(const QString & filename)
         QSvgNode* node = stack.pop();
         QSvgRenderer* renderer = nullptr;
         LaserPrimitive* item = nullptr;
-        qDebug() << node->nodeId() << node->type();
+        //qDebug() << node->nodeId() << node->type();
         switch (node->type())
         {
         case QSvgNode::DOC:
@@ -130,7 +130,7 @@ LaserDocument* SvgImporter::import(const QString & filename)
             {
                 QSvgRect* svgRectNode = reinterpret_cast<QSvgRect*>(node);
                 qreal area = svgRectNode->rect().width() * svgRectNode->rect().height();
-                qDebug() << "svg rect's area:" << area;
+                //qDebug() << "svg rect's area:" << area;
                 if (area > 0)
                     item = new LaserRectItem(svgRectNode->rect(), ldoc, shapeUnit);
             }

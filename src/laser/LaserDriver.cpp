@@ -1,6 +1,8 @@
 #include "LaserDriver.h"
 
 #include <QDebug>
+#include "util/Utils.h"
+#include "util/TypeUtils.h"
 
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
@@ -82,6 +84,10 @@ bool LaserDriver::load()
     m_fnStopMachining = (FN_VOID_VOID)m_library.resolve("StopMachining");
     m_fnControlMotor = (FN_INT_BOOL)m_library.resolve("ControlMotor");
     m_fnTestLaserLight = (FN_INT_BOOL)m_library.resolve("TestLaserLight");
+
+    m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
+
+    Q_ASSERT(m_fnLoadDataFromFile);
 
     //qDebug() << m_fnGetAPILibVersion;
     //qDebug() << m_fnGetAPILibCompileInfo;
@@ -196,12 +202,14 @@ bool LaserDriver::writeSysParamToCard(QList<int> addresses, QList<double> values
     addrBuf = addrList.join(",");
     valuesBuf = valuesList.join(",");
 
-    wchar_t* wcAddrs = new wchar_t[addrBuf.length() + 1];
+    wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
+    wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
+    /*wchar_t* wcAddrs = new wchar_t[addrBuf.length() + 1];
     wchar_t* wcValues = new wchar_t[valuesBuf.length() + 1];
     addrBuf.toWCharArray(wcAddrs);
     wcAddrs[addrBuf.length()] = 0;
     valuesBuf.toWCharArray(wcValues);
-    wcValues[valuesBuf.length()] = 0;
+    wcValues[valuesBuf.length()] = 0;*/
     bool success = m_fnWriteSysParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
     delete[] wcValues;
@@ -219,10 +227,12 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
         addrList.append(QString("%1").arg(addresses[i]));
     }
     QString addrStr = addrList.join(",");
-    wchar_t* addrBuf = new wchar_t[addrStr.length() + 1];
+    wchar_t* addrBuf = typeUtils::qStringToWCharPtr(addrStr);
+    /*wchar_t* addrBuf = new wchar_t[addrStr.length() + 1];
     addrStr.toWCharArray(addrBuf);
-    addrBuf[addrStr.length() + 1] = 0;
+    addrBuf[addrStr.length()] = 0;*/
     bool success = m_fnReadSysParamFromCard(addrBuf) != -1;
+    delete[] addrBuf;
     return success;
 }
 
@@ -285,6 +295,25 @@ int LaserDriver::controlMotor(bool open)
 int LaserDriver::testLaserLight(bool open)
 {
     return m_fnTestLaserLight(open);
+}
+
+int LaserDriver::loadDataFromFile(const QString & filename)
+{
+    //wchar_t* buf = new wchar_t[filename.length() + 1];
+    //filename.toWCharArray(m_wcharBuffer);
+    //m_wcharBuffer[filename.length()] = 0;
+    int ret = 0;
+    try
+    {
+        wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
+        ret = m_fnLoadDataFromFile(filenameBuf);
+        delete[] filenameBuf;
+    }
+    catch (void*)
+    {
+        qDebug() << "error";
+    }
+    return ret;
 }
 
 

@@ -17,9 +17,10 @@ void TestLaserDriver::laserDriverTestCase()
     qDebug() << compileInfo;
     driver.init(w.winId());
     QList<int> ports = driver.getPortList();
+    qDebug() << "ports:" << ports;
     QVERIFY(ports.length() > 0);
-    QVERIFY(driver.initComPort(ports[0]));
-    QVERIFY(driver.unInitComPort());
+    //QVERIFY(driver.initComPort(ports[0]));
+    //QVERIFY(driver.unInitComPort());
     driver.setTransTimeOutInterval(20);
     driver.setSoftwareInitialization(1016, 10, 10, 210, 297);
     driver.setHardwareInitialization(0.2, 300, 2, 1);
@@ -36,12 +37,12 @@ void TestLaserDriver::laserDriverTestCase()
     QVERIFY(!driver.getMainCardID().isEmpty());
     qDebug() << "GetCurrentLaserPos:" << driver.GetCurrentLaserPos();
     driver.smallScaleMovement(true, false, 2, 100, 200, 300);
+    driver.loadDataFromFile("D:/LaserController/install/shapes.svg");
     driver.startMachining(true);
     driver.pauseContinueMachining(true);
     //driver.stopMachining();
     driver.controlMotor(true);
     driver.testLaserLight(true);
-    QThread::sleep(3);
     driver.unload();
 }
 

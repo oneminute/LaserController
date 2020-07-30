@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     QTEST_SET_MAIN_SOURCE_PATH
 
     int ret = 0;
-    //ret += QTest::qExec(&testLaserDriver, argc, argv);
+    ret += QTest::qExec(&testLaserDriver, argc, argv);
     ret += QTest::qExec(&testStateController, argc, argv);
     ret += QTest::qExec(&testLaserDocument, argc, argv);
 

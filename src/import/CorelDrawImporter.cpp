@@ -30,13 +30,8 @@ LaserDocument * CorelDrawImporter::import(const QString & filename)
 
     app = VGCore::IVGApplicationPtr(L"CorelDRAW.Application.18");
 
-    QDir appDir(QCoreApplication::applicationDirPath());
     QDir tmpDir(QCoreApplication::applicationDirPath() + "/tmp");
-    //tmpDir.cd("tmp");
-    if (!tmpDir.exists())
-    {
-        appDir.mkpath("tmp");
-    }
+    
     QString tmpSvgFilename = "";
     try
     {

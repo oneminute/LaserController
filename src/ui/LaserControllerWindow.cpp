@@ -13,7 +13,9 @@
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
 #include "ui/LaserLayerDialog.h"
+#include "ui/ConnectionDialog.h"
 #include "widget/LaserViewer.h"
+#include "util/Utils.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -36,7 +38,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
-    //m_ui->toolButtonRemoveLayer->addAction(m_ui->actionRemoveLayer);
     m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
 
     // set up tools buttons
@@ -48,9 +49,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     QToolButton* toolButtonLineTool = new QToolButton();
     QToolButton* toolButtonSplineTool = new QToolButton();
     QToolButton* toolButtonBitmapTool = new QToolButton();
-
-    //QBoxLayout* toolBarToolsLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom);
-    //m_ui->toolBarTools->setLayout(toolBarToolsLayout);
 
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
     toolButtonRectangleTool->setDefaultAction(m_ui->actionRectangleTool);
@@ -77,10 +75,21 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
+    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMechining);
+    connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
+    connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
 
     StateControllerInst.initState().addTransition(this, SIGNAL(windowCreated()), &StateControllerInst.normalState());
 
     bindWidgetsProperties();
+
+    // check tmp folder
+    QDir appDir(QCoreApplication::applicationDirPath());
+    m_tmpDir = QDir(QCoreApplication::applicationDirPath() + "/tmp");
+    if (!m_tmpDir.exists())
+    {
+        appDir.mkpath("tmp");
+    }
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -178,6 +187,32 @@ void LaserControllerWindow::onActionExportJson(bool checked)
             m_scene->document()->exportJSON(filename);
 
     }
+}
+
+void LaserControllerWindow::onActionMechining(bool checked)
+{
+    //QString filename = utils::createUUID("json_") + ".json";
+    ConnectionDialog dialog;
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString filename = "export.json";
+        filename = m_tmpDir.absoluteFilePath(filename);
+        m_scene->document()->exportJSON(filename);
+        qDebug() << "export temp json file for machining" << filename;
+        LaserDriver::instance().loadDataFromFile(filename);
+        LaserDriver::instance().startMachining(true);
+        //m_tmpDir.remove(filename);
+    }
+}
+
+void LaserControllerWindow::onActionPauseMechining(bool checked)
+{
+    LaserDriver::instance().pauseContinueMachining(checked);
+}
+
+void LaserControllerWindow::onActionStopMechining(bool checked)
+{
+    LaserDriver::instance().stopMachining();
 }
 
 void LaserControllerWindow::bindWidgetsProperties()

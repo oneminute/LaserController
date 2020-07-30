@@ -16,3 +16,11 @@ _bstr_t typeUtils::qStringToBstr(const QString & str)
     _bstr_t bstr = SysAllocString(wstr.c_str());
     return bstr;
 }
+
+wchar_t * typeUtils::qStringToWCharPtr(const QString & str)
+{
+    wchar_t* buf = new wchar_t[str.length() + 1];
+    str.toWCharArray(buf);
+    buf[str.length()] = 0;
+    return buf;
+}
