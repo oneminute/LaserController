@@ -11,7 +11,13 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::addLibraryPath("./bin");
+    QDir dir(QApplication::applicationDirPath());
+    QApplication::addLibraryPath(dir.absoluteFilePath("bin"));
+    QApplication::setOrganizationName("OneMinute");
+    QApplication::setApplicationVersion(QString("%1.%2.%3.%4").arg(LC_VERSION_MAJOR).arg(LC_VERSION_MINOR).arg(LC_VERSION_BUILD).arg(LC_VERSION_REVISION));
+
+    qDebug() << QApplication::applicationVersion();
+
     QApplication a(argc, argv);
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 

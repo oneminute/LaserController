@@ -10,6 +10,19 @@
     </message>
 </context>
 <context>
+    <name>ConnectionDialog</name>
+    <message>
+        <location filename="src/ui/ConnectionDialog.ui" line="14"/>
+        <source>Connection Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/ConnectionDialog.ui" line="20"/>
+        <source>COM:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExportDialog</name>
     <message>
         <location filename="src/svg/exportdialog.cpp" line="86"/>
@@ -221,180 +234,195 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="61"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="64"/>
         <source>Layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="81"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="84"/>
         <source>S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="91"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="94"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="36"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="96"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="99"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="36"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="106"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="109"/>
         <source>Add Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="122"/>
-        <location filename="src/ui/LaserControllerWindow.ui" line="239"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="125"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="242"/>
         <source>Remove Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="146"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="149"/>
         <source>Propergies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="155"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="158"/>
         <source>toolBar_2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="181"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="184"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="184"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="187"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="189"/>
         <location filename="src/ui/LaserControllerWindow.ui" line="192"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="195"/>
         <source>Import SVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="197"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="200"/>
         <source>Export JSON</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="202"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="205"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="205"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="208"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="210"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="213"/>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="213"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="216"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="218"/>
         <location filename="src/ui/LaserControllerWindow.ui" line="221"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="224"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="226"/>
         <location filename="src/ui/LaserControllerWindow.ui" line="229"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="232"/>
         <source>Add Engraving Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="234"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="237"/>
         <source>Add Cutting Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="244"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="247"/>
         <source>Area Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="249"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="252"/>
         <source>Cancel Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="258"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="261"/>
         <source>Selection Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="267"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="270"/>
         <source>Rectangle Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="276"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="279"/>
         <source>Ellipse Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="285"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="288"/>
         <source>Polygon Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="294"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="297"/>
         <source>Text Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="303"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="306"/>
         <source>Line Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="312"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="315"/>
         <source>Bitmap Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="321"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="324"/>
         <source>Spline Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.ui" line="326"/>
         <location filename="src/ui/LaserControllerWindow.ui" line="329"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="332"/>
         <source>Import CorelDraw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
+        <location filename="src/ui/LaserControllerWindow.ui" line="337"/>
+        <source>Machining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="345"/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.ui" line="350"/>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="36"/>
         <source>C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="34"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="36"/>
         <source>T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="93"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="244"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="102"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="275"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="177"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="182"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
