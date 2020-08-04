@@ -84,8 +84,8 @@ public:
     QString getCompileInfo();
     void init(int handle);
     void unInit();
-    QList<int> getPortList();
-    bool initComPort(int index);
+    QStringList getPortList();
+    bool initComPort(const QString& name);
     bool unInitComPort();
     void setTransTimeOutInterval(int interval);
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
@@ -107,8 +107,15 @@ public:
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename);
 
+    bool isLoaded() const { return m_isLoaded; }
+    bool isConnected() const { return m_isConnected; }
+    QString portName() const { return m_portName; }
+
 private:
     bool m_isLoaded;
+    bool m_isConnected;
+    QString m_portName;
+
     QLibrary m_library;
 
     FN_WCHART_VOID m_fnGetAPILibVersion;

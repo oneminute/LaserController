@@ -16,6 +16,7 @@ add_definitions(-DPCL_ONLY_CORE_POINT_TYPES)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
+# declare variables
 set(QT_WIN32_PATH "" CACHE PATH "")
 set(OPENCV_WIN32_PATH "" CACHE PATH "")
 list(APPEND CMAKE_PROGRAM_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH})
@@ -40,13 +41,15 @@ find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL CONFIG REQUIRED)
 find_package(OpenCV REQUIRED QUIET)
 find_package(OpenMP REQUIRED QUIET)
 find_package(ZLib REQUIRED QUIET)
+find_package(glog REQUIRED QUIET)
+find_package(gflags REQUIRED QUIET)
 
 set(TS_FILES LaserController_zh_CN.ts)
 
 add_compile_definitions(LC_VERSION_MAJOR=0)
 add_compile_definitions(LC_VERSION_MINOR=1)
 add_compile_definitions(LC_VERSION_BUILD=1)
-add_compile_definitions(LC_VERSION_REVISION=1)
+add_compile_definitions(LC_VERSION_REVISION=2)
 
 #add_subdirectory(widgets)
 set(INCLUDE_DIRS
@@ -169,7 +172,11 @@ set(LINK_LIBRARIES
     ${Boost_LIBRARIES} 
     ${ZLIB_LIBRARIES}
     ${CustomWidgets_LIBRARY}
+    glog::glog
+    ${GFLAGS_LIBRARIES}
 )
+
+message(STATUS ${GFLAGS_LIBRARIES})
 
 if(ANDROID)
   add_library(LaserController SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${TS_FILES})

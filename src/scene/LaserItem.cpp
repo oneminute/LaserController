@@ -137,7 +137,7 @@ void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 LaserShapeItem::LaserShapeItem(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit)
     : LaserPrimitive(doc, type, unit)
 {
-    m_type = LPT_SHAPE;
+    //m_type = LPT_SHAPE;
 }
 
 LaserEllipseItem::LaserEllipseItem(const QRectF bounds, LaserDocument * doc, SizeUnit unit)

@@ -6,6 +6,9 @@
 
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
+    , m_isLoaded(false)
+    , m_isConnected(false)
+    , m_portName("")
 {
 
 }
@@ -130,31 +133,23 @@ void LaserDriver::unInit()
     m_isLoaded = false;
 }
 
-QList<int> LaserDriver::getPortList()
+QStringList LaserDriver::getPortList()
 {
     QString portList = QString::fromWCharArray(m_fnGetComPortList());
     QStringList portNames = portList.split(";");
-    QList<int> ports;
-    QRegExp re("COM(\\d+)");
-    for (int i = 0; i < portNames.length(); i++)
-    {
-        QString portItem = portNames[i];
-        re.indexIn(portItem);
-        QString portName = re.cap(1);
-        qDebug() << portItem << portName;
-        bool ok = false;
-        int port = portName.toInt(&ok);
-        if (ok)
-        {
-            ports.append(port);
-        }
-    }
-    return ports;
+    
+    return portNames;
 }
 
-bool LaserDriver::initComPort(int index)
+bool LaserDriver::initComPort(const QString & name)
 {
-    int result = m_fnInitComPort(index);
+    int port = utils::parsePortName(name);
+    int result = m_fnInitComPort(port);
+    if (result == 0)
+    {
+        m_isConnected = true;
+        m_portName = name;
+    }
     return result == 0;
 }
 

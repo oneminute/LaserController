@@ -2,6 +2,7 @@
 #include "ui_ConnectionDialog.h"
 
 #include "laser/LaserDriver.h"
+#include "util/Utils.h"
 
 ConnectionDialog::ConnectionDialog(QWidget* parent)
     : QDialog(parent)
@@ -9,10 +10,10 @@ ConnectionDialog::ConnectionDialog(QWidget* parent)
 {
     m_ui->setupUi(this);
 
-    QList<int> ports = LaserDriver::instance().getPortList();
+    QStringList ports = LaserDriver::instance().getPortList();
     for (int i = 0; i < ports.size(); i++)
     {
-        m_ui->comboBoxCOMs->addItem(QString("COM %1").arg(ports[i]), ports[i]);
+        m_ui->comboBoxCOMs->addItem(ports[i], utils::parsePortName(ports[i]));
     }
 
 }
@@ -24,7 +25,7 @@ ConnectionDialog::~ConnectionDialog()
 
 void ConnectionDialog::accept()
 {
-    int comPort = m_ui->comboBoxCOMs->currentData(Qt::UserRole).toInt();
-    LaserDriver::instance().initComPort(comPort);
+    QString portName = m_ui->comboBoxCOMs->currentText();
+    LaserDriver::instance().initComPort(portName);
     QDialog::accept();
 }

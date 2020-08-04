@@ -4,6 +4,8 @@
 #include <QFileDialog>
 #include <QTreeWidgetItem>
 #include <QTimer>
+#include <QErrorMessage>
+#include <QMessageBox>
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
@@ -78,6 +80,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMechining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
+    connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
+    connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
+    connect(m_ui->actionLoadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionLoadMotor);
+    connect(m_ui->actionUnloadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionUnloadMotor);
 
     StateControllerInst.initState().addTransition(this, SIGNAL(windowCreated()), &StateControllerInst.normalState());
 
@@ -192,17 +198,14 @@ void LaserControllerWindow::onActionExportJson(bool checked)
 void LaserControllerWindow::onActionMechining(bool checked)
 {
     //QString filename = utils::createUUID("json_") + ".json";
-    ConnectionDialog dialog;
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        QString filename = "export.json";
-        filename = m_tmpDir.absoluteFilePath(filename);
-        m_scene->document()->exportJSON(filename);
-        qDebug() << "export temp json file for machining" << filename;
-        LaserDriver::instance().loadDataFromFile(filename);
-        LaserDriver::instance().startMachining(true);
-        //m_tmpDir.remove(filename);
-    }
+
+    QString filename = "export.json";
+    filename = m_tmpDir.absoluteFilePath(filename);
+    m_scene->document()->exportJSON(filename);
+    qDebug() << "export temp json file for machining" << filename;
+    LaserDriver::instance().loadDataFromFile(filename);
+    LaserDriver::instance().startMachining(true);
+    //m_tmpDir.remove(filename);
 }
 
 void LaserControllerWindow::onActionPauseMechining(bool checked)
@@ -213,6 +216,40 @@ void LaserControllerWindow::onActionPauseMechining(bool checked)
 void LaserControllerWindow::onActionStopMechining(bool checked)
 {
     LaserDriver::instance().stopMachining();
+}
+
+void LaserControllerWindow::onActionConnect(bool checked)
+{
+    ConnectionDialog dialog;
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        if (!LaserDriver::instance().isConnected())
+        {
+            QErrorMessage dialog;
+            dialog.showMessage(tr("Can not connect to laser machine."));
+        }
+    }
+}
+
+void LaserControllerWindow::onActionDisconnect(bool checked)
+{
+    if (QMessageBox::Apply == QMessageBox::question(this, tr("Disconnect"), tr("Do you want to disconnect from laser machine?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+    {
+        LaserDriver::instance().disconnect();
+    }
+}
+
+void LaserControllerWindow::onActionLoadMotor(bool checked)
+{
+    LaserDriver::instance().controlMotor(true);
+}
+
+void LaserControllerWindow::onActionUnloadMotor(bool checked)
+{
+    if (QMessageBox::Apply == QMessageBox::question(this, tr("Unload motor"), tr("Do you want to unload motor?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+    {
+        LaserDriver::instance().controlMotor(false);
+    }
 }
 
 void LaserControllerWindow::bindWidgetsProperties()

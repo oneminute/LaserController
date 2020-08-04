@@ -34,6 +34,10 @@ protected slots:
     void onActionMechining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
+    void onActionConnect(bool checked = false);
+    void onActionDisconnect(bool checked = false);
+    void onActionLoadMotor(bool checked = false);
+    void onActionUnloadMotor(bool checked = false);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);

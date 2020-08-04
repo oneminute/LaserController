@@ -55,6 +55,10 @@
    <addaction name="actionImportSVG"/>
    <addaction name="actionImportCorelDraw"/>
    <addaction name="actionExportJSON"/>
+   <addaction name="actionConnect"/>
+   <addaction name="actionDisconnect"/>
+   <addaction name="actionLoadMotor"/>
+   <addaction name="actionUnloadMotor"/>
    <addaction name="actionMachining"/>
    <addaction name="actionPause"/>
    <addaction name="actionStop"/>
@@ -348,6 +352,29 @@
   <action name="actionStop">
    <property name="text">
     <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionDisconnect">
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+  </action>
+  <action name="actionLoadMotor">
+   <property name="text">
+    <string>Load Motor</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Motor</string>
+   </property>
+  </action>
+  <action name="actionUnloadMotor">
+   <property name="text">
+    <string>Unload Motor</string>
    </property>
   </action>
  </widget>
