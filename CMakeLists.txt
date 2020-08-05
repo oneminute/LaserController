@@ -46,11 +46,6 @@ find_package(gflags REQUIRED QUIET)
 
 set(TS_FILES LaserController_zh_CN.ts)
 
-add_compile_definitions(LC_VERSION_MAJOR=0)
-add_compile_definitions(LC_VERSION_MINOR=1)
-add_compile_definitions(LC_VERSION_BUILD=1)
-add_compile_definitions(LC_VERSION_REVISION=2)
-
 #add_subdirectory(widgets)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}

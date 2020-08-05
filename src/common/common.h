@@ -3,8 +3,6 @@
 
 #include <QDebug>
 
-#define LC_VERSION LC_VERSION_MAJON.LC_VERSION_MINOR.LC_VERSION_BUILD.LC_VERSION_REVISION
-
 enum SizeUnit {
     SU_PERCENT,
     SU_PX,
