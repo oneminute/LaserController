@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>992</width>
     <height>600</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>992</width>
      <height>21</height>
     </rect>
    </property>
@@ -34,7 +34,9 @@
      <addaction name="actionImportSVG"/>
      <addaction name="actionImportCorelDraw"/>
     </widget>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
+    <addaction name="actionCloseDocument"/>
     <addaction name="actionExportJSON"/>
     <addaction name="menuImport"/>
    </widget>
@@ -51,9 +53,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionImportSVG"/>
    <addaction name="actionImportCorelDraw"/>
+   <addaction name="actionCloseDocument"/>
    <addaction name="actionExportJSON"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
@@ -184,6 +188,9 @@
    </attribute>
   </widget>
   <action name="actionOpen">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -192,6 +199,9 @@
    </property>
   </action>
   <action name="actionImportSVG">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Import SVG</string>
    </property>
@@ -200,11 +210,17 @@
    </property>
   </action>
   <action name="actionExportJSON">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Export JSON</string>
    </property>
   </action>
   <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -213,6 +229,9 @@
    </property>
   </action>
   <action name="actionSaveAs">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save As</string>
    </property>
@@ -221,6 +240,9 @@
    </property>
   </action>
   <action name="actionNew">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
@@ -229,6 +251,9 @@
    </property>
   </action>
   <action name="actionAddEngravingLayer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Add Engraving Layer</string>
    </property>
@@ -237,26 +262,41 @@
    </property>
   </action>
   <action name="actionAddCuttingLayer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Add Cutting Layer</string>
    </property>
   </action>
   <action name="actionRemoveLayer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Remove Layer</string>
    </property>
   </action>
   <action name="actionAreaSelection">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Area Selection</string>
    </property>
   </action>
   <action name="actionCancelSelection">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Cancel Selection</string>
    </property>
   </action>
   <action name="actionSelectionTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Selection.png</normaloff>:/ui/icons/images/Selection.png</iconset>
@@ -266,6 +306,9 @@
    </property>
   </action>
   <action name="actionRectangleTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Rectangle.png</normaloff>:/ui/icons/images/Rectangle.png</iconset>
@@ -275,6 +318,9 @@
    </property>
   </action>
   <action name="actionEllipseTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Ellipse.png</normaloff>:/ui/icons/images/Ellipse.png</iconset>
@@ -284,6 +330,9 @@
    </property>
   </action>
   <action name="actionPolygonTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Polygon.png</normaloff>:/ui/icons/images/Polygon.png</iconset>
@@ -293,6 +342,9 @@
    </property>
   </action>
   <action name="actionTextTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Text.png</normaloff>:/ui/icons/images/Text.png</iconset>
@@ -302,6 +354,9 @@
    </property>
   </action>
   <action name="actionLineTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Line.png</normaloff>:/ui/icons/images/Line.png</iconset>
@@ -311,6 +366,9 @@
    </property>
   </action>
   <action name="actionBitmapTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Image.png</normaloff>:/ui/icons/images/Image.png</iconset>
@@ -320,6 +378,9 @@
    </property>
   </action>
   <action name="actionSplineTool">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/Spline.png</normaloff>:/ui/icons/images/Spline.png</iconset>
@@ -329,6 +390,9 @@
    </property>
   </action>
   <action name="actionImportCorelDraw">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Import CorelDraw</string>
    </property>
@@ -337,6 +401,9 @@
    </property>
   </action>
   <action name="actionMachining">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Machining</string>
    </property>
@@ -345,26 +412,41 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Pause</string>
    </property>
   </action>
   <action name="actionStop">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Stop</string>
    </property>
   </action>
   <action name="actionConnect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Connect</string>
    </property>
   </action>
   <action name="actionDisconnect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Disconnect</string>
    </property>
   </action>
   <action name="actionLoadMotor">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Load Motor</string>
    </property>
@@ -373,8 +455,22 @@
    </property>
   </action>
   <action name="actionUnloadMotor">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Unload Motor</string>
+   </property>
+  </action>
+  <action name="actionCloseDocument">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close Document</string>
+   </property>
+   <property name="toolTip">
+    <string>Close Document</string>
    </property>
   </action>
  </widget>

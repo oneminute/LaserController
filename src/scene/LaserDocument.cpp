@@ -16,16 +16,19 @@
 #include "laser/LaserDriver.h"
 #include "util/PltUtils.h"
 #include "LaserLayer.h"
+#include "state/StateController.h"
 
 LaserDocument::LaserDocument(QObject* parent)
     : QObject(parent)
     , m_blockSignals(false)
+    , m_isOpened(false)
 {
     init();
 }
 
 LaserDocument::~LaserDocument()
 {
+    close();
 }
 
 void LaserDocument::addItem(LaserPrimitive * item)
@@ -98,6 +101,29 @@ void LaserDocument::addLayer(LaserLayer* layer)
         m_cuttingLayers.append(layer);
         break;
     }
+
+    updateLayersStructure();
+}
+
+void LaserDocument::removeLayer(LaserLayer * layer)
+{
+    LaserLayer* initLayer = nullptr;
+    QList<LaserLayer*>* layers = nullptr;
+    if (layer->type() == LLT_CUTTING)
+    {
+        layers = &m_cuttingLayers;
+    }
+    else
+    {
+        layers = &m_engravingLayers;
+    }
+    initLayer = (*layers)[0];
+    for (QList<LaserPrimitive*>::iterator i = layer->items().begin(); i != layer->items().end(); i++)
+    {
+        LaserPrimitive* item = *i;
+        initLayer->addItem(item);
+    }
+    layers->removeOne(layer);
 
     updateLayersStructure();
 }
@@ -307,6 +333,21 @@ void LaserDocument::destroy()
     deleteLater();
 }
 
+void LaserDocument::open()
+{
+    m_isOpened = true;
+    emit opened();
+}
+
+void LaserDocument::close()
+{
+    if (m_isOpened)
+    {
+        m_isOpened = false;
+        emit closed();
+    }
+}
+
 void LaserDocument::init()
 {
     QString layerName = newLayerName(LLT_ENGRAVING);
@@ -314,5 +355,8 @@ void LaserDocument::init()
 
     layerName = newLayerName(LLT_CUTTING);
     addLayer(new LaserLayer(layerName, LLT_CUTTING, this));
+
+    ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
+    ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
 }
 

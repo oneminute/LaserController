@@ -2,6 +2,7 @@
 #include "CorelDrawImporter.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
+#include "scene/LaserDocument.h"
 
 #include <system_error>
 #include <QDir>
@@ -88,5 +89,6 @@ LaserDocument * CorelDrawImporter::import(const QString & filename)
         tmpDir.remove(tmpSvgFilename);
     }
 
+    doc->open();
     return doc;
 }

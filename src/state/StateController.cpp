@@ -1,36 +1,40 @@
 #include "StateController.h"
 
 #include <QDebug>
+#include <QFinalState>
 
 StateController::StateController(QObject* parent)
     :QObject(parent)
 {
-    m_stateMainNormal.setParent(&m_stateMain);
-    m_stateMainSingleSelected.setParent(&m_stateMain);
-    m_stateMainMultiSelected.setParent(&m_stateMain);
-    m_stateMainLayerSelected.setParent(&m_stateMain);
-    m_stateMainNewShape.setParent(&m_stateMain);
-    m_stateMain.setInitialState(&m_stateMainNormal);
+    STATE_MACHINE_MEMBER = new QStateMachine();
 
-    m_stateMainSingleSelectedNormal.setParent(&m_stateMainSingleSelected);
-    m_stateMainSingleSelectedScaling.setParent(&m_stateMainSingleSelected);
-    m_stateMainSingleSelectedRotating.setParent(&m_stateMainSingleSelected);
-    m_stateMainSingleSelected.setInitialState(&m_stateMainSingleSelectedNormal);
+    DEFINE_TOPLEVEL_INIT_STATE(init);
+    DEFINE_TOPLEVEL_STATE(working);
+    workingState->setChildMode(QState::ChildMode::ParallelStates);
+    DEFINE_TOPLEVEL_FINAL_STATE(finish);
 
-    m_fsm.addState(&m_stateInit);
-    m_fsm.addState(&m_stateNormal);
-    m_fsm.addState(&m_stateMain);
-    m_fsm.addState(&m_stateMachining);
-    m_fsm.addState(&m_stateFinal);
-    m_fsm.setInitialState(&m_stateInit);
+    DEFINE_CHILD_STATE(working, document);
+    DEFINE_CHILD_STATE(working, device);
 
-    connect(&m_stateInit, &QState::entered, this, &StateController::onInitStateEntered);
-    connect(&m_stateInit, &QState::exited, this, &StateController::onInitStateExited);
-    connect(&m_stateNormal, &QState::entered, this, &StateController::onNormalStateEntered);
-    connect(&m_stateNormal, &QState::exited, this, &StateController::onNormalStateExited);
+    DEFINE_CHILD_INIT_STATE(document, documentEmpty);
+    DEFINE_CHILD_STATE(document, documentWorking);
+    DEFINE_CHILD_INIT_STATE(documentWorking, documentNormal);
+    DEFINE_CHILD_STATE(documentWorking, documentSelecting);
+    DEFINE_CHILD_STATE(documentWorking, documentSelected);
+    DEFINE_CHILD_STATE(documentWorking, documentTransforming);
+    DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
 
-    //m_stateInit.addTransition(this, "initToMain", &m_stateMain);
-    //m_fsm.addTransition(this, SIGNAL(initToMain()), m_stateMain);
+    DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
+    DEFINE_CHILD_STATE(device, deviceConnected);
+    DEFINE_CHILD_STATE(device, deviceMachining);
+    DEFINE_CHILD_STATE(device, devicePause);
+    DEFINE_CHILD_STATE(device, deviceError);
+
+}
+
+StateController::~StateController()
+{
+    STATE_MACHINE_MEMBER->deleteLater();
 }
 
 StateController& StateController::instance()
@@ -38,29 +42,4 @@ StateController& StateController::instance()
     static StateController controller;
     return controller;
 }
-
-void StateController::onInitStateEntered()
-{
-    qDebug() << "init state entered.";
-}
-
-void StateController::onInitStateExited()
-{
-    qDebug() << "init state exited.";
-}
-
-void StateController::onNormalStateEntered()
-{
-    qDebug() << "normal state entered.";
-}
-
-void StateController::onNormalStateExited()
-{
-    qDebug() << "normal state exited.";
-}
-
-//void StateController::onInitToMain()
-//{
-//    emit initToMain();
-//}
 

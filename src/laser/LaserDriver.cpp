@@ -1,8 +1,10 @@
 #include "LaserDriver.h"
 
 #include <QDebug>
+#include <QErrorMessage>
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
+#include "state/StateController.h"
 
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
@@ -10,7 +12,10 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_isConnected(false)
     , m_portName("")
 {
-
+    ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, SIGNAL(connected()));
+    ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, SIGNAL(disconnected()));
+    ADD_TRANSITION(deviceMachiningState, deviceUnconnectedState, this, SIGNAL(disconnected()));
+    ADD_TRANSITION(devicePauseState, deviceUnconnectedState, this, SIGNAL(disconnected()));
 }
 
 LaserDriver::~LaserDriver()
@@ -32,6 +37,17 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
 {
     QString eventData = QString::fromWCharArray(sysEventData);
     qDebug() << "System message callback handler:" << sysMsgIndex << sysMsgCode << eventData;
+    switch (sysMsgCode)
+    {
+    case 17:
+        emit instance().connected();
+        break;
+    case 18:
+        QErrorMessage msg;
+        msg.showMessage(tr("Device disconnected!"));
+        emit instance().disconnected();
+        break;
+    }
 }
 
 void LaserDriver::ProcDataProgressCallBackHandler(int position, int totalCount)

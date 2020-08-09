@@ -55,7 +55,6 @@ void initLog(char* argv)
     FLAGS_max_log_size = 100; //Maximum log size: 100MB
     FLAGS_logbufsecs = 0;        //缓冲日志输出，默认为30秒，此处改为立即输出
     FLAGS_stop_logging_if_full_disk = true;     //当磁盘被写满时，停止日志输出
-    FLAGS_log_dir = "tmp";
 
     //set log path;第一个参数为日志级别设置,级别高于 google::INFO 的日志同时输出到屏幕，第二个参数表示输出目录及日志文件名前缀,log目录我是事先在build-prj目录下创建好.
     google::SetLogDestination(google::GLOG_INFO,   "log/INFO_");
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
     initLog(argv[0]);
     qInstallMessageHandler(messageOutput);
 
-    qDebug() << QApplication::applicationVersion();
+    qDebug() << "version:" << QApplication::applicationVersion();
 
     QTranslator translator;
     qDebug() << "load translation file." << a.applicationName() << QLocale::system().name();
@@ -97,6 +96,6 @@ int main(int argc, char *argv[])
     w.showMaximized();
     int ret = a.exec();
 
-    StateController::instance().fsm().stop();
+    StateController::stop();
     return ret;
 }

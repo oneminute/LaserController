@@ -34,6 +34,7 @@ public:
     QList<LaserLayer*> engravingLayers() const;
     QList<LaserLayer*> cuttingLayers() const;
     void addLayer(LaserLayer* layer);
+    void removeLayer(LaserLayer* layer);
 
     QString newLayerName(LaserLayerType type) const;
 
@@ -42,10 +43,14 @@ public:
 
     void blockSignals(bool block = true);
 
+    bool isOpened() const { return m_isOpened; }
+
 public slots:
     void exportJSON(const QString& filename);
     void updateLayersStructure();
     void destroy();
+    void open();
+    void close();
 
 protected:
     void init();
@@ -53,6 +58,8 @@ protected:
 signals:
     void layersStructureChanged();
     void readyToDestroyed();
+    void opened();
+    void closed();
 
 private:
     QList<LaserPrimitive*> m_items;
@@ -61,6 +68,7 @@ private:
     PageInformation m_pageInfo;
     qreal m_scale;
     bool m_blockSignals;
+    bool m_isOpened;
 
     Q_DISABLE_COPY(LaserDocument);
 };

@@ -111,6 +111,13 @@ public:
     bool isConnected() const { return m_isConnected; }
     QString portName() const { return m_portName; }
 
+signals:
+    void connected();
+    void disconnected();
+    void machining();
+    void paused();
+    void stopped();
+
 private:
     bool m_isLoaded;
     bool m_isConnected;

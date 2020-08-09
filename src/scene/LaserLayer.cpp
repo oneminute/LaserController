@@ -131,6 +131,9 @@ void LaserLayer::setRunSpeedPower(int runSpeedPower) { m_runSpeedPower = runSpee
 
 void LaserLayer::addItem(LaserPrimitive * item)
 {
+    if (m_items.contains(item))
+        return;
+
     m_items.append(item);
     m_doc->updateLayersStructure();
 }

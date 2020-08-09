@@ -85,7 +85,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionLoadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionLoadMotor);
     connect(m_ui->actionUnloadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionUnloadMotor);
 
-    StateControllerInst.initState().addTransition(this, SIGNAL(windowCreated()), &StateControllerInst.normalState());
+    ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     bindWidgetsProperties();
 
@@ -109,7 +109,7 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     if (filename.isEmpty())
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
-    QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
+    //QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
     LaserDocument* doc = importer->import(filename);
     if (doc)
     {
@@ -117,13 +117,12 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
         m_ui->treeWidgetLayers->setDocument(doc);
         m_ui->treeWidgetLayers->updateItems();
     }
-    StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
+    //StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 {
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::CORELDRAW);
-    QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
     LaserDocument* doc = importer->import();
     if (doc)
     {
@@ -131,7 +130,6 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
         m_ui->treeWidgetLayers->setDocument(doc);
         m_ui->treeWidgetLayers->updateItems();
     }
-    StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }
 
 void LaserControllerWindow::onActionAddEngravingLayer(bool)
@@ -158,6 +156,36 @@ void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
 void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
     qDebug() << "removing layer.";
+    QTreeWidgetItem* item = m_ui->treeWidgetLayers->currentItem();
+    if (item == nullptr)
+        return;
+    if (item->parent() == nullptr)
+    {
+        LaserLayer* layer = item->data(0, Qt::UserRole).value<LaserLayer*>();
+        
+        if (layer->type() == LLT_CUTTING)
+        {
+            if (m_scene->document()->cuttingLayers()[0] == layer)
+            {
+                QMessageBox::warning(this, tr("Remove layer"), tr("You can not remove base cutting layer."), QMessageBox::StandardButton::Ok, QMessageBox::NoButton);
+                return;
+            }
+        }
+        else if (layer->type() == LLT_ENGRAVING)
+        {
+            if (m_scene->document()->engravingLayers()[0] == layer)
+            {
+                QMessageBox::warning(this, tr("Remove layer"), tr("You can not remove base engraving layer."), QMessageBox::StandardButton::Ok, QMessageBox::NoButton);
+                return;
+            }
+        }
+        int result = QMessageBox::question(this, tr("Remove layer"), tr("Do you want to remove this layer?"),
+            QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Cancel);
+        if (result == QMessageBox::StandardButton::Apply)
+        {
+            m_scene->document()->removeLayer(layer);
+        }
+    }
 }
 
 void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem * item, int column)
@@ -235,7 +263,7 @@ void LaserControllerWindow::onActionDisconnect(bool checked)
 {
     if (QMessageBox::Apply == QMessageBox::question(this, tr("Disconnect"), tr("Do you want to disconnect from laser machine?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
     {
-        LaserDriver::instance().disconnect();
+        LaserDriver::instance().unInitComPort();
     }
 }
 
@@ -254,45 +282,89 @@ void LaserControllerWindow::onActionUnloadMotor(bool checked)
 
 void LaserControllerWindow::bindWidgetsProperties()
 {
-    StateControllerInst.initState().assignProperty(m_ui->actionOpen, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->actionOpen, "enabled", true);
-    StateControllerInst.mainState().assignProperty(m_ui->actionOpen, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->actionOpen, "enabled", false);
+    // actionOpen
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentWorkingState);
+    // end actionOpen
 
-    StateControllerInst.initState().assignProperty(m_ui->actionSave, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->actionSave, "enabled", false);
-    StateControllerInst.mainState().assignProperty(m_ui->actionSave, "enabled", false);
-    StateControllerInst.machiningState().assignProperty(m_ui->actionSave, "enabled", false);
+    // actionImportSVG
+    BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", false, documentWorkingState);
+    // end actionImportSVG
 
-    StateControllerInst.initState().assignProperty(m_ui->actionImportSVG, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->actionImportSVG, "enabled", true);
-    StateControllerInst.mainState().assignProperty(m_ui->actionImportSVG, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->actionImportSVG, "enabled", false);
+    // actionExportJSON
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentWorkingState);
+    // end actionExportJSON
 
-    StateControllerInst.initState().assignProperty(m_ui->actionExportJSON, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->actionExportJSON, "enabled", false);
-    StateControllerInst.mainState().assignProperty(m_ui->actionExportJSON, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->actionExportJSON, "enabled", false);
+    // actionSave
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentWorkingState);
+    // end actionSave
 
-    StateControllerInst.initState().assignProperty(m_ui->toolButtonAddLayer, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->toolButtonAddLayer, "enabled", false);
-    StateControllerInst.mainState().assignProperty(m_ui->toolButtonAddLayer, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->toolButtonAddLayer, "enabled", false);
+    // actionSaveAs
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
+    // end actionSaveAs
 
-    StateControllerInst.initState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", false);
-    StateControllerInst.mainState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->actionAddEngravingLayer, "enabled", false);
+    // actionCloseDocument
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentWorkingState);
+    // end actionCloseDocument
 
-    StateControllerInst.initState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", false);
-    StateControllerInst.mainState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->actionAddCuttingLayer, "enabled", false);
+    // toolButtonAddLayer
+    BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", true, documentWorkingState);
+    // end toolButtonAddLayer
 
-    StateControllerInst.initState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", false);
-    StateControllerInst.normalState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", false);
-    StateControllerInst.mainState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", true);
-    StateControllerInst.machiningState().assignProperty(m_ui->toolButtonRemoveLayer, "enabled", false);
+    // toolButtonRemoveLayer
+    BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", true, documentWorkingState);
+    // end toolButtonRemoveLayer
+
+    // actionAddEngravingLayer
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", true, documentWorkingState);
+    // end actionAddEngravingLayer
+
+    // actionAddCuttingLayer
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", true, documentWorkingState);
+    // end actionAddCuttingLayer
+
+    // actionConnect
+    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", true, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, devicePauseState);
+    // end actionConnect
+
+    // actionDisconnect
+    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePauseState);
+    // end actionDisconnect
+
+    // actionStop
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePauseState);
+    // end actionStop
 }
 
 void LaserControllerWindow::showEvent(QShowEvent * event)

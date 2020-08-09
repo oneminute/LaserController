@@ -29,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionFileOpen, &QAction::triggered, this, &MainWindow::onActionFileOpen);
 
-    StateController::instance().fsm().start();
-
     //openLibrary("");
     LaserDriver::instance().load();
     LaserDriver::instance().init(this->winId());

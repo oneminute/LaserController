@@ -169,5 +169,6 @@ LaserDocument* SvgImporter::import(const QString & filename)
     }
     
     emit imported();
+    ldoc->open();
     return ldoc;
 }
