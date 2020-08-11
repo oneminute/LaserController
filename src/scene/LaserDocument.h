@@ -4,6 +4,7 @@
 #include "common/common.h"
 
 #include <QObject>
+#include <QMap>
 #include <QSharedPointer>
 #include <QSharedDataPointer>
 
@@ -28,9 +29,11 @@ public:
     void setPageInformation(const PageInformation& page);
     QRectF pageBounds() const;
 
-    QList<LaserPrimitive*> items() const;
+    QMap<QString, LaserPrimitive*> items() const;
+    LaserPrimitive* laserPrimitive(const QString& id) const;
 
-    QList<LaserLayer*> layers() const;
+    QMap<QString, LaserLayer*> layers() const;
+    LaserLayer* laserLayer(const QString& id) const;
     QList<LaserLayer*> engravingLayers() const;
     QList<LaserLayer*> cuttingLayers() const;
     void addLayer(LaserLayer* layer);
@@ -62,9 +65,11 @@ signals:
     void closed();
 
 private:
-    QList<LaserPrimitive*> m_items;
+    QMap<QString, LaserPrimitive*> m_items;
     QList<LaserLayer*> m_engravingLayers;
     QList<LaserLayer*> m_cuttingLayers;
+    QMap<QString, LaserLayer*> m_layers;
+
     PageInformation m_pageInfo;
     qreal m_scale;
     bool m_blockSignals;

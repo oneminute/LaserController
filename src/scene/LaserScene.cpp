@@ -27,14 +27,14 @@ void LaserScene::updateDocument(LaserDocument * doc)
     }
 
     doc->setParent(this);
-    QList<LaserPrimitive*> items = doc->items();
-    for (QList<LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
+    QMap<QString, LaserPrimitive*> items = doc->items();
+    for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {
-        //(*i)->bindGraphicsItem(this);
-        this->addItem(*i);
+        this->addItem(i.value());
     }
     m_doc = doc;
 
+    qDebug() << "page bounds:" << m_doc->pageBounds();
     m_background = addRect(m_doc->pageBounds(), QPen(Qt::gray, 0.2f, Qt::SolidLine));
 }
 

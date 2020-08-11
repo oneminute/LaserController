@@ -33,7 +33,7 @@ LaserDocument::~LaserDocument()
 
 void LaserDocument::addItem(LaserPrimitive * item)
 {
-    m_items.append(item);
+    m_items.insert(item->objectName(), item);
 
     if (item->isShape())
     {
@@ -70,14 +70,24 @@ QRectF LaserDocument::pageBounds() const
     return QRectF(0, 0, m_pageInfo.width(), m_pageInfo.height());
 }
 
-QList<LaserPrimitive*> LaserDocument::items() const
+QMap<QString, LaserPrimitive*> LaserDocument::items() const
 {
     return m_items;
 }
 
-QList<LaserLayer*> LaserDocument::layers() const
+LaserPrimitive * LaserDocument::laserPrimitive(const QString & id) const
 {
-    return m_engravingLayers + m_cuttingLayers;
+    return m_items[id];
+}
+
+QMap<QString, LaserLayer*> LaserDocument::layers() const
+{
+    return m_layers;
+}
+
+LaserLayer * LaserDocument::laserLayer(const QString & id) const
+{
+    return m_layers[id];
 }
 
 QList<LaserLayer*> LaserDocument::engravingLayers() const
@@ -101,6 +111,7 @@ void LaserDocument::addLayer(LaserLayer* layer)
         m_cuttingLayers.append(layer);
         break;
     }
+    m_layers.insert(layer->objectName(), layer);
 
     updateLayersStructure();
 }
@@ -124,6 +135,7 @@ void LaserDocument::removeLayer(LaserLayer * layer)
         initLayer->addItem(item);
     }
     layers->removeOne(layer);
+    m_layers.remove(layer->objectName());
 
     updateLayersStructure();
 }

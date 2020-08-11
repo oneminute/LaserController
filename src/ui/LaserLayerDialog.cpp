@@ -55,15 +55,6 @@ void LaserLayerDialog::initUi(bool editing)
     {
         m_ui->lineEditLayerName->setText(m_doc->newLayerName(m_type));
     }
-
-    /*if (m_type == LLT_ENGRAVING)
-    {
-        m_ui->groupBoxEngraving->setVisible(false);
-    }
-    else if (m_type == LLT_CUTTING)
-    {
-        m_ui->groupBoxCutting->setVisible(false);
-    }*/
 }
 
 void LaserLayerDialog::accept()

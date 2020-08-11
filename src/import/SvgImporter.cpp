@@ -157,6 +157,8 @@ LaserDocument* SvgImporter::import(const QString & filename)
             t = node->getCascadeTransform();
             qreal scaleX = ratio;
             qreal scaleY = ratio;
+
+            qDebug() << "scale:" << scaleX << scaleY;
             
             QTransform tt = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * ratio, t.dy() * ratio).scale(scaleX, scaleY);
             item->setTransform(tt);

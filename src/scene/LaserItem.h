@@ -22,7 +22,7 @@ class LaserPrimitive : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    LaserPrimitive(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPrimitive(LaserDocument* doc = nullptr, LaserPrimitiveType type = LPT_SHAPE, SizeUnit unit = SizeUnit::SU_MM100);
     virtual ~LaserPrimitive();
 
     LaserDocument* document() const { return m_doc; }
@@ -34,7 +34,7 @@ public:
     virtual QRectF boundingRect() const override;
     QPointF laserStartPos() const;
 
-    virtual void draw(QPainter* painter) = 0;
+    virtual void draw(QPainter* painter) {};
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat()) { return std::vector<cv::Point2f>(); }
     virtual QByteArray engravingImage() { return QByteArray(); }
@@ -48,6 +48,9 @@ public:
 
     QString name() const { return m_name; }
     void setName(const QString& name) { m_name = name; }
+
+    //QDataStream& operator<<(QDataStream& stream);
+    //QDataStream& operator>>(QDataStream& stream);
 
 protected:
     QString typeName(LaserPrimitiveType typeId);
@@ -72,6 +75,10 @@ private:
 
     friend class LaserDocument;
 };
+
+//Q_DECLARE_METATYPE(LaserPrimitive)
+
+QDebug operator<<(QDebug debug, const LaserPrimitive& item);
 
 class LaserShapeItem : public LaserPrimitive
 {

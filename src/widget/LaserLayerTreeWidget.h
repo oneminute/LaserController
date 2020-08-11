@@ -23,6 +23,7 @@ public slots:
     void fillLayersTree(QList<LaserLayer*> &layers, const QString& type);
 
 protected:
+    //virtual void startDrag(Qt::DropActions supportedActions);
     virtual void dropEvent(QDropEvent* event);
 
 signals:

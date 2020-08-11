@@ -8,7 +8,7 @@
 
 void TestStateController::initTestCase()
 {
-    m_toMainAction = new QAction();
+    /*m_toMainAction = new QAction();
     m_toDocumentAction = new QAction();
     m_toMachiningAction = new QAction();
     m_toFinishedAction = new QAction();
@@ -17,12 +17,12 @@ void TestStateController::initTestCase()
     StateController::instance().normalState().addTransition(m_toDocumentAction, SIGNAL(triggered()), &StateController::instance().mainState());
     StateController::instance().mainState().addTransition(m_toMachiningAction, SIGNAL(triggered()), &StateController::instance().machiningState());
     StateController::instance().machiningState().addTransition(m_toDocumentAction, SIGNAL(triggered()), &StateController::instance().mainState());
-    StateController::instance().mainState().addTransition(m_toFinishedAction, SIGNAL(triggered()), &StateController::instance().finalState());
+    StateController::instance().mainState().addTransition(m_toFinishedAction, SIGNAL(triggered()), &StateController::instance().finalState());*/
 }
 
 void TestStateController::transitionTestCase()
 {
-    QSignalSpy spyStateMachineStarted(&StateController::instance().fsm(), SIGNAL(started()));
+    /*QSignalSpy spyStateMachineStarted(&StateController::instance().fsm(), SIGNAL(started()));
     QSignalSpy spyInitStateEntered(&StateController::instance().initState(), SIGNAL(entered()));
     QSignalSpy spyMainStateEntered(&StateController::instance().normalState(), SIGNAL(entered()));
     QSignalSpy spyDocumentStateEntered(&StateController::instance().mainState(), SIGNAL(entered()));
@@ -54,13 +54,13 @@ void TestStateController::transitionTestCase()
     QTimer::singleShot(100, m_toFinishedAction, SLOT(trigger()));
     QVERIFY(spyFinishedStateEntered.wait());
     QCOMPARE(spyFinishedStateEntered.count(), 1);
-    QCOMPARE(spyStateMachineFinished.count(), 1);
+    QCOMPARE(spyStateMachineFinished.count(), 1);*/
 }
 
 void TestStateController::cleanupTestCase()
 {
-    delete m_toMainAction;
+    /*delete m_toMainAction;
     delete m_toDocumentAction;
     delete m_toMachiningAction;
-    delete m_toFinishedAction;
+    delete m_toFinishedAction;*/
 }

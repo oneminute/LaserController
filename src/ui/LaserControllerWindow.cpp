@@ -161,7 +161,8 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
         return;
     if (item->parent() == nullptr)
     {
-        LaserLayer* layer = item->data(0, Qt::UserRole).value<LaserLayer*>();
+        QString id = item->data(0, Qt::UserRole).toString();
+        LaserLayer* layer = m_scene->document()->laserLayer(id);
         
         if (layer->type() == LLT_CUTTING)
         {
@@ -190,9 +191,10 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 
 void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem * item, int column)
 {
+    QString id = item->data(0, Qt::UserRole).toString();
     if (item->parent() == nullptr)
     {
-        LaserLayer* layer = item->data(0, Qt::UserRole).value<LaserLayer*>();
+        LaserLayer* layer = m_scene->document()->laserLayer(id);
         
         LaserLayerDialog dialog(layer);
         if (dialog.exec() == QDialog::Accepted)
@@ -203,7 +205,7 @@ void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem 
     }
     else
     {
-        LaserPrimitive* laserPrimitive = item->data(0, Qt::UserRole).value<LaserPrimitive*>();
+        LaserPrimitive* laserPrimitive = m_scene->document()->laserPrimitive(id);
         //qDebug() << type;
     }
 }
@@ -356,6 +358,22 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePauseState);
+    // end actionDisconnect
+
+    // actionDisconnect
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePauseState);
+    // end actionDisconnect
+
+    // actionDisconnect
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, devicePauseState);
     // end actionDisconnect
 
     // actionStop

@@ -84,6 +84,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 QRectF LaserPrimitive::boundingRect() const
 {
     QRectF bounds = m_transform.mapRect(m_boundingRect);
+    //qDebug() << this->name() << bounds;
     return bounds;
 }
 
@@ -100,6 +101,25 @@ QString LaserPrimitive::typeName()
 {
     return typeName(m_type);
 }
+
+//QDataStream & LaserPrimitive::operator<<(QDataStream & stream)
+//{
+//    stream << objectName()
+//        << name()
+//        << type();
+//    return stream;
+//}
+//
+//QDataStream & LaserPrimitive::operator>>(QDataStream & stream)
+//{
+//    QString objName;
+//    int type;
+//    stream >> objName
+//        >> m_name
+//        >> type;
+//    m_type = (LaserPrimitiveType)type;
+//    return stream;
+//}
 
 QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
 {
@@ -327,4 +347,11 @@ QByteArray LaserBitmapItem::engravingImage()
 void LaserBitmapItem::draw(QPainter * painter)
 {
     painter->drawImage(m_bounds, m_image);
+}
+
+QDebug operator<<(QDebug debug, const LaserPrimitive & item)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "(" << item.name() << ", " << item.objectName() << ", " << item.type() << ")";
+    return debug;
 }

@@ -1,8 +1,9 @@
+#include "laser/LaserDriver.h"
+#include "scene/LaserItem.h"
+#include "state/StateController.h"
+#include "state/StateController.h"
 #include "ui/MainWindow.h"
 #include "ui/LaserControllerWindow.h"
-#include "state/StateController.h"
-#include "laser/LaserDriver.h"
-#include "state/StateController.h"
 #include "version.h"
 
 #include <QApplication>
@@ -87,6 +88,9 @@ int main(int argc, char *argv[])
     {
         qDebug() << "load translation file." << a.applicationName() << QLocale::system().bcp47Name();
     }
+
+    //qRegisterMetaType<LaserPrimitive*>();
+    //qRegisterMetaTypeStreamOperators<LaserPrimitive*>();
 
     StateController::start();
 

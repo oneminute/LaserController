@@ -1,6 +1,7 @@
 #include "LaserLayerTreeWidget.h"
 
 #include <QSharedData>
+#include <QMimeData>
 
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
@@ -52,8 +53,8 @@ void LaserLayerTreeWidget::fillLayersTree(QList<LaserLayer*>& layers, const QStr
         layerWidgetItem->setCheckState(1, Qt::Unchecked);
         layerWidgetItem->setText(2, type);
         layerWidgetItem->setText(3, "V");
-        layerWidgetItem->setData(0, Qt::UserRole, QVariant::fromValue<LaserLayer*>(layer));
-        layerWidgetItem->setData(1, Qt::UserRole, layer->type());
+        layerWidgetItem->setData(0, Qt::UserRole, layer->objectName());
+        //layerWidgetItem->setData(1, Qt::UserRole, layer->type());
         for (int li = 0; li != laserItems.size(); li++)
         {
             LaserPrimitive* laserItem = laserItems[li];
@@ -62,15 +63,26 @@ void LaserLayerTreeWidget::fillLayersTree(QList<LaserLayer*>& layers, const QStr
             itemWidgetItem->setCheckState(1, Qt::Unchecked);
             itemWidgetItem->setText(2, "S");
             itemWidgetItem->setText(3, "V");
-            itemWidgetItem->setData(0, Qt::UserRole, QVariant::fromValue<LaserPrimitive*>(laserItem));
-            itemWidgetItem->setData(1, Qt::UserRole, laserItem->laserItemType());
+            itemWidgetItem->setData(0, Qt::UserRole, laserItem->objectName());
+            //itemWidgetItem->setData(1, Qt::UserRole, laserItem->laserItemType());
         }
         treeWidgetItems.append(layerWidgetItem);
     }
     insertTopLevelItems(0, treeWidgetItems);
 }
 
+//void LaserLayerTreeWidget::startDrag(Qt::DropActions supportedActions)
+//{
+//    
+//}
+
 void LaserLayerTreeWidget::dropEvent(QDropEvent* event)
 {
-    qDebug() << event;
+    const QMimeData* data = event->mimeData();
+    QList<QTreeWidgetItem*> selItems = selectedItems();
+    for (QList<QTreeWidgetItem*>::iterator i = selItems.begin(); i != selItems.end(); i++)
+    {
+        QString id = (*i)->data(0, Qt::UserRole).toString();
+        qDebug() << id;
+    }
 }

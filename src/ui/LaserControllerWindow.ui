@@ -87,6 +87,9 @@
        <property name="dragDropMode">
         <enum>QAbstractItemView::DragDrop</enum>
        </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
        <column>
         <property name="text">
          <string>S</string>
