@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //openLibrary("");
     LaserDriver::instance().load();
-    LaserDriver::instance().init(this->winId());
+    LaserDriver::instance().init(this);
 }
 
 MainWindow::~MainWindow()

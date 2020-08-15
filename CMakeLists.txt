@@ -213,6 +213,7 @@ INSTALL(TARGETS LaserController
 INSTALL(FILES 
             "${CMAKE_SOURCE_DIR}/third/bin/CustomWidgets.dll"
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
+            "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
         DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 

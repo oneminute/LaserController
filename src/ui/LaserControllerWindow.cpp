@@ -6,9 +6,11 @@
 #include <QTimer>
 #include <QErrorMessage>
 #include <QMessageBox>
+#include <QThread>
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
+#include "laser/Task.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
 #include "scene/LaserLayer.h"
@@ -84,6 +86,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
     connect(m_ui->actionLoadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionLoadMotor);
     connect(m_ui->actionUnloadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionUnloadMotor);
+    connect(m_ui->actionDownload, &QAction::triggered, this, &LaserControllerWindow::onActionDownload);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -227,14 +230,15 @@ void LaserControllerWindow::onActionExportJson(bool checked)
 
 void LaserControllerWindow::onActionMechining(bool checked)
 {
+    //QString filename = "export.json";
+    //filename = m_tmpDir.absoluteFilePath(filename);
+    //m_scene->document()->exportJSON(filename);
+    //qDebug() << "export temp json file for machining" << filename;
+    //MachiningTask* task = new MachiningTask(&LaserDriver::instance(), filename);
+    //task->start();
     //QString filename = utils::createUUID("json_") + ".json";
 
-    QString filename = "export.json";
-    filename = m_tmpDir.absoluteFilePath(filename);
-    m_scene->document()->exportJSON(filename);
-    qDebug() << "export temp json file for machining" << filename;
-    LaserDriver::instance().loadDataFromFile(filename);
-    LaserDriver::instance().startMachining(true);
+    LaserDriver::instance().startMachining(false);
     //m_tmpDir.remove(filename);
 }
 
@@ -269,9 +273,18 @@ void LaserControllerWindow::onActionDisconnect(bool checked)
     }
 }
 
+void LaserControllerWindow::onActionDownload(bool checked)
+{
+    QString filename = "export.json";
+    filename = m_tmpDir.absoluteFilePath(filename);
+    m_scene->document()->exportJSON(filename);
+    qDebug() << "export temp json file for machining" << filename;
+    LaserDriver::instance().loadDataFromFile(filename);
+}
+
 void LaserControllerWindow::onActionLoadMotor(bool checked)
 {
-    LaserDriver::instance().controlMotor(true);
+    LaserDriver::instance().controlMotor(false);
 }
 
 void LaserControllerWindow::onActionUnloadMotor(bool checked)
@@ -379,7 +392,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // actionStop
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePauseState);
     // end actionStop

@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
     LaserControllerWindow w;
     LaserDriver::instance().load();
-    LaserDriver::instance().init(w.winId());
+    LaserDriver::instance().init(&w);
     w.showMaximized();
     int ret = a.exec();
 

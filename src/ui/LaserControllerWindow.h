@@ -36,6 +36,7 @@ protected slots:
     void onActionStopMechining(bool checked = false);
     void onActionConnect(bool checked = false);
     void onActionDisconnect(bool checked = false);
+    void onActionDownload(bool checked = false);
     void onActionLoadMotor(bool checked = false);
     void onActionUnloadMotor(bool checked = false);
 

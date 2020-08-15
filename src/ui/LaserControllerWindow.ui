@@ -61,8 +61,7 @@
    <addaction name="actionExportJSON"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
-   <addaction name="actionLoadMotor"/>
-   <addaction name="actionUnloadMotor"/>
+   <addaction name="actionDownload"/>
    <addaction name="actionMachining"/>
    <addaction name="actionPause"/>
    <addaction name="actionStop"/>
@@ -474,6 +473,11 @@
    </property>
    <property name="toolTip">
     <string>Close Document</string>
+   </property>
+  </action>
+  <action name="actionDownload">
+   <property name="text">
+    <string>Download</string>
    </property>
   </action>
  </widget>

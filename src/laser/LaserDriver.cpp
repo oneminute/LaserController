@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QErrorMessage>
+#include <QMessageBox>
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 #include "state/StateController.h"
@@ -10,16 +11,24 @@ LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
     , m_isLoaded(false)
     , m_isConnected(false)
+    , m_isMachining(false)
+    , m_isPaused(false)
     , m_portName("")
+    , m_parentWidget(nullptr)
+    , m_isDownloading(false)
+    , m_packagesCount(0)
 {
-    ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, SIGNAL(connected()));
-    ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, SIGNAL(disconnected()));
-    ADD_TRANSITION(deviceMachiningState, deviceUnconnectedState, this, SIGNAL(disconnected()));
-    ADD_TRANSITION(devicePauseState, deviceUnconnectedState, this, SIGNAL(disconnected()));
+    ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, SIGNAL(comPortConnected()));
+    ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, SIGNAL(comPortDisconnected()));
+    ADD_TRANSITION(deviceMachiningState, deviceUnconnectedState, this, SIGNAL(comPortDisconnected()));
+    ADD_TRANSITION(devicePauseState, deviceUnconnectedState, this, SIGNAL(comPortDisconnected()));
+    ADD_TRANSITION(deviceConnectedState, deviceDownloadingState, this, SIGNAL(downloaded()));
+    ADD_TRANSITION(deviceDownloadingState, deviceMachiningState, this, SIGNAL(machiningStarted()));
 }
 
 LaserDriver::~LaserDriver()
 {
+    unload();
 }
 
 LaserDriver & LaserDriver::instance()
@@ -28,7 +37,7 @@ LaserDriver & LaserDriver::instance()
     return driver;
 }
 
-void LaserDriver::ProgressCallBackHandler(int position, int totalCount)
+void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCount)
 {
     qDebug() << "Progress callback handler:" << position << totalCount;
 }
@@ -39,20 +48,78 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     qDebug() << "System message callback handler:" << sysMsgIndex << sysMsgCode << eventData;
     switch (sysMsgCode)
     {
-    case 17:
-        emit instance().connected();
-        break;
-    case 18:
-        QErrorMessage msg;
-        msg.showMessage(tr("Device disconnected!"));
-        emit instance().disconnected();
-        break;
+    case ComPortOpened:    // 串口打开
+    {
+        instance().m_isConnected = true;
+        emit instance().comPortConnected();
+        instance().readAllSysParamFromCard();
+        //instance().lPenMoveToOriginalPoint(10);
+    }
+    break;
+    case ComPortClosed:    // 串口关闭
+    {
+        instance().m_isConnected = false;
+        emit instance().comPortDisconnected();
+    }
+    break;
+    case StartWorking:    // 开始加工
+    {
+        instance().m_isMachining = true;
+        emit instance().machiningStarted();
+    }
+    break;
+    case USBArrival:    // USB设备已连接
+    {
+
+    }
+    break;
+    case USBRemove:    // USB设备已断开
+    {
+
+    }
+    break;
+    case PauseWorking:    // 暂停加工
+    {
+        instance().m_isPaused = true;
+        emit instance().machiningPaused();
+    }
+    break;
+    case StopWorking:    // 停止加工。
+    {
+        emit instance().machiningStopped();
+    }
+    break;
+    case ReturnWorkState:
+    {
+        LaserState state;
+        if (state.parse(eventData))
+        {
+            emit instance().workStateUpdated(state);
+        }
+    }
+    break;
+    case NotWorking:
+    {
+        emit instance().idle();
+    }
+    break;
+    case WorkFinished:    // 加工完成
+    {
+        instance().m_isMachining = false;
+        emit instance().machiningStopped();
+    }
+    break;
     }
 }
 
-void LaserDriver::ProcDataProgressCallBackHandler(int position, int totalCount)
+void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount)
 {
-    qDebug() << "Proc progress callback handler:" << position << totalCount;
+    float progress = position * 1.0f / totalCount;
+    qDebug() << "Proc progress callback handler:" << position << totalCount << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
+    if (instance().m_isDownloading)
+    {
+        emit instance().downloading(position, totalCount, progress);
+    }
 }
 
 bool LaserDriver::load()
@@ -60,10 +127,13 @@ bool LaserDriver::load()
     if (m_isLoaded)
         return true;
 
+    qRegisterMetaType<LaserState>("LaserState");
+
     m_library.setFileName("LaserLib32.dll");
     if (!m_library.load())
     {
         qDebug() << "load LaserLib failure:" << m_library.errorString();
+        emit libraryLoaded(false);
         return false;
     }
 
@@ -108,12 +178,8 @@ bool LaserDriver::load()
 
     Q_ASSERT(m_fnLoadDataFromFile);
 
-    //qDebug() << m_fnGetAPILibVersion;
-    //qDebug() << m_fnGetAPILibCompileInfo;
-    //qDebug() << m_fnInitLib;
-    //qDebug() << m_fnUnInitLib;
-
     m_isLoaded = true;
+    emit libraryLoaded(true);
     return true;
 }
 
@@ -122,6 +188,7 @@ void LaserDriver::unload()
     if (m_isLoaded)
         m_fnUnInitLib();
     m_isLoaded = false;
+    emit libraryUnloaded();
 }
 
 QString LaserDriver::getVersion()
@@ -138,15 +205,17 @@ QString LaserDriver::getCompileInfo()
     return info;
 }
 
-void LaserDriver::init(int handle)
+void LaserDriver::init(QWidget* parentWidget)
 {
-    m_fnInitLib(handle);
+    m_fnInitLib(parentWidget->winId());
+    emit libraryInitialized();
 }
 
 void LaserDriver::unInit()
 {
     m_fnUnInitLib();
     m_isLoaded = false;
+    emit libraryUninitialized();
 }
 
 QStringList LaserDriver::getPortList()
@@ -215,12 +284,7 @@ bool LaserDriver::writeSysParamToCard(QList<int> addresses, QList<double> values
 
     wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
     wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
-    /*wchar_t* wcAddrs = new wchar_t[addrBuf.length() + 1];
-    wchar_t* wcValues = new wchar_t[valuesBuf.length() + 1];
-    addrBuf.toWCharArray(wcAddrs);
-    wcAddrs[addrBuf.length()] = 0;
-    valuesBuf.toWCharArray(wcValues);
-    wcValues[valuesBuf.length()] = 0;*/
+    
     bool success = m_fnWriteSysParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
     delete[] wcValues;
@@ -239,12 +303,18 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
     }
     QString addrStr = addrList.join(",");
     wchar_t* addrBuf = typeUtils::qStringToWCharPtr(addrStr);
-    /*wchar_t* addrBuf = new wchar_t[addrStr.length() + 1];
-    addrStr.toWCharArray(addrBuf);
-    addrBuf[addrStr.length()] = 0;*/
+    
     bool success = m_fnReadSysParamFromCard(addrBuf) != -1;
     delete[] addrBuf;
     return success;
+}
+
+bool LaserDriver::readAllSysParamFromCard()
+{
+    QList<int> params;
+    params << 3 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
+        << 16 << 17 << 18 << 19 << 20 << 21 << 22 << 23;
+    return readSysParamFromCard(params);
 }
 
 void LaserDriver::showAboutWindow()
@@ -308,17 +378,18 @@ int LaserDriver::testLaserLight(bool open)
     return m_fnTestLaserLight(open);
 }
 
-int LaserDriver::loadDataFromFile(const QString & filename)
+int LaserDriver::loadDataFromFile(const QString & filename, bool withMachining)
 {
-    //wchar_t* buf = new wchar_t[filename.length() + 1];
-    //filename.toWCharArray(m_wcharBuffer);
-    //m_wcharBuffer[filename.length()] = 0;
     int ret = 0;
+    m_isWithMachining = withMachining;
     try
     {
         wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
-        ret = m_fnLoadDataFromFile(filenameBuf);
+        m_isDownloading = true;
+        m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
+        qDebug() << "packages of transformed data:" << m_packagesCount;
         delete[] filenameBuf;
+        emit downloaded();
     }
     catch (void*)
     {

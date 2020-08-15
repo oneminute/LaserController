@@ -15,7 +15,7 @@ void TestLaserDriver::laserDriverTestCase()
     QString compileInfo = driver.getCompileInfo();
     qDebug() << version;
     qDebug() << compileInfo;
-    driver.init(w.winId());
+    driver.init(&w);
     QStringList ports = driver.getPortList();
     qDebug() << "ports:" << ports;
     QVERIFY(ports.length() > 0);

@@ -26,6 +26,7 @@ StateController::StateController(QObject* parent)
 
     DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
     DEFINE_CHILD_STATE(device, deviceConnected);
+    DEFINE_CHILD_STATE(device, deviceDownloading);
     DEFINE_CHILD_STATE(device, deviceMachining);
     DEFINE_CHILD_STATE(device, devicePause);
     DEFINE_CHILD_STATE(device, deviceError);

@@ -123,6 +123,7 @@ public:
     DECL_STATE(device)
     DECL_STATE(deviceUnconnected)
     DECL_STATE(deviceConnected)
+    DECL_STATE(deviceDownloading)
     DECL_STATE(deviceMachining)
     DECL_STATE(devicePause)
     DECL_STATE(deviceError)

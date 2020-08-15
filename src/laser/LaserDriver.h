@@ -3,12 +3,20 @@
 
 #include <QObject>
 #include <QLibrary>
+#include <QWidget>
+
+enum LaserWorkMode
+{
+    LWM_WORKING,
+    LWM_PAUSE,
+    LWM_STOP
+};
 
 struct LaserState
 {
 public:
     LaserState()
-        : workingMode(0)
+        : workingMode(LaserWorkMode::LWM_STOP)
         , operation(0)
         , x(0)
         , y(0)
@@ -16,30 +24,143 @@ public:
         , power(0)
         , gray(0)
     {}
-    int workingMode;
+    LaserWorkMode workingMode;
     int operation;
     double x;
     double y;
     double z;
     double power;
     double gray;
+
+    bool parse(const QString& data)
+    {
+        QStringList values = data.split(";");
+        if (values.size() != 7)
+            return false;
+
+        for (int i = 0; i < values.size(); i++)
+        {
+            QString value = values[i];
+            bool ok = false;
+            int iValue = value.toInt(&ok);
+            if (!ok)
+                return false;
+
+            switch (i)
+            {
+            case 0:
+                workingMode = static_cast<LaserWorkMode>(iValue);
+                break;
+            case 1:
+                operation = iValue;
+                break;
+            case 2:
+                x = iValue;
+                break;
+            case 3:
+                y = iValue;
+                break;
+            case 4:
+                z = iValue;
+                break;
+            case 5:
+                power = iValue;
+                break;
+            case 6:
+                gray = iValue;
+                break;
+            }
+        }
+        return true;
+    }
 };
+
+Q_DECLARE_METATYPE(LaserState)
 
 class LaserDriver : public QObject
 {
     Q_OBJECT
+
+    enum SysMsgCode
+    {
+        InitComPortError = 1,
+        UnInitComPortError = 2,
+        SendDataStrError = 3,
+        SendDataBufError = 4,
+        InitializeError = 5,
+        UninitializeError = 6,
+        ComPortExceptionError = 7,
+        GraphicMaxSizeError = 8,
+        SendStreamError = 9,
+        SendCommandError = 10,
+        DecryptCommandError = 11,
+        RetransTimeOutError = 12,
+        TransCompleteOK = 13,
+        ComPortNotOpened = 14,
+        GraphicMinSizeError = 15,
+        NoneDataTransError = 16,
+        ComPortOpened = 17,
+        ComPortClosed = 18,
+        TransTimeOutError = 19,
+        DataFormatError = 20,
+        FileNotExistsError = 21,
+        FunctionRestrict = 22,
+        SendDataError = 23,
+        ReceiveWrongDataOutTimes = 24,
+        StartWorking = 25,
+        ImageDataError = 26,
+        USBArrival = 27,
+        USBRemove = 28,
+        ReadSysParamFromCardError = 30,
+        WriteSysParamToCardError = 31,
+        ReadSysParamFromCardOK = 32,
+        WriteSysParamToCardOK = 33,
+        ReturnTextMsgFromCallBack = 34,
+        UnknownError = 35,
+        PauseWorking = 36,
+        ContinueWorking = 37,
+        StopWorking = 38,
+        MotorLock = 39,
+        MotorUnlock = 40,
+        LaserLightOn = 41,
+        LaserLightOff = 42,
+        TimeOutResend = 43,
+        DisabledOnWorking = 44,
+        GetComPortListError = 45,
+        GetComPortListOK = 46,
+        MachineOffLine = 47,
+        ComPortIndexErr = 48,
+        SystemFatalError = 49,
+        ComPortNotAvailable = 50,
+        CancelCurrentWork = 51,
+        ReturnWorkState = 52,
+        CanNotDoOnWorking = 53,
+        RequestAndContinue = 54,
+        BreakpointResume = 55,
+        NotWorking = 56,
+        BreakpointDataError = 57,
+        WorkFinished = 58,
+        EnlockerNotExists = 59,
+        FactoryPasswordValid = 60,
+        FactoryPasswordInvalid = 61,
+        ChangeFactoryPasswordOK = 62,
+        ChangeFactoryPasswordError = 63,
+        FactoryPasswordLengthError = 64,
+        FactoryPasswordExpired = 65
+    };
+
 private:
     typedef wchar_t* (*FN_WCHART_VOID)();
     typedef void(__stdcall *FN_VOID_INT)(int value);
     typedef void(*FN_VOID_VOID)();
 
-    typedef void(__cdecl *FNProgressCallBackHandler)(int position, int totalCount);
+    typedef void(__cdecl *FNProgressCallBackHandler)(void* ptr, int position, int totalCount);
     typedef void(*FNProgressCallBack)(FNProgressCallBackHandler callback);
 
     typedef void(__cdecl *FNSysMessageCallBackHandler)(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
     typedef void(*FNSysMessageCallBack)(FNSysMessageCallBackHandler callback);
 
-    typedef void(__cdecl *FNProcDataProgressCallBackHandler)(int position, int totalCount);
+    typedef void(__cdecl *FNProcDataProgressCallBackHandler)(void* ptr, int position, int totalCount);
     typedef void(*FNProcDataProgressCallBack)(FNProcDataProgressCallBackHandler callback);
 
     //typedef wchar_t*(*FNGetComPortList)();
@@ -65,24 +186,19 @@ private:
     ~LaserDriver();
 
 public:
-    enum LaserWorkMode
-    {
-        Working,
-        Pause,
-        Stop
-    };
+    
 
     static LaserDriver& instance();
-    static void ProgressCallBackHandler(int position, int totalCount);
+    static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
     static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
-    static void ProcDataProgressCallBackHandler(int position, int totalCount);
+    static void ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount);
 
     bool load();
     void unload();
 
     QString getVersion();
     QString getCompileInfo();
-    void init(int handle);
+    void init(QWidget* parentWidget);
     void unInit();
     QStringList getPortList();
     bool initComPort(const QString& name);
@@ -93,6 +209,7 @@ public:
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
     bool writeSysParamToCard(QList<int> addresses, QList<double> values);
     bool readSysParamFromCard(QList<int> addresses);
+    bool readAllSysParamFromCard();
     void showAboutWindow();
     void lPenMoveToOriginalPoint(double speed);
     void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, double startSpeed, double workSpeed);
@@ -105,23 +222,39 @@ public:
     void stopMachining();
     int controlMotor(bool open);
     int testLaserLight(bool open);
-    int loadDataFromFile(const QString& filename);
+    int loadDataFromFile(const QString& filename, bool withMachining = true);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
+    bool isMachining() const { return m_isMachining; }
     QString portName() const { return m_portName; }
 
 signals:
-    void connected();
-    void disconnected();
-    void machining();
-    void paused();
-    void stopped();
+    void libraryLoaded(bool success = true);
+    void libraryUnloaded();
+    void libraryInitialized();
+    void libraryUninitialized();
+    void comPortConnected();
+    void comPortDisconnected(bool isError = false, const QString& errorMsg = "");
+    void machiningStarted();
+    void machiningPaused();
+    void machiningStopped(bool isSuccess = true, const QString& errorMsg = "");
+    void downloading(int current, int total, float progress);
+    void downloaded();
+    void workStateUpdated(LaserState state);
+    void idle();
 
 private:
     bool m_isLoaded;
     bool m_isConnected;
+    bool m_isMachining;
+    bool m_isPaused;
+    bool m_isWithMachining;
+    bool m_isDownloading;
+    int m_packagesCount;
     QString m_portName;
+    QWidget* m_parentWidget;
+    LaserWorkMode m_workMode;
 
     QLibrary m_library;
 
