@@ -18,7 +18,7 @@ StateController::StateController(QObject* parent)
 
     DEFINE_CHILD_INIT_STATE(document, documentEmpty);
     DEFINE_CHILD_STATE(document, documentWorking);
-    DEFINE_CHILD_INIT_STATE(documentWorking, documentNormal);
+    DEFINE_CHILD_INIT_STATE(documentWorking, documentIdle);
     DEFINE_CHILD_STATE(documentWorking, documentSelecting);
     DEFINE_CHILD_STATE(documentWorking, documentSelected);
     DEFINE_CHILD_STATE(documentWorking, documentTransforming);
@@ -26,11 +26,12 @@ StateController::StateController(QObject* parent)
 
     DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
     DEFINE_CHILD_STATE(device, deviceConnected);
-    DEFINE_CHILD_STATE(device, deviceDownloading);
-    DEFINE_CHILD_STATE(device, deviceMachining);
-    DEFINE_CHILD_STATE(device, devicePause);
-    DEFINE_CHILD_STATE(device, deviceError);
-
+    DEFINE_CHILD_INIT_STATE(deviceConnected, deviceIdle);
+    DEFINE_CHILD_STATE(deviceConnected, deviceDownloading);
+    DEFINE_CHILD_STATE(deviceConnected, deviceDownloaded);
+    DEFINE_CHILD_STATE(deviceConnected, deviceMachining);
+    DEFINE_CHILD_STATE(deviceConnected, devicePaused);
+    DEFINE_CHILD_STATE(deviceConnected, deviceError);
 }
 
 StateController::~StateController()

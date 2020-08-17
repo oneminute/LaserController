@@ -11,7 +11,7 @@
 #include <qtranslator.h>
 #include <QDebug>
 
-#define GLOG_NO_ABBREVIATED_SEVERITIES
+//#define GLOG_NO_ABBREVIATED_SEVERITIES
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <glog/logging.h>

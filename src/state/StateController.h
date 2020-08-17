@@ -32,7 +32,8 @@
         void on##state##StateEntered() { qDebug().noquote() << "enter state " << #state; }
 
 #define DEFINE_STATE(state) \
-   QState* state##State = new QState(); \
+    QState* state##State = new QState(); \
+    state##State->setObjectName(#state"State"); \
     if (DEBUG_STATES) \
     { \
         connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
@@ -41,7 +42,8 @@
     STATES_MEMBER.insert(#state, state##State); 
 
 #define DEFINE_FINAL_STATE(state) \
-   QFinalState* state##State = new QFinalState(); \
+    QFinalState* state##State = new QFinalState(); \
+    state##State->setObjectName(#state"State"); \
     if (DEBUG_STATES) \
     { \
         connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
@@ -108,27 +110,43 @@ public:
     static void start() { instance().fsm()->start(); }
     static void stop() { instance().fsm()->stop(); }
 
+#pragma region top level states
     DECL_STATE(init)
+
+#pragma region working state
     DECL_STATE(working)
 
-    DECL_STATE(document)
+#pragma region document state
     DECL_STATE(documentEmpty)
+    DECL_STATE(document)
+
+#pragma region documentWorking state
     DECL_STATE(documentWorking)
-    DECL_STATE(documentNormal)
+    DECL_STATE(documentIdle)
     DECL_STATE(documentSelecting)
     DECL_STATE(documentSelected)
     DECL_STATE(documentTransforming)
     DECL_STATE(documentPrimitive)
+#pragma endregion documentWorking state
+#pragma region document state
 
+#pragma region device state
     DECL_STATE(device)
     DECL_STATE(deviceUnconnected)
+
     DECL_STATE(deviceConnected)
+    DECL_STATE(deviceIdle)
     DECL_STATE(deviceDownloading)
+    DECL_STATE(deviceDownloaded)
     DECL_STATE(deviceMachining)
-    DECL_STATE(devicePause)
+    DECL_STATE(devicePaused)
     DECL_STATE(deviceError)
+#pragma endregion device state
+#pragma endregion working state
 
     DECL_FINAL_STATE(finish)
+#pragma endregion top level states
+
 private:
     QStateMachine* m_fsm;
 

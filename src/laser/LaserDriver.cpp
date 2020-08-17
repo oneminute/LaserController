@@ -3,9 +3,11 @@
 #include <QDebug>
 #include <QErrorMessage>
 #include <QMessageBox>
+
+#include "state/StateController.h"
+#include "task/ConnectionTask.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
-#include "state/StateController.h"
 
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
@@ -18,12 +20,15 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_isDownloading(false)
     , m_packagesCount(0)
 {
-    ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, SIGNAL(comPortConnected()));
-    ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, SIGNAL(comPortDisconnected()));
-    ADD_TRANSITION(deviceMachiningState, deviceUnconnectedState, this, SIGNAL(comPortDisconnected()));
-    ADD_TRANSITION(devicePauseState, deviceUnconnectedState, this, SIGNAL(comPortDisconnected()));
-    ADD_TRANSITION(deviceConnectedState, deviceDownloadingState, this, SIGNAL(downloaded()));
-    ADD_TRANSITION(deviceDownloadingState, deviceMachiningState, this, SIGNAL(machiningStarted()));
+    ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDriver::comPortConnected);
+    ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDriver::comPortDisconnected);
+    ADD_TRANSITION(deviceIdleState, deviceDownloadingState, this, &LaserDriver::downloading);
+    ADD_TRANSITION(deviceDownloadingState, deviceDownloadedState, this, &LaserDriver::downloaded);
+    ADD_TRANSITION(deviceDownloadedState, deviceMachiningState, this, &LaserDriver::machiningStarted);
+    ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
+    ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
+    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
+    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
 }
 
 LaserDriver::~LaserDriver()
@@ -48,12 +53,26 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     qDebug() << "System message callback handler:" << sysMsgIndex << sysMsgCode << eventData;
     switch (sysMsgCode)
     {
+    case InitComPortError:      // 初始化串口错误
+    {
+        emit instance().comPortError(tr("Initialize com port error."));
+    }
+    break;
+    case ComPortExceptionError: // 串口异常
+    {
+        emit instance().comPortError(tr("Com port exception."));
+    }
+    break;
+    case ComPortNotOpened:      // 串口未打开
+    {
+        emit instance().comPortError(tr("Can not open com port."));
+    }
+    break;
     case ComPortOpened:    // 串口打开
     {
         instance().m_isConnected = true;
         emit instance().comPortConnected();
-        instance().readAllSysParamFromCard();
-        //instance().lPenMoveToOriginalPoint(10);
+        //instance().readAllSysParamFromCard();
     }
     break;
     case ComPortClosed:    // 串口关闭
@@ -75,7 +94,11 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     break;
     case USBRemove:    // USB设备已断开
     {
-
+    }
+    break;
+    case ReadSysParamFromCardOK:    // 读取系统参数后返回的数据
+    {
+        emit instance().sysParamFromCardArrived(eventData);
     }
     break;
     case PauseWorking:    // 暂停加工
@@ -87,6 +110,17 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     case StopWorking:    // 停止加工。
     {
         emit instance().machiningStopped();
+    }
+    break;
+    case GetComPortListError:
+    {
+        emit instance().comPortsFetchError();
+    }
+    break;
+    case GetComPortListOK:
+    {
+        QStringList portNames = eventData.split(";");
+        emit instance().comPortsFetched(portNames);
     }
     break;
     case ReturnWorkState:
@@ -175,6 +209,7 @@ bool LaserDriver::load()
     m_fnTestLaserLight = (FN_INT_BOOL)m_library.resolve("TestLaserLight");
 
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
+    m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
 
     Q_ASSERT(m_fnLoadDataFromFile);
 
@@ -224,6 +259,11 @@ QStringList LaserDriver::getPortList()
     QStringList portNames = portList.split(";");
     
     return portNames;
+}
+
+void LaserDriver::getPortListAsyn()
+{
+    m_fnGetComPortList();
 }
 
 bool LaserDriver::initComPort(const QString & name)
@@ -313,7 +353,8 @@ bool LaserDriver::readAllSysParamFromCard()
 {
     QList<int> params;
     params << 3 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
-        << 16 << 17 << 18 << 19 << 20 << 21 << 22 << 23;
+        << 16 << 17 << 18 << 19 << 20 << 21 << 22 << 23 << 27 << 28 << 29 
+        << 30 << 31 << 32 << 34 << 35 << 36 << 38 << 39 << 40;
     return readSysParamFromCard(params);
 }
 
@@ -352,7 +393,7 @@ void LaserDriver::smallScaleMovement(bool fromZeroPoint, bool laserOn, char moto
 {
     m_fnSmallScaleMovement(fromZeroPoint, laserOn, motorAxis, deviation, laserPower, moveSpeed);
 }
-
+ 
 void LaserDriver::startMachining(bool zeroPointStyle)
 {
     m_fnStartMachining(zeroPointStyle);
@@ -382,20 +423,36 @@ int LaserDriver::loadDataFromFile(const QString & filename, bool withMachining)
 {
     int ret = 0;
     m_isWithMachining = withMachining;
-    try
-    {
-        wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
-        m_isDownloading = true;
-        m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
-        qDebug() << "packages of transformed data:" << m_packagesCount;
-        delete[] filenameBuf;
-        emit downloaded();
-    }
-    catch (void*)
-    {
-        qDebug() << "error";
-    }
+    wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
+    m_isDownloading = true;
+    m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
+    qDebug() << "packages of transformed data:" << m_packagesCount;
+    delete[] filenameBuf;
+    emit downloaded();
     return ret;
 }
 
+void LaserDriver::getDeviceWorkState()
+{
+    m_fnGetDeviceWorkState();
+}
 
+void LaserDriver::setRegister(RegisterType rt, QVariant value)
+{
+    m_registers[rt] = value;
+}
+
+bool LaserDriver::getRegister(RegisterType rt, QVariant & value)
+{
+    if (m_registers.contains(rt))
+    {
+        value = m_registers[rt];
+        return true;
+    }
+    return false;
+}
+
+ConnectionTask * LaserDriver::createConnectionTask(QWidget* parentWidget)
+{
+    return new ConnectionTask(&instance(), parentWidget);
+}

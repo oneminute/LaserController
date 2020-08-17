@@ -59,12 +59,14 @@
    <addaction name="actionImportCorelDraw"/>
    <addaction name="actionCloseDocument"/>
    <addaction name="actionExportJSON"/>
+   <addaction name="actionLoadJson"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
-   <addaction name="actionDownload"/>
    <addaction name="actionMachining"/>
    <addaction name="actionPause"/>
    <addaction name="actionStop"/>
+   <addaction name="actionWorkState"/>
+   <addaction name="actionMoveToOriginalPoint"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">
    <property name="windowTitle">
@@ -478,6 +480,21 @@
   <action name="actionDownload">
    <property name="text">
     <string>Download</string>
+   </property>
+  </action>
+  <action name="actionWorkState">
+   <property name="text">
+    <string>Work State</string>
+   </property>
+  </action>
+  <action name="actionMoveToOriginalPoint">
+   <property name="text">
+    <string>Move To Original Point</string>
+   </property>
+  </action>
+  <action name="actionLoadJson">
+   <property name="text">
+    <string>Load Json</string>
    </property>
   </action>
  </widget>

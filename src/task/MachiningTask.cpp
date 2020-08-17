@@ -1,7 +1,5 @@
-#include "Task.h"
-#include "LaserDriver.h"
-
-#include <QSharedData>
+#include "MachiningTask.h"
+#include "laser/LaserDriver.h"
 
 MachiningTask::MachiningTask(LaserDriver* driver, const QString& filename, bool zeroPointStyle, QObject* parent)
     : DriverTask(driver, parent)
@@ -13,7 +11,7 @@ MachiningTask::MachiningTask(LaserDriver* driver, const QString& filename, bool 
     //connect(driver, &LaserDriver::idle, this, &MachiningTask::onStopped);
     connect(driver, &LaserDriver::downloading, this, &MachiningTask::onDownloading);
     connect(driver, &LaserDriver::downloaded, this, &MachiningTask::onDownloaded);
-    connect(driver, &LaserDriver::machiningStopped, this, &MachiningTask::onCompleted);
+    //connect(driver, &LaserDriver::machiningStopped, this, &MachiningTask::onCompleted);
 }
 
 MachiningTask::~MachiningTask()
@@ -70,4 +68,3 @@ void MachiningTask::onDownloaded()
 {
     //driver()->startMachining(m_zeroPointStyle);
 }
-

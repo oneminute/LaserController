@@ -31,6 +31,7 @@ protected slots:
     void onActionRemoveLayer(bool checked = false);
     void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onActionExportJson(bool checked = false);
+    void onActionLoadJson(bool checked = false);
     void onActionMechining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
@@ -39,6 +40,8 @@ protected slots:
     void onActionDownload(bool checked = false);
     void onActionLoadMotor(bool checked = false);
     void onActionUnloadMotor(bool checked = false);
+    void onActionWorkState(bool checked = false);
+    void onActionMoveToOriginalPoint(bool checked = false);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
@@ -54,6 +57,8 @@ private:
     QScopedPointer<LaserScene> m_scene;
     bool m_created;
     QDir m_tmpDir;
+    QString m_currentJson;
+    bool m_useLoadedJson;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

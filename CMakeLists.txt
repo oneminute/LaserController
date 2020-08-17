@@ -80,6 +80,9 @@ FILE(GLOB STATE_SOURCES src/state/*.cpp)
 FILE(GLOB SVG_HEADERS src/svg/*.h src/svg/*.hpp)
 FILE(GLOB SVG_SOURCES src/svg/*.cpp)
 
+FILE(GLOB TASK_HEADERS src/task/*.h src/task/*.hpp)
+FILE(GLOB TASK_SOURCES src/task/*.cpp)
+
 FILE(GLOB UI_HEADERS src/ui/*.h)
 FILE(GLOB UI_SOURCES src/ui/*.cpp)
 FILE(GLOB UI_FILES src/ui/*.ui)
@@ -110,6 +113,7 @@ set(HEADER_FILES
 	${SCENE_HEADERS}
     ${STATE_HEADERS}
     ${SVG_HEADERS}
+    ${TASK_HEADERS}
     ${UI_HEADERS}
     ${UTIL_HEADERS}
     ${WIDGET_HEADERS}
@@ -125,6 +129,7 @@ set(SRC_FILES
 	${SCENE_SOURCES}
     ${STATE_SOURCES}
     ${SVG_SOURCES}
+    ${TASK_SOURCES}
     ${UI_SOURCES}
     ${UI_FILES}
     ${UTIL_SOURCES}
@@ -144,6 +149,8 @@ IF(MSVC)
     source_group("source\\state" FILES ${STATE_SOURCES})
     source_group("source\\svg" FILES ${SVG_SOURCES})
     source_group("header\\svg" FILES ${SVG_HEADERS})
+    source_group("source\\task" FILES ${TASK_SOURCES})
+    source_group("header\\task" FILES ${TASK_HEADERS})
     source_group("source\\ui" FILES ${UI_SOURCES} ${UI_FILES})
     source_group("header\\ui" FILES ${UI_HEADERS})
     source_group("source\\util" FILES ${UTIL_SOURCES})

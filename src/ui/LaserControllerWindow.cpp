@@ -10,16 +10,15 @@
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
-#include "laser/Task.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
+#include "task/ConnectionTask.h"
 #include "ui/LaserLayerDialog.h"
-#include "ui/ConnectionDialog.h"
-#include "widget/LaserViewer.h"
 #include "util/Utils.h"
+#include "widget/LaserViewer.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -79,6 +78,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
+    connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMechining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
@@ -87,6 +87,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionLoadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionLoadMotor);
     connect(m_ui->actionUnloadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionUnloadMotor);
     connect(m_ui->actionDownload, &QAction::triggered, this, &LaserControllerWindow::onActionDownload);
+    connect(m_ui->actionWorkState, &QAction::triggered, this, &LaserControllerWindow::onActionWorkState);
+    connect(m_ui->actionMoveToOriginalPoint, &QAction::triggered, this, &LaserControllerWindow::onActionMoveToOriginalPoint);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -219,7 +221,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setMimeTypeFilters(QStringList() << "application/json");
     dialog.setWindowTitle(tr("Export"));
-    if (dialog.exec() == QFileDialog::AcceptSave)
+    if (dialog.exec() == QFileDialog::Accepted)
     {
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
@@ -228,17 +230,40 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     }
 }
 
+void LaserControllerWindow::onActionLoadJson(bool checked)
+{
+    QFileDialog dialog(this);
+    //dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setMimeTypeFilters(QStringList() << "application/json");
+    dialog.setWindowTitle(tr("Load Json"));
+    if (dialog.exec() == QFileDialog::Accepted)
+    {
+        QString filename = dialog.selectedFiles().constFirst();
+        if (!filename.isEmpty() && !filename.isNull())
+        {
+            m_currentJson = filename;
+            m_useLoadedJson = true;
+            qDebug() << m_currentJson << m_useLoadedJson;
+        }
+    }
+}
+
 void LaserControllerWindow::onActionMechining(bool checked)
 {
-    //QString filename = "export.json";
-    //filename = m_tmpDir.absoluteFilePath(filename);
-    //m_scene->document()->exportJSON(filename);
-    //qDebug() << "export temp json file for machining" << filename;
-    //MachiningTask* task = new MachiningTask(&LaserDriver::instance(), filename);
-    //task->start();
-    //QString filename = utils::createUUID("json_") + ".json";
-
-    LaserDriver::instance().startMachining(false);
+    if (m_useLoadedJson)
+    {
+        qDebug() << "export temp json file for machining" << m_currentJson;
+        LaserDriver::instance().loadDataFromFile(m_currentJson);
+    }
+    else
+    {
+        QString filename = "export.json";
+        filename = m_tmpDir.absoluteFilePath(filename);
+        m_scene->document()->exportJSON(filename);
+        qDebug() << "export temp json file for machining" << filename;
+        LaserDriver::instance().loadDataFromFile(filename);
+    }
+    m_useLoadedJson = false;
     //m_tmpDir.remove(filename);
 }
 
@@ -254,15 +279,8 @@ void LaserControllerWindow::onActionStopMechining(bool checked)
 
 void LaserControllerWindow::onActionConnect(bool checked)
 {
-    ConnectionDialog dialog;
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        if (!LaserDriver::instance().isConnected())
-        {
-            QErrorMessage dialog;
-            dialog.showMessage(tr("Can not connect to laser machine."));
-        }
-    }
+    ConnectionTask* task = LaserDriver::instance().createConnectionTask(this);
+    task->start();
 }
 
 void LaserControllerWindow::onActionDisconnect(bool checked)
@@ -293,6 +311,16 @@ void LaserControllerWindow::onActionUnloadMotor(bool checked)
     {
         LaserDriver::instance().controlMotor(false);
     }
+}
+
+void LaserControllerWindow::onActionWorkState(bool checked)
+{
+    LaserDriver::instance().getDeviceWorkState();
+}
+
+void LaserControllerWindow::onActionMoveToOriginalPoint(bool checked)
+{
+    LaserDriver::instance().lPenMoveToOriginalPoint(50);
 }
 
 void LaserControllerWindow::bindWidgetsProperties()
@@ -362,7 +390,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", true, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, devicePauseState);
+    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, devicePausedState);
     // end actionConnect
 
     // actionDisconnect
@@ -370,7 +398,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePauseState);
+    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePausedState);
     // end actionDisconnect
 
     // actionDisconnect
@@ -378,24 +406,28 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePauseState);
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePausedState);
     // end actionDisconnect
 
-    // actionDisconnect
+    // actionPause
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, devicePauseState);
-    // end actionDisconnect
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, devicePausedState);
+    // end actionPause
 
     // actionStop
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePauseState);
+    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePausedState);
     // end actionStop
+
+    // actionLoadJson
+
+    // end actionLoadJson
 }
 
 void LaserControllerWindow::showEvent(QShowEvent * event)

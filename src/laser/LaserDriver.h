@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QLibrary>
 #include <QWidget>
+#include <QMap>
+
+#include "task/Task.h"
 
 enum LaserWorkMode
 {
@@ -146,7 +149,80 @@ class LaserDriver : public QObject
         ChangeFactoryPasswordOK = 62,
         ChangeFactoryPasswordError = 63,
         FactoryPasswordLengthError = 64,
-        FactoryPasswordExpired = 65
+        FactoryPasswordExpired = 65,
+        MainCardRegisterOK = 66,
+        MainCardRegisterError = 67,
+        MachineWorking = 68
+    };
+
+    enum RegisterType
+    {
+        REG_03 = 3,                     // 复位校准速度
+        RT_RESET_CALIB_SPEED = 3,
+        REG_05 = 5,                     // 快速移动速度
+        RT_MOVE_FAST_SPEED = 5,
+        REG_06 = 6,                     // 切割速度
+        RT_CUTTING_SPEED = 6,
+        REG_07 = 7,                     // 回机械原点速度
+        RT_MOVE_TO_ORI_SPEED = 7,
+        REG_08 = 8,                     // 工作面象限位置
+        RT_WORKING_QUADRANT = 8,
+        REG_09 = 9,                     // X轴脉冲长度
+        RT_X_AXIS_PULSE_LENGTH = 9,
+        REG_10 = 10,                    // Y轴脉冲长度
+        RT_Y_AXIS_PULSE_LENGTH = 10,
+        REG_11 = 11,                    // X轴回差
+        RT_X_AXIS_BACKLASH = 11,
+        REG_12 = 12,                    // Y轴回差
+        RT_Y_AXIS_BACKLASH = 12,
+        REG_13 = 13,                    // 雕刻列步进值
+        RT_ENGRAVING_COLUMN_STEP = 13,
+        REG_14 = 14,                    // 雕刻行步进值
+        RT_ENGRAVING_ROW_STEP = 14,
+        REG_15 = 15,                    // 雕刻激光功率
+        RT_ENGRAVING_LASER_POWER = 15,
+        REG_16 = 16,                    // 雕刻灰阶最大值
+        RT_MAX_ENGRAVING_GRAY_VALUE = 16,
+        REG_17 = 17,                    // 雕刻灰阶最小值
+        RT_MIN_ENGRAVING_GRAY_VALUE = 17,
+        REG_18 = 18,                    // 切割激光功率
+        RT_CUTTING_LASER_POWER = 18,
+        REG_19 = 19,                    // 切割运行速度对应激光功率比值
+        RT_CUTTING_RUNNING_SPEED_RATIO = 19,
+        REG_20 = 20,                    // 切割启动速度对应激光功率比值
+        RT_CUTTING_LAUNCHING_SPEED_RATIO = 20,
+        REG_21 = 21,                    // 电机相位
+        RT_MACHINE_PHASE = 21,
+        REG_22 = 22,                    // 限位相位
+        RT_LIMIT_PHASE = 22,
+        REG_23 = 23,                    // 系统累计运行时间
+        RT_TOTAL_WORKING_DURATION = 23,
+        REG_24 = 24,                    // 激光管累计运行时间
+        RT_TOTAL_LASER_DURATION = 24,
+        REG_25 = 25,                    // 切割激光频率
+        RT_CUTTING_LASER_FREQ = 25,
+        REG_26 = 26,                    // 板卡注册状态
+        RT_REGISTION = 26,
+        REG_27 = 27,                    // 雕刻激光频率
+        RT_ENGRAVING_LASER_FREQ = 27,
+        REG_31 = 31,                    // 第1组用户自定义加工原点X值
+        RT_CUSTOM_1_X = 31,
+        REG_32 = 32,                    // 第1组用户自定义加工原点Y值
+        RT_CUSTOM_1_Y = 32,
+        REG_33 = 33,                    // 第2组用户自定义加工原点X值
+        RT_CUSTOM_2_X = 33,
+        REG_34 = 34,                    // 第2组用户自定义加工原点Y值
+        RT_CUSTOM_2_Y = 34,
+        REG_35 = 35,                    // 第3组用户自定义加工原点X值
+        RT_CUSTOM_3_X = 35,
+        REG_36 = 36,                    // 第3组用户自定义加工原点Y值
+        RT_CUSTOM_3_Y = 36,
+        REG_38 = 38,                    // 加工幅面宽X、高Y
+        RT_LAYOUT_SIZE = 38,
+        REG_39 = 39,                    // 绘图单位
+        RT_PAINTING_UNIT = 39,
+        REG_40 = 40,                    // 快速移动起跳速度
+        RT_MOVE_FAST_LAUNCHING_SPEED = 40
     };
 
 private:
@@ -162,8 +238,6 @@ private:
 
     typedef void(__cdecl *FNProcDataProgressCallBackHandler)(void* ptr, int position, int totalCount);
     typedef void(*FNProcDataProgressCallBack)(FNProcDataProgressCallBackHandler callback);
-
-    //typedef wchar_t*(*FNGetComPortList)();
 
     typedef int(__stdcall *FN_INT_INT)(int comPort);
     typedef int(*FN_INT_VOID)();
@@ -186,8 +260,6 @@ private:
     ~LaserDriver();
 
 public:
-    
-
     static LaserDriver& instance();
     static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
     static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
@@ -201,6 +273,7 @@ public:
     void init(QWidget* parentWidget);
     void unInit();
     QStringList getPortList();
+    void getPortListAsyn();
     bool initComPort(const QString& name);
     bool unInitComPort();
     void setTransTimeOutInterval(int interval);
@@ -223,11 +296,17 @@ public:
     int controlMotor(bool open);
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
+    void getDeviceWorkState();
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
     bool isMachining() const { return m_isMachining; }
     QString portName() const { return m_portName; }
+
+    void setRegister(RegisterType rt, QVariant value);
+    bool getRegister(RegisterType rt, QVariant& value);
+
+    static ConnectionTask* createConnectionTask(QWidget* parentWidget);
 
 signals:
     void libraryLoaded(bool success = true);
@@ -236,13 +315,19 @@ signals:
     void libraryUninitialized();
     void comPortConnected();
     void comPortDisconnected(bool isError = false, const QString& errorMsg = "");
+    void comPortError(const QString& errorMsg);
+    void comPortsFetched(const QStringList& ports);
+    void comPortsFetchError();
     void machiningStarted();
     void machiningPaused();
-    void machiningStopped(bool isSuccess = true, const QString& errorMsg = "");
+    void continueWorking();
+    void machiningStopped();
+    void machiningCompleted();
     void downloading(int current, int total, float progress);
     void downloaded();
     void workStateUpdated(LaserState state);
     void idle();
+    void sysParamFromCardArrived(const QString& data);
 
 private:
     bool m_isLoaded;
@@ -255,6 +340,7 @@ private:
     QString m_portName;
     QWidget* m_parentWidget;
     LaserWorkMode m_workMode;
+    QMap<RegisterType, QVariant> m_registers;
 
     QLibrary m_library;
 
@@ -294,6 +380,8 @@ private:
     FN_INT_BOOL m_fnTestLaserLight;
 
     FN_INT_WCHART m_fnLoadDataFromFile;
+
+    FN_VOID_VOID m_fnGetDeviceWorkState;
 
     wchar_t m_wcharBuffer[2048];
 };
