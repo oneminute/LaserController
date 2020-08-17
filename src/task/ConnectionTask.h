@@ -17,9 +17,12 @@ protected slots:
     void comPortsFetchError();
     void onConnected();
     void onError(const QString& errorMsg);
+    void onSysParamFromCardArrived(const QString& eventData);
+    void onSysParamFromCardError();
 
 private:
     QWidget* m_parentWidget;
+    QList<int> m_registerList;
 };
 
 #endif // CONNECTIONTASK_H

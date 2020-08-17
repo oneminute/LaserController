@@ -6,6 +6,7 @@
 
 #include "state/StateController.h"
 #include "task/ConnectionTask.h"
+#include "task/DisconnectionTask.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 
@@ -94,6 +95,11 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     break;
     case USBRemove:    // USB设备已断开
     {
+    }
+    break;
+    case ReadSysParamFromCardError:
+    {
+        emit instance().sysParamFromCardError();
     }
     break;
     case ReadSysParamFromCardOK:    // 读取系统参数后返回的数据
@@ -278,7 +284,7 @@ bool LaserDriver::initComPort(const QString & name)
     return result == 0;
 }
 
-bool LaserDriver::unInitComPort()
+bool LaserDriver::uninitComPort()
 {
     int result = m_fnUnInitComPort();
     return result == 0;
@@ -455,4 +461,9 @@ bool LaserDriver::getRegister(RegisterType rt, QVariant & value)
 ConnectionTask * LaserDriver::createConnectionTask(QWidget* parentWidget)
 {
     return new ConnectionTask(&instance(), parentWidget);
+}
+
+DisconnectionTask * LaserDriver::createDisconnectionTask(QWidget * parentWidget)
+{
+    return new DisconnectionTask(&instance(), parentWidget);
 }

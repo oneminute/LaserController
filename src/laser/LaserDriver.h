@@ -84,6 +84,7 @@ class LaserDriver : public QObject
 {
     Q_OBJECT
 
+public:
     enum SysMsgCode
     {
         InitComPortError = 1,
@@ -275,7 +276,7 @@ public:
     QStringList getPortList();
     void getPortListAsyn();
     bool initComPort(const QString& name);
-    bool unInitComPort();
+    bool uninitComPort();
     void setTransTimeOutInterval(int interval);
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
     void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
@@ -307,6 +308,7 @@ public:
     bool getRegister(RegisterType rt, QVariant& value);
 
     static ConnectionTask* createConnectionTask(QWidget* parentWidget);
+    static DisconnectionTask* createDisconnectionTask(QWidget* parentWidget);
 
 signals:
     void libraryLoaded(bool success = true);
@@ -328,6 +330,7 @@ signals:
     void workStateUpdated(LaserState state);
     void idle();
     void sysParamFromCardArrived(const QString& data);
+    void sysParamFromCardError();
 
 private:
     bool m_isLoaded;

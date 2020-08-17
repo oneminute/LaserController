@@ -16,6 +16,7 @@
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
 #include "task/ConnectionTask.h"
+#include "task/DisconnectionTask.h"
 #include "ui/LaserLayerDialog.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
@@ -285,10 +286,8 @@ void LaserControllerWindow::onActionConnect(bool checked)
 
 void LaserControllerWindow::onActionDisconnect(bool checked)
 {
-    if (QMessageBox::Apply == QMessageBox::question(this, tr("Disconnect"), tr("Do you want to disconnect from laser machine?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
-    {
-        LaserDriver::instance().unInitComPort();
-    }
+    DisconnectionTask* task = LaserDriver::instance().createDisconnectionTask(this);
+    task->start();
 }
 
 void LaserControllerWindow::onActionDownload(bool checked)

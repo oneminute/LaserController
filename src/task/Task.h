@@ -12,6 +12,7 @@ class Task;
 
 class DriverTask;
 class ConnectionTask;
+class DisconnectionTask;
 class MahciningTask;
 
 class Task : public QObject
@@ -61,6 +62,10 @@ protected:
     void setRunning(bool running) { m_isRunning = running; }
     void setError(bool error, const QString& errorMsg = "")
     {
+        if (error)
+        {
+            qWarning() << error;
+        }
         m_isError = error;
         m_errorMsg = errorMsg;
     }
