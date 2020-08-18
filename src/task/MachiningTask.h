@@ -30,9 +30,11 @@ public slots:
     void onStarted();
     void onPaused();
     void onStopped();
-    void onCompleted(bool isSuccess = true, const QString& errorMsg = "");
+    void onCompleted();
     void onDownloading(int current, int total, float progress);
     void onDownloaded();
+    void onWorkingCanceled();
+    void onunknownError();
 
 private:
     bool m_zeroPointStyle;

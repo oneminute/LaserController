@@ -32,7 +32,7 @@ protected slots:
     void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onActionExportJson(bool checked = false);
     void onActionLoadJson(bool checked = false);
-    void onActionMechining(bool checked = false);
+    void onActionMachining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
     void onActionConnect(bool checked = false);

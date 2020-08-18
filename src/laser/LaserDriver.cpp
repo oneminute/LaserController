@@ -7,6 +7,7 @@
 #include "state/StateController.h"
 #include "task/ConnectionTask.h"
 #include "task/DisconnectionTask.h"
+#include "task/MachiningTask.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 
@@ -45,7 +46,13 @@ LaserDriver & LaserDriver::instance()
 
 void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCount)
 {
-    qDebug() << "Progress callback handler:" << position << totalCount;
+    float progress = position * 1.0f / totalCount;
+    qDebug() << "Progress callback handler:" << position << totalCount << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4)
+;
+    if (instance().m_isDownloading)
+    {
+        emit instance().downloading(position, totalCount, progress);
+    }
 }
 
 void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t * sysEventData)
@@ -97,6 +104,11 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     {
     }
     break;
+    case DataTransformed:   // 数据传输完成
+    {
+        emit instance().downloaded();
+    }
+    break;
     case ReadSysParamFromCardError:
     {
         emit instance().sysParamFromCardError();
@@ -105,6 +117,11 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     case ReadSysParamFromCardOK:    // 读取系统参数后返回的数据
     {
         emit instance().sysParamFromCardArrived(eventData);
+    }
+    break;
+    case UnknownError:
+    {
+        emit instance().unknownError();
     }
     break;
     case PauseWorking:    // 暂停加工
@@ -127,6 +144,11 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     {
         QStringList portNames = eventData.split(";");
         emit instance().comPortsFetched(portNames);
+    }
+    break;
+    case CancelCurrentWork:
+    {
+        emit instance().workingCanceled();
     }
     break;
     case ReturnWorkState:
@@ -156,10 +178,7 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 {
     float progress = position * 1.0f / totalCount;
     qDebug() << "Proc progress callback handler:" << position << totalCount << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
-    if (instance().m_isDownloading)
-    {
-        emit instance().downloading(position, totalCount, progress);
-    }
+    
 }
 
 bool LaserDriver::load()
@@ -434,7 +453,8 @@ int LaserDriver::loadDataFromFile(const QString & filename, bool withMachining)
     m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
     qDebug() << "packages of transformed data:" << m_packagesCount;
     delete[] filenameBuf;
-    emit downloaded();
+    m_isDownloading = false;
+    emit machiningStarted();
     return ret;
 }
 
@@ -466,4 +486,9 @@ ConnectionTask * LaserDriver::createConnectionTask(QWidget* parentWidget)
 DisconnectionTask * LaserDriver::createDisconnectionTask(QWidget * parentWidget)
 {
     return new DisconnectionTask(&instance(), parentWidget);
+}
+
+MachiningTask * LaserDriver::createMachiningTask(const QString & filename, bool zeroPointStyle)
+{
+    return new MachiningTask(&instance(), filename, zeroPointStyle);
 }

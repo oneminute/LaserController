@@ -115,6 +115,7 @@ public:
         ImageDataError = 26,
         USBArrival = 27,
         USBRemove = 28,
+        DataTransformed = 29,
         ReadSysParamFromCardError = 30,
         WriteSysParamToCardError = 31,
         ReadSysParamFromCardOK = 32,
@@ -309,6 +310,7 @@ public:
 
     static ConnectionTask* createConnectionTask(QWidget* parentWidget);
     static DisconnectionTask* createDisconnectionTask(QWidget* parentWidget);
+    static MachiningTask* createMachiningTask(const QString& filename, bool zeroPointStyle = false);
 
 signals:
     void libraryLoaded(bool success = true);
@@ -331,6 +333,8 @@ signals:
     void idle();
     void sysParamFromCardArrived(const QString& data);
     void sysParamFromCardError();
+    void unknownError();
+    void workingCanceled();
 
 private:
     bool m_isLoaded;

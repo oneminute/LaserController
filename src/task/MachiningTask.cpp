@@ -7,11 +7,11 @@ MachiningTask::MachiningTask(LaserDriver* driver, const QString& filename, bool 
     , m_filename(filename)
 {
     connect(driver, &LaserDriver::machiningStarted, this, &MachiningTask::onStarted);
-    //connect(driver, &LaserDriver::machiningStopped, this, &MachiningTask::onStopped);
-    //connect(driver, &LaserDriver::idle, this, &MachiningTask::onStopped);
+    connect(driver, &LaserDriver::machiningPaused, this, &MachiningTask::onPaused);
     connect(driver, &LaserDriver::downloading, this, &MachiningTask::onDownloading);
     connect(driver, &LaserDriver::downloaded, this, &MachiningTask::onDownloaded);
-    //connect(driver, &LaserDriver::machiningStopped, this, &MachiningTask::onCompleted);
+    connect(driver, &LaserDriver::machiningStopped, this, &MachiningTask::onStopped);
+    connect(driver, &LaserDriver::machiningCompleted, this, &MachiningTask::onCompleted);
 }
 
 MachiningTask::~MachiningTask()
@@ -21,11 +21,8 @@ MachiningTask::~MachiningTask()
 
 void MachiningTask::start()
 {
-    //driver()->stopMachining();
+    driver()->loadDataFromFile(m_filename);
     Task::start();
-    
-    setProgress(0.05f);
-    onStopped();
 }
 
 void MachiningTask::onStarted()
@@ -35,28 +32,18 @@ void MachiningTask::onStarted()
 
 void MachiningTask::onPaused()
 {
+    qDebug() << "machining paused.";
 }
 
 void MachiningTask::onStopped()
 {
-    //disconnect(driver(), &LaserDriver::machiningStopped, this, &MachiningTask::onStopped);
-    //disconnect(driver(), &LaserDriver::idle, this, &MachiningTask::onStopped);
     setProgress(0.1f);
-    driver()->loadDataFromFile(m_filename);
-    driver()->startMachining(m_zeroPointStyle);
+    stop();
 }
 
-void MachiningTask::onCompleted(bool isSuccess, const QString& errorMsg)
+void MachiningTask::onCompleted()
 {
-    if (isSuccess)
-    {
-        stop();
-    }
-    else
-    {
-        setError(false, errorMsg);
-        stop();
-    }
+    stop();
 }
 
 void MachiningTask::onDownloading(int current, int total, float progress)
@@ -66,5 +53,15 @@ void MachiningTask::onDownloading(int current, int total, float progress)
 
 void MachiningTask::onDownloaded()
 {
-    //driver()->startMachining(m_zeroPointStyle);
+    setProgress(0.3f);
+}
+
+void MachiningTask::onWorkingCanceled()
+{
+    setError(true, "working has been canceled.");
+}
+
+void MachiningTask::onunknownError()
+{
+    setError(true, "unknown error.");
 }

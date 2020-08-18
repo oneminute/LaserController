@@ -13,7 +13,7 @@ class Task;
 class DriverTask;
 class ConnectionTask;
 class DisconnectionTask;
-class MahciningTask;
+class MachiningTask;
 
 class Task : public QObject
 {
@@ -55,7 +55,7 @@ public:
 protected:
     void setProgress(float progress) 
     {
-        //qDebug() << "progress:" << progress;
+        qDebug() << "progress:" << progress;
         m_progress = progress; 
         emit progressUpdated(progress);
     }

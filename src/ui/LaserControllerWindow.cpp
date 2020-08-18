@@ -17,6 +17,7 @@
 #include "state/StateController.h"
 #include "task/ConnectionTask.h"
 #include "task/DisconnectionTask.h"
+#include "task/MachiningTask.h"
 #include "ui/LaserLayerDialog.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
@@ -80,7 +81,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
-    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMechining);
+    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
@@ -249,12 +250,13 @@ void LaserControllerWindow::onActionLoadJson(bool checked)
     }
 }
 
-void LaserControllerWindow::onActionMechining(bool checked)
+void LaserControllerWindow::onActionMachining(bool checked)
 {
     if (m_useLoadedJson)
     {
         qDebug() << "export temp json file for machining" << m_currentJson;
-        LaserDriver::instance().loadDataFromFile(m_currentJson);
+        MachiningTask* task = LaserDriver::instance().createMachiningTask(m_currentJson, false);
+        task->start();
     }
     else
     {
@@ -262,15 +264,15 @@ void LaserControllerWindow::onActionMechining(bool checked)
         filename = m_tmpDir.absoluteFilePath(filename);
         m_scene->document()->exportJSON(filename);
         qDebug() << "export temp json file for machining" << filename;
-        LaserDriver::instance().loadDataFromFile(filename);
+        MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
+        task->start();
     }
     m_useLoadedJson = false;
-    //m_tmpDir.remove(filename);
 }
 
 void LaserControllerWindow::onActionPauseMechining(bool checked)
 {
-    LaserDriver::instance().pauseContinueMachining(checked);
+    LaserDriver::instance().pauseContinueMachining(!checked);
 }
 
 void LaserControllerWindow::onActionStopMechining(bool checked)
@@ -413,7 +415,9 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", true, devicePausedState);
     // end actionPause
 
     // actionStop
