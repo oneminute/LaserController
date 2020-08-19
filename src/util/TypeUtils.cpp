@@ -24,3 +24,15 @@ wchar_t * typeUtils::qStringToWCharPtr(const QString & str)
     buf[str.length()] = 0;
     return buf;
 }
+
+cv::Rect typeUtils::qtRect2cvRect(const QRect & rect)
+{
+    return cv::Rect(rect.left(), rect.top(), rect.right(), rect.bottom());
+}
+
+cv::Rect typeUtils::qtRect2cvRect(const QRectF & rect, float scale)
+{
+    return cv::Rect(
+        cv::Point2f(rect.left() * scale, rect.top() * scale), 
+        cv::Point2f(rect.right() * scale, rect.bottom() * scale));
+}

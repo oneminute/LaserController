@@ -36,8 +36,8 @@ public:
 
     virtual void draw(QPainter* painter) {};
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat()) { return std::vector<cv::Point2f>(); }
-    virtual QByteArray engravingImage() { return QByteArray(); }
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return std::vector<cv::Point2f>(); }
+    virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
 
     qreal unitToMM() const;
 
@@ -203,7 +203,7 @@ public:
 
     QRectF bounds() const { return m_bounds; }
 
-    virtual QByteArray engravingImage();
+    virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }
     virtual QString typeName() { return tr("Bitmap"); }

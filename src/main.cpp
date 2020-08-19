@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     QDir dir(QApplication::applicationDirPath());
     QApplication::addLibraryPath(dir.absoluteFilePath("bin"));
-    QApplication::setApplicationName(QObject::tr("Laser Controller"));
+    QApplication::setApplicationName(QObject::tr("LaserController"));
     QApplication::setApplicationDisplayName(QObject::tr("Laser Controller"));
     QApplication::setOrganizationName("OneMinute");
     QApplication::setApplicationVersion(QString("%1.%2.%3.%4").arg(LC_VERSION_MAJOR).arg(LC_VERSION_MINOR).arg(LC_VERSION_BUILD).arg(LC_VERSION_REVISION));
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     initLog(argv[0]);
     qInstallMessageHandler(messageOutput);
 
-    qDebug() << "version:" << QApplication::applicationVersion();
+    qDebug() << "product name:" << QApplication::applicationName() << ", version:" << QApplication::applicationVersion();
 
     QTranslator translator;
     qDebug() << "load translation file." << a.applicationName() << QLocale::system().name();

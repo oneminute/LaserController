@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QRect>
 #include <comutil.h>
 
 #include <opencv2/opencv.hpp>
@@ -22,6 +23,10 @@ namespace typeUtils
     _bstr_t qStringToBstr(const QString& str);
 
     wchar_t* qStringToWCharPtr(const QString& str);
+
+    cv::Rect qtRect2cvRect(const QRect& rect);
+
+    cv::Rect qtRect2cvRect(const QRectF& rect, float scale = 1.f);
 }
 
 #endif // TYPEUTILS_H

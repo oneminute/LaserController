@@ -24,9 +24,7 @@ LaserDriver::LaserDriver(QObject* parent)
 {
     ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDriver::comPortConnected);
     ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDriver::comPortDisconnected);
-    ADD_TRANSITION(deviceIdleState, deviceDownloadingState, this, &LaserDriver::downloading);
-    ADD_TRANSITION(deviceDownloadingState, deviceDownloadedState, this, &LaserDriver::downloaded);
-    ADD_TRANSITION(deviceDownloadedState, deviceMachiningState, this, &LaserDriver::machiningStarted);
+    ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
     ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
     ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
@@ -106,7 +104,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     break;
     case DataTransformed:   // 数据传输完成
     {
-        emit instance().downloaded();
+        //emit instance().downloaded();
     }
     break;
     case ReadSysParamFromCardError:
@@ -454,7 +452,7 @@ int LaserDriver::loadDataFromFile(const QString & filename, bool withMachining)
     qDebug() << "packages of transformed data:" << m_packagesCount;
     delete[] filenameBuf;
     m_isDownloading = false;
-    emit machiningStarted();
+    //emit machiningStarted();
     return ret;
 }
 

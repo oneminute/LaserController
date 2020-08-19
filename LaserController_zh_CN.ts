@@ -23,6 +23,27 @@
     </message>
 </context>
 <context>
+    <name>ConnectionTask</name>
+    <message>
+        <location filename="src/task/ConnectionTask.cpp" line="46"/>
+        <source>Get com ports error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DisconnectionTask</name>
+    <message>
+        <location filename="src/task/DisconnectionTask.cpp" line="21"/>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/task/DisconnectionTask.cpp" line="21"/>
+        <source>Do you want to disconnect from laser machine?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExportDialog</name>
     <message>
         <location filename="src/svg/exportdialog.cpp" line="86"/>
@@ -245,13 +266,13 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="106"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="39"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="43"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="111"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="39"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="43"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -412,7 +433,6 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="447"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="287"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -450,65 +470,60 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="src/ui/LaserControllerWindow.ui" line="497"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="238"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="242"/>
         <source>Load Json</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="39"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="43"/>
         <source>C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="39"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="43"/>
         <source>T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="113"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="446"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="117"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="457"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="176"/>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="184"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="180"/>
         <location filename="src/ui/LaserControllerWindow.cpp" line="188"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="192"/>
         <source>Remove layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="176"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="180"/>
         <source>You can not remove base cutting layer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="184"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="188"/>
         <source>You can not remove base engraving layer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="188"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="192"/>
         <source>Do you want to remove this layer?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="223"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="227"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="287"/>
-        <source>Do you want to disconnect from laser machine?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="309"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="318"/>
         <source>Unload motor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/ui/LaserControllerWindow.cpp" line="309"/>
+        <location filename="src/ui/LaserControllerWindow.cpp" line="318"/>
         <source>Do you want to unload motor?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -529,17 +544,17 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDriver</name>
     <message>
-        <location filename="src/laser/LaserDriver.cpp" line="58"/>
+        <location filename="src/laser/LaserDriver.cpp" line="64"/>
         <source>Initialize com port error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/laser/LaserDriver.cpp" line="63"/>
+        <location filename="src/laser/LaserDriver.cpp" line="69"/>
         <source>Com port exception.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/laser/LaserDriver.cpp" line="68"/>
+        <location filename="src/laser/LaserDriver.cpp" line="74"/>
         <source>Can not open com port.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1689,6 +1704,10 @@ Coordinate</source>
     <name>QObject</name>
     <message>
         <location filename="src/main.cpp" line="74"/>
+        <source>LaserController</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="src/main.cpp" line="75"/>
         <source>Laser Controller</source>
         <translation type="unfinished"></translation>

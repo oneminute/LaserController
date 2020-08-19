@@ -331,16 +331,40 @@ LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, Las
     , m_image(image)
     , m_bounds(bounds)
 {
+    m_image = m_image.convertToFormat(QImage::Format_Grayscale8);
     m_boundingRect = m_bounds;
     m_type = LPT_BITMAP;
 }
 
-QByteArray LaserBitmapItem::engravingImage() 
+QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas) 
 { 
     QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    m_image.save(&buffer, "PNG");
+
+    QTransform t = m_transform * sceneTransform();
+    if (!canvas.empty())
+    {
+        QRectF bounds = t.mapRect(m_boundingRect);
+        cv::Rect roiRect = typeUtils::qtRect2cvRect(bounds, 40);
+        cv::Mat roi = canvas(roiRect);
+        qDebug() << "engraving image bounds:" << bounds;
+        qDebug() << "engraving image size:" << m_image.width() << m_image.height();
+        qDebug() << "roiRect:" << roiRect.x << roiRect.y << roiRect.width << roiRect.height;
+        QImage image = m_image.scaled(roi.cols, roi.rows);
+        cv::Mat mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+        mat.convertTo(mat, CV_8UC3);
+        cv::cvtColor(mat, mat, cv::COLOR_GRAY2BGR);
+        mat.copyTo(roi);
+
+        qDebug() << "device pixel ratio:" << image.devicePixelRatioF();
+        image.setDotsPerMeterX(600 * 40);
+        image.setDotsPerMeterY(600 * 40);
+        qDebug() << "device pixel ratio:" << image.devicePixelRatioF();
+        qDebug() << "image size:" << image.size();
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
+        image.save(&buffer, "PNG");
+    }
+
     return ba; 
 }
 

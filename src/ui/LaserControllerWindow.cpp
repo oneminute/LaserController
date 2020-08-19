@@ -7,6 +7,7 @@
 #include <QErrorMessage>
 #include <QMessageBox>
 #include <QThread>
+#include <QTemporaryFile>
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
@@ -27,6 +28,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_ui(new Ui::LaserControllerWindow)
     , m_scene(new LaserScene)
     , m_created(false)
+    , m_useLoadedJson(false)
 {
     m_ui->setupUi(this);
 
@@ -261,11 +263,16 @@ void LaserControllerWindow::onActionMachining(bool checked)
     else
     {
         QString filename = "export.json";
-        filename = m_tmpDir.absoluteFilePath(filename);
-        m_scene->document()->exportJSON(filename);
-        qDebug() << "export temp json file for machining" << filename;
-        MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
-        task->start();
+        //QTemporaryFile file;
+        //if (file.open())
+        //{
+            //QString filename = file.fileName();
+            qDebug() << "exporting to temporary json file:" << filename;
+            m_scene->document()->exportJSON(filename);
+            qDebug() << "export temp json file for machining" << filename;
+            MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
+            task->start();
+        //}
     }
     m_useLoadedJson = false;
 }
