@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QTemporaryFile>
+#include <QImage>
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
@@ -20,8 +21,13 @@
 #include "task/DisconnectionTask.h"
 #include "task/MachiningTask.h"
 #include "ui/LaserLayerDialog.h"
+#include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
+
+#include "halftone/SSIM.h"
+#include "halftone/Ostromoukhov.h"
+#include "halftone/SAHalftoner.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -93,6 +99,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionDownload, &QAction::triggered, this, &LaserControllerWindow::onActionDownload);
     connect(m_ui->actionWorkState, &QAction::triggered, this, &LaserControllerWindow::onActionWorkState);
     connect(m_ui->actionMoveToOriginalPoint, &QAction::triggered, this, &LaserControllerWindow::onActionMoveToOriginalPoint);
+    connect(m_ui->actionHalfTone, &QAction::triggered, this, &LaserControllerWindow::onActionHalfTone);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -329,6 +336,26 @@ void LaserControllerWindow::onActionWorkState(bool checked)
 void LaserControllerWindow::onActionMoveToOriginalPoint(bool checked)
 {
     LaserDriver::instance().lPenMoveToOriginalPoint(50);
+}
+
+void LaserControllerWindow::onActionHalfTone(bool checked)
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Images (*.png *.bmp *.jpg)"));
+    if (!filename.isEmpty() && !filename.isNull())
+    {
+        QImage image(filename);
+        image = image.convertToFormat(QImage::Format_Grayscale8);
+        cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+        float mmWidth = 1000.f * image.width() / image.dotsPerMeterX();
+        float mmHeight = 1000.f * image.height() / image.dotsPerMeterY();
+        //qDebug() << "dpiX:" << dpiX << ", dpiY:" << dpiY;
+        //imageUtils::floydSteinberg(src, mmWidth, mmHeight);
+        imageUtils::halftone(src, mmWidth, mmHeight, 100);
+
+        //SAHer saher(src);
+        //saher.ComputeSAH();
+        //cv::imshow("sah", saher.GetResult());
+    }
 }
 
 void LaserControllerWindow::bindWidgetsProperties()

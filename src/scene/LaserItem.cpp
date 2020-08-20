@@ -356,9 +356,9 @@ QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas)
         mat.copyTo(roi);
 
         qDebug() << "device pixel ratio:" << image.devicePixelRatioF();
-        image.setDotsPerMeterX(600 * 40);
-        image.setDotsPerMeterY(600 * 40);
-        qDebug() << "device pixel ratio:" << image.devicePixelRatioF();
+        //image.setDotsPerMeterX(12000);
+        //image.setDotsPerMeterY(12000);
+        qDebug() << "dpix:" << image.dotsPerMeterX() / 39.37 << ", dpiy:" << image.dotsPerMeterY() / 39.37;
         qDebug() << "image size:" << image.size();
         QBuffer buffer(&ba);
         buffer.open(QIODevice::WriteOnly);

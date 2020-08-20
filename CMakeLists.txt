@@ -63,6 +63,9 @@ FILE(GLOB BASE_SOURCES src/*.cpp)
 FILE(GLOB COMMON_HEADERS src/common/*.h)
 FILE(GLOB COMMON_SOURCES src/common/*.cpp)
 
+FILE(GLOB HALFTONE_HEADERS src/halftone/*.h)
+FILE(GLOB HALFTONE_SOURCES src/halftone/*.cpp)
+
 FILE(GLOB IMPORT_HEADERS src/import/*.h)
 FILE(GLOB IMPORT_SOURCES src/import/*.cpp)
 
@@ -108,6 +111,7 @@ set(HEADER_FILES
     ${HEADER_FILES}
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
+    ${HALFTONE_HEADERS}
     ${IMPORT_HEADERS}
     ${LASER_HEADERS}
 	${SCENE_HEADERS}
@@ -123,6 +127,7 @@ set(SRC_FILES
     ${SRC_FILES}
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
+    ${HALFTONE_SOURCES}
     ${IMPORT_SOURCES}
     ${LASER_SOURCES}
     ${RES}
@@ -139,10 +144,12 @@ set(SRC_FILES
 IF(MSVC)
     source_group("source\\common" FILES ${COMMON_SOURCES})
     source_group("header\\common" FILES ${COMMON_HEADERS})
-    source_group("source\\laser" FILES ${LASER_SOURCES})
-    source_group("header\\laser" FILES ${LASER_HEADERS})
+    source_group("source\\halftone" FILES ${HALFTONE_SOURCES})
+    source_group("header\\halftone" FILES ${HALFTONE_HEADERS})
     source_group("source\\import" FILES ${IMPORT_SOURCES})
     source_group("header\\import" FILES ${IMPORT_HEADERS})
+    source_group("source\\laser" FILES ${LASER_SOURCES})
+    source_group("header\\laser" FILES ${LASER_HEADERS})
 	source_group("source\\scene" FILES ${SCENE_SOURCES})
 	source_group("header\\scene" FILES ${SCENE_HEADERS})
     source_group("header\\state" FILES ${STATE_HEADERS})

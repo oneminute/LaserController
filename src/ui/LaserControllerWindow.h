@@ -42,6 +42,7 @@ protected slots:
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
     void onActionMoveToOriginalPoint(bool checked = false);
+    void onActionHalfTone(bool checked = false);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);

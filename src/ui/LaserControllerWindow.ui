@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>992</width>
-    <height>600</height>
+    <width>1033</width>
+    <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>992</width>
+     <width>1033</width>
      <height>21</height>
     </rect>
    </property>
@@ -40,7 +40,17 @@
     <addaction name="actionExportJSON"/>
     <addaction name="menuImport"/>
    </widget>
+   <widget class="QMenu" name="menuAdvance">
+    <property name="title">
+     <string>&amp;Advance</string>
+    </property>
+    <addaction name="actionWorkState"/>
+    <addaction name="actionMoveToOriginalPoint"/>
+    <addaction name="actionHalfTone"/>
+    <addaction name="actionLoadJson"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuAdvance"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -59,14 +69,11 @@
    <addaction name="actionImportCorelDraw"/>
    <addaction name="actionCloseDocument"/>
    <addaction name="actionExportJSON"/>
-   <addaction name="actionLoadJson"/>
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
    <addaction name="actionMachining"/>
    <addaction name="actionPause"/>
    <addaction name="actionStop"/>
-   <addaction name="actionWorkState"/>
-   <addaction name="actionMoveToOriginalPoint"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">
    <property name="windowTitle">
@@ -495,6 +502,11 @@
   <action name="actionLoadJson">
    <property name="text">
     <string>Load Json</string>
+   </property>
+  </action>
+  <action name="actionHalfTone">
+   <property name="text">
+    <string>Half Tone</string>
    </property>
   </action>
  </widget>
