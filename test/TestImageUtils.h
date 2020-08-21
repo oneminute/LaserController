@@ -13,6 +13,7 @@ class TestImageUtils : public QObject
     Q_OBJECT
 private slots:
     void generateDitchMatRecTestCase();
+    void generateRoundSpiralMatTestCase();
 
 private:
 };

@@ -5,8 +5,9 @@ void TestImageUtils::generateDitchMatRecTestCase()
 {
     //cv::Mat mat = imageUtils::generateSpiralDitchMat(2);
     //std::cout << mat << std::endl;
-    cv::Mat mat = imageUtils::generateSpiralDitchMat(3);
-    std::cout << mat << std::endl;
+    //int grades;
+    //cv::Mat mat = imageUtils::generateSpiralDitchMat(20, grades);
+    //std::cout << mat << std::endl;
     //mat = imageUtils::generateSpiralDitchMat(4);
     //std::cout << mat << std::endl;
     /*mat = imageUtils::generateSpiralDitchMat(5);
@@ -30,4 +31,13 @@ void TestImageUtils::generateDitchMatRecTestCase()
     std::cout << mat << std::endl;
     mat = imageUtils::generateBayerDitchMatRec(4);
     std::cout << mat << std::endl;*/
+
+    //cv::Mat mat = imageUtils::generateCircleMat(20);
+    //std::cout << mat << std::endl;
+}
+
+void TestImageUtils::generateRoundSpiralMatTestCase()
+{
+    imageUtils::generateRoundSpiralMat(7);
+    imageUtils::generateRoundSpiralMat(6);
 }

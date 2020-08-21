@@ -12,19 +12,23 @@
 namespace imageUtils
 {
     cv::Mat halftone(cv::Mat src, float mmWidth, float mmHeight, float lpi = 100, float dpi = 600, float degrees = 45.0);
+    cv::Mat halftone2(cv::Mat src, float mmWidth, float mmHeight, float lpi = 100, float dpi = 600, float degrees = 45.0);
 
     // Floyd-Steinberg
     cv::Mat floydSteinberg(cv::Mat src, float mmWidth, float mmHeight, float lpi = 100, float dpi = 600);
 
-    cv::Mat generateSpiralDitchMat(int circleNum, float degrees = 45);
+    cv::Mat generateSpiralPattern(int gridSize, int& grades, float degrees = 45);
     cv::Mat generateSpiralDitchMatRec(int circleNum);
 
-    cv::Mat generateBayerDitchMat(int circleNum, float degrees = 45);
+    cv::Mat generateBayerPattern(int gridSize, int& grades, float degrees = 45);
     cv::Mat generateBayerDitchMatRec(int circleNum);
 
-    cv::Mat generateCircleMat(int size, float degrees = 45);
+    cv::Mat generateCircleMat(int gridSize, int& grades, float degrees = 45);
 
-    cv::Mat generateRotatedPattern(cv::Mat src, float degrees = 45);
+    cv::Mat generateRotatedPattern(cv::Mat src, int gridSize, float degrees = 45);
+
+    cv::Mat generateRoundSpiralPattern(int gridSize, int& grades, float degrees = 45);
+    cv::Mat generateRoundSpiralMat(int gridSize);
 }
 
 #endif // 

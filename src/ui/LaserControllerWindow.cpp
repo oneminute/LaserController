@@ -350,7 +350,7 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
         float mmHeight = 1000.f * image.height() / image.dotsPerMeterY();
         //qDebug() << "dpiX:" << dpiX << ", dpiY:" << dpiY;
         //imageUtils::floydSteinberg(src, mmWidth, mmHeight);
-        imageUtils::halftone(src, mmWidth, mmHeight, 100);
+        imageUtils::halftone2(src, mmWidth, mmHeight, 50, 600, 45);
 
         //SAHer saher(src);
         //saher.ComputeSAH();
