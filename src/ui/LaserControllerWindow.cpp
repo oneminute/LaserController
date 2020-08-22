@@ -21,13 +21,10 @@
 #include "task/DisconnectionTask.h"
 #include "task/MachiningTask.h"
 #include "ui/LaserLayerDialog.h"
+#include "ui/HalftoneDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
-
-#include "halftone/SSIM.h"
-#include "halftone/Ostromoukhov.h"
-#include "halftone/SAHalftoner.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -348,13 +345,12 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
         cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
         float mmWidth = 1000.f * image.width() / image.dotsPerMeterX();
         float mmHeight = 1000.f * image.height() / image.dotsPerMeterY();
-        //qDebug() << "dpiX:" << dpiX << ", dpiY:" << dpiY;
-        //imageUtils::floydSteinberg(src, mmWidth, mmHeight);
-        imageUtils::halftone2(src, mmWidth, mmHeight, 50, 600, 45);
 
-        //SAHer saher(src);
-        //saher.ComputeSAH();
-        //cv::imshow("sah", saher.GetResult());
+        HalftoneDialog dialog(this);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            imageUtils::halftone2(src, mmWidth, mmHeight, dialog.lpi(), dialog.dpi(), dialog.degrees());
+        }
     }
 }
 

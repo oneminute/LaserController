@@ -160,6 +160,7 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float mmWidth, float mmHeight, float 
 
     qDebug().noquote().nospace() << "          lpi: " << lpi;
     qDebug().noquote().nospace() << "          dpi: " << dpi;
+    qDebug().noquote().nospace() << "angle degrees: " << degrees;
     qDebug().noquote().nospace() << "     src cols: " << src.cols;
     qDebug().noquote().nospace() << "     src rows: " << src.rows;
     qDebug().noquote().nospace() << "      mmWidth: " << mmWidth;
