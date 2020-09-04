@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>564</width>
+    <height>272</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="6" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -59,6 +59,9 @@
    </item>
    <item row="1" column="1">
     <widget class="HorizontalEditSlider" name="horizontalEditSliderDegrees">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="toolTip">
       <string>A widget combined Horizontal Slider and Line Edit.</string>
      </property>
@@ -96,6 +99,63 @@
      </property>
      <property name="value">
       <number>600</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Pixel Interval</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="HorizontalEditSlider" name="horizontalEditSliderPixelInterval">
+     <property name="toolTip">
+      <string>A widget combined Horizontal Slider and Line Edit.</string>
+     </property>
+     <property name="whatsThis">
+      <string>A widget combined Horizontal Slider and Line Edit.</string>
+     </property>
+     <property name="maximum">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>7</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Y pulse length</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLabel" name="labelYPulseLength">
+     <property name="text">
+      <string>0.006329114</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Nonlinear Coefficient</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBoxNonlinearCoefficient">
+     <property name="maximum">
+      <double>10.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.500000000000000</double>
      </property>
     </widget>
    </item>

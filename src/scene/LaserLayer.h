@@ -2,6 +2,7 @@
 #define LASERLAYER_H
 
 #include "common/common.h"
+#include <QColor>
 #include <QObject>
 #include <QPointF>
 #include <QList>
@@ -18,6 +19,9 @@ class LaserLayer : public QObject
 public:
     explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document);
     virtual ~LaserLayer();
+
+    bool removable() const { return m_removable; }
+    void setRemovable(bool removable) { m_removable = removable; }
 
     QString name() const;
     void setName(const QString& name);
@@ -71,9 +75,13 @@ public:
     void addItem(LaserPrimitive* item);
     QList<LaserPrimitive*>& items();
 
+    QColor color() const { return m_color; }
+    void setColor(const QColor& color) { m_color = color; }
+
     LaserDocument* document() const;
 
 protected:
+    bool m_removable;
     LaserLayerType m_type;
     QString m_name;
 
@@ -99,6 +107,7 @@ protected:
     LaserDocument* m_doc;
 
     QList<LaserPrimitive*> m_items;
+    QColor m_color;
     Q_DISABLE_COPY(LaserLayer)
 };
 

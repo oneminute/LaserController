@@ -44,7 +44,7 @@ find_package(ZLib REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
 
-set(TS_FILES LaserController_zh_CN.ts)
+set(TS_FILES translations/LaserController_zh_CN.ts)
 
 #add_subdirectory(widgets)
 set(INCLUDE_DIRS
@@ -195,6 +195,13 @@ endif()
 
 message(STATUS Boost_LIBRARIES=${Boost_LIBRARIES})
 target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
+
+message(QM_FILES=${QM_FILES})
+set(QM_FILES
+    ${QM_FILES}
+    ${SRC_FILES}
+    ${HEADER_FILES}
+)
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 

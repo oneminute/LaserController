@@ -14,6 +14,7 @@ QT_END_NAMESPACE
 
 class LaserViewer;
 class LaserScene;
+class QLabel;
 class QTreeWidgetItem;
 
 class LaserControllerWindow : public QMainWindow
@@ -29,7 +30,7 @@ protected slots:
     void onActionAddEngravingLayer(bool checked = false);
     void onActionAddCuttingLayer(bool checked = false);
     void onActionRemoveLayer(bool checked = false);
-    void onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onTableWidgetLayersCellDoubleClicked(int row, int column);
     void onActionExportJson(bool checked = false);
     void onActionLoadJson(bool checked = false);
     void onActionMachining(bool checked = false);
@@ -60,6 +61,14 @@ private:
     QDir m_tmpDir;
     QString m_currentJson;
     bool m_useLoadedJson;
+
+    // widgets on status bar
+    QLabel* m_statusBarStatus;
+    QLabel* m_statusBarTips;
+    QLabel* m_statusBarCoordinate;
+    QLabel* m_statusBarLocation;
+    QLabel* m_statusBarPageInfo;
+    QLabel* m_statusBarCopyright;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

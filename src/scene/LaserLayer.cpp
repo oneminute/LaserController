@@ -7,6 +7,7 @@
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document)
     : QObject(document)
+    , m_removable(true)
     , m_type(type)
     , m_name(name)
     , m_minSpeed(60)

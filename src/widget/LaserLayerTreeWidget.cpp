@@ -9,6 +9,12 @@
 LaserLayerTreeWidget::LaserLayerTreeWidget(QWidget* parent)
     : QTreeWidget(parent)
 {
+    // initialize layers Tree Widget
+    //setColumnWidth(0, 45);
+    //setColumnWidth(1, 45);
+    //setColumnWidth(2, 45);
+    //setColumnWidth(3, 45);
+    //setHeaderLabels(QStringList() << tr("Name") << tr("C") << tr("T") << tr("V"));
 }
 
 LaserLayerTreeWidget::~LaserLayerTreeWidget()
@@ -35,9 +41,9 @@ void LaserLayerTreeWidget::updateItems()
     if (m_doc)
     {
         QList<LaserLayer*> layers = document()->cuttingLayers();
-        fillLayersTree(layers, "C");
+        fillLayersTree(layers, tr("C"));
         layers = document()->engravingLayers();
-        fillLayersTree(layers, "E");
+        fillLayersTree(layers, tr("E"));
     }
 }
 
@@ -49,23 +55,28 @@ void LaserLayerTreeWidget::fillLayersTree(QList<LaserLayer*>& layers, const QStr
         LaserLayer* layer = layers[i];
         QList<LaserPrimitive*> laserItems = layer->items();
         QTreeWidgetItem* layerWidgetItem = new QTreeWidgetItem((QTreeWidgetItem*)nullptr, 0);
-        layerWidgetItem->setText(0, layer->name());
-        layerWidgetItem->setCheckState(1, Qt::Unchecked);
-        layerWidgetItem->setText(2, type);
-        layerWidgetItem->setText(3, "V");
+        //layerWidgetItem->setText(0, "    ");
+        layerWidgetItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+        layerWidgetItem->setBackgroundColor(0, layer->color());
+        //layerWidgetItem->setBackground(0, QBrush(layer->color()));
+        //layerWidgetItem->setCheckState(1, Qt::Unchecked);
+        layerWidgetItem->setText(1, type);
+        layerWidgetItem->setText(2, layer->name());
+        layerWidgetItem->setBackgroundColor(2, layer->color());
+        layerWidgetItem->setText(3, QString::number(layer->items().count()));
         layerWidgetItem->setData(0, Qt::UserRole, layer->objectName());
         //layerWidgetItem->setData(1, Qt::UserRole, layer->type());
-        for (int li = 0; li != laserItems.size(); li++)
-        {
-            LaserPrimitive* laserItem = laserItems[li];
-            QTreeWidgetItem* itemWidgetItem = new QTreeWidgetItem(layerWidgetItem);
-            itemWidgetItem->setText(0, laserItem->name());
-            itemWidgetItem->setCheckState(1, Qt::Unchecked);
-            itemWidgetItem->setText(2, "S");
-            itemWidgetItem->setText(3, "V");
-            itemWidgetItem->setData(0, Qt::UserRole, laserItem->objectName());
-            //itemWidgetItem->setData(1, Qt::UserRole, laserItem->laserItemType());
-        }
+        //for (int li = 0; li != laserItems.size(); li++)
+        //{
+        //    LaserPrimitive* laserItem = laserItems[li];
+        //    QTreeWidgetItem* itemWidgetItem = new QTreeWidgetItem(layerWidgetItem);
+        //    itemWidgetItem->setText(0, laserItem->name());
+        //    itemWidgetItem->setCheckState(1, Qt::Unchecked);
+        //    itemWidgetItem->setText(2, "S");
+        //    itemWidgetItem->setText(3, "V");
+        //    itemWidgetItem->setData(0, Qt::UserRole, laserItem->objectName());
+        //    //itemWidgetItem->setData(1, Qt::UserRole, laserItem->laserItemType());
+        //}
         treeWidgetItems.append(layerWidgetItem);
     }
     insertTopLevelItems(0, treeWidgetItems);

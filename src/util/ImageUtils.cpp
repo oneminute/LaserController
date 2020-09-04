@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QtMath>
+#include <QMap>
 
 cv::Mat imageUtils::halftone(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi, float degrees)
 {
@@ -130,76 +131,64 @@ cv::Mat imageUtils::halftone(cv::Mat src, float mmWidth, float mmHeight, float l
     return cv::Mat();
 }
 
-cv::Mat imageUtils::halftone2(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi, float degrees)
+cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, float nonlinearCoefficient)
 {
-    float inchWidth = mmWidth * MM_TO_INCH;
-    float inchHeight = mmHeight * MM_TO_INCH;
+    // convert unit from mm to inch
+    float inchWidth = src.cols / dpi;
+    float inchHeight = src.rows / dpi;
 
-    float outHPixels = inchWidth * dpi;
-    float outVPixels = inchHeight * dpi;
+    // choose the bigger one between gridwidth and grid height
+    //int gridSize = std::round(std::ceil(dpi / lpi) * sqrt(2));
+    int gridSize = std::ceil(dpi / lpi) / 2;
+    if (gridSize % 2)
+        gridSize += 1;
+    //gridSize = ((gridSize / 2) + 1) * 2;
 
-    int dotsHCount = std::round(inchWidth * lpi);
-    int dotsVCount = std::round(inchHeight * lpi);
+    // out image
+    cv::Mat outMat(src.rows, src.cols, CV_8UC1, cv::Scalar(255));
 
-    float dotsPerPixelH = std::round(dotsHCount * 1.0 / src.cols);
-    float dotsPerPixelV = std::round(dotsVCount * 1.0 / src.rows);
-
-    float dotWidth = std::round(outHPixels / dotsHCount);
-    float dotHeight = std::round(outVPixels / dotsVCount);
-
-    int gridSize = std::round(dotWidth * 1.);
-
-    cv::Mat outMat(outVPixels, outHPixels, CV_8UC1, cv::Scalar(255));
-
-    cv::Mat resized;
-    cv::resize(src, resized, outMat.size());
-    cv::imwrite("resized.bmp", resized);
     int grayGrades;
-    cv::Mat ditchMat = generateRoundSpiralPattern(gridSize, grayGrades, degrees);
+    //cv::Mat ditchMat = generateRoundSpiralPattern(gridSize, grayGrades, degrees);
     //cv::Mat ditchMat = generateCircleMat(gridSize, grayGrades, degrees);
+    cv::Mat ditchMat = generateRoundSpiralMat(gridSize);
+    ditchMat = generateRotatedPattern45(ditchMat);
+    grayGrades = gridSize * gridSize * 3;
 
     qDebug().noquote().nospace() << "          lpi: " << lpi;
     qDebug().noquote().nospace() << "          dpi: " << dpi;
     qDebug().noquote().nospace() << "angle degrees: " << degrees;
     qDebug().noquote().nospace() << "     src cols: " << src.cols;
     qDebug().noquote().nospace() << "     src rows: " << src.rows;
-    qDebug().noquote().nospace() << "      mmWidth: " << mmWidth;
-    qDebug().noquote().nospace() << "     mmHeight: " << mmHeight;
+    qDebug().noquote().nospace() << "    src dpi h: " << src.cols / inchWidth;
+    qDebug().noquote().nospace() << "    src dpi v: " << src.rows / inchHeight;
+    //qDebug().noquote().nospace() << "      mmWidth: " << mmWidth;
+    //qDebug().noquote().nospace() << "     mmHeight: " << mmHeight;
     qDebug().noquote().nospace() << "    inchWidth: " << inchWidth;
     qDebug().noquote().nospace() << "   inchHeight: " << inchHeight;
-    qDebug().noquote().nospace() << "   outHPixels: " << outHPixels;
-    qDebug().noquote().nospace() << "   outVPixels: " << outVPixels;
-    qDebug().noquote().nospace() << "   dotsHCount: " << dotsHCount;
-    qDebug().noquote().nospace() << "   dotsVCount: " << dotsVCount;
-    qDebug().noquote().nospace() << "dotsPerPixelH: " << dotsPerPixelH;
-    qDebug().noquote().nospace() << "dotsPerPixelV: " << dotsPerPixelV;
-    qDebug().noquote().nospace() << "     dotWidth: " << dotWidth;
-    qDebug().noquote().nospace() << "    dotHeight: " << dotHeight;
+    //qDebug().noquote().nospace() << "   outHPixels: " << outHPixels;
+    //qDebug().noquote().nospace() << "   outVPixels: " << outVPixels;
+    //qDebug().noquote().nospace() << "       linesH: " << linesH;
+    //qDebug().noquote().nospace() << "       linesV: " << linesV;
+    //qDebug().noquote().nospace() << "    gridWidth: " << gridWidth;
+    //qDebug().noquote().nospace() << "   gridHeight: " << gridHeight;
     qDebug().noquote().nospace() << "     gridSize: " << gridSize;
     qDebug().noquote().nospace() << "   grayGrades: " << grayGrades;
     qDebug().noquote().nospace() << "ditchMat size: " << ditchMat.cols;
 
-    float threshold = 64.5f;
-
-    float coa = 7.f / 16;
-    float cob = 3.f / 16;
-    float coc = 5.f / 16;
-    float cod = 1.f / 16;
-
-    for (int r = 0; r < resized.rows; r += ditchMat.rows)
+    for (int r = 0; r < src.rows; r += ditchMat.rows)
     {
-        for (int c = 0; c < resized.cols; c += ditchMat.cols)
+        for (int c = 0; c < src.cols; c += ditchMat.cols)
         {
             cv::Point start(c, r);
             for (int x = 0; x < ditchMat.cols; x++)
             {
                 for (int y = 0; y < ditchMat.rows; y++)
                 {
-                    if (r + y < resized.rows && c + x < resized.cols)
+                    if (r + y < src.rows && c + x < src.cols)
                     {
-                        uchar srcPixel = resized.ptr<uchar>(r + y)[c + x];
+                        uchar srcPixel = src.ptr<uchar>(r + y)[c + x];
                         //int grayValue = std::ceil((255.f - srcPixel) * grayGrades / 255);
-                        float grayValue = (255.f - srcPixel) * grayGrades / 255;
+                        float grayValue = std::pow((255.f - srcPixel) / 255, nonlinearCoefficient) * grayGrades;
                         float ditchPixel = ditchMat.ptr<float>(y)[x];
 
                         if (grayValue > ditchPixel)
@@ -209,8 +198,12 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float mmWidth, float mmHeight, float 
             }
         }
     }
-    //cv::imwrite("dotsMat2.tiff", dotsMat);
-    cv::imwrite("outMat.bmp", outMat);
+    std::vector<int>param; 
+    param.push_back(cv::IMWRITE_PNG_BILEVEL);
+    param.push_back(1);
+    param.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    param.push_back(0);
+    cv::imwrite("outMat.png", outMat, param);
     return cv::Mat();
 }
 
@@ -256,7 +249,6 @@ cv::Mat imageUtils::floydSteinberg(cv::Mat src, float mmWidth, float mmHeight, f
     cv::Mat dotsMatBin(dotsVCount, dotsHCount, CV_8UC1, cv::Scalar(255));
     //cv::Mat ditchMat = generateDitchMatRec(ditchSize);
     //cv::Mat ditchMat = generateBayerDitchMatRec(std::ceil(std::sqrt(ditchSize)) + 1);
-    //cv::Mat
 
     for (int r = 0; r < src.rows; r++)
     {
@@ -485,7 +477,6 @@ cv::Mat imageUtils::generateRotatedPattern(cv::Mat src, int gridSize, float degr
         {
             cv::Rect rect = cv::Rect(i * src32F.cols, j * src32F.rows, src32F.cols, src32F.rows);
             cv::Mat roi = arranged(rect);
-            //if (i == 1 && j == 1)
             src32F.copyTo(roi);
         }
     }
@@ -502,13 +493,13 @@ cv::Mat imageUtils::generateRotatedPattern(cv::Mat src, int gridSize, float degr
     rot.at<double>(1, 2) += bbox.height / 2.0 - arranged.rows / 2.0;
 
     cv::Mat rotated;
-    cv::warpAffine(arranged, rotated, rot, bbox.size(), cv::INTER_CUBIC, 0, cv::Scalar(255));
+    cv::warpAffine(arranged, rotated, rot, bbox.size(), cv::INTER_AREA, 0, cv::Scalar(255));
     std::cout << "rotated" << std::endl;
     std::cout << rotated << std::endl;
     cv::imwrite("rot.bmp", rotated);
 
-    double d = gridSize;
-    cv::Mat roi = rotated(cv::Rect2d(d, d, d, d));
+    double d = src.cols * sqrt(2) * 2;
+    cv::Mat roi = rotated(cv::Rect2d((rotated.cols - d) / 2, (rotated.cols - d) / 2, d, d));
     cv::Mat pattern;
     roi.copyTo(pattern);
     for (int r = 0; r < pattern.rows; r++)
@@ -525,15 +516,175 @@ cv::Mat imageUtils::generateRotatedPattern(cv::Mat src, int gridSize, float degr
     return pattern;
 }
 
+cv::Mat imageUtils::generateRotatedPattern2(cv::Mat src, int gridSize, float degrees)
+{
+    cv::Mat rotated = src;
+    std::cout << "rotated:" << std::endl;
+    cv::imwrite("rotated.bmp", rotated);
+    std::cout << rotated << std::endl;
+    cv::Mat mask;
+    rotated.convertTo(mask, CV_8UC1);
+    rotated.convertTo(rotated, CV_8UC1);
+    cv::threshold(mask, mask, 254, 255, cv::THRESH_BINARY_INV);
+    std::cout << "mask:" << std::endl;
+    std::cout << mask << std::endl;
+
+    float x = gridSize * std::cos(degrees * M_PI / 180);
+    float y = gridSize * std::sin(degrees * M_PI / 180);
+
+    int ditchSize = std::round(rotated.cols * sqrt(2));
+    cv::Mat pattern(ditchSize, ditchSize, CV_8UC1, cv::Scalar(0));
+    cv::Mat arranged(rotated.rows * 3, rotated.cols * 3, CV_8UC1, cv::Scalar(255));
+
+    cv::Point2f center = cv::Point2f((arranged.cols - 1) / 2.f, (arranged.rows - 1) / 2.f);
+    {
+        cv::Point2f p1(x, y);
+        p1 += center;
+        cv::Rect roiRect(p1.x - rotated.cols / 2, p1.y - rotated.rows / 2, rotated.cols, rotated.rows);
+        cv::Mat roi = arranged(roiRect);
+        rotated.copyTo(roi, mask);
+        std::cout << p1 << std::endl;
+        std::cout << "arranged1:" << std::endl;
+        std::cout << arranged << std::endl;
+    }
+    {
+        cv::Point2f p1(-x, y);
+        p1 += center;
+        cv::Rect roiRect(p1.x - rotated.cols / 2, p1.y - rotated.rows / 2, rotated.cols, rotated.rows);
+        cv::Mat roi = arranged(roiRect);
+        rotated.copyTo(roi, mask);
+        std::cout << p1 << std::endl;
+        std::cout << "arranged2:" << std::endl;
+        std::cout << arranged << std::endl;
+    }
+    {
+        cv::Point2f p1(x, -y);
+        p1 += center;
+        cv::Rect roiRect(p1.x - rotated.cols / 2, p1.y - rotated.rows / 2, rotated.cols, rotated.rows);
+        cv::Mat roi = arranged(roiRect);
+        rotated.copyTo(roi, mask);
+        std::cout << p1 << std::endl;
+        std::cout << "arranged3:" << std::endl;
+        std::cout << arranged << std::endl;
+    }
+    {
+        cv::Point2f p1(-x, -y);
+        p1 += center;
+        cv::Rect roiRect(p1.x - rotated.cols / 2, p1.y - rotated.rows / 2, rotated.cols, rotated.rows);
+        cv::Mat roi = arranged(roiRect);
+        rotated.copyTo(roi, mask);
+        std::cout << p1 << std::endl;
+        std::cout << "arranged4:" << std::endl;
+        std::cout << arranged << std::endl;
+    }
+    {
+        cv::Point2f p1(0, 0);
+        p1 += center;
+        cv::Rect roiRect(p1.x - rotated.cols / 2, p1.y - rotated.rows / 2, rotated.cols, rotated.rows);
+        cv::Mat roi = arranged(roiRect);
+        rotated.copyTo(roi, mask);
+        std::cout << p1 << std::endl;
+        std::cout << "arranged5:" << std::endl;
+        std::cout << arranged << std::endl;
+    }
+    {
+        cv::Point2f p1(0, 0);
+        p1 += center;
+        cv::Rect roiRect(p1.x - ditchSize / 2, p1.y - ditchSize / 2, ditchSize, ditchSize);
+        cv::Mat roi = arranged(roiRect);
+
+        roi.copyTo(pattern);
+        pattern.convertTo(pattern, CV_32F);
+        cv::imwrite("pattern.bmp", pattern);
+        std::cout << "pattern: " << std::endl;
+        std::cout << pattern << std::endl;
+    }
+    std::cout << "arranged:" << std::endl;
+    std::cout << arranged << std::endl;
+    cv::imwrite("arranged.bmp", arranged);
+
+    return pattern;
+}
+
+cv::Mat imageUtils::generateRotatedPattern45(cv::Mat src)
+{
+    cv::Mat pattern(src.rows * 2, src.cols * 2, CV_8U, cv::Scalar(255));
+
+    cv::Mat ucharMat;
+    src.convertTo(ucharMat, CV_8UC1);
+    std::cout << ucharMat << std::endl;
+    
+    int middle = (src.cols - 1) / 2;
+
+    cv::Mat roi = pattern(cv::Rect(src.cols / 2, src.rows / 2, src.cols, src.rows));
+    ucharMat.copyTo(roi);
+    std::cout << std::endl << pattern << std::endl;
+
+    roi = pattern(cv::Rect(0, 0, src.cols / 2, src.rows / 2));
+    cv::Mat srcRoi = ucharMat(cv::Rect(src.cols / 2, src.rows / 2, src.cols / 2, src.rows / 2));
+    srcRoi.copyTo(roi);
+    std::cout << std::endl << pattern << std::endl;
+
+    roi = pattern(cv::Rect(src.cols + src.cols / 2, src.rows + src.rows / 2, src.cols / 2, src.rows / 2));
+    srcRoi = ucharMat(cv::Rect(0, 0, src.cols / 2, src.rows / 2));
+    srcRoi.copyTo(roi);
+    std::cout << std::endl << pattern << std::endl;
+
+    roi = pattern(cv::Rect(0, src.rows + src.rows / 2, src.cols / 2, src.rows / 2));
+    srcRoi = ucharMat(cv::Rect(src.cols / 2, 0, src.cols / 2, src.rows / 2));
+    srcRoi.copyTo(roi);
+    std::cout << std::endl << pattern << std::endl;
+
+    roi = pattern(cv::Rect(src.cols + src.cols / 2, 0, src.cols / 2, src.rows / 2));
+    srcRoi = ucharMat(cv::Rect(0, src.rows / 2, src.cols / 2, src.rows / 2));
+    srcRoi.copyTo(roi);
+    std::cout << std::endl << pattern << std::endl;
+
+    double length = 0.0;
+    int max = src.cols * src.rows * 3 - 1;
+    int it = src.cols * src.rows;
+    double degreesStep = M_PI / 90;
+    cv::Point2f center((pattern.cols - 1) / 2.0, (pattern.rows - 1) / 2.0);
+    while (it <= max)
+    {
+        for (double degrees = 0; degrees < M_PI * 2; degrees += degreesStep)
+        {
+            double fx = length * std::cos(degrees) + center.x;
+            double fy = length * std::sin(degrees) + center.y;
+            int x = std::round(fx);
+            int y = std::round(fy);
+
+            if (x >= 0 && x < pattern.cols && y >= 0 && y < pattern.rows)
+            {
+                int v = pattern.ptr<uchar>(y)[x];
+               
+                if (v == 255)
+                {
+                    pattern.ptr<uchar>(y)[x] = it;
+                    it++;
+                }
+            }
+        }
+        
+        length += 0.2;
+        if (length > sqrt(2) * pattern.cols)
+            break;
+    }
+    std::cout << std::endl << pattern << std::endl;
+
+    pattern.convertTo(pattern, CV_32F);
+    return pattern;
+}
+
 cv::Mat imageUtils::generateRoundSpiralPattern(int gridSize, int& grades, float degrees)
 {
-    int ditchSize = gridSize / std::sqrt(2);
-    grades = ditchSize * ditchSize;
-    cv::Mat spiralMat = generateRoundSpiralMat(ditchSize);
+    //int ditchSize = gridSize / std::sqrt(2);
+    grades = gridSize * gridSize;
+    cv::Mat spiralMat = generateRoundSpiralMat(gridSize);
     std::cout << "round spiral mat:" << std::endl;
     std::cout << spiralMat << std::endl;
     cv::imwrite("round_spiral.bmp", spiralMat);
-    cv::Mat dst = generateRotatedPattern(spiralMat, gridSize, degrees);
+    cv::Mat dst = generateRotatedPattern2(spiralMat, gridSize, degrees);
     return dst;
 }
 
@@ -565,21 +716,12 @@ cv::Mat imageUtils::generateRoundSpiralMat(int gridSize)
             if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
             {
                 int v = dst.ptr<int>(y)[x];
-                /*if (max == count)
+               
+                if (v < 0)
                 {
-                    qDebug() << length << x << y << 0;
-                    dst.ptr<uchar>(y)[x] = 0;
+                    dst.ptr<int>(y)[x] = max - count;
                     count--;
                 }
-                else
-                {*/
-                    if (v < 0)
-                    {
-                        dst.ptr<int>(y)[x] = max - count;
-                        //qDebug() << length << x << y << max - count;
-                        count--;
-                    }
-                //}
             }
         }
         
@@ -588,4 +730,48 @@ cv::Mat imageUtils::generateRoundSpiralMat(int gridSize)
     return dst;
 }
 
+cv::Mat imageUtils::rotateMat(cv::Mat src, float degrees)
+{
+    //cv::Point2f center((src.cols - 1) / 2, (src.rows - 1) / 2);
+    double cosValue = std::cos(degrees * M_PI / 180);
+    double sinValue = std::sin(degrees * M_PI / 180);
 
+    //int c = src.cols;
+    //int a = std::round(c * cosValue);
+    //int b = std::round(c * sinValue);
+    double c = src.cols;
+    double a = c * cosValue;
+    double b = c * sinValue;
+
+    qDebug() << a << b << c;
+    
+    //double i0 = 0.5;
+    //double j0 = 0.5;
+    //double x0 = 0.5;
+    //double y0 = 0.5;
+    //int i0 = 0;
+    //int j0 = 0;
+    //int x0 = 0;
+    //int y0 = 0;
+
+    QMap<QPair<int, int>, bool> coords;
+    for (int ri = 0; ri < src.rows; ri++)
+    {
+        for(int ci = 0; ci < src.cols; ci++)
+        {
+            int i0 = ci;
+            int j0 = ri;
+            int x0 = std::round(ci * cosValue - ri * sinValue);
+            int y0 = std::round(ci * sinValue + ri * cosValue);
+            double x = (ci + 0.5 - i0) * a / c - (ri + 0.5 - j0) * b / c;
+            double y = (ci + 0.5 - i0) * b / c + (ri + 0.5 - j0) * a / c;
+            int ix = std::round(x + x0);
+            int iy = std::round(y + y0);
+            QPair<int, int> pair(ix, iy);
+            bool exists = coords.contains(pair);
+            std::cout << "[" << ci << ", " << ri << "] --> [" << ix << ", " << iy << "] " << exists << " [" << x << ", " << y << "]" << std::endl;
+            coords.insert(pair, true);
+        }
+    }
+    return cv::Mat();
+}

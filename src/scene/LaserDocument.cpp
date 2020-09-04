@@ -336,11 +336,26 @@ void LaserDocument::close()
 
 void LaserDocument::init()
 {
-    QString layerName = newLayerName(LLT_ENGRAVING);
-    addLayer(new LaserLayer(layerName, LLT_ENGRAVING, this));
+    int count = 8;
+    for (int i = 0; i < count; i++)
+    {
+        QColor color1(QColor::Hsv);
+        color1.setHsv(i * 179 / count, 255, 255);
+        QString layerName = newLayerName(LLT_ENGRAVING);
+        LaserLayer* layer1 = new LaserLayer(layerName, LLT_ENGRAVING, this);
+        layer1->setColor(color1);
+        addLayer(layer1);
 
-    layerName = newLayerName(LLT_CUTTING);
-    addLayer(new LaserLayer(layerName, LLT_CUTTING, this));
+        QColor color2(QColor::Hsv);
+        color2.setHsv(i * 179 / count + 180, 255, 255);
+        layerName = newLayerName(LLT_CUTTING);
+        LaserLayer* layer2 = new LaserLayer(layerName, LLT_CUTTING, this);
+        layer2->setColor(color2);
+        addLayer(layer2);
+    }
+
+    engravingLayers()[0]->setRemovable(false);
+    cuttingLayers()[0]->setRemovable(false);
 
     ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
     ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));

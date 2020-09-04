@@ -38,6 +38,22 @@ void TestImageUtils::generateDitchMatRecTestCase()
 
 void TestImageUtils::generateRoundSpiralMatTestCase()
 {
-    imageUtils::generateRoundSpiralMat(7);
-    imageUtils::generateRoundSpiralMat(6);
+    /*cv::Mat mat = imageUtils::generateRoundSpiralMat(5);
+    std::cout << "mat:" << std::endl;
+    std::cout << mat << std::endl;
+    cv::Mat rotMat = imageUtils::rotateMat(mat, 45);
+    std::cout << "rotMat:" << std::endl;
+    std::cout << rotMat << std::endl;*/
+    //imageUtils::generateRoundSpiralMat(6);
+}
+
+void TestImageUtils::generateRotatedPatternTestCase()
+{
+    cv::Mat mat = imageUtils::generateRoundSpiralMat(4);
+    std::cout << "mat:" << std::endl;
+    std::cout << mat << std::endl;
+    imageUtils::generateRotatedPattern45(mat);
+    //cv::Mat rotMat = imageUtils::generateRotatedPattern2(mat, 4, 45);
+    //std::cout << "rotMat:" << std::endl;
+    //std::cout << rotMat << std::endl;
 }

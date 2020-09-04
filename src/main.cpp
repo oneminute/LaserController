@@ -2,7 +2,6 @@
 #include "scene/LaserItem.h"
 #include "state/StateController.h"
 #include "state/StateController.h"
-#include "ui/MainWindow.h"
 #include "ui/LaserControllerWindow.h"
 #include "version.h"
 
@@ -67,7 +66,7 @@ void initLog(char* argv)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
     QDir dir(QApplication::applicationDirPath());
     QApplication::addLibraryPath(dir.absoluteFilePath("bin"));
@@ -83,10 +82,12 @@ int main(int argc, char *argv[])
     qDebug() << "product name:" << QApplication::applicationName() << ", version:" << QApplication::applicationVersion();
 
     QTranslator translator;
-    qDebug() << "load translation file." << a.applicationName() << QLocale::system().name();
-    if (translator.load(QLocale(), a.applicationName(), QLatin1String("_")))
+    QLocale locale(QLocale::Chinese);
+    //qDebug() << "load translation file." << a.applicationName() << locale.name();
+    if (translator.load(locale, app.applicationName(), QLatin1String("_"), QLatin1String("translations")))
     {
-        qDebug() << "load translation file." << a.applicationName() << QLocale::system().bcp47Name();
+        qDebug() << "load translation file." << app.applicationName() << locale.name();
+        app.installTranslator(&translator);
     }
 
     //qRegisterMetaType<LaserPrimitive*>();
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
     LaserDriver::instance().load();
     LaserDriver::instance().init(&w);
     w.showMaximized();
-    int ret = a.exec();
+    int ret = app.exec();
 
     StateController::stop();
     return ret;

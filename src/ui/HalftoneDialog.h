@@ -19,6 +19,9 @@ public:
     float lpi() const { return m_lpi; }
     float degrees() const { return m_degrees; }
     float dpi() const { return m_dpi; }
+    float pixelInterval() const { return m_pixelInterval; }
+    float yPulseLength() const { return m_yPulseLength; }
+    float nonlinearCoefficient() const { return m_nonlinearCoefficient; }
 
 protected slots:
     void accept() override;
@@ -28,6 +31,9 @@ private:
     float m_lpi;
     float m_degrees;
     float m_dpi;
+    float m_pixelInterval;
+    float m_yPulseLength;
+    float m_nonlinearCoefficient;
 };
 
 #endif // HALFTONEDIALOG_H

@@ -14,6 +14,7 @@ class TestImageUtils : public QObject
 private slots:
     void generateDitchMatRecTestCase();
     void generateRoundSpiralMatTestCase();
+    void generateRotatedPatternTestCase();
 
 private:
 };

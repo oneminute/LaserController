@@ -1,14 +1,15 @@
-#include "LaserControllerWindow.h"
+﻿#include "LaserControllerWindow.h"
 #include "ui_LaserControllerWindow.h"
 
-#include <QFileDialog>
-#include <QTreeWidgetItem>
-#include <QTimer>
 #include <QErrorMessage>
-#include <QMessageBox>
-#include <QThread>
-#include <QTemporaryFile>
+#include <QFileDialog>
 #include <QImage>
+#include <QLabel>
+#include <QMessageBox>
+#include <QTemporaryFile>
+#include <QThread>
+#include <QTimer>
+#include <QTreeWidgetItem>
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
@@ -39,12 +40,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     this->setCentralWidget(m_viewer);
 
     // initialize layers Tree Widget
-    m_ui->treeWidgetLayers->setColumnWidth(0, 90);
-    m_ui->treeWidgetLayers->setColumnWidth(1, 15);
-    m_ui->treeWidgetLayers->setColumnWidth(2, 15);
-    m_ui->treeWidgetLayers->setColumnWidth(3, 15);
-    m_ui->treeWidgetLayers->setHeaderLabels(QStringList() << tr("Name") << tr("C") << tr("T") << tr("V"));
-    m_ui->treeWidgetLayers->header()->moveSection(0, 2);
+    m_ui->tableWidgetLayers->setColumnWidth(0, 30);
+    m_ui->tableWidgetLayers->setColumnWidth(1, 45);
+    m_ui->tableWidgetLayers->setColumnWidth(2, 60);
+    m_ui->tableWidgetLayers->setColumnWidth(3, 30);
+    //m_ui->treeWidgetLayers->setHeaderLabels(QStringList() << tr("Name") << tr("C") << tr("T") << tr("V"));
+    //m_ui->treeWidgetLayers->header()->moveSection(0, 2);
 
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
@@ -78,12 +79,55 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
+    // init status bar
+    m_statusBarStatus = new QLabel;
+    m_statusBarStatus->setText(tr("Tips"));
+    m_statusBarStatus->setMinimumWidth(45);
+    m_statusBarStatus->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarStatus);
+    m_ui->statusbar->addWidget(utils::createSeparator());
+
+    m_statusBarTips = new QLabel;
+    m_statusBarTips->setText(tr("Welcome!"));
+    m_statusBarTips->setMinimumWidth(120);
+    m_statusBarTips->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarTips);
+    m_ui->statusbar->addWidget(utils::createSeparator());
+
+    m_statusBarCoordinate = new QLabel;
+    m_statusBarCoordinate->setText(tr("0,0"));
+    m_statusBarCoordinate->setMinimumWidth(45);
+    m_statusBarCoordinate->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarCoordinate);
+    m_ui->statusbar->addWidget(utils::createSeparator());
+    
+    m_statusBarLocation = new QLabel;
+    m_statusBarLocation->setText(tr("Top Left"));
+    m_statusBarLocation->setMinimumWidth(100);
+    m_statusBarLocation->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addPermanentWidget(utils::createSeparator());
+    m_ui->statusbar->addPermanentWidget(m_statusBarLocation);
+
+    m_statusBarPageInfo = new QLabel;
+    m_statusBarPageInfo->setText(tr("Page Size(mm): 210x320"));
+    m_statusBarPageInfo->setMinimumWidth(150);
+    m_statusBarPageInfo->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addPermanentWidget(utils::createSeparator());
+    m_ui->statusbar->addPermanentWidget(m_statusBarPageInfo);
+
+    m_statusBarCopyright = new QLabel;
+    m_statusBarCopyright->setText(tr(u8"Copyright \u00a9 2020 Super Laser Technologies, Inc. All Rights Reserved."));
+    m_statusBarCopyright->setMinimumWidth(200);
+    m_statusBarCopyright->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addPermanentWidget(utils::createSeparator());
+    m_ui->statusbar->addPermanentWidget(m_statusBarCopyright);
+
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
     connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
     connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
-    connect(m_ui->treeWidgetLayers, &QTreeWidget::itemDoubleClicked, this, &LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked);
+    connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
@@ -127,8 +171,8 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     if (doc)
     {
         m_scene->updateDocument(doc);
-        m_ui->treeWidgetLayers->setDocument(doc);
-        m_ui->treeWidgetLayers->updateItems();
+        m_ui->tableWidgetLayers->setDocument(doc);
+        m_ui->tableWidgetLayers->updateItems();
     }
     //StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }
@@ -140,8 +184,8 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     if (doc)
     {
         m_scene->updateDocument(doc);
-        m_ui->treeWidgetLayers->setDocument(doc);
-        m_ui->treeWidgetLayers->updateItems();
+        m_ui->tableWidgetLayers->setDocument(doc);
+        m_ui->tableWidgetLayers->updateItems();
     }
 }
 
@@ -169,8 +213,8 @@ void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
 void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
     qDebug() << "removing layer.";
-    QTreeWidgetItem* item = m_ui->treeWidgetLayers->currentItem();
-    if (item == nullptr)
+    QTableWidgetItem* item = m_ui->tableWidgetLayers->currentItem();
+    /*if (item == nullptr)
         return;
     if (item->parent() == nullptr)
     {
@@ -199,28 +243,22 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
         {
             m_scene->document()->removeLayer(layer);
         }
-    }
+    }*/
 }
 
-void LaserControllerWindow::onTreeWidgetLayersItemDoubleClicked(QTreeWidgetItem * item, int column)
+void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int column)
 {
-    QString id = item->data(0, Qt::UserRole).toString();
-    if (item->parent() == nullptr)
+    QTableWidgetItem* item = m_ui->tableWidgetLayers->item(row, 0);
+    QString id = item->data(Qt::UserRole).toString();
+
+    LaserLayer* layer = m_scene->document()->laserLayer(id);
+
+    LaserLayerDialog dialog(layer);
+    if (dialog.exec() == QDialog::Accepted)
     {
-        LaserLayer* layer = m_scene->document()->laserLayer(id);
-        
-        LaserLayerDialog dialog(layer);
-        if (dialog.exec() == QDialog::Accepted)
-        {
-            m_ui->treeWidgetLayers->updateItems();
-        }
-        //qDebug() << type << layer->name();
+        m_ui->tableWidgetLayers->updateItems();
     }
-    else
-    {
-        LaserPrimitive* laserPrimitive = m_scene->document()->laserPrimitive(id);
-        //qDebug() << type;
-    }
+    //qDebug() << type << layer->name();
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)
@@ -349,7 +387,17 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
         HalftoneDialog dialog(this);
         if (dialog.exec() == QDialog::Accepted)
         {
-            imageUtils::halftone2(src, mmWidth, mmHeight, dialog.lpi(), dialog.dpi(), dialog.degrees());
+            float pixelInterval = dialog.pixelInterval() * dialog.yPulseLength();
+
+            int outWidth = mmWidth * MM_TO_INCH * dialog.dpi();
+            int outHeight = std::round(mmHeight / pixelInterval);
+            qDebug() << " out width:" << outWidth;
+            qDebug() << "out height:" << outHeight;
+
+            cv::Mat resized;
+            cv::resize(src, resized, cv::Size(outWidth, outHeight));
+            
+            imageUtils::halftone2(resized, dialog.lpi(), dialog.dpi(), dialog.degrees(), dialog.nonlinearCoefficient());
         }
     }
 }

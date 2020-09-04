@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1033</width>
-    <height>656</height>
+    <height>844</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,9 +48,64 @@
     <addaction name="actionMoveToOriginalPoint"/>
     <addaction name="actionHalfTone"/>
     <addaction name="actionLoadJson"/>
+    <addaction name="actionPathOptimization"/>
+    <addaction name="actionRemoteAssistance"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>&amp;Options</string>
+    </property>
+    <addaction name="actionSystemOptions"/>
+    <addaction name="actionManufacturerOptions"/>
+   </widget>
+   <widget class="QMenu" name="menuDraw">
+    <property name="title">
+     <string>&amp;Primitive</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuMainboard">
+    <property name="title">
+     <string>&amp;Mainboard</string>
+    </property>
+    <addaction name="actionMainboardInformation"/>
+    <addaction name="actionUpdateFirmware"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionShowToolbar"/>
+    <addaction name="actionShowStatusBar"/>
+    <addaction name="actionShowLayersPanel"/>
+    <addaction name="actionShowPropertiesPanel"/>
+    <addaction name="actionShowOperationPanel"/>
+    <addaction name="actionShowRuler"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionOnlineHelp"/>
+    <addaction name="actionUpdate"/>
+    <addaction name="actionOfficialWebsite"/>
+    <addaction name="actionContactUs"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuDraw"/>
+   <addaction name="menuOptions"/>
    <addaction name="menuAdvance"/>
+   <addaction name="menuMainboard"/>
+   <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -85,37 +140,31 @@
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="LaserLayerTreeWidget" name="treeWidgetLayers">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="LaserLayerTableWidget" name="tableWidgetLayers">
+       <property name="columnCount">
+        <number>4</number>
        </property>
-       <property name="dragDropMode">
-        <enum>QAbstractItemView::DragDrop</enum>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
-       </property>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
        <column>
         <property name="text">
-         <string>S</string>
+         <string>Color</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string notr="true">T</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>V</string>
+         <string>Type</string>
         </property>
        </column>
        <column>
         <property name="text">
          <string>Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Count</string>
         </property>
        </column>
       </widget>
@@ -164,13 +213,40 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetProperties">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="windowTitle">
-    <string>Propergies</string>
+    <string>Properties</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4"/>
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="leftMargin">
+      <number>9</number>
+     </property>
+     <property name="topMargin">
+      <number>9</number>
+     </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
+     <property name="bottomMargin">
+      <number>9</number>
+     </property>
+     <item>
+      <widget class="QStackedWidget" name="stackedWidget">
+       <widget class="QWidget" name="page"/>
+       <widget class="QWidget" name="page_2"/>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QToolBar" name="toolBarTools">
    <property name="windowTitle">
@@ -197,6 +273,250 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="1">
+          <widget class="QPushButton" name="pushButtonCutByBoundings">
+           <property name="text">
+            <string>Cut</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButtonPause">
+           <property name="text">
+            <string>Pause</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="pushButtonStart">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="pushButtonSpotShot">
+           <property name="text">
+            <string>Spot shot</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="pushButtonStop">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButtonMoveByBoundings">
+           <property name="text">
+            <string>Move</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="1" column="1">
+          <widget class="QPushButton" name="pushButtonSettings">
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>S</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="pushButtonMoveUp">
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>U</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButtonMoveLeft">
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>L</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="pushButtonMoveRight">
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>R</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButtonMoveDown">
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>D</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkBoxExportSelection">
+         <property name="text">
+          <string>Export Selection</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="checkBoxPathOptimization">
+         <property name="text">
+          <string>Path Optimization</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBoxRelocateBySelection">
+         <property name="text">
+          <string>Relocation By Selection</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="checkBoxResumeTransfer">
+         <property name="text">
+          <string>Resume Transfer</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QFormLayout" name="formLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelOrigin">
+         <property name="text">
+          <string>Origin</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboBoxOrigin">
+         <item>
+          <property name="text">
+           <string>Current Position</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mechanical Origin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Laser Power</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="HorizontalEditSlider" name="horizontalEditSliderLaserPower">
+         <property name="toolTip">
+          <string>A widget combined Horizontal Slider and Line Edit.</string>
+         </property>
+         <property name="whatsThis">
+          <string>A widget combined Horizontal Slider and Line Edit.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Device</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBoxDevices"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonConnect">
+         <property name="text">
+          <string>Connect</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionOpen">
    <property name="enabled">
@@ -509,12 +829,115 @@
     <string>Half Tone</string>
    </property>
   </action>
+  <action name="actionCut">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="actionSystemOptions">
+   <property name="text">
+    <string>System Options</string>
+   </property>
+  </action>
+  <action name="actionManufacturerOptions">
+   <property name="text">
+    <string>Manufacturer Options</string>
+   </property>
+  </action>
+  <action name="actionPathOptimization">
+   <property name="text">
+    <string>Path Optimization</string>
+   </property>
+  </action>
+  <action name="actionRemoteAssistance">
+   <property name="text">
+    <string>Remote Assistance</string>
+   </property>
+  </action>
+  <action name="actionMainboardInformation">
+   <property name="text">
+    <string>Mainboard Information</string>
+   </property>
+  </action>
+  <action name="actionUpdateFirmware">
+   <property name="text">
+    <string>Update firmware</string>
+   </property>
+  </action>
+  <action name="actionShowToolbar">
+   <property name="text">
+    <string>Show Toolbar</string>
+   </property>
+  </action>
+  <action name="actionShowStatusBar">
+   <property name="text">
+    <string>Show Statusbar</string>
+   </property>
+  </action>
+  <action name="actionShowLayersPanel">
+   <property name="text">
+    <string>Show Layers Panel</string>
+   </property>
+  </action>
+  <action name="actionShowPropertiesPanel">
+   <property name="text">
+    <string>Show Parameters Panel</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Parameters</string>
+   </property>
+  </action>
+  <action name="actionShowOperationPanel">
+   <property name="text">
+    <string>Show Operation Panel</string>
+   </property>
+  </action>
+  <action name="actionShowRuler">
+   <property name="text">
+    <string>Show Ruler</string>
+   </property>
+  </action>
+  <action name="actionOnlineHelp">
+   <property name="text">
+    <string>Online Help</string>
+   </property>
+  </action>
+  <action name="actionUpdate">
+   <property name="text">
+    <string>Update</string>
+   </property>
+  </action>
+  <action name="actionOfficialWebsite">
+   <property name="text">
+    <string>Official Website</string>
+   </property>
+  </action>
+  <action name="actionContactUs">
+   <property name="text">
+    <string>Contact Us</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>LaserLayerTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header location="global">widget/LaserLayerTreeWidget.h</header>
+   <class>HorizontalEditSlider</class>
+   <extends>QWidget</extends>
+   <header>HorizontalEditSlider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LaserLayerTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>widget/LaserLayerTableWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
