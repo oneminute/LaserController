@@ -15,9 +15,15 @@ LaserLayerTableWidget::~LaserLayerTableWidget()
 
 }
 
+void LaserLayerTableWidget::setDocument(LaserDocument * doc) 
+{ 
+    m_doc = doc; 
+    connect(m_doc, &LaserDocument::layersStructureChanged, this, &LaserLayerTableWidget::updateItems);
+}
+
 void LaserLayerTableWidget::updateItems()
 {
-    clear();
+    setRowCount(0);
 
     if (m_doc)
     {
@@ -53,4 +59,20 @@ void LaserLayerTableWidget::fillLayers(QList<LaserLayer*>& layers, const QString
         layerWidgetItem3->setText(QString::number(layer->items().count()));
         setItem(row, 3, layerWidgetItem3);
     }
+}
+
+void LaserLayerTableWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
+{
+    if (selected.count() <= 0)
+        return;
+
+    int row = selected.indexes()[0].row();
+    if (deselected.count() > 0)
+    {
+        if (row == deselected.indexes()[0].row())
+            return;
+    }
+
+    QString layerId = item(row, 0)->data(Qt::UserRole).toString();
+    emit layerSelectionChanged(layerId);
 }

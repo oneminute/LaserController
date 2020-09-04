@@ -4,6 +4,7 @@
 
 #include "util/Utils.h"
 #include "LaserDocument.h"
+#include "LaserItem.h"
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document)
     : QObject(document)
@@ -135,6 +136,7 @@ void LaserLayer::addItem(LaserPrimitive * item)
     if (m_items.contains(item))
         return;
 
+    item->setLayer(this);
     m_items.append(item);
     m_doc->updateLayersStructure();
 }
@@ -142,6 +144,16 @@ void LaserLayer::addItem(LaserPrimitive * item)
 QList<LaserPrimitive*>& LaserLayer::items()
 {
     return m_items;
+}
+
+void LaserLayer::removeItem(LaserPrimitive * item)
+{
+    if (!m_items.contains(item))
+        return;
+
+    item->setLayer(nullptr);
+    m_items.removeOne(item);
+    m_doc->updateLayersStructure();
 }
 
 LaserDocument * LaserLayer::document() const

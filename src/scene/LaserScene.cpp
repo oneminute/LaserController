@@ -49,3 +49,17 @@ void LaserScene::clearDocument(bool delDoc)
     }
 }
 
+QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
+{
+    QList<LaserPrimitive*> primitives;
+    for (QGraphicsItem* item : selectedItems())
+    {
+        LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
+        if (primitive)
+        {
+            primitives.append(primitive);
+        }
+    }
+    return primitives;
+}
+

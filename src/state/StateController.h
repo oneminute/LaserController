@@ -15,6 +15,7 @@
 #define DEBUG_STATES true
 #define STATE_MACHINE_MEMBER m_fsm
 #define STATES_MEMBER m_states
+#define STATES_CURRENT m_currentStates
 
 #define StateControllerInst StateController::instance()
 
@@ -22,32 +23,41 @@
     public: \
         QState* state##State() const { return reinterpret_cast<QState*>(STATES_MEMBER[#state]); } \
     public slots: \
-        void on##state##StateEntered() { qDebug().noquote() << "enter state " << #state; } \
-        void on##state##StateExited() { qDebug().noquote() << "exit state " << #state; }
+        void on##state##StateEntered() \
+        { \
+            if (DEBUG_STATES) \
+                qDebug().noquote() << "enter state " << #state; \
+            STATES_CURRENT.insert(state##State()->objectName()); \
+        } \
+        void on##state##StateExited() \
+        { \
+            if (DEBUG_STATES) \
+                qDebug().noquote() << "exit state " << #state; \
+            STATES_CURRENT.remove(state##State()->objectName()); \
+        }
 
 #define DECL_FINAL_STATE(state) \
     public: \
         QFinalState* state##State() const { return reinterpret_cast<QFinalState*>(STATES_MEMBER[#state]); } \
     public slots: \
-        void on##state##StateEntered() { qDebug().noquote() << "enter state " << #state; }
+        void on##state##StateEntered() \
+        { \
+            if (DEBUG_STATES) \
+                qDebug().noquote() << "enter state " << #state; \
+            STATES_CURRENT.insert(state##State()->objectName()); \
+        }
 
 #define DEFINE_STATE(state) \
     QState* state##State = new QState(); \
     state##State->setObjectName(#state"State"); \
-    if (DEBUG_STATES) \
-    { \
-        connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
-        connect(state##State, &QState::exited, this, &StateController::on##state##StateExited); \
-    } \
+    connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
+    connect(state##State, &QState::exited, this, &StateController::on##state##StateExited); \
     STATES_MEMBER.insert(#state, state##State); 
 
 #define DEFINE_FINAL_STATE(state) \
     QFinalState* state##State = new QFinalState(); \
     state##State->setObjectName(#state"State"); \
-    if (DEBUG_STATES) \
-    { \
-        connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
-    } \
+    connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
     STATES_MEMBER.insert(#state, state##State); 
 
 #define DEFINE_CHILD_STATE(parent, state) \
@@ -110,6 +120,10 @@ public:
     static void start() { instance().fsm()->start(); }
     static void stop() { instance().fsm()->stop(); }
 
+    static bool onState(QAbstractState* state);
+    static bool anyState(const QList<QAbstractState*>& states);
+    static bool allStates(const QList<QAbstractState*>& states);
+
 #pragma region top level states
     DECL_STATE(init)
 
@@ -151,6 +165,7 @@ private:
     QStateMachine* m_fsm;
 
     QMap<QString, QAbstractState*> m_states;
+    QSet<QString> m_currentStates;
 };
 
 #endif // STATECONTROLLER_H

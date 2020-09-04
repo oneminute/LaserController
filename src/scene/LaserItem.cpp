@@ -15,11 +15,13 @@
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
 #include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
 
 QMap<int, int> LaserPrimitive::g_itemsMaxIndex;
 
 LaserPrimitive::LaserPrimitive(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit)
     : m_doc(doc)
+    , m_layer(nullptr)
     , m_unit(unit)
     , m_isHover(false)
     , m_type(type)
@@ -72,7 +74,12 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     }
     
     // »æÖÆÍ¼Ôª
-    painter->setPen(QPen(Qt::blue, 50, Qt::SolidLine));
+    QColor color = Qt::blue;
+    if (m_layer)
+    {
+        color = m_layer->color();
+    }
+    painter->setPen(QPen(color, 50, Qt::SolidLine));
     QTransform t = m_transform * painter->worldTransform();
     painter->setTransform(t);
     draw(painter);

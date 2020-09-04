@@ -49,6 +49,16 @@ void LaserDocument::addItem(LaserPrimitive * item)
 
 void LaserDocument::addItem(LaserPrimitive * item, LaserLayer * layer)
 {
+    item->layer()->removeItem(item);
+    layer->addItem(item);
+}
+
+void LaserDocument::addItem(LaserPrimitive * item, const QString& id)
+{
+    if (!m_layers.contains(id))
+        return;
+
+    addItem(item, m_layers[id]);
 }
 
 void LaserDocument::removeItem(LaserPrimitive * item)
@@ -111,7 +121,7 @@ void LaserDocument::addLayer(LaserLayer* layer)
         m_cuttingLayers.append(layer);
         break;
     }
-    m_layers.insert(layer->objectName(), layer);
+    m_layers.insert(layer->id(), layer);
 
     updateLayersStructure();
 }
@@ -135,7 +145,7 @@ void LaserDocument::removeLayer(LaserLayer * layer)
         initLayer->addItem(item);
     }
     layers->removeOne(layer);
-    m_layers.remove(layer->objectName());
+    m_layers.remove(layer->id());
 
     updateLayersStructure();
 }

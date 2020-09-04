@@ -45,3 +45,28 @@ StateController& StateController::instance()
     return controller;
 }
 
+bool StateController::onState(QAbstractState * state)
+{
+    return instance().m_currentStates.contains(state->objectName());
+}
+
+bool StateController::anyState(const QList<QAbstractState*>& states)
+{
+    bool result = false;
+    for (const QAbstractState* state : states)
+    {
+        result = result || instance().m_currentStates.contains(state->objectName());
+    }
+    return result;
+}
+
+bool StateController::allStates(const QList<QAbstractState*>& states)
+{
+    bool result = true;
+    for (const QAbstractState* state : states)
+    {
+        result = result && instance().m_currentStates.contains(state->objectName());
+    }
+    return result;
+}
+

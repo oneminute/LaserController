@@ -44,8 +44,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->tableWidgetLayers->setColumnWidth(1, 45);
     m_ui->tableWidgetLayers->setColumnWidth(2, 60);
     m_ui->tableWidgetLayers->setColumnWidth(3, 30);
-    //m_ui->treeWidgetLayers->setHeaderLabels(QStringList() << tr("Name") << tr("C") << tr("T") << tr("V"));
-    //m_ui->treeWidgetLayers->header()->moveSection(0, 2);
 
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
     m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
@@ -127,7 +125,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
     connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
-    connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
@@ -141,6 +138,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionWorkState, &QAction::triggered, this, &LaserControllerWindow::onActionWorkState);
     connect(m_ui->actionMoveToOriginalPoint, &QAction::triggered, this, &LaserControllerWindow::onActionMoveToOriginalPoint);
     connect(m_ui->actionHalfTone, &QAction::triggered, this, &LaserControllerWindow::onActionHalfTone);
+
+    connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
+    connect(m_ui->tableWidgetLayers, &LaserLayerTableWidget::layerSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -258,7 +258,14 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
     {
         m_ui->tableWidgetLayers->updateItems();
     }
-    //qDebug() << type << layer->name();
+}
+
+void LaserControllerWindow::onTableWidgetLayersSelectionChanged(const QString & layerId)
+{
+    for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
+    {
+        m_scene->document()->addItem(primitive, layerId);
+    }
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)

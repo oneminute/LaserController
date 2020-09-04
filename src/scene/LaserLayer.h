@@ -23,6 +23,8 @@ public:
     bool removable() const { return m_removable; }
     void setRemovable(bool removable) { m_removable = removable; }
 
+    QString id() const { return objectName(); }
+
     QString name() const;
     void setName(const QString& name);
     LaserLayerType type() const;
@@ -74,6 +76,7 @@ public:
 
     void addItem(LaserPrimitive* item);
     QList<LaserPrimitive*>& items();
+    void removeItem(LaserPrimitive* item);
 
     QColor color() const { return m_color; }
     void setColor(const QColor& color) { m_color = color; }

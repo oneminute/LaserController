@@ -14,6 +14,7 @@
 #include <opencv2/opencv.hpp>
 
 class LaserDocument;
+class LaserLayer;
 class LaserScene;
 class QPaintEvent;
 class LaserViewer;
@@ -49,8 +50,8 @@ public:
     QString name() const { return m_name; }
     void setName(const QString& name) { m_name = name; }
 
-    //QDataStream& operator<<(QDataStream& stream);
-    //QDataStream& operator>>(QDataStream& stream);
+    LaserLayer* layer() const { return m_layer; }
+    void setLayer(LaserLayer* layer) { m_layer = layer; }
 
 protected:
     QString typeName(LaserPrimitiveType typeId);
@@ -60,6 +61,7 @@ protected:
 
 protected:
     LaserDocument* m_doc;
+    LaserLayer* m_layer;
     SizeUnit m_unit;
     QTransform m_transform;
     QRectF m_boundingRect;

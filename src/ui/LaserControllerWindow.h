@@ -31,6 +31,7 @@ protected slots:
     void onActionAddCuttingLayer(bool checked = false);
     void onActionRemoveLayer(bool checked = false);
     void onTableWidgetLayersCellDoubleClicked(int row, int column);
+    void onTableWidgetLayersSelectionChanged(const QString& layerId);
     void onActionExportJson(bool checked = false);
     void onActionLoadJson(bool checked = false);
     void onActionMachining(bool checked = false);

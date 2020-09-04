@@ -23,6 +23,7 @@ public:
 
     void addItem(LaserPrimitive* item);
     void addItem(LaserPrimitive* item, LaserLayer* layer);
+    void addItem(LaserPrimitive* item, const QString& id);
     void removeItem(LaserPrimitive* item);
 
     PageInformation pageInformation() const;

@@ -7,6 +7,7 @@
 class QPaintEvent;
 class LaserViewer;
 class LaserDocument;
+class LaserPrimitive;
 
 class LaserScene : public QGraphicsScene
 {
@@ -19,6 +20,8 @@ public:
     void clearDocument(bool delDoc = false);
 
     LaserDocument* document() { return m_doc; }
+
+    QList<LaserPrimitive*> selectedPrimitives() const;
 
 private:
 
