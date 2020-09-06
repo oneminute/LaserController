@@ -182,46 +182,6 @@
        </column>
       </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QToolButton" name="toolButtonAddLayer">
-         <property name="text">
-          <string>Add Layer</string>
-         </property>
-         <property name="popupMode">
-          <enum>QToolButton::InstantPopup</enum>
-         </property>
-         <property name="autoRaise">
-          <bool>false</bool>
-         </property>
-         <property name="arrowType">
-          <enum>Qt::NoArrow</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="toolButtonRemoveLayer">
-         <property name="text">
-          <string>Remove Layer</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -314,6 +274,9 @@
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="1" column="1">
           <widget class="QPushButton" name="pushButtonCutByBoundings">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Cut</string>
            </property>
@@ -321,6 +284,9 @@
          </item>
          <item row="1" column="0">
           <widget class="QPushButton" name="pushButtonPause">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Pause</string>
            </property>
@@ -328,6 +294,9 @@
          </item>
          <item row="0" column="0">
           <widget class="QPushButton" name="pushButtonStart">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Start</string>
            </property>
@@ -335,6 +304,9 @@
          </item>
          <item row="0" column="1">
           <widget class="QPushButton" name="pushButtonSpotShot">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Spot shot</string>
            </property>
@@ -342,6 +314,9 @@
          </item>
          <item row="2" column="0">
           <widget class="QPushButton" name="pushButtonStop">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Stop</string>
            </property>
@@ -349,6 +324,9 @@
          </item>
          <item row="2" column="1">
           <widget class="QPushButton" name="pushButtonMoveByBoundings">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Move</string>
            </property>
@@ -360,6 +338,9 @@
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="1" column="1">
           <widget class="QPushButton" name="pushButtonSettings">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>30</width>
@@ -373,6 +354,9 @@
          </item>
          <item row="0" column="1">
           <widget class="QPushButton" name="pushButtonMoveUp">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>30</width>
@@ -386,6 +370,9 @@
          </item>
          <item row="1" column="0">
           <widget class="QPushButton" name="pushButtonMoveLeft">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>30</width>
@@ -399,6 +386,9 @@
          </item>
          <item row="1" column="2">
           <widget class="QPushButton" name="pushButtonMoveRight">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>30</width>
@@ -412,6 +402,9 @@
          </item>
          <item row="2" column="1">
           <widget class="QPushButton" name="pushButtonMoveDown">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>30</width>
@@ -520,7 +513,10 @@
         <widget class="QComboBox" name="comboBoxDevices"/>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonConnect">
+        <widget class="QToolButton" name="toolButtonConnect">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Connect</string>
          </property>

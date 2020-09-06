@@ -43,12 +43,18 @@ LaserDocument * CorelDrawImporter::import(const QString & filename)
             return nullptr;
         }
 
+        qDebug() << "selection count:" << doc->Selection()->Shapes->Count;
+        VGCore::cdrExportRange range = VGCore::cdrExportRange::cdrCurrentPage;
+        if (doc->Selection()->Shapes->Count > 0)
+        {
+            range = VGCore::cdrExportRange::cdrSelection;
+        }
+
         tmpSvgFilename = utils::createUUID() + ".svg";
         tmpSvgFilename = tmpDir.absoluteFilePath(tmpSvgFilename);
         //QString tmpSvgFilename("d:/tmp.svg");
 
         qDebug().noquote() << "export corel draw active document to" << tmpSvgFilename;
-        
         
         VGCore::IVGStructExportOptionsPtr opt = app->CreateStructExportOptions();
         VGCore::IVGStructPaletteOptionsPtr pal = app->CreateStructPaletteOptions();
@@ -59,7 +65,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename)
         pal->PaletteType = VGCore::cdrPaletteOptimized;
         pal->NumColors = 16;
         pal->DitherType = VGCore::cdrDitherNone;
-        VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, VGCore::cdrCurrentPage, opt, pal);
+        VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, range, opt, pal);
         if (filter->HasDialog)
         {
             if (filter->ShowDialog(0))

@@ -43,11 +43,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->tableWidgetLayers->setColumnWidth(0, 30);
     m_ui->tableWidgetLayers->setColumnWidth(1, 45);
     m_ui->tableWidgetLayers->setColumnWidth(2, 60);
-    m_ui->tableWidgetLayers->setColumnWidth(3, 30);
+    m_ui->tableWidgetLayers->setColumnWidth(3, 75);
 
-    m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
-    m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
-    m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
+    //m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
+    //m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
+    //m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
 
     // set up tools buttons
     QToolButton* toolButtonSelectionTool = new QToolButton();
@@ -76,6 +76,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonLineTool);
     m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
+
+    m_ui->toolButtonConnect->setDefaultAction(m_ui->actionConnect);
 
     // init status bar
     m_statusBarStatus = new QLabel;
@@ -438,6 +440,12 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", false, documentWorkingState);
     // end actionImportSVG
 
+    // actionImportCorelDraw
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentWorkingState);
+    // end actionImportCorelDraw
+
     // actionExportJSON
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentEmptyState);
@@ -463,15 +471,15 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end actionCloseDocument
 
     // toolButtonAddLayer
-    BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", true, documentWorkingState);
+    //BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", false, initState);
+    //BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", false, documentEmptyState);
+    //BIND_PROP_TO_STATE(m_ui->toolButtonAddLayer, "enabled", true, documentWorkingState);
     // end toolButtonAddLayer
 
     // toolButtonRemoveLayer
-    BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", true, documentWorkingState);
+    //BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", false, initState);
+    //BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", false, documentEmptyState);
+    //BIND_PROP_TO_STATE(m_ui->toolButtonRemoveLayer, "enabled", true, documentWorkingState);
     // end toolButtonRemoveLayer
 
     // actionAddEngravingLayer
