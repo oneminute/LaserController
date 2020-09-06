@@ -141,6 +141,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveToOriginalPoint, &QAction::triggered, this, &LaserControllerWindow::onActionMoveToOriginalPoint);
     connect(m_ui->actionHalfTone, &QAction::triggered, this, &LaserControllerWindow::onActionHalfTone);
     connect(m_ui->actionDeletePrimitive, &QAction::triggered, this, &LaserControllerWindow::onActionDeletePrimitive);
+    connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &LaserLayerTableWidget::layerSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
@@ -423,6 +424,14 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
         {
             m_scene->document()->removeItem(primitive);
         }
+    }
+}
+
+void LaserControllerWindow::onActionCloseDocument(bool checked)
+{
+    if (QMessageBox::Apply == QMessageBox::question(this, tr("Close document?"), tr("Do you want to close current document?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+    {
+        m_scene->clearDocument(true);
     }
 }
 

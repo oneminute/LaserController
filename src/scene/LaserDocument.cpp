@@ -342,6 +342,7 @@ void LaserDocument::close()
 {
     if (m_isOpened)
     {
+        destroy();
         m_isOpened = false;
         emit closed();
     }

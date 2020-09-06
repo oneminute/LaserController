@@ -90,11 +90,14 @@ LaserDocument * CorelDrawImporter::import(const QString & filename)
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
     LaserDocument* doc = importer->import(tmpSvgFilename);
 
-    if (tmpDir.exists(tmpSvgFilename))
+    if (doc)
     {
-        tmpDir.remove(tmpSvgFilename);
-    }
+        if (tmpDir.exists(tmpSvgFilename))
+        {
+            tmpDir.remove(tmpSvgFilename);
+        }
 
-    doc->open();
+        doc->open();
+    }
     return doc;
 }

@@ -46,6 +46,7 @@ protected slots:
     void onActionMoveToOriginalPoint(bool checked = false);
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
+    void onActionCloseDocument(bool checked = false);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);

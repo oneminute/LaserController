@@ -365,7 +365,7 @@ Would you like to overwrite it?</source>
         <translation>图元数量</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="370"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="351"/>
         <source>S</source>
         <translation>设置</translation>
     </message>
@@ -375,449 +375,457 @@ Would you like to overwrite it?</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="190"/>
         <source>Add Layer</source>
-        <translation>添加图层</translation>
+        <translation type="vanished">添加图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="206"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="621"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="617"/>
         <source>Remove Layer</source>
         <translation>移除图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="236"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="196"/>
         <source>Properties</source>
         <translation>属性</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="266"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="226"/>
         <source>toolBar_2</source>
         <translation>工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="318"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="847"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="281"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="843"/>
         <source>Cut</source>
         <translation>切边框</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="332"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="301"/>
         <source>Start</source>
         <translation>启动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="339"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="311"/>
         <source>Spot shot</source>
         <translation>点射</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="353"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="331"/>
         <source>Move</source>
         <translation>走边框</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="383"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="367"/>
         <source>U</source>
         <translation>上</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="396"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="383"/>
         <source>L</source>
         <translation>左</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="409"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="399"/>
         <source>R</source>
         <translation>右</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="422"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="415"/>
         <source>D</source>
         <translation>下</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="435"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="428"/>
         <source>Export Selection</source>
         <translation>输出选中图形</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="442"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="872"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="435"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="868"/>
         <source>Path Optimization</source>
         <translation>路径优化</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="449"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="442"/>
         <source>Relocation By Selection</source>
         <translation>选中图形定位</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="456"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="449"/>
         <source>Resume Transfer</source>
         <translation>断点续传</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="467"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="460"/>
         <source>Origin</source>
         <translation>图形定位位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="475"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="468"/>
         <source>Current Position</source>
         <translation>当前位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="480"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="473"/>
         <source>Mechanical Origin</source>
         <translation>机械原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="494"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="487"/>
         <source>Laser Power</source>
         <translation>激光功率</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="501"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="504"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="494"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="497"/>
         <source>A widget combined Horizontal Slider and Line Edit.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="515"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="508"/>
         <source>Device</source>
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="539"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="535"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="542"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="538"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="550"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="553"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="546"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="549"/>
         <source>Import SVG</source>
         <translation>从SVG导入</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="561"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="557"/>
         <source>Export JSON</source>
         <translation>导出JSON文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="569"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="565"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="572"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="568"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="580"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="576"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="583"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="579"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="591"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="594"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="587"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="590"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="602"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="605"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="598"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="601"/>
         <source>Add Engraving Layer</source>
         <translation>添加雕刻图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="613"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="609"/>
         <source>Add Cutting Layer</source>
         <translation>添加切割图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="629"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="625"/>
         <source>Area Selection</source>
         <translation>区域选择</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="637"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="633"/>
         <source>Cancel Selection</source>
         <translation>取消选择</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="649"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="645"/>
         <source>Selection Tool</source>
         <translation>选择工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="661"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="657"/>
         <source>Rectangle Tool</source>
         <translation>矩形工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="673"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="669"/>
         <source>Ellipse Tool</source>
         <translation>椭圆工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="685"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="681"/>
         <source>Polygon Tool</source>
         <translation>多边形工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="697"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="693"/>
         <source>Text Tool</source>
         <translation>文本工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="709"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="705"/>
         <source>Line Tool</source>
         <translation>线工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="721"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="717"/>
         <source>Bitmap Tool</source>
         <translation>位图工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="733"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="729"/>
         <source>Spline Tool</source>
         <translation>样条线工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="741"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="744"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="737"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="740"/>
         <source>Import CorelDraw</source>
         <translation>从CorelDraw导入</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="752"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="748"/>
         <source>Machining</source>
         <translation>加工</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="852"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="848"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="857"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="853"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="862"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="858"/>
         <source>System Options</source>
         <translation>系统参数</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="867"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="863"/>
         <source>Manufacturer Options</source>
         <translation>厂家参数</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="877"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="873"/>
         <source>Remote Assistance</source>
         <translation>远程协助</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="882"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="878"/>
         <source>Mainboard Information</source>
         <translation>主板信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="887"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="883"/>
         <source>Update firmware</source>
         <translation>更新固件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="892"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="888"/>
         <source>Show Toolbar</source>
         <translation>显示工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="897"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="893"/>
         <source>Show Statusbar</source>
         <translation>显示状态栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="902"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="898"/>
         <source>Show Layers Panel</source>
         <translation>显示图层面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="907"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="903"/>
         <source>Show Parameters Panel</source>
         <translation>显示属性面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="910"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="906"/>
         <source>Show Parameters</source>
         <translation>显示参数面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="915"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="911"/>
         <source>Show Operation Panel</source>
         <translation>显示操作面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="920"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="916"/>
         <source>Show Ruler</source>
         <translation>显示标尺</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="925"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="921"/>
         <source>Online Help</source>
         <translation>在线帮助</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="930"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="926"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="935"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="931"/>
         <source>Official Website</source>
         <translation>官网</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="940"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="936"/>
         <source>Contact Us</source>
         <translation>联系我们</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="945"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="941"/>
         <source>Delete Primitive</source>
         <translation>删除图元</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="325"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="763"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="291"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="759"/>
         <source>Pause</source>
         <translation>暂停</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="346"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="771"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="321"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="767"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="525"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="779"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="521"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="775"/>
         <source>Connect</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="787"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="783"/>
         <source>Disconnect</source>
         <translation>断开连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="795"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="798"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="791"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="794"/>
         <source>Load Motor</source>
         <translation>加载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="806"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="802"/>
         <source>Unload Motor</source>
         <translation>卸载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="814"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="817"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="810"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="813"/>
         <source>Close Document</source>
         <translation>关闭文档</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="822"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="818"/>
         <source>Download</source>
         <translation>下发数据</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="827"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="823"/>
         <source>Work State</source>
         <translation>工作状态</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="832"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="828"/>
         <source>Move To Original Point</source>
         <translation>移动点原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="837"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="295"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="833"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="298"/>
         <source>Load Json</source>
         <translation>加载JSON文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="842"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="838"/>
         <source>Half Tone</source>
         <translation>半色调算法</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="82"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="84"/>
         <source>Tips</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="89"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="91"/>
         <source>Welcome!</source>
         <translation>欢迎使用！</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="96"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="98"/>
         <source>0,0</source>
         <translation>0,0</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="103"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="105"/>
         <source>Top Left</source>
         <translation>左上</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="110"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="112"/>
         <source>Page Size(mm): 210x320</source>
         <translation>加工幅面(mm): 210 X 320</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="166"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="546"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="169"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="567"/>
         <source>Open SVG File</source>
         <translation>打开SVG文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="266"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="269"/>
         <source>Move primitives?</source>
         <translation>移动图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="266"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="269"/>
         <source>Do you want to move primitives to selected layer?</source>
         <translation>是否移动图元到选定的图层？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="418"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="421"/>
         <source>Delete primitives?</source>
         <translation>删除图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="418"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="421"/>
         <source>Do you want to delete primitives to selected layer?</source>
         <translation>是否删除选定的图元？</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="432"/>
+        <source>Close document?</source>
+        <translation>关闭文档？</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="432"/>
+        <source>Do you want to close current document?</source>
+        <translation>是否关闭当前文档？</translation>
     </message>
     <message>
         <source>Remove layer</source>
@@ -836,27 +844,27 @@ Would you like to overwrite it?</source>
         <translation type="vanished">是否移除当前图层？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="280"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="283"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="371"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="374"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="371"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="374"/>
         <source>Do you want to unload motor?</source>
         <translation>是否卸载电机？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="389"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="392"/>
         <source>Open Image</source>
         <translation>打开图片</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="389"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="392"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation>图片</translation>
     </message>
@@ -864,12 +872,12 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="161"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="164"/>
         <source>Engraving</source>
         <translation>雕刻</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="165"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="168"/>
         <source>Cutting</source>
         <translation>切割</translation>
     </message>

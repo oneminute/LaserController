@@ -44,7 +44,7 @@ void LaserScene::clearDocument(bool delDoc)
 
     if (delDoc && m_doc)
     {
-        m_doc->destroy();
+        m_doc->close();
         m_doc = nullptr;
     }
 }
