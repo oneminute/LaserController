@@ -63,6 +63,9 @@ void LaserDocument::addItem(LaserPrimitive * item, const QString& id)
 
 void LaserDocument::removeItem(LaserPrimitive * item)
 {
+    item->layer()->removeItem(item);
+    m_items.remove(item->objectName());
+    item->deleteLater();
 }
 
 PageInformation LaserDocument::pageInformation() const

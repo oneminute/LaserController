@@ -70,6 +70,7 @@
     <property name="title">
      <string>&amp;Primitive</string>
     </property>
+    <addaction name="actionDeletePrimitive"/>
    </widget>
    <widget class="QMenu" name="menuMainboard">
     <property name="title">
@@ -937,6 +938,11 @@
   <action name="actionContactUs">
    <property name="text">
     <string>Contact Us</string>
+   </property>
+  </action>
+  <action name="actionDeletePrimitive">
+   <property name="text">
+    <string>Delete Primitive</string>
    </property>
   </action>
  </widget>
