@@ -13,16 +13,14 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_name(name)
     , m_minSpeed(60)
     , m_runSpeed(300)
-    , m_laserPower(60)
+    , m_laserPower(115)
     , m_engravingForward(true)
     , m_engravingStyle(0)
-    , m_lineSpacing(10)
-    , m_columnSpacing(10)
-    , m_startX(10)
-    , m_startY(10)
+    , m_lineSpacing(7)
+    , m_columnSpacing(0)
+    , m_startX(25)
+    , m_startY(0)
     , m_errorX(0)
-    , m_errorY(0)
-    , m_moveSpeed(0)
     , m_minSpeedPower(60)
     , m_runSpeedPower(60)
     , m_doc(document)
@@ -30,6 +28,23 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     Q_ASSERT(document);
     setParent(document);
     setObjectName(utils::createUUID("layer_"));
+
+    if (m_type == LLT_ENGRAVING)
+    {
+        m_minSpeed = 60;
+        m_runSpeed = 300;
+        m_laserPower = 115;
+        m_minSpeedPower = 0;
+        m_runSpeedPower = 900;
+    }
+    else if (m_type == LLT_CUTTING)
+    {
+        m_minSpeed = 15;
+        m_runSpeed = 60;
+        m_laserPower = 80;
+        m_minSpeedPower = 700;
+        m_runSpeedPower = 1000;
+    }
 }
 
 LaserLayer::~LaserLayer()
@@ -108,20 +123,6 @@ void LaserLayer::setStartY(int y)
 int LaserLayer::errorX() const { return m_errorX; }
 
 void LaserLayer::setErrorX(int errorX) { m_errorX = errorX; }
-
-int LaserLayer::errorY() const
-{
-    return m_errorY;
-}
-
-void LaserLayer::setErrorY(int errorY)
-{
-    m_errorY = errorY;
-}
-
-int LaserLayer::moveSpeed() const { return m_moveSpeed; }
-
-void LaserLayer::setMoveSpeed(int moveSpeed) { m_moveSpeed = moveSpeed; }
 
 int LaserLayer::minSpeedPower() const { return m_minSpeedPower; }
 

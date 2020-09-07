@@ -266,7 +266,8 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
 
 void LaserControllerWindow::onTableWidgetLayersSelectionChanged(const QString & layerId)
 {
-    if (QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+    if (m_scene->selectedPrimitives().count() > 0 && 
+        QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
     {
         for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
         {

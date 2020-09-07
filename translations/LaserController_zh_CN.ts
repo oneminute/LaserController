@@ -929,24 +929,20 @@ Would you like to overwrite it?</source>
         <location filename="../src/ui/LaserLayerDialog.ui" line="81"/>
         <location filename="../src/ui/LaserLayerDialog.ui" line="101"/>
         <location filename="../src/ui/LaserLayerDialog.ui" line="104"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="142"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="145"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="235"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="238"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="258"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="261"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="278"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="134"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="137"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="150"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="153"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="246"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="249"/>
         <location filename="../src/ui/LaserLayerDialog.ui" line="281"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="298"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="301"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="336"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="339"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="392"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="395"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="422"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="425"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="438"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="441"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="284"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="304"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="307"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="324"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="327"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="344"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="347"/>
         <source>A widget combined Horizontal Slider and Line Edit.</source>
         <translation></translation>
     </message>
@@ -961,82 +957,79 @@ Would you like to overwrite it?</source>
         <translation>激光功率</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="123"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="169"/>
         <source>Engraving</source>
         <translation>雕刻</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="135"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="239"/>
         <source>Line Spacing</source>
         <translation>行间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="157"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="261"/>
         <source>10</source>
         <translation>10</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="170"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="181"/>
         <source>Engraving Forward</source>
         <translation>是否正向雕刻</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="187"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="198"/>
         <source>Engraving Style</source>
         <translation>雕刻顺序</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="196"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="207"/>
         <source>By Row</source>
         <translation>按行</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="206"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="217"/>
         <source>By Column</source>
         <translation>按列</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="228"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="274"/>
         <source>Column Spacing</source>
         <translation>列间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="251"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="297"/>
         <source>Start X</source>
         <translation>雕刻起点X</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="271"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="317"/>
         <source>Start Y</source>
         <translation>雕刻起点Y</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="291"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="337"/>
         <source>Error X</source>
         <translation>回差X</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="329"/>
         <source>Error Y</source>
-        <translation>回差Y</translation>
+        <translation type="vanished">回差Y</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="367"/>
         <source>Cutting</source>
-        <translation>切割</translation>
+        <translation type="vanished">切割</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="385"/>
         <source>Move Speed</source>
-        <translation>移动速度</translation>
+        <translation type="vanished">移动速度</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="408"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="120"/>
         <source>Min Speed Power</source>
         <translation>起跳速比</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="415"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="127"/>
         <source>Run Speed Power</source>
         <translation>移动速比</translation>
     </message>

@@ -4,6 +4,8 @@
 
 #include "scene/LaserLayer.h"
 #include "scene/LaserDocument.h"
+#include "scene/PageInformation.h"
+#include "laser/LaserDriver.h"
 
 LaserLayerDialog::LaserLayerDialog(LaserDocument* doc, LaserLayerType type, QWidget* parent)
     : QDialog(parent)
@@ -22,6 +24,7 @@ LaserLayerDialog::LaserLayerDialog(LaserLayer* layer, QWidget* parent)
     , m_layer(layer)
 {
     Q_ASSERT(layer);
+    m_doc = layer->document();
     initUi(true);
 }
 
@@ -32,6 +35,60 @@ LaserLayerDialog::~LaserLayerDialog()
 void LaserLayerDialog::initUi(bool editing)
 {
     m_ui->setupUi(this);
+
+    /*QVariant value;
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
+    {
+        m_ui->horizontalEditSliderLineSpacing->setValue(value.toInt());
+    }
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_COLUMN_STEP, value))
+    {
+        m_ui->horizontalEditSliderColumnSpacing->setValue(value.toInt());
+    }
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_CUSTOM_1_X, value))
+    {
+        m_ui->horizontalEditSliderStartX->setValue(value.toInt());
+    }
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_CUSTOM_1_Y, value))
+    {
+        m_ui->horizontalEditSliderStartY->setValue(value.toInt());
+    }
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_X_AXIS_BACKLASH, value))
+    {
+        m_ui->horizontalEditSliderErrorX->setValue(value.toInt());
+    }*/
+    /*if (LaserDriver::instance().getRegister(LaserDriver::RT_CUTTING_LAUNCHING_SPEED_RATIO, value))
+    {
+        m_ui->horizontalEditSliderMinSpeedPower->setValue(value.toInt());
+    }
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_CUTTING_RUNNING_SPEED_RATIO, value))
+    {
+        m_ui->horizontalEditSliderRunSpeedPower->setValue(value.toInt());
+    }*/
+
+    m_ui->horizontalEditSliderStartX->setMaximum(m_doc->pageInformation().width());
+    m_ui->horizontalEditSliderStartY->setMaximum(m_doc->pageInformation().height());
+    if (m_type == LLT_ENGRAVING)
+    {
+        m_ui->horizontalEditSliderMinSpeed->setValue(60);
+        m_ui->horizontalEditSliderRunSpeed->setValue(300);
+        m_ui->horizontalEditSliderLaserPower->setValue(115);
+        m_ui->horizontalEditSliderLineSpacing->setValue(7);
+        m_ui->horizontalEditSliderColumnSpacing->setValue(0);
+        m_ui->horizontalEditSliderStartX->setValue(25);
+        m_ui->horizontalEditSliderStartY->setValue(0);
+        m_ui->horizontalEditSliderErrorX->setValue(0);
+        m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
+        m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
+    }
+    else if (m_type == LLT_CUTTING)
+    {
+        m_ui->horizontalEditSliderMinSpeed->setValue(15);
+        m_ui->horizontalEditSliderRunSpeed->setValue(60);
+        m_ui->horizontalEditSliderLaserPower->setValue(80);
+        m_ui->horizontalEditSliderMinSpeedPower->setValue(700);
+        m_ui->horizontalEditSliderRunSpeedPower->setValue(1000);
+    }
 
     if (editing)
     {
@@ -46,8 +103,6 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->horizontalEditSliderStartX->setValue(m_layer->startX());
         m_ui->horizontalEditSliderStartY->setValue(m_layer->startY());
         m_ui->horizontalEditSliderErrorX->setValue(m_layer->errorX());
-        m_ui->horizontalEditSliderErrorY->setValue(m_layer->errorY());
-        m_ui->horizontalEditSliderMoveSpeed->setValue(m_layer->moveSpeed());
         m_ui->horizontalEditSliderMinSpeedPower->setValue(m_layer->minSpeedPower());
         m_ui->horizontalEditSliderRunSpeedPower->setValue(m_layer->runSpeedPower());
     }
@@ -73,8 +128,6 @@ void LaserLayerDialog::accept()
     m_layer->setStartX(m_ui->horizontalEditSliderStartX->value());
     m_layer->setStartY(m_ui->horizontalEditSliderStartY->value());
     m_layer->setErrorX(m_ui->horizontalEditSliderErrorX->value());
-    m_layer->setErrorY(m_ui->horizontalEditSliderErrorY->value());
-    m_layer->setMoveSpeed(m_ui->horizontalEditSliderMoveSpeed->value());
     m_layer->setMinSpeedPower(m_ui->horizontalEditSliderMinSpeedPower->value());
     m_layer->setRunSpeedPower(m_ui->horizontalEditSliderRunSpeedPower->value());
 

@@ -62,12 +62,6 @@ public:
     int errorX() const;
     void setErrorX(int errorX);
 
-    int errorY() const;
-    void setErrorY(int errorY);
-
-    int moveSpeed() const;
-    void setMoveSpeed(int moveSpeed);
-
     int minSpeedPower() const;
     void setMinSpeedPower(int minSpeedPower);
 
@@ -100,10 +94,8 @@ protected:
     int m_startX;
     int m_startY;
     int m_errorX;
-    int m_errorY;
 
     // cutting fields
-    int m_moveSpeed;
     int m_minSpeedPower;
     int m_runSpeedPower;
 

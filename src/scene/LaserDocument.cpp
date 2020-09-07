@@ -223,7 +223,7 @@ void LaserDocument::exportJSON(const QString& filename)
             layerObj["LayerId"] = layerId;
             layerObj["MinSpeed"] = layer->minSpeed();
             layerObj["RunSpeed"] = layer->runSpeed();
-            layerObj["MoveSpeed"] = layer->moveSpeed();
+            //layerObj["MoveSpeed"] = layer->moveSpeed();
             layerObj["LaserPower"] = layer->laserPower();
             layerObj["MinSpeedPower"] = layer->minSpeedPower();
             layerObj["RunSpeedPower"] = layer->runSpeedPower();
@@ -265,7 +265,7 @@ void LaserDocument::exportJSON(const QString& filename)
             layerObj["HStep"] = layer->lineSpacing();
             layerObj["LStep"] = layer->columnSpacing();
             layerObj["ErrorX"] = layer->errorX();
-            layerObj["ErrorY"] = layer->errorY();
+            //layerObj["ErrorY"] = layer->errorY();
             layerObj["MinSpeedPower"] = layer->minSpeedPower();
             layerObj["RunSpeedPower"] = layer->runSpeedPower();
 

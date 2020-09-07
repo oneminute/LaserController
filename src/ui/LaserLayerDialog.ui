@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>618</width>
-    <height>546</height>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -114,6 +114,52 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>Min Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Run Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="HorizontalEditSlider" name="horizontalEditSliderMinSpeedPower">
+        <property name="toolTip">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="whatsThis">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>60</number>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="HorizontalEditSlider" name="horizontalEditSliderRunSpeedPower">
+        <property name="toolTip">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="whatsThis">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>60</number>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -129,41 +175,6 @@
       <property name="formAlignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Line Spacing</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderLineSpacing">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>10</number>
-        </property>
-        <property name="text">
-         <string>10</string>
-        </property>
-        <property name="maximumLineEditSize">
-         <size>
-          <width>30</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
@@ -221,6 +232,41 @@
          </spacer>
         </item>
        </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Line Spacing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="HorizontalEditSlider" name="horizontalEditSliderLineSpacing">
+        <property name="toolTip">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="whatsThis">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>10</number>
+        </property>
+        <property name="text">
+         <string>10</string>
+        </property>
+        <property name="maximumLineEditSize">
+         <size>
+          <width>30</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_10">
@@ -320,131 +366,6 @@
           <width>50</width>
           <height>16777215</height>
          </size>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Error Y</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderErrorY">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>3000000</number>
-        </property>
-        <property name="singleStep">
-         <number>1000</number>
-        </property>
-        <property name="pageStep">
-         <number>30000</number>
-        </property>
-        <property name="value">
-         <number>0</number>
-        </property>
-        <property name="maximumLineEditSize">
-         <size>
-          <width>50</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBoxCutting">
-     <property name="title">
-      <string>Cutting</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_3">
-      <property name="labelAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-      <property name="formAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="minimumSize">
-         <size>
-          <width>102</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Move Speed</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderMoveSpeed">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>500</number>
-        </property>
-        <property name="value">
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>Min Speed Power</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_15">
-        <property name="text">
-         <string>Run Speed Power</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderMinSpeedPower">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>60</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderRunSpeedPower">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>60</number>
         </property>
        </widget>
       </item>
