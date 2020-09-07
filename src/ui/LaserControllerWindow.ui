@@ -125,11 +125,6 @@
    <addaction name="actionImportCorelDraw"/>
    <addaction name="actionCloseDocument"/>
    <addaction name="actionExportJSON"/>
-   <addaction name="actionConnect"/>
-   <addaction name="actionDisconnect"/>
-   <addaction name="actionMachining"/>
-   <addaction name="actionPause"/>
-   <addaction name="actionStop"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">
    <property name="windowTitle">
@@ -214,6 +209,12 @@
      </property>
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>300</height>
+        </size>
+       </property>
        <widget class="QWidget" name="page"/>
        <widget class="QWidget" name="page_2"/>
       </widget>
@@ -248,6 +249,9 @@
    </attribute>
   </widget>
   <widget class="QDockWidget" name="dockWidget_2">
+   <property name="windowTitle">
+    <string>Operations</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
@@ -272,60 +276,96 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="1" column="1">
-          <widget class="QPushButton" name="pushButtonCutByBoundings">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Cut</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="pushButtonPause">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Pause</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
-          <widget class="QPushButton" name="pushButtonStart">
+          <widget class="QToolButton" name="toolButtonStart">
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
            </property>
            <property name="text">
             <string>Start</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="pushButtonSpotShot">
+         <item row="1" column="0">
+          <widget class="QToolButton" name="toolButtonPause">
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
-            <string>Spot shot</string>
+            <string>Pause</string>
            </property>
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QPushButton" name="pushButtonStop">
+          <widget class="QToolButton" name="toolButtonStop">
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
            </property>
            <property name="text">
             <string>Stop</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButtonMoveByBoundings">
+         <item row="0" column="1">
+          <widget class="QToolButton" name="toolButtonSpotShot">
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Spot Shot</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QToolButton" name="toolButtonCut">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Cut</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QToolButton" name="toolButtonMove">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
            </property>
            <property name="text">
             <string>Move</string>
@@ -337,14 +377,14 @@
        <item>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="1" column="1">
-          <widget class="QPushButton" name="pushButtonSettings">
+          <widget class="QToolButton" name="toolButtonSettings">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="maximumSize">
+           <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>16777215</height>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
@@ -353,14 +393,14 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QPushButton" name="pushButtonMoveUp">
+          <widget class="QToolButton" name="toolButtonMoveUp">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="maximumSize">
+           <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>16777215</height>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
@@ -368,31 +408,15 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="pushButtonMoveLeft">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>L</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="2">
-          <widget class="QPushButton" name="pushButtonMoveRight">
+          <widget class="QToolButton" name="toolButtonMoveRight">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="maximumSize">
+           <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>16777215</height>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
@@ -400,15 +424,31 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButtonMoveDown">
+         <item row="1" column="0">
+          <widget class="QToolButton" name="toolButtonMoveLeft">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="maximumSize">
+           <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>16777215</height>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>L</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QToolButton" name="toolButtonMoveDown">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>30</width>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
@@ -501,7 +541,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0,0">
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
@@ -519,6 +559,16 @@
          </property>
          <property name="text">
           <string>Connect</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonDisconnect">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Disconnect</string>
          </property>
         </widget>
        </item>

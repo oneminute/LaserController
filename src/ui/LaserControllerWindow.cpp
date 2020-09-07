@@ -78,11 +78,15 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
     m_ui->toolButtonConnect->setDefaultAction(m_ui->actionConnect);
+    m_ui->toolButtonDisconnect->setDefaultAction(m_ui->actionDisconnect);
+    m_ui->toolButtonStart->setDefaultAction(m_ui->actionMachining);
+    m_ui->toolButtonPause->setDefaultAction(m_ui->actionPause);
+    m_ui->toolButtonStop->setDefaultAction(m_ui->actionStop);
 
     // init status bar
     m_statusBarStatus = new QLabel;
     m_statusBarStatus->setText(tr("Tips"));
-    m_statusBarStatus->setMinimumWidth(45);
+    m_statusBarStatus->setMinimumWidth(120);
     m_statusBarStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarStatus);
     m_ui->statusbar->addWidget(utils::createSeparator());
@@ -146,6 +150,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &LaserLayerTableWidget::layerSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
 
+    connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
+    connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
+    connect(&LaserDriver::instance(), &LaserDriver::comPortDisconnected, this, &LaserControllerWindow::onDriverComPortDisconnected);
+
+    //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
+    connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
+
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     bindWidgetsProperties();
@@ -157,6 +168,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     {
         appDir.mkpath("tmp");
     }
+
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -346,8 +358,8 @@ void LaserControllerWindow::onActionStopMechining(bool checked)
 
 void LaserControllerWindow::onActionConnect(bool checked)
 {
-    ConnectionTask* task = LaserDriver::instance().createConnectionTask(this);
-    task->start();
+    //ConnectionTask* task = LaserDriver::instance().createConnectionTask(this);
+    //task->start();
 }
 
 void LaserControllerWindow::onActionDisconnect(bool checked)
@@ -436,6 +448,45 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
     }
 }
 
+void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)
+{
+    for (int i = 0; i < ports.size(); i++)
+    {
+        m_ui->comboBoxDevices->addItem(ports[i], utils::parsePortName(ports[i]));
+    }
+
+    if (!ports.isEmpty())
+    {
+        LaserDriver::instance().initComPort(ports[0]);
+    }
+}
+
+void LaserControllerWindow::onDriverComPortConnected()
+{
+    m_statusBarStatus->setText(tr("Device Connected"));
+}
+
+void LaserControllerWindow::onDriverComPortDisconnected(bool isError, const QString & errorMsg)
+{
+    m_statusBarStatus->setText(tr("Device Disconnected"));
+}
+
+void LaserControllerWindow::onWindowCreated()
+{
+}
+
+void LaserControllerWindow::onEnterDeviceUnconnectedState()
+{
+    static bool first = true;
+    if (first)
+    {
+        LaserDriver::instance().load();
+        LaserDriver::instance().init(this);
+        LaserDriver::instance().getPortListAsyn();
+        first = false;
+    }
+}
+
 void LaserControllerWindow::bindWidgetsProperties()
 {
     // actionOpen
@@ -520,13 +571,29 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePausedState);
     // end actionDisconnect
 
-    // actionDisconnect
+    // toolButtonConnect
+    BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", true, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, devicePausedState);
+    // end toolButtonConnect
+
+    // toolButtonDisconnect
+    BIND_PROP_TO_STATE(m_ui->toolButtonDisconnect, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonDisconnect, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonDisconnect, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonDisconnect, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonDisconnect, "enabled", true, devicePausedState);
+    // end toolButtonDisconnect
+
+    // actionMachining
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePausedState);
-    // end actionDisconnect
+    // end actionMachining
 
     // actionPause
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);

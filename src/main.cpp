@@ -26,19 +26,19 @@ void messageOutput(QtMsgType type, const QMessageLogContext &context, const QStr
     switch (type)
     {
     case QtDebugMsg:
-        LOG(INFO) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << " " << function << "] " << localMsg.constData();
+        LOG(INFO) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << /*" " << function <<*/ "] " << localMsg.constData();
         break;
     case QtInfoMsg:
-        LOG(INFO) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << " " << function << "] " << localMsg.constData();
+        LOG(INFO) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << /*" " << function <<*/ "] " << localMsg.constData();
         break;
     case QtWarningMsg:
-        LOG(WARNING) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << " " << function << "] " << localMsg.constData();
+        LOG(WARNING) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << /*" " << function <<*/ "] " << localMsg.constData();
         break;
     case QtCriticalMsg:
-        LOG(ERROR) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << " " << function << "] " << localMsg.constData();
+        LOG(ERROR) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << /*" " << function <<*/ "] " << localMsg.constData();
         break;
     case QtFatalMsg:
-        LOG(FATAL) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << " " << function << "] " << localMsg.constData();
+        LOG(FATAL) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << /*" " << function <<*/ "] " << localMsg.constData();
         break;
     }
 }
@@ -96,9 +96,8 @@ int main(int argc, char *argv[])
     StateController::start();
 
     LaserControllerWindow w;
-    LaserDriver::instance().load();
-    LaserDriver::instance().init(&w);
     w.showMaximized();
+
     int ret = app.exec();
 
     StateController::stop();

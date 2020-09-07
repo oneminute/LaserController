@@ -48,6 +48,14 @@ protected slots:
     void onActionDeletePrimitive(bool checked = false);
     void onActionCloseDocument(bool checked = false);
 
+    void onDriverComPortsFetched(const QStringList& ports);
+    void onDriverComPortConnected();
+    void onDriverComPortDisconnected(bool isError = false, const QString& errorMsg = "");
+
+    void onWindowCreated();
+
+    void onEnterDeviceUnconnectedState();
+
 private:
     QString getFilename(const QString& title, const QStringList& mime);
     void bindWidgetsProperties();
