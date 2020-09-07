@@ -157,6 +157,11 @@ void LaserLayer::removeItem(LaserPrimitive * item)
     m_doc->updateLayersStructure();
 }
 
+bool LaserLayer::isEmpty() const
+{
+    return m_items.count() == 0;
+}
+
 LaserDocument * LaserLayer::document() const
 {
     return m_doc;

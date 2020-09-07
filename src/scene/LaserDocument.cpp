@@ -218,6 +218,8 @@ void LaserDocument::exportJSON(const QString& filename)
         for (int i = 0; i < m_cuttingLayers.size(); i++)
         {
             LaserLayer* layer = m_cuttingLayers[i];
+            if (layer->isEmpty())
+                continue;
             //QString layerId = "Layer" + QString::number(i + 1);
             QJsonObject layerObj;
             layerObj["LayerId"] = layerId;
@@ -254,6 +256,8 @@ void LaserDocument::exportJSON(const QString& filename)
         for (int i = 0; i < m_engravingLayers.size(); i++)
         {
             LaserLayer* layer = m_engravingLayers[i];
+            if (layer->isEmpty())
+                continue;
             //QString layerId = "Layer" + QString::number(i + 1);
             QJsonObject layerObj;
             layerObj["LayerId"] = layerId;

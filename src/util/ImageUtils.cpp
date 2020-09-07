@@ -204,7 +204,7 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, 
     param.push_back(cv::IMWRITE_PNG_COMPRESSION);
     param.push_back(0);
     cv::imwrite("outMat.png", outMat, param);
-    return cv::Mat();
+    return outMat;
 }
 
 cv::Mat imageUtils::floydSteinberg(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi)

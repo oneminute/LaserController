@@ -71,6 +71,7 @@ public:
     void addItem(LaserPrimitive* item);
     QList<LaserPrimitive*>& items();
     void removeItem(LaserPrimitive* item);
+    bool isEmpty() const;
 
     QColor color() const { return m_color; }
     void setColor(const QColor& color) { m_color = color; }

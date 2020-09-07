@@ -9,6 +9,8 @@
 #include <Eigen/Core>
 
 #include "LaserScene.h"
+#include "laser/LaserDriver.h"
+#include "util/ImageUtils.h"
 #include "util/PltUtils.h"
 #include "util/TypeUtils.h"
 #include "util/UnitUtils.h"
@@ -347,34 +349,68 @@ QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas)
 { 
     QByteArray ba;
 
+    
+
+    cv::Mat src(m_image.height(), m_image.width(), CV_8UC1, (void*)m_image.constBits(), m_image.bytesPerLine());
+    float mmWidth = 1000.f * m_image.width() / m_image.dotsPerMeterX();
+    float mmHeight = 1000.f * m_image.height() / m_image.dotsPerMeterY();
+
+    float pixelInterval = 7;
+    double yPulseLength = 0.006329114;
+    QVariant value;
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_Y_AXIS_PULSE_LENGTH, value))
+    {
+        qDebug() << "y pulse register:" << value;
+        yPulseLength = value.toDouble() / 1000.0;
+    }
+    pixelInterval = pixelInterval * yPulseLength;
+
+    int outWidth = mmWidth * MM_TO_INCH * 600;
+    int outHeight = std::round(mmHeight / pixelInterval);
+    qDebug() << " out width:" << outWidth;
+    qDebug() << "out height:" << outHeight;
+
+    cv::Mat resized;
+    cv::resize(src, resized, cv::Size(outWidth, outHeight));
+    
+    cv::Mat outMat = imageUtils::halftone2(resized, 100, 600, 45, 1.5);
+    std::vector<uchar> buffer;
+    std::vector<int>param; 
+    param.push_back(cv::IMWRITE_PNG_BILEVEL);
+    param.push_back(1);
+    param.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    param.push_back(0);
+    cv::imencode(".png", outMat, buffer, param);
+
+    QBuffer baBuf(&ba);
+    baBuf.open(QIODevice::WriteOnly);
+    baBuf.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+
     QTransform t = m_transform * sceneTransform();
     if (!canvas.empty())
     {
         QRectF bounds = t.mapRect(m_boundingRect);
         cv::Rect roiRect = typeUtils::qtRect2cvRect(bounds, 40);
+        roiRect = cv::Rect(roiRect.x, roiRect.y, outMat.cols, outMat.rows);
         cv::Mat roi = canvas(roiRect);
-        qDebug() << "engraving image bounds:" << bounds;
-        qDebug() << "engraving image size:" << m_image.width() << m_image.height();
-        qDebug() << "roiRect:" << roiRect.x << roiRect.y << roiRect.width << roiRect.height;
-        QImage image = m_image.scaled(roi.cols, roi.rows);
-        cv::Mat mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
-        mat.convertTo(mat, CV_8UC3);
-        cv::cvtColor(mat, mat, cv::COLOR_GRAY2BGR);
+        //qDebug() << "engraving image bounds:" << bounds;
+        //qDebug() << "engraving image size:" << m_image.width() << m_image.height();
+        //qDebug() << "roiRect:" << roiRect.x << roiRect.y << roiRect.width << roiRect.height;
+        //QImage image = m_image.scaled(roi.cols, roi.rows);
+        //cv::Mat mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+        //mat.convertTo(mat, CV_8UC3);
+        cv::Mat mat;
+        cv::cvtColor(outMat, mat, cv::COLOR_GRAY2BGR);
         mat.copyTo(roi);
-
-        qDebug() << "device pixel ratio:" << image.devicePixelRatioF();
+        //qDebug() << "device pixel ratio:" << image.devicePixelRatioF();
         //image.setDotsPerMeterX(12000);
         //image.setDotsPerMeterY(12000);
-        qDebug() << "dpix:" << image.dotsPerMeterX() / 39.37 << ", dpiy:" << image.dotsPerMeterY() / 39.37;
-        qDebug() << "image size:" << image.size();
-        QBuffer buffer(&ba);
-        buffer.open(QIODevice::WriteOnly);
-        image.save(&buffer, "PNG");
+        //qDebug() << "dpix:" << image.dotsPerMeterX() / 39.37 << ", dpiy:" << image.dotsPerMeterY() / 39.37;
+        //qDebug() << "image size:" << image.size();
+        //QBuffer buffer(&ba);
+        //buffer.open(QIODevice::WriteOnly);
+        //image.save(&buffer, "PNG");
     }
-
-    cv::Mat src(m_image.height(), m_image.width(), CV_8UC1, (void*)m_image.constBits(), m_image.bytesPerLine());
-    float mmWidth = 1000.f * m_image.width() / m_image.dotsPerMeterX();
-    float mmHeight = 1000.f * m_image.height() / m_image.dotsPerMeterY();
 
     return ba; 
 }

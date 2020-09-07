@@ -137,7 +137,7 @@
          <string>A widget combined Horizontal Slider and Line Edit.</string>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>1000</number>
         </property>
         <property name="value">
          <number>60</number>
@@ -153,7 +153,7 @@
          <string>A widget combined Horizontal Slider and Line Edit.</string>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>1000</number>
         </property>
         <property name="value">
          <number>60</number>

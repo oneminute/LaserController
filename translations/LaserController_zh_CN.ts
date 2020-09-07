@@ -757,7 +757,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="833"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="298"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="299"/>
         <source>Load Json</source>
         <translation>加载JSON文件</translation>
     </message>
@@ -793,37 +793,37 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="169"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="567"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="568"/>
         <source>Open SVG File</source>
         <translation>打开SVG文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="269"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="270"/>
         <source>Move primitives?</source>
         <translation>移动图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="269"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="270"/>
         <source>Do you want to move primitives to selected layer?</source>
         <translation>是否移动图元到选定的图层？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="421"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="422"/>
         <source>Delete primitives?</source>
         <translation>删除图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="421"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="422"/>
         <source>Do you want to delete primitives to selected layer?</source>
         <translation>是否删除选定的图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="432"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="433"/>
         <source>Close document?</source>
         <translation>关闭文档？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="432"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="433"/>
         <source>Do you want to close current document?</source>
         <translation>是否关闭当前文档？</translation>
     </message>
@@ -844,27 +844,27 @@ Would you like to overwrite it?</source>
         <translation type="vanished">是否移除当前图层？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="283"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="284"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="374"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="375"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="374"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="375"/>
         <source>Do you want to unload motor?</source>
         <translation>是否卸载电机？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="392"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="393"/>
         <source>Open Image</source>
         <translation>打开图片</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="392"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="393"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation>图片</translation>
     </message>
@@ -1063,42 +1063,42 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="134"/>
+        <location filename="../src/scene/LaserItem.cpp" line="136"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="135"/>
+        <location filename="../src/scene/LaserItem.cpp" line="137"/>
         <source>Circle</source>
         <translation>圆</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="136"/>
+        <location filename="../src/scene/LaserItem.cpp" line="138"/>
         <source>Ellipse</source>
         <translation>椭圆</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="137"/>
+        <location filename="../src/scene/LaserItem.cpp" line="139"/>
         <source>Line</source>
         <translation>线段</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="138"/>
+        <location filename="../src/scene/LaserItem.cpp" line="140"/>
         <source>Path</source>
         <translation>路径</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="139"/>
+        <location filename="../src/scene/LaserItem.cpp" line="141"/>
         <source>Polygon</source>
         <translation>封闭多边形</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="140"/>
+        <location filename="../src/scene/LaserItem.cpp" line="142"/>
         <source>Polyline</source>
         <translation>非封闭多边形</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserItem.cpp" line="141"/>
+        <location filename="../src/scene/LaserItem.cpp" line="143"/>
         <source>Rect</source>
         <translation>矩形</translation>
     </message>
