@@ -237,6 +237,8 @@ INSTALL(FILES
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
         DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-
+INSTALL(FILES 
+            "${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.qm"
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/translations)
 
 WIN_DEPLOY_QT(LaserController)

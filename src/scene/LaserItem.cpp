@@ -372,6 +372,10 @@ QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas)
         image.save(&buffer, "PNG");
     }
 
+    cv::Mat src(m_image.height(), m_image.width(), CV_8UC1, (void*)m_image.constBits(), m_image.bytesPerLine());
+    float mmWidth = 1000.f * m_image.width() / m_image.dotsPerMeterX();
+    float mmHeight = 1000.f * m_image.height() / m_image.dotsPerMeterY();
+
     return ba; 
 }
 
