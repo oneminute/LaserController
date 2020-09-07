@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>618</width>
-    <height>463</height>
+    <height>581</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
      </property>
      <layout class="QFormLayout" name="formLayout">
       <property name="labelAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
       <property name="formAlignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -170,7 +170,7 @@
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <property name="labelAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
       <property name="formAlignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -363,9 +363,81 @@
         </property>
         <property name="maximumLineEditSize">
          <size>
-          <width>50</width>
+          <width>30</width>
           <height>16777215</height>
          </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Bitmap</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <property name="labelAlignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>LPI</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="HorizontalEditSlider" name="horizontalEditSliderLPI">
+        <property name="toolTip">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="whatsThis">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>200</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>DPI</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="HorizontalEditSlider" name="horizontalEditSliderDPI">
+        <property name="toolTip">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+        <property name="whatsThis">
+         <string>A widget combined Horizontal Slider and Line Edit.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Nonlinear Coefficient</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBoxNonlinearCoefficient">
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.500000000000000</double>
         </property>
        </widget>
       </item>

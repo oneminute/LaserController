@@ -130,6 +130,9 @@ void LaserLayerDialog::accept()
     m_layer->setErrorX(m_ui->horizontalEditSliderErrorX->value());
     m_layer->setMinSpeedPower(m_ui->horizontalEditSliderMinSpeedPower->value());
     m_layer->setRunSpeedPower(m_ui->horizontalEditSliderRunSpeedPower->value());
+    m_layer->setLpi(m_ui->horizontalEditSliderLPI->value());
+    m_layer->setDpi(m_ui->horizontalEditSliderDPI->value());
+    m_layer->setNonlinearCoefficient(m_ui->doubleSpinBoxNonlinearCoefficient->value());
 
     QDialog::accept();
 }

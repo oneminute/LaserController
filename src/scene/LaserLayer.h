@@ -76,6 +76,15 @@ public:
     QColor color() const { return m_color; }
     void setColor(const QColor& color) { m_color = color; }
 
+    int lpi() const { return m_lpi; }
+    void setLpi(int lpi) { m_lpi = lpi; }
+
+    int dpi() const { return m_dpi; }
+    void setDpi(int dpi) { m_dpi = dpi; }
+
+    qreal nonlinearCoefficient() const { return m_nonlinearCoefficient; }
+    void setNonlinearCoefficient(qreal value) { m_nonlinearCoefficient = value; }
+
     LaserDocument* document() const;
 
 protected:
@@ -99,6 +108,11 @@ protected:
     // cutting fields
     int m_minSpeedPower;
     int m_runSpeedPower;
+
+    // bitmap fields
+    int m_lpi;
+    int m_dpi;
+    qreal m_nonlinearCoefficient;
 
     LaserDocument* m_doc;
 
