@@ -10,19 +10,20 @@
 
 LaserViewer::LaserViewer(QWidget* parent)
     : QGraphicsView(parent)
-    , m_scene(nullptr)
+    , m_scene(new LaserScene)
     , m_rubberBandActive(false)
     , m_mousePressed(false)
 {
+    setScene(m_scene.data());
     init();
 }
 
-LaserViewer::LaserViewer(LaserScene* scene, QWidget* parent)
-    : QGraphicsView(scene, parent)
-    , m_scene(scene)
-{
-    init();
-}
+//LaserViewer::LaserViewer(LaserScene* scene, QWidget* parent)
+//    : QGraphicsView(scene, parent)
+//    , m_scene(scene)
+//{
+//    init();
+//}
 
 LaserViewer::~LaserViewer()
 {

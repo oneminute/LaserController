@@ -49,6 +49,12 @@ public:
 
     bool isOpened() const { return m_isOpened; }
 
+    static int engravingLayersCount();
+    static void setEngravingLayersCount(int count);
+
+    static int cuttingLayersCount();
+    static void setCuttingLayersCount(int count);
+
 public slots:
     void exportJSON(const QString& filename);
     void updateLayersStructure();
@@ -75,6 +81,9 @@ private:
     qreal m_scale;
     bool m_blockSignals;
     bool m_isOpened;
+
+    static int m_engravingLayersCount;
+    static int m_cuttingLayersCount;
 
     Q_DISABLE_COPY(LaserDocument);
 };

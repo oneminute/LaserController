@@ -67,7 +67,7 @@ signals:
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
     LaserViewer* m_viewer;
-    QScopedPointer<LaserScene> m_scene;
+    LaserScene* m_scene;
     bool m_created;
     QDir m_tmpDir;
     QString m_currentJson;
@@ -80,6 +80,8 @@ private:
     QLabel* m_statusBarLocation;
     QLabel* m_statusBarPageInfo;
     QLabel* m_statusBarCopyright;
+
+
 };
 
 #endif // LASERCONTROLLERWINDOW_H

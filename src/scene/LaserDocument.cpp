@@ -18,6 +18,9 @@
 #include "LaserLayer.h"
 #include "state/StateController.h"
 
+int LaserDocument::m_engravingLayersCount(8);
+int LaserDocument::m_cuttingLayersCount(8);
+
 LaserDocument::LaserDocument(QObject* parent)
     : QObject(parent)
     , m_blockSignals(false)
@@ -324,6 +327,14 @@ void LaserDocument::blockSignals(bool block)
     m_blockSignals = block;
 }
 
+int LaserDocument::engravingLayersCount() { return m_engravingLayersCount; }
+
+void LaserDocument::setEngravingLayersCount(int count) { m_engravingLayersCount = count; }
+
+int LaserDocument::cuttingLayersCount() { return m_cuttingLayersCount; }
+
+void LaserDocument::setCuttingLayersCount(int count) { m_cuttingLayersCount = count; }
+
 void LaserDocument::updateLayersStructure()
 {
     if (!m_blockSignals)
@@ -354,22 +365,24 @@ void LaserDocument::close()
 
 void LaserDocument::init()
 {
-    int count = 8;
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < m_engravingLayersCount; i++)
     {
-        QColor color1(QColor::Hsv);
-        color1.setHsv(i * 179 / count, 255, 255);
+        QColor color(QColor::Hsv);
+        color.setHsv(i * 179 / m_engravingLayersCount, 255, 255);
         QString layerName = newLayerName(LLT_ENGRAVING);
-        LaserLayer* layer1 = new LaserLayer(layerName, LLT_ENGRAVING, this);
-        layer1->setColor(color1);
-        addLayer(layer1);
+        LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
+        layer->setColor(color);
+        addLayer(layer);
+    }
 
-        QColor color2(QColor::Hsv);
-        color2.setHsv(i * 179 / count + 180, 255, 255);
-        layerName = newLayerName(LLT_CUTTING);
-        LaserLayer* layer2 = new LaserLayer(layerName, LLT_CUTTING, this);
-        layer2->setColor(color2);
-        addLayer(layer2);
+    for (int i = 0; i < m_cuttingLayersCount; i++)
+    {
+        QColor color(QColor::Hsv);
+        color.setHsv(i * 179 / m_cuttingLayersCount + 180, 255, 255);
+        QString layerName = newLayerName(LLT_CUTTING);
+        LaserLayer* layer = new LaserLayer(layerName, LLT_CUTTING, this);
+        layer->setColor(color);
+        addLayer(layer);
     }
 
     engravingLayers()[0]->setRemovable(false);

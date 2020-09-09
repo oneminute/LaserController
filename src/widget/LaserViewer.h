@@ -11,7 +11,7 @@ class LaserViewer : public QGraphicsView
     Q_OBJECT
 public:
     explicit LaserViewer(QWidget* parent = nullptr);
-    explicit LaserViewer(LaserScene* scene, QWidget* parent = nullptr);
+    //explicit LaserViewer(LaserScene* scene, QWidget* parent = nullptr);
     ~LaserViewer();
 
     qreal zoomFactor() const;
@@ -39,7 +39,8 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
-    LaserScene* m_scene;
+    QScopedPointer<LaserScene> m_scene;
+    //LaserScene* m_scene;
     bool m_rubberBandActive;
     QPoint m_rubberBandOrigin;
     bool m_mousePressed;

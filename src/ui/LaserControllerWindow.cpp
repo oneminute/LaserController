@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QTemporaryFile>
 #include <QThread>
 #include <QTimer>
@@ -30,14 +31,71 @@
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::LaserControllerWindow)
-    , m_scene(new LaserScene)
     , m_created(false)
     , m_useLoadedJson(false)
 {
     m_ui->setupUi(this);
 
-    m_viewer = new LaserViewer(m_scene.data());
-    this->setCentralWidget(m_viewer);
+    m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
+    m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
+    
+    for (int i = 0; i < LaserDocument::engravingLayersCount(); i++)
+    {
+        QPushButton* button = new QPushButton;
+        button->setFixedWidth(30);
+        button->setFixedHeight(30);
+        QColor color(QColor::Hsv);
+        color.setHsv(i * 179 / LaserDocument::engravingLayersCount(), 255, 255);
+        QPalette pal = button->palette();
+        pal.setColor(QPalette::Button, color);
+        button->setAutoFillBackground(true);
+        button->setPalette(pal);
+        button->update();
+        m_ui->horizontalLayoutLayerButtons->addWidget(button);
+        connect(button, &QPushButton::clicked, [=](bool checked = false)
+            {
+                qDebug() << "engraving" << i;
+                if (m_scene->selectedPrimitives().count() > 0 &&
+                    QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+                {
+                    for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
+                    {
+                        m_scene->document()->addItem(primitive, m_scene->document()->engravingLayers()[i]);
+                    }
+                }
+            }
+        );
+    }
+
+    for (int i = 0; i < LaserDocument::cuttingLayersCount(); i++)
+    {
+        QPushButton* button = new QPushButton;
+        button->setFixedWidth(30);
+        button->setFixedHeight(30);
+        QColor color(QColor::Hsv);
+        color.setHsv(i * 179 / LaserDocument::cuttingLayersCount() + 180, 255, 255);
+        QPalette pal = button->palette();
+        pal.setColor(QPalette::Button, color);
+        button->setAutoFillBackground(true);
+        button->setPalette(pal);
+        button->update();
+        m_ui->horizontalLayoutLayerButtons->addWidget(button);
+        connect(button, &QPushButton::clicked, [=](bool checked = false)
+            {
+                qDebug() << "cutting" << i;
+                if (m_scene->selectedPrimitives().count() > 0 &&
+                    QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+                {
+                    for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
+                    {
+                        m_scene->document()->addItem(primitive, m_scene->document()->cuttingLayers()[i]);
+                    }
+                }
+            }
+        );
+    }
+
+    m_ui->horizontalLayoutLayerButtons->addStretch();
 
     // initialize layers Tree Widget
     m_ui->tableWidgetLayers->setColumnWidth(0, 30);
@@ -278,14 +336,7 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
 
 void LaserControllerWindow::onTableWidgetLayersSelectionChanged(const QString & layerId)
 {
-    if (m_scene->selectedPrimitives().count() > 0 && 
-        QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
-    {
-        for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
-        {
-            m_scene->document()->addItem(primitive, layerId);
-        }
-    }
+    
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)

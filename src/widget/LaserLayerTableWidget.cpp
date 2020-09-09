@@ -1,5 +1,6 @@
 #include "LaserLayerTableWidget.h"
 
+#include <QPushButton>
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
 
@@ -39,13 +40,24 @@ void LaserLayerTableWidget::fillLayers(QList<LaserLayer*>& layers, const QString
     for (int i = 0; i < layers.size(); i++)
     {
         int row = rowCount();
-        setRowCount(row + 1);
         LaserLayer* layer = layers[i];
         QList<LaserPrimitive*> laserItems = layer->items();
-        QTableWidgetItem* layerWidgetItem0 = new QTableWidgetItem();
-        layerWidgetItem0->setBackgroundColor(layer->color());
-        layerWidgetItem0->setData(Qt::UserRole, layer->objectName());
-        setItem(row, 0, layerWidgetItem0);
+        if (laserItems.isEmpty())
+            continue;
+        setRowCount(row + 1);
+        //QTableWidgetItem* layerWidgetItem0 = new QTableWidgetItem();
+        //layerWidgetItem0->setBackgroundColor(layer->color());
+        //layerWidgetItem0->setData(Qt::UserRole, layer->objectName());
+        //setItem(row, 0, layerWidgetItem0);
+
+        QPushButton* button = new QPushButton;
+        //button->setFixedWidth(26);
+        //button->setFixedHeight(26);
+        QPalette pal = button->palette();
+        pal.setColor(QPalette::Button, layer->color());
+        button->setAutoFillBackground(true);
+        button->setPalette(pal);
+        setCellWidget(row, 0, button);
 
         QTableWidgetItem* layerWidgetItem1 = new QTableWidgetItem();
         layerWidgetItem1->setText(type);
@@ -63,7 +75,7 @@ void LaserLayerTableWidget::fillLayers(QList<LaserLayer*>& layers, const QString
 
 void LaserLayerTableWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
-    if (selected.count() <= 0)
+    /*if (selected.count() <= 0)
         return;
 
     int row = selected.indexes()[0].row();
@@ -74,5 +86,5 @@ void LaserLayerTableWidget::selectionChanged(const QItemSelection & selected, co
     }
 
     QString layerId = item(row, 0)->data(Qt::UserRole).toString();
-    emit layerSelectionChanged(layerId);
+    emit layerSelectionChanged(layerId);*/
 }
