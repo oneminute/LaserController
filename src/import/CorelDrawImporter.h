@@ -26,7 +26,7 @@ public:
     explicit CorelDrawImporter(QObject* parent = nullptr);
     virtual ~CorelDrawImporter();
 
-    virtual LaserDocument* import(const QString& filename);
+    virtual LaserDocument* import(const QString& filename, LaserScene* scene);
 };
 
 #endif // CORELDRAWIMPORTER_H

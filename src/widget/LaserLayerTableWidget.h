@@ -22,7 +22,6 @@ public slots:
     void fillLayers(QList<LaserLayer*> &layers, const QString& type);
 
 protected:
-    virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
 
 signals:
     void layerSelectionChanged(const QString& layerId);

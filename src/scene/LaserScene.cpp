@@ -2,6 +2,7 @@
 
 #include "LaserDocument.h"
 #include "LaserItem.h"
+#include "LaserLayer.h"
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
@@ -15,7 +16,7 @@ LaserScene::~LaserScene()
 
 }
 
-void LaserScene::updateDocument(LaserDocument * doc)
+void LaserScene::updateDocument(const QList<QPushButton*>& layerButtons, LaserDocument * doc)
 {
     if (m_doc == doc)
     {
@@ -27,6 +28,12 @@ void LaserScene::updateDocument(LaserDocument * doc)
     }
 
     doc->setParent(this);
+    QList<LaserLayer*> layers = doc->layers();
+    for (int i = 0; i < doc->layersCount(); i++)
+    {
+        layers[i]->bindButton(layerButtons[i]);
+    }
+
     QMap<QString, LaserPrimitive*> items = doc->items();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {

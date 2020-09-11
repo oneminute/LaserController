@@ -12,6 +12,7 @@
 class LaserPrimitive;
 class LaserLayerPrivate;
 class LaserDocument;
+class QPushButton;
 
 class LaserLayer : public QObject
 {
@@ -87,6 +88,11 @@ public:
 
     LaserDocument* document() const;
 
+    void bindButton(QPushButton* button);
+
+protected:
+    void onClicked(bool checked = false);
+
 protected:
     bool m_removable;
     LaserLayerType m_type;
@@ -115,6 +121,7 @@ protected:
     qreal m_nonlinearCoefficient;
 
     LaserDocument* m_doc;
+    QPushButton* m_button;
 
     QList<LaserPrimitive*> m_items;
     QColor m_color;

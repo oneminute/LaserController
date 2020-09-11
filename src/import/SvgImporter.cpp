@@ -21,9 +21,9 @@ SvgImporter::~SvgImporter()
 {
 }
 
-LaserDocument* SvgImporter::import(const QString & filename)
+LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
 {
-    LaserDocument* ldoc = new LaserDocument;
+    LaserDocument* ldoc = new LaserDocument(scene);
     ImportSVGDialog dialog;
     dialog.exec();
 

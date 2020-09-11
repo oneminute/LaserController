@@ -16,6 +16,7 @@ class LaserViewer;
 class LaserScene;
 class QLabel;
 class QTreeWidgetItem;
+class QPushButton;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -55,6 +56,8 @@ protected slots:
     void onWindowCreated();
 
     void onEnterDeviceUnconnectedState();
+    void onActionMoveLayerUp(bool checked = false);
+    void onActionMoveLayerDown(bool checked = false);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
@@ -81,6 +84,7 @@ private:
     QLabel* m_statusBarPageInfo;
     QLabel* m_statusBarCopyright;
 
+    QList<QPushButton*> m_layerButtons;
 
 };
 

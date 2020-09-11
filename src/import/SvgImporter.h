@@ -12,7 +12,7 @@ public:
     explicit SvgImporter(QObject* parent = nullptr);
     virtual ~SvgImporter();
 
-    virtual LaserDocument* import(const QString& filename);
+    virtual LaserDocument* import(const QString& filename, LaserScene* scene);
 
 private:
     friend class Importer;

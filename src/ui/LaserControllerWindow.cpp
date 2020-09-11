@@ -36,63 +36,40 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 {
     m_ui->setupUi(this);
 
+    QList<QColor> colors;
+    colors << QColor(Qt::red)
+        << QColor(Qt::blue)
+        << QColor(Qt::darkRed)
+        << QColor(Qt::darkBlue)
+        << QColor(Qt::green)
+        << QColor(Qt::cyan)
+        << QColor(Qt::darkGreen)
+        << QColor(Qt::darkCyan)
+        << QColor(Qt::magenta)
+        << QColor(Qt::yellow)
+        << QColor(Qt::darkMagenta)
+        << QColor(Qt::darkYellow)
+        << QColor(qRgb(172, 0, 0))
+        << QColor(qRgb(0, 172, 0))
+        << QColor(qRgb(0, 0, 196))
+        << QColor(qRgb(196, 48, 172));
+
     m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
     
-    for (int i = 0; i < LaserDocument::engravingLayersCount(); i++)
+    int colorTick = 360 / LaserDocument::layersCount();
+    for (int i = 0; i < LaserDocument::layersCount(); i++)
     {
         QPushButton* button = new QPushButton;
         button->setFixedWidth(30);
         button->setFixedHeight(30);
-        QColor color(QColor::Hsv);
-        color.setHsv(i * 179 / LaserDocument::engravingLayersCount(), 255, 255);
         QPalette pal = button->palette();
-        pal.setColor(QPalette::Button, color);
+        pal.setColor(QPalette::Button, colors[i]);
         button->setAutoFillBackground(true);
         button->setPalette(pal);
         button->update();
         m_ui->horizontalLayoutLayerButtons->addWidget(button);
-        connect(button, &QPushButton::clicked, [=](bool checked = false)
-            {
-                qDebug() << "engraving" << i;
-                if (m_scene->selectedPrimitives().count() > 0 &&
-                    QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
-                {
-                    for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
-                    {
-                        m_scene->document()->addItem(primitive, m_scene->document()->engravingLayers()[i]);
-                    }
-                }
-            }
-        );
-    }
-
-    for (int i = 0; i < LaserDocument::cuttingLayersCount(); i++)
-    {
-        QPushButton* button = new QPushButton;
-        button->setFixedWidth(30);
-        button->setFixedHeight(30);
-        QColor color(QColor::Hsv);
-        color.setHsv(i * 179 / LaserDocument::cuttingLayersCount() + 180, 255, 255);
-        QPalette pal = button->palette();
-        pal.setColor(QPalette::Button, color);
-        button->setAutoFillBackground(true);
-        button->setPalette(pal);
-        button->update();
-        m_ui->horizontalLayoutLayerButtons->addWidget(button);
-        connect(button, &QPushButton::clicked, [=](bool checked = false)
-            {
-                qDebug() << "cutting" << i;
-                if (m_scene->selectedPrimitives().count() > 0 &&
-                    QMessageBox::Apply == QMessageBox::question(this, tr("Move primitives?"), tr("Do you want to move primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
-                {
-                    for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
-                    {
-                        m_scene->document()->addItem(primitive, m_scene->document()->cuttingLayers()[i]);
-                    }
-                }
-            }
-        );
+        m_layerButtons.append(button);
     }
 
     m_ui->horizontalLayoutLayerButtons->addStretch();
@@ -140,6 +117,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolButtonStart->setDefaultAction(m_ui->actionMachining);
     m_ui->toolButtonPause->setDefaultAction(m_ui->actionPause);
     m_ui->toolButtonStop->setDefaultAction(m_ui->actionStop);
+    m_ui->toolButtonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
+    m_ui->toolButtonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
 
     // init status bar
     m_statusBarStatus = new QLabel;
@@ -204,6 +183,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionHalfTone, &QAction::triggered, this, &LaserControllerWindow::onActionHalfTone);
     connect(m_ui->actionDeletePrimitive, &QAction::triggered, this, &LaserControllerWindow::onActionDeletePrimitive);
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
+    connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
+    connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &LaserLayerTableWidget::layerSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
@@ -241,10 +222,11 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
     //QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
-    LaserDocument* doc = importer->import(filename);
+    LaserDocument* doc = importer->import(filename, m_scene);
     if (doc)
     {
-        m_scene->updateDocument(doc);
+        m_scene->updateDocument(m_layerButtons, doc);
+        //updateLayerButtons();
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
     }
@@ -254,10 +236,11 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 {
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::CORELDRAW);
-    LaserDocument* doc = importer->import();
+    LaserDocument* doc = importer->import("", m_scene);
     if (doc)
     {
-        m_scene->updateDocument(doc);
+        m_scene->updateDocument(m_layerButtons, doc);
+        //updateLayerButtons();
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
     }
@@ -322,10 +305,10 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 
 void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int column)
 {
-    QTableWidgetItem* item = m_ui->tableWidgetLayers->item(row, 0);
-    QString id = item->data(Qt::UserRole).toString();
+    QTableWidgetItem* item = m_ui->tableWidgetLayers->item(row, 1);
+    int index = item->data(Qt::UserRole).toInt();
 
-    LaserLayer* layer = m_scene->document()->laserLayer(id);
+    LaserLayer* layer = m_scene->document()->layers()[index];
 
     LaserLayerDialog dialog(layer);
     if (dialog.exec() == QDialog::Accepted)
@@ -537,6 +520,51 @@ void LaserControllerWindow::onEnterDeviceUnconnectedState()
         first = false;
     }
 }
+
+void LaserControllerWindow::onActionMoveLayerUp(bool checked)
+{
+    QList<QTableWidgetItem*> selectedItems = m_ui->tableWidgetLayers->selectedItems();
+    if (selectedItems.isEmpty())
+        return;
+
+    int row = selectedItems[0]->row();
+    if (row == 0)
+        return;
+
+    QTableWidgetItem* current = m_ui->tableWidgetLayers->item(row, 1);
+    QTableWidgetItem* target = m_ui->tableWidgetLayers->item(row - 1, 1);
+    m_scene->document()->swapLayers(target->data(Qt::UserRole).toInt(), current->data(Qt::UserRole).toInt());
+    m_ui->tableWidgetLayers->selectRow(row - 1);
+}
+
+void LaserControllerWindow::onActionMoveLayerDown(bool checked)
+{
+    QList<QTableWidgetItem*> selectedItems = m_ui->tableWidgetLayers->selectedItems();
+    if (selectedItems.isEmpty())
+        return;
+
+    int row = selectedItems[0]->row();
+    if (row >= m_ui->tableWidgetLayers->rowCount() - 1)
+        return;
+
+    QTableWidgetItem* current = m_ui->tableWidgetLayers->item(row, 1);
+    QTableWidgetItem* target = m_ui->tableWidgetLayers->item(row + 1, 1);
+    m_scene->document()->swapLayers(target->data(Qt::UserRole).toInt(), current->data(Qt::UserRole).toInt());
+    m_ui->tableWidgetLayers->selectRow(row + 1);
+}
+
+//void LaserControllerWindow::updateLayerButtons()
+//{
+//    if (!m_scene->document())
+//        return;
+//
+//    QList<LaserLayer*> layers = m_scene->document()->layers();
+//    for (int i = 0; i < layers.count(); i++)
+//    {
+//        m_layerButtons[i]->setUserData(0, layers[i]);
+//        layers[i]->setColor(m_layerButtons[i]->palette().color(QPalette::Button));
+//    }
+//}
 
 void LaserControllerWindow::bindWidgetsProperties()
 {

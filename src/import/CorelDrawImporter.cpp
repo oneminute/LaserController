@@ -19,7 +19,7 @@ CorelDrawImporter::~CorelDrawImporter()
 {
 }
 
-LaserDocument * CorelDrawImporter::import(const QString & filename)
+LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* scene)
 {
     VGCore::IVGApplicationPtr app;
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -88,7 +88,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename)
     }
 
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
-    LaserDocument* doc = importer->import(tmpSvgFilename);
+    LaserDocument* doc = importer->import(tmpSvgFilename, scene);
 
     if (doc)
     {

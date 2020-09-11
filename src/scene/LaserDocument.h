@@ -13,17 +13,18 @@
 class LaserDocumentPrivate;
 class LaserPrimitive;
 class LaserLayer;
+class LaserScene;
 
 class LaserDocument : public QObject
 {
     Q_OBJECT
 public:
-    explicit LaserDocument(QObject* parent = nullptr);
+    explicit LaserDocument(LaserScene* scene, QObject* parent = nullptr);
     ~LaserDocument();
 
     void addItem(LaserPrimitive* item);
     void addItem(LaserPrimitive* item, LaserLayer* layer);
-    void addItem(LaserPrimitive* item, const QString& id);
+    //void addItem(LaserPrimitive* item, const QString& id);
     void removeItem(LaserPrimitive* item);
 
     PageInformation pageInformation() const;
@@ -33,10 +34,10 @@ public:
     QMap<QString, LaserPrimitive*> items() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
 
-    QMap<QString, LaserLayer*> layers() const;
-    LaserLayer* laserLayer(const QString& id) const;
-    QList<LaserLayer*> engravingLayers() const;
-    QList<LaserLayer*> cuttingLayers() const;
+    QList<LaserLayer*> layers() const;
+    //LaserLayer* laserLayer(const QString& id) const;
+    //QList<LaserLayer*> engravingLayers() const;
+    //QList<LaserLayer*> cuttingLayers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
 
@@ -49,11 +50,13 @@ public:
 
     bool isOpened() const { return m_isOpened; }
 
-    static int engravingLayersCount();
-    static void setEngravingLayersCount(int count);
+    //void setScene(LaserScene* scene) { m_scene = scene; }
+    LaserScene* scene() const { return m_scene; }
 
-    static int cuttingLayersCount();
-    static void setCuttingLayersCount(int count);
+    void swapLayers(int i, int j);
+
+    static int layersCount() { return m_layersCount; }
+    static void setLayersCount(int count) { m_layersCount = count; }
 
 public slots:
     void exportJSON(const QString& filename);
@@ -73,17 +76,20 @@ signals:
 
 private:
     QMap<QString, LaserPrimitive*> m_items;
-    QList<LaserLayer*> m_engravingLayers;
-    QList<LaserLayer*> m_cuttingLayers;
-    QMap<QString, LaserLayer*> m_layers;
+    //QList<LaserLayer*> m_engravingLayers;
+    //QList<LaserLayer*> m_cuttingLayers;
+    //QMap<QString, LaserLayer*> m_layers;
+    QList<LaserLayer*> m_layers;
 
     PageInformation m_pageInfo;
     qreal m_scale;
     bool m_blockSignals;
     bool m_isOpened;
+    LaserScene* m_scene;
 
-    static int m_engravingLayersCount;
-    static int m_cuttingLayersCount;
+    //static int m_engravingLayersCount;
+    //static int m_cuttingLayersCount;
+    static int m_layersCount;
 
     Q_DISABLE_COPY(LaserDocument);
 };

@@ -18,13 +18,15 @@
 #include "LaserLayer.h"
 #include "state/StateController.h"
 
-int LaserDocument::m_engravingLayersCount(8);
-int LaserDocument::m_cuttingLayersCount(8);
+//int LaserDocument::m_engravingLayersCount(8);
+//int LaserDocument::m_cuttingLayersCount(8);
+int LaserDocument::m_layersCount(16);
 
-LaserDocument::LaserDocument(QObject* parent)
+LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
     : QObject(parent)
     , m_blockSignals(false)
     , m_isOpened(false)
+    , m_scene(scene)
 {
     init();
 }
@@ -40,11 +42,11 @@ void LaserDocument::addItem(LaserPrimitive * item)
 
     if (item->isShape())
     {
-        m_cuttingLayers[0]->addItem(item);
+        m_layers[1]->addItem(item);
     }
     else if (item->isBitmap())
     {
-        m_engravingLayers[0]->addItem(item);
+        m_layers[0]->addItem(item);
     }
 
     updateLayersStructure();
@@ -56,13 +58,13 @@ void LaserDocument::addItem(LaserPrimitive * item, LaserLayer * layer)
     layer->addItem(item);
 }
 
-void LaserDocument::addItem(LaserPrimitive * item, const QString& id)
-{
-    if (!m_layers.contains(id))
-        return;
-
-    addItem(item, m_layers[id]);
-}
+//void LaserDocument::addItem(LaserPrimitive * item, const QString& id)
+//{
+//    if (!m_layers.contains(id))
+//        return;
+//
+//    addItem(item, m_layers[id]);
+//}
 
 void LaserDocument::removeItem(LaserPrimitive * item)
 {
@@ -96,29 +98,29 @@ LaserPrimitive * LaserDocument::laserPrimitive(const QString & id) const
     return m_items[id];
 }
 
-QMap<QString, LaserLayer*> LaserDocument::layers() const
+QList<LaserLayer*> LaserDocument::layers() const
 {
     return m_layers;
 }
 
-LaserLayer * LaserDocument::laserLayer(const QString & id) const
-{
-    return m_layers[id];
-}
+//LaserLayer * LaserDocument::laserLayer(const QString & id) const
+//{
+//    return m_layers[id];
+//}
 
-QList<LaserLayer*> LaserDocument::engravingLayers() const
-{
-    return m_engravingLayers;
-}
+//QList<LaserLayer*> LaserDocument::engravingLayers() const
+//{
+//    return m_engravingLayers;
+//}
 
-QList<LaserLayer*> LaserDocument::cuttingLayers() const
-{
-    return m_cuttingLayers;
-}
+//QList<LaserLayer*> LaserDocument::cuttingLayers() const
+//{
+//    return m_cuttingLayers;
+//}
 
 void LaserDocument::addLayer(LaserLayer* layer)
 {
-    switch (layer->type())
+    /*switch (layer->type())
     {
     case LLT_ENGRAVING:
         m_engravingLayers.append(layer);
@@ -126,8 +128,8 @@ void LaserDocument::addLayer(LaserLayer* layer)
     case LLT_CUTTING:
         m_cuttingLayers.append(layer);
         break;
-    }
-    m_layers.insert(layer->id(), layer);
+    }*/
+    m_layers.append(layer);
 
     updateLayersStructure();
 }
@@ -135,7 +137,7 @@ void LaserDocument::addLayer(LaserLayer* layer)
 void LaserDocument::removeLayer(LaserLayer * layer)
 {
     LaserLayer* initLayer = nullptr;
-    QList<LaserLayer*>* layers = nullptr;
+    /*QList<LaserLayer*>* layers = nullptr;
     if (layer->type() == LLT_CUTTING)
     {
         layers = &m_cuttingLayers;
@@ -143,24 +145,27 @@ void LaserDocument::removeLayer(LaserLayer * layer)
     else
     {
         layers = &m_engravingLayers;
-    }
-    initLayer = (*layers)[0];
+    }*/
+    /*initLayer = (*layers)[0];
     for (QList<LaserPrimitive*>::iterator i = layer->items().begin(); i != layer->items().end(); i++)
     {
         LaserPrimitive* item = *i;
         initLayer->addItem(item);
-    }
-    layers->removeOne(layer);
-    m_layers.remove(layer->id());
+    }*/
+    int i = m_layers.indexOf(layer);
+    if (i < 2)
+        return;
+    m_layers.removeOne(layer);
+    //m_layers.remove(layer->id());
 
     updateLayersStructure();
 }
 
 QString LaserDocument::newLayerName(LaserLayerType type) const
 {
-    QList<LaserLayer*> layers;
+    //QList<LaserLayer*> layers;
     QString prefix;
-    switch (type)
+    /*switch (type)
     {
     case LLT_ENGRAVING:
         layers = m_engravingLayers;
@@ -170,15 +175,15 @@ QString LaserDocument::newLayerName(LaserLayerType type) const
         layers = m_cuttingLayers;
         prefix = tr("Cutting");
         break;
-    }
-    int n = layers.size() + 1;
+    }*/
+    int n = m_layers.size() + 1;
     bool used = true;
     QString name;
     while (used)
     {
         used = false;
         name = prefix + QString::number(n);
-        for (QList<LaserLayer*>::iterator i = layers.begin(); i != layers.end(); i++)
+        for (QList<LaserLayer*>::const_iterator i = m_layers.begin(); i != m_layers.end(); i++)
         {
             if ((*i)->name() == name)
             {
@@ -217,71 +222,38 @@ void LaserDocument::exportJSON(const QString& filename)
     cv::Mat canvas(m_pageInfo.height() * 40, m_pageInfo.width() * 40, CV_8UC3, cv::Scalar(255, 255, 255));
     int layerId = 0;
     QJsonArray dataInfo;
+    for (int i = 0; i < m_layers.count(); i++)
     {
-        for (int i = 0; i < m_cuttingLayers.size(); i++)
+        LaserLayer* layer = m_layers[i];
+        if (layer->isEmpty())
+            continue;
+        QJsonObject layerObj;
+        layerObj["LayerId"] = i;
+        layerObj["MinSpeed"] = layer->minSpeed();
+        layerObj["RunSpeed"] = layer->runSpeed();
+        layerObj["LaserPower"] = layer->laserPower();
+        layerObj["MinSpeedPower"] = layer->minSpeedPower();
+        layerObj["RunSpeedPower"] = layer->runSpeedPower();
+        if (layer->type() == LLT_ENGRAVING)
         {
-            LaserLayer* layer = m_cuttingLayers[i];
-            if (layer->isEmpty())
-                continue;
-            //QString layerId = "Layer" + QString::number(i + 1);
-            QJsonObject layerObj;
-            layerObj["LayerId"] = layerId;
-            layerObj["MinSpeed"] = layer->minSpeed();
-            layerObj["RunSpeed"] = layer->runSpeed();
-            //layerObj["MoveSpeed"] = layer->moveSpeed();
-            layerObj["LaserPower"] = layer->laserPower();
-            layerObj["MinSpeedPower"] = layer->minSpeedPower();
-            layerObj["RunSpeedPower"] = layer->runSpeedPower();
-            //layerInfo[layerId] = layerObj;
-            layerInfo.append(layerObj);
-
-            QList<LaserPrimitive*> laserItems = layer->items();
-            for (int li = 0; li < laserItems.size(); li++)
-            {
-                LaserPrimitive* laserItem = laserItems[li];
-                QJsonObject itemObj;
-                itemObj["Layer"] = layerId;
-                //itemObj["PrinterDrawUnit"] = 1016;
-                itemObj["FinishRun"] = 0;
-                std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
-                if (!points.empty())
-                {
-                    itemObj["Type"] = laserItem->typeName();
-                    itemObj["Data"] = QString(pltUtils::points2Plt(points));
-                    dataInfo.append(itemObj);
-                }
-            }
-            layerId++;
-        }
-    }
-    {
-        QJsonObject imageObj;
-        for (int i = 0; i < m_engravingLayers.size(); i++)
-        {
-            LaserLayer* layer = m_engravingLayers[i];
-            if (layer->isEmpty())
-                continue;
-            //QString layerId = "Layer" + QString::number(i + 1);
-            QJsonObject layerObj;
-            layerObj["LayerId"] = layerId;
             layerObj["CarveForward"] = layer->engravingForward();
             layerObj["CarveStyle"] = layer->engravingStyle();
-            layerObj["MinSpeed"] = layer->minSpeed();
-            layerObj["RunSpeed"] = layer->runSpeed();
-            layerObj["LaserPower"] = layer->laserPower();
             layerObj["HStep"] = layer->lineSpacing();
             layerObj["LStep"] = layer->columnSpacing();
             layerObj["ErrorX"] = layer->errorX();
-            //layerObj["ErrorY"] = layer->errorY();
             layerObj["MinSpeedPower"] = layer->minSpeedPower();
             layerObj["RunSpeedPower"] = layer->runSpeedPower();
+        }
+        
+        layerInfo.append(layerObj);
 
-            QList<LaserPrimitive*> laserItems = layer->items();
-            for (int li = 0; li < laserItems.size(); li++)
+        QList<LaserPrimitive*> laserItems = layer->items();
+        for (int li = 0; li < laserItems.size(); li++)
+        {
+            LaserPrimitive* laserItem = laserItems[li];
+            QJsonObject itemObj;
+            if (layer->type() == LLT_ENGRAVING)
             {
-                LaserPrimitive* laserItem = laserItems[li];
-                QJsonObject itemObj;
-
                 itemObj["Layer"] = layerId;
                 itemObj["FinishRun"] = 0;
                 QPointF pos = laserItem->laserStartPos();
@@ -300,10 +272,21 @@ void LaserDocument::exportJSON(const QString& filename)
                     dataInfo.append(itemObj);
                 }
             }
-            layerInfo.append(layerObj);
+            else if (layer->type() == LLT_CUTTING)
+            {
+                itemObj["Layer"] = layerId;
+                itemObj["FinishRun"] = 0;
+                std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
+                if (!points.empty())
+                {
+                    itemObj["Type"] = laserItem->typeName();
+                    itemObj["Data"] = QString(pltUtils::points2Plt(points));
+                    dataInfo.append(itemObj);
+                }
+            }
         }
-        layerId++;
     }
+    
     QJsonObject actionObj;
 
     jsonObj["LayerInfo"] = layerInfo;
@@ -327,13 +310,13 @@ void LaserDocument::blockSignals(bool block)
     m_blockSignals = block;
 }
 
-int LaserDocument::engravingLayersCount() { return m_engravingLayersCount; }
-
-void LaserDocument::setEngravingLayersCount(int count) { m_engravingLayersCount = count; }
-
-int LaserDocument::cuttingLayersCount() { return m_cuttingLayersCount; }
-
-void LaserDocument::setCuttingLayersCount(int count) { m_cuttingLayersCount = count; }
+void LaserDocument::swapLayers(int i, int j)
+{
+    LaserLayer* layer = m_layers[i];
+    m_layers[i] = m_layers[j];
+    m_layers[j] = layer;
+    updateLayersStructure();
+}
 
 void LaserDocument::updateLayersStructure()
 {
@@ -365,7 +348,7 @@ void LaserDocument::close()
 
 void LaserDocument::init()
 {
-    for (int i = 0; i < m_engravingLayersCount; i++)
+    /*for (int i = 0; i < m_engravingLayersCount; i++)
     {
         QColor color(QColor::Hsv);
         color.setHsv(i * 179 / m_engravingLayersCount, 255, 255);
@@ -383,10 +366,24 @@ void LaserDocument::init()
         LaserLayer* layer = new LaserLayer(layerName, LLT_CUTTING, this);
         layer->setColor(color);
         addLayer(layer);
+    }*/
+    QString layerName = newLayerName(LLT_ENGRAVING);
+    LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
+    addLayer(layer);
+
+    layerName = newLayerName(LLT_CUTTING);
+    layer = new LaserLayer(layerName, LLT_CUTTING, this);
+    addLayer(layer);
+
+    for (int i = 2; i < m_layersCount; i++)
+    {
+        QString layerName = newLayerName(LLT_ENGRAVING);
+        LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
+        addLayer(layer);
     }
 
-    engravingLayers()[0]->setRemovable(false);
-    cuttingLayers()[0]->setRemovable(false);
+    //engravingLayers()[0]->setRemovable(false);
+    //cuttingLayers()[0]->setRemovable(false);
 
     ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
     ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));

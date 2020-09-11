@@ -1,10 +1,12 @@
 #include "LaserLayer.h"
 
-#include <QSharedData>
+#include <QPushButton>
+#include <QMessageBox>
 
 #include "util/Utils.h"
 #include "LaserDocument.h"
 #include "LaserItem.h"
+#include "LaserScene.h"
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document)
     : QObject(document)
@@ -168,5 +170,23 @@ bool LaserLayer::isEmpty() const
 LaserDocument * LaserLayer::document() const
 {
     return m_doc;
+}
+
+void LaserLayer::bindButton(QPushButton * button)
+{
+    setColor(button->palette().color(QPalette::Button));
+    connect(button, &QPushButton::clicked, this, &LaserLayer::onClicked);
+}
+
+void LaserLayer::onClicked(bool checked)
+{
+    LaserScene* scene = m_doc->scene();
+    if (scene->selectedPrimitives().count() > 0)
+    {
+        for (LaserPrimitive* primitive : scene->selectedPrimitives())
+        {
+            scene->document()->addItem(primitive, this);
+        }
+    }
 }
 

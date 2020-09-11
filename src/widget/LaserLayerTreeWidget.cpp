@@ -40,10 +40,10 @@ void LaserLayerTreeWidget::updateItems()
 
     if (m_doc)
     {
-        QList<LaserLayer*> layers = document()->cuttingLayers();
-        fillLayersTree(layers, tr("C"));
-        layers = document()->engravingLayers();
-        fillLayersTree(layers, tr("E"));
+        //QList<LaserLayer*> layers = document()->cuttingLayers();
+        //fillLayersTree(layers, tr("C"));
+        //layers = document()->engravingLayers();
+        //fillLayersTree(layers, tr("E"));
     }
 }
 
