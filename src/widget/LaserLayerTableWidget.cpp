@@ -1,5 +1,6 @@
 #include "LaserLayerTableWidget.h"
 
+#include <QLabel>
 #include <QPushButton>
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
@@ -48,12 +49,9 @@ void LaserLayerTableWidget::updateItems()
                 type = tr("E");
             }
 
-            QPushButton* button = new QPushButton;
-            QPalette pal = button->palette();
-            pal.setColor(QPalette::Button, layer->color());
-            button->setAutoFillBackground(true);
-            button->setPalette(pal);
-            setCellWidget(row, 0, button);
+            QTableWidgetItem* layerWidgetItem0 = new QTableWidgetItem();
+            layerWidgetItem0->setBackgroundColor(layer->color());
+            setItem(row, 0, layerWidgetItem0);
 
             QTableWidgetItem* layerWidgetItem1 = new QTableWidgetItem();
             layerWidgetItem1->setText(type);
@@ -71,35 +69,4 @@ void LaserLayerTableWidget::updateItems()
     }
 }
 
-void LaserLayerTableWidget::fillLayers(QList<LaserLayer*>& layers, const QString& type)
-{
-    for (int i = 0; i < layers.size(); i++)
-    {
-        int row = rowCount();
-        LaserLayer* layer = layers[i];
-        QList<LaserPrimitive*> laserItems = layer->items();
-        if (laserItems.isEmpty())
-            continue;
-        setRowCount(row + 1);
-
-        QPushButton* button = new QPushButton;
-        QPalette pal = button->palette();
-        pal.setColor(QPalette::Button, layer->color());
-        button->setAutoFillBackground(true);
-        button->setPalette(pal);
-        setCellWidget(row, 0, button);
-
-        QTableWidgetItem* layerWidgetItem1 = new QTableWidgetItem();
-        layerWidgetItem1->setText(type);
-        setItem(row, 1, layerWidgetItem1);
-
-        QTableWidgetItem* layerWidgetItem2 = new QTableWidgetItem();
-        layerWidgetItem2->setText(layer->name());
-        setItem(row, 2, layerWidgetItem2);
-
-        QTableWidgetItem* layerWidgetItem3 = new QTableWidgetItem();
-        layerWidgetItem3->setText(QString::number(layer->items().count()));
-        setItem(row, 3, layerWidgetItem3);
-    }
-}
 

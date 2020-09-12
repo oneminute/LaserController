@@ -34,6 +34,7 @@ protected slots:
     void onUseDocumentPageSizeStateChanged(int state);
     void onUsePresetPageSizeStateChanged(int state);
     void onPresetPageSizeIndexChanged(const QString& text);
+    virtual void accept();
 
 private:
     QScopedPointer<Ui::ImportSVGDialog> m_ui;

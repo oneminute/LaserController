@@ -111,25 +111,6 @@ QString LaserPrimitive::typeName()
     return typeName(m_type);
 }
 
-//QDataStream & LaserPrimitive::operator<<(QDataStream & stream)
-//{
-//    stream << objectName()
-//        << name()
-//        << type();
-//    return stream;
-//}
-//
-//QDataStream & LaserPrimitive::operator>>(QDataStream & stream)
-//{
-//    QString objName;
-//    int type;
-//    stream >> objName
-//        >> m_name
-//        >> type;
-//    m_type = (LaserPrimitiveType)type;
-//    return stream;
-//}
-
 QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
 {
     static QMap<LaserPrimitiveType, QString> TypeNamesMap{

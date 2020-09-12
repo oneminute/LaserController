@@ -18,7 +18,7 @@ public:
     explicit LaserScene(QObject* parent = nullptr);
     ~LaserScene();
 
-    void updateDocument(const QList<QPushButton*>& layerButtons, LaserDocument* doc);
+    void updateDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
 
     LaserDocument* document() { return m_doc; }

@@ -16,7 +16,7 @@ LaserScene::~LaserScene()
 
 }
 
-void LaserScene::updateDocument(const QList<QPushButton*>& layerButtons, LaserDocument * doc)
+void LaserScene::updateDocument(LaserDocument * doc)
 {
     if (m_doc == doc)
     {
@@ -28,11 +28,6 @@ void LaserScene::updateDocument(const QList<QPushButton*>& layerButtons, LaserDo
     }
 
     doc->setParent(this);
-    QList<LaserLayer*> layers = doc->layers();
-    for (int i = 0; i < doc->layersCount(); i++)
-    {
-        layers[i]->bindButton(layerButtons[i]);
-    }
 
     QMap<QString, LaserPrimitive*> items = doc->items();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)

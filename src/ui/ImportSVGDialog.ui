@@ -53,7 +53,7 @@
          <bool>false</bool>
         </property>
         <property name="currentText">
-         <string>mm</string>
+         <string>%</string>
         </property>
         <item>
          <property name="text">
@@ -138,7 +138,7 @@
       <item row="1" column="1">
        <widget class="QComboBox" name="comboBoxShapeUnit">
         <property name="currentText">
-         <string>mm/100</string>
+         <string>%</string>
         </property>
         <item>
          <property name="text">
@@ -323,7 +323,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

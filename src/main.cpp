@@ -90,6 +90,13 @@ int main(int argc, char *argv[])
         app.installTranslator(&translator);
     }
 
+    QTranslator qtTranslator;
+    if (qtTranslator.load(locale, QLatin1String("qt"), QLatin1String("_"), QLatin1String("translations")))
+    {
+        qDebug() << "load translation file." << "qt" << locale.name();
+        app.installTranslator(&qtTranslator);
+    }
+
     //qRegisterMetaType<LaserPrimitive*>();
     //qRegisterMetaTypeStreamOperators<LaserPrimitive*>();
 

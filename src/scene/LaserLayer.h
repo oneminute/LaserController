@@ -12,7 +12,7 @@
 class LaserPrimitive;
 class LaserLayerPrivate;
 class LaserDocument;
-class QPushButton;
+class LayerButton;
 
 class LaserLayer : public QObject
 {
@@ -74,8 +74,7 @@ public:
     void removeItem(LaserPrimitive* item);
     bool isEmpty() const;
 
-    QColor color() const { return m_color; }
-    void setColor(const QColor& color) { m_color = color; }
+    QColor color() const;
 
     int lpi() const { return m_lpi; }
     void setLpi(int lpi) { m_lpi = lpi; }
@@ -88,10 +87,10 @@ public:
 
     LaserDocument* document() const;
 
-    void bindButton(QPushButton* button);
+    void bindButton(LayerButton* button);
 
 protected:
-    void onClicked(bool checked = false);
+    void onClicked();
 
 protected:
     bool m_removable;
@@ -121,10 +120,9 @@ protected:
     qreal m_nonlinearCoefficient;
 
     LaserDocument* m_doc;
-    QPushButton* m_button;
+    LayerButton* m_button;
 
     QList<LaserPrimitive*> m_items;
-    QColor m_color;
     Q_DISABLE_COPY(LaserLayer)
 };
 

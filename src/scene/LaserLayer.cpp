@@ -1,12 +1,12 @@
 #include "LaserLayer.h"
 
-#include <QPushButton>
 #include <QMessageBox>
 
 #include "util/Utils.h"
 #include "LaserDocument.h"
 #include "LaserItem.h"
 #include "LaserScene.h"
+#include "widget/LayerButton.h"
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document)
     : QObject(document)
@@ -29,6 +29,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_lpi(100)
     , m_dpi(600)
     , m_nonlinearCoefficient(1.5)
+    , m_button(nullptr)
 {
     Q_ASSERT(document);
     setParent(document);
@@ -167,18 +168,26 @@ bool LaserLayer::isEmpty() const
     return m_items.count() == 0;
 }
 
+QColor LaserLayer::color() const 
+{
+    if (m_button)
+        return m_button->color();
+    else
+        return QColor();
+}
+
 LaserDocument * LaserLayer::document() const
 {
     return m_doc;
 }
 
-void LaserLayer::bindButton(QPushButton * button)
+void LaserLayer::bindButton(LayerButton * button)
 {
-    setColor(button->palette().color(QPalette::Button));
-    connect(button, &QPushButton::clicked, this, &LaserLayer::onClicked);
+    m_button = button;
+    connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
 }
 
-void LaserLayer::onClicked(bool checked)
+void LaserLayer::onClicked()
 {
     LaserScene* scene = m_doc->scene();
     if (scene->selectedPrimitives().count() > 0)

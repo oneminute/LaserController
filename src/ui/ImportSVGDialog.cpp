@@ -147,3 +147,15 @@ void ImportSVGDialog::onPresetPageSizeIndexChanged(const QString &)
 
     qDebug() << ps.name() << ps.key() << m_pageWidth << m_pageHeight;
 }
+
+void ImportSVGDialog::accept()
+{
+    QPageSize::PageSizeId id = m_ui->comboBoxPresetSize->currentData().value<QPageSize::PageSizeId>();
+    QPageSize ps(id);
+    m_pageUnitFromSVG = (SizeUnit)m_ui->comboBoxShapeUnit->currentIndex();
+    m_pageWidth = ps.size(QPageSize::Millimeter).width();
+    m_pageHeight = ps.size(QPageSize::Millimeter).height();
+    m_shapeSizeUnit = (SizeUnit)m_ui->comboBoxShapeUnit->currentIndex();
+    qDebug() << "shape unit:" << m_shapeSizeUnit;
+    QDialog::accept();
+}

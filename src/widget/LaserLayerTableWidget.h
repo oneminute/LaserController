@@ -19,7 +19,6 @@ public:
 
 public slots:
     void updateItems();
-    void fillLayers(QList<LaserLayer*> &layers, const QString& type);
 
 protected:
 

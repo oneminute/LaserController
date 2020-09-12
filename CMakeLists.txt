@@ -220,6 +220,7 @@ function(WIN_DEPLOY_QT target)
                 --dir ${CMAKE_INSTALL_PREFIX}
                 --verbose 1
                 --release
+                --no-translations
                 \"$<TARGET_FILE:${target}>\"
         COMMENT "Deploying Qt libraries using windeployqt for compilation target '${target}' ..."
     )

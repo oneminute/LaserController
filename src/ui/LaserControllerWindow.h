@@ -7,6 +7,7 @@
 #include <QDir>
 
 #include "scene/LaserLayer.h"
+#include "widget/LayerButton.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
@@ -84,7 +85,7 @@ private:
     QLabel* m_statusBarPageInfo;
     QLabel* m_statusBarCopyright;
 
-    QList<QPushButton*> m_layerButtons;
+    QList<LayerButton*> m_layerButtons;
 
 };
 

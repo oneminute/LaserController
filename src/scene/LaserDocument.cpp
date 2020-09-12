@@ -56,15 +56,8 @@ void LaserDocument::addItem(LaserPrimitive * item, LaserLayer * layer)
 {
     item->layer()->removeItem(item);
     layer->addItem(item);
+    updateLayersStructure();
 }
-
-//void LaserDocument::addItem(LaserPrimitive * item, const QString& id)
-//{
-//    if (!m_layers.contains(id))
-//        return;
-//
-//    addItem(item, m_layers[id]);
-//}
 
 void LaserDocument::removeItem(LaserPrimitive * item)
 {
@@ -103,32 +96,8 @@ QList<LaserLayer*> LaserDocument::layers() const
     return m_layers;
 }
 
-//LaserLayer * LaserDocument::laserLayer(const QString & id) const
-//{
-//    return m_layers[id];
-//}
-
-//QList<LaserLayer*> LaserDocument::engravingLayers() const
-//{
-//    return m_engravingLayers;
-//}
-
-//QList<LaserLayer*> LaserDocument::cuttingLayers() const
-//{
-//    return m_cuttingLayers;
-//}
-
 void LaserDocument::addLayer(LaserLayer* layer)
 {
-    /*switch (layer->type())
-    {
-    case LLT_ENGRAVING:
-        m_engravingLayers.append(layer);
-        break;
-    case LLT_CUTTING:
-        m_cuttingLayers.append(layer);
-        break;
-    }*/
     m_layers.append(layer);
 
     updateLayersStructure();
@@ -137,45 +106,19 @@ void LaserDocument::addLayer(LaserLayer* layer)
 void LaserDocument::removeLayer(LaserLayer * layer)
 {
     LaserLayer* initLayer = nullptr;
-    /*QList<LaserLayer*>* layers = nullptr;
-    if (layer->type() == LLT_CUTTING)
-    {
-        layers = &m_cuttingLayers;
-    }
-    else
-    {
-        layers = &m_engravingLayers;
-    }*/
-    /*initLayer = (*layers)[0];
-    for (QList<LaserPrimitive*>::iterator i = layer->items().begin(); i != layer->items().end(); i++)
-    {
-        LaserPrimitive* item = *i;
-        initLayer->addItem(item);
-    }*/
+    
     int i = m_layers.indexOf(layer);
     if (i < 2)
         return;
     m_layers.removeOne(layer);
-    //m_layers.remove(layer->id());
 
     updateLayersStructure();
 }
 
 QString LaserDocument::newLayerName(LaserLayerType type) const
 {
-    //QList<LaserLayer*> layers;
-    QString prefix;
-    /*switch (type)
-    {
-    case LLT_ENGRAVING:
-        layers = m_engravingLayers;
-        prefix = tr("Engraving");
-        break;
-    case LLT_CUTTING:
-        layers = m_cuttingLayers;
-        prefix = tr("Cutting");
-        break;
-    }*/
+    QString prefix(tr("Layer"));
+    
     int n = m_layers.size() + 1;
     bool used = true;
     QString name;
@@ -318,6 +261,15 @@ void LaserDocument::swapLayers(int i, int j)
     updateLayersStructure();
 }
 
+void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
+{
+    for (int i = 0; i < layersCount(); i++)
+    {
+        m_layers[i]->bindButton(layerButtons[i]);
+    }
+    updateLayersStructure();
+}
+
 void LaserDocument::updateLayersStructure()
 {
     if (!m_blockSignals)
@@ -348,25 +300,6 @@ void LaserDocument::close()
 
 void LaserDocument::init()
 {
-    /*for (int i = 0; i < m_engravingLayersCount; i++)
-    {
-        QColor color(QColor::Hsv);
-        color.setHsv(i * 179 / m_engravingLayersCount, 255, 255);
-        QString layerName = newLayerName(LLT_ENGRAVING);
-        LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
-        layer->setColor(color);
-        addLayer(layer);
-    }
-
-    for (int i = 0; i < m_cuttingLayersCount; i++)
-    {
-        QColor color(QColor::Hsv);
-        color.setHsv(i * 179 / m_cuttingLayersCount + 180, 255, 255);
-        QString layerName = newLayerName(LLT_CUTTING);
-        LaserLayer* layer = new LaserLayer(layerName, LLT_CUTTING, this);
-        layer->setColor(color);
-        addLayer(layer);
-    }*/
     QString layerName = newLayerName(LLT_ENGRAVING);
     LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
     addLayer(layer);
@@ -381,9 +314,6 @@ void LaserDocument::init()
         LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
         addLayer(layer);
     }
-
-    //engravingLayers()[0]->setRemovable(false);
-    //cuttingLayers()[0]->setRemovable(false);
 
     ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
     ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));

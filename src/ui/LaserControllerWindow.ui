@@ -19,7 +19,11 @@
      <widget class="LaserViewer" name="graphicsView"/>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayoutLayerButtons"/>
+     <layout class="QHBoxLayout" name="horizontalLayoutLayerButtons">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -168,20 +172,32 @@
         <property name="text">
          <string>Color</string>
         </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
        </column>
        <column>
         <property name="text">
          <string>Type</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
         </property>
        </column>
        <column>
         <property name="text">
          <string>Name</string>
         </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
        </column>
        <column>
         <property name="text">
          <string>Count</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
         </property>
        </column>
       </widget>

@@ -23,10 +23,11 @@ SvgImporter::~SvgImporter()
 
 LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
 {
-    LaserDocument* ldoc = new LaserDocument(scene);
     ImportSVGDialog dialog;
-    dialog.exec();
+    if (dialog.exec() == QDialog::Rejected)
+        return nullptr;
 
+    LaserDocument* ldoc = new LaserDocument(scene);
     QSvgTinyDocument* doc = QSvgTinyDocument::load(filename);
     if (doc == nullptr)
     {
@@ -51,11 +52,13 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
     page.setWidth(svgSize.width());
     page.setHeight(svgSize.height());
     ldoc->setPageInformation(page);
+    ldoc->blockSignals();
 
     if (!dialog.shapeUnitFromSVG())
     {
         shapeUnit = dialog.shapeSizeUnit();
     }
+    qDebug() << "shapeUnit:" << shapeUnit;
 
     QList<QSvgNode*> nodes = doc->renderers();
     QStack<QSvgNode*> stack;
@@ -70,13 +73,9 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
         QSvgNode* node = stack.pop();
         QSvgRenderer* renderer = nullptr;
         LaserPrimitive* item = nullptr;
-        //qDebug() << node->nodeId() << node->type();
         switch (node->type())
         {
         case QSvgNode::DOC:
-        {
-            qDebug().noquote() << "Doc:" << node->transformedBounds();
-        }
         case QSvgNode::G:
         case QSvgNode::DEFS:
         case QSvgNode::SWITCH:
@@ -130,7 +129,6 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
             {
                 QSvgRect* svgRectNode = reinterpret_cast<QSvgRect*>(node);
                 qreal area = svgRectNode->rect().width() * svgRectNode->rect().height();
-                //qDebug() << "svg rect's area:" << area;
                 if (area > 0)
                     item = new LaserRectItem(svgRectNode->rect(), ldoc, shapeUnit);
             }
@@ -152,14 +150,14 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
         if (item)
         {
             QTransform t;
+            //qDebug() << "unit:" << item->unit();
             qreal ratio = unitUtils::unitToMM(item->unit());
             
             t = node->getCascadeTransform();
             qreal scaleX = ratio;
             qreal scaleY = ratio;
+            //qDebug() << scaleX << scaleY;
 
-            qDebug() << "scale:" << scaleX << scaleY;
-            
             QTransform tt = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * ratio, t.dy() * ratio).scale(scaleX, scaleY);
             item->setTransform(tt);
 
@@ -169,6 +167,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
             ldoc->addItem(item);
         }
     }
+    ldoc->blockSignals(false);
     
     emit imported();
     ldoc->open();

@@ -14,6 +14,7 @@ class LaserDocumentPrivate;
 class LaserPrimitive;
 class LaserLayer;
 class LaserScene;
+class LayerButton;
 
 class LaserDocument : public QObject
 {
@@ -35,9 +36,6 @@ public:
     LaserPrimitive* laserPrimitive(const QString& id) const;
 
     QList<LaserLayer*> layers() const;
-    //LaserLayer* laserLayer(const QString& id) const;
-    //QList<LaserLayer*> engravingLayers() const;
-    //QList<LaserLayer*> cuttingLayers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
 
@@ -50,10 +48,11 @@ public:
 
     bool isOpened() const { return m_isOpened; }
 
-    //void setScene(LaserScene* scene) { m_scene = scene; }
     LaserScene* scene() const { return m_scene; }
 
     void swapLayers(int i, int j);
+
+    void bindLayerButtons(const QList<LayerButton*>& layerButtons);
 
     static int layersCount() { return m_layersCount; }
     static void setLayersCount(int count) { m_layersCount = count; }

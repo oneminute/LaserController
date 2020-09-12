@@ -27,6 +27,7 @@
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
+#include "widget/LayerButton.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -60,24 +61,24 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     int colorTick = 360 / LaserDocument::layersCount();
     for (int i = 0; i < LaserDocument::layersCount(); i++)
     {
-        QPushButton* button = new QPushButton;
+        LayerButton* button = new LayerButton;
+        button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         button->setFixedWidth(30);
         button->setFixedHeight(30);
-        QPalette pal = button->palette();
-        pal.setColor(QPalette::Button, colors[i]);
-        button->setAutoFillBackground(true);
-        button->setPalette(pal);
+        button->setColor(colors[i]);
         button->update();
         m_ui->horizontalLayoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
+
+        connect(button, &LayerButton::colorUpdated, m_ui->tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     }
 
     m_ui->horizontalLayoutLayerButtons->addStretch();
 
     // initialize layers Tree Widget
-    m_ui->tableWidgetLayers->setColumnWidth(0, 30);
-    m_ui->tableWidgetLayers->setColumnWidth(1, 45);
-    m_ui->tableWidgetLayers->setColumnWidth(2, 60);
+    m_ui->tableWidgetLayers->setColumnWidth(0, 45);
+    m_ui->tableWidgetLayers->setColumnWidth(1, 60);
+    m_ui->tableWidgetLayers->setColumnWidth(2, 75);
     m_ui->tableWidgetLayers->setColumnWidth(3, 75);
 
     //m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
@@ -225,8 +226,8 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     LaserDocument* doc = importer->import(filename, m_scene);
     if (doc)
     {
-        m_scene->updateDocument(m_layerButtons, doc);
-        //updateLayerButtons();
+        doc->bindLayerButtons(m_layerButtons);
+        m_scene->updateDocument(doc);
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
     }
@@ -239,8 +240,8 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     LaserDocument* doc = importer->import("", m_scene);
     if (doc)
     {
-        m_scene->updateDocument(m_layerButtons, doc);
-        //updateLayerButtons();
+        doc->bindLayerButtons(m_layerButtons);
+        m_scene->updateDocument(doc);
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
     }
@@ -271,36 +272,6 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
     qDebug() << "removing layer.";
     QTableWidgetItem* item = m_ui->tableWidgetLayers->currentItem();
-    /*if (item == nullptr)
-        return;
-    if (item->parent() == nullptr)
-    {
-        QString id = item->data(0, Qt::UserRole).toString();
-        LaserLayer* layer = m_scene->document()->laserLayer(id);
-        
-        if (layer->type() == LLT_CUTTING)
-        {
-            if (m_scene->document()->cuttingLayers()[0] == layer)
-            {
-                QMessageBox::warning(this, tr("Remove layer"), tr("You can not remove base cutting layer."), QMessageBox::StandardButton::Ok, QMessageBox::NoButton);
-                return;
-            }
-        }
-        else if (layer->type() == LLT_ENGRAVING)
-        {
-            if (m_scene->document()->engravingLayers()[0] == layer)
-            {
-                QMessageBox::warning(this, tr("Remove layer"), tr("You can not remove base engraving layer."), QMessageBox::StandardButton::Ok, QMessageBox::NoButton);
-                return;
-            }
-        }
-        int result = QMessageBox::question(this, tr("Remove layer"), tr("Do you want to remove this layer?"),
-            QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Cancel);
-        if (result == QMessageBox::StandardButton::Apply)
-        {
-            m_scene->document()->removeLayer(layer);
-        }
-    }*/
 }
 
 void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int column)

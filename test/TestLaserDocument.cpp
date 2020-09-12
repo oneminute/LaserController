@@ -2,7 +2,7 @@
 
 void TestLaserDocument::initTestCase()
 {
-    m_doc = new LaserDocument();
+    //m_doc = new LaserDocument();
 }
 
 void TestLaserDocument::documentTestCase()
