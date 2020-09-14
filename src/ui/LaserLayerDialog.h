@@ -32,6 +32,9 @@ protected:
 protected slots:
     virtual void accept();
 
+    void onCuttingToggled(bool checked);
+    void onEngravingToggled(bool checked);
+
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;
     LaserDocument* m_doc;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>618</width>
-    <height>581</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,6 +27,44 @@
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
       <item row="0" column="0">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>Layer Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="radioButtonCutting">
+          <property name="text">
+           <string>Cutting</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonEngraving">
+          <property name="text">
+           <string>Engraving</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="minimumSize">
          <size>
@@ -37,19 +75,29 @@
         <property name="text">
          <string>Layer Name</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEditLayerName"/>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEditLayerName">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>Min Speed</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="HorizontalEditSlider" name="horizontalEditSliderMinSpeed">
         <property name="toolTip">
          <string>A widget combined Horizontal Slider and Line Edit.</string>
@@ -65,14 +113,14 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Run Speed</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="HorizontalEditSlider" name="horizontalEditSliderRunSpeed">
         <property name="toolTip">
          <string>A widget combined Horizontal Slider and Line Edit.</string>
@@ -88,14 +136,14 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>Laser Power</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="HorizontalEditSlider" name="horizontalEditSliderLaserPower">
         <property name="toolTip">
          <string>A widget combined Horizontal Slider and Line Edit.</string>
@@ -114,21 +162,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="label_14">
         <property name="text">
          <string>Min Speed Power</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_15">
-        <property name="text">
-         <string>Run Speed Power</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="HorizontalEditSlider" name="horizontalEditSliderMinSpeedPower">
         <property name="toolTip">
          <string>A widget combined Horizontal Slider and Line Edit.</string>
@@ -144,7 +185,14 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Run Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
        <widget class="HorizontalEditSlider" name="horizontalEditSliderRunSpeedPower">
         <property name="toolTip">
          <string>A widget combined Horizontal Slider and Line Edit.</string>
@@ -373,7 +421,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBoxBitmap">
      <property name="title">
       <string>Bitmap</string>
      </property>

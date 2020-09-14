@@ -27,7 +27,7 @@ public:
     QString id() const { return objectName(); }
 
     QString name() const;
-    void setName(const QString& name);
+    //void setName(const QString& name);
     LaserLayerType type() const;
 
     int minSpeed() const;
@@ -95,7 +95,7 @@ protected:
 protected:
     bool m_removable;
     LaserLayerType m_type;
-    QString m_name;
+    //QString m_name;
 
     int m_minSpeed;
     int m_runSpeed;

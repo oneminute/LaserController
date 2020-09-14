@@ -115,7 +115,7 @@ void LaserDocument::removeLayer(LaserLayer * layer)
     updateLayersStructure();
 }
 
-QString LaserDocument::newLayerName(LaserLayerType type) const
+QString LaserDocument::newLayerName() const
 {
     QString prefix(tr("Layer"));
     
@@ -300,17 +300,17 @@ void LaserDocument::close()
 
 void LaserDocument::init()
 {
-    QString layerName = newLayerName(LLT_ENGRAVING);
+    QString layerName = newLayerName();
     LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
     addLayer(layer);
 
-    layerName = newLayerName(LLT_CUTTING);
+    layerName = newLayerName();
     layer = new LaserLayer(layerName, LLT_CUTTING, this);
     addLayer(layer);
 
     for (int i = 2; i < m_layersCount; i++)
     {
-        QString layerName = newLayerName(LLT_ENGRAVING);
+        QString layerName = newLayerName();
         LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
         addLayer(layer);
     }

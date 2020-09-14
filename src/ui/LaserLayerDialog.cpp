@@ -25,6 +25,7 @@ LaserLayerDialog::LaserLayerDialog(LaserLayer* layer, QWidget* parent)
 {
     Q_ASSERT(layer);
     m_doc = layer->document();
+    m_type = layer->type();
     initUi(true);
 }
 
@@ -35,6 +36,9 @@ LaserLayerDialog::~LaserLayerDialog()
 void LaserLayerDialog::initUi(bool editing)
 {
     m_ui->setupUi(this);
+
+    connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
+    connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
 
     /*QVariant value;
     if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
@@ -80,6 +84,9 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->horizontalEditSliderErrorX->setValue(0);
         m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
         m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
+
+        m_ui->radioButtonCutting->setChecked(false);
+        m_ui->radioButtonEngraving->setChecked(true);
     }
     else if (m_type == LLT_CUTTING)
     {
@@ -88,6 +95,11 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->horizontalEditSliderLaserPower->setValue(80);
         m_ui->horizontalEditSliderMinSpeedPower->setValue(700);
         m_ui->horizontalEditSliderRunSpeedPower->setValue(1000);
+
+        m_ui->radioButtonCutting->setChecked(true);
+        m_ui->radioButtonEngraving->setChecked(false);
+
+        setFixedHeight(300);
     }
 
     if (editing)
@@ -106,9 +118,30 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->horizontalEditSliderMinSpeedPower->setValue(m_layer->minSpeedPower());
         m_ui->horizontalEditSliderRunSpeedPower->setValue(m_layer->runSpeedPower());
     }
-    else
+    
+}
+
+void LaserLayerDialog::onCuttingToggled(bool checked)
+{
+    if (checked)
     {
-        m_ui->lineEditLayerName->setText(m_doc->newLayerName(m_type));
+        m_ui->groupBoxGeneral->setVisible(true);
+        m_ui->groupBoxEngraving->setVisible(false);
+        m_ui->groupBoxBitmap->setVisible(false);
+
+        setFixedHeight(300);
+    }
+}
+
+void LaserLayerDialog::onEngravingToggled(bool checked)
+{
+    if (checked)
+    {
+        m_ui->groupBoxGeneral->setVisible(true);
+        m_ui->groupBoxEngraving->setVisible(true);
+        m_ui->groupBoxBitmap->setVisible(true);
+
+        setFixedHeight(600);
     }
 }
 
@@ -116,8 +149,8 @@ void LaserLayerDialog::accept()
 {
     if (!m_layer)
         m_layer = new LaserLayer(m_ui->lineEditLayerName->text(), m_type, m_doc);
-    else
-        m_layer->setName(m_ui->lineEditLayerName->text());
+    //else
+        //m_layer->setName(m_ui->lineEditLayerName->text());
     m_layer->setMinSpeed(m_ui->horizontalEditSliderMinSpeed->value());
     m_layer->setRunSpeed(m_ui->horizontalEditSliderRunSpeed->value());
     m_layer->setLaserPower(m_ui->horizontalEditSliderLaserPower->value());

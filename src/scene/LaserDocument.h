@@ -39,7 +39,7 @@ public:
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
 
-    QString newLayerName(LaserLayerType type) const;
+    QString newLayerName() const;
 
     qreal scale() const;
     void setScale(qreal scale);

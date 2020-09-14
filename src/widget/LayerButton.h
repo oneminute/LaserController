@@ -22,12 +22,11 @@ public:
     void setLayer(LaserLayer* layer) { m_layer = layer; }
 
 protected:
-    virtual void contextMenuEvent(QContextMenuEvent *event);
-    virtual void mouseDoubleClickEvent(QMouseEvent* event);
-    virtual void mousePressEvent(QMouseEvent* event);
-    virtual void mouseReleaseEvent(QMouseEvent* event);
-
-    void updateColor();
+    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
     void clicked();

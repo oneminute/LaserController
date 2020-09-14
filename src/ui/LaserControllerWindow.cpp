@@ -62,10 +62,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     for (int i = 0; i < LaserDocument::layersCount(); i++)
     {
         LayerButton* button = new LayerButton;
-        button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        button->setFixedWidth(30);
-        button->setFixedHeight(30);
+        //button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        //button->setFixedWidth(60);
+        button->setFixedHeight(50);
         button->setColor(colors[i]);
+        button->setText(QString(tr("Layer %1")).arg(i + 1));
         button->update();
         m_ui->horizontalLayoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
@@ -249,7 +250,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 
 void LaserControllerWindow::onActionAddEngravingLayer(bool)
 {
-    QString newName = m_scene->document()->newLayerName(LLT_ENGRAVING);
+    QString newName = m_scene->document()->newLayerName();
     LaserLayerDialog dialog(m_scene->document(), LLT_ENGRAVING);
     if (dialog.exec() == QDialog::Accepted)
     {

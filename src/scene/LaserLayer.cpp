@@ -12,7 +12,6 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     : QObject(document)
     , m_removable(true)
     , m_type(type)
-    , m_name(name)
     , m_minSpeed(60)
     , m_runSpeed(300)
     , m_laserPower(115)
@@ -60,13 +59,20 @@ LaserLayer::~LaserLayer()
 
 QString LaserLayer::name() const 
 {
-    return m_name; 
+    if (m_button)
+    {
+        return m_button->text();
+    }
+    else
+    {
+        return tr("undefined");
+    }
 }
 
-void LaserLayer::setName(const QString & name)
-{
-    m_name = name;
-}
+//void LaserLayer::setName(const QString & name)
+//{
+//    m_name = name;
+//}
 
 LaserLayerType LaserLayer::type() const { return m_type; }
 

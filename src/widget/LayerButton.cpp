@@ -2,6 +2,7 @@
 
 #include <QMouseEvent>
 #include <QColorDialog>
+#include <QPainter>
 
 LayerButton::LayerButton(QWidget* parent)
     : QLabel(parent)
@@ -9,7 +10,6 @@ LayerButton::LayerButton(QWidget* parent)
     , m_pressed(false)
     , m_layer(nullptr)
 {
-    updateColor();
 }
 
 LayerButton::~LayerButton()
@@ -24,7 +24,7 @@ QColor LayerButton::color() const
 void LayerButton::setColor(const QColor & color)
 {
     m_color = color; 
-    updateColor();
+    update();
 }
 
 void LayerButton::contextMenuEvent(QContextMenuEvent * event)
@@ -58,9 +58,22 @@ void LayerButton::mouseReleaseEvent(QMouseEvent * event)
     }
 }
 
-void LayerButton::updateColor()
+void LayerButton::paintEvent(QPaintEvent * event)
 {
-    QVariant v(m_color);
-    QString styleSheet = QString("QLabel {background-color: %1}").arg(v.toString());
-    setStyleSheet(styleSheet);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QTransform t;
+    t.translate(width() / 2, 0);
+    painter.setTransform(t);
+
+    painter.setBrush(QBrush(m_color));
+    painter.setPen(QPen(m_color));
+    painter.drawRect(-10, 0, 20, 20);
+
+    t = QTransform::fromTranslate(0, 0);
+    painter.setTransform(t);
+    painter.setPen(Qt::black);
+    painter.drawText(QRect(0, 20, width(), height() - 20), Qt::AlignCenter, text());
 }
+
