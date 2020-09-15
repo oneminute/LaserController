@@ -1072,12 +1072,12 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="45"/>
         <source>C</source>
-        <translation>切割</translation>
+        <translation>C</translation>
     </message>
     <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="49"/>
         <source>E</source>
-        <translation>雕刻</translation>
+        <translation>E</translation>
     </message>
 </context>
 <context>

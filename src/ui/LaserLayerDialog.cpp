@@ -147,8 +147,8 @@ void LaserLayerDialog::onEngravingToggled(bool checked)
 
 void LaserLayerDialog::accept()
 {
-    if (!m_layer)
-        m_layer = new LaserLayer(m_ui->lineEditLayerName->text(), m_type, m_doc);
+    //if (!m_layer)
+        //m_layer = new LaserLayer(m_ui->lineEditLayerName->text(), m_type, m_doc);
     //else
         //m_layer->setName(m_ui->lineEditLayerName->text());
     m_layer->setMinSpeed(m_ui->horizontalEditSliderMinSpeed->value());

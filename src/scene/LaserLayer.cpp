@@ -69,12 +69,12 @@ QString LaserLayer::name() const
     }
 }
 
-//void LaserLayer::setName(const QString & name)
-//{
-//    m_name = name;
-//}
-
 LaserLayerType LaserLayer::type() const { return m_type; }
+
+void LaserLayer::setType(LaserLayerType type)
+{
+    m_type = type;
+}
 
 int LaserLayer::minSpeed() const { return m_minSpeed; }
 
@@ -202,6 +202,39 @@ void LaserLayer::onClicked()
         {
             scene->document()->addItem(primitive, this);
         }
+
+        QList<LaserPrimitiveType> types;
+        for (LaserPrimitive* primitive : m_items)
+        {
+            if (primitive->isShape())
+            {
+                if (!types.contains(LPT_SHAPE))
+                {
+                    types.append(LPT_SHAPE);
+                }
+            }
+            else if (primitive->isBitmap())
+            {
+                if (!types.contains(LPT_BITMAP))
+                {
+                    types.append(LPT_BITMAP);
+                }
+            }
+        }
+
+        if (types.size() > 1)
+        {
+            setType(LLT_ENGRAVING);
+        }
+        else if (types[0] == LPT_SHAPE)
+        {
+            setType(LLT_CUTTING);
+        }
+        else if (types[0] == LPT_BITMAP)
+        {
+            setType(LLT_ENGRAVING);
+        }
+        scene->document()->updateLayersStructure();
     }
 }
 

@@ -29,6 +29,7 @@ public:
     QString name() const;
     //void setName(const QString& name);
     LaserLayerType type() const;
+    void setType(LaserLayerType type);
 
     int minSpeed() const;
     void setMinSpeed(int minSpeed);
