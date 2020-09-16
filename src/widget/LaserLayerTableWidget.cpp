@@ -53,7 +53,9 @@ void LaserLayerTableWidget::updateItems()
             }
 
             QTableWidgetItem* itemColor = new QTableWidgetItem();
-            itemColor->setFlags(Qt::ItemIsEnabled);
+            Qt::ItemFlags flags = itemColor->flags();
+            flags &= ~Qt::ItemIsSelectable;
+            itemColor->setFlags(flags);
             itemColor->setBackgroundColor(layer->color());
             itemColor->setTextAlignment(Qt::AlignCenter);
 

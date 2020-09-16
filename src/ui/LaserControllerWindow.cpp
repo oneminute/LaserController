@@ -36,6 +36,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_useLoadedJson(false)
 {
     m_ui->setupUi(this);
+    setDockNestingEnabled(true);
 
     QList<QColor> colors;
     colors << QColor(Qt::red)
@@ -67,13 +68,27 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         button->setColor(colors[i]);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
-        m_ui->horizontalLayoutLayerButtons->addWidget(button);
+        m_ui->layoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
 
         connect(button, &LayerButton::colorUpdated, m_ui->tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     }
+    m_ui->layoutLayerButtons->addStretch();
 
-    m_ui->horizontalLayoutLayerButtons->addStretch();
+    removeDockWidget(m_ui->dockWidgetLayerButtons);
+    removeDockWidget(m_ui->dockWidgetLayers);
+    removeDockWidget(m_ui->dockWidgetProperties);
+    removeDockWidget(m_ui->dockWidgetOperations);
+
+    addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayers);
+    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetLayerButtons, Qt::Horizontal);
+    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations, Qt::Vertical);
+    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties, Qt::Vertical);
+
+    m_ui->dockWidgetLayerButtons->show();
+    m_ui->dockWidgetLayers->show();
+    m_ui->dockWidgetProperties->show();
+    m_ui->dockWidgetOperations->show();
 
     // initialize layers Tree Widget
     m_ui->tableWidgetLayers->setColumnWidth(0, 45);
