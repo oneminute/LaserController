@@ -62,11 +62,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     for (int i = 0; i < LaserDocument::layersCount(); i++)
     {
         LayerButton* button = new LayerButton;
-        //button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        //button->setFixedWidth(60);
+        button->setMinimumWidth(30);
         button->setFixedHeight(50);
         button->setColor(colors[i]);
-        button->setText(QString(tr("Layer %1")).arg(i + 1));
+        button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
         m_ui->horizontalLayoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
@@ -78,13 +77,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     // initialize layers Tree Widget
     m_ui->tableWidgetLayers->setColumnWidth(0, 45);
-    m_ui->tableWidgetLayers->setColumnWidth(1, 60);
+    m_ui->tableWidgetLayers->setColumnWidth(1, 30);
     m_ui->tableWidgetLayers->setColumnWidth(2, 75);
-    m_ui->tableWidgetLayers->setColumnWidth(3, 75);
-
-    //m_ui->toolButtonAddLayer->addAction(m_ui->actionAddEngravingLayer);
-    //m_ui->toolButtonAddLayer->addAction(m_ui->actionAddCuttingLayer);
-    //m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
+    m_ui->tableWidgetLayers->setColumnWidth(3, 45);
+    m_ui->tableWidgetLayers->setColumnWidth(4, 75);
+    m_ui->tableWidgetLayers->setColumnWidth(5, 30);
+    m_ui->tableWidgetLayers->setColumnWidth(6, 30);
 
     // set up tools buttons
     QToolButton* toolButtonSelectionTool = new QToolButton();
@@ -223,7 +221,6 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     if (filename.isEmpty())
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
-    //QSignalTransition* t = StateControllerInst.normalState().addTransition(importer.data(), SIGNAL(imported()), &StateControllerInst.mainState());
     LaserDocument* doc = importer->import(filename, m_scene);
     if (doc)
     {
@@ -232,7 +229,6 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
     }
-    //StateControllerInst.normalState().removeTransition(reinterpret_cast<QAbstractTransition*>(t));
 }
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)

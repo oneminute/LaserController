@@ -2,6 +2,9 @@
 
 #include <QLabel>
 #include <QPushButton>
+#include <QCheckBox>
+#include <QBoxLayout>
+
 #include "scene/LaserDocument.h"
 #include "scene/LaserItem.h"
 
@@ -49,22 +52,62 @@ void LaserLayerTableWidget::updateItems()
                 type = tr("E");
             }
 
-            QTableWidgetItem* layerWidgetItem0 = new QTableWidgetItem();
-            layerWidgetItem0->setBackgroundColor(layer->color());
-            setItem(row, 0, layerWidgetItem0);
+            QTableWidgetItem* itemColor = new QTableWidgetItem();
+            itemColor->setFlags(Qt::ItemIsEnabled);
+            itemColor->setBackgroundColor(layer->color());
+            itemColor->setTextAlignment(Qt::AlignCenter);
 
-            QTableWidgetItem* layerWidgetItem1 = new QTableWidgetItem();
-            layerWidgetItem1->setText(type);
-            layerWidgetItem1->setData(Qt::UserRole, i);
-            setItem(row, 1, layerWidgetItem1);
+            QTableWidgetItem* itemType = new QTableWidgetItem();
+            itemType->setText(type);
+            itemType->setTextAlignment(Qt::AlignCenter);
 
-            QTableWidgetItem* layerWidgetItem2 = new QTableWidgetItem();
-            layerWidgetItem2->setText(layer->name());
-            setItem(row, 2, layerWidgetItem2);
+            QTableWidgetItem* itemName = new QTableWidgetItem();
+            itemName->setText(QString("%1%2").arg(type).arg(layer->name()));
+            itemName->setTextAlignment(Qt::AlignCenter);
 
-            QTableWidgetItem* layerWidgetItem3 = new QTableWidgetItem();
-            layerWidgetItem3->setText(QString::number(layer->items().count()));
-            setItem(row, 3, layerWidgetItem3);
+            QTableWidgetItem* itemCount = new QTableWidgetItem();
+            itemCount->setText(QString::number(layer->items().count()));
+            itemCount->setTextAlignment(Qt::AlignCenter);
+
+            QTableWidgetItem* itemSpeedPower = new QTableWidgetItem();
+            itemSpeedPower->setText(QString("%1/%2").arg(layer->minSpeed()).arg(layer->laserPower()));
+            itemSpeedPower->setTextAlignment(Qt::AlignCenter);
+
+            QCheckBox* exportable = new QCheckBox();
+            QWidget* exportablePanel = new QWidget();
+            QHBoxLayout* exportableLayout = new QHBoxLayout(exportablePanel);
+            exportableLayout->addWidget(exportable);
+            exportableLayout->setAlignment(Qt::AlignCenter);
+            exportableLayout->setContentsMargins(0, 0, 0, 0);
+            exportablePanel->setLayout(exportableLayout);
+            exportable->setChecked(layer->exportable());
+            connect(exportable, &QCheckBox::toggled, [=](bool checked) 
+                {
+                    layer->setExportable(checked);
+                }
+            );
+            setCellWidget(row, 5, exportablePanel);
+
+            QCheckBox* visible = new QCheckBox();
+            QWidget* visiblePanel = new QWidget();
+            QHBoxLayout* visibleLayout = new QHBoxLayout(visiblePanel);
+            visibleLayout->addWidget(visible);
+            visibleLayout->setAlignment(Qt::AlignCenter);
+            visibleLayout->setContentsMargins(0, 0, 0, 0);
+            visiblePanel->setLayout(visibleLayout);
+            visible->setChecked(layer->visible());
+            connect(visible, &QCheckBox::toggled, [=](bool checked)
+                {
+                    layer->setVisible(checked);
+                }
+            );
+            setCellWidget(row, 6, visiblePanel);
+
+            setItem(row, 0, itemName);
+            setItem(row, 1, itemColor);
+            setItem(row, 2, itemType);
+            setItem(row, 3, itemCount);
+            setItem(row, 4, itemSpeedPower);
         }
     }
 }

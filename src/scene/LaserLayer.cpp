@@ -29,6 +29,8 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_dpi(600)
     , m_nonlinearCoefficient(1.5)
     , m_button(nullptr)
+    , m_exportable(true)
+    , m_visible(true)
 {
     Q_ASSERT(document);
     setParent(document);

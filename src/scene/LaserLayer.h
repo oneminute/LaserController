@@ -90,6 +90,12 @@ public:
 
     void bindButton(LayerButton* button);
 
+    bool exportable() const { return m_exportable; }
+    void setExportable(bool value) { m_exportable = value; }
+
+    bool visible() const { return m_visible; }
+    void setVisible(bool visible) { m_visible = visible; }
+
 protected:
     void onClicked();
 
@@ -122,6 +128,9 @@ protected:
 
     LaserDocument* m_doc;
     LayerButton* m_button;
+
+    bool m_exportable;
+    bool m_visible;
 
     QList<LaserPrimitive*> m_items;
     Q_DISABLE_COPY(LaserLayer)
