@@ -96,6 +96,9 @@ public:
     bool visible() const { return m_visible; }
     void setVisible(bool visible) { m_visible = visible; }
 
+    int row() const { return m_row; }
+    void setRow(int row) { m_row = row; }
+
 protected:
     void onClicked();
 
@@ -131,6 +134,8 @@ protected:
 
     bool m_exportable;
     bool m_visible;
+
+    int m_row;
 
     QList<LaserPrimitive*> m_items;
     Q_DISABLE_COPY(LaserLayer)

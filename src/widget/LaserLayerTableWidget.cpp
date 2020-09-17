@@ -41,6 +41,7 @@ void LaserLayerTableWidget::updateItems()
             if (laserItems.isEmpty())
                 continue;
             setRowCount(row + 1);
+            layer->setRow(row);
 
             QString type;
             if (layer->type() == LLT_CUTTING)

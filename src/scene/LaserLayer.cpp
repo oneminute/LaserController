@@ -31,6 +31,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_button(nullptr)
     , m_exportable(true)
     , m_visible(true)
+    , m_row(-1)
 {
     Q_ASSERT(document);
     setParent(document);

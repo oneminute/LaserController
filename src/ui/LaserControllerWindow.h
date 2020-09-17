@@ -60,6 +60,8 @@ protected slots:
     void onActionMoveLayerUp(bool checked = false);
     void onActionMoveLayerDown(bool checked = false);
 
+    void onLaserSceneSelectedChanged();
+
 private:
     QString getFilename(const QString& title, const QStringList& mime);
     void bindWidgetsProperties();

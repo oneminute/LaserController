@@ -204,6 +204,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
 
+    connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
+
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
     connect(&LaserDriver::instance(), &LaserDriver::comPortDisconnected, this, &LaserControllerWindow::onDriverComPortDisconnected);
@@ -311,11 +313,13 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     int index = item->data(Qt::UserRole).toInt();
 
     LaserLayer* layer = m_scene->document()->layers()[index];
+    m_scene->blockSignals(true);
     m_scene->clearSelection();
     for (LaserPrimitive* primitive : layer->items())
     {
         primitive->setSelected(true);
     }
+    m_scene->blockSignals(false);
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)
@@ -547,6 +551,28 @@ void LaserControllerWindow::onActionMoveLayerDown(bool checked)
     QTableWidgetItem* target = m_ui->tableWidgetLayers->item(row + 1, 1);
     m_scene->document()->swapLayers(target->data(Qt::UserRole).toInt(), current->data(Qt::UserRole).toInt());
     m_ui->tableWidgetLayers->selectRow(row + 1);
+}
+
+void LaserControllerWindow::onLaserSceneSelectedChanged()
+{
+    QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
+    if (items.isEmpty())
+        return;
+
+    //if (!m_ui->tableWidgetLayers->selectedItems().isEmpty())
+        //return;
+
+    //if (items.count() > 1)
+        //return;
+
+    m_ui->tableWidgetLayers->blockSignals(true);
+    for (LaserPrimitive* item : items)
+    {
+        int row = items[0]->layer()->row();
+        if (row != -1)
+            m_ui->tableWidgetLayers->selectRow(row);
+    }
+    m_ui->tableWidgetLayers->blockSignals(false);
 }
 
 //void LaserControllerWindow::updateLayerButtons()
