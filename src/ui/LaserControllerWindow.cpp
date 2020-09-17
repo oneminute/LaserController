@@ -202,7 +202,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
-    connect(m_ui->tableWidgetLayers, &LaserLayerTableWidget::layerSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
+    connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
 
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
@@ -288,7 +288,7 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 
 void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int column)
 {
-    QTableWidgetItem* item = m_ui->tableWidgetLayers->item(row, 1);
+    QTableWidgetItem* item = m_ui->tableWidgetLayers->item(row, 0);
     int index = item->data(Qt::UserRole).toInt();
 
     LaserLayer* layer = m_scene->document()->layers()[index];
@@ -300,9 +300,22 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
     }
 }
 
-void LaserControllerWindow::onTableWidgetLayersSelectionChanged(const QString & layerId)
+void LaserControllerWindow::onTableWidgetItemSelectionChanged()
 {
-    
+    QList<QTableWidgetItem*> items = m_ui->tableWidgetLayers->selectedItems();
+    if (items.isEmpty())
+        return;
+
+    int row = items[0]->row();
+    QTableWidgetItem* item = m_ui->tableWidgetLayers->item(row, 0);
+    int index = item->data(Qt::UserRole).toInt();
+
+    LaserLayer* layer = m_scene->document()->layers()[index];
+    m_scene->clearSelection();
+    for (LaserPrimitive* primitive : layer->items())
+    {
+        primitive->setSelected(true);
+    }
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)

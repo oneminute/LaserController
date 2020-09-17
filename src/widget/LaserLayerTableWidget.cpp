@@ -110,6 +110,8 @@ void LaserLayerTableWidget::updateItems()
             setItem(row, 2, itemType);
             setItem(row, 3, itemCount);
             setItem(row, 4, itemSpeedPower);
+
+            item(row, 0)->setData(Qt::UserRole, i);
         }
     }
 }
