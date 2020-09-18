@@ -70,8 +70,8 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->horizontalEditSliderRunSpeedPower->setValue(value.toInt());
     }*/
 
-    m_ui->horizontalEditSliderStartX->setMaximum(m_doc->pageInformation().width());
-    m_ui->horizontalEditSliderStartY->setMaximum(m_doc->pageInformation().height());
+    //m_ui->horizontalEditSliderStartX->setMaximum(m_doc->pageInformation().width());
+    //m_ui->horizontalEditSliderStartY->setMaximum(m_doc->pageInformation().height());
     if (m_type == LLT_ENGRAVING)
     {
         m_ui->horizontalEditSliderMinSpeed->setValue(60);
@@ -79,9 +79,9 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->horizontalEditSliderLaserPower->setValue(115);
         m_ui->horizontalEditSliderLineSpacing->setValue(7);
         m_ui->horizontalEditSliderColumnSpacing->setValue(0);
-        m_ui->horizontalEditSliderStartX->setValue(25);
-        m_ui->horizontalEditSliderStartY->setValue(0);
-        m_ui->horizontalEditSliderErrorX->setValue(0);
+        //m_ui->horizontalEditSliderStartX->setValue(25);
+        //m_ui->horizontalEditSliderStartY->setValue(0);
+        //m_ui->horizontalEditSliderErrorX->setValue(0);
         m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
         m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
 
@@ -112,11 +112,12 @@ void LaserLayerDialog::initUi(bool editing)
         m_ui->checkBoxEngravingForward->setChecked(m_layer->engravingForward());
         m_ui->horizontalEditSliderLineSpacing->setValue(m_layer->lineSpacing());
         m_ui->horizontalEditSliderColumnSpacing->setValue(m_layer->columnSpacing());
-        m_ui->horizontalEditSliderStartX->setValue(m_layer->startX());
-        m_ui->horizontalEditSliderStartY->setValue(m_layer->startY());
-        m_ui->horizontalEditSliderErrorX->setValue(m_layer->errorX());
+        //m_ui->horizontalEditSliderStartX->setValue(m_layer->startX());
+        //m_ui->horizontalEditSliderStartY->setValue(m_layer->startY());
+        //m_ui->horizontalEditSliderErrorX->setValue(m_layer->errorX());
         m_ui->horizontalEditSliderMinSpeedPower->setValue(m_layer->minSpeedPower());
         m_ui->horizontalEditSliderRunSpeedPower->setValue(m_layer->runSpeedPower());
+        m_ui->checkBoxUseHalftone->setChecked(m_layer->useHalftone());
     }
     
 }
@@ -158,14 +159,15 @@ void LaserLayerDialog::accept()
     m_layer->setEngravingStyle(m_ui->radioButtonByRow->isChecked());
     m_layer->setLineSpacing(m_ui->horizontalEditSliderLineSpacing->value());
     m_layer->setColumnSpacing(m_ui->horizontalEditSliderColumnSpacing->value());
-    m_layer->setStartX(m_ui->horizontalEditSliderStartX->value());
-    m_layer->setStartY(m_ui->horizontalEditSliderStartY->value());
-    m_layer->setErrorX(m_ui->horizontalEditSliderErrorX->value());
+    //m_layer->setStartX(m_ui->horizontalEditSliderStartX->value());
+    //m_layer->setStartY(m_ui->horizontalEditSliderStartY->value());
+    //m_layer->setErrorX(m_ui->horizontalEditSliderErrorX->value());
     m_layer->setMinSpeedPower(m_ui->horizontalEditSliderMinSpeedPower->value());
     m_layer->setRunSpeedPower(m_ui->horizontalEditSliderRunSpeedPower->value());
     m_layer->setLpi(m_ui->horizontalEditSliderLPI->value());
     m_layer->setDpi(m_ui->horizontalEditSliderDPI->value());
     m_layer->setNonlinearCoefficient(m_ui->doubleSpinBoxNonlinearCoefficient->value());
+    m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
 
     QDialog::accept();
 }

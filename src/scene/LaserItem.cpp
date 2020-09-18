@@ -357,7 +357,11 @@ QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas)
     cv::Mat resized;
     cv::resize(src, resized, cv::Size(outWidth, outHeight));
     
-    cv::Mat outMat = imageUtils::halftone2(resized, layer()->lpi(), layer()->dpi(), 45, layer()->nonlinearCoefficient());
+    cv::Mat outMat = resized;
+    if (layer()->useHalftone())
+    {
+        outMat = imageUtils::halftone2(resized, layer()->lpi(), layer()->dpi(), 45, layer()->nonlinearCoefficient());
+    }
     std::vector<uchar> buffer;
     std::vector<int>param; 
     param.push_back(cv::IMWRITE_PNG_BILEVEL);

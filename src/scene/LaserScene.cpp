@@ -13,7 +13,7 @@ LaserScene::LaserScene(QObject* parent)
 
 LaserScene::~LaserScene()
 {
-
+    clearSelection();
 }
 
 void LaserScene::updateDocument(LaserDocument * doc)

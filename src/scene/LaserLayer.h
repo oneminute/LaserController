@@ -99,6 +99,9 @@ public:
     int row() const { return m_row; }
     void setRow(int row) { m_row = row; }
 
+    bool useHalftone() const { return m_useHalftone; }
+    void setUseHalftone(bool value) { m_useHalftone = value; }
+
 protected:
     void onClicked();
 
@@ -136,6 +139,7 @@ protected:
     bool m_visible;
 
     int m_row;
+    bool m_useHalftone;
 
     QList<LaserPrimitive*> m_items;
     Q_DISABLE_COPY(LaserLayer)
