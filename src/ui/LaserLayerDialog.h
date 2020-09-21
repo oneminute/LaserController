@@ -18,14 +18,18 @@ class LaserLayerDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit LaserLayerDialog(LaserDocument* doc, LaserLayerType type, QWidget* parent = nullptr);
+    //explicit LaserLayerDialog(LaserDocument* doc, LaserLayerType type, QWidget* parent = nullptr);
     explicit LaserLayerDialog(LaserLayer* layer, QWidget* parent = nullptr);
     ~LaserLayerDialog();
 
     LaserLayer* layer() const { return m_layer; }
 
 private:
-    void initUi(bool editing);
+    void initUi();
+
+    void initCuttingParameters();
+
+    void initEngravingParameters();
 
 protected:
 

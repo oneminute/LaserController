@@ -936,7 +936,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserLayer</name>
     <message>
-        <location filename="../src/scene/LaserLayer.cpp" line="71"/>
+        <location filename="../src/scene/LaserLayer.cpp" line="72"/>
         <source>undefined</source>
         <translation>未定义</translation>
     </message>
@@ -1057,7 +1057,7 @@ Would you like to overwrite it?</source>
         <translation>列间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="417"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="426"/>
         <source>Use Halftone?</source>
         <translation>半色调网屏？</translation>
     </message>
@@ -1089,7 +1089,7 @@ Would you like to overwrite it?</source>
         <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="400"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="409"/>
         <source>Nonlinear Coefficient</source>
         <translation>非线性系数</translation>
     </message>
@@ -1097,14 +1097,24 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserLayerTableWidget</name>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="49"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="50"/>
         <source>C</source>
         <translation>C</translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="53"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="51"/>
+        <source>Cutting</source>
+        <translation>切割</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="55"/>
         <source>E</source>
         <translation>E</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="56"/>
+        <source>Engraving</source>
+        <translation>雕刻</translation>
     </message>
 </context>
 <context>

@@ -111,6 +111,11 @@ QString LaserPrimitive::typeName()
     return typeName(m_type);
 }
 
+QString LaserPrimitive::typeLatinName()
+{
+    return typeLatinName(m_type);
+}
+
 QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
 {
     static QMap<LaserPrimitiveType, QString> TypeNamesMap{
@@ -123,7 +128,23 @@ QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
         { LPT_POLYLINE, tr("Polyline") },
         { LPT_RECT, tr("Rect") }
     };
+    
     return TypeNamesMap[typeId];
+}
+
+QString LaserPrimitive::typeLatinName(LaserPrimitiveType typeId)
+{
+    static QMap<LaserPrimitiveType, QString> TypeLatinNamesMap{
+        { LPT_BITMAP, "Bitmap" },
+        { LPT_CIRCLE, "Circle" },
+        { LPT_ELLIPSE, "Ellipse" },
+        { LPT_LINE, "Line" },
+        { LPT_PATH, "Path" },
+        { LPT_POLYGON, "Polygon" },
+        { LPT_POLYLINE, "Polyline" },
+        { LPT_RECT, "Rect" }
+    };
+    return TypeLatinNamesMap[typeId];
 }
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)

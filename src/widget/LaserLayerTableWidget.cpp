@@ -44,13 +44,16 @@ void LaserLayerTableWidget::updateItems()
             layer->setRow(row);
 
             QString type;
+            QString fullType;
             if (layer->type() == LLT_CUTTING)
             {
                 type = tr("C");
+                fullType = tr("Cutting");
             }
             else if (layer->type() == LLT_ENGRAVING)
             {
                 type = tr("E");
+                fullType = tr("Engraving");
             }
 
             QTableWidgetItem* itemColor = new QTableWidgetItem();
@@ -61,7 +64,7 @@ void LaserLayerTableWidget::updateItems()
             itemColor->setTextAlignment(Qt::AlignCenter);
 
             QTableWidgetItem* itemType = new QTableWidgetItem();
-            itemType->setText(type);
+            itemType->setText(fullType);
             itemType->setTextAlignment(Qt::AlignCenter);
 
             QTableWidgetItem* itemName = new QTableWidgetItem();

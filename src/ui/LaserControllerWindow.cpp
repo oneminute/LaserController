@@ -180,8 +180,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
-    connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
-    connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
+    //connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
+    //connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
@@ -261,26 +261,26 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     }
 }
 
-void LaserControllerWindow::onActionAddEngravingLayer(bool)
-{
-    QString newName = m_scene->document()->newLayerName();
-    LaserLayerDialog dialog(m_scene->document(), LLT_ENGRAVING);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        LaserLayer* layer = dialog.layer();
-        m_scene->document()->addLayer(layer);
-    }
-}
+//void LaserControllerWindow::onActionAddEngravingLayer(bool)
+//{
+//    QString newName = m_scene->document()->newLayerName();
+//    LaserLayerDialog dialog(m_scene->document(), LLT_ENGRAVING);
+//    if (dialog.exec() == QDialog::Accepted)
+//    {
+//        LaserLayer* layer = dialog.layer();
+//        m_scene->document()->addLayer(layer);
+//    }
+//}
 
-void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
-{
-    LaserLayerDialog dialog(m_scene->document(), LLT_CUTTING);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        LaserLayer* layer = dialog.layer();
-        m_scene->document()->addLayer(layer);
-    }
-}
+//void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
+//{
+//    LaserLayerDialog dialog(m_scene->document(), LLT_CUTTING);
+//    if (dialog.exec() == QDialog::Accepted)
+//    {
+//        LaserLayer* layer = dialog.layer();
+//        m_scene->document()->addLayer(layer);
+//    }
+//}
 
 void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
@@ -370,11 +370,11 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //if (file.open())
         //{
             //QString filename = file.fileName();
-            qDebug() << "exporting to temporary json file:" << filename;
-            m_scene->document()->exportJSON(filename);
-            qDebug() << "export temp json file for machining" << filename;
-            MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
-            task->start();
+        qDebug() << "exporting to temporary json file:" << filename;
+        m_scene->document()->exportJSON(filename);
+        qDebug() << "export temp json file for machining" << filename;
+        MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
+        task->start();
         //}
     }
     m_useLoadedJson = false;
@@ -686,6 +686,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceIdleState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePausedState);
     // end actionMachining

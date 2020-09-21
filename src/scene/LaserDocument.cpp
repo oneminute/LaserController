@@ -222,7 +222,7 @@ void LaserDocument::exportJSON(const QString& filename)
                 std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
                 if (!points.empty())
                 {
-                    itemObj["Type"] = laserItem->typeName();
+                    itemObj["Type"] = laserItem->typeLatinName();
                     itemObj["Data"] = QString(pltUtils::points2Plt(points));
                     dataInfo.append(itemObj);
                 }

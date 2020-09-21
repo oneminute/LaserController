@@ -29,8 +29,8 @@ public:
 protected slots:
     void onActionImportSVG(bool checked = false);
     void onActionImportCorelDraw(bool checked = false);
-    void onActionAddEngravingLayer(bool checked = false);
-    void onActionAddCuttingLayer(bool checked = false);
+    //void onActionAddEngravingLayer(bool checked = false);
+    //void onActionAddCuttingLayer(bool checked = false);
     void onActionRemoveLayer(bool checked = false);
     void onTableWidgetLayersCellDoubleClicked(int row, int column);
     void onTableWidgetItemSelectionChanged();

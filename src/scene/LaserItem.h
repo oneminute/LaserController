@@ -44,6 +44,7 @@ public:
 
     LaserPrimitiveType laserItemType() const { return m_type; }
     QString typeName();
+    QString typeLatinName();
     bool isShape() const { return (int)m_type <= (int)LPT_SHAPE; }
     bool isBitmap() const { return m_type == LPT_BITMAP; }
 
@@ -55,6 +56,7 @@ public:
 
 protected:
     QString typeName(LaserPrimitiveType typeId);
+    QString typeLatinName(LaserPrimitiveType typeId);
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
