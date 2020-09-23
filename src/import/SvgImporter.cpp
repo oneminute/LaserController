@@ -11,8 +11,8 @@
 #include "scene/LaserDocument.h"
 #include "util/UnitUtils.h"
 
-SvgImporter::SvgImporter(QObject* parent)
-    : Importer(parent)
+SvgImporter::SvgImporter(QWidget* parentWnd, QObject* parent)
+    : Importer(parentWnd, parent)
 {
 
 }
@@ -29,12 +29,20 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
 
     LaserDocument* ldoc = new LaserDocument(scene);
     QSvgTinyDocument* doc = QSvgTinyDocument::load(filename);
+    QRectF viewBox = doc->viewBox();
     if (doc == nullptr)
     {
         return nullptr;
     }
     QSize svgSize = doc->size();
+
+    qreal docScaleWidth = svgSize.width() * 1.0 / viewBox.width();
+    qreal docScaleHeight = svgSize.height() * 1.0 / viewBox.height();
+
     qDebug() << "document size:" << svgSize;
+    qDebug() << "viewBox size:" << viewBox;
+    qDebug() << "doc scale width:" << docScaleWidth;
+    qDebug() << "doc scale height:" << docScaleHeight;
 
     SizeUnit docUnit;
     SizeUnit shapeUnit = SU_MM100;
@@ -151,14 +159,14 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
         {
             QTransform t;
             //qDebug() << "unit:" << item->unit();
-            qreal ratio = unitUtils::unitToMM(item->unit());
+            //qreal ratio = unitUtils::unitToMM(item->unit());
             
             t = node->getCascadeTransform();
-            qreal scaleX = ratio;
-            qreal scaleY = ratio;
+            //qreal scaleX = ratio;
+            //qreal scaleY = ratio;
             //qDebug() << scaleX << scaleY;
 
-            QTransform tt = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * ratio, t.dy() * ratio).scale(scaleX, scaleY);
+            QTransform tt = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * docScaleWidth, t.dy() * docScaleHeight).scale(docScaleWidth, docScaleHeight);
             item->setTransform(tt);
 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())

@@ -6,6 +6,7 @@
 ImportSVGDialog::ImportSVGDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::ImportSVGDialog)
+    , m_pageSizeUnit(SizeUnit::SU_MM)
 {
     m_ui->setupUi(this);
 
@@ -156,6 +157,7 @@ void ImportSVGDialog::accept()
     m_pageWidth = ps.size(QPageSize::Millimeter).width();
     m_pageHeight = ps.size(QPageSize::Millimeter).height();
     m_shapeSizeUnit = (SizeUnit)m_ui->comboBoxShapeUnit->currentIndex();
+    m_pageSizeUnit = (SizeUnit)m_ui->comboBoxPresetSize->currentIndex();
     qDebug() << "shape unit:" << m_shapeSizeUnit;
     QDialog::accept();
 }

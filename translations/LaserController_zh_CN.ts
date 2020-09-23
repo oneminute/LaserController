@@ -558,7 +558,7 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="716"/>
         <source>Export JSON</source>
-        <translation>导入JSON</translation>
+        <translation>导出JSON</translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="724"/>

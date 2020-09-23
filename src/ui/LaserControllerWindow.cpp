@@ -237,7 +237,7 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     QString filename = getFilename(tr("Open SVG File"), QStringList() << "image/svg+xml" << "image/svg+xml-compressed");
     if (filename.isEmpty())
         return;
-    QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
+    QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::SVG);
     LaserDocument* doc = importer->import(filename, m_scene);
     if (doc)
     {
@@ -250,7 +250,7 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 {
-    QSharedPointer<Importer> importer = Importer::getImporter(Importer::CORELDRAW);
+    QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::CORELDRAW);
     LaserDocument* doc = importer->import("", m_scene);
     if (doc)
     {

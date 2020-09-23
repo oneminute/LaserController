@@ -398,13 +398,20 @@ QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas)
     QTransform t = m_transform * sceneTransform();
     if (!canvas.empty())
     {
-        QRectF bounds = t.mapRect(m_boundingRect);
-        cv::Rect roiRect = typeUtils::qtRect2cvRect(bounds, 40);
-        roiRect = cv::Rect(roiRect.x, roiRect.y, outMat.cols, outMat.rows);
-        cv::Mat roi = canvas(roiRect);
-        cv::Mat mat;
-        cv::cvtColor(outMat, mat, cv::COLOR_GRAY2BGR);
-        mat.copyTo(roi);
+        try
+        {
+            QRectF bounds = t.mapRect(m_boundingRect);
+            cv::Rect roiRect = typeUtils::qtRect2cvRect(bounds, 40);
+            roiRect = cv::Rect(roiRect.x, roiRect.y, outMat.cols, outMat.rows);
+            cv::Mat roi = canvas(roiRect);
+            cv::Mat mat;
+            cv::cvtColor(outMat, mat, cv::COLOR_GRAY2BGR);
+            mat.copyTo(roi);
+        }
+        catch (cv::Exception& e)
+        {
+            std::cout << e.err << std::endl;
+        }
     }
 
     return ba; 

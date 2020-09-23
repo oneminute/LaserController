@@ -8,9 +8,10 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QDialog>
+#include <QMessageBox>
 
-CorelDrawImporter::CorelDrawImporter(QObject* parent)
-    : Importer(parent)
+CorelDrawImporter::CorelDrawImporter(QWidget* parentWnd, QObject* parent)
+    : Importer(parentWnd, parent)
 {
 
 }
@@ -30,6 +31,12 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
     }
 
     app = VGCore::IVGApplicationPtr(L"CorelDRAW.Application.18");
+    qDebug() << "visible: " << app->Visible;
+    /*if (!app->Visible)
+    {
+        QMessageBox::warning(m_parentWnd, tr("CorelDRAW not open"), tr("Please open your corelDRAW application!"));
+        return nullptr;
+    }*/
 
     QDir tmpDir(QCoreApplication::applicationDirPath() + "/tmp");
     
@@ -37,9 +44,13 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
     try
     {
         app->Visible = VARIANT_TRUE;
+        //VGCore::IVGWindowPtr window = app->AppWindow;
+        //qDebug() << "window:" << window;
+        //window->Activate();
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
         if (!doc)
         {
+            QMessageBox::warning(m_parentWnd, tr("No active document"), tr("No active document in CorelDRAW!"));
             return nullptr;
         }
 
@@ -52,19 +63,22 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 
         tmpSvgFilename = utils::createUUID() + ".svg";
         tmpSvgFilename = tmpDir.absoluteFilePath(tmpSvgFilename);
-        //QString tmpSvgFilename("d:/tmp.svg");
 
         qDebug().noquote() << "export corel draw active document to" << tmpSvgFilename;
         
         VGCore::IVGStructExportOptionsPtr opt = app->CreateStructExportOptions();
+        //opt->AlwaysOverprintBlack = true;
+        //opt->AntiAliasingType = VGCore::cdrNormalAntiAliasing;
+        //opt->Compression = VGCore::cdrCompressionNone;
+        //opt->Dithered = false;
+        opt->ImageType = VGCore::cdrGrayscaleImage;
+        //opt->ResolutionX = 72;
+        //opt->ResolutionY = 72;
+
         VGCore::IVGStructPaletteOptionsPtr pal = app->CreateStructPaletteOptions();
-        opt->AntiAliasingType = VGCore::cdrNormalAntiAliasing;
-        opt->ImageType = VGCore::cdrRGBColorImage;
-        opt->ResolutionX = 72;
-        opt->ResolutionY = 72;
-        pal->PaletteType = VGCore::cdrPaletteOptimized;
-        pal->NumColors = 16;
-        pal->DitherType = VGCore::cdrDitherNone;
+        //pal->PaletteType = VGCore::cdrPaletteOptimized;
+        //pal->NumColors = 16;
+        //pal->DitherType = VGCore::cdrDitherNone;
         VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, range, opt, pal);
         if (filter->HasDialog)
         {
@@ -73,6 +87,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
                 hr = filter->Finish();
                 if (FAILED(hr))
                 {
+                    qDebug() << hr;
                     QString errorMessage = QString::fromLocal8Bit(std::system_category().message(hr).c_str());
                     qWarning() << errorMessage;
                 }
@@ -85,9 +100,10 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         //wprintf(L"Error occurred: 0x%08X (%s)\n", ex.Error(), ex.ErrorMessage());
         QString errorMessage = QString::fromLocal8Bit(std::system_category().message(ex.Error()).c_str());
         qDebug() << errorMessage;
+        return nullptr;
     }
 
-    QSharedPointer<Importer> importer = Importer::getImporter(Importer::SVG);
+    QSharedPointer<Importer> importer = Importer::getImporter(m_parentWnd, Importer::SVG);
     LaserDocument* doc = importer->import(tmpSvgFilename, scene);
 
     if (doc)

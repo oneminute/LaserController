@@ -23,7 +23,7 @@ class CorelDrawImporter : public Importer
 {
     Q_OBJECT
 public:
-    explicit CorelDrawImporter(QObject* parent = nullptr);
+    explicit CorelDrawImporter(QWidget* parentWnd, QObject* parent = nullptr);
     virtual ~CorelDrawImporter();
 
     virtual LaserDocument* import(const QString& filename, LaserScene* scene);

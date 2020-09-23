@@ -17,14 +17,17 @@ public:
         CORELDRAW
     };
 
-    Importer(QObject* parent = nullptr);
+    Importer(QWidget* parentWnd, QObject* parent = nullptr);
 
     virtual LaserDocument* import(const QString& filename, LaserScene* scene) = 0;
     
-    static QSharedPointer<Importer> getImporter(Types type);
+    static QSharedPointer<Importer> getImporter(QWidget* parentWnd, Types type);
 
 signals:
     void imported();
+
+protected:
+    QWidget* m_parentWnd;
 };
 
 #endif // IMPORTER_H
