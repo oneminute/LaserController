@@ -27,7 +27,6 @@ public:
     QString id() const { return objectName(); }
 
     QString name() const;
-    //void setName(const QString& name);
     LaserLayerType type() const;
     void setType(LaserLayerType type);
 
@@ -108,11 +107,13 @@ protected:
 protected:
     bool m_removable;
     LaserLayerType m_type;
-    //QString m_name;
 
+    // normal fields
     int m_minSpeed;
     int m_runSpeed;
     int m_laserPower;
+    int m_minSpeedPower;
+    int m_runSpeedPower;
 
     // engraving fields
     bool m_engravingForward;
@@ -123,23 +124,18 @@ protected:
     int m_startY;
     int m_errorX;
 
-    // cutting fields
-    int m_minSpeedPower;
-    int m_runSpeedPower;
-
     // bitmap fields
     int m_lpi;
     int m_dpi;
     qreal m_nonlinearCoefficient;
+    int m_row;
+    bool m_useHalftone;
 
     LaserDocument* m_doc;
     LayerButton* m_button;
 
     bool m_exportable;
     bool m_visible;
-
-    int m_row;
-    bool m_useHalftone;
 
     QList<LaserPrimitive*> m_items;
     Q_DISABLE_COPY(LaserLayer)

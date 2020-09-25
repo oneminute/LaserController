@@ -261,27 +261,6 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     }
 }
 
-//void LaserControllerWindow::onActionAddEngravingLayer(bool)
-//{
-//    QString newName = m_scene->document()->newLayerName();
-//    LaserLayerDialog dialog(m_scene->document(), LLT_ENGRAVING);
-//    if (dialog.exec() == QDialog::Accepted)
-//    {
-//        LaserLayer* layer = dialog.layer();
-//        m_scene->document()->addLayer(layer);
-//    }
-//}
-
-//void LaserControllerWindow::onActionAddCuttingLayer(bool checked)
-//{
-//    LaserLayerDialog dialog(m_scene->document(), LLT_CUTTING);
-//    if (dialog.exec() == QDialog::Accepted)
-//    {
-//        LaserLayer* layer = dialog.layer();
-//        m_scene->document()->addLayer(layer);
-//    }
-//}
-
 void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
     qDebug() << "removing layer.";

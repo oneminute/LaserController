@@ -18,7 +18,6 @@ class LaserLayerDialog : public QDialog
 {
     Q_OBJECT
 public:
-    //explicit LaserLayerDialog(LaserDocument* doc, LaserLayerType type, QWidget* parent = nullptr);
     explicit LaserLayerDialog(LaserLayer* layer, QWidget* parent = nullptr);
     ~LaserLayerDialog();
 
@@ -31,6 +30,8 @@ private:
 
     void initEngravingParameters();
 
+    void initBothParameters();
+
 protected:
 
 protected slots:
@@ -38,6 +39,7 @@ protected slots:
 
     void onCuttingToggled(bool checked);
     void onEngravingToggled(bool checked);
+    void onBothToggled(bool checked);
 
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;

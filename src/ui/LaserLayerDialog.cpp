@@ -7,16 +7,6 @@
 #include "scene/PageInformation.h"
 #include "laser/LaserDriver.h"
 
-//LaserLayerDialog::LaserLayerDialog(LaserDocument* doc, LaserLayerType type, QWidget* parent)
-//    : QDialog(parent)
-//    , m_ui(new Ui::LaserLayerDialog)
-//    , m_doc(doc)
-//    , m_layer(nullptr)
-//    , m_type(type)
-//{
-//    initUi();
-//}
-
 LaserLayerDialog::LaserLayerDialog(LaserLayer* layer, QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::LaserLayerDialog)
@@ -39,6 +29,7 @@ void LaserLayerDialog::initUi()
 
     connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
     connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
+    connect(m_ui->radioButtonBoth, &QRadioButton::toggled, this, &LaserLayerDialog::onBothToggled);
 
     /*QVariant value;
     if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
@@ -75,10 +66,23 @@ void LaserLayerDialog::initUi()
     if (m_type == LLT_ENGRAVING)
     {
         initEngravingParameters();
+        m_ui->radioButtonCutting->setChecked(false);
+        m_ui->radioButtonEngraving->setChecked(true);
+        m_ui->radioButtonBoth->setChecked(false);
     }
     else if (m_type == LLT_CUTTING)
     {
         initCuttingParameters();
+        m_ui->radioButtonCutting->setChecked(true);
+        m_ui->radioButtonEngraving->setChecked(false);
+        m_ui->radioButtonBoth->setChecked(false);
+    }
+    else if (m_type == LLT_BOTH)
+    {
+        initEngravingParameters();
+        m_ui->radioButtonCutting->setChecked(false);
+        m_ui->radioButtonEngraving->setChecked(false);
+        m_ui->radioButtonBoth->setChecked(true);
     }
 
     m_ui->lineEditLayerName->setText(m_layer->name());
@@ -100,8 +104,6 @@ void LaserLayerDialog::initCuttingParameters()
     m_ui->horizontalEditSliderLaserPower->setValue(80);
     m_ui->horizontalEditSliderMinSpeedPower->setValue(700);
     m_ui->horizontalEditSliderRunSpeedPower->setValue(1000);
-    m_ui->radioButtonCutting->setChecked(true);
-    m_ui->radioButtonEngraving->setChecked(false);
     m_ui->groupBoxGeneral->setVisible(true);
     m_ui->groupBoxEngraving->setVisible(false);
     m_ui->groupBoxBitmap->setVisible(false);
@@ -117,8 +119,21 @@ void LaserLayerDialog::initEngravingParameters()
     m_ui->horizontalEditSliderColumnSpacing->setValue(0);
     m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
     m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
-    m_ui->radioButtonCutting->setChecked(false);
-    m_ui->radioButtonEngraving->setChecked(true);
+    m_ui->groupBoxGeneral->setVisible(true);
+    m_ui->groupBoxEngraving->setVisible(true);
+    m_ui->groupBoxBitmap->setVisible(true);
+    setFixedHeight(600);
+}
+
+void LaserLayerDialog::initBothParameters()
+{
+    m_ui->horizontalEditSliderMinSpeed->setValue(60);
+    m_ui->horizontalEditSliderRunSpeed->setValue(300);
+    m_ui->horizontalEditSliderLaserPower->setValue(115);
+    m_ui->horizontalEditSliderLineSpacing->setValue(7);
+    m_ui->horizontalEditSliderColumnSpacing->setValue(0);
+    m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
+    m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
     m_ui->groupBoxGeneral->setVisible(true);
     m_ui->groupBoxEngraving->setVisible(true);
     m_ui->groupBoxBitmap->setVisible(true);
@@ -130,6 +145,7 @@ void LaserLayerDialog::onCuttingToggled(bool checked)
     if (checked)
     {
         initCuttingParameters();
+        m_type = LLT_CUTTING;
     }
 }
 
@@ -138,6 +154,16 @@ void LaserLayerDialog::onEngravingToggled(bool checked)
     if (checked)
     {
         initEngravingParameters();
+        m_type = LLT_ENGRAVING;
+    }
+}
+
+void LaserLayerDialog::onBothToggled(bool checked)
+{
+    if (checked)
+    {
+        initEngravingParameters();
+        m_type = LLT_BOTH;
     }
 }
 
@@ -156,6 +182,7 @@ void LaserLayerDialog::accept()
     m_layer->setDpi(m_ui->horizontalEditSliderDPI->value());
     m_layer->setNonlinearCoefficient(m_ui->doubleSpinBoxNonlinearCoefficient->value());
     m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
+    m_layer->setType(m_type);
 
     QDialog::accept();
 }

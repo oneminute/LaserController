@@ -80,7 +80,8 @@ enum LaserPrimitiveType
 enum LaserLayerType
 {
     LLT_ENGRAVING,
-    LLT_CUTTING
+    LLT_CUTTING,
+    LLT_BOTH
 };
 
 #endif // COMMON_H

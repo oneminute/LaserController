@@ -55,6 +55,11 @@ void LaserLayerTableWidget::updateItems()
                 type = tr("E");
                 fullType = tr("Engraving");
             }
+            else if (layer->type() == LLT_BOTH)
+            {
+                type = tr("C+E");
+                fullType = tr("Both");
+            }
 
             QTableWidgetItem* itemColor = new QTableWidgetItem();
             Qt::ItemFlags flags = itemColor->flags();
