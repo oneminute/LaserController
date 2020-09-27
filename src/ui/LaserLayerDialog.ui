@@ -51,6 +51,9 @@
         </item>
         <item>
          <widget class="QRadioButton" name="radioButtonBoth">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Both</string>
           </property>

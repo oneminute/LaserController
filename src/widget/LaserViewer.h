@@ -29,6 +29,7 @@ signals:
     void beginSelecting();
     void endSelecting();
     void cancelSelecting();
+    void mouseMoved(const QPointF& pos);
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;

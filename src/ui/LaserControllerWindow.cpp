@@ -205,6 +205,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
+    connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
 
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
@@ -546,6 +547,12 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
             m_ui->tableWidgetLayers->selectRow(row);
     }
     m_ui->tableWidgetLayers->blockSignals(false);
+}
+
+void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
+{
+    QString posStr = QString("%1mm,%2mm").arg(pos.x()).arg(pos.y());
+    m_statusBarLocation->setText(posStr);
 }
 
 //void LaserControllerWindow::updateLayerButtons()

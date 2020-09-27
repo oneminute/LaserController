@@ -84,15 +84,19 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 
 void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 {
+    QPoint point = event->pos();
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
-        m_selectionEndPoint = event->pos();
+        m_selectionEndPoint = point;
         QPainterPath selectionPath;
         selectionPath.addRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
         
         m_scene->setSelectionArea(mapToScene(selectionPath));
         return;
     }
+    QPointF pos = mapToScene(point);
+    emit mouseMoved(pos);
+
     event->accept();
 }
 

@@ -161,10 +161,9 @@ void LaserDocument::exportJSON(const QString& filename)
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
-    QJsonArray layerInfo;
+    QJsonArray layers;
     cv::Mat canvas(m_pageInfo.height() * 40, m_pageInfo.width() * 40, CV_8UC3, cv::Scalar(255, 255, 255));
     int layerId = 0;
-    QJsonArray dataInfo;
     for (int i = 0; i < m_layers.count(); i++)
     {
         LaserLayer* layer = m_layers[i];
@@ -172,6 +171,7 @@ void LaserDocument::exportJSON(const QString& filename)
             continue;
         QJsonObject layerObj;
         layerObj["LayerId"] = i;
+        layerObj["Type"] = layer->type();
         layerObj["MinSpeed"] = layer->minSpeed();
         layerObj["RunSpeed"] = layer->runSpeed();
         layerObj["LaserPower"] = layer->laserPower();
@@ -187,9 +187,8 @@ void LaserDocument::exportJSON(const QString& filename)
             layerObj["MinSpeedPower"] = layer->minSpeedPower();
             layerObj["RunSpeedPower"] = layer->runSpeedPower();
         }
-        
-        layerInfo.append(layerObj);
 
+        QJsonArray items;
         QList<LaserPrimitive*> laserItems = layer->items();
         for (int li = 0; li < laserItems.size(); li++)
         {
@@ -199,20 +198,20 @@ void LaserDocument::exportJSON(const QString& filename)
             {
                 itemObj["Layer"] = layerId;
                 itemObj["FinishRun"] = 0;
-                QPointF pos = laserItem->laserStartPos();
+                //QPointF pos = laserItem->laserStartPos();
                 itemObj["StartX"] = laserItem->boundingRect().left();
                 itemObj["StartY"] = laserItem->boundingRect().top();
-                layerObj["StartX"] = laserItem->boundingRect().left();
-                layerObj["StartY"] = laserItem->boundingRect().top();
-                layerObj["Width"] = laserItem->boundingRect().width();
-                layerObj["Height"] = laserItem->boundingRect().height();
+                //layerObj["StartX"] = laserItem->boundingRect().left();
+                //layerObj["StartY"] = laserItem->boundingRect().top();
+                itemObj["Width"] = laserItem->boundingRect().width();
+                itemObj["Height"] = laserItem->boundingRect().height();
                 
                 QByteArray data = laserItem->engravingImage(canvas);
                 if (!data.isEmpty())
                 {
-                    itemObj["Type"] = "PNG";
+                    itemObj["Type"] = laserItem->typeLatinName();
+                    itemObj["ImageType"] = "PNG";
                     itemObj["Data"] = QString(data.toBase64());
-                    dataInfo.append(itemObj);
                 }
             }
             else if (layer->type() == LLT_CUTTING)
@@ -224,16 +223,18 @@ void LaserDocument::exportJSON(const QString& filename)
                 {
                     itemObj["Type"] = laserItem->typeLatinName();
                     itemObj["Data"] = QString(pltUtils::points2Plt(points));
-                    dataInfo.append(itemObj);
                 }
             }
+            items.append(itemObj);
         }
+        layerObj["Items"] = items;
+        layers.append(layerObj);
     }
     
     QJsonObject actionObj;
 
-    jsonObj["LayerInfo"] = layerInfo;
-    jsonObj["DataInfo"] = dataInfo;
+    jsonObj["Layers"] = layers;
+    //jsonObj["DataInfo"] = dataInfo;
 
     QJsonDocument jsonDoc(jsonObj);
 
