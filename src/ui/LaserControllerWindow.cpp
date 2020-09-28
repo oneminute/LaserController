@@ -15,7 +15,7 @@
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
 #include "scene/LaserDocument.h"
-#include "scene/LaserItem.h"
+#include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "state/StateController.h"

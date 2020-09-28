@@ -7,7 +7,7 @@
 #include "svg/qsvgrenderer.h"
 #include "svg/qsvggraphics.h"
 #include "ui/ImportSVGDialog.h"
-#include "scene/LaserItem.h"
+#include "scene/LaserPrimitive.h"
 #include "scene/LaserDocument.h"
 #include "util/UnitUtils.h"
 
@@ -103,32 +103,32 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
         case QSvgNode::ELLIPSE:
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
-            item = new LaserEllipseItem(svgEllipseNode->bounds(), ldoc, shapeUnit);
+            item = new LaserEllipse(svgEllipseNode->bounds(), ldoc, shapeUnit);
         }
             break;
         case QSvgNode::LINE:
         {
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
-            item = new LaserLineItem(svgLineNode->line(), ldoc, shapeUnit);
+            item = new LaserLine(svgLineNode->line(), ldoc, shapeUnit);
         }
             break;
         case QSvgNode::ARC:
         case QSvgNode::PATH:
         {
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
-            item = new LaserPathItem(svgPathNode->path(), ldoc, shapeUnit);
+            item = new LaserPath(svgPathNode->path(), ldoc, shapeUnit);
         }
             break;
         case QSvgNode::POLYGON:
         {
             QSvgPolygon* svgPolygon = reinterpret_cast<QSvgPolygon*>(node);
-            item = new LaserPolygonItem(svgPolygon->polygon(), ldoc, shapeUnit);
+            item = new LaserPolygon(svgPolygon->polygon(), ldoc, shapeUnit);
         }
             break;
         case QSvgNode::POLYLINE:
         {
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
-            item = new LaserPolylineItem(svgPolylineNode->polyline(), ldoc, shapeUnit);
+            item = new LaserPolyline(svgPolylineNode->polyline(), ldoc, shapeUnit);
         }
             break;
         case QSvgNode::RECT:
@@ -138,7 +138,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
                 QSvgRect* svgRectNode = reinterpret_cast<QSvgRect*>(node);
                 qreal area = svgRectNode->rect().width() * svgRectNode->rect().height();
                 if (area > 0)
-                    item = new LaserRectItem(svgRectNode->rect(), ldoc, shapeUnit);
+                    item = new LaserRect(svgRectNode->rect(), ldoc, shapeUnit);
             }
             break;
         }
@@ -148,7 +148,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
         case QSvgNode::IMAGE:
         {
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
-            item = new LaserBitmapItem(svgImageNode->image(), svgImageNode->imageBounds(), ldoc, shapeUnit);
+            item = new LaserBitmap(svgImageNode->image(), svgImageNode->imageBounds(), ldoc, shapeUnit);
         }
             break;
         default:

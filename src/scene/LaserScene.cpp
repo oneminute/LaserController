@@ -1,7 +1,7 @@
 #include "LaserScene.h"
 
 #include "LaserDocument.h"
-#include "LaserItem.h"
+#include "LaserPrimitive.h"
 #include "LaserLayer.h"
 
 LaserScene::LaserScene(QObject* parent)

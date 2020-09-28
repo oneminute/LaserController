@@ -4,7 +4,7 @@
 
 #include "util/Utils.h"
 #include "LaserDocument.h"
-#include "LaserItem.h"
+#include "LaserPrimitive.h"
 #include "LaserScene.h"
 #include "widget/LayerButton.h"
 

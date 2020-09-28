@@ -7,7 +7,7 @@ void TestLaserDocument::initTestCase()
 
 void TestLaserDocument::documentTestCase()
 {
-    LaserRectItem* rectItem01 = new LaserRectItem(QRectF(10, 10, 30, 30), m_doc);
+    LaserRect* rectItem01 = new LaserRect(QRectF(10, 10, 30, 30), m_doc);
     m_doc->addItem(rectItem01);
 }
 

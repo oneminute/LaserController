@@ -11,7 +11,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "LaserItem.h"
+#include "LaserPrimitive.h"
 #include "PageInformation.h"
 #include "laser/LaserDriver.h"
 #include "util/PltUtils.h"

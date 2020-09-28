@@ -6,7 +6,7 @@
 #include <QBoxLayout>
 
 #include "scene/LaserDocument.h"
-#include "scene/LaserItem.h"
+#include "scene/LaserPrimitive.h"
 
 LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
     : QTableWidget(parent)

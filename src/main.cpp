@@ -1,5 +1,5 @@
 #include "laser/LaserDriver.h"
-#include "scene/LaserItem.h"
+#include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"

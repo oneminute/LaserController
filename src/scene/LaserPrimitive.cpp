@@ -1,4 +1,4 @@
-#include "LaserItem.h"
+#include "LaserPrimitive.h"
 
 #include <QSharedData>
 #include <QPaintEvent>
@@ -165,20 +165,20 @@ void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     update();
 }
 
-LaserShapeItem::LaserShapeItem(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit)
+LaserShape::LaserShape(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit)
     : LaserPrimitive(doc, type, unit)
 {
     //m_type = LPT_SHAPE;
 }
 
-LaserEllipseItem::LaserEllipseItem(const QRectF bounds, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, LPT_ELLIPSE, unit)
+LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, SizeUnit unit)
+    : LaserShape(doc, LPT_ELLIPSE, unit)
     , m_bounds(bounds)
 {
     m_boundingRect = m_bounds;
 }
 
-std::vector<cv::Point2f> LaserEllipseItem::cuttingPoints(cv::Mat& mat)
+std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& mat)
 {
     QPainterPath path;
 
@@ -193,24 +193,24 @@ std::vector<cv::Point2f> LaserEllipseItem::cuttingPoints(cv::Mat& mat)
     return points;
 }
 
-void LaserEllipseItem::draw(QPainter* painter)
+void LaserEllipse::draw(QPainter* painter)
 {
     painter->drawEllipse(m_bounds);
 }
 
-LaserRectItem::LaserRectItem(const QRectF rect, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, LPT_RECT, unit)
+LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, SizeUnit unit)
+    : LaserShape(doc, LPT_RECT, unit)
     , m_rect(rect)
 {
     m_boundingRect = m_rect;
 }
 
-void LaserRectItem::draw(QPainter* painter)
+void LaserRect::draw(QPainter* painter)
 {
     painter->drawRect(m_rect);
 }
 
-std::vector<cv::Point2f> LaserRectItem::cuttingPoints(cv::Mat& mat)
+std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& mat)
 {
     QTransform t = m_transform * sceneTransform();
     std::vector<cv::Point2f> points;
@@ -231,26 +231,26 @@ std::vector<cv::Point2f> LaserRectItem::cuttingPoints(cv::Mat& mat)
     return points;
 }
 
-LaserLineItem::LaserLineItem(const QLineF & line, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, LPT_LINE, unit)
+LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, SizeUnit unit)
+    : LaserShape(doc, LPT_LINE, unit)
     , m_line(line)
 {
     m_boundingRect = QRectF(m_line.p1(), m_line.p2());
 }
 
-void LaserLineItem::draw(QPainter * painter)
+void LaserLine::draw(QPainter * painter)
 {
     painter->drawLine(m_line);
 }
 
-LaserPathItem::LaserPathItem(const QPainterPath & path, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, LPT_PATH, unit)
+LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, SizeUnit unit)
+    : LaserShape(doc, LPT_PATH, unit)
     , m_path(path)
 {
     m_boundingRect = path.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPathItem::cuttingPoints(cv::Mat& mat)
+std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& mat)
 {
     std::vector<cv::Point2f> points;
     if (m_path.pointAtPercent(0) != m_path.pointAtPercent(1))
@@ -266,19 +266,19 @@ std::vector<cv::Point2f> LaserPathItem::cuttingPoints(cv::Mat& mat)
     return points;
 }
 
-void LaserPathItem::draw(QPainter * painter)
+void LaserPath::draw(QPainter * painter)
 {
     painter->drawPath(m_path);
 }
 
-LaserPolylineItem::LaserPolylineItem(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, LPT_POLYLINE, unit)
+LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
+    : LaserShape(doc, LPT_POLYLINE, unit)
     , m_poly(poly)
 {
     m_boundingRect = m_poly.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPolylineItem::cuttingPoints(cv::Mat & mat)
+std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & mat)
 {
     std::vector<cv::Point2f> points;
     cv::Point2f lastPt;
@@ -299,19 +299,19 @@ std::vector<cv::Point2f> LaserPolylineItem::cuttingPoints(cv::Mat & mat)
     return points;
 }
 
-void LaserPolylineItem::draw(QPainter * painter)
+void LaserPolyline::draw(QPainter * painter)
 {
     painter->drawPolyline(m_poly);
 }
 
-LaserPolygonItem::LaserPolygonItem(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
-    : LaserShapeItem(doc, LPT_POLYGON, unit)
+LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
+    : LaserShape(doc, LPT_POLYGON, unit)
     , m_poly(poly)
 {
     m_boundingRect = m_poly.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPolygonItem::cuttingPoints(cv::Mat & mat)
+std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & mat)
 {
     std::vector<cv::Point2f> points;
     cv::Point2f lastPt;
@@ -332,12 +332,12 @@ std::vector<cv::Point2f> LaserPolygonItem::cuttingPoints(cv::Mat & mat)
     return points;
 }
 
-void LaserPolygonItem::draw(QPainter * painter)
+void LaserPolygon::draw(QPainter * painter)
 {
     painter->drawPolygon(m_poly);
 }
 
-LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, LaserDocument * doc, SizeUnit unit)
+LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocument * doc, SizeUnit unit)
     : LaserPrimitive(doc, LPT_BITMAP, unit)
     , m_image(image)
     , m_bounds(bounds)
@@ -347,7 +347,7 @@ LaserBitmapItem::LaserBitmapItem(const QImage & image, const QRectF& bounds, Las
     m_type = LPT_BITMAP;
 }
 
-QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas) 
+QByteArray LaserBitmap::engravingImage(cv::Mat& canvas) 
 { 
     QByteArray ba;
 
@@ -417,7 +417,7 @@ QByteArray LaserBitmapItem::engravingImage(cv::Mat& canvas)
     return ba; 
 }
 
-void LaserBitmapItem::draw(QPainter * painter)
+void LaserBitmap::draw(QPainter * painter)
 {
     painter->drawImage(m_bounds, m_image);
 }

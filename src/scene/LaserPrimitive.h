@@ -1,5 +1,5 @@
-#ifndef LASERITEM_H
-#define LASERITEM_H
+#ifndef LASERPRIMITIVE_H
+#define LASERPRIMITIVE_H
 
 #include "common/common.h"
 #include <QObject>
@@ -84,22 +84,22 @@ private:
 
 QDebug operator<<(QDebug debug, const LaserPrimitive& item);
 
-class LaserShapeItem : public LaserPrimitive
+class LaserShape : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserShapeItem(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserShape(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
 
 private:
-    Q_DISABLE_COPY(LaserShapeItem);
+    Q_DISABLE_COPY(LaserShape);
 };
 
-class LaserEllipseItem : public LaserShapeItem
+class LaserEllipse : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserEllipseItem(const QRectF bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
-    virtual ~LaserEllipseItem() {}
+    LaserEllipse(const QRectF bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    virtual ~LaserEllipse() {}
 
     QRectF bounds() const { return m_bounds; }
     void setBounds(const QRectF& bounds) { m_bounds = bounds; }
@@ -109,14 +109,14 @@ public:
 
 private:
     QRectF m_bounds;
-    Q_DISABLE_COPY(LaserEllipseItem)
+    Q_DISABLE_COPY(LaserEllipse)
 };
 
-class LaserRectItem : public LaserShapeItem
+class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserRectItem(const QRectF rect, LaserDocument* doc,  SizeUnit unit = SizeUnit::SU_MM100);
+    LaserRect(const QRectF rect, LaserDocument* doc,  SizeUnit unit = SizeUnit::SU_MM100);
 
     QRectF rect() const { return m_rect; }
     void setRect(const QRectF& rect) { m_rect = rect; }
@@ -126,14 +126,14 @@ public:
 
 private:
     QRectF m_rect;
-    Q_DISABLE_COPY(LaserRectItem);
+    Q_DISABLE_COPY(LaserRect);
 };
 
-class LaserLineItem : public LaserShapeItem
+class LaserLine : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserLineItem(const QLineF& line, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserLine(const QLineF& line, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
     QLineF line() const { return m_line; }
     void setLine(const QLineF& line) { m_line = line; }
@@ -142,14 +142,14 @@ public:
 
 private:
     QLineF m_line;
-    Q_DISABLE_COPY(LaserLineItem);
+    Q_DISABLE_COPY(LaserLine);
 };
 
-class LaserPathItem : public LaserShapeItem
+class LaserPath : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPathItem(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPath(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
     QPainterPath path() const { return m_path; }
     void setPath(const QPainterPath& path) { m_path = path; }
@@ -159,14 +159,14 @@ public:
 
 private:
     QPainterPath m_path;
-    Q_DISABLE_COPY(LaserPathItem);
+    Q_DISABLE_COPY(LaserPath);
 };
 
-class LaserPolylineItem : public LaserShapeItem
+class LaserPolyline : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolylineItem(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPolyline(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
     QPolygonF polyline() const { return m_poly; }
     void setPolyline(const QPolygonF& poly) { m_poly = poly; }
@@ -176,14 +176,14 @@ public:
 
 private:
     QPolygonF m_poly;
-    Q_DISABLE_COPY(LaserPolylineItem);
+    Q_DISABLE_COPY(LaserPolyline);
 };
 
-class LaserPolygonItem : public LaserShapeItem
+class LaserPolygon : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolygonItem(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPolygon(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
     QPolygonF polyline() const { return m_poly; }
     void setPolyline(const QPolygonF& poly) { m_poly = poly; }
@@ -193,14 +193,14 @@ public:
 
 private:
     QPolygonF m_poly;
-    Q_DISABLE_COPY(LaserPolygonItem);
+    Q_DISABLE_COPY(LaserPolygon);
 };
 
-class LaserBitmapItem : public LaserPrimitive
+class LaserBitmap : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserBitmapItem(const QImage& image, const QRectF& bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
 
     QImage image() const { return m_image; }
     void setImage(const QImage& image) { m_image = m_image; }
@@ -215,7 +215,7 @@ public:
 private:
     QImage m_image;
     QRectF m_bounds;
-    Q_DISABLE_COPY(LaserBitmapItem);
+    Q_DISABLE_COPY(LaserBitmap);
 };
 
-#endif // LASERITEM_H
+#endif // LASERPRIMITIVE_H

@@ -4,7 +4,7 @@
 #include <QMimeData>
 
 #include "scene/LaserDocument.h"
-#include "scene/LaserItem.h"
+#include "scene/LaserPrimitive.h"
 
 LaserLayerTreeWidget::LaserLayerTreeWidget(QWidget* parent)
     : QTreeWidget(parent)

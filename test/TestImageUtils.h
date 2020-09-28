@@ -6,7 +6,7 @@
 
 #include <scene/LaserDocument.h>
 #include <scene/LaserLayer.h>
-#include <scene/LaserItem.h>
+#include <scene/LaserPrimitive.h>
 
 class TestImageUtils : public QObject
 {
