@@ -11,6 +11,8 @@
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 
+QMap<int, QString> LaserDriver::m_registerComments;
+
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
     , m_isLoaded(false)
@@ -78,7 +80,6 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     {
         instance().m_isConnected = true;
         emit instance().comPortConnected();
-        //instance().readAllSysParamFromCard();
     }
     break;
     case ComPortClosed:    // 串口关闭
@@ -114,6 +115,27 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     break;
     case ReadSysParamFromCardOK:    // 读取系统参数后返回的数据
     {
+        instance().m_registers.clear();
+        for (QString i : eventData.split(";"))
+        {
+            QString str = i.trimmed();
+            if (str.isEmpty() || str.isNull())
+                continue;
+
+            QStringList tokens = str.split(",");
+            if (tokens.length() != 2)
+                continue;
+
+            int addr = 0;
+            bool ok = false;
+            addr = tokens[0].toInt(&ok);
+            if (!ok)
+                continue;
+
+            QVariant value = tokens[1];
+            instance().m_registers.insert((RegisterType)addr, value);
+        }
+        emit instance().registersFectched(instance().m_registers);
         emit instance().sysParamFromCardArrived(eventData);
     }
     break;
@@ -181,6 +203,40 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 
 bool LaserDriver::load()
 {
+    m_registerComments.insert(REG_03, tr("Reset calib speed."));
+    m_registerComments.insert(REG_05, tr("Move fast speed."));
+    m_registerComments.insert(REG_06, tr("Cutting speed."));
+    m_registerComments.insert(REG_07, tr("Move to origin speed."));
+    m_registerComments.insert(REG_08, tr("Working quadrant."));
+    m_registerComments.insert(REG_09, tr("X Axis pulse length."));
+    m_registerComments.insert(REG_10, tr("Y Axis pulse length."));
+    m_registerComments.insert(REG_11, tr("X Axis backlash."));
+    m_registerComments.insert(REG_12, tr("Y Axis backlash."));
+    m_registerComments.insert(REG_13, tr("Engraving column step."));
+    m_registerComments.insert(REG_14, tr("Engraving row step."));
+    m_registerComments.insert(REG_15, tr("Engraving laser power."));
+    m_registerComments.insert(REG_16, tr("Max engraving gray value."));
+    m_registerComments.insert(REG_17, tr("Min engraving gray value."));
+    m_registerComments.insert(REG_18, tr("Cutting laser power."));
+    m_registerComments.insert(REG_19, tr("Cutting running speed ratio."));
+    m_registerComments.insert(REG_20, tr("Cutting launching speed ratio."));
+    m_registerComments.insert(REG_21, tr("Machine phase."));
+    m_registerComments.insert(REG_22, tr("Limit phase."));
+    m_registerComments.insert(REG_23, tr("Total working duration."));
+    m_registerComments.insert(REG_24, tr("Total laser duration."));
+    m_registerComments.insert(REG_25, tr("Cutting laser frequency."));
+    m_registerComments.insert(REG_26, tr("Registion."));
+    m_registerComments.insert(REG_27, tr("Engraving laser frequency."));
+    m_registerComments.insert(REG_31, tr("Custom 1 X."));
+    m_registerComments.insert(REG_32, tr("Custom 1 Y."));
+    m_registerComments.insert(REG_33, tr("Custom 2 X."));
+    m_registerComments.insert(REG_34, tr("Custom 2 Y."));
+    m_registerComments.insert(REG_35, tr("Custom 3 X."));
+    m_registerComments.insert(REG_36, tr("Custom 3 Y."));
+    m_registerComments.insert(REG_38, tr("Layout size."));
+    m_registerComments.insert(REG_39, tr("Painting unit."));
+    m_registerComments.insert(REG_40, tr("Move fast launching speed."));
+
     if (m_isLoaded)
         return true;
 
@@ -327,26 +383,27 @@ void LaserDriver::setHardwareInitialization(double curveToSpeedRatio, int logica
     m_fnSetHardwareInitialization(curveToSpeedRatio, logicalResolution, maxSpeed, zeroCoordinates);
 }
 
-bool LaserDriver::writeSysParamToCard(QList<int> addresses, QList<double> values)
+bool LaserDriver::writeSysParamToCard(const QMap<RegisterType, QVariant>& values)
 {
-    if (addresses.length() == 0 || values.length() == 0)
-        return false;
-    if (addresses.length() != values.length())
+    if (values.count() == 0)
         return false;
 
     QString addrBuf, valuesBuf;
     QStringList addrList;
     QStringList valuesList;
-    for (int i = 0; i < addresses.length(); i++)
+    for (QMap<RegisterType, QVariant>::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
-        addrList.append(QString("%1").arg(addresses[i]));
-        valuesList.append(QString("%1").arg(values[i]));
+        addrList.append(QString("%1").arg(i.key()));
+        valuesList.append(i.value().toString());
     }
     addrBuf = addrList.join(",");
     valuesBuf = valuesList.join(",");
 
     wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
     wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
+
+    qDebug() << "address list: " << addrBuf;
+    qDebug() << "values list: " << valuesBuf;
     
     bool success = m_fnWriteSysParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
@@ -474,6 +531,13 @@ bool LaserDriver::getRegister(RegisterType rt, QVariant & value)
         return true;
     }
     return false;
+}
+
+QString LaserDriver::registerComment(RegisterType rt)
+{
+    if (m_registerComments.contains(rt))
+        return m_registerComments[rt];
+    return QString("");
 }
 
 ConnectionTask * LaserDriver::createConnectionTask(QWidget* parentWidget)

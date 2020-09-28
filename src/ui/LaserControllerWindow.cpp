@@ -24,6 +24,7 @@
 #include "task/MachiningTask.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/HalftoneDialog.h"
+#include "ui/RegistersDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
@@ -200,6 +201,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
+    connect(m_ui->actionShowRegisters, &QAction::triggered, this, &LaserControllerWindow::onActionShowRegisters);
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
@@ -460,6 +462,12 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
     {
         m_scene->clearDocument(true);
     }
+}
+
+void LaserControllerWindow::onActionShowRegisters(bool checked)
+{
+    RegistersDialog dialog;
+    dialog.exec();
 }
 
 void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)

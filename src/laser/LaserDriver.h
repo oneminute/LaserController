@@ -282,7 +282,7 @@ public:
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
     void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
-    bool writeSysParamToCard(QList<int> addresses, QList<double> values);
+    bool writeSysParamToCard(const QMap<RegisterType, QVariant>& values);
     bool readSysParamFromCard(QList<int> addresses);
     bool readAllSysParamFromCard();
     void showAboutWindow();
@@ -307,6 +307,7 @@ public:
 
     void setRegister(RegisterType rt, QVariant value);
     bool getRegister(RegisterType rt, QVariant& value);
+    QString registerComment(RegisterType rt);
 
     static ConnectionTask* createConnectionTask(QWidget* parentWidget);
     static DisconnectionTask* createDisconnectionTask(QWidget* parentWidget);
@@ -332,6 +333,7 @@ signals:
     void workStateUpdated(LaserState state);
     void idle();
     void sysParamFromCardArrived(const QString& data);
+    void registersFectched(const QMap<RegisterType, QVariant>& data);
     void sysParamFromCardError();
     void unknownError();
     void workingCanceled();
@@ -391,6 +393,8 @@ private:
     FN_VOID_VOID m_fnGetDeviceWorkState;
 
     wchar_t m_wcharBuffer[2048];
+
+    static QMap<int, QString> m_registerComments;
 };
 
 #endif // LASERCONTROLLER_H

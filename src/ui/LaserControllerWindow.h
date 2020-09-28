@@ -47,6 +47,7 @@ protected slots:
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
     void onActionCloseDocument(bool checked = false);
+    void onActionShowRegisters(bool checked = false);
 
     void onDriverComPortsFetched(const QStringList& ports);
     void onDriverComPortConnected();
