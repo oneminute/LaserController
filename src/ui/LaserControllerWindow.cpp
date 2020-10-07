@@ -29,6 +29,7 @@
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
 #include "widget/LayerButton.h"
+#include "widget/PropertiesHelperManager.h"
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -179,10 +180,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addPermanentWidget(utils::createSeparator());
     m_ui->statusbar->addPermanentWidget(m_statusBarCopyright);
 
+    m_ui->tableWidgetParameters->setColumnWidth(0, 100);
+    m_ui->tableWidgetParameters->setColumnWidth(1, 300);
+
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
-    //connect(m_ui->actionAddEngravingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddEngravingLayer);
-    //connect(m_ui->actionAddCuttingLayer, &QAction::triggered, this, &LaserControllerWindow::onActionAddCuttingLayer);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
@@ -555,6 +557,12 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
             m_ui->tableWidgetLayers->selectRow(row);
     }
     m_ui->tableWidgetLayers->blockSignals(false);
+
+    if (items.count() == 1)
+    {
+        LaserPrimitive* item = items[0];
+        PropertiesHelperManager::primitivePropertiesHelper().resetProperties(item, m_ui->tableWidgetParameters);
+    }
 }
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)

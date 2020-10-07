@@ -9,6 +9,8 @@
 #include <qstylefactory.h>
 #include <qtranslator.h>
 #include <QDebug>
+#include <QDataStream>
+#include <QTextStream>
 
 //#define GLOG_NO_ABBREVIATED_SEVERITIES
 #define WIN32_LEAN_AND_MEAN
@@ -97,8 +99,12 @@ int main(int argc, char *argv[])
         app.installTranslator(&qtTranslator);
     }
 
-    //qRegisterMetaType<LaserPrimitive*>();
-    //qRegisterMetaTypeStreamOperators<LaserPrimitive*>();
+    QFile file("theme/Dark.qss");
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream stream(&file);
+        app.setStyleSheet(stream.readAll());
+    }
 
     StateController::start();
 

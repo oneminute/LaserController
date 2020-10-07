@@ -19,6 +19,66 @@ class LaserScene;
 class QPaintEvent;
 class LaserViewer;
 
+struct FinishRun
+{
+public:
+    FinishRun()
+        : code(0)
+    {}
+
+    union
+    {
+        quint16 code;
+        struct
+        {
+            quint8 action;
+            quint8 relays;
+        };
+    };
+
+    void setRelays(const QList<int>& relays, bool enabled = true)
+    {
+        for (int no : relays)
+        {
+            setRelay(no, enabled);
+        }
+    }
+
+    void setRelay(int no, bool enabled = true)
+    {
+        int relayNo = no;
+        if (relayNo < 0 || relayNo > 7)
+            return;
+
+        int relayBit = 1 << relayNo;
+
+        if (enabled)
+        {
+            relays |= relayBit;
+        }
+        else
+        {
+            relays &= ~relayBit;
+        }
+    }
+
+    void setAction(int action)
+    {
+        this->action = action;
+    }
+
+    bool isEnabled(int no)
+    {
+        int relayNo = no;
+        int relayBit = 1 << relayNo;
+        return relayBit & relays;
+    }
+
+    QString toString();
+};
+
+Q_DECLARE_METATYPE(FinishRun);
+
 class LaserPrimitive : public QGraphicsObject
 {
     Q_OBJECT
@@ -54,12 +114,15 @@ public:
     LaserLayer* layer() const { return m_layer; }
     void setLayer(LaserLayer* layer) { m_layer = layer; }
 
+    FinishRun& finishRun() { return m_finishRun; }
+
 protected:
     QString typeName(LaserPrimitiveType typeId);
     QString typeLatinName(LaserPrimitiveType typeId);
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 protected:
     LaserDocument* m_doc;
@@ -69,6 +132,7 @@ protected:
     QRectF m_boundingRect;
     LaserPrimitiveType m_type;
     QString m_name;
+    FinishRun m_finishRun;
 
     bool m_isHover;
 

@@ -84,4 +84,33 @@ enum LaserLayerType
     LLT_BOTH
 };
 
+enum RelayAction
+{
+    RA_NONE = 0,
+    RA_RELEASE = 1,
+    RA_ORIGIN = 2,
+    RA_MACHINING_1 = 3,
+    RA_MACHINING_2 = 4,
+    RA_MACHINING_3 = 5
+};
+
+enum PropertyType
+{
+    PT_Text = 0,
+    PT_FinishRun
+};
+
+enum PropertyEditor
+{
+    PE_LineEdit = 0,
+    PE_FinishRunWidget
+};
+
+enum WidgetUserData
+{
+    WUD_PropertyValue = Qt::UserRole + 1, 
+    WUD_PropertyType, 
+    WUD_PropertyEditor
+};
+
 #endif // COMMON_H

@@ -285,15 +285,20 @@
       <number>9</number>
      </property>
      <item>
-      <widget class="QStackedWidget" name="stackedWidget">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>300</height>
-        </size>
-       </property>
-       <widget class="QWidget" name="page"/>
-       <widget class="QWidget" name="page_2"/>
+      <widget class="QTableWidget" name="tableWidgetParameters">
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Property</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Value</string>
+        </property>
+       </column>
       </widget>
      </item>
     </layout>

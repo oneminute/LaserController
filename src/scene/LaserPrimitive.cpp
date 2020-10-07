@@ -160,8 +160,15 @@ void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
     update();
 }
 
+void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+    qDebug() << m_name << "mouse press event";
+    update();
+}
+
 void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+    qDebug() << m_name << "mouse release event";
     update();
 }
 
@@ -427,4 +434,45 @@ QDebug operator<<(QDebug debug, const LaserPrimitive & item)
     QDebugStateSaver saver(debug);
     debug.nospace() << "(" << item.name() << ", " << item.objectName() << ", " << item.type() << ")";
     return debug;
+}
+
+QString FinishRun::toString()
+{
+    QString text = QObject::tr("Relays: ");
+    QStringList nos;
+    for (int i = 0; i < 8; i++)
+    {
+        if (isEnabled(i))
+        {
+            nos.append(QString::number(i + 1));
+        }
+    }
+    text.append(nos.join(","));
+    text.append(" Action: ");
+
+    QString actionStr;
+    switch (action)
+    {
+    case RA_NONE:
+        actionStr = QObject::tr("None");
+        break;
+    case RA_RELEASE:
+        actionStr = QObject::tr("Release");
+        break;
+    case RA_ORIGIN:
+        actionStr = QObject::tr("Machining 1");
+        break;
+    case RA_MACHINING_1:
+        actionStr = QObject::tr("Machining 2");
+        break;
+    case RA_MACHINING_2:
+        actionStr = QObject::tr("Machining 3");
+        break;
+    case RA_MACHINING_3:
+        actionStr = QObject::tr("None");
+        break;
+    }
+
+    text.append(actionStr);
+    return text;
 }

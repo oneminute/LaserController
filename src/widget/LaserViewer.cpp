@@ -43,7 +43,12 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 
 void LaserViewer::wheelEvent(QWheelEvent * event)
 {
-    zoomBy(qPow(1.2, event->delta() / 240.0));
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        zoomBy(qPow(1.2, event->delta() / 240.0));
+    }
+    else
+        QGraphicsView::wheelEvent(event);
 }
 
 void LaserViewer::zoomBy(qreal factor)
@@ -58,6 +63,10 @@ void LaserViewer::zoomBy(qreal factor)
 
 void LaserViewer::mousePressEvent(QMouseEvent * event)
 {
+    QGraphicsView::mousePressEvent(event);
+    if (event->isAccepted())
+        return;
+
     QList<QAbstractState*> states;
     states << StateControllerInst.documentIdleState()
         << StateControllerInst.documentSelectedState();
@@ -67,18 +76,9 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
         {
             m_selectionStartPoint = event->pos();
             m_selectionEndPoint = m_selectionStartPoint;
-            event->accept();
             emit beginSelecting();
             qDebug() << "begin to select";
         }
-        else
-        {
-            QWidget::mousePressEvent(event);
-        }
-    }
-    else
-    {
-        QWidget::mousePressEvent(event);
     }
 }
 
@@ -94,10 +94,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
         m_scene->setSelectionArea(mapToScene(selectionPath));
         return;
     }
+    else
+    {
+        QGraphicsView::mouseMoveEvent(event);
+    }
     QPointF pos = mapToScene(point);
     emit mouseMoved(pos);
-
-    event->accept();
 }
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
@@ -110,15 +112,19 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
         {
             m_scene->clearSelection();
             emit cancelSelecting();
+            QGraphicsView::mouseReleaseEvent(event);
         }
         else
         {
             emit endSelecting();
         }
     }
+    else
+    {
+        QGraphicsView::mouseReleaseEvent(event);
+    }
 
     m_mousePressed = false;
-    event->accept();
 }
 
 qreal LaserViewer::zoomFactor() const
