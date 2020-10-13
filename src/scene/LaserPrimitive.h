@@ -153,6 +153,8 @@ class LaserShape : public LaserPrimitive
     Q_OBJECT
 public:
     LaserShape(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+    virtual QPainterPath toPath() const = 0;
+    virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) override;
 
 private:
     Q_DISABLE_COPY(LaserShape);
@@ -171,6 +173,8 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
+    virtual QPainterPath toPath() const;
+
 private:
     QRectF m_bounds;
     Q_DISABLE_COPY(LaserEllipse)
@@ -188,6 +192,8 @@ public:
     virtual void draw(QPainter* painter);
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
 
+    virtual QPainterPath toPath() const;
+
 private:
     QRectF m_rect;
     Q_DISABLE_COPY(LaserRect);
@@ -203,6 +209,8 @@ public:
     void setLine(const QLineF& line) { m_line = line; }
 
     virtual void draw(QPainter* painter);
+
+    virtual QPainterPath toPath() const;
 
 private:
     QLineF m_line;
@@ -221,6 +229,8 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
+    virtual QPainterPath toPath() const;
+
 private:
     QPainterPath m_path;
     Q_DISABLE_COPY(LaserPath);
@@ -238,6 +248,8 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
 
+    virtual QPainterPath toPath() const;
+
 private:
     QPolygonF m_poly;
     Q_DISABLE_COPY(LaserPolyline);
@@ -254,6 +266,8 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& mat = cv::Mat());
     virtual void draw(QPainter* painter);
+
+    virtual QPainterPath toPath() const;
 
 private:
     QPolygonF m_poly;

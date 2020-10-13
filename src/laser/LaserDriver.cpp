@@ -290,6 +290,8 @@ bool LaserDriver::load()
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
 
+    m_fnMillimeter2MicroStep = (FN_INT_DOUBLE_BOOL)m_library.resolve("Millimeter2MicroStep");
+
     Q_ASSERT(m_fnLoadDataFromFile);
 
     m_isLoaded = true;
@@ -516,6 +518,11 @@ int LaserDriver::loadDataFromFile(const QString & filename, bool withMachining)
 void LaserDriver::getDeviceWorkState()
 {
     m_fnGetDeviceWorkState();
+}
+
+int LaserDriver::mm2MicroStep(double mm, bool xaxis)
+{
+    return m_fnMillimeter2MicroStep(mm, xaxis);
 }
 
 void LaserDriver::setRegister(RegisterType rt, QVariant value)

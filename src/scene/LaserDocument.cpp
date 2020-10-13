@@ -170,23 +170,39 @@ void LaserDocument::exportJSON(const QString& filename)
         if (layer->isEmpty())
             continue;
         QJsonObject layerObj;
-        layerObj["LayerId"] = i;
-        layerObj["Type"] = layer->type();
-        layerObj["MinSpeed"] = layer->minSpeed();
-        layerObj["RunSpeed"] = layer->runSpeed();
-        layerObj["LaserPower"] = layer->laserPower();
-        layerObj["MinSpeedPower"] = layer->minSpeedPower();
-        layerObj["RunSpeedPower"] = layer->runSpeedPower();
+        QJsonObject paramObj;
+        QJsonObject engravingParamObj;
+        QJsonObject cuttingParamObj;
         if (layer->type() == LLT_ENGRAVING)
         {
-            layerObj["CarveForward"] = layer->engravingForward();
-            layerObj["CarveStyle"] = layer->engravingStyle();
-            layerObj["HStep"] = layer->lineSpacing();
-            layerObj["LStep"] = layer->columnSpacing();
-            layerObj["ErrorX"] = layer->errorX();
-            layerObj["MinSpeedPower"] = layer->minSpeedPower();
-            layerObj["RunSpeedPower"] = layer->runSpeedPower();
+            engravingParamObj["LayerId"] = i;
+            engravingParamObj["Type"] = layer->type();
+            engravingParamObj["MinSpeed"] = layer->minSpeed();
+            engravingParamObj["RunSpeed"] = layer->runSpeed();
+            engravingParamObj["LaserPower"] = layer->laserPower();
+            engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
+            engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+            engravingParamObj["CarveForward"] = layer->engravingForward();
+            engravingParamObj["CarveStyle"] = layer->engravingStyle();
+            engravingParamObj["HStep"] = layer->lineSpacing();
+            engravingParamObj["LStep"] = layer->columnSpacing();
+            engravingParamObj["ErrorX"] = layer->errorX();
+            engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
+            engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
         }
+        else if (layer->type() == LLT_CUTTING)
+        {
+            cuttingParamObj["LayerId"] = i;
+            cuttingParamObj["Type"] = layer->type();
+            cuttingParamObj["MinSpeed"] = layer->minSpeed();
+            cuttingParamObj["RunSpeed"] = layer->runSpeed();
+            cuttingParamObj["LaserPower"] = layer->laserPower();
+            cuttingParamObj["MinSpeedPower"] = layer->minSpeedPower();
+            cuttingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+        }
+        paramObj["EngravingParams"] = engravingParamObj;
+        paramObj["CuttingParams"] = cuttingParamObj;
+        layerObj["Params"] = paramObj;
 
         QJsonArray items;
         QList<LaserPrimitive*> laserItems = layer->items();
@@ -199,8 +215,8 @@ void LaserDocument::exportJSON(const QString& filename)
                 itemObj["Layer"] = layerId;
                 itemObj["FinishRun"] = 0;
                 //QPointF pos = laserItem->laserStartPos();
-                itemObj["StartX"] = laserItem->boundingRect().left();
-                itemObj["StartY"] = laserItem->boundingRect().top();
+                //itemObj["StartX"] = laserItem->boundingRect().left();
+                //itemObj["StartY"] = laserItem->boundingRect().top();
                 //layerObj["StartX"] = laserItem->boundingRect().left();
                 //layerObj["StartY"] = laserItem->boundingRect().top();
                 itemObj["Width"] = laserItem->boundingRect().width();
@@ -217,7 +233,6 @@ void LaserDocument::exportJSON(const QString& filename)
             else if (layer->type() == LLT_CUTTING)
             {
                 itemObj["Layer"] = layerId;
-                itemObj["FinishRun"] = 0;
                 std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
                 if (!points.empty())
                 {
@@ -225,6 +240,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     itemObj["Data"] = QString(pltUtils::points2Plt(points));
                 }
             }
+            itemObj["FinishRun"] = laserItem->finishRun().code;
             items.append(itemObj);
         }
         layerObj["Items"] = items;

@@ -113,4 +113,21 @@ enum WidgetUserData
     WUD_PropertyEditor
 };
 
+struct FillStyleAndPixelsCount
+{
+    union {
+        int code;
+        struct {
+            quint8 fillStyle;
+            quint8 count0;
+            quint8 count1;
+            quint8 count2;
+        };
+    };
+
+    FillStyleAndPixelsCount()
+        : code(0)
+    {}
+};
+
 #endif // COMMON_H

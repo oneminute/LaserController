@@ -187,13 +187,7 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, SizeUnit un
 
 std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& mat)
 {
-    QPainterPath path;
-
-    QTransform t = m_transform * sceneTransform();
-    path.addEllipse(t.mapRect(m_bounds));
-
-    QTransform transform = QTransform::fromScale(40, 40);
-    path = transform.map(path);
+    QPainterPath path = toPath();
 
     std::vector<cv::Point2f> points;
     pltUtils::pathPoints(path, points, mat);
@@ -203,6 +197,18 @@ std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& mat)
 void LaserEllipse::draw(QPainter* painter)
 {
     painter->drawEllipse(m_bounds);
+}
+
+QPainterPath LaserEllipse::toPath() const
+{
+    QPainterPath path;
+
+    QTransform t = m_transform * sceneTransform();
+    path.addEllipse(t.mapRect(m_bounds));
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+    return path;
 }
 
 LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, SizeUnit unit)
@@ -238,6 +244,19 @@ std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& mat)
     return points;
 }
 
+QPainterPath LaserRect::toPath() const
+{
+    QPainterPath path;
+    QTransform t = m_transform * sceneTransform();
+    QPolygonF rect = t.map(m_rect);
+    path.addPolygon(rect);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+
+    return path;
+}
+
 LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, SizeUnit unit)
     : LaserShape(doc, LPT_LINE, unit)
     , m_line(line)
@@ -250,6 +269,11 @@ void LaserLine::draw(QPainter * painter)
     painter->drawLine(m_line);
 }
 
+QPainterPath LaserLine::toPath() const
+{
+    return QPainterPath();
+}
+
 LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, SizeUnit unit)
     : LaserShape(doc, LPT_PATH, unit)
     , m_path(path)
@@ -260,13 +284,7 @@ LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, SizeUnit un
 std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& mat)
 {
     std::vector<cv::Point2f> points;
-    if (m_path.pointAtPercent(0) != m_path.pointAtPercent(1))
-        m_path.lineTo(m_path.pointAtPercent(0));
-    QTransform t = m_transform * sceneTransform();
-    QPainterPath path = t.map(m_path);
-
-    QTransform transform = QTransform::fromScale(40, 40);
-    path = transform.map(path);
+    QPainterPath path = toPath();
     
     pltUtils::pathPoints(path, points, mat);
     
@@ -276,6 +294,19 @@ std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& mat)
 void LaserPath::draw(QPainter * painter)
 {
     painter->drawPath(m_path);
+}
+
+QPainterPath LaserPath::toPath() const
+{
+    QPainterPath path = m_path;
+    if (path.pointAtPercent(0) != path.pointAtPercent(1))
+        path.lineTo(path.pointAtPercent(0));
+    QTransform t = m_transform * sceneTransform();
+    path = t.map(path);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+    return path;
 }
 
 LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
@@ -311,6 +342,19 @@ void LaserPolyline::draw(QPainter * painter)
     painter->drawPolyline(m_poly);
 }
 
+QPainterPath LaserPolyline::toPath() const
+{
+    QPainterPath path;
+    QTransform t = m_transform * sceneTransform();
+    QPolygonF rect = t.map(m_poly);
+    path.addPolygon(rect);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+
+    return path;
+}
+
 LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
     : LaserShape(doc, LPT_POLYGON, unit)
     , m_poly(poly)
@@ -342,6 +386,19 @@ std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & mat)
 void LaserPolygon::draw(QPainter * painter)
 {
     painter->drawPolygon(m_poly);
+}
+
+QPainterPath LaserPolygon::toPath() const
+{
+    QPainterPath path;
+    QTransform t = m_transform * sceneTransform();
+    QPolygonF rect = t.map(m_poly);
+    path.addPolygon(rect);
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+
+    return path;
 }
 
 LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocument * doc, SizeUnit unit)
@@ -390,17 +447,21 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     {
         outMat = imageUtils::halftone2(resized, layer()->lpi(), layer()->dpi(), 45, layer()->nonlinearCoefficient());
     }
-    std::vector<uchar> buffer;
-    std::vector<int>param; 
-    param.push_back(cv::IMWRITE_PNG_BILEVEL);
-    param.push_back(1);
-    param.push_back(cv::IMWRITE_PNG_COMPRESSION);
-    param.push_back(0);
-    cv::imencode(".png", outMat, buffer, param);
+    //std::vector<uchar> buffer;
+    //std::vector<int>param; 
+    //param.push_back(cv::IMWRITE_PNG_BILEVEL);
+    //param.push_back(1);
+    //param.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    //param.push_back(0);
+    //cv::imencode(".png", outMat, buffer, param);
 
-    QBuffer baBuf(&ba);
-    baBuf.open(QIODevice::WriteOnly);
-    baBuf.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+    //QBuffer baBuf(&ba);
+    //baBuf.open(QIODevice::WriteOnly);
+    //baBuf.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+
+    QPointF pos = laserStartPos();
+    ba = imageUtils::image2EngravingData(outMat, boundingRect().left(), 
+        boundingRect().top(), pixelInterval, mmWidth);
 
     QTransform t = m_transform * sceneTransform();
     if (!canvas.empty())
@@ -475,4 +536,10 @@ QString FinishRun::toString()
 
     text.append(actionStr);
     return text;
+}
+
+QByteArray LaserShape::engravingImage(cv::Mat & canvas)
+{
+    QByteArray bytes;
+    return bytes;
 }

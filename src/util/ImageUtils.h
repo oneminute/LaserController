@@ -33,6 +33,8 @@ namespace imageUtils
     cv::Mat generateRoundSpiralMat(int gridSize);
 
     cv::Mat rotateMat(cv::Mat src, float degrees);
+
+    QByteArray image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width);
 }
 
 #endif // 

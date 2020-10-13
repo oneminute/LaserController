@@ -26,18 +26,17 @@ void LaserScene::updateDocument(LaserDocument * doc)
     {
         clearDocument(true);
     }
+    m_doc = doc;
 
-    doc->setParent(this);
+    m_doc->setParent(this);
 
+    qDebug() << "page bounds:" << m_doc->pageBounds();
+    m_background = addRect(m_doc->pageBounds(), QPen(Qt::gray, 0.2f, Qt::SolidLine), QBrush(Qt::white));
     QMap<QString, LaserPrimitive*> items = doc->items();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {
         this->addItem(i.value());
     }
-    m_doc = doc;
-
-    qDebug() << "page bounds:" << m_doc->pageBounds();
-    m_background = addRect(m_doc->pageBounds(), QPen(Qt::gray, 0.2f, Qt::SolidLine));
 }
 
 void LaserScene::clearDocument(bool delDoc)

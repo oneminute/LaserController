@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
     QFile file("theme/Dark.qss");
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
-        QTextStream stream(&file);
-        app.setStyleSheet(stream.readAll());
+        //QTextStream stream(&file);
+        //app.setStyleSheet(stream.readAll());
     }
 
     StateController::start();

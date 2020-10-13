@@ -4,6 +4,9 @@
 #include <QtMath>
 #include <QMap>
 
+#include "common/common.h"
+#include "laser/LaserDriver.h"
+
 cv::Mat imageUtils::halftone(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi, float degrees)
 {
     float inchWidth = mmWidth * MM_TO_INCH;
@@ -774,4 +777,25 @@ cv::Mat imageUtils::rotateMat(cv::Mat src, float degrees)
         }
     }
     return cv::Mat();
+}
+
+QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width)
+{
+    QByteArray bytes;
+    QDataStream stream(&bytes, QIODevice::ReadWrite);
+    int xStart = LaserDriver::instance().mm2MicroStep(x);
+    int xEnd = LaserDriver::instance().mm2MicroStep(x + width);
+    FillStyleAndPixelsCount fspc;
+    fspc.code = mat.cols;
+    fspc.fillStyle = 0;
+    for (int r = 0; r < mat.rows; r++)
+    {
+        int yStart = LaserDriver::instance().mm2MicroStep(y + r * rowInterval);
+        stream << yStart << xStart << xEnd << fspc.code;
+        for (int c = 0; c < mat.cols; c++)
+        {
+            stream << mat.ptr<quint8>(r)[c];
+        }
+    }
+    return bytes;
 }

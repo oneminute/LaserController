@@ -258,6 +258,8 @@ private:
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
     typedef int(__stdcall *FN_INT_BOOL)(bool pause);
 
+    typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double millimeter, bool xaxis);
+
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
 
@@ -299,6 +301,7 @@ public:
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
     void getDeviceWorkState();
+    int mm2MicroStep(double mm, bool xaxis = true);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
@@ -391,6 +394,8 @@ private:
     FN_INT_WCHART m_fnLoadDataFromFile;
 
     FN_VOID_VOID m_fnGetDeviceWorkState;
+
+    FN_INT_DOUBLE_BOOL m_fnMillimeter2MicroStep;
 
     wchar_t m_wcharBuffer[2048];
 

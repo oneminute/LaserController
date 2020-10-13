@@ -28,7 +28,7 @@ void TestLaserDriver::laserDriverTestCase()
     QList<double> values;
     addrs << 3 << 5 << 6;
     values << 0.003 << 0.004 << 0.005;
-    QVERIFY(driver.writeSysParamToCard(addrs, values));
+    //QVERIFY(driver.writeSysParamToCard(addrs, values));
     QVERIFY(driver.readSysParamFromCard(addrs));
     //driver.showAboutWindow();
     driver.lPenMoveToOriginalPoint(0.1);
