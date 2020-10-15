@@ -125,9 +125,76 @@ struct FillStyleAndPixelsCount
         };
     };
 
+    int count() const
+    {
+        return code & 0x7fffffff;
+    }
+
     FillStyleAndPixelsCount()
         : code(0)
     {}
 };
+
+Q_DECLARE_METATYPE(FillStyleAndPixelsCount);
+
+struct FinishRun
+{
+public:
+    FinishRun()
+        : code(0)
+    {}
+
+    union
+    {
+        quint16 code;
+        struct
+        {
+            quint8 action;
+            quint8 relays;
+        };
+    };
+
+    void setRelays(const QList<int>& relays, bool enabled = true)
+    {
+        for (int no : relays)
+        {
+            setRelay(no, enabled);
+        }
+    }
+
+    void setRelay(int no, bool enabled = true)
+    {
+        int relayNo = no;
+        if (relayNo < 0 || relayNo > 7)
+            return;
+
+        int relayBit = 1 << relayNo;
+
+        if (enabled)
+        {
+            relays |= relayBit;
+        }
+        else
+        {
+            relays &= ~relayBit;
+        }
+    }
+
+    void setAction(int action)
+    {
+        this->action = action;
+    }
+
+    bool isEnabled(int no)
+    {
+        int relayNo = no;
+        int relayBit = 1 << relayNo;
+        return relayBit & relays;
+    }
+
+    QString toString();
+};
+
+Q_DECLARE_METATYPE(FinishRun);
 
 #endif // COMMON_H

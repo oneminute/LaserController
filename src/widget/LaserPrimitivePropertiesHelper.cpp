@@ -36,7 +36,7 @@ void LaserPrimitivePropertiesHelper::resetProperties(LaserPrimitive * primitive,
     m_table->setItem(0, 0, nameLabelItem);
     m_table->setItem(0, 1, nameItem);
 
-    QTableWidgetItem* finishRunLabelItem = new QTableWidgetItem;
+    /*QTableWidgetItem* finishRunLabelItem = new QTableWidgetItem;
     finishRunLabelItem->setText(QObject::tr("Finish Run"));
     finishRunLabelItem->setFlags(nameLabelItem->flags() & ~Qt::ItemIsEditable);
     QTableWidgetItem* finishRunItem = new QTableWidgetItem;
@@ -46,5 +46,5 @@ void LaserPrimitivePropertiesHelper::resetProperties(LaserPrimitive * primitive,
     finishRunItem->setData(WidgetUserData::WUD_PropertyEditor, PropertyEditor::PE_FinishRunWidget);
     m_table->setItem(1, 0, finishRunLabelItem);
     m_table->setItem(1, 1, finishRunItem);
-    m_table->resizeRowToContents(1);
+    m_table->resizeRowToContents(1);*/
 }

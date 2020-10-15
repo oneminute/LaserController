@@ -10,6 +10,7 @@
 #include <QGraphicsObject>
 #include <QPolygonF>
 #include <QPainterPath>
+#include <QVector>
 
 #include <opencv2/opencv.hpp>
 
@@ -19,65 +20,83 @@ class LaserScene;
 class QPaintEvent;
 class LaserViewer;
 
-struct FinishRun
+struct Slice
 {
-public:
-    FinishRun()
-        : code(0)
-    {}
+    qreal y;
+    qreal xStart;
+    qreal xEnd;
+    FillStyleAndPixelsCount fspc;
+    QVector<quint8> pixels;
 
-    union
+    void reverse()
     {
-        quint16 code;
-        struct
-        {
-            quint8 action;
-            quint8 relays;
-        };
-    };
-
-    void setRelays(const QList<int>& relays, bool enabled = true)
-    {
-        for (int no : relays)
-        {
-            setRelay(no, enabled);
-        }
+        qSwap(xStart, xEnd);
+        std::reverse(pixels.begin(), pixels.end());
     }
 
-    void setRelay(int no, bool enabled = true)
+    qreal left() const
     {
-        int relayNo = no;
-        if (relayNo < 0 || relayNo > 7)
-            return;
-
-        int relayBit = 1 << relayNo;
-
-        if (enabled)
-        {
-            relays |= relayBit;
-        }
+        if (xStart < xEnd)
+            return xEnd;
         else
-        {
-            relays &= ~relayBit;
-        }
+            return xStart;
     }
 
-    void setAction(int action)
+    qreal right() const
     {
-        this->action = action;
+        if (xStart > xEnd)
+            return xStart;
+        else
+            return xEnd;
     }
 
-    bool isEnabled(int no)
+    qreal length() const
     {
-        int relayNo = no;
-        int relayBit = 1 << relayNo;
-        return relayBit & relays;
+        return right() - left();
     }
-
-    QString toString();
 };
 
-Q_DECLARE_METATYPE(FinishRun);
+struct SliceGroup
+{
+    QVector<Slice> slices;
+
+    Slice& first() { return slices.first(); }
+    Slice& last() { return slices.last(); }
+
+    void append(Slice& slice)
+    {
+        qreal startDiff = qAbs(slice.xStart - last().xEnd);
+        qreal endDiff = qAbs(slice.xEnd - last().xEnd);
+
+        if (startDiff > endDiff)
+        {
+            slice.reverse();
+        }
+
+        slices.append(slice);
+    }
+
+    bool adjacent(const Slice& slice, qreal vInterval, qreal hInterval = 0.1f)
+    {
+        if (isEmpty())
+            return false;
+
+        // determine vertical interval
+        if (slice.y - last().y > vInterval)
+            return false;
+
+        // determine horizontal interval
+        qreal left = qMin(slice.left(), last().left());
+        qreal right = qMin(slice.right(), last().right());
+
+        if (right - left - (slice.length() + last().length()) > hInterval)
+            return false;
+
+        return true;
+    }
+
+    bool isEmpty() const { return slices.isEmpty(); }
+};
 
 class LaserPrimitive : public QGraphicsObject
 {
@@ -114,8 +133,6 @@ public:
     LaserLayer* layer() const { return m_layer; }
     void setLayer(LaserLayer* layer) { m_layer = layer; }
 
-    FinishRun& finishRun() { return m_finishRun; }
-
 protected:
     QString typeName(LaserPrimitiveType typeId);
     QString typeLatinName(LaserPrimitiveType typeId);
@@ -132,7 +149,6 @@ protected:
     QRectF m_boundingRect;
     LaserPrimitiveType m_type;
     QString m_name;
-    FinishRun m_finishRun;
 
     bool m_isHover;
 

@@ -213,7 +213,7 @@ void LaserDocument::exportJSON(const QString& filename)
             if (layer->type() == LLT_ENGRAVING)
             {
                 itemObj["Layer"] = layerId;
-                itemObj["FinishRun"] = 0;
+                //itemObj["FinishRun"] = 0;
                 //QPointF pos = laserItem->laserStartPos();
                 //itemObj["StartX"] = laserItem->boundingRect().left();
                 //itemObj["StartY"] = laserItem->boundingRect().top();
@@ -240,7 +240,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     itemObj["Data"] = QString(pltUtils::points2Plt(points));
                 }
             }
-            itemObj["FinishRun"] = laserItem->finishRun().code;
+            //itemObj["FinishRun"] = laserItem->finishRun().code;
             items.append(itemObj);
         }
         layerObj["Items"] = items;

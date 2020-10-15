@@ -788,14 +788,27 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
     FillStyleAndPixelsCount fspc;
     fspc.code = mat.cols;
     fspc.fillStyle = 0;
+    bool forward = true;
     for (int r = 0; r < mat.rows; r++)
     {
         int yStart = LaserDriver::instance().mm2MicroStep(y + r * rowInterval);
-        stream << yStart << xStart << xEnd << fspc.code;
-        for (int c = 0; c < mat.cols; c++)
+        if (forward)
         {
-            stream << mat.ptr<quint8>(r)[c];
+            stream << yStart << xStart << xEnd << fspc.code;
+            for (int c = 0; c < mat.cols; c++)
+            {
+                stream << mat.ptr<quint8>(r)[c];
+            }
         }
+        else
+        {
+            stream << yStart << xEnd << xStart << fspc.code;
+            for (int c = mat.cols - 1; c >= 0; c--)
+            {
+                stream << mat.ptr<quint8>(r)[c];
+            }
+        }
+        forward = !forward;
     }
     return bytes;
 }
