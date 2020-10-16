@@ -35,6 +35,9 @@ namespace imageUtils
     cv::Mat rotateMat(cv::Mat src, float degrees);
 
     QByteArray image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width);
+
+    QPointF closestPointTo(const QPointF &target, const QPainterPath &sourcePath);
+    bool hit(const QLineF &line, const QPainterPath& path, QPointF &hitPos);
 }
 
 #endif // 

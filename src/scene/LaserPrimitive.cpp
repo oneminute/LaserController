@@ -561,9 +561,17 @@ QByteArray LaserShape::engravingImage(cv::Mat & canvas)
 
     QList<SliceGroup> groups;
 
-    for (int y = boundRect.top(); y <= boundRect.bottom(); y += pixelInterval)
+    for (qreal y = boundRect.top(); y <= boundRect.bottom(); y += pixelInterval)
     {
-        
+        QLineF hLine(boundRect.left() - 0.01f, y, boundRect.right() + 0.01f, y + 1);
+        QRectF hRect(hLine.p1(), hLine.p2());
+        QPainterPath linePath;
+        linePath.addRect(hRect);
+        QPainterPath intersection = path.intersected(linePath);
+        for (int i = 0; i < intersection.elementCount(); i++)
+        {
+            qDebug() << i << intersection.elementAt(i);
+        }
     }
     return bytes;
 }

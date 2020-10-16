@@ -783,6 +783,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
+    stream.setByteOrder(QDataStream::LittleEndian);
     int xStart = LaserDriver::instance().mm2MicroStep(x);
     int xEnd = LaserDriver::instance().mm2MicroStep(x + width);
     FillStyleAndPixelsCount fspc;
@@ -792,23 +793,93 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
     for (int r = 0; r < mat.rows; r++)
     {
         int yStart = LaserDriver::instance().mm2MicroStep(y + r * rowInterval);
+        int bitCount = 0;
+        quint8 byte = 0;
         if (forward)
         {
             stream << yStart << xStart << xEnd << fspc.code;
             for (int c = 0; c < mat.cols; c++)
             {
-                stream << mat.ptr<quint8>(r)[c];
+                int gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
+                bitCount++;
+                byte |= (gray << bitCount);
+                if (bitCount == 8)
+                {
+                    bitCount = 0;
+                    byte = 0;
+                    stream << byte;
+                }
             }
+            if (mat.cols % 8 != 0)
+                stream << byte;
         }
         else
         {
             stream << yStart << xEnd << xStart << fspc.code;
             for (int c = mat.cols - 1; c >= 0; c--)
             {
-                stream << mat.ptr<quint8>(r)[c];
+                int gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
+                bitCount++;
+                byte |= (gray << bitCount);
+                if (bitCount == 8)
+                {
+                    bitCount = 0;
+                    byte = 0;
+                    stream << byte;
+                }
             }
+            if (mat.cols % 8 != 0)
+                stream << byte;
         }
         forward = !forward;
     }
     return bytes;
+}
+
+/*!
+    Returns the closest element (position) in \a sourcePath to \a target,
+    using \l{QPoint::manhattanLength()} to determine the distances.
+*/
+QPointF imageUtils::closestPointTo(const QPointF &target, const QPainterPath &sourcePath)
+{
+    Q_ASSERT(!sourcePath.isEmpty());
+    QPointF shortestDistance = sourcePath.elementAt(0) - target;
+    qreal shortestLength = shortestDistance.manhattanLength();
+    for (int i = 1; i < sourcePath.elementCount(); ++i) {
+        const QPointF distance(sourcePath.elementAt(i) - target);
+        const qreal length = distance.manhattanLength();
+        if (length < shortestLength) {
+            shortestDistance = sourcePath.elementAt(i);
+            shortestLength = length;
+        }
+    }
+    return shortestDistance;
+}
+
+/*!
+    Returns \c true if \a projectilePath intersects with any items in \a scene,
+    setting \a hitPos to the position of the intersection.
+*/
+bool imageUtils::hit(const QLineF &line, const QPainterPath& path, QPointF &hitPos)
+{
+    //// Extend the first point in the path out by 1 pixel.
+    //QLineF startEdge = line.normalVector();
+    //startEdge.setLength(1);
+    //// Swap the points in the line so the normal vector is at the other end of the line.
+    //line.setPoints(pathAsLine.p2(), pathAsLine.p1());
+    //QLineF endEdge = pathAsLine.normalVector();
+    //// The end point is currently pointing the wrong way; move it to face the same
+    //// direction as startEdge.
+    //endEdge.setLength(-1);
+    //// Now we can create a rectangle from our edges.
+    //QPainterPath rectPath(startEdge.p1());
+    //rectPath.lineTo(startEdge.p2());
+    //rectPath.lineTo(endEdge.p2());
+    //rectPath.lineTo(endEdge.p1());
+    //rectPath.lineTo(startEdge.p1());
+    //// The hit position will be the element (point) of the rectangle that is the
+    //// closest to where the projectile was fired from.
+    //hitPos = closestPointTo(projectileStartPos, targetShape.intersected(rectPath));
+
+    return false;
 }

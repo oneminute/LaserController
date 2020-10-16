@@ -159,6 +159,7 @@ void LaserDocument::exportJSON(const QString& filename)
     laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
+    laserDocumentInfo["FinishRun"] = m_finishRun.code;
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layers;

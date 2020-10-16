@@ -54,6 +54,9 @@ public:
 
     void bindLayerButtons(const QList<LayerButton*>& layerButtons);
 
+    FinishRun& finishRun() { return m_finishRun; }
+    void setFinishRun(const FinishRun& value) { m_finishRun = value; }
+
     static int layersCount() { return m_layersCount; }
     static void setLayersCount(int count) { m_layersCount = count; }
 
@@ -85,6 +88,7 @@ private:
     bool m_blockSignals;
     bool m_isOpened;
     LaserScene* m_scene;
+    FinishRun m_finishRun;
 
     //static int m_engravingLayersCount;
     //static int m_cuttingLayersCount;
