@@ -1,8 +1,10 @@
 #include "ImageUtils.h"
 
 #include <QDebug>
+#include <QFile>
 #include <QtMath>
 #include <QMap>
+#include <QPainterPath>
 
 #include "common/common.h"
 #include "laser/LaserDriver.h"
@@ -833,6 +835,15 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         }
         forward = !forward;
     }
+    QFile file("image.bin");
+    file.open(QIODevice::ReadWrite);
+    file.write(bytes.toBase64());
+    file.close();
+    QFile reopenFile("image.bin");
+    file.open(QIODevice::ReadOnly);
+    QByteArray reopenBytes = file.readAll();
+    QByteArray hexBytes = QByteArray::fromBase64(reopenBytes);
+
     return bytes;
 }
 

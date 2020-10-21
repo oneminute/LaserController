@@ -1,5 +1,6 @@
 #include "LaserLayerTreeWidget.h"
 
+#include <QDropEvent>
 #include <QSharedData>
 #include <QMimeData>
 

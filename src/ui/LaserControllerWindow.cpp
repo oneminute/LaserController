@@ -256,7 +256,10 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 {
     QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::CORELDRAW);
-    LaserDocument* doc = importer->import("", m_scene);
+    QVariantMap params;
+    params["parent_winid"] = winId();
+    params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
+    LaserDocument* doc = importer->import("", m_scene, params);
     if (doc)
     {
         doc->bindLayerButtons(m_layerButtons);

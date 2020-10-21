@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMap>
+#include <QVariant>
 
 class LaserDocument;
 class LaserScene;
@@ -19,7 +21,7 @@ public:
 
     Importer(QWidget* parentWnd, QObject* parent = nullptr);
 
-    virtual LaserDocument* import(const QString& filename, LaserScene* scene) = 0;
+    virtual LaserDocument* import(const QString& filename, LaserScene* scene, const QVariantMap& params = QVariantMap()) = 0;
     
     static QSharedPointer<Importer> getImporter(QWidget* parentWnd, Types type);
 

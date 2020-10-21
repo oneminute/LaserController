@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QStack>
+#include <QMainWindow>
 
 #include "svg/qsvgtinydocument.h"
 #include "svg/qsvgrenderer.h"
@@ -21,9 +22,16 @@ SvgImporter::~SvgImporter()
 {
 }
 
-LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene)
+LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, const QVariantMap& params)
 {
-    ImportSVGDialog dialog;
+    QMainWindow* parent = nullptr;
+    if (params.contains("parent_win"))
+    {
+        parent = params["parent_win"].value<QMainWindow*>();
+        parent->activateWindow();
+        parent->setFocus();
+    }
+    ImportSVGDialog dialog(parent);
     if (dialog.exec() == QDialog::Rejected)
         return nullptr;
 

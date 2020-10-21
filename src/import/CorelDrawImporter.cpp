@@ -10,6 +10,17 @@
 #include <QDialog>
 #include <QMessageBox>
 
+#ifdef _DEBUG
+// If you are not building 32-bit Debug target, update this include path, so
+// the IntelliSense manages to load the generated header file for the type library.
+#include <LaserController.dir\Debug\VGCoreAuto.tlh>
+#else
+#import "libid:95E23C91-BC5A-49F3-8CD1-1FC515597048" version("12.0") \
+      rename("GetCommandLine", "VGGetCommandLine") \
+      rename("CopyFile", "VGCopyFile") \
+      rename("FindWindow", "VGFindWindow")
+#endif
+
 CorelDrawImporter::CorelDrawImporter(QWidget* parentWnd, QObject* parent)
     : Importer(parentWnd, parent)
 {
@@ -20,33 +31,28 @@ CorelDrawImporter::~CorelDrawImporter()
 {
 }
 
-LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* scene)
+LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* scene, const QVariantMap& params)
 {
-    VGCore::IVGApplicationPtr app;
+    //nativeImport(filename, scene);
+
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-    if (FAILED(hr))
-    {
-        qWarning() << "Can not initialize CorelDraw.";
-        return nullptr;
-    }
-
-    app = VGCore::IVGApplicationPtr(L"CorelDRAW.Application.18");
-    qDebug() << "visible: " << app->Visible;
-    /*if (!app->Visible)
-    {
-        QMessageBox::warning(m_parentWnd, tr("CorelDRAW not open"), tr("Please open your corelDRAW application!"));
-        return nullptr;
-    }*/
-
+    //CLSID clsid;
+    //hr = CLSIDFromProgID(L"CorelDRAW.Application.18", &clsid);
+    /*VGCore::IVGApplication* app = nullptr;
+    hr = CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER,
+        __uuidof(VGCore::IVGApplication),
+        reinterpret_cast<void**>(&app));    */
     QDir tmpDir(QCoreApplication::applicationDirPath() + "/tmp");
+    VGCore::IVGApplicationPtr app(L"CorelDRAW.Application.18");
     
-    QString tmpSvgFilename = "";
+    QString tmpSvgFilename = "d:\\test.svg";
+    bool success = true;
     try
     {
         app->Visible = VARIANT_TRUE;
-        //VGCore::IVGWindowPtr window = app->AppWindow;
-        //qDebug() << "window:" << window;
-        //window->Activate();
+        VGCore::IVGWindowPtr window = app->ActiveWindow;
+        qDebug() << "window:" << window;
+        window->Activate();
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
         if (!doc)
         {
@@ -62,27 +68,30 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         }
 
         tmpSvgFilename = utils::createUUID() + ".svg";
-        tmpSvgFilename = tmpDir.absoluteFilePath(tmpSvgFilename);
+        tmpSvgFilename = QDir::toNativeSeparators(tmpDir.absoluteFilePath(tmpSvgFilename));
 
         qDebug().noquote() << "export corel draw active document to" << tmpSvgFilename;
         
-        VGCore::IVGStructExportOptionsPtr opt = app->CreateStructExportOptions();
+        //VGCore::IVGStructExportOptionsPtr opt = app->CreateStructExportOptions();
         //opt->AlwaysOverprintBlack = true;
         //opt->AntiAliasingType = VGCore::cdrNormalAntiAliasing;
         //opt->Compression = VGCore::cdrCompressionNone;
         //opt->Dithered = false;
-        opt->ImageType = VGCore::cdrGrayscaleImage;
+        //opt->ImageType = VGCore::cdrGrayscaleImage;
         //opt->ResolutionX = 72;
         //opt->ResolutionY = 72;
 
-        VGCore::IVGStructPaletteOptionsPtr pal = app->CreateStructPaletteOptions();
+        //VGCore::IVGStructPaletteOptionsPtr pal = app->CreateStructPaletteOptions();
         //pal->PaletteType = VGCore::cdrPaletteOptimized;
         //pal->NumColors = 16;
         //pal->DitherType = VGCore::cdrDitherNone;
-        VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, range, opt, pal);
+        VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, range, nullptr, nullptr);
         if (filter->HasDialog)
         {
-            if (filter->ShowDialog(0))
+            int parentWinId = 0;
+            if (params.contains("parent_winid"))
+                parentWinId = params["parent_winid"].toInt();
+            if (filter->ShowDialog(parentWinId))
             {
                 hr = filter->Finish();
                 if (FAILED(hr))
@@ -100,20 +109,27 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         //wprintf(L"Error occurred: 0x%08X (%s)\n", ex.Error(), ex.ErrorMessage());
         QString errorMessage = QString::fromLocal8Bit(std::system_category().message(ex.Error()).c_str());
         qDebug() << errorMessage;
-        return nullptr;
+        success = false;
     }
 
-    QSharedPointer<Importer> importer = Importer::getImporter(m_parentWnd, Importer::SVG);
-    LaserDocument* doc = importer->import(tmpSvgFilename, scene);
-
-    if (doc)
+    LaserDocument* doc = nullptr;
+    if (success)
     {
-        if (tmpDir.exists(tmpSvgFilename))
-        {
-            tmpDir.remove(tmpSvgFilename);
-        }
+        QSharedPointer<Importer> importer = Importer::getImporter(m_parentWnd, Importer::SVG);
+        doc = importer->import(tmpSvgFilename, scene, params);
 
-        doc->open();
+        if (doc)
+        {
+            if (tmpDir.exists(tmpSvgFilename))
+            {
+                //tmpDir.remove(tmpSvgFilename);
+            }
+
+            doc->open();
+        }
     }
+    app->Release();
+    CoUninitialize();
     return doc;
 }
+

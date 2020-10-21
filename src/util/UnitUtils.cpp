@@ -2,6 +2,7 @@
 #include "UnitUtils.h"
 
 #include <QtMath>
+#include <QSize>
 
 namespace unitUtils
 {

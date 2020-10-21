@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QtMath>
 #include <QSaveFile>
+#include <QFile>
 
 #include <opencv2/opencv.hpp>
 

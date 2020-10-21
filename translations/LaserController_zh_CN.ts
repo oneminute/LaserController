@@ -33,12 +33,12 @@
 <context>
     <name>CorelDrawImporter</name>
     <message>
-        <location filename="../src/import/CorelDrawImporter.cpp" line="53"/>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="64"/>
         <source>No active document</source>
         <translation>无打开的有效文档</translation>
     </message>
     <message>
-        <location filename="../src/import/CorelDrawImporter.cpp" line="53"/>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="64"/>
         <source>No active document in CorelDRAW!</source>
         <translation>CorelDRAW中无打开的有效文档！</translation>
     </message>
@@ -340,7 +340,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="291"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="307"/>
         <source>Bitmap</source>
         <translation type="unfinished">位图</translation>
     </message>
@@ -990,7 +990,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="120"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="121"/>
         <source>Layer</source>
         <translation>图层</translation>
     </message>
@@ -1433,33 +1433,33 @@ Would you like to overwrite it?</source>
         <translation>激光控制器</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="498"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="502"/>
         <source>Relays: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="514"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="529"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="518"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="533"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="517"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="521"/>
         <source>Release</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="520"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="524"/>
         <source>Machining 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="523"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="527"/>
         <source>Machining 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="526"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="530"/>
         <source>Machining 3</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1467,11 +1467,6 @@ Would you like to overwrite it?</source>
         <location filename="../src/widget/LaserPrimitivePropertiesHelper.cpp" line="29"/>
         <source>Name</source>
         <translation type="unfinished">名称</translation>
-    </message>
-    <message>
-        <location filename="../src/widget/LaserPrimitivePropertiesHelper.cpp" line="40"/>
-        <source>Finish Run</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
