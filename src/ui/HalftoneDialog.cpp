@@ -8,8 +8,8 @@ HalftoneDialog::HalftoneDialog(QWidget* parent)
     m_ui->setupUi(this);
 
     m_ui->editSliderLpi->setMinimum(1);
-    m_ui->editSliderLpi->setMaximum(200);
-    m_ui->editSliderLpi->setValue(100);
+    m_ui->editSliderLpi->setMaximum(100);
+    m_ui->editSliderLpi->setValue(40);
 
     m_ui->editSliderDegrees->setMaximum(90);
     m_ui->editSliderDegrees->setValue(45);
