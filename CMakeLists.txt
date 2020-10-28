@@ -21,16 +21,8 @@ set(QT_WIN32_PATH "" CACHE PATH "")
 set(OPENCV_WIN32_PATH "" CACHE PATH "")
 list(APPEND CMAKE_PROGRAM_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH})
 
-message(CMAKE_PROGRAM_PATH=${CMAKE_PROGRAM_PATH})
-message(CMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH})
-message(CMAKE_SYSTEM_PROGRAM_PATH=${CMAKE_SYSTEM_PROGRAM_PATH})
-message(CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH})
-
 set(NEW_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH} $ENV{PATH})
 set(CMAKE_MSVCIDE_RUN_PATH ${NEW_PATH})
-foreach(VAR in ${CMAKE_MSVCIDE_RUN_PATH})
-    message(${VAR})
-endforeach(VAR in ${CMAKE_MSVCIDE_RUN_PATH})
 
 # Find the QtWidgets library
 set(Boost_USE_STATIC_LIBS ON)
@@ -46,6 +38,8 @@ find_package(gflags REQUIRED QUIET)
 
 set(TS_FILES translations/LaserController_zh_CN.ts)
 
+add_subdirectory(src/widget/LRWidgets)
+
 #add_subdirectory(widgets)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
@@ -54,7 +48,7 @@ set(INCLUDE_DIRS
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
-    third/CustomWidgets/include
+    src/widget/LRWidgets
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)
@@ -170,19 +164,14 @@ IF(MSVC)
 ENDIF(MSVC)
 
 include_directories(${INCLUDE_DIRS})
-SET(CustomWidgets_LIBRARY
-  debug ${CMAKE_CURRENT_SOURCE_DIR}/third/CustomWidgets/lib/CustomWidgetsd.lib
-  optimized ${CMAKE_CURRENT_SOURCE_DIR}/third/CustomWidgets/lib/CustomWidgets.lib
-)
-message(${CustomWidgets_LIBRARY})
 set(LINK_LIBRARIES 
     Qt5::Widgets Qt5::Charts Qt5::OpenGL
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
     ${ZLIB_LIBRARIES}
-    ${CustomWidgets_LIBRARY}
     glog::glog
     ${GFLAGS_LIBRARIES}
+    LRWidgets
 )
 
 message(STATUS ${GFLAGS_LIBRARIES})
@@ -214,7 +203,6 @@ function(WIN_DEPLOY_QT target)
     # POST_BUILD step
     # - after build, we have a bin/lib for analyzing qt dependencies
     # - we run windeployqt on target and deploy Qt libs
-
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND "${QT_BIN_DIR}/windeployqt.exe"         
                 --dir ${CMAKE_INSTALL_PREFIX}
@@ -226,14 +214,11 @@ function(WIN_DEPLOY_QT target)
     )
 
 endfunction()
-message(${QMAKE_EXECUTABLE})
-message(${QT_BIN_DIR})
 
 INSTALL(TARGETS LaserController
         DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime)
 
 INSTALL(FILES 
-            "${CMAKE_SOURCE_DIR}/third/bin/CustomWidgets.dll"
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
         DESTINATION ${CMAKE_INSTALL_PREFIX})
@@ -242,4 +227,6 @@ INSTALL(FILES
             "${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.qm"
         DESTINATION ${CMAKE_INSTALL_PREFIX}/translations)
 
-WIN_DEPLOY_QT(LaserController)
+INSTALL(CODE "
+        WIN_DEPLOY_QT(LaserController)
+        ")

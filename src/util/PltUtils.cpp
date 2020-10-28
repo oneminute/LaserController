@@ -55,7 +55,8 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     qreal anchorRadians = radians;
 
     points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
-    cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+    if (!canvas.empty())
+        cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
 
     for (int i = 1; i < length; i++)
     {
@@ -69,8 +70,11 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
         diff = qRadiansToDegrees(diff);
         if (diff >= 5.0 || radians * anchorRadians < 0)
         {
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(255, 0, 0));
-            cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+            if (!canvas.empty())
+            {
+                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(255, 0, 0));
+                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+            }
             points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
             anchor = pt;
             anchorSlope = slope;
@@ -79,13 +83,15 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     }
 
     pt = path.pointAtPercent(1.0);
-    cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
+    if (!canvas.empty())
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
 
     QPointF endPt = pt;
     if (!pointsEql(startPt, endPt))
     {
         points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
-        cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
+        if (!canvas.empty())
+            cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     }
     
     return points.size();

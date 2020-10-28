@@ -185,12 +185,12 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, SizeUnit un
     m_boundingRect = m_bounds;
 }
 
-std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& mat)
+std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& canvas)
 {
     QPainterPath path = toPath();
 
     std::vector<cv::Point2f> points;
-    pltUtils::pathPoints(path, points, mat);
+    pltUtils::pathPoints(path, points, canvas);
     return points;
 }
 
@@ -223,7 +223,7 @@ void LaserRect::draw(QPainter* painter)
     painter->drawRect(m_rect);
 }
 
-std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& mat)
+std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& canvas)
 {
     QTransform t = m_transform * sceneTransform();
     std::vector<cv::Point2f> points;
@@ -236,10 +236,13 @@ std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& mat)
     points.push_back(pt3);
     points.push_back(pt4);
 
-    cv::line(mat, pt1, pt2, cv::Scalar(0));
-    cv::line(mat, pt2, pt3, cv::Scalar(0));
-    cv::line(mat, pt3, pt4, cv::Scalar(0));
-    cv::line(mat, pt4, pt1, cv::Scalar(0));
+    if (!canvas.empty())
+    {
+        cv::line(canvas, pt1, pt2, cv::Scalar(0));
+        cv::line(canvas, pt2, pt3, cv::Scalar(0));
+        cv::line(canvas, pt3, pt4, cv::Scalar(0));
+        cv::line(canvas, pt4, pt1, cv::Scalar(0));
+    }
 
     return points;
 }
@@ -281,12 +284,12 @@ LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, SizeUnit un
     m_boundingRect = path.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& mat)
+std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& canvas)
 {
     std::vector<cv::Point2f> points;
     QPainterPath path = toPath();
     
-    pltUtils::pathPoints(path, points, mat);
+    pltUtils::pathPoints(path, points, canvas);
     
     return points;
 }
@@ -316,7 +319,7 @@ LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, SizeUn
     m_boundingRect = m_poly.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & mat)
+std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
 {
     std::vector<cv::Point2f> points;
     cv::Point2f lastPt;
@@ -325,14 +328,15 @@ std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & mat)
     {
         QPointF pt = t.map(m_poly[i]) * 40;
         cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
-        if (i > 0)
+        if (i > 0 && !canvas.empty())
         {
-            cv::line(mat, lastPt, cvPt, cv::Scalar(0));
+            cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
         }
         lastPt = cvPt;
         points.push_back(cvPt);
     }
-    cv::line(mat, points[points.size() - 1], points[0], cv::Scalar(0));
+    if (!canvas.empty())
+        cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     
     return points;
 }
@@ -362,7 +366,7 @@ LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, SizeUnit
     m_boundingRect = m_poly.boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & mat)
+std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & canvas)
 {
     std::vector<cv::Point2f> points;
     cv::Point2f lastPt;
@@ -371,14 +375,15 @@ std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & mat)
     {
         QPointF pt = t.map(m_poly[i]) * 40;
         cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
-        if (i > 0)
+        if (i > 0 && !canvas.empty())
         {
-            cv::line(mat, lastPt, cvPt, cv::Scalar(0));
+            cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
         }
         lastPt = cvPt;
         points.push_back(cvPt);
     }
-    cv::line(mat, points[points.size() - 1], points[0], cv::Scalar(0));
+    if (!canvas.empty())
+        cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     
     return points;
 }
@@ -434,8 +439,10 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     }
     qreal pixelInterval = scanInterval * yPulseLength;
 
-    int outWidth = mmWidth * MM_TO_INCH * 600;
-    int outHeight = std::round(mmHeight / pixelInterval);
+    qreal boundingWidth = boundingRect().width();
+    qreal boundingHeight = boundingRect().height();
+    int outWidth = boundingWidth * MM_TO_INCH * 600;
+    int outHeight = std::round(boundingHeight / pixelInterval);
     qDebug() << " out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
 
@@ -447,21 +454,10 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     {
         outMat = imageUtils::halftone2(resized, layer()->lpi(), layer()->dpi(), 45, layer()->nonlinearCoefficient());
     }
-    //std::vector<uchar> buffer;
-    //std::vector<int>param; 
-    //param.push_back(cv::IMWRITE_PNG_BILEVEL);
-    //param.push_back(1);
-    //param.push_back(cv::IMWRITE_PNG_COMPRESSION);
-    //param.push_back(0);
-    //cv::imencode(".png", outMat, buffer, param);
-
-    //QBuffer baBuf(&ba);
-    //baBuf.open(QIODevice::WriteOnly);
-    //baBuf.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
 
     QPointF pos = laserStartPos();
     ba = imageUtils::image2EngravingData(outMat, boundingRect().left(), 
-        boundingRect().top(), pixelInterval, mmWidth);
+        boundingRect().top(), pixelInterval, boundingWidth);
 
     QTransform t = m_transform * sceneTransform();
     if (!canvas.empty())

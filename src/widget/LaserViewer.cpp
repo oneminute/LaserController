@@ -18,13 +18,6 @@ LaserViewer::LaserViewer(QWidget* parent)
     init();
 }
 
-//LaserViewer::LaserViewer(LaserScene* scene, QWidget* parent)
-//    : QGraphicsView(scene, parent)
-//    , m_scene(scene)
-//{
-//    init();
-//}
-
 LaserViewer::~LaserViewer()
 {
     init();
@@ -32,13 +25,13 @@ LaserViewer::~LaserViewer()
 
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
+    QGraphicsView::paintEvent(event);
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         QPainter painter(viewport());
         painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
     }
-    QGraphicsView::paintEvent(event);
 }
 
 void LaserViewer::wheelEvent(QWheelEvent * event)

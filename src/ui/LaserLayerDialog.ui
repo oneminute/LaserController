@@ -107,42 +107,10 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderMinSpeed">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>300</number>
-        </property>
-        <property name="value">
-         <number>60</number>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Run Speed</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderRunSpeed">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>300</number>
         </property>
        </widget>
       </item>
@@ -153,45 +121,10 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderLaserPower">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="pageStep">
-         <number>50</number>
-        </property>
-        <property name="value">
-         <number>60</number>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="0">
        <widget class="QLabel" name="label_14">
         <property name="text">
          <string>Min Speed Power</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderMinSpeedPower">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>60</number>
         </property>
        </widget>
       </item>
@@ -202,21 +135,20 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="1">
+       <widget class="EditSlider" name="editSliderMinSpeed" native="true"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="EditSlider" name="editSliderRunSpeed" native="true"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="EditSlider" name="editSliderLaserPower" native="true"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="EditSlider" name="editSliderMinSpeedPower" native="true"/>
+      </item>
       <item row="6" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderRunSpeedPower">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>60</number>
-        </property>
-       </widget>
+       <widget class="EditSlider" name="editSliderRunSpeedPower" native="true"/>
       </item>
      </layout>
     </widget>
@@ -298,34 +230,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderLineSpacing">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>10</number>
-        </property>
-        <property name="text">
-         <string>10</string>
-        </property>
-        <property name="maximumLineEditSize">
-         <size>
-          <width>30</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
@@ -333,21 +237,11 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="1">
+       <widget class="EditSlider" name="editSliderLineSpacing" native="true"/>
+      </item>
       <item row="3" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderColumnSpacing">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>10</number>
-        </property>
-       </widget>
+       <widget class="EditSlider" name="editSliderColumnSpacing" native="true"/>
       </item>
      </layout>
     </widget>
@@ -368,48 +262,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderLPI">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>200</number>
-        </property>
-        <property name="value">
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>DPI</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="HorizontalEditSlider" name="horizontalEditSliderDPI">
-        <property name="toolTip">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="whatsThis">
-         <string>A widget combined Horizontal Slider and Line Edit.</string>
-        </property>
-        <property name="minimum">
-         <number>300</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>600</number>
         </property>
        </widget>
       </item>
@@ -444,6 +300,12 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="EditSlider" name="editSliderLPI" native="true"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="EditSlider" name="editSliderDPI" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -461,9 +323,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>HorizontalEditSlider</class>
+   <class>EditSlider</class>
    <extends>QWidget</extends>
-   <header>HorizontalEditSlider.h</header>
+   <header>widget/LRWidgets/widget/editslider.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -8,6 +8,7 @@
 
 #include "common/common.h"
 #include "laser/LaserDriver.h"
+#include "UnitUtils.h"
 
 cv::Mat imageUtils::halftone(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi, float degrees)
 {
@@ -786,15 +787,15 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
     stream.setByteOrder(QDataStream::LittleEndian);
-    int xStart = LaserDriver::instance().mm2MicroStep(x);
-    int xEnd = LaserDriver::instance().mm2MicroStep(x + width);
+    int xStart = unitUtils::mm2MicroMM(x);
+    int xEnd = unitUtils::mm2MicroMM(x + width);
     FillStyleAndPixelsCount fspc;
-    fspc.code = mat.cols;
-    fspc.fillStyle = 0;
+    fspc.setCount(mat.cols);
+    fspc.setSame(false);
     bool forward = true;
     for (int r = 0; r < mat.rows; r++)
     {
-        int yStart = LaserDriver::instance().mm2MicroStep(y + r * rowInterval);
+        int yStart = unitUtils::mm2MicroMM(y + r * rowInterval);
         int bitCount = 0;
         quint8 byte = 0;
         if (forward)
@@ -802,14 +803,16 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
             stream << yStart << xStart << xEnd << fspc.code;
             for (int c = 0; c < mat.cols; c++)
             {
-                int gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
+                quint8 pixel = mat.ptr<quint8>(r)[c];
+                //qDebug() << mat.ptr<quint8>(r)[c];
+                quint8 gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
                 bitCount++;
                 byte |= (gray << bitCount);
                 if (bitCount == 8)
                 {
                     bitCount = 0;
-                    byte = 0;
                     stream << byte;
+                    byte = 0;
                 }
             }
             if (mat.cols % 8 != 0)
@@ -820,14 +823,14 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
             stream << yStart << xEnd << xStart << fspc.code;
             for (int c = mat.cols - 1; c >= 0; c--)
             {
-                int gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
+                quint8 gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
                 bitCount++;
                 byte |= (gray << bitCount);
                 if (bitCount == 8)
                 {
                     bitCount = 0;
-                    byte = 0;
                     stream << byte;
+                    byte = 0;
                 }
             }
             if (mat.cols % 8 != 0)
@@ -835,15 +838,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         }
         forward = !forward;
     }
-    QFile file("image.bin");
-    file.open(QIODevice::ReadWrite);
-    file.write(bytes.toBase64());
-    file.close();
-    QFile reopenFile("image.bin");
-    file.open(QIODevice::ReadOnly);
-    QByteArray reopenBytes = file.readAll();
-    QByteArray hexBytes = QByteArray::fromBase64(reopenBytes);
-
+    
     return bytes;
 }
 
@@ -894,3 +889,4 @@ bool imageUtils::hit(const QLineF &line, const QPainterPath& path, QPointF &hitP
 
     return false;
 }
+

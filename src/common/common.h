@@ -115,19 +115,35 @@ enum WidgetUserData
 
 struct FillStyleAndPixelsCount
 {
-    union {
-        int code;
-        struct {
-            quint8 fillStyle;
-            quint8 count0;
-            quint8 count1;
-            quint8 count2;
-        };
-    };
+    int code;
 
     int count() const
     {
         return code & 0x7fffffff;
+    }
+
+    void setCount(int count)
+    {
+        code &= 0x80000000;
+        int t = count & 0x7fffffff;
+        code |= t;
+    }
+
+    void setSame(bool same = true)
+    {
+        if (same)
+        {
+            code |= 0x80000000;
+        }
+        else
+        {
+            code &= 0x7fffffff;
+        }
+    }
+
+    bool same()
+    {
+        return code & 0x80000000;
     }
 
     FillStyleAndPixelsCount()

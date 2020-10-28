@@ -520,10 +520,10 @@ void LaserDriver::getDeviceWorkState()
     m_fnGetDeviceWorkState();
 }
 
-int LaserDriver::mm2MicroStep(double mm, bool xaxis)
-{
-    return m_fnMillimeter2MicroStep(mm, xaxis);
-}
+//int LaserDriver::mm2MicroStep(double mm, bool xaxis)
+//{
+//    return m_fnMillimeter2MicroStep(mm, xaxis);
+//}
 
 void LaserDriver::setRegister(RegisterType rt, QVariant value)
 {

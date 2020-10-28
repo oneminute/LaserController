@@ -38,6 +38,7 @@ namespace imageUtils
 
     QPointF closestPointTo(const QPointF &target, const QPainterPath &sourcePath);
     bool hit(const QLineF &line, const QPainterPath& path, QPointF &hitPos);
+
 }
 
 #endif // 

@@ -1,5 +1,5 @@
 #include "LaserLayerDialog.h"
-#include "HorizontalEditSlider.h"
+#include "widget/EditSlider.h"
 #include "ui_LaserLayerDialog.h"
 
 #include "scene/LaserLayer.h"
@@ -31,38 +31,6 @@ void LaserLayerDialog::initUi()
     connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
     connect(m_ui->radioButtonBoth, &QRadioButton::toggled, this, &LaserLayerDialog::onBothToggled);
 
-    /*QVariant value;
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
-    {
-        m_ui->horizontalEditSliderLineSpacing->setValue(value.toInt());
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_COLUMN_STEP, value))
-    {
-        m_ui->horizontalEditSliderColumnSpacing->setValue(value.toInt());
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_CUSTOM_1_X, value))
-    {
-        m_ui->horizontalEditSliderStartX->setValue(value.toInt());
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_CUSTOM_1_Y, value))
-    {
-        m_ui->horizontalEditSliderStartY->setValue(value.toInt());
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_X_AXIS_BACKLASH, value))
-    {
-        m_ui->horizontalEditSliderErrorX->setValue(value.toInt());
-    }*/
-    /*if (LaserDriver::instance().getRegister(LaserDriver::RT_CUTTING_LAUNCHING_SPEED_RATIO, value))
-    {
-        m_ui->horizontalEditSliderMinSpeedPower->setValue(value.toInt());
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_CUTTING_RUNNING_SPEED_RATIO, value))
-    {
-        m_ui->horizontalEditSliderRunSpeedPower->setValue(value.toInt());
-    }*/
-
-    //m_ui->horizontalEditSliderStartX->setMaximum(m_doc->pageInformation().width());
-    //m_ui->horizontalEditSliderStartY->setMaximum(m_doc->pageInformation().height());
     if (m_type == LLT_ENGRAVING)
     {
         initEngravingParameters();
@@ -86,24 +54,24 @@ void LaserLayerDialog::initUi()
     }
 
     m_ui->lineEditLayerName->setText(m_layer->name());
-    m_ui->horizontalEditSliderMinSpeed->setValue(m_layer->minSpeed());
-    m_ui->horizontalEditSliderRunSpeed->setValue(m_layer->runSpeed());
-    m_ui->horizontalEditSliderLaserPower->setValue(m_layer->laserPower());
+    m_ui->editSliderMinSpeed->setValue(m_layer->minSpeed());
+    m_ui->editSliderRunSpeed->setValue(m_layer->runSpeed());
+    m_ui->editSliderLaserPower->setValue(m_layer->laserPower());
     m_ui->checkBoxEngravingForward->setChecked(m_layer->engravingForward());
-    m_ui->horizontalEditSliderLineSpacing->setValue(m_layer->lineSpacing());
-    m_ui->horizontalEditSliderColumnSpacing->setValue(m_layer->columnSpacing());
-    m_ui->horizontalEditSliderMinSpeedPower->setValue(m_layer->minSpeedPower());
-    m_ui->horizontalEditSliderRunSpeedPower->setValue(m_layer->runSpeedPower());
+    m_ui->editSliderLineSpacing->setValue(m_layer->lineSpacing());
+    m_ui->editSliderColumnSpacing->setValue(m_layer->columnSpacing());
+    m_ui->editSliderMinSpeedPower->setValue(m_layer->minSpeedPower());
+    m_ui->editSliderRunSpeedPower->setValue(m_layer->runSpeedPower());
     m_ui->checkBoxUseHalftone->setChecked(m_layer->useHalftone());
 }
 
 void LaserLayerDialog::initCuttingParameters()
 {
-    m_ui->horizontalEditSliderMinSpeed->setValue(15);
-    m_ui->horizontalEditSliderRunSpeed->setValue(60);
-    m_ui->horizontalEditSliderLaserPower->setValue(80);
-    m_ui->horizontalEditSliderMinSpeedPower->setValue(700);
-    m_ui->horizontalEditSliderRunSpeedPower->setValue(1000);
+    m_ui->editSliderMinSpeed->setValue(15);
+    m_ui->editSliderRunSpeed->setValue(60);
+    m_ui->editSliderLaserPower->setValue(80);
+    m_ui->editSliderMinSpeedPower->setValue(700);
+    m_ui->editSliderRunSpeedPower->setValue(1000);
     m_ui->groupBoxGeneral->setVisible(true);
     m_ui->groupBoxEngraving->setVisible(false);
     m_ui->groupBoxBitmap->setVisible(false);
@@ -112,13 +80,13 @@ void LaserLayerDialog::initCuttingParameters()
 
 void LaserLayerDialog::initEngravingParameters()
 {
-    m_ui->horizontalEditSliderMinSpeed->setValue(60);
-    m_ui->horizontalEditSliderRunSpeed->setValue(300);
-    m_ui->horizontalEditSliderLaserPower->setValue(115);
-    m_ui->horizontalEditSliderLineSpacing->setValue(7);
-    m_ui->horizontalEditSliderColumnSpacing->setValue(0);
-    m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
-    m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
+    m_ui->editSliderMinSpeed->setValue(60);
+    m_ui->editSliderRunSpeed->setValue(300);
+    m_ui->editSliderLaserPower->setValue(115);
+    m_ui->editSliderLineSpacing->setValue(7);
+    m_ui->editSliderColumnSpacing->setValue(0);
+    m_ui->editSliderMinSpeedPower->setValue(0);
+    m_ui->editSliderRunSpeedPower->setValue(900);
     m_ui->groupBoxGeneral->setVisible(true);
     m_ui->groupBoxEngraving->setVisible(true);
     m_ui->groupBoxBitmap->setVisible(true);
@@ -127,13 +95,13 @@ void LaserLayerDialog::initEngravingParameters()
 
 void LaserLayerDialog::initBothParameters()
 {
-    m_ui->horizontalEditSliderMinSpeed->setValue(60);
-    m_ui->horizontalEditSliderRunSpeed->setValue(300);
-    m_ui->horizontalEditSliderLaserPower->setValue(115);
-    m_ui->horizontalEditSliderLineSpacing->setValue(7);
-    m_ui->horizontalEditSliderColumnSpacing->setValue(0);
-    m_ui->horizontalEditSliderMinSpeedPower->setValue(0);
-    m_ui->horizontalEditSliderRunSpeedPower->setValue(900);
+    m_ui->editSliderMinSpeed->setValue(60);
+    m_ui->editSliderRunSpeed->setValue(300);
+    m_ui->editSliderLaserPower->setValue(115);
+    m_ui->editSliderLineSpacing->setValue(7);
+    m_ui->editSliderColumnSpacing->setValue(0);
+    m_ui->editSliderMinSpeedPower->setValue(0);
+    m_ui->editSliderRunSpeedPower->setValue(900);
     m_ui->groupBoxGeneral->setVisible(true);
     m_ui->groupBoxEngraving->setVisible(true);
     m_ui->groupBoxBitmap->setVisible(true);
@@ -169,17 +137,17 @@ void LaserLayerDialog::onBothToggled(bool checked)
 
 void LaserLayerDialog::accept()
 {
-    m_layer->setMinSpeed(m_ui->horizontalEditSliderMinSpeed->value());
-    m_layer->setRunSpeed(m_ui->horizontalEditSliderRunSpeed->value());
-    m_layer->setLaserPower(m_ui->horizontalEditSliderLaserPower->value());
+    m_layer->setMinSpeed(m_ui->editSliderMinSpeed->value());
+    m_layer->setRunSpeed(m_ui->editSliderRunSpeed->value());
+    m_layer->setLaserPower(m_ui->editSliderLaserPower->value());
     m_layer->setEngravingForward(m_ui->checkBoxEngravingForward->isChecked());
     m_layer->setEngravingStyle(m_ui->radioButtonByRow->isChecked());
-    m_layer->setLineSpacing(m_ui->horizontalEditSliderLineSpacing->value());
-    m_layer->setColumnSpacing(m_ui->horizontalEditSliderColumnSpacing->value());
-    m_layer->setMinSpeedPower(m_ui->horizontalEditSliderMinSpeedPower->value());
-    m_layer->setRunSpeedPower(m_ui->horizontalEditSliderRunSpeedPower->value());
-    m_layer->setLpi(m_ui->horizontalEditSliderLPI->value());
-    m_layer->setDpi(m_ui->horizontalEditSliderDPI->value());
+    m_layer->setLineSpacing(m_ui->editSliderLineSpacing->value());
+    m_layer->setColumnSpacing(m_ui->editSliderColumnSpacing->value());
+    m_layer->setMinSpeedPower(m_ui->editSliderMinSpeedPower->value());
+    m_layer->setRunSpeedPower(m_ui->editSliderRunSpeedPower->value());
+    m_layer->setLpi(m_ui->editSliderLPI->value());
+    m_layer->setDpi(m_ui->editSliderDPI->value());
     m_layer->setNonlinearCoefficient(m_ui->doubleSpinBoxNonlinearCoefficient->value());
     m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
     m_layer->setType(m_type);
