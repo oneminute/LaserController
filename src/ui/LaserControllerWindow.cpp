@@ -445,7 +445,7 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
             cv::Mat resized;
             cv::resize(src, resized, cv::Size(outWidth, outHeight));
             
-            imageUtils::halftone2(resized, dialog.lpi(), dialog.dpi(), dialog.degrees(), dialog.nonlinearCoefficient());
+            imageUtils::halftone3(resized, dialog.lpi(), dialog.dpi(), dialog.degrees(), dialog.nonlinearCoefficient());
         }
     }
 }

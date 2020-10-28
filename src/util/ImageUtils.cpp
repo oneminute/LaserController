@@ -167,16 +167,8 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, 
     qDebug().noquote().nospace() << "     src rows: " << src.rows;
     qDebug().noquote().nospace() << "    src dpi h: " << src.cols / inchWidth;
     qDebug().noquote().nospace() << "    src dpi v: " << src.rows / inchHeight;
-    //qDebug().noquote().nospace() << "      mmWidth: " << mmWidth;
-    //qDebug().noquote().nospace() << "     mmHeight: " << mmHeight;
     qDebug().noquote().nospace() << "    inchWidth: " << inchWidth;
     qDebug().noquote().nospace() << "   inchHeight: " << inchHeight;
-    //qDebug().noquote().nospace() << "   outHPixels: " << outHPixels;
-    //qDebug().noquote().nospace() << "   outVPixels: " << outVPixels;
-    //qDebug().noquote().nospace() << "       linesH: " << linesH;
-    //qDebug().noquote().nospace() << "       linesV: " << linesV;
-    //qDebug().noquote().nospace() << "    gridWidth: " << gridWidth;
-    //qDebug().noquote().nospace() << "   gridHeight: " << gridHeight;
     qDebug().noquote().nospace() << "     gridSize: " << gridSize;
     qDebug().noquote().nospace() << "   grayGrades: " << grayGrades;
     qDebug().noquote().nospace() << "ditchMat size: " << ditchMat.cols;
@@ -210,6 +202,115 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, 
     param.push_back(cv::IMWRITE_PNG_COMPRESSION);
     param.push_back(0);
     cv::imwrite("outMat.png", outMat, param);
+    return outMat;
+}
+
+cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, float nonlinearCoefficient)
+{
+    cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
+    cv::Mat rot = cv::getRotationMatrix2D(center, degrees, 1.);
+    cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), src.size(), degrees).boundingRect2f();
+
+    // adjust transformation matrix
+    rot.at<double>(0, 2) += bbox.width / 2.0 - src.cols / 2.0;
+    rot.at<double>(1, 2) += bbox.height / 2.0 - src.rows / 2.0;
+
+    cv::Mat rotated;
+    cv::warpAffine(src, rotated, rot, bbox.size(), cv::INTER_AREA, 0, cv::Scalar(255));
+    cv::imwrite("temp/halfton3_rot.bmp", rotated);
+
+    // convert unit from mm to inch
+    float inchWidth = src.cols / dpi;
+    float inchHeight = src.rows / dpi;
+
+    // choose the bigger one between gridwidth and grid height
+    //int gridSize = std::round(std::ceil(dpi / lpi) * sqrt(2));
+    int gridSize = std::ceil(dpi / lpi) / 2;
+    if (gridSize % 2)
+        gridSize += 1;
+
+    // out image
+    cv::Mat outMat(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
+
+    int grayGrades;
+    cv::Mat ditchMat = generateRoundSpiralMat(gridSize);
+    ditchMat.convertTo(ditchMat, CV_8UC1);
+    grayGrades = gridSize * gridSize;
+    for (int x = 0; x < ditchMat.cols; x++)
+    {
+        for (int y = 0; y < ditchMat.rows; y++)
+        {
+            quint8 ditchPixel = ditchMat.ptr<quint8>(y)[x];
+            ditchPixel = grayGrades - ditchPixel;
+            ditchPixel = ditchPixel * 255 / (grayGrades - 1);
+            ditchMat.ptr<quint8>(y)[x] = ditchPixel;
+        }
+    }
+    std::cout << "ditchMat:" << std::endl << ditchMat << std::endl;
+
+    qDebug().noquote().nospace() << "          lpi: " << lpi;
+    qDebug().noquote().nospace() << "          dpi: " << dpi;
+    qDebug().noquote().nospace() << "angle degrees: " << degrees;
+    qDebug().noquote().nospace() << "     src cols: " << src.cols;
+    qDebug().noquote().nospace() << "     src rows: " << src.rows;
+    qDebug().noquote().nospace() << "    src dpi h: " << src.cols / inchWidth;
+    qDebug().noquote().nospace() << "    src dpi v: " << src.rows / inchHeight;
+    qDebug().noquote().nospace() << "    inchWidth: " << inchWidth;
+    qDebug().noquote().nospace() << "   inchHeight: " << inchHeight;
+    qDebug().noquote().nospace() << "     gridSize: " << gridSize;
+    qDebug().noquote().nospace() << "   grayGrades: " << grayGrades;
+    qDebug().noquote().nospace() << "ditchMat size: " << ditchMat.cols;
+
+    for (int r = 0; r < rotated.rows; r += ditchMat.rows)
+    {
+        for (int c = 0; c < rotated.cols; c += ditchMat.cols)
+        {
+            cv::Point start(c, r);
+            for (int x = 0; x < ditchMat.cols; x++)
+            {
+                for (int y = 0; y < ditchMat.rows; y++)
+                {
+                    if (r + y < rotated.rows && c + x < rotated.cols)
+                    {
+                        uchar srcPixel = rotated.ptr<uchar>(r + y)[c + x];
+                        //int grayValue = std::round((255.f - srcPixel) * grayGrades / 255);
+                        uchar ditchPixel = ditchMat.ptr<uchar>(y)[x];
+
+                        if (srcPixel >= ditchPixel)
+                            outMat.ptr<uchar>(r + y)[c + x] = 255;
+                    }
+                }
+            }
+        }
+    }
+    std::vector<int>param; 
+    param.push_back(cv::IMWRITE_PNG_BILEVEL);
+    param.push_back(1);
+    param.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    param.push_back(0);
+    cv::imwrite("temp/halftone3_outMat.png", outMat, param);
+
+    center = cv::Point2f((rotated.cols - 1) / 2, (rotated.rows - 1) / 2);
+    rot = cv::getRotationMatrix2D(center, -degrees, 1.);
+    bbox = cv::RotatedRect(cv::Point2f(), rotated.size(), 0).boundingRect2f();
+    cv::warpAffine(outMat, rotated, rot, bbox.size(), cv::INTER_AREA, 0, cv::Scalar(255));
+    cv::imwrite("temp/halfton3_rot_inv.bmp", rotated);
+
+    cv::Rect roi((rotated.cols - src.cols - 1) / 2, (rotated.rows - src.rows - 1) / 2, src.cols, src.rows);
+    outMat = rotated(roi);
+    cv::imwrite("temp/halfton3_processed.bmp", outMat);
+
+    cv::threshold(outMat, outMat, 225, 255, cv::THRESH_BINARY);
+    cv::imwrite("temp/halfton3_threshed.bmp", outMat);
+
+    cv::Mat kernel = (cv::Mat_ <uchar>(3, 3) << 1, 1, 1, 1, 0, 1, 1, 1, 1);
+    cv::Mat filter2DMat;
+    cv::filter2D(outMat, filter2DMat, outMat.depth(), kernel);
+    cv::threshold(filter2DMat, filter2DMat, 0, 255, cv::THRESH_BINARY);
+
+    outMat = outMat & filter2DMat;
+    cv::imwrite("temp/halfton3_final.bmp", outMat);
+
     return outMat;
 }
 
