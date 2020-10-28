@@ -107,3 +107,9 @@ canvas_test.png
 export.json
 
 outMat.png
+
+temp/
+
+*.cdr
+
+*.svg
