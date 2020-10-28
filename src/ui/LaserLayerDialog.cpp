@@ -148,7 +148,6 @@ void LaserLayerDialog::accept()
     m_layer->setRunSpeedPower(m_ui->editSliderRunSpeedPower->value());
     m_layer->setLpi(m_ui->editSliderLPI->value());
     m_layer->setDpi(m_ui->editSliderDPI->value());
-    m_layer->setNonlinearCoefficient(m_ui->doubleSpinBoxNonlinearCoefficient->value());
     m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
     m_layer->setType(m_type);
 

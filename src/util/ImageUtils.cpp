@@ -205,8 +205,9 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, 
     return outMat;
 }
 
-cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, float nonlinearCoefficient)
+cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
 {
+    float lpi2 = lpi * qCos(qDegreesToRadians(degrees));
     cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
     cv::Mat rot = cv::getRotationMatrix2D(center, degrees, 1.);
     cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), src.size(), degrees).boundingRect2f();
@@ -224,8 +225,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, 
     float inchHeight = src.rows / dpi;
 
     // choose the bigger one between gridwidth and grid height
-    //int gridSize = std::round(std::ceil(dpi / lpi) * sqrt(2));
-    int gridSize = std::ceil(dpi / lpi) / 2;
+    int gridSize = std::ceil(dpi / lpi2) / 2;
     if (gridSize % 2)
         gridSize += 1;
 
@@ -241,7 +241,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, 
         for (int y = 0; y < ditchMat.rows; y++)
         {
             quint8 ditchPixel = ditchMat.ptr<quint8>(y)[x];
-            ditchPixel = grayGrades - ditchPixel;
+            ditchPixel = grayGrades - ditchPixel - 1;
             ditchPixel = ditchPixel * 255 / (grayGrades - 1);
             ditchMat.ptr<quint8>(y)[x] = ditchPixel;
         }
@@ -249,6 +249,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, 
     std::cout << "ditchMat:" << std::endl << ditchMat << std::endl;
 
     qDebug().noquote().nospace() << "          lpi: " << lpi;
+    qDebug().noquote().nospace() << "     true lpi: " << lpi2;
     qDebug().noquote().nospace() << "          dpi: " << dpi;
     qDebug().noquote().nospace() << "angle degrees: " << degrees;
     qDebug().noquote().nospace() << "     src cols: " << src.cols;
@@ -273,10 +274,9 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, 
                     if (r + y < rotated.rows && c + x < rotated.cols)
                     {
                         uchar srcPixel = rotated.ptr<uchar>(r + y)[c + x];
-                        //int grayValue = std::round((255.f - srcPixel) * grayGrades / 255);
                         uchar ditchPixel = ditchMat.ptr<uchar>(y)[x];
 
-                        if (srcPixel >= ditchPixel)
+                        if (srcPixel > ditchPixel)
                             outMat.ptr<uchar>(r + y)[c + x] = 255;
                     }
                 }
@@ -293,14 +293,14 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, 
     center = cv::Point2f((rotated.cols - 1) / 2, (rotated.rows - 1) / 2);
     rot = cv::getRotationMatrix2D(center, -degrees, 1.);
     bbox = cv::RotatedRect(cv::Point2f(), rotated.size(), 0).boundingRect2f();
-    cv::warpAffine(outMat, rotated, rot, bbox.size(), cv::INTER_AREA, 0, cv::Scalar(255));
+    cv::warpAffine(outMat, rotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
     cv::imwrite("temp/halfton3_rot_inv.bmp", rotated);
 
     cv::Rect roi((rotated.cols - src.cols - 1) / 2, (rotated.rows - src.rows - 1) / 2, src.cols, src.rows);
     outMat = rotated(roi);
     cv::imwrite("temp/halfton3_processed.bmp", outMat);
 
-    cv::threshold(outMat, outMat, 225, 255, cv::THRESH_BINARY);
+    /*cv::threshold(outMat, outMat, 225, 255, cv::THRESH_BINARY);
     cv::imwrite("temp/halfton3_threshed.bmp", outMat);
 
     cv::Mat kernel = (cv::Mat_ <uchar>(3, 3) << 1, 1, 1, 1, 0, 1, 1, 1, 1);
@@ -309,7 +309,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees, 
     cv::threshold(filter2DMat, filter2DMat, 0, 255, cv::THRESH_BINARY);
 
     outMat = outMat & filter2DMat;
-    cv::imwrite("temp/halfton3_final.bmp", outMat);
+    cv::imwrite("temp/halfton3_final.bmp", outMat);*/
 
     return outMat;
 }

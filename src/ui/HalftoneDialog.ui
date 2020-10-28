@@ -21,15 +21,8 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+   <item row="0" column="1">
+    <widget class="EditSlider" name="editSliderLpi" native="true"/>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_2">
@@ -38,12 +31,18 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="1">
+    <widget class="EditSlider" name="editSliderDegrees" native="true"/>
+   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>DPI</string>
      </property>
     </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="EditSlider" name="editSliderDpi" native="true"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_4">
@@ -52,51 +51,32 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="3" column="1">
+    <widget class="EditSlider" name="editSliderPixelInterval" native="true"/>
+   </item>
+   <item row="4" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Y pulse length</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="4" column="1">
     <widget class="QLabel" name="labelYPulseLength">
      <property name="text">
       <string>0.006329114</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Nonlinear Coefficient</string>
+   <item row="5" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBoxNonlinearCoefficient">
-     <property name="maximum">
-      <double>10.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.010000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.500000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="EditSlider" name="editSliderLpi" native="true"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="EditSlider" name="editSliderDegrees" native="true"/>
-   </item>
-   <item row="3" column="1">
-    <widget class="EditSlider" name="editSliderPixelInterval" native="true"/>
-   </item>
-   <item row="2" column="1">
-    <widget class="EditSlider" name="editSliderDpi" native="true"/>
    </item>
   </layout>
  </widget>

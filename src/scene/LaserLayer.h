@@ -82,8 +82,8 @@ public:
     int dpi() const { return m_dpi; }
     void setDpi(int dpi) { m_dpi = dpi; }
 
-    qreal nonlinearCoefficient() const { return m_nonlinearCoefficient; }
-    void setNonlinearCoefficient(qreal value) { m_nonlinearCoefficient = value; }
+    //qreal nonlinearCoefficient() const { return m_nonlinearCoefficient; }
+    //void setNonlinearCoefficient(qreal value) { m_nonlinearCoefficient = value; }
 
     LaserDocument* document() const;
 
@@ -127,7 +127,7 @@ protected:
     // bitmap fields
     int m_lpi;
     int m_dpi;
-    qreal m_nonlinearCoefficient;
+    //qreal m_nonlinearCoefficient;
     int m_row;
     bool m_useHalftone;
 

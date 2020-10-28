@@ -452,7 +452,7 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     cv::Mat outMat = resized;
     if (layer()->useHalftone())
     {
-        outMat = imageUtils::halftone2(resized, layer()->lpi(), layer()->dpi(), 45, layer()->nonlinearCoefficient());
+        outMat = imageUtils::halftone3(resized, layer()->lpi(), layer()->dpi(), 45);
     }
 
     QPointF pos = laserStartPos();

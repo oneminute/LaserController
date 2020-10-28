@@ -9,9 +9,10 @@ HalftoneDialog::HalftoneDialog(QWidget* parent)
 
     m_ui->editSliderLpi->setMinimum(1);
     m_ui->editSliderLpi->setMaximum(100);
-    m_ui->editSliderLpi->setValue(40);
+    m_ui->editSliderLpi->setValue(60);
 
-    m_ui->editSliderDegrees->setMaximum(90);
+    m_ui->editSliderDegrees->setMinimum(0);
+    m_ui->editSliderDegrees->setMaximum(45);
     m_ui->editSliderDegrees->setValue(45);
 
     m_ui->editSliderDpi->setMinimum(0);
@@ -34,6 +35,5 @@ void HalftoneDialog::accept()
     m_dpi = m_ui->editSliderDpi->value();
     m_pixelInterval = m_ui->editSliderPixelInterval->value();
     m_yPulseLength = m_ui->labelYPulseLength->text().toFloat();
-    m_nonlinearCoefficient = m_ui->doubleSpinBoxNonlinearCoefficient->value();
     QDialog::accept();
 }
