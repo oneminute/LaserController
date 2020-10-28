@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+cmake_policy(SET CMP0074 NEW)
 
 project(LaserController LANGUAGES CXX)
 
@@ -32,7 +33,7 @@ find_package(Boost 1.66 COMPONENTS timer REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL CONFIG REQUIRED)
 find_package(OpenCV REQUIRED QUIET)
 find_package(OpenMP REQUIRED QUIET)
-find_package(ZLib REQUIRED QUIET)
+find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
 
@@ -174,18 +175,14 @@ set(LINK_LIBRARIES
     LRWidgets
 )
 
-message(STATUS ${GFLAGS_LIBRARIES})
-
 if(ANDROID)
   add_library(LaserController SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${TS_FILES})
 else()
   add_executable(LaserController ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${TS_FILES})
 endif()
 
-message(STATUS Boost_LIBRARIES=${Boost_LIBRARIES})
 target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
 
-message(QM_FILES=${QM_FILES})
 set(QM_FILES
     ${QM_FILES}
     ${SRC_FILES}
