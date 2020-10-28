@@ -154,34 +154,47 @@ Would you like to overwrite it?</source>
         <translation>每英寸线数</translation>
     </message>
     <message>
-        <location filename="../src/ui/HalftoneDialog.ui" line="37"/>
+        <location filename="../src/ui/HalftoneDialog.ui" line="30"/>
         <source>Angle Degrees</source>
         <translation>旋转角度值</translation>
     </message>
     <message>
-        <location filename="../src/ui/HalftoneDialog.ui" line="44"/>
+        <location filename="../src/ui/HalftoneDialog.ui" line="40"/>
         <source>DPI</source>
         <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/ui/HalftoneDialog.ui" line="51"/>
+        <location filename="../src/ui/HalftoneDialog.ui" line="50"/>
         <source>Pixel Interval</source>
         <translation>像素间隔</translation>
     </message>
     <message>
-        <location filename="../src/ui/HalftoneDialog.ui" line="58"/>
+        <location filename="../src/ui/HalftoneDialog.ui" line="60"/>
         <source>Y pulse length</source>
         <translation>Y脉冲长度</translation>
     </message>
     <message>
-        <location filename="../src/ui/HalftoneDialog.ui" line="65"/>
+        <location filename="../src/ui/HalftoneDialog.ui" line="67"/>
         <source>0.006329114</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/HalftoneDialog.ui" line="72"/>
         <source>Nonlinear Coefficient</source>
-        <translation>非线性系数</translation>
+        <translation type="vanished">非线性系数</translation>
+    </message>
+</context>
+<context>
+    <name>ImageButton</name>
+    <message>
+        <location filename="../src/widget/LRWidgets/widget/imagebutton.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widget/LRWidgets/widget/imagebutton.ui" line="41"/>
+        <location filename="../src/widget/LRWidgets/widget/imagebutton.ui" line="48"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -972,7 +985,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="121"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="119"/>
         <source>Layer</source>
         <translation>图层</translation>
     </message>
@@ -1163,7 +1176,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserLayer</name>
     <message>
-        <location filename="../src/scene/LaserLayer.cpp" line="72"/>
+        <location filename="../src/scene/LaserLayer.cpp" line="71"/>
         <source>undefined</source>
         <translation>未定义</translation>
     </message>

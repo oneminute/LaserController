@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0074 NEW)
+cmake_policy(SET CMP0087 OLD)
 
 project(LaserController LANGUAGES CXX)
 
@@ -31,7 +32,7 @@ set(Boost_USE_MULTITHREADED ON)
 find_package(Eigen3 REQUIRED)
 find_package(Boost 1.66 COMPONENTS timer REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL CONFIG REQUIRED)
-find_package(OpenCV REQUIRED QUIET)
+find_package(OpenCV COMPONENTS core imgcodecs imgproc REQUIRED QUIET)
 find_package(OpenMP REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
@@ -96,6 +97,7 @@ FILE(GLOB MOCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_autogen/*.cpp)
 set(OTHER_FILES
     config.ini
     README.md
+    ReleaseNotes.txt
     .gitignore
 )
 
@@ -193,37 +195,34 @@ qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 add_subdirectory(test)
 
-get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
-get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
-function(WIN_DEPLOY_QT target)
-
-    # POST_BUILD step
-    # - after build, we have a bin/lib for analyzing qt dependencies
-    # - we run windeployqt on target and deploy Qt libs
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND "${QT_BIN_DIR}/windeployqt.exe"         
-                --dir ${CMAKE_INSTALL_PREFIX}
-                --verbose 1
-                --release
-                --no-translations
-                \"$<TARGET_FILE:${target}>\"
-        COMMENT "Deploying Qt libraries using windeployqt for compilation target '${target}' ..."
-    )
-
-endfunction()
-
 INSTALL(TARGETS LaserController
         DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime)
 
 INSTALL(FILES 
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
+            "${CMAKE_SOURCE_DIR}/ReleaseNotes.txt"
         DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 INSTALL(FILES 
             "${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.qm"
         DESTINATION ${CMAKE_INSTALL_PREFIX}/translations)
 
+foreach(_lib IN LISTS OpenCV_LIBS)
+    INSTALL(FILES 
+                "${OpenCV_DIR}/../bin/${_lib}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll"
+            DESTINATION ${CMAKE_INSTALL_PREFIX})
+endforeach()
+
+get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
 INSTALL(CODE "
-        WIN_DEPLOY_QT(LaserController)
+        execute_process(
+            COMMAND \"${QT_BIN_DIR}/windeployqt.exe\"
+                    --dir ${CMAKE_INSTALL_PREFIX}
+                    --verbose 1
+                    --release
+                    --no-translations
+                    ${CMAKE_INSTALL_PREFIX}/LaserController.exe
+        )
         ")

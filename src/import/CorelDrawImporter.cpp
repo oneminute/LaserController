@@ -70,8 +70,8 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         opt->Compression = VGCore::cdrCompressionNone;
         opt->Dithered = false;
         opt->ImageType = VGCore::cdrRGBColorImage;
-        opt->ResolutionX = 72;
-        opt->ResolutionY = 72;
+        opt->ResolutionX = 600;
+        opt->ResolutionY = 600;
 
         VGCore::IVGStructPaletteOptionsPtr pal = app->CreateStructPaletteOptions();
         pal->PaletteType = VGCore::cdrPaletteOptimized;

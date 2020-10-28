@@ -301,7 +301,6 @@ public:
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
     void getDeviceWorkState();
-    //int mm2MicroStep(double mm, bool xaxis = true);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }

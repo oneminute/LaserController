@@ -19,8 +19,6 @@
 #include "LaserLayer.h"
 #include "state/StateController.h"
 
-//int LaserDocument::m_engravingLayersCount(8);
-//int LaserDocument::m_cuttingLayersCount(8);
 int LaserDocument::m_layersCount(16);
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -216,12 +214,6 @@ void LaserDocument::exportJSON(const QString& filename)
             if (layer->type() == LLT_ENGRAVING)
             {
                 itemObj["Layer"] = layerId;
-                //itemObj["FinishRun"] = 0;
-                //QPointF pos = laserItem->laserStartPos();
-                //itemObj["StartX"] = laserItem->boundingRect().left();
-                //itemObj["StartY"] = laserItem->boundingRect().top();
-                //layerObj["StartX"] = laserItem->boundingRect().left();
-                //layerObj["StartY"] = laserItem->boundingRect().top();
                 itemObj["Width"] = laserItem->boundingRect().width();
                 itemObj["Height"] = laserItem->boundingRect().height();
                 
@@ -243,7 +235,6 @@ void LaserDocument::exportJSON(const QString& filename)
                     itemObj["Data"] = QString(pltUtils::points2Plt(points));
                 }
             }
-            //itemObj["FinishRun"] = laserItem->finishRun().code;
             items.append(itemObj);
         }
         layerObj["Items"] = items;
@@ -253,7 +244,6 @@ void LaserDocument::exportJSON(const QString& filename)
     QJsonObject actionObj;
 
     jsonObj["Layers"] = layers;
-    //jsonObj["DataInfo"] = dataInfo;
 
     QJsonDocument jsonDoc(jsonObj);
 
