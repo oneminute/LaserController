@@ -198,7 +198,14 @@ add_subdirectory(test)
 INSTALL(TARGETS LaserController
         DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime)
 
+# Convert windows style path to cmake style path(\ to /).
+file(TO_CMAKE_PATH "$ENV{WINDIR}" WIN_DIR )
+
 INSTALL(FILES 
+            ${WIN_DIR}/system32/MSVCP140.dll
+            ${WIN_DIR}/system32/VCRUNTIME140.dll
+            ${WIN_DIR}/system32/VCRUNTIME140_1.dll
+            ${WIN_DIR}/system32/CONCRT140.dll
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.txt"
