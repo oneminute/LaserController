@@ -53,6 +53,11 @@ void LaserLayerDialog::initUi()
         m_ui->radioButtonBoth->setChecked(true);
     }
 
+    m_ui->editSliderDPI->setMaximum(1200);
+    m_ui->editSliderDPI->setMinimum(0);
+    m_ui->editSliderLPI->setMaximum(1);
+    m_ui->editSliderLPI->setMaximum(100);
+
     m_ui->lineEditLayerName->setText(m_layer->name());
     m_ui->editSliderMinSpeed->setValue(m_layer->minSpeed());
     m_ui->editSliderRunSpeed->setValue(m_layer->runSpeed());
@@ -63,6 +68,8 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderMinSpeedPower->setValue(m_layer->minSpeedPower());
     m_ui->editSliderRunSpeedPower->setValue(m_layer->runSpeedPower());
     m_ui->checkBoxUseHalftone->setChecked(m_layer->useHalftone());
+    m_ui->editSliderDPI->setValue(m_layer->dpi());
+    m_ui->editSliderLPI->setValue(m_layer->lpi());
 }
 
 void LaserLayerDialog::initCuttingParameters()
@@ -87,6 +94,8 @@ void LaserLayerDialog::initEngravingParameters()
     m_ui->editSliderColumnSpacing->setValue(0);
     m_ui->editSliderMinSpeedPower->setValue(0);
     m_ui->editSliderRunSpeedPower->setValue(900);
+    m_ui->editSliderDPI->setValue(600);
+    m_ui->editSliderLPI->setValue(600);
     m_ui->groupBoxGeneral->setVisible(true);
     m_ui->groupBoxEngraving->setVisible(true);
     m_ui->groupBoxBitmap->setVisible(true);

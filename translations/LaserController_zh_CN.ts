@@ -66,38 +66,38 @@
 <context>
     <name>ExportDialog</name>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="86"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="86"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="93"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="93"/>
         <source>Browse...</source>
         <translation>浏览...</translation>
     </message>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="96"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="96"/>
         <source>File:</source>
         <translation>文件：</translation>
     </message>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="106"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="106"/>
         <source>x</source>
         <extracomment>Multiplication, as in 32x32</extracomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="116"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="116"/>
         <source>Size:</source>
         <translation>尺寸：</translation>
     </message>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="128"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="128"/>
         <source>Please enter a file name</source>
         <translation>请输入文件名</translation>
     </message>
     <message>
-        <location filename="../src/svg/exportdialog.cpp" line="133"/>
+        <location filename="../src/ui/ExportDialog.cpp" line="133"/>
         <source>%1 already exists.
 Would you like to overwrite it?</source>
         <translation>%1已存在。\n是否覆盖？</translation>
@@ -1275,7 +1275,7 @@ Would you like to overwrite it?</source>
         <translation>列间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="292"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="261"/>
         <source>Use Halftone?</source>
         <translation>半色调网屏？</translation>
     </message>
@@ -1297,19 +1297,18 @@ Would you like to overwrite it?</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="261"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="275"/>
         <source>LPI</source>
         <translation>每英寸线数</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="268"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="285"/>
         <source>DPI</source>
         <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="275"/>
         <source>Nonlinear Coefficient</source>
-        <translation>非线性系数</translation>
+        <translation type="vanished">非线性系数</translation>
     </message>
 </context>
 <context>

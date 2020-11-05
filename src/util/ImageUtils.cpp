@@ -218,7 +218,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
 
     cv::Mat rotated;
     cv::warpAffine(src, rotated, rot, bbox.size(), cv::INTER_AREA, 0, cv::Scalar(255));
-    cv::imwrite("temp/halfton3_rot.bmp", rotated);
+    cv::imwrite("tmp/halfton3_rot.bmp", rotated);
 
     // convert unit from mm to inch
     float inchWidth = src.cols / dpi;
@@ -288,17 +288,17 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     param.push_back(1);
     param.push_back(cv::IMWRITE_PNG_COMPRESSION);
     param.push_back(0);
-    cv::imwrite("temp/halftone3_outMat.png", outMat, param);
+    cv::imwrite("tmp/halftone3_outMat.png", outMat, param);
 
     center = cv::Point2f((rotated.cols - 1) / 2, (rotated.rows - 1) / 2);
     rot = cv::getRotationMatrix2D(center, -degrees, 1.);
     bbox = cv::RotatedRect(cv::Point2f(), rotated.size(), 0).boundingRect2f();
     cv::warpAffine(outMat, rotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
-    cv::imwrite("temp/halfton3_rot_inv.bmp", rotated);
+    cv::imwrite("tmp/halfton3_rot_inv.bmp", rotated);
 
     cv::Rect roi((rotated.cols - src.cols - 1) / 2, (rotated.rows - src.rows - 1) / 2, src.cols, src.rows);
     outMat = rotated(roi);
-    cv::imwrite("temp/halfton3_processed.bmp", outMat);
+    cv::imwrite("tmp/halfton3_processed.bmp", outMat);
 
     /*cv::threshold(outMat, outMat, 225, 255, cv::THRESH_BINARY);
     cv::imwrite("temp/halfton3_threshed.bmp", outMat);

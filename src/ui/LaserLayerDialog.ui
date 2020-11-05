@@ -255,37 +255,6 @@
       <property name="labelAlignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>LPI</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>DPI</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_16">
-        <property name="text">
-         <string>Nonlinear Coefficient</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBoxNonlinearCoefficient">
-        <property name="maximum">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.500000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
@@ -300,8 +269,22 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>LPI</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
        <widget class="EditSlider" name="editSliderLPI" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>DPI</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
        <widget class="EditSlider" name="editSliderDPI" native="true"/>
@@ -325,7 +308,7 @@
   <customwidget>
    <class>EditSlider</class>
    <extends>QWidget</extends>
-   <header>widget/LRWidgets/widget/editslider.h</header>
+   <header>widget/LRWidgets/widget/EditSlider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

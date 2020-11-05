@@ -25,7 +25,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_minSpeedPower(60)
     , m_runSpeedPower(60)
     , m_doc(document)
-    , m_lpi(30)
+    , m_lpi(60)
     , m_dpi(600)
     , m_button(nullptr)
     , m_exportable(true)
