@@ -207,7 +207,8 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, 
 
 cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
 {
-    float lpi2 = lpi * qCos(qDegreesToRadians(degrees));
+    qreal cos = qCos(qDegreesToRadians(degrees));
+    //int lpi2 = qFloor(lpi * cos);
     cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
     cv::Mat rot = cv::getRotationMatrix2D(center, degrees, 1.);
     cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), src.size(), degrees).boundingRect2f();
@@ -225,9 +226,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     float inchHeight = src.rows / dpi;
 
     // choose the bigger one between gridwidth and grid height
-    int gridSize = std::ceil(dpi / lpi2) / 2;
-    if (gridSize % 2)
-        gridSize += 1;
+    int gridSize = qRound(dpi / lpi * cos);
 
     // out image
     cv::Mat outMat(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
@@ -249,7 +248,6 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     std::cout << "ditchMat:" << std::endl << ditchMat << std::endl;
 
     qDebug().noquote().nospace() << "          lpi: " << lpi;
-    qDebug().noquote().nospace() << "     true lpi: " << lpi2;
     qDebug().noquote().nospace() << "          dpi: " << dpi;
     qDebug().noquote().nospace() << "angle degrees: " << degrees;
     qDebug().noquote().nospace() << "     src cols: " << src.cols;
@@ -294,11 +292,15 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     rot = cv::getRotationMatrix2D(center, -degrees, 1.);
     bbox = cv::RotatedRect(cv::Point2f(), rotated.size(), 0).boundingRect2f();
     cv::warpAffine(outMat, rotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
-    cv::imwrite("tmp/halfton3_rot_inv.bmp", rotated);
+    cv::imwrite("tmp/halfton3_rot_inv.png", rotated, param);
 
     cv::Rect roi((rotated.cols - src.cols - 1) / 2, (rotated.rows - src.rows - 1) / 2, src.cols, src.rows);
     outMat = rotated(roi);
-    cv::imwrite("tmp/halfton3_processed.bmp", outMat);
+    cv::imwrite("tmp/halfton3_processed.png", outMat, param);
+
+#ifdef _DEBUG
+    cv::imshow("halftone3_processed", outMat);
+#endif
 
     /*cv::threshold(outMat, outMat, 225, 255, cv::THRESH_BINARY);
     cv::imwrite("temp/halfton3_threshed.bmp", outMat);
@@ -900,45 +902,73 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         int bitCount = 0;
         quint8 byte = 0;
         if (forward)
-        {
             stream << yStart << xStart << xEnd << fspc.code;
-            for (int c = 0; c < mat.cols; c++)
-            {
-                quint8 pixel = mat.ptr<quint8>(r)[c];
-                //qDebug() << mat.ptr<quint8>(r)[c];
-                quint8 gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
-                bitCount++;
-                byte |= (gray << bitCount);
-                if (bitCount == 8)
-                {
-                    bitCount = 0;
-                    stream << byte;
-                    byte = 0;
-                }
-            }
-            if (mat.cols % 8 != 0)
-                stream << byte;
-        }
         else
-        {
             stream << yStart << xEnd << xStart << fspc.code;
-            for (int c = mat.cols - 1; c >= 0; c--)
+
+        for (int c = 0; c < mat.cols; c++)
+        {
+            quint8 bin;
+            if (forward)
             {
-                quint8 gray = mat.ptr<quint8>(r)[c] == 0 ? 0 : 1;
-                bitCount++;
-                byte |= (gray << bitCount);
-                if (bitCount == 8)
-                {
-                    bitCount = 0;
-                    stream << byte;
-                    byte = 0;
-                }
+                bin = mat.ptr<quint8>(r)[c] ? 1 : 0;
             }
-            if (mat.cols % 8 != 0)
+            else
+            {
+                bin = mat.ptr<quint8>(r)[mat.cols - c - 1] ? 1 : 0;
+            }
+            byte = byte << 1;
+            byte |= bin;
+            bitCount++;
+            if (bitCount == 8)
+            {
                 stream << byte;
+                bitCount = 0;
+                byte = 0;
+            }
         }
+        if (mat.cols % 8 != 0)
+            stream << byte;
+
         forward = !forward;
     }
+
+    forward = true;
+    QDataStream restoreStream(&bytes, QIODevice::ReadWrite);
+    restoreStream.setByteOrder(QDataStream::LittleEndian);
+    cv::Mat res1(mat.size(), CV_8UC1, cv::Scalar(255));
+    cv::Mat res2(mat.size(), CV_8UC1, cv::Scalar(255));
+    int row = 0;
+    while (!restoreStream.atEnd())
+    {
+        int yStart;
+        restoreStream >> yStart >> xEnd >> xStart >> fspc.code;
+        int length = fspc.count();
+        int byteCount = length % 8 == 0 ? length / 8 : length / 8 + 1;
+        for (int c = 0; c < byteCount; c++)
+        {
+            uchar byte;
+            restoreStream >> byte;
+            for (int i = 0; i < qMin(length, 8); i++)
+            {
+                uchar bit = (1 << i) & byte;
+                uchar pixel = bit ? 255 : 0;
+                if (forward)
+                {
+                    res1.ptr<uchar>(row)[c * 8 + i] = pixel;
+                }
+                else
+                {
+                    res2.ptr<uchar>(row)[fspc.count() - c * 8 - i - 1] = pixel;
+                }
+            }
+            length -= 8;
+        }
+        row++;
+        forward = !forward;
+    }
+    cv::imwrite("tmp/res1.bmp", res1);
+    cv::imwrite("tmp/res2.bmp", res2);
     
     return bytes;
 }

@@ -53,9 +53,16 @@ void LaserLayerDialog::initUi()
         m_ui->radioButtonBoth->setChecked(true);
     }
 
-    m_ui->editSliderDPI->setMaximum(1200);
+    m_ui->editSliderMinSpeed->setMaximum(600);
+    m_ui->editSliderRunSpeed->setMaximum(600);
+    m_ui->editSliderLaserPower->setMaximum(1000);
+    m_ui->editSliderLineSpacing->setMaximum(50);
+    m_ui->editSliderColumnSpacing->setMaximum(50);
+    m_ui->editSliderMinSpeedPower->setMaximum(1000);
+    m_ui->editSliderRunSpeedPower->setMaximum(1000);
     m_ui->editSliderDPI->setMinimum(0);
-    m_ui->editSliderLPI->setMaximum(1);
+    m_ui->editSliderDPI->setMaximum(1200);
+    m_ui->editSliderLPI->setMinimum(1);
     m_ui->editSliderLPI->setMaximum(100);
 
     m_ui->lineEditLayerName->setText(m_layer->name());
