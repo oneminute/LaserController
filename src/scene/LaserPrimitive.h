@@ -224,6 +224,7 @@ public:
     QLineF line() const { return m_line; }
     void setLine(const QLineF& line) { m_line = line; }
 
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;

@@ -341,7 +341,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="307"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="308"/>
         <source>Bitmap</source>
         <translation type="unfinished">位图</translation>
     </message>
@@ -1400,33 +1400,33 @@ Would you like to overwrite it?</source>
         <translation>激光控制器</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="498"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="517"/>
         <source>Relays: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="514"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="529"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="533"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="548"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="517"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="536"/>
         <source>Release</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="520"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="539"/>
         <source>Machining 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="523"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="542"/>
         <source>Machining 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="526"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="545"/>
         <source>Machining 3</source>
         <translation type="unfinished"></translation>
     </message>

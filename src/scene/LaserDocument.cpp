@@ -162,8 +162,8 @@ void LaserDocument::exportJSON(const QString& filename)
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layers;
-    cv::Mat canvas;
-    //cv::Mat canvas(m_pageInfo.height() * 40, m_pageInfo.width() * 40, CV_8UC3, cv::Scalar(255, 255, 255));
+    //cv::Mat canvas;
+    cv::Mat canvas(m_pageInfo.height() * 40, m_pageInfo.width() * 40, CV_8UC3, cv::Scalar(255, 255, 255));
     int layerId = 0;
     for (int i = 0; i < m_layers.count(); i++)
     {
@@ -211,6 +211,7 @@ void LaserDocument::exportJSON(const QString& filename)
         {
             LaserPrimitive* laserItem = laserItems[li];
             QJsonObject itemObj;
+            bool add = false;
             if (layer->type() == LLT_ENGRAVING)
             {
                 itemObj["Layer"] = layerId;
@@ -223,6 +224,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     itemObj["Type"] = laserItem->typeLatinName();
                     itemObj["ImageType"] = "PNG";
                     itemObj["Data"] = QString(data.toBase64());
+                    add = true;
                 }
             }
             else if (layer->type() == LLT_CUTTING)
@@ -233,9 +235,11 @@ void LaserDocument::exportJSON(const QString& filename)
                 {
                     itemObj["Type"] = laserItem->typeLatinName();
                     itemObj["Data"] = QString(pltUtils::points2Plt(points));
+                    add = true;
                 }
             }
-            items.append(itemObj);
+            if (add)
+                items.append(itemObj);
         }
         layerObj["Items"] = items;
         layers.append(layerObj);
@@ -256,7 +260,7 @@ void LaserDocument::exportJSON(const QString& filename)
     saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
 
     if (!canvas.empty())
-        cv::imwrite("canvas_test.png", canvas);
+        cv::imwrite("tmp/canvas_test.png", canvas);
 }
 
 void LaserDocument::blockSignals(bool block)

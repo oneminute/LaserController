@@ -933,7 +933,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         forward = !forward;
     }
 
-    forward = true;
+    /*forward = true;
     QDataStream restoreStream(&bytes, QIODevice::ReadWrite);
     restoreStream.setByteOrder(QDataStream::LittleEndian);
     cv::Mat res1(mat.size(), CV_8UC1, cv::Scalar(255));
@@ -968,7 +968,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         forward = !forward;
     }
     cv::imwrite("tmp/res1.bmp", res1);
-    cv::imwrite("tmp/res2.bmp", res2);
+    cv::imwrite("tmp/res2.bmp", res2);*/
     
     return bytes;
 }

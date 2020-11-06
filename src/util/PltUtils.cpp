@@ -66,6 +66,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
         radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
 
         qreal diff = qAbs(qAbs(radians) - qAbs(anchorRadians));
+        qreal dist = QLineF(pt, anchor).length();
 
         diff = qRadiansToDegrees(diff);
         if (diff >= 5.0 || radians * anchorRadians < 0)
@@ -80,19 +81,32 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
             anchorSlope = slope;
             anchorRadians = radians;
         }
+        else if (diff != 0 && dist >= 10)
+        {
+            if (!canvas.empty())
+            {
+                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(255, 0, 0));
+                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+            }
+            points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
+            anchor = pt;
+            anchorSlope = slope;
+            anchorRadians = radians;
+        }
     }
 
     pt = path.pointAtPercent(1.0);
+    points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
     if (!canvas.empty())
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
 
-    QPointF endPt = pt;
+    /*QPointF endPt = pt;
     if (!pointsEql(startPt, endPt))
     {
         points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
         if (!canvas.empty())
             cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
-    }
+    }*/
     
     return points.size();
 }
@@ -103,12 +117,13 @@ QByteArray pltUtils::points2Plt(const std::vector<cv::Point2f>& points)
     if (points.empty())
         return buffer;
 
-    cv::Point2f pt = points[points.size() - 1];
-    buffer.append(QString("PU%1 %2;").arg(qFloor(pt.x)).arg(-qFloor(pt.y)));
+    //cv::Point2f pt = points[points.size() - 1];
+    cv::Point2f pt = points[0];
+    buffer.append(QString("PU%1 %2;").arg(qRound(pt.x)).arg(-qRound(pt.y)));
     for (int i = 0; i < points.size(); i++)
     {
         pt = points[i];
-        buffer.append(QString("PD%1 %2;").arg(qFloor(pt.x)).arg(-qFloor(pt.y)));
+        buffer.append(QString("PD%1 %2;").arg(qRound(pt.x)).arg(-qRound(pt.y)));
     }
     return buffer;
 }
@@ -120,5 +135,5 @@ QByteArray pltUtils::image2Plt(const QImage & image)
 
 bool pltUtils::pointsEql(const QPointF & pt1, const QPointF & pt2)
 {
-    return qFloor(pt1.x()) == qFloor(pt2.x()) && qFloor(pt1.y()) == qFloor(pt2.y());
+    return qRound(pt1.x()) == qRound(pt2.x()) && qRound(pt1.y()) == qRound(pt2.y());
 }

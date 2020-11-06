@@ -235,6 +235,7 @@ std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& canvas)
     points.push_back(pt2);
     points.push_back(pt3);
     points.push_back(pt4);
+    points.push_back(pt1);
 
     if (!canvas.empty())
     {
@@ -267,6 +268,16 @@ LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, SizeUnit unit)
     m_boundingRect = QRectF(m_line.p1(), m_line.p2());
 }
 
+std::vector<cv::Point2f> LaserLine::cuttingPoints(cv::Mat& canvas)
+{
+    std::vector<cv::Point2f> points;
+    QPainterPath path = toPath();
+    
+    pltUtils::pathPoints(path, points, canvas);
+    
+    return points;
+}
+
 void LaserLine::draw(QPainter * painter)
 {
     painter->drawLine(m_line);
@@ -274,7 +285,16 @@ void LaserLine::draw(QPainter * painter)
 
 QPainterPath LaserLine::toPath() const
 {
-    return QPainterPath();
+    QPainterPath path;
+    QTransform t = m_transform * sceneTransform();
+    QLineF line = t.map(m_line);
+    path.moveTo(line.p1());
+    path.lineTo(line.p2());
+
+    QTransform transform = QTransform::fromScale(40, 40);
+    path = transform.map(path);
+
+    return path;
 }
 
 LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, SizeUnit unit)
@@ -302,8 +322,8 @@ void LaserPath::draw(QPainter * painter)
 QPainterPath LaserPath::toPath() const
 {
     QPainterPath path = m_path;
-    if (path.pointAtPercent(0) != path.pointAtPercent(1))
-        path.lineTo(path.pointAtPercent(0));
+    //if (path.pointAtPercent(0) != path.pointAtPercent(1))
+        //path.lineTo(path.pointAtPercent(0));
     QTransform t = m_transform * sceneTransform();
     path = t.map(path);
 
@@ -382,6 +402,7 @@ std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & canvas)
         lastPt = cvPt;
         points.push_back(cvPt);
     }
+    points.push_back(points[0]);
     if (!canvas.empty())
         cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     
@@ -397,8 +418,8 @@ QPainterPath LaserPolygon::toPath() const
 {
     QPainterPath path;
     QTransform t = m_transform * sceneTransform();
-    QPolygonF rect = t.map(m_poly);
-    path.addPolygon(rect);
+    QPolygonF poly = t.map(m_poly);
+    path.addPolygon(poly);
 
     QTransform transform = QTransform::fromScale(40, 40);
     path = transform.map(path);

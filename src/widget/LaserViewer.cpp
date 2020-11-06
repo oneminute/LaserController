@@ -135,31 +135,31 @@ void LaserViewer::init()
     setInteractive(true);
     setMouseTracking(true);
 
-    QComboBox* comboBoxScale = new QComboBox;
+    /*QComboBox* comboBoxScale = new QComboBox;
     comboBoxScale->addItem("100%", 1.0);
     comboBoxScale->addItem("200%", 2.0);
     comboBoxScale->addItem("300%", 3.0);
     comboBoxScale->addItem("400%", 4.0);
     comboBoxScale->addItem("500%", 5.0);
     comboBoxScale->addItem("1000%", 10.0);
-
+*/
     //QLayout* layout = horizontalScrollBar()->layout();
-    QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight);
+    //QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight);
     //horizontalScrollBar()->setLayout(layout);
     //layout->insertWidget(0, comboBoxScale);
     //layout->addWidget(comboBoxScale);
 
-    QScrollBar* newBar = new QScrollBar(Qt::Horizontal);
-    QPalette::ColorRole role = newBar->foregroundRole();
-    QPalette palette;
-    palette.setColor(role, Qt::red);
-    newBar->setPalette(palette);
-    layout->addWidget(comboBoxScale);
+    //QScrollBar* newBar = new QScrollBar(Qt::Horizontal);
+    //QPalette::ColorRole role = newBar->foregroundRole();
+    //QPalette palette;
+    //palette.setColor(role, Qt::red);
+    //newBar->setPalette(palette);
+    //layout->addWidget(comboBoxScale);
     //layout->addWidget(newBar);
-    newBar->setLayout(layout);
+    //newBar->setLayout(layout);
     //newBar->setFixedSize(100, 30);
     //newBar->show();
-    setHorizontalScrollBar(newBar);
+    //setHorizontalScrollBar(newBar);
 
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
     ADD_TRANSITION(documentSelectingState, documentSelectedState, this, &LaserViewer::endSelecting);
