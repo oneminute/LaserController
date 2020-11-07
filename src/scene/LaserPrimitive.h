@@ -133,6 +133,8 @@ public:
     LaserLayer* layer() const { return m_layer; }
     void setLayer(LaserLayer* layer) { m_layer = layer; }
 
+    virtual QList<QPainterPath> subPaths() const { return QList<QPainterPath>(); }
+
 protected:
     QString typeName(LaserPrimitiveType typeId);
     QString typeLatinName(LaserPrimitiveType typeId);
@@ -247,6 +249,8 @@ public:
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
+
+    virtual QList<QPainterPath> subPaths() const;
 
 private:
     QPainterPath m_path;

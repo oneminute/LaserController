@@ -230,12 +230,34 @@ void LaserDocument::exportJSON(const QString& filename)
             else if (layer->type() == LLT_CUTTING)
             {
                 itemObj["Layer"] = layerId;
-                std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
-                if (!points.empty())
+                QList<QPainterPath> paths = laserItem->subPaths();
+                if (paths.isEmpty())
                 {
-                    itemObj["Type"] = laserItem->typeLatinName();
-                    itemObj["Data"] = QString(pltUtils::points2Plt(points));
-                    add = true;
+                    std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
+                    if (!points.empty())
+                    {
+                        itemObj["Type"] = laserItem->typeLatinName();
+                        itemObj["Data"] = QString(pltUtils::points2Plt(points));
+                        add = true;
+                    }
+                }
+                else
+                {
+                    QString pltString;
+                    for (QPainterPath subPath : paths)
+                    {
+                        std::vector<cv::Point2f> points;
+                        if (pltUtils::pathPoints(subPath, points, canvas))
+                        {
+                            pltString.append(QString(pltUtils::points2Plt(points)));
+                        }
+                    }
+                    if (!pltString.isEmpty())
+                    {
+                        itemObj["Type"] = laserItem->typeLatinName();
+                        itemObj["Data"] = pltString;
+                        add = true;
+                    }
                 }
             }
             if (add)

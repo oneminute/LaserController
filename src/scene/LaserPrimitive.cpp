@@ -322,14 +322,27 @@ void LaserPath::draw(QPainter * painter)
 QPainterPath LaserPath::toPath() const
 {
     QPainterPath path = m_path;
-    //if (path.pointAtPercent(0) != path.pointAtPercent(1))
-        //path.lineTo(path.pointAtPercent(0));
     QTransform t = m_transform * sceneTransform();
     path = t.map(path);
 
     QTransform transform = QTransform::fromScale(40, 40);
     path = transform.map(path);
     return path;
+}
+
+QList<QPainterPath> LaserPath::subPaths() const
+{
+    QList<QPainterPath> paths;
+    QPainterPath path = toPath();
+    QList<QPolygonF> polys = path.toSubpathPolygons();
+    qDebug() << "sub polys count:" << polys.count();
+    for (QPolygonF& poly : polys)
+    {
+        QPainterPath subPath;
+        subPath.addPolygon(poly);
+        paths.append(subPath);
+    }
+    return paths;
 }
 
 LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, SizeUnit unit)
