@@ -908,15 +908,8 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
 
         for (int c = 0; c < mat.cols; c++)
         {
-            quint8 bin;
-            if (forward)
-            {
-                bin = mat.ptr<quint8>(r)[c] ? 1 : 0;
-            }
-            else
-            {
-                bin = mat.ptr<quint8>(r)[mat.cols - c - 1] ? 1 : 0;
-            }
+            quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
+            quint8 bin = pixel ? 0 : 1;
             byte = byte << 1;
             byte |= bin;
             bitCount++;
