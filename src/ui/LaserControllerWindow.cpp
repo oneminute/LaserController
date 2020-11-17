@@ -134,6 +134,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolButtonDisconnect->setDefaultAction(m_ui->actionDisconnect);
     m_ui->toolButtonStart->setDefaultAction(m_ui->actionMachining);
     m_ui->toolButtonPause->setDefaultAction(m_ui->actionPause);
+    m_ui->actionPause->setCheckable(true);
     m_ui->toolButtonStop->setDefaultAction(m_ui->actionStop);
     m_ui->toolButtonSpotShot->setDefaultAction(m_ui->actionLaserSpotShot);
     m_ui->actionLaserSpotShot->setCheckable(true);
@@ -225,6 +226,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
     connect(&LaserDriver::instance(), &LaserDriver::comPortDisconnected, this, &LaserControllerWindow::onDriverComPortDisconnected);
+    //connect(&LaserDriver::instance(), &LaserDriver::machiningStarted, this, &LaserControllerWindow::onStarted);
+    //connect(&LaserDriver::instance(), &LaserDriver::machiningPaused, this, &LaserControllerWindow::onPaused);
+    //connect(&LaserDriver::instance(), &LaserDriver::downloading, this, &LaserControllerWindow::onDownloading);
+    //connect(&LaserDriver::instance(), &LaserDriver::downloaded, this, &LaserControllerWindow::onDownloaded);
+    //connect(&LaserDriver::instance(), &LaserDriver::machiningStopped, this, &LaserControllerWindow::onStopped);
+    //connect(&LaserDriver::instance(), &LaserDriver::machiningCompleted, this, &LaserControllerWindow::onCompleted);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
@@ -359,8 +366,9 @@ void LaserControllerWindow::onActionMachining(bool checked)
     if (m_useLoadedJson)
     {
         qDebug() << "export temp json file for machining" << m_currentJson;
-        MachiningTask* task = LaserDriver::instance().createMachiningTask(m_currentJson, false);
-        task->start();
+        //MachiningTask* task = LaserDriver::instance().createMachiningTask(m_currentJson, false);
+        //task->start();
+        LaserDriver::instance().loadDataFromFile(m_currentJson);
     }
     else
     {
@@ -377,8 +385,9 @@ void LaserControllerWindow::onActionMachining(bool checked)
         qDebug() << "exporting to temporary json file:" << filename;
         m_scene->document()->exportJSON(filename);
         qDebug() << "export temp json file for machining" << filename;
-        MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
-        task->start();
+        LaserDriver::instance().loadDataFromFile(filename);
+        //MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
+        //task->start();
         //}
     }
     m_useLoadedJson = false;
@@ -386,12 +395,25 @@ void LaserControllerWindow::onActionMachining(bool checked)
 
 void LaserControllerWindow::onActionPauseMechining(bool checked)
 {
-    LaserDriver::instance().pauseContinueMachining(!checked);
+    //LaserDriver::instance().pauseContinueMachining(!checked);
+    int result = LaserDriver::instance().pauseContinueMachining(!checked);
+    qDebug() << "pause result:" << result << ", checked state:" << checked;
+    m_ui->actionPause->blockSignals(true);
+    if (result == 1)
+    {
+        m_ui->actionPause->setChecked(true);
+    }
+    else
+    {
+        m_ui->actionPause->setChecked(false);
+    }
+    m_ui->actionPause->blockSignals(false);
 }
 
 void LaserControllerWindow::onActionStopMechining(bool checked)
 {
     LaserDriver::instance().stopMachining();
+    m_ui->actionPause->setChecked(false);
 }
 
 void LaserControllerWindow::onActionLaserSpotShot(bool checked)
@@ -738,13 +760,18 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end actionMachining
 
     // actionPause
+    /*BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", true, devicePausedState);*/
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceIdleState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, devicePausedState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", true, devicePausedState);
     // end actionPause
 
     // actionStop

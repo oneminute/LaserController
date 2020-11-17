@@ -29,6 +29,7 @@ LaserDriver::LaserDriver(QObject* parent)
     ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
     ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
     ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
+    ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
 }
@@ -61,49 +62,49 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     qDebug() << "System message callback handler:" << sysMsgIndex << sysMsgCode << eventData;
     switch (sysMsgCode)
     {
-    case InitComPortError:      // ��ʼ�����ڴ���
+    case InitComPortError:      
     {
         emit instance().comPortError(tr("Initialize com port error."));
     }
     break;
-    case ComPortExceptionError: // �����쳣
+    case ComPortExceptionError: 
     {
         emit instance().comPortError(tr("Com port exception."));
     }
     break;
-    case ComPortNotOpened:      // ����δ��
+    case ComPortNotOpened:      
     {
         emit instance().comPortError(tr("Can not open com port."));
     }
     break;
-    case ComPortOpened:    // ���ڴ�
+    case ComPortOpened:    
     {
         instance().m_isConnected = true;
         emit instance().comPortConnected();
     }
     break;
-    case ComPortClosed:    // ���ڹر�
+    case ComPortClosed:    
     {
         instance().m_isConnected = false;
         emit instance().comPortDisconnected();
     }
     break;
-    case StartWorking:    // ��ʼ�ӹ�
+    case StartWorking:    
     {
         instance().m_isMachining = true;
         emit instance().machiningStarted();
     }
     break;
-    case USBArrival:    // USB�豸������
+    case USBArrival:    
     {
 
     }
     break;
-    case USBRemove:    // USB�豸�ѶϿ�
+    case USBRemove:    
     {
     }
     break;
-    case DataTransformed:   // ���ݴ������
+    case DataTransformed:   
     {
         //emit instance().downloaded();
     }
@@ -113,7 +114,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
         emit instance().sysParamFromCardError();
     }
     break;
-    case ReadSysParamFromCardOK:    // ��ȡϵͳ�����󷵻ص�����
+    case ReadSysParamFromCardOK:    
     {
         instance().m_registers.clear();
         for (QString i : eventData.split(";"))
@@ -144,13 +145,13 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
         emit instance().unknownError();
     }
     break;
-    case PauseWorking:    // ��ͣ�ӹ�
+    case PauseWorking:    
     {
         instance().m_isPaused = true;
         emit instance().machiningPaused();
     }
     break;
-    case StopWorking:    // ֹͣ�ӹ���
+    case StopWorking:    
     {
         emit instance().machiningStopped();
     }
