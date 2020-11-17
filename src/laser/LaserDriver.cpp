@@ -61,49 +61,49 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     qDebug() << "System message callback handler:" << sysMsgIndex << sysMsgCode << eventData;
     switch (sysMsgCode)
     {
-    case InitComPortError:      // ³õÊ¼»¯´®¿Ú´íÎó
+    case InitComPortError:      // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½
     {
         emit instance().comPortError(tr("Initialize com port error."));
     }
     break;
-    case ComPortExceptionError: // ´®¿ÚÒì³£
+    case ComPortExceptionError: // ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     {
         emit instance().comPortError(tr("Com port exception."));
     }
     break;
-    case ComPortNotOpened:      // ´®¿ÚÎ´´ò¿ª
+    case ComPortNotOpened:      // ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½
     {
         emit instance().comPortError(tr("Can not open com port."));
     }
     break;
-    case ComPortOpened:    // ´®¿Ú´ò¿ª
+    case ComPortOpened:    // ï¿½ï¿½ï¿½Ú´ï¿½
     {
         instance().m_isConnected = true;
         emit instance().comPortConnected();
     }
     break;
-    case ComPortClosed:    // ´®¿Ú¹Ø±Õ
+    case ComPortClosed:    // ï¿½ï¿½ï¿½Ú¹Ø±ï¿½
     {
         instance().m_isConnected = false;
         emit instance().comPortDisconnected();
     }
     break;
-    case StartWorking:    // ¿ªÊ¼¼Ó¹¤
+    case StartWorking:    // ï¿½ï¿½Ê¼ï¿½Ó¹ï¿½
     {
         instance().m_isMachining = true;
         emit instance().machiningStarted();
     }
     break;
-    case USBArrival:    // USBÉè±¸ÒÑÁ¬½Ó
+    case USBArrival:    // USBï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
 
     }
     break;
-    case USBRemove:    // USBÉè±¸ÒÑ¶Ï¿ª
+    case USBRemove:    // USBï¿½è±¸ï¿½Ñ¶Ï¿ï¿½
     {
     }
     break;
-    case DataTransformed:   // Êý¾Ý´«ÊäÍê³É
+    case DataTransformed:   // ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         //emit instance().downloaded();
     }
@@ -113,7 +113,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
         emit instance().sysParamFromCardError();
     }
     break;
-    case ReadSysParamFromCardOK:    // ¶ÁÈ¡ÏµÍ³²ÎÊýºó·µ»ØµÄÊý¾Ý
+    case ReadSysParamFromCardOK:    // ï¿½ï¿½È¡ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ó·µ»Øµï¿½ï¿½ï¿½ï¿½ï¿½
     {
         instance().m_registers.clear();
         for (QString i : eventData.split(";"))
@@ -144,13 +144,13 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
         emit instance().unknownError();
     }
     break;
-    case PauseWorking:    // ÔÝÍ£¼Ó¹¤
+    case PauseWorking:    // ï¿½ï¿½Í£ï¿½Ó¹ï¿½
     {
         instance().m_isPaused = true;
         emit instance().machiningPaused();
     }
     break;
-    case StopWorking:    // Í£Ö¹¼Ó¹¤¡£
+    case StopWorking:    // Í£Ö¹ï¿½Ó¹ï¿½ï¿½ï¿½
     {
         emit instance().machiningStopped();
     }
@@ -185,10 +185,30 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
         emit instance().idle();
     }
     break;
-    case WorkFinished:    // ¼Ó¹¤Íê³É
+    case WorkFinished:    
     {
         instance().m_isMachining = false;
         emit instance().machiningStopped();
+    }
+    break;
+    case FactoryPasswordValid:
+    {
+        emit instance().rightManufacturerPassword();
+    }
+    break;
+    case FactoryPasswordInvalid:
+    {
+        emit instance().wrongManufacturerPassword();
+    }
+    break;
+    case ChangeFactoryPasswordOK:
+    {
+        emit instance().changeManufacturerPasswordOk();
+    }
+    break;
+    case ChangeFactoryPasswordError:
+    {
+        emit instance().changeManufacturerPasswordFailure();
     }
     break;
     }
@@ -204,6 +224,7 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 bool LaserDriver::load()
 {
     m_registerComments.insert(REG_03, tr("Reset calib speed."));
+    m_registerComments.insert(REG_04, tr("Engraving Launcing Speed."));
     m_registerComments.insert(REG_05, tr("Move fast speed."));
     m_registerComments.insert(REG_06, tr("Cutting speed."));
     m_registerComments.insert(REG_07, tr("Move to origin speed."));
@@ -266,7 +287,7 @@ bool LaserDriver::load()
     m_fnInitComPort = (FN_INT_INT)m_library.resolve("InitComPort");
     m_fnUnInitComPort = (FN_INT_VOID)m_library.resolve("UnInitComPort");
 
-    m_fnSetTRansTimeOutInterval = (FN_VOID_INT)m_library.resolve("SetTransTimeOutInterval");
+    m_fnSetTransTimeOutInterval = (FN_VOID_INT)m_library.resolve("SetTransTimeOutInterval");
     m_fnSetSoftwareInitialization = (FNSetSoftwareInitialization)m_library.resolve("SetSoftwareInitialization");
     m_fnSetRotateDeviceParam = (FNSetRotateDeviceParam)m_library.resolve("SetRotateDeviceParam");
     m_fnSetHardwareInitialization = (FNSetHardwareInitialization)m_library.resolve("SetHardwareInitialization");
@@ -274,6 +295,8 @@ bool LaserDriver::load()
     m_fnWriteSysParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteSysParamToCard");
     m_fnReadSysParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadSysParamFromCard");
     m_fnShowAboutWindow = (FN_VOID_VOID)m_library.resolve("ShowAboutWindow");
+    m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactoryPassWord");
+    m_fnWriteFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("WriteFactoryPassWord");
 
     m_fnLPenMoveToOriginalPoint = (FN_VOID_DOUBLE)m_library.resolve("LPenMoveToOriginalPoint");
     m_fnLPenQuickMoveTo = (FNLPenQuickMoveTo)m_library.resolve("LPenQuickMoveTo");
@@ -367,7 +390,7 @@ bool LaserDriver::uninitComPort()
 
 void LaserDriver::setTransTimeOutInterval(int interval)
 {
-    m_fnSetTRansTimeOutInterval(interval);
+    m_fnSetTransTimeOutInterval(interval);
 }
 
 void LaserDriver::setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight)
@@ -434,8 +457,8 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllSysParamFromCard()
 {
     QList<int> params;
-    params << 3 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
-        << 16 << 17 << 18 << 19 << 20 << 21 << 22 << 23 << 27 << 28 << 29 
+    params << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
+        << 16 << 17 << 18 << 19 << 20 << 21 << 22 << 23 << 24 << 25 << 27 << 28 << 29 
         << 30 << 31 << 32 << 34 << 35 << 36 << 38 << 39 << 40;
     return readSysParamFromCard(params);
 }
@@ -443,6 +466,24 @@ bool LaserDriver::readAllSysParamFromCard()
 void LaserDriver::showAboutWindow()
 {
     m_fnShowAboutWindow();
+}
+
+bool LaserDriver::checkFactoryPassword(const QString & password)
+{
+    wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
+    bool success = m_fnCheckFactoryPassword(wcPassword) != -1;
+    delete[] wcPassword;
+    return success;
+}
+
+bool LaserDriver::changeFactoryPassword(const QString & oldPassword, const QString & newPassword)
+{
+    wchar_t* wcOldPassword = typeUtils::qStringToWCharPtr(oldPassword);
+    wchar_t* wcNewPassword = typeUtils::qStringToWCharPtr(newPassword);
+    bool success = m_fnWriteFactoryPassword(wcOldPassword, wcNewPassword) != -1;
+    delete[] wcOldPassword;
+    delete[] wcNewPassword;
+    return success;
 }
 
 void LaserDriver::lPenMoveToOriginalPoint(double speed)

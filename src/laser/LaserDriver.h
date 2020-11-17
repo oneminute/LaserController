@@ -159,71 +159,73 @@ public:
 
     enum RegisterType
     {
-        REG_03 = 3,                     // 复位校准速度
+        REG_03 = 3,                     
         RT_RESET_CALIB_SPEED = 3,
-        REG_05 = 5,                     // 快速移动速度
+        REG_04 = 4,
+        RT_ENGRAVING_LAUNCING_SPEED = 4,
+        REG_05 = 5,                     
         RT_MOVE_FAST_SPEED = 5,
-        REG_06 = 6,                     // 切割速度
+        REG_06 = 6,                     
         RT_CUTTING_SPEED = 6,
-        REG_07 = 7,                     // 回机械原点速度
+        REG_07 = 7,                     
         RT_MOVE_TO_ORI_SPEED = 7,
-        REG_08 = 8,                     // 工作面象限位置
+        REG_08 = 8,                     
         RT_WORKING_QUADRANT = 8,
-        REG_09 = 9,                     // X轴脉冲长度
+        REG_09 = 9,                     
         RT_X_AXIS_PULSE_LENGTH = 9,
-        REG_10 = 10,                    // Y轴脉冲长度
+        REG_10 = 10,                    
         RT_Y_AXIS_PULSE_LENGTH = 10,
-        REG_11 = 11,                    // X轴回差
+        REG_11 = 11,                    
         RT_X_AXIS_BACKLASH = 11,
-        REG_12 = 12,                    // Y轴回差
+        REG_12 = 12,                    
         RT_Y_AXIS_BACKLASH = 12,
-        REG_13 = 13,                    // 雕刻列步进值
+        REG_13 = 13,                    
         RT_ENGRAVING_COLUMN_STEP = 13,
-        REG_14 = 14,                    // 雕刻行步进值
+        REG_14 = 14,                    
         RT_ENGRAVING_ROW_STEP = 14,
-        REG_15 = 15,                    // 雕刻激光功率
+        REG_15 = 15,                    
         RT_ENGRAVING_LASER_POWER = 15,
-        REG_16 = 16,                    // 雕刻灰阶最大值
+        REG_16 = 16,                    
         RT_MAX_ENGRAVING_GRAY_VALUE = 16,
-        REG_17 = 17,                    // 雕刻灰阶最小值
+        REG_17 = 17,                    
         RT_MIN_ENGRAVING_GRAY_VALUE = 17,
-        REG_18 = 18,                    // 切割激光功率
+        REG_18 = 18,                    
         RT_CUTTING_LASER_POWER = 18,
-        REG_19 = 19,                    // 切割运行速度对应激光功率比值
+        REG_19 = 19,                    
         RT_CUTTING_RUNNING_SPEED_RATIO = 19,
-        REG_20 = 20,                    // 切割启动速度对应激光功率比值
+        REG_20 = 20,                    
         RT_CUTTING_LAUNCHING_SPEED_RATIO = 20,
-        REG_21 = 21,                    // 电机相位
+        REG_21 = 21,                    
         RT_MACHINE_PHASE = 21,
-        REG_22 = 22,                    // 限位相位
+        REG_22 = 22,                    
         RT_LIMIT_PHASE = 22,
-        REG_23 = 23,                    // 系统累计运行时间
+        REG_23 = 23,                    
         RT_TOTAL_WORKING_DURATION = 23,
-        REG_24 = 24,                    // 激光管累计运行时间
+        REG_24 = 24,                    
         RT_TOTAL_LASER_DURATION = 24,
-        REG_25 = 25,                    // 切割激光频率
+        REG_25 = 25,                    
         RT_CUTTING_LASER_FREQ = 25,
-        REG_26 = 26,                    // 板卡注册状态
+        REG_26 = 26,                    
         RT_REGISTION = 26,
-        REG_27 = 27,                    // 雕刻激光频率
+        REG_27 = 27,                    
         RT_ENGRAVING_LASER_FREQ = 27,
-        REG_31 = 31,                    // 第1组用户自定义加工原点X值
+        REG_31 = 31,                    
         RT_CUSTOM_1_X = 31,
-        REG_32 = 32,                    // 第1组用户自定义加工原点Y值
+        REG_32 = 32,                    
         RT_CUSTOM_1_Y = 32,
-        REG_33 = 33,                    // 第2组用户自定义加工原点X值
+        REG_33 = 33,                    
         RT_CUSTOM_2_X = 33,
-        REG_34 = 34,                    // 第2组用户自定义加工原点Y值
+        REG_34 = 34,                    
         RT_CUSTOM_2_Y = 34,
-        REG_35 = 35,                    // 第3组用户自定义加工原点X值
+        REG_35 = 35,                    
         RT_CUSTOM_3_X = 35,
-        REG_36 = 36,                    // 第3组用户自定义加工原点Y值
+        REG_36 = 36,                    
         RT_CUSTOM_3_Y = 36,
-        REG_38 = 38,                    // 加工幅面宽X、高Y
+        REG_38 = 38,                    
         RT_LAYOUT_SIZE = 38,
-        REG_39 = 39,                    // 绘图单位
+        REG_39 = 39,                    
         RT_PAINTING_UNIT = 39,
-        REG_40 = 40,                    // 快速移动起跳速度
+        REG_40 = 40,                    
         RT_MOVE_FAST_LAUNCHING_SPEED = 40
     };
 
@@ -288,6 +290,8 @@ public:
     bool readSysParamFromCard(QList<int> addresses);
     bool readAllSysParamFromCard();
     void showAboutWindow();
+    bool checkFactoryPassword(const QString& password);
+    bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
     void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, double startSpeed, double workSpeed);
     void controlHDAction(int action);
@@ -339,6 +343,10 @@ signals:
     void sysParamFromCardError();
     void unknownError();
     void workingCanceled();
+    void rightManufacturerPassword();
+    void wrongManufacturerPassword();
+    void changeManufacturerPasswordOk();
+    void changeManufacturerPasswordFailure();
 
 private:
     bool m_isLoaded;
@@ -368,7 +376,7 @@ private:
     FN_INT_INT m_fnInitComPort;
     FN_INT_VOID m_fnUnInitComPort;
 
-    FN_VOID_INT m_fnSetTRansTimeOutInterval;
+    FN_VOID_INT m_fnSetTransTimeOutInterval;
     FNSetSoftwareInitialization m_fnSetSoftwareInitialization;
     FNSetRotateDeviceParam m_fnSetRotateDeviceParam;
     FNSetHardwareInitialization m_fnSetHardwareInitialization;
@@ -377,6 +385,8 @@ private:
     FN_INT_WCHART m_fnReadSysParamFromCard;
 
     FN_VOID_VOID m_fnShowAboutWindow;
+    FN_INT_WCHART m_fnCheckFactoryPassword;
+    FN_INT_WCHART_WCHART m_fnWriteFactoryPassword;
 
     FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;
     FNLPenQuickMoveTo m_fnLPenQuickMoveTo;

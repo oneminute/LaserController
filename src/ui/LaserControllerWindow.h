@@ -37,6 +37,9 @@ protected slots:
     void onActionMachining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
+    void onActionLaserSpotShot(bool checked = false);
+    void onActionLaserCut(bool checked = false);
+    void onActionLaserMove(bool checked = false);
     void onActionConnect(bool checked = false);
     void onActionDisconnect(bool checked = false);
     void onActionDownload(bool checked = false);

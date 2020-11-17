@@ -24,6 +24,7 @@
 #include "task/MachiningTask.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/HalftoneDialog.h"
+#include "ui/ParameterDialog.h"
 #include "ui/RegistersDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
@@ -134,6 +135,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolButtonStart->setDefaultAction(m_ui->actionMachining);
     m_ui->toolButtonPause->setDefaultAction(m_ui->actionPause);
     m_ui->toolButtonStop->setDefaultAction(m_ui->actionStop);
+    m_ui->toolButtonSpotShot->setDefaultAction(m_ui->actionLaserSpotShot);
+    m_ui->actionLaserSpotShot->setCheckable(true);
+    m_ui->toolButtonCut->setDefaultAction(m_ui->actionLaserCut);
+    m_ui->toolButtonMove->setDefaultAction(m_ui->actionLaserMove);
+    m_ui->toolButtonSettings->setDefaultAction(m_ui->actionShowRegisters);
+    
     m_ui->toolButtonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
     m_ui->toolButtonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
 
@@ -191,6 +198,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
+    connect(m_ui->actionLaserSpotShot, &QAction::triggered, this, &LaserControllerWindow::onActionLaserSpotShot);
+    connect(m_ui->actionLaserCut, &QAction::triggered, this, &LaserControllerWindow::onActionLaserCut);
+    connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
+
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
     connect(m_ui->actionLoadMotor, &QAction::triggered, this, &LaserControllerWindow::onActionLoadMotor);
@@ -230,6 +241,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
+    //m_ui->actionShowRegisters->setDisabled(true);
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -352,6 +364,11 @@ void LaserControllerWindow::onActionMachining(bool checked)
     }
     else
     {
+        if (m_scene->document() == nullptr)
+        {
+            QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
+            return;
+        }
         QString filename = "export.json";
         //QTemporaryFile file;
         //if (file.open())
@@ -375,6 +392,29 @@ void LaserControllerWindow::onActionPauseMechining(bool checked)
 void LaserControllerWindow::onActionStopMechining(bool checked)
 {
     LaserDriver::instance().stopMachining();
+}
+
+void LaserControllerWindow::onActionLaserSpotShot(bool checked)
+{
+    int result = LaserDriver::instance().testLaserLight(checked);
+    if (result == 5)
+    {
+        qDebug() << "Light on.";
+        m_ui->actionLaserSpotShot->setChecked(true);
+    }
+    else if (result == 6)
+    {
+        qDebug() << "Light off.";
+        m_ui->actionLaserSpotShot->setChecked(false);
+    }
+}
+
+void LaserControllerWindow::onActionLaserCut(bool checked)
+{
+}
+
+void LaserControllerWindow::onActionLaserMove(bool checked)
+{
 }
 
 void LaserControllerWindow::onActionConnect(bool checked)
@@ -471,7 +511,8 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
 
 void LaserControllerWindow::onActionShowRegisters(bool checked)
 {
-    RegistersDialog dialog;
+    //RegistersDialog dialog;
+    ParameterDialog dialog;
     dialog.exec();
 }
 
@@ -713,6 +754,30 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePausedState);
     // end actionStop
+
+    // actionLaserSpotShot
+    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, devicePausedState);
+    // end actionLaserSpotShot
+
+    // actionLaserCut
+    BIND_PROP_TO_STATE(m_ui->actionLaserCut, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserCut, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserCut, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserCut, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserCut, "enabled", true, devicePausedState);
+    // end actionLaserCut
+
+    // actionLaserMove
+    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, devicePausedState);
+    // end actionLaserMove
 
     // actionLoadJson
 
