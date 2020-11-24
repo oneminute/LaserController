@@ -659,6 +659,19 @@
        </item>
       </layout>
      </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -1143,6 +1156,51 @@
    </property>
    <property name="text">
     <string>Move</string>
+   </property>
+  </action>
+  <action name="actionHome">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_home.png</normaloff>:/ui/icons/images/move_home.png</iconset>
+   </property>
+   <property name="text">
+    <string>Home</string>
+   </property>
+  </action>
+  <action name="actionMoveLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_left.png</normaloff>:/ui/icons/images/move_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Left</string>
+   </property>
+  </action>
+  <action name="actionMoveRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_right.png</normaloff>:/ui/icons/images/move_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Right</string>
+   </property>
+  </action>
+  <action name="actionMoveUp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_up.png</normaloff>:/ui/icons/images/move_up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Up</string>
+   </property>
+  </action>
+  <action name="actionMoveDown">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_down.png</normaloff>:/ui/icons/images/move_down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Down</string>
    </property>
   </action>
  </widget>

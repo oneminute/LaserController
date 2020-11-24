@@ -85,10 +85,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayers);
     splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetLayerButtons, Qt::Horizontal);
-    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations, Qt::Vertical);
-    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties, Qt::Vertical);
 
-    m_ui->dockWidgetLayerButtons->show();
+    tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations);
+    tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties);
+
+    //m_ui->dockWidgetLayerButtons->show();
     m_ui->dockWidgetLayers->show();
     m_ui->dockWidgetProperties->show();
     m_ui->dockWidgetOperations->show();
@@ -140,7 +141,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->actionLaserSpotShot->setCheckable(true);
     m_ui->toolButtonCut->setDefaultAction(m_ui->actionLaserCut);
     m_ui->toolButtonMove->setDefaultAction(m_ui->actionLaserMove);
-    m_ui->toolButtonSettings->setDefaultAction(m_ui->actionShowRegisters);
+    m_ui->toolButtonSettings->setDefaultAction(m_ui->actionHome);
+    m_ui->toolButtonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
+    m_ui->toolButtonMoveRight->setDefaultAction(m_ui->actionMoveRight);
+    m_ui->toolButtonMoveUp->setDefaultAction(m_ui->actionMoveUp);
+    m_ui->toolButtonMoveDown->setDefaultAction(m_ui->actionMoveDown);
     
     m_ui->toolButtonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
     m_ui->toolButtonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
@@ -533,7 +538,12 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
 
 void LaserControllerWindow::onActionShowRegisters(bool checked)
 {
-    //RegistersDialog dialog;
+    ParameterDialog dialog;
+    dialog.exec();
+}
+
+void LaserControllerWindow::onActionHome(bool checked)
+{
     ParameterDialog dialog;
     dialog.exec();
 }
