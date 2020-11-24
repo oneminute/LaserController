@@ -24,6 +24,7 @@ public:
 protected slots:
     void registersFetched(const QMap<LaserDriver::RegisterType, QVariant>& datas);
     void rightManufactorPassword();
+    void wrongManufactorPassword();
 
     void onPushButtonReadClicked(bool checked = false);
 

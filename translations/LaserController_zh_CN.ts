@@ -830,7 +830,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1001"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="344"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="351"/>
         <source>Load Json</source>
         <translation>加载Json文件</translation>
     </message>
@@ -959,98 +959,98 @@ Would you like to overwrite it?</source>
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="149"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="150"/>
         <source>Tips</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="156"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="157"/>
         <source>Welcome!</source>
         <translation>欢迎！</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="163"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="164"/>
         <source>0,0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="170"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="171"/>
         <source>Top Left</source>
         <translation>左上</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="177"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="178"/>
         <source>Page Size(mm): 210x320</source>
         <translation>页面尺寸(mm): 210x320</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="254"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="801"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="261"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="828"/>
         <source>Open SVG File</source>
         <translation>打开SVG文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="329"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="336"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="369"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="377"/>
         <source>Alert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="369"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="377"/>
         <source>No active document. Please open or import a document to mechining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="448"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="470"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="448"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="470"/>
         <source>Do you want to unload motor?</source>
         <translation>是否确认卸载电机？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="466"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="488"/>
         <source>Open Image</source>
         <translation>打开图片</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="466"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="488"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="495"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="517"/>
         <source>Delete primitives?</source>
         <translation>删除图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="495"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="517"/>
         <source>Do you want to delete primitives to selected layer?</source>
         <translation>是否删除选中的图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="506"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="528"/>
         <source>Close document?</source>
         <translation>关闭文档？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="506"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="528"/>
         <source>Do you want to close current document?</source>
         <translation>是否关闭当前文件？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="534"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="556"/>
         <source>Device Connected</source>
         <translation>设备已连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="539"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="561"/>
         <source>Device Disconnected</source>
         <translation>设备未连接</translation>
     </message>
@@ -1066,187 +1066,187 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserDriver</name>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="66"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="67"/>
         <source>Initialize com port error.</source>
         <translation>初始化COM端口错误。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="71"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="72"/>
         <source>Com port exception.</source>
         <translation>COM端口异常。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="76"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="77"/>
         <source>Can not open com port.</source>
         <translation>无法打开COM端口。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="226"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="227"/>
         <source>Reset calib speed.</source>
         <translation>复位校准速度。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="227"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="228"/>
         <source>Engraving Launcing Speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="228"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="229"/>
         <source>Move fast speed.</source>
         <translation>快速移动速度。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="229"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="230"/>
         <source>Cutting speed.</source>
         <translation>切割速度。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="230"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="231"/>
         <source>Move to origin speed.</source>
         <translation>回机械原点速度。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="231"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="232"/>
         <source>Working quadrant.</source>
         <translation>工作面象限位置。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="232"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="233"/>
         <source>X Axis pulse length.</source>
         <translation>X轴脉冲长度。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="233"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="234"/>
         <source>Y Axis pulse length.</source>
         <translation>Y轴脉冲长度。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="234"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="235"/>
         <source>X Axis backlash.</source>
         <translation>X轴回差。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="235"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="236"/>
         <source>Y Axis backlash.</source>
         <translation>Y轴回差。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="236"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="237"/>
         <source>Engraving column step.</source>
         <translation>雕刻列步进值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="237"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="238"/>
         <source>Engraving row step.</source>
         <translation>雕刻行步进值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="238"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="239"/>
         <source>Engraving laser power.</source>
         <translation>雕刻激光功率。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="239"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="240"/>
         <source>Max engraving gray value.</source>
         <translation>雕刻灰阶最大值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="240"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="241"/>
         <source>Min engraving gray value.</source>
         <translation>雕刻灰阶最小值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="241"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="242"/>
         <source>Cutting laser power.</source>
         <translation>切割激光功率。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="242"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="243"/>
         <source>Cutting running speed ratio.</source>
         <translation>切割运行速度对应激光功率比值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="243"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="244"/>
         <source>Cutting launching speed ratio.</source>
         <translation>切割启动速度对应激光功率比值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="244"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="245"/>
         <source>Machine phase.</source>
         <translation>电机相位。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="245"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="246"/>
         <source>Limit phase.</source>
         <translation>限位相位。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="246"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="247"/>
         <source>Total working duration.</source>
         <translation>系统累计运行时间。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="247"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="248"/>
         <source>Total laser duration.</source>
         <translation>激光管累计运行时间。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="248"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="249"/>
         <source>Cutting laser frequency.</source>
         <translation>切割激光频率。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="249"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="250"/>
         <source>Registion.</source>
         <translation>板卡注册状态。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="250"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="251"/>
         <source>Engraving laser frequency.</source>
         <translation>雕刻激光频率。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="251"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="252"/>
         <source>Custom 1 X.</source>
         <translation>第1组用户自定义加工原点X值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="252"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="253"/>
         <source>Custom 1 Y.</source>
         <translation>第1组用户自定义加工原点Y值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="253"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="254"/>
         <source>Custom 2 X.</source>
         <translation>第2组用户自定义加工原点X值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="254"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="255"/>
         <source>Custom 2 Y.</source>
         <translation>第2组用户自定义加工原点Y值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="255"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="256"/>
         <source>Custom 3 X.</source>
         <translation>第3组用户自定义加工原点X值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="256"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="257"/>
         <source>Custom 3 Y.</source>
         <translation>第3组用户自定义加工原点Y值。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="257"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="258"/>
         <source>Layout size.</source>
         <translation>加工幅面宽X、高Y。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="258"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="259"/>
         <source>Painting unit.</source>
         <translation>绘图单位。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="259"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="260"/>
         <source>Move fast launching speed.</source>
         <translation>快速移动起跳速度。</translation>
     </message>

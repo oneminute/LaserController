@@ -53,6 +53,7 @@ ParameterDialog::ParameterDialog(QWidget* parent)
 
     connect(&LaserDriver::instance(), &LaserDriver::registersFectched, this, &ParameterDialog::registersFetched);
     connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &ParameterDialog::rightManufactorPassword);
+    connect(&LaserDriver::instance(), &LaserDriver::wrongManufacturerPassword, this, &ParameterDialog::wrongManufactorPassword);
     connect(m_ui->pushButtonRead, &QPushButton::clicked, this, &ParameterDialog::onPushButtonReadClicked);
     connect(m_ui->pushButtonWrite, &QPushButton::clicked, this, &ParameterDialog::onPushButtonWriteClicked);
     connect(m_ui->pushButtonDefault, &QPushButton::clicked, this, &ParameterDialog::onPushButtonDefaultClicked);
@@ -111,6 +112,11 @@ void ParameterDialog::makeDefault()
 void ParameterDialog::rightManufactorPassword()
 {
     m_ui->groupBoxManufactor->setVisible(true);
+}
+
+void ParameterDialog::wrongManufactorPassword()
+{
+    m_ui->groupBoxManufactor->setVisible(false);
 }
 
 void ParameterDialog::onPushButtonReadClicked(bool checked)
