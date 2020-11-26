@@ -114,3 +114,5 @@ temp/
 *.svg
 
 tmp/
+
+iphist.dat
