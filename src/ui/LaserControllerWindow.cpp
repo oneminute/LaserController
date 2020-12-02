@@ -11,6 +11,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QTreeWidgetItem>
+//#include <QCustomPlot>
 
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
@@ -61,6 +62,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
+	//QCustomPlot *pCustomPlot = new QCustomPlot(this);
     
     int colorTick = 360 / LaserDocument::layersCount();
     for (int i = 0; i < LaserDocument::layersCount(); i++)

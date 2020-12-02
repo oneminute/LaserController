@@ -93,12 +93,12 @@
 <context>
     <name>CorelDrawImporter</name>
     <message>
-        <location filename="../src/import/CorelDrawImporter.cpp" line="51"/>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="45"/>
         <source>No active document</source>
         <translation>无打开的有效文档</translation>
     </message>
     <message>
-        <location filename="../src/import/CorelDrawImporter.cpp" line="51"/>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="45"/>
         <source>No active document in CorelDRAW!</source>
         <translation>CorelDRAW中无打开的有效文档！</translation>
     </message>

@@ -163,12 +163,19 @@ void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     qDebug() << m_name << "mouse press event";
+	QGraphicsObject::mousePressEvent(event);
+	if (!this->isSelected()) {
+		LaserDocument* document = (LaserDocument*)this->parent();
+		document->scene()->clearSelection();
+	}
+	
     update();
 }
 
 void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     qDebug() << m_name << "mouse release event";
+	QGraphicsObject::mouseReleaseEvent(event);
     update();
 }
 
