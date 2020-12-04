@@ -51,19 +51,19 @@ void initLog(char* argv)
     google::InitGoogleLogging(argv);
     google::InstallFailureSignalHandler();
 
-    FLAGS_stderrthreshold = google::GLOG_ERROR; //INFO WARNING ERROR FATAL, д╛хойДЁЖ╣╫stderr(app Output/cli)╣д╥╖ж╣йгERROR
-    FLAGS_alsologtostderr = true; //╣╠уБ╦Жх╚╬ж╠Да©н╙уФй╠ё╛╨ЖбтFLAGS_stderrthreshold╣дочжфё╛кЫсппео╒╢Рс║╣╫жу╤к
-    FLAGS_colorlogtostderr = true; //иХжцйДЁЖ╣╫фад╩╣дхуж╬отй╬оЮс╕яуи╚,╢МнС╣х╪╤спяуи╚гЬ╥ж
+    FLAGS_stderrthreshold = google::GLOG_ERROR; //INFO WARNING ERROR FATAL, д╛О©╫О©╫О©╫О©╫О©╫О©╫О©╫stderr(app Output/cli)О©╫д╥О©╫ж╣О©╫О©╫ERROR
+    FLAGS_alsologtostderr = true; //О©╫О©╫О©╫О©╫О©╫х╚О©╫ж╠О©╫О©╫О©╫н╙О©╫О©╫й╠О©╫О©╫О©╫О©╫О©╫О©╫FLAGS_stderrthresholdО©╫О©╫О©╫О©╫О©╫фёО©╫О©╫О©╫О©╫О©╫О©╫О©╫о╒О©╫О©╫с║О©╫О©╫О©╫у╤О©╫
+    FLAGS_colorlogtostderr = true; //О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д╩О©╫О©╫О©╫О©╫ж╬О©╫О©╫й╬О©╫О©╫с╕О©╫О©╫и╚,О©╫О©╫О©╫О©╫х╪О©╫О©╫О©╫О©╫О©╫и╚О©╫О©╫О©╫О©╫
     FLAGS_max_log_size = 100; //Maximum log size: 100MB
-    FLAGS_logbufsecs = 0;        //╩╨ЁЕхуж╬йДЁЖё╛д╛хон╙30цКё╛╢к╢╕╦дн╙а╒╪╢йДЁЖ
-    FLAGS_stop_logging_if_full_disk = true;     //╣╠╢еел╠╩п╢бЗй╠ё╛мёж╧хуж╬йДЁЖ
+    FLAGS_logbufsecs = 0;        //О©╫О©╫О©╫О©╫О©╫О©╫ж╬О©╫О©╫О©╫О©╫О©╫д╛О©╫О©╫н╙30О©╫Кё╛О©╫к╢О©╫О©╫О©╫н╙О©╫О©╫О©╫О©╫О©╫О©╫О©╫
+    FLAGS_stop_logging_if_full_disk = true;     //О©╫О©╫О©╫О©╫О©╫л╠О©╫п╢О©╫О©╫й╠О©╫О©╫мёж╧О©╫О©╫ж╬О©╫О©╫О©╫
 
-    //set log path;╣зр╩╦Ж╡нйЩн╙хуж╬╪╤╠ПиХжц,╪╤╠П╦ъсз google::INFO ╣дхуж╬м╛й╠йДЁЖ╣╫фад╩ё╛╣з╤Ч╦Ж╡нйЩ╠Мй╬йДЁЖд©б╪╪╟хуж╬нд╪ЧцШг╟в╨,logд©б╪нрйгйбохтзbuild-prjд©б╪об╢╢╫╗╨ц.
+    //set log path;О©╫О©╫р╩О©╫О©╫О©╫О©╫О©╫О©╫н╙О©╫О©╫ж╬О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫,О©╫О©╫О©╫О©╫О©╫О©╫О©╫ google::INFO О©╫О©╫О©╫О©╫ж╬м╛й╠О©╫О©╫О©╫О©╫О©╫О©╫О©╫д╩О©╫О©╫О©╫з╤О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╬О©╫О©╫О©╫д©б╪О©╫О©╫О©╫О©╫ж╬О©╫д╪О©╫О©╫О©╫г╟в╨,logд©б╪О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫build-prjд©б╪О©╫б╢О©╫О©╫О©╫О©╫О©╫.
     google::SetLogDestination(google::GLOG_INFO,   "log/INFO_");
-    google::SetLogDestination(google::GLOG_WARNING,"log/WARNING_");   //иХжц google::WARNING ╪╤╠П╣дхуж╬╢Ф╢╒б╥╬╤╨мнд╪ЧцШг╟в╨
-    google::SetLogDestination(google::GLOG_ERROR,  "log/ERROR_");    //иХжц google::ERROR ╪╤╠П╣дхуж╬╢Ф╢╒б╥╬╤╨мнд╪ЧцШг╟в╨
-    google::SetLogDestination(google::GLOG_FATAL,  "log/FATAL_");    //иХжц google::FATAL ╪╤╠П╣дхуж╬╢Ф╢╒б╥╬╤╨мнд╪ЧцШг╟в╨
-    google::SetLogFilenameExtension("lc_");     //иХжцнд╪ЧцШю╘у╧ё╛хГф╫л╗ё©╩РфДкЭпХр╙гЬ╥ж╣дпео╒
+    google::SetLogDestination(google::GLOG_WARNING,"log/WARNING_");   //О©╫О©╫О©╫О©╫ google::WARNING О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╬О©╫Ф╢╒б╥О©╫О©╫О©╫О©╫О©╫д╪О©╫О©╫О©╫г╟в╨
+    google::SetLogDestination(google::GLOG_ERROR,  "log/ERROR_");    //О©╫О©╫О©╫О©╫ google::ERROR О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╬О©╫Ф╢╒б╥О©╫О©╫О©╫О©╫О©╫д╪О©╫О©╫О©╫г╟в╨
+    google::SetLogDestination(google::GLOG_FATAL,  "log/FATAL_");    //О©╫О©╫О©╫О©╫ google::FATAL О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╬О©╫Ф╢╒б╥О©╫О©╫О©╫О©╫О©╫д╪О©╫О©╫О©╫г╟в╨
+    google::SetLogFilenameExtension("lc_");     //О©╫О©╫О©╫О©╫О©╫д╪О©╫О©╫О©╫О©╫О©╫у╧О©╫О©╫О©╫О©╫ф╫л╗О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫р╙О©╫О©╫О©╫ж╣О©╫О©╫О©╫о╒
 }
 
 int main(int argc, char *argv[])
@@ -89,14 +89,14 @@ int main(int argc, char *argv[])
     if (translator.load(locale, app.applicationName(), QLatin1String("_"), QLatin1String("translations")))
     {
         qDebug() << "load translation file." << app.applicationName() << locale.name();
-        app.installTranslator(&translator);
+        //app.installTranslator(&translator);
     }
 
     QTranslator qtTranslator;
     if (qtTranslator.load(locale, QLatin1String("qt"), QLatin1String("_"), QLatin1String("translations")))
     {
         qDebug() << "load translation file." << "qt" << locale.name();
-        app.installTranslator(&qtTranslator);
+        //app.installTranslator(&qtTranslator);
     }
 
     QFile file("theme/Dark.qss");

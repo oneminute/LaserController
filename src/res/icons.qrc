@@ -8,12 +8,37 @@
         <file>images/Spline.png</file>
         <file>images/Selection.png</file>
         <file>images/Text.png</file>
-        <file>images/move_down.png</file>
         <file>images/move_home.png</file>
         <file>images/move_left.png</file>
         <file>images/move_right.png</file>
-        <file>images/move_up.png</file>
         <file>images/rot_anticlock.png</file>
         <file>images/rot_clock.png</file>
+        <file>images/move_origin.png</file>
+        <file>images/move_bottom_left.png</file>
+        <file>images/move_bottom_right.png</file>
+        <file>images/move_top_left.png</file>
+        <file>images/move_top_right.png</file>
+        <file>images/move_bottom.png</file>
+        <file>images/move_top.png</file>
+        <file>images/move_down.png</file>
+        <file>images/move_up.png</file>
+        <file>images/connect.png</file>
+        <file>images/disconnect.png</file>
+        <file>images/new_document.png</file>
+        <file>images/open_document.png</file>
+        <file>images/save_document.png</file>
+        <file>images/import_document.png</file>
+        <file>images/import_svg.png</file>
+        <file>images/import_cdr.png</file>
+        <file>images/redo.png</file>
+        <file>images/undo.png</file>
+        <file>images/copy.png</file>
+        <file>images/close_document.png</file>
+        <file>images/export_json.png</file>
+        <file>images/settings_device.png</file>
+        <file>images/Settings.png</file>
+        <file>images/cut.png</file>
+        <file>images/paste.png</file>
+        <file>images/delete.png</file>
     </qresource>
 </RCC>

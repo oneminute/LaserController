@@ -62,14 +62,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
-	//QCustomPlot *pCustomPlot = new QCustomPlot(this);
     
     int colorTick = 360 / LaserDocument::layersCount();
     for (int i = 0; i < LaserDocument::layersCount(); i++)
     {
         LayerButton* button = new LayerButton;
         button->setMinimumWidth(30);
-        button->setFixedHeight(50);
+        button->setFixedHeight(30);
         button->setColor(colors[i]);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
@@ -80,15 +79,16 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     }
     m_ui->layoutLayerButtons->addStretch();
 
-    removeDockWidget(m_ui->dockWidgetLayerButtons);
+    //removeDockWidget(m_ui->dockWidgetLayerButtons);
     removeDockWidget(m_ui->dockWidgetLayers);
     removeDockWidget(m_ui->dockWidgetProperties);
     removeDockWidget(m_ui->dockWidgetOperations);
 
-    addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayers);
-    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetLayerButtons, Qt::Horizontal);
+    //addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayerButtons);
+    splitDockWidget(m_ui->dockWidgetLayerButtons, m_ui->dockWidgetLayers, Qt::Horizontal);
+    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations, Qt::Vertical);
 
-    tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations);
+    tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetMovement);
     tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties);
 
     //m_ui->dockWidgetLayerButtons->show();
@@ -142,10 +142,15 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolButtonSpotShot->setDefaultAction(m_ui->actionLaserSpotShot);
     m_ui->actionLaserSpotShot->setCheckable(true);
     m_ui->toolButtonCut->setDefaultAction(m_ui->actionLaserCut);
-    m_ui->toolButtonMove->setDefaultAction(m_ui->actionLaserMove);
-    m_ui->toolButtonSettings->setDefaultAction(m_ui->actionHome);
+    m_ui->toolButtonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
     m_ui->toolButtonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
     m_ui->toolButtonMoveRight->setDefaultAction(m_ui->actionMoveRight);
+    m_ui->toolButtonMoveTop->setDefaultAction(m_ui->actionMoveTop);
+    m_ui->toolButtonMoveBottom->setDefaultAction(m_ui->actionMoveBottom);
+    m_ui->toolButtonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
+    m_ui->toolButtonMoveTopRight->setDefaultAction(m_ui->actionMoveTopRight);
+    m_ui->toolButtonMoveBottomLeft->setDefaultAction(m_ui->actionMoveBottomLeft);
+    m_ui->toolButtonMoveBottomRight->setDefaultAction(m_ui->actionMoveBottomRight);
     m_ui->toolButtonMoveUp->setDefaultAction(m_ui->actionMoveUp);
     m_ui->toolButtonMoveDown->setDefaultAction(m_ui->actionMoveDown);
     

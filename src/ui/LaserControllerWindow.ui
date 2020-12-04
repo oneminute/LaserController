@@ -49,6 +49,7 @@
     </widget>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
     <addaction name="actionCloseDocument"/>
     <addaction name="actionExportJSON"/>
     <addaction name="menuImport"/>
@@ -127,6 +128,12 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>36</width>
+     <height>36</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -135,10 +142,22 @@
    </attribute>
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
    <addaction name="actionImportSVG"/>
    <addaction name="actionImportCorelDraw"/>
-   <addaction name="actionCloseDocument"/>
    <addaction name="actionExportJSON"/>
+   <addaction name="actionCloseDocument"/>
+   <addaction name="separator"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionDeletePrimitive"/>
+   <addaction name="separator"/>
+   <addaction name="actionSettings"/>
+   <addaction name="actionDeviceSettings"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">
    <property name="windowTitle">
@@ -381,7 +400,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="0" column="1">
           <widget class="QToolButton" name="toolButtonPause">
            <property name="enabled">
             <bool>false</bool>
@@ -397,8 +416,8 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QToolButton" name="toolButtonStop">
+         <item row="1" column="0">
+          <widget class="QToolButton" name="toolButtonCut">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -409,11 +428,11 @@
             </size>
            </property>
            <property name="text">
-            <string>Stop</string>
+            <string>Cut</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="2">
           <widget class="QToolButton" name="toolButtonSpotShot">
            <property name="enabled">
             <bool>false</bool>
@@ -432,8 +451,8 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QToolButton" name="toolButtonCut">
+         <item row="0" column="2">
+          <widget class="QToolButton" name="toolButtonStop">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -444,15 +463,12 @@
             </size>
            </property>
            <property name="text">
-            <string>Cut</string>
+            <string>Stop</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QToolButton" name="toolButtonMove">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
+         <item row="2" column="0">
+          <widget class="QToolButton" name="toolButtonReset">
            <property name="maximumSize">
             <size>
              <width>60</width>
@@ -460,154 +476,43 @@
             </size>
            </property>
            <property name="text">
-            <string>Move</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="1" column="1">
-          <widget class="QToolButton" name="toolButtonSettings">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>S</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QToolButton" name="toolButtonMoveUp">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>U</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QToolButton" name="toolButtonMoveRight">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>R</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QToolButton" name="toolButtonMoveLeft">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>L</string>
+            <string>Reset</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QToolButton" name="toolButtonMoveDown">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimumSize">
+          <widget class="QToolButton" name="toolButtonBackToOrigin">
+           <property name="maximumSize">
             <size>
-             <width>30</width>
-             <height>0</height>
+             <width>60</width>
+             <height>16777215</height>
             </size>
            </property>
            <property name="text">
-            <string>D</string>
+            <string>Origin</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QToolButton" name="toolButtonPathOptimization">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Optimize</string>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="checkBoxExportSelection">
-         <property name="text">
-          <string>Export Selection</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="checkBoxPathOptimization">
-         <property name="text">
-          <string>Path Optimization</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="checkBoxRelocateBySelection">
-         <property name="text">
-          <string>Relocation By Selection</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="checkBoxResumeTransfer">
-         <property name="text">
-          <string>Resume Transfer</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </item>
      <item>
       <layout class="QFormLayout" name="formLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="labelOrigin">
-         <property name="text">
-          <string>Origin</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="comboBoxOrigin">
-         <item>
-          <property name="text">
-           <string>Current Position</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Mechanical Origin</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_2">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -620,8 +525,87 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="EditSlider" name="editSliderLaserPower" native="true"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Start Position</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="comboBoxStartPosition">
+         <item>
+          <property name="text">
+           <string>Current Position</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Custom Origin</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mechnical Origin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>Min Power</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_16">
+         <property name="text">
+          <string>Max Power</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="EditSlider" name="editSliderLaserPowerMin" native="true"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="EditSlider" name="editSliderLaserPowerMax" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_10">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="toolButtonReadPower">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Read</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonWritePower">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Write</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -708,9 +692,495 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="dockWidgetMovement">
+   <property name="windowTitle">
+    <string>Movement</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_5">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Coordinates</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="labelCoordinates">
+         <property name="text">
+          <string>X = 0, Y = 0, Z = 0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Step(mm)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>X</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Y</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_2"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Z</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_3"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,0,1" columnminimumwidth="0,0,0,0">
+       <item row="1" column="2">
+        <widget class="QToolButton" name="toolButtonMoveRight">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>R</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QToolButton" name="toolButtonMoveTopLeft">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>TL</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="toolButtonMoveTop">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>T</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QToolButton" name="toolButtonMoveTopRight">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>TR</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QToolButton" name="toolButtonMoveBottomLeft">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>BL</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QToolButton" name="toolButtonMoveBottomRight">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>BR</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QToolButton" name="toolButtonMoveToOrigin">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>O</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QToolButton" name="toolButtonMoveLeft">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>L</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QToolButton" name="toolButtonMoveBottom">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>B</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QToolButton" name="toolButtonMoveUp">
+         <property name="text">
+          <string>U</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QToolButton" name="toolButtonMoveDown">
+         <property name="text">
+          <string>D</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QFormLayout" name="formLayout_3">
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelOrigin">
+         <property name="text">
+          <string>Post Event</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboPostEvent">
+         <item>
+          <property name="text">
+           <string>Stop at current position</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Unload motor</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Back to mechnical origin</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Back to machining origin</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QRadioButton" name="radioButtonMachiningOrigin1">
+         <property name="text">
+          <string>Origin1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QRadioButton" name="radioButtonMachiningOrigin2">
+         <property name="text">
+          <string>Origin2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QRadioButton" name="radioButtonMachiningOrigin3">
+         <property name="text">
+          <string>Origin3</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>X</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxOrigin1X">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Y</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxOrigin1Y">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>X</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxOrigin2X">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_12">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Y</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxOrigin2Y">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>X</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxOrigin3X">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Y</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxOrigin3Y">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="toolButtonReadOrigins">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Read</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonWriteOrigins">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Write</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionOpen">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/open_document.png</normaloff>:/ui/icons/images/open_document.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -723,6 +1193,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/import_svg.png</normaloff>:/ui/icons/images/import_svg.png</iconset>
+   </property>
    <property name="text">
     <string>Import SVG</string>
    </property>
@@ -734,6 +1208,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/export_json.png</normaloff>:/ui/icons/images/export_json.png</iconset>
+   </property>
    <property name="text">
     <string>Export JSON</string>
    </property>
@@ -741,6 +1219,10 @@
   <action name="actionSave">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/save_document.png</normaloff>:/ui/icons/images/save_document.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -763,6 +1245,10 @@
   <action name="actionNew">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/new_document.png</normaloff>:/ui/icons/images/new_document.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -914,6 +1400,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/import_cdr.png</normaloff>:/ui/icons/images/import_cdr.png</iconset>
+   </property>
    <property name="text">
     <string>Import CorelDraw</string>
    </property>
@@ -952,6 +1442,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/connect.png</normaloff>:/ui/icons/images/connect.png</iconset>
+   </property>
    <property name="text">
     <string>Connect</string>
    </property>
@@ -959,6 +1453,10 @@
   <action name="actionDisconnect">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/disconnect.png</normaloff>:/ui/icons/images/disconnect.png</iconset>
    </property>
    <property name="text">
     <string>Disconnect</string>
@@ -986,6 +1484,10 @@
   <action name="actionCloseDocument">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/close_document.png</normaloff>:/ui/icons/images/close_document.png</iconset>
    </property>
    <property name="text">
     <string>Close Document</string>
@@ -1020,16 +1522,28 @@
    </property>
   </action>
   <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/cut.png</normaloff>:/ui/icons/images/cut.png</iconset>
+   </property>
    <property name="text">
     <string>Cut</string>
    </property>
   </action>
   <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/copy.png</normaloff>:/ui/icons/images/copy.png</iconset>
+   </property>
    <property name="text">
     <string>Copy</string>
    </property>
   </action>
   <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/paste.png</normaloff>:/ui/icons/images/paste.png</iconset>
+   </property>
    <property name="text">
     <string>Paste</string>
    </property>
@@ -1118,6 +1632,10 @@
    </property>
   </action>
   <action name="actionDeletePrimitive">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/delete.png</normaloff>:/ui/icons/images/delete.png</iconset>
+   </property>
    <property name="text">
     <string>Delete Primitive</string>
    </property>
@@ -1158,13 +1676,13 @@
     <string>Move</string>
    </property>
   </action>
-  <action name="actionHome">
+  <action name="actionMoveToOrigin">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/move_home.png</normaloff>:/ui/icons/images/move_home.png</iconset>
+     <normaloff>:/ui/icons/images/move_origin.png</normaloff>:/ui/icons/images/move_origin.png</iconset>
    </property>
    <property name="text">
-    <string>Home</string>
+    <string>Origin</string>
    </property>
   </action>
   <action name="actionMoveLeft">
@@ -1185,6 +1703,60 @@
     <string>Move Right</string>
    </property>
   </action>
+  <action name="actionMoveTop">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_top.png</normaloff>:/ui/icons/images/move_top.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Top</string>
+   </property>
+  </action>
+  <action name="actionMoveBottom">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_bottom.png</normaloff>:/ui/icons/images/move_bottom.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Bottom</string>
+   </property>
+  </action>
+  <action name="actionMoveTopLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_top_left.png</normaloff>:/ui/icons/images/move_top_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Top Left</string>
+   </property>
+  </action>
+  <action name="actionMoveTopRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_top_right.png</normaloff>:/ui/icons/images/move_top_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Top Right</string>
+   </property>
+  </action>
+  <action name="actionMoveBottomLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_bottom_left.png</normaloff>:/ui/icons/images/move_bottom_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Bottom Left</string>
+   </property>
+  </action>
+  <action name="actionMoveBottomRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_bottom_right.png</normaloff>:/ui/icons/images/move_bottom_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Bottom Right</string>
+   </property>
+  </action>
   <action name="actionMoveUp">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
@@ -1201,6 +1773,42 @@
    </property>
    <property name="text">
     <string>Move Down</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/undo.png</normaloff>:/ui/icons/images/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/redo.png</normaloff>:/ui/icons/images/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/Settings.png</normaloff>:/ui/icons/images/Settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionDeviceSettings">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/settings_device.png</normaloff>:/ui/icons/images/settings_device.png</iconset>
+   </property>
+   <property name="text">
+    <string>Device Settings</string>
    </property>
   </action>
  </widget>
