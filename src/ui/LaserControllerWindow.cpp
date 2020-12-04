@@ -202,6 +202,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     m_ui->tableWidgetParameters->setColumnWidth(0, 100);
     m_ui->tableWidgetParameters->setColumnWidth(1, 300);
+	//设置为可选择
+	m_ui->actionRectangleTool->setCheckable(true);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
@@ -229,6 +231,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
     connect(m_ui->actionShowRegisters, &QAction::triggered, this, &LaserControllerWindow::onActionShowRegisters);
 
+	connect(m_ui->actionRectangleTool, &QAction::triggered, this, &LaserControllerWindow::onActionRectangle);
+
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
 
@@ -247,6 +251,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
+	
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -555,6 +560,14 @@ void LaserControllerWindow::onActionHome(bool checked)
     dialog.exec();
 }
 
+void LaserControllerWindow::onActionRectangle(bool checked)
+{
+	if (checked) {
+		m_ui->actionRectangleTool->setEnabled(false);
+		//StateController::
+	}
+}
+
 void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -822,6 +835,11 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, devicePausedState);
     // end actionLaserMove
+
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentWorkingState);
+
 
     // actionLoadJson
 

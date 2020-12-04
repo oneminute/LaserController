@@ -141,6 +141,7 @@ public:
     DECL_STATE(documentSelected)
     DECL_STATE(documentTransforming)
     DECL_STATE(documentPrimitive)
+	DECL_STATE(documentPrimitiveRect)		
 #pragma endregion documentWorking state
 #pragma region document state
 

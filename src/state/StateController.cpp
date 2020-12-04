@@ -23,6 +23,7 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(documentWorking, documentSelected);
     DEFINE_CHILD_STATE(documentWorking, documentTransforming);
     DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRect);
 
     DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
     DEFINE_CHILD_STATE(device, deviceConnected);

@@ -18,6 +18,8 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_scene(new LaserScene)
     , m_rubberBandActive(false)
     , m_mousePressed(false)
+	, m_ruller(this)
+	
 {
     setScene(m_scene.data());
     init();
@@ -30,12 +32,19 @@ LaserViewer::~LaserViewer()
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
     QGraphicsView::paintEvent(event);
+	//»­±ê³ß
+	m_ruller.draw();
+	//×´Ì¬Ñ¡Ôñ
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         QPainter painter(viewport());
         painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
-    }
+	}
+	/*else if (StateControllerInst.onState(StateControllerInst.dcument)) {
+
+	}*/
+	
 }
 
 void LaserViewer::wheelEvent(QWheelEvent * event)
