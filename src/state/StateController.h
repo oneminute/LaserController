@@ -137,6 +137,7 @@ public:
 #pragma region documentWorking state
     DECL_STATE(documentWorking)
     DECL_STATE(documentIdle)
+    DECL_STATE(documentSelection)
     DECL_STATE(documentSelecting)
     DECL_STATE(documentSelected)
     DECL_STATE(documentTransforming)

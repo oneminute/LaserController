@@ -203,6 +203,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->tableWidgetParameters->setColumnWidth(0, 100);
     m_ui->tableWidgetParameters->setColumnWidth(1, 300);
 	//设置为可选择
+    m_ui->actionSelectionTool->setCheckable(true);
 	m_ui->actionRectangleTool->setCheckable(true);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
@@ -232,6 +233,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionShowRegisters, &QAction::triggered, this, &LaserControllerWindow::onActionShowRegisters);
 
 	connect(m_ui->actionRectangleTool, &QAction::triggered, this, &LaserControllerWindow::onActionRectangle);
+	connect(m_ui->actionSelectionTool, &QAction::triggered, this, &LaserControllerWindow::onActionSelectionTool);
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
@@ -254,6 +256,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
+    ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(creatingRectangle()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(creatingRectangle()));
+    ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 
     bindWidgetsProperties();
 
@@ -560,12 +565,27 @@ void LaserControllerWindow::onActionHome(bool checked)
     dialog.exec();
 }
 
+void LaserControllerWindow::onActionSelectionTool(bool checked)
+{
+    if (checked)
+    {
+        emit isIdle();
+    }
+    else
+    {
+        m_ui->actionSelectionTool->setChecked(true);
+    }
+}
+
 void LaserControllerWindow::onActionRectangle(bool checked)
 {
 	if (checked) {
-		m_ui->actionRectangleTool->setEnabled(false);
-		//StateController::
+        emit creatingRectangle();
 	}
+    else
+    {
+        m_ui->actionRectangleTool->setChecked(true);
+    }
 }
 
 void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)
@@ -790,12 +810,12 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end actionMachining
 
     // actionPause
-    /*BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "setChecked", true, devicePausedState);*/
+    /*BIND_PROP_TO_STATE(m_ui->actionPause, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "checked", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "checked", false, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "checked", false, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "checked", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionPause, "checked", true, devicePausedState);*/
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceConnectedState);
@@ -836,10 +856,29 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, devicePausedState);
     // end actionLaserMove
 
+    // actionSelectionTool
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentIdleState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentSelectingState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveState);
+    // end 
+
+    // actionRectangleTool
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentWorkingState);
-
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentIdleState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectingState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", true, documentPrimitiveRectState);
+    // end actionRectangleTool
 
     // actionLoadJson
 

@@ -42,7 +42,7 @@ void Ruller::drawAxes()
 
     QRectF rect = toSceneMatrix().mapRect(m_view->sceneRect());
 	//QRectF rect = m_view->rect();
-	qDebug() << m_view->rect();
+	//qDebug() << m_view->rect();
     //painter.drawRect(rect);
     painter.drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
     painter.drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
@@ -60,10 +60,10 @@ void Ruller::drawTick()
 
     QRectF rect = toSceneMatrix().mapRect(m_view->sceneRect());
 	//QRectF rect = m_view->rect();
-    qDebug()<<"left: "<<rect.left();
-    qDebug()<<"right: "<<rect.right();
-    qDebug()<<"top: "<<rect.top();
-    qDebug()<<"bottom: "<<rect.bottom();
+    //qDebug()<<"left: "<<rect.left();
+    //qDebug()<<"right: "<<rect.right();
+    //qDebug()<<"top: "<<rect.top();
+    //qDebug()<<"bottom: "<<rect.bottom();
     qreal unit = 1.0 / m_factor;
     qreal size = m_factor / 10;
     //横轴
