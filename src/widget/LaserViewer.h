@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsView>
+#include "scene/Ruller.h"
 
 class LaserScene;
 
@@ -48,6 +49,7 @@ private:
     QPoint m_lastDragPos;
     QPointF m_selectionStartPoint;
     QPointF m_selectionEndPoint;
+	Ruller m_ruller;
 };
 
 #endif // LASERVIEWER_H
