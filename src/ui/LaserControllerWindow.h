@@ -77,7 +77,8 @@ private:
 signals:
     void windowCreated();
     void isIdle();
-    void creatingRectangle();
+    void idleRectangle();
+	void creatingRectangle();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;

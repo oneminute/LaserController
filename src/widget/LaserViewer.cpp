@@ -9,6 +9,8 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 
+#include "scene/LaserPrimitive.h"
+#include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
 #include "state/StateController.h"
@@ -41,9 +43,12 @@ void LaserViewer::paintEvent(QPaintEvent * event)
         painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
 	}
-	/*else if (StateControllerInst.onState(StateControllerInst.dcument)) {
-
-	}*/
+	//创建Rect
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+		QPainter painter(viewport());
+		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		painter.drawRect(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint));
+	}
 	
 }
 
@@ -85,7 +90,16 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
             emit beginSelecting();
             qDebug() << "begin to select";
         }
-    }
+	}
+	//创建Rect
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) {
+		if (event->button() == Qt::LeftButton) {
+			m_creatingRectStartPoint = event->pos();
+			m_creatingRectEndPoint = m_creatingRectStartPoint;
+			emit creatingRectangle();
+		}
+
+	}
 }
 
 void LaserViewer::mouseMoveEvent(QMouseEvent * event)
@@ -100,6 +114,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
         m_scene->setSelectionArea(mapToScene(selectionPath));
         return;
     }
+	//创建Rect
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+		m_creatingRectEndPoint = point;
+		return;
+
+	}
     else
     {
         QGraphicsView::mouseMoveEvent(event);
@@ -124,7 +144,14 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
         {
             emit endSelecting();
         }
-    }
+	}
+	//创建Rect结束 
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+		m_creatingRectEndPoint = event->pos();
+		LaserRect *rect = new LaserRect(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint), m_scene->document());
+		m_scene->document()->addItem(rect);
+		emit readyRectangle();
+	}
     else
     {
         QGraphicsView::mouseReleaseEvent(event);
@@ -175,6 +202,9 @@ void LaserViewer::init()
     ADD_TRANSITION(documentSelectedState, documentSelectingState, this, &LaserViewer::beginSelecting);
     ADD_TRANSITION(documentSelectedState, documentIdleState, this, &LaserViewer::cancelSelecting);
     ADD_TRANSITION(documentSelectingState, documentIdleState, this, &LaserViewer::cancelSelecting);
+	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRectCreatingState, this, SIGNAL(creatingRectangle()));
+	ADD_TRANSITION(documentPrimitiveRectCreatingState, documentPrimitiveRectReadyState, this, SIGNAL(readyRectangle()));
+	
 }
 
 void LaserViewer::zoomIn()

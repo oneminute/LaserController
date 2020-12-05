@@ -31,6 +31,8 @@ signals:
     void endSelecting();
     void cancelSelecting();
     void mouseMoved(const QPointF& pos);
+	void creatingRectangle();
+	void readyRectangle();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -49,6 +51,8 @@ private:
     QPoint m_lastDragPos;
     QPointF m_selectionStartPoint;
     QPointF m_selectionEndPoint;
+	QPointF m_creatingRectStartPoint;
+	QPointF m_creatingRectEndPoint;
 	Ruller m_ruller;
 };
 

@@ -256,8 +256,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
-    ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(creatingRectangle()));
-    ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(creatingRectangle()));
+    ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(idleRectangle()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(idleRectangle()));
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 
     bindWidgetsProperties();
@@ -580,7 +580,7 @@ void LaserControllerWindow::onActionSelectionTool(bool checked)
 void LaserControllerWindow::onActionRectangle(bool checked)
 {
 	if (checked) {
-        emit creatingRectangle();
+        emit idleRectangle();
 	}
     else
     {
@@ -878,6 +878,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectedState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", true, documentPrimitiveRectState);
+
     // end actionRectangleTool
 
     // actionLoadJson
