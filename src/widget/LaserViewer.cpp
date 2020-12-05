@@ -150,7 +150,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		m_creatingRectEndPoint = event->pos();
         QRectF rect(mapToScene(m_creatingRectStartPoint.toPoint()), mapToScene(m_creatingRectEndPoint.toPoint()));
 		LaserRect *rectItem = new LaserRect(rect, m_scene->document());
-		m_scene->addItem(rectItem);
+		m_scene->addLaserPrimitive(rectItem);
 		emit readyRectangle();
 	}
     else

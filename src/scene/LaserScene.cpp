@@ -53,6 +53,7 @@ void LaserScene::clearDocument(bool delDoc)
 void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
     m_doc->addItem(primitive);
+    addItem(primitive);
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
