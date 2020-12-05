@@ -34,16 +34,16 @@ LaserViewer::~LaserViewer()
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
     QGraphicsView::paintEvent(event);
-	//»­±ê³ß
+	//ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_ruller.draw();
-	//×´Ì¬Ñ¡Ôñ
+	//×´Ì¬Ñ¡ï¿½ï¿½
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         QPainter painter(viewport());
         painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
 	}
-	//´´½¨Rect
+	//ï¿½ï¿½ï¿½ï¿½Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		QPainter painter(viewport());
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
@@ -91,7 +91,7 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
             qDebug() << "begin to select";
         }
 	}
-	//´´½¨Rect
+	//ï¿½ï¿½ï¿½ï¿½Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) {
 		if (event->button() == Qt::LeftButton) {
 			m_creatingRectStartPoint = event->pos();
@@ -114,7 +114,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
         m_scene->setSelectionArea(mapToScene(selectionPath));
         return;
     }
-	//´´½¨Rect
+	//ï¿½ï¿½ï¿½ï¿½Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		m_creatingRectEndPoint = point;
 		return;
@@ -145,11 +145,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
             emit endSelecting();
         }
 	}
-	//´´½¨Rect½áÊø 
+	//ï¿½ï¿½ï¿½ï¿½Rectï¿½ï¿½ï¿½ï¿½ 
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		m_creatingRectEndPoint = event->pos();
-		LaserRect *rect = new LaserRect(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint), m_scene->document());
-		m_scene->document()->addItem(rect);
+        QRectF rect(mapToScene(m_creatingRectStartPoint.toPoint()), mapToScene(m_creatingRectEndPoint.toPoint()));
+		LaserRect *rectItem = new LaserRect(rect, m_scene->document());
+		m_scene->addItem(rectItem);
 		emit readyRectangle();
 	}
     else

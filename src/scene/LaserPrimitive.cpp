@@ -81,8 +81,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     {
         color = m_layer->color();
     }
-    painter->setPen(QPen(color, 50, Qt::SolidLine));
     QTransform t = m_transform * painter->worldTransform();
+    painter->setPen(QPen(color, 1 / t.m11(), Qt::SolidLine));
     painter->setTransform(t);
     draw(painter);
 

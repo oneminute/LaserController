@@ -20,6 +20,7 @@ public:
 
     void updateDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
+    void addLaserPrimitive(LaserPrimitive* primitive);
 
     LaserDocument* document() { return m_doc; }
 
