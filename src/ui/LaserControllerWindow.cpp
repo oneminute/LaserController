@@ -85,13 +85,15 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     removeDockWidget(m_ui->dockWidgetOperations);
 
     //addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayerButtons);
-    splitDockWidget(m_ui->dockWidgetLayerButtons, m_ui->dockWidgetLayers, Qt::Horizontal);
+    addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayers);
+    //splitDockWidget(m_ui->dockWidgetLayerButtons, m_ui->dockWidgetLayers, Qt::Horizontal);
+    splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetLayerButtons, Qt::Horizontal);
     splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations, Qt::Vertical);
 
     tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetMovement);
     tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties);
 
-    //m_ui->dockWidgetLayerButtons->show();
+    m_ui->dockWidgetLayerButtons->show();
     m_ui->dockWidgetLayers->show();
     m_ui->dockWidgetProperties->show();
     m_ui->dockWidgetOperations->show();

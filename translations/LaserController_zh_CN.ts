@@ -1144,74 +1144,74 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="283"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="902"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="273"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="845"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="358"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="348"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="399"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="389"/>
         <source>Alert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="399"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="389"/>
         <source>No active document. Please open or import a document to mechining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="937"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="492"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="482"/>
         <source>Unload motor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="492"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="482"/>
         <source>Do you want to unload motor?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="510"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="500"/>
         <source>Open Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="510"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="500"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="539"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="529"/>
         <source>Delete primitives?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="539"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="529"/>
         <source>Do you want to delete primitives to selected layer?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="550"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="540"/>
         <source>Close document?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="550"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="540"/>
         <source>Do you want to close current document?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="606"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="573"/>
         <source>Device Connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="611"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="578"/>
         <source>Device Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
