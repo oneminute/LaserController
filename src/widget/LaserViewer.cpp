@@ -21,6 +21,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_rubberBandActive(false)
     , m_mousePressed(false)
 	, m_ruller(this)
+	, m_isKeyShiftPressed(false)
 	
 {
     setScene(m_scene.data());
@@ -34,20 +35,34 @@ LaserViewer::~LaserViewer()
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
     QGraphicsView::paintEvent(event);
-	//�����
+	//RULLER
 	m_ruller.draw();
-	//״̬ѡ��
-    if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
+	//selectioin
+	if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         QPainter painter(viewport());
         painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
 	}
-	//����Rect
+	//Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		QPainter painter(viewport());
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 		painter.drawRect(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint));
+	}
+	//Ellipse
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
+		QPainter painter(viewport());
+		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		if (m_isKeyShiftPressed) {
+			qreal distance = distanceTwoPoints(m_creatingEllipseStartPoint, m_creatingEllipseEndPoint) * 0.5;
+			QPointF delt((m_creatingEllipseEndPoint.x() - m_creatingEllipseStartPoint.x())*0.5, (m_creatingEllipseEndPoint.y() - m_creatingEllipseStartPoint.y())*0.5);
+			painter.drawEllipse(m_creatingEllipseStartPoint+delt, distance, distance);
+			
+		}
+		else {
+			painter.drawEllipse(QRectF(m_creatingEllipseStartPoint, m_creatingEllipseEndPoint));
+		}
 	}
 	
 }
@@ -91,7 +106,7 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
             qDebug() << "begin to select";
         }
 	}
-	//����Rect
+	//Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) {
 		if (event->button() == Qt::LeftButton) {
 			m_creatingRectStartPoint = event->pos();
@@ -100,11 +115,27 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 		}
 
 	}
+	//Ellipse
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseReadyState())) {
+		if (event->button() == Qt::LeftButton) {
+			m_creatingEllipseStartPoint = event->pos();
+			m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
+			emit creatingEllipse();
+		}
+	}
+
 }
 
 void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 {
     QPoint point = event->pos();
+	//shift keyboard
+	if (event->modifiers() & Qt::ShiftModifier) {
+		m_isKeyShiftPressed = true;
+	}
+	else {
+		m_isKeyShiftPressed = false;
+	}
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         m_selectionEndPoint = point;
@@ -114,11 +145,17 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
         m_scene->setSelectionArea(mapToScene(selectionPath));
         return;
     }
-	//����Rect
+	//Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		m_creatingRectEndPoint = point;
 		return;
 
+	}
+	//Ellipse
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
+		m_creatingEllipseEndPoint = point;
+		
+		return;
 	}
     else
     {
@@ -130,6 +167,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 {
+	
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         qreal distance = (m_selectionEndPoint - m_selectionStartPoint).manhattanLength();
@@ -145,7 +183,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
             emit endSelecting();
         }
 	}
-	//����Rect���� 
+	//Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		m_creatingRectEndPoint = event->pos();
         QRectF rect(mapToScene(m_creatingRectStartPoint.toPoint()), mapToScene(m_creatingRectEndPoint.toPoint()));
@@ -153,17 +191,50 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		m_scene->addLaserPrimitive(rectItem);
 		emit readyRectangle();
 	}
+	//Ellipse
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
+		m_creatingRectEndPoint = event->pos();
+		if (m_isKeyShiftPressed) {
+			qreal radius = distanceTwoPoints(m_creatingEllipseStartPoint, m_creatingEllipseEndPoint) * 0.5;
+			QPointF delt((m_creatingEllipseEndPoint.x() - m_creatingEllipseStartPoint.x())*0.5, (m_creatingEllipseEndPoint.y() - m_creatingEllipseStartPoint.y())*0.5);
+			QPointF center = m_creatingEllipseStartPoint + delt;
+			QPointF startPoint = QPointF(center.x() - radius, center.y() - radius);
+			QPointF endPoint = QPointF(center.x() + radius, center.y() + radius);
+			QRectF rect(mapToScene(startPoint.toPoint()), mapToScene(endPoint.toPoint()));
+			LaserEllipse *circleItem = new LaserEllipse(rect, m_scene->document());
+			m_scene->addLaserPrimitive(circleItem);
+		}
+		else {
+			QRectF rect(mapToScene(m_creatingEllipseStartPoint.toPoint()), mapToScene(m_creatingEllipseEndPoint.toPoint()));
+			LaserEllipse *ellipseItem = new LaserEllipse(rect, m_scene->document());
+			m_scene->addLaserPrimitive(ellipseItem);
+		}
+		
+
+		emit readyEllipse();
+
+	}
     else
     {
         QGraphicsView::mouseReleaseEvent(event);
     }
 
     m_mousePressed = false;
+	//shift keyboard
+	m_isKeyShiftPressed = false;
 }
 
 qreal LaserViewer::zoomFactor() const
 {
     return transform().m11();
+}
+
+qreal LaserViewer::distanceTwoPoints(QPointF _start, QPointF _end)
+{
+	qreal x = _start.x() - _end.x();
+	qreal y = _start.y() - _end.y();
+	qreal distance = qSqrt(x*x + y * y);
+	return distance;
 }
 
 void LaserViewer::init()
@@ -205,6 +276,8 @@ void LaserViewer::init()
     ADD_TRANSITION(documentSelectingState, documentIdleState, this, &LaserViewer::cancelSelecting);
 	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRectCreatingState, this, SIGNAL(creatingRectangle()));
 	ADD_TRANSITION(documentPrimitiveRectCreatingState, documentPrimitiveRectReadyState, this, SIGNAL(readyRectangle()));
+	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveEllipseCreatingState, this, SIGNAL(creatingEllipse()));
+	ADD_TRANSITION(documentPrimitiveEllipseCreatingState, documentPrimitiveEllipseReadyState, this, SIGNAL(readyEllipse()));
 	
 }
 

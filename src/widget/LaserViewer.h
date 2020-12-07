@@ -16,6 +16,7 @@ public:
     ~LaserViewer();
 
     qreal zoomFactor() const;
+	qreal distanceTwoPoints(QPointF _start, QPointF _end);
 
 private:
     void init();
@@ -33,6 +34,8 @@ signals:
     void mouseMoved(const QPointF& pos);
 	void creatingRectangle();
 	void readyRectangle();
+	void creatingEllipse();
+	void readyEllipse();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -49,10 +52,17 @@ private:
     QPoint m_rubberBandOrigin;
     bool m_mousePressed;
     QPoint m_lastDragPos;
+
     QPointF m_selectionStartPoint;
     QPointF m_selectionEndPoint;
+
 	QPointF m_creatingRectStartPoint;
 	QPointF m_creatingRectEndPoint;
+
+	QPointF m_creatingEllipseStartPoint;
+	QPointF m_creatingEllipseEndPoint;
+	bool m_isKeyShiftPressed;
+
 	Ruller m_ruller;
 };
 
