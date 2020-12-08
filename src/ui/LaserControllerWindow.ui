@@ -557,22 +557,22 @@
        <item row="3" column="0">
         <widget class="QLabel" name="label_15">
          <property name="text">
-          <string>Min Power</string>
+          <string>Min Energy</string>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_16">
          <property name="text">
-          <string>Max Power</string>
+          <string>Max Energy</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="EditSlider" name="editSliderLaserPowerMin" native="true"/>
+        <widget class="EditSlider" name="editSliderLaserEnergyMin" native="true"/>
        </item>
        <item row="4" column="1">
-        <widget class="EditSlider" name="editSliderLaserPowerMax" native="true"/>
+        <widget class="EditSlider" name="editSliderLaserEnergyMax" native="true"/>
        </item>
       </layout>
      </item>
@@ -610,7 +610,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0">
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
@@ -628,16 +628,6 @@
          </property>
          <property name="text">
           <string>Connect</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="toolButtonDisconnect">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Disconnect</string>
          </property>
         </widget>
        </item>
@@ -723,7 +713,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Step(mm)</string>
+          <string>Distance(mm)</string>
          </property>
         </widget>
        </item>
@@ -737,7 +727,20 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox"/>
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxDistanceX">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_7">
@@ -747,7 +750,20 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_2"/>
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxDistanceY">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_8">
@@ -757,7 +773,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_3"/>
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxDistanceZ">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <double>500.000000000000000</double>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -783,6 +806,9 @@
        </item>
        <item row="0" column="0">
         <widget class="QToolButton" name="toolButtonMoveTopLeft">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="maximumSize">
           <size>
            <width>30</width>
@@ -812,6 +838,9 @@
        </item>
        <item row="0" column="2">
         <widget class="QToolButton" name="toolButtonMoveTopRight">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="maximumSize">
           <size>
            <width>30</width>
@@ -825,6 +854,9 @@
        </item>
        <item row="2" column="0">
         <widget class="QToolButton" name="toolButtonMoveBottomLeft">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="maximumSize">
           <size>
            <width>30</width>
@@ -838,6 +870,9 @@
        </item>
        <item row="2" column="2">
         <widget class="QToolButton" name="toolButtonMoveBottomRight">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="maximumSize">
           <size>
            <width>30</width>
@@ -899,6 +934,9 @@
        </item>
        <item row="0" column="3">
         <widget class="QToolButton" name="toolButtonMoveUp">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>U</string>
          </property>
@@ -906,6 +944,9 @@
        </item>
        <item row="2" column="3">
         <widget class="QToolButton" name="toolButtonMoveDown">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>D</string>
          </property>
@@ -1132,6 +1173,9 @@
        </property>
        <item>
         <widget class="QToolButton" name="toolButtonReadOrigins">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1145,6 +1189,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="toolButtonWriteOrigins">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>

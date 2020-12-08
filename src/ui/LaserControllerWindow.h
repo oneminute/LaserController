@@ -8,6 +8,7 @@
 
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
+#include "laser/LaserDriver.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
@@ -25,6 +26,8 @@ class LaserControllerWindow : public QMainWindow
 public:
     LaserControllerWindow(QWidget* parent = nullptr);
     ~LaserControllerWindow();
+
+    void moveLaser(const QVector3D& delta);
 
 protected slots:
     void onActionImportSVG(bool checked = false);
@@ -46,7 +49,19 @@ protected slots:
     void onActionLoadMotor(bool checked = false);
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
+
     void onActionMoveToOriginalPoint(bool checked = false);
+    void onActionMoveTop(bool checked = false);
+    void onActionMoveBottom(bool checked = false);
+    void onActionMoveLeft(bool checked = false);
+    void onActionMoveRight(bool checked = false);
+    void onActionMoveTopLeft(bool checked = false);
+    void onActionMoveTopRight(bool checked = false);
+    void onActionMoveBottomLeft(bool checked = false);
+    void onActionMoveBottomRight(bool checked = false);
+    void onActionMoveUp(bool checked = false);
+    void onActionMoveDown(bool checked = false);
+
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
     void onActionCloseDocument(bool checked = false);
@@ -62,12 +77,15 @@ protected slots:
     void onWindowCreated();
 
     void onEnterDeviceUnconnectedState();
+    void onEnterDeviceConnectedState();
     void onActionMoveLayerUp(bool checked = false);
     void onActionMoveLayerDown(bool checked = false);
 
     void onLaserSceneSelectedChanged();
-
     void onLaserViewerMouseMoved(const QPointF& pos);
+
+    void onLaserRegistersFetched(const LaserDriver::RegistersMap& registers);
+    void onLaserReturnWorkState(LaserState state);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);

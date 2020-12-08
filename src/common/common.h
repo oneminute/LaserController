@@ -113,6 +113,18 @@ enum WidgetUserData
     WUD_PropertyEditor
 };
 
+enum QUADRANT
+{
+    QUADRANT1 = 2,
+    QUADRANT_TR = 2,
+    QUADRANT2 = 1,
+    QUADRANT_TL = 1,
+    QUADRANT3 = 4,
+    QUADRANT_BL = 4,
+    QUADRANT4 = 3,
+    QUADRANT_BR = 3
+};
+
 struct FillStyleAndPixelsCount
 {
     int code;

@@ -303,7 +303,7 @@ bool LaserDriver::load()
     m_fnLPenQuickMoveTo = (FNLPenQuickMoveTo)m_library.resolve("LPenQuickMoveTo");
     m_fnControlHDAction = (FN_VOID_INT)m_library.resolve("ControlHDAction");
     m_fnGetMainCardID = (FN_WCHART_VOID)m_library.resolve("GetMainCardID");
-    m_fnGetCurrentLaserPos = (FN_INT_VOID)m_library.resolve("GetCurrentLaserPos");
+    m_fnGetCurrentLaserPos = (FN_WCHART_VOID)m_library.resolve("GetCurrentLaserPos");
     m_fnSmallScaleMovement = (FNSmallScaleMovement)m_library.resolve("SmallScaleMovement");
     m_fnStartMachining = (FN_VOID_BOOL)m_library.resolve("StartMachining");
     m_fnPauseContinueMachining = (FN_INT_BOOL)m_library.resolve("PauseContinueMachining");
@@ -409,7 +409,7 @@ void LaserDriver::setHardwareInitialization(double curveToSpeedRatio, int logica
     m_fnSetHardwareInitialization(curveToSpeedRatio, logicalResolution, maxSpeed, zeroCoordinates);
 }
 
-bool LaserDriver::writeSysParamToCard(const QMap<RegisterType, QVariant>& values)
+bool LaserDriver::writeSysParamToCard(const RegistersMap& values)
 {
     if (values.count() == 0)
         return false;
@@ -492,7 +492,7 @@ void LaserDriver::lPenMoveToOriginalPoint(double speed)
     m_fnLPenMoveToOriginalPoint(speed);
 }
 
-void LaserDriver::lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, double startSpeed, double workSpeed)
+void LaserDriver::lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed)
 {
     m_fnLPenQuickMoveTo(xyzStyle, zeroPointStyle, x, y, z, startSpeed, workSpeed);
 }
@@ -508,9 +508,19 @@ QString LaserDriver::getMainCardID()
     return id;
 }
 
-int LaserDriver::GetCurrentLaserPos()
+QVector3D LaserDriver::GetCurrentLaserPos()
 {
-    return m_fnGetCurrentLaserPos();
+    wchar_t* raw = m_fnGetCurrentLaserPos();
+    QString posStr = QString::fromWCharArray(raw);
+    QVector3D pos;
+    QStringList posSegs = posStr.split(';', QString::SplitBehavior::SkipEmptyParts);
+    Q_ASSERT(posSegs.length() == 3);
+    pos.setX(posSegs[0].toFloat());
+    pos.setY(posSegs[1].toFloat());
+    pos.setZ(posSegs[2].toFloat());
+    qDebug() << "Raw pos value:" << posStr;
+    qDebug() << "Pos value:" << pos;
+    return pos;
 }
 
 void LaserDriver::smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed)
@@ -582,6 +592,18 @@ QString LaserDriver::registerComment(RegisterType rt)
     if (m_registerComments.contains(rt))
         return m_registerComments[rt];
     return QString("");
+}
+
+bool LaserDriver::getLayout(float & width, float & height)
+{
+    if (!m_registers.contains(RT_LAYOUT_SIZE))
+        return false;
+
+    int pageSize = m_registers[RT_LAYOUT_SIZE].toInt();
+    width = (pageSize >> 16) & 0x0000FFFF;
+    height = pageSize & 0x0000FFFF;
+
+    return true;
 }
 
 ConnectionTask * LaserDriver::createConnectionTask(QWidget* parentWidget)

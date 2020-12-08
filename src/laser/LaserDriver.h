@@ -3,8 +3,9 @@
 
 #include <QObject>
 #include <QLibrary>
-#include <QWidget>
 #include <QMap>
+#include <QVector3D>
+#include <QWidget>
 
 #include "task/Task.h"
 
@@ -184,17 +185,17 @@ public:
         REG_14 = 14,                    
         RT_ENGRAVING_ROW_STEP = 14,
         REG_15 = 15,                    
-        RT_ENGRAVING_LASER_POWER = 15,
+        RT_LIGHT_ON_DELAY = 15,
         REG_16 = 16,                    
-        RT_MAX_ENGRAVING_GRAY_VALUE = 16,
+        RT_LIGHT_OFF_DELAY = 16,
         REG_17 = 17,                    
         RT_MIN_ENGRAVING_GRAY_VALUE = 17,
         REG_18 = 18,                    
         RT_CUTTING_LASER_POWER = 18,
         REG_19 = 19,                    
-        RT_CUTTING_RUNNING_SPEED_RATIO = 19,
+        RT_MIN_LASER_ENERGY = 19,
         REG_20 = 20,                    
-        RT_CUTTING_LAUNCHING_SPEED_RATIO = 20,
+        RT_MAX_LASER_ENERGY = 20,
         REG_21 = 21,                    
         RT_MACHINE_PHASE = 21,
         REG_22 = 22,                    
@@ -229,6 +230,8 @@ public:
         RT_MOVE_FAST_LAUNCHING_SPEED = 40
     };
 
+    typedef QMap<RegisterType, QVariant> RegistersMap;
+
 private:
     typedef wchar_t* (*FN_WCHART_VOID)();
     typedef void(__stdcall *FN_VOID_INT)(int value);
@@ -254,7 +257,7 @@ private:
     typedef int(__stdcall *FN_INT_WCHART)(wchar_t* address);
 
     typedef void(__stdcall *FN_VOID_DOUBLE)(double speed);
-    typedef void(__stdcall *FNLPenQuickMoveTo)(char xyzStyle, bool zeroPointStyle, double x, double y, double z, double startSpeed, double workSpeed);
+    typedef void(__stdcall *FNLPenQuickMoveTo)(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
     typedef void(__stdcall *FNSmallScaleMovement)(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
 
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
@@ -286,17 +289,17 @@ public:
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
     void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
-    bool writeSysParamToCard(const QMap<RegisterType, QVariant>& values);
+    bool writeSysParamToCard(const RegistersMap& values);
     bool readSysParamFromCard(QList<int> addresses);
     bool readAllSysParamFromCard();
     void showAboutWindow();
     bool checkFactoryPassword(const QString& password);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
-    void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, double startSpeed, double workSpeed);
+    void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
     void controlHDAction(int action);
     QString getMainCardID();
-    int GetCurrentLaserPos();
+    QVector3D GetCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
     void startMachining(bool zeroPointStyle);
     int pauseContinueMachining(bool pause);
@@ -314,6 +317,7 @@ public:
     void setRegister(RegisterType rt, QVariant value);
     bool getRegister(RegisterType rt, QVariant& value);
     QString registerComment(RegisterType rt);
+    bool getLayout(float& width, float& height);
 
     static ConnectionTask* createConnectionTask(QWidget* parentWidget);
     static DisconnectionTask* createDisconnectionTask(QWidget* parentWidget);
@@ -339,7 +343,7 @@ signals:
     void workStateUpdated(LaserState state);
     void idle();
     void sysParamFromCardArrived(const QString& data);
-    void registersFectched(const QMap<RegisterType, QVariant>& data);
+    void registersFectched(const RegistersMap& data);
     void sysParamFromCardError();
     void unknownError();
     void workingCanceled();
@@ -359,7 +363,7 @@ private:
     QString m_portName;
     QWidget* m_parentWidget;
     LaserWorkMode m_workMode;
-    QMap<RegisterType, QVariant> m_registers;
+    RegistersMap m_registers;
 
     QLibrary m_library;
 
@@ -392,7 +396,7 @@ private:
     FNLPenQuickMoveTo m_fnLPenQuickMoveTo;
     FN_VOID_INT m_fnControlHDAction;
     FN_WCHART_VOID m_fnGetMainCardID;
-    FN_INT_VOID m_fnGetCurrentLaserPos;
+    FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FNSmallScaleMovement m_fnSmallScaleMovement;
     FN_VOID_BOOL m_fnStartMachining;
     FN_INT_BOOL m_fnPauseContinueMachining;
