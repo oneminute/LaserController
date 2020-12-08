@@ -36,6 +36,8 @@ signals:
 	void readyRectangle();
 	void creatingEllipse();
 	void readyEllipse();
+	void creatingLine();
+	void readyLine();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -60,7 +62,12 @@ private:
 	QPointF m_creatingRectEndPoint;
 
 	QPointF m_creatingEllipseStartPoint;
+	QPointF m_creatingEllipseStartInitPoint;
 	QPointF m_creatingEllipseEndPoint;
+
+	QPointF m_creatingLineStartPoint;
+	QPointF m_creatingLineEndPoint;
+
 	bool m_isKeyShiftPressed;
 
 	Ruller m_ruller;

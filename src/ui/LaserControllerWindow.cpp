@@ -208,6 +208,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->actionSelectionTool->setCheckable(true);
 	m_ui->actionRectangleTool->setCheckable(true);
 	m_ui->actionEllipseTool->setCheckable(true);
+	m_ui->actionLineTool->setCheckable(true);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
@@ -235,6 +236,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
     connect(m_ui->actionShowRegisters, &QAction::triggered, this, &LaserControllerWindow::onActionShowRegisters);
 
+	connect(m_ui->actionLineTool, &QAction::triggered, this, &LaserControllerWindow::onActionLine);
 	connect(m_ui->actionRectangleTool, &QAction::triggered, this, &LaserControllerWindow::onActionRectangle);
 	connect(m_ui->actionEllipseTool, &QAction::triggered, this, &LaserControllerWindow::onActionEllipse);
 	connect(m_ui->actionSelectionTool, &QAction::triggered, this, &LaserControllerWindow::onActionSelectionTool);
@@ -261,13 +263,20 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
-    ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(idleRectangle()));
-    ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(idleRectangle()));
-	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveRectState, this, SIGNAL(idleRectangle()));
+    ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 
-	ADD_TRANSITION(documentIdleState, documentPrimitiveEllipseState, this, SIGNAL(idleEllipse()));
-	ADD_TRANSITION(documentSelectionState, documentPrimitiveEllipseState, this, SIGNAL(idleEllipse()));
-	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveEllipseState, this, SIGNAL(idleEllipse()));
+	ADD_TRANSITION(documentIdleState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+	ADD_TRANSITION(documentSelectionState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+
+	ADD_TRANSITION(documentIdleState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+	ADD_TRANSITION(documentSelectionState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 
@@ -591,7 +600,7 @@ void LaserControllerWindow::onActionSelectionTool(bool checked)
 void LaserControllerWindow::onActionRectangle(bool checked)
 {
 	if (checked) {
-        emit idleRectangle();
+        emit readyRectangle();
 	}
     else
     {
@@ -602,11 +611,22 @@ void LaserControllerWindow::onActionRectangle(bool checked)
 void LaserControllerWindow::onActionEllipse(bool checked)
 {
 	if (checked) {
-		emit idleEllipse();
+		emit readyEllipse();
 	}
 	else
 	{
 		m_ui->actionEllipseTool->setChecked(true);
+	}
+}
+
+void LaserControllerWindow::onActionLine(bool checked)
+{
+	if (checked) {
+		emit readyLine();
+	}
+	else
+	{
+		m_ui->actionLineTool->setChecked(true);
 	}
 }
 
@@ -889,6 +909,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveEllipseState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveLineState);
     // end 
 
     // actionRectangleTool
@@ -901,6 +922,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectedState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveEllipseState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveLineState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", true, documentPrimitiveRectState);
     // end actionRectangleTool
 
@@ -914,8 +936,23 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentSelectedState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveRectState);
+	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveLineState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", true, documentPrimitiveEllipseState);
 	// end actionElippseTool
+
+	// actionLineTool
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentIdleState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectingState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveRectState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveEllipseState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", true, documentPrimitiveLineState);
+	// end actionLineTool
 
     // actionLoadJson
 

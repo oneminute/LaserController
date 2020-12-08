@@ -33,6 +33,10 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveEllipse, documentPrimitiveEllipseReady);
 	DEFINE_CHILD_STATE(documentPrimitiveEllipse, documentPrimitiveEllipseCreating);
 
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveLine);
+	DEFINE_CHILD_INIT_STATE(documentPrimitiveLine, documentPrimitiveLineReady);
+	DEFINE_CHILD_STATE(documentPrimitiveLine, documentPrimitiveLineCreating);
+
     DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
     DEFINE_CHILD_STATE(device, deviceConnected);
     DEFINE_CHILD_INIT_STATE(deviceConnected, deviceIdle);
