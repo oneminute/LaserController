@@ -212,6 +212,10 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
         emit instance().changeManufacturerPasswordFailure();
     }
     break;
+    case FactoryPasswordLengthError:
+    {
+        emit instance().wrongManufacturerPassword();
+    }
     }
 }
 

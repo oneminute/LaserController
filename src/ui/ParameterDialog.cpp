@@ -1,6 +1,7 @@
 #include "ParameterDialog.h"
 #include "ui_ParameterDialog.h"
 
+#include <QMessageBox>
 #include "ChangePasswordDialog.h"
 
 ParameterDialog::ParameterDialog(QWidget* parent)
@@ -116,6 +117,7 @@ void ParameterDialog::rightManufactorPassword()
 
 void ParameterDialog::wrongManufactorPassword()
 {
+    QMessageBox::warning(this, tr("Wrong password"), tr("Wrong password"));
     m_ui->groupBoxManufactor->setVisible(false);
 }
 
