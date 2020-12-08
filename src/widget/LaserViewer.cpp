@@ -22,6 +22,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_mousePressed(false)
 	, m_ruller(this)
 	, m_isKeyShiftPressed(false)
+	, m_isMouseInStartRect(false)
 	
 {
     setScene(m_scene.data());
@@ -58,6 +59,24 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineCreatingState())) {
 		painter.drawLine(m_creatingLineStartPoint, m_creatingLineEndPoint);
 	}
+	//Polygon
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
+		if (m_isMouseInStartRect) {
+			painter.fillRect(m_polygonStartRect, QBrush(Qt::red, Qt::SolidPattern));
+		}
+		else {
+			painter.fillRect(m_polygonStartRect, QBrush(Qt::black, Qt::SolidPattern));
+		}
+		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		for (int i = 0; i < m_creatingPolygonPoints.length(); i++) {
+			QPointF start = m_creatingPolygonPoints.at(i);
+			if (i < m_creatingPolygonPoints.length() - 1) {
+				QPointF end = m_creatingPolygonPoints.at(i + 1);
+				painter.drawLine(start, end);
+			}
+		}
+		painter.drawLine(m_creatingPolygonPoints.at(m_creatingPolygonPoints.length() - 1), m_creatingPolygonEndPoint);
+	}
 	
 }
 
@@ -86,46 +105,53 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
     QGraphicsView::mousePressEvent(event);
     if (event->isAccepted())
         return;
-
     QList<QAbstractState*> states;
     states << StateControllerInst.documentIdleState()
         << StateControllerInst.documentSelectedState();
-    if (StateControllerInst.anyState(states))
-    {
-        if (event->button() == Qt::LeftButton)
-        {
-            m_selectionStartPoint = event->pos();
-            m_selectionEndPoint = m_selectionStartPoint;
-            emit beginSelecting();
-            qDebug() << "begin to select";
-        }
-	}
-	//Rect
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) {
-		if (event->button() == Qt::LeftButton) {
+	//Left Button
+	if (event->button() == Qt::LeftButton) {
+		if (StateControllerInst.anyState(states))
+		{
+			
+			m_selectionStartPoint = event->pos();
+			m_selectionEndPoint = m_selectionStartPoint;
+			emit beginSelecting();
+			qDebug() << "begin to select";
+			
+		}
+		//Rect
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) {
+			
 			m_creatingRectStartPoint = event->pos();
 			m_creatingRectEndPoint = m_creatingRectStartPoint;
 			emit creatingRectangle();
+			QGraphicsRectItem *rect = new QGraphicsRectItem(mapToScene(m_creatingRectStartPoint.toPoint()).x(), mapToScene(m_creatingRectStartPoint.toPoint()).y(), 3, 3);
+			this->scene()->addItem(rect);
 		}
-
-	}
-	//Ellipse
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseReadyState())) {
-		if (event->button() == Qt::LeftButton) {
+		//Ellipse
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseReadyState())) {
+			
 			m_creatingEllipseStartPoint = event->pos();
 			m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
 			m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
 			emit creatingEllipse();
 		}
-	}
-	//Line
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineReadyState())) {
-		if (event->button() == Qt::LeftButton) {
+		//Line
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineReadyState())) {
+			
 			m_creatingLineStartPoint = event->pos();
 			m_creatingLineEndPoint = m_creatingLineStartPoint;
 			emit creatingLine();
 		}
+		//Polygon Ready
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonReadyState())) {
+			//clear
+			m_creatingPolygonPoints.clear();
+			emit creatingPolygonStartRect();
+		}
+		
 	}
+    
 }
 
 void LaserViewer::mouseMoveEvent(QMouseEvent * event)
@@ -157,12 +183,20 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
 		m_creatingEllipseEndPoint = point;
 		if (m_isKeyShiftPressed) {
-			QPointF end(m_creatingEllipseEndPoint.x(), m_creatingEllipseStartInitPoint.y());
+			/*QPointF end(m_creatingEllipseEndPoint.x(), m_creatingEllipseStartInitPoint.y());
 			qreal radius = (m_creatingEllipseStartInitPoint - end).manhattanLength() * 0.5;
 			QPointF delt((m_creatingEllipseEndPoint.x() - m_creatingEllipseStartInitPoint.x())*0.5, (m_creatingEllipseEndPoint.y() - m_creatingEllipseStartInitPoint.y())*0.5);
 			QPointF center = m_creatingEllipseStartInitPoint + delt;
 			m_creatingEllipseStartPoint = QPointF(center.x() - radius, center.y() - radius);
-			m_creatingEllipseEndPoint = QPointF(center.x() + radius, center.y() + radius);
+			m_creatingEllipseEndPoint = QPointF(center.x() + radius, center.y() + radius);*/
+			qreal w = m_creatingEllipseEndPoint.x() - m_creatingEllipseStartPoint.x();
+			qreal h = m_creatingEllipseEndPoint.y() - m_creatingEllipseStartPoint.y();
+			if (qAbs(w) < qAbs(h)) {
+				m_creatingEllipseEndPoint = QPointF(m_creatingEllipseStartPoint.x()+w, m_creatingEllipseStartPoint.y()+w);
+			}
+			else {
+				m_creatingEllipseEndPoint = QPointF(m_creatingEllipseStartPoint.x()+h, m_creatingEllipseStartPoint.y()+h);
+			}
 		}
 		return;
 	}
@@ -185,6 +219,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 			}
 		}
 		return;
+	}
+	//Polygon
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
+		
+		m_isMouseInStartRect = m_polygonStartRect.contains(event->pos());
+		m_creatingPolygonEndPoint = point;
 	}
     else
     {
@@ -233,6 +273,42 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		m_scene->addLaserPrimitive(lineItem);
 		emit readyLine();
 	}
+	//Polygon Ready
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonStartRectState())) {
+		//init
+		m_creatingPolygonStartPoint = event->pos();
+		m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
+		m_creatingPolygonPoints.append(m_creatingPolygonStartPoint);
+
+		qreal width = 5;
+		qreal halfWidth = width * 0.5;
+		m_polygonStartRect = QRectF(m_creatingPolygonStartPoint.x() - halfWidth, m_creatingPolygonStartPoint.y() - halfWidth, width, width);
+
+		emit creatingPolygon();
+	}
+	//Polygon Creating
+	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
+		m_creatingPolygonEndPoint = event->pos();
+		
+		if (m_polygonStartRect.contains(m_creatingPolygonEndPoint)) {
+			m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
+			if (m_creatingPolygonPoints.length() > 1) {
+				m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
+				for (int i = 0; i < m_creatingPolygonPoints.length(); i++) {
+					m_creatingPolygonPoints[i] = mapToScene(m_creatingPolygonPoints[i].toPoint());
+				}
+				QPolygonF qPolygon(m_creatingPolygonPoints);
+				LaserPolygon *polygon = new LaserPolygon(qPolygon, m_scene->document());
+				m_scene->addLaserPrimitive(polygon);
+				emit readyPolygon();
+			}
+			
+		}
+		else {
+			m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
+		}
+		
+	}
     else
     {
         QGraphicsView::mouseReleaseEvent(event);
@@ -245,14 +321,6 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 qreal LaserViewer::zoomFactor() const
 {
     return transform().m11();
-}
-
-qreal LaserViewer::distanceTwoPoints(QPointF _start, QPointF _end)
-{
-	qreal x = _start.x() - _end.x();
-	qreal y = _start.y() - _end.y();
-	qreal distance = qSqrt(x*x + y * y);
-	return distance;
 }
 
 void LaserViewer::init()
@@ -298,6 +366,14 @@ void LaserViewer::init()
 	ADD_TRANSITION(documentPrimitiveEllipseCreatingState, documentPrimitiveEllipseReadyState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveLineCreatingState, this, SIGNAL(creatingLine()));
 	ADD_TRANSITION(documentPrimitiveLineCreatingState, documentPrimitiveLineReadyState, this, SIGNAL(readyLine()));
+	ADD_TRANSITION(documentPrimitivePolygonStartRectState, documentPrimitivePolygonCreatingState, this, SIGNAL(creatingPolygon()));
+	ADD_TRANSITION(documentPrimitivePolygonCreatingState, documentPrimitivePolygonReadyState, this, SIGNAL(readyPolygon()));
+	ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonStartRectState, this, SIGNAL(creatingPolygonStartRect()));
+	
+}
+
+void LaserViewer::DetectMouseRange(QRectF _rect, QPointF _pos)
+{
 	
 }
 

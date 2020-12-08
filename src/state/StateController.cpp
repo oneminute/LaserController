@@ -37,6 +37,11 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveLine, documentPrimitiveLineReady);
 	DEFINE_CHILD_STATE(documentPrimitiveLine, documentPrimitiveLineCreating);
 
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitivePolygon);
+	DEFINE_CHILD_INIT_STATE(documentPrimitivePolygon, documentPrimitivePolygonReady);
+	DEFINE_CHILD_STATE(documentPrimitivePolygon, documentPrimitivePolygonCreating);
+	DEFINE_CHILD_STATE(documentPrimitivePolygon, documentPrimitivePolygonStartRect);	
+
     DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
     DEFINE_CHILD_STATE(device, deviceConnected);
     DEFINE_CHILD_INIT_STATE(deviceConnected, deviceIdle);

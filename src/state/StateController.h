@@ -151,6 +151,10 @@ public:
 	DECL_STATE(documentPrimitiveLine)
 	DECL_STATE(documentPrimitiveLineReady)
 	DECL_STATE(documentPrimitiveLineCreating)
+	DECL_STATE(documentPrimitivePolygon)
+	DECL_STATE(documentPrimitivePolygonReady)
+	DECL_STATE(documentPrimitivePolygonStartRect)
+	DECL_STATE(documentPrimitivePolygonCreating)
 #pragma endregion documentWorking state
 #pragma region document state
 

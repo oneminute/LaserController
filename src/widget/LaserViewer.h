@@ -16,10 +16,11 @@ public:
     ~LaserViewer();
 
     qreal zoomFactor() const;
-	qreal distanceTwoPoints(QPointF _start, QPointF _end);
+	
 
 private:
     void init();
+	void DetectMouseRange(QRectF _rect, QPointF _pos);
 
 public slots:
     void zoomIn();
@@ -38,7 +39,9 @@ signals:
 	void readyEllipse();
 	void creatingLine();
 	void readyLine();
-
+	void creatingPolygonStartRect();
+	void creatingPolygon();
+	void readyPolygon();
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void wheelEvent(QWheelEvent *event) override;
@@ -67,6 +70,13 @@ private:
 
 	QPointF m_creatingLineStartPoint;
 	QPointF m_creatingLineEndPoint;
+
+	QPointF m_creatingPolygonStartPoint;
+	QPointF m_creatingPolygonEndPoint;
+	QVector<QPointF> m_creatingPolygonPoints;
+	//qreal m_polygonStartRectWidth;
+	QRectF m_polygonStartRect;
+	bool m_isMouseInStartRect;
 
 	bool m_isKeyShiftPressed;
 
