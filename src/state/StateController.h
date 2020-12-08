@@ -145,6 +145,16 @@ public:
 	DECL_STATE(documentPrimitiveRect)
 	DECL_STATE(documentPrimitiveRectReady)
 	DECL_STATE(documentPrimitiveRectCreating)
+	DECL_STATE(documentPrimitiveEllipse)
+	DECL_STATE(documentPrimitiveEllipseReady)
+	DECL_STATE(documentPrimitiveEllipseCreating)
+	DECL_STATE(documentPrimitiveLine)
+	DECL_STATE(documentPrimitiveLineReady)
+	DECL_STATE(documentPrimitiveLineCreating)
+	DECL_STATE(documentPrimitivePolygon)
+	DECL_STATE(documentPrimitivePolygonReady)
+	DECL_STATE(documentPrimitivePolygonStartRect)
+	DECL_STATE(documentPrimitivePolygonCreating)
 #pragma endregion documentWorking state
 #pragma region document state
 

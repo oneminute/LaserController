@@ -193,7 +193,7 @@ set(QM_FILES
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
-add_subdirectory(test)
+#add_subdirectory(test)
 
 INSTALL(TARGETS LaserController
         DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime)

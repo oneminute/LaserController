@@ -24,9 +24,23 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(documentSelection, documentSelected);
     DEFINE_CHILD_STATE(documentWorking, documentTransforming);
     DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
+
 	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRect);
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveRect, documentPrimitiveRectReady);
 	DEFINE_CHILD_STATE(documentPrimitiveRect, documentPrimitiveRectCreating);
+
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveEllipse);
+	DEFINE_CHILD_INIT_STATE(documentPrimitiveEllipse, documentPrimitiveEllipseReady);
+	DEFINE_CHILD_STATE(documentPrimitiveEllipse, documentPrimitiveEllipseCreating);
+
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveLine);
+	DEFINE_CHILD_INIT_STATE(documentPrimitiveLine, documentPrimitiveLineReady);
+	DEFINE_CHILD_STATE(documentPrimitiveLine, documentPrimitiveLineCreating);
+
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitivePolygon);
+	DEFINE_CHILD_INIT_STATE(documentPrimitivePolygon, documentPrimitivePolygonReady);
+	DEFINE_CHILD_STATE(documentPrimitivePolygon, documentPrimitivePolygonCreating);
+	DEFINE_CHILD_STATE(documentPrimitivePolygon, documentPrimitivePolygonStartRect);	
 
     DEFINE_CHILD_INIT_STATE(device, deviceUnconnected);
     DEFINE_CHILD_STATE(device, deviceConnected);
