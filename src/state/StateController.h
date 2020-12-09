@@ -155,6 +155,10 @@ public:
 	DECL_STATE(documentPrimitivePolygonReady)
 	DECL_STATE(documentPrimitivePolygonStartRect)
 	DECL_STATE(documentPrimitivePolygonCreating)
+	DECL_STATE(documentPrimitiveSpline)
+	DECL_STATE(documentPrimitiveSplineReady)
+	DECL_STATE(documentPrimitiveSplineStartReady)
+	DECL_STATE(documentPrimitiveSplineCreating)
 #pragma endregion documentWorking state
 #pragma region document state
 

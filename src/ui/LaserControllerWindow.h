@@ -72,6 +72,7 @@ protected slots:
 	void onActionEllipse(bool checked = false);
 	void onActionLine(bool checked = false);
 	void onActionPolygon(bool checked = false);
+	void onActionSpline(bool checked = false);
 
     void onDriverComPortsFetched(const QStringList& ports);
     void onDriverComPortConnected();
@@ -102,6 +103,7 @@ signals:
 	void readyEllipse();
 	void readyLine();
 	void readyPolygon();
+	void readySpline();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;

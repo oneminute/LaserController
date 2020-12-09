@@ -595,6 +595,16 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="560"/>
+        <source>Min Energy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="567"/>
+        <source>Max Energy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="593"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1186"/>
         <source>Read</source>
@@ -618,28 +628,8 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="716"/>
-        <source>Distance(mm)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1509"/>
-        <source>Disconnect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="687"/>
         <source>Movement</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="560"/>
-        <source>Min Energy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="567"/>
-        <source>Max Energy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -650,6 +640,11 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="709"/>
         <source>X = 0, Y = 0, Z = 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="716"/>
+        <source>Distance(mm)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -740,7 +735,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="978"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="598"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="611"/>
         <source>Unload motor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -894,6 +889,11 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1509"/>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1517"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1520"/>
         <source>Load Motor</source>
@@ -927,7 +927,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1563"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="478"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="491"/>
         <source>Load Json</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1149,90 +1149,90 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="336"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="348"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="356"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="364"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="374"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="349"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="361"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="369"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="377"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="387"/>
         <source>Operate failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="336"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="349"/>
         <source>Laser device is not connected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="348"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="356"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="364"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="374"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="361"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="369"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="377"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="387"/>
         <source>Getting register value failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="388"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1234"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="401"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1279"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="463"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="476"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="504"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="517"/>
         <source>Alert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="504"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="517"/>
         <source>No active document. Please open or import a document to mechining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="598"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="611"/>
         <source>Do you want to unload motor?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="676"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="689"/>
         <source>Open Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="676"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="689"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="705"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="718"/>
         <source>Delete primitives?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="705"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="718"/>
         <source>Do you want to delete primitives to selected layer?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="716"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="729"/>
         <source>Close document?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="716"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="729"/>
         <source>Do you want to close current document?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="805"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="829"/>
         <source>Device Connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="810"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="834"/>
         <source>Device Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1263,172 +1263,172 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="227"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="231"/>
         <source>Reset calib speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="228"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="232"/>
         <source>Engraving Launcing Speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="229"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="233"/>
         <source>Move fast speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="230"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="234"/>
         <source>Cutting speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="231"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="235"/>
         <source>Move to origin speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="232"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="236"/>
         <source>Working quadrant.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="233"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="237"/>
         <source>X Axis pulse length.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="234"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="238"/>
         <source>Y Axis pulse length.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="235"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="239"/>
         <source>X Axis backlash.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="236"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="240"/>
         <source>Y Axis backlash.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="237"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="241"/>
         <source>Engraving column step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="238"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="242"/>
         <source>Engraving row step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="239"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="243"/>
         <source>Engraving laser power.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="240"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="244"/>
         <source>Max engraving gray value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="241"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="245"/>
         <source>Min engraving gray value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="242"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="246"/>
         <source>Cutting laser power.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="243"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="247"/>
         <source>Cutting running speed ratio.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="244"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="248"/>
         <source>Cutting launching speed ratio.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="245"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="249"/>
         <source>Machine phase.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="246"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="250"/>
         <source>Limit phase.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="247"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="251"/>
         <source>Total working duration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="248"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="252"/>
         <source>Total laser duration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="249"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="253"/>
         <source>Cutting laser frequency.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="250"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="254"/>
         <source>Registion.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="251"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="255"/>
         <source>Engraving laser frequency.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="252"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="256"/>
         <source>Custom 1 X.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="253"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="257"/>
         <source>Custom 1 Y.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="254"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="258"/>
         <source>Custom 2 X.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="255"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="259"/>
         <source>Custom 2 Y.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="256"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="260"/>
         <source>Custom 3 X.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="257"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="261"/>
         <source>Custom 3 Y.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="258"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="262"/>
         <source>Layout size.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="259"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="263"/>
         <source>Painting unit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="260"/>
+        <location filename="../src/laser/LaserDriver.cpp" line="264"/>
         <source>Move fast launching speed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1842,47 +1842,52 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="36"/>
+        <location filename="../src/ui/ParameterDialog.cpp" line="37"/>
         <source>Top Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="37"/>
+        <location filename="../src/ui/ParameterDialog.cpp" line="38"/>
         <source>Top Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="38"/>
+        <location filename="../src/ui/ParameterDialog.cpp" line="39"/>
         <source>Bottom Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="39"/>
-        <source>Bottom Left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/ParameterDialog.cpp" line="40"/>
-        <location filename="../src/ui/ParameterDialog.cpp" line="44"/>
-        <source>0</source>
+        <source>Bottom Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/ParameterDialog.cpp" line="41"/>
         <location filename="../src/ui/ParameterDialog.cpp" line="45"/>
-        <source>1</source>
+        <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/ParameterDialog.cpp" line="42"/>
         <location filename="../src/ui/ParameterDialog.cpp" line="46"/>
-        <source>2</source>
+        <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/ParameterDialog.cpp" line="43"/>
         <location filename="../src/ui/ParameterDialog.cpp" line="47"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ParameterDialog.cpp" line="44"/>
+        <location filename="../src/ui/ParameterDialog.cpp" line="48"/>
         <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ParameterDialog.cpp" line="120"/>
+        <source>Wrong password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

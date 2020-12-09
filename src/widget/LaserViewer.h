@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGraphicsView>
 #include "scene/Ruller.h"
+#include "widget/SplineNode.h"
 
 class LaserScene;
 
@@ -42,13 +43,21 @@ signals:
 	void creatingPolygonStartRect();
 	void creatingPolygon();
 	void readyPolygon();
+	//void creatingSplineStartReady();
+	void creatingSpline();
+	void readySpline();
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
+	//mouse
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
+	//key
+	virtual void keyPressEvent(QKeyEvent *event) override;
+	virtual void keyReleaseEvent(QKeyEvent *event) override;
+
 
 private:
     QScopedPointer<LaserScene> m_scene;
@@ -77,6 +86,9 @@ private:
 	//qreal m_polygonStartRectWidth;
 	QRectF m_polygonStartRect;
 	bool m_isMouseInStartRect;
+
+	QVector<SplineNode*> m_creatingSplineNodes;
+	QPointF m_creatingSplinePoint;
 
 	bool m_isKeyShiftPressed;
 
