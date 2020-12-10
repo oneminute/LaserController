@@ -91,6 +91,10 @@ protected slots:
     void onLaserRegistersFetched(const LaserDriver::RegistersMap& registers);
     void onLaserReturnWorkState(LaserState state);
 
+    void readMachiningOrigins(bool checked = false);
+    void writeMachiningOrigins(bool checked = false);
+    void updatePostEventWidgets(int index);
+
 private:
     QString getFilename(const QString& title, const QStringList& mime);
     void bindWidgetsProperties();

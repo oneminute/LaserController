@@ -1172,7 +1172,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="401"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1279"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1278"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>

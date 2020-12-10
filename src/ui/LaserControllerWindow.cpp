@@ -262,6 +262,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionPolygonTool, &QAction::triggered, this, &LaserControllerWindow::onActionPolygon);
 	connect(m_ui->actionSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSpline);
 
+    connect(m_ui->toolButtonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
+    connect(m_ui->toolButtonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
+    connect(m_ui->comboBoxPostEvent, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::updatePostEventWidgets);
+
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
 
@@ -283,7 +287,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
-	
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -334,7 +337,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
-    //m_ui->actionShowRegisters->setDisabled(true);
+    updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -918,29 +921,101 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 
 void LaserControllerWindow::onLaserRegistersFetched(const LaserDriver::RegistersMap & registers)
 {
-    bool first = true;
-    if (first)
+    if (registers.contains(LaserDriver::RT_CUTTING_LASER_POWER))
     {
-        QVariant value;
-        if (LaserDriver::instance().getRegister(LaserDriver::RT_CUTTING_LASER_POWER, value))
-        {
-            m_ui->editSliderLaserPower->setValue(value.toInt());
-        }
-        if (LaserDriver::instance().getRegister(LaserDriver::RT_MAX_LASER_ENERGY, value))
-        {
-            m_ui->editSliderLaserEnergyMax->setValue(value.toInt());
-        }
-        if (LaserDriver::instance().getRegister(LaserDriver::RT_MIN_LASER_ENERGY, value))
-        {
-            m_ui->editSliderLaserEnergyMin->setValue(value.toInt());
-        }
-        first = false;
+        m_ui->editSliderLaserPower->setValue(registers[LaserDriver::RT_CUTTING_LASER_POWER].toInt());
+    }
+    if (registers.contains(LaserDriver::RT_MAX_LASER_ENERGY))
+    {
+        m_ui->editSliderLaserEnergyMax->setValue(registers[LaserDriver::RT_MAX_LASER_ENERGY].toInt());
+    }
+    if (registers.contains(LaserDriver::RT_MIN_LASER_ENERGY))
+    {
+        m_ui->editSliderLaserEnergyMin->setValue(registers[LaserDriver::RT_MIN_LASER_ENERGY].toInt());
+    }
+    if (registers.contains(LaserDriver::RT_CUSTOM_1_X))
+    {
+        m_ui->doubleSpinBoxOrigin1X->setValue(registers[LaserDriver::RT_CUSTOM_1_X].toDouble());
+    }
+    if (registers.contains(LaserDriver::RT_CUSTOM_1_Y))
+    {
+        m_ui->doubleSpinBoxOrigin2Y->setValue(registers[LaserDriver::RT_CUSTOM_1_Y].toDouble());
+    }
+    if (registers.contains(LaserDriver::RT_CUSTOM_2_X))
+    {
+        m_ui->doubleSpinBoxOrigin2X->setValue(registers[LaserDriver::RT_CUSTOM_2_X].toDouble());
+    }
+    if (registers.contains(LaserDriver::RT_CUSTOM_2_Y))
+    {
+        m_ui->doubleSpinBoxOrigin2Y->setValue(registers[LaserDriver::RT_CUSTOM_2_Y].toDouble());
+    }
+    if (registers.contains(LaserDriver::RT_CUSTOM_3_X))
+    {
+        m_ui->doubleSpinBoxOrigin3X->setValue(registers[LaserDriver::RT_CUSTOM_3_X].toDouble());
+    }
+    if (registers.contains(LaserDriver::RT_CUSTOM_3_Y))
+    {
+        m_ui->doubleSpinBoxOrigin3Y->setValue(registers[LaserDriver::RT_CUSTOM_3_Y].toDouble());
     }
 }
 
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x).arg(state.y).arg(state.z));
+}
+
+void LaserControllerWindow::readMachiningOrigins(bool checked)
+{
+    LaserDriver::instance().readSysParamFromCard(QList<int>() 
+        << LaserDriver::RT_CUSTOM_1_X
+        << LaserDriver::RT_CUSTOM_1_Y
+        << LaserDriver::RT_CUSTOM_2_X
+        << LaserDriver::RT_CUSTOM_2_Y
+        << LaserDriver::RT_CUSTOM_3_X
+        << LaserDriver::RT_CUSTOM_3_Y
+    );
+}
+
+void LaserControllerWindow::writeMachiningOrigins(bool checked)
+{
+    LaserDriver::RegistersMap values;
+    values[LaserDriver::RT_CUSTOM_1_X] = m_ui->doubleSpinBoxOrigin1X->value();
+    values[LaserDriver::RT_CUSTOM_1_Y] = m_ui->doubleSpinBoxOrigin1Y->value();
+    values[LaserDriver::RT_CUSTOM_2_X] = m_ui->doubleSpinBoxOrigin2X->value();
+    values[LaserDriver::RT_CUSTOM_2_Y] = m_ui->doubleSpinBoxOrigin2Y->value();
+    values[LaserDriver::RT_CUSTOM_3_X] = m_ui->doubleSpinBoxOrigin3X->value();
+    values[LaserDriver::RT_CUSTOM_3_Y] = m_ui->doubleSpinBoxOrigin3Y->value();
+    LaserDriver::instance().writeSysParamToCard(values);
+}
+
+void LaserControllerWindow::updatePostEventWidgets(int index)
+{
+    if (index == 3)
+    {
+        m_ui->radioButtonMachiningOrigin1->setEnabled(true);
+        m_ui->radioButtonMachiningOrigin2->setEnabled(true);
+        m_ui->radioButtonMachiningOrigin3->setEnabled(true);
+
+        m_ui->doubleSpinBoxOrigin1X->setEnabled(true);
+        m_ui->doubleSpinBoxOrigin1Y->setEnabled(true);
+        m_ui->doubleSpinBoxOrigin2X->setEnabled(true);
+        m_ui->doubleSpinBoxOrigin2Y->setEnabled(true);
+        m_ui->doubleSpinBoxOrigin3X->setEnabled(true);
+        m_ui->doubleSpinBoxOrigin3Y->setEnabled(true);
+    }
+    else
+    {
+        m_ui->radioButtonMachiningOrigin1->setEnabled(false);
+        m_ui->radioButtonMachiningOrigin2->setEnabled(false);
+        m_ui->radioButtonMachiningOrigin3->setEnabled(false);
+
+        m_ui->doubleSpinBoxOrigin1X->setEnabled(false);
+        m_ui->doubleSpinBoxOrigin1Y->setEnabled(false);
+        m_ui->doubleSpinBoxOrigin2X->setEnabled(false);
+        m_ui->doubleSpinBoxOrigin2Y->setEnabled(false);
+        m_ui->doubleSpinBoxOrigin3X->setEnabled(false);
+        m_ui->doubleSpinBoxOrigin3Y->setEnabled(false);
+    }
 }
 
 void LaserControllerWindow::bindWidgetsProperties()
@@ -1160,6 +1235,22 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, devicePausedState);
     // end actionMoveToOrigin
+
+    // toolButtonReadOrigins
+    BIND_PROP_TO_STATE(m_ui->toolButtonReadOrigins, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonReadOrigins, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonReadOrigins, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonReadOrigins, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonReadOrigins, "enabled", false, devicePausedState);
+    // end toolButtonReadOrigins
+
+    // toolButtonWriteOrigins
+    BIND_PROP_TO_STATE(m_ui->toolButtonWriteOrigins, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonWriteOrigins, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonWriteOrigins, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonWriteOrigins, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->toolButtonWriteOrigins, "enabled", false, devicePausedState);
+    // end toolButtonWriteOrigins
 
     // actionSelectionTool
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);
