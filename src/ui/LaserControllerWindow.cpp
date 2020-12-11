@@ -141,8 +141,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->actionPause->setCheckable(true);
     m_ui->toolButtonStop->setDefaultAction(m_ui->actionStop);
     m_ui->toolButtonSpotShot->setDefaultAction(m_ui->actionLaserSpotShot);
-    m_ui->actionLaserSpotShot->setCheckable(true);
     m_ui->toolButtonCut->setDefaultAction(m_ui->actionLaserCut);
+    m_ui->toolButtonReset->setDefaultAction(m_ui->actionReset);
+    m_ui->toolButtonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
+    m_ui->toolButtonPathOptimization->setDefaultAction(m_ui->actionPathOptimization);
+
     m_ui->toolButtonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
     m_ui->toolButtonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
     m_ui->toolButtonMoveRight->setDefaultAction(m_ui->actionMoveRight);
@@ -264,7 +267,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->toolButtonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
     connect(m_ui->toolButtonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
-    connect(m_ui->comboBoxPostEvent, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::updatePostEventWidgets);
+    connect(m_ui->toolButtonSpotShot, &QToolButton::pressed, this, &LaserControllerWindow::lightOnLaser);
+    connect(m_ui->toolButtonSpotShot, &QToolButton::released, this, &LaserControllerWindow::lightOffLaser);
+    connect(m_ui->actionReset, &QAction::triggered, this, &LaserControllerWindow::laserResetToOriginalPoint);
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
@@ -337,7 +342,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
-    updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
+    //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -509,8 +514,6 @@ void LaserControllerWindow::onActionMachining(bool checked)
     if (m_useLoadedJson)
     {
         qDebug() << "export temp json file for machining" << m_currentJson;
-        //MachiningTask* task = LaserDriver::instance().createMachiningTask(m_currentJson, false);
-        //task->start();
         LaserDriver::instance().loadDataFromFile(m_currentJson);
     }
     else
@@ -529,6 +532,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
         m_scene->document()->exportJSON(filename);
         qDebug() << "export temp json file for machining" << filename;
         LaserDriver::instance().loadDataFromFile(filename);
+        LaserDriver::instance().startMachining(m_ui->comboBoxStartPosition->currentIndex() == 3);
         //MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
         //task->start();
         //}
@@ -964,6 +968,16 @@ void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
     m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x).arg(state.y).arg(state.z));
 }
 
+void LaserControllerWindow::lightOnLaser()
+{
+    LaserDriver::instance().testLaserLight(true);
+}
+
+void LaserControllerWindow::lightOffLaser()
+{
+    LaserDriver::instance().testLaserLight(false);
+}
+
 void LaserControllerWindow::readMachiningOrigins(bool checked)
 {
     LaserDriver::instance().readSysParamFromCard(QList<int>() 
@@ -1016,6 +1030,17 @@ void LaserControllerWindow::updatePostEventWidgets(int index)
         m_ui->doubleSpinBoxOrigin3X->setEnabled(false);
         m_ui->doubleSpinBoxOrigin3Y->setEnabled(false);
     }
+}
+
+void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
+{
+    QVariant value;
+    if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_TO_ORI_SPEED,value))
+    {
+        QMessageBox::warning(this, tr("Read registers failure"), tr("Cannot read registers value!"));
+        return;
+    }
+    LaserDriver::instance().lPenMoveToOriginalPoint(value.toDouble());
 }
 
 void LaserControllerWindow::bindWidgetsProperties()
