@@ -123,7 +123,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     toolButtonPolygonTool->setDefaultAction(m_ui->actionPolygonTool);
     toolButtonTextTool->setDefaultAction(m_ui->actionTextTool);
     toolButtonLineTool->setDefaultAction(m_ui->actionLineTool);
-    toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
+    toolButtonSplineTool->addAction(m_ui->actionSplineTool);
+	toolButtonSplineTool->addAction(m_ui->actionEditSpline);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
 
     m_ui->toolBarTools->addWidget(toolButtonSelectionTool);
@@ -220,6 +221,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->actionLineTool->setCheckable(true);
 	m_ui->actionPolygonTool->setCheckable(true);
 	m_ui->actionSplineTool->setCheckable(true);
+	m_ui->actionEditSpline->setCheckable(true);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
@@ -264,6 +266,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionSelectionTool, &QAction::triggered, this, &LaserControllerWindow::onActionSelectionTool);
 	connect(m_ui->actionPolygonTool, &QAction::triggered, this, &LaserControllerWindow::onActionPolygon);
 	connect(m_ui->actionSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSpline);
+	connect(m_ui->actionEditSpline, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 
     connect(m_ui->toolButtonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
     connect(m_ui->toolButtonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
@@ -292,6 +295,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
+	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -301,6 +305,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
@@ -308,6 +313,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
@@ -315,6 +321,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
@@ -322,6 +329,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
@@ -329,6 +337,15 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+
+	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 
@@ -818,6 +835,18 @@ void LaserControllerWindow::onActionSpline(bool checked)
 	}
 }
 
+void LaserControllerWindow::onActionSplineEdit(bool checked)
+{
+	if (checked) {
+		
+		emit readySplineEdit();
+	}
+	else
+	{
+		m_ui->actionEditSpline->setChecked(true);
+	}
+}
+
 void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -966,6 +995,11 @@ void LaserControllerWindow::onLaserRegistersFetched(const LaserDriver::Registers
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x).arg(state.y).arg(state.z));
+}
+
+void LaserControllerWindow::onCreatSpline()
+{
+	m_viewer->createSpline();
 }
 
 void LaserControllerWindow::lightOnLaser()
@@ -1291,6 +1325,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveLineState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitivePolygonState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineEditState);
     // end 
 
     // actionRectangleTool
@@ -1307,6 +1342,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", true, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitivePolygonState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineEditState);
     // end actionRectangleTool
 
 	// actionElippseTool
@@ -1323,6 +1359,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", true, documentPrimitiveEllipseState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitivePolygonState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineEditState);
 	// end actionElippseTool
 
 	// actionLineTool
@@ -1339,6 +1376,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", true, documentPrimitiveLineState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitivePolygonState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineEditState);
 	// end actionLineTool
 
 	// actionPolygonTool
@@ -1354,6 +1392,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveEllipseState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveLineState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", true, documentPrimitivePolygonState);
 	// end actionPolygonTool
 
@@ -1370,8 +1409,26 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveEllipseState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveLineState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitivePolygonState);
+	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", true, documentPrimitiveSplineState);
 	// end actionSplineTool
+
+	// actionSplineEditTool
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentIdleState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentSelectingState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveRectState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveEllipseState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveLineState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitivePolygonState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", true, documentPrimitiveSplineEditState);
+	// end actionSplineEditTool
 
     // actionLoadJson
 
