@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsView>
+#include <QTime>
 #include "scene/Ruller.h"
 #include "widget/SplineNode.h"
 
@@ -59,10 +60,11 @@ signals:
 	void creatingPolygonStartRect();
 	void creatingPolygon();
 	void readyPolygon();
-	//void creatingSplineStartReady();
 	void creatingSpline();
 	void readySpline();
-	//void edtingSpline();
+	void creatingText();
+	void readyText();
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void wheelEvent(QWheelEvent *event) override;
@@ -111,6 +113,11 @@ private:
 	qreal m_splineNodeDrawWidth;
 	qreal m_splineNodeEditWidth;
 	qreal m_splineHandlerWidth;
+	//Text
+	QPointF m_textInputPoint;
+	QTime m_time;
+	int m_curTime;
+	int m_lastTime;
 
 	bool m_isKeyShiftPressed;
 

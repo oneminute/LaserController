@@ -29,6 +29,8 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_splineHandlerWidth(5)
 	, m_splineNodeEditWidth(5)
 	, m_handlingSpline(SplineStruct())
+	, m_lastTime(0)
+	, m_curTime(0)
 
 {
     setScene(m_scene.data());
@@ -114,6 +116,26 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 			}
 		}		
 	}
+	//Text
+	else {
+		if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+			
+			m_curTime = m_time.elapsed();
+			if (m_curTime>0 && m_curTime <= 1000) {
+				
+				painter.setPen(QPen(Qt::black, 3, Qt::SolidLine));
+			}
+			else if(m_curTime>1000 && m_curTime <=2000){
+				painter.setPen(QPen(Qt::white, 3, Qt::SolidLine));
+			}
+			else if(m_curTime > 2000){
+				m_time.restart();
+			}
+			
+			QPointF point = mapFromScene(m_textInputPoint);
+			painter.drawLine(QPointF(point.x(), point.y()-10), QPointF(point.x(), point.y() + 10));
+		}
+	}
 }
 
 void LaserViewer::wheelEvent(QWheelEvent * event)
@@ -187,7 +209,12 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 			initSpline();
 			emit creatingSpline();
 		}
-		
+		//Text
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextReadyState())) {
+			m_textInputPoint = mapToScene(event->pos());
+			m_time.start();
+			emit creatingText();
+		}
 	}
     
 }
@@ -387,12 +414,24 @@ void LaserViewer::keyPressEvent(QKeyEvent * event)
 		case Qt::SHIFT:
 
 			break;
+
 	}
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent * event)
 {
+	qDebug() << event->key() <<":"<< Qt::Key_Enter;
 	
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		case Qt::Key_Enter:
+			if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+				emit readyText();
+			}
+			break;
+
+	}
 }
 
 qreal LaserViewer::zoomFactor() const
@@ -448,6 +487,8 @@ void LaserViewer::init()
 	ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonStartRectState, this, SIGNAL(creatingPolygonStartRect()));
 	ADD_TRANSITION(documentPrimitiveSplineReadyState, documentPrimitiveSplineCreatingState, this, SIGNAL(creatingSpline()));
 	ADD_TRANSITION(documentPrimitiveSplineCreatingState, documentPrimitiveSplineReadyState, this, SIGNAL(readySpline()));
+	ADD_TRANSITION(documentPrimitiveTextReadyState, documentPrimitiveTextCreatingState, this, SIGNAL(creatingText()));
+	ADD_TRANSITION(documentPrimitiveTextCreatingState, documentPrimitiveTextReadyState, this, SIGNAL(readyText()));
 }
 
 void LaserViewer::initSpline()

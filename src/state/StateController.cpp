@@ -42,6 +42,10 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_STATE(documentPrimitivePolygon, documentPrimitivePolygonCreating);
 	DEFINE_CHILD_STATE(documentPrimitivePolygon, documentPrimitivePolygonStartRect);
 
+	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveText);
+	DEFINE_CHILD_INIT_STATE(documentPrimitiveText, documentPrimitiveTextReady);
+	DEFINE_CHILD_STATE(documentPrimitiveText, documentPrimitiveTextCreating);
+
 	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveSpline);
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveSpline, documentPrimitiveSplineReady);
 	DEFINE_CHILD_STATE(documentPrimitiveSpline, documentPrimitiveSplineCreating);
