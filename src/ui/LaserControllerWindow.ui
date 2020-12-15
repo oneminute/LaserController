@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1103</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -59,7 +59,7 @@
      <string>&amp;Advance</string>
     </property>
     <addaction name="actionWorkState"/>
-    <addaction name="actionMoveToOriginalPoint"/>
+    <addaction name="actionMoveToOrigin"/>
     <addaction name="actionHalfTone"/>
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
@@ -77,8 +77,8 @@
     <property name="title">
      <string>&amp;Options</string>
     </property>
-    <addaction name="actionSystemOptions"/>
-    <addaction name="actionManufacturerOptions"/>
+    <addaction name="actionSettings"/>
+    <addaction name="actionDeviceSettings"/>
    </widget>
    <widget class="QMenu" name="menuDraw">
     <property name="title">
@@ -92,7 +92,6 @@
     </property>
     <addaction name="actionMainboardInformation"/>
     <addaction name="actionUpdateFirmware"/>
-    <addaction name="actionShowRegisters"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -469,6 +468,9 @@
          </item>
          <item row="2" column="0">
           <widget class="QToolButton" name="toolButtonReset">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
@@ -482,6 +484,9 @@
          </item>
          <item row="2" column="1">
           <widget class="QToolButton" name="toolButtonBackToOrigin">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
@@ -495,6 +500,9 @@
          </item>
          <item row="2" column="2">
           <widget class="QToolButton" name="toolButtonPathOptimization">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
@@ -1164,6 +1172,51 @@
          </item>
         </layout>
        </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Relays</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QCheckBox" name="checkBoxRelay1">
+           <property name="text">
+            <string>Relay1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBoxRelay2">
+           <property name="text">
+            <string>Relay2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBoxRelay3">
+           <property name="text">
+            <string>Relay3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
      <item>
@@ -1556,11 +1609,6 @@
     <string>Work State</string>
    </property>
   </action>
-  <action name="actionMoveToOriginalPoint">
-   <property name="text">
-    <string>Move To Original Point</string>
-   </property>
-  </action>
   <action name="actionLoadJson">
    <property name="text">
     <string>Load Json</string>
@@ -1596,16 +1644,6 @@
    </property>
    <property name="text">
     <string>Paste</string>
-   </property>
-  </action>
-  <action name="actionSystemOptions">
-   <property name="text">
-    <string>System Options</string>
-   </property>
-  </action>
-  <action name="actionManufacturerOptions">
-   <property name="text">
-    <string>Manufacturer Options</string>
    </property>
   </action>
   <action name="actionPathOptimization">
@@ -1698,11 +1736,6 @@
   <action name="actionMoveLayerDown">
    <property name="text">
     <string>Move Down</string>
-   </property>
-  </action>
-  <action name="actionShowRegisters">
-   <property name="text">
-    <string>Show Registers</string>
    </property>
   </action>
   <action name="actionLaserSpotShot">

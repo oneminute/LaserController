@@ -35,6 +35,42 @@ QFrame * utils::createSeparator(int width, int height, QFrame::Shape shape, QFra
     return separator;
 }
 
+QVector3D utils::putToQuadrant(const QVector3D & pos, QUADRANT quadrant)
+{
+    float x = pos.x();
+    float y = pos.y();
+    float z = pos.z();
+    switch (quadrant)
+    {
+    case QUADRANT1:
+    {
+        if (x < 0) x = -x;
+        if (y < 0) y = -y;
+    }
+        break;
+    case QUADRANT2:
+    {
+        if (x > 0) x = -x;
+        if (y < 0) y = -y;
+    }
+        break;
+    case QUADRANT3:
+    {
+        if (x > 0) x = -x;
+        if (y > 0) y = -y;
+    }
+        break;
+    case QUADRANT4:
+    {
+        if (x < 0) x = -x;
+        if (y > 0) y = -y;
+    }
+        break;
+    }
+
+    return QVector3D(x, y, z);
+}
+
 void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float height)
 {
     float x = pos.x();

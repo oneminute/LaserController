@@ -1,5 +1,5 @@
-#ifndef PARAMETER_DIALOG_H
-#define PARAMETER_DIALOG_H
+#ifndef DEVICE_SETTINGS_DIALOG_H
+#define DEVICE_SETTINGS_DIALOG_H
 
 #include <qobject.h>
 #include <QDialog>
@@ -9,15 +9,15 @@
 
 namespace Ui
 {
-    class ParameterDialog;
+    class DeviceSettingsDialog;
 }
 
-class ParameterDialog : public QDialog
+class DeviceSettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ParameterDialog(QWidget* parent = nullptr);
-    virtual ~ParameterDialog();
+    explicit DeviceSettingsDialog(QWidget* parent = nullptr);
+    virtual ~DeviceSettingsDialog();
 
     void makeDefault();
 
@@ -39,7 +39,7 @@ protected slots:
     void onPushButtonResetClicked(bool checked = false);
 
 private:
-    QScopedPointer<Ui::ParameterDialog> m_ui;
+    QScopedPointer<Ui::DeviceSettingsDialog> m_ui;
 };
 
-#endif // PARAMETER_DIALOG_H
+#endif // DEVICE_SETTINGS_DIALOG_H

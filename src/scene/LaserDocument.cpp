@@ -162,7 +162,6 @@ void LaserDocument::exportJSON(const QString& filename)
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layers;
-    //cv::Mat canvas;
     cv::Mat canvas(m_pageInfo.height() * 40, m_pageInfo.width() * 40, CV_8UC3, cv::Scalar(255, 255, 255));
     int layerId = 0;
     for (int i = 0; i < m_layers.count(); i++)
