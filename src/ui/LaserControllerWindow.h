@@ -73,6 +73,8 @@ protected slots:
 	void onActionLine(bool checked = false);
 	void onActionPolygon(bool checked = false);
 	void onActionSpline(bool checked = false);
+	void onActionSplineEdit(bool checked = false);
+	void onActionText(bool checked = false);
 
     void onDriverComPortsFetched(const QStringList& ports);
     void onDriverComPortConnected();
@@ -93,6 +95,8 @@ protected slots:
 
     void onLaserRegistersFetched(const LaserDriver::RegistersMap& registers);
     void onLaserReturnWorkState(LaserState state);
+
+	void onCreatSpline();
 
     void lightOnLaser();
     void lightOffLaser();
@@ -117,6 +121,8 @@ signals:
 	void readyLine();
 	void readyPolygon();
 	void readySpline();
+	void readySplineEdit();
+	void readyText();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;

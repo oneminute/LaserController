@@ -3,11 +3,27 @@
 
 #include <QObject>
 #include <QGraphicsView>
+#include <QTime>
 #include "scene/Ruller.h"
 #include "widget/SplineNode.h"
 
 class LaserScene;
-
+//Spline Node Struct
+struct SplineNodeStruct {
+	QPointF node;
+	QPointF handler1;
+	QPointF handler2;
+	SplineNodeStruct(QPointF _node) {
+		node = _node;
+		handler1 = node;
+		handler2 = node;
+	}
+};
+//Spline Struct
+struct SplineStruct{
+	QString objectName;//id,LaserPrimitive's objectName is UUid
+	QList<SplineNodeStruct> nodeList;
+};
 class LaserViewer : public QGraphicsView
 {
     Q_OBJECT
@@ -21,8 +37,9 @@ public:
 
 private:
     void init();
-	void DetectMouseRange(QRectF _rect, QPointF _pos);
-
+	void initSpline();
+public:
+	void createSpline();
 public slots:
     void zoomIn();
     void zoomOut();
@@ -43,9 +60,11 @@ signals:
 	void creatingPolygonStartRect();
 	void creatingPolygon();
 	void readyPolygon();
-	//void creatingSplineStartReady();
 	void creatingSpline();
 	void readySpline();
+	void creatingText();
+	void readyText();
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void wheelEvent(QWheelEvent *event) override;
@@ -83,12 +102,22 @@ private:
 	QPointF m_creatingPolygonStartPoint;
 	QPointF m_creatingPolygonEndPoint;
 	QVector<QPointF> m_creatingPolygonPoints;
-	//qreal m_polygonStartRectWidth;
 	QRectF m_polygonStartRect;
 	bool m_isMouseInStartRect;
-
-	QVector<SplineNode*> m_creatingSplineNodes;
-	QPointF m_creatingSplinePoint;
+	//Spline
+	SplineStruct m_handlingSpline;//creating and editing
+	QList<SplineStruct> m_splineList;
+	QPointF m_creatingSplineMousePos;
+	QPointF m_handlingSplinePoint;
+	QRectF m_mouseHoverRect;
+	qreal m_splineNodeDrawWidth;
+	qreal m_splineNodeEditWidth;
+	qreal m_splineHandlerWidth;
+	//Text
+	QPointF m_textInputPoint;
+	QTime m_time;
+	int m_curTime;
+	int m_lastTime;
 
 	bool m_isKeyShiftPressed;
 
