@@ -124,7 +124,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     toolButtonTextTool->setDefaultAction(m_ui->actionTextTool);
     toolButtonLineTool->setDefaultAction(m_ui->actionLineTool);
     toolButtonSplineTool->addAction(m_ui->actionSplineTool);
-	toolButtonSplineTool->addAction(m_ui->actionEditSpline);
+	toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
 
     m_ui->toolBarTools->addWidget(toolButtonSelectionTool);
@@ -221,7 +221,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->actionLineTool->setCheckable(true);
 	m_ui->actionPolygonTool->setCheckable(true);
 	m_ui->actionSplineTool->setCheckable(true);
-	m_ui->actionEditSpline->setCheckable(true);
+	m_ui->actionEditSplineTool->setCheckable(true);
 	m_ui->actionTextTool->setCheckable(true);
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
@@ -267,7 +267,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionSelectionTool, &QAction::triggered, this, &LaserControllerWindow::onActionSelectionTool);
 	connect(m_ui->actionPolygonTool, &QAction::triggered, this, &LaserControllerWindow::onActionPolygon);
 	connect(m_ui->actionSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSpline);
-	connect(m_ui->actionEditSpline, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
+	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 
     connect(m_ui->toolButtonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
@@ -860,7 +860,7 @@ void LaserControllerWindow::onActionSplineEdit(bool checked)
 	}
 	else
 	{
-		m_ui->actionEditSpline->setChecked(true);
+		m_ui->actionEditSplineTool->setChecked(true);
 	}
 }
 
@@ -1449,21 +1449,21 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// end actionSplineTool
 
 	// actionSplineEditTool
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentSelectedState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", true, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSpline, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentIdleState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectingState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveRectState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveEllipseState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveLineState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitivePolygonState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", true, documentPrimitiveSplineEditState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveTextState);
 	// end actionSplineEditTool
 
 	// actionTextTool

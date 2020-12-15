@@ -1858,9 +1858,12 @@
     <string>Device Settings</string>
    </property>
   </action>
-  <action name="actionEditSpline">
+  <action name="actionEditSplineTool">
    <property name="text">
-    <string>Edit Spline</string>
+    <string>Edit Spline Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Spline Tool</string>
    </property>
   </action>
   <action name="actionReset">

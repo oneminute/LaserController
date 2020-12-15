@@ -119,8 +119,8 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	//Text
 	else {
 		if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-			
-			m_curTime = m_time.elapsed();
+			//cursor
+			/*m_curTime = m_time.elapsed();
 			if (m_curTime>0 && m_curTime <= 1000) {
 				
 				painter.setPen(QPen(Qt::black, 3, Qt::SolidLine));
@@ -133,7 +133,8 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 			}
 			
 			QPointF point = mapFromScene(m_textInputPoint);
-			painter.drawLine(QPointF(point.x(), point.y()-10), QPointF(point.x(), point.y() + 10));
+			painter.drawLine(QPointF(point.x(), point.y()-10), QPointF(point.x(), point.y() + 10));*/
+
 		}
 	}
 }
@@ -211,8 +212,9 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 		}
 		//Text
 		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextReadyState())) {
-			m_textInputPoint = mapToScene(event->pos());
-			m_time.start();
+			m_textInputPoint = mapToScene(event->pos()).toPoint();
+			//m_time.start();
+			creatTextEdit();
 			emit creatingText();
 		}
 	}
@@ -416,22 +418,22 @@ void LaserViewer::keyPressEvent(QKeyEvent * event)
 			break;
 
 	}
+	QGraphicsView::keyPressEvent(event);
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent * event)
 {
-	qDebug() << event->key() <<":"<< Qt::Key_Enter;
 	
 	switch (event->key())
 	{
-		case Qt::Key_Return:
-		case Qt::Key_Enter:
+		case Qt::Key_Escape:
 			if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+				releaseTextEdit();
 				emit readyText();
 			}
 			break;
-
 	}
+	QGraphicsView::keyReleaseEvent(event);
 }
 
 qreal LaserViewer::zoomFactor() const
@@ -495,6 +497,23 @@ void LaserViewer::initSpline()
 {
 	m_handlingSpline = SplineStruct();
 	m_mouseHoverRect = QRectF();
+}
+
+void LaserViewer::creatTextEdit()
+{
+	m_textEdit = new QTextEdit();
+	QPoint startPoint = QPoint(m_textInputPoint.x(), m_textInputPoint.y()-15);
+	QPoint endPoint = QPoint(m_textInputPoint.x() + 100, m_textInputPoint.y() + 15);
+	
+	m_textEdit->setFocus();
+	m_textEdit->setOverwriteMode(true);
+	QGraphicsProxyWidget *proxy = m_scene->addWidget(m_textEdit);
+	proxy->setPos(startPoint);
+}
+
+void LaserViewer::releaseTextEdit()
+{
+	delete m_textEdit;
 }
 
 void LaserViewer::createSpline()

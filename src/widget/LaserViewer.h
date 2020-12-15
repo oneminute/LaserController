@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGraphicsView>
 #include <QTime>
+#include <QTextEdit>
 #include "scene/Ruller.h"
 #include "widget/SplineNode.h"
 
@@ -38,6 +39,8 @@ public:
 private:
     void init();
 	void initSpline();
+	void creatTextEdit();
+	void releaseTextEdit();
 public:
 	void createSpline();
 public slots:
@@ -114,10 +117,11 @@ private:
 	qreal m_splineNodeEditWidth;
 	qreal m_splineHandlerWidth;
 	//Text
-	QPointF m_textInputPoint;
+	QPoint m_textInputPoint;
 	QTime m_time;
 	int m_curTime;
 	int m_lastTime;
+	QTextEdit *m_textEdit;
 
 	bool m_isKeyShiftPressed;
 
