@@ -27,7 +27,9 @@ public:
     LaserControllerWindow(QWidget* parent = nullptr);
     ~LaserControllerWindow();
 
-    void moveLaser(const QVector3D& delta);
+    void moveLaser(const QVector3D& delta, bool relative = true, const QVector3D& abstractDest = QVector3D());
+    FinishRun finishRun();
+    void setFinishRun(const FinishRun& finishRun);
 
 protected slots:
     void onActionImportSVG(bool checked = false);
@@ -50,7 +52,6 @@ protected slots:
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
 
-    void onActionMoveToOriginalPoint(bool checked = false);
     void onActionMoveTop(bool checked = false);
     void onActionMoveBottom(bool checked = false);
     void onActionMoveLeft(bool checked = false);
@@ -65,8 +66,7 @@ protected slots:
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
     void onActionCloseDocument(bool checked = false);
-    void onActionShowRegisters(bool checked = false);
-    void onActionHome(bool checked = false);
+    void onActionDeviceSettings(bool checked = false);
     void onActionSelectionTool(bool checked = false);
 	void onActionRectangle(bool checked = false);
 	void onActionEllipse(bool checked = false);
@@ -88,6 +88,9 @@ protected slots:
     void onLaserSceneSelectedChanged();
     void onLaserViewerMouseMoved(const QPointF& pos);
 
+    void onEditSliderLaserEngergyMinChanged(int value);
+    void onEditSliderLaserEngergyMaxChanged(int value);
+
     void onLaserRegistersFetched(const LaserDriver::RegistersMap& registers);
     void onLaserReturnWorkState(LaserState state);
 
@@ -95,7 +98,10 @@ protected slots:
     void lightOffLaser();
     void readMachiningOrigins(bool checked = false);
     void writeMachiningOrigins(bool checked = false);
+    void readMachiningPower(bool checked = false);
+    void writeMachiningPower(bool checked = false);
     void updatePostEventWidgets(int index);
+    void laserBackToMachiningOriginalPoint(bool checked = false);
     void laserResetToOriginalPoint(bool checked = false);
 
 private:

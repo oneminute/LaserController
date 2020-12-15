@@ -15,6 +15,8 @@ namespace utils
 
     QFrame* createSeparator(int width = 0, int height = 0, QFrame::Shape shape = QFrame::VLine, QFrame::Shadow shadow = QFrame::Sunken);
 
+    QVector3D putToQuadrant(const QVector3D& pos, QUADRANT quadrant);
+
     void limitToLayout(QVector3D& pos, QUADRANT quadrant, float width, float height);
 }
 

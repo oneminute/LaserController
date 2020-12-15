@@ -1,12 +1,12 @@
-#include "ParameterDialog.h"
-#include "ui_ParameterDialog.h"
+#include "DeviceSettingsDialog.h"
+#include "ui_DeviceSettingsDialog.h"
 
 #include <QMessageBox>
 #include "ChangePasswordDialog.h"
 
-ParameterDialog::ParameterDialog(QWidget* parent)
+DeviceSettingsDialog::DeviceSettingsDialog(QWidget* parent)
     : QDialog(parent)
-    , m_ui(new Ui::ParameterDialog)
+    , m_ui(new Ui::DeviceSettingsDialog)
 {
     m_ui->setupUi(this);
 
@@ -52,24 +52,24 @@ ParameterDialog::ParameterDialog(QWidget* parent)
 
     m_ui->groupBoxManufactor->setVisible(false);
 
-    connect(&LaserDriver::instance(), &LaserDriver::registersFectched, this, &ParameterDialog::registersFetched);
-    connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &ParameterDialog::rightManufactorPassword);
-    connect(&LaserDriver::instance(), &LaserDriver::wrongManufacturerPassword, this, &ParameterDialog::wrongManufactorPassword);
-    connect(m_ui->pushButtonRead, &QPushButton::clicked, this, &ParameterDialog::onPushButtonReadClicked);
-    connect(m_ui->pushButtonWrite, &QPushButton::clicked, this, &ParameterDialog::onPushButtonWriteClicked);
-    connect(m_ui->pushButtonDefault, &QPushButton::clicked, this, &ParameterDialog::onPushButtonDefaultClicked);
-    connect(m_ui->pushButtonVerifyPassword, &QPushButton::clicked, this, &ParameterDialog::onPushButtonVerifyClicked);
-    connect(m_ui->pushButtonClearPassword, &QPushButton::clicked, this, &ParameterDialog::onPushButtonClearClicked);
-    connect(m_ui->pushButtonResetPassword, &QPushButton::clicked, this, &ParameterDialog::onPushButtonResetClicked);
+    connect(&LaserDriver::instance(), &LaserDriver::registersFectched, this, &DeviceSettingsDialog::registersFetched);
+    connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &DeviceSettingsDialog::rightManufactorPassword);
+    connect(&LaserDriver::instance(), &LaserDriver::wrongManufacturerPassword, this, &DeviceSettingsDialog::wrongManufactorPassword);
+    connect(m_ui->pushButtonRead, &QPushButton::clicked, this, &DeviceSettingsDialog::onPushButtonReadClicked);
+    connect(m_ui->pushButtonWrite, &QPushButton::clicked, this, &DeviceSettingsDialog::onPushButtonWriteClicked);
+    connect(m_ui->pushButtonDefault, &QPushButton::clicked, this, &DeviceSettingsDialog::onPushButtonDefaultClicked);
+    connect(m_ui->pushButtonVerifyPassword, &QPushButton::clicked, this, &DeviceSettingsDialog::onPushButtonVerifyClicked);
+    connect(m_ui->pushButtonClearPassword, &QPushButton::clicked, this, &DeviceSettingsDialog::onPushButtonClearClicked);
+    connect(m_ui->pushButtonResetPassword, &QPushButton::clicked, this, &DeviceSettingsDialog::onPushButtonResetClicked);
 
     LaserDriver::instance().readAllSysParamFromCard();
 }
 
-ParameterDialog::~ParameterDialog()
+DeviceSettingsDialog::~DeviceSettingsDialog()
 {
 }
 
-void ParameterDialog::makeDefault()
+void DeviceSettingsDialog::makeDefault()
 {
     m_ui->editSliderCuttingStartSpeed->setValue(15);
     m_ui->editSliderCuttingRunSpeed->setValue(50);
@@ -110,23 +110,23 @@ void ParameterDialog::makeDefault()
     m_ui->editSliderDrawingUnit->setValue(1016);
 }
 
-void ParameterDialog::rightManufactorPassword()
+void DeviceSettingsDialog::rightManufactorPassword()
 {
     m_ui->groupBoxManufactor->setVisible(true);
 }
 
-void ParameterDialog::wrongManufactorPassword()
+void DeviceSettingsDialog::wrongManufactorPassword()
 {
     QMessageBox::warning(this, tr("Wrong password"), tr("Wrong password"));
     m_ui->groupBoxManufactor->setVisible(false);
 }
 
-void ParameterDialog::onPushButtonReadClicked(bool checked)
+void DeviceSettingsDialog::onPushButtonReadClicked(bool checked)
 {
     LaserDriver::instance().readAllSysParamFromCard();
 }
 
-void ParameterDialog::onPushButtonWriteClicked(bool checked)
+void DeviceSettingsDialog::onPushButtonWriteClicked(bool checked)
 {
     QMap<LaserDriver::RegisterType, QVariant> values;
     values[LaserDriver::REG_18] = QString::number(m_ui->editSliderCuttingPower->value());
@@ -165,30 +165,30 @@ void ParameterDialog::onPushButtonWriteClicked(bool checked)
     LaserDriver::instance().writeSysParamToCard(values);
 }
 
-void ParameterDialog::onPushButtonDefaultClicked(bool checked)
+void DeviceSettingsDialog::onPushButtonDefaultClicked(bool checked)
 {
     makeDefault();
 }
 
-void ParameterDialog::onPushButtonVerifyClicked(bool checked)
+void DeviceSettingsDialog::onPushButtonVerifyClicked(bool checked)
 {
     LaserDriver::instance().checkFactoryPassword(m_ui->lineEditManufacturerPassword->text());
 }
 
-void ParameterDialog::onPushButtonClearClicked(bool checked)
+void DeviceSettingsDialog::onPushButtonClearClicked(bool checked)
 {
     m_ui->lineEditManufacturerPassword->setText("");
 }
 
-void ParameterDialog::onPushButtonResetClicked(bool checked)
+void DeviceSettingsDialog::onPushButtonResetClicked(bool checked)
 {
-    disconnect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &ParameterDialog::rightManufactorPassword);
+    disconnect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &DeviceSettingsDialog::rightManufactorPassword);
     ChangePasswordDialog dialog;
     dialog.exec();
-    connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &ParameterDialog::rightManufactorPassword);
+    connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &DeviceSettingsDialog::rightManufactorPassword);
 }
 
-void ParameterDialog::registersFetched(const QMap<LaserDriver::RegisterType, QVariant>& datas)
+void DeviceSettingsDialog::registersFetched(const QMap<LaserDriver::RegisterType, QVariant>& datas)
 {
     m_ui->editSliderCuttingStartSpeed->setValue(15);
     m_ui->editSliderCuttingRunSpeed->setValue(50);
