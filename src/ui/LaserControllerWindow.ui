@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1103</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1893,6 +1893,14 @@
    </property>
    <property name="text">
     <string>Device Settings</string>
+   </property>
+  </action>
+  <action name="actionEditSplineTool">
+   <property name="text">
+    <string>Edit Spline Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Spline Tool</string>
    </property>
   </action>
   <action name="actionReset">
