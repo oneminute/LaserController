@@ -104,6 +104,266 @@
     </message>
 </context>
 <context>
+    <name>DeviceSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="20"/>
+        <source>Parameter Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="30"/>
+        <source>Machining</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="41"/>
+        <source>Cutting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="50"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="112"/>
+        <source>Start Speed(mm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="60"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="122"/>
+        <source>Run Speed(mm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="70"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="132"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="175"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="226"/>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="80"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="142"/>
+        <source>Start/Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="90"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="152"/>
+        <source>Run/Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="103"/>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="188"/>
+        <source>Engraving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="169"/>
+        <source>Cutting tune-up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="197"/>
+        <source>Row spacing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="207"/>
+        <source>Column Spacing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="220"/>
+        <source>Engraving tune-up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="242"/>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="251"/>
+        <source>Move Start Speed(mm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="261"/>
+        <source>Move Run Speed(mm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="268"/>
+        <source>X Backlash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="275"/>
+        <source>Y Backlash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="282"/>
+        <source>Total Running Time(Minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="289"/>
+        <source>Laser Total Use Time(Minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="296"/>
+        <source>Cut Laser Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="303"/>
+        <source>Carving Laser Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="346"/>
+        <source>Manufacturer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="357"/>
+        <source>Manufacturer Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="367"/>
+        <source>Verify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="374"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="381"/>
+        <source>Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="406"/>
+        <source>Reset Speed(mm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="416"/>
+        <source>Zero Speed(mm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="426"/>
+        <source>Zero Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="433"/>
+        <source>X Step Length(um)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="440"/>
+        <source>Y Step Length(um)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="447"/>
+        <source>Motor Direction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="454"/>
+        <source>Limit Direction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="461"/>
+        <source>Page Width(mm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="468"/>
+        <source>Page Height(mm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="475"/>
+        <source>Drawing Unit(per inch)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="572"/>
+        <source>Read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="579"/>
+        <source>Write</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.ui" line="586"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="37"/>
+        <source>Top Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="38"/>
+        <source>Top Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="39"/>
+        <source>Bottom Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="40"/>
+        <source>Bottom Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="41"/>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="45"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="42"/>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="46"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="43"/>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="47"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="44"/>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="48"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="120"/>
+        <source>Wrong password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DisconnectionTask</name>
     <message>
         <location filename="../src/task/DisconnectionTask.cpp" line="21"/>
@@ -438,683 +698,684 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="99"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="98"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="110"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="109"/>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="129"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="128"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="164"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="163"/>
         <source>Layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="193"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="192"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="201"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="200"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="209"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="208"/>
         <source>Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="217"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="216"/>
         <source>Count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="225"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="224"/>
         <source>Speed/Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="233"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="232"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="241"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="240"/>
         <source>Visible</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="270"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="277"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="269"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="276"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="294"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="293"/>
         <source>Properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="320"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="319"/>
         <source>Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="325"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="324"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="335"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="334"/>
         <source>toolBar_2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="361"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="360"/>
         <source>Operations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="399"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="398"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="415"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1477"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="414"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1537"/>
         <source>Pause</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="431"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1577"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1715"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="430"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1632"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1752"/>
         <source>Cut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="447"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1710"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="446"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1747"/>
         <source>Spot Shot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="466"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1485"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="465"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1545"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="479"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="481"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1900"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="492"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1732"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="497"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1769"/>
         <source>Origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="505"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="513"/>
         <source>Optimize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="524"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="532"/>
         <source>Laser Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="534"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="542"/>
         <source>Start Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="542"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="550"/>
         <source>Current Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="547"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="555"/>
         <source>Custom Origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="552"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="560"/>
         <source>Mechnical Origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="560"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="568"/>
         <source>Min Energy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="567"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="575"/>
         <source>Max Energy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="593"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1186"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="601"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1242"/>
         <source>Read</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="606"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1202"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="614"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1258"/>
         <source>Write</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="617"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="625"/>
         <source>Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="630"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1497"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="638"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1557"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="687"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="695"/>
         <source>Movement</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="702"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="710"/>
         <source>Coordinates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="709"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="717"/>
         <source>X = 0, Y = 0, Z = 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="716"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="724"/>
         <source>Distance(mm)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="725"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1025"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1075"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1125"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="733"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1036"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1086"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1136"/>
         <source>X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="748"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1048"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1098"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1148"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="756"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1059"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1109"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1159"/>
         <source>Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="771"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="779"/>
         <source>Z</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="803"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="811"/>
         <source>R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="819"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="827"/>
         <source>TL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="835"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="843"/>
         <source>T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="851"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="859"/>
         <source>TR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="867"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="875"/>
         <source>BL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="883"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="891"/>
         <source>BR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="899"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="907"/>
         <source>O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="915"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="923"/>
         <source>L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="931"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="939"/>
         <source>B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="941"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="949"/>
         <source>U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="951"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="959"/>
         <source>D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="965"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="973"/>
         <source>Post Event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="973"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="981"/>
         <source>Stop at current position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="978"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="611"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="986"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="696"/>
         <source>Unload motor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="983"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="991"/>
         <source>Back to mechnical origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="988"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="996"/>
         <source>Back to machining origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="996"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1004"/>
         <source>Origin1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1003"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1014"/>
         <source>Origin2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1010"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1021"/>
         <source>Origin3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1233"/>
-        <source>Open</source>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1178"/>
+        <source>Relays</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1236"/>
-        <source>Ctrl+O</source>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1187"/>
+        <source>Relay1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1248"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1251"/>
-        <source>Import SVG</source>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1194"/>
+        <source>Relay2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1263"/>
-        <source>Export JSON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1275"/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1278"/>
-        <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1286"/>
-        <source>Save As</source>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1201"/>
+        <source>Relay3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1289"/>
-        <source>Ctrl+Shift+S</source>
+        <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1301"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1292"/>
+        <source>Ctrl+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1304"/>
-        <source>New</source>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1307"/>
+        <source>Import SVG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1312"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1315"/>
-        <source>Add Engraving Layer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1323"/>
-        <source>Add Cutting Layer</source>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1319"/>
+        <source>Export JSON</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1331"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1334"/>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1342"/>
+        <source>Save As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1345"/>
+        <source>Ctrl+Shift+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1357"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1360"/>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1368"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1371"/>
+        <source>Add Engraving Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1379"/>
+        <source>Add Cutting Layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1387"/>
         <source>Remove Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1339"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1395"/>
         <source>Area Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1347"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1403"/>
         <source>Cancel Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1359"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1415"/>
         <source>Selection Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1371"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1427"/>
         <source>Rectangle Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1383"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1439"/>
         <source>Ellipse Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1395"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1451"/>
         <source>Polygon Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1407"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1463"/>
         <source>Text Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1419"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1475"/>
         <source>Line Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1431"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1487"/>
         <source>Bitmap Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1443"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1499"/>
         <source>Spline Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1455"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1458"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1511"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1514"/>
         <source>Import CorelDraw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1466"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1526"/>
         <source>Machining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1509"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1569"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1517"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1520"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1577"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1580"/>
         <source>Load Motor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1528"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1588"/>
         <source>Unload Motor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1540"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1543"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1600"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1603"/>
         <source>Close Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1548"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1608"/>
         <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1553"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1613"/>
         <source>Work State</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1558"/>
-        <source>Move To Original Point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1563"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="491"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1618"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="575"/>
         <source>Load Json</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1568"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1623"/>
         <source>Half Tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1586"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1641"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1595"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1650"/>
         <source>Paste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1600"/>
-        <source>System Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1605"/>
-        <source>Manufacturer Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1610"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1655"/>
         <source>Path Optimization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1615"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1660"/>
         <source>Remote Assistance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1620"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1665"/>
         <source>Mainboard Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1625"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1670"/>
         <source>Update firmware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1630"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1675"/>
         <source>Show Toolbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1635"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1680"/>
         <source>Show Statusbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1640"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1685"/>
         <source>Show Layers Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1645"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1690"/>
         <source>Show Parameters Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1648"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1693"/>
         <source>Show Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1653"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1698"/>
         <source>Show Operation Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1658"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1703"/>
         <source>Show Ruler</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1663"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1708"/>
         <source>Online Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1668"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1713"/>
         <source>Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1673"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1718"/>
         <source>Official Website</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1678"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1723"/>
         <source>Contact Us</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1687"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1732"/>
         <source>Delete Primitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1692"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1813"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1737"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1850"/>
         <source>Move Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1697"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1822"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1742"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1859"/>
         <source>Move Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1702"/>
-        <source>Show Registers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1723"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1760"/>
         <source>Move</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1741"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1778"/>
         <source>Move Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1750"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1787"/>
         <source>Move Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1759"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1796"/>
         <source>Move Top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1768"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1805"/>
         <source>Move Bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1777"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1814"/>
         <source>Move Top Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1786"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1823"/>
         <source>Move Top Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1795"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1832"/>
         <source>Move Bottom Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1804"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1841"/>
         <source>Move Bottom Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1831"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1868"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1840"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1877"/>
         <source>Redo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1849"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1886"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1858"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1895"/>
         <source>Device Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1124,116 +1385,126 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="170"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="174"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="177"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="181"/>
         <source>Welcome!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="184"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="188"/>
         <source>0,0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="191"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="195"/>
         <source>Top Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="198"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="202"/>
         <source>Page Size(mm): 210x320</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="349"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="361"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="369"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="377"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="387"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="395"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="404"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="412"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="420"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="430"/>
         <source>Operate failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="349"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="395"/>
         <source>Laser device is not connected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="361"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="369"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="377"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="387"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="404"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="412"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="420"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="430"/>
         <source>Getting register value failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="401"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1278"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="483"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1627"/>
         <source>Open SVG File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="476"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="558"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="517"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="599"/>
         <source>Alert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="517"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="599"/>
         <source>No active document. Please open or import a document to mechining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="611"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="696"/>
         <source>Do you want to unload motor?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="689"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="769"/>
         <source>Open Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="689"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="769"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="718"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="798"/>
         <source>Delete primitives?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="718"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="798"/>
         <source>Do you want to delete primitives to selected layer?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="729"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="809"/>
         <source>Close document?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="729"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="809"/>
         <source>Do you want to close current document?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="829"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="927"/>
         <source>Device Connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="834"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="932"/>
         <source>Device Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1192"/>
+        <source>Read registers failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1192"/>
+        <source>Cannot read registers value!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1628,266 +1899,6 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/scene/LaserPrimitive.cpp" line="129"/>
         <source>Rect</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ParameterDialog</name>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="20"/>
-        <source>Parameter Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="30"/>
-        <source>Machining</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="41"/>
-        <source>Cutting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="50"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="112"/>
-        <source>Start Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="60"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="122"/>
-        <source>Run Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="70"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="132"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="175"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="226"/>
-        <source>Power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="80"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="142"/>
-        <source>Start/Power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="90"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="152"/>
-        <source>Run/Power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="103"/>
-        <location filename="../src/ui/ParameterDialog.ui" line="188"/>
-        <source>Engraving</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="169"/>
-        <source>Cutting tune-up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="197"/>
-        <source>Row spacing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="207"/>
-        <source>Column Spacing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="220"/>
-        <source>Engraving tune-up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="242"/>
-        <source>System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="251"/>
-        <source>Move Start Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="261"/>
-        <source>Move Run Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="268"/>
-        <source>X Backlash</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="275"/>
-        <source>Y Backlash</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="282"/>
-        <source>Total Running Time(Minutes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="289"/>
-        <source>Laser Total Use Time(Minutes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="296"/>
-        <source>Cut Laser Frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="303"/>
-        <source>Carving Laser Frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="346"/>
-        <source>Manufacturer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="357"/>
-        <source>Manufacturer Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="367"/>
-        <source>Verify</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="374"/>
-        <source>Clear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="381"/>
-        <source>Change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="406"/>
-        <source>Reset Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="416"/>
-        <source>Zero Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="426"/>
-        <source>Zero Position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="433"/>
-        <source>X Step Length(um)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="440"/>
-        <source>Y Step Length(um)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="447"/>
-        <source>Motor Direction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="454"/>
-        <source>Limit Direction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="461"/>
-        <source>Page Width(mm)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="468"/>
-        <source>Page Height(mm)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="475"/>
-        <source>Drawing Unit(per inch)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="572"/>
-        <source>Read</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="579"/>
-        <source>Write</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.ui" line="586"/>
-        <source>Default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="37"/>
-        <source>Top Left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="38"/>
-        <source>Top Right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="39"/>
-        <source>Bottom Right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="40"/>
-        <source>Bottom Left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="41"/>
-        <location filename="../src/ui/ParameterDialog.cpp" line="45"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="42"/>
-        <location filename="../src/ui/ParameterDialog.cpp" line="46"/>
-        <source>1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="43"/>
-        <location filename="../src/ui/ParameterDialog.cpp" line="47"/>
-        <source>2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="44"/>
-        <location filename="../src/ui/ParameterDialog.cpp" line="48"/>
-        <source>3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ParameterDialog.cpp" line="120"/>
-        <source>Wrong password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

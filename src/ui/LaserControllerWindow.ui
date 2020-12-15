@@ -1518,6 +1518,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/machining.png</normaloff>:/ui/icons/images/machining.png</iconset>
+   </property>
    <property name="text">
     <string>Machining</string>
    </property>
@@ -1889,11 +1893,6 @@
    </property>
    <property name="text">
     <string>Device Settings</string>
-   </property>
-  </action>
-  <action name="actionEditSpline">
-   <property name="text">
-    <string>Edit Spline</string>
    </property>
   </action>
   <action name="actionReset">
