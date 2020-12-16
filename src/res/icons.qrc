@@ -41,5 +41,12 @@
         <file>images/paste.png</file>
         <file>images/delete.png</file>
         <file>images/machining.png</file>
+        <file>images/pause.png</file>
+        <file>images/start.png</file>
+        <file>images/stop.png</file>
+        <file>images/reset.png</file>
+        <file>images/reset_origin.png</file>
+        <file>images/cut_edge.png</file>
+        <file>images/path_opt.png</file>
     </qresource>
 </RCC>

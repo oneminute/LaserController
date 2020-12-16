@@ -42,25 +42,25 @@ QVector3D utils::putToQuadrant(const QVector3D & pos, QUADRANT quadrant)
     float z = pos.z();
     switch (quadrant)
     {
-    case QUADRANT1:
+    case QUADRANT_1:
     {
         if (x < 0) x = -x;
         if (y < 0) y = -y;
     }
         break;
-    case QUADRANT2:
+    case QUADRANT_2:
     {
         if (x > 0) x = -x;
         if (y < 0) y = -y;
     }
         break;
-    case QUADRANT3:
+    case QUADRANT_3:
     {
         if (x > 0) x = -x;
         if (y > 0) y = -y;
     }
         break;
-    case QUADRANT4:
+    case QUADRANT_4:
     {
         if (x < 0) x = -x;
         if (y > 0) y = -y;
@@ -77,25 +77,25 @@ void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float
     float y = pos.y();
     switch (quadrant)
     {
-    case QUADRANT1:
+    case QUADRANT_1:
     {
         x = qBound(0.f, x, width);
         y = qBound(0.f, y, width);
     }
         break;
-    case QUADRANT2:
+    case QUADRANT_2:
     {
         x = qBound(-width, x, 0.f);
         y = qBound(0.f, y, width);
     }
         break;
-    case QUADRANT3:
+    case QUADRANT_3:
     {
         x = qBound(-width, x, 0.f);
         y = qBound(-height, y, 0.f);
     }
         break;
-    case QUADRANT4:
+    case QUADRANT_4:
     {
         x = qBound(0.f, x, width);
         y = qBound(-height, y, 0.f);

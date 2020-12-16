@@ -116,26 +116,14 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     break;
     case ReadSysParamFromCardOK:    
     {
-        instance().m_registers.clear();
-        for (QString i : eventData.split(";"))
-        {
-            QString str = i.trimmed();
-            if (str.isEmpty() || str.isNull())
-                continue;
-
-            QStringList tokens = str.split(",");
-            if (tokens.length() != 2)
-                continue;
-
-            int addr = 0;
-            bool ok = false;
-            addr = tokens[0].toInt(&ok);
-            if (!ok)
-                continue;
-
-            QVariant value = tokens[1];
-            instance().m_registers.insert((RegisterType)addr, value);
-        }
+        parseAndRefreshRegisters(eventData);
+        emit instance().registersFectched(instance().m_registers);
+        emit instance().sysParamFromCardArrived(eventData);
+    }
+    break;
+    case WriteSysParamToCardOK:
+    {
+        parseAndRefreshRegisters(eventData);
         emit instance().registersFectched(instance().m_registers);
         emit instance().sysParamFromCardArrived(eventData);
     }
@@ -216,6 +204,30 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     {
         emit instance().wrongManufacturerPassword();
     }
+    }
+}
+
+void LaserDriver::parseAndRefreshRegisters(QString &eventData)
+{
+    instance().m_registers.clear();
+    for (QString i : eventData.split(";"))
+    {
+        QString str = i.trimmed();
+        if (str.isEmpty() || str.isNull())
+            continue;
+
+        QStringList tokens = str.split(",");
+        if (tokens.length() != 2)
+            continue;
+
+        int addr = 0;
+        bool ok = false;
+        addr = tokens[0].toInt(&ok);
+        if (!ok)
+            continue;
+
+        QVariant value = tokens[1];
+        instance().m_registers.insert((RegisterType)addr, value);
     }
 }
 
