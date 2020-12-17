@@ -9,6 +9,7 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 #include <QPainterPath>
+#include <QLabel> 
 
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
@@ -23,6 +24,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_rubberBandActive(false)
     , m_mousePressed(false)
 	, m_ruller(this)
+	, m_isKeyDelPress(false)
 	, m_isKeyShiftPressed(false)
 	, m_isMouseInStartRect(false)
 	, m_splineNodeDrawWidth(3)
@@ -61,7 +63,20 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	}
 	//Ellipse
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
-		painter.drawEllipse(QRectF(mapFromScene(m_creatingEllipseStartPoint), mapFromScene(m_creatingEllipseEndPoint)));
+		m_EllipseEndPoint = m_creatingEllipseEndPoint;
+		if (m_isKeyShiftPressed) {
+			qreal w = m_EllipseEndPoint.x() - m_creatingEllipseStartPoint.x();
+			qreal h = m_EllipseEndPoint.y() - m_creatingEllipseStartPoint.y();
+			if (qAbs(w) < qAbs(h)) {
+				m_EllipseEndPoint = QPointF(m_creatingEllipseStartPoint.x() + w, m_creatingEllipseStartPoint.y() + w);
+			}
+			else {
+				m_EllipseEndPoint = QPointF(m_creatingEllipseStartPoint.x() + h, m_creatingEllipseStartPoint.y() + h);
+			}
+
+		}
+		
+		painter.drawEllipse(QRectF(mapFromScene(m_creatingEllipseStartPoint), mapFromScene(m_EllipseEndPoint)));
 	}
 	//Line
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineCreatingState())) {
@@ -119,22 +134,7 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	//Text
 	else {
 		if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-			//cursor
-			/*m_curTime = m_time.elapsed();
-			if (m_curTime>0 && m_curTime <= 1000) {
-				
-				painter.setPen(QPen(Qt::black, 3, Qt::SolidLine));
-			}
-			else if(m_curTime>1000 && m_curTime <=2000){
-				painter.setPen(QPen(Qt::white, 3, Qt::SolidLine));
-			}
-			else if(m_curTime > 2000){
-				m_time.restart();
-			}
 			
-			QPointF point = mapFromScene(m_textInputPoint);
-			painter.drawLine(QPointF(point.x(), point.y()-10), QPointF(point.x(), point.y() + 10));*/
-
 		}
 	}
 }
@@ -213,7 +213,6 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 		//Text
 		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextReadyState())) {
 			m_textInputPoint = mapToScene(event->pos()).toPoint();
-			//m_time.start();
 			creatTextEdit();
 			emit creatingText();
 		}
@@ -249,16 +248,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 	//Ellipse
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
 		m_creatingEllipseEndPoint = mapToScene(point);
-		if (m_isKeyShiftPressed) {
-			qreal w = m_creatingEllipseEndPoint.x() - m_creatingEllipseStartPoint.x();
-			qreal h = m_creatingEllipseEndPoint.y() - m_creatingEllipseStartPoint.y();
-			if (qAbs(w) < qAbs(h)) {
-				m_creatingEllipseEndPoint = QPointF(m_creatingEllipseStartPoint.x()+w, m_creatingEllipseStartPoint.y()+w);
-			}
-			else {
-				m_creatingEllipseEndPoint = QPointF(m_creatingEllipseStartPoint.x()+h, m_creatingEllipseStartPoint.y()+h);
-			}
-		}
+		
 		return;
 	}
 	//Line
@@ -328,7 +318,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 	}
 	//Ellipse
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {		
-		QRectF rect(m_creatingEllipseStartPoint, m_creatingEllipseEndPoint);
+		QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
 		LaserEllipse *ellipseItem = new LaserEllipse(rect, m_scene->document());
 		m_scene->addLaserPrimitive(ellipseItem);
 		emit readyEllipse();
@@ -413,10 +403,12 @@ void LaserViewer::keyPressEvent(QKeyEvent * event)
 {
 	switch (event->key())
 	{
-		case Qt::SHIFT:
-
+		case Qt::Key_Shift:
+			m_isKeyShiftPressed = true;
 			break;
-
+		case Qt::Key_Delete:
+			m_isKeyDelPress = true;
+			break;
 	}
 	QGraphicsView::keyPressEvent(event);
 }
@@ -428,9 +420,16 @@ void LaserViewer::keyReleaseEvent(QKeyEvent * event)
 	{
 		case Qt::Key_Escape:
 			if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+				
 				releaseTextEdit();
 				emit readyText();
 			}
+			break;
+		case Qt::Key_Shift:
+			m_isKeyShiftPressed = false;
+		case Qt::Key_Delete:
+			m_isKeyDelPress = false;
+			break;
 			break;
 	}
 	QGraphicsView::keyReleaseEvent(event);
@@ -502,17 +501,25 @@ void LaserViewer::initSpline()
 void LaserViewer::creatTextEdit()
 {
 	m_textEdit = new QTextEdit();
-	QPoint startPoint = QPoint(m_textInputPoint.x(), m_textInputPoint.y()-15);
-	QPoint endPoint = QPoint(m_textInputPoint.x() + 100, m_textInputPoint.y() + 15);
-	
-	m_textEdit->setFocus();
-	m_textEdit->setOverwriteMode(true);
+	QPoint startPoint = QPoint(m_textInputPoint.x(), m_textInputPoint.y());
 	QGraphicsProxyWidget *proxy = m_scene->addWidget(m_textEdit);
 	proxy->setPos(startPoint);
+	m_textEdit->setFocus();
+	m_textEdit->resize(24, 42);
+	m_textEdit->setStyleSheet("background-color : rgb(0,255,0,0%);");
+	m_textEdit->setFrameShape(QFrame::NoFrame);
+	m_textEdit->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+	m_textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	connect(m_textEdit->document(), SIGNAL(contentsChanged()), SLOT(textAreaChanged()));
 }
 
 void LaserViewer::releaseTextEdit()
 {
+	QPoint end(m_textInputPoint.x() + m_textEdit->document()->size().width(), m_textInputPoint.y() + m_textEdit->document()->size().height());
+	QRect rect(m_textInputPoint, end);
+	LaserText *text = new LaserText(rect, m_textEdit->toHtml(), m_scene->document(), LaserPrimitiveType::LPT_TEXT);
+	m_scene->addLaserPrimitive(text);
 	delete m_textEdit;
 }
 
@@ -557,4 +564,11 @@ void LaserViewer::resetZoom()
         resetTransform();
         emit zoomChanged();
     }
+}
+
+void LaserViewer::textAreaChanged()
+{
+	int newwidth = m_textEdit->document()->size().width();
+	int newheight = m_textEdit->document()->size().height();
+	m_textEdit->resize(newwidth, newheight);
 }

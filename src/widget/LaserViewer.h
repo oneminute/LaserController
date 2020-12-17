@@ -30,7 +30,6 @@ class LaserViewer : public QGraphicsView
     Q_OBJECT
 public:
     explicit LaserViewer(QWidget* parent = nullptr);
-    //explicit LaserViewer(LaserScene* scene, QWidget* parent = nullptr);
     ~LaserViewer();
 
     qreal zoomFactor() const;
@@ -47,6 +46,7 @@ public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
+	void textAreaChanged();
 
 signals:
     void zoomChanged();
@@ -98,10 +98,11 @@ private:
 	QPointF m_creatingEllipseStartPoint;
 	QPointF m_creatingEllipseStartInitPoint;
 	QPointF m_creatingEllipseEndPoint;
+	QPointF m_EllipseEndPoint;
 
 	QPointF m_creatingLineStartPoint;
 	QPointF m_creatingLineEndPoint;
-
+	//Polygon
 	QPointF m_creatingPolygonStartPoint;
 	QPointF m_creatingPolygonEndPoint;
 	QVector<QPointF> m_creatingPolygonPoints;
@@ -124,6 +125,7 @@ private:
 	QTextEdit *m_textEdit;
 
 	bool m_isKeyShiftPressed;
+	bool m_isKeyDelPress;
 
 	Ruller m_ruller;
 };
