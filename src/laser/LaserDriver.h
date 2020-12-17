@@ -272,6 +272,7 @@ public:
     static LaserDriver& instance();
     static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
     static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
+    static void parseAndRefreshRegisters(QString &eventData);
     static void ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount);
 
     bool load();

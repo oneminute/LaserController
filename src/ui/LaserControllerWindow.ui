@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1103</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -388,14 +388,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Start</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -404,14 +419,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Pause</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -420,14 +450,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Cut</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -436,17 +481,32 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Spot Shot</string>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
            <property name="checkable">
             <bool>false</bool>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -455,14 +515,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Stop</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -471,14 +546,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Reset</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -487,14 +577,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Origin</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -503,14 +608,29 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>60</width>
-             <height>16777215</height>
+             <height>60</height>
             </size>
            </property>
            <property name="text">
             <string>Optimize</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
            </property>
           </widget>
          </item>
@@ -1520,7 +1640,7 @@
    </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/machining.png</normaloff>:/ui/icons/images/machining.png</iconset>
+     <normaloff>:/ui/icons/images/start.png</normaloff>:/ui/icons/images/start.png</iconset>
    </property>
    <property name="text">
     <string>Machining</string>
@@ -1533,6 +1653,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/pause.png</normaloff>:/ui/icons/images/pause.png</iconset>
+   </property>
    <property name="text">
     <string>Pause</string>
    </property>
@@ -1540,6 +1664,10 @@
   <action name="actionStop">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/stop.png</normaloff>:/ui/icons/images/stop.png</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
@@ -1651,8 +1779,12 @@
    </property>
   </action>
   <action name="actionPathOptimization">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/path_opt.png</normaloff>:/ui/icons/images/path_opt.png</iconset>
+   </property>
    <property name="text">
-    <string>Path Optimization</string>
+    <string>Path Opt</string>
    </property>
   </action>
   <action name="actionRemoteAssistance">
@@ -1743,11 +1875,19 @@
    </property>
   </action>
   <action name="actionLaserSpotShot">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/machining.png</normaloff>:/ui/icons/images/machining.png</iconset>
+   </property>
    <property name="text">
-    <string>Spot Shot</string>
+    <string>Spot</string>
    </property>
   </action>
   <action name="actionLaserCut">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/cut_edge.png</normaloff>:/ui/icons/images/cut_edge.png</iconset>
+   </property>
    <property name="text">
     <string>Cut</string>
    </property>
@@ -1904,6 +2044,10 @@
    </property>
   </action>
   <action name="actionReset">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/reset.png</normaloff>:/ui/icons/images/reset.png</iconset>
+   </property>
    <property name="text">
     <string>Reset</string>
    </property>
