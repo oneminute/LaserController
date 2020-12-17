@@ -14,12 +14,13 @@
 
 #include "LaserPrimitive.h"
 #include "PageInformation.h"
+#include "common/Config.h"
 #include "laser/LaserDriver.h"
 #include "util/PltUtils.h"
 #include "LaserLayer.h"
 #include "state/StateController.h"
 
-int LaserDocument::m_layersCount(16);
+//int LaserDocument::m_layersCount(16);
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
     : QObject(parent)
@@ -299,7 +300,7 @@ void LaserDocument::swapLayers(int i, int j)
 
 void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
 {
-    for (int i = 0; i < layersCount(); i++)
+    for (int i = 0; i < Config::LayersMaxLayersCount(); i++)
     {
         m_layers[i]->bindButton(layerButtons[i]);
     }
@@ -344,7 +345,7 @@ void LaserDocument::init()
     layer = new LaserLayer(layerName, LLT_CUTTING, this);
     addLayer(layer);
 
-    for (int i = 2; i < m_layersCount; i++)
+    for (int i = 2; i < Config::LayersMaxLayersCount(); i++)
     {
         QString layerName = newLayerName();
         LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);

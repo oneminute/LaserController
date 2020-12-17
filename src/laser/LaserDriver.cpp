@@ -209,7 +209,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
 
 void LaserDriver::parseAndRefreshRegisters(QString &eventData)
 {
-    instance().m_registers.clear();
+    //instance().m_registers.clear();
     for (QString i : eventData.split(";"))
     {
         QString str = i.trimmed();

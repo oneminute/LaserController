@@ -25,7 +25,6 @@ public:
 
     void addItem(LaserPrimitive* item);
     void addItem(LaserPrimitive* item, LaserLayer* layer);
-    //void addItem(LaserPrimitive* item, const QString& id);
     void removeItem(LaserPrimitive* item);
 
     PageInformation pageInformation() const;
@@ -57,8 +56,8 @@ public:
     FinishRun& finishRun() { return m_finishRun; }
     void setFinishRun(const FinishRun& value) { m_finishRun = value; }
 
-    static int layersCount() { return m_layersCount; }
-    static void setLayersCount(int count) { m_layersCount = count; }
+    //static int layersCount() { return m_layersCount; }
+    //static void setLayersCount(int count) { m_layersCount = count; }
 
 public slots:
     void exportJSON(const QString& filename);
@@ -78,9 +77,6 @@ signals:
 
 private:
     QMap<QString, LaserPrimitive*> m_items;
-    //QList<LaserLayer*> m_engravingLayers;
-    //QList<LaserLayer*> m_cuttingLayers;
-    //QMap<QString, LaserLayer*> m_layers;
     QList<LaserLayer*> m_layers;
 
     PageInformation m_pageInfo;
@@ -90,9 +86,7 @@ private:
     LaserScene* m_scene;
     FinishRun m_finishRun;
 
-    //static int m_engravingLayersCount;
-    //static int m_cuttingLayersCount;
-    static int m_layersCount;
+    //static int m_layersCount;
 
     Q_DISABLE_COPY(LaserDocument);
 };

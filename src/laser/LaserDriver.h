@@ -38,7 +38,7 @@ public:
 
     bool parse(const QString& data)
     {
-        QStringList values = data.split(";");
+        QStringList values = data.split(";", QString::SkipEmptyParts);
         if (values.size() != 7)
             return false;
 
@@ -46,34 +46,33 @@ public:
         {
             QString value = values[i];
             bool ok = false;
-            int iValue = value.toInt(&ok);
-            if (!ok)
-                return false;
 
             switch (i)
             {
             case 0:
-                workingMode = static_cast<LaserWorkMode>(iValue);
+                workingMode = static_cast<LaserWorkMode>(value.toInt(&ok));
                 break;
             case 1:
-                operation = iValue;
+                operation = value.toInt(&ok);
                 break;
             case 2:
-                x = iValue;
+                x = value.toDouble(&ok);
                 break;
             case 3:
-                y = iValue;
+                y = value.toDouble(&ok);
                 break;
             case 4:
-                z = iValue;
+                z = value.toDouble(&ok);
                 break;
             case 5:
-                power = iValue;
+                power = value.toInt(&ok);
                 break;
             case 6:
-                gray = iValue;
+                gray = value.toInt(&ok);
                 break;
             }
+            if (!ok)
+                return false;
         }
         return true;
     }
