@@ -11,7 +11,7 @@
 #include <QPolygonF>
 #include <QPainterPath>
 #include <QVector>
-
+#include <QTextEdit>
 #include <opencv2/opencv.hpp>
 
 class LaserDocument;
@@ -315,6 +315,24 @@ private:
     QImage m_image;
     QRectF m_bounds;
     Q_DISABLE_COPY(LaserBitmap);
+};
+
+class LaserText : public LaserPrimitive
+{
+	Q_OBJECT
+public:
+	LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+
+	QRect rect() const { return m_rect; }
+	QString content() const { return m_content; }
+
+	virtual void draw(QPainter* painter);
+	virtual LaserPrimitiveType type() { return LPT_TEXT; }
+	virtual QString typeName() { return tr("Text"); }
+private:
+	QString m_content;
+	QRect m_rect;
+	Q_DISABLE_COPY(LaserText);
 };
 
 #endif // LASERPRIMITIVE_H

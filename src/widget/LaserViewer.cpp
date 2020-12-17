@@ -9,6 +9,7 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 #include <QPainterPath>
+#include <QLabel> 
 
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
@@ -119,22 +120,7 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	//Text
 	else {
 		if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-			//cursor
-			/*m_curTime = m_time.elapsed();
-			if (m_curTime>0 && m_curTime <= 1000) {
-				
-				painter.setPen(QPen(Qt::black, 3, Qt::SolidLine));
-			}
-			else if(m_curTime>1000 && m_curTime <=2000){
-				painter.setPen(QPen(Qt::white, 3, Qt::SolidLine));
-			}
-			else if(m_curTime > 2000){
-				m_time.restart();
-			}
 			
-			QPointF point = mapFromScene(m_textInputPoint);
-			painter.drawLine(QPointF(point.x(), point.y()-10), QPointF(point.x(), point.y() + 10));*/
-
 		}
 	}
 }
@@ -213,7 +199,6 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 		//Text
 		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextReadyState())) {
 			m_textInputPoint = mapToScene(event->pos()).toPoint();
-			//m_time.start();
 			creatTextEdit();
 			emit creatingText();
 		}
@@ -428,6 +413,7 @@ void LaserViewer::keyReleaseEvent(QKeyEvent * event)
 	{
 		case Qt::Key_Escape:
 			if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+				
 				releaseTextEdit();
 				emit readyText();
 			}
@@ -502,17 +488,25 @@ void LaserViewer::initSpline()
 void LaserViewer::creatTextEdit()
 {
 	m_textEdit = new QTextEdit();
-	QPoint startPoint = QPoint(m_textInputPoint.x(), m_textInputPoint.y()-15);
-	QPoint endPoint = QPoint(m_textInputPoint.x() + 100, m_textInputPoint.y() + 15);
-	
-	m_textEdit->setFocus();
-	m_textEdit->setOverwriteMode(true);
+	QPoint startPoint = QPoint(m_textInputPoint.x(), m_textInputPoint.y());
 	QGraphicsProxyWidget *proxy = m_scene->addWidget(m_textEdit);
 	proxy->setPos(startPoint);
+	m_textEdit->setFocus();
+	m_textEdit->resize(24, 42);
+	m_textEdit->setStyleSheet("background-color : rgb(0,255,0,0%);");
+	m_textEdit->setFrameShape(QFrame::NoFrame);
+	m_textEdit->setWordWrapMode(QTextOption::WrapMode::NoWrap);
+	m_textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	connect(m_textEdit->document(), SIGNAL(contentsChanged()), SLOT(textAreaChanged()));
 }
 
 void LaserViewer::releaseTextEdit()
 {
+	QPoint end(m_textInputPoint.x() + m_textEdit->document()->size().width(), m_textInputPoint.y() + m_textEdit->document()->size().height());
+	QRect rect(m_textInputPoint, end);
+	LaserText *text = new LaserText(rect, m_textEdit->toHtml(), m_scene->document(), LaserPrimitiveType::LPT_TEXT);
+	m_scene->addLaserPrimitive(text);
 	delete m_textEdit;
 }
 
@@ -557,4 +551,11 @@ void LaserViewer::resetZoom()
         resetTransform();
         emit zoomChanged();
     }
+}
+
+void LaserViewer::textAreaChanged()
+{
+	int newwidth = m_textEdit->document()->size().width();
+	int newheight = m_textEdit->document()->size().height();
+	m_textEdit->resize(newwidth, newheight);
 }

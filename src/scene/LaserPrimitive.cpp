@@ -4,9 +4,10 @@
 #include <QPaintEvent>
 #include <QBuffer>
 #include <QtMath>
-
+#include <QGraphicsTextItem> 
 #include <opencv2/opencv.hpp>
 #include <Eigen/Core>
+#include <QTextEdit>
 
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
@@ -611,4 +612,20 @@ QByteArray LaserShape::engravingImage(cv::Mat & canvas)
         }
     }
     return bytes;
+}
+
+LaserText::LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit)
+	: LaserPrimitive(doc, LPT_TEXT, unit)
+	, m_rect(rect)
+	, m_content(content)
+{
+	m_boundingRect = m_rect;
+}
+void LaserText::draw(QPainter * painter)
+{
+	
+	QTextDocument doc;
+	doc.setHtml(m_content);
+	painter->translate(m_rect.topLeft());
+	doc.drawContents(painter, QRect(0, 0, m_rect.width(), m_rect.height()));
 }

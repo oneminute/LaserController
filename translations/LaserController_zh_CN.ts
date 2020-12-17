@@ -815,7 +815,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="481"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1900"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1908"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1377,6 +1377,12 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1895"/>
         <source>Device Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1900"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1903"/>
+        <source>Edit Spline Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -30,7 +30,6 @@ class LaserViewer : public QGraphicsView
     Q_OBJECT
 public:
     explicit LaserViewer(QWidget* parent = nullptr);
-    //explicit LaserViewer(LaserScene* scene, QWidget* parent = nullptr);
     ~LaserViewer();
 
     qreal zoomFactor() const;
@@ -47,6 +46,7 @@ public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
+	void textAreaChanged();
 
 signals:
     void zoomChanged();

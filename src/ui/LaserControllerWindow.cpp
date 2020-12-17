@@ -995,6 +995,8 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
     m_ui->tableWidgetLayers->blockSignals(true);
     for (LaserPrimitive* item : items)
     {
+		if (items[0]->layer() == nullptr)
+			continue;
         int row = items[0]->layer()->row();
         if (row != -1)
             m_ui->tableWidgetLayers->selectRow(row);
