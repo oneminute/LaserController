@@ -1,3 +1,4 @@
+#include "common/Config.h"
 #include "laser/LaserDriver.h"
 #include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
@@ -82,6 +83,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(messageOutput);
 
     qDebug() << "product name:" << QApplication::applicationName() << ", version:" << QApplication::applicationVersion();
+
+    Config::load();
 
     QTranslator translator;
     QLocale locale(QLocale::Chinese);

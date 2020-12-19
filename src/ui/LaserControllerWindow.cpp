@@ -1284,14 +1284,6 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePausedState);
     // end actionDisconnect
 
-    //// toolButtonConnect
-    //BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, initState);
-    //BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, deviceConnectedState);
-    //BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", true, deviceUnconnectedState);
-    //BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, deviceMachiningState);
-    //BIND_PROP_TO_STATE(m_ui->toolButtonConnect, "enabled", false, devicePausedState);
-    //// end toolButtonConnect
-
     // actionMachining
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);

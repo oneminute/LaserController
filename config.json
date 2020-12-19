@@ -1,0 +1,18 @@
+{
+    "General": {
+        "Language": {
+            "defaultValue": "English",
+            "name": "Language",
+            "type": 4,
+            "value": "English"
+        }
+    },
+    "Layers": {
+        "MaxLayersCount": {
+            "defaultValue": 16,
+            "name": "MaxLayersCount",
+            "type": 0,
+            "value": 16
+        }
+    }
+}

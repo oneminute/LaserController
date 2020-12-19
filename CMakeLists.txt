@@ -95,7 +95,7 @@ FILE(GLOB WIDGET_SOURCES src/widget/*.cpp)
 FILE(GLOB MOCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_autogen/*.cpp)
 
 set(OTHER_FILES
-    config.ini
+    config.json
     README.md
     ReleaseNotes.txt
     .gitignore
@@ -209,6 +209,7 @@ INSTALL(FILES
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.txt"
+            "${CMAKE_SOURCE_DIR}/config.json"
         DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 INSTALL(FILES 
