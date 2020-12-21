@@ -24,6 +24,7 @@
 #include "task/ConnectionTask.h"
 #include "task/DisconnectionTask.h"
 #include "task/MachiningTask.h"
+#include "ui/ConfigDialog.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/HalftoneDialog.h"
 #include "ui/DeviceSettingsDialog.h"

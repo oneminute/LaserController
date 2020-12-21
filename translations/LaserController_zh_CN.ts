@@ -70,6 +70,14 @@
     </message>
 </context>
 <context>
+    <name>ConfigDialog</name>
+    <message>
+        <location filename="../src/ui/ConfigDialog.ui" line="14"/>
+        <source>Config Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConnectionDialog</name>
     <message>
         <location filename="../src/ui/ConnectionDialog.ui" line="14"/>
@@ -1969,12 +1977,22 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="39"/>
+        <location filename="../src/common/Config.cpp" line="34"/>
+        <source>Open Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="34"/>
+        <source>An error occured when opening configuration file!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="69"/>
         <source>Save Failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="39"/>
+        <location filename="../src/common/Config.cpp" line="69"/>
         <source>An error occured when saving configuration file!</source>
         <translation type="unfinished"></translation>
     </message>

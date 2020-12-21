@@ -45,7 +45,6 @@ void Config::load()
         QString prefix = g.key();
         QJsonObject group = g.value().toObject();
 
-        //qDebug() << "group:" << prefix << group;
         for (QJsonObject::ConstIterator i = group.constBegin(); i != group.constEnd(); i++)
         {
             QString name = i.key();
