@@ -5,8 +5,6 @@
 #include <QGraphicsView>
 #include <QTime>
 #include <QTextEdit>
-#include "scene/Ruller.h"
-#include "widget/SplineNode.h"
 
 class LaserScene;
 //Spline Node Struct
@@ -126,8 +124,8 @@ private:
 
 	bool m_isKeyShiftPressed;
 	bool m_isKeyDelPress;
-
-	Ruller m_ruller;
+	//Ruller
+	qreal m_rullerWidth;
 };
 
 #endif // LASERVIEWER_H

@@ -237,6 +237,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionLaserSpotShot, &QAction::triggered, this, &LaserControllerWindow::onActionLaserSpotShot);
     connect(m_ui->actionLaserCut, &QAction::triggered, this, &LaserControllerWindow::onActionLaserCut);
     connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
+	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::onActionNew);
 
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
@@ -497,6 +498,22 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
     }
+}
+void LaserControllerWindow::onActionNew(bool checked)
+{
+	LaserDocument* doc = new LaserDocument(m_scene);
+	PageInformation page;
+	page.setWidth(320);
+	page.setHeight(280);
+	doc->setPageInformation(page);
+	doc->open();
+	if (doc)
+	{
+		doc->bindLayerButtons(m_layerButtons);
+		m_scene->updateDocument(doc);
+		m_ui->tableWidgetLayers->setDocument(doc);
+		m_ui->tableWidgetLayers->updateItems();
+	}
 }
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
@@ -1226,6 +1243,12 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", true, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", false, documentWorkingState);
     // end actionImportSVG
+
+	// actionNew
+	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentWorkingState);
+	// end actionNew
 
     // actionImportCorelDraw
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);

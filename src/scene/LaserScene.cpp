@@ -7,6 +7,7 @@
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
     , m_doc(nullptr)
+	, m_background(nullptr)
 {
 
 }

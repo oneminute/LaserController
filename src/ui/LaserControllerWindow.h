@@ -51,6 +51,7 @@ protected slots:
     void onActionLoadMotor(bool checked = false);
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
+	void onActionNew(bool checked = false);
 
     void onActionMoveTop(bool checked = false);
     void onActionMoveBottom(bool checked = false);
