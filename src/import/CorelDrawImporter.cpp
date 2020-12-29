@@ -28,9 +28,9 @@ CorelDrawImporter::~CorelDrawImporter()
 LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* scene, const QVariantMap& params)
 {
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-    QDir tmpDir(QCoreApplication::applicationDirPath() + "/tmp");
     VGCore::IVGApplicationPtr app(L"CorelDRAW.Application.18");
     
+    QDir tmpDir(QCoreApplication::applicationDirPath() + "\\tmp");
     QString tmpSvgFilename;
     bool success = true;
     try

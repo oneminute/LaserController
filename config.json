@@ -14,5 +14,49 @@
             "type": 0,
             "value": 16
         }
+    },
+    "UI": {
+        "ColorButtonHeight": {
+            "defaultValue": 30,
+            "name": "ColorButtonHeight",
+            "type": 0,
+            "value": 0
+        },
+        "ColorButtonWidth": {
+            "defaultValue": 30,
+            "name": "ColorButtonWidth",
+            "type": 0,
+            "value": 0
+        },
+        "OperationButtonHeight": {
+            "defaultValue": 60,
+            "name": "OperationButtonHeight",
+            "type": 0,
+            "value": 60
+        },
+        "OperationButtonIconSize": {
+            "defaultValue": 32,
+            "name": "OperationButtonIconSize",
+            "type": 0,
+            "value": 32
+        },
+        "OperationButtonShowText": {
+            "defaultValue": true,
+            "name": "OperationButtonShowText",
+            "type": 3,
+            "value": true
+        },
+        "OperationButtonWidth": {
+            "defaultValue": 60,
+            "name": "OperationButtonWidth",
+            "type": 0,
+            "value": 60
+        },
+        "ToolButtonSize": {
+            "defaultValue": 32,
+            "name": "ToolButtonSize",
+            "type": 0,
+            "value": 32
+        }
     }
 }

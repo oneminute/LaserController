@@ -69,8 +69,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     for (int i = 0; i < Config::LayersMaxLayersCount(); i++)
     {
         LayerButton* button = new LayerButton;
-        button->setMinimumWidth(30);
-        button->setFixedHeight(30);
+        button->setMinimumWidth(Config::UIColorButtonWidth());
+        button->setFixedHeight(Config::UIColorButtonHeight());
         button->setColor(colors[i]);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
@@ -125,7 +125,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     toolButtonPolygonTool->setDefaultAction(m_ui->actionPolygonTool);
     toolButtonTextTool->setDefaultAction(m_ui->actionTextTool);
     toolButtonLineTool->setDefaultAction(m_ui->actionLineTool);
-    toolButtonSplineTool->addAction(m_ui->actionSplineTool);
+    toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
 	toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
 
@@ -251,6 +251,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
     connect(m_ui->actionDeviceSettings, &QAction::triggered, this, &LaserControllerWindow::onActionDeviceSettings);
+    connect(m_ui->actionSettings, &QAction::triggered, this, &LaserControllerWindow::onActionSettings);
 
     connect(m_ui->actionMoveTop, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTop);
     connect(m_ui->actionMoveBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottom);
@@ -832,6 +833,12 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
     {
         m_scene->clearDocument(true);
     }
+}
+
+void LaserControllerWindow::onActionSettings(bool checked)
+{
+    ConfigDialog dialog;
+    dialog.exec();
 }
 
 void LaserControllerWindow::onActionDeviceSettings(bool checked)

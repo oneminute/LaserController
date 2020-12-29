@@ -9,6 +9,11 @@
 QMap<QString, Config::ConfigItem> Config::items;
 Config Config::config;
 
+Config::Config()
+{
+
+}
+
 Config::ConfigItem::ConfigItem(const QString & _prefix, const QString & _name, const QString & _description, const QVariant & _defaultValue, ConfigItemType _type)
     : prefix(_prefix)
     , name(_name)
@@ -109,4 +114,18 @@ void Config::restore()
 QString Config::configFilePath()
 {
     return "config.json";
+}
+
+bool Config::isModified()
+{
+    bool isModified = false;
+    for (QMap<QString, ConfigItem>::ConstIterator i = items.constBegin(); i != items.constEnd(); i++)
+    {
+        if (i.value().modified)
+        {
+            isModified = true;
+            break;
+        }
+    }
+    return isModified;
 }
