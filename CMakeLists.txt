@@ -204,7 +204,7 @@ file(TO_CMAKE_PATH "$ENV{WINDIR}" WIN_DIR )
 INSTALL(FILES 
             ${WIN_DIR}/system32/MSVCP140.dll
             ${WIN_DIR}/system32/VCRUNTIME140.dll
-            ${WIN_DIR}/system32/VCRUNTIME140_1.dll
+            #${WIN_DIR}/system32/VCRUNTIME140_1.dll
             ${WIN_DIR}/system32/CONCRT140.dll
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
@@ -224,6 +224,8 @@ endforeach()
 
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
 get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
+message(QMAKE_EXECUTABLE=${QMAKE_EXECUTABLE})
+message(QT_BIN_DIR=${QT_BIN_DIR})
 INSTALL(CODE "
         execute_process(
             COMMAND \"${QT_BIN_DIR}/windeployqt.exe\"
@@ -231,6 +233,5 @@ INSTALL(CODE "
                     --verbose 1
                     --release
                     --no-translations
-                    ${CMAKE_INSTALL_PREFIX}/LaserController.exe
-        )
+                    ${CMAKE_INSTALL_PREFIX}/LaserController.exe)
         ")

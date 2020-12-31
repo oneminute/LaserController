@@ -19,6 +19,7 @@ public:
 
 public slots:
     void updateItems();
+    void laserDocumentClosed();
 
 protected:
 

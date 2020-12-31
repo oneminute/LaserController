@@ -4,7 +4,7 @@
 QString utils::createUUID(const QString& prefix)
 {
     QString ret = prefix;
-    ret.append(QUuid::createUuid().toString(QUuid::Id128));
+    ret.append(QUuid::createUuid().toString());
     return ret;
 }
 

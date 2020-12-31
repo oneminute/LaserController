@@ -9,6 +9,8 @@
 #include <QCoreApplication>
 #include <QDialog>
 #include <QMessageBox>
+#include <QWidget>
+#include <QWindow>
 
 #import "libid:95E23C91-BC5A-49F3-8CD1-1FC515597048" version("12.0") \
       rename("GetCommandLine", "VGGetCommandLine") \
@@ -28,17 +30,28 @@ CorelDrawImporter::~CorelDrawImporter()
 LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* scene, const QVariantMap& params)
 {
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    if (FAILED(hr))
+    {
+        QMessageBox::warning(m_parentWnd, tr("Import failure"), tr("Cannot load cdr x8's dll."));
+        return nullptr;
+    }
     VGCore::IVGApplicationPtr app(L"CorelDRAW.Application.18");
-    
     QDir tmpDir(QCoreApplication::applicationDirPath() + "\\tmp");
     QString tmpSvgFilename;
     bool success = true;
     try
     {
         app->Visible = VARIANT_TRUE;
+        
         VGCore::IVGWindowPtr window = app->ActiveWindow;
         qDebug() << "window:" << window;
-        window->Activate();
+
+        QWindow* cdrWindow = QWindow::fromWinId(window->Handle);
+        Qt::WindowState windowState = (Qt::WindowState)((cdrWindow->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+        cdrWindow->setWindowState(windowState);
+        cdrWindow->show();
+        cdrWindow->requestActivate();
+        cdrWindow->deleteLater();
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
         if (!doc)
         {
@@ -113,7 +126,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
             doc->open();
         }
     }
-    app->Release();
+    //app->Release();
     CoUninitialize();
     return doc;
 }

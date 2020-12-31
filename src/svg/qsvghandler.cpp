@@ -2884,7 +2884,7 @@ static void parseBaseGradient(QSvgNode *node,
     }
 
     if (units.isEmpty() || units == QLatin1String("objectBoundingBox")) {
-         grad->setCoordinateMode(QGradient::ObjectMode);
+         grad->setCoordinateMode(QGradient::ObjectBoundingMode);
     }
 }
 

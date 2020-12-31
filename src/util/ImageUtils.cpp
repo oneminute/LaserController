@@ -1,5 +1,7 @@
 #include "ImageUtils.h"
 
+#include <iostream>
+
 #include <QDebug>
 #include <QFile>
 #include <QtMath>

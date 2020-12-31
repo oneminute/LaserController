@@ -52,7 +52,7 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	QPainter painter(viewport());
 	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 	//Ruller
-	if (m_scene != nullptr && m_scene->backgroundItem() != nullptr) {
+	if (m_scene != nullptr && m_scene->backgroundItem() != nullptr && m_scene->document() != nullptr) {
 		//Axes
 		QPointF origin = mapFromScene(m_scene->backgroundItem()->pos());
 		QRectF rect = this->rect();

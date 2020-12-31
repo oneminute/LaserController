@@ -380,7 +380,7 @@ public:
     void saveGradientUnits(QTextStream &str, const QGradient *gradient)
     {
         str << QLatin1String("gradientUnits=\"");
-        if (gradient && (gradient->coordinateMode() == QGradient::ObjectBoundingMode || gradient->coordinateMode() == QGradient::ObjectMode))
+        if (gradient && (gradient->coordinateMode() == QGradient::ObjectBoundingMode || gradient->coordinateMode() == QGradient::ObjectBoundingMode))
             str << QLatin1String("objectBoundingBox");
         else
             str << QLatin1String("userSpaceOnUse");

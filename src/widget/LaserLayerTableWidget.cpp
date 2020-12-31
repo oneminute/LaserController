@@ -24,6 +24,13 @@ void LaserLayerTableWidget::setDocument(LaserDocument * doc)
 { 
     m_doc = doc; 
     connect(m_doc, &LaserDocument::layersStructureChanged, this, &LaserLayerTableWidget::updateItems);
+    connect(m_doc, &LaserDocument::closed, this, &LaserLayerTableWidget::laserDocumentClosed);
+}
+
+void LaserLayerTableWidget::laserDocumentClosed()
+{
+    m_doc = nullptr;
+    updateItems();
 }
 
 void LaserLayerTableWidget::updateItems()

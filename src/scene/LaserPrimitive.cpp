@@ -1,5 +1,7 @@
 #include "LaserPrimitive.h"
 
+#include <iostream>
+
 #include <QSharedData>
 #include <QPaintEvent>
 #include <QBuffer>

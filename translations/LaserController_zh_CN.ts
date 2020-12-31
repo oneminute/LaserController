@@ -147,12 +147,22 @@
 <context>
     <name>CorelDrawImporter</name>
     <message>
-        <location filename="../src/import/CorelDrawImporter.cpp" line="45"/>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="35"/>
+        <source>Import failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="35"/>
+        <source>Cannot load cdr x8&apos;s dll.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="58"/>
         <source>No active document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/import/CorelDrawImporter.cpp" line="45"/>
+        <location filename="../src/import/CorelDrawImporter.cpp" line="58"/>
         <source>No active document in CorelDRAW!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1926,42 +1936,42 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="123"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="125"/>
         <source>Bitmap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="124"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="126"/>
         <source>Circle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="125"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="127"/>
         <source>Ellipse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="126"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="128"/>
         <source>Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="127"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="129"/>
         <source>Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="128"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="130"/>
         <source>Polygon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="129"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="131"/>
         <source>Polyline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="130"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="132"/>
         <source>Rect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1987,33 +1997,33 @@ Would you like to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="540"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="542"/>
         <source>Relays: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="556"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="571"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="558"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="573"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="559"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="561"/>
         <source>Release</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="562"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="564"/>
         <source>Machining 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="565"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="567"/>
         <source>Machining 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="568"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="570"/>
         <source>Machining 3</source>
         <translation type="unfinished"></translation>
     </message>
