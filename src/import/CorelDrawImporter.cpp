@@ -44,7 +44,11 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         app->Visible = VARIANT_TRUE;
         
         VGCore::IVGWindowPtr window = app->ActiveWindow;
-        qDebug() << "window:" << window;
+        if (!window)
+        {
+            QMessageBox::warning(m_parentWnd, tr("Import CDR"), tr("No active document in CorelDRAW!"));
+            return nullptr;
+        }
 
         QWindow* cdrWindow = QWindow::fromWinId(window->Handle);
         Qt::WindowState windowState = (Qt::WindowState)((cdrWindow->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
@@ -55,7 +59,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
         if (!doc)
         {
-            QMessageBox::warning(m_parentWnd, tr("No active document"), tr("No active document in CorelDRAW!"));
+            QMessageBox::warning(m_parentWnd, tr("Import CDR"), tr("No active document in CorelDRAW!"));
             return nullptr;
         }
 
