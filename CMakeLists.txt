@@ -184,6 +184,10 @@ else()
 endif()
 
 target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
+set_target_properties(
+    ${PROJECT_NAME} PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
 
 set(QM_FILES
     ${QM_FILES}

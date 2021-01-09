@@ -48,23 +48,33 @@ void messageOutput(QtMsgType type, const QMessageLogContext &context, const QStr
 
 void initLog(char* argv)
 {
+	QDir rootDir(".");
+	if (!rootDir.exists("log"))
+	{
+		rootDir.mkdir("log");
+	}
     std::cout << argv << std::endl;
     google::InitGoogleLogging(argv);
     google::InstallFailureSignalHandler();
 
-    FLAGS_stderrthreshold = google::GLOG_ERROR; //INFO WARNING ERROR FATAL, Ĭ�������stderr(app Output/cli)�ķ�ֵ��ERROR
-    FLAGS_alsologtostderr = true; //�����ȫ�ֱ���Ϊ��ʱ������FLAGS_stderrthreshold�����ƣ�������Ϣ��ӡ���ն�
-    FLAGS_colorlogtostderr = true; //�����������Ļ����־��ʾ��Ӧ��ɫ,����ȼ�����ɫ����
-    FLAGS_max_log_size = 100; //Maximum log size: 100MB
-    FLAGS_logbufsecs = 0;        //������־�����Ĭ��Ϊ30�룬�˴���Ϊ�������
-    FLAGS_stop_logging_if_full_disk = true;     //�����̱�д��ʱ��ֹͣ��־���
+    FLAGS_stderrthreshold = google::GLOG_ERROR;
+    FLAGS_alsologtostderr = true; 
+    FLAGS_colorlogtostderr = true; 
+    FLAGS_max_log_size = 100;
+    FLAGS_logbufsecs = 0; 
+    FLAGS_stop_logging_if_full_disk = true; 
 
-    //set log path;��һ������Ϊ��־��������,������� google::INFO ����־ͬʱ�������Ļ���ڶ���������ʾ���Ŀ¼����־�ļ���ǰ׺,logĿ¼����������build-prjĿ¼�´�����.
-    google::SetLogDestination(google::GLOG_INFO,   "log/INFO_");
-    google::SetLogDestination(google::GLOG_WARNING,"log/WARNING_");   //���� google::WARNING �������־�洢·�����ļ���ǰ׺
-    google::SetLogDestination(google::GLOG_ERROR,  "log/ERROR_");    //���� google::ERROR �������־�洢·�����ļ���ǰ׺
-    google::SetLogDestination(google::GLOG_FATAL,  "log/FATAL_");    //���� google::FATAL �������־�洢·�����ļ���ǰ׺
-    google::SetLogFilenameExtension("lc_");     //�����ļ�����չ����ƽ̨����������Ҫ���ֵ���Ϣ
+    //set log path;
+    google::SetLogDestination(google::GLOG_INFO,   "log/logs");
+    google::SetLogDestination(google::GLOG_WARNING,"log/logs");
+    google::SetLogDestination(google::GLOG_ERROR,  "log/logs");
+    google::SetLogDestination(google::GLOG_FATAL,  "log/logs");
+    google::SetLogFilenameExtension("lc_");
+}
+
+void checkCrash()
+{
+
 }
 
 int main(int argc, char *argv[])
