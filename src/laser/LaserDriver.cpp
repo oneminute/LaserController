@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QErrorMessage>
 #include <QMessageBox>
+#include <QFile>
+#include <QDataStream>
 
 #include "state/StateController.h"
 #include "task/ConnectionTask.h"
@@ -32,6 +34,26 @@ LaserDriver::LaserDriver(QObject* parent)
     ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
+
+    QFile deviceCache("dev_cache.bin");
+    if (!deviceCache.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "Can not read cache file!";
+        return;
+    }
+
+    qDebug() << "available bytes:" << deviceCache.bytesAvailable();
+    QDataStream stream(&deviceCache);
+    QMap<int, QVariant> registers;
+    stream >> registers;
+    qDebug() << "load cached registers:" << registers;
+    m_registers.clear();
+    for (QMap<int, QVariant>::ConstIterator i = registers.constBegin(); i != registers.constEnd(); i++)
+    {
+        m_registers.insert(static_cast<RegisterType>(i.key()), i.value());
+    }
+
+    deviceCache.close();
 }
 
 LaserDriver::~LaserDriver()
@@ -229,6 +251,18 @@ void LaserDriver::parseAndRefreshRegisters(QString &eventData)
         QVariant value = tokens[1];
         instance().m_registers.insert((RegisterType)addr, value);
     }
+
+    QFile deviceCache("dev_cache.bin");
+    if (!deviceCache.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qWarning() << "Can not create cache file!";
+        return;
+    }
+
+    QDataStream stream(&deviceCache);
+    stream << instance().m_registers;
+
+    deviceCache.close();
 }
 
 void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount)
@@ -474,9 +508,9 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllSysParamFromCard()
 {
     QList<int> params;
-    params << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
-        << 16 << 17 << 18 << 19 << 20 << 21 << 22 << 23 << 24 << 25 << 27 << 28 << 29 
-        << 30 << 31 << 32 << 34 << 35 << 36 << 38 << 39 << 40;
+    params << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
+        << 16 << 18 << 19 << 20 << 21 << 22 << 23 << 24 << 25 << 27 << 31 << 32 << 34 << 35 << 36 << 38 << 39 << 40;
+    //params << 2 ;
     return readSysParamFromCard(params);
 }
 

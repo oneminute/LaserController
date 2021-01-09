@@ -116,3 +116,5 @@ temp/
 tmp/
 
 iphist.dat
+
+dev_cache.bin

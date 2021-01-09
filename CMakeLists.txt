@@ -210,6 +210,7 @@ INSTALL(FILES
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.txt"
             "${CMAKE_SOURCE_DIR}/config.json"
+            "${CMAKE_SOURCE_DIR}/dev_cache.bin"
         DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 INSTALL(FILES 
