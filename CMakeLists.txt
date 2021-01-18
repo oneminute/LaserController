@@ -31,8 +31,8 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Eigen3 REQUIRED)
 find_package(Boost 1.66 COMPONENTS timer REQUIRED)
-find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL CONFIG REQUIRED)
-find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui REQUIRED QUIET)
+find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Test CONFIG REQUIRED)
+find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui videoio REQUIRED)
 find_package(OpenMP REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
@@ -168,7 +168,7 @@ ENDIF(MSVC)
 
 include_directories(${INCLUDE_DIRS})
 set(LINK_LIBRARIES 
-    Qt5::Widgets Qt5::Charts Qt5::OpenGL
+    Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Test
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
     ${ZLIB_LIBRARIES}
@@ -195,48 +195,8 @@ set(QM_FILES
     ${HEADER_FILES}
 )
 
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
-#add_subdirectory(test)
-
-INSTALL(TARGETS LaserController
-        DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime)
-
-# Convert windows style path to cmake style path(\ to /).
-file(TO_CMAKE_PATH "$ENV{WINDIR}" WIN_DIR )
-
-INSTALL(FILES 
-            ${WIN_DIR}/system32/MSVCP140.dll
-            ${WIN_DIR}/system32/VCRUNTIME140.dll
-            #${WIN_DIR}/system32/VCRUNTIME140_1.dll
-            ${WIN_DIR}/system32/CONCRT140.dll
-            "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
-            "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
-            "${CMAKE_SOURCE_DIR}/ReleaseNotes.txt"
-            "${CMAKE_SOURCE_DIR}/config.json"
-            "${CMAKE_SOURCE_DIR}/dev_cache.bin"
-        DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-INSTALL(FILES 
-            "${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.qm"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/translations)
-
-foreach(_lib IN LISTS OpenCV_LIBS)
-    INSTALL(FILES 
-                "${OpenCV_DIR}/../bin/${_lib}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.dll"
-            DESTINATION ${CMAKE_INSTALL_PREFIX})
-endforeach()
-
-get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
-get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
-message(QMAKE_EXECUTABLE=${QMAKE_EXECUTABLE})
-message(QT_BIN_DIR=${QT_BIN_DIR})
-INSTALL(CODE "
-        execute_process(
-            COMMAND \"${QT_BIN_DIR}/windeployqt.exe\"
-                    --dir ${CMAKE_INSTALL_PREFIX}
-                    --verbose 1
-                    --release
-                    --no-translations
-                    ${CMAKE_INSTALL_PREFIX}/LaserController.exe)
-        ")
+include(cmake_install_Debug.txt)
+include(cmake_install_Release.txt)
+include(cmake_install_RelWithDebInfo.txt)

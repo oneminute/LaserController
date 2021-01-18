@@ -1989,12 +1989,12 @@ Would you like to overwrite it?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="86"/>
+        <location filename="../src/main.cpp" line="111"/>
         <source>LaserController</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="87"/>
+        <location filename="../src/main.cpp" line="112"/>
         <source>Laser Controller</source>
         <translation type="unfinished"></translation>
     </message>

@@ -42,13 +42,14 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
     try
     {
         app->Visible = VARIANT_TRUE;
-        
+		qDebug() << "app visible:" << app->Visible;
         VGCore::IVGWindowPtr window = app->ActiveWindow;
         if (!window)
         {
             QMessageBox::warning(m_parentWnd, tr("Import CDR"), tr("No active document in CorelDRAW!"));
             return nullptr;
         }
+		qDebug() << "CDR Window active object:" << window;
 
         QWindow* cdrWindow = QWindow::fromWinId(window->Handle);
         Qt::WindowState windowState = (Qt::WindowState)((cdrWindow->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
@@ -56,7 +57,11 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         cdrWindow->show();
         cdrWindow->requestActivate();
         cdrWindow->deleteLater();
+
+		qDebug() << "cdr window object ptr:" << cdrWindow;
+
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
+		qDebug() << "cdr document ptr:" << doc;
         if (!doc)
         {
             QMessageBox::warning(m_parentWnd, tr("Import CDR"), tr("No active document in CorelDRAW!"));
@@ -65,14 +70,13 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 
         qDebug() << "selection count:" << doc->Selection()->Shapes->Count;
         VGCore::cdrExportRange range = VGCore::cdrExportRange::cdrCurrentPage;
-        if (doc->Selection()->Shapes->Count > 0)
+        if (doc->Selection() && doc->Selection()->Shapes->Count > 0)
         {
             range = VGCore::cdrExportRange::cdrSelection;
         }
 
         tmpSvgFilename = utils::createUUID() + ".svg";
         tmpSvgFilename = QDir::toNativeSeparators(tmpDir.absoluteFilePath(tmpSvgFilename));
-
         qDebug().noquote() << "export corel draw active document to" << tmpSvgFilename;
         
         VGCore::IVGStructExportOptionsPtr opt = app->CreateStructExportOptions();

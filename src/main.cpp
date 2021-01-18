@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QDataStream>
 #include <QTextStream>
+#include <QDateTime>
 
 //#define GLOG_NO_ABBREVIATED_SEVERITIES
 #define WIN32_LEAN_AND_MEAN
@@ -53,7 +54,6 @@ void initLog(char* argv)
 	{
 		rootDir.mkdir("log");
 	}
-    std::cout << argv << std::endl;
     google::InitGoogleLogging(argv);
     google::InstallFailureSignalHandler();
 
@@ -72,9 +72,34 @@ void initLog(char* argv)
     google::SetLogFilenameExtension("lc_");
 }
 
+void clearCrash()
+{
+	QFile crash("crash.bin");
+	if (crash.exists())
+	{
+		crash.remove();
+	}
+}
+
 void checkCrash()
 {
-
+	QFile crash("crash.bin");
+	if (crash.exists())
+	{
+		// last running with a crash.
+		qWarning() << "Found crash info.";
+		crash.open(QIODevice::ReadOnly);
+		QDataStream stream(&crash);
+		QDateTime datetime;
+		stream >> datetime;
+		qWarning() << "crashed launching at " << datetime;
+		crash.close();
+		clearCrash();
+	}
+	crash.open(QIODevice::WriteOnly);
+	QDataStream stream(&crash);
+	stream << QDateTime::currentDateTime();
+	crash.close();
 }
 
 int main(int argc, char *argv[])
@@ -88,6 +113,8 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("OneMinute");
     QApplication::setApplicationVersion(QString("%1.%2.%3.%4").arg(LC_VERSION_MAJOR).arg(LC_VERSION_MINOR).arg(LC_VERSION_BUILD).arg(LC_VERSION_REVISION));
     QApplication::setStyle(QStyleFactory::create("Fusion"));
+
+	checkCrash();
 
     initLog(argv[0]);
     qInstallMessageHandler(messageOutput);
@@ -127,5 +154,6 @@ int main(int argc, char *argv[])
     int ret = app.exec();
 
     StateController::stop();
+	clearCrash();
     return ret;
 }

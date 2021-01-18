@@ -22,8 +22,10 @@ DeviceSettingsDialog::DeviceSettingsDialog(QWidget* parent)
     m_ui->editSliderEngravingStartPowerRate->setMaximum(1000);
     m_ui->editSliderEngravingRunPowerRate->setMaximum(1000);
 
-    m_ui->editSliderEngravingRowSpacing->setMaximum(50);
-    m_ui->editSliderEngravingColumnSpacing->setMaximum(50);
+    m_ui->editSliderEngravingRowSpacing->setMinimum(1);
+    m_ui->editSliderEngravingRowSpacing->setMaximum(1000);
+    m_ui->editSliderEngravingColumnSpacing->setMinimum(0);
+    m_ui->editSliderEngravingColumnSpacing->setMaximum(1000);
 
     m_ui->editSliderMoveStartSpeed->setMaximum(600);
     m_ui->editSliderMoveRunSpeed->setMaximum(600);

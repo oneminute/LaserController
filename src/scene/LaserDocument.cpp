@@ -156,6 +156,7 @@ void LaserDocument::exportJSON(const QString& filename)
     QJsonObject jsonObj;
 
     QJsonObject laserDocumentInfo;
+	qDebug() << &LaserDriver::instance();
     laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
@@ -279,7 +280,8 @@ void LaserDocument::exportJSON(const QString& filename)
         return;
     }
 
-    saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
+    qint64 writtenBytes = saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
+	qDebug() << "written bytes:" << writtenBytes;
 
     if (!canvas.empty())
         cv::imwrite("tmp/canvas_test.png", canvas);
