@@ -69,9 +69,9 @@ public:
     int runSpeedPower() const;
     void setRunSpeedPower(int runSpeedPower);
 
-    void addItem(LaserPrimitive* item);
-    QList<LaserPrimitive*>& items();
-    void removeItem(LaserPrimitive* item);
+    void addPrimitive(LaserPrimitive* item);
+    QList<LaserPrimitive*>& primitives();
+    void removePrimitive(LaserPrimitive* item);
     bool isEmpty() const;
 
     QColor color() const;

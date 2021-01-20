@@ -44,7 +44,7 @@ void LaserLayerTableWidget::updateItems()
         {
             int row = rowCount();
             LaserLayer* layer = layers[i];
-            QList<LaserPrimitive*> laserItems = layer->items();
+            QList<LaserPrimitive*> laserItems = layer->primitives();
             if (laserItems.isEmpty())
                 continue;
             setRowCount(row + 1);
@@ -84,7 +84,7 @@ void LaserLayerTableWidget::updateItems()
             itemName->setTextAlignment(Qt::AlignCenter);
 
             QTableWidgetItem* itemCount = new QTableWidgetItem();
-            itemCount->setText(QString::number(layer->items().count()));
+            itemCount->setText(QString::number(layer->primitives().count()));
             itemCount->setTextAlignment(Qt::AlignCenter);
 
             QTableWidgetItem* itemSpeedPower = new QTableWidgetItem();

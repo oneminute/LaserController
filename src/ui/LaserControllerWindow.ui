@@ -264,6 +264,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QToolButton" name="toolButtonRemoveLayer">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="toolButtonMoveLayerUp">
          <property name="text">
           <string>...</string>
@@ -1870,6 +1877,9 @@
    </property>
   </action>
   <action name="actionMoveLayerDown">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Move Down</string>
    </property>

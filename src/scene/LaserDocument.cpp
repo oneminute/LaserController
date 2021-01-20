@@ -36,32 +36,32 @@ LaserDocument::~LaserDocument()
     close();
 }
 
-void LaserDocument::addItem(LaserPrimitive * item)
+void LaserDocument::addPrimitive(LaserPrimitive * item)
 {
     m_items.insert(item->objectName(), item);
 
     if (item->isShape())
     {
-        m_layers[1]->addItem(item);
+        m_layers[1]->addPrimitive(item);
     }
     else if (item->isBitmap())
     {
-        m_layers[0]->addItem(item);
+        m_layers[0]->addPrimitive(item);
     }
 
     updateLayersStructure();
 }
 
-void LaserDocument::addItem(LaserPrimitive * item, LaserLayer * layer)
+void LaserDocument::addPrimitive(LaserPrimitive * item, LaserLayer * layer)
 {
-    item->layer()->removeItem(item);
-    layer->addItem(item);
+    item->layer()->removePrimitive(item);
+    layer->addPrimitive(item);
     updateLayersStructure();
 }
 
-void LaserDocument::removeItem(LaserPrimitive * item)
+void LaserDocument::removePrimitive(LaserPrimitive * item)
 {
-    item->layer()->removeItem(item);
+    item->layer()->removePrimitive(item);
     m_items.remove(item->objectName());
     item->deleteLater();
 }
@@ -81,7 +81,7 @@ QRectF LaserDocument::pageBounds() const
     return QRectF(0, 0, m_pageInfo.width(), m_pageInfo.height());
 }
 
-QMap<QString, LaserPrimitive*> LaserDocument::items() const
+QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
 {
     return m_items;
 }
@@ -113,6 +113,16 @@ void LaserDocument::removeLayer(LaserLayer * layer)
     m_layers.removeOne(layer);
 
     updateLayersStructure();
+}
+
+LaserLayer * LaserDocument::defaultCuttingLayer() const
+{
+	return m_layers[1];
+}
+
+LaserLayer * LaserDocument::defaultEngravingLayer() const
+{
+	return m_layers[0];
 }
 
 QString LaserDocument::newLayerName() const
@@ -207,7 +217,7 @@ void LaserDocument::exportJSON(const QString& filename)
         layerObj["Params"] = paramObj;
 
         QJsonArray items;
-        QList<LaserPrimitive*> laserItems = layer->items();
+        QList<LaserPrimitive*> laserItems = layer->primitives();
         for (int li = 0; li < laserItems.size(); li++)
         {
             LaserPrimitive* laserItem = laserItems[li];

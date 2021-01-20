@@ -23,20 +23,22 @@ public:
     explicit LaserDocument(LaserScene* scene, QObject* parent = nullptr);
     ~LaserDocument();
 
-    void addItem(LaserPrimitive* item);
-    void addItem(LaserPrimitive* item, LaserLayer* layer);
-    void removeItem(LaserPrimitive* item);
+    void addPrimitive(LaserPrimitive* item);
+    void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
+    void removePrimitive(LaserPrimitive* item);
 
     PageInformation pageInformation() const;
     void setPageInformation(const PageInformation& page);
     QRectF pageBounds() const;
 
-    QMap<QString, LaserPrimitive*> items() const;
+    QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
 
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
+	LaserLayer* defaultCuttingLayer() const;
+	LaserLayer* defaultEngravingLayer() const;
 
     QString newLayerName() const;
 

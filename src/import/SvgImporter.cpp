@@ -169,7 +169,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setObjectName(node->nodeId());
 
-            ldoc->addItem(item);
+            ldoc->addPrimitive(item);
         }
     }
     ldoc->blockSignals(false);

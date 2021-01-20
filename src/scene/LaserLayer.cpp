@@ -147,7 +147,7 @@ int LaserLayer::runSpeedPower() const { return m_runSpeedPower; }
 
 void LaserLayer::setRunSpeedPower(int runSpeedPower) { m_runSpeedPower = runSpeedPower; }
 
-void LaserLayer::addItem(LaserPrimitive * item)
+void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     if (m_items.contains(item))
         return;
@@ -157,12 +157,12 @@ void LaserLayer::addItem(LaserPrimitive * item)
     m_doc->updateLayersStructure();
 }
 
-QList<LaserPrimitive*>& LaserLayer::items()
+QList<LaserPrimitive*>& LaserLayer::primitives()
 {
     return m_items;
 }
 
-void LaserLayer::removeItem(LaserPrimitive * item)
+void LaserLayer::removePrimitive(LaserPrimitive * item)
 {
     if (!m_items.contains(item))
         return;
@@ -203,7 +203,7 @@ void LaserLayer::onClicked()
     {
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
         {
-            scene->document()->addItem(primitive, this);
+            scene->document()->addPrimitive(primitive, this);
         }
 
         QList<LaserPrimitiveType> types;

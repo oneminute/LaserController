@@ -54,7 +54,7 @@ void LaserLayerTreeWidget::fillLayersTree(QList<LaserLayer*>& layers, const QStr
     for (int i = 0; i < layers.size(); i++)
     {
         LaserLayer* layer = layers[i];
-        QList<LaserPrimitive*> laserItems = layer->items();
+        QList<LaserPrimitive*> laserItems = layer->primitives();
         QTreeWidgetItem* layerWidgetItem = new QTreeWidgetItem((QTreeWidgetItem*)nullptr, 0);
         //layerWidgetItem->setText(0, "    ");
         layerWidgetItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
@@ -64,7 +64,7 @@ void LaserLayerTreeWidget::fillLayersTree(QList<LaserLayer*>& layers, const QStr
         layerWidgetItem->setText(1, type);
         layerWidgetItem->setText(2, layer->name());
         layerWidgetItem->setBackgroundColor(2, layer->color());
-        layerWidgetItem->setText(3, QString::number(layer->items().count()));
+        layerWidgetItem->setText(3, QString::number(layer->primitives().count()));
         layerWidgetItem->setData(0, Qt::UserRole, layer->objectName());
         //layerWidgetItem->setData(1, Qt::UserRole, layer->type());
         //for (int li = 0; li != laserItems.size(); li++)

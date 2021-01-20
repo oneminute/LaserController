@@ -33,7 +33,7 @@ void LaserScene::updateDocument(LaserDocument * doc)
 
     qDebug() << "page bounds:" << m_doc->pageBounds();
     m_background = addRect(m_doc->pageBounds(), QPen(Qt::gray, 0.2f, Qt::SolidLine), QBrush(Qt::white));
-    QMap<QString, LaserPrimitive*> items = doc->items();
+    QMap<QString, LaserPrimitive*> items = doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {
         this->addItem(i.value());
@@ -53,7 +53,7 @@ void LaserScene::clearDocument(bool delDoc)
 
 void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
-    m_doc->addItem(primitive);
+    m_doc->addPrimitive(primitive);
     addItem(primitive);
 }
 

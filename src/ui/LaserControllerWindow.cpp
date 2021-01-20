@@ -163,6 +163,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     
     m_ui->toolButtonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
     m_ui->toolButtonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
+	m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
 
     m_ui->editSliderLaserPower->setMinimum(0);
     m_ui->editSliderLaserPower->setMaximum(1000);
@@ -537,6 +538,48 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
     qDebug() << "removing layer.";
     QTableWidgetItem* item = m_ui->tableWidgetLayers->currentItem();
+	qDebug() << item->row() << item->column();
+	if (!item)
+	{
+		return;
+	}
+
+    item = m_ui->tableWidgetLayers->item(item->row(), 0);
+	int index = item->data(Qt::UserRole).toInt();
+	LaserLayer* layer = m_scene->document()->layers()[index];
+	if (layer == m_scene->document()->defaultCuttingLayer() || layer == m_scene->document()->defaultEngravingLayer())
+	{
+		QMessageBox::warning(this, tr("Remove Layer"), tr("You can not remove default layer. (Note: The first two layers are default layers, one for cutting and another for engraving."));
+		return;
+	}
+
+	QMessageBox::StandardButton button = QMessageBox::question(this, tr("Remove Layer"), 
+		tr("Do you want to remove all primitives belonged to this layer? If you choose 'Yes' all primitives in this layer will be deleted, otherwise they will be moved to the default layer."));
+	if (button == QMessageBox::Yes)
+	{
+        for (LaserPrimitive* primitive : layer->primitives())
+        {
+            m_scene->document()->removePrimitive(primitive);
+        }
+	}
+	else
+	{
+		if (layer->type() == LLT_ENGRAVING)
+		{
+			for (LaserPrimitive* primitive : layer->primitives())
+			{
+				m_scene->document()->addPrimitive(primitive, m_scene->document()->defaultEngravingLayer());
+			}
+		}
+		else if (layer->type() == LLT_CUTTING)
+		{
+			for (LaserPrimitive* primitive : layer->primitives())
+			{
+				m_scene->document()->addPrimitive(primitive, m_scene->document()->defaultCuttingLayer());
+			}
+		}
+	}
+	m_ui->tableWidgetLayers->updateItems();
 }
 
 void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int column)
@@ -566,7 +609,7 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     LaserLayer* layer = m_scene->document()->layers()[index];
     m_scene->blockSignals(true);
     m_scene->clearSelection();
-    for (LaserPrimitive* primitive : layer->items())
+    for (LaserPrimitive* primitive : layer->primitives())
     {
         primitive->setSelected(true);
     }
@@ -818,12 +861,13 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
 
 void LaserControllerWindow::onActionDeletePrimitive(bool checked)
 {
-    if (QMessageBox::Apply == QMessageBox::question(this, tr("Delete primitives?"), tr("Do you want to delete primitives to selected layer?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+    if (QMessageBox::Apply == QMessageBox::question(this, tr("Delete primitives?"), tr("Do you want to delete primitives selected?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
     {
         for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
         {
-            m_scene->document()->removeItem(primitive);
+            m_scene->document()->removePrimitive(primitive);
         }
+		m_ui->tableWidgetLayers->updateItems();
     }
 }
 
@@ -1645,9 +1689,23 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", true, documentPrimitiveTextState);
 	// end actionTextTool
 
-    // actionLoadJson
+    // actionRemoveLayer
+	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentIdleState);
+    // end actionRemoveLayer
 
-    // end actionLoadJson
+    // actionMoveLayerUp
+	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentIdleState);
+    // end actionMoveLayerUp
+
+    // actionMoveLayerDown
+	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentIdleState);
+    // end actionMoveLayerDown
 }
 
 void LaserControllerWindow::showEvent(QShowEvent * event)
