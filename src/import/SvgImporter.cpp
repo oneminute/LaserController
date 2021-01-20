@@ -11,6 +11,7 @@
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserDocument.h"
 #include "util/UnitUtils.h"
+#include "laser\LaserDriver.h"
 
 SvgImporter::SvgImporter(QWidget* parentWnd, QObject* parent)
     : Importer(parentWnd, parent)
@@ -28,18 +29,17 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     if (params.contains("parent_win"))
     {
         parent = params["parent_win"].value<QMainWindow*>();
-        parent->activateWindow();
-        parent->setFocus();
+		parent->activateWindow();
+		qDebug() << "is active window:" << parent->isActiveWindow();
     }
-    ImportSVGDialog dialog(parent);
-    if (dialog.exec() == QDialog::Rejected)
-        return nullptr;
 
     LaserDocument* ldoc = new LaserDocument(scene);
     QSvgTinyDocument* doc = QSvgTinyDocument::load(filename);
     QRectF viewBox = doc->viewBox();
     if (doc == nullptr)
     {
+		qWarning() << "Load SVG document failure!";
+		ldoc->deleteLater();
         return nullptr;
     }
     QSize svgSize = doc->size();
@@ -55,25 +55,19 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     SizeUnit docUnit;
     SizeUnit shapeUnit = SU_MM100;
 
-    if (dialog.pageUnitFromSVG())
-    {
-        docUnit = doc->sizeUnit();
-    }
-    else
-    {
-        docUnit = dialog.pageSizeUnit();
-    }
-
+	float width, height;
+	if (!LaserDriver::instance().getLayout(width, height))
+	{
+		qWarning() << "Read register layout size failure!";
+		ldoc->deleteLater();
+		return nullptr;
+	}
     PageInformation page;
-    page.setWidth(svgSize.width());
-    page.setHeight(svgSize.height());
+    page.setWidth(width);
+    page.setHeight(height);
     ldoc->setPageInformation(page);
     ldoc->blockSignals();
 
-    if (!dialog.shapeUnitFromSVG())
-    {
-        shapeUnit = dialog.shapeSizeUnit();
-    }
     qDebug() << "shapeUnit:" << shapeUnit;
 
     QList<QSvgNode*> nodes = doc->renderers();

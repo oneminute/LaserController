@@ -59,7 +59,6 @@ get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
 INSTALL(CODE "
 	execute_process(
 		COMMAND \"${QT_BIN_DIR}/windeployqt.exe\"
-		#COMMAND Qt5::windeployqt
 			--dir ${CMAKE_INSTALL_PREFIX}_Release
 			--verbose 1
 			--release

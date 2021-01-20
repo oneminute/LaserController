@@ -20,13 +20,13 @@
             "defaultValue": 30,
             "name": "ColorButtonHeight",
             "type": 0,
-            "value": 0
+            "value": 30
         },
         "ColorButtonWidth": {
             "defaultValue": 30,
             "name": "ColorButtonWidth",
             "type": 0,
-            "value": 0
+            "value": 30
         },
         "OperationButtonHeight": {
             "defaultValue": 60,

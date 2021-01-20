@@ -3,6 +3,8 @@
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 #include "scene/LaserDocument.h"
+#include "VGCoreAuto.tlh"
+#include <ObjIdl.h>
 
 #include <system_error>
 #include <QDir>
@@ -12,7 +14,7 @@
 #include <QWidget>
 #include <QWindow>
 
-#import "libid:95E23C91-BC5A-49F3-8CD1-1FC515597048" version("12.0") \
+//#import "libid:95E23C91-BC5A-49F3-8CD1-1FC515597048" version("12.0") \
       rename("GetCommandLine", "VGGetCommandLine") \
       rename("CopyFile", "VGCopyFile") \
       rename("FindWindow", "VGFindWindow")
@@ -32,39 +34,76 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     if (FAILED(hr))
     {
-        QMessageBox::warning(m_parentWnd, tr("Import failure"), tr("Cannot load cdr x8's dll."));
+        QMessageBox::warning(m_parentWnd, tr("Import failure"), tr("Cannot initialize COM."));
+		CoUninitialize();
         return nullptr;
     }
-    VGCore::IVGApplicationPtr app(L"CorelDRAW.Application.18");
-    QDir tmpDir(QCoreApplication::applicationDirPath() + "\\tmp");
-    QString tmpSvgFilename;
+
+	CLSID clsid;
+	hr = CLSIDFromProgID(L"CorelDRAW.Application.18", &clsid);
+
+	QDir tmpDir(QCoreApplication::applicationDirPath() + "\\tmp");
+	QString tmpSvgFilename;
     bool success = true;
     try
     {
+		VGCore::IVGApplicationPtr app(L"CorelDRAW.Application.18");
+		if (!app)
+		{
+			QMessageBox::warning(m_parentWnd, tr("Import failure"), tr("Cannot load cdr x8's dll."));
+			CoUninitialize();
+			return nullptr;
+		}
+
+		IUnknown* pUnk = NULL;
+		app.QueryInterface(IID_IUnknown, (void**)&pUnk);
+
+
         app->Visible = VARIANT_TRUE;
 		qDebug() << "app visible:" << app->Visible;
+		VGCore::IVGWindowsPtr wnds = app->Windows;
+		qDebug() << "cdr windows count:" << wnds->Count;
+		for (int i = 1; i <= wnds->Count; i++)
+		{
+			VGCore::IVGWindowPtr wnd = wnds->Item[i];
+			qDebug() << "cdr window's handle" << i << hex << showbase << wnd->Handle;
+		}
+
         VGCore::IVGWindowPtr window = app->ActiveWindow;
         if (!window)
         {
             QMessageBox::warning(m_parentWnd, tr("Import CDR"), tr("No active document in CorelDRAW!"));
+			CoUninitialize();
             return nullptr;
         }
 		qDebug() << "CDR Window active object:" << window;
+		qDebug() << "CDR window handle:" << hex << showbase << window->GetHandle();
 
-        QWindow* cdrWindow = QWindow::fromWinId(window->Handle);
-        Qt::WindowState windowState = (Qt::WindowState)((cdrWindow->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-        cdrWindow->setWindowState(windowState);
-        cdrWindow->show();
-        cdrWindow->requestActivate();
-        cdrWindow->deleteLater();
+		VGCore::cdrWindowState wndState = window->WindowState;
+		qDebug() << "cdr window is active?" << window->Active;
+		qDebug() << "cdr window state:" << wndState;
+		window->Activate();
 
-		qDebug() << "cdr window object ptr:" << cdrWindow;
+		HWND hWnd = (HWND) window->Handle;
+		while (hWnd)
+		{
+			HWND parent = GetParent(hWnd);
+			if (!parent)
+				break;
+			//qDebug() << hex << showbase << parent;
+			hWnd = parent;
+		}
+		qDebug() << "cdr top window's handle:" << hex << showbase << hWnd;
+		ShowWindow(hWnd, SW_RESTORE);
+
+		//qDebug() << "cdr window object ptr:" << cdrWindow;
 
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
 		qDebug() << "cdr document ptr:" << doc;
         if (!doc)
         {
             QMessageBox::warning(m_parentWnd, tr("Import CDR"), tr("No active document in CorelDRAW!"));
+			CoUninitialize();
             return nullptr;
         }
 
@@ -94,12 +133,17 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         pal->DitherType = VGCore::cdrDitherNone;
 
         VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, range, opt, pal);
+		/*hr = filter->Finish();
+		if (FAILED(hr))
+		{
+			qDebug() << hr;
+			QString errorMessage = QString::fromLocal8Bit(std::system_category().message(hr).c_str());
+			qWarning() << errorMessage;
+		}*/
         if (filter->HasDialog)
         {
-            int parentWinId = 0;
-            if (params.contains("parent_winid"))
-                parentWinId = params["parent_winid"].toInt();
-            if (filter->ShowDialog(parentWinId))
+            //int parentWinId = 0;
+            if (filter->ShowDialog((long)hWnd))
             {
                 hr = filter->Finish();
                 if (FAILED(hr))
@@ -109,12 +153,17 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
                     qWarning() << errorMessage;
                 }
             }
+			else
+			{
+				success = false;
+			}
         }
     }
     catch (_com_error& ex)
     {
         QString errorMessage = QString::fromLocal8Bit(std::system_category().message(ex.Error()).c_str());
         qDebug() << errorMessage;
+		QMessageBox::warning(m_parentWnd, tr("Import Failure"), tr("Can not import from cdr! Please confirm that cdr has been installed."));
         success = false;
     }
 
@@ -134,7 +183,6 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
             doc->open();
         }
     }
-    //app->Release();
     CoUninitialize();
     return doc;
 }

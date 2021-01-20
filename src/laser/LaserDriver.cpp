@@ -328,12 +328,12 @@ bool LaserDriver::load()
     m_fnUnInitLib = (FN_VOID_VOID)m_library.resolve("UnInitLib");
     m_fnProgressCallBack = (FNProgressCallBack)m_library.resolve("ProgressCallBack");
     m_fnSysMessageCallBack = (FNSysMessageCallBack)m_library.resolve("SysMessageCallBack");
-    m_fnProcDataProgressCallBack = (FNProcDataProgressCallBack)m_library.resolve("ProcDataProgressCallBack");
+    //m_fnProcDataProgressCallBack = (FNProcDataProgressCallBack)m_library.resolve("ProcDataProgressCallBack");
     m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
 
     m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
     m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
-    m_fnProcDataProgressCallBack(LaserDriver::ProcDataProgressCallBackHandler);
+    //m_fnProcDataProgressCallBack(LaserDriver::ProcDataProgressCallBackHandler);
 
     m_fnInitComPort = (FN_INT_INT)m_library.resolve("InitComPort");
     m_fnUnInitComPort = (FN_INT_VOID)m_library.resolve("UnInitComPort");

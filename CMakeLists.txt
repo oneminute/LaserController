@@ -51,6 +51,7 @@ set(INCLUDE_DIRS
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
     src/widget/LRWidgets
+	third/cdr/include
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)
@@ -98,6 +99,9 @@ set(OTHER_FILES
     config.json
     README.md
     ReleaseNotes.txt
+	cmake_install_debug.txt
+	cmake_install_release.txt
+	cmake_install_relwithdebinfo.txt
     .gitignore
 )
 
@@ -180,7 +184,7 @@ set(LINK_LIBRARIES
 if(ANDROID)
   add_library(LaserController SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${TS_FILES})
 else()
-  add_executable(LaserController ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${TS_FILES})
+  add_executable(LaserController ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES})
 endif()
 
 target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
