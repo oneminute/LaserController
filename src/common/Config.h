@@ -36,21 +36,42 @@ enum ConfigItemType
     public: \
         static int PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toInt(); } \
         static int default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toInt(); } \
-        static void setPREFIX##NAME(int value) { items[#PREFIX"/"#NAME].value = value; items[#PREFIX"/"#NAME].modified = true; }
+        static void set##PREFIX##NAME(int value) \
+		{ \
+			if (items[#PREFIX"/"#NAME].value != value) \
+			{ \
+				items[#PREFIX"/"#NAME].value = value; \
+				items[#PREFIX"/"#NAME].modified = true; \
+			} \
+		}
 
 #define CONFIG_ITEM_BOOL(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
     DUMMY_STRUCT(PREFIX, NAME, CIT_BOOL, DEFAULT_VALUE, DESCRIPTION) \
     public: \
         static bool PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toBool(); } \
         static bool default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toBool(); } \
-        static void setPREFIX##NAME(bool value) { items[#PREFIX"/"#NAME].value = value; items[#PREFIX"/"#NAME].modified = true; }
+        static void set##PREFIX##NAME(bool value) \
+		{ \
+			if (items[#PREFIX"/"#NAME].value != value) \
+			{ \
+				items[#PREFIX"/"#NAME].value = value; \
+				items[#PREFIX"/"#NAME].modified = true; \
+			} \
+		}
 
 #define CONFIG_ITEM_STRING(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
     DUMMY_STRUCT(PREFIX, NAME, CIT_STRING, DEFAULT_VALUE, DESCRIPTION) \
     public: \
         static QString PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toString(); } \
         static QString default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toString(); } \
-        static void setPREFIX##NAME(const QString& value) { items[#PREFIX"/"#NAME].value = value; items[#PREFIX"/"#NAME].modified = true; }
+        static void set##PREFIX##NAME(const QString& value) \
+		{ \
+			if (items[#PREFIX"/"#NAME].value != value) \
+			{ \
+				items[#PREFIX"/"#NAME].value = value; \
+				items[#PREFIX"/"#NAME].modified = true; \
+			} \
+		}
 
 class Config
 {
@@ -98,6 +119,21 @@ public:
 
     CONFIG_ITEM_INT(UI, ColorButtonWidth, 30, "Width of the color buttons.")
     CONFIG_ITEM_INT(UI, ColorButtonHeight, 30, "Height of the color buttons.")
+
+	CONFIG_ITEM_INT(CuttingLayer, MinSpeed, 15, "Min speed for cutting layers.")
+	CONFIG_ITEM_INT(CuttingLayer, RunSpeed, 60, "Run speed for cutting layers.")
+	CONFIG_ITEM_INT(CuttingLayer, LaserPower, 80, "Laser power for cutting layers.")
+	CONFIG_ITEM_INT(CuttingLayer, MinSpeedPower, 700, "Min speed power for cutting layers.")
+	CONFIG_ITEM_INT(CuttingLayer, RunSpeedPower, 1000, "Run speed power for cutting layers.")
+
+	CONFIG_ITEM_INT(EngravingLayer, MinSpeed, 60, "Min speed for engraving layers.")
+	CONFIG_ITEM_INT(EngravingLayer, RunSpeed, 300, "Run speed for engraving layers.")
+	CONFIG_ITEM_INT(EngravingLayer, LaserPower, 115, "Laser power for engraving layers.")
+	CONFIG_ITEM_INT(EngravingLayer, MinSpeedPower, 0, "Min speed power for engraving layers.")
+	CONFIG_ITEM_INT(EngravingLayer, RunSpeedPower, 900, "Run speed power for engraving layers.")
+	CONFIG_ITEM_BOOL(EngravingLayer, UseHalftone, true, "Use halftone algorithm when processing bitmaps.")
+	CONFIG_ITEM_INT(EngravingLayer, LPI, 600, "Lines per inch.")
+	CONFIG_ITEM_INT(EngravingLayer, DPI, 600, "Dots per inch.")
 
 private:
     Config();

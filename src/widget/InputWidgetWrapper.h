@@ -34,7 +34,7 @@ public:
         WT_EditSlider
     };
 
-    explicit InputWidgetWrapper(QWidget* widget, Config::ConfigItem* configItem, QLabel* labelName, QLabel* labelDesc);
+    explicit InputWidgetWrapper(QWidget* widget, Config::ConfigItem* configItem, QLabel* labelName = nullptr, QLabel* labelDesc = nullptr);
     virtual ~InputWidgetWrapper();
 
     void updateConfigItem();

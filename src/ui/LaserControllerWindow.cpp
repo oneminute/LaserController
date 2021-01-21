@@ -538,7 +538,6 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 {
     qDebug() << "removing layer.";
     QTableWidgetItem* item = m_ui->tableWidgetLayers->currentItem();
-	qDebug() << item->row() << item->column();
 	if (!item)
 	{
 		return;
@@ -547,22 +546,29 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
     item = m_ui->tableWidgetLayers->item(item->row(), 0);
 	int index = item->data(Qt::UserRole).toInt();
 	LaserLayer* layer = m_scene->document()->layers()[index];
-	if (layer == m_scene->document()->defaultCuttingLayer() || layer == m_scene->document()->defaultEngravingLayer())
+	if (layer->isDefault())
 	{
-		QMessageBox::warning(this, tr("Remove Layer"), tr("You can not remove default layer. (Note: The first two layers are default layers, one for cutting and another for engraving."));
+		QMessageBox::warning(this, tr("Remove Layer"), tr("You can not remove default layer. (Note: The first two layers are default layers, one for cutting and another for engraving.)"));
 		return;
 	}
 
-	QMessageBox::StandardButton button = QMessageBox::question(this, tr("Remove Layer"), 
-		tr("Do you want to remove all primitives belonged to this layer? If you choose 'Yes' all primitives in this layer will be deleted, otherwise they will be moved to the default layer."));
-	if (button == QMessageBox::Yes)
+	QMessageBox msgBox(this);
+	msgBox.setWindowTitle(tr("Remove Layer"));
+	msgBox.setText(tr("You are about deleting selected layer. Do you want to delete all primitives belonged to this layer or move them to default layer?"));
+	msgBox.setInformativeText(tr("If you click 'Delete', all primitives in this layer will be deleted. \nIf you click 'Move', they will be moved to the default layer. \nIf you click 'Cancel', do nothing."));
+	msgBox.setIcon(QMessageBox::Icon::Question);
+	QPushButton* deleteButton = msgBox.addButton(tr("Delete"), QMessageBox::ActionRole);
+	QPushButton* moveButton = msgBox.addButton(tr("Move"), QMessageBox::ActionRole);
+	QPushButton* cancelButton = msgBox.addButton(tr("Cancel"), QMessageBox::RejectRole);
+	msgBox.exec();
+	if (msgBox.clickedButton() == deleteButton)
 	{
         for (LaserPrimitive* primitive : layer->primitives())
         {
             m_scene->document()->removePrimitive(primitive);
         }
 	}
-	else
+	else if (msgBox.clickedButton() == moveButton)
 	{
 		if (layer->type() == LLT_ENGRAVING)
 		{

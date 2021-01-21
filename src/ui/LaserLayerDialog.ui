@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>618</width>
-    <height>535</height>
+    <width>698</width>
+    <height>483</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
      </property>
      <layout class="QFormLayout" name="formLayout">
       <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
       <property name="formAlignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -86,7 +86,7 @@
          <string>Layer Name</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -100,55 +100,67 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Min Speed</string>
-        </property>
-       </widget>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxCutting">
+     <property name="title">
+      <string>Cutting</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="labelAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <item row="0" column="1">
+       <widget class="EditSlider" name="editSliderCuttingMinSpeed" native="true"/>
       </item>
-      <item row="3" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Run Speed</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="1" column="1">
+       <widget class="EditSlider" name="editSliderCuttingRunSpeed" native="true"/>
+      </item>
+      <item row="2" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>Laser Power</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="2" column="1">
+       <widget class="EditSlider" name="editSliderCuttingLaserPower" native="true"/>
+      </item>
+      <item row="3" column="0">
        <widget class="QLabel" name="label_14">
         <property name="text">
          <string>Min Speed Power</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="3" column="1">
+       <widget class="EditSlider" name="editSliderCuttingMinSpeedPower" native="true"/>
+      </item>
+      <item row="4" column="0">
        <widget class="QLabel" name="label_15">
         <property name="text">
          <string>Run Speed Power</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="EditSlider" name="editSliderMinSpeed" native="true"/>
-      </item>
-      <item row="3" column="1">
-       <widget class="EditSlider" name="editSliderRunSpeed" native="true"/>
-      </item>
       <item row="4" column="1">
-       <widget class="EditSlider" name="editSliderLaserPower" native="true"/>
+       <widget class="EditSlider" name="editSliderCuttingRunSpeedPower" native="true"/>
       </item>
-      <item row="5" column="1">
-       <widget class="EditSlider" name="editSliderMinSpeedPower" native="true"/>
-      </item>
-      <item row="6" column="1">
-       <widget class="EditSlider" name="editSliderRunSpeedPower" native="true"/>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Min Speed</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -158,135 +170,89 @@
      <property name="title">
       <string>Engraving</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="formAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
+     <layout class="QFormLayout" name="formLayout_3">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Engraving Forward</string>
+         <string>Min Speed</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QCheckBox" name="checkBoxEngravingForward">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Engraving Style</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QRadioButton" name="radioButtonByRow">
-          <property name="text">
-           <string>By Row</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonByColumn">
-          <property name="text">
-           <string>By Column</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+       <widget class="EditSlider" name="editSliderEngravingMinSpeed" native="true"/>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Line Spacing</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>Column Spacing</string>
+         <string>Run Speed</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="EditSlider" name="editSliderLineSpacing" native="true"/>
+       <widget class="EditSlider" name="editSliderEngravingRunSpeed" native="true"/>
       </item>
-      <item row="3" column="1">
-       <widget class="EditSlider" name="editSliderColumnSpacing" native="true"/>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Laser Power</string>
+        </property>
+       </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBoxBitmap">
-     <property name="title">
-      <string>Bitmap</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_3">
-      <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <item row="0" column="0">
+      <item row="4" column="1">
+       <widget class="EditSlider" name="editSliderEngravingLaserPower" native="true"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Min Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="EditSlider" name="editSliderEngravingMinSpeedPower" native="true"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Run Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="EditSlider" name="editSliderEngravingRunSpeedPower" native="true"/>
+      </item>
+      <item row="10" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
          <string>Use Halftone?</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="10" column="1">
        <widget class="QCheckBox" name="checkBoxUseHalftone">
         <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="11" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>LPI</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="11" column="1">
        <widget class="EditSlider" name="editSliderLPI" native="true"/>
       </item>
-      <item row="2" column="0">
+      <item row="13" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>DPI</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="13" column="1">
        <widget class="EditSlider" name="editSliderDPI" native="true"/>
       </item>
      </layout>
@@ -298,7 +264,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::Reset|QDialogButtonBox::RestoreDefaults|QDialogButtonBox::Save</set>
      </property>
     </widget>
    </item>

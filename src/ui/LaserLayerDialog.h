@@ -9,6 +9,8 @@
 class QCloseEvent;
 class LaserLayer;
 class LaserDocument;
+class InputWidgetWrapper;
+class QAbstractButton;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserLayerDialog; }
@@ -26,11 +28,9 @@ public:
 private:
     void initUi();
 
-    void initCuttingParameters();
+    void resetParameters();
 
-    void initEngravingParameters();
-
-    void initBothParameters();
+	void restoreParameters();
 
 protected:
 
@@ -41,11 +41,14 @@ protected slots:
     void onEngravingToggled(bool checked);
     void onBothToggled(bool checked);
 
+	void onButtonClicked(QAbstractButton *button);
+
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;
     LaserDocument* m_doc;
     LaserLayer* m_layer;
     LaserLayerType m_type;
+    QList<InputWidgetWrapper*> m_wrappers;
 };
 
 #endif // LASERLAYERDIALOG_H

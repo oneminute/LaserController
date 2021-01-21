@@ -312,6 +312,9 @@ void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
 
 void InputWidgetWrapper::setValue(const QVariant & value)
 {
+	if (!m_labelName)
+		return;
+
     QPalette::ColorRole role = m_labelName->foregroundRole();
     QPalette palette = m_labelName->palette();
 

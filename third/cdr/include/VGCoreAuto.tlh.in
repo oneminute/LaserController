@@ -35165,7 +35165,7 @@ IVGView : IDispatch
 // Function implementation mapping
 //
 
-#pragma start_map_region("D:\LaserController\LaserController\third\cdr\include\VGCoreAuto.tli")
+#pragma start_map_region("@VG_CORE_AUTO_TLI@")
 __declspec(implementation_key(1)) HRESULT ICorelImportFilter::Reset ( );
 __declspec(implementation_key(2)) HRESULT ICorelImportFilter::Finish ( );
 __declspec(implementation_key(3)) VARIANT_BOOL ICorelImportFilter::GetHasDialog ( );

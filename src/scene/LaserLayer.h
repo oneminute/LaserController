@@ -18,7 +18,7 @@ class LaserLayer : public QObject
 {
     Q_OBJECT
 public:
-    explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document);
+    explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault = false);
     virtual ~LaserLayer();
 
     bool removable() const { return m_removable; }
@@ -101,6 +101,8 @@ public:
     bool useHalftone() const { return m_useHalftone; }
     void setUseHalftone(bool value) { m_useHalftone = value; }
 
+	bool isDefault() const { return m_isDefault; }
+
 protected:
     void onClicked();
 
@@ -127,7 +129,6 @@ protected:
     // bitmap fields
     int m_lpi;
     int m_dpi;
-    //qreal m_nonlinearCoefficient;
     int m_row;
     bool m_useHalftone;
 
@@ -136,6 +137,7 @@ protected:
 
     bool m_exportable;
     bool m_visible;
+	bool m_isDefault;
 
     QList<LaserPrimitive*> m_items;
     Q_DISABLE_COPY(LaserLayer)

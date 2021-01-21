@@ -7,8 +7,9 @@
 #include "LaserPrimitive.h"
 #include "LaserScene.h"
 #include "widget/LayerButton.h"
+#include "common/Config.h"
 
-LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document)
+LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
     : QObject(document)
     , m_removable(true)
     , m_type(type)
@@ -32,6 +33,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_visible(true)
     , m_row(-1)
     , m_useHalftone(true)
+	, m_isDefault(isDefault)
 {
     Q_ASSERT(document);
     setParent(document);
@@ -39,20 +41,23 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
 
     if (m_type == LLT_ENGRAVING)
     {
-        m_minSpeed = 60;
-        m_runSpeed = 300;
-        m_laserPower = 115;
-        m_minSpeedPower = 0;
-        m_runSpeedPower = 900;
+        m_minSpeed = Config::EngravingLayerMinSpeed();
+        m_runSpeed = Config::EngravingLayerRunSpeed();
+        m_laserPower = Config::EngravingLayerLaserPower();
+        m_minSpeedPower = Config::EngravingLayerMinSpeedPower();
+        m_runSpeedPower = Config::EngravingLayerRunSpeedPower();
     }
     else if (m_type == LLT_CUTTING)
     {
-        m_minSpeed = 15;
-        m_runSpeed = 60;
-        m_laserPower = 80;
-        m_minSpeedPower = 700;
-        m_runSpeedPower = 1000;
+        m_minSpeed = Config::CuttingLayerMinSpeed();
+        m_runSpeed = Config::CuttingLayerRunSpeed();
+        m_laserPower = Config::CuttingLayerLaserPower();
+        m_minSpeedPower = Config::CuttingLayerMinSpeedPower();
+        m_runSpeedPower = Config::CuttingLayerRunSpeedPower();
     }
+	m_useHalftone = Config::EngravingLayerUseHalftone();
+	m_lpi = Config::EngravingLayerLPI();
+	m_dpi = Config::EngravingLayerDPI();
 }
 
 LaserLayer::~LaserLayer()

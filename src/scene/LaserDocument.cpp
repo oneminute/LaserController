@@ -350,11 +350,11 @@ void LaserDocument::close()
 void LaserDocument::init()
 {
     QString layerName = newLayerName();
-    LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
+    LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
     addLayer(layer);
 
     layerName = newLayerName();
-    layer = new LaserLayer(layerName, LLT_CUTTING, this);
+    layer = new LaserLayer(layerName, LLT_CUTTING, this, true);
     addLayer(layer);
 
     for (int i = 2; i < Config::LayersMaxLayersCount(); i++)

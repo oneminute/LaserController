@@ -3,7 +3,7 @@
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 #include "scene/LaserDocument.h"
-#include "VGCoreAuto.tlh"
+#include <VGCoreAuto.tlh>
 #include <ObjIdl.h>
 
 #include <system_error>
@@ -94,9 +94,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 			hWnd = parent;
 		}
 		qDebug() << "cdr top window's handle:" << hex << showbase << hWnd;
-		ShowWindow(hWnd, SW_RESTORE);
-
-		//qDebug() << "cdr window object ptr:" << cdrWindow;
+		ShowWindow(hWnd, SW_HIDE);
 
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
 		qDebug() << "cdr document ptr:" << doc;
@@ -143,7 +141,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         if (filter->HasDialog)
         {
             //int parentWinId = 0;
-            if (filter->ShowDialog((long)hWnd))
+            if (filter->ShowDialog(m_parentWnd->winId()))
             {
                 hr = filter->Finish();
                 if (FAILED(hr))

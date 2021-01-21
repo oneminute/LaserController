@@ -39,6 +39,8 @@ find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
 
 set(TS_FILES translations/LaserController_zh_CN.ts)
+set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
+configure_file(${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tlh.in VGCoreAuto.tlh)
 
 add_subdirectory(src/widget/LRWidgets)
 
@@ -51,7 +53,7 @@ set(INCLUDE_DIRS
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
     src/widget/LRWidgets
-	third/cdr/include
+	${PROJECT_BINARY_DIR}
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)
@@ -102,6 +104,7 @@ set(OTHER_FILES
 	cmake_install_debug.txt
 	cmake_install_release.txt
 	cmake_install_relwithdebinfo.txt
+	third/cdr/include/VGCoreAuto.tlh.in
     .gitignore
 )
 
