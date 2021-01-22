@@ -390,7 +390,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 LaserControllerWindow::~LaserControllerWindow()
 {
-    //m_ui->tableWidgetLayers->clearSelection();
 }
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)

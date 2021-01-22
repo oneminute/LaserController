@@ -3242,7 +3242,6 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
     QString viewBoxStr = attributes.value(QLatin1String("viewBox")).toString();
 
     SizeUnit type = SU_PX; // FIXME: is the default correct?
-    node->setSizeUnit(type);
     qreal width = 0;
     if (!widthStr.isEmpty()) {
         width = parseLength(widthStr, type, handler);
@@ -3257,6 +3256,7 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
             //height = convertToPixels(height, false, type);
         node->setHeight(int(height), type == SU_PERCENT);
     }
+    node->setSizeUnit(type);
 
     QStringList viewBoxValues;
     if (!viewBoxStr.isEmpty()) {

@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <Qt>
 #include <QDebug>
 
 enum SizeUnit {
@@ -124,6 +125,23 @@ enum QUADRANT
     QUADRANT_3 = 3,
     QUADRANT_TL = 4,
     QUADRANT_4 = 4
+};
+
+class Global
+{
+public:
+	static int dpiX;
+	static int dpiY;
+	static SizeUnit unit;
+
+    static int mm2PixelsX(float mm);
+    static int mm2PixelsY(float mm);
+    static float pixels2mmX(int pixels);
+    static float pixels2mmY(int pixels);
+
+	static float convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
+	static float convertToMM(SizeUnit from, float num, Qt::Orientation orientation = Qt::Horizontal);
+	static float convertFromMM(SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
 };
 
 struct FillStyleAndPixelsCount

@@ -31,7 +31,6 @@ public:
     ~LaserViewer();
 
     qreal zoomFactor() const;
-	
 
 private:
     void init();

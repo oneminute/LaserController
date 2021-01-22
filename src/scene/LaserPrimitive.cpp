@@ -60,7 +60,6 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
 
-    // �������
     QRectF bounds = boundingRect();
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
@@ -78,7 +77,6 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         painter->drawRect(bounds);
     }
     
-    // ����ͼԪ
     QColor color = Qt::blue;
     if (m_layer)
     {

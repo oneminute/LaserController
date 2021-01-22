@@ -45,6 +45,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 	QDir tmpDir(QCoreApplication::applicationDirPath() + "\\tmp");
 	QString tmpSvgFilename;
     bool success = true;
+	HWND hWnd = 0;
     try
     {
 		VGCore::IVGApplicationPtr app(L"CorelDRAW.Application.18");
@@ -57,7 +58,6 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 
 		IUnknown* pUnk = NULL;
 		app.QueryInterface(IID_IUnknown, (void**)&pUnk);
-
 
         app->Visible = VARIANT_TRUE;
 		qDebug() << "app visible:" << app->Visible;
@@ -84,17 +84,16 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 		qDebug() << "cdr window state:" << wndState;
 		window->Activate();
 
-		HWND hWnd = (HWND) window->Handle;
+		hWnd = (HWND) window->Handle;
 		while (hWnd)
 		{
 			HWND parent = GetParent(hWnd);
 			if (!parent)
 				break;
-			//qDebug() << hex << showbase << parent;
 			hWnd = parent;
 		}
 		qDebug() << "cdr top window's handle:" << hex << showbase << hWnd;
-		ShowWindow(hWnd, SW_HIDE);
+		ShowWindow(hWnd, SW_SHOWMINIMIZED);
 
         VGCore::IVGDocumentPtr doc = app->ActiveDocument;
 		qDebug() << "cdr document ptr:" << doc;
@@ -131,16 +130,9 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         pal->DitherType = VGCore::cdrDitherNone;
 
         VGCore::ICorelExportFilterPtr filter = doc->ExportEx(typeUtils::qStringToBstr(tmpSvgFilename), VGCore::cdrSVG, range, opt, pal);
-		/*hr = filter->Finish();
-		if (FAILED(hr))
-		{
-			qDebug() << hr;
-			QString errorMessage = QString::fromLocal8Bit(std::system_category().message(hr).c_str());
-			qWarning() << errorMessage;
-		}*/
+		
         if (filter->HasDialog)
         {
-            //int parentWinId = 0;
             if (filter->ShowDialog(m_parentWnd->winId()))
             {
                 hr = filter->Finish();
@@ -164,6 +156,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 		QMessageBox::warning(m_parentWnd, tr("Import Failure"), tr("Can not import from cdr! Please confirm that cdr has been installed."));
         success = false;
     }
+	ShowWindow(hWnd, SW_RESTORE);
 
     LaserDocument* doc = nullptr;
     if (success)

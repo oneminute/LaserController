@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
     qDebug() << "product name:" << QApplication::applicationName() << ", version:" << QApplication::applicationVersion();
 
     Config::load();
+	Global::unit = static_cast<SizeUnit>(Config::GeneralUnit());
 
     QTranslator translator;
     QLocale locale(QLocale::Chinese);

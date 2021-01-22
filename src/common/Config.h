@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "common/common.h"
+
 #include <QObject>
 #include <QString>
 #include <QVariant>
@@ -107,6 +109,7 @@ public:
     };
 
     CONFIG_ITEM_STRING(General, Language, "English", "Language for both UI and Business.")
+	CONFIG_ITEM_INT(General, Unit, (int)SU_MM, "Unit using global.")
 
     CONFIG_ITEM_INT(Layers, MaxLayersCount, 16, "Max layers count.")
 
