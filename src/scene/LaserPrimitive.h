@@ -98,17 +98,16 @@ struct SliceGroup
     bool isEmpty() const { return slices.isEmpty(); }
 };
 
+class LaserPrimitivePrivate;
 class LaserPrimitive : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    LaserPrimitive(LaserDocument* doc = nullptr, LaserPrimitiveType type = LPT_SHAPE, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc = nullptr, LaserPrimitiveType type = LPT_SHAPE);
     virtual ~LaserPrimitive();
 
-    LaserDocument* document() const { return m_doc; }
-    SizeUnit unit() const { return m_unit; }
-    QTransform extraTransform() { return m_transform; }
-    void setTransform(const QTransform& transform) { m_transform = transform; }
+    LaserDocument* document() const;
+
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
     virtual QRectF boundingRect() const override;
@@ -119,45 +118,36 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return std::vector<cv::Point2f>(); }
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
 
-    qreal unitToMM() const;
+    LaserPrimitiveType primitiveType() const;
+    QString typeName() const;
+    QString typeLatinName() const;
+    bool isShape() const;
+    bool isBitmap() const;
 
-    LaserPrimitiveType laserItemType() const { return m_type; }
-    QString typeName();
-    QString typeLatinName();
-    bool isShape() const { return (int)m_type <= (int)LPT_SHAPE; }
-    bool isBitmap() const { return m_type == LPT_BITMAP; }
+    QString name() const;
+    void setName(const QString& name);
 
-    QString name() const { return m_name; }
-    void setName(const QString& name) { m_name = name; }
-
-    LaserLayer* layer() const { return m_layer; }
-    void setLayer(LaserLayer* layer) { m_layer = layer; }
+    LaserLayer* layer() const;
+    void setLayer(LaserLayer* layer);
 
     virtual QList<QPainterPath> subPaths() const { return QList<QPainterPath>(); }
 
+    virtual QPainterPath outline() const;
+
 protected:
-    QString typeName(LaserPrimitiveType typeId);
-    QString typeLatinName(LaserPrimitiveType typeId);
+    QString typeName(LaserPrimitiveType typeId) const;
+    QString typeLatinName(LaserPrimitiveType typeId) const;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 protected:
-    LaserDocument* m_doc;
-    LaserLayer* m_layer;
-    SizeUnit m_unit;
-    QTransform m_transform;
-    QRectF m_boundingRect;
-    LaserPrimitiveType m_type;
-    QString m_name;
-
-    bool m_isHover;
-
     static QMap<int, int> g_itemsMaxIndex;
+    QScopedPointer<LaserPrimitivePrivate> d_ptr;
 
-private:
-    Q_DISABLE_COPY(LaserPrimitive);
+    Q_DECLARE_PRIVATE(LaserPrimitive)
+    Q_DISABLE_COPY(LaserPrimitive)
 
     friend class LaserDocument;
 };
@@ -166,27 +156,31 @@ private:
 
 QDebug operator<<(QDebug debug, const LaserPrimitive& item);
 
+class LaserShapePrivate;
 class LaserShape : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserShape(LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type);
+    virtual ~LaserShape() { } 
     virtual QPainterPath toPath() const = 0;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) override;
 
 private:
     Q_DISABLE_COPY(LaserShape);
+    Q_DECLARE_PRIVATE(LaserShape);
 };
 
+class LaserEllipsePrivate;
 class LaserEllipse : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserEllipse(const QRectF bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserEllipse(const QRectF bounds, LaserDocument* doc);
     virtual ~LaserEllipse() {}
 
-    QRectF bounds() const { return m_bounds; }
-    void setBounds(const QRectF& bounds) { m_bounds = bounds; }
+    QRectF bounds() const;
+    void setBounds(const QRectF& bounds);
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
@@ -194,18 +188,20 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    QRectF m_bounds;
+    Q_DECLARE_PRIVATE(LaserEllipse)
     Q_DISABLE_COPY(LaserEllipse)
 };
 
+class LaserRectPrivate;
 class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserRect(const QRectF rect, LaserDocument* doc,  SizeUnit unit = SizeUnit::SU_MM100);
+    LaserRect(const QRectF rect, LaserDocument* doc);
+    virtual ~LaserRect() {}
 
-    QRectF rect() const { return m_rect; }
-    void setRect(const QRectF& rect) { m_rect = rect; }
+    QRectF rect() const;
+    void setRect(const QRectF& rect);
 
     virtual void draw(QPainter* painter);
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
@@ -213,18 +209,20 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    QRectF m_rect;
-    Q_DISABLE_COPY(LaserRect);
+    Q_DECLARE_PRIVATE(LaserRect)
+    Q_DISABLE_COPY(LaserRect)
 };
 
+class LaserLinePrivate;
 class LaserLine : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserLine(const QLineF& line, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserLine(const QLineF& line, LaserDocument* doc);
+    virtual ~LaserLine() {}
 
-    QLineF line() const { return m_line; }
-    void setLine(const QLineF& line) { m_line = line; }
+    QLineF line() const;
+    void setLine(const QLineF& line);
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
@@ -232,18 +230,20 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    QLineF m_line;
     Q_DISABLE_COPY(LaserLine);
+    Q_DECLARE_PRIVATE(LaserLine);
 };
 
+class LaserPathPrivate;
 class LaserPath : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPath(const QPainterPath& path, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPath(const QPainterPath& path, LaserDocument* doc);
+    virtual ~LaserPath() {}
 
-    QPainterPath path() const { return m_path; }
-    void setPath(const QPainterPath& path) { m_path = path; }
+    QPainterPath path() const;
+    void setPath(const QPainterPath& path);
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
@@ -253,18 +253,20 @@ public:
     virtual QList<QPainterPath> subPaths() const;
 
 private:
-    QPainterPath m_path;
+    Q_DECLARE_PRIVATE(LaserPath);
     Q_DISABLE_COPY(LaserPath);
 };
 
+class LaserPolylinePrivate;
 class LaserPolyline : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolyline(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPolyline(const QPolygonF& poly, LaserDocument* doc);
+    virtual ~LaserPolyline() {}
 
-    QPolygonF polyline() const { return m_poly; }
-    void setPolyline(const QPolygonF& poly) { m_poly = poly; }
+    QPolygonF polyline() const;
+    void setPolyline(const QPolygonF& poly);
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
@@ -272,18 +274,20 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    QPolygonF m_poly;
-    Q_DISABLE_COPY(LaserPolyline);
+    Q_DECLARE_PRIVATE(LaserPolyline)
+    Q_DISABLE_COPY(LaserPolyline)
 };
 
+class LaserPolygonPrivate;
 class LaserPolygon : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolygon(const QPolygonF& poly, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserPolygon(const QPolygonF& poly, LaserDocument* doc);
+    virtual ~LaserPolygon() {}
 
-    QPolygonF polyline() const { return m_poly; }
-    void setPolyline(const QPolygonF& poly) { m_poly = poly; }
+    QPolygonF polyline() const;
+    void setPolyline(const QPolygonF& poly);
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
@@ -291,20 +295,22 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    QPolygonF m_poly;
-    Q_DISABLE_COPY(LaserPolygon);
+    Q_DECLARE_PRIVATE(LaserPolygon)
+    Q_DISABLE_COPY(LaserPolygon)
 };
 
+class LaserBitmapPrivate;
 class LaserBitmap : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc, SizeUnit unit = SizeUnit::SU_MM100);
+    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc);
+    virtual ~LaserBitmap() {}
 
-    QImage image() const { return m_image; }
-    void setImage(const QImage& image) { m_image = m_image; }
+    QImage image() const;
+    void setImage(const QImage& image);
 
-    QRectF bounds() const { return m_bounds; }
+    QRectF bounds() const;
 
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
@@ -312,27 +318,27 @@ public:
     virtual QString typeName() { return tr("Bitmap"); }
 
 private:
-    QImage m_image;
-    QRectF m_bounds;
-    Q_DISABLE_COPY(LaserBitmap);
+    Q_DECLARE_PRIVATE(LaserBitmap)
+    Q_DISABLE_COPY(LaserBitmap)
 };
 
+class LaserTextPrivate;
 class LaserText : public LaserPrimitive
 {
 	Q_OBJECT
 public:
-	LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type, SizeUnit unit = SizeUnit::SU_MM100);
+	LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type);
+    virtual ~LaserText() {}
 
-	QRect rect() const { return m_rect; }
-	QString content() const { return m_content; }
+    QRect rect() const;
+    QString content() const;
 
 	virtual void draw(QPainter* painter);
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
 private:
-	QString m_content;
-	QRect m_rect;
-	Q_DISABLE_COPY(LaserText);
+    Q_DECLARE_PRIVATE(LaserText)
+	Q_DISABLE_COPY(LaserText)
 };
 
 #endif // LASERPRIMITIVE_H

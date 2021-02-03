@@ -51,7 +51,6 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	//RULLER
 	//m_ruller.draw();
 	//painter
-	//qDebug() << this->geometry().top();
 	QPainter painter(viewport());
 	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 	//Ruller
@@ -123,7 +122,6 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 			painter.drawLine(QPointF(rect.left(), origin.y() + i * mediumTick), QPointF(rect.left() + m_rullerWidth * 0.5, origin.y() + i * mediumTick));
 		}
 	}
-	
 
 	//selectioin
 	if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))

@@ -16,6 +16,7 @@ class LaserLayer;
 class LaserScene;
 class LayerButton;
 
+class LaserDocumentPrivate;
 class LaserDocument : public QObject
 {
     Q_OBJECT
@@ -47,16 +48,19 @@ public:
 
     void blockSignals(bool block = true);
 
-    bool isOpened() const { return m_isOpened; }
+	bool isOpened() const;
 
-    LaserScene* scene() const { return m_scene; }
+	LaserScene* scene() const;
 
     void swapLayers(int i, int j);
 
     void bindLayerButtons(const QList<LayerButton*>& layerButtons);
 
-    FinishRun& finishRun() { return m_finishRun; }
-    void setFinishRun(const FinishRun& value) { m_finishRun = value; }
+	FinishRun& finishRun();
+	void setFinishRun(const FinishRun& value);
+
+	SizeUnit unit() const;
+	void setUnit(SizeUnit unit);
 
     //static int layersCount() { return m_layersCount; }
     //static void setLayersCount(int count) { m_layersCount = count; }
@@ -67,30 +71,24 @@ public slots:
     void destroy();
     void open();
     void close();
+	void analysis();
+    void outline();
+
 
 protected:
     void init();
 
 signals:
     void layersStructureChanged();
-    void readyToDestroyed();
     void opened();
     void closed();
+    void outlineUpdated();
 
-private:
-    QMap<QString, LaserPrimitive*> m_items;
-    QList<LaserLayer*> m_layers;
-
-    PageInformation m_pageInfo;
-    qreal m_scale;
-    bool m_blockSignals;
-    bool m_isOpened;
-    LaserScene* m_scene;
-    FinishRun m_finishRun;
-
-    //static int m_layersCount;
+protected:
+	QScopedPointer<LaserDocumentPrivate> d_ptr;
 
     Q_DISABLE_COPY(LaserDocument);
+	Q_DECLARE_PRIVATE(LaserDocument);
 };
 
 #endif // LASERDOCUMENT_H

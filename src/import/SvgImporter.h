@@ -9,7 +9,7 @@ class SvgImporter : public Importer
 {
     Q_OBJECT
 public:
-    explicit SvgImporter(QWidget* parentWnd, QObject* parent = nullptr);
+    explicit SvgImporter(QObject* parent = nullptr);
     virtual ~SvgImporter();
 
     virtual LaserDocument* import(const QString& filename, LaserScene* scene, const QVariantMap& params = QVariantMap());

@@ -24,7 +24,7 @@ public slots:
 protected:
 
 signals:
-    void layerSelectionChanged(const QString& layerId);
+    //void layerSelectionChanged(const QString& layerId);
 
 private:
     LaserDocument* m_doc;

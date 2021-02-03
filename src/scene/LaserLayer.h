@@ -132,7 +132,7 @@ protected:
     int m_row;
     bool m_useHalftone;
 
-    LaserDocument* m_doc;
+    LaserDocument* doc;
     LayerButton* m_button;
 
     bool m_exportable;

@@ -100,14 +100,6 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     if (!canvas.empty())
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
 
-    /*QPointF endPt = pt;
-    if (!pointsEql(startPt, endPt))
-    {
-        points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
-        if (!canvas.empty())
-            cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
-    }*/
-    
     return points.size();
 }
 

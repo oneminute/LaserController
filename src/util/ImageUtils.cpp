@@ -215,12 +215,15 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     cv::Mat rot = cv::getRotationMatrix2D(center, degrees, 1.);
     cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), src.size(), degrees).boundingRect2f();
 
+	int rotatedWidth = qMax(static_cast<int>(bbox.width), src.cols);
+	int rotatedHeight = qMax(static_cast<int>(bbox.height), src.rows);
     // adjust transformation matrix
-    rot.at<double>(0, 2) += bbox.width / 2.0 - src.cols / 2.0;
-    rot.at<double>(1, 2) += bbox.height / 2.0 - src.rows / 2.0;
+    rot.at<double>(0, 2) += rotatedWidth / 2.0 - src.cols / 2.0;
+    rot.at<double>(1, 2) += rotatedHeight / 2.0 - src.rows / 2.0;
 
+    cv::imwrite("tmp/src.bmp", src);
     cv::Mat rotated;
-    cv::warpAffine(src, rotated, rot, bbox.size(), cv::INTER_AREA, 0, cv::Scalar(255));
+    cv::warpAffine(src, rotated, rot, cv::Size(rotatedWidth, rotatedHeight), cv::INTER_AREA, 0, cv::Scalar(255));
     cv::imwrite("tmp/halfton3_rot.bmp", rotated);
 
     // convert unit from mm to inch
@@ -276,7 +279,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
                         uchar srcPixel = rotated.ptr<uchar>(r + y)[c + x];
                         uchar ditchPixel = ditchMat.ptr<uchar>(y)[x];
 
-                        if (srcPixel > ditchPixel)
+                        if (srcPixel >= ditchPixel)
                             outMat.ptr<uchar>(r + y)[c + x] = 255;
                     }
                 }
@@ -296,7 +299,16 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     cv::warpAffine(outMat, rotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
     cv::imwrite("tmp/halfton3_rot_inv.png", rotated, param);
 
-    cv::Rect roi((rotated.cols - src.cols - 1) / 2, (rotated.rows - src.rows - 1) / 2, src.cols, src.rows);
+	int roix = (rotated.cols - src.cols - 1) / 2;
+	int roiy = (rotated.rows - src.rows - 1) / 2;
+	int roiCols = src.cols;
+	int roiRows = src.rows;
+	if (roix < 0)
+	{
+		roix = 0;
+
+	}
+    cv::Rect roi(roix, roiy, roiCols, roiRows);
     outMat = rotated(roi);
     cv::imwrite("tmp/halfton3_processed.png", outMat, param);
 

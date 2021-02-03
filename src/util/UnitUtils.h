@@ -11,8 +11,6 @@ namespace unitUtils
 
     QString pageSizeName(QPageSize::PageSizeId id);
 
-    qreal unitToMM(SizeUnit other);
-
     inline int mm2MicroMM(double mm)
     {
         return qRound(mm * 1000);

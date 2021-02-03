@@ -3,6 +3,9 @@
 
 #include <Qt>
 #include <QDebug>
+#include <QTransform>
+
+class QWidget;
 
 enum SizeUnit {
     SU_PERCENT,
@@ -10,7 +13,6 @@ enum SizeUnit {
     SU_PC,
     SU_PT,
     SU_MM,
-    SU_MM100,
     SU_CM,
     SU_IN,
     SU_OTHER
@@ -67,6 +69,7 @@ enum PageType {
 
 enum LaserPrimitiveType
 {
+    LPT_UNKNOWN,
     LPT_LINE,
     LPT_CIRCLE,
     LPT_ELLIPSE,
@@ -133,6 +136,7 @@ public:
 	static int dpiX;
 	static int dpiY;
 	static SizeUnit unit;
+	static QWidget* mainWindow;
 
     static int mm2PixelsX(float mm);
     static int mm2PixelsY(float mm);
@@ -142,6 +146,8 @@ public:
 	static float convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
 	static float convertToMM(SizeUnit from, float num, Qt::Orientation orientation = Qt::Horizontal);
 	static float convertFromMM(SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
+	static QTransform matrixToMM(SizeUnit from, float hScale = 1.f, float vScale = 1.f);
+	static QTransform matrix(SizeUnit from, SizeUnit to, float hScale = 1.0f, float vScale = 1.0f);
 };
 
 struct FillStyleAndPixelsCount

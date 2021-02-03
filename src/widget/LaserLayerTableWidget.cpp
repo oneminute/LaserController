@@ -30,7 +30,6 @@ void LaserLayerTableWidget::setDocument(LaserDocument * doc)
 void LaserLayerTableWidget::laserDocumentClosed()
 {
     m_doc = nullptr;
-    updateItems();
 }
 
 void LaserLayerTableWidget::updateItems()

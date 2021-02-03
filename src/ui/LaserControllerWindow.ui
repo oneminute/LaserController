@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1103</width>
-    <height>923</height>
+    <width>1212</width>
+    <height>998</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1103</width>
+     <width>1212</width>
      <height>23</height>
     </rect>
    </property>
@@ -64,6 +64,7 @@
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
     <addaction name="actionRemoteAssistance"/>
+    <addaction name="actionAnalysisDocument"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -1404,6 +1405,33 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="dockWidgetOutline">
+   <property name="windowTitle">
+    <string>Outline</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_6">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QTreeWidget" name="treeWidgetOutline">
+       <property name="columnCount">
+        <number>1</number>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionOpen">
    <property name="enabled">
     <bool>false</bool>
@@ -2060,6 +2088,14 @@
    </property>
    <property name="text">
     <string>Reset</string>
+   </property>
+  </action>
+  <action name="actionAnalysisDocument">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Analysis Document</string>
    </property>
   </action>
  </widget>

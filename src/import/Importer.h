@@ -19,7 +19,7 @@ public:
         CORELDRAW
     };
 
-    Importer(QWidget* parentWnd, QObject* parent = nullptr);
+    Importer(QObject* parent = nullptr);
 
     virtual LaserDocument* import(const QString& filename, LaserScene* scene, const QVariantMap& params = QVariantMap()) = 0;
     
@@ -29,7 +29,6 @@ signals:
     void imported();
 
 protected:
-    QWidget* m_parentWnd;
 };
 
 #endif // IMPORTER_H

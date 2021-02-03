@@ -11,8 +11,8 @@
 #include <QThread>
 #include <QTimer>
 #include <QTreeWidgetItem>
-//#include <QCustomPlot>
 
+#include "common/common.h"
 #include "common/Config.h"
 #include "import/Importer.h"
 #include "laser/LaserDriver.h"
@@ -41,6 +41,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_created(false)
     , m_useLoadedJson(false)
 {
+	Global::mainWindow = this;
     m_ui->setupUi(this);
     setDockNestingEnabled(true);
 
@@ -85,6 +86,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     removeDockWidget(m_ui->dockWidgetLayers);
     removeDockWidget(m_ui->dockWidgetProperties);
     removeDockWidget(m_ui->dockWidgetOperations);
+	removeDockWidget(m_ui->dockWidgetOutline);
 
     //addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayerButtons);
     addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayers);
@@ -94,11 +96,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetMovement);
     tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties);
+    tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOutline);
 
     m_ui->dockWidgetLayerButtons->show();
     m_ui->dockWidgetLayers->show();
     m_ui->dockWidgetProperties->show();
     m_ui->dockWidgetOperations->show();
+    m_ui->dockWidgetOutline->show();
 
     // initialize layers Tree Widget
     m_ui->tableWidgetLayers->setColumnWidth(0, 45);
@@ -494,6 +498,7 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
     LaserDocument* doc = importer->import(filename, m_scene);
     if (doc)
     {
+		connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
         doc->bindLayerButtons(m_layerButtons);
         m_scene->updateDocument(doc);
         m_ui->tableWidgetLayers->setDocument(doc);
@@ -881,6 +886,7 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
     if (QMessageBox::Apply == QMessageBox::question(this, tr("Close document?"), tr("Do you want to close current document?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
     {
         m_scene->clearDocument(true);
+		m_ui->tableWidgetLayers->updateItems();
     }
 }
 
@@ -1070,7 +1076,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
     if (items.isEmpty())
         return;
 
-    m_ui->tableWidgetLayers->blockSignals(true);
+    //m_ui->tableWidgetLayers->blockSignals(true);
     for (LaserPrimitive* item : items)
     {
 		if (items[0]->layer() == nullptr)
@@ -1079,13 +1085,13 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
         if (row != -1)
             m_ui->tableWidgetLayers->selectRow(row);
     }
-    m_ui->tableWidgetLayers->blockSignals(false);
+    //m_ui->tableWidgetLayers->blockSignals(false);
 
-    if (items.count() == 1)
+    /*if (items.count() == 1)
     {
         LaserPrimitive* item = items[0];
         PropertiesHelperManager::primitivePropertiesHelper().resetProperties(item, m_ui->tableWidgetParameters);
-    }
+    }*/
 }
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
@@ -1711,6 +1717,12 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentIdleState);
     // end actionMoveLayerDown
+
+    // actionAnalysisDocument
+	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", true, documentIdleState);
+    // end actionAnalysisDocument
 }
 
 void LaserControllerWindow::showEvent(QShowEvent * event)

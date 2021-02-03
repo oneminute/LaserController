@@ -6,6 +6,7 @@
 int Global::dpiX(96);
 int Global::dpiY(96);
 SizeUnit Global::unit(SU_MM);
+QWidget* Global::mainWindow(nullptr);
 
 int Global::mm2PixelsX(float mm)
 {
@@ -56,9 +57,6 @@ float Global::convertToMM(SizeUnit from, float num, Qt::Orientation orientation)
 	case SU_MM:
 		factor = 1.0f;
 		break;
-	case SU_MM100:
-		factor = 0.01f;
-		break;
 	case SU_CM:
 		factor = 10.0f;
 		break;
@@ -76,7 +74,7 @@ float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
 	switch (to)
 	{
 	case SU_PX:
-		factor = dpi * 25.4f;
+		factor = dpi / 25.4f;
 		break;
 	case SU_PT:
 		factor = 72 / 25.4f;
@@ -87,9 +85,6 @@ float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
 	case SU_MM:
 		factor = 1.0f;
 		break;
-	case SU_MM100:
-		factor = 100.f;
-		break;
 	case SU_CM:
 		factor = 0.1f;
 		break;
@@ -98,4 +93,18 @@ float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
 		break;
 	}
 	return num * factor;
+}
+
+QTransform Global::matrixToMM(SizeUnit from, float hScale, float vScale)
+{
+	QTransform transform;
+	transform.scale(Global::convertToMM(from, 1) * hScale, Global::convertToMM(from, 1, Qt::Vertical) * vScale);
+	return transform;
+}
+
+QTransform Global::matrix(SizeUnit from, SizeUnit to, float hScale, float vScale)
+{
+	QTransform transform;
+	transform.scale(Global::convertUnit(from, to, 1) * hScale, Global::convertUnit(from, to, 1, Qt::Vertical) * vScale);
+	return transform;
 }

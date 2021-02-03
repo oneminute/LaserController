@@ -25,7 +25,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     , m_errorX(0)
     , m_minSpeedPower(60)
     , m_runSpeedPower(60)
-    , m_doc(document)
+    , doc(document)
     , m_lpi(60)
     , m_dpi(600)
     , m_button(nullptr)
@@ -39,7 +39,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     setParent(document);
     setObjectName(utils::createUUID("layer_"));
 
-    if (m_type == LLT_ENGRAVING)
+    if (type == LLT_ENGRAVING)
     {
         m_minSpeed = Config::EngravingLayerMinSpeed();
         m_runSpeed = Config::EngravingLayerRunSpeed();
@@ -47,7 +47,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
         m_minSpeedPower = Config::EngravingLayerMinSpeedPower();
         m_runSpeedPower = Config::EngravingLayerRunSpeedPower();
     }
-    else if (m_type == LLT_CUTTING)
+    else if (type == LLT_CUTTING)
     {
         m_minSpeed = Config::CuttingLayerMinSpeed();
         m_runSpeed = Config::CuttingLayerRunSpeed();
@@ -81,7 +81,7 @@ LaserLayerType LaserLayer::type() const { return m_type; }
 
 void LaserLayer::setType(LaserLayerType type)
 {
-    m_type = type;
+    type = type;
 }
 
 int LaserLayer::minSpeed() const { return m_minSpeed; }
@@ -159,7 +159,7 @@ void LaserLayer::addPrimitive(LaserPrimitive * item)
 
     item->setLayer(this);
     m_items.append(item);
-    m_doc->updateLayersStructure();
+    doc->updateLayersStructure();
 }
 
 QList<LaserPrimitive*>& LaserLayer::primitives()
@@ -174,7 +174,7 @@ void LaserLayer::removePrimitive(LaserPrimitive * item)
 
     item->setLayer(nullptr);
     m_items.removeOne(item);
-    m_doc->updateLayersStructure();
+    doc->updateLayersStructure();
 }
 
 bool LaserLayer::isEmpty() const
@@ -192,7 +192,7 @@ QColor LaserLayer::color() const
 
 LaserDocument * LaserLayer::document() const
 {
-    return m_doc;
+    return doc;
 }
 
 void LaserLayer::bindButton(LayerButton * button)
@@ -203,7 +203,7 @@ void LaserLayer::bindButton(LayerButton * button)
 
 void LaserLayer::onClicked()
 {
-    LaserScene* scene = m_doc->scene();
+    LaserScene* scene = doc->scene();
     if (scene->selectedPrimitives().count() > 0)
     {
         for (LaserPrimitive* primitive : scene->selectedPrimitives())

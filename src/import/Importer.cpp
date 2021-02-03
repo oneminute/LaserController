@@ -2,9 +2,8 @@
 #include "SvgImporter.h"
 #include "CorelDrawImporter.h"
 
-Importer::Importer(QWidget* parentWnd, QObject* parent)
+Importer::Importer(QObject* parent)
     : QObject(parent)
-    , m_parentWnd(parentWnd)
 {}
 
 QSharedPointer<Importer> Importer::getImporter(QWidget* parentWnd, Types type)
@@ -12,9 +11,9 @@ QSharedPointer<Importer> Importer::getImporter(QWidget* parentWnd, Types type)
     switch (type)
     {
     case Types::SVG:
-        return QSharedPointer<Importer>(new SvgImporter(parentWnd));
+        return QSharedPointer<Importer>(new SvgImporter);
     case Types::CORELDRAW:
-        return QSharedPointer<Importer>(new CorelDrawImporter(parentWnd));
+        return QSharedPointer<Importer>(new CorelDrawImporter);
     default:
         break;
     }
