@@ -14,6 +14,7 @@ class LaserLayerPrivate;
 class LaserDocument;
 class LayerButton;
 
+class LaserLayerPrivate;
 class LaserLayer : public QObject
 {
     Q_OBJECT
@@ -21,8 +22,8 @@ public:
     explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault = false);
     virtual ~LaserLayer();
 
-    bool removable() const { return m_removable; }
-    void setRemovable(bool removable) { m_removable = removable; }
+    bool removable() const;
+    void setRemovable(bool removable);
 
     QString id() const { return objectName(); }
 
@@ -76,11 +77,11 @@ public:
 
     QColor color() const;
 
-    int lpi() const { return m_lpi; }
-    void setLpi(int lpi) { m_lpi = lpi; }
+    int lpi() const;
+    void setLpi(int lpi);
 
-    int dpi() const { return m_dpi; }
-    void setDpi(int dpi) { m_dpi = dpi; }
+    int dpi() const;
+    void setDpi(int dpi);
 
     //qreal nonlinearCoefficient() const { return m_nonlinearCoefficient; }
     //void setNonlinearCoefficient(qreal value) { m_nonlinearCoefficient = value; }
@@ -89,57 +90,27 @@ public:
 
     void bindButton(LayerButton* button);
 
-    bool exportable() const { return m_exportable; }
-    void setExportable(bool value) { m_exportable = value; }
+    bool exportable() const;
+    void setExportable(bool value);
 
-    bool visible() const { return m_visible; }
-    void setVisible(bool visible) { m_visible = visible; }
+    bool visible() const;
+    void setVisible(bool visible);
 
-    int row() const { return m_row; }
-    void setRow(int row) { m_row = row; }
+    int row() const;
+    void setRow(int row);
 
-    bool useHalftone() const { return m_useHalftone; }
-    void setUseHalftone(bool value) { m_useHalftone = value; }
+    bool useHalftone() const;
+    void setUseHalftone(bool value);
 
-	bool isDefault() const { return m_isDefault; }
+    bool isDefault() const;
 
 protected:
     void onClicked();
 
 protected:
-    bool m_removable;
-    LaserLayerType m_type;
-
-    // normal fields
-    int m_minSpeed;
-    int m_runSpeed;
-    int m_laserPower;
-    int m_minSpeedPower;
-    int m_runSpeedPower;
-
-    // engraving fields
-    bool m_engravingForward;
-    int m_engravingStyle;
-    int m_lineSpacing;
-    int m_columnSpacing;
-    int m_startX;
-    int m_startY;
-    int m_errorX;
-
-    // bitmap fields
-    int m_lpi;
-    int m_dpi;
-    int m_row;
-    bool m_useHalftone;
-
-    LaserDocument* doc;
-    LayerButton* m_button;
-
-    bool m_exportable;
-    bool m_visible;
-	bool m_isDefault;
-
-    QList<LaserPrimitive*> m_items;
+    
+    QScopedPointer<LaserLayerPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(LaserLayer);
     Q_DISABLE_COPY(LaserLayer)
 };
 

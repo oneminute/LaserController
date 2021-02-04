@@ -9,55 +9,102 @@
 #include "widget/LayerButton.h"
 #include "common/Config.h"
 
+class LaserLayerPrivate
+{
+    Q_DECLARE_PUBLIC(LaserLayer)
+public:
+    LaserLayerPrivate(LaserLayer* ptr)
+        : q_ptr(ptr)
+        , removable(true)
+        , minSpeed(60)
+        , runSpeed(300)
+        , laserPower(115)
+        , engravingForward(true)
+        , engravingStyle(0)
+        , lineSpacing(7)
+        , columnSpacing(0)
+        , startX(25)
+        , startY(0)
+        , errorX(0)
+        , minSpeedPower(60)
+        , runSpeedPower(60)
+        , doc(nullptr)
+        , lpi(60)
+        , dpi(600)
+        , button(nullptr)
+        , exportable(true)
+        , visible(true)
+        , row(-1)
+        , useHalftone(true)
+        , isDefault(false)   
+    {}
+
+    bool removable;
+    LaserLayerType type;
+
+    // normal fields
+    int minSpeed;
+    int runSpeed;
+    int laserPower;
+    int minSpeedPower;
+    int runSpeedPower;
+
+    // engraving fields
+    bool engravingForward;
+    int engravingStyle;
+    int lineSpacing;
+    int columnSpacing;
+    int startX;
+    int startY;
+    int errorX;
+
+    // bitmap fields
+    int lpi;
+    int dpi;
+    int row;
+    bool useHalftone;
+
+    LaserDocument* doc;
+    LayerButton* button;
+
+    bool exportable;
+    bool visible;
+	bool isDefault;
+
+    QList<LaserPrimitive*> items;   
+    LaserLayer* q_ptr;
+};
+
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
     : QObject(document)
-    , m_removable(true)
-    , m_type(type)
-    , m_minSpeed(60)
-    , m_runSpeed(300)
-    , m_laserPower(115)
-    , m_engravingForward(true)
-    , m_engravingStyle(0)
-    , m_lineSpacing(7)
-    , m_columnSpacing(0)
-    , m_startX(25)
-    , m_startY(0)
-    , m_errorX(0)
-    , m_minSpeedPower(60)
-    , m_runSpeedPower(60)
-    , doc(document)
-    , m_lpi(60)
-    , m_dpi(600)
-    , m_button(nullptr)
-    , m_exportable(true)
-    , m_visible(true)
-    , m_row(-1)
-    , m_useHalftone(true)
-	, m_isDefault(isDefault)
 {
+    Q_D(LaserLayer);
     Q_ASSERT(document);
+    d->doc = document;
+    d->type = type;
+    d->isDefault = isDefault;
     setParent(document);
     setObjectName(utils::createUUID("layer_"));
 
     if (type == LLT_ENGRAVING)
     {
-        m_minSpeed = Config::EngravingLayerMinSpeed();
-        m_runSpeed = Config::EngravingLayerRunSpeed();
-        m_laserPower = Config::EngravingLayerLaserPower();
-        m_minSpeedPower = Config::EngravingLayerMinSpeedPower();
-        m_runSpeedPower = Config::EngravingLayerRunSpeedPower();
+        d->minSpeed = Config::EngravingLayerMinSpeed();
+        d->runSpeed = Config::EngravingLayerRunSpeed();
+        d->laserPower = Config::EngravingLayerLaserPower();
+        d->minSpeedPower = Config::EngravingLayerMinSpeedPower();
+        d->runSpeedPower = Config::EngravingLayerRunSpeedPower();
     }
     else if (type == LLT_CUTTING)
     {
-        m_minSpeed = Config::CuttingLayerMinSpeed();
-        m_runSpeed = Config::CuttingLayerRunSpeed();
-        m_laserPower = Config::CuttingLayerLaserPower();
-        m_minSpeedPower = Config::CuttingLayerMinSpeedPower();
-        m_runSpeedPower = Config::CuttingLayerRunSpeedPower();
+        d->minSpeed = Config::CuttingLayerMinSpeed();
+        d->runSpeed = Config::CuttingLayerRunSpeed();
+        d->laserPower = Config::CuttingLayerLaserPower();
+        d->minSpeedPower = Config::CuttingLayerMinSpeedPower();
+        d->runSpeedPower = Config::CuttingLayerRunSpeedPower();
     }
-	m_useHalftone = Config::EngravingLayerUseHalftone();
-	m_lpi = Config::EngravingLayerLPI();
-	m_dpi = Config::EngravingLayerDPI();
+	d->useHalftone = Config::EngravingLayerUseHalftone();
+	d->lpi = Config::EngravingLayerLPI();
+	d->dpi = Config::EngravingLayerDPI();
 }
 
 LaserLayer::~LaserLayer()
@@ -65,11 +112,24 @@ LaserLayer::~LaserLayer()
     qDebug() << objectName();
 }
 
+bool LaserLayer::removable() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->removable; 
+}
+
+void LaserLayer::setRemovable(bool removable) 
+{ 
+    Q_D(LaserLayer);
+    d->removable = removable; 
+}
+
 QString LaserLayer::name() const 
 {
-    if (m_button)
+    Q_D(const LaserLayer);
+    if (d->button)
     {
-        return m_button->text();
+        return d->button->text();
     }
     else
     {
@@ -77,133 +137,313 @@ QString LaserLayer::name() const
     }
 }
 
-LaserLayerType LaserLayer::type() const { return m_type; }
+LaserLayerType LaserLayer::type() const 
+{
+    Q_D(const LaserLayer);
+    return d->type; 
+}
 
 void LaserLayer::setType(LaserLayerType type)
 {
-    type = type;
+    Q_D(LaserLayer);
+    d->type = type;
 }
 
-int LaserLayer::minSpeed() const { return m_minSpeed; }
+int LaserLayer::minSpeed() const 
+{
+    Q_D(const LaserLayer);
+    return d->minSpeed; 
+}
 
-void LaserLayer::setMinSpeed(int minSpeed) { m_minSpeed = minSpeed; }
+void LaserLayer::setMinSpeed(int minSpeed) 
+{
+    Q_D(LaserLayer);
+    d->minSpeed = minSpeed; 
+}
 
-int LaserLayer::runSpeed() const { return m_runSpeed; }
+int LaserLayer::runSpeed() const 
+{
+    Q_D(const LaserLayer);
+    return d->runSpeed; 
+}
 
-void LaserLayer::setRunSpeed(int runSpeed) { m_runSpeed = runSpeed; }
+void LaserLayer::setRunSpeed(int runSpeed) 
+{
+    Q_D(LaserLayer);
+    d->runSpeed = runSpeed; 
+}
 
-int LaserLayer::laserPower() const { return m_laserPower; }
+int LaserLayer::laserPower() const 
+{
+    Q_D(const LaserLayer);
+    return d->laserPower; 
+}
 
-void LaserLayer::setLaserPower(int laserPower) { m_laserPower = laserPower; }
+void LaserLayer::setLaserPower(int laserPower) 
+{
+    Q_D(LaserLayer);
+    d->laserPower = laserPower; 
+}
 
-bool LaserLayer::engravingForward() const { return m_engravingForward; }
+bool LaserLayer::engravingForward() const 
+{
+    Q_D(const LaserLayer);
+    return d->engravingForward; 
+}
 
-void LaserLayer::setEngravingForward(bool engravingForward) { m_engravingForward = engravingForward; }
+void LaserLayer::setEngravingForward(bool engravingForward) 
+{ 
+    Q_D(LaserLayer);
+    d->engravingForward = engravingForward; 
+}
 
-int LaserLayer::engravingStyle() const { return m_engravingStyle; }
+int LaserLayer::engravingStyle() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->engravingStyle; 
+}
 
-void LaserLayer::setEngravingStyle(int engravingStyle) { m_engravingStyle = engravingStyle; }
+void LaserLayer::setEngravingStyle(int engravingStyle) 
+{ 
+    Q_D(LaserLayer);
+    d->engravingStyle = engravingStyle; 
+}
 
-int LaserLayer::lineSpacing() const { return m_lineSpacing; }
+int LaserLayer::lineSpacing() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->lineSpacing; 
+}
 
-void LaserLayer::setLineSpacing(int lineSpacing) { m_lineSpacing = lineSpacing; }
+void LaserLayer::setLineSpacing(int lineSpacing) 
+{ 
+    Q_D(LaserLayer);
+    d->lineSpacing = lineSpacing; 
+}
 
-int LaserLayer::columnSpacing() const { return m_columnSpacing; }
+int LaserLayer::columnSpacing() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->columnSpacing; 
+}
 
-void LaserLayer::setColumnSpacing(int columnSpacing) { m_columnSpacing = columnSpacing; }
+void LaserLayer::setColumnSpacing(int columnSpacing) 
+{ 
+    Q_D(LaserLayer);
+    d->columnSpacing = columnSpacing; 
+}
 
-QPoint LaserLayer::startPos() const { return QPoint(m_startX, m_startY); }
+QPoint LaserLayer::startPos() const 
+{ 
+    Q_D(const LaserLayer);
+    return QPoint(d->startX, d->startY); 
+}
 
 void LaserLayer::setStartPos(const QPoint & startPos) 
 { 
-    m_startX = startPos.x(); 
-    m_startY = startPos.y();
+    Q_D(LaserLayer);
+    d->startX = startPos.x(); 
+    d->startY = startPos.y();
 }
 
 int LaserLayer::startX() const
 {
-    return m_startX;
+    Q_D(const LaserLayer);
+    return d->startX;
 }
 
 void LaserLayer::setStartX(int x)
 {
-    m_startX = x;
+    Q_D(LaserLayer);
+    d->startX = x;
 }
 
 int LaserLayer::startY() const
 {
-    return m_startY;
+    Q_D(const LaserLayer);
+    return d->startY;
 }
 
 void LaserLayer::setStartY(int y)
 {
-    m_startY = y;
+    Q_D(LaserLayer);
+    d->startY = y;
 }
 
-int LaserLayer::errorX() const { return m_errorX; }
+int LaserLayer::errorX() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->errorX; 
+}
 
-void LaserLayer::setErrorX(int errorX) { m_errorX = errorX; }
+void LaserLayer::setErrorX(int errorX) 
+{ 
+    Q_D(LaserLayer);
+    d->errorX = errorX; 
+}
 
-int LaserLayer::minSpeedPower() const { return m_minSpeedPower; }
+int LaserLayer::minSpeedPower() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->minSpeedPower; 
+}
 
-void LaserLayer::setMinSpeedPower(int minSpeedPower) { m_minSpeedPower = minSpeedPower; }
+void LaserLayer::setMinSpeedPower(int minSpeedPower) 
+{ 
+    Q_D(LaserLayer);
+    d->minSpeedPower = minSpeedPower; 
+}
 
-int LaserLayer::runSpeedPower() const { return m_runSpeedPower; }
+int LaserLayer::runSpeedPower() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->runSpeedPower; 
+}
 
-void LaserLayer::setRunSpeedPower(int runSpeedPower) { m_runSpeedPower = runSpeedPower; }
+void LaserLayer::setRunSpeedPower(int runSpeedPower) 
+{ 
+    Q_D(LaserLayer);
+    d->runSpeedPower = runSpeedPower; 
+}
 
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
-    if (m_items.contains(item))
+    Q_D(LaserLayer);
+    if (d->items.contains(item))
         return;
 
     item->setLayer(this);
-    m_items.append(item);
-    doc->updateLayersStructure();
+    d->items.append(item);
+    d->doc->updateLayersStructure();
 }
 
 QList<LaserPrimitive*>& LaserLayer::primitives()
 {
-    return m_items;
+    Q_D(LaserLayer);
+    return d->items;
 }
 
 void LaserLayer::removePrimitive(LaserPrimitive * item)
 {
-    if (!m_items.contains(item))
+    Q_D(LaserLayer);
+    if (!d->items.contains(item))
         return;
 
     item->setLayer(nullptr);
-    m_items.removeOne(item);
-    doc->updateLayersStructure();
+    d->items.removeOne(item);
+    d->doc->updateLayersStructure();
 }
 
 bool LaserLayer::isEmpty() const
 {
-    return m_items.count() == 0;
+    Q_D(const LaserLayer);
+    return d->items.count() == 0;
 }
 
 QColor LaserLayer::color() const 
 {
-    if (m_button)
-        return m_button->color();
+    Q_D(const LaserLayer);
+    if (d->button)
+        return d->button->color();
     else
         return QColor();
 }
 
+int LaserLayer::lpi() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->lpi; 
+}
+
+void LaserLayer::setLpi(int lpi) 
+{ 
+    Q_D(LaserLayer);
+    d->lpi = lpi; 
+}
+
+int LaserLayer::dpi() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->dpi; 
+}
+
+void LaserLayer::setDpi(int dpi) 
+{ 
+    Q_D(LaserLayer);
+    d->dpi = dpi; 
+}
+
 LaserDocument * LaserLayer::document() const
 {
-    return doc;
+    Q_D(const LaserLayer);
+    return d->doc;
 }
 
 void LaserLayer::bindButton(LayerButton * button)
 {
-    m_button = button;
+    Q_D(LaserLayer);
+    d->button = button;
     connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
+}
+
+bool LaserLayer::exportable() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->exportable; 
+}
+
+void LaserLayer::setExportable(bool value) 
+{ 
+    Q_D(LaserLayer);
+    d->exportable = value; 
+}
+
+bool LaserLayer::visible() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->visible; 
+}
+
+void LaserLayer::setVisible(bool visible) 
+{ 
+    Q_D(LaserLayer);
+    d->visible = visible; 
+}
+
+int LaserLayer::row() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->row; 
+}
+
+void LaserLayer::setRow(int row) 
+{ 
+    Q_D(LaserLayer);
+    d->row = row; 
+}
+
+bool LaserLayer::useHalftone() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->useHalftone; 
+}
+
+void LaserLayer::setUseHalftone(bool value) 
+{ 
+    Q_D(LaserLayer);
+    d->useHalftone = value; 
+}
+
+bool LaserLayer::isDefault() const 
+{ 
+    Q_D(const LaserLayer);
+    return d->isDefault; 
 }
 
 void LaserLayer::onClicked()
 {
-    LaserScene* scene = doc->scene();
+    Q_D(LaserLayer);
+    LaserScene* scene = d->doc->scene();
     if (scene->selectedPrimitives().count() > 0)
     {
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
@@ -212,7 +452,7 @@ void LaserLayer::onClicked()
         }
 
         QList<LaserPrimitiveType> types;
-        for (LaserPrimitive* primitive : m_items)
+        for (LaserPrimitive* primitive : d->items)
         {
             if (primitive->isShape())
             {
