@@ -433,7 +433,6 @@ void LaserDocument::analysis()
 
 	for (LaserPrimitive* primitive : d->primitives)
 	{
-		qDebug() << primitive->objectName() << primitive->primitiveType();
 		if (primitive->primitiveType() == LPT_PATH)
 		{
 			LaserPath* laserPath = qobject_cast<LaserPath*>(primitive);
@@ -444,12 +443,14 @@ void LaserDocument::analysis()
 			}
 		}
 	}
+
+    outline();
 }
 
 void LaserDocument::outline()
 {
     QStack<LaserPrimitive*> stack;
-    QList<LaserPrimitive*> outlineTree;
+    QList<QGraphicsItem*> outlineTree;
     for (LaserPrimitive* primitive : primitives().values())
     {
         stack.push(primitive);
@@ -458,6 +459,7 @@ void LaserDocument::outline()
     while (!stack.isEmpty())
     {
         LaserPrimitive* candidate = stack.pop();
+        qDebug().nospace().noquote() << "candidate: " << candidate->objectName();
 
         // first primitive
         if (outlineTree.isEmpty())
@@ -466,13 +468,40 @@ void LaserDocument::outline()
             continue;
         }
 
-        // determine relation between candidate and each primitive within outlineTree
-        for (LaserPrimitive* treeNode : outlineTree)
+        if (iterateOutlineNodes(candidate, outlineTree))
         {
-
+            outlineTree.append(candidate);
         }
     }
+
+    QStack<LaserPrimitive*> showStack;
+    for (QGraphicsItem* item : outlineTree)
+    {
+        LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
+        if (!primitive)
+            continue;
+        printOutline(primitive, 0);
+    }
+
     emit outlineUpdated();
+}
+
+void LaserDocument::printOutline(LaserPrimitive* primitive, int level)
+{
+    QString space = "";
+    for (int i = 0; i < level; i++)
+    {
+        space.append("  ");
+    }
+    qDebug().nospace().noquote() << space << primitive->objectName();
+
+    for (QGraphicsItem* item : primitive->childItems())
+    {
+        LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
+        if (!primitive)
+            continue;
+        printOutline(primitive, level + 1);
+    }
 }
 
 void LaserDocument::init()
@@ -494,5 +523,76 @@ void LaserDocument::init()
 
     ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
     ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
+}
+
+RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPainterPath& b)
+{
+    RELATION rel;
+    if (a.contains(b))
+    {
+        // candidate primitive contains tree node primitive
+        rel = A_CONTAINS_B;
+    }
+    else if (b.contains(a))
+    {
+        // tree node primitive contains candidate primitive
+        rel = B_CONTAINS_A;
+    }
+    else if (a.intersects(b))
+    {
+        // a intersects with b
+        rel = INTERSECTION;
+    }
+    else
+    {
+        // no relationship between candidate primitive and tree node primitive
+        rel = RELATION::NONE;
+    }
+    return rel;
+}
+
+bool LaserDocument::iterateOutlineNodes(LaserPrimitive* candidate, QList<QGraphicsItem*>& nodes)
+{
+    // determine relation between candidate and each primitive within outlineTree
+    bool inserting = true;
+    for (QList<QGraphicsItem*>::Iterator i = nodes.begin(); i != nodes.end();)
+    {
+        QGraphicsItem* treeNode = *i;
+        QList<QGraphicsItem*>::Iterator i2 = i;
+        LaserPrimitive* treeNodePtr = dynamic_cast<LaserPrimitive*>(treeNode);
+        if (!treeNodePtr)
+            continue;
+        RELATION rel = determineRelationship(candidate->outline(), treeNodePtr->outline());
+        qDebug().noquote() << candidate->objectName() << treeNodePtr->objectName() << rel;
+        if (rel == A_CONTAINS_B)
+        {
+            treeNodePtr->setParentItem(candidate);
+            nodes.erase(i2);
+            inserting = true;
+        }
+        else if (rel == B_CONTAINS_A)
+        {
+            if (treeNodePtr->childItems().isEmpty())
+            {
+                candidate->setParentItem(treeNodePtr);
+            }
+            else
+            {
+                if (iterateOutlineNodes(candidate, treeNodePtr->childItems()))
+                {
+                    candidate->setParentItem(treeNodePtr);
+                }
+            }
+            return false;
+        }
+        else if (rel == INTERSECTION)
+        {
+
+        }
+
+        i++;
+    }
+    
+    return inserting;
 }
 

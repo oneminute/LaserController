@@ -23,6 +23,17 @@
 #include "scene/LaserLayer.h"
 
 QMap<int, int> LaserPrimitive::g_itemsMaxIndex;
+QMap<LaserPrimitiveType, int> g_counter{
+    { LPT_LINE, 0 },
+    { LPT_CIRCLE, 0},
+    { LPT_ELLIPSE, 0},
+    { LPT_RECT, 0},
+    { LPT_POLYLINE, 0},
+    { LPT_POLYGON, 0},
+    { LPT_PATH, 0},
+    { LPT_BITMAP, 0},
+    { LPT_TEXT, 0},
+};
 
 class LaserPrimitivePrivate
 {
@@ -55,7 +66,10 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     d->type = type;
     Q_ASSERT(doc);
     setParent(doc);
-    setObjectName(utils::createUUID("primitive_"));
+
+    g_counter[type]++;
+    QString objName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
+    setObjectName(objName);
 
     this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
@@ -111,6 +125,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
     painter->setPen(QPen(color, 1, Qt::SolidLine));
     draw(painter);
+
+    QPainterPath outline = this->outline();
+    QPointF startPos = outline.pointAtPercent(0);
+    painter->drawText(startPos, this->objectName());
 }
 
 QRectF LaserPrimitive::boundingRect() const

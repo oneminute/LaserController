@@ -1084,6 +1084,8 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
         int row = items[0]->layer()->row();
         if (row != -1)
             m_ui->tableWidgetLayers->selectRow(row);
+
+        qDebug().nospace().nospace() << "selected primitive: " << item->objectName();
     }
     //m_ui->tableWidgetLayers->blockSignals(false);
 

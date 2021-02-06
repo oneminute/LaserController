@@ -130,6 +130,14 @@ enum QUADRANT
     QUADRANT_4 = 4
 };
 
+enum RELATION
+{
+    A_CONTAINS_B,
+    B_CONTAINS_A,
+    INTERSECTION,
+    NONE
+};
+
 class Global
 {
 public:

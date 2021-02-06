@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QSharedPointer>
 #include <QSharedDataPointer>
+#include <QGraphicsItem>
 
 #include "PageInformation.h"
 
@@ -73,10 +74,12 @@ public slots:
     void close();
 	void analysis();
     void outline();
-
+    void printOutline(LaserPrimitive* primitive, int level);
 
 protected:
     void init();
+    RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
+    bool iterateOutlineNodes(LaserPrimitive* candidate, QList<QGraphicsItem*>& nodes);
 
 signals:
     void layersStructureChanged();

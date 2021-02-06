@@ -77,6 +77,7 @@ public:
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
     : QObject(document)
+    , d_ptr(new LaserLayerPrivate(this))
 {
     Q_D(LaserLayer);
     Q_ASSERT(document);
