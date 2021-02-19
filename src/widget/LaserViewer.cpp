@@ -308,7 +308,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 		QPainterPath selectionPath;
 		selectionPath.addRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
         //right selectionÓÒÑ¡
-		if (m_selectionEndPoint.x > m_selectionStartPoint.x) {			
+		if (m_selectionEndPoint.x() > m_selectionStartPoint.x()) {			
 			m_scene->setSelectionArea(mapToScene(selectionPath));
 			
 		}
