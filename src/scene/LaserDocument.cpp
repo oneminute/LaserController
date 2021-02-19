@@ -21,12 +21,12 @@
 #include "LaserLayer.h"
 #include "state/StateController.h"
 
-class LaserDocumentPrivate
+class LaserDocumentPrivate: public LaserNodePrivate
 {
 	Q_DECLARE_PUBLIC(LaserDocument)
 public:
 	LaserDocumentPrivate(LaserDocument* ptr)
-		: q_ptr(ptr)
+		: LaserNodePrivate(ptr)
 		, blockSignals(false)
 		, isOpened(false)
 	{}
@@ -39,15 +39,13 @@ public:
     LaserScene* scene;
     FinishRun finishRun;
 	SizeUnit unit;
-
-	LaserDocument* q_ptr;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
-    : QObject(parent)
-	, d_ptr(new LaserDocumentPrivate(this))
+	: LaserNode(new LaserDocumentPrivate(this), LNT_STRUCTURAL)
 {
-	d_ptr->scene = scene;
+    Q_D(LaserDocument);
+	d->scene = scene;
     init();
 }
 
@@ -429,7 +427,7 @@ void LaserDocument::close()
 void LaserDocument::analysis()
 {
 	Q_D(LaserDocument);
-	qDebug() << "begin analysising";
+	qLogD << "begin analysising";
 
 	for (LaserPrimitive* primitive : d->primitives)
 	{
@@ -439,7 +437,7 @@ void LaserDocument::analysis()
 			QList<QPainterPath> subPaths = laserPath->subPaths();
 			for (int i = 0; i < subPaths.size(); i++)
 			{
-				qDebug() << "sub path" << i << ":" << subPaths[i];
+				qLogD << "sub path " << i << ":" << subPaths[i];
 			}
 		}
 	}
@@ -459,7 +457,7 @@ void LaserDocument::outline()
     while (!stack.isEmpty())
     {
         LaserPrimitive* candidate = stack.pop();
-        qDebug().nospace().noquote() << "candidate: " << candidate->objectName();
+        qLogD << "candidate: " << candidate->objectName();
 
         // first primitive
         if (outlineTree.isEmpty())
@@ -502,6 +500,14 @@ void LaserDocument::printOutline(LaserPrimitive* primitive, int level)
             continue;
         printOutline(primitive, level + 1);
     }
+}
+
+void LaserDocument::save(const QString& filename)
+{
+}
+
+void LaserDocument::load(const QString& filename)
+{
 }
 
 void LaserDocument::init()

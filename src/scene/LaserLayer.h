@@ -9,13 +9,15 @@
 #include <QSharedDataPointer>
 #include <QExplicitlySharedDataPointer>
 
+#include "LaserNode.h"
+
 class LaserPrimitive;
 class LaserLayerPrivate;
 class LaserDocument;
 class LayerButton;
 
 class LaserLayerPrivate;
-class LaserLayer : public QObject
+class LaserLayer : public LaserNode
 {
     Q_OBJECT
 public:
@@ -25,7 +27,7 @@ public:
     bool removable() const;
     void setRemovable(bool removable);
 
-    QString id() const { return objectName(); }
+    QString id() const;
 
     QString name() const;
     LaserLayerType type() const;
@@ -109,7 +111,6 @@ protected:
 
 protected:
     
-    QScopedPointer<LaserLayerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(LaserLayer);
     Q_DISABLE_COPY(LaserLayer)
 };

@@ -5,6 +5,22 @@
 #include <QDebug>
 #include <QTransform>
 
+#define qLogD qDebug().noquote().nospace()
+#define qsLogD qDebug().nospace()
+#define qnLogD qDebug().nospace()
+#define qLogW qWarning().noquote().nospace()
+#define qsLogW qWarning().nospace()
+#define qnLogW qWarning().nospace()
+#define qLogI qInfo().noquote().nospace()
+#define qsLogI qInfo().nospace()
+#define qnLogI qInfo().nospace()
+#define qLogC qCritical().noquote().nospace()
+#define qsLogC qCritical().nospace()
+#define qnLogC qCritical().nospace()
+#define qLogF qFatal().noquote().nospace()
+#define qsLogF qFatal().nospace()
+#define qnLogF qFatal().nospace()
+
 class QWidget;
 
 enum SizeUnit {
