@@ -47,6 +47,7 @@ LaserViewer::~LaserViewer()
 
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
+	qLogD << "paintEvent: " << StateControllerInst.currentStates();
     QGraphicsView::paintEvent(event);
 	//RULLER
 	//m_ruller.draw();
@@ -128,6 +129,7 @@ void LaserViewer::paintEvent(QPaintEvent * event)
     {       
 		painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
+		qLogD << "drawing: " << m_selectionStartPoint << ", " << m_selectionEndPoint;
 	}
 	//Rect
 	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
@@ -243,30 +245,29 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 	if (event->button() == Qt::LeftButton) {
 		if (StateControllerInst.anyState(states))
 		{
-			
 			m_selectionStartPoint = event->pos();
 			m_selectionEndPoint = m_selectionStartPoint;
 			emit beginSelecting();
 			qDebug() << "begin to select";			
 		}
 		//Rect
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) {
-			
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) 
+		{
 			m_creatingRectStartPoint = mapToScene(event->pos());
 			m_creatingRectEndPoint = m_creatingRectStartPoint;
 			emit creatingRectangle();
 		}
 		//Ellipse
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseReadyState())) {
-			
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseReadyState())) 
+		{
 			m_creatingEllipseStartPoint = mapToScene(event->pos());
 			m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
 			m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
 			emit creatingEllipse();
 		}
 		//Line
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineReadyState())) {
-			
+		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineReadyState())) 
+		{
 			m_creatingLineStartPoint = mapToScene(event->pos());
 			m_creatingLineEndPoint = m_creatingLineStartPoint;
 			emit creatingLine();
@@ -316,7 +317,9 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 		else {
 			m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::ContainsItemShape);
 		}
-        
+		qLogD << "moving update: ";
+        QGraphicsView::mouseMoveEvent(event);
+		this->viewport()->repaint();
         return;
     }
 	//Rect
@@ -362,7 +365,6 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 		m_creatingSplineMousePos = event->pos();
 		
 	}
-	
     else
     {
         QGraphicsView::mouseMoveEvent(event);
@@ -373,7 +375,6 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 {
-	
     if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {
         qreal distance = (m_selectionEndPoint - m_selectionStartPoint).manhattanLength();
@@ -477,6 +478,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 
     m_mousePressed = false;
 	m_isKeyShiftPressed = false;
+	this->viewport()->repaint();
 }
 
 void LaserViewer::keyPressEvent(QKeyEvent * event)

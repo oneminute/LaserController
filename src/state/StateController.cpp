@@ -96,3 +96,8 @@ bool StateController::allStates(const QList<QAbstractState*>& states)
     return result;
 }
 
+QSet<QString> StateController::currentStates() 
+{
+    return m_currentStates; 
+}
+

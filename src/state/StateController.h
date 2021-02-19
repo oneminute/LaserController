@@ -123,6 +123,7 @@ public:
     static bool onState(QAbstractState* state);
     static bool anyState(const QList<QAbstractState*>& states);
     static bool allStates(const QList<QAbstractState*>& states);
+    QSet<QString> currentStates();
 
 #pragma region top level states
     DECL_STATE(init)
@@ -159,7 +160,7 @@ public:
 	DECL_STATE(documentPrimitiveSplineReady)
 	DECL_STATE(documentPrimitiveSplineCreating)
 	DECL_STATE(documentPrimitiveSplineEdit)
-		DECL_STATE(documentPrimitiveText)
+	DECL_STATE(documentPrimitiveText)
 	DECL_STATE(documentPrimitiveTextReady)
 	DECL_STATE(documentPrimitiveTextCreating)
 #pragma endregion documentWorking state
