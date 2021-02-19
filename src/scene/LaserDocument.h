@@ -10,6 +10,7 @@
 #include <QGraphicsItem>
 
 #include "PageInformation.h"
+#include "LaserNode.h"
 
 class LaserDocumentPrivate;
 class LaserPrimitive;
@@ -18,7 +19,7 @@ class LaserScene;
 class LayerButton;
 
 class LaserDocumentPrivate;
-class LaserDocument : public QObject
+class LaserDocument : public LaserNode
 {
     Q_OBJECT
 public:
@@ -75,6 +76,8 @@ public slots:
 	void analysis();
     void outline();
     void printOutline(LaserPrimitive* primitive, int level);
+    void save(const QString& filename);
+    void load(const QString& filename);
 
 protected:
     void init();
@@ -88,10 +91,11 @@ signals:
     void outlineUpdated();
 
 protected:
-	QScopedPointer<LaserDocumentPrivate> d_ptr;
+    Q_DISABLE_COPY(LaserDocument)
+    Q_DECLARE_PRIVATE(LaserDocument)
 
-    Q_DISABLE_COPY(LaserDocument);
-	Q_DECLARE_PRIVATE(LaserDocument);
+    friend class LaserNode;
+    friend class LaserNodePrivate;
 };
 
 #endif // LASERDOCUMENT_H

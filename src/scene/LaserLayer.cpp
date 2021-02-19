@@ -9,12 +9,12 @@
 #include "widget/LayerButton.h"
 #include "common/Config.h"
 
-class LaserLayerPrivate
+class LaserLayerPrivate: public LaserNodePrivate
 {
     Q_DECLARE_PUBLIC(LaserLayer)
 public:
     LaserLayerPrivate(LaserLayer* ptr)
-        : q_ptr(ptr)
+        : LaserNodePrivate(ptr)
         , removable(true)
         , minSpeed(60)
         , runSpeed(300)
@@ -72,20 +72,18 @@ public:
 	bool isDefault;
 
     QList<LaserPrimitive*> items;   
-    LaserLayer* q_ptr;
 };
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
-    : QObject(document)
-    , d_ptr(new LaserLayerPrivate(this))
+    : LaserNode(new LaserLayerPrivate(this), LNT_STRUCTURAL)
 {
     Q_D(LaserLayer);
     Q_ASSERT(document);
     d->doc = document;
     d->type = type;
     d->isDefault = isDefault;
+    d->nodeName = utils::createUUID("layer_");
     setParent(document);
-    setObjectName(utils::createUUID("layer_"));
 
     if (type == LLT_ENGRAVING)
     {
@@ -123,6 +121,12 @@ void LaserLayer::setRemovable(bool removable)
 { 
     Q_D(LaserLayer);
     d->removable = removable; 
+}
+
+QString LaserLayer::id() const 
+{
+    Q_D(const LaserLayer);
+    return d->nodeName; 
 }
 
 QString LaserLayer::name() const 
