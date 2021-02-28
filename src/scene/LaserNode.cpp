@@ -34,3 +34,30 @@ void LaserNode::setNodeName(const QString& name)
     Q_D(LaserNode);
     d->nodeName = name;
 }
+
+void LaserNode::addChildNode(LaserNode* node)
+{
+    Q_D(LaserNode);
+    if (!d->childNodes.contains(node))
+    {
+        d->childNodes.append(node);
+    }
+}
+
+void LaserNode::removeChildNode(LaserNode* node)
+{
+    Q_D(LaserNode);
+    d->childNodes.removeOne(node);
+}
+
+void LaserNode::clearChildren()
+{
+    Q_D(LaserNode);
+    d->childNodes.clear();
+}
+
+bool LaserNode::hasChildren() const
+{
+    Q_D(const LaserNode);
+    return !d->childNodes.isEmpty();
+}

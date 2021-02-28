@@ -19,7 +19,7 @@ class LaserScene;
 class LayerButton;
 
 class LaserDocumentPrivate;
-class LaserDocument : public LaserNode
+class LaserDocument : public QObject, public LaserNode
 {
     Q_OBJECT
 public:
@@ -64,9 +64,6 @@ public:
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
 
-    //static int layersCount() { return m_layersCount; }
-    //static void setLayersCount(int count) { m_layersCount = count; }
-
 public slots:
     void exportJSON(const QString& filename);
     void updateLayersStructure();
@@ -75,14 +72,19 @@ public slots:
     void close();
 	void analysis();
     void outline();
-    void printOutline(LaserPrimitive* primitive, int level);
+    void clearOutline();
+    void printOutline(LaserNode* node, int level);
+    void arrange();
+    void optimize();
     void save(const QString& filename);
     void load(const QString& filename);
 
 protected:
     void init();
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
-    bool iterateOutlineNodes(LaserPrimitive* candidate, QList<QGraphicsItem*>& nodes);
+    void outline(LaserNode* node);
+    void clearOutline(LaserNode* node);
+    void addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node);
 
 signals:
     void layersStructureChanged();
@@ -92,7 +94,7 @@ signals:
 
 protected:
     Q_DISABLE_COPY(LaserDocument)
-    Q_DECLARE_PRIVATE(LaserDocument)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserDocument)
 
     friend class LaserNode;
     friend class LaserNodePrivate;

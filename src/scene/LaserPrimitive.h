@@ -14,6 +14,8 @@
 #include <QTextEdit>
 #include <opencv2/opencv.hpp>
 
+#include "LaserNode.h"
+
 class LaserDocument;
 class LaserLayer;
 class LaserScene;
@@ -99,7 +101,7 @@ struct SliceGroup
 };
 
 class LaserPrimitivePrivate;
-class LaserPrimitive : public QGraphicsObject
+class LaserPrimitive : public QGraphicsObject, public LaserNode
 {
     Q_OBJECT
 public:
@@ -144,9 +146,8 @@ protected:
 
 protected:
     static QMap<int, int> g_itemsMaxIndex;
-    QScopedPointer<LaserPrimitivePrivate> d_ptr;
 
-    Q_DECLARE_PRIVATE(LaserPrimitive)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPrimitive)
     Q_DISABLE_COPY(LaserPrimitive)
 
     friend class LaserDocument;
@@ -168,7 +169,7 @@ public:
 
 private:
     Q_DISABLE_COPY(LaserShape);
-    Q_DECLARE_PRIVATE(LaserShape);
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserShape);
 };
 
 class LaserEllipsePrivate;
@@ -188,7 +189,7 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    Q_DECLARE_PRIVATE(LaserEllipse)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)
     Q_DISABLE_COPY(LaserEllipse)
 };
 
@@ -209,7 +210,7 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    Q_DECLARE_PRIVATE(LaserRect)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
     Q_DISABLE_COPY(LaserRect)
 };
 
@@ -231,7 +232,7 @@ public:
 
 private:
     Q_DISABLE_COPY(LaserLine);
-    Q_DECLARE_PRIVATE(LaserLine);
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserLine);
 };
 
 class LaserPathPrivate;
@@ -253,7 +254,7 @@ public:
     virtual QList<QPainterPath> subPaths() const;
 
 private:
-    Q_DECLARE_PRIVATE(LaserPath);
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPath);
     Q_DISABLE_COPY(LaserPath);
 };
 
@@ -274,7 +275,7 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    Q_DECLARE_PRIVATE(LaserPolyline)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
     Q_DISABLE_COPY(LaserPolyline)
 };
 
@@ -295,7 +296,7 @@ public:
     virtual QPainterPath toPath() const;
 
 private:
-    Q_DECLARE_PRIVATE(LaserPolygon)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
     Q_DISABLE_COPY(LaserPolygon)
 };
 
@@ -318,7 +319,7 @@ public:
     virtual QString typeName() { return tr("Bitmap"); }
 
 private:
-    Q_DECLARE_PRIVATE(LaserBitmap)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
     Q_DISABLE_COPY(LaserBitmap)
 };
 
@@ -337,7 +338,7 @@ public:
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
 private:
-    Q_DECLARE_PRIVATE(LaserText)
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)
 };
 

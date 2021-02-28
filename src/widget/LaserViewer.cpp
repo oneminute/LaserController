@@ -47,7 +47,7 @@ LaserViewer::~LaserViewer()
 
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
-	qLogD << "paintEvent: " << StateControllerInst.currentStates();
+	//qLogD << "paintEvent: " << StateControllerInst.currentStates();
     QGraphicsView::paintEvent(event);
 	//RULLER
 	//m_ruller.draw();

@@ -75,7 +75,7 @@ public:
 };
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
-    : LaserNode(new LaserLayerPrivate(this), LNT_STRUCTURAL)
+    : LaserNode(new LaserLayerPrivate(this), LNT_LAYER)
 {
     Q_D(LaserLayer);
     Q_ASSERT(document);
@@ -319,6 +319,7 @@ void LaserLayer::addPrimitive(LaserPrimitive * item)
 
     item->setLayer(this);
     d->items.append(item);
+    d->childNodes.append(item);
     d->doc->updateLayersStructure();
 }
 
@@ -389,6 +390,7 @@ void LaserLayer::bindButton(LayerButton * button)
     Q_D(LaserLayer);
     d->button = button;
     connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
+    d->nodeName = button->text();
 }
 
 bool LaserLayer::exportable() const 

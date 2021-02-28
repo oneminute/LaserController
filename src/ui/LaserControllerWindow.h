@@ -109,6 +109,8 @@ protected slots:
     void updatePostEventWidgets(int index);
     void laserBackToMachiningOriginalPoint(bool checked = false);
     void laserResetToOriginalPoint(bool checked = false);
+    void updateOutlineTree();
+    void initDocument(LaserDocument* doc);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);

@@ -22,7 +22,6 @@
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 
-QMap<int, int> LaserPrimitive::g_itemsMaxIndex;
 QMap<LaserPrimitiveType, int> g_counter{
     { LPT_LINE, 0 },
     { LPT_CIRCLE, 0},
@@ -35,12 +34,12 @@ QMap<LaserPrimitiveType, int> g_counter{
     { LPT_TEXT, 0},
 };
 
-class LaserPrimitivePrivate
+class LaserPrimitivePrivate: public LaserNodePrivate
 {
     Q_DECLARE_PUBLIC(LaserPrimitive)
 public:
     LaserPrimitivePrivate(LaserPrimitive* ptr)
-        : q_ptr(ptr)
+        : LaserNodePrivate(ptr)
         , doc(nullptr)
         , layer(nullptr)
         , isHover(false)
@@ -51,25 +50,20 @@ public:
     LaserLayer* layer;
     QRectF boundingRect;
     LaserPrimitiveType type;
-    QString name;
     bool isHover;
     QPainterPath outline;
-
-    LaserPrimitive* q_ptr;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type)
-    : d_ptr(data)
+    : LaserNode(data, LNT_PRIMITIVE)
 {
     Q_D(LaserPrimitive);
     d->doc = doc;
     d->type = type;
     Q_ASSERT(doc);
-    setParent(doc);
+    QObject::setParent(doc);
 
     g_counter[type]++;
-    QString objName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
-    setObjectName(objName);
 
     this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
@@ -77,17 +71,13 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
 
     this->setAcceptHoverEvents(true);
 
-    if (!g_itemsMaxIndex.contains(d->type))
-    {
-        g_itemsMaxIndex.insert(d->type, 0);
-    }
-    int index = ++g_itemsMaxIndex[d->type];
-    d->name = QString("%1_%2").arg(typeName(d->type)).arg(index);
+    d->nodeName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
 }
 
 LaserPrimitive::~LaserPrimitive()
 {
-    qDebug() << objectName();
+    Q_D(LaserPrimitive);
+    qDebug() << d->nodeName;
 }
 
 LaserDocument* LaserPrimitive::document() const 
@@ -128,7 +118,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
     QPainterPath outline = this->outline();
     QPointF startPos = outline.pointAtPercent(0);
-    painter->drawText(startPos, this->objectName());
+    painter->drawText(startPos, name());
 }
 
 QRectF LaserPrimitive::boundingRect() const
@@ -178,13 +168,13 @@ bool LaserPrimitive::isBitmap() const
 QString LaserPrimitive::name() const 
 {
     Q_D(const LaserPrimitive);
-    return d->name; 
+    return d->nodeName; 
 }
 
 void LaserPrimitive::setName(const QString& name) 
 {
     Q_D(LaserPrimitive);
-    d->name = name; 
+    d->nodeName = name; 
 }
 
 LaserLayer* LaserPrimitive::layer() const 
@@ -254,7 +244,7 @@ void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	QGraphicsObject::mousePressEvent(event);
 	if (!this->isSelected()) {
-		LaserDocument* document = (LaserDocument*)this->parent();
+		LaserDocument* document = (LaserDocument*)this->QObject::parent();
 		document->scene()->clearSelection();
 	}
 	
@@ -824,7 +814,7 @@ void LaserBitmap::draw(QPainter * painter)
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)
 {
     QDebugStateSaver saver(debug);
-    debug.nospace() << "(" << item.name() << ", " << item.objectName() << ", " << item.type() << ")";
+    debug.nospace() << "(" << item.name() << ", " << item.type() << ")";
     return debug;
 }
 

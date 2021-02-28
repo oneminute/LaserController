@@ -176,7 +176,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             item->setTransform(t);
 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
-                item->setObjectName(node->nodeId());
+                item->setName(node->nodeId());
 
             ldoc->addPrimitive(item);
         }

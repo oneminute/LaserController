@@ -7,13 +7,14 @@
 enum LaserNodeType
 {
     LNT_UNKNOWN,
-    LNT_STRUCTURAL,
+    LNT_DOCUMENT,
+    LNT_LAYER,
     LNT_PRIMITIVE
 };
 
 class LaserNodePrivate;
 
-class LaserNode: public QObject
+class LaserNode
 {
 public:
     LaserNode(LaserNodePrivate* dPtr, LaserNodeType nodeType);
@@ -24,6 +25,11 @@ public:
 
     QString nodeName() const;
     void setNodeName(const QString& name);
+
+    void addChildNode(LaserNode* node);
+    void removeChildNode(LaserNode* node);
+    void clearChildren();
+    bool hasChildren() const;
 
 protected:
     QScopedPointer<LaserNodePrivate> d_ptr;

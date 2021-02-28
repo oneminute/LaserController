@@ -17,7 +17,7 @@ class LaserDocument;
 class LayerButton;
 
 class LaserLayerPrivate;
-class LaserLayer : public LaserNode
+class LaserLayer : public QObject, public LaserNode
 {
     Q_OBJECT
 public:
@@ -111,7 +111,7 @@ protected:
 
 protected:
     
-    Q_DECLARE_PRIVATE(LaserLayer);
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserLayer);
     Q_DISABLE_COPY(LaserLayer)
 };
 

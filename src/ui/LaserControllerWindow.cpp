@@ -496,14 +496,7 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::SVG);
     LaserDocument* doc = importer->import(filename, m_scene);
-    if (doc)
-    {
-		connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
-        doc->bindLayerButtons(m_layerButtons);
-        m_scene->updateDocument(doc);
-        m_ui->tableWidgetLayers->setDocument(doc);
-        m_ui->tableWidgetLayers->updateItems();
-    }
+    initDocument(doc);
 }
 void LaserControllerWindow::onActionNew(bool checked)
 {
@@ -513,13 +506,7 @@ void LaserControllerWindow::onActionNew(bool checked)
 	page.setHeight(280);
 	doc->setPageInformation(page);
 	doc->open();
-	if (doc)
-	{
-		doc->bindLayerButtons(m_layerButtons);
-		m_scene->updateDocument(doc);
-		m_ui->tableWidgetLayers->setDocument(doc);
-		m_ui->tableWidgetLayers->updateItems();
-	}
+    initDocument(doc);
 }
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
@@ -529,13 +516,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
     LaserDocument* doc = importer->import("", m_scene, params);
-    if (doc)
-    {
-        doc->bindLayerButtons(m_layerButtons);
-        m_scene->updateDocument(doc);
-        m_ui->tableWidgetLayers->setDocument(doc);
-        m_ui->tableWidgetLayers->updateItems();
-    }
+    initDocument(doc);
 }
 
 void LaserControllerWindow::onActionRemoveLayer(bool checked)
@@ -1294,6 +1275,25 @@ void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
     LaserDriver::instance().lPenMoveToOriginalPoint(value.toDouble());
 }
 
+void LaserControllerWindow::updateOutlineTree()
+{
+    
+}
+
+void LaserControllerWindow::initDocument(LaserDocument* doc)
+{
+    if (doc)
+    {
+		connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
+        connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
+        connect(m_ui->actionPathOptimization, &QAction::triggered, doc, &LaserDocument::optimize);
+        doc->bindLayerButtons(m_layerButtons);
+        m_scene->updateDocument(doc);
+        m_ui->tableWidgetLayers->setDocument(doc);
+        m_ui->tableWidgetLayers->updateItems();
+    }
+}
+
 void LaserControllerWindow::bindWidgetsProperties()
 {
     // actionOpen
@@ -1429,14 +1429,6 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, devicePausedState);
     // end actionReset
-
-    // actionPathOptimization
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, devicePausedState);
-    // end actionPathOptimization
 
     // actionMoveTop
     BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, initState);
@@ -1725,6 +1717,12 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", true, documentIdleState);
     // end actionAnalysisDocument
+
+    // actionPathOptimization
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", true, documentIdleState);
+    // end actionPathOptimization
 }
 
 void LaserControllerWindow::showEvent(QShowEvent * event)

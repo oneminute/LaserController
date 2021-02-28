@@ -42,7 +42,7 @@ public:
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
-	: LaserNode(new LaserDocumentPrivate(this), LNT_STRUCTURAL)
+	: LaserNode(new LaserDocumentPrivate(this), LNT_DOCUMENT)
 {
     Q_D(LaserDocument);
 	d->scene = scene;
@@ -57,7 +57,7 @@ LaserDocument::~LaserDocument()
 void LaserDocument::addPrimitive(LaserPrimitive * item)
 {
 	Q_D(LaserDocument);
-    d->primitives.insert(item->objectName(), item);
+    d->primitives.insert(item->nodeName(), item);
 
     if (item->isShape())
     {
@@ -82,8 +82,8 @@ void LaserDocument::removePrimitive(LaserPrimitive * item)
 {
 	Q_D(LaserDocument);
     item->layer()->removePrimitive(item);
-    d->primitives.remove(item->objectName());
-    item->deleteLater();
+    d->primitives.remove(item->nodeName());
+    item->QObject::deleteLater();
 }
 
 PageInformation LaserDocument::pageInformation() const
@@ -126,6 +126,7 @@ void LaserDocument::addLayer(LaserLayer* layer)
 {
 	Q_D(LaserDocument);
     d->layers.append(layer);
+    d->childNodes.append(layer);
 
     updateLayersStructure();
 }
@@ -139,6 +140,7 @@ void LaserDocument::removeLayer(LaserLayer * layer)
     if (i < 2)
         return;
     d->layers.removeOne(layer);
+    d->childNodes.removeOne(layer);
 
     updateLayersStructure();
 }
@@ -447,58 +449,87 @@ void LaserDocument::analysis()
 
 void LaserDocument::outline()
 {
-    QStack<LaserPrimitive*> stack;
-    QList<QGraphicsItem*> outlineTree;
-    for (LaserPrimitive* primitive : primitives().values())
-    {
-        stack.push(primitive);
-    }
-
-    while (!stack.isEmpty())
-    {
-        LaserPrimitive* candidate = stack.pop();
-        qLogD << "candidate: " << candidate->objectName();
-
-        // first primitive
-        if (outlineTree.isEmpty())
-        {
-            outlineTree.append(candidate);
-            continue;
-        }
-
-        if (iterateOutlineNodes(candidate, outlineTree))
-        {
-            outlineTree.append(candidate);
-        }
-    }
-
-    QStack<LaserPrimitive*> showStack;
-    for (QGraphicsItem* item : outlineTree)
-    {
-        LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
-        if (!primitive)
-            continue;
-        printOutline(primitive, 0);
-    }
+    clearOutline();
+    printOutline(this, 0);
+    outline(this);
+    printOutline(this, 0);
 
     emit outlineUpdated();
 }
 
-void LaserDocument::printOutline(LaserPrimitive* primitive, int level)
+void LaserDocument::clearOutline()
+{
+    clearOutline(this);
+}
+
+void LaserDocument::printOutline(LaserNode* node, int level)
 {
     QString space = "";
     for (int i = 0; i < level; i++)
     {
         space.append("  ");
     }
-    qDebug().nospace().noquote() << space << primitive->objectName();
+    qDebug().nospace().noquote() << space << node->nodeName();
 
-    for (QGraphicsItem* item : primitive->childItems())
+    for (LaserNode* item : node->childNodes())
     {
-        LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
-        if (!primitive)
-            continue;
-        printOutline(primitive, level + 1);
+        printOutline(item, level + 1);
+    }
+}
+
+void LaserDocument::arrange()
+{
+}
+
+void LaserDocument::optimize()
+{
+    for (LaserLayer* layer : layers())
+    {
+        QMap<LaserNode*, int> levelMap;
+        QStack<LaserNode*> stack;
+        stack.push(layer);
+        levelMap.insert(layer, -1);
+        int maxLevel = 0;
+        while (!stack.isEmpty())
+        {
+            LaserNode* node = stack.pop();
+            int level = levelMap[node];
+            if (level > maxLevel)
+                maxLevel = level;
+            if (node->hasChildren())
+            {
+                for (LaserNode* childNode : node->childNodes())
+                {
+                    stack.push(childNode);
+                    levelMap.insert(childNode, level + 1);
+                }
+            }
+        }
+
+        QList<QList<LaserNode*>> levelNodes;
+        for (int i = 0; i <= maxLevel; i++)
+        {
+            levelNodes.append(QList<LaserNode*>());
+        }
+        for (QMap<LaserNode*, int>::iterator i = levelMap.begin(); i != levelMap.end(); i++)
+        {
+            LaserNode* node = i.key();
+            int level = i.value();
+            if (level < 0)
+                continue;
+
+            levelNodes[level].append(node);
+        }
+
+        for (int i = 0; i < levelNodes.size(); i++)
+        {
+            for (int j = 0; j < levelNodes[i].size(); j++)
+            {
+                qLogD << i << ", " << j << ": " << levelNodes[i][j]->nodeName();
+            }
+
+            
+        }
     }
 }
 
@@ -512,6 +543,8 @@ void LaserDocument::load(const QString& filename)
 
 void LaserDocument::init()
 {
+    Q_D(LaserDocument);
+    d->nodeName = "document";
     QString layerName = newLayerName();
     LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
     addLayer(layer);
@@ -557,48 +590,78 @@ RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPain
     return rel;
 }
 
-bool LaserDocument::iterateOutlineNodes(LaserPrimitive* candidate, QList<QGraphicsItem*>& nodes)
+void LaserDocument::outline(LaserNode* node)
 {
-    // determine relation between candidate and each primitive within outlineTree
-    bool inserting = true;
-    for (QList<QGraphicsItem*>::Iterator i = nodes.begin(); i != nodes.end();)
+    if (node->nodeType() == LNT_DOCUMENT)
     {
-        QGraphicsItem* treeNode = *i;
-        QList<QGraphicsItem*>::Iterator i2 = i;
-        LaserPrimitive* treeNodePtr = dynamic_cast<LaserPrimitive*>(treeNode);
-        if (!treeNodePtr)
+        for (QList<LaserNode*>::iterator i = node->childNodes().begin(); i != node->childNodes().end(); i++)
+        {
+            outline(*i);
+        }
+    }
+    else if (node->nodeType() == LNT_LAYER)
+    {
+        LaserLayer* layer = dynamic_cast<LaserLayer*>(node);
+        if (!layer)
+            return;
+
+        for (LaserPrimitive* primitive : layer->primitives())
+        {
+            addPrimitiveToNodesTree(primitive, layer);
+        }
+    }
+}
+
+void LaserDocument::clearOutline(LaserNode* node)
+{
+    if (node->hasChildren())
+    {
+        for (LaserNode* node : node->childNodes())
+        {
+            clearOutline(node);
+        }
+    }
+
+    node->clearChildren();
+    if (node->nodeType() == LNT_DOCUMENT)
+    {
+        LaserDocument* doc = dynamic_cast<LaserDocument*>(node);
+        for (LaserLayer* layer : doc->layers())
+        {
+            addChildNode(layer);
+        }
+    }
+
+}
+
+void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node)
+{
+    if (!node->hasChildren())
+    {
+        node->addChildNode(primitive);
+        return;
+    }
+
+    for (int i = node->childNodes().length() - 1; i >= 0; i--)
+    {
+        LaserNode* childNode = node->childNodes()[i];
+        LaserPrimitive* childPrimitive = dynamic_cast<LaserPrimitive*>(childNode);
+        if (!childPrimitive)
             continue;
-        RELATION rel = determineRelationship(candidate->outline(), treeNodePtr->outline());
-        qDebug().noquote() << candidate->objectName() << treeNodePtr->objectName() << rel;
+
+        RELATION rel = determineRelationship(primitive->outline(), childPrimitive->outline());
+        //qDebug().noquote() << primitive->nodeName() << childPrimitive->nodeName() << rel;
         if (rel == A_CONTAINS_B)
         {
-            treeNodePtr->setParentItem(candidate);
-            nodes.erase(i2);
-            inserting = true;
+            primitive->addChildNode(childPrimitive);
+            node->removeChildNode(childPrimitive);
         }
         else if (rel == B_CONTAINS_A)
         {
-            if (treeNodePtr->childItems().isEmpty())
-            {
-                candidate->setParentItem(treeNodePtr);
-            }
-            else
-            {
-                if (iterateOutlineNodes(candidate, treeNodePtr->childItems()))
-                {
-                    candidate->setParentItem(treeNodePtr);
-                }
-            }
-            return false;
+            addPrimitiveToNodesTree(primitive, childNode);
+            return;
         }
-        else if (rel == INTERSECTION)
-        {
-
-        }
-
-        i++;
     }
-    
-    return inserting;
+    node->addChildNode(primitive);
 }
 
