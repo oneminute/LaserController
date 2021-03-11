@@ -451,18 +451,19 @@ void LaserDocument::analysis()
 void LaserDocument::outline()
 {
     qLogD << "Before outline:";
-    clearOutline();
+    clearOutline(true);
     printOutline(this, 0);
-    outline(this);
+    //outlineByLayers(this);
+    outlineByGroups(this);
     qLogD << "After outline:";
     printOutline(this, 0);
 
     emit outlineUpdated();
 }
 
-void LaserDocument::clearOutline()
+void LaserDocument::clearOutline(bool clearLayers)
 {
-    clearOutline(this);
+    clearOutline(this, clearLayers);
 }
 
 void LaserDocument::printOutline(LaserNode* node, int level)
@@ -554,13 +555,13 @@ RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPain
     return rel;
 }
 
-void LaserDocument::outline(LaserNode* node)
+void LaserDocument::outlineByLayers(LaserNode* node)
 {
     if (node->nodeType() == LNT_DOCUMENT)
     {
         for (QList<LaserNode*>::iterator i = node->childNodes().begin(); i != node->childNodes().end(); i++)
         {
-            outline(*i);
+            outlineByLayers(*i);
         }
     }
     else if (node->nodeType() == LNT_LAYER)
@@ -576,7 +577,18 @@ void LaserDocument::outline(LaserNode* node)
     }
 }
 
-void LaserDocument::clearOutline(LaserNode* node)
+void LaserDocument::outlineByGroups(LaserNode* node)
+{
+    if (node->nodeType() == LNT_DOCUMENT)
+    {
+        for (LaserPrimitive* primitive : primitives())
+        {
+            addPrimitiveToNodesTree(primitive, this);
+        }
+    }
+}
+
+void LaserDocument::clearOutline(LaserNode* node, bool clearLayers)
 {
     if (node->hasChildren())
     {
@@ -587,7 +599,7 @@ void LaserDocument::clearOutline(LaserNode* node)
     }
 
     node->clearChildren();
-    if (node->nodeType() == LNT_DOCUMENT)
+    if (node->nodeType() == LNT_DOCUMENT && !clearLayers)
     {
         LaserDocument* doc = dynamic_cast<LaserDocument*>(node);
         for (LaserLayer* layer : doc->layers())

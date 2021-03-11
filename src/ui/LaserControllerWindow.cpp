@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QStack>
 #include <QTemporaryFile>
 #include <QThread>
 #include <QTimer>
@@ -1277,7 +1278,36 @@ void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 
 void LaserControllerWindow::updateOutlineTree()
 {
-    
+    m_ui->treeWidgetOutline->clear();
+
+    QStack<LaserNode*> stack;
+    stack.push(m_scene->document());
+
+    QMap<LaserNode*, QTreeWidgetItem*> nodeItemMap;
+    while (!stack.isEmpty())
+    {
+        LaserNode* node = stack.pop();
+
+        QTreeWidgetItem* parentItem = nullptr;
+        if (node->parentNode() != nullptr && nodeItemMap.contains(node->parentNode()))
+        {
+            parentItem = nodeItemMap[node->parentNode()];
+        }
+        QTreeWidgetItem* item = new QTreeWidgetItem(parentItem);
+        nodeItemMap.insert(node, item);
+        item->setText(0, node->nodeName());
+        if (parentItem == nullptr)
+        {
+            m_ui->treeWidgetOutline->addTopLevelItem(item);
+        }
+
+        for (LaserNode* childNode : node->childNodes())
+        {
+            stack.push(childNode);
+        }
+    }
+
+    m_ui->treeWidgetOutline->expandAll();
 }
 
 void LaserControllerWindow::initDocument(LaserDocument* doc)

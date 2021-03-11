@@ -72,7 +72,7 @@ public slots:
     void close();
 	void analysis();
     void outline();
-    void clearOutline();
+    void clearOutline(bool clearLayers = false);
     void printOutline(LaserNode* node, int level);
     void arrange();
     void optimize();
@@ -82,8 +82,9 @@ public slots:
 protected:
     void init();
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
-    void outline(LaserNode* node);
-    void clearOutline(LaserNode* node);
+    void outlineByLayers(LaserNode* node);
+    void outlineByGroups(LaserNode* node);
+    void clearOutline(LaserNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node);
 
 signals:
