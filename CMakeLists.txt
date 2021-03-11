@@ -32,7 +32,8 @@ set(Boost_USE_MULTITHREADED ON)
 find_package(Eigen3 REQUIRED)
 find_package(Boost 1.66 COMPONENTS timer REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Test CONFIG REQUIRED)
-find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui videoio REQUIRED)
+find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui videoio flann REQUIRED)
+#find_package(PolyClipping REQUIRED)
 find_package(OpenMP REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
@@ -43,17 +44,17 @@ set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
 configure_file(${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tlh.in VGCoreAuto.tlh)
 
 add_subdirectory(src/widget/LRWidgets)
-
-#add_subdirectory(widgets)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
     src
-    ${Boost_INCLUDE_DIRS}
+    src/algorithm/wykobi
+    ${Boost_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
     src/widget/LRWidgets
 	${PROJECT_BINARY_DIR}
+    #${PolyClipping_INCLUDE_DIRS}
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)
@@ -95,6 +96,12 @@ FILE(GLOB UTIL_SOURCES src/util/*.cpp)
 FILE(GLOB WIDGET_HEADERS src/widget/*.h)
 FILE(GLOB WIDGET_SOURCES src/widget/*.cpp)
 
+FILE(GLOB ALGORITHM_HEADERS src/algorithm/*.h)
+FILE(GLOB ALGORITHM_SOURCES src/algorithm/*.cpp)
+
+FILE(GLOB WYKOBI_HEADERS src/algorithm/wykobi/*.inl)
+FILE(GLOB WYKOBI_SOURCES src/algorithm/wykobi/*.hpp)
+
 FILE(GLOB MOCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_autogen/*.cpp)
 
 set(OTHER_FILES
@@ -115,6 +122,8 @@ set(HEADER_FILES
     ${HEADER_FILES}
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
+    ${ALGORITHM_HEADERS}
+    ${WYKOBI_HEADERS}
     ${HALFTONE_HEADERS}
     ${IMPORT_HEADERS}
     ${LASER_HEADERS}
@@ -131,6 +140,8 @@ set(SRC_FILES
     ${SRC_FILES}
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
+    ${ALGORITHM_SOURCES}
+    ${WYKOBI_SOURCES}
     ${HALFTONE_SOURCES}
     ${IMPORT_SOURCES}
     ${LASER_SOURCES}
@@ -148,6 +159,10 @@ set(SRC_FILES
 IF(MSVC)
     source_group("source\\common" FILES ${COMMON_SOURCES})
     source_group("header\\common" FILES ${COMMON_HEADERS})
+    source_group("source\\algorithm" FILES ${ALGORITHM_SOURCES})
+    source_group("header\\algorithm" FILES ${ALGORITHM_HEADERS})
+    source_group("source\\wykobi" FILES ${WYKOBI_SOURCES})
+    source_group("header\\wykobi" FILES ${WYKOBI_HEADERS})
     source_group("source\\halftone" FILES ${HALFTONE_SOURCES})
     source_group("header\\halftone" FILES ${HALFTONE_HEADERS})
     source_group("source\\import" FILES ${IMPORT_SOURCES})
@@ -182,6 +197,8 @@ set(LINK_LIBRARIES
     glog::glog
     ${GFLAGS_LIBRARIES}
     LRWidgets
+    #PolyClipping
+    #${PolyClipping_LIBRARIES}
 )
 
 if(ANDROID)
@@ -195,6 +212,17 @@ set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
+
+add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
+target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})
+add_executable(TestWykobi test/TestWykobi.cpp)
+target_link_libraries(TestWykobi PRIVATE ${LINK_LIBRARIES})
+add_executable(TestQtClosestPoint test/TestQtClosestPoint.cpp)
+target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
+add_executable(TestQt2Wykobi test/TestQt2Wykobi.cpp)
+target_link_libraries(TestQt2Wykobi PRIVATE ${LINK_LIBRARIES})
+add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
+target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
 
 set(QM_FILES
     ${QM_FILES}

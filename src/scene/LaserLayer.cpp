@@ -71,7 +71,7 @@ public:
     bool visible;
 	bool isDefault;
 
-    QList<LaserPrimitive*> items;   
+    QList<LaserPrimitive*> primitives;   
 };
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
@@ -314,11 +314,11 @@ void LaserLayer::setRunSpeedPower(int runSpeedPower)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
-    if (d->items.contains(item))
+    if (d->primitives.contains(item))
         return;
 
     item->setLayer(this);
-    d->items.append(item);
+    d->primitives.append(item);
     d->childNodes.append(item);
     d->doc->updateLayersStructure();
 }
@@ -326,24 +326,24 @@ void LaserLayer::addPrimitive(LaserPrimitive * item)
 QList<LaserPrimitive*>& LaserLayer::primitives()
 {
     Q_D(LaserLayer);
-    return d->items;
+    return d->primitives;
 }
 
 void LaserLayer::removePrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
-    if (!d->items.contains(item))
+    if (!d->primitives.contains(item))
         return;
 
     item->setLayer(nullptr);
-    d->items.removeOne(item);
+    d->primitives.removeOne(item);
     d->doc->updateLayersStructure();
 }
 
 bool LaserLayer::isEmpty() const
 {
     Q_D(const LaserLayer);
-    return d->items.count() == 0;
+    return d->primitives.count() == 0;
 }
 
 QColor LaserLayer::color() const 
@@ -447,6 +447,12 @@ bool LaserLayer::isDefault() const
     return d->isDefault; 
 }
 
+bool LaserLayer::isAvailable() const
+{
+    Q_D(const LaserLayer);
+    return !d->primitives.isEmpty();
+}
+
 void LaserLayer::onClicked()
 {
     Q_D(LaserLayer);
@@ -459,7 +465,7 @@ void LaserLayer::onClicked()
         }
 
         QList<LaserPrimitiveType> types;
-        for (LaserPrimitive* primitive : d->items)
+        for (LaserPrimitive* primitive : d->primitives)
         {
             if (primitive->isShape())
             {

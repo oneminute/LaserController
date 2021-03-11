@@ -106,6 +106,8 @@ public:
 
     bool isDefault() const;
 
+    virtual bool isAvailable() const;
+
 protected:
     void onClicked();
 

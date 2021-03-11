@@ -118,3 +118,5 @@ tmp/
 iphist.dat
 
 windeployqt/
+
+crash.bin

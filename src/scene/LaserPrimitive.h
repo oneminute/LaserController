@@ -118,6 +118,7 @@ public:
     virtual void draw(QPainter* painter) {};
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return std::vector<cv::Point2f>(); }
+    std::vector<cv::Point2f> mechiningPoints() const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
 
     LaserPrimitiveType primitiveType() const;

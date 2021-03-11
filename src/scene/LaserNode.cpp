@@ -41,6 +41,7 @@ void LaserNode::addChildNode(LaserNode* node)
     if (!d->childNodes.contains(node))
     {
         d->childNodes.append(node);
+        node->setParentNode(this);
     }
 }
 
@@ -60,4 +61,27 @@ bool LaserNode::hasChildren() const
 {
     Q_D(const LaserNode);
     return !d->childNodes.isEmpty();
+}
+
+QPointF LaserNode::center() const
+{
+    Q_D(const LaserNode);
+    return d->center;
+}
+
+bool LaserNode::isAvailable() const
+{
+    return true;
+}
+
+LaserNode* LaserNode::parentNode() const
+{
+    Q_D(const LaserNode);
+    return d->parentNode;
+}
+
+void LaserNode::setParentNode(LaserNode* parent)
+{
+    Q_D(LaserNode);
+    d->parentNode = parent;
 }

@@ -38,7 +38,7 @@ namespace imageUtils
     QByteArray image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width);
 
     QPointF closestPointTo(const QPointF &target, const QPainterPath &sourcePath);
-    bool hit(const QLineF &line, const QPainterPath& path, QPointF &hitPos);
+    bool hit(const QLineF& ray, const QPainterPath& target, QPointF& hitPos);
 
 }
 

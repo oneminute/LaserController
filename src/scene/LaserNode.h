@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QScopedPointer>
+#include <QVector2D>
 
 enum LaserNodeType
 {
@@ -31,6 +32,13 @@ public:
     void clearChildren();
     bool hasChildren() const;
 
+    QPointF center() const;
+
+    virtual bool isAvailable() const;
+
+    LaserNode* parentNode() const;
+    void setParentNode(LaserNode* parent);
+
 protected:
     QScopedPointer<LaserNodePrivate> d_ptr;
 
@@ -45,11 +53,14 @@ public:
     LaserNodePrivate(LaserNode* ptr)
         : q_ptr(ptr)
         , nodeType(LNT_UNKNOWN)
+        , center(0, 0)
     {}
 
+    LaserNode* parentNode;
     QList<LaserNode*> childNodes;
     LaserNodeType nodeType;
     QString nodeName;
+    QPointF center;
     LaserNode* q_ptr;
 };
 

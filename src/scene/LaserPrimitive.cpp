@@ -52,6 +52,7 @@ public:
     LaserPrimitiveType type;
     bool isHover;
     QPainterPath outline;
+    std::vector<cv::Point2f> mechiningPoints;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type)
@@ -118,6 +119,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
     QPainterPath outline = this->outline();
     QPointF startPos = outline.pointAtPercent(0);
+    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
     painter->drawText(startPos, name());
 }
 
@@ -135,7 +137,13 @@ QPointF LaserPrimitive::laserStartPos() const
     return pos;
 }
 
-LaserPrimitiveType LaserPrimitive::primitiveType() const 
+std::vector<cv::Point2f> LaserPrimitive::mechiningPoints() const
+{
+    Q_D(const LaserPrimitive);
+    return d->mechiningPoints;
+}
+
+LaserPrimitiveType LaserPrimitive::primitiveType() const
 {
     Q_D(const LaserPrimitive);
     return d->type; 
@@ -290,6 +298,8 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc)
     d->bounds = bounds;
     d->boundingRect = bounds;
     d->outline.addEllipse(bounds);
+
+    d->center = bounds.center();
 }
 
 QRectF LaserEllipse::bounds() const 
@@ -306,10 +316,12 @@ void LaserEllipse::setBounds(const QRectF& bounds)
 
 std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& canvas)
 {
+    Q_D(LaserEllipse);
     QPainterPath path = toPath();
 
     std::vector<cv::Point2f> points;
     pltUtils::pathPoints(path, points, canvas);
+    d->mechiningPoints = points;
     return points;
 }
 
@@ -349,6 +361,7 @@ LaserRect::LaserRect(const QRectF rect, LaserDocument * doc)
     d->rect = rect;
     d->boundingRect = rect;
     d->outline.addRect(rect);
+    d->center = rect.center();
 }
 
 QRectF LaserRect::rect() const 
@@ -392,6 +405,7 @@ std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& canvas)
         cv::line(canvas, pt4, pt1, cv::Scalar(0));
     }
 
+    d->mechiningPoints = points;
     return points;
 }
 
@@ -427,6 +441,7 @@ LaserLine::LaserLine(const QLineF & line, LaserDocument * doc)
     d->boundingRect = QRectF(d->line.p1(), d->line.p2());
     d->outline.moveTo(line.p1());
     d->outline.lineTo(line.p2());
+    d->center = line.center();
 }
 
 QLineF LaserLine::line() const 
@@ -443,11 +458,13 @@ void LaserLine::setLine(const QLineF& line)
 
 std::vector<cv::Point2f> LaserLine::cuttingPoints(cv::Mat& canvas)
 {
+    Q_D(LaserLine);
     std::vector<cv::Point2f> points;
     QPainterPath path = toPath();
     
     pltUtils::pathPoints(path, points, canvas);
     
+    d->mechiningPoints = points;
     return points;
 }
 
@@ -489,6 +506,7 @@ LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc)
     d->path = path;
     d->boundingRect = path.boundingRect();
     d->outline.addPath(path);
+    d->center = d->boundingRect.center();
 }
 
 QPainterPath LaserPath::path() const 
@@ -505,11 +523,13 @@ void LaserPath::setPath(const QPainterPath& path)
 
 std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& canvas)
 {
+    Q_D(LaserPath);
     std::vector<cv::Point2f> points;
     QPainterPath path = toPath();
     
     pltUtils::pathPoints(path, points, canvas);
     
+    d->mechiningPoints = points;
     return points;
 }
 
@@ -563,11 +583,15 @@ LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc)
     d->poly = poly;
     d->boundingRect = poly.boundingRect();
 
+    d->center = *poly.begin();
     d->outline.moveTo(*poly.begin());
     for (int i = 1; i < poly.count(); i++)
     {
+        d->center += poly[i];
         d->outline.lineTo(poly[i]);
     }
+
+    d->center /= poly.count();
 }
 
 QPolygonF LaserPolyline::polyline() const 
@@ -602,6 +626,7 @@ std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
     if (!canvas.empty())
         cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     
+    d->mechiningPoints = points;
     return points;
 }
 
@@ -642,6 +667,12 @@ LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc)
     d->poly = poly;
     d->boundingRect = poly.boundingRect();
     d->outline.addPolygon(poly);
+    
+    for (int i = 0; i < poly.count(); i++)
+    {
+        d->center += poly[i];
+    }
+    d->center /= poly.count();
 }
 
 QPolygonF LaserPolygon::polyline() const 
@@ -677,6 +708,7 @@ std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & canvas)
     if (!canvas.empty())
         cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
     
+    d->mechiningPoints = points;
     return points;
 }
 
@@ -719,6 +751,7 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     d->boundingRect = bounds;
     d->type = LPT_BITMAP;
     d->outline.addRect(bounds);
+    d->center = bounds.center();
 }
 
 QImage LaserBitmap::image() const 
@@ -917,6 +950,7 @@ LaserText::LaserText(const QRect rect, const QString content, LaserDocument* doc
     d->content = content;
 	d->boundingRect = rect;
     d->outline.addRect(rect);
+    d->center = rect.center();
 }
 
 QRect LaserText::rect() const 

@@ -16,6 +16,7 @@
 #include "LaserPrimitive.h"
 #include "PageInformation.h"
 #include "common/Config.h"
+#include "algorithm/PathOptimizer.h"
 #include "laser/LaserDriver.h"
 #include "util/PltUtils.h"
 #include "LaserLayer.h"
@@ -431,7 +432,7 @@ void LaserDocument::analysis()
 	Q_D(LaserDocument);
 	qLogD << "begin analysising";
 
-	for (LaserPrimitive* primitive : d->primitives)
+	/*for (LaserPrimitive* primitive : d->primitives)
 	{
 		if (primitive->primitiveType() == LPT_PATH)
 		{
@@ -442,16 +443,18 @@ void LaserDocument::analysis()
 				qLogD << "sub path " << i << ":" << subPaths[i];
 			}
 		}
-	}
+	}*/
 
     outline();
 }
 
 void LaserDocument::outline()
 {
+    qLogD << "Before outline:";
     clearOutline();
     printOutline(this, 0);
     outline(this);
+    qLogD << "After outline:";
     printOutline(this, 0);
 
     emit outlineUpdated();
@@ -464,12 +467,15 @@ void LaserDocument::clearOutline()
 
 void LaserDocument::printOutline(LaserNode* node, int level)
 {
+    if (!node->isAvailable())
+        return;
+
     QString space = "";
     for (int i = 0; i < level; i++)
     {
         space.append("  ");
     }
-    qDebug().nospace().noquote() << space << node->nodeName();
+    qLogD << space << node->nodeName();
 
     for (LaserNode* item : node->childNodes())
     {
@@ -483,54 +489,12 @@ void LaserDocument::arrange()
 
 void LaserDocument::optimize()
 {
-    for (LaserLayer* layer : layers())
-    {
-        QMap<LaserNode*, int> levelMap;
-        QStack<LaserNode*> stack;
-        stack.push(layer);
-        levelMap.insert(layer, -1);
-        int maxLevel = 0;
-        while (!stack.isEmpty())
-        {
-            LaserNode* node = stack.pop();
-            int level = levelMap[node];
-            if (level > maxLevel)
-                maxLevel = level;
-            if (node->hasChildren())
-            {
-                for (LaserNode* childNode : node->childNodes())
-                {
-                    stack.push(childNode);
-                    levelMap.insert(childNode, level + 1);
-                }
-            }
-        }
-
-        QList<QList<LaserNode*>> levelNodes;
-        for (int i = 0; i <= maxLevel; i++)
-        {
-            levelNodes.append(QList<LaserNode*>());
-        }
-        for (QMap<LaserNode*, int>::iterator i = levelMap.begin(); i != levelMap.end(); i++)
-        {
-            LaserNode* node = i.key();
-            int level = i.value();
-            if (level < 0)
-                continue;
-
-            levelNodes[level].append(node);
-        }
-
-        for (int i = 0; i < levelNodes.size(); i++)
-        {
-            for (int j = 0; j < levelNodes[i].size(); j++)
-            {
-                qLogD << i << ", " << j << ": " << levelNodes[i][j]->nodeName();
-            }
-
-            
-        }
-    }
+    Q_D(LaserDocument);
+	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
+	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
+    //cv::Mat canvas(pageHeight * 40, pageWidth * 40, CV_8UC3, cv::Scalar(255, 255, 255));
+    QScopedPointer<PathOptimizer> optimizer(new PathOptimizer(layers()));
+    optimizer->optimize(pageWidth, pageHeight);
 }
 
 void LaserDocument::save(const QString& filename)

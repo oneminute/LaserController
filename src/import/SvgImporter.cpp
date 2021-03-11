@@ -71,7 +71,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     while (!stack.empty())
     {
         QSvgNode* node = stack.pop();
-		qDebug() << "node shape:" << node->type() << ", display mode:" << node->displayMode();
+		//qDebug() << "node shape:" << node->type() << ", display mode:" << node->displayMode();
         QSvgRenderer* renderer = nullptr;
         LaserPrimitive* item = nullptr;
         switch (node->type())

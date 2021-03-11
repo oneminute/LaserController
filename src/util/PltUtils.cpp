@@ -3,6 +3,7 @@
 #include <QtMath>
 #include <QDebug>
 
+#include "common/common.h"
 #include "TypeUtils.h"
 
 int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
@@ -48,7 +49,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
 
     QPointF startPt = pt;
-    qDebug() << "Slope:" << slope << ", Angle degrees: " << qRadiansToDegrees(radians);
+    //qDebug() << "Slope:" << slope << ", Angle degrees: " << qRadiansToDegrees(radians);
 
     QPointF anchor = pt;
     qreal anchorSlope = slope;
@@ -100,6 +101,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     if (!canvas.empty())
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
 
+    qLogD << "path with " << path.elementCount() << " elements convert to " << points.size() << " points.";
     return points.size();
 }
 

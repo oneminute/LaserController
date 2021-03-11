@@ -984,7 +984,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
     Returns the closest element (position) in \a sourcePath to \a target,
     using \l{QPoint::manhattanLength()} to determine the distances.
 */
-QPointF imageUtils::closestPointTo(const QPointF &target, const QPainterPath &sourcePath)
+QPointF imageUtils::closestPointTo(const QPointF& target, const QPainterPath& sourcePath)
 {
     Q_ASSERT(!sourcePath.isEmpty());
     QPointF shortestDistance = sourcePath.elementAt(0) - target;
@@ -1004,27 +1004,37 @@ QPointF imageUtils::closestPointTo(const QPointF &target, const QPainterPath &so
     Returns \c true if \a projectilePath intersects with any items in \a scene,
     setting \a hitPos to the position of the intersection.
 */
-bool imageUtils::hit(const QLineF &line, const QPainterPath& path, QPointF &hitPos)
+bool imageUtils::hit(const QLineF& ray, const QPainterPath& target, QPointF& hitPos)
 {
-    //// Extend the first point in the path out by 1 pixel.
-    //QLineF startEdge = line.normalVector();
-    //startEdge.setLength(1);
-    //// Swap the points in the line so the normal vector is at the other end of the line.
-    //line.setPoints(pathAsLine.p2(), pathAsLine.p1());
-    //QLineF endEdge = pathAsLine.normalVector();
-    //// The end point is currently pointing the wrong way; move it to face the same
-    //// direction as startEdge.
-    //endEdge.setLength(-1);
-    //// Now we can create a rectangle from our edges.
-    //QPainterPath rectPath(startEdge.p1());
-    //rectPath.lineTo(startEdge.p2());
-    //rectPath.lineTo(endEdge.p2());
-    //rectPath.lineTo(endEdge.p1());
-    //rectPath.lineTo(startEdge.p1());
-    //// The hit position will be the element (point) of the rectangle that is the
-    //// closest to where the projectile was fired from.
-    //hitPos = closestPointTo(projectileStartPos, targetShape.intersected(rectPath));
+    // QLineF has normalVector(), which is useful for extending our path to a rectangle.
+    // The path needs to be a rectangle, as QPainterPath::intersected() only accounts
+    // for intersections between fill areas, which ray doesn't have.
+    // Extend the first point in the path out by 1 pixel.
+    QLineF startEdge = ray.normalVector();
+    startEdge.setLength(1);
 
-    return false;
+    // Swap the points in the line so the normal vector is at the other end of the line.
+    QLineF revertLine(ray.p2(), ray.p1());
+    QLineF endEdge = revertLine.normalVector();
+
+    // The end point is currently pointing the wrong way; move it to face the same
+    // direction as startEdge.
+    endEdge.setLength(-1);
+
+    // Now we can create a rectangle from our edges.
+    QPainterPath rectPath(startEdge.p1());
+    rectPath.lineTo(startEdge.p2());
+    rectPath.lineTo(endEdge.p2());
+    rectPath.lineTo(endEdge.p1());
+    rectPath.lineTo(startEdge.p1());
+
+    // The hit position will be the element (point) of the rectangle that is the
+    // closest to where the projectile was fired from.
+    QPainterPath intersection = target.intersected(rectPath);
+    if (intersection.isEmpty())
+        return false;
+
+    hitPos = closestPointTo(ray.p1(), intersection);
+    return true;
 }
 
