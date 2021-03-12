@@ -1,5 +1,7 @@
 #include "LaserNode.h"
 
+#include <QStack>
+
 LaserNode::LaserNode(LaserNodePrivate* dPtr, LaserNodeType nodeType)
     : d_ptr(dPtr)
 {
@@ -84,4 +86,31 @@ void LaserNode::setParentNode(LaserNode* parent)
 {
     Q_D(LaserNode);
     d->parentNode = parent;
+}
+
+QList<LaserNode*> LaserNode::findAllLeaves(LaserNode* exclude)
+{
+    QList<LaserNode*> leaves;
+    QStack<LaserNode*> stack;
+
+    stack.push(this);
+    while (!stack.isEmpty())
+    {
+        LaserNode* laserNode = stack.pop();
+
+        if (!laserNode->hasChildren())
+        {
+            leaves.append(laserNode);
+            continue;
+        }
+
+        for (LaserNode* childNode : laserNode->childNodes())
+        {
+            if (childNode == exclude)
+                continue;
+
+            stack.push(childNode);
+        }
+    }
+    return leaves;
 }

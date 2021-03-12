@@ -39,6 +39,8 @@ public:
     LaserNode* parentNode() const;
     void setParentNode(LaserNode* parent);
 
+    QList<LaserNode*> findAllLeaves(LaserNode* exclude = nullptr);
+
 protected:
     QScopedPointer<LaserNodePrivate> d_ptr;
 

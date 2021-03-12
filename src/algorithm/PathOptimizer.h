@@ -29,6 +29,10 @@ public:
     cv::Point2f tailPoint() const;
     cv::Point2f point(int index) const;
 
+    //Node* parent();
+    //void addChild(Node* node);
+    //QList<Node*>& children();
+
 private:
     QScopedPointer<NodePrivate> m_ptr;
 
@@ -88,10 +92,15 @@ class PathOptimizer : public QObject
 {
     Q_OBJECT
 public:
-    explicit PathOptimizer(QList<LaserLayer*> layers, QObject* parent = nullptr);
+    explicit PathOptimizer(LaserNode* root, bool containsLayers = true, QObject* parent = nullptr);
     virtual ~PathOptimizer();
 
     void optimize(int canvasWidth, int canvasHeight);
+    bool isContainsLayers() const;
+
+protected:
+    float initializeByTopologyLayers(QList<LaserNode*> groups);
+    float initializeByGroups(LaserNode* root);
 
 private:
     QScopedPointer<PathOptimizerPrivate> m_ptr;

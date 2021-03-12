@@ -401,6 +401,7 @@ void Ant::drawPath(cv::Mat& canvas, int iteration)
 {
     Q_D(const Ant);
     cv::Point2f lastPos(0, 0);
+    QRandomGenerator random(QDateTime::currentDateTime().toMSecsSinceEpoch());
     for (int i = 0; i < d->nodesQueue.length(); i++)
     {
         cv::circle(canvas, lastPos, 20, cv::Scalar(0, 0, 255), 5);
@@ -411,11 +412,11 @@ void Ant::drawPath(cv::Mat& canvas, int iteration)
         std::vector<cv::Point2f> points = node->points();
         cv::Mat pointsMat(points);
         pointsMat.convertTo(pointsMat, CV_32S);
-        cv::polylines(canvas, pointsMat, false, cv::Scalar(255, 0, 0), 5);
+        cv::polylines(canvas, pointsMat, false, cv::Scalar(random.bounded(256), random.bounded(256), random.bounded(256)), 5);
         lastPos = startPos;
         if (!node->isClosour())
         {
-            if (d->pointIndex == 0)
+            if (pointIndex == 0)
             {
                 lastPos = node->tailPoint();
             }
@@ -423,6 +424,7 @@ void Ant::drawPath(cv::Mat& canvas, int iteration)
             {
                 lastPos = node->headPoint();
             }
+            cv::circle(canvas, lastPos, 18, cv::Scalar(0, 255, 0), 6);
         }
         qLogD << "  " << node->primitive()->nodeName();
     }
@@ -443,25 +445,123 @@ public:
     QList<QList<QList<Node*>>> nodes;
     QList<Edge*> edges;
     QMap<LaserPrimitive*, Node*> pritmive2NodeMap;
+    bool containsLayers;
+    QList<Node*> topologyTrees;
+    QList<Node*> leaves;
     PathOptimizer* q_ptr;
 };
 
-PathOptimizer::PathOptimizer(QList<LaserLayer*> layers, QObject* parent)
+PathOptimizer::PathOptimizer(LaserNode* root, bool containsLayers, QObject* parent)
     : QObject(parent)
     , m_ptr(new PathOptimizerPrivate(this))
 {
     Q_D(PathOptimizer);
+    d->containsLayers = containsLayers;
 
-    for (LaserLayer* layer : layers)
+    //float avgEdgeLength = initializeByTopologyLayers(root->childNodes());
+    float avgEdgeLength = initializeByGroups(root);
+
+    float pheromones = 1.0f;
+
+    /*for (int i = 0; i < d->edges.size(); i++)
     {
-        if (!layer->isAvailable())
-            continue;
+        d->edges[i]->setPheromones(pheromones);
+        qLogD << i << ". " << d->edges[i]->a()->primitive()->nodeName()
+            << " --> " << d->edges[i]->b()->primitive()->nodeName()
+            << ", length: " << d->edges[i]->length()
+            << ", pheromones: " << d->edges[i]->pheromones();
+    }*/
+}
+
+PathOptimizer::~PathOptimizer()
+{
+}
+
+void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
+{
+    Q_D(PathOptimizer);
+    int maxAnts = 3;
+    int maxIteration = 5;
+    const float rho = 0.5f;
+
+    QList<Ant*> ants;
+    ants.reserve(maxAnts);
+    QRandomGenerator random(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    //int initNodesCount = d->nodes[0][d->nodes[0].size() - 1].size();
+    int initNodesCount = d->leaves.size();
+
+    for (int i = 0; i < maxAnts; i++)
+    {
+        Ant* ant = new Ant(i);
+        ants.append(ant);
+    }
+
+    for (int iteration = 0; iteration < maxIteration; iteration++)
+    {
+        qLogD << "iteration " << iteration;
+        for (int i = 0; i < maxAnts; i++)
+        {
+            int nodeIndex = random.bounded(initNodesCount);
+            Node* node = d->leaves[nodeIndex];
+            Ant* ant = ants[i];
+            ant->initialize();
+            ant->arrived(node, cv::Point2f(0, 0));
+            ants.append(ant);
+        }
+        for (int iAnt = 0; iAnt < maxAnts; iAnt++)
+        {
+            Ant* ant = ants[iAnt];
+            while (true)
+            {
+                if (!ant->moveForward())
+                    break;
+            }
+            qLogD << "ant " << iAnt << " total length: " << ant->totalLength();
+        }
+
+        for (Edge* edge : d->edges)
+        {
+            float pheromones = edge->pheromones();
+            edge->setPheromones(pheromones * (1 - rho));
+        }
+
+        for (int iAnt = 0; iAnt < maxAnts; iAnt++)
+        {
+            Ant* ant = ants[iAnt];
+            ant->updatePheromones();
+            cv::Mat canvas = cv::Mat(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(255, 255, 255));
+            ant->drawPath(canvas, iteration);
+        }
+        
+    }
+}
+
+bool PathOptimizer::isContainsLayers() const
+{
+    Q_D(const PathOptimizer);
+    return d->containsLayers;
+}
+
+float PathOptimizer::initializeByTopologyLayers(QList<LaserNode*> groups)
+{
+    Q_D(PathOptimizer);
+    QList<LaserNode*> topGroups;
+    if (d->containsLayers)
+    {
+        topGroups = groups;
+    }
+    else
+    {
+        topGroups.append(groups[0]->parentNode());
+    }
+    for (LaserNode* group : topGroups)
+    {
         int layerIndex = d->nodes.length();
         d->nodes.append(QList<QList<Node*>>());
         QMap<LaserNode*, int> levelMap;
         QStack<LaserNode*> stack;
-        stack.push(layer);
-        levelMap.insert(layer, -1);
+        stack.push(group);
+        levelMap.insert(group, -1);
         int maxLevel = 0;
         while (!stack.isEmpty())
         {
@@ -533,78 +633,100 @@ PathOptimizer::PathOptimizer(QList<LaserLayer*> layers, QObject* parent)
         }
     }
     avgEdgeLength /= d->edges.size();
-    //float pheromones = 1.0f / (d->pritmive2NodeMap.size() * avgEdgeLength);
-    float pheromones = 1.0f;
-
-    for (int i = 0; i < d->edges.size(); i++)
-    {
-        d->edges[i]->setPheromones(pheromones);
-        qLogD << i << ". " << d->edges[i]->a()->primitive()->nodeName()
-            << " --> " << d->edges[i]->b()->primitive()->nodeName()
-            << ", length: " << d->edges[i]->length()
-            << ", pheromones: " << d->edges[i]->pheromones();
-    }
+    return avgEdgeLength;
 }
 
-PathOptimizer::~PathOptimizer()
-{
-}
-
-void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
+float PathOptimizer::initializeByGroups(LaserNode* root)
 {
     Q_D(PathOptimizer);
-    int maxAnts = 3;
-    int maxIteration = 100;
-    const float rho = 0.5f;
+    QStack<LaserNode*> stack;
 
-    QList<Ant*> ants;
-    ants.reserve(maxAnts);
-    QRandomGenerator random(QDateTime::currentDateTime().toMSecsSinceEpoch());
-    int initNodesCount = d->nodes[0][d->nodes[0].size() - 1].size();
-
-    for (int i = 0; i < maxAnts; i++)
+    for (LaserNode* node : root->childNodes())
     {
-        Ant* ant = new Ant(i);
-        ants.append(ant);
+        stack.push(node);
     }
 
-    for (int iteration = 0; iteration < maxIteration; iteration++)
+    QMap<LaserNode*, Node*> laserNodeMap;
+    while (!stack.isEmpty())
     {
-        qLogD << "iteration " << iteration;
-        for (int i = 0; i < maxAnts; i++)
+        LaserNode* laserNode = stack.pop();
+        LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(laserNode);
+        if (primitive)
         {
-            int nodeIndex = random.bounded(initNodesCount);
-            Node* node = d->nodes[0][d->nodes[0].size() - 1][nodeIndex];
-            Ant* ant = ants[i];
-            ant->initialize();
-            ant->arrived(node, cv::Point2f(0, 0));
-            ants.append(ant);
-        }
-        for (int iAnt = 0; iAnt < maxAnts; iAnt++)
-        {
-            Ant* ant = ants[iAnt];
-            while (true)
+            Node* node = new Node(primitive);
+            laserNodeMap.insert(laserNode, node);
+
+            if (laserNode->hasChildren())
             {
-                if (!ant->moveForward())
-                    break;
+                for (LaserNode* childNode : laserNode->childNodes())
+                {
+                    stack.push(childNode);
+                }
             }
-            qLogD << "ant " << iAnt << " total length: " << ant->totalLength();
+            else
+            {
+                d->leaves.append(node);
+            }
         }
-
-        for (Edge* edge : d->edges)
-        {
-            float pheromones = edge->pheromones();
-            edge->setPheromones(pheromones * (1 - rho));
-        }
-
-        for (int iAnt = 0; iAnt < maxAnts; iAnt++)
-        {
-            Ant* ant = ants[iAnt];
-            ant->updatePheromones();
-            cv::Mat canvas = cv::Mat(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(255, 255, 255));
-            ant->drawPath(canvas, iteration);
-        }
-        
     }
+
+    stack.clear();
+    for (Node* node : d->leaves)
+    {
+        stack.push(node->primitive());
+    }
+
+    float avgEdgeLength = 0;
+    QSet<LaserNode*> travelled;
+    while (!stack.isEmpty())
+    {
+        LaserNode* laserNode = stack.pop();
+        
+        /*if (!node->parentNode())
+        {
+            continue;
+        }*/
+
+        if (laserNode->parentNode())
+        {
+            // find all child nodes from its siblings
+            QList<LaserNode*> siblingChildren = laserNode->parentNode()->findAllLeaves(laserNode);
+
+            Node* node = laserNodeMap[laserNode];
+            for (LaserNode* leafNode : siblingChildren)
+            {
+                Edge* edge = new Edge(node, laserNodeMap[leafNode]);
+                node->addEdge(edge);
+                d->edges.append(edge);
+            }
+
+            Node* parentNode = laserNodeMap[laserNode->parentNode()];
+            if (parentNode)
+            {
+                Edge* edge = new Edge(node, parentNode);
+                avgEdgeLength += edge->length();
+                node->setOutEdge(edge);
+                travelled.insert(laserNode);
+
+                stack.push(laserNode->parentNode());
+            }
+        }
+    }
+
+    /*for (LaserNode* laserNode : travelled)
+    {
+        Node* node = laserNodeMap[laserNode];
+
+        qLogD << "node " << laserNode->nodeName() << "'s edges:";
+        for (Edge* edge : node->edges())
+        {
+            qLogD << "    to " << edge->b()->primitive()->nodeName();
+        }
+        qLogD << "    out to " << node->outEdge()->b()->primitive()->nodeName();
+    }*/
+
+    avgEdgeLength /= d->edges.size();
+
+    return avgEdgeLength;
 }
 

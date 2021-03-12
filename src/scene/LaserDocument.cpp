@@ -493,8 +493,7 @@ void LaserDocument::optimize()
     Q_D(LaserDocument);
 	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
 	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
-    //cv::Mat canvas(pageHeight * 40, pageWidth * 40, CV_8UC3, cv::Scalar(255, 255, 255));
-    QScopedPointer<PathOptimizer> optimizer(new PathOptimizer(layers()));
+    QScopedPointer<PathOptimizer> optimizer(new PathOptimizer(this, true));
     optimizer->optimize(pageWidth, pageHeight);
 }
 
@@ -604,7 +603,8 @@ void LaserDocument::clearOutline(LaserNode* node, bool clearLayers)
         LaserDocument* doc = dynamic_cast<LaserDocument*>(node);
         for (LaserLayer* layer : doc->layers())
         {
-            addChildNode(layer);
+            if (layer->isAvailable())
+                addChildNode(layer);
         }
     }
 
