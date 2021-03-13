@@ -7,11 +7,13 @@
 #include "scene/LaserPrimitive.h"
 
 class Edge;
+class PathOptimizer;
+
 class NodePrivate;
 class Node
 {
 public:
-    explicit Node(LaserPrimitive* primitive);
+    explicit Node(LaserPrimitive* primitive, const QString& name = "");
 
     LaserPrimitive* primitive();
 
@@ -22,12 +24,13 @@ public:
     Edge* outEdge() const;
 
     cv::Point2f startPos() const;
-    cv::Point2f nearestPoint(const cv::Point2f& point, int& index, float& dist);
+    cv::Point2f nearestPoint(const cv::Point2f& point, int& index, double& dist);
     std::vector<cv::Point2f> points() const;
     bool isClosour() const;
     cv::Point2f headPoint() const;
     cv::Point2f tailPoint() const;
     cv::Point2f point(int index) const;
+    QString nodeName() const;
 
     //Node* parent();
     //void addChild(Node* node);
@@ -48,12 +51,13 @@ public:
 
     void clear();
 
-    float length() const;
-    void setLength(float length);
+    double length() const;
+    void setLength(double length);
     void setLength(const cv::Point2f& p1, const cv::Point2f& p2);
 
-    float pheromones() const;
-    void setPheromones(float pheromones);
+    double pheromones() const;
+    void setPheromones(double pheromones);
+    void volatize(double rho);
 
     Node* a();
     Node* b();
@@ -69,7 +73,7 @@ class AntPrivate;
 class Ant
 {
 public:
-    explicit Ant(int antIndex);
+    explicit Ant(int antIndex, PathOptimizer* optimizer);
 
     void initialize();
     void arrived(Node* node, const cv::Point2f& lastPos);
@@ -78,8 +82,10 @@ public:
     bool moveForward();
     int antIndex() const;
     void updatePheromones();
-    float totalLength() const;
+    double totalLength() const;
     void drawPath(cv::Mat& canvas, int iteration);
+    QQueue<Node*> path() const;
+    QMap<Node*, int> arrivedNodes() const;
 
 private:
     QScopedPointer<AntPrivate> m_ptr;
@@ -98,9 +104,13 @@ public:
     void optimize(int canvasWidth, int canvasHeight);
     bool isContainsLayers() const;
 
+    double avgEdgeLength() const;
+    QList<Edge*> edges() const;
+    int edgesCount() const;
+
 protected:
-    float initializeByTopologyLayers(QList<LaserNode*> groups);
-    float initializeByGroups(LaserNode* root);
+    void initializeByTopologyLayers(QList<LaserNode*> groups);
+    void initializeByGroups(LaserNode* root);
 
 private:
     QScopedPointer<PathOptimizerPrivate> m_ptr;
@@ -108,5 +118,7 @@ private:
     Q_DECLARE_PRIVATE_D(m_ptr, PathOptimizer)
     Q_DISABLE_COPY(PathOptimizer)
 };
+
+void drawPath(cv::Mat& canvas, const QQueue<Node*>& path, const QMap<Node*, int>& arrivedNodes);
 
 #endif // PATHOPTIMIZER_H
