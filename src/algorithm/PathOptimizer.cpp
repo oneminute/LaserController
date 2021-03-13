@@ -343,7 +343,7 @@ void Ant::arrived(Node* node, const cv::Point2f& lastPos)
     d->path.push_back(node);
     d->currentNode = node;
     d->totalLength += dist;
-    qLogD << "ant " << antIndex() << " arrived at " << currentNode()->nodeName() << " by walking through " << dist << " units";
+    //qLogD << "ant " << antIndex() << " arrived at " << currentNode()->nodeName() << " by walking through " << dist << " units";
 }
 
 Node* Ant::currentNode() const
@@ -393,27 +393,6 @@ bool Ant::moveForward()
 
         double weight = edge->pheromones() / edge->length();
         edgeWeights.insert(edge, weight);
-
-        //int index;
-        //double distance;
-        //cv::Point2f pointPos = currentPos();
-        //cv::Point2f pos = edge->b()->nearestPoint(pointPos, index, distance);
-        //neighbourPointIndex.insert(edge->b(), index);
-        //double p1 = std::powf(edge->pheromones(), alpha);
-        //double eta = random->bounded(1 / d->optimizer->avgEdgeLength());
-        //double p2 = std::powf(eta, beta);
-        //double p2 = std::powf(eta, beta);
-        //double prob = p1 + p2;
-        //qLogD << "  ant " << d->antIndex << " [" << edge->a()->nodeName()
-            //<< " -> " << edge->b()->nodeName() << qSetRealNumberPrecision(10) << "] eta = " << eta
-            //<< ", p1 = " << p1 << ", p2 = " << p2 << ", prob = " << prob;
-        //if (prob > maxProb)
-        //{
-            //maxEdge = edge;
-            //maxProb = prob;
-            //maxIndex = index;
-            //maxDistance = distance;
-        //}
     }
 
     for (QMap<Edge*, double>::iterator i = edgeWeights.begin(); i != edgeWeights.end(); i++)
@@ -439,7 +418,7 @@ bool Ant::moveForward()
         {
             return false;
         }
-        qLogD << "    ant " << d->antIndex << " walked through all nodes within this group.";
+        //qLogD << "    ant " << d->antIndex << " walked through all nodes within this group.";
         arrived(d->currentNode->outEdge()->b(), currentPos());
         return true;
     }
@@ -847,7 +826,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
                 Edge* edge = new Edge(node, parentNode);
                 d->avgEdgeLength += edge->length();
                 node->setOutEdge(edge);
-
+                d->edges.append(edge);
                 stack.push(laserNode->parentNode());
             }
         }
@@ -876,6 +855,11 @@ void PathOptimizer::printNodeAndEdges()
         qLogD << "node " << node->nodeName() << "'s edges:";
         for (Edge* edge : node->edges())
         {
+            qLogD << "    " << edge->a()->nodeName() << " --> " << edge->b()->nodeName() << " " << edge->pheromones();
+        }
+        if (node->outEdge())
+        {
+            Edge* edge = node->outEdge();
             qLogD << "    " << edge->a()->nodeName() << " --> " << edge->b()->nodeName() << " " << edge->pheromones();
         }
     }

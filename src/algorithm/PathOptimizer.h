@@ -112,6 +112,8 @@ protected:
     void initializeByTopologyLayers(QList<LaserNode*> groups);
     void initializeByGroups(LaserNode* root);
 
+    void printNodeAndEdges();
+
 private:
     QScopedPointer<PathOptimizerPrivate> m_ptr;
 
