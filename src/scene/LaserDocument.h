@@ -66,6 +66,7 @@ public:
 
 public slots:
     void exportJSON(const QString& filename);
+    void exportJSON2(const QString& filename);
     void updateLayersStructure();
     void destroy();
     void open();

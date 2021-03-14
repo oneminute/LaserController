@@ -198,8 +198,8 @@ void LaserDocument::setScale(qreal scale)
 void LaserDocument::exportJSON(const QString& filename)
 {
 	Q_D(LaserDocument);
-    QFile saveFile(filename);
 
+    QFile saveFile(filename);
     QJsonObject jsonObj;
 
     QJsonObject laserDocumentInfo;
@@ -317,6 +317,129 @@ void LaserDocument::exportJSON(const QString& filename)
         layers.append(layerObj);
     }
     
+    QJsonObject actionObj;
+
+    jsonObj["Layers"] = layers;
+
+    QJsonDocument jsonDoc(jsonObj);
+
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    {
+        qWarning("Couldn't open save file.");
+        return;
+    }
+
+    qint64 writtenBytes = saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
+	qDebug() << "written bytes:" << writtenBytes;
+
+    if (!canvas.empty())
+        cv::imwrite("tmp/canvas_test.png", canvas);
+}
+
+void LaserDocument::exportJSON2(const QString& filename)
+{
+    Q_D(LaserDocument);
+
+	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
+	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
+    QScopedPointer<PathOptimizer> optimizer(new PathOptimizer(this, true));
+    PathOptimizer::Path path;
+    optimizer->optimize(pageWidth, pageHeight, path);
+
+    QFile saveFile(filename);
+    QJsonObject jsonObj;
+
+    QJsonObject laserDocumentInfo;
+	qDebug() << &LaserDriver::instance();
+    laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
+    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    laserDocumentInfo["PrinterDrawUnit"] = 1016;
+    laserDocumentInfo["FinishRun"] = d->finishRun.code;
+    jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
+
+    QJsonArray layers;
+    cv::Mat canvas(pageHeight, pageWidth, CV_8UC3, cv::Scalar(255, 255, 255));
+    int layerId = 0;
+    cv::Point2f lastPoint(0, 0);
+
+    for (PathOptimizer::PathNode pathNode : path)
+    {
+        LaserPrimitive* primitive = pathNode.first;
+        if (!primitive)
+            continue;
+        int pointIndex = pathNode.second;
+
+        LaserLayer* layer = primitive->layer();
+        QJsonObject layerObj;
+        QJsonObject paramObj;
+        QJsonObject engravingParamObj;
+        QJsonObject cuttingParamObj;
+        if (layer->type() == LLT_ENGRAVING)
+        {
+            engravingParamObj["LayerId"] = layerId;
+            engravingParamObj["Type"] = layer->type();
+            engravingParamObj["MinSpeed"] = layer->minSpeed();
+            engravingParamObj["RunSpeed"] = layer->runSpeed();
+            engravingParamObj["LaserPower"] = layer->laserPower();
+            engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
+            engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+            engravingParamObj["CarveForward"] = layer->engravingForward();
+            engravingParamObj["CarveStyle"] = layer->engravingStyle();
+            engravingParamObj["HStep"] = layer->lineSpacing();
+            engravingParamObj["LStep"] = layer->columnSpacing();
+            engravingParamObj["ErrorX"] = layer->errorX();
+            engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
+            engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+        }
+        else if (layer->type() == LLT_CUTTING)
+        {
+            cuttingParamObj["LayerId"] = layerId;
+            cuttingParamObj["Type"] = layer->type();
+            cuttingParamObj["MinSpeed"] = layer->minSpeed();
+            cuttingParamObj["RunSpeed"] = layer->runSpeed();
+            cuttingParamObj["LaserPower"] = layer->laserPower();
+            cuttingParamObj["MinSpeedPower"] = layer->minSpeedPower();
+            cuttingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+        }
+        paramObj["EngravingParams"] = engravingParamObj;
+        paramObj["CuttingParams"] = cuttingParamObj;
+        layerObj["Params"] = paramObj;
+
+        QJsonArray items;
+        QJsonObject itemObj;
+        if (layer->type() == LLT_ENGRAVING)
+        {
+            itemObj["Layer"] = layerId;
+            itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
+            itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+            
+            QByteArray data = primitive->engravingImage(canvas);
+            if (!data.isEmpty())
+            {
+                itemObj["Type"] = primitive->typeLatinName();
+                itemObj["ImageType"] = "PNG";
+                itemObj["Data"] = QString(data.toBase64());
+                items.append(itemObj);
+            }
+        }
+        else if (layer->type() == LLT_CUTTING)
+        {
+            itemObj["Layer"] = layerId;
+            QList<QPainterPath> paths = primitive->subPaths();
+            //std::vector<cv::Point2f> points = primitive->cuttingPoints(canvas);
+            std::vector<cv::Point2f> points = primitive->mechiningPoints(lastPoint, pointIndex, canvas);
+            if (!points.empty())
+            {
+                itemObj["Type"] = primitive->typeLatinName();
+                itemObj["Data"] = QString(pltUtils::points2Plt(points));
+                items.append(itemObj);
+            }
+        }
+        layerObj["Items"] = items;
+        layers.append(layerObj);
+        layerId++;
+    }
+
     QJsonObject actionObj;
 
     jsonObj["Layers"] = layers;
@@ -494,7 +617,8 @@ void LaserDocument::optimize()
 	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
 	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
     QScopedPointer<PathOptimizer> optimizer(new PathOptimizer(this, true));
-    optimizer->optimize(pageWidth, pageHeight);
+    PathOptimizer::Path path;
+    optimizer->optimize(pageWidth, pageHeight, path);
 }
 
 void LaserDocument::save(const QString& filename)

@@ -98,10 +98,12 @@ class PathOptimizer : public QObject
 {
     Q_OBJECT
 public:
+    typedef QPair<LaserPrimitive*, int> PathNode;
+    typedef QList<PathNode> Path;
     explicit PathOptimizer(LaserNode* root, bool containsLayers = true, QObject* parent = nullptr);
     virtual ~PathOptimizer();
 
-    void optimize(int canvasWidth, int canvasHeight);
+    void optimize(int canvasWidth, int canvasHeight, Path& primitives);
     bool isContainsLayers() const;
 
     double avgEdgeLength() const;

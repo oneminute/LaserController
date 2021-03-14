@@ -137,10 +137,86 @@ QPointF LaserPrimitive::laserStartPos() const
     return pos;
 }
 
-std::vector<cv::Point2f> LaserPrimitive::mechiningPoints() const
+std::vector<cv::Point2f> LaserPrimitive::mechiningPoints(cv::Point2f& lastPoint, int pointIndex, cv::Mat& canvas) const
 {
     Q_D(const LaserPrimitive);
-    return d->mechiningPoints;
+    int pointsCount = d->mechiningPoints.size();
+    cv::Point2f head = d->mechiningPoints[0];
+    cv::Point2f tail = d->mechiningPoints[pointsCount - 1];
+    double distBetweenHeadAndTail = cv::norm(head - tail);
+    std::vector<cv::Point2f> points;
+
+    // check the primitive is whether closour
+    if (qFuzzyCompare(distBetweenHeadAndTail, 0))
+    {
+        int prevIndex = (pointIndex - 1 + pointsCount) % pointsCount;
+        int nextIndex = (pointIndex + 1) % pointsCount;
+        cv::Point2f currentPoint = d->mechiningPoints[pointIndex];
+        cv::Point2f prevPoint = d->mechiningPoints[prevIndex];
+        cv::Point2f nextPoint = d->mechiningPoints[nextIndex];
+
+        cv::Vec2f inDir = currentPoint - lastPoint;
+        cv::Vec2f prevDir = prevPoint - currentPoint;
+        cv::Vec2f nextDir = nextPoint - currentPoint;
+
+        int prevScore = 0;
+        if (inDir[0] * prevDir[0] >= 0)
+            prevScore++;
+        if (inDir[1] * prevDir[1] >= 0)
+            prevScore++;
+
+        int nextScore = 0;
+        if (inDir[0] * nextDir[0] >= 0)
+            nextScore++;
+        if (inDir[1] * nextDir[1] >= 0)
+            nextScore++;
+
+        int step = 0;
+        if (nextScore >= prevScore)
+        {
+            step = 1;
+        }
+        else
+        {
+            step = -1;
+        }
+
+        int cursor = pointIndex;
+        points.reserve(pointsCount);
+        for (int i = 0; i < pointsCount; i++)
+        {
+            cv::Point2f point = d->mechiningPoints[cursor];
+            points.push_back(point);
+            cursor = (cursor + step + pointsCount) % pointsCount;
+        }
+
+        lastPoint = currentPoint;
+    }
+    else
+    {
+        if (pointIndex == 0)
+        {
+            points = d->mechiningPoints;
+            lastPoint = tail;
+        }
+        else
+        {
+            for (int i = pointsCount - 1; i >= 0; i--)
+            {
+                points.push_back(d->mechiningPoints[i]);
+            }
+            lastPoint = head;
+        }
+    }
+
+    if (!canvas.empty())
+    {
+        cv::Mat pointsMat(points);
+        pointsMat.convertTo(pointsMat, CV_32S);
+        cv::polylines(canvas, pointsMat, false, cv::Scalar(0, 0, 255), 5);
+    }
+    
+    return points;
 }
 
 LaserPrimitiveType LaserPrimitive::primitiveType() const

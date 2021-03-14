@@ -151,7 +151,6 @@ cv::Point2f Node::nearestPoint(const cv::Point2f& point, int& index, double& dis
         d->flannIndex.knnSearch(query, indices, dists, 1);
 
         index = indices.ptr<int>(0)[0];
-        //dist = std::sqrtf(dists.ptr<float>(0)[0]);
         cv::Point2f target = d->points[index];
         dist = cv::norm(point - target);
         return target;
@@ -381,9 +380,6 @@ bool Ant::moveForward()
     Edge* maxEdge = nullptr;
     double alpha = 1.f;
     double beta = 2.f;
-    //QMap<Node*, int> neighbourPointIndex;
-    //int maxIndex;
-    //double maxDistance;
     QRandomGenerator* random = QRandomGenerator::global();
     QMap<Edge*, double> edgeWeights;
     for (Edge* edge : d->currentNode->edges())
@@ -523,11 +519,11 @@ public:
         : q_ptr(ptr)
     {}
 
-    QList<QList<QList<Node*>>> nodes;
+    QList<QList<QList<Node*>>> layerNodes;
     QList<Edge*> edges;
     QMap<LaserPrimitive*, Node*> pritmive2NodeMap;
     bool containsLayers;
-    QList<Node*> topologyNodes;
+    QList<Node*> nodes;
     QList<Node*> leaves;
     double avgEdgeLength;
     Node* rootNode;
@@ -541,7 +537,6 @@ PathOptimizer::PathOptimizer(LaserNode* root, bool containsLayers, QObject* pare
     Q_D(PathOptimizer);
     d->containsLayers = containsLayers;
 
-    //double avgEdgeLength = initializeByTopologyLayers(root->childNodes());
     initializeByGroups(root);
 
     double pheromones = 1.0f;
@@ -560,9 +555,12 @@ PathOptimizer::PathOptimizer(LaserNode* root, bool containsLayers, QObject* pare
 
 PathOptimizer::~PathOptimizer()
 {
+    Q_D(PathOptimizer);
+    qDeleteAll(d->nodes);
+    qDeleteAll(d->edges);
 }
 
-void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
+void PathOptimizer::optimize(int canvasWidth, int canvasHeight, Path& primitives)
 {
     Q_D(PathOptimizer);
     int maxAnts = 10;
@@ -572,7 +570,6 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
     QList<Ant*> ants;
     ants.reserve(maxAnts);
     QRandomGenerator random(QDateTime::currentDateTime().toMSecsSinceEpoch());
-    //int initNodesCount = d->nodes[0][d->nodes[0].size() - 1].size();
     int initNodesCount = d->leaves.size();
 
     for (int i = 0; i < maxAnts; i++)
@@ -591,8 +588,6 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
         qLogD << "iteration " << iteration;
         for (int i = 0; i < maxAnts; i++)
         {
-            //int nodeIndex = random.bounded(initNodesCount);
-            //Node* node = d->leaves[nodeIndex];
             Ant* ant = ants[i];
             ant->initialize();
             ant->arrived(d->rootNode, cv::Point2f(0, 0));
@@ -631,6 +626,15 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
         printNodeAndEdges();
     }
 
+    primitives.clear();
+    for (Node* node : minLengthPath)
+    {
+        QPair<LaserPrimitive*, int> pair;
+        pair.first = node->primitive();
+        pair.second = minLengthArrivedNodes[node];
+        primitives.append(pair);
+    }
+
     qLogD << "min length is " << minPathLength << " at iteration " << minIteration << " by ant " << minAnt->antIndex();
 
     cv::Mat canvas = cv::Mat(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -638,6 +642,7 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
     QString filename = QString("tmp/path.png");
     cv::imwrite(filename.toStdString(), canvas);
     canvas.release();
+    qDeleteAll(ants);
 }
 
 bool PathOptimizer::isContainsLayers() const
@@ -678,8 +683,8 @@ void PathOptimizer::initializeByTopologyLayers(QList<LaserNode*> groups)
     }
     for (LaserNode* group : topGroups)
     {
-        int layerIndex = d->nodes.length();
-        d->nodes.append(QList<QList<Node*>>());
+        int layerIndex = d->layerNodes.length();
+        d->layerNodes.append(QList<QList<Node*>>());
         QMap<LaserNode*, int> levelMap;
         QStack<LaserNode*> stack;
         stack.push(group);
@@ -703,7 +708,7 @@ void PathOptimizer::initializeByTopologyLayers(QList<LaserNode*> groups)
 
         for (int i = 0; i <= maxLevel; i++)
         {
-            d->nodes[layerIndex].append(QList<Node*>());
+            d->layerNodes[layerIndex].append(QList<Node*>());
         }
         for (QMap<LaserNode*, int>::iterator i = levelMap.begin(); i != levelMap.end(); i++)
         {
@@ -714,40 +719,40 @@ void PathOptimizer::initializeByTopologyLayers(QList<LaserNode*> groups)
 
             LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(laserNode);
             Node* node = new Node(primitive);
-            d->nodes[layerIndex][level].append(node);
+            d->layerNodes[layerIndex][level].append(node);
             d->pritmive2NodeMap[primitive] = node;
         }
 
     }
 
     d->avgEdgeLength = 0;
-    for (int l = 0; l < d->nodes.size(); l++)
+    for (int l = 0; l < d->layerNodes.size(); l++)
     {
-        for (int i = d->nodes[l].size() - 1; i >= 0; i--)
+        for (int i = d->layerNodes[l].size() - 1; i >= 0; i--)
         {
-            for (int j = 0; j < d->nodes[l][i].size(); j++)
+            for (int j = 0; j < d->layerNodes[l][i].size(); j++)
             {
-                for (int n = 0; n < d->nodes[l][i].size(); n++)
+                for (int n = 0; n < d->layerNodes[l][i].size(); n++)
                 {
                     if (n == j)
                         continue;
 
-                    Edge* edge = new Edge(d->nodes[l][i][j], d->nodes[l][i][n]);
+                    Edge* edge = new Edge(d->layerNodes[l][i][j], d->layerNodes[l][i][n]);
                     d->avgEdgeLength += edge->length();
-                    d->nodes[l][i][j]->addEdge(edge);
+                    d->layerNodes[l][i][j]->addEdge(edge);
                     d->edges.append(edge);
                 }
 
                 if (i > 0)
                 {
-                    LaserPrimitive* primitive = d->nodes[l][i][j]->primitive();
+                    LaserPrimitive* primitive = d->layerNodes[l][i][j]->primitive();
                     LaserPrimitive* parentPrimitive = dynamic_cast<LaserPrimitive*>(primitive->parentNode());
                     if (parentPrimitive)
                     {
                         Node* parentNode = d->pritmive2NodeMap[parentPrimitive];
-                        Edge* edge = new Edge(d->nodes[l][i][j], parentNode);
+                        Edge* edge = new Edge(d->layerNodes[l][i][j], parentNode);
                         d->avgEdgeLength += edge->length();
-                        d->nodes[l][i][j]->setOutEdge(edge);
+                        d->layerNodes[l][i][j]->setOutEdge(edge);
                         d->edges.append(edge);
                     }
                 }
@@ -775,7 +780,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
         if (primitive)
         {
             Node* node = new Node(primitive);
-            d->topologyNodes.append(node);
+            d->nodes.append(node);
             laserNodeMap.insert(laserNode, node);
 
             if (laserNode->hasChildren())
@@ -833,7 +838,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
     }
 
     d->rootNode = new Node(nullptr, "Root");
-    d->topologyNodes.append(d->rootNode);
+    d->nodes.append(d->rootNode);
     for (Node* node : d->leaves)
     {
         Edge* edge = new Edge(d->rootNode, node);
@@ -850,7 +855,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
 void PathOptimizer::printNodeAndEdges()
 {
     Q_D(PathOptimizer);
-    for (Node* node : d->topologyNodes)
+    for (Node* node : d->nodes)
     {
         qLogD << "node " << node->nodeName() << "'s edges:";
         for (Edge* edge : node->edges())
