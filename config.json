@@ -87,6 +87,12 @@
             "name": "Language",
             "type": 4,
             "value": "English"
+        },
+        "Unit": {
+            "defaultValue": 4,
+            "name": "Unit",
+            "type": 0,
+            "value": 4
         }
     },
     "Layers": {
@@ -95,6 +101,46 @@
             "name": "MaxLayersCount",
             "type": 0,
             "value": 16
+        }
+    },
+    "OptimizePath": {
+        "MaxAnts": {
+            "defaultValue": 100,
+            "name": "MaxAnts",
+            "type": 0,
+            "value": 100
+        },
+        "MaxIterations": {
+            "defaultValue": 500,
+            "name": "MaxIterations",
+            "type": 0,
+            "value": 1000
+        },
+        "MaxTraverseCount": {
+            "defaultValue": 10000,
+            "name": "MaxTraverseCount",
+            "type": 0,
+            "value": 100000
+        },
+        "UseGreedyAlgorithm": {
+            "defaultValue": true,
+            "name": "UseGreedyAlgorithm",
+            "type": 3,
+            "value": false
+        },
+        "VolatileRate": {
+            "defaultValue": 0.65,
+            "name": "VolatileRate",
+            "type": 1,
+            "value": 0.9
+        }
+    },
+    "PltUtils": {
+        "MaxAnglesDiff": {
+            "defaultValue": 5,
+            "name": "MaxAnglesDiff",
+            "type": 1,
+            "value": 5
         }
     },
     "UI": {

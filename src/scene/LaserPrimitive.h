@@ -118,6 +118,7 @@ public:
     virtual void draw(QPainter* painter) {};
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return std::vector<cv::Point2f>(); }
+    std::vector<cv::Point2f> mechiningPoints() const;
     std::vector<cv::Point2f> mechiningPoints(cv::Point2f& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
 
@@ -318,6 +319,8 @@ public:
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }
     virtual QString typeName() { return tr("Bitmap"); }
+
+    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)

@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #include "common/common.h"
+#include "common/Config.h"
 #include "TypeUtils.h"
 
 int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
@@ -70,7 +71,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
         qreal dist = QLineF(pt, anchor).length();
 
         diff = qRadiansToDegrees(diff);
-        if (diff >= 5.0 || radians * anchorRadians < 0)
+        if (diff >= Config::PltUtilsMaxAnglesDiff() || radians * anchorRadians < 0)
         {
             if (!canvas.empty())
             {

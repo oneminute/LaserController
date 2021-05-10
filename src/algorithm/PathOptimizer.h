@@ -2,9 +2,11 @@
 #define PATHOPTIMIZER_H
 
 #include <QObject>
+#include <QThread>
 #include <QVector2D>
 #include "scene/LaserNode.h"
 #include "scene/LaserPrimitive.h"
+#include "ui/ProgressDialog.h"
 
 class Edge;
 class PathOptimizer;
@@ -14,6 +16,7 @@ class Node
 {
 public:
     explicit Node(LaserPrimitive* primitive, const QString& name = "");
+    ~Node();
 
     LaserPrimitive* primitive();
 
@@ -24,7 +27,7 @@ public:
     Edge* outEdge() const;
 
     cv::Point2f startPos() const;
-    cv::Point2f nearestPoint(const cv::Point2f& point, int& index, double& dist);
+    cv::Point2f nearestPoint(cv::Point2f point, int& index, float& dist);
     std::vector<cv::Point2f> points() const;
     bool isClosour() const;
     cv::Point2f headPoint() const;
@@ -61,6 +64,8 @@ public:
 
     Node* a();
     Node* b();
+
+    void print();
 
 private:
     QScopedPointer<EdgePrivate> m_ptr;
@@ -100,15 +105,28 @@ class PathOptimizer : public QObject
 public:
     typedef QPair<LaserPrimitive*, int> PathNode;
     typedef QList<PathNode> Path;
-    explicit PathOptimizer(LaserNode* root, bool containsLayers = true, QObject* parent = nullptr);
+    explicit PathOptimizer(LaserNode* root, int totalNodes, int maxIterations, 
+        int maxAnts, int maxTravers, float volatileRate, 
+        bool useGreedyAlgorithm = false, bool containsLayers = true,
+        QObject* parent = nullptr);
     virtual ~PathOptimizer();
 
-    void optimize(int canvasWidth, int canvasHeight, Path& primitives);
     bool isContainsLayers() const;
 
     double avgEdgeLength() const;
     QList<Edge*> edges() const;
     int edgesCount() const;
+    bool useGreedyAlgorithm() const;
+    Path optimizedPath() const;
+
+public slots:
+    void optimize(int canvasWidth, int canvasHeight);
+
+signals:
+    void progressUpdated(float progress);
+    void messageUpdated(const QString& msg);
+    void titleUpdated(const QString& msg);
+    void finished();
 
 protected:
     void initializeByTopologyLayers(QList<LaserNode*> groups);
@@ -121,6 +139,27 @@ private:
 
     Q_DECLARE_PRIVATE_D(m_ptr, PathOptimizer)
     Q_DISABLE_COPY(PathOptimizer)
+};
+
+class OptimizerController : public QObject
+{
+    Q_OBJECT
+public:
+    OptimizerController(LaserNode* root, int totalNodes, QObject* parent = nullptr);
+    ~OptimizerController();
+
+    PathOptimizer::Path optimize(float pageWidth, float pageHeight);
+
+public slots:
+    void finished();
+
+signals:
+    void start(float pageWidth, float pageHeight);
+
+private:
+    QScopedPointer<ProgressDialog> m_dialog;
+    QThread m_thread;
+    QScopedPointer<PathOptimizer> m_optimizer;
 };
 
 void drawPath(cv::Mat& canvas, const QQueue<Node*>& path, const QMap<Node*, int>& arrivedNodes);

@@ -137,6 +137,12 @@ QPointF LaserPrimitive::laserStartPos() const
     return pos;
 }
 
+std::vector<cv::Point2f> LaserPrimitive::mechiningPoints() const
+{
+    Q_D(const LaserPrimitive);
+    return d->mechiningPoints;
+}
+
 std::vector<cv::Point2f> LaserPrimitive::mechiningPoints(cv::Point2f& lastPoint, int pointIndex, cv::Mat& canvas) const
 {
     Q_D(const LaserPrimitive);
@@ -631,7 +637,7 @@ QList<QPainterPath> LaserPath::subPaths() const
     QList<QPainterPath> paths;
     QPainterPath path = toPath();
     QList<QPolygonF> polys = path.toSubpathPolygons();
-    qDebug() << "sub polys count:" << polys.count();
+    //qDebug() << "sub polys count:" << polys.count();
     for (QPolygonF& poly : polys)
     {
         QPainterPath subPath;
@@ -918,6 +924,33 @@ void LaserBitmap::draw(QPainter * painter)
 {
     Q_D(LaserBitmap);
     painter->drawImage(d->bounds, d->image);
+}
+
+std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
+{
+    Q_D(LaserBitmap);
+	QTransform t = transform() * Global::matrixToMM(SU_PX, 40, 40);
+    std::vector<cv::Point2f> points;
+    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.topLeft()));
+    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.topRight()));
+    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.bottomRight()));
+    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.bottomLeft()));
+    points.push_back(pt1);
+    points.push_back(pt2);
+    points.push_back(pt3);
+    points.push_back(pt4);
+    points.push_back(pt1);
+
+    if (!canvas.empty())
+    {
+        cv::line(canvas, pt1, pt2, cv::Scalar(0));
+        cv::line(canvas, pt2, pt3, cv::Scalar(0));
+        cv::line(canvas, pt3, pt4, cv::Scalar(0));
+        cv::line(canvas, pt4, pt1, cv::Scalar(0));
+    }
+
+    d->mechiningPoints = points;
+    return points;
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

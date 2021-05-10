@@ -492,7 +492,9 @@ void LaserControllerWindow::setFinishRun(const FinishRun & finishRun)
 
 void LaserControllerWindow::onActionImportSVG(bool checked)
 {
+    qLogD << "onActionImportSVG";
     QString filename = getFilename(tr("Open SVG File"), QStringList() << "image/svg+xml" << "image/svg+xml-compressed");
+    qLogD << "importing filename is " << filename;
     if (filename.isEmpty())
         return;
     QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::SVG);
@@ -1767,10 +1769,12 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
 
 QString LaserControllerWindow::getFilename(const QString& title, const QStringList & mime)
 {
+    qLogD << "getFilename:" << title << mime;
     QFileDialog dialog(this);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setMimeTypeFilters(QStringList() << "image/svg+xml" << "image/svg+xml-compressed");
+    dialog.setMimeTypeFilters(mime);
     dialog.setWindowTitle(tr("Open SVG File"));
+    qLogD << "preparing open dialog";
     if (dialog.exec() == QDialog::Accepted)
         return dialog.selectedFiles().constFirst();
     else

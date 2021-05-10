@@ -47,6 +47,34 @@ enum ConfigItemType
 			} \
 		}
 
+#define CONFIG_ITEM_FLOAT(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_FLOAT, DEFAULT_VALUE, DESCRIPTION) \
+    public: \
+        static float PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toFloat(); } \
+        static float default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toFloat(); } \
+        static void set##PREFIX##NAME(float value) \
+		{ \
+			if (items[#PREFIX"/"#NAME].value != value) \
+			{ \
+				items[#PREFIX"/"#NAME].value = value; \
+				items[#PREFIX"/"#NAME].modified = true; \
+			} \
+		}
+
+#define CONFIG_ITEM_DOUBLE(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_FLOAT, DEFAULT_VALUE, DESCRIPTION) \
+    public: \
+        static double PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toDouble(); } \
+        static double default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toDouble(); } \
+        static void set##PREFIX##NAME(double value) \
+		{ \
+			if (items[#PREFIX"/"#NAME].value != value) \
+			{ \
+				items[#PREFIX"/"#NAME].value = value; \
+				items[#PREFIX"/"#NAME].modified = true; \
+			} \
+		}
+
 #define CONFIG_ITEM_BOOL(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
     DUMMY_STRUCT(PREFIX, NAME, CIT_BOOL, DEFAULT_VALUE, DESCRIPTION) \
     public: \
@@ -137,6 +165,14 @@ public:
 	CONFIG_ITEM_BOOL(EngravingLayer, UseHalftone, true, "Use halftone algorithm when processing bitmaps.")
 	CONFIG_ITEM_INT(EngravingLayer, LPI, 600, "Lines per inch.")
 	CONFIG_ITEM_INT(EngravingLayer, DPI, 600, "Dots per inch.")
+
+    CONFIG_ITEM_INT(OptimizePath, MaxAnts, 100, "Max ants count.")
+    CONFIG_ITEM_INT(OptimizePath, MaxIterations, 500, "Max iteration count.")
+    CONFIG_ITEM_INT(OptimizePath, MaxTraverseCount, 2000, "Max tranverse count.")
+    CONFIG_ITEM_DOUBLE(OptimizePath, VolatileRate, 0.65, "Volatie rate.")
+    CONFIG_ITEM_BOOL(OptimizePath, UseGreedyAlgorithm, true, "Use greedy algorithm form path optimization.")
+
+    CONFIG_ITEM_DOUBLE(PltUtils, MaxAnglesDiff, 5.0, "Max angles diff")
 
 private:
     Config();

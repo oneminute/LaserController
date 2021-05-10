@@ -38,6 +38,13 @@ find_package(OpenMP REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
+find_package(FLANN REQUIRED QUIET)
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
 
 set(TS_FILES translations/LaserController_zh_CN.ts)
 set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
@@ -52,6 +59,7 @@ set(INCLUDE_DIRS
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
+    ${FLANN_INCLUDE_DIR}
     src/widget/LRWidgets
 	${PROJECT_BINARY_DIR}
     #${PolyClipping_INCLUDE_DIRS}
@@ -191,6 +199,7 @@ ENDIF(MSVC)
 include_directories(${INCLUDE_DIRS})
 set(LINK_LIBRARIES 
     Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Test
+    FLANN::FLANN
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
     ${ZLIB_LIBRARIES}
@@ -215,12 +224,12 @@ set_target_properties(
 
 add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
 target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})
-add_executable(TestWykobi test/TestWykobi.cpp)
-target_link_libraries(TestWykobi PRIVATE ${LINK_LIBRARIES})
+#add_executable(TestWykobi test/TestWykobi.cpp)
+#target_link_libraries(TestWykobi PRIVATE ${LINK_LIBRARIES})
 add_executable(TestQtClosestPoint test/TestQtClosestPoint.cpp)
 target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
-add_executable(TestQt2Wykobi test/TestQt2Wykobi.cpp)
-target_link_libraries(TestQt2Wykobi PRIVATE ${LINK_LIBRARIES})
+#add_executable(TestQt2Wykobi test/TestQt2Wykobi.cpp)
+#target_link_libraries(TestQt2Wykobi PRIVATE ${LINK_LIBRARIES})
 add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
 target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
 
