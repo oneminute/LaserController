@@ -85,6 +85,7 @@ protected:
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
     void outlineByLayers(LaserNode* node);
     void outlineByGroups(LaserNode* node);
+    void optimizeGroups(LaserNode* node);
     void clearOutline(LaserNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node);
 

@@ -591,6 +591,7 @@ void LaserDocument::outline()
     printOutline(this, 0);
     //outlineByLayers(this);
     outlineByGroups(this);
+    optimizeGroups(this);
     qLogD << "After outline:";
     printOutline(this, 0);
 
@@ -721,6 +722,74 @@ void LaserDocument::outlineByGroups(LaserNode* node)
         for (LaserPrimitive* primitive : primitives())
         {
             addPrimitiveToNodesTree(primitive, this);
+        }
+    }
+}
+
+void LaserDocument::optimizeGroups(LaserNode* node)
+{
+    if (!node->isAvailable())
+        return;
+
+    QList<LaserNode*> children = node->childNodes();
+    qSort(children.begin(), children.end(), [=](LaserNode * a, LaserNode * b) -> bool {
+        if (a->center().y() < b->center().y()) 
+        {
+            return true;
+        }
+        else if (a->center().y() > b->center().y())
+        {
+            return false;
+        }
+        else
+        {
+            if (a->center().x() < b->center().x())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    });
+
+    for (LaserNode* item : children)
+    {
+        qLogD << item->center().x() << ", " << item->center().y();
+    }
+
+    int maxChildNodes = 10;
+    //int batchCount = children.count() / maxChildNodes + 1;
+    if (children.count() > maxChildNodes)
+    {
+        node->childNodes().clear();
+        QPointF center(0, 0);
+        LaserNode* newNode = nullptr;
+        for (int i = 0, count = 0; i < children.count(); i++)
+        {
+            if (count == 0)
+            {
+                newNode = new LaserNode(LaserNodeType::LNT_VIRTUAL);
+            }
+            center += children[i]->center();
+            newNode->addChildNode(children[i]);
+            if (++count == maxChildNodes)
+            {
+                center /= newNode->childNodes().count();
+                newNode->setCenter(center);
+                node->addChildNode(newNode);
+                center = QPointF(0, 0);
+                count = 0;
+            }
+        }
+        optimizeGroups(node);
+    }
+    else
+    {
+        for (LaserNode* item : node->childNodes())
+        {
+            optimizeGroups(item);
         }
     }
 }

@@ -9,6 +9,13 @@ LaserNode::LaserNode(LaserNodePrivate* dPtr, LaserNodeType nodeType)
     d->nodeType = nodeType;
 }
 
+LaserNode::LaserNode(LaserNodeType nodeType)
+    : d_ptr(new LaserNodePrivate(this))
+{
+    Q_D(LaserNode);
+    d->nodeType = nodeType;
+}
+
 LaserNode::~LaserNode()
 {
 }
@@ -71,9 +78,21 @@ QPointF LaserNode::center() const
     return d->center;
 }
 
+void LaserNode::setCenter(QPointF& value)
+{
+    Q_D(LaserNode);
+    d->center = value;
+}
+
 bool LaserNode::isAvailable() const
 {
     return true;
+}
+
+bool LaserNode::isVirtual() const
+{
+    Q_D(const LaserNode);
+    return d->nodeType == LaserNodeType::LNT_VIRTUAL;
 }
 
 LaserNode* LaserNode::parentNode() const

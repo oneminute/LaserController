@@ -10,7 +10,8 @@ enum LaserNodeType
     LNT_UNKNOWN,
     LNT_DOCUMENT,
     LNT_LAYER,
-    LNT_PRIMITIVE
+    LNT_PRIMITIVE,
+    LNT_VIRTUAL,
 };
 
 class LaserNodePrivate;
@@ -19,6 +20,7 @@ class LaserNode
 {
 public:
     LaserNode(LaserNodePrivate* dPtr, LaserNodeType nodeType);
+    LaserNode(LaserNodeType nodeType);
     virtual ~LaserNode();
 
     QList<LaserNode*>& childNodes();
@@ -33,8 +35,10 @@ public:
     bool hasChildren() const;
 
     QPointF center() const;
+    void setCenter(QPointF& value);
 
     virtual bool isAvailable() const;
+    bool isVirtual() const;
 
     LaserNode* parentNode() const;
     void setParentNode(LaserNode* parent);
