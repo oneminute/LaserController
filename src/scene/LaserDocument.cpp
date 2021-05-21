@@ -1,6 +1,7 @@
 #include "LaserDocument.h"
 
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QList>
 #include <QJsonArray>
@@ -343,9 +344,13 @@ void LaserDocument::exportJSON2(const QString& filename)
 	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
 	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
     
-    OptimizerController* optimizer = new OptimizerController(this, d->primitives.size());
+    QElapsedTimer timer;
+    timer.start();
+    OptimizerController* optimizer = new OptimizerController(this, totalNodes());
     PathOptimizer::Path path = optimizer->optimize(pageWidth, pageHeight);
+    qLogD << "optimized duration: " << timer.elapsed() / 1000.0;
 
+    timer.start();
     QFile saveFile(filename);
     QJsonObject jsonObj;
 
@@ -470,6 +475,7 @@ void LaserDocument::exportJSON2(const QString& filename)
 
     if (!canvas.empty())
         cv::imwrite("tmp/canvas_test.png", canvas);
+    qLogD << "exported json duration: " << timer.elapsed() / 1000.0;
 }
 
 void LaserDocument::blockSignals(bool block)
@@ -632,7 +638,7 @@ void LaserDocument::optimize()
 	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
     
     qLogD << "LaserDocument::optimize";
-    OptimizerController* optimizer = new OptimizerController(this, d->primitives.size());
+    OptimizerController* optimizer = new OptimizerController(this, totalNodes());
     optimizer->optimize(pageWidth, pageHeight);
 }
 
@@ -642,6 +648,23 @@ void LaserDocument::save(const QString& filename)
 
 void LaserDocument::load(const QString& filename)
 {
+}
+
+int LaserDocument::totalNodes()
+{
+    QStack<LaserNode*> stack;
+    stack.push(this);
+    int count = 0;
+    while (!stack.isEmpty())
+    {
+        LaserNode* node = stack.pop();
+        count++;
+        for (LaserNode* child : node->childNodes())
+        {
+            stack.push(child);
+        }
+    }
+    return count;
 }
 
 void LaserDocument::init()
@@ -726,7 +749,7 @@ void LaserDocument::outlineByGroups(LaserNode* node)
     }
 }
 
-void LaserDocument::optimizeGroups(LaserNode* node)
+void LaserDocument::optimizeGroups(LaserNode* node, int level)
 {
     if (!node->isAvailable())
         return;
@@ -759,7 +782,7 @@ void LaserDocument::optimizeGroups(LaserNode* node)
         qLogD << item->center().x() << ", " << item->center().y();
     }
 
-    int maxChildNodes = 10;
+    int maxChildNodes = 11;
     //int batchCount = children.count() / maxChildNodes + 1;
     if (children.count() > maxChildNodes)
     {
@@ -771,6 +794,8 @@ void LaserDocument::optimizeGroups(LaserNode* node)
             if (count == 0)
             {
                 newNode = new LaserNode(LaserNodeType::LNT_VIRTUAL);
+                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+                newNode->setNodeName(nodeName);
             }
             center += children[i]->center();
             newNode->addChildNode(children[i]);
@@ -783,13 +808,13 @@ void LaserDocument::optimizeGroups(LaserNode* node)
                 count = 0;
             }
         }
-        optimizeGroups(node);
+        optimizeGroups(node, level);
     }
     else
     {
         for (LaserNode* item : node->childNodes())
         {
-            optimizeGroups(item);
+            optimizeGroups(item, level + 1);
         }
     }
 }

@@ -15,7 +15,7 @@ class NodePrivate;
 class Node
 {
 public:
-    explicit Node(LaserPrimitive* primitive, const QString& name = "");
+    explicit Node(LaserNode* laserNode, const QString& name = "");
     ~Node();
 
     LaserPrimitive* primitive();
@@ -28,12 +28,14 @@ public:
 
     cv::Point2f startPos() const;
     cv::Point2f nearestPoint(cv::Point2f point, int& index, float& dist);
+    cv::Point2f currentPos() const;
     std::vector<cv::Point2f> points() const;
     bool isClosour() const;
     cv::Point2f headPoint() const;
     cv::Point2f tailPoint() const;
     cv::Point2f point(int index) const;
     QString nodeName() const;
+    bool isVirtual() const;
 
     //Node* parent();
     //void addChild(Node* node);
@@ -114,6 +116,7 @@ public:
     bool isContainsLayers() const;
 
     double avgEdgeLength() const;
+    double initPheromones() const;
     QList<Edge*> edges() const;
     int edgesCount() const;
     bool useGreedyAlgorithm() const;
@@ -129,7 +132,6 @@ signals:
     void finished();
 
 protected:
-    void initializeByTopologyLayers(QList<LaserNode*> groups);
     void initializeByGroups(LaserNode* root);
 
     void printNodeAndEdges();

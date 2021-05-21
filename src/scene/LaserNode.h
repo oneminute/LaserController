@@ -33,6 +33,7 @@ public:
     void removeChildNode(LaserNode* node);
     void clearChildren();
     bool hasChildren() const;
+    int childCount() const;
 
     QPointF center() const;
     void setCenter(QPointF& value);

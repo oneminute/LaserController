@@ -72,16 +72,22 @@ bool LaserNode::hasChildren() const
     return !d->childNodes.isEmpty();
 }
 
-QPointF LaserNode::center() const
+int LaserNode::childCount() const
 {
     Q_D(const LaserNode);
-    return d->center;
+    return d->childNodes.count();
 }
 
-void LaserNode::setCenter(QPointF& value)
+QPointF LaserNode::position() const
+{
+    Q_D(const LaserNode);
+    return d->position;
+}
+
+void LaserNode::setPosition(QPointF& value)
 {
     Q_D(LaserNode);
-    d->center = value;
+    d->position = value;
 }
 
 bool LaserNode::isAvailable() const

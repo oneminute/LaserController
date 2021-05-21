@@ -33,6 +33,7 @@ ProgressDialog::~ProgressDialog()
 void ProgressDialog::addMessage(const QString& msg)
 {
     Q_D(ProgressDialog);
+    qLogD << msg;
     m_ui->plainTextEditDetails->appendPlainText(msg);
 }
 

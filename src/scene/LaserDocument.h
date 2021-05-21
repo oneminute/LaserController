@@ -79,13 +79,14 @@ public slots:
     void optimize();
     void save(const QString& filename);
     void load(const QString& filename);
+    int totalNodes();
 
 protected:
     void init();
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
     void outlineByLayers(LaserNode* node);
     void outlineByGroups(LaserNode* node);
-    void optimizeGroups(LaserNode* node);
+    void optimizeGroups(LaserNode* node, int level = 1);
     void clearOutline(LaserNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node);
 
