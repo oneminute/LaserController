@@ -116,6 +116,18 @@
             "type": 0,
             "value": 1000
         },
+        "MaxStartingPointAnglesDiff": {
+            "defaultValue": 45,
+            "name": "MaxStartingPointAnglesDiff",
+            "type": 0,
+            "value": 45
+        },
+        "MaxStartingPoints": {
+            "defaultValue": 8,
+            "name": "MaxStartingPoints",
+            "type": 0,
+            "value": 8
+        },
         "MaxTraverseCount": {
             "defaultValue": 10000,
             "name": "MaxTraverseCount",
@@ -140,7 +152,13 @@
             "defaultValue": 5,
             "name": "MaxAnglesDiff",
             "type": 1,
-            "value": 5
+            "value": 10
+        },
+        "MaxIntervalDistance": {
+            "defaultValue": 10,
+            "name": "MaxIntervalDistance",
+            "type": 1,
+            "value": 30
         }
     },
     "UI": {

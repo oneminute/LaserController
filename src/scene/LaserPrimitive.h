@@ -120,6 +120,8 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return std::vector<cv::Point2f>(); }
     std::vector<cv::Point2f> mechiningPoints() const;
     std::vector<cv::Point2f> mechiningPoints(cv::Point2f& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
+    QList<int> startingIndices() const;
+    std::vector<cv::Point2f> startingPoints() const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
 
     LaserPrimitiveType primitiveType() const;

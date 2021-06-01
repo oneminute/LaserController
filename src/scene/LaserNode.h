@@ -18,8 +18,9 @@ class LaserNodePrivate;
 
 class LaserNode
 {
-public:
+protected:
     LaserNode(LaserNodePrivate* dPtr, LaserNodeType nodeType);
+public:
     LaserNode(LaserNodeType nodeType);
     virtual ~LaserNode();
 
@@ -35,11 +36,15 @@ public:
     bool hasChildren() const;
     int childCount() const;
 
-    QPointF center() const;
-    void setCenter(QPointF& value);
+    QPointF position() const;
+    void setPosition(QPointF& value);
 
     virtual bool isAvailable() const;
     bool isVirtual() const;
+    bool isDocument() const;
+    bool isLayer() const;
+    bool isPrimitive() const;
+    bool isUnknown() const;
 
     LaserNode* parentNode() const;
     void setParentNode(LaserNode* parent);
@@ -51,24 +56,6 @@ protected:
 
     Q_DECLARE_PRIVATE(LaserNode)
     Q_DISABLE_COPY(LaserNode)
-};
-
-class LaserNodePrivate
-{
-    Q_DECLARE_PUBLIC(LaserNode)
-public:
-    LaserNodePrivate(LaserNode* ptr)
-        : q_ptr(ptr)
-        , nodeType(LNT_UNKNOWN)
-        , center(0, 0)
-    {}
-
-    LaserNode* parentNode;
-    QList<LaserNode*> childNodes;
-    LaserNodeType nodeType;
-    QString nodeName;
-    QPointF center;
-    LaserNode* q_ptr;
 };
 
 #endif //LASERNODE_H

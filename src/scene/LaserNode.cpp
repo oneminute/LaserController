@@ -2,6 +2,8 @@
 
 #include <QStack>
 
+#include "LaserNodePrivate.h"
+
 LaserNode::LaserNode(LaserNodePrivate* dPtr, LaserNodeType nodeType)
     : d_ptr(dPtr)
 {
@@ -99,6 +101,30 @@ bool LaserNode::isVirtual() const
 {
     Q_D(const LaserNode);
     return d->nodeType == LaserNodeType::LNT_VIRTUAL;
+}
+
+bool LaserNode::isDocument() const
+{
+    Q_D(const LaserNode);
+    return d->nodeType == LaserNodeType::LNT_DOCUMENT;
+}
+
+bool LaserNode::isLayer() const
+{
+    Q_D(const LaserNode);
+    return d->nodeType == LaserNodeType::LNT_LAYER;
+}
+
+bool LaserNode::isPrimitive() const
+{
+    Q_D(const LaserNode);
+    return d->nodeType == LaserNodeType::LNT_PRIMITIVE;
+}
+
+bool LaserNode::isUnknown() const
+{
+    Q_D(const LaserNode);
+    return d->nodeType == LaserNodeType::LNT_UNKNOWN;
 }
 
 LaserNode* LaserNode::parentNode() const

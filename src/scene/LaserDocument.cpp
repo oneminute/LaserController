@@ -22,16 +22,17 @@
 #include "util/PltUtils.h"
 #include "LaserLayer.h"
 #include "state/StateController.h"
+#include "LaserNodePrivate.h"
 
-class LaserDocumentPrivate: public LaserNodePrivate
+class LaserDocumentPrivate : public LaserNodePrivate
 {
-	Q_DECLARE_PUBLIC(LaserDocument)
+    Q_DECLARE_PUBLIC(LaserDocument)
 public:
-	LaserDocumentPrivate(LaserDocument* ptr)
-		: LaserNodePrivate(ptr)
-		, blockSignals(false)
-		, isOpened(false)
-	{}
+    LaserDocumentPrivate(LaserDocument* ptr)
+        : LaserNodePrivate(ptr)
+        , blockSignals(false)
+        , isOpened(false)
+    {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
     PageInformation pageInfo;
@@ -40,14 +41,14 @@ public:
     bool isOpened;
     LaserScene* scene;
     FinishRun finishRun;
-	SizeUnit unit;
+    SizeUnit unit;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
-	: LaserNode(new LaserDocumentPrivate(this), LNT_DOCUMENT)
+    : LaserNode(new LaserDocumentPrivate(this), LNT_DOCUMENT)
 {
     Q_D(LaserDocument);
-	d->scene = scene;
+    d->scene = scene;
     init();
 }
 
@@ -56,9 +57,9 @@ LaserDocument::~LaserDocument()
     close();
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive * item)
+void LaserDocument::addPrimitive(LaserPrimitive* item)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     d->primitives.insert(item->nodeName(), item);
 
     if (item->isShape())
@@ -73,16 +74,16 @@ void LaserDocument::addPrimitive(LaserPrimitive * item)
     updateLayersStructure();
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive * item, LaserLayer * layer)
+void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
 {
     item->layer()->removePrimitive(item);
     layer->addPrimitive(item);
     updateLayersStructure();
 }
 
-void LaserDocument::removePrimitive(LaserPrimitive * item)
+void LaserDocument::removePrimitive(LaserPrimitive* item)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     item->layer()->removePrimitive(item);
     d->primitives.remove(item->nodeName());
     item->QObject::deleteLater();
@@ -90,54 +91,54 @@ void LaserDocument::removePrimitive(LaserPrimitive * item)
 
 PageInformation LaserDocument::pageInformation() const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     return d->pageInfo;
 }
 
-void LaserDocument::setPageInformation(const PageInformation & page)
+void LaserDocument::setPageInformation(const PageInformation& page)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     d->pageInfo = page;
 }
 
 QRectF LaserDocument::pageBounds() const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     return QRectF(0, 0, d->pageInfo.width(), d->pageInfo.height());
 }
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     return d->primitives;
 }
 
-LaserPrimitive * LaserDocument::laserPrimitive(const QString & id) const
+LaserPrimitive* LaserDocument::laserPrimitive(const QString& id) const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     return d->primitives[id];
 }
 
 QList<LaserLayer*> LaserDocument::layers() const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     return d->layers;
 }
 
 void LaserDocument::addLayer(LaserLayer* layer)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     d->layers.append(layer);
     d->childNodes.append(layer);
 
     updateLayersStructure();
 }
 
-void LaserDocument::removeLayer(LaserLayer * layer)
+void LaserDocument::removeLayer(LaserLayer* layer)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     LaserLayer* initLayer = nullptr;
-    
+
     int i = d->layers.indexOf(layer);
     if (i < 2)
         return;
@@ -147,23 +148,23 @@ void LaserDocument::removeLayer(LaserLayer * layer)
     updateLayersStructure();
 }
 
-LaserLayer * LaserDocument::defaultCuttingLayer() const
+LaserLayer* LaserDocument::defaultCuttingLayer() const
 {
-	Q_D(const LaserDocument);
-	return d->layers[1];
+    Q_D(const LaserDocument);
+    return d->layers[1];
 }
 
-LaserLayer * LaserDocument::defaultEngravingLayer() const
+LaserLayer* LaserDocument::defaultEngravingLayer() const
 {
-	Q_D(const LaserDocument);
-	return d->layers[0];
+    Q_D(const LaserDocument);
+    return d->layers[0];
 }
 
 QString LaserDocument::newLayerName() const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     QString prefix(tr("Layer"));
-    
+
     int n = d->layers.size() + 1;
     bool used = true;
     QString name;
@@ -186,25 +187,25 @@ QString LaserDocument::newLayerName() const
 
 qreal LaserDocument::scale() const
 {
-	Q_D(const LaserDocument);
+    Q_D(const LaserDocument);
     return d->scale;
 }
 
 void LaserDocument::setScale(qreal scale)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     d->scale = scale;
 }
 
 void LaserDocument::exportJSON(const QString& filename)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
 
     QFile saveFile(filename);
     QJsonObject jsonObj;
 
     QJsonObject laserDocumentInfo;
-	qDebug() << &LaserDriver::instance();
+    qDebug() << &LaserDriver::instance();
     laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
@@ -212,8 +213,8 @@ void LaserDocument::exportJSON(const QString& filename)
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layers;
-	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width());
-	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical);
+    float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width());
+    float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical);
     cv::Mat canvas(pageHeight * 40, pageWidth * 40, CV_8UC3, cv::Scalar(255, 255, 255));
     int layerId = 0;
     for (int i = 0; i < d->layers.count(); i++)
@@ -268,7 +269,7 @@ void LaserDocument::exportJSON(const QString& filename)
                 itemObj["Layer"] = layerId;
                 itemObj["Width"] = Global::convertToMM(SU_PX, laserItem->boundingRect().width());
                 itemObj["Height"] = Global::convertToMM(SU_PX, laserItem->boundingRect().height(), Qt::Vertical);
-                
+
                 QByteArray data = laserItem->engravingImage(canvas);
                 if (!data.isEmpty())
                 {
@@ -298,7 +299,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     for (QPainterPath subPath : paths)
                     {
                         std::vector<cv::Point2f> points;
-                        if (pltUtils::pathPoints(subPath, points, canvas))
+                        if (pltUtils::path2Points(subPath, points, canvas))
                         {
                             pltString.append(QString(pltUtils::points2Plt(points)));
                         }
@@ -317,7 +318,7 @@ void LaserDocument::exportJSON(const QString& filename)
         layerObj["Items"] = items;
         layers.append(layerObj);
     }
-    
+
     QJsonObject actionObj;
 
     jsonObj["Layers"] = layers;
@@ -331,7 +332,7 @@ void LaserDocument::exportJSON(const QString& filename)
     }
 
     qint64 writtenBytes = saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
-	qDebug() << "written bytes:" << writtenBytes;
+    qDebug() << "written bytes:" << writtenBytes;
 
     if (!canvas.empty())
         cv::imwrite("tmp/canvas_test.png", canvas);
@@ -341,9 +342,9 @@ void LaserDocument::exportJSON2(const QString& filename)
 {
     Q_D(LaserDocument);
 
-	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
-	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
-    
+    float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
+    float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
+
     QElapsedTimer timer;
     timer.start();
     OptimizerController* optimizer = new OptimizerController(this, totalNodes());
@@ -355,7 +356,7 @@ void LaserDocument::exportJSON2(const QString& filename)
     QJsonObject jsonObj;
 
     QJsonObject laserDocumentInfo;
-	qDebug() << &LaserDriver::instance();
+    qDebug() << &LaserDriver::instance();
     laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
@@ -391,7 +392,7 @@ void LaserDocument::exportJSON2(const QString& filename)
             itemObj["Layer"] = layerId;
             itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
             itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
-            
+
             QByteArray data = primitive->engravingImage(canvas);
             if (!data.isEmpty())
             {
@@ -471,7 +472,7 @@ void LaserDocument::exportJSON2(const QString& filename)
     }
 
     qint64 writtenBytes = saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
-	qDebug() << "written bytes:" << writtenBytes;
+    qDebug() << "written bytes:" << writtenBytes;
 
     if (!canvas.empty())
         cv::imwrite("tmp/canvas_test.png", canvas);
@@ -480,25 +481,25 @@ void LaserDocument::exportJSON2(const QString& filename)
 
 void LaserDocument::blockSignals(bool block)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     d->blockSignals = block;
 }
 
-bool LaserDocument::isOpened() const 
-{ 
-	Q_D(const LaserDocument);
-	return d->isOpened; 
+bool LaserDocument::isOpened() const
+{
+    Q_D(const LaserDocument);
+    return d->isOpened;
 }
 
-LaserScene * LaserDocument::scene() const 
+LaserScene* LaserDocument::scene() const
 {
-	Q_D(const LaserDocument);
-	return d->scene; 
+    Q_D(const LaserDocument);
+    return d->scene;
 }
 
 void LaserDocument::swapLayers(int i, int j)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     LaserLayer* layer = d->layers[i];
     d->layers[i] = d->layers[j];
     d->layers[j] = layer;
@@ -507,7 +508,7 @@ void LaserDocument::swapLayers(int i, int j)
 
 void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     for (int i = 0; i < Config::LayersMaxLayersCount(); i++)
     {
         d->layers[i]->bindButton(layerButtons[i]);
@@ -515,33 +516,33 @@ void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
     updateLayersStructure();
 }
 
-FinishRun & LaserDocument::finishRun() 
-{ 
-	Q_D(LaserDocument);
-	return d->finishRun; 
+FinishRun& LaserDocument::finishRun()
+{
+    Q_D(LaserDocument);
+    return d->finishRun;
 }
 
-void LaserDocument::setFinishRun(const FinishRun & value)
+void LaserDocument::setFinishRun(const FinishRun& value)
 {
-	Q_D(LaserDocument);
-	d->finishRun = value; 
+    Q_D(LaserDocument);
+    d->finishRun = value;
 }
 
 SizeUnit LaserDocument::unit() const
 {
-	Q_D(const LaserDocument);
-	return d->unit;
+    Q_D(const LaserDocument);
+    return d->unit;
 }
 
 void LaserDocument::setUnit(SizeUnit unit)
 {
-	Q_D(LaserDocument);
-	d->unit = unit;
+    Q_D(LaserDocument);
+    d->unit = unit;
 }
 
 void LaserDocument::updateLayersStructure()
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     if (!d->blockSignals)
         emit layersStructureChanged();
 }
@@ -553,14 +554,14 @@ void LaserDocument::destroy()
 
 void LaserDocument::open()
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     d->isOpened = true;
     emit opened();
 }
 
 void LaserDocument::close()
 {
-	Q_D(LaserDocument);
+    Q_D(LaserDocument);
     if (d->isOpened)
     {
         destroy();
@@ -571,21 +572,21 @@ void LaserDocument::close()
 
 void LaserDocument::analysis()
 {
-	Q_D(LaserDocument);
-	qLogD << "begin analysising";
+    Q_D(LaserDocument);
+    qLogD << "begin analysising";
 
-	/*for (LaserPrimitive* primitive : d->primitives)
-	{
-		if (primitive->primitiveType() == LPT_PATH)
-		{
-			LaserPath* laserPath = qobject_cast<LaserPath*>(primitive);
-			QList<QPainterPath> subPaths = laserPath->subPaths();
-			for (int i = 0; i < subPaths.size(); i++)
-			{
-				qLogD << "sub path " << i << ":" << subPaths[i];
-			}
-		}
-	}*/
+    /*for (LaserPrimitive* primitive : d->primitives)
+    {
+        if (primitive->primitiveType() == LPT_PATH)
+        {
+            LaserPath* laserPath = qobject_cast<LaserPath*>(primitive);
+            QList<QPainterPath> subPaths = laserPath->subPaths();
+            for (int i = 0; i < subPaths.size(); i++)
+            {
+                qLogD << "sub path " << i << ":" << subPaths[i];
+            }
+        }
+    }*/
 
     outline();
 }
@@ -634,9 +635,9 @@ void LaserDocument::arrange()
 void LaserDocument::optimize()
 {
     Q_D(LaserDocument);
-	float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
-	float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
-    
+    float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
+    float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
+
     qLogD << "LaserDocument::optimize";
     OptimizerController* optimizer = new OptimizerController(this, totalNodes());
     optimizer->optimize(pageWidth, pageHeight);
@@ -755,18 +756,18 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
         return;
 
     QList<LaserNode*> children = node->childNodes();
-    qSort(children.begin(), children.end(), [=](LaserNode * a, LaserNode * b) -> bool {
-        if (a->center().y() < b->center().y()) 
+    qSort(children.begin(), children.end(), [=](LaserNode* a, LaserNode* b) -> bool {
+        if (a->position().y() < b->position().y())
         {
             return true;
         }
-        else if (a->center().y() > b->center().y())
+        else if (a->position().y() > b->position().y())
         {
             return false;
         }
         else
         {
-            if (a->center().x() < b->center().x())
+            if (a->position().x() < b->position().x())
             {
                 return true;
             }
@@ -775,11 +776,11 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
                 return false;
             }
         }
-    });
+        });
 
     for (LaserNode* item : children)
     {
-        qLogD << item->center().x() << ", " << item->center().y();
+        qLogD << item->position().x() << ", " << item->position().y();
     }
 
     int maxChildNodes = 11;
@@ -797,12 +798,12 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
                 QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
                 newNode->setNodeName(nodeName);
             }
-            center += children[i]->center();
+            center += children[i]->position();
             newNode->addChildNode(children[i]);
             if (++count == maxChildNodes)
             {
                 center /= newNode->childNodes().count();
-                newNode->setCenter(center);
+                newNode->setPosition(center);
                 node->addChildNode(newNode);
                 center = QPointF(0, 0);
                 count = 0;
@@ -872,4 +873,5 @@ void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode
     }
     node->addChildNode(primitive);
 }
+
 

@@ -33,7 +33,6 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost 1.66 COMPONENTS timer REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Test CONFIG REQUIRED)
 find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui videoio flann REQUIRED)
-#find_package(PolyClipping REQUIRED)
 find_package(OpenMP REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
@@ -62,7 +61,6 @@ set(INCLUDE_DIRS
     ${FLANN_INCLUDE_DIR}
     src/widget/LRWidgets
 	${PROJECT_BINARY_DIR}
-    #${PolyClipping_INCLUDE_DIRS}
 )
 
 FILE(GLOB BASE_HEADERS src/*.h ./*.hpp)
@@ -206,8 +204,6 @@ set(LINK_LIBRARIES
     glog::glog
     ${GFLAGS_LIBRARIES}
     LRWidgets
-    #PolyClipping
-    #${PolyClipping_LIBRARIES}
 )
 
 if(ANDROID)
@@ -232,6 +228,8 @@ target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
 #target_link_libraries(TestQt2Wykobi PRIVATE ${LINK_LIBRARIES})
 add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
 target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
+add_executable(TestQPainterPath test/TestQPainterPath.cpp)
+target_link_libraries(TestQPainterPath PRIVATE ${LINK_LIBRARIES})
 
 set(QM_FILES
     ${QM_FILES}

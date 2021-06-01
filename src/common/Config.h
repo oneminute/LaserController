@@ -171,8 +171,12 @@ public:
     CONFIG_ITEM_INT(OptimizePath, MaxTraverseCount, 2000, "Max tranverse count.")
     CONFIG_ITEM_DOUBLE(OptimizePath, VolatileRate, 0.65, "Volatie rate.")
     CONFIG_ITEM_BOOL(OptimizePath, UseGreedyAlgorithm, true, "Use greedy algorithm form path optimization.")
+    CONFIG_ITEM_INT(OptimizePath, MaxStartingPoints, 8, "Max tranverse count.")
+    CONFIG_ITEM_INT(OptimizePath, MaxStartingPointAnglesDiff, 45, "Max angles diff between two starting points.")
+    //CONFIG_ITEM_DOUBLE(OptimizePath, MinStartingPointsInterval, 8, "Min interval between two starting points.")
 
     CONFIG_ITEM_DOUBLE(PltUtils, MaxAnglesDiff, 5.0, "Max angles diff")
+    CONFIG_ITEM_DOUBLE(PltUtils, MaxIntervalDistance, 10.0, "Max interval distance")
 
 private:
     Config();

@@ -41,13 +41,19 @@ int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector
     return count;
 }
 
-int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& points, cv::Mat& canvas)
+int pltUtils::path2Points(const QPainterPath & path, std::vector<cv::Point2f>& points, cv::Mat& canvas)
 {
+    // 获取图元的总长度
     qreal length = path.length();
-
     QPointF pt = path.pointAtPercent(0);
     qreal slope = path.slopeAtPercent(0);
     qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
+
+    // 用于计算起刀点的变量
+    QList<int> startingIndices;
+    int startingPointsCount = 0;
+    //int maxStartingPoints = qMax(qCeil(length / Config::OptimizePathMinStartingPointsInterval()), Config::OptimizePathMaxStartingPoints());
+    //qreal startingPoiontsInterval = length / maxStartingPoints;
 
     QPointF startPt = pt;
     //qDebug() << "Slope:" << slope << ", Angle degrees: " << qRadiansToDegrees(radians);
@@ -56,6 +62,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
     qreal anchorSlope = slope;
     qreal anchorRadians = radians;
 
+    // 保存第一个点
     points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
     if (!canvas.empty())
         cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
@@ -83,7 +90,7 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
             anchorSlope = slope;
             anchorRadians = radians;
         }
-        else if (diff != 0 && dist >= 10)
+        else if (diff != 0 && dist >= Config::PltUtilsMaxIntervalDistance())
         {
             if (!canvas.empty())
             {
@@ -99,8 +106,11 @@ int pltUtils::pathPoints(const QPainterPath & path, std::vector<cv::Point2f>& po
 
     pt = path.pointAtPercent(1.0);
     points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
-    if (!canvas.empty())
+    if (!canvas.empty()) 
+    {
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt), typeUtils::qtPointF2CVPoint2f(startPt), cv::Scalar(0));
+    }
 
     qLogD << "path with " << path.elementCount() << " elements convert to " << points.size() << " points.";
     return points.size();

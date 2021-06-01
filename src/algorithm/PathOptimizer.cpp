@@ -39,7 +39,7 @@ public:
         if (laserNode)
         {
             name = laserNode->nodeName();
-            QPointF c = laserNode->center();
+            QPointF c = laserNode->position();
             center = cv::Point2f(c.x(), c.y());
         }
         if (primitive)
