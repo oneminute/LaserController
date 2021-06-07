@@ -163,6 +163,22 @@ void LaserViewer::zoomBy(qreal factor)
     emit zoomChanged(m_scene->document()->scale(), mapFromScene(m_scene->backgroundItem()->pos()));
 }
 
+void LaserViewer::leaveEvent(QEvent * event)
+{
+	m_horizontalRuler->setIsMarkMouse(false);
+	m_verticalRuler->setIsMarkMouse(false);
+	m_horizontalRuler->repaint();
+	m_verticalRuler->repaint();
+}
+
+void LaserViewer::enterEvent(QEvent * event)
+{
+	m_horizontalRuler->setIsMarkMouse(true);
+	m_verticalRuler->setIsMarkMouse(true);
+	m_horizontalRuler->repaint();
+	m_verticalRuler->repaint();
+}
+
 void LaserViewer::mousePressEvent(QMouseEvent * event)
 {
     QGraphicsView::mousePressEvent(event);
@@ -226,6 +242,11 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 {
     QPoint point = event->pos();
+	//ruler
+	m_horizontalRuler->setMousePoint(point);
+	m_verticalRuler->setMousePoint(point);
+	m_horizontalRuler->repaint();
+	m_verticalRuler->repaint();
 	//shift keyboard
 	if (event->modifiers() & Qt::ShiftModifier) {
 		m_isKeyShiftPressed = true;

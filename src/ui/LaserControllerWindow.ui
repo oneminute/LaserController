@@ -31,10 +31,10 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="RulerWidget" name="widget" native="true"/>
+       <widget class="RulerWidget" name="horizontal_ruler" native="true"/>
       </item>
       <item row="1" column="0">
-       <widget class="RulerWidget" name="widget_2" native="true"/>
+       <widget class="RulerWidget" name="vertical_ruler" native="true"/>
       </item>
      </layout>
     </item>

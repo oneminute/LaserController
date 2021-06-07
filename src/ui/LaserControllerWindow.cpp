@@ -71,23 +71,23 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 	//ruler
 	m_ui->gridLayout->setSpacing(0);
-	m_ui->widget->setViewer(m_viewer);
-	m_ui->widget->refresh();
-	m_viewer->setHorizontalRuler(m_ui->widget);
-	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->widget, &RulerWidget::viewZoomChanged);
-	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->widget, [=] {
+	m_ui->horizontal_ruler->setViewer(m_viewer);
+	m_ui->horizontal_ruler->refresh();
+	m_viewer->setHorizontalRuler(m_ui->horizontal_ruler);
+	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->horizontal_ruler, &RulerWidget::viewZoomChanged);
+	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->horizontal_ruler, [=] {
 		qDebug() << "ruler_h";
-		m_ui->widget->setScale(1.0);
+		m_ui->horizontal_ruler->setScale(1.0);
 	});
 
-	m_ui->widget_2->setViewer(m_viewer);
-	m_ui->widget_2->setIsVertical(true);
-	m_ui->widget_2->refresh();
-	m_viewer->setVerticalRuler(m_ui->widget_2);
-	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->widget_2, &RulerWidget::viewZoomChanged);
-	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->widget_2, [=] {
+	m_ui->vertical_ruler->setViewer(m_viewer);
+	m_ui->vertical_ruler->setIsVertical(true);
+	m_ui->vertical_ruler->refresh();
+	m_viewer->setVerticalRuler(m_ui->vertical_ruler);
+	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->vertical_ruler, &RulerWidget::viewZoomChanged);
+	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->vertical_ruler, [=] {
 		qDebug() << "ruler_v";
-		m_ui->widget_2->setScale(1.0);
+		m_ui->vertical_ruler->setScale(1.0);
 	});
 	
     int colorTick = 360 / Config::LayersMaxLayersCount();

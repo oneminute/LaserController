@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QWidget>
+#include <QPoint>
 #include "LaserViewer.h"
 
 class LaserScene;
@@ -17,25 +18,28 @@ public:
 	void setViewer(LaserViewer* _v);
 	void setFactor(qreal _factor);
 	void setScale(qreal _scale);
+	void setIsMarkMouse(bool _bl);
+	void setMousePoint(const QPoint& _point);
 	void refresh();
 	
 protected:
 	void paintEvent(QPaintEvent *event);
 private:
-	bool isVertical;
-	bool isVisible = false;
-	int minHeightSize = 15;
-	int minWidthSize = 18;
-	qreal factor = 1.0;
-	qreal scale = 1.0;
-	qreal millimeter = 5;//变化的
-	QPointF original = QPointF(0, 0);
-	LaserViewer* viewer = nullptr;
-	qreal baseMillimeter = 5;//假设一毫米等于5个像素
-	int flag = 1;
-	qreal unit = 0;
-	qreal longUnit = 0;
-	qreal mediumUnit = 0;
+	bool m_isVertical;
+	bool m_isMarkMouse = false;//是否标记鼠标
+	int m_minHeightSize = 15;
+	int m_minWidthSize = 18;
+	qreal m_factor = 1.0;
+	qreal m_scale = 1.0;
+	qreal m_millimeter = 5;//变化的
+	QPointF m_original = QPointF(0, 0);
+	LaserViewer* m_viewer = nullptr;
+	qreal m_baseMillimeter = 5;//假设一毫米等于5个像素
+	int m_flag = 1;
+	qreal m_unit = 0;
+	qreal m_longUnit = 0;
+	qreal m_mediumUnit = 0;
+	QPoint m_mousePoint;
 private :
 	void drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive = true);
 	void drawSmallUnit(qreal unit, qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isToRight = true);

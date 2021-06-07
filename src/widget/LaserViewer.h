@@ -73,6 +73,8 @@ protected:
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
 	//mouse
+	virtual void leaveEvent(QEvent *event) override;
+	virtual void enterEvent(QEvent *event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;

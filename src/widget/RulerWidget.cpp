@@ -8,11 +8,11 @@
 #include <state/StateController.h>
 #include "qmath.h"
 RulerWidget::RulerWidget(QWidget * parent, bool _isVertical)
-	:QWidget(parent), isVertical(_isVertical)
+	:QWidget(parent), m_isVertical(_isVertical), m_mousePoint(0, 0)
 {
-	baseMillimeter = Global::mm2PixelsX(1.0);
-	millimeter = baseMillimeter;
-	unit = millimeter;
+	m_baseMillimeter = Global::mm2PixelsX(1.0);
+	m_millimeter = m_baseMillimeter;
+	m_unit = m_millimeter;
 	refresh();
 }
 
@@ -23,33 +23,43 @@ RulerWidget::~RulerWidget()
 
 void RulerWidget::setIsVertical(bool _bl)
 {
-	isVertical = _bl;
+	m_isVertical = _bl;
 	
 }
 
 void RulerWidget::setViewer(LaserViewer* _v)
 {
-	viewer = _v;
+	m_viewer = _v;
 }
 
 void RulerWidget::setFactor(qreal _factor)
 {
-	factor = _factor;
+	m_factor = _factor;
 }
 
 void RulerWidget::setScale(qreal _scale)
 {
-	scale = _scale;
+	m_scale = _scale;
+}
+
+void RulerWidget::setIsMarkMouse(bool _bl)
+{
+	m_isMarkMouse = _bl;
+}
+
+void RulerWidget::setMousePoint(const QPoint& _point)
+{
+	m_mousePoint = _point;
 }
 
 void RulerWidget::refresh()
 {
 	
-	if (isVertical) {
-		this->setMinimumWidth(minWidthSize);
+	if (m_isVertical) {
+		this->setMinimumWidth(m_minWidthSize);
 	}
 	else {
-		this->setMinimumHeight(minHeightSize);
+		this->setMinimumHeight(m_minHeightSize);
 	}
 	
 }
@@ -57,9 +67,9 @@ void RulerWidget::refresh()
 
 
 void RulerWidget::viewZoomChanged(qreal _factor, const QPointF& topleft) {
-	factor = _factor;
-	original = topleft;
-	scale *= factor;
+	m_factor = _factor;
+	m_original = topleft;
+	m_scale *= m_factor;
 	repaint();
 }
 
@@ -70,82 +80,92 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		return;
 	}
 	QPainter painter(this);
-	painter.setPen(QPen(Qt::black, 0.5, Qt::SolidLine));
+	//mouse position
+	if (m_isMarkMouse) {
+		painter.setPen(QPen(Qt::red, 1.2, Qt::DotLine));
+		if (m_isVertical) {
+			painter.drawLine(QPoint(0, m_mousePoint.y()), QPoint(m_minWidthSize, m_mousePoint.y()));
+		}
+		else {
+			painter.drawLine(QPoint(m_mousePoint.x(), 0), QPoint(m_mousePoint.x(), m_minHeightSize));
+		}
+		
+		
+	}
+	
+	//Ruller
+	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 	QFont font = painter.font();
 	font.setPixelSize(10);
 	painter.setFont(font);
-	//Ruller
 	//Axes
-	millimeter = baseMillimeter * scale;
-	qreal minification = 1 / scale;
+	m_millimeter = m_baseMillimeter * m_scale;
+	qreal minification = 1 / m_scale;
 	int pow_10 = qLn(minification) / qLn(10);
-	flag = qRound(qPow(10, pow_10));//1,10,100,1000...缩小倍数
-	original = viewer->mapFromScene(viewer->scene()->backgroundItem()->pos());
-
-	
-	
-	int textCoef = 1 * flag;
-	if (scale >= 1.0) {
-		unit = millimeter;
-		longUnit = 10 * millimeter;
-		mediumUnit = 5 * millimeter;
+	m_flag = qRound(qPow(10, pow_10));//1,10,100,1000...缩小倍数
+	m_original = m_viewer->mapFromScene(m_viewer->scene()->backgroundItem()->pos());
+	int textCoef = 1 * m_flag;
+	if (m_scale >= 1.0) {
+		m_unit = m_millimeter;
+		m_longUnit = 10 * m_millimeter;
+		m_mediumUnit = 5 * m_millimeter;
 	}
 	else {
-		qreal shrinkScale = 1 / scale;
-		if (shrinkScale > 1*flag && shrinkScale < 1.2*flag) {
-			unit = millimeter * flag;
-			longUnit = 10 * millimeter * flag;
-			mediumUnit = 5 * millimeter * flag;
+		qreal shrinkScale = 1 / m_scale;
+		if (shrinkScale > 1*m_flag && shrinkScale < 1.2*m_flag) {
+			m_unit = m_millimeter * m_flag;
+			m_longUnit = 10 * m_millimeter * m_flag;
+			m_mediumUnit = 5 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 1.2*flag && shrinkScale < 2 * flag) {
-			unit = 2*millimeter * flag;
-			longUnit = 10 * millimeter * flag;
-			mediumUnit = 0;
+		else if (shrinkScale >= 1.2*m_flag && shrinkScale < 2 * m_flag) {
+			m_unit = 2*m_millimeter * m_flag;
+			m_longUnit = 10 * m_millimeter * m_flag;
+			m_mediumUnit = 0;
 		}
-		else if (shrinkScale >= 2 * flag && shrinkScale < 2.2*flag) {
-			textCoef = 2 * flag;
-			unit = 2*millimeter * flag;
-			longUnit = 20 * millimeter * flag;
-			mediumUnit = 10 * millimeter * flag;
+		else if (shrinkScale >= 2 * m_flag && shrinkScale < 2.2*m_flag) {
+			textCoef = 2 * m_flag;
+			m_unit = 2*m_millimeter * m_flag;
+			m_longUnit = 20 * m_millimeter * m_flag;
+			m_mediumUnit = 10 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 2.2*flag && shrinkScale < 5 * flag) {
-			textCoef = 2 * flag;
-			unit = 5 * millimeter * flag;
-			longUnit = 20 * millimeter * flag;
-			mediumUnit = 10 * millimeter * flag;
+		else if (shrinkScale >= 2.2*m_flag && shrinkScale < 5 * m_flag) {
+			textCoef = 2 * m_flag;
+			m_unit = 5 * m_millimeter * m_flag;
+			m_longUnit = 20 * m_millimeter * m_flag;
+			m_mediumUnit = 10 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 5 * flag && shrinkScale < 5.5 * flag) {
-			textCoef = 5 * flag;
-			unit = 5 * millimeter * flag;
-			longUnit = 50 * millimeter * flag;
-			mediumUnit = 10 * millimeter * flag;
+		else if (shrinkScale >= 5 * m_flag && shrinkScale < 5.5 * m_flag) {
+			textCoef = 5 * m_flag;
+			m_unit = 5 * m_millimeter * m_flag;
+			m_longUnit = 50 * m_millimeter * m_flag;
+			m_mediumUnit = 10 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 5.5 * flag && shrinkScale < 10 * flag) {
-			textCoef = 5 * flag;
-			unit = 10 * millimeter * flag;
-			longUnit = 50 * millimeter * flag;
-			mediumUnit = 0;
+		else if (shrinkScale >= 5.5 * m_flag && shrinkScale < 10 * m_flag) {
+			textCoef = 5 * m_flag;
+			m_unit = 10 * m_millimeter * m_flag;
+			m_longUnit = 50 * m_millimeter * m_flag;
+			m_mediumUnit = 0;
 		}
 	}
-	if (longUnit < 20) {
+	if (m_longUnit < 20) {
 		font.setPixelSize(8);
 		painter.setFont(font);
 	}
 	QRectF rect = this->rect();
-	QRectF documentRect = viewer->scene()->backgroundItem()->rect();
-	QRectF viewerRect = viewer->rect();
+	QRectF documentRect = m_viewer->scene()->backgroundItem()->rect();
+	QRectF viewerRect = m_viewer->rect();
 	qreal dimension = 0;
-	if (isVertical) {
+	if (m_isVertical) {
 		if (rect.height() >documentRect.height()) {
-			dimension = rect.bottom() - original.y();
-			drawRuler(original.y() - rect.top(), textCoef, painter, false);
+			dimension = rect.bottom() - m_original.y();
+			drawRuler(m_original.y() - rect.top(), textCoef, painter, false);
 		}
 		drawRuler(dimension, textCoef, painter);
 	}
 	else {
 		if (rect.width() >documentRect.width()) {
-			dimension = rect.right() - original.x();
-			drawRuler(original.x() - rect.left(), textCoef, painter, false);
+			dimension = rect.right() - m_original.x();
+			drawRuler(m_original.x() - rect.left(), textCoef, painter, false);
 		}
 		drawRuler(dimension, textCoef, painter);
 	}
@@ -156,46 +176,46 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter,bool isPositive)
 {
 	QRectF rect = this->rect();
-	int longSize = dimension / longUnit;
+	int longSize = dimension / m_longUnit;
 	for (int i = 0; i <= longSize; i++) {
-		qreal originalStart = original.x();
-		if (isVertical) {
-			originalStart = original.y();
+		qreal originalStart = m_original.x();
+		if (m_isVertical) {
+			originalStart = m_original.y();
 		}
-		float longStart = originalStart + i * longUnit;
+		float longStart = originalStart + i * m_longUnit;
 		if (!isPositive) {
-			longStart = originalStart - i * longUnit;
+			longStart = originalStart - i * m_longUnit;
 		}
 		qreal edge = rect.top();
-		if (isVertical) {
+		if (m_isVertical) {
 			edge = rect.left();
-			painter.drawLine(QPointF( edge + 7, longStart), QPointF(edge + minWidthSize, longStart));
+			painter.drawLine(QPointF( edge + 7, longStart), QPointF(edge + m_minWidthSize, longStart));
 			painter.drawText(QPointF(edge, longStart+10), QString::number(i * textCoef));
 		}
 		else {
-			painter.drawLine(QPointF(longStart, edge + 7), QPointF(longStart, edge + minHeightSize));
+			painter.drawLine(QPointF(longStart, edge + 7), QPointF(longStart, edge + m_minHeightSize));
 			painter.drawText(QPointF(longStart+2, edge + 8), QString::number(i * textCoef));
 		}
 		
-		if (mediumUnit > 5) {
-			int mediumSize = longUnit / mediumUnit;
+		if (m_mediumUnit > 5) {
+			int mediumSize = m_longUnit / m_mediumUnit;
 			for (int mi = 1; mi < mediumSize; mi++) {
-				float mStart = longStart + mi * mediumUnit;
+				float mStart = longStart + mi * m_mediumUnit;
 				if (!isPositive) {
-					mStart = longStart - mi * mediumUnit;
+					mStart = longStart - mi * m_mediumUnit;
 				}
-				if (isVertical) {
-					painter.drawLine(QPointF(edge + 12, mStart), QPointF(edge + minWidthSize, mStart));
+				if (m_isVertical) {
+					painter.drawLine(QPointF(edge + 12, mStart), QPointF(edge + m_minWidthSize, mStart));
 				}
 				else {
-					painter.drawLine(QPointF(mStart, edge + 10), QPointF(mStart, edge + minHeightSize));
+					painter.drawLine(QPointF(mStart, edge + 10), QPointF(mStart, edge + m_minHeightSize));
 				}
-				drawSmallUnit(unit, mediumUnit, mStart, edge, painter);
+				drawSmallUnit(m_unit, m_mediumUnit, mStart, edge, painter);
 			}
-			drawSmallUnit(unit, mediumUnit, longStart, edge, painter);
+			drawSmallUnit(m_unit, m_mediumUnit, longStart, edge, painter);
 		}
 		else {
-			drawSmallUnit(unit, longUnit, longStart, edge, painter);
+			drawSmallUnit(m_unit, m_longUnit, longStart, edge, painter);
 		}
 	}
 }
@@ -209,11 +229,11 @@ void RulerWidget::drawSmallUnit(qreal unit,qreal _length, qreal _original, qreal
 			if (!isToRight) {
 				sStart = _original - si * unit;
 			}
-			if (isVertical) {
-				_painter.drawLine(QPointF(_edge + 14, sStart), QPointF(_edge + minWidthSize, sStart));
+			if (m_isVertical) {
+				_painter.drawLine(QPointF(_edge + 14, sStart), QPointF(_edge + m_minWidthSize, sStart));
 			}
 			else {
-				_painter.drawLine(QPointF(sStart, _edge + 12), QPointF(sStart, _edge + minHeightSize));
+				_painter.drawLine(QPointF(sStart, _edge + 12), QPointF(sStart, _edge + m_minHeightSize));
 			}
 			
 		}
