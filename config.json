@@ -78,7 +78,7 @@
             "defaultValue": true,
             "name": "UseHalftone",
             "type": 3,
-            "value": true
+            "value": null
         }
     },
     "General": {
@@ -86,7 +86,7 @@
             "defaultValue": "English",
             "name": "Language",
             "type": 4,
-            "value": "English"
+            "value": "中文"
         },
         "Unit": {
             "defaultValue": 4,
@@ -138,7 +138,7 @@
             "defaultValue": true,
             "name": "UseGreedyAlgorithm",
             "type": 3,
-            "value": false
+            "value": null
         },
         "VolatileRate": {
             "defaultValue": 0.65,

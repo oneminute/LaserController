@@ -237,7 +237,11 @@ set(QM_FILES
     ${HEADER_FILES}
 )
 
-#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${TS_FILES})
+
+add_custom_target (GenerateTranslations 
+    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.ts
+)
 
 include(cmake_install_Debug.txt)
 include(cmake_install_Release.txt)
