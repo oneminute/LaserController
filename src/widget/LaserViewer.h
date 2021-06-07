@@ -5,7 +5,7 @@
 #include <QGraphicsView>
 #include <QTime>
 #include <QTextEdit>
-
+class RulerWidget;
 class LaserScene;
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -39,6 +39,9 @@ private:
 	void releaseTextEdit();
 public:
 	void createSpline();
+	LaserScene* scene();
+	void setHorizontalRuler(RulerWidget* _r);
+	void setVerticalRuler(RulerWidget * _r);
 public slots:
     void zoomIn();
     void zoomOut();
@@ -46,7 +49,7 @@ public slots:
 	void textAreaChanged();
 
 signals:
-    void zoomChanged();
+    void zoomChanged(qreal factor, const QPointF& topleft);
     void beginSelecting();
     void endSelecting();
     void cancelSelecting();
@@ -76,6 +79,9 @@ protected:
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
+	//scroll
+
+	virtual void scrollContentsBy(int dx, int dy) override;
 
 
 private:
@@ -124,7 +130,8 @@ private:
 	bool m_isKeyShiftPressed;
 	bool m_isKeyDelPress;
 	//Ruller
-	qreal m_rullerWidth;
+	RulerWidget* m_horizontalRuler;
+	RulerWidget* m_verticalRuler;
 };
 
 #endif // LASERVIEWER_H

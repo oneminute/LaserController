@@ -44,6 +44,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 {
 	Global::mainWindow = this;
     m_ui->setupUi(this);
+	
+
     setDockNestingEnabled(true);
 
     QList<QColor> colors;
@@ -66,7 +68,28 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
-    
+
+	//ruler
+	m_ui->gridLayout->setSpacing(0);
+	m_ui->widget->setViewer(m_viewer);
+	m_ui->widget->refresh();
+	m_viewer->setHorizontalRuler(m_ui->widget);
+	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->widget, &RulerWidget::viewZoomChanged);
+	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->widget, [=] {
+		qDebug() << "ruler_h";
+		m_ui->widget->setScale(1.0);
+	});
+
+	m_ui->widget_2->setViewer(m_viewer);
+	m_ui->widget_2->setIsVertical(true);
+	m_ui->widget_2->refresh();
+	m_viewer->setVerticalRuler(m_ui->widget_2);
+	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->widget_2, &RulerWidget::viewZoomChanged);
+	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->widget_2, [=] {
+		qDebug() << "ruler_v";
+		m_ui->widget_2->setScale(1.0);
+	});
+	
     int colorTick = 360 / Config::LayersMaxLayersCount();
     for (int i = 0; i < Config::LayersMaxLayersCount(); i++)
     {

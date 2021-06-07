@@ -16,6 +16,7 @@
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
 #include "state/StateController.h"
+#include "widget/RulerWidget.h"
 
 LaserViewer::LaserViewer(QWidget* parent)
     : QGraphicsView(parent)
@@ -31,7 +32,8 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_handlingSpline(SplineStruct())
 	, m_lastTime(0)
 	, m_curTime(0)
-	, m_rullerWidth(15)
+	, m_horizontalRuler(nullptr)
+	, m_verticalRuler(nullptr)
 
 {
     setScene(m_scene.data());
@@ -39,6 +41,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 
 	Global::dpiX = logicalDpiX();
 	Global::dpiY = logicalDpiY();
+	
 }
 
 LaserViewer::~LaserViewer()
@@ -47,83 +50,9 @@ LaserViewer::~LaserViewer()
 
 void LaserViewer::paintEvent(QPaintEvent * event)
 {
-	//qLogD << "paintEvent: " << StateControllerInst.currentStates();
     QGraphicsView::paintEvent(event);
-	//RULLER
-	//m_ruller.draw();
-	//painter
 	QPainter painter(viewport());
 	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-	//Ruller
-	if (m_scene != nullptr && m_scene->backgroundItem() != nullptr && m_scene->document() != nullptr) {
-		//Axes
-		QPointF origin = mapFromScene(m_scene->backgroundItem()->pos());
-		QRectF rect = this->rect();
-		//rect = QRect(rect.left() + m_rullerWidth, rect.top() + m_rullerWidth, rect.width() - m_rullerWidth, rect.height() - m_rullerWidth);
-		painter.drawLine(QPointF(rect.left(), rect.top()), QPointF(rect.right(), rect.top()));
-		painter.drawLine(QPointF(rect.left(), rect.top()), QPointF(rect.left(), rect.bottom()));
-		qreal unit = 10 * zoomFactor();
-		qreal longTick = unit * 10;
-		qreal mediumTick = unit * 5;
-		//painter.drawText(QPointF(100, 100), QString("123"));
-		//horizontal axis
-		//unit
-		for (int i = 0; i <= (origin.x() - rect.left()) / unit; i++)
-		{
-			painter.drawLine(QPointF(origin.x() - i*unit, rect.top()), QPointF(origin.x() - i * unit, rect.top() + m_rullerWidth * 0.2));
-		}
-		for (int i = 0; i <= (rect.right() -origin.x()) / unit; i++)
-		{
-			painter.drawLine(QPointF(origin.x()+i*unit, rect.top()), QPointF(origin.x() + i * unit, rect.top() + m_rullerWidth * 0.2));
-		}
-		//long
-		for (int i = 0; i <= (origin.x() - rect.left()) / longTick; i++) {
-			painter.drawLine(QPointF(origin.x() - i*longTick, rect.top()), QPointF(origin.x() - i * longTick, rect.top() + m_rullerWidth));
-			painter.drawText(QPointF(origin.x() - i * longTick+2, rect.top()+15), QString::number(i));
-		}
-		for (int i = 0; i <= (rect.right() -origin.x()) / longTick; i++) {
-			painter.drawLine(QPointF(origin.x() + i * longTick, rect.top()), QPointF(origin.x() + i * longTick, rect.top() + m_rullerWidth));
-			painter.drawText(QPointF(origin.x() + i * longTick + 2, rect.top() + 15), QString::number(i));
-		}
-		//medium
-		for (int i = 0; i <= (origin.x() - rect.left()) / mediumTick; i++) {
-			painter.drawLine(QPointF(origin.x() - i*mediumTick, rect.top()), QPointF(origin.x() - i * mediumTick, rect.top() + m_rullerWidth * 0.5));
-		}
-		for (int i = 0; i <= (rect.right() - origin.x()) / mediumTick; i++) {
-			painter.drawLine(QPointF(origin.x() + i * mediumTick, rect.top()), QPointF(origin.x() + i * mediumTick, rect.top() + m_rullerWidth * 0.5));
-		}
-		//vertical axis
-		//unit
-		for (int i = 0; i <= (origin.y() - rect.top()) / unit; i++)
-		{
-			painter.drawLine(QPointF(rect.left(), origin.y() - i * unit), QPointF(rect.left() + m_rullerWidth * 0.2, origin.y() - i * unit));
-		}
-		for (int i = 0; i <= (rect.bottom() - origin.y()) / unit; i++)
-		{
-			painter.drawLine(QPointF(rect.left(), origin.y() + i * unit), QPointF(rect.left() + m_rullerWidth * 0.2, origin.y() + i * unit));
-		}
-		//long
-		for (int i = 0; i <= (origin.y() - rect.top()) / longTick; i++)
-		{
-			painter.drawLine(QPointF(rect.left(), origin.y() - i * longTick), QPointF(rect.left() + m_rullerWidth, origin.y() - i * longTick));
-			painter.drawText(QPointF(rect.left() + 8, origin.y() - i * longTick+12), QString::number(i));
-		}
-		for (int i = 0; i <= (rect.bottom() - origin.y()) / longTick; i++)
-		{
-			painter.drawLine(QPointF(rect.left(), origin.y() + i * longTick), QPointF(rect.left() + m_rullerWidth, origin.y() + i * longTick));
-			painter.drawText(QPointF(rect.left() + 8, origin.y() + i * longTick + 12), QString::number(i));
-		}	
-		//medium
-		for (int i = 0; i <= (origin.y() - rect.top()) / mediumTick; i++)
-		{
-			painter.drawLine(QPointF(rect.left(), origin.y() - i * mediumTick), QPointF(rect.left() + m_rullerWidth * 0.5, origin.y() - i * mediumTick));
-		}
-		for (int i = 0; i <= (rect.bottom() - origin.y()) / longTick; i++)
-		{
-			painter.drawLine(QPointF(rect.left(), origin.y() + i * mediumTick), QPointF(rect.left() + m_rullerWidth * 0.5, origin.y() + i * mediumTick));
-		}
-	}
-
 	//selectioin
 	if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
     {       
@@ -230,7 +159,8 @@ void LaserViewer::zoomBy(qreal factor)
         return;
     scale(factor, factor);
     m_scene->document()->setScale(factor);
-    emit zoomChanged();
+	qDebug() << "scale:" << m_scene->document()->scale();
+    emit zoomChanged(m_scene->document()->scale(), mapFromScene(m_scene->backgroundItem()->pos()));
 }
 
 void LaserViewer::mousePressEvent(QMouseEvent * event)
@@ -517,6 +447,17 @@ void LaserViewer::keyReleaseEvent(QKeyEvent * event)
 	QGraphicsView::keyReleaseEvent(event);
 }
 
+void LaserViewer::scrollContentsBy(int dx, int dy)
+{
+	QGraphicsView::scrollContentsBy(dx, dy);
+	if (m_horizontalRuler != nullptr) {
+		m_horizontalRuler->repaint();
+	}
+	if (m_verticalRuler != nullptr) {
+		m_verticalRuler->repaint();
+	}
+}
+
 qreal LaserViewer::zoomFactor() const
 {
     return transform().m11();
@@ -604,6 +545,21 @@ void LaserViewer::createSpline()
 	qDebug() << "m_splineList length: " << m_splineList.length();
 }
 
+LaserScene * LaserViewer::scene()
+{
+	return this->m_scene.data();
+}
+
+void LaserViewer::setHorizontalRuler(RulerWidget * _r)
+{
+	m_horizontalRuler = _r;
+}
+
+void LaserViewer::setVerticalRuler(RulerWidget * _r)
+{
+	m_verticalRuler = _r;
+}
+
 void LaserViewer::zoomIn()
 {
     zoomBy(2);
@@ -618,7 +574,7 @@ void LaserViewer::resetZoom()
 {
     if (!qFuzzyCompare(zoomFactor(), qreal(1))) {
         resetTransform();
-        emit zoomChanged();
+        emit zoomChanged(zoomFactor(), mapFromScene(m_scene->backgroundItem()->pos()));
     }
 }
 
