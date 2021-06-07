@@ -13,6 +13,11 @@ int Global::mm2PixelsX(float mm)
 	return mm / 25.4f * dpiX;
 }
 
+qreal Global::mm2PixelsXF(float mm)
+{
+	return mm / 25.4f * dpiX;
+}
+
 int Global::mm2PixelsY(float mm)
 {
 	return mm / 25.4f * dpiY;

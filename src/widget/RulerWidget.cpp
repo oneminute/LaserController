@@ -10,7 +10,7 @@
 RulerWidget::RulerWidget(QWidget * parent, bool _isVertical)
 	:QWidget(parent), m_isVertical(_isVertical), m_mousePoint(0, 0)
 {
-	m_baseMillimeter = Global::mm2PixelsX(1.0);
+	m_baseMillimeter = Global::mm2PixelsXF(1.0);
 	m_millimeter = m_baseMillimeter;
 	m_unit = m_millimeter;
 	refresh();

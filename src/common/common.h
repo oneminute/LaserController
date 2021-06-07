@@ -163,6 +163,7 @@ public:
 	static QWidget* mainWindow;
 
     static int mm2PixelsX(float mm);
+	static qreal Global::mm2PixelsXF(float mm);
     static int mm2PixelsY(float mm);
     static float pixels2mmX(int pixels);
     static float pixels2mmY(int pixels);
