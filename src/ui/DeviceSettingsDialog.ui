@@ -27,7 +27,7 @@
      </property>
      <widget class="QWidget" name="tabMachining">
       <attribute name="title">
-       <string>Machining</string>
+       <string>Mechining</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>

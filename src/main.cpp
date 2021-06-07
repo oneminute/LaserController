@@ -121,24 +121,24 @@ int main(int argc, char *argv[])
 
     qDebug() << "product name:" << QApplication::applicationName() << ", version:" << QApplication::applicationVersion();
 
-    Config::load();
-	Global::unit = static_cast<SizeUnit>(Config::GeneralUnit());
-
     QTranslator translator;
     QLocale locale(QLocale::Chinese);
     //qDebug() << "load translation file." << a.applicationName() << locale.name();
     if (translator.load(locale, app.applicationName(), QLatin1String("_"), QLatin1String("translations")))
     {
         qDebug() << "load translation file." << app.applicationName() << locale.name();
-        //app.installTranslator(&translator);
+        app.installTranslator(&translator);
     }
 
     QTranslator qtTranslator;
     if (qtTranslator.load(locale, QLatin1String("qt"), QLatin1String("_"), QLatin1String("translations")))
     {
         qDebug() << "load translation file." << "qt" << locale.name();
-        //app.installTranslator(&qtTranslator);
+        app.installTranslator(&qtTranslator);
     }
+
+    Config::load();
+	Global::unit = static_cast<SizeUnit>(Config::GeneralUnit());
 
     QFile file("theme/Dark.qss");
     if (file.open(QFile::ReadOnly | QFile::Text))

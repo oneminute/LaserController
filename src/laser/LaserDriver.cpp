@@ -275,7 +275,7 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 bool LaserDriver::load()
 {
     m_registerComments.insert(REG_03, tr("Reset calib speed."));
-    m_registerComments.insert(REG_04, tr("Engraving Launcing Speed."));
+    m_registerComments.insert(REG_04, tr("Engraving Launching Speed."));
     m_registerComments.insert(REG_05, tr("Move fast speed."));
     m_registerComments.insert(REG_06, tr("Cutting speed."));
     m_registerComments.insert(REG_07, tr("Move to origin speed."));
@@ -292,7 +292,7 @@ bool LaserDriver::load()
     m_registerComments.insert(REG_18, tr("Cutting laser power."));
     m_registerComments.insert(REG_19, tr("Cutting running speed ratio."));
     m_registerComments.insert(REG_20, tr("Cutting launching speed ratio."));
-    m_registerComments.insert(REG_21, tr("Machine phase."));
+    m_registerComments.insert(REG_21, tr("Motor phase."));
     m_registerComments.insert(REG_22, tr("Limit phase."));
     m_registerComments.insert(REG_23, tr("Total working duration."));
     m_registerComments.insert(REG_24, tr("Total laser duration."));

@@ -645,7 +645,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         if (!filename.isEmpty() && !filename.isNull())
         {
             m_scene->document()->setFinishRun(finishRun());
-            m_scene->document()->exportJSON2(filename);
+            m_scene->document()->exportJSON(filename);
         }
     }
 }
@@ -690,7 +690,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
 
         m_scene->document()->setFinishRun(finishRun());
         qDebug() << "exporting to temporary json file:" << filename;
-        m_scene->document()->exportJSON2(filename);
+        m_scene->document()->exportJSON(filename);
         qDebug() << "export temp json file for machining" << filename;
         LaserDriver::instance().loadDataFromFile(filename);
         LaserDriver::instance().startMachining(m_ui->comboBoxStartPosition->currentIndex() == 3);
@@ -764,7 +764,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
 {
     QString filename = "export.json";
     filename = m_tmpDir.absoluteFilePath(filename);
-    m_scene->document()->exportJSON2(filename);
+    m_scene->document()->exportJSON(filename);
     qDebug() << "export temp json file for machining" << filename;
     LaserDriver::instance().loadDataFromFile(filename);
 }

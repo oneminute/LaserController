@@ -709,7 +709,7 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
     Ant* minAnt = nullptr;
 
     int coreNumber = omp_get_num_procs();
-    omp_set_num_threads(coreNumber);
+    omp_set_num_threads(coreNumber * 0.6);
     int badTimes = 0;
 
     for (int iteration = 0; iteration < maxIteration; iteration++)
@@ -867,7 +867,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
         //LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(laserNode);
         Node* node = new Node(laserNode);
         d->nodes.append(node);
-        QString msg = QString("[%1/%2] Node %3 created.").arg(d->nodes.length()).arg(d->totalNodes).arg(node->nodeName());
+        QString msg = QString(tr("[%1/%2] Node %3 created.")).arg(d->nodes.length()).arg(d->totalNodes).arg(node->nodeName());
         emit messageUpdated(msg);
         float progress = 8.f * d->nodes.length() / d->totalNodes;
         emit progressUpdated(progress);
@@ -902,7 +902,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
             continue;
         travelled.insert(laserNode);
 
-        QString msg = QString("[%1/%2] Generating edges for node %3.").arg(travelled.size()).arg(d->totalNodes).arg(laserNode->nodeName());
+        QString msg = QString(tr("[%1/%2] Generating edges for node %3.")).arg(travelled.size()).arg(d->totalNodes).arg(laserNode->nodeName());
         emit messageUpdated(msg);
         float progress = 8 + 2 * travelled.size() / d->totalNodes;
         emit progressUpdated(progress);
@@ -915,7 +915,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
             for (LaserNode* leafNode : siblingChildren)
             {
                 Edge* edge = new Edge(node, laserNodeMap[leafNode]);
-                QString msg = QString("[%1/%2] Created edge from node %3 to node %4 with length is %5.")
+                QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
                     .arg(travelled.size())
                     .arg(d->totalNodes)
                     .arg(node->nodeName())
@@ -930,7 +930,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
             if (parentNode)
             {
                 Edge* edge = new Edge(node, parentNode);
-                QString msg = QString("[%1/%2] Created edge from node %3 to node %4 with length is %5.")
+                QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
                     .arg(travelled.size())
                     .arg(d->totalNodes)
                     .arg(node->nodeName())
@@ -956,7 +956,7 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
     }
 
     d->avgEdgeLength /= d->edges.size();
-    emit messageUpdated(QString("average edge length is %1").arg(d->avgEdgeLength));
+    emit messageUpdated(QString(tr("average edge length is %1")).arg(d->avgEdgeLength));
     //printNodeAndEdges();
 }
 

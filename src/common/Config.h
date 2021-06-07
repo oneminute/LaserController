@@ -18,23 +18,25 @@ enum ConfigItemType
     CIT_DATETIME
 };
 
-#define DUMMY_STRUCT(PREFIX, NAME, TYPE, DEFAULT_VALUE, DESCRIPTION) \
+
+#define DUMMY_STRUCT(PREFIX, NAME, TYPE, DEFAULT_VALUE, ADVANCED) \
+    private: \
     public: \
         struct Dummy##PREFIX##NAME: public ConfigItem \
         { \
         public: \
             Dummy##PREFIX##NAME() \
-                : ConfigItem(#PREFIX, #NAME, QObject::tr(DESCRIPTION), DEFAULT_VALUE, TYPE) \
-            {} \
+                : ConfigItem(#PREFIX, #NAME, DEFAULT_VALUE, TYPE, ADVANCED) \
+            { \
+            } \
         }; \
         Dummy##PREFIX##NAME PREFIX##NAME##Stub; \
     public: \
         static void restore##PREFIX##NAME() { items[#PREFIX"/"#NAME].restore(); } \
-        static QString PREFIX##NAME##Description() { return items[#PREFIX"/"#NAME].description; } \
         static ConfigItem* PREFIX##NAME##Item() { return &items[#PREFIX"/"#NAME]; }
 
-#define CONFIG_ITEM_INT(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
-    DUMMY_STRUCT(PREFIX, NAME, CIT_INT, DEFAULT_VALUE, DESCRIPTION) \
+#define CONFIG_ITEM_INT(PREFIX, NAME, DEFAULT_VALUE, ADVANCED) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_INT, DEFAULT_VALUE, ADVANCED) \
     public: \
         static int PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toInt(); } \
         static int default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toInt(); } \
@@ -47,8 +49,8 @@ enum ConfigItemType
 			} \
 		}
 
-#define CONFIG_ITEM_FLOAT(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
-    DUMMY_STRUCT(PREFIX, NAME, CIT_FLOAT, DEFAULT_VALUE, DESCRIPTION) \
+#define CONFIG_ITEM_FLOAT(PREFIX, NAME, DEFAULT_VALUE, ADVANCED) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_FLOAT, DEFAULT_VALUE, ADVANCED) \
     public: \
         static float PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toFloat(); } \
         static float default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toFloat(); } \
@@ -61,8 +63,8 @@ enum ConfigItemType
 			} \
 		}
 
-#define CONFIG_ITEM_DOUBLE(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
-    DUMMY_STRUCT(PREFIX, NAME, CIT_FLOAT, DEFAULT_VALUE, DESCRIPTION) \
+#define CONFIG_ITEM_DOUBLE(PREFIX, NAME, DEFAULT_VALUE, ADVANCED) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_FLOAT, DEFAULT_VALUE, ADVANCED) \
     public: \
         static double PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toDouble(); } \
         static double default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toDouble(); } \
@@ -75,8 +77,8 @@ enum ConfigItemType
 			} \
 		}
 
-#define CONFIG_ITEM_BOOL(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
-    DUMMY_STRUCT(PREFIX, NAME, CIT_BOOL, DEFAULT_VALUE, DESCRIPTION) \
+#define CONFIG_ITEM_BOOL(PREFIX, NAME, DEFAULT_VALUE, ADVANCED) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_BOOL, DEFAULT_VALUE, ADVANCED) \
     public: \
         static bool PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toBool(); } \
         static bool default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toBool(); } \
@@ -89,8 +91,8 @@ enum ConfigItemType
 			} \
 		}
 
-#define CONFIG_ITEM_STRING(PREFIX, NAME, DEFAULT_VALUE, DESCRIPTION) \
-    DUMMY_STRUCT(PREFIX, NAME, CIT_STRING, DEFAULT_VALUE, DESCRIPTION) \
+#define CONFIG_ITEM_STRING(PREFIX, NAME, DEFAULT_VALUE, ADVANCED) \
+    DUMMY_STRUCT(PREFIX, NAME, CIT_STRING, DEFAULT_VALUE, ADVANCED) \
     public: \
         static QString PREFIX##NAME() { return items[#PREFIX"/"#NAME].value.toString(); } \
         static QString default##PREFIX##NAME() { return items[#PREFIX"/"#NAME].defaultValue.toString(); } \
@@ -103,24 +105,27 @@ enum ConfigItemType
 			} \
 		}
 
+
 class Config
 {
 public:
     struct ConfigItem
     {
     public:
-        ConfigItem(const QString& _prefix = "General",
+        ConfigItem(const QString& _prefix = QObject::tr("General"),
             const QString& _name = "",
-            const QString& _description = "",
             const QVariant& _defaultValue = QVariant(),
-            ConfigItemType _type = CIT_INT);
+            ConfigItemType _type = CIT_INT,
+            const bool _advanced = false);
         QString prefix;
+        QString title;
+        QString description;
         QString name;
         QString key;
-        QString description;
         QVariant value;
         QVariant defaultValue;
         ConfigItemType type;
+        bool advanced;
         bool modified;
 
         void restore()
@@ -136,47 +141,47 @@ public:
         }
     };
 
-    CONFIG_ITEM_STRING(General, Language, "English", "Language for both UI and Business.")
-	CONFIG_ITEM_INT(General, Unit, (int)SU_MM, "Unit using global.")
+    CONFIG_ITEM_STRING(General, Language, "English", false)
+	CONFIG_ITEM_INT(General, Unit, (int)SU_MM, false)
 
-    CONFIG_ITEM_INT(Layers, MaxLayersCount, 16, "Max layers count.")
+    CONFIG_ITEM_INT(Layers, MaxLayersCount, 16, false)
 
-    CONFIG_ITEM_INT(UI, OperationButtonIconSize, 32, "Size of operation buttons' icons.")
-    CONFIG_ITEM_INT(UI, OperationButtonWidth, 60, "Width of operation buttons.")
-    CONFIG_ITEM_INT(UI, OperationButtonHeight, 60, "Height of operation buttons.")
-    CONFIG_ITEM_BOOL(UI, OperationButtonShowText, true, "Whether to show text of operation button or not.")
+    CONFIG_ITEM_INT(UI, OperationButtonIconSize, 32, false)
+    CONFIG_ITEM_INT(UI, OperationButtonWidth, 60, false)
+    CONFIG_ITEM_INT(UI, OperationButtonHeight, 60, false)
+    CONFIG_ITEM_BOOL(UI, OperationButtonShowText, true, false)
 
-    CONFIG_ITEM_INT(UI, ToolButtonSize, 32, "Size of tool buttons")
+    CONFIG_ITEM_INT(UI, ToolButtonSize, 32, false)
 
-    CONFIG_ITEM_INT(UI, ColorButtonWidth, 30, "Width of the color buttons.")
-    CONFIG_ITEM_INT(UI, ColorButtonHeight, 30, "Height of the color buttons.")
+    CONFIG_ITEM_INT(UI, ColorButtonWidth, 30, false)
+    CONFIG_ITEM_INT(UI, ColorButtonHeight, 30, false)
 
-	CONFIG_ITEM_INT(CuttingLayer, MinSpeed, 15, "Min speed for cutting layers.")
-	CONFIG_ITEM_INT(CuttingLayer, RunSpeed, 60, "Run speed for cutting layers.")
-	CONFIG_ITEM_INT(CuttingLayer, LaserPower, 80, "Laser power for cutting layers.")
-	CONFIG_ITEM_INT(CuttingLayer, MinSpeedPower, 700, "Min speed power for cutting layers.")
-	CONFIG_ITEM_INT(CuttingLayer, RunSpeedPower, 1000, "Run speed power for cutting layers.")
+	CONFIG_ITEM_INT(CuttingLayer, MinSpeed, 15, false)
+	CONFIG_ITEM_INT(CuttingLayer, RunSpeed, 60, false)
+	CONFIG_ITEM_INT(CuttingLayer, LaserPower, 80, false)
+	CONFIG_ITEM_INT(CuttingLayer, MinSpeedPower, 700, false)
+	CONFIG_ITEM_INT(CuttingLayer, RunSpeedPower, 1000, false)
 
-	CONFIG_ITEM_INT(EngravingLayer, MinSpeed, 60, "Min speed for engraving layers.")
-	CONFIG_ITEM_INT(EngravingLayer, RunSpeed, 300, "Run speed for engraving layers.")
-	CONFIG_ITEM_INT(EngravingLayer, LaserPower, 115, "Laser power for engraving layers.")
-	CONFIG_ITEM_INT(EngravingLayer, MinSpeedPower, 0, "Min speed power for engraving layers.")
-	CONFIG_ITEM_INT(EngravingLayer, RunSpeedPower, 900, "Run speed power for engraving layers.")
-	CONFIG_ITEM_BOOL(EngravingLayer, UseHalftone, true, "Use halftone algorithm when processing bitmaps.")
-	CONFIG_ITEM_INT(EngravingLayer, LPI, 600, "Lines per inch.")
-	CONFIG_ITEM_INT(EngravingLayer, DPI, 600, "Dots per inch.")
+	CONFIG_ITEM_INT(EngravingLayer, MinSpeed, 60, false)
+	CONFIG_ITEM_INT(EngravingLayer, RunSpeed, 300, false)
+	CONFIG_ITEM_INT(EngravingLayer, LaserPower, 115, false)
+	CONFIG_ITEM_INT(EngravingLayer, MinSpeedPower, 0, false)
+	CONFIG_ITEM_INT(EngravingLayer, RunSpeedPower, 900, false)
+	CONFIG_ITEM_BOOL(EngravingLayer, UseHalftone, true, false)
+	CONFIG_ITEM_INT(EngravingLayer, LPI, 600, false)
+	CONFIG_ITEM_INT(EngravingLayer, DPI, 600, false)
 
-    CONFIG_ITEM_INT(OptimizePath, MaxAnts, 100, "Max ants count.")
-    CONFIG_ITEM_INT(OptimizePath, MaxIterations, 500, "Max iteration count.")
-    CONFIG_ITEM_INT(OptimizePath, MaxTraverseCount, 2000, "Max tranverse count.")
-    CONFIG_ITEM_DOUBLE(OptimizePath, VolatileRate, 0.65, "Volatie rate.")
-    CONFIG_ITEM_BOOL(OptimizePath, UseGreedyAlgorithm, true, "Use greedy algorithm form path optimization.")
-    CONFIG_ITEM_INT(OptimizePath, MaxStartingPoints, 8, "Max tranverse count.")
-    CONFIG_ITEM_INT(OptimizePath, MaxStartingPointAnglesDiff, 45, "Max angles diff between two starting points.")
+    CONFIG_ITEM_INT(OptimizePath, MaxAnts, 100, false)
+    CONFIG_ITEM_INT(OptimizePath, MaxIterations, 500, false)
+    CONFIG_ITEM_INT(OptimizePath, MaxTraverseCount, 2000, false)
+    CONFIG_ITEM_DOUBLE(OptimizePath, VolatileRate, 0.65, false)
+    CONFIG_ITEM_BOOL(OptimizePath, UseGreedyAlgorithm, true, false)
+    CONFIG_ITEM_INT(OptimizePath, MaxStartingPoints, 8, false)
+    CONFIG_ITEM_INT(OptimizePath, MaxStartingPointAnglesDiff, 45, false)
     //CONFIG_ITEM_DOUBLE(OptimizePath, MinStartingPointsInterval, 8, "Min interval between two starting points.")
 
-    CONFIG_ITEM_DOUBLE(PltUtils, MaxAnglesDiff, 5.0, "Max angles diff")
-    CONFIG_ITEM_DOUBLE(PltUtils, MaxIntervalDistance, 10.0, "Max interval distance")
+    CONFIG_ITEM_DOUBLE(PltUtils, MaxAnglesDiff, 5.0, false)
+    CONFIG_ITEM_DOUBLE(PltUtils, MaxIntervalDistance, 10.0, false)
 
 private:
     Config();
