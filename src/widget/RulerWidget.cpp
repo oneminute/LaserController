@@ -161,22 +161,28 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	QRectF documentRect = m_viewer->scene()->backgroundItem()->rect();
 	QRectF viewerRect = m_viewer->rect();
 	qreal dimension = 0;
-	qLogD << "Drawing ruler: " << rect << ", documentRect.height: " << documentRect;
+	//qLogD << "Drawing ruler: " << rect << ", documentRect.height: " << documentRect;
 	if (m_isVertical) {
-		dimension = rect.height();
-		if (rect.height() > documentRect.height()) {
+		
+		if (m_original.y() > 0) {
 			dimension = rect.bottom() - m_original.y();
-			qLogD << "original: " << m_original << ", dimension: " << dimension;
+			//qLogD << "original: " << m_original << ", dimension: " << dimension;
 			drawRuler(m_original.y() - rect.top(), textCoef, painter, false);
+		}
+		else {
+			dimension = rect.height() + (-m_original.y());
 		}
 		drawRuler(dimension, textCoef, painter);
 	}
 	else {
-		dimension = rect.width();
-		if (rect.width() >documentRect.width()) {
+		
+		if (m_original.x() > 0) {
 			dimension = rect.right() - m_original.x();
-			qLogD << "original: " << m_original << ", dimension: " << dimension;
+			//qLogD << "original: " << m_original << ", dimension: " << dimension;
 			drawRuler(m_original.x() - rect.left(), textCoef, painter, false);
+		}
+		else {
+			dimension = rect.width() + (-m_original.x());
 		}
 		drawRuler(dimension, textCoef, painter);
 	}
@@ -184,7 +190,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	
 }
 
-void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter,bool isPositive)
+void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive)
 {
 	QRectF rect = this->rect();
 	int longSize = dimension / m_longUnit;
