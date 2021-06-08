@@ -11,6 +11,9 @@ RulerWidget::RulerWidget(QWidget * parent, bool _isVertical)
 	:QWidget(parent), m_isVertical(_isVertical), m_mousePoint(0, 0)
 {
 	m_baseMillimeter = Global::mm2PixelsXF(1.0);
+	if (m_isVertical) {
+		m_baseMillimeter = Global::mm2PixelsYF(1.0);
+	}
 	m_millimeter = m_baseMillimeter;
 	m_unit = m_millimeter;
 	refresh();
@@ -221,7 +224,7 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter,boo
 }
 
 void RulerWidget::drawSmallUnit(qreal unit,qreal _length, qreal _original, qreal _edge, QPainter& _painter, bool isToRight) {
-	if (unit > 3) {
+	//if (unit > 3) {
 		int smallSize = _length / unit;
 		
 		for (int si = 1; si < smallSize; si++) {
@@ -237,5 +240,5 @@ void RulerWidget::drawSmallUnit(qreal unit,qreal _length, qreal _original, qreal
 			}
 			
 		}
-	}
+	//}
 }
