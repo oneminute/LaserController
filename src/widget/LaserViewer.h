@@ -30,18 +30,19 @@ public:
     explicit LaserViewer(QWidget* parent = nullptr);
     ~LaserViewer();
 
-    qreal zoomFactor() const;
+    qreal zoomScale() const;
+	void setZoomScale(qreal zoomScale);
+	void createSpline();
+	LaserScene* scene();
+	void setHorizontalRuler(RulerWidget* _r);
+	void setVerticalRuler(RulerWidget * _r);
 
 private:
     void init();
 	void initSpline();
 	void creatTextEdit();
 	void releaseTextEdit();
-public:
-	void createSpline();
-	LaserScene* scene();
-	void setHorizontalRuler(RulerWidget* _r);
-	void setVerticalRuler(RulerWidget * _r);
+
 public slots:
     void zoomIn();
     void zoomOut();
@@ -50,6 +51,7 @@ public slots:
 
 signals:
     void zoomChanged(qreal factor, const QPointF& topleft);
+	void scaleChanged(qreal scale);
     void beginSelecting();
     void endSelecting();
     void cancelSelecting();

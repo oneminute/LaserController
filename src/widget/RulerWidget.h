@@ -26,15 +26,15 @@ protected:
 	void paintEvent(QPaintEvent *event);
 private:
 	bool m_isVertical;
-	bool m_isMarkMouse = false;//ÊÇ·ñ±ê¼ÇÊó±ê
+	bool m_isMarkMouse = false;//ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	int m_minHeightSize = 15;
 	int m_minWidthSize = 18;
 	qreal m_factor = 1.0;
 	qreal m_scale = 1.0;
-	qreal m_millimeter = 5;//±ä»¯µÄ
+	qreal m_millimeter = 5;//ï¿½ä»¯ï¿½ï¿½
 	QPointF m_original = QPointF(0, 0);
 	LaserViewer* m_viewer = nullptr;
-	qreal m_baseMillimeter = 5;//¼ÙÉèÒ»ºÁÃ×µÈÓÚ5¸öÏñËØ
+	qreal m_baseMillimeter = 5;//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½×µï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	int m_flag = 1;
 	qreal m_unit = 0;
 	qreal m_longUnit = 0;

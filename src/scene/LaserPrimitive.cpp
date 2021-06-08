@@ -848,7 +848,7 @@ public:
     {}
 
     QImage image;
-    QRectF bounds;
+    //QRectF bounds;
 };
 
 LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocument * doc)
@@ -877,7 +877,7 @@ void LaserBitmap::setImage(const QImage& image)
 QRectF LaserBitmap::bounds() const 
 {
     Q_D(const LaserBitmap);
-    return d->bounds; 
+    return d->boundingRect; 
 }
 
 QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
@@ -949,7 +949,7 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
 void LaserBitmap::draw(QPainter * painter)
 {
     Q_D(LaserBitmap);
-    painter->drawImage(d->bounds, d->image);
+    painter->drawImage(d->boundingRect, d->image);
 }
 
 std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
@@ -957,10 +957,10 @@ std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
     Q_D(LaserBitmap);
 	QTransform t = transform() * Global::matrixToMM(SU_PX, 40, 40);
     std::vector<cv::Point2f> points;
-    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.topLeft()));
-    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.topRight()));
-    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.bottomRight()));
-    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(t.map(d->bounds.bottomLeft()));
+    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.topLeft()));
+    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.topRight()));
+    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.bottomRight()));
+    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.bottomLeft()));
     points.push_back(pt1);
     points.push_back(pt2);
     points.push_back(pt3);

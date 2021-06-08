@@ -31,7 +31,7 @@ void LaserScene::updateDocument(LaserDocument * doc)
 
     m_doc->setParent(this);
 
-    qDebug() << "page bounds in mm:" << m_doc->pageBounds();
+    qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
     m_background = addRect(m_doc->pageBounds(), QPen(Qt::gray, 0.2f, Qt::SolidLine), QBrush(Qt::white));
 	setSceneRect(m_doc->pageBounds());
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();

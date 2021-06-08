@@ -91,6 +91,7 @@ protected slots:
 
     void onLaserSceneSelectedChanged();
     void onLaserViewerMouseMoved(const QPointF& pos);
+    void onLaserViewerScaleChanged(qreal factor);
 
     void onEditSliderLaserEngergyMinChanged(int value);
     void onEditSliderLaserEngergyMaxChanged(int value);
@@ -139,6 +140,7 @@ private:
 
     // widgets on status bar
     QLabel* m_statusBarStatus;
+    QLabel* m_statusBarScale;
     QLabel* m_statusBarTips;
     QLabel* m_statusBarCoordinate;
     QLabel* m_statusBarLocation;

@@ -154,13 +154,14 @@ void LaserViewer::wheelEvent(QWheelEvent * event)
 
 void LaserViewer::zoomBy(qreal factor)
 {
-    const qreal currentZoom = zoomFactor();
+    const qreal currentZoom = zoomScale();
     if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
         return;
     scale(factor, factor);
     m_scene->document()->setScale(factor);
 	qDebug() << "scale:" << m_scene->document()->scale();
     emit zoomChanged(m_scene->document()->scale(), mapFromScene(m_scene->backgroundItem()->pos()));
+	emit scaleChanged(zoomScale());
 }
 
 void LaserViewer::leaveEvent(QEvent * event)
@@ -259,12 +260,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
         m_selectionEndPoint = point;
 		QPainterPath selectionPath;
 		selectionPath.addRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
-        //right selectionÓÒÑ¡
+        //right selectionï¿½ï¿½Ñ¡
 		if (m_selectionEndPoint.x() > m_selectionStartPoint.x()) {			
 			m_scene->setSelectionArea(mapToScene(selectionPath));
 			
 		}
-		//left selection×óÑ¡
+		//left selectionï¿½ï¿½Ñ¡
 		else {
 			m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::ContainsItemShape);
 		}
@@ -479,9 +480,15 @@ void LaserViewer::scrollContentsBy(int dx, int dy)
 	}
 }
 
-qreal LaserViewer::zoomFactor() const
+qreal LaserViewer::zoomScale() const
 {
     return transform().m11();
+}
+
+void LaserViewer::setZoomScale(qreal zoomScale)
+{
+	scale(1 / transform().m11(), 1 / transform().m22());
+	scale(zoomScale, zoomScale);
 }
 
 void LaserViewer::init()
@@ -593,9 +600,9 @@ void LaserViewer::zoomOut()
 
 void LaserViewer::resetZoom()
 {
-    if (!qFuzzyCompare(zoomFactor(), qreal(1))) {
+    if (!qFuzzyCompare(zoomScale(), qreal(1))) {
         resetTransform();
-        emit zoomChanged(zoomFactor(), mapFromScene(m_scene->backgroundItem()->pos()));
+        emit zoomChanged(zoomScale(), mapFromScene(m_scene->backgroundItem()->pos()));
     }
 }
 

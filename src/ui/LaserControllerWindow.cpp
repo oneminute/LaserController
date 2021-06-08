@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStack>
+#include <QtMath>
 #include <QTemporaryFile>
 #include <QThread>
 #include <QTimer>
@@ -208,6 +209,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addWidget(m_statusBarStatus);
     m_ui->statusbar->addWidget(utils::createSeparator());
 
+    m_statusBarScale = new QLabel;
+    m_statusBarScale->setText(tr("100%"));
+    m_statusBarScale->setMinimumWidth(120);
+    m_statusBarScale->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarScale);
+    m_ui->statusbar->addWidget(utils::createSeparator());
+
     m_statusBarTips = new QLabel;
     m_statusBarTips->setText(tr("Welcome!"));
     m_statusBarTips->setMinimumWidth(120);
@@ -318,6 +326,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
+    connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
 
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
@@ -1105,8 +1114,15 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
-    QString posStr = QString("%1mm,%2mm").arg(pos.x()).arg(pos.y());
+    qreal x = Global::convertToMM(SU_PX, pos.x());
+    qreal y = Global::convertToMM(SU_PX, pos.y());
+    QString posStr = QString("%1mm,%2mm | %3px,%4px").arg(x).arg(y).arg(qFloor(pos.x())).arg(qFloor(pos.y()));
     m_statusBarLocation->setText(posStr);
+}
+
+void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
+{
+    m_statusBarScale->setText(QString("%1%").arg(factor * 100));
 }
 
 void LaserControllerWindow::onEditSliderLaserEngergyMinChanged(int value)
