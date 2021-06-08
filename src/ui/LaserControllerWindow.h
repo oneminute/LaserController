@@ -16,6 +16,7 @@ QT_END_NAMESPACE
 
 class LaserViewer;
 class LaserScene;
+class QComboBox;
 class QLabel;
 class QTreeWidgetItem;
 class QPushButton;
@@ -133,6 +134,7 @@ private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
     LaserViewer* m_viewer;
     LaserScene* m_scene;
+    QComboBox* m_comboBoxScale;
     bool m_created;
     QDir m_tmpDir;
     QString m_currentJson;

@@ -36,7 +36,7 @@ public:
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
     PageInformation pageInfo;
-    qreal scale;
+    //qreal scale;
     bool blockSignals;
     bool isOpened;
     LaserScene* scene;
@@ -185,17 +185,17 @@ QString LaserDocument::newLayerName() const
     return name;
 }
 
-qreal LaserDocument::scale() const
-{
-    Q_D(const LaserDocument);
-    return d->scale;
-}
-
-void LaserDocument::setScale(qreal scale)
-{
-    Q_D(LaserDocument);
-    d->scale = scale;
-}
+//qreal LaserDocument::scale() const
+//{
+//    Q_D(const LaserDocument);
+//    return d->scale;
+//}
+//
+//void LaserDocument::setScale(qreal scale)
+//{
+//    Q_D(LaserDocument);
+//    d->scale = scale;
+//}
 
 void LaserDocument::exportJSON(const QString& filename)
 {

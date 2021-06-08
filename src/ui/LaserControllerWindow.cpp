@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QStack>
 #include <QtMath>
+#include <QScrollBar>
 #include <QTemporaryFile>
 #include <QThread>
 #include <QTimer>
@@ -70,8 +71,29 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
 
-	//ruler
+	// 初始化整个工作区。这是一个网格布局的9宫格。
+    m_comboBoxScale = new QComboBox;
+    m_comboBoxScale->addItem("10%", 0.1);
+    m_comboBoxScale->addItem("25%", 0.25);
+    m_comboBoxScale->addItem("50%", 0.5);
+    m_comboBoxScale->addItem("75%", 0.75);
+    m_comboBoxScale->addItem("100%", 1);
+    m_comboBoxScale->addItem("150%", 1.5);
+    m_comboBoxScale->addItem("200%", 2.0);
+    m_comboBoxScale->addItem("300%", 3.0);
+    m_comboBoxScale->addItem("400%", 4.0);
+    m_comboBoxScale->addItem("500%", 5.0);
+    m_comboBoxScale->addItem("1000%", 10.0);
+    QBoxLayout* viewHoriBottomLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+    viewHoriBottomLayout->setSpacing(0);
+    viewHoriBottomLayout->setMargin(0);
+    viewHoriBottomLayout->addWidget(m_comboBoxScale);
+    viewHoriBottomLayout->addWidget(m_viewer->horizontalScrollBar());
+    viewHoriBottomLayout->setStretch(0, 0);
+    viewHoriBottomLayout->setStretch(1, 1);
 	m_ui->gridLayout->setSpacing(0);
+    m_ui->gridLayout->addWidget(const_cast<QScrollBar*>(m_viewer->verticalScrollBar()), 0, 2, 2, 1);
+    m_ui->gridLayout->addLayout(viewHoriBottomLayout, 2, 0, 1, 2);
 	m_ui->horizontal_ruler->setViewer(m_viewer);
 	m_ui->horizontal_ruler->refresh();
 	m_viewer->setHorizontalRuler(m_ui->horizontal_ruler);

@@ -45,8 +45,8 @@ public:
 
     QString newLayerName() const;
 
-    qreal scale() const;
-    void setScale(qreal scale);
+    //qreal scale() const;
+    //void setScale(qreal scale);
 
     void blockSignals(bool block = true);
 

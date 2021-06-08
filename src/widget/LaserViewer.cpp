@@ -158,9 +158,9 @@ void LaserViewer::zoomBy(qreal factor)
     if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
         return;
     scale(factor, factor);
-    m_scene->document()->setScale(factor);
-	qDebug() << "scale:" << m_scene->document()->scale();
-    emit zoomChanged(m_scene->document()->scale(), mapFromScene(m_scene->backgroundItem()->pos()));
+    //m_scene->document()->setScale(factor);
+	//qDebug() << "scale:" << m_scene->document()->scale();
+    emit zoomChanged(factor, mapFromScene(m_scene->backgroundItem()->pos()));
 	emit scaleChanged(zoomScale());
 }
 

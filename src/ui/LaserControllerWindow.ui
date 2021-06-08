@@ -14,29 +14,37 @@
    <string>Laser Controller</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
-    <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="spacing">
-       <number>0</number>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="1" column="1">
+     <widget class="LaserViewer" name="graphicsView">
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
-      <item row="1" column="1">
-       <widget class="LaserViewer" name="graphicsView">
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOn</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOn</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="RulerWidget" name="horizontal_ruler" native="true"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="RulerWidget" name="vertical_ruler" native="true"/>
-      </item>
-     </layout>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="RulerWidget" name="horizontal_ruler" native="true"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="RulerWidget" name="vertical_ruler" native="true"/>
     </item>
    </layout>
   </widget>
@@ -46,7 +54,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

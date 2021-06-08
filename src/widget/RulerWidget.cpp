@@ -16,6 +16,9 @@ RulerWidget::RulerWidget(QWidget * parent, bool _isVertical)
 	}
 	m_millimeter = m_baseMillimeter;
 	m_unit = m_millimeter;
+	qLogD << "baseMillimeter: " << m_baseMillimeter;
+	qLogD << "millimeter: " << m_millimeter;
+	qLogD << "unit: " << m_unit;
 	refresh();
 }
 
@@ -158,16 +161,21 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	QRectF documentRect = m_viewer->scene()->backgroundItem()->rect();
 	QRectF viewerRect = m_viewer->rect();
 	qreal dimension = 0;
+	qLogD << "Drawing ruler: " << rect << ", documentRect.height: " << documentRect;
 	if (m_isVertical) {
-		if (rect.height() >documentRect.height()) {
+		dimension = rect.height();
+		if (rect.height() > documentRect.height()) {
 			dimension = rect.bottom() - m_original.y();
+			qLogD << "original: " << m_original << ", dimension: " << dimension;
 			drawRuler(m_original.y() - rect.top(), textCoef, painter, false);
 		}
 		drawRuler(dimension, textCoef, painter);
 	}
 	else {
+		dimension = rect.width();
 		if (rect.width() >documentRect.width()) {
 			dimension = rect.right() - m_original.x();
+			qLogD << "original: " << m_original << ", dimension: " << dimension;
 			drawRuler(m_original.x() - rect.left(), textCoef, painter, false);
 		}
 		drawRuler(dimension, textCoef, painter);
