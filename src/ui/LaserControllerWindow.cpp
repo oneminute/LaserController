@@ -72,7 +72,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
 
 	// 初始化整个工作区。这是一个网格布局的9宫格。
+
+    // 初始化缩放列表控件
     m_comboBoxScale = new QComboBox;
+    m_comboBoxScale->setEditable(true);
     m_comboBoxScale->addItem("10%", 0.1);
     m_comboBoxScale->addItem("25%", 0.25);
     m_comboBoxScale->addItem("50%", 0.5);
@@ -84,7 +87,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_comboBoxScale->addItem("400%", 4.0);
     m_comboBoxScale->addItem("500%", 5.0);
     m_comboBoxScale->addItem("1000%", 10.0);
+    m_comboBoxScale->setCurrentText("100%");
     QBoxLayout* viewHoriBottomLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+    QRegularExpression percentageRE("^[0-9]+%$");
+    QValidator* percentageValidator = new QRegularExpressionValidator(percentageRE, m_comboBoxScale);
+    m_comboBoxScale->setValidator(percentageValidator);
+
     viewHoriBottomLayout->setSpacing(0);
     viewHoriBottomLayout->setMargin(0);
     viewHoriBottomLayout->addWidget(m_comboBoxScale);
@@ -350,6 +358,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
     connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
+    connect(m_comboBoxScale, &QComboBox::currentTextChanged, this, &LaserControllerWindow::onComboBoxSxaleTextChanged);
 
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
@@ -1145,7 +1154,7 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 
 void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 {
-    QString value = QString("%1%").arg(factor * 100);
+    QString value = QString("%1%").arg(factor * 100, 0, 'f', 0);
     m_statusBarScale->setText(value);
     m_comboBoxScale->blockSignals(true);
     m_comboBoxScale->setCurrentText(value);
@@ -1154,7 +1163,20 @@ void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 
 void LaserControllerWindow::onComboBoxSxaleIndexChanged(int index)
 {
-    m_viewer->setZoomValue(m_comboBoxScale->currentData().toReal());
+    //m_viewer->setZoomValue(m_comboBoxScale->currentData().toReal());
+}
+
+void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
+{
+    // 使用正则表达式检查输入的内容，并获取数字部分的字符串。
+    QRegularExpression percentageRE("^([0-9]+)%$");
+    QRegularExpressionMatch match = percentageRE.match(text);
+    if (match.hasMatch())
+    {
+        QString number = percentageRE.match(text).captured(1);
+        qreal zoom = number.toDouble() / 100;
+        m_viewer->setZoomValue(zoom);
+    }
 }
 
 void LaserControllerWindow::onEditSliderLaserEngergyMinChanged(int value)

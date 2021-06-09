@@ -147,8 +147,8 @@ void LaserViewer::wheelEvent(QWheelEvent * event)
     if (event->modifiers() & Qt::ControlModifier)
     {
 		//qreal wheelZoomValue = qPow(1.2, event->delta() / 240.0);
-		qreal wheelZoomValue = qRound((1 + event->delta() / 120.0 * 0.1) * 100) / 100.0;
-		qLogD << "wheelZoomValue: " << wheelZoomValue << ", delta: " << event->delta();
+		qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
+		//qLogD << "wheelZoomValue: " << wheelZoomValue << ", delta: " << event->delta();
         zoomBy(wheelZoomValue);
     }
     else
