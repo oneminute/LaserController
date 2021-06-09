@@ -144,7 +144,6 @@ private:
 
     // widgets on status bar
     QLabel* m_statusBarStatus;
-    QLabel* m_statusBarScale;
     QLabel* m_statusBarTips;
     QLabel* m_statusBarCoordinate;
     QLabel* m_statusBarLocation;

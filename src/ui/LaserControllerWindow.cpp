@@ -76,22 +76,23 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     // 初始化缩放列表控件
     m_comboBoxScale = new QComboBox;
     m_comboBoxScale->setEditable(true);
-    m_comboBoxScale->addItem("10%", 0.1);
-    m_comboBoxScale->addItem("25%", 0.25);
-    m_comboBoxScale->addItem("50%", 0.5);
-    m_comboBoxScale->addItem("75%", 0.75);
-    m_comboBoxScale->addItem("100%", 1);
-    m_comboBoxScale->addItem("150%", 1.5);
-    m_comboBoxScale->addItem("200%", 2.0);
-    m_comboBoxScale->addItem("300%", 3.0);
-    m_comboBoxScale->addItem("400%", 4.0);
-    m_comboBoxScale->addItem("500%", 5.0);
-    m_comboBoxScale->addItem("1000%", 10.0);
+    m_comboBoxScale->addItem("10%");
+    m_comboBoxScale->addItem("25%");
+    m_comboBoxScale->addItem("50%");
+    m_comboBoxScale->addItem("75%");
+    m_comboBoxScale->addItem("100%");
+    m_comboBoxScale->addItem("150%");
+    m_comboBoxScale->addItem("200%");
+    m_comboBoxScale->addItem("300%");
+    m_comboBoxScale->addItem("400%");
+    m_comboBoxScale->addItem("500%");
+    m_comboBoxScale->addItem("1000%");
     m_comboBoxScale->setCurrentText("100%");
     QBoxLayout* viewHoriBottomLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
     QRegularExpression percentageRE("^[0-9]+%$");
     QValidator* percentageValidator = new QRegularExpressionValidator(percentageRE, m_comboBoxScale);
     m_comboBoxScale->setValidator(percentageValidator);
+    m_comboBoxScale->setMaximumHeight(16);
 
     viewHoriBottomLayout->setSpacing(0);
     viewHoriBottomLayout->setMargin(0);
@@ -237,13 +238,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarStatus->setMinimumWidth(120);
     m_statusBarStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarStatus);
-    m_ui->statusbar->addWidget(utils::createSeparator());
-
-    m_statusBarScale = new QLabel;
-    m_statusBarScale->setText(tr("100%"));
-    m_statusBarScale->setMinimumWidth(120);
-    m_statusBarScale->setAlignment(Qt::AlignHCenter);
-    m_ui->statusbar->addWidget(m_statusBarScale);
     m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarTips = new QLabel;
@@ -1155,7 +1149,6 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 {
     QString value = QString("%1%").arg(factor * 100, 0, 'f', 0);
-    m_statusBarScale->setText(value);
     m_comboBoxScale->blockSignals(true);
     m_comboBoxScale->setCurrentText(value);
     m_comboBoxScale->blockSignals(false);
