@@ -349,6 +349,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
+    connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
 
     connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
     connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
@@ -1144,7 +1145,16 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 
 void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 {
-    m_statusBarScale->setText(QString("%1%").arg(factor * 100));
+    QString value = QString("%1%").arg(factor * 100);
+    m_statusBarScale->setText(value);
+    m_comboBoxScale->blockSignals(true);
+    m_comboBoxScale->setCurrentText(value);
+    m_comboBoxScale->blockSignals(false);
+}
+
+void LaserControllerWindow::onComboBoxSxaleIndexChanged(int index)
+{
+    m_viewer->setZoomValue(m_comboBoxScale->currentData().toReal());
 }
 
 void LaserControllerWindow::onEditSliderLaserEngergyMinChanged(int value)

@@ -93,6 +93,7 @@ protected slots:
     void onLaserSceneSelectedChanged();
     void onLaserViewerMouseMoved(const QPointF& pos);
     void onLaserViewerScaleChanged(qreal factor);
+    void onComboBoxSxaleIndexChanged(int index);
 
     void onEditSliderLaserEngergyMinChanged(int value);
     void onEditSliderLaserEngergyMaxChanged(int value);

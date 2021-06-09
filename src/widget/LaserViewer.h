@@ -30,8 +30,8 @@ public:
     explicit LaserViewer(QWidget* parent = nullptr);
     ~LaserViewer();
 
-    qreal zoomScale() const;
-	void setZoomScale(qreal zoomScale);
+    qreal zoomValue() const;
+	void setZoomValue(qreal zoomScale);
 	void createSpline();
 	LaserScene* scene();
 	void setHorizontalRuler(RulerWidget* _r);

@@ -99,6 +99,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		
 	}
 	
+	m_scale = m_viewer->zoomValue();
 	//Ruller
 	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 	QFont font = painter.font();

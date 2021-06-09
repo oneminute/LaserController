@@ -146,7 +146,10 @@ void LaserViewer::wheelEvent(QWheelEvent * event)
 {
     if (event->modifiers() & Qt::ControlModifier)
     {
-        zoomBy(qPow(1.2, event->delta() / 240.0));
+		//qreal wheelZoomValue = qPow(1.2, event->delta() / 240.0);
+		qreal wheelZoomValue = qRound((1 + event->delta() / 120.0 * 0.1) * 100) / 100.0;
+		qLogD << "wheelZoomValue: " << wheelZoomValue << ", delta: " << event->delta();
+        zoomBy(wheelZoomValue);
     }
     else
         QGraphicsView::wheelEvent(event);
@@ -154,14 +157,14 @@ void LaserViewer::wheelEvent(QWheelEvent * event)
 
 void LaserViewer::zoomBy(qreal factor)
 {
-    const qreal currentZoom = zoomScale();
+    const qreal currentZoom = zoomValue();
     if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
         return;
     scale(factor, factor);
     //m_scene->document()->setScale(factor);
 	//qDebug() << "scale:" << m_scene->document()->scale();
     emit zoomChanged(factor, mapFromScene(m_scene->backgroundItem()->pos()));
-	emit scaleChanged(zoomScale());
+	emit scaleChanged(zoomValue());
 }
 
 void LaserViewer::leaveEvent(QEvent * event)
@@ -480,15 +483,16 @@ void LaserViewer::scrollContentsBy(int dx, int dy)
 	}
 }
 
-qreal LaserViewer::zoomScale() const
+qreal LaserViewer::zoomValue() const
 {
     return transform().m11();
 }
 
-void LaserViewer::setZoomScale(qreal zoomScale)
+void LaserViewer::setZoomValue(qreal zoomValue)
 {
 	scale(1 / transform().m11(), 1 / transform().m22());
-	scale(zoomScale, zoomScale);
+	scale(zoomValue, zoomValue);
+	emit scaleChanged(zoomValue);
 }
 
 void LaserViewer::init()
@@ -600,9 +604,9 @@ void LaserViewer::zoomOut()
 
 void LaserViewer::resetZoom()
 {
-    if (!qFuzzyCompare(zoomScale(), qreal(1))) {
+    if (!qFuzzyCompare(zoomValue(), qreal(1))) {
         resetTransform();
-        emit zoomChanged(zoomScale(), mapFromScene(m_scene->backgroundItem()->pos()));
+        emit zoomChanged(zoomValue(), mapFromScene(m_scene->backgroundItem()->pos()));
     }
 }
 
