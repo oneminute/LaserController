@@ -38,8 +38,8 @@ private:
 	qreal m_longUnit = 0;
 	qreal m_mediumUnit = 0;
 	QPoint m_mousePoint;
-	int m_textMaxSize = 10;
-	int m_textMinSize = 9;
+	qreal m_textMaxSize = 10;
+	//qreal m_textMinSize = 9;
 private :
 	void drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive = true);
 	void drawMediumUnit(qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isPositive = true);

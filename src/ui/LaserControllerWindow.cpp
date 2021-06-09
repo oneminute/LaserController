@@ -104,23 +104,27 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->gridLayout->addWidget(const_cast<QScrollBar*>(m_viewer->verticalScrollBar()), 0, 2, 2, 1);
     m_ui->gridLayout->addLayout(viewHoriBottomLayout, 2, 0, 1, 2);
 	m_ui->horizontal_ruler->setViewer(m_viewer);
-	m_ui->horizontal_ruler->refresh();
+	
 	//m_ui->ruler_topleft->setStyleSheet("background:blue");
 	m_viewer->setHorizontalRuler(m_ui->horizontal_ruler);
+	m_ui->horizontal_ruler->refresh();
 	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->horizontal_ruler, &RulerWidget::viewZoomChanged);
 	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->horizontal_ruler, [=] {
 		qDebug() << "ruler_h";
-		m_ui->horizontal_ruler->setScale(1.0);
+		//m_ui->horizontal_ruler->setScale(1.0);
+		//m_ui->horizontal_ruler->refresh();
 	});
 
 	m_ui->vertical_ruler->setViewer(m_viewer);
 	m_ui->vertical_ruler->setIsVertical(true);
-	m_ui->vertical_ruler->refresh();
+	
 	m_viewer->setVerticalRuler(m_ui->vertical_ruler);
+	m_ui->vertical_ruler->refresh();
 	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->vertical_ruler, &RulerWidget::viewZoomChanged);
-	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->vertical_ruler, [=] {
+	connect(StateControllerInst.documentState(), &QState::initialStateChanged, m_ui->vertical_ruler, [=] {
 		qDebug() << "ruler_v";
-		m_ui->vertical_ruler->setScale(1.0);
+		//m_ui->vertical_ruler->setScale(1.0);
+		//m_ui->vertical_ruler->refresh();
 	});
 	
     int colorTick = 360 / Config::LayersMaxLayersCount();
