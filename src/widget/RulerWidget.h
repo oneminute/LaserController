@@ -16,7 +16,6 @@ public:
 	~RulerWidget();
 	void setIsVertical(bool _bl);
 	void setViewer(LaserViewer* _v);
-	void setFactor(qreal _factor);
 	void setScale(qreal _scale);
 	void setIsMarkMouse(bool _bl);
 	void setMousePoint(const QPoint& _point);
@@ -28,8 +27,7 @@ private:
 	bool m_isVertical;
 	bool m_isMarkMouse = false;//�Ƿ������
 	int m_minHeightSize = 15;
-	int m_minWidthSize = 18;
-	qreal m_factor = 1.0;
+	int m_minWidthSize = 15;
 	qreal m_scale = 1.0;
 	qreal m_millimeter = 5;//�仯��
 	QPointF m_original = QPointF(0, 0);
@@ -40,11 +38,14 @@ private:
 	qreal m_longUnit = 0;
 	qreal m_mediumUnit = 0;
 	QPoint m_mousePoint;
+	int m_textMaxSize = 10;
+	int m_textMinSize = 9;
 private :
 	void drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive = true);
-	void drawSmallUnit(qreal unit, qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isToRight = true);
+	void drawMediumUnit(qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isPositive = true);
+	void drawSmallUnit(qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isToRight = true);
 public slots:
-	void viewZoomChanged(qreal _factor, const QPointF& topleft);
+	void viewZoomChanged(const QPointF& topleft);
 };
 
 #endif // RULERWIDGET_H

@@ -50,7 +50,7 @@ public slots:
 	void textAreaChanged();
 
 signals:
-    void zoomChanged(qreal factor, const QPointF& topleft);
+    void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
     void beginSelecting();
     void endSelecting();

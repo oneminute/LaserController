@@ -163,7 +163,7 @@ void LaserViewer::zoomBy(qreal factor)
     scale(factor, factor);
     //m_scene->document()->setScale(factor);
 	//qDebug() << "scale:" << m_scene->document()->scale();
-    emit zoomChanged(factor, mapFromScene(m_scene->backgroundItem()->pos()));
+    emit zoomChanged( mapFromScene(m_scene->backgroundItem()->pos()));
 	emit scaleChanged(zoomValue());
 }
 
@@ -606,7 +606,7 @@ void LaserViewer::resetZoom()
 {
     if (!qFuzzyCompare(zoomValue(), qreal(1))) {
         resetTransform();
-        emit zoomChanged(zoomValue(), mapFromScene(m_scene->backgroundItem()->pos()));
+        emit zoomChanged(mapFromScene(m_scene->backgroundItem()->pos()));
     }
 }
 

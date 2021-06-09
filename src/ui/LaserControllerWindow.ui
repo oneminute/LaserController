@@ -17,6 +17,9 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
      <number>0</number>
@@ -46,6 +49,13 @@
     <item row="1" column="0">
      <widget class="RulerWidget" name="vertical_ruler" native="true"/>
     </item>
+    <item row="0" column="0">
+     <widget class="QWidget" name="ruler_topleft" native="true">
+      <property name="styleSheet">
+       <string notr="true">background:rgb(200, 200, 200)</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -54,7 +64,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

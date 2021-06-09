@@ -105,6 +105,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->gridLayout->addLayout(viewHoriBottomLayout, 2, 0, 1, 2);
 	m_ui->horizontal_ruler->setViewer(m_viewer);
 	m_ui->horizontal_ruler->refresh();
+	//m_ui->ruler_topleft->setStyleSheet("background:blue");
 	m_viewer->setHorizontalRuler(m_ui->horizontal_ruler);
 	connect(m_viewer, &LaserViewer::zoomChanged, m_ui->horizontal_ruler, &RulerWidget::viewZoomChanged);
 	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_ui->horizontal_ruler, [=] {
