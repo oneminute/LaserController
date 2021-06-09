@@ -1,6 +1,3 @@
 [submodule "src/widget/LRWidgets"]
 	path = src/widget/LRWidgets
 	url = https://github.com/oneminute/LRWidgets
-[submodule "src/algorithm/wykobi"]
-	path = src/algorithm/wykobi
-	url = https://github.com/oneminute/wykobi.git
