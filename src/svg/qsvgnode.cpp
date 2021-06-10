@@ -352,14 +352,11 @@ QTransform QSvgNode::getCascadeTransform() const
     const QSvgNode* node = this;
     while (node)
     {
-        if (node->hasStyle())
+        QSvgStyleProperty* style = node->styleProperty(QSvgStyleProperty::TRANSFORM);
+        if (style)
         {
-            QSvgStyleProperty* style = node->styleProperty(QSvgStyleProperty::TRANSFORM);
-            if (style)
-            {
-                QSvgTransformStyle* tStyle = reinterpret_cast<QSvgTransformStyle*>(style);
-                t = t * tStyle->qtransform();
-            }
+            QSvgTransformStyle* tStyle = reinterpret_cast<QSvgTransformStyle*>(style);
+            t = t * tStyle->qtransform();
         }
         node = node->parent();
     }

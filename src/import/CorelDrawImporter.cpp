@@ -168,7 +168,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         {
             if (tmpDir.exists(tmpSvgFilename))
             {
-                tmpDir.remove(tmpSvgFilename);
+                //tmpDir.remove(tmpSvgFilename);
             }
 
             doc->open();

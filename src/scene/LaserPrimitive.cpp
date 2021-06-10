@@ -886,8 +886,8 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     QByteArray ba;
 
     cv::Mat src(d->image.height(), d->image.width(), CV_8UC1, (void*)d->image.constBits(), d->image.bytesPerLine());
-    float mmWidth = 1000.f * d->image.width() / d->image.dotsPerMeterX();
-    float mmHeight = 1000.f * d->image.height() / d->image.dotsPerMeterY();
+    //float mmWidth = 1000.f * d->image.width() / d->image.dotsPerMeterX();
+    //float mmHeight = 1000.f * d->image.height() / d->image.dotsPerMeterY();
 
     int scanInterval = 7;
     double yPulseLength = 0.006329114;
@@ -906,10 +906,15 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
 
 	qreal boundingWidth = Global::convertToMM(SU_PX, d->boundingRect.width());
 	qreal boundingHeight = Global::convertToMM(SU_PX, d->boundingRect.height(), Qt::Vertical);
+    qreal boundingLeft = Global::convertToMM(SU_PX, d->boundingRect.left());
+    qreal boundingTop = Global::convertToMM(SU_PX, d->boundingRect.top());
     int outWidth = boundingWidth * MM_TO_INCH * 600;
     int outHeight = std::round(boundingHeight / pixelInterval);
-    qDebug() << " out width:" << outWidth;
+    qLogD << "bounding rect: " << d->boundingRect;
+    qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
+    qDebug() << "out left:" << boundingLeft;
+    qDebug() << "out top:" << boundingTop;
 
     cv::Mat resized;
     cv::resize(src, resized, cv::Size(outWidth, outHeight));
@@ -920,9 +925,7 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
         outMat = imageUtils::halftone3(resized, layer()->lpi(), layer()->dpi(), 45);
     }
 
-    QPointF pos = laserStartPos();
-    ba = imageUtils::image2EngravingData(outMat, d->boundingRect.left(), 
-        d->boundingRect.top(), pixelInterval, boundingWidth);
+    ba = imageUtils::image2EngravingData(outMat, boundingLeft, boundingTop, pixelInterval, boundingWidth);
 
     QTransform t = transform().scale(Global::convertToMM(SU_PX, 1), Global::convertToMM(SU_PX, 1, Qt::Vertical));
     if (!canvas.empty())

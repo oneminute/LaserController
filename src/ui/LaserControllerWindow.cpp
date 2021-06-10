@@ -679,6 +679,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setMimeTypeFilters(QStringList() << "application/json");
     dialog.setWindowTitle(tr("Export"));
+    dialog.selectFile(m_scene->document()->nodeName());
     if (dialog.exec() == QFileDialog::Accepted)
     {
         QString filename = dialog.selectedFiles().constFirst();
