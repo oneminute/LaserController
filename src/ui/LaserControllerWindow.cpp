@@ -1124,6 +1124,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
         return;
 
     //m_ui->tableWidgetLayers->blockSignals(true);
+    qLogD << "selected items count: " << items.length();
     for (LaserPrimitive* item : items)
     {
 		if (items[0]->layer() == nullptr)

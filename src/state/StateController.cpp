@@ -71,7 +71,7 @@ StateController& StateController::instance()
     return controller;
 }
 
-bool StateController::onState(QAbstractState * state)
+bool StateController::isInState(QAbstractState * state)
 {
     return instance().m_currentStates.contains(state->objectName());
 }

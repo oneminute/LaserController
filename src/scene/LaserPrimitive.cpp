@@ -221,7 +221,7 @@ std::vector<cv::Point2f> LaserPrimitive::mechiningPoints(cv::Point2f& lastPoint,
     {
         cv::Mat pointsMat(points);
         pointsMat.convertTo(pointsMat, CV_32S);
-        cv::polylines(canvas, pointsMat, false, cv::Scalar(0, 0, 255), 5);
+        cv::polylines(canvas, pointsMat, true, cv::Scalar(0, 0, 255), 5);
     }
     
     return points;

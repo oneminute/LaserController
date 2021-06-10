@@ -72,7 +72,7 @@ void RulerWidget::viewZoomChanged(const QPointF& topleft) {
 void RulerWidget::paintEvent(QPaintEvent *event)
 {
 	QWidget::paintEvent(event);
-	if (!StateControllerInst.onState(StateControllerInst.documentWorkingState())) {
+	if (!StateControllerInst.isInState(StateControllerInst.documentWorkingState())) {
 		return;
 	}
 	QPainter painter(this);

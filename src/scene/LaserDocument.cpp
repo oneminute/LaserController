@@ -199,7 +199,7 @@ QString LaserDocument::newLayerName() const
 
 void LaserDocument::exportJSON(const QString& filename)
 {
-    exportJSON1(filename);
+    exportJSON2(filename);
 }
 
 void LaserDocument::exportJSON1(const QString& filename)
@@ -783,10 +783,10 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
         }
         });
 
-    for (LaserNode* item : children)
+    /*for (LaserNode* item : children)
     {
         qLogD << item->position().x() << ", " << item->position().y();
-    }
+    }*/
 
     int maxChildNodes = 11;
     //int batchCount = children.count() / maxChildNodes + 1;

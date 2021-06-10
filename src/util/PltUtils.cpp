@@ -43,13 +43,13 @@ int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector
 
 int pltUtils::path2Points(const QPainterPath & path, std::vector<cv::Point2f>& points, cv::Mat& canvas)
 {
-    // »ñÈ¡Í¼ÔªµÄ×Ü³¤¶È
+    // ï¿½ï¿½È¡Í¼Ôªï¿½ï¿½ï¿½Ü³ï¿½ï¿½ï¿½
     qreal length = path.length();
     QPointF pt = path.pointAtPercent(0);
     qreal slope = path.slopeAtPercent(0);
     qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
 
-    // ÓÃÓÚ¼ÆËãÆðµ¶µãµÄ±äÁ¿
+    // ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½ï¿½ðµ¶µï¿½Ä±ï¿½ï¿½ï¿½
     QList<int> startingIndices;
     int startingPointsCount = 0;
     //int maxStartingPoints = qMax(qCeil(length / Config::OptimizePathMinStartingPointsInterval()), Config::OptimizePathMaxStartingPoints());
@@ -62,7 +62,7 @@ int pltUtils::path2Points(const QPainterPath & path, std::vector<cv::Point2f>& p
     qreal anchorSlope = slope;
     qreal anchorRadians = radians;
 
-    // ±£´æµÚÒ»¸öµã
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½
     points.push_back(typeUtils::qtPointF2CVPoint2f(pt));
     if (!canvas.empty())
         cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));

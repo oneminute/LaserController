@@ -569,6 +569,7 @@ void drawPath(cv::Mat& canvas, const QQueue<Node*>& path, const QMap<Node*, int>
                 lastPos = node->headPoint();
             }
             cv::circle(canvas, lastPos, 18, cv::Scalar(0, 255, 0), 6);
+            cv::line(canvas, lastPos, startPos, cv::Scalar(0, 0, 255), 3);
         }
         //qLogD << "  " << node->nodeName();
     }

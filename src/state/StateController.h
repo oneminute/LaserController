@@ -120,7 +120,7 @@ public:
     static void start() { instance().fsm()->start(); }
     static void stop() { instance().fsm()->stop(); }
 
-    static bool onState(QAbstractState* state);
+    static bool isInState(QAbstractState* state);
     static bool anyState(const QList<QAbstractState*>& states);
     static bool allStates(const QList<QAbstractState*>& states);
     QSet<QString> currentStates();

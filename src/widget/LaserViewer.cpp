@@ -54,18 +54,18 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	QPainter painter(viewport());
 	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 	//selectioin
-	if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
+	if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {       
 		painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
 		qLogD << "drawing: " << m_selectionStartPoint << ", " << m_selectionEndPoint;
 	}
 	//Rect
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		painter.drawRect(QRectF(mapFromScene(m_creatingRectStartPoint), mapFromScene(m_creatingRectEndPoint)));
 	}
 	//Ellipse
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
 		m_EllipseEndPoint = m_creatingEllipseEndPoint;
 		if (m_isKeyShiftPressed) {
 			qreal w = m_EllipseEndPoint.x() - m_creatingEllipseStartPoint.x();
@@ -82,11 +82,11 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 		painter.drawEllipse(QRectF(mapFromScene(m_creatingEllipseStartPoint), mapFromScene(m_EllipseEndPoint)));
 	}
 	//Line
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
 		painter.drawLine(mapFromScene(m_creatingLineStartPoint), mapFromScene(m_creatingLineEndPoint));
 	}
 	//Polygon
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 		QRectF rect = QRectF(mapFromScene(m_polygonStartRect.topLeft()), mapFromScene(m_polygonStartRect.bottomRight()));
 		if (m_isMouseInStartRect) {
 			painter.fillRect(rect, QBrush(Qt::red, Qt::SolidPattern));
@@ -105,7 +105,7 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 		painter.drawLine(mapFromScene(m_creatingPolygonPoints.at(m_creatingPolygonPoints.length() - 1)), mapFromScene(m_creatingPolygonEndPoint));
 	}
 	//Spline
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
 		QList<SplineNodeStruct>& nodeList = m_handlingSpline.nodeList;
 		int nodesLength = nodeList.length();
 		for (int i = 0; i < nodesLength; i++) {
@@ -136,7 +136,7 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 	}
 	//Text
 	else {
-		if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+		if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
 			
 		}
 	}
@@ -201,14 +201,14 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 			qDebug() << "begin to select";			
 		}
 		//Rect
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectReadyState())) 
+		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectReadyState())) 
 		{
 			m_creatingRectStartPoint = mapToScene(event->pos());
 			m_creatingRectEndPoint = m_creatingRectStartPoint;
 			emit creatingRectangle();
 		}
 		//Ellipse
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseReadyState())) 
+		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseReadyState())) 
 		{
 			m_creatingEllipseStartPoint = mapToScene(event->pos());
 			m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
@@ -216,25 +216,25 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
 			emit creatingEllipse();
 		}
 		//Line
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineReadyState())) 
+		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineReadyState())) 
 		{
 			m_creatingLineStartPoint = mapToScene(event->pos());
 			m_creatingLineEndPoint = m_creatingLineStartPoint;
 			emit creatingLine();
 		}
 		//Polygon Ready
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonReadyState())) {
+		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
 			//clear
 			m_creatingPolygonPoints.clear();
 			emit creatingPolygonStartRect();
 		}
 		//Spline
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveSplineReadyState())) {
+		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineReadyState())) {
 			initSpline();
 			emit creatingSpline();
 		}
 		//Text
-		else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextReadyState())) {
+		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {
 			m_textInputPoint = mapToScene(event->pos()).toPoint();
 			creatTextEdit();
 			emit creatingText();
@@ -258,7 +258,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 	else {
 		m_isKeyShiftPressed = false;
 	}
-    if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
+    if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
         m_selectionEndPoint = point;
 		QPainterPath selectionPath;
@@ -278,19 +278,19 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
         return;
     }
 	//Rect
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		m_creatingRectEndPoint = mapToScene(point);
 		return;
 
 	}
 	//Ellipse
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
 		m_creatingEllipseEndPoint = mapToScene(point);
 		
 		return;
 	}
 	//Line
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
 		m_creatingLineEndPoint = mapToScene(point);
 		if (m_isKeyShiftPressed) {
 			qreal angle = QLineF(m_creatingLineStartPoint, m_creatingLineEndPoint).angle();
@@ -310,27 +310,27 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 		return;
 	}
 	//Polygon
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 		
 		m_isMouseInStartRect = m_polygonStartRect.contains(mapToScene(event->pos()));
 		m_creatingPolygonEndPoint = mapToScene(point);
 	}
 	//Spline
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
 		m_creatingSplineMousePos = event->pos();
 		
 	}
-    else
+    /*else
     {
         QGraphicsView::mouseMoveEvent(event);
-    }
+    }*/
     QPointF pos = mapToScene(point);
     emit mouseMoved(pos);
 }
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 {
-    if (StateControllerInst.onState(StateControllerInst.documentSelectingState()))
+    if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
         qreal distance = (m_selectionEndPoint - m_selectionStartPoint).manhattanLength();
         qDebug() << "distance:" << distance;
@@ -346,21 +346,21 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
         }
 	}
 	//Rect
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
         QRectF rect(m_creatingRectStartPoint, m_creatingRectEndPoint);
 		LaserRect *rectItem = new LaserRect(rect, m_scene->document());
 		m_scene->addLaserPrimitive(rectItem);
 		emit readyRectangle();
 	}
 	//Ellipse
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {		
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {		
 		QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
 		LaserEllipse *ellipseItem = new LaserEllipse(rect, m_scene->document());
 		m_scene->addLaserPrimitive(ellipseItem);
 		emit readyEllipse();
 	}
 	//Line
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveLineCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
 		if (m_creatingLineStartPoint != m_creatingLineEndPoint) {
 
 			QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
@@ -371,7 +371,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		
 	}
 	//Polygon Start
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonStartRectState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonStartRectState())) {
 		//init
 		m_creatingPolygonStartPoint = mapToScene(event->pos());
 		m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
@@ -384,7 +384,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		emit creatingPolygon();
 	}
 	//Polygon Creating
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 		m_creatingPolygonEndPoint = mapToScene(event->pos());
 		if (m_polygonStartRect.contains(m_creatingPolygonEndPoint)) {
 			m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
@@ -404,7 +404,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		}
 	}
 	//Spline
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
 		if (event->button() == Qt::LeftButton) {
 			m_creatingSplineMousePos = event->pos();
 			if (m_mouseHoverRect.contains(m_creatingSplineMousePos)) {
@@ -420,7 +420,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 		
 	}
 	//Spline Eidt
-	else if (StateControllerInst.onState(StateControllerInst.documentPrimitiveSplineEditState())) {
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineEditState())) {
 		if (m_scene->selectedItems().length() == 1) {
 			LaserPath *path = (LaserPath*)m_scene->selectedItems()[0];
 			path->setVisible(false);
@@ -456,7 +456,7 @@ void LaserViewer::keyReleaseEvent(QKeyEvent * event)
 	switch (event->key())
 	{
 		case Qt::Key_Escape:
-			if (StateControllerInst.onState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+			if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
 				
 				releaseTextEdit();
 				emit readyText();
