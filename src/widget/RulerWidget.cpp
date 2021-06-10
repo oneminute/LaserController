@@ -78,7 +78,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	QPainter painter(this);
 	//mouse position
 	if (m_isMarkMouse) {
-		painter.setPen(QPen(Qt::red, 1.2, Qt::DotLine));
+		painter.setPen(QPen(QColor(242, 149, 149), 1.2, Qt::DotLine));
 		if (m_isVertical) {
 			painter.drawLine(QPoint(0, m_mousePoint.y()), QPoint(m_minWidthSize, m_mousePoint.y()));
 		}
@@ -91,7 +91,8 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	
 	m_scale = m_viewer->zoomValue();
 	//Ruller
-	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+	QRectF rect = this->rect();
+	painter.setPen(QPen(QColor(200, 200, 200), 1, Qt::SolidLine));
 	
 	//Axes
 	m_millimeter = m_baseMillimeter * m_scale;
@@ -112,30 +113,30 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 			m_longUnit = 10 * m_millimeter * m_flag;
 			m_mediumUnit = 5 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 1.2*m_flag && shrinkScale < 1.5 * m_flag) {
+		else if (shrinkScale >= 1.2*m_flag && shrinkScale < 2.0 * m_flag) {
 			m_unit = 2*m_millimeter * m_flag;
 			m_longUnit = 10 * m_millimeter * m_flag;
 			m_mediumUnit = 0;
 		}
-		else if (shrinkScale >= 1.5 * m_flag && shrinkScale < 2.0*m_flag) {
+		else if (shrinkScale >= 2.0 * m_flag && shrinkScale < 3.0*m_flag) {
 			textCoef = 2 * m_flag;
 			m_unit = 2*m_millimeter * m_flag;
 			m_longUnit = 20 * m_millimeter * m_flag;
 			m_mediumUnit = 10 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 2.0*m_flag && shrinkScale < 3.5 * m_flag) {
+		else if (shrinkScale >= 3.0*m_flag && shrinkScale < 5.0 * m_flag) {
 			textCoef = 2 * m_flag;
 			m_unit = 5 * m_millimeter * m_flag;
 			m_longUnit = 20 * m_millimeter * m_flag;
 			m_mediumUnit = 10 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 3.5 * m_flag && shrinkScale < 5.0 * m_flag) {
+		else if (shrinkScale >= 5.0 * m_flag && shrinkScale < 7.0 * m_flag) {
 			textCoef = 5 * m_flag;
 			m_unit = 5 * m_millimeter * m_flag;
 			m_longUnit = 50 * m_millimeter * m_flag;
 			m_mediumUnit = 10 * m_millimeter * m_flag;
 		}
-		else if (shrinkScale >= 5.0 * m_flag && shrinkScale < 10 * m_flag) {
+		else if (shrinkScale >= 7.0 * m_flag && shrinkScale < 10 * m_flag) {
 			textCoef = 5 * m_flag;
 			m_unit = 10 * m_millimeter * m_flag;
 			m_longUnit = 50 * m_millimeter * m_flag;
@@ -143,7 +144,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		}
 	}
 	
-	QRectF rect = this->rect();
+	
 	QRectF documentRect = m_viewer->scene()->backgroundItem()->rect();
 	QRectF viewerRect = m_viewer->rect();
 	qreal dimension = 0;
@@ -179,11 +180,11 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 	QFont font = painter.font();
 	font.setPixelSize(m_textMaxSize);
 	painter.setFont(font);
-	painter.setPen(QPen(QColor(163, 163, 163), 1));
+	painter.setPen(QPen(QColor(200, 200, 200), 1));
 	
 	//size
 	QRectF rect = this->rect();
-	int longSize = dimension / m_longUnit;
+	int longSize = qRound(dimension / m_longUnit);
 	for (int i = 0; i <= longSize; i++) {
 		qreal originalStart = m_original.x();
 		if (m_isVertical) {
@@ -212,7 +213,7 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 				for (int j = 0; j < length; j++) {
 					painter.drawText(QPointF(edge + 3, longStart + 10 + j*font.pixelSize()), QString(number_str[j]));
 				}
-				painter.setPen(QPen(QColor(163, 163, 163), 1));
+				painter.setPen(QPen(QColor(200, 200, 200), 1));
 			}
 			
 			
@@ -229,13 +230,13 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 					painter.setPen(QPen(QColor(8, 137, 246), 1));
 				}
 				painter.drawText(QPointF(longStart + 2, edge + 8), QString::number(i * textCoef));
-				painter.setPen(QPen(QColor(163, 163, 163), 1));
+				painter.setPen(QPen(QColor(200, 200, 200), 1));
 			}
 			
 		}
 		
 		if (m_mediumUnit > 0) {
-			int mediumSize = m_longUnit / m_mediumUnit;
+			int mediumSize = qRound(m_longUnit / m_mediumUnit);
 			for (int mi = 1; mi < mediumSize; mi++) {
 				float mStart = longStart + mi * m_mediumUnit;
 				if (!isPositive) {
@@ -263,8 +264,8 @@ void RulerWidget::drawMediumUnit(qreal _length, qreal _left, qreal _top, QPainte
 }
 
 void RulerWidget::drawSmallUnit(qreal _length, qreal _original, qreal _edge, QPainter& _painter, bool isToRight) {
-	if (m_unit > 3) {
-		int smallSize = _length / m_unit;
+	if (m_unit > 4) {
+		int smallSize = qRound(_length / m_unit);
 		
 		for (int si = 1; si < smallSize; si++) {
 			float sStart = _original + si * m_unit;
