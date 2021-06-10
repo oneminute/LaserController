@@ -109,7 +109,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
 
 LaserLayer::~LaserLayer()
 {
-    qLogD << "layer " << name() << " destroyed.";
+    qLogD << "layer " << nodeName() << " destroyed.";
 }
 
 bool LaserLayer::removable() const 

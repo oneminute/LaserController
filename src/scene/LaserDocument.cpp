@@ -199,7 +199,7 @@ QString LaserDocument::newLayerName() const
 
 void LaserDocument::exportJSON(const QString& filename)
 {
-    exportJSON2(filename);
+    exportJSON1(filename);
 }
 
 void LaserDocument::exportJSON1(const QString& filename)

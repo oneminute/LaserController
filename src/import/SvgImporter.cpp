@@ -1,6 +1,7 @@
 #include "SvgImporter.h"
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QStack>
 #include <QMainWindow>
 
@@ -27,37 +28,39 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 {
 	Global::mainWindow->activateWindow();
 
-    LaserDocument* ldoc = new LaserDocument(scene);
-    QSvgTinyDocument* doc = QSvgTinyDocument::load(filename);
-    QRectF viewBox = doc->viewBox();
-    if (doc == nullptr)
+    //调用QSvgTinyDocument组件，解析并读取SVG文件。
+    QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
+
+    LaserDocument* laserDoc = new LaserDocument(scene);
+    QRectF viewBox = svgDoc->viewBox();
+    if (svgDoc == nullptr)
     {
 		qWarning() << "Load SVG document failure!";
-		ldoc->deleteLater();
+		laserDoc->deleteLater();
         return nullptr;
     }
-	ldoc->setUnit(doc->sizeUnit());
+	laserDoc->setUnit(svgDoc->sizeUnit());
 
-    QSize svgSize = doc->size();
+    QSize svgSize = svgDoc->size();
     qreal docScaleWidth = svgSize.width() * 1.0 / viewBox.width();
     qreal docScaleHeight = svgSize.height() * 1.0 / viewBox.height();
 
-	float width, height;
-	LaserDriver::instance().getLayout(width, height);
+	float layoutWidth, layoutHeight;
+	LaserDriver::instance().getLayout(layoutWidth, layoutHeight);
     PageInformation page;
-    page.setWidth(Global::convertUnit(ldoc->unit(), SU_PX, width));
-    page.setHeight(Global::convertUnit(ldoc->unit(), SU_PX, height, Qt::Vertical));
-    ldoc->setPageInformation(page);
-    ldoc->blockSignals();
+    page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, layoutWidth));
+    page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, layoutHeight, Qt::Vertical));
+    laserDoc->setPageInformation(page);
+    laserDoc->blockSignals();
 
-    qDebug() << "shapeUnit:" << ldoc->unit();
-    qDebug() << "document size:" << svgSize;
-    qDebug() << "viewBox size:" << viewBox;
-    qDebug() << "doc scale width:" << docScaleWidth;
-    qDebug() << "doc scale height:" << docScaleHeight;
+    qDebug() << "shapeUnit:" << laserDoc->unit();
+    qDebug() << "svg size:" << svgSize;
+    qDebug() << "svg viewBox size:" << viewBox;
+    qDebug() << "svg scale width:" << docScaleWidth;
+    qDebug() << "svg scale height:" << docScaleHeight;
 	qDebug() << "page size:" << page.width() << page.height();
 
-    QList<QSvgNode*> nodes = doc->renderers();
+    QList<QSvgNode*> nodes = svgDoc->renderers();
     QStack<QSvgNode*> stack;
     QList<QSvgRenderer*> renderers;
     for (int i = 0; i < nodes.length(); i++)
@@ -66,7 +69,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     }
 
 	QMatrix matrix;
-	matrix.scale(docScaleWidth * Global::convertUnit(ldoc->unit(), SU_PX, 1.0f), docScaleHeight * Global::convertUnit(ldoc->unit(), SU_PX, 1.0f, Qt::Vertical));
+	matrix.scale(docScaleWidth * Global::convertUnit(laserDoc->unit(), SU_PX, 1.0f), docScaleHeight * Global::convertUnit(laserDoc->unit(), SU_PX, 1.0f, Qt::Vertical));
 
     while (!stack.empty())
     {
@@ -97,14 +100,14 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
 			QRectF bounds = matrix.mapRect(svgEllipseNode->bounds());
-            item = new LaserEllipse(bounds, ldoc);
+            item = new LaserEllipse(bounds, laserDoc);
         }
             break;
         case QSvgNode::LINE:
         {
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
 			QLineF line = matrix.map(svgLineNode->line());
-            item = new LaserLine(line, ldoc);
+            item = new LaserLine(line, laserDoc);
         }
             break;
         case QSvgNode::ARC:
@@ -112,21 +115,21 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
-            item = new LaserPath(path, ldoc);
+            item = new LaserPath(path, laserDoc);
         }
             break;
         case QSvgNode::POLYGON:
         {
             QSvgPolygon* svgPolygonNode = reinterpret_cast<QSvgPolygon*>(node);
 			QPolygonF polygon = matrix.map(svgPolygonNode->polygon());
-            item = new LaserPolygon(polygon, ldoc);
+            item = new LaserPolygon(polygon, laserDoc);
         }
             break;
         case QSvgNode::POLYLINE:
         {
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
 			QPolygonF polyline = matrix.map(svgPolylineNode->polyline());
-            item = new LaserPolyline(polyline, ldoc);
+            item = new LaserPolyline(polyline, laserDoc);
         }
             break;
         case QSvgNode::RECT:
@@ -138,7 +141,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 				if (area > 0)
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
-					item = new LaserRect(rect, ldoc);
+					item = new LaserRect(rect, laserDoc);
 					qDebug() << "rect:" << rect;
 				}
             }
@@ -151,7 +154,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
 			QRectF bounds = matrix.mapRect(svgImageNode->imageBounds());
-            item = new LaserBitmap(svgImageNode->image(), bounds, ldoc);
+            item = new LaserBitmap(svgImageNode->image(), bounds, laserDoc);
         }
             break;
         default:
@@ -178,12 +181,15 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setName(node->nodeId());
 
-            ldoc->addPrimitive(item);
+            laserDoc->addPrimitive(item);
         }
     }
-    ldoc->blockSignals(false);
+    QFileInfo fileInfo(filename);
+    QString docName = fileInfo.baseName();
+    laserDoc->setNodeName(docName);
+    laserDoc->blockSignals(false);
     
     emit imported();
-    ldoc->open();
-    return ldoc;
+    laserDoc->open();
+    return laserDoc;
 }

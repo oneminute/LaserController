@@ -904,8 +904,8 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     }
     qreal pixelInterval = scanInterval * yPulseLength;
 
-	qreal boundingWidth = Global::convertToMM(SU_PX, boundingRect().width());
-	qreal boundingHeight = Global::convertToMM(SU_PX, boundingRect().height(), Qt::Vertical);
+	qreal boundingWidth = Global::convertToMM(SU_PX, d->boundingRect.width());
+	qreal boundingHeight = Global::convertToMM(SU_PX, d->boundingRect.height(), Qt::Vertical);
     int outWidth = boundingWidth * MM_TO_INCH * 600;
     int outHeight = std::round(boundingHeight / pixelInterval);
     qDebug() << " out width:" << outWidth;
@@ -921,8 +921,8 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     }
 
     QPointF pos = laserStartPos();
-    ba = imageUtils::image2EngravingData(outMat, boundingRect().left(), 
-        boundingRect().top(), pixelInterval, boundingWidth);
+    ba = imageUtils::image2EngravingData(outMat, d->boundingRect.left(), 
+        d->boundingRect.top(), pixelInterval, boundingWidth);
 
     QTransform t = transform().scale(Global::convertToMM(SU_PX, 1), Global::convertToMM(SU_PX, 1, Qt::Vertical));
     if (!canvas.empty())
