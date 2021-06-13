@@ -307,6 +307,11 @@ void LaserPrimitive::setLayer(LaserLayer* layer)
     d->layer = layer; 
 }
 
+QString LaserPrimitive::toString() const
+{
+    return QString("[LaserPrimitive: name=%1]").arg(nodeName());
+}
+
 QPainterPath LaserPrimitive::outline() const
 {
     Q_D(const LaserPrimitive);
@@ -361,10 +366,10 @@ void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	QGraphicsObject::mousePressEvent(event);
-	if (!this->isSelected()) {
+	/*if (!this->isSelected()) {
 		LaserDocument* document = (LaserDocument*)this->QObject::parent();
 		document->scene()->clearSelection();
-	}
+	}*/
 	
     update();
 }
@@ -899,7 +904,7 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
         qDebug() << "row step register:" << value;
         scanInterval = value.toInt();
     }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_Y_AXIS_PULSE_LENGTH, value))
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_X_AXIS_PULSE_LENGTH, value))
     {
         qDebug() << "y pulse register:" << value;
         yPulseLength = value.toDouble() / 1000.0;

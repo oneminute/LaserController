@@ -55,9 +55,9 @@ signals:
     void beginSelecting();
     void endSelecting();
     void cancelSelecting();
-	void startSelectedEditing();
+	void cancelSelected();
+	void beginSelectedEditing();
 	void endSelectedEditing();
-	void endSelected();
     void mouseMoved(const QPointF& pos);
 	void creatingRectangle();
 	void readyRectangle();

@@ -136,6 +136,8 @@ public:
     LaserLayer* layer() const;
     void setLayer(LaserLayer* layer);
 
+    QString toString() const;
+
     virtual QList<QPainterPath> subPaths() const { return QList<QPainterPath>(); }
 
     virtual QPainterPath outline() const;
