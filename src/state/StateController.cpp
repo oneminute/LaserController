@@ -22,6 +22,7 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(documentWorking, documentSelection);
     DEFINE_CHILD_INIT_STATE(documentSelection, documentSelecting);
     DEFINE_CHILD_STATE(documentSelection, documentSelected);
+	DEFINE_CHILD_STATE(documentSelection, documentSelectedEditing);
     DEFINE_CHILD_STATE(documentWorking, documentTransforming);
     DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
 

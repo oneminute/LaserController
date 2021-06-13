@@ -68,11 +68,12 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
 
     g_counter[type]++;
 
-    this->setFlag(ItemIsMovable, true);
+    //this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
-    this->setFlag(ItemIsFocusable, true);
+    //this->setFlag(ItemIsFocusable, true);
 
-    this->setAcceptHoverEvents(true);
+    //this->setAcceptHoverEvents(true);
+	this->setAcceptedMouseButtons(false);
 
     d->nodeName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
 }
@@ -98,17 +99,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
-    if (isSelected())
-    {
-        painter->setPen(QPen(Qt::gray, 0.2f, Qt::SolidLine));
-        painter->drawRect(bounds);
-    }
-    //else if (isUnderMouse())
-    else if (d->isHover)
-    {
-        painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
-        painter->drawRect(bounds);
-    }
+    
     
     QColor color = Qt::blue;
     if (d->layer)
@@ -117,6 +108,17 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     }
 
     painter->setPen(QPen(color, 1, Qt::SolidLine));
+	if (isSelected())
+	{
+		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+		//painter->drawRect(bounds);
+	}
+	//else if (isUnderMouse())
+	else if (d->isHover)
+	{
+		painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
+		painter->drawRect(bounds);
+	}
     draw(painter);
 
     QPainterPath outline = this->outline();

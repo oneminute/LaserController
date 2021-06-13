@@ -141,6 +141,7 @@ public:
     DECL_STATE(documentSelection)
     DECL_STATE(documentSelecting)
     DECL_STATE(documentSelected)
+	DECL_STATE(documentSelectedEditing)
     DECL_STATE(documentTransforming)
     DECL_STATE(documentPrimitive)
 	DECL_STATE(documentPrimitiveRect)

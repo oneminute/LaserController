@@ -48,5 +48,6 @@
         <file>images/reset_origin.png</file>
         <file>images/cut_edge.png</file>
         <file>images/path_opt.png</file>
+        <file>images/handle_rotate.png</file>
     </qresource>
 </RCC>

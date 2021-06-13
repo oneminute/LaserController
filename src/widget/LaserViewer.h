@@ -55,6 +55,9 @@ signals:
     void beginSelecting();
     void endSelecting();
     void cancelSelecting();
+	void startSelectedEditing();
+	void endSelectedEditing();
+	void endSelected();
     void mouseMoved(const QPointF& pos);
 	void creatingRectangle();
 	void readyRectangle();
@@ -136,6 +139,23 @@ private:
 	//Ruller
 	RulerWidget* m_horizontalRuler;
 	RulerWidget* m_verticalRuler;
+	//select
+	int m_handleRectPixel = 10;
+	QList<QRectF> m_selectedHandleList;
+	int m_curSelectedHandleIndex = -1;
+	/*QRectF& m_selectedCenter;
+	QRectF& m_selectedLeftTop;
+	QRectF& m_selectedRightTop;
+	QRectF& m_selectedLeftBottom;
+	QRectF& m_selectedRightBottom;
+	QRectF& m_selectedTopCenter;
+	QRectF& m_selectedRightCenter;
+	QRectF& m_selectedBottomCenter;
+	QRectF& m_selectedLeftCenter;
+	QRectF& m_selectedLeftTopRotate;
+	QRectF& m_selectedRightTopRotate;
+	QRectF& m_selectedLeftBottomRotate;
+	QRectF& m_selectedRightBottomRotate;*/
 };
 
 #endif // LASERVIEWER_H

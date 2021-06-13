@@ -10,6 +10,7 @@
 #include <QScrollBar>
 #include <QPainterPath>
 #include <QLabel> 
+#include <QImage>
 
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
@@ -52,13 +53,127 @@ void LaserViewer::paintEvent(QPaintEvent * event)
 {
     QGraphicsView::paintEvent(event);
 	QPainter painter(viewport());
+	painter.setRenderHint(QPainter::Antialiasing);
 	painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+
 	//selectioin
+
+	
 	if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {       
 		painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
 		qLogD << "drawing: " << m_selectionStartPoint << ", " << m_selectionEndPoint;
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
+		qDebug() << "SelectedEditing paint";
+
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+		qDebug() << "documentSelectedState paint";
+		QList<QGraphicsItem*> items = m_scene->selectedItems();
+		if (items.size() <= 0) {
+			return;
+		}
+		qreal left ,right, top, bottom;
+		for (int i = 0; i < items.size(); i++) {
+			if (i == 0) {
+				left = items[0]->boundingRect().left();
+				right = items[0]->boundingRect().right();
+				top = items[0]->boundingRect().top();
+				bottom = items[0]->boundingRect().bottom();
+			}
+			else {
+				qreal curLeft = items[i]->boundingRect().left();
+				qreal curRight = items[i]->boundingRect().right();
+				qreal curTop = items[i]->boundingRect().top();
+				qreal curBottom = items[i]->boundingRect().bottom();
+				if (curLeft < left) {
+					left = curLeft;
+				}
+				if (curRight > right) {
+					right = curRight;
+				}
+				if (curTop <  top) {
+					top = curTop;
+				}
+				if (curBottom > bottom) {
+					bottom = curBottom;
+				}
+			}
+		}
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		painter.setBrush(QBrush(Qt::gray));
+		QPointF centerPoint(mapFromScene((right - left) * 0.5 + left, (bottom - top) * 0.5 + top));
+		qreal halfSize = m_handleRectPixel * 0.5;
+		//center(0)
+		m_selectedHandleList.clear();
+		m_selectedHandleList.append(QRectF(QPointF(centerPoint.x() - halfSize, centerPoint.y() - halfSize), QPointF(centerPoint.x() + halfSize, centerPoint.y() + halfSize)));
+		painter.drawRect(m_selectedHandleList[0]);
+		QPointF leftTop(mapFromScene(left, top));
+		QPointF rightBottom(mapFromScene(right, bottom));
+		leftTop.setX(leftTop.x() - 2);
+		leftTop.setY(leftTop.y() - 2);
+		rightBottom.setX(rightBottom.x() + 2);
+		rightBottom.setY(rightBottom.y() + 2);
+		//left_top(1,2)
+		m_selectedHandleList.append(QRectF(leftTop.x() - m_handleRectPixel, leftTop.y() - m_handleRectPixel, m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[1]);
+		painter.setPen(QPen(Qt::gray, 3, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(leftTop.x() - 15, leftTop.y() - 17, 8, 8));//Ðý×ª
+		//painter.drawRect(m_selectedHandleList[2]);
+		painter.drawArc(QRectF(QPointF(leftTop.x() - 17, leftTop.y() - 17), QPointF(leftTop.x() +10, leftTop.y() +10)), 90*16, 95*16);
+		painter.setPen(QPen(Qt::gray, 2, Qt::SolidLine));
+		painter.drawLine(QPointF(leftTop.x()-1, leftTop.y()-17), QPointF(leftTop.x() - 9, leftTop.y()-19));
+		painter.drawLine(QPointF(leftTop.x() - 18, leftTop.y() - 5), QPointF(leftTop.x() - 19, leftTop.y() - 9));
+		//top_center(3)
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(leftTop.x()+(rightBottom.x()-leftTop.x())*0.5 - m_handleRectPixel*0.5, leftTop.y() - m_handleRectPixel, m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[3]);
+		//right_top(4,5)
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(rightBottom.x(), leftTop.y() - m_handleRectPixel, m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[4]);
+		painter.setPen(QPen(Qt::gray, 3, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(rightBottom.x() + 13, leftTop.y() - 17, 8, 8));//Ðý×ª
+		//painter.drawRect(m_selectedHandleList[5]);
+		painter.drawArc(QRectF(QPointF(rightBottom.x() - 10, leftTop.y() - 17), QPointF(rightBottom.x() + 17, leftTop.y() + 10)), 90 * 16, -95 * 16);
+		painter.setPen(QPen(Qt::gray, 2, Qt::SolidLine));
+		painter.drawLine(QPointF(rightBottom.x() + 4, leftTop.y() - 18), QPointF(rightBottom.x() + 4 + qCos(M_PI / 180 * 13) * 6, leftTop.y() - 18 - qSin(M_PI / 180 * 13) * 6));
+		painter.drawLine(QPointF(rightBottom.x() + 18, leftTop.y() - 3), QPointF(rightBottom.x() + 18 + qSin(M_PI / 180 * 13) * 6, leftTop.y() - 3 - qCos(M_PI / 180 * 13) * 6));
+		//right_center(6)
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(rightBottom.x(), leftTop.y() + (rightBottom.y() - leftTop.y())*0.5 - m_handleRectPixel * 0.5,  m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[6]);
+		//right_bottom£¨7,8£©
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(rightBottom.x(), rightBottom.y(), m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[7]);
+		painter.setPen(QPen(Qt::gray, 3, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(rightBottom.x() + 12, rightBottom.y() + 12, 8, 8));//Ðý×ª
+		//painter.drawRect(m_selectedHandleList[8]);
+		painter.drawArc(QRectF(QPointF(rightBottom.x() - 10, rightBottom.y() - 10), QPointF(rightBottom.x() + 17, rightBottom.y() + 17)), -90 * 16, 95 * 16);
+		painter.drawLine(QPointF(rightBottom.x() + 4, rightBottom.y() + 18), QPointF(rightBottom.x() + 4 + qCos(M_PI / 180 * 13) * 6, rightBottom.y() + 18 + qSin(M_PI / 180 * 13) * 6));
+		painter.drawLine(QPointF(rightBottom.x() + 18, rightBottom.y() + 1), QPointF(rightBottom.x() + 19 + qSin(M_PI / 180 * 13) * 7, rightBottom.y() + 1 + qCos(M_PI / 180 * 13) * 7));
+		//bottom_center(9)
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(leftTop.x() + (rightBottom.x() - leftTop.x())*0.5 - m_handleRectPixel * 0.5, rightBottom.y(),  m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[9]);
+		//left_bottom£¨10£¬ 11£©
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(leftTop.x() - m_handleRectPixel, rightBottom.y(), m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[10]);
+		painter.setPen(QPen(Qt::gray, 3, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(leftTop.x() - 19, rightBottom.y() + 12, 8, 8));//Ðý×ª
+		//painter.drawRect(m_selectedHandleList[11]);
+		painter.drawArc(QRectF(QPointF(leftTop.x() - 17, rightBottom.y() + 17), QPointF(leftTop.x()+10, rightBottom.y() - 10)), -90 * 16, -95 * 16);
+		painter.setPen(QPen(Qt::gray, 2, Qt::SolidLine));
+		painter.drawLine(QPointF(leftTop.x() - 11, rightBottom.y() + 19), QPointF(leftTop.x() - 11 + qCos(M_PI / 180 * 13) * 6, rightBottom.y() + 19 - qSin(M_PI / 180 * 13) * 6));
+		painter.drawLine(QPointF(leftTop.x() - 18, rightBottom.y() +2), QPointF(leftTop.x() - 18 - qSin(M_PI / 180 * 13) * 7, rightBottom.y()+2 + qCos(M_PI / 180 * 13) * 7));
+		//left_center(12)
+		painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
+		m_selectedHandleList.append(QRectF(leftTop.x()- m_handleRectPixel, leftTop.y() + (rightBottom.y() - leftTop.y())*0.5 - m_handleRectPixel * 0.5, m_handleRectPixel, m_handleRectPixel));
+		painter.drawRect(m_selectedHandleList[12]);
 	}
 	//Rect
 	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
@@ -189,16 +304,23 @@ void LaserViewer::mousePressEvent(QMouseEvent * event)
     if (event->isAccepted())
         return;
     QList<QAbstractState*> states;
-    states << StateControllerInst.documentIdleState()
-        << StateControllerInst.documentSelectedState();
+	states << StateControllerInst.documentIdleState();
+        //<< StateControllerInst.documentSelectedState();
 	//Left Button
 	if (event->button() == Qt::LeftButton) {
+		//select
 		if (StateControllerInst.anyState(states))
 		{
 			m_selectionStartPoint = event->pos();
 			m_selectionEndPoint = m_selectionStartPoint;
 			emit beginSelecting();
 			qDebug() << "begin to select";			
+		}
+		else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+			if (m_curSelectedHandleIndex > -1) {
+				emit startSelectedEditing();
+			}
+			
 		}
 		//Rect
 		else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectReadyState())) 
@@ -258,25 +380,90 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 	else {
 		m_isKeyShiftPressed = false;
 	}
+	//select
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-        m_selectionEndPoint = point;
-		QPainterPath selectionPath;
-		selectionPath.addRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
-        //right selectionï¿½ï¿½Ñ¡
-		if (m_selectionEndPoint.x() > m_selectionStartPoint.x()) {			
-			m_scene->setSelectionArea(mapToScene(selectionPath));
-			
-		}
-		//left selectionï¿½ï¿½Ñ¡
-		else {
-			m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::ContainsItemShape);
-		}
+        m_selectionEndPoint = point;     
 		qLogD << "moving update: ";
         QGraphicsView::mouseMoveEvent(event);
 		this->viewport()->repaint();
         return;
     }
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+		for (int i = 0; i < m_selectedHandleList.size(); i++) {
+			if (m_selectedHandleList[i].contains(point)) {
+				m_curSelectedHandleIndex = i;
+				switch (m_curSelectedHandleIndex)
+				{
+				case 0:
+					this->setCursor(Qt::SizeAllCursor);
+					break;
+				case 1:
+				case 7: {
+					this->setCursor(Qt::SizeFDiagCursor);
+					break;
+				}
+				case 4:
+				case 10: {
+					this->setCursor(Qt::SizeBDiagCursor);
+					break;
+				}
+				case 3:
+				case 9: {
+					this->setCursor(Qt::SizeVerCursor);
+					break;
+				}
+				case 6:
+				case 12: {
+					this->setCursor(Qt::SizeHorCursor);
+					break;
+				}
+				case 2: {
+					//QMatrix matrix;
+					//matrix.rotate(-90);
+					QPixmap cMap(":/ui/icons/images/handle_rotate.png");
+					this->setCursor(cMap.scaled(16, 16, Qt::KeepAspectRatio));
+					break;
+				}
+					
+				case 5: {
+					QMatrix matrix;
+					matrix.rotate(90);
+					QPixmap cMap(":/ui/icons/images/handle_rotate.png");
+					this->setCursor(cMap.scaled(16, 16, Qt::KeepAspectRatio).transformed(matrix));
+					break;
+				}
+				case 8: {
+					QMatrix matrix;
+					matrix.rotate(180);
+					QPixmap cMap(":/ui/icons/images/handle_rotate.png");
+					this->setCursor(cMap.scaled(16, 16, Qt::KeepAspectRatio).transformed(matrix));
+					break;
+				}
+				case 11: {
+					QMatrix matrix;
+					matrix.rotate(270);
+					QPixmap cMap(":/ui/icons/images/handle_rotate.png");
+					this->setCursor(cMap.scaled(16, 16, Qt::KeepAspectRatio).transformed(matrix));
+					break;
+				}
+				default:
+					break;
+				}
+				break;
+			}
+			if (i == m_selectedHandleList.size() - 1) {
+				m_curSelectedHandleIndex = -1;
+				this->setCursor(Qt::ArrowCursor);
+			}
+		}
+
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
+		qDebug() << "documentSelectedEditingState move";
+		QGraphicsView::mouseMoveEvent(event);
+		this->viewport()->repaint();
+	}
 	//Rect
 	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		m_creatingRectEndPoint = mapToScene(point);
@@ -330,9 +517,24 @@ void LaserViewer::mouseMoveEvent(QMouseEvent * event)
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
 {
+	//select
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-        qreal distance = (m_selectionEndPoint - m_selectionStartPoint).manhattanLength();
+		QPainterPath selectionPath;
+		selectionPath.addRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
+		m_scene->setSelectionArea(mapToScene(selectionPath));
+		//right select
+		if (m_selectionEndPoint.x() < m_selectionStartPoint.x()) {
+			m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::IntersectsItemShape);
+		}
+		//left selection
+		else if(m_selectionEndPoint.x() > m_selectionStartPoint.x()){
+			m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::ContainsItemShape);
+		}
+		/*for (int i = 0; i < m_scene->.size(); i++) {
+			m_scene->selectedItems()[i]->setSelected(true);
+		}*/
+		qreal distance = (m_selectionEndPoint - m_selectionStartPoint).manhattanLength();
         qDebug() << "distance:" << distance;
         if (distance <= 0.000001f)
         {
@@ -344,7 +546,18 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent * event)
         {
             emit endSelecting();
         }
+		m_selectedHandleList.clear();
+		m_curSelectedHandleIndex = -1;
 	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+		m_selectedHandleList.clear();
+		m_curSelectedHandleIndex = -1;
+		emit endSelected();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
+		emit endSelectedEditing();
+	}
+	
 	//Rect
 	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
         QRectF rect(m_creatingRectStartPoint, m_creatingRectEndPoint);
@@ -506,6 +719,9 @@ void LaserViewer::init()
     ADD_TRANSITION(documentSelectedState, documentSelectingState, this, &LaserViewer::beginSelecting);
     ADD_TRANSITION(documentSelectedState, documentIdleState, this, &LaserViewer::cancelSelecting);
     ADD_TRANSITION(documentSelectingState, documentIdleState, this, &LaserViewer::cancelSelecting);
+	ADD_TRANSITION(documentSelectedState, documentSelectedEditingState, this, &LaserViewer::startSelectedEditing);
+	ADD_TRANSITION(documentSelectedState, documentIdleState, this, &LaserViewer::endSelected);
+	ADD_TRANSITION(documentSelectedEditingState, documentSelectedState, this, &LaserViewer::endSelectedEditing);
 	ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRectCreatingState, this, SIGNAL(creatingRectangle()));
 	ADD_TRANSITION(documentPrimitiveRectCreatingState, documentPrimitiveRectReadyState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveEllipseCreatingState, this, SIGNAL(creatingEllipse()));
