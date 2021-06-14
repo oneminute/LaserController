@@ -111,6 +111,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	if (isSelected())
 	{
 		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+	
 		//painter->drawRect(bounds);
 	}
 	//else if (isUnderMouse())

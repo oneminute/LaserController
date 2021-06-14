@@ -42,6 +42,7 @@ private:
 	void initSpline();
 	void creatTextEdit();
 	void releaseTextEdit();
+	void selectedHandleScale(QPainter& painter);
 
 public slots:
     void zoomIn();
@@ -76,6 +77,7 @@ signals:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 	void paintSelectedState(QPainter& painter);
+	void setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
 	//mouse
@@ -143,20 +145,9 @@ private:
 	//select
 	int m_handleRectPixel = 10;
 	QList<QRectF> m_selectedHandleList;
+	QPoint m_mousePoint;
 	int m_curSelectedHandleIndex = -1;
-	/*QRectF& m_selectedCenter;
-	QRectF& m_selectedLeftTop;
-	QRectF& m_selectedRightTop;
-	QRectF& m_selectedLeftBottom;
-	QRectF& m_selectedRightBottom;
-	QRectF& m_selectedTopCenter;
-	QRectF& m_selectedRightCenter;
-	QRectF& m_selectedBottomCenter;
-	QRectF& m_selectedLeftCenter;
-	QRectF& m_selectedLeftTopRotate;
-	QRectF& m_selectedRightTopRotate;
-	QRectF& m_selectedLeftBottomRotate;
-	QRectF& m_selectedRightBottomRotate;*/
+	QRectF m_selectedRect;
 };
 
 #endif // LASERVIEWER_H

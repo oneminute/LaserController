@@ -172,6 +172,7 @@ public:
     virtual ~LaserShape() { } 
     virtual QPainterPath toPath() const = 0;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) override;
+	
 
 private:
     Q_DISABLE_COPY(LaserShape);
