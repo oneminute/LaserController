@@ -901,11 +901,15 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 
 		LaserPrimitive* item = (LaserPrimitive*)m_scene->selectedItems()[i];
 		QMatrix matrix;
+		matrix.scale(item->scale() * offset, item->scale() * offset);
 		//painter.device()-
 		//matrix.scale(item->scale() * offset, item->scale() * offset);
-		if (m_curSelectedHandleIndex == 1) {
-			
-			item->setTransformOriginPoint(m_selectedRect.bottomRight());
+        QPointF newPoint;
+		if (m_curSelectedHandleIndex == 1) 
+        {
+            // 计算该放大操作中的新原点位置
+            newPoint = matrix.map(m_selectedRect.bottomRight());
+			//item->setTransformOriginPoint(m_selectedRect.bottomRight());
 			//item->setScale(item->scale() * offset);
 			//matrix = item->matr;
 		}
@@ -920,8 +924,12 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 		else if (m_curSelectedHandleIndex == 10) {
 			//item->setTransformOriginPoint(item->boundingRect().topRight());
 		}
-		matrix.scale(item->scale() * offset, item->scale() * offset);
 		//item->setMatrix(matrix, true);
+
+        // 计算原点平移向量
+        QPointF diff = m_selectedRect.bottomRight() - newPoint;
+        // 平移原点
+        matrix.translate(diff.x(), diff.y());
 		item->setTransform(QTransform(matrix), true);
 	}
 }
