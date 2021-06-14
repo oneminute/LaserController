@@ -905,7 +905,7 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 		//matrix.scale(item->scale() * offset, item->scale() * offset);
 		if (m_curSelectedHandleIndex == 1) {
 			
-			//item->setTransformOriginPoint(m_selectedRect.bottomRight());
+			item->setTransformOriginPoint(m_selectedRect.bottomRight());
 			//item->setScale(item->scale() * offset);
 			//matrix = item->matr;
 		}
@@ -920,9 +920,9 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 		else if (m_curSelectedHandleIndex == 10) {
 			//item->setTransformOriginPoint(item->boundingRect().topRight());
 		}
-		//matrix.scale(item->scale() * offset, item->scale() * offset);
+		matrix.scale(item->scale() * offset, item->scale() * offset);
 		//item->setMatrix(matrix, true);
-		//item->setTransform(QTransform(matrix), true);
+		item->setTransform(QTransform(matrix), true);
 	}
 }
 
