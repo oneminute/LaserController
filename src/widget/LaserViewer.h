@@ -75,6 +75,7 @@ signals:
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
+	void paintSelectedState(QPainter& painter);
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
 	//mouse
@@ -89,7 +90,7 @@ protected:
 	//scroll
 
 	virtual void scrollContentsBy(int dx, int dy) override;
-
+	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
 
 private:
     QScopedPointer<LaserScene> m_scene;

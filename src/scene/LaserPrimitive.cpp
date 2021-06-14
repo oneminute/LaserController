@@ -366,6 +366,7 @@ void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	QGraphicsObject::mousePressEvent(event);
+    qLogD << "mousePressEvent: " << nodeName();
 	/*if (!this->isSelected()) {
 		LaserDocument* document = (LaserDocument*)this->QObject::parent();
 		document->scene()->clearSelection();
