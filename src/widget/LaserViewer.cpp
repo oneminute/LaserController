@@ -80,7 +80,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 					QGraphicsItem* item = m_scene->selectedItems()[i];
 					QMatrix matrix;
 					matrix.translate(offsetPos.x(), offsetPos.y());
-					item->setTransform(QTransform(matrix), true);
+					//item->setTransform(QTransform(matrix), true);
+					item->setPos(item->pos() + offsetPos);
 				}
 				//painter.drawRect(m_scene->selectedItems()[0]->boundingRect());
 				break;
@@ -190,17 +191,18 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     }
     qreal left, right, top, bottom;
     for (int i = 0; i < items.size(); i++) {
+		LaserPrimitive* item = (LaserPrimitive*)items[i];
         if (i == 0) {
-            left = items[0]->boundingRect().left();
-            right = items[0]->boundingRect().right();
-            top = items[0]->boundingRect().top();
-            bottom = items[0]->boundingRect().bottom();
+            left = item->boundingRect().left();
+            right = item->boundingRect().right();
+            top = item->boundingRect().top();
+            bottom = item->boundingRect().bottom();
         }
         else {
-            qreal curLeft = items[i]->boundingRect().left();
-            qreal curRight = items[i]->boundingRect().right();
-            qreal curTop = items[i]->boundingRect().top();
-            qreal curBottom = items[i]->boundingRect().bottom();
+            qreal curLeft = item->boundingRect().left();
+            qreal curRight = item->boundingRect().right();
+            qreal curTop = item->boundingRect().top();
+            qreal curBottom = item->boundingRect().bottom();
             if (curLeft < left) {
                 left = curLeft;
             }
@@ -860,7 +862,7 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 				offset = 1 - offset * 0.0025;
 			}
 			else {
-				if (m_mousePoint.y() < lastPos.y()) {
+				if (m_mousePoint.y() > lastPos.y()) {
 					offset = 1 - offset * 0.0025;
 				}
 				else {
@@ -877,7 +879,7 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 				offset = 1 - offset * 0.0025;
 			}
 			else {
-				if (m_mousePoint.y() < lastPos.y()) {
+				if (m_mousePoint.y() > lastPos.y()) {
 					offset = 1 - offset * 0.0025;
 				}
 				else {
@@ -887,9 +889,37 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 			break;
 		}
 		case 7: {
+			if (m_mousePoint.x() > lastPos.x()) {
+				offset = 1 + offset * 0.0025;
+			}
+			else if (m_mousePoint.x() < lastPos.x()) {
+				offset = 1 - offset * 0.0025;
+			}
+			else {
+				if (m_mousePoint.y() < lastPos.y()) {
+					offset = 1 - offset * 0.0025;
+				}
+				else {
+					offset = 1 + offset * 0.0025;
+				}
+			}
 			break;
 		}
 		case 10: {
+			if (m_mousePoint.x() < lastPos.x()) {
+				offset = 1 + offset * 0.0025;
+			}
+			else if (m_mousePoint.x() < lastPos.x()) {
+				offset = 1 - offset * 0.0025;
+			}
+			else {
+				if (m_mousePoint.y() < lastPos.y()) {
+					offset = 1 - offset * 0.0025;
+				}
+				else {
+					offset = 1 + offset * 0.0025;
+				}
+			}
 			break;
 		}
 	}
@@ -904,30 +934,28 @@ void LaserViewer::selectedHandleScale(QPainter& painter)
 		matrix.scale(item->scale() * offset, item->scale() * offset);
 		//painter.device()-
 		//matrix.scale(item->scale() * offset, item->scale() * offset);
-        QPointF newPoint;
+		QPointF diff;
 		if (m_curSelectedHandleIndex == 1) 
         {
-            // 计算该放大操作中的新原点位置
-            newPoint = matrix.map(m_selectedRect.bottomRight());
-			//item->setTransformOriginPoint(m_selectedRect.bottomRight());
-			//item->setScale(item->scale() * offset);
-			//matrix = item->matr;
+            //计算该放大操作中的新原点位置
+			QPointF newPoint = matrix.map(m_selectedRect.bottomRight());
+			diff = m_selectedRect.bottomRight() - newPoint;
 		}
 		else if (m_curSelectedHandleIndex == 4) {
-			item->setTransformOriginPoint(item->boundingRect().bottomLeft());
-			//item->setScale(item->scale() * offset);
-			matrix = item->matrix();
+			QPointF newPoint = matrix.map(m_selectedRect.bottomLeft());
+			diff = m_selectedRect.bottomLeft() - newPoint;
 		}
 		else if (m_curSelectedHandleIndex == 7) {
-			//item->setTransformOriginPoint(item->boundingRect().topLeft());
+			QPointF newPoint = matrix.map(m_selectedRect.topLeft());
+			diff = m_selectedRect.topLeft() - newPoint;
 		}
 		else if (m_curSelectedHandleIndex == 10) {
-			//item->setTransformOriginPoint(item->boundingRect().topRight());
+			QPointF newPoint = matrix.map(m_selectedRect.topRight());
+			diff = m_selectedRect.topRight() - newPoint;
 		}
 		//item->setMatrix(matrix, true);
 
-        // 计算原点平移向量
-        QPointF diff = m_selectedRect.bottomRight() - newPoint;
+        
         // 平移原点
         matrix.translate(diff.x(), diff.y());
 		item->setTransform(QTransform(matrix), true);
