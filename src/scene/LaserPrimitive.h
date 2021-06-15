@@ -113,6 +113,7 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
     virtual QRectF boundingRect() const override;
+    QRectF sceneBoundingRect() const;
     QPointF laserStartPos() const;
 
     virtual void draw(QPainter* painter) {};

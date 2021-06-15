@@ -94,6 +94,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 {
     Q_D(LaserPrimitive);
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
+    qLogD << "primitive " << d->nodeName << " painter transform : " << painter->transform();
 
     QRectF bounds = boundingRect();
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
@@ -107,12 +108,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         color = d->layer->color();
     }
 
-    painter->setPen(QPen(color, 1, Qt::SolidLine));
 	if (isSelected())
 	{
-		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
-	
-		//painter->drawRect(bounds);
+		painter->setPen(QPen(Qt::green, 1.2f, Qt::DashLine));
+	    painter->drawRect(bounds);
 	}
 	//else if (isUnderMouse())
 	else if (d->isHover)
@@ -120,6 +119,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
 		painter->drawRect(bounds);
 	}
+    painter->setPen(QPen(color, 1, Qt::SolidLine));
     draw(painter);
 
     QPainterPath outline = this->outline();
@@ -132,6 +132,13 @@ QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
     QRectF bounds = transform().mapRect(d->boundingRect);
+    return bounds;
+}
+
+QRectF LaserPrimitive::sceneBoundingRect() const
+{
+    Q_D(const LaserPrimitive);
+    QRectF bounds = sceneTransform().mapRect(d->boundingRect);
     return bounds;
 }
 

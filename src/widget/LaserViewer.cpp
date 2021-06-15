@@ -192,17 +192,18 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     qreal left, right, top, bottom;
     for (int i = 0; i < items.size(); i++) {
 		LaserPrimitive* item = (LaserPrimitive*)items[i];
+        QRectF boundingRect = item->sceneBoundingRect();
         if (i == 0) {
-            left = item->boundingRect().left();
-            right = item->boundingRect().right();
-            top = item->boundingRect().top();
-            bottom = item->boundingRect().bottom();
+            left = boundingRect.left();
+            right = boundingRect.right();
+            top = boundingRect.top();
+            bottom = boundingRect.bottom();
         }
         else {
-            qreal curLeft = item->boundingRect().left();
-            qreal curRight = item->boundingRect().right();
-            qreal curTop = item->boundingRect().top();
-            qreal curBottom = item->boundingRect().bottom();
+            qreal curLeft = boundingRect.left();
+            qreal curRight = boundingRect.right();
+            qreal curTop = boundingRect.top();
+            qreal curBottom = boundingRect.bottom();
             if (curLeft < left) {
                 left = curLeft;
             }
@@ -218,6 +219,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
         }
     }
 	m_selectedRect = QRectF(QPointF(left, top), QPointF(right, bottom));
+    qLogD << "viewer painter transform: " << painter.transform();
     painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
     painter.setBrush(QBrush(Qt::gray));
     QPointF centerPoint(mapFromScene((right - left) * 0.5 + left, (bottom - top) * 0.5 + top));
