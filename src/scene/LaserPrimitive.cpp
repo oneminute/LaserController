@@ -103,6 +103,9 @@ void LaserPrimitive::setSelectedEditingMatrix(QMatrix mat) {
 void LaserPrimitive::setSelectedEditingState(int state) {
 	m_selectedEditingState = state;
 }*/
+void setSelectedInGroup(bool selected) {
+
+}
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
@@ -115,6 +118,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     bounds = QRectF(topLeft, bottomRight);
     
     QColor color = Qt::blue;
+	painter->setPen(QPen(color, 1, Qt::SolidLine));
     if (d->layer)
     {
         color = d->layer->color();
@@ -123,23 +127,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	if (isSelected())
 	{
 		isSelected();
+		
 		painter->setPen(QPen(Qt::green, 1.2f, Qt::DashLine));
 	    painter->drawRect(bounds);
-
-			/*switch (m_selectedEditingState) {
-			case 0: {//Ëõ·Å
-				QMatrix matrix;
-				matrix.scale(m_scaleX, m_scaleY);
-				//matrix.translate(m_scaleTX, m_scaleTY);
-				//setMatrix(matrix, true);
-				//setMatrix(m_selectedEditingMatrix, true);
-				break;
-			}
-
-
-			}*/
-		
-		
+		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
 	}
 	//else if (isUnderMouse())
 	else if (d->isHover)
@@ -147,7 +138,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
 		painter->drawRect(bounds);
 	}
-    painter->setPen(QPen(color, 1, Qt::SolidLine));
+    
     draw(painter);
 
     QPainterPath outline = this->outline();

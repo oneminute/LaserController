@@ -38,7 +38,8 @@ public:
 	void setHorizontalRuler(RulerWidget* _r);
 	void setVerticalRuler(RulerWidget * _r);
 	LaserPrimitiveGroup* group();
-
+	QRectF selectedItemsSceneBoundingRect();
+	void resetSelectedItemsGroupRect(QRectF _sceneRect);
 private:
     void init();
 	void initSpline();
@@ -86,6 +87,7 @@ protected:
 	void setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
+	
 	//mouse
 	virtual void leaveEvent(QEvent *event) override;
 	virtual void enterEvent(QEvent *event) override;

@@ -29,12 +29,12 @@ qreal Global::mm2PixelsYF(float mm)
 
 float Global::pixels2mmX(int pixels)
 {
-	return pixels / dpiX * 25.4f;
+	return pixels * 25.4f / dpiX;
 }
 
 float Global::pixels2mmY(int pixels)
 {
-	return pixels / dpiY * 25.4f;
+	return pixels * 25.4f / dpiY;
 }
 
 float Global::convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation)

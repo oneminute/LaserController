@@ -59,7 +59,7 @@ void LaserPrimitiveGroup::removeFromGroup(LaserPrimitive * primitive, bool updat
 {
 	Q_D(LaserPrimitiveGroup);
 	QGraphicsItemGroup::removeFromGroup(primitive);
-	primitive->setSelected(false);
+	//primitive->setSelected(false);
 }
 
 QRectF LaserPrimitiveGroup::boundingRect() const

@@ -300,8 +300,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//posx, posy, lock, unlcok
 	m_posXLabel = new QLabel("XPos");
 	m_posYLabel = new QLabel("YPos");
-	m_posXBox = new QDoubleSpinBox();
-	m_posYBox = new QDoubleSpinBox();
+	m_posXBox = new LaserDoubleSpinBox();
+	m_posXBox->setMinimum(-DBL_MAX);
+	m_posXBox->setMaximum(DBL_MAX);
+	m_posYBox = new LaserDoubleSpinBox();
+	m_posYBox->setMinimum(-DBL_MAX);
+	m_posYBox->setMaximum(DBL_MAX);
 	m_posXUnit = new QLabel("mm");
 	m_posYUnit = new QLabel("mm");
 	m_lockOrUnlock = new QToolButton();
@@ -318,8 +322,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//width, height
 	QLabel* widthLabel = new QLabel("Width");
 	QLabel* heightLabel = new QLabel("Height");
-	m_widthBox = new QDoubleSpinBox();
-	m_heightBox = new QDoubleSpinBox();
+	m_widthBox = new LaserDoubleSpinBox();
+	m_widthBox->setMinimum(-DBL_MAX);
+	m_widthBox->setMaximum(DBL_MAX);
+	m_heightBox = new LaserDoubleSpinBox();
+	m_heightBox->setMinimum(-DBL_MAX);
+	m_heightBox->setMaximum(DBL_MAX);
 	m_widthUnit = new QLabel("mm");
 	m_heightUnit = new QLabel("mm");
 
@@ -333,6 +341,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//rate
 	m_xRateBox = new QDoubleSpinBox();
 	m_yRateBox = new QDoubleSpinBox();
+
 	QLabel* xRateLabel = new QLabel("%");
 	QLabel* yRateLabel = new QLabel("%");
 	
@@ -372,6 +381,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//rotate
 	QLabel* rotateLabel = new QLabel("Rotate");
 	m_rotateBox = new QDoubleSpinBox();
+	m_rotateBox->setMinimum(-360.0);
+	m_rotateBox->setMaximum(360.0);
 	m_mmOrIn = new QToolButton();
 	m_ui->actionUnitChange->setText("mm");
 	m_mmOrIn->setDefaultAction(m_ui->actionUnitChange);
@@ -470,6 +481,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
+	//selected property QDoubleSpinBox's value change
+	//connect(m_posXBox, &QDoubleSpinBox::valueChanged, this, )
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -646,11 +659,6 @@ FinishRun LaserControllerWindow::finishRun()
 
 void LaserControllerWindow::setFinishRun(const FinishRun & finishRun)
 {
-}
-
-void LaserControllerWindow::setPosXBox(qreal _value)
-{
-	m_posXBox->setValue(_value);
 }
 
 void LaserControllerWindow::onActionImportSVG(bool checked)
@@ -1221,9 +1229,14 @@ void LaserControllerWindow::onActionMoveLayerDown(bool checked)
 void LaserControllerWindow::onLaserSceneSelectedChanged()
 {
     QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
-    if (items.isEmpty())
-        return;
-
+	if (items.length() == 0) {
+		m_propertyWidget->setEnabled(false);
+		return;
+	}
+	else if (items.length() > 0) {
+		m_propertyWidget->setEnabled(true);
+		selectedChange();
+	}	
     //m_ui->tableWidgetLayers->blockSignals(true);
     qLogD << "selected items count: " << items.length();
     for (LaserPrimitive* item : items)
@@ -1518,8 +1531,12 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
 		//selected properties
-		connect(m_scene, &LaserScene::selectionChanged,this, &LaserControllerWindow::selectionChange);
+		//connect(m_scene, &LaserScene::selectionChanged,this, &LaserControllerWindow::selectionChange);
 		connect(m_viewer, &LaserViewer::selectedChange, this, &LaserControllerWindow::selectedChange);
+		connect(m_posXBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
+		connect(m_posYBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
+		connect(m_widthBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
+		connect(m_heightBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
     }
 }
 //selected items change
@@ -1529,10 +1546,54 @@ void LaserControllerWindow::selectedChange()
 
 	/*m_posXBox->setValue(rect.left());
 	m_posYBox->setValue(rect.top());*/
-	int size = m_scene->selectedItems().size();
+	
+	int size = m_scene->selectedPrimitives().length();
+	if (size > 0) {
+		QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
+		if (rect.width() == 0 && rect.height() == 0) {
+			return;
+		}
+		QRectF rectReal = QRectF(m_scene->backgroundItem()->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
+		qDebug() << rectReal.top();
+		float a = Global::pixels2mmY(114);
+		qDebug() << a;
+		m_posXBox->setValue(Global::pixels2mmX(rectReal.left()));
+		m_posYBox->setValue(Global::pixels2mmX(rectReal.top()));
+		m_widthBox->setValue(Global::pixels2mmX(rectReal.width()));
+		m_heightBox->setValue(Global::pixels2mmX(rectReal.height()));
+	}
+}
+void LaserControllerWindow::selectionPropertyBoxChange()
+{
+	if (m_posXBox->value() > 9000) {
+		m_posXBox->setValue(9000);
+	}
+	if (m_posXBox->value() < -9000) {
+		m_posXBox->setValue(-9000);
+	}
+	if (m_posYBox->value() > 9000) {
+		m_posYBox->setValue(9000);
+	}
+	if (m_posYBox->value() < -9000) {
+		m_posYBox->setValue(-9000);
+	}
+	if (m_widthBox->value() > 20000) {
+		m_widthBox->setValue(20000);
+	}
+	if (m_widthBox->value() < -20000) {
+		m_widthBox->setValue(-20000);
+	}
+	if (m_heightBox->value() > 20000) {
+		m_heightBox->setValue(20000);
+	}
+	if (m_heightBox->value() < -20000) {
+		m_heightBox->setValue(-20000);
+	}
+
+	//m_viewer->resetSelectedItemsGroupRect();
 }
 //selection areas change
-void LaserControllerWindow::selectionChange()
+/*void LaserControllerWindow::selectionChange()
 {
 	if (m_scene->selectedItems().size() == 0) {
 		m_propertyWidget->setEnabled(false);
@@ -1541,7 +1602,7 @@ void LaserControllerWindow::selectionChange()
 		m_propertyWidget->setEnabled(true);
 		selectedChange();
 	}
-}
+}*/
 
 void LaserControllerWindow::bindWidgetsProperties()
 {

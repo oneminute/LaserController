@@ -8,6 +8,7 @@
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
 #include "laser/LaserDriver.h"
+#include "widget/LaserDoubleSpinBox.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
@@ -35,7 +36,6 @@ public:
     void moveLaser(const QVector3D& delta, bool relative = true, const QVector3D& abstractDest = QVector3D());
     FinishRun finishRun();
     void setFinishRun(const FinishRun& finishRun);
-	void setPosXBox(qreal _value);
 
 protected slots:
     void onActionImportSVG(bool checked = false);
@@ -95,7 +95,7 @@ protected slots:
     void onActionMoveLayerUp(bool checked = false);
     void onActionMoveLayerDown(bool checked = false);
 
-    void onLaserSceneSelectedChanged();
+    
     void onLaserViewerMouseMoved(const QPointF& pos);
     void onLaserViewerScaleChanged(qreal factor);
     void onComboBoxSxaleIndexChanged(int index);
@@ -121,8 +121,9 @@ protected slots:
     void updateOutlineTree();
     void initDocument(LaserDocument* doc);
 	//selection
+	void onLaserSceneSelectedChanged();
 	void selectedChange();//items
-	void selectionChange();
+	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
@@ -164,13 +165,13 @@ private:
 	QWidget* m_propertyWidget;
 	QLabel* m_posXLabel;
 	QLabel* m_posYLabel;
-	QDoubleSpinBox* m_posXBox;
-	QDoubleSpinBox* m_posYBox;
+	LaserDoubleSpinBox* m_posXBox;
+	LaserDoubleSpinBox* m_posYBox;
 	QToolButton* m_lockOrUnlock;
 	QLabel* m_posXUnit;
 	QLabel* m_posYUnit;
-	QDoubleSpinBox* m_widthBox;
-	QDoubleSpinBox* m_heightBox;
+	LaserDoubleSpinBox* m_widthBox;
+	LaserDoubleSpinBox* m_heightBox;
 	QLabel* m_widthUnit;
 	QLabel* m_heightUnit;
 	QDoubleSpinBox* m_xRateBox;

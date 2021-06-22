@@ -204,21 +204,29 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		painter.drawEllipse(groupOrigin, 5, 5);
 
 		painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
-		QPolygonF boundingRect = this->mapFromScene(m_group->boundingRect());
+		QPolygonF boundingRect = this->mapFromScene(selectedItemsSceneBoundingRect());
 		painter.drawPolygon(boundingRect);
 		painter.setPen(QPen(Qt::green, 1, Qt::SolidLine));
 		boundingRect = this->mapFromScene(m_selectedRect);
 		painter.drawPolygon(boundingRect);
 		painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
-		boundingRect = this->mapFromScene(m_group->sceneBoundingRect());
+		boundingRect = this->mapFromScene(selectedItemsSceneBoundingRect());
 		painter.drawPolygon(boundingRect);
 	}
 }
-/*void LaserViewer::getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom) {
-	QList<QGraphicsItem*> items = m_scene->selectedItems();
-	if (items.size() <= 0) {
-		return;
+QRectF LaserViewer::selectedItemsSceneBoundingRect() {
+	//QList<QGraphicsItem*> items = m_scene->selectedItems();
+	QRectF rect;
+	
+	QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
+	
+	if (items.length() <= 0) {
+		return rect;
 	}
+	qreal left = 0;
+	qreal right = 0;
+	qreal top = 0;
+	qreal bottom = 0;
 	for (int i = 0; i < items.size(); i++) {
 		LaserPrimitive* item = (LaserPrimitive*)items[i];
 		QRectF boundingRect = item->sceneBoundingRect();
@@ -247,14 +255,28 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 			}
 		}
 	}
-}*/
+	rect = QRectF(left, top, right - left, bottom - top);
+	return rect;
+}
+void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect)
+{
+	if (m_group && !m_group->isEmpty()) {
+		QRectF bounds = selectedItemsSceneBoundingRect();
+		QTransform t = m_group->transform();
+		//move
+		QPointF diff = _sceneRect.topLeft() - bounds.topLeft();
+		t.translate(diff.x(), diff.y());
+		m_group->setTransform(t, true);
+		//resize
+
+	}
+}
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
     
     qreal left, right, top, bottom;
-	//getSelctedItemsRect(left, right, top, bottom);
-	QRectF rect = m_group->sceneBoundingRect();
-	//rect = m_group->transform().mapRect(rect);
+	//QRectF rect = m_group->sceneBoundingRect();
+	QRectF rect = selectedItemsSceneBoundingRect();
 	left = rect.left();
 	right = rect.right();
 	top = rect.top();
@@ -415,10 +437,12 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
             {
-				m_selectedRect = m_group->sceneBoundingRect();
+				//m_selectedRect = m_group->sceneBoundingRect();
+				m_selectedRect = selectedItemsSceneBoundingRect();
 				m_oldTransform = m_group->transform();
 				m_rate = 1;
-				QRectF boundRect = m_group->sceneBoundingRect();
+				//QRectF boundRect = m_group->sceneBoundingRect();
+				QRectF boundRect = selectedItemsSceneBoundingRect();
 				qLogD << "group bounding rect: " << boundRect;
 				switch (m_curSelectedHandleIndex)
 				{
@@ -484,6 +508,9 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					for (QGraphicsItem *item : items)
 						m_group->removeFromGroup(qgraphicsitem_cast<LaserPrimitive*>(item));
 				}
+				//m_scene->removeItem(m_group);
+				//delete m_group;
+				//m_scene->destroyItemGroup(m_group);
 				m_group->setMatrix(QMatrix());
                 emit cancelSelected();
                 m_selectionStartPoint = event->pos();
@@ -744,10 +771,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 					continue;
 				m_group->addToGroup(item);
 			}
+			m_group->setSelected(true);
 		}
 		else
 		{
 			m_group = m_scene->createItemGroup(m_scene->selectedPrimitives());
+			m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+			m_group->setSelected(true);
 		}
 		m_scene->addItem(m_group);
 		
@@ -1155,8 +1185,10 @@ void LaserViewer::selectedHandleScale()
 		case 5:
 		case 8:
 		case 11: {
-			QPointF vec2 = m_mousePoint - mapFromScene(m_group->sceneBoundingRect().center());
-			QPointF vec1 = m_lastPos - mapFromScene(m_group->sceneBoundingRect().center());
+			//QPointF vec2 = m_mousePoint - mapFromScene(m_group->sceneBoundingRect().center());
+			//QPointF vec1 = m_lastPos - mapFromScene(m_group->sceneBoundingRect().center());
+			QPointF vec2 = m_mousePoint - mapFromScene(selectedItemsSceneBoundingRect().center());
+			QPointF vec1 = m_lastPos - mapFromScene(selectedItemsSceneBoundingRect().center());
 			QVector2D v1(vec1);
 			QVector2D v2(vec2);
 			v1.normalize();
