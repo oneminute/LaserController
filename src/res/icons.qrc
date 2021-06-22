@@ -49,5 +49,7 @@
         <file>images/cut_edge.png</file>
         <file>images/path_opt.png</file>
         <file>images/handle_rotate.png</file>
+        <file>images/lock.png</file>
+        <file>images/unlock.png</file>
     </qresource>
 </RCC>
