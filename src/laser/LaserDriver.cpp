@@ -6,14 +6,15 @@
 #include <QFile>
 #include <QDataStream>
 
+#include "LaserDevice.h"
+#include "LaserRegister.h"
+#include "exception/LaserException.h"
 #include "state/StateController.h"
-#include "task/ConnectionTask.h"
-#include "task/DisconnectionTask.h"
-#include "task/MachiningTask.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 
-QMap<int, QString> LaserDriver::m_registerComments;
+QMap<int, QString> LaserDriver::g_registerComments;
+LaserDriver* LaserDriver::g_driver(nullptr);
 
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
@@ -25,9 +26,15 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_parentWidget(nullptr)
     , m_isDownloading(false)
     , m_packagesCount(0)
+    , m_device(nullptr)
+    , m_isClosed(false)
 {
-    ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDriver::comPortConnected);
-    ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDriver::comPortDisconnected);
+    if (g_driver)
+    {
+        throw LaserFatalException(tr("Device driver initialize failure."));
+    }
+    g_driver = this;
+
     ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
     ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
     ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
@@ -35,7 +42,7 @@ LaserDriver::LaserDriver(QObject* parent)
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
 
-    QFile deviceCache("dev_cache.bin");
+    /*QFile deviceCache("dev_cache.bin");
     if (!deviceCache.open(QIODevice::ReadOnly))
     {
         qWarning() << "Can not read cache file!";
@@ -53,24 +60,28 @@ LaserDriver::LaserDriver(QObject* parent)
         m_registers.insert(static_cast<RegisterType>(i.key()), i.value());
     }
 
-    deviceCache.close();
+    deviceCache.close();*/
 }
 
 LaserDriver::~LaserDriver()
 {
-    unload();
+    //unload();
+    g_driver = nullptr;
+    qLogD << "driver destroyed";
 }
 
 LaserDriver & LaserDriver::instance()
 {
-    static LaserDriver driver;
-    return driver;
+    return *g_driver;
 }
 
 void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCount)
 {
+    if (instance().m_isClosed)
+        return;
+
     float progress = position * 1.0f / totalCount;
-    qDebug() << "Progress callback handler:" << position << totalCount << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4)
+    qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4)
 ;
     if (instance().m_isDownloading)
     {
@@ -80,156 +91,22 @@ void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCoun
 
 void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t * sysEventData)
 {
-    QString eventData = QString::fromWCharArray(sysEventData);
-    qDebug() << "System message callback handler:" << sysMsgIndex << sysMsgCode << eventData;
-    switch (sysMsgCode)
-    {
-    case InitComPortError:      
-    {
-        emit instance().comPortError(tr("Initialize com port error."));
-    }
-    break;
-    case ComPortExceptionError: 
-    {
-        emit instance().comPortError(tr("Com port exception."));
-    }
-    break;
-    case ComPortNotOpened:      
-    {
-        emit instance().comPortError(tr("Can not open com port."));
-    }
-    break;
-    case ComPortOpened:    
-    {
-        instance().m_isConnected = true;
-        emit instance().comPortConnected();
-    }
-    break;
-    case ComPortClosed:    
-    {
-        instance().m_isConnected = false;
-        emit instance().comPortDisconnected();
-    }
-    break;
-    case StartWorking:    
-    {
-        instance().m_isMachining = true;
-        emit instance().machiningStarted();
-    }
-    break;
-    case USBArrival:    
-    {
+    if (instance().m_isClosed)
+        return;
 
-    }
-    break;
-    case USBRemove:    
+    QString eventData = QString::fromWCharArray(sysEventData);
+    qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event id = " << eventData;
+    if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
     {
+        emit instance().raiseError(sysMsgCode, eventData);
     }
-    break;
-    case DataTransformed:   
+    else if (sysMsgCode >= M_Base)
     {
-        //emit instance().downloaded();
-    }
-    break;
-    case ReadSysParamFromCardError:
-    {
-        emit instance().sysParamFromCardError();
-    }
-    break;
-    case ReadSysParamFromCardOK:    
-    {
-        parseAndRefreshRegisters(eventData);
-        emit instance().registersFectched(instance().m_registers);
-        emit instance().sysParamFromCardArrived(eventData);
-    }
-    break;
-    case WriteSysParamToCardOK:
-    {
-        parseAndRefreshRegisters(eventData);
-        emit instance().registersFectched(instance().m_registers);
-        emit instance().sysParamFromCardArrived(eventData);
-    }
-    break;
-    case UnknownError:
-    {
-        emit instance().unknownError();
-    }
-    break;
-    case PauseWorking:    
-    {
-        instance().m_isPaused = true;
-        emit instance().machiningPaused();
-    }
-    break;
-    case StopWorking:    
-    {
-        emit instance().machiningStopped();
-    }
-    break;
-    case GetComPortListError:
-    {
-        emit instance().comPortsFetchError();
-    }
-    break;
-    case GetComPortListOK:
-    {
-        QStringList portNames = eventData.split(";");
-        emit instance().comPortsFetched(portNames);
-    }
-    break;
-    case CancelCurrentWork:
-    {
-        emit instance().workingCanceled();
-    }
-    break;
-    case ReturnWorkState:
-    {
-        LaserState state;
-        if (state.parse(eventData))
-        {
-            emit instance().workStateUpdated(state);
-        }
-    }
-    break;
-    case NotWorking:
-    {
-        emit instance().idle();
-    }
-    break;
-    case WorkFinished:    
-    {
-        instance().m_isMachining = false;
-        emit instance().machiningStopped();
-    }
-    break;
-    case FactoryPasswordValid:
-    {
-        emit instance().rightManufacturerPassword();
-    }
-    break;
-    case FactoryPasswordInvalid:
-    {
-        emit instance().wrongManufacturerPassword();
-    }
-    break;
-    case ChangeFactoryPasswordOK:
-    {
-        emit instance().changeManufacturerPasswordOk();
-    }
-    break;
-    case ChangeFactoryPasswordError:
-    {
-        emit instance().changeManufacturerPasswordFailure();
-    }
-    break;
-    case FactoryPasswordLengthError:
-    {
-        emit instance().wrongManufacturerPassword();
-    }
+        emit instance().sendMessage(sysMsgCode, eventData);
     }
 }
 
-void LaserDriver::parseAndRefreshRegisters(QString &eventData)
+void LaserDriver::parseAndRefreshRegisters(QString &eventData, RegistersMap& registers)
 {
     //instance().m_registers.clear();
     for (QString i : eventData.split(";"))
@@ -249,7 +126,15 @@ void LaserDriver::parseAndRefreshRegisters(QString &eventData)
             continue;
 
         QVariant value = tokens[1];
-        instance().m_registers.insert((RegisterType)addr, value);
+        
+        if (registers.contains(addr))
+        {
+            registers[addr] = value;
+        }
+        else
+        {
+            registers.insert(addr, value);
+        }
     }
 
     QFile deviceCache("dev_cache.bin");
@@ -274,7 +159,7 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 
 bool LaserDriver::load()
 {
-    m_registerComments.insert(REG_03, tr("Reset calib speed."));
+    /*m_registerComments.insert(REG_03, tr("Reset calib speed."));
     m_registerComments.insert(REG_04, tr("Engraving Launching Speed."));
     m_registerComments.insert(REG_05, tr("Move fast speed."));
     m_registerComments.insert(REG_06, tr("Cutting speed."));
@@ -307,7 +192,7 @@ bool LaserDriver::load()
     m_registerComments.insert(REG_36, tr("Custom 3 Y."));
     m_registerComments.insert(REG_38, tr("Layout size."));
     m_registerComments.insert(REG_39, tr("Painting unit."));
-    m_registerComments.insert(REG_40, tr("Move fast launching speed."));
+    m_registerComments.insert(REG_40, tr("Move fast launching speed."));*/
 
     if (m_isLoaded)
         return true;
@@ -331,8 +216,6 @@ bool LaserDriver::load()
     //m_fnProcDataProgressCallBack = (FNProcDataProgressCallBack)m_library.resolve("ProcDataProgressCallBack");
     m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
 
-    m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
-    m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
     //m_fnProcDataProgressCallBack(LaserDriver::ProcDataProgressCallBackHandler);
 
     m_fnInitComPort = (FN_INT_INT)m_library.resolve("InitComPort");
@@ -345,6 +228,9 @@ bool LaserDriver::load()
 
     m_fnWriteSysParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteSysParamToCard");
     m_fnReadSysParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadSysParamFromCard");
+    m_fnWriteUserParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteUserParamToCard");
+    m_fnReadUserParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadUserParamFromCard");
+
     m_fnShowAboutWindow = (FN_VOID_VOID)m_library.resolve("ShowAboutWindow");
     m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactoryPassWord");
     m_fnWriteFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("WriteFactoryPassWord");
@@ -378,7 +264,18 @@ void LaserDriver::unload()
     if (m_isLoaded)
         m_fnUnInitLib();
     m_isLoaded = false;
+    m_isClosed = true;
     emit libraryUnloaded();
+}
+
+void LaserDriver::setDevice(LaserDevice* device)
+{
+    m_device = device;
+}
+
+LaserDevice* LaserDriver::device() const
+{
+    return m_device;
 }
 
 QString LaserDriver::getVersion()
@@ -395,9 +292,11 @@ QString LaserDriver::getCompileInfo()
     return info;
 }
 
-void LaserDriver::init(QWidget* parentWidget)
+void LaserDriver::init(int winId)
 {
-    m_fnInitLib(parentWidget->winId());
+    m_fnInitLib(winId);
+    m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
+    m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
     emit libraryInitialized();
 }
 
@@ -414,11 +313,6 @@ QStringList LaserDriver::getPortList()
     QStringList portNames = portList.split(";");
     
     return portNames;
-}
-
-void LaserDriver::getPortListAsyn()
-{
-    m_fnGetComPortList();
 }
 
 bool LaserDriver::initComPort(const QString & name)
@@ -467,7 +361,7 @@ bool LaserDriver::writeSysParamToCard(const RegistersMap& values)
     QString addrBuf, valuesBuf;
     QStringList addrList;
     QStringList valuesList;
-    for (QMap<RegisterType, QVariant>::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
+    for (LaserDriver::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
         valuesList.append(i.value().toString());
@@ -508,10 +402,68 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllSysParamFromCard()
 {
     QList<int> params;
-    params << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15
-        << 16 << 18 << 19 << 20 << 21 << 22 << 23 << 24 << 25 << 27 << 31 << 32 << 34 << 35 << 36 << 38 << 39 << 40;
-    //params << 2 ;
+    for (int i = 0; i < 52; i++)
+    {
+        params << i;
+    }
     return readSysParamFromCard(params);
+}
+
+bool LaserDriver::writeUserParamToCard(const RegistersMap& values)
+{
+    if (values.count() == 0)
+        return false;
+
+    QString addrBuf, valuesBuf;
+    QStringList addrList;
+    QStringList valuesList;
+    for (LaserDriver::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
+    {
+        addrList.append(QString("%1").arg(i.key()));
+        valuesList.append(i.value().toString());
+    }
+    addrBuf = addrList.join(",");
+    valuesBuf = valuesList.join(",");
+
+    wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
+    wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
+
+    qDebug() << "address list: " << addrBuf;
+    qDebug() << "values list: " << valuesBuf;
+    
+    bool success = m_fnWriteUserParamToCard(wcAddrs, wcValues) != -1;
+    delete[] wcAddrs;
+    delete[] wcValues;
+    return success;
+}
+
+bool LaserDriver::readUserParamFromCard(QList<int> addresses)
+{
+    if (addresses.length() == 0)
+        return false;
+
+    QStringList addrList;
+    for (int i = 0; i < addresses.length(); i++)
+    {
+        addrList.append(QString("%1").arg(addresses[i]));
+    }
+    QString addrStr = addrList.join(",");
+    wchar_t* addrBuf = typeUtils::qStringToWCharPtr(addrStr);
+    
+    bool success = m_fnReadUserParamFromCard(addrBuf) != -1;
+    delete[] addrBuf;
+    return success;
+}
+
+bool LaserDriver::readAllUserParamFromCard()
+{
+    QList<int> params;
+    for (int i = 0; i < 23; i++)
+    {
+        params << i;
+    }
+    return readSysParamFromCard(params);
+
 }
 
 void LaserDriver::showAboutWindow()
@@ -622,12 +574,12 @@ void LaserDriver::getDeviceWorkState()
     m_fnGetDeviceWorkState();
 }
 
-void LaserDriver::setRegister(RegisterType rt, QVariant value)
+void LaserDriver::setSystemRegister(LaserDriver::SystemRegisterType rt, QVariant value)
 {
     m_registers[rt] = value;
 }
 
-bool LaserDriver::getRegister(RegisterType rt, QVariant & value)
+bool LaserDriver::getSystemRegister(LaserDriver::SystemRegisterType rt, QVariant & value)
 {
     if (m_registers.contains(rt))
     {
@@ -637,36 +589,22 @@ bool LaserDriver::getRegister(RegisterType rt, QVariant & value)
     return false;
 }
 
-QString LaserDriver::registerComment(RegisterType rt)
-{
-    if (m_registerComments.contains(rt))
-        return m_registerComments[rt];
-    return QString("");
-}
+//QString LaserDriver::registerComment(RegisterType rt)
+//{
+//    if (m_registerComments.contains(rt))
+//        return m_registerComments[rt];
+//    return QString("");
+//}
 
 bool LaserDriver::getLayout(float & width, float & height)
 {
-    if (!m_registers.contains(RT_LAYOUT_SIZE))
+    if (!m_registers.contains(LaserDriver::RT_X_MAX_LENGTH) || 
+        !m_registers.contains(LaserDriver::RT_Y_MAX_LENGTH))
         return false;
 
-    int pageSize = m_registers[RT_LAYOUT_SIZE].toInt();
-    width = (pageSize >> 16) & 0x0000FFFF;
-    height = pageSize & 0x0000FFFF;
+    width = m_registers[RT_X_MAX_LENGTH].toInt();
+    height = m_registers[RT_Y_MAX_LENGTH].toInt();
 
     return true;
 }
 
-ConnectionTask * LaserDriver::createConnectionTask(QWidget* parentWidget)
-{
-    return new ConnectionTask(&instance(), parentWidget);
-}
-
-DisconnectionTask * LaserDriver::createDisconnectionTask(QWidget * parentWidget)
-{
-    return new DisconnectionTask(&instance(), parentWidget);
-}
-
-MachiningTask * LaserDriver::createMachiningTask(const QString & filename, bool zeroPointStyle)
-{
-    return new MachiningTask(&instance(), filename, zeroPointStyle);
-}

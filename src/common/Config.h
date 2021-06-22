@@ -141,7 +141,7 @@ public:
         }
     };
 
-    CONFIG_ITEM_STRING(General, Language, "English", false)
+    CONFIG_ITEM_INT(General, Language, 25, false)
 	CONFIG_ITEM_INT(General, Unit, (int)SU_MM, false)
 
     CONFIG_ITEM_INT(Layers, MaxLayersCount, 16, false)
@@ -183,11 +183,15 @@ public:
     CONFIG_ITEM_DOUBLE(PltUtils, MaxAnglesDiff, 5.0, false)
     CONFIG_ITEM_DOUBLE(PltUtils, MaxIntervalDistance, 10.0, false)
 
+    CONFIG_ITEM_BOOL(Device, AutoConnectFirst, true, false)
+
 private:
     Config();
+    ~Config();
 
 public:
     static void load();
+    static void loadTitlesAndDescriptions();
     static void save();
     static void restore();
     static QString configFilePath();

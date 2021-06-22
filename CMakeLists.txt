@@ -53,7 +53,6 @@ add_subdirectory(src/widget/LRWidgets)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
     src
-    src/algorithm/wykobi
     ${Boost_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
@@ -68,6 +67,9 @@ FILE(GLOB BASE_SOURCES src/*.cpp)
 
 FILE(GLOB COMMON_HEADERS src/common/*.h)
 FILE(GLOB COMMON_SOURCES src/common/*.cpp)
+
+FILE(GLOB EXCEPTION_HEADERS src/exception/*.h)
+FILE(GLOB EXCEPTION_SOURCES src/exception/*.cpp)
 
 FILE(GLOB HALFTONE_HEADERS src/halftone/*.h)
 FILE(GLOB HALFTONE_SOURCES src/halftone/*.cpp)
@@ -105,10 +107,9 @@ FILE(GLOB WIDGET_SOURCES src/widget/*.cpp)
 FILE(GLOB ALGORITHM_HEADERS src/algorithm/*.h)
 FILE(GLOB ALGORITHM_SOURCES src/algorithm/*.cpp)
 
-FILE(GLOB WYKOBI_HEADERS src/algorithm/wykobi/*.inl)
-FILE(GLOB WYKOBI_SOURCES src/algorithm/wykobi/*.hpp)
-
 FILE(GLOB MOCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_autogen/*.cpp)
+FILE(GLOB DOCS docs/*.*)
+LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 
 set(OTHER_FILES
     config.json
@@ -123,13 +124,14 @@ set(OTHER_FILES
 
 source_group("ui" FILES ${UIS})
 source_group("others" FILES ${OTHER_FILES})
+source_group("docs" FILES ${DOCS})
 
 set(HEADER_FILES
     ${HEADER_FILES}
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
+    ${EXCEPTION_HEADERS}
     ${ALGORITHM_HEADERS}
-    ${WYKOBI_HEADERS}
     ${HALFTONE_HEADERS}
     ${IMPORT_HEADERS}
     ${LASER_HEADERS}
@@ -146,6 +148,7 @@ set(SRC_FILES
     ${SRC_FILES}
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
+    ${EXCEPTION_SOURCES}
     ${ALGORITHM_SOURCES}
     ${WYKOBI_SOURCES}
     ${HALFTONE_SOURCES}
@@ -167,8 +170,8 @@ IF(MSVC)
     source_group("header\\common" FILES ${COMMON_HEADERS})
     source_group("source\\algorithm" FILES ${ALGORITHM_SOURCES})
     source_group("header\\algorithm" FILES ${ALGORITHM_HEADERS})
-    source_group("source\\wykobi" FILES ${WYKOBI_SOURCES})
-    source_group("header\\wykobi" FILES ${WYKOBI_HEADERS})
+    source_group("source\\exception" FILES ${EXCEPTION_SOURCES})
+    source_group("header\\exception" FILES ${EXCEPTION_HEADERS})
     source_group("source\\halftone" FILES ${HALFTONE_SOURCES})
     source_group("header\\halftone" FILES ${HALFTONE_HEADERS})
     source_group("source\\import" FILES ${IMPORT_SOURCES})
@@ -190,6 +193,7 @@ IF(MSVC)
     source_group("header\\widget" FILES ${WIDGET_HEADERS})
     source_group("source\\widget" FILES ${WIDGET_SOURCES})
     source_group("source\\mocs" FILES ${MOCS})
+    source_group("header" FILES ${BASE_HEADERS})
     source_group("source" FILES ${BASE_SOURCES})
     source_group("res" FILES ${RES})
 ENDIF(MSVC)
@@ -207,9 +211,9 @@ set(LINK_LIBRARIES
 )
 
 if(ANDROID)
-  add_library(LaserController SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${TS_FILES})
+  add_library(LaserController SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS} ${TS_FILES})
 else()
-  add_executable(LaserController ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES})
+  add_executable(LaserController ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS})
 endif()
 
 target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
@@ -220,16 +224,14 @@ set_target_properties(
 
 add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
 target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})
-#add_executable(TestWykobi test/TestWykobi.cpp)
-#target_link_libraries(TestWykobi PRIVATE ${LINK_LIBRARIES})
 add_executable(TestQtClosestPoint test/TestQtClosestPoint.cpp)
 target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
-#add_executable(TestQt2Wykobi test/TestQt2Wykobi.cpp)
-#target_link_libraries(TestQt2Wykobi PRIVATE ${LINK_LIBRARIES})
 add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
 target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
 add_executable(TestQPainterPath test/TestQPainterPath.cpp)
 target_link_libraries(TestQPainterPath PRIVATE ${LINK_LIBRARIES})
+add_executable(TestException test/TestException.cpp src/exception/LaserException.h)
+target_link_libraries(TestException PRIVATE ${LINK_LIBRARIES})
 
 set(QM_FILES
     ${QM_FILES}

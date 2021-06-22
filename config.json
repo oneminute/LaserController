@@ -83,10 +83,10 @@
     },
     "General": {
         "Language": {
-            "defaultValue": "English",
+            "defaultValue": 31,
             "name": "Language",
-            "type": 4,
-            "value": "中文"
+            "type": 0,
+            "value": 25
         },
         "Unit": {
             "defaultValue": 4,

@@ -79,9 +79,11 @@ protected slots:
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
 
-    void onDriverComPortsFetched(const QStringList& ports);
-    void onDriverComPortConnected();
-    void onDriverComPortDisconnected(bool isError = false, const QString& errorMsg = "");
+    void onDeviceComPortsFetched(const QStringList& ports);
+    void onDeviceConnected();
+    void onDeviceDisconnected();
+    void onMainCardRegistered();
+    void onMainCardActivated();
 
     void onWindowCreated();
 
@@ -144,6 +146,8 @@ private:
 
     // widgets on status bar
     QLabel* m_statusBarStatus;
+    QLabel* m_statusBarRegister;
+    QLabel* m_statusBarActivation;
     QLabel* m_statusBarTips;
     QLabel* m_statusBarCoordinate;
     QLabel* m_statusBarLocation;

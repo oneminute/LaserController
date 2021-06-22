@@ -908,16 +908,16 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     int scanInterval = 7;
     double yPulseLength = 0.006329114;
     QVariant value;
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
+    /*if (LaserDriver::instance().getRegister(LaserDriver::RT_SCAN_ROW_SPACING, value))
     {
         qDebug() << "row step register:" << value;
         scanInterval = value.toInt();
     }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_X_AXIS_PULSE_LENGTH, value))
+    if (LaserDriver::instance().getRegister(LaserDriver::RT_SCAN_ROW_SPEED, value))
     {
         qDebug() << "y pulse register:" << value;
         yPulseLength = value.toDouble() / 1000.0;
-    }
+    }*/
     qreal pixelInterval = scanInterval * yPulseLength;
 
 	qreal boundingWidth = Global::convertToMM(SU_PX, d->boundingRect.width());
@@ -1055,7 +1055,7 @@ QByteArray LaserShape::engravingImage(cv::Mat& canvas)
     int scanInterval = 7;
     double yPulseLength = 0.006329114;
     QVariant value;
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
+    /*if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
     {
         qDebug() << "row step register:" << value;
         scanInterval = value.toInt();
@@ -1064,7 +1064,7 @@ QByteArray LaserShape::engravingImage(cv::Mat& canvas)
     {
         qDebug() << "y pulse register:" << value;
         yPulseLength = value.toDouble() / 1000.0;
-    }
+    }*/
     qreal pixelInterval = scanInterval * yPulseLength;
 
     QList<SliceGroup> groups;

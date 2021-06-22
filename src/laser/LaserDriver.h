@@ -7,7 +7,10 @@
 #include <QVector3D>
 #include <QWidget>
 
+#include "LaserDefines.h"
 #include "task/Task.h"
+
+class LaserDevice;
 
 enum LaserWorkMode
 {
@@ -85,151 +88,151 @@ class LaserDriver : public QObject
     Q_OBJECT
 
 public:
-    enum SysMsgCode
+    enum SystemRegisterType
     {
-        InitComPortError = 1,
-        UnInitComPortError = 2,
-        SendDataStrError = 3,
-        SendDataBufError = 4,
-        InitializeError = 5,
-        UninitializeError = 6,
-        ComPortExceptionError = 7,
-        GraphicMaxSizeError = 8,
-        SendStreamError = 9,
-        SendCommandError = 10,
-        DecryptCommandError = 11,
-        RetransTimeOutError = 12,
-        TransCompleteOK = 13,
-        ComPortNotOpened = 14,
-        GraphicMinSizeError = 15,
-        NoneDataTransError = 16,
-        ComPortOpened = 17,
-        ComPortClosed = 18,
-        TransTimeOutError = 19,
-        DataFormatError = 20,
-        FileNotExistsError = 21,
-        FunctionRestrict = 22,
-        SendDataError = 23,
-        ReceiveWrongDataOutTimes = 24,
-        StartWorking = 25,
-        ImageDataError = 26,
-        USBArrival = 27,
-        USBRemove = 28,
-        DataTransformed = 29,
-        ReadSysParamFromCardError = 30,
-        WriteSysParamToCardError = 31,
-        ReadSysParamFromCardOK = 32,
-        WriteSysParamToCardOK = 33,
-        ReturnTextMsgFromCallBack = 34,
-        UnknownError = 35,
-        PauseWorking = 36,
-        ContinueWorking = 37,
-        StopWorking = 38,
-        MotorLock = 39,
-        MotorUnlock = 40,
-        LaserLightOn = 41,
-        LaserLightOff = 42,
-        TimeOutResend = 43,
-        DisabledOnWorking = 44,
-        GetComPortListError = 45,
-        GetComPortListOK = 46,
-        MachineOffLine = 47,
-        ComPortIndexErr = 48,
-        SystemFatalError = 49,
-        ComPortNotAvailable = 50,
-        CancelCurrentWork = 51,
-        ReturnWorkState = 52,
-        CanNotDoOnWorking = 53,
-        RequestAndContinue = 54,
-        BreakpointResume = 55,
-        NotWorking = 56,
-        BreakpointDataError = 57,
-        WorkFinished = 58,
-        EnlockerNotExists = 59,
-        FactoryPasswordValid = 60,
-        FactoryPasswordInvalid = 61,
-        ChangeFactoryPasswordOK = 62,
-        ChangeFactoryPasswordError = 63,
-        FactoryPasswordLengthError = 64,
-        FactoryPasswordExpired = 65,
-        MainCardRegisterOK = 66,
-        MainCardRegisterError = 67,
-        MachineWorking = 68
+        REG_SYS_09 = 9,                     
+        RT_SYS_RUN_TIME = 9,
+        REG_SYS_10 = 10,
+        RT_LASER_RUN_TIME = 10,
+        REG_SYS_11 = 11,                     
+        RT_SYS_RUN_NUM = 11,
+        REG_SYS_12 = 12,                     
+        RT_X_MAX_LENGTH = 12,
+        REG_SYS_13 = 13,                     
+        RT_X_DIR_PHASE = 13,
+        REG_SYS_14 = 14,                     
+        RT_X_LIMIT_PHASE = 14,
+        REG_SYS_15 = 15,                     
+        RT_X_ZERO_DEV = 15,
+        REG_SYS_16 = 16,                    
+        RT_X_STEP_LENGTH = 16,
+        REG_SYS_17 = 17,                    
+        RT_X_LIMIT_NUM = 17,
+        REG_SYS_18 = 18,                    
+        RT_SYS_X_RESET_ENABLED = 18,
+        REG_SYS_19 = 19,                    
+        RT_X_MOTOR_NUM = 19,
+        REG_SYS_20 = 20,                    
+        RT_X_MOTOR_I = 20,
+        REG_SYS_21 = 21,                    
+        RT_X_START_SPEED = 21,
+        REG_SYS_22 = 22,                    
+        RT_X_MAX_SPEED = 22,
+        REG_SYS_23 = 23,                    
+        RT_X_MAX_A = 23,
+        REG_SYS_24 = 24,                    
+        RT_X_URGENT_A = 24,
+        REG_SYS_25 = 25,                    
+        RT_Y_MAX_LENGTH = 25,
+        REG_SYS_26 = 26,                    
+        RT_Y_DIR_PHASE = 26,
+        REG_SYS_27 = 27,                    
+        RT_Y_LIMIT_PHASE = 27,
+        REG_SYS_28 = 28,                    
+        RT_Y_ZERO_DEV = 28,
+        REG_SYS_29 = 29,                    
+        RT_Y_STEP_LENGTH = 29,
+        REG_SYS_30 = 30,                    
+        RT_Y_LIMIT_NUM = 30,
+        REG_SYS_31 = 31,                    
+        RT_SYS_Y_RESET_ENABLED = 31,
+        REG_SYS_32 = 32,
+        RT_Y_MOTOR_NUM = 32,
+        REG_SYS_33 = 33,
+        RT_Y_MOTOR_I = 33,
+        REG_SYS_34 = 34,
+        RT_Y_START_SPEED = 34,
+        REG_SYS_35 = 35,
+        RT_Y_MAX_SPEED = 35,
+        REG_SYS_36 = 36,
+        RT_Y_MAX_A = 36,
+        REG_SYS_37 = 37,
+        RT_Y_URGENT_A = 37,
+        REG_SYS_38 = 38,
+        RT_Z_MAX_LENGTH = 38,
+        REG_SYS_39 = 39,
+        RT_Z_LIMIT_PHASE = 39,
+        REG_SYS_40 = 40,
+        RT_Z_ZERO_DEV = 40,
+        REG_SYS_41 = 41,
+        RT_Z_STEP_LENGTH = 41,
+        REG_SYS_42 = 42,
+        RT_Z_LIMIT_NUM = 42,
+        REG_SYS_43 = 43,
+        RT_SYS_Z_RESET_ENABLED = 43,
+        REG_SYS_44 = 44,
+        RT_Z_MOTOR_NUM = 44,
+        REG_SYS_45 = 45,
+        RT_Z_MOTOR_I = 45,
+        REG_SYS_46 = 46,
+        RT_Z_START_SPEED = 46,
+        REG_SYS_47 = 47,
+        RT_Z_MAX_SPEED = 47,
+        REG_SYS_48 = 48,
+        RT_Z_MAX_A = 48,
+        REG_SYS_49 = 49,
+        RT_Z_URGENT_A = 49,
+        REG_SYS_50 = 50,
+        RT_LASER_MAX_POWER = 50,
+        REG_SYS_51 = 51,
+        RT_LASER_MIN_POWER = 51,
+        REG_SYS_52 = 52,
+        RT_LASER_POWER_FREQ = 52
     };
 
-    enum RegisterType
+    enum UserRegisterType
     {
-        REG_03 = 3,                     
-        RT_RESET_CALIB_SPEED = 3,
-        REG_04 = 4,
-        RT_ENGRAVING_LAUNCING_SPEED = 4,
-        REG_05 = 5,                     
-        RT_MOVE_FAST_SPEED = 5,
-        REG_06 = 6,                     
-        RT_CUTTING_SPEED = 6,
-        REG_07 = 7,                     
-        RT_MOVE_TO_ORI_SPEED = 7,
-        REG_08 = 8,                     
-        RT_WORKING_QUADRANT = 8,
-        REG_09 = 9,                     
-        RT_X_AXIS_PULSE_LENGTH = 9,
-        REG_10 = 10,                    
-        RT_Y_AXIS_PULSE_LENGTH = 10,
-        REG_11 = 11,                    
-        RT_X_AXIS_BACKLASH = 11,
-        REG_12 = 12,                    
-        RT_Y_AXIS_BACKLASH = 12,
-        REG_13 = 13,                    
-        RT_ENGRAVING_COLUMN_STEP = 13,
-        REG_14 = 14,                    
-        RT_ENGRAVING_ROW_STEP = 14,
-        REG_15 = 15,                    
-        RT_LIGHT_ON_DELAY = 15,
-        REG_16 = 16,                    
-        RT_LIGHT_OFF_DELAY = 16,
-        REG_17 = 17,                    
-        RT_MIN_ENGRAVING_GRAY_VALUE = 17,
-        REG_18 = 18,                    
-        RT_CUTTING_LASER_POWER = 18,
-        REG_19 = 19,                    
-        RT_MIN_LASER_ENERGY = 19,
-        REG_20 = 20,                    
-        RT_MAX_LASER_ENERGY = 20,
-        REG_21 = 21,                    
-        RT_MACHINE_PHASE = 21,
-        REG_22 = 22,                    
-        RT_LIMIT_PHASE = 22,
-        REG_23 = 23,                    
-        RT_TOTAL_WORKING_DURATION = 23,
-        REG_24 = 24,                    
-        RT_TOTAL_LASER_DURATION = 24,
-        REG_25 = 25,                    
-        RT_CUTTING_LASER_FREQ = 25,
-        REG_26 = 26,                    
-        RT_REGISTION = 26,
-        REG_27 = 27,                    
-        RT_ENGRAVING_LASER_FREQ = 27,
-        REG_31 = 31,                    
-        RT_CUSTOM_1_X = 31,
-        REG_32 = 32,                    
-        RT_CUSTOM_1_Y = 32,
-        REG_33 = 33,                    
-        RT_CUSTOM_2_X = 33,
-        REG_34 = 34,                    
-        RT_CUSTOM_2_Y = 34,
-        REG_35 = 35,                    
-        RT_CUSTOM_3_X = 35,
-        REG_36 = 36,                    
-        RT_CUSTOM_3_Y = 36,
-        REG_38 = 38,                    
-        RT_LAYOUT_SIZE = 38,
-        REG_39 = 39,                    
-        RT_PAINTING_UNIT = 39,
-        REG_40 = 40,                    
-        RT_MOVE_FAST_LAUNCHING_SPEED = 40
+        REG_USER_00 = 0,
+        RT_HEAD = 0,
+        REG_USER_01 = 1,
+        RT_ACC_MODE = 1,
+        REG_USER_02 = 2,
+        RT_CUT_MOVE_SPEED = 2,
+        REG_USER_03 = 3,
+        RT_CUT_MOVE_A = 3,
+        REG_USER_04 = 4,
+        RT_CUT_TURN_SPEED = 4,
+        REG_USER_05 = 5,
+        RT_CUT_TURN_A = 5,
+        REG_USER_06 = 6,
+        RT_CUT_WORK_A = 6,
+        REG_USER_07 = 7,
+        RT_CUT_MOVE_SPEED_PER = 7,
+        REG_USER_08 = 8,
+        RT_CUT_WORK_SPEED_PER = 8,
+        REG_USER_09 = 9,
+        RT_CUT_SPOT_SIZE = 9,
+        REG_USER_10 = 10,
+        RT_SCAN_X_START_SPEED = 10,
+        REG_USER_11 = 11,
+        RT_SCAN_Y_START_SPEED = 11,
+        REG_USER_12 = 12,
+        RT_SCAN_X_A = 12,
+        REG_USER_13 = 13,
+        RT_SCAN_Y_A = 13,
+        REG_USER_14 = 14,
+        RT_SCAN_ROW_SPEED = 14,
+        REG_USER_15 = 15,
+        RT_SCAN_ROW_SPACING = 15,
+        REG_USER_16 = 16,
+        RT_SCAN_RETURN_ERR = 16,
+        REG_USER_17 = 17,
+        RT_SCAN_LASER_POWER = 17,
+        REG_USER_18 = 18,
+        RT_USER_X_RESET_ENABLED = 18,
+        REG_USER_19 = 19,
+        RT_USER_Y_RESET_ENABLED = 19,
+        REG_USER_20 = 20,
+        RT_USER_Z_RESET_ENABLED = 20,
+        REG_USER_21 = 21,
+        RT_RETURN_POS = 21,
+        REG_USER_22 = 22,
+        RT_BACKLASH_X = 22,
+        REG_USER_23 = 23,
+        RT_BACKLASH_Y = 23
     };
 
-    typedef QMap<RegisterType, QVariant> RegistersMap;
+    typedef QMap<int, QVariant> RegistersMap;
 
 private:
     typedef wchar_t* (*FN_WCHART_VOID)();
@@ -264,34 +267,40 @@ private:
 
     typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double millimeter, bool xaxis);
 
+public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
 
-public:
     static LaserDriver& instance();
     static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
     static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
-    static void parseAndRefreshRegisters(QString &eventData);
+    static void parseAndRefreshRegisters(QString &eventData, RegistersMap& registers);
     static void ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount);
 
     bool load();
     void unload();
+    void setDevice(LaserDevice* device);
+    LaserDevice* device() const;
 
     QString getVersion();
     QString getCompileInfo();
-    void init(QWidget* parentWidget);
+    void init(int winId);
     void unInit();
     QStringList getPortList();
-    void getPortListAsyn();
     bool initComPort(const QString& name);
     bool uninitComPort();
     void setTransTimeOutInterval(int interval);
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
     void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
+
     bool writeSysParamToCard(const RegistersMap& values);
     bool readSysParamFromCard(QList<int> addresses);
     bool readAllSysParamFromCard();
+    bool writeUserParamToCard(const RegistersMap& values);
+    bool readUserParamFromCard(QList<int> addresses);
+    bool readAllUserParamFromCard();
+
     void showAboutWindow();
     bool checkFactoryPassword(const QString& password);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
@@ -314,24 +323,20 @@ public:
     bool isMachining() const { return m_isMachining; }
     QString portName() const { return m_portName; }
 
-    void setRegister(RegisterType rt, QVariant value);
-    bool getRegister(RegisterType rt, QVariant& value);
-    QString registerComment(RegisterType rt);
+    void setSystemRegister(SystemRegisterType rt, QVariant value);
+    bool getSystemRegister(SystemRegisterType rt, QVariant& value);
+    //QString registerComment(RegisterType rt);
     bool getLayout(float& width, float& height);
 
-    static ConnectionTask* createConnectionTask(QWidget* parentWidget);
-    static DisconnectionTask* createDisconnectionTask(QWidget* parentWidget);
-    static MachiningTask* createMachiningTask(const QString& filename, bool zeroPointStyle = false);
+protected slots:
 
 signals:
     void libraryLoaded(bool success = true);
     void libraryUnloaded();
     void libraryInitialized();
     void libraryUninitialized();
-    void comPortConnected();
-    void comPortDisconnected(bool isError = false, const QString& errorMsg = "");
+
     void comPortError(const QString& errorMsg);
-    void comPortsFetched(const QStringList& ports);
     void comPortsFetchError();
     void machiningStarted();
     void machiningPaused();
@@ -351,6 +356,8 @@ signals:
     void wrongManufacturerPassword();
     void changeManufacturerPasswordOk();
     void changeManufacturerPasswordFailure();
+    void raiseError(int code, const QString& message);
+    void sendMessage(int code, const QString& message);
 
 private:
     bool m_isLoaded;
@@ -387,6 +394,8 @@ private:
 
     FN_INT_WCHART_WCHART m_fnWriteSysParamToCard;
     FN_INT_WCHART m_fnReadSysParamFromCard;
+    FN_INT_WCHART_WCHART m_fnWriteUserParamToCard;
+    FN_INT_WCHART m_fnReadUserParamFromCard;
 
     FN_VOID_VOID m_fnShowAboutWindow;
     FN_INT_WCHART m_fnCheckFactoryPassword;
@@ -412,7 +421,11 @@ private:
 
     wchar_t m_wcharBuffer[2048];
 
-    static QMap<int, QString> m_registerComments;
+    LaserDevice* m_device;
+    bool m_isClosed;
+
+    static QMap<int, QString> g_registerComments;
+    static LaserDriver* g_driver;
 };
 
 #endif // LASERCONTROLLER_H

@@ -130,8 +130,8 @@ void DeviceSettingsDialog::onPushButtonReadClicked(bool checked)
 
 void DeviceSettingsDialog::onPushButtonWriteClicked(bool checked)
 {
-    QMap<LaserDriver::RegisterType, QVariant> values;
-    values[LaserDriver::REG_18] = QString::number(m_ui->editSliderCuttingPower->value());
+    LaserDriver::RegistersMap values;
+    /*values[LaserDriver::REG_18] = QString::number(m_ui->editSliderCuttingPower->value());
     values[LaserDriver::REG_20] = QString::number(m_ui->editSliderCuttingStartPowerRate->value());
     values[LaserDriver::REG_19] = QString::number(m_ui->editSliderCuttingRunPowerRate->value());
 
@@ -162,7 +162,7 @@ void DeviceSettingsDialog::onPushButtonWriteClicked(bool checked)
     int pageSize = 0;
     pageSize = m_ui->editSliderPageWidth->value() << 16 | m_ui->editSliderPageHeight->value();
     values[LaserDriver::REG_38] = pageSize;
-    values[LaserDriver::REG_39] = m_ui->editSliderDrawingUnit->value();
+    values[LaserDriver::REG_39] = m_ui->editSliderDrawingUnit->value();*/
 
     LaserDriver::instance().writeSysParamToCard(values);
 }
@@ -190,9 +190,9 @@ void DeviceSettingsDialog::onPushButtonResetClicked(bool checked)
     connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &DeviceSettingsDialog::rightManufactorPassword);
 }
 
-void DeviceSettingsDialog::registersFetched(const QMap<LaserDriver::RegisterType, QVariant>& datas)
+void DeviceSettingsDialog::registersFetched(const LaserDriver::RegistersMap& datas)
 {
-    m_ui->editSliderCuttingStartSpeed->setValue(15);
+    /*m_ui->editSliderCuttingStartSpeed->setValue(15);
     m_ui->editSliderCuttingRunSpeed->setValue(50);
     m_ui->editSliderCuttingPower->setValue(datas[LaserDriver::REG_18].toInt());
     m_ui->editSliderCuttingStartPowerRate->setValue(datas[LaserDriver::REG_20].toInt());
@@ -231,5 +231,5 @@ void DeviceSettingsDialog::registersFetched(const QMap<LaserDriver::RegisterType
     m_ui->editSliderPageWidth->setValue(pageWidth);
     m_ui->editSliderPageHeight->setValue(pageHeight);
 
-    m_ui->editSliderDrawingUnit->setValue(datas[LaserDriver::REG_39].toInt());
+    m_ui->editSliderDrawingUnit->setValue(datas[LaserDriver::REG_39].toInt());*/
 }

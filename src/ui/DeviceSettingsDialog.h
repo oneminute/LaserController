@@ -22,7 +22,7 @@ public:
     void makeDefault();
 
 protected slots:
-    void registersFetched(const QMap<LaserDriver::RegisterType, QVariant>& datas);
+    void registersFetched(const LaserDriver::RegistersMap& datas);
     void rightManufactorPassword();
     void wrongManufactorPassword();
 

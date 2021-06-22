@@ -15,18 +15,16 @@
 #include <QTimer>
 #include <QTreeWidgetItem>
 
+#include "LaserApplication.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "import/Importer.h"
-#include "laser/LaserDriver.h"
+#include "laser/LaserDevice.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
-#include "task/ConnectionTask.h"
-#include "task/DisconnectionTask.h"
-#include "task/MachiningTask.h"
 #include "ui/ConfigDialog.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/HalftoneDialog.h"
@@ -240,9 +238,23 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     // init status bar
     m_statusBarStatus = new QLabel;
     m_statusBarStatus->setText(tr("Tips"));
-    m_statusBarStatus->setMinimumWidth(120);
+    m_statusBarStatus->setMinimumWidth(60);
     m_statusBarStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarStatus);
+    m_ui->statusbar->addWidget(utils::createSeparator());
+
+    m_statusBarRegister = new QLabel;
+    m_statusBarRegister->setText(tr("Unregistered"));
+    m_statusBarRegister->setMinimumWidth(60);
+    m_statusBarRegister->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarRegister);
+    m_ui->statusbar->addWidget(utils::createSeparator());
+
+    m_statusBarActivation = new QLabel;
+    m_statusBarActivation->setText(tr("Inactivated"));
+    m_statusBarActivation->setMinimumWidth(60);
+    m_statusBarActivation->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarActivation);
     m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarTips = new QLabel;
@@ -359,17 +371,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
     connect(m_comboBoxScale, &QComboBox::currentTextChanged, this, &LaserControllerWindow::onComboBoxSxaleTextChanged);
 
-    connect(&LaserDriver::instance(), &LaserDriver::comPortsFetched, this, &LaserControllerWindow::onDriverComPortsFetched);
-    connect(&LaserDriver::instance(), &LaserDriver::comPortConnected, this, &LaserControllerWindow::onDriverComPortConnected);
-    connect(&LaserDriver::instance(), &LaserDriver::comPortDisconnected, this, &LaserControllerWindow::onDriverComPortDisconnected);
+    connect(LaserApplication::device, &LaserDevice::comPortsFetched, this, &LaserControllerWindow::onDeviceComPortsFetched);
+    connect(LaserApplication::device, &LaserDevice::connected, this, &LaserControllerWindow::onDeviceConnected);
+    connect(LaserApplication::device, &LaserDevice::disconnected, this, &LaserControllerWindow::onDeviceDisconnected);
+    connect(LaserApplication::device, &LaserDevice::mainCardRegistered, this, &LaserControllerWindow::onMainCardRegistered);
+    connect(LaserApplication::device, &LaserDevice::mainCardActivated, this, &LaserControllerWindow::onMainCardActivated);
     connect(&LaserDriver::instance(), &LaserDriver::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
     connect(&LaserDriver::instance(), &LaserDriver::registersFectched, this, &LaserControllerWindow::onLaserRegistersFetched);
-    //connect(&LaserDriver::instance(), &LaserDriver::machiningStarted, this, &LaserControllerWindow::onStarted);
-    //connect(&LaserDriver::instance(), &LaserDriver::machiningPaused, this, &LaserControllerWindow::onPaused);
-    //connect(&LaserDriver::instance(), &LaserDriver::downloading, this, &LaserControllerWindow::onDownloading);
-    //connect(&LaserDriver::instance(), &LaserDriver::downloaded, this, &LaserControllerWindow::onDownloaded);
-    //connect(&LaserDriver::instance(), &LaserDriver::machiningStopped, this, &LaserControllerWindow::onStopped);
-    //connect(&LaserDriver::instance(), &LaserDriver::machiningCompleted, this, &LaserControllerWindow::onCompleted);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
@@ -454,6 +462,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     }
 
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
+    qLogD << "main window initialized";
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -471,27 +480,27 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
     QVariant value;
 
     // Get Quadrant;
-    if (!LaserDriver::instance().getRegister(LaserDriver::RT_WORKING_QUADRANT, value))
+    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_WORKING_QUADRANT, value))
     {
         QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
         return;
-    }
+    }*/
     QUADRANT quad = static_cast<QUADRANT>(value.toInt());
 
     // Get registor #5
-    if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_SPEED, value))
+    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_SPEED, value))
     {
         QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
         return;
-    }
+    }*/
     int moveFastSpeed = value.toInt();
 
     // Get registor #40
-    if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_LAUNCHING_SPEED, value))
+    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_LAUNCHING_SPEED, value))
     {
         QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
         return;
-    }
+    }*/
     int moveFastLaunchingSpeed = value.toInt();
 
     // Get layout size
@@ -1041,7 +1050,7 @@ void LaserControllerWindow::onActionText(bool checked)
 	}
 }
 
-void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)
+void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
     {
@@ -1054,14 +1063,24 @@ void LaserControllerWindow::onDriverComPortsFetched(const QStringList & ports)
     }
 }
 
-void LaserControllerWindow::onDriverComPortConnected()
+void LaserControllerWindow::onDeviceConnected()
 {
-    m_statusBarStatus->setText(tr("Device Connected"));
+    m_statusBarStatus->setText(tr("Connected"));
 }
 
-void LaserControllerWindow::onDriverComPortDisconnected(bool isError, const QString & errorMsg)
+void LaserControllerWindow::onDeviceDisconnected()
 {
-    m_statusBarStatus->setText(tr("Device Disconnected"));
+    m_statusBarStatus->setText(tr("Disconnected"));
+}
+
+void LaserControllerWindow::onMainCardRegistered()
+{
+    m_statusBarRegister->setText(tr("Registered"));
+}
+
+void LaserControllerWindow::onMainCardActivated()
+{
+    m_statusBarActivation->setText(tr("Activated"));
 }
 
 void LaserControllerWindow::onWindowCreated()
@@ -1070,14 +1089,6 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::onEnterDeviceUnconnectedState()
 {
-    static bool first = true;
-    if (first)
-    {
-        LaserDriver::instance().load();
-        LaserDriver::instance().init(this);
-        LaserDriver::instance().getPortListAsyn();
-        first = false;
-    }
     m_ui->toolButtonConnect->setDefaultAction(m_ui->actionConnect);
 }
 
@@ -1201,7 +1212,7 @@ void LaserControllerWindow::onEditSliderLaserEngergyMaxChanged(int value)
 
 void LaserControllerWindow::onLaserRegistersFetched(const LaserDriver::RegistersMap & registers)
 {
-    if (registers.contains(LaserDriver::RT_CUTTING_LASER_POWER))
+    /*if (registers.contains(LaserDriver::RT_CUTTING_LASER_POWER))
     {
         m_ui->editSliderLaserPower->setValue(registers[LaserDriver::RT_CUTTING_LASER_POWER].toInt());
     }
@@ -1247,7 +1258,7 @@ void LaserControllerWindow::onLaserRegistersFetched(const LaserDriver::Registers
         m_ui->doubleSpinBoxOrigin1Y->setMaximum(height);
         m_ui->doubleSpinBoxOrigin2Y->setMaximum(height);
         m_ui->doubleSpinBoxOrigin3Y->setMaximum(height);
-    }
+    }*/
 }
 
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
@@ -1272,44 +1283,44 @@ void LaserControllerWindow::lightOffLaser()
 
 void LaserControllerWindow::readMachiningOrigins(bool checked)
 {
-    LaserDriver::instance().readSysParamFromCard(QList<int>() 
+    /*LaserDriver::instance().readSysParamFromCard(QList<int>() 
         << LaserDriver::RT_CUSTOM_1_X
         << LaserDriver::RT_CUSTOM_1_Y
         << LaserDriver::RT_CUSTOM_2_X
         << LaserDriver::RT_CUSTOM_2_Y
         << LaserDriver::RT_CUSTOM_3_X
         << LaserDriver::RT_CUSTOM_3_Y
-    );
+    );*/
 }
 
 void LaserControllerWindow::writeMachiningOrigins(bool checked)
 {
-    LaserDriver::RegistersMap values;
+    /*LaserDriver::RegistersMap values;
     values[LaserDriver::RT_CUSTOM_1_X] = m_ui->doubleSpinBoxOrigin1X->value();
     values[LaserDriver::RT_CUSTOM_1_Y] = m_ui->doubleSpinBoxOrigin1Y->value();
     values[LaserDriver::RT_CUSTOM_2_X] = m_ui->doubleSpinBoxOrigin2X->value();
     values[LaserDriver::RT_CUSTOM_2_Y] = m_ui->doubleSpinBoxOrigin2Y->value();
     values[LaserDriver::RT_CUSTOM_3_X] = m_ui->doubleSpinBoxOrigin3X->value();
     values[LaserDriver::RT_CUSTOM_3_Y] = m_ui->doubleSpinBoxOrigin3Y->value();
-    LaserDriver::instance().writeSysParamToCard(values);
+    LaserDriver::instance().writeSysParamToCard(values);*/
 }
 
 void LaserControllerWindow::readMachiningPower(bool checked)
 {
-    LaserDriver::instance().readSysParamFromCard(QList<int>() 
+    /*LaserDriver::instance().readSysParamFromCard(QList<int>() 
         << LaserDriver::RT_CUTTING_LASER_POWER
         << LaserDriver::RT_MIN_LASER_ENERGY
         << LaserDriver::RT_MAX_LASER_ENERGY
-    );
+    );*/
 }
 
 void LaserControllerWindow::writeMachiningPower(bool checked)
 {
-    LaserDriver::RegistersMap values;
+   /* LaserDriver::RegistersMap values;
     values[LaserDriver::RT_CUTTING_LASER_POWER] = m_ui->editSliderLaserPower->value();
     values[LaserDriver::RT_MIN_LASER_ENERGY] = m_ui->editSliderLaserEnergyMin->value();
     values[LaserDriver::RT_MAX_LASER_ENERGY] = m_ui->editSliderLaserEnergyMax->value();
-    LaserDriver::instance().writeSysParamToCard(values);
+    LaserDriver::instance().writeSysParamToCard(values);*/
 }
 
 void LaserControllerWindow::updatePostEventWidgets(int index)
@@ -1362,13 +1373,13 @@ void LaserControllerWindow::laserBackToMachiningOriginalPoint(bool checked)
 
 void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 {
-    QVariant value;
+    /*QVariant value;
     if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_TO_ORI_SPEED,value))
     {
         QMessageBox::warning(this, tr("Read registers failure"), tr("Cannot read registers value!"));
         return;
     }
-    LaserDriver::instance().lPenMoveToOriginalPoint(value.toDouble());
+    LaserDriver::instance().lPenMoveToOriginalPoint(value.toDouble());*/
 }
 
 void LaserControllerWindow::updateOutlineTree()

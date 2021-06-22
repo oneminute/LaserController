@@ -55,25 +55,25 @@ void RegistersDialog::onRegistersItemChanged(QTableWidgetItem * item)
     if (newText != oldText)
     {
         item->setBackgroundColor(Qt::red);
-        m_changedRegisters[(LaserDriver::RegisterType)addr] = newText;
+        m_changedRegisters[addr] = newText;
     }
     else
     {
         item->setBackgroundColor(Qt::white);
-        if (m_changedRegisters.contains((LaserDriver::RegisterType)addr))
+        if (m_changedRegisters.contains(addr))
         {
-            m_changedRegisters.remove((LaserDriver::RegisterType)addr);
+            m_changedRegisters.remove(addr);
         }
     }
 }
 
-void RegistersDialog::registersFetched(const QMap<LaserDriver::RegisterType, QVariant>& datas)
+void RegistersDialog::registersFetched(const LaserDriver::RegistersMap& datas)
 {
     m_ui->tableWidgetRegisters->blockSignals(true);
     m_ui->tableWidgetRegisters->setRowCount(datas.count());
 
     int i = 0;
-    for (QMap<LaserDriver::RegisterType, QVariant>::ConstIterator it = datas.constBegin(); it != datas.constEnd(); it++)
+    for (LaserDriver::RegistersMap::ConstIterator it = datas.constBegin(); it != datas.constEnd(); it++)
     {
         int addr = it.key();
         QVariant value = it.value();
@@ -93,7 +93,7 @@ void RegistersDialog::registersFetched(const QMap<LaserDriver::RegisterType, QVa
         m_ui->tableWidgetRegisters->setItem(i, 1, valueItem);
 
         QTableWidgetItem* commentItem = new QTableWidgetItem;
-        commentItem->setText(LaserDriver::instance().registerComment((LaserDriver::RegisterType)addr));
+        //commentItem->setText(LaserDriver::instance().registerComment(addr));
         m_ui->tableWidgetRegisters->setItem(i, 2, commentItem);
         flags = commentItem->flags();
         flags &= ~Qt::ItemIsEditable;

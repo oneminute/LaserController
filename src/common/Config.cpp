@@ -33,7 +33,46 @@ Config::ConfigItem::ConfigItem(const QString & _prefix, const QString & _name, c
     }
 }
 
+Config::~Config()
+{
+}
+
 void Config::load()
+{
+    QFile configFile(configFilePath());
+    if (!configFile.open(QFile::Text | QFile::ReadOnly))
+    {
+        QMessageBox::warning(nullptr, QObject::tr("Open Failure"), QObject::tr("An error occured when opening configuration file!"));
+        return;
+    }
+
+    QByteArray data = configFile.readAll();
+
+    QJsonDocument doc(QJsonDocument::fromJson(data));
+
+    QJsonObject json = doc.object();
+    for (QJsonObject::ConstIterator g = json.constBegin(); g != json.constEnd(); g++)
+    {
+        QString prefix = g.key();
+        QJsonObject group = g.value().toObject();
+
+        for (QJsonObject::ConstIterator i = group.constBegin(); i != group.constEnd(); i++)
+        {
+            QString name = i.key();
+            QJsonObject itemObj = i.value().toObject();
+
+            QString key = QString("%1/%2").arg(prefix).arg(name);
+            items[key].value = itemObj["value"].toVariant();
+            items[key].defaultValue = itemObj["defaultValue"].toVariant();
+
+            qDebug() << items[key].toString();
+        }
+    }
+
+    configFile.close();
+}
+
+void Config::loadTitlesAndDescriptions()
 {
     GeneralLanguageItem()->title = QObject::tr("Language");
     GeneralLanguageItem()->description = QObject::tr("Language for both UI and Business.");
@@ -99,38 +138,8 @@ void Config::load()
     PltUtilsMaxAnglesDiffItem()->description = QObject::tr("Max angles diff between tow points.");
     PltUtilsMaxIntervalDistanceItem()->title = QObject::tr("Max interval distance");
     PltUtilsMaxIntervalDistanceItem()->description = QObject::tr("Max interval distance between tow points.");
-
-    QFile configFile(configFilePath());
-    if (!configFile.open(QFile::Text | QFile::ReadOnly))
-    {
-        QMessageBox::warning(nullptr, QObject::tr("Open Failure"), QObject::tr("An error occured when opening configuration file!"));
-        return;
-    }
-
-    QByteArray data = configFile.readAll();
-
-    QJsonDocument doc(QJsonDocument::fromJson(data));
-
-    QJsonObject json = doc.object();
-    for (QJsonObject::ConstIterator g = json.constBegin(); g != json.constEnd(); g++)
-    {
-        QString prefix = g.key();
-        QJsonObject group = g.value().toObject();
-
-        for (QJsonObject::ConstIterator i = group.constBegin(); i != group.constEnd(); i++)
-        {
-            QString name = i.key();
-            QJsonObject itemObj = i.value().toObject();
-
-            QString key = QString("%1/%2").arg(prefix).arg(name);
-            items[key].value = itemObj["value"].toVariant();
-            items[key].defaultValue = itemObj["defaultValue"].toVariant();
-
-            qDebug() << items[key].toString();
-        }
-    }
-
-    configFile.close();
+    DeviceAutoConnectFirstItem()->title = QObject::tr("Auto connect first");
+    DeviceAutoConnectFirstItem()->description = QObject::tr("Auto connect to first com port when found multiple laser devices.");
 }
 
 void Config::save()

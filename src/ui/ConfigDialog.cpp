@@ -42,9 +42,10 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     // setup general config items
     QComboBox* comboBoxLanguages = new QComboBox;
-    comboBoxLanguages->addItem(tr("English"));
-    comboBoxLanguages->addItem(tr("Chinese"));
-    int languageItem = comboBoxLanguages->findText(Config::GeneralLanguage());
+
+    comboBoxLanguages->addItem(QLocale::languageToString(QLocale::English), QLocale::English);
+    comboBoxLanguages->addItem(QLocale::languageToString(QLocale::Chinese), QLocale::Chinese);
+    int languageItem = comboBoxLanguages->findText(QLocale::languageToString((QLocale::Language)Config::GeneralLanguage()));
     if (languageItem == -1)
     {
         QMessageBox::warning(this, tr("Config Error"), QString(tr("The language \"%1\" reading from config file can not be recognized. Please check your config file.")).arg(Config::GeneralLanguage()));

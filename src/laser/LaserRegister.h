@@ -3,13 +3,32 @@
 
 #include <QObject>
 
+class LaserRegister;
+class LaserDriver;
 class LaserRegisterPrivate;
 class LaserRegister : public QObject
 {
     Q_OBJECT
 public:
-    explicit LaserRegister(QObject* parent = nullptr);
-    explicit LaserRegister(int addr, const QVariant& defaultValue, QObject* parent = nullptr);
+    explicit LaserRegister(int addr, const QString& name = "", const QString& description = "", 
+        bool isSystem = true, bool readOnly = false, LaserDriver* parent = nullptr);
+    virtual ~LaserRegister();
+
+    int address() const;
+    QString name() const;
+    QString description() const;
+    bool readOnly() const;
+
+    QVariant value() const;
+    void setValue(const QVariant& value);
+
+    bool readAsync();
+    bool writeAsync();
+
+signals:
+    void readyRead(const QVariant& value);
+    void readyWritten();
+    void valueChanged(const QVariant& value);
 
 private:
     QScopedPointer<LaserRegisterPrivate> m_ptr;
