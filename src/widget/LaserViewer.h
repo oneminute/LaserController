@@ -7,6 +7,7 @@
 #include <QTextEdit>
 class RulerWidget;
 class LaserScene;
+class LaserPrimitiveGroup;
 //Spline Node Struct
 struct SplineNodeStruct {
 	QPointF node;
@@ -36,13 +37,17 @@ public:
 	LaserScene* scene();
 	void setHorizontalRuler(RulerWidget* _r);
 	void setVerticalRuler(RulerWidget * _r);
-
+	LaserPrimitiveGroup* group();
+	QRectF selectedItemsSceneBoundingRect();
+	void resetSelectedItemsGroupRect(QRectF _sceneRect);
 private:
     void init();
 	void initSpline();
 	void creatTextEdit();
 	void releaseTextEdit();
-	void selectedHandleScale(QPainter& painter);
+	void selectedHandleScale();
+	void selectedHandleRotate();
+	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
 
 public slots:
     void zoomIn();
@@ -73,6 +78,8 @@ signals:
 	void readySpline();
 	void creatingText();
 	void readyText();
+	void selectedEding();
+	void selectedChange();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -80,6 +87,7 @@ protected:
 	void setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
+	
 	//mouse
 	virtual void leaveEvent(QEvent *event) override;
 	virtual void enterEvent(QEvent *event) override;
@@ -148,6 +156,19 @@ private:
 	QPoint m_mousePoint;
 	int m_curSelectedHandleIndex = -1;
 	QRectF m_selectedRect;
+	//QMap<LaserPrimitive*, QPointF> m_selectedItemsDxDy;
+
+	QPointF m_origin;
+	QPointF m_originUntrans;
+	QPointF m_newOrigin;
+	//QPointF m_groupOldTranslate;
+	QPoint m_lastPos;
+	qreal m_rate;
+	QTransform m_oldTransform;
+	qreal m_radians;
+
+	qreal m_selectedEditCount = 0;
+	LaserPrimitiveGroup* m_group;
 };
 
 #endif // LASERVIEWER_H

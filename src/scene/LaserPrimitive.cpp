@@ -10,6 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <Eigen/Core>
 #include <QTextEdit>
+#include <QGraphicsSceneMouseEvent>
 
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
@@ -71,11 +72,9 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     //this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
     //this->setFlag(ItemIsFocusable, true);
-
     //this->setAcceptHoverEvents(true);
-	this->setAcceptedMouseButtons(false);
-
     d->nodeName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
+	
 }
 
 LaserPrimitive::~LaserPrimitive()
@@ -89,20 +88,37 @@ LaserDocument* LaserPrimitive::document() const
     Q_D(const LaserPrimitive);
     return d->doc; 
 }
+/*void LaserPrimitive::setScaleValue(qreal x, qreal y) {
+	m_scaleX = x;
+	m_scaleY = y;
+}
+void LaserPrimitive::setScaleTranslate(qreal x, qreal y) {
+	m_scaleTX = x;
+	m_scaleTY = y;
+}
+void LaserPrimitive::setSelectedEditingMatrix(QMatrix mat) {
+	m_selectedEditingMatrix = mat;
+}
 
+void LaserPrimitive::setSelectedEditingState(int state) {
+	m_selectedEditingState = state;
+}*/
+void setSelectedInGroup(bool selected) {
+
+}
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
-    qLogD << "primitive " << d->nodeName << " painter transform : " << painter->transform();
+    //qLogD << "primitive " << d->nodeName << " painter transform : " << painter->transform();
 
     QRectF bounds = boundingRect();
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
     
-    
     QColor color = Qt::blue;
+	painter->setPen(QPen(color, 1, Qt::SolidLine));
     if (d->layer)
     {
         color = d->layer->color();
@@ -110,8 +126,11 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
 	if (isSelected())
 	{
+		isSelected();
+		
 		painter->setPen(QPen(Qt::green, 1.2f, Qt::DashLine));
 	    painter->drawRect(bounds);
+		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
 	}
 	//else if (isUnderMouse())
 	else if (d->isHover)
@@ -119,7 +138,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
 		painter->drawRect(bounds);
 	}
-    painter->setPen(QPen(color, 1, Qt::SolidLine));
+    
     draw(painter);
 
     QPainterPath outline = this->outline();
@@ -131,7 +150,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
-    QRectF bounds = transform().mapRect(d->boundingRect);
+    //QRectF bounds = transform().mapRect(d->boundingRect);
+	QRectF bounds = d->boundingRect;
     return bounds;
 }
 
@@ -373,20 +393,25 @@ void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 
 void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
-	QGraphicsObject::mousePressEvent(event);
+	//QGraphicsObject::mousePressEvent(event);
     qLogD << "mousePressEvent: " << nodeName();
 	/*if (!this->isSelected()) {
 		LaserDocument* document = (LaserDocument*)this->QObject::parent();
 		document->scene()->clearSelection();
 	}*/
 	
-    update();
+    //update();
+}
+
+void LaserPrimitive::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
+	event->accept();
+	
 }
 
 void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-	QGraphicsObject::mouseReleaseEvent(event);
-    update();
+	//QGraphicsObject::mouseReleaseEvent(event);
+    //update();
 }
 
 class LaserShapePrivate : public LaserPrimitivePrivate

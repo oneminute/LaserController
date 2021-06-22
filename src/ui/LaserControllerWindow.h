@@ -5,21 +5,26 @@
 #include <QMainWindow>
 #include <QScopedPointer>
 #include <QDir>
-
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
 #include "laser/LaserDriver.h"
+#include "widget/LaserDoubleSpinBox.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
 
+class QWidget;
 class LaserViewer;
 class LaserScene;
 class QComboBox;
 class QLabel;
 class QTreeWidgetItem;
 class QPushButton;
+class QGridLayout;
+class QDoubleSpinBox;
+class QToolButton;
+class QRadioButton;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -95,7 +100,7 @@ protected slots:
     void onActionMoveLayerUp(bool checked = false);
     void onActionMoveLayerDown(bool checked = false);
 
-    void onLaserSceneSelectedChanged();
+    
     void onLaserViewerMouseMoved(const QPointF& pos);
     void onLaserViewerScaleChanged(qreal factor);
     void onComboBoxSxaleIndexChanged(int index);
@@ -120,6 +125,10 @@ protected slots:
     void laserResetToOriginalPoint(bool checked = false);
     void updateOutlineTree();
     void initDocument(LaserDocument* doc);
+	//selection
+	void onLaserSceneSelectedChanged();
+	void selectedChange();//items
+	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
@@ -158,7 +167,33 @@ private:
     QLabel* m_statusBarCopyright;
 
     QList<LayerButton*> m_layerButtons;
-
+	//selected items properties
+	QGridLayout* m_propertyLayout;
+	QWidget* m_propertyWidget;
+	QLabel* m_posXLabel;
+	QLabel* m_posYLabel;
+	LaserDoubleSpinBox* m_posXBox;
+	LaserDoubleSpinBox* m_posYBox;
+	QToolButton* m_lockOrUnlock;
+	QLabel* m_posXUnit;
+	QLabel* m_posYUnit;
+	LaserDoubleSpinBox* m_widthBox;
+	LaserDoubleSpinBox* m_heightBox;
+	QLabel* m_widthUnit;
+	QLabel* m_heightUnit;
+	QDoubleSpinBox* m_xRateBox;
+	QDoubleSpinBox* m_yRateBox;
+	QRadioButton* m_topLeftBtn;
+	QRadioButton* m_topCenterBtn;
+	QRadioButton* m_topRightBtn;
+	QRadioButton* m_bottomLeftBtn;
+	QRadioButton* m_bottomCenterBtn;
+	QRadioButton* m_bottomRightBtn;
+	QRadioButton* m_leftCenterBtn;
+	QRadioButton* m_centerBtn;
+	QRadioButton* m_rightCenterBtn;
+	QDoubleSpinBox* m_rotateBox;
+	QToolButton* m_mmOrIn;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

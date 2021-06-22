@@ -14,6 +14,8 @@
 #include <QThread>
 #include <QTimer>
 #include <QTreeWidgetItem>
+#include <QGridLayout>
+#include "scene/LaserPrimitiveGroup.h"
 
 #include "LaserApplication.h"
 #include "common/common.h"
@@ -303,6 +305,110 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->actionSplineTool->setCheckable(true);
 	m_ui->actionEditSplineTool->setCheckable(true);
 	m_ui->actionTextTool->setCheckable(true);
+	//init selected items properties
+	m_propertyLayout = new QGridLayout(m_ui->properties);
+	m_propertyLayout->setMargin(0);
+	m_propertyLayout->setSpacing(3);
+	//posx, posy, lock, unlcok
+	m_posXLabel = new QLabel("XPos");
+	m_posYLabel = new QLabel("YPos");
+	m_posXBox = new LaserDoubleSpinBox();
+	m_posXBox->setMinimum(-DBL_MAX);
+	m_posXBox->setMaximum(DBL_MAX);
+	m_posYBox = new LaserDoubleSpinBox();
+	m_posYBox->setMinimum(-DBL_MAX);
+	m_posYBox->setMaximum(DBL_MAX);
+	m_posXUnit = new QLabel("mm");
+	m_posYUnit = new QLabel("mm");
+	m_lockOrUnlock = new QToolButton();
+	m_lockOrUnlock->setDefaultAction(m_ui->actionLock);
+
+	m_propertyLayout->addWidget(m_posXLabel, 0, 0);
+	m_propertyLayout->addWidget(m_posYLabel, 1, 0);
+	m_propertyLayout->addWidget(m_posXBox, 0, 1);
+	m_propertyLayout->addWidget(m_posYBox, 1, 1);
+	m_propertyLayout->addWidget(m_posXUnit, 0, 2);
+	m_propertyLayout->addWidget(m_posYUnit, 1, 2);
+	m_propertyLayout->addWidget(m_lockOrUnlock, 0, 3, 2, 1);
+
+	//width, height
+	QLabel* widthLabel = new QLabel("Width");
+	QLabel* heightLabel = new QLabel("Height");
+	m_widthBox = new LaserDoubleSpinBox();
+	m_widthBox->setMinimum(-DBL_MAX);
+	m_widthBox->setMaximum(DBL_MAX);
+	m_heightBox = new LaserDoubleSpinBox();
+	m_heightBox->setMinimum(-DBL_MAX);
+	m_heightBox->setMaximum(DBL_MAX);
+	m_widthUnit = new QLabel("mm");
+	m_heightUnit = new QLabel("mm");
+
+	m_propertyLayout->addWidget(widthLabel, 0, 4);
+	m_propertyLayout->addWidget(heightLabel, 1, 4);
+	m_propertyLayout->addWidget(m_widthBox, 0, 5);
+	m_propertyLayout->addWidget(m_heightBox, 1, 5);
+	m_propertyLayout->addWidget(m_widthUnit, 0, 6);
+	m_propertyLayout->addWidget(m_heightUnit, 1, 6);
+
+	//rate
+	m_xRateBox = new QDoubleSpinBox();
+	m_yRateBox = new QDoubleSpinBox();
+
+	QLabel* xRateLabel = new QLabel("%");
+	QLabel* yRateLabel = new QLabel("%");
+	
+	m_propertyLayout->addWidget(m_xRateBox, 0, 7);
+	m_propertyLayout->addWidget(m_yRateBox, 1, 7);
+	m_propertyLayout->addWidget(xRateLabel, 0, 8);
+	m_propertyLayout->addWidget(yRateLabel, 1, 8);
+
+	//rotate
+	QGridLayout*  rotateLayout = new QGridLayout();
+	rotateLayout->setMargin(0);
+	rotateLayout->setSpacing(0);
+	rotateLayout->setAlignment(Qt::AlignCenter);
+	m_topLeftBtn = new QRadioButton();
+	m_topCenterBtn = new QRadioButton();
+	m_topRightBtn = new QRadioButton();
+	m_leftCenterBtn = new QRadioButton();
+	m_centerBtn = new QRadioButton();
+	m_rightCenterBtn = new QRadioButton();
+	m_bottomLeftBtn = new QRadioButton();
+	m_bottomCenterBtn = new QRadioButton();
+	m_bottomRightBtn = new QRadioButton();
+
+	rotateLayout->addWidget(m_topLeftBtn, 0, 0);
+	rotateLayout->addWidget(m_topCenterBtn, 0, 1);
+	rotateLayout->addWidget(m_topRightBtn, 0, 2);
+	rotateLayout->addWidget(m_leftCenterBtn, 1, 0);
+	rotateLayout->addWidget(m_centerBtn, 1, 1);
+	rotateLayout->addWidget(m_rightCenterBtn, 1, 2);
+	rotateLayout->addWidget(m_bottomLeftBtn, 2, 0);
+	rotateLayout->addWidget(m_bottomCenterBtn, 2, 1);
+	rotateLayout->addWidget(m_bottomRightBtn, 2, 2);
+	QWidget* rotateWidget = new QWidget();
+	rotateWidget->setStyleSheet(".QWidget{border-radius:2px;border:0.5px solid #d2d2d2;}");
+	rotateWidget->setLayout(rotateLayout);
+	m_propertyLayout->addWidget(rotateWidget,0, 9, 2, 2);
+	//rotate
+	QLabel* rotateLabel = new QLabel("Rotate");
+	m_rotateBox = new QDoubleSpinBox();
+	m_rotateBox->setMinimum(-360.0);
+	m_rotateBox->setMaximum(360.0);
+	m_mmOrIn = new QToolButton();
+	m_ui->actionUnitChange->setText("mm");
+	m_mmOrIn->setDefaultAction(m_ui->actionUnitChange);
+
+	m_propertyLayout->addWidget(rotateLabel, 0, 11, 2, 1);
+	m_propertyLayout->addWidget(m_rotateBox, 0, 12, 2, 1);
+	m_propertyLayout->addWidget(m_mmOrIn, 0, 13, 2, 1);
+
+	m_propertyWidget = new QWidget();
+	m_propertyWidget->setLayout(m_propertyLayout);
+	m_ui->properties->addWidget(m_propertyWidget);
+	//m_ui->properties->addWidget(m_posXLabel);
+	m_propertyWidget->setEnabled(false);
+
 
     connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
@@ -383,6 +489,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
+	//selected property QDoubleSpinBox's value change
+	//connect(m_posXBox, &QDoubleSpinBox::valueChanged, this, )
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -697,7 +805,7 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
 
     LaserLayer* layer = m_scene->document()->layers()[index];
     m_scene->blockSignals(true);
-    m_scene->clearSelection();
+    //m_scene->clearSelection();
     for (LaserPrimitive* primitive : layer->primitives())
     {
         primitive->setSelected(true);
@@ -1155,9 +1263,14 @@ void LaserControllerWindow::onActionMoveLayerDown(bool checked)
 void LaserControllerWindow::onLaserSceneSelectedChanged()
 {
     QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
-    if (items.isEmpty())
-        return;
-
+	if (items.length() == 0) {
+		m_propertyWidget->setEnabled(false);
+		return;
+	}
+	else if (items.length() > 0) {
+		m_propertyWidget->setEnabled(true);
+		selectedChange();
+	}	
     //m_ui->tableWidgetLayers->blockSignals(true);
     qLogD << "selected items count: " << items.length();
     for (LaserPrimitive* item : items)
@@ -1451,8 +1564,79 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         doc->outline();
         m_ui->tableWidgetLayers->setDocument(doc);
         m_ui->tableWidgetLayers->updateItems();
+		//selected properties
+		//connect(m_scene, &LaserScene::selectionChanged,this, &LaserControllerWindow::selectionChange);
+		connect(m_viewer, &LaserViewer::selectedChange, this, &LaserControllerWindow::selectedChange);
+		connect(m_posXBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
+		connect(m_posYBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
+		connect(m_widthBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
+		connect(m_heightBox, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::selectionPropertyBoxChange);
     }
 }
+//selected items change
+void LaserControllerWindow::selectedChange()
+{
+	//QRectF rect = m_viewer->group()->sceneBoundingRect();
+
+	/*m_posXBox->setValue(rect.left());
+	m_posYBox->setValue(rect.top());*/
+	
+	int size = m_scene->selectedPrimitives().length();
+	if (size > 0) {
+		QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
+		if (rect.width() == 0 && rect.height() == 0) {
+			return;
+		}
+		QRectF rectReal = QRectF(m_scene->backgroundItem()->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
+		qDebug() << rectReal.top();
+		float a = Global::pixels2mmY(114);
+		qDebug() << a;
+		m_posXBox->setValue(Global::pixels2mmX(rectReal.left()));
+		m_posYBox->setValue(Global::pixels2mmX(rectReal.top()));
+		m_widthBox->setValue(Global::pixels2mmX(rectReal.width()));
+		m_heightBox->setValue(Global::pixels2mmX(rectReal.height()));
+	}
+}
+void LaserControllerWindow::selectionPropertyBoxChange()
+{
+	if (m_posXBox->value() > 9000) {
+		m_posXBox->setValue(9000);
+	}
+	if (m_posXBox->value() < -9000) {
+		m_posXBox->setValue(-9000);
+	}
+	if (m_posYBox->value() > 9000) {
+		m_posYBox->setValue(9000);
+	}
+	if (m_posYBox->value() < -9000) {
+		m_posYBox->setValue(-9000);
+	}
+	if (m_widthBox->value() > 20000) {
+		m_widthBox->setValue(20000);
+	}
+	if (m_widthBox->value() < -20000) {
+		m_widthBox->setValue(-20000);
+	}
+	if (m_heightBox->value() > 20000) {
+		m_heightBox->setValue(20000);
+	}
+	if (m_heightBox->value() < -20000) {
+		m_heightBox->setValue(-20000);
+	}
+
+	//m_viewer->resetSelectedItemsGroupRect();
+}
+//selection areas change
+/*void LaserControllerWindow::selectionChange()
+{
+	if (m_scene->selectedItems().size() == 0) {
+		m_propertyWidget->setEnabled(false);
+	}
+	else if (m_scene->selectedItems().size() > 0) {
+		m_propertyWidget->setEnabled(true);
+		selectedChange();
+	}
+}*/
 
 void LaserControllerWindow::bindWidgetsProperties()
 {

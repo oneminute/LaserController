@@ -143,12 +143,17 @@ public:
 
     virtual QPainterPath outline() const;
 
+	/*void setScaleValue(qreal x, qreal y);
+	void setScaleTranslate(qreal x, qreal y);
+	void setSelectedEditingState(int state);
+	void setSelectedEditingMatrix(QMatrix mat);*/
 protected:
     QString typeName(LaserPrimitiveType typeId) const;
     QString typeLatinName(LaserPrimitiveType typeId) const;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 protected:
@@ -158,6 +163,12 @@ protected:
     Q_DISABLE_COPY(LaserPrimitive)
 
     friend class LaserDocument;
+	/*int m_selectedEditingState;
+	qreal m_scaleX = 1;
+	qreal m_scaleY = 1;
+	qreal m_scaleTX = 0;
+	qreal m_scaleTY = 0;
+	QMatrix m_selectedEditingMatrix;*/
 };
 
 //Q_DECLARE_METATYPE(LaserPrimitive)
@@ -216,6 +227,7 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
 
     virtual QPainterPath toPath() const;
+	
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)

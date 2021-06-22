@@ -10,6 +10,7 @@ class QPushButton;
 class LaserViewer;
 class LaserDocument;
 class LaserPrimitive;
+class LaserPrimitiveGroup;
 
 class LaserScene : public QGraphicsScene
 {
@@ -26,6 +27,9 @@ public:
     LaserDocument* document() { return m_doc; }
 
     QList<LaserPrimitive*> selectedPrimitives() const;
+
+	LaserPrimitiveGroup *createItemGroup(const QList<LaserPrimitive*> &items);
+	void destroyItemGroup(LaserPrimitiveGroup *group);
 
 private:
 
