@@ -238,7 +238,10 @@ bool LaserDriver::load()
     m_fnLPenMoveToOriginalPoint = (FN_VOID_DOUBLE)m_library.resolve("LPenMoveToOriginalPoint");
     m_fnLPenQuickMoveTo = (FNLPenQuickMoveTo)m_library.resolve("LPenQuickMoveTo");
     m_fnControlHDAction = (FN_VOID_INT)m_library.resolve("ControlHDAction");
+
     m_fnGetMainCardID = (FN_WCHART_VOID)m_library.resolve("GetMainCardID");
+    m_fnActiveMainCard = (FNActivationMainCard)m_library.resolve("ActivationMainCard");
+
     m_fnGetCurrentLaserPos = (FN_WCHART_VOID)m_library.resolve("GetCurrentLaserPos");
     m_fnSmallScaleMovement = (FNSmallScaleMovement)m_library.resolve("SmallScaleMovement");
     m_fnStartMachining = (FN_VOID_BOOL)m_library.resolve("StartMachining");
@@ -508,6 +511,52 @@ QString LaserDriver::getMainCardID()
 {
     QString id = QString::fromWCharArray(m_fnGetMainCardID());
     return id;
+}
+
+QString LaserDriver::activateMainCard(const QString& name, const QString& address, 
+    const QString& phone, const QString& qq, const QString& wx, const QString& email, 
+    const QString& country, const QString& distributor, const QString& trademark, 
+    const QString& model, const QString& cardId)
+{
+    wchar_t* nameBuf = typeUtils::qStringToWCharPtr(name);
+    wchar_t* addressBuf = typeUtils::qStringToWCharPtr(address);
+    wchar_t* phoneBuf = typeUtils::qStringToWCharPtr(phone);
+    wchar_t* qqBuf = typeUtils::qStringToWCharPtr(qq);
+    wchar_t* wxBuf = typeUtils::qStringToWCharPtr(wx);
+    wchar_t* emailBuf = typeUtils::qStringToWCharPtr(email);
+    wchar_t* countryBuf = typeUtils::qStringToWCharPtr(country);
+    wchar_t* distributorBuf = typeUtils::qStringToWCharPtr(distributor);
+    wchar_t* trademarkBuf = typeUtils::qStringToWCharPtr(trademark);
+    wchar_t* modelBuf = typeUtils::qStringToWCharPtr(model);
+    wchar_t* cardIdBuf = typeUtils::qStringToWCharPtr(cardId);
+
+    /*char* nameBuf = typeUtils::qStringToCharPtr(name);
+    char* addressBuf = typeUtils::qStringToCharPtr(address);
+    char* phoneBuf = typeUtils::qStringToCharPtr(phone);
+    char* qqBuf = typeUtils::qStringToCharPtr(qq);
+    char* wxBuf = typeUtils::qStringToCharPtr(wx);
+    char* emailBuf = typeUtils::qStringToCharPtr(email);
+    char* countryBuf = typeUtils::qStringToCharPtr(country);
+    char* distributorBuf = typeUtils::qStringToCharPtr(distributor);
+    char* trademarkBuf = typeUtils::qStringToCharPtr(trademark);
+    char* modelBuf = typeUtils::qStringToCharPtr(model);
+    char* cardIdBuf = typeUtils::qStringToCharPtr(cardId);*/
+    wchar_t* resultBuf = m_fnActiveMainCard(nameBuf, addressBuf, phoneBuf, qqBuf, wxBuf,
+        emailBuf, countryBuf, distributorBuf, trademarkBuf, modelBuf, cardIdBuf);
+    QString result = QString::fromWCharArray(resultBuf);
+    //QString result = QString::fromLatin1(resultBuf);
+    delete[] nameBuf;
+    delete[] addressBuf;
+    delete[] phoneBuf;
+    delete[] qqBuf;
+    delete[] wxBuf;
+    delete[] emailBuf;
+    delete[] countryBuf;
+    delete[] distributorBuf;
+    delete[] trademarkBuf;
+    delete[] modelBuf;
+    delete[] cardIdBuf;
+    return result;
 }
 
 QVector3D LaserDriver::GetCurrentLaserPos()

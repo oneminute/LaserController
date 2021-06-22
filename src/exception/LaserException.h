@@ -33,6 +33,16 @@ public:
 
     QString toString() const;
 
+    int errorCode() const
+    {
+        return m_errorCode;
+    }
+
+    QString errorMessage() const
+    {
+        return m_errorMessage;
+    }
+
 protected:
     int m_errorCode;
     QString m_errorMessage;

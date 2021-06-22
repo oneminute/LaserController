@@ -562,6 +562,29 @@ void LaserControllerWindow::setFinishRun(const FinishRun & finishRun)
 {
 }
 
+void LaserControllerWindow::handleSecurityException(int code, const QString& message)
+{
+    switch (code)
+    {
+    case E_MainCardInactivated:
+    {
+        LaserApplication::device->activateMainCard(
+            "name",
+            "address",
+            "18688886666",
+            "12341234",
+            "wx_66886688",
+            "happy@ever.net",
+            "China",
+            "Unknown",
+            "Unknown",
+            "Default"
+        );
+        break;
+    }
+    }
+}
+
 void LaserControllerWindow::onActionImportSVG(bool checked)
 {
     qLogD << "onActionImportSVG";

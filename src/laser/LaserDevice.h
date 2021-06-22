@@ -23,6 +23,17 @@ public slots:
     void unload();
     void connectDevice(const QString& portName);
     void disconnectDevice();
+    QString activateMainCard(const QString& name,
+        const QString& address,
+        const QString& phone,
+        const QString& qq,
+        const QString& wx,
+        const QString& email,
+        const QString& country,
+        const QString& distributor,
+        const QString& trademark,
+        const QString& model
+    );
 
 protected:
     void unbindDriver();

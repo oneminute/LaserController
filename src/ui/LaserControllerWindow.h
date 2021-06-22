@@ -32,6 +32,9 @@ public:
     FinishRun finishRun();
     void setFinishRun(const FinishRun& finishRun);
 
+public slots:
+    void handleSecurityException(int code, const QString& message);
+
 protected slots:
     void onActionImportSVG(bool checked = false);
     void onActionImportCorelDraw(bool checked = false);

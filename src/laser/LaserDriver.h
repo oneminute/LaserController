@@ -267,6 +267,12 @@ private:
 
     typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double millimeter, bool xaxis);
 
+    typedef wchar_t* (__stdcall *FNActivationMainCard)(wchar_t* name, wchar_t* address, wchar_t* phone, wchar_t* qq,
+        wchar_t* wx, wchar_t* email, wchar_t* country, wchar_t* distributor, wchar_t* trademark, wchar_t* model,
+        wchar_t* cardId);
+    //typedef char* (__stdcall *FNActivationMainCard)(char* name, char* address, char* phone, char* qq,
+        //char* wx, char* email, char* country, char* distributor, char* trademark, char* model,
+        //char* cardId);
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -307,7 +313,21 @@ public:
     void lPenMoveToOriginalPoint(double speed);
     void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
     void controlHDAction(int action);
+
     QString getMainCardID();
+    QString activateMainCard(const QString& name,
+        const QString& address,
+        const QString& phone,
+        const QString& qq,
+        const QString& wx,
+        const QString& email,
+        const QString& country,
+        const QString& distributor,
+        const QString& trademark,
+        const QString& model,
+        const QString& cardId
+    );
+
     QVector3D GetCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
     void startMachining(bool zeroPointStyle);
@@ -404,7 +424,10 @@ private:
     FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;
     FNLPenQuickMoveTo m_fnLPenQuickMoveTo;
     FN_VOID_INT m_fnControlHDAction;
+
     FN_WCHART_VOID m_fnGetMainCardID;
+    FNActivationMainCard m_fnActiveMainCard;
+
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FNSmallScaleMovement m_fnSmallScaleMovement;
     FN_VOID_BOOL m_fnStartMachining;

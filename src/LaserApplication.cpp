@@ -132,6 +132,11 @@ bool LaserApplication::notify(QObject * receiver, QEvent * event)
     try {
         done = QApplication::notify(receiver, event);
     }
+    catch (LaserDeviceSecurityException* e)
+    {
+        qLogW << "laser security exception: " << e->toString();
+        mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
+    }
     catch (LaserException* e)
     {
         qLogD << "laser exception: " << e->toString();

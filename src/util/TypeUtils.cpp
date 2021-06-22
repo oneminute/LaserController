@@ -25,6 +25,15 @@ wchar_t * typeUtils::qStringToWCharPtr(const QString & str)
     return buf;
 }
 
+char* typeUtils::qStringToCharPtr(const QString& str)
+{
+    char* buf = new char[str.length() + 1];
+    const char* cStr = str.toStdString().c_str();
+    memcpy(buf, cStr, str.length());
+    buf[str.length()] = 0;
+    return buf;
+}
+
 cv::Rect typeUtils::qtRect2cvRect(const QRect & rect)
 {
     return cv::Rect(rect.left(), rect.top(), rect.right(), rect.bottom());

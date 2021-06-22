@@ -86,6 +86,15 @@ void LaserDevice::disconnectDevice()
     }
 }
 
+QString LaserDevice::activateMainCard(const QString& name, const QString& address, const QString& phone, const QString& qq, const QString& wx, const QString& email, const QString& country, const QString& distributor, const QString& trademark, const QString& model)
+{
+    Q_D(LaserDevice);
+    QString cardId = d->driver->getMainCardID();
+    QString result = d->driver->activateMainCard(name, address, phone, qq, wx, email, country, distributor, trademark, model, cardId);
+    qLogD << "activation result: " << result;
+    return result;
+}
+
 void LaserDevice::unbindDriver()
 {
     Q_D(LaserDevice);
@@ -96,166 +105,169 @@ void LaserDevice::unbindDriver()
     }
 }
 
-
 void LaserDevice::handleError(int code, const QString& message)
 {
     LaserException* exception = nullptr;
     switch (code)
     {
     case E_SystemFatalError:
-        exception = new LaserDeviceFatalException(code, tr("Laser device fatal error"));
+        throw new LaserDeviceFatalException(code, tr("Laser device fatal error"));
         break;
     case E_UnknownError:
-        exception = new LaserDeviceUnknownException(code);
+        throw new LaserDeviceUnknownException(code);
         break;
     case E_InitializeError:
-        exception = new LaserDeviceConnectionException(code, tr("Failed to initialize laser device"));
+        throw new LaserDeviceConnectionException(code, tr("Failed to initialize laser device"));
         break;
     case E_UninitializeError:
-        exception = new LaserDeviceConnectionException(code, tr("Failed to uninitialize laser device normally"));
+        throw new LaserDeviceConnectionException(code, tr("Failed to uninitialize laser device normally"));
         break;
     case E_ComPortNotAvailable:
-        exception = new LaserDeviceConnectionException(code, tr("Com port not available"));
+        throw new LaserDeviceConnectionException(code, tr("Com port not available"));
         break;
     case E_GetComPortListError:
-        exception = new LaserDeviceConnectionException(code, tr("Failed to get COM port list"));
+        throw new LaserDeviceConnectionException(code, tr("Failed to get COM port list"));
         break;
     case E_DongleNotExists:
-        exception = new LaserDeviceSecurityException(code, tr("Dongle does not exist"));
+        throw new LaserDeviceSecurityException(code, tr("Dongle does not exist"));
         break;
     case E_DongleActiveDisabled:
-        exception = new LaserDeviceSecurityException(code, tr("Dongle activation is disabled"));
+        throw new LaserDeviceSecurityException(code, tr("Dongle activation is disabled"));
         break;
     case E_MainCardRegisterError:
-        exception = new LaserDeviceSecurityException(code, tr("Failed to register main card"));
+        throw new LaserDeviceSecurityException(code, tr("Failed to register main card"));
         break;
     case E_MainCardInactivated:
-        exception = new LaserDeviceSecurityException(code, tr("Main card inactivated"));
+        throw new LaserDeviceSecurityException(code, tr("Main card inactivated"));
         break;
     case E_InvalidMainCardId:
-        exception = new LaserDeviceSecurityException(code, tr("Invalid main card ID"));
+        throw new LaserDeviceSecurityException(code, tr("Invalid main card ID"));
         break;
     case E_InvalidDongleId:
-        exception = new LaserDeviceSecurityException(code, tr("Invalid dongle ID"));
+        throw new LaserDeviceSecurityException(code, tr("Invalid dongle ID"));
         break;
     case E_CardBindDongleError:
-        exception = new LaserDeviceSecurityException(code, tr("Failed to bind card with dongle"));
+        throw new LaserDeviceSecurityException(code, tr("Failed to bind card with dongle"));
         break;
     case E_CardBindDongleRepeatedly:
-        exception = new LaserDeviceSecurityException(code, tr("The card is repeatedly bound to the dongle"));
+        throw new LaserDeviceSecurityException(code, tr("The card is repeatedly bound to the dongle"));
         break;
     case E_CardDongleBoundExceedsTimes:
-        exception = new LaserDeviceSecurityException(code, tr("The number of times the card is bound to the dongle exceeds the allowable range"));
+        throw new LaserDeviceSecurityException(code, tr("The number of times the card is bound to the dongle exceeds the allowable range"));
         break;
     case E_CardDongleBoundIllegal:
-        exception = new LaserDeviceSecurityException(code, tr("The card is illegally bound to the dongle"));
+        throw new LaserDeviceSecurityException(code, tr("The card is illegally bound to the dongle"));
         break;
     case E_ClearLaserTubeDurationError:
-        exception = new LaserDeviceException(code, tr("Failed to clear duration of laser tube"));
+        throw new LaserDeviceException(code, tr("Failed to clear duration of laser tube"));
         break;
     case E_FactoryPasswordIncorrect:
-        exception = new LaserDeviceSecurityException(code, tr("Incorrect factory password"));
+        throw new LaserDeviceSecurityException(code, tr("Incorrect factory password"));
         break;
     case E_FactoryPasswordLengthError:
-        exception = new LaserDeviceSecurityException(code, tr("Invalid length of factory password"));
+        throw new LaserDeviceSecurityException(code, tr("Invalid length of factory password"));
         break;
     case E_FactoryPasswordExpired:
-        exception = new LaserDeviceSecurityException(code, tr("Factory password expired"));
+        throw new LaserDeviceSecurityException(code, tr("Factory password expired"));
         break;
     case E_PasswordIncorrectTooManyTimes:
-        exception = new LaserDeviceSecurityException(code, tr("Input incorrect factory password too many times"));
+        throw new LaserDeviceSecurityException(code, tr("Input incorrect factory password too many times"));
         break;
     case E_ChangeFactoryPasswordError:
-        exception = new LaserDeviceSecurityException(code, tr("Failed to change factory password"));
+        throw new LaserDeviceSecurityException(code, tr("Failed to change factory password"));
         break;
     case E_ReadSysParamFromCardError:
-        exception = new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
+        throw new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
         break;
     case E_WriteSysParamToCardError:
-        exception = new LaserDeviceIOException(code, tr("Failed to write parameters to device"));
+        throw new LaserDeviceIOException(code, tr("Failed to write parameters to device"));
         break;
     case E_ReadUserParamFromCardError:
-        exception = new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
+        throw new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
         break;
     case E_WriteUserParamToCardError:
-        exception = new LaserDeviceIOException(code, tr("Failed to write parameters to device"));
+        throw new LaserDeviceIOException(code, tr("Failed to write parameters to device"));
         break;
     case E_SaveParamsToServerError:
-        exception = new LaserNetworkException(code, tr("Failed to save parameters to server"));
+        throw new LaserNetworkException(code, tr("Failed to save parameters to server"));
         break;
     case E_LoadParamsFromServerError:
-        exception = new LaserNetworkException(code, tr("Failed to load parameters from server"));
+        throw new LaserNetworkException(code, tr("Failed to load parameters from server"));
         break;
     case E_FileNotExistsError:
-        exception = new LaserDeviceDataException(code, tr("File does not exist"));
+        throw new LaserDeviceDataException(code, tr("File does not exist"));
         break;
     case E_InvalidDataFormat:
-        exception = new LaserDeviceDataException(code, tr("Invalid data format"));
+        throw new LaserDeviceDataException(code, tr("Invalid data format"));
         break;
     case E_DecryptCommandError:
-        exception = new LaserDeviceDataException(code, tr("Failed to decrypt data"));
+        throw new LaserDeviceDataException(code, tr("Failed to decrypt data"));
         break;
     case E_InvalidImageData:
-        exception = new LaserDeviceDataException(code, tr("Invalid image data"));
+        throw new LaserDeviceDataException(code, tr("Invalid image data"));
         break;
     case E_ImageMinSizeTooSmall:
-        exception = new LaserDeviceDataException(code, tr("Min size of image is too small"));
+        throw new LaserDeviceDataException(code, tr("Min size of image is too small"));
         break;
     case E_ImageMaxSizeTooLarge:
-        exception = new LaserDeviceDataException(code, tr("Max size of image is too large"));
+        throw new LaserDeviceDataException(code, tr("Max size of image is too large"));
         break;
     case E_NoDataError:
-        exception = new LaserDeviceIOException(code, tr("No data transfered"));
+        throw new LaserDeviceIOException(code, tr("No data transfered"));
         break;
     case E_TransferDataTimeout:
-        exception = new LaserDeviceIOException(code, tr("Transfering data timeout"));
+        throw new LaserDeviceIOException(code, tr("Transfering data timeout"));
         break;
     case E_RetransferAfterTimeout:
-        exception = new LaserDeviceIOException(code, tr("Retransfer data after timeout"));
+        throw new LaserDeviceIOException(code, tr("Retransfer data after timeout"));
         break;
     case E_RetransferTooManyTimes:
-        exception = new LaserDeviceIOException(code, tr("Retransfer data too many times"));
+        throw new LaserDeviceIOException(code, tr("Retransfer data too many times"));
         break;
     case E_TransferDataError:
-        exception = new LaserDeviceIOException(code, tr("Failed to transfer data"));
+        throw new LaserDeviceIOException(code, tr("Failed to transfer data"));
         break;
     case E_ReceiveInvalidDataTooManyTimes:
-        exception = new LaserDeviceIOException(code, tr("Receive invalid data too many times"));
+        throw new LaserDeviceIOException(code, tr("Receive invalid data too many times"));
         break;
     case E_BreakpointDataError:
-        exception = new LaserDeviceIOException(code, tr("Failed to transfer data with breakpoint"));
+        throw new LaserDeviceIOException(code, tr("Failed to transfer data with breakpoint"));
         break;
     case E_CanNotDoOnWorking:
-        exception = new LaserDeviceMachiningException(code, tr("This operation is not supported during machining"));
+        throw new LaserDeviceMachiningException(code, tr("This operation is not supported during machining"));
         break;
     case E_PingServerFail:
-        exception = new LaserNetworkException(code, tr("Failed to connect to server"));
+        throw new LaserNetworkException(code, tr("Failed to connect to server"));
         break;
     case E_ConnectServerError:
-        exception = new LaserNetworkException(code, tr("Failed to log in to server"));
+        throw new LaserNetworkException(code, tr("Failed to log in to server"));
         break;
     case E_ConnectFrequently:
-        exception = new LaserNetworkException(code, tr("Login too frequently"));
+        throw new LaserNetworkException(code, tr("Login too frequently"));
         break;
     case E_SubmitToServerError:
-        exception = new LaserNetworkException(code, tr("Failed to submit data"));
+        throw new LaserNetworkException(code, tr("Failed to submit data"));
         break;
     case E_UpdateInfoFileNotExists:
-        exception = new LaserNetworkException(code, tr("Updating info file does not exist"));
+        throw new LaserNetworkException(code, tr("Updating info file does not exist"));
         break;
     case E_UpdateFileNotExists:
-        exception = new LaserNetworkException(code, tr("Updating file dose not exist"));
+        throw new LaserNetworkException(code, tr("Updating file dose not exist"));
         break;
     case E_UpdateFailed:
-        exception = new LaserNetworkException(code, tr("Failed to update"));
+        throw new LaserNetworkException(code, tr("Failed to update"));
         break;
     case E_DownloadFirmwareDataError:
-        exception = new LaserNetworkException(code, tr("Failed to download firmware"));
+        throw new LaserNetworkException(code, tr("Failed to download firmware"));
         break;
     case E_UpdateFirmwareTimeout:
-        exception = new LaserNetworkException(code, tr("Update firmware timeout"));
+        throw new LaserNetworkException(code, tr("Update firmware timeout"));
         break;
     }
+    /*if (exception)
+    {
+        throw exception;
+    }*/
 }
 
 void LaserDevice::handleMessage(int code, const QString& message)

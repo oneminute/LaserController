@@ -24,6 +24,8 @@ namespace typeUtils
 
     wchar_t* qStringToWCharPtr(const QString& str);
 
+    char* qStringToCharPtr(const QString& str);
+
     cv::Rect qtRect2cvRect(const QRect& rect);
 
     cv::Rect qtRect2cvRect(const QRectF& rect, float scale = 1.f);
