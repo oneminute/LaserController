@@ -194,6 +194,7 @@ private:
 	QRadioButton* m_rightCenterBtn;
 	QDoubleSpinBox* m_rotateBox;
 	QToolButton* m_mmOrIn;
+	bool m_unitIsMM;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

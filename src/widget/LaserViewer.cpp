@@ -86,11 +86,20 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
         //qDebug() << "documentSelectedState paint: " << m_scene->selectedPrimitives();
+		
+		
+		
 		QGraphicsView::paintEvent(event);
 		QPainter painter(viewport());
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        paintSelectedState(painter);
+		QRect rect = m_scene->backgroundItem()->boundingRect().toRect();
+		rect = QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
+		//painter.eraseRect(rect);
+		paintSelectedState(painter);
+		
+		//painter.restore();
+		//QGraphicsView::paintEvent(event);
     }
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
@@ -258,25 +267,79 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	rect = QRectF(left, top, right - left, bottom - top);
 	return rect;
 }
-void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect)
+void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, int _state)
 {
 	if (m_group && !m_group->isEmpty()) {
 		QRectF bounds = selectedItemsSceneBoundingRect();
+		QPointF point = _sceneRect.topLeft();
+		qreal width = _sceneRect.width();
+		qreal height = _sceneRect.height();
 		QTransform t = m_group->transform();
-		//move
-		QPointF diff = _sceneRect.topLeft() - bounds.topLeft();
-		t.translate(diff.x(), diff.y());
-		m_group->setTransform(t, true);
-		//resize
+		switch (_state) {
+			case 0: {//topLeft
 
+				break;
+			}
+			case 1: {//topCenter
+				break;
+			}
+			case 2: {//topRight
+				break;
+			}
+			case 3: {//leftCenter
+				break;
+			}
+			case 4: {//center
+				// move
+				QPointF diff = m_group->mapFromScene(point - bounds.center());
+				t.translate(diff.x(), diff.y());
+				//m_group->setTransform(t, true);
+				//resize
+				qreal rateX = width / bounds.width();
+				qreal rateY = height / bounds.height();
+				//QPointF offset = m_group->mapFromScene(QPointF((width - bounds.width()) * 0.5, (height - bounds.height())*0.5));
+				QTransform t ;
+				t.scale(rateX, rateY);
+				QPointF center = m_group->mapFromScene(point);
+				QPointF offset = center - center * t;
+				QTransform t1;
+				t1.translate(offset.x(), offset.y());
+				m_group->setTransform(t*t1 , true);
+				break;
+			}
+			case 5: {//rightCenter
+				break;
+			}
+			case 6: {//leftBottom
+				break;
+			}
+			case 7: {//bottomCenter
+				break;
+			}
+			case 8: {//rightBottom
+				break;
+			}
+		}
+		
+		
+		//t.scale(rateX, )
 	}
 }
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
-    
+	
     qreal left, right, top, bottom;
-	//QRectF rect = m_group->sceneBoundingRect();
+	/*QRectF rect;
+	if (m_group && !m_group->isEmpty()) {
+		rect = m_group->sceneBoundingRect();
+		qDebug() << "paintSelectedState group" ;
+	}
+	else {
+		rect = selectedItemsSceneBoundingRect();
+		qDebug() << "paintSelectedState primi";
+	}*/
 	QRectF rect = selectedItemsSceneBoundingRect();
+	qDebug() << "paintSelectedState: "<<rect;
 	left = rect.left();
 	right = rect.right();
 	top = rect.top();

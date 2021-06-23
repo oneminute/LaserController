@@ -168,6 +168,8 @@ public:
 	static qreal mm2PixelsYF(float mm);
     static float pixels2mmX(int pixels);
     static float pixels2mmY(int pixels);
+	static float pixelsF2mmX(float pixels);
+	static float pixelsF2mmY(float pixels);
 
 	static float convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
 	static float convertToMM(SizeUnit from, float num, Qt::Orientation orientation = Qt::Horizontal);

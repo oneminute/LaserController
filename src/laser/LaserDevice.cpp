@@ -341,7 +341,12 @@ void LaserDevice::onLibraryLoaded(bool success)
 {
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryLoaded: success = " << success;
-    d->driver->init(LaserApplication::mainWindow->winId());
+	try {
+		d->driver->init(LaserApplication::mainWindow->winId());
+	}
+	catch (...) {
+
+	}
 }
 
 void LaserDevice::onLibraryInitialized()

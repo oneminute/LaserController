@@ -43,6 +43,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_ui(new Ui::LaserControllerWindow)
     , m_created(false)
     , m_useLoadedJson(false)
+	, m_unitIsMM(true)
 {
     m_ui->setupUi(this);
 	
@@ -1590,10 +1591,10 @@ void LaserControllerWindow::selectedChange()
 		qDebug() << rectReal.top();
 		float a = Global::pixels2mmY(114);
 		qDebug() << a;
-		m_posXBox->setValue(Global::pixels2mmX(rectReal.left()));
-		m_posYBox->setValue(Global::pixels2mmX(rectReal.top()));
-		m_widthBox->setValue(Global::pixels2mmX(rectReal.width()));
-		m_heightBox->setValue(Global::pixels2mmX(rectReal.height()));
+		m_posXBox->setValue(Global::pixelsF2mmX(rectReal.center().x()));
+		m_posYBox->setValue(Global::pixelsF2mmX(rectReal.center().y()));
+		m_widthBox->setValue(Global::pixelsF2mmX(rectReal.width()));
+		m_heightBox->setValue(Global::pixelsF2mmX(rectReal.height()));
 	}
 }
 void LaserControllerWindow::selectionPropertyBoxChange()
@@ -1622,8 +1623,23 @@ void LaserControllerWindow::selectionPropertyBoxChange()
 	if (m_heightBox->value() < -20000) {
 		m_heightBox->setValue(-20000);
 	}
-
-	//m_viewer->resetSelectedItemsGroupRect();
+	qreal x = m_posXBox->value();
+	qreal y = m_posYBox->value();
+	qreal width = m_widthBox->value();
+	qreal height = m_heightBox->value();
+	if (m_unitIsMM) {
+		x = Global::mm2PixelsXF(x);
+		y = Global::mm2PixelsYF(y);
+		width = Global::mm2PixelsXF(width);
+		height = Global::mm2PixelsYF(height);
+	}
+	//repaint window
+	QSize size = m_viewer->size();
+	QSize newSize(size.width()+1, size.height()+1);
+	m_viewer->resize(newSize);
+	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), 4);
+	m_viewer->resize(size);
+	
 }
 //selection areas change
 /*void LaserControllerWindow::selectionChange()

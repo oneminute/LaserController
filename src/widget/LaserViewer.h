@@ -39,7 +39,7 @@ public:
 	void setVerticalRuler(RulerWidget * _r);
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
-	void resetSelectedItemsGroupRect(QRectF _sceneRect);
+	void resetSelectedItemsGroupRect(QRectF _sceneRect, int _state);
 private:
     void init();
 	void initSpline();
