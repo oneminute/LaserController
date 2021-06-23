@@ -160,7 +160,7 @@ public:
 	static int dpiX;
 	static int dpiY;
 	static SizeUnit unit;
-	static QWidget* mainWindow;
+	//static QWidget* mainWindow;
 
     static int mm2PixelsX(float mm);
 	static qreal Global::mm2PixelsXF(float mm);

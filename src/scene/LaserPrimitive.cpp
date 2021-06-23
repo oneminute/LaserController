@@ -138,6 +138,12 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
 		painter->drawRect(bounds);
 	}
+    else
+    {
+		painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
+		painter->drawRect(bounds);
+    }
+	painter->setPen(QPen(color, 1, Qt::SolidLine));
     
     draw(painter);
 

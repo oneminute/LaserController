@@ -44,7 +44,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_created(false)
     , m_useLoadedJson(false)
 {
-	Global::mainWindow = this;
     m_ui->setupUi(this);
 	
 

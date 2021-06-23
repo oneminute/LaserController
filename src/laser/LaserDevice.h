@@ -17,6 +17,11 @@ public:
     void resetDriver(LaserDriver* driver);
 
     QString portName() const;
+
+    qreal layoutWidth() const;
+    void setLayoutWidth(qreal width);
+    qreal layoutHeight() const;
+    void setLayoutHeight(qreal height);
     
 public slots:
     void load();

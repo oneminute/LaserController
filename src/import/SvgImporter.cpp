@@ -2,18 +2,21 @@
 
 #include <QDebug>
 #include <QFileInfo>
+#include <QMainWindow>
 #include <QRegularExpression>
 #include <QStack>
-#include <QMainWindow>
 
-#include "svg/qsvgtinydocument.h"
-#include "svg/qsvgrenderer.h"
-#include "svg/qsvggraphics.h"
-#include "ui/ImportSVGDialog.h"
-#include "scene/LaserPrimitive.h"
+#include "LaserApplication.h"
+#include "laser/LaserDevice.h"
+#include "laser/LaserDriver.h"
 #include "scene/LaserDocument.h"
+#include "scene/LaserPrimitive.h"
+#include "svg/qsvggraphics.h"
+#include "svg/qsvgrenderer.h"
+#include "svg/qsvgtinydocument.h"
+#include "ui/ImportSVGDialog.h"
+#include "ui/LaserControllerWindow.h"
 #include "util/UnitUtils.h"
-#include "laser\LaserDriver.h"
 
 SvgImporter::SvgImporter(QObject* parent)
     : Importer(parent)
@@ -27,7 +30,7 @@ SvgImporter::~SvgImporter()
 
 LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, const QVariantMap& params)
 {
-	Global::mainWindow->activateWindow();
+	LaserApplication::mainWindow->activateWindow();
 
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
@@ -46,11 +49,11 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     qreal docScaleWidth = svgSize.width() * 1.0 / viewBox.width();
     qreal docScaleHeight = svgSize.height() * 1.0 / viewBox.height();
 
-	float layoutWidth, layoutHeight;
-	LaserDriver::instance().getLayout(layoutWidth, layoutHeight);
+	//float layoutWidth, layoutHeight;
+	//LaserDriver::instance().getLayout(layoutWidth, layoutHeight);
     PageInformation page;
-    page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, layoutWidth));
-    page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, layoutHeight, Qt::Vertical));
+    page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
+    page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
     laserDoc->setPageInformation(page);
     laserDoc->blockSignals();
 

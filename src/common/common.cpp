@@ -6,7 +6,7 @@
 int Global::dpiX(96);
 int Global::dpiY(96);
 SizeUnit Global::unit(SU_MM);
-QWidget* Global::mainWindow(nullptr);
+//QWidget* Global::mainWindow(nullptr);
 
 int Global::mm2PixelsX(float mm)
 {

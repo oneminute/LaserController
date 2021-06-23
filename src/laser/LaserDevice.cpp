@@ -16,10 +16,14 @@ public:
         : q_ptr(ptr)
         , driver(nullptr)
         , portName("")
+        , layoutWidth(320)
+        , layoutHeight(210)
     {}
 
     LaserDriver* driver;
     QString portName;
+    qreal layoutWidth;
+    qreal layoutHeight;
     LaserDevice* q_ptr;
 };
 
@@ -61,6 +65,30 @@ void LaserDevice::load()
 {
     Q_D(LaserDevice);
     d->driver->load();
+}
+
+qreal LaserDevice::layoutWidth() const
+{
+    Q_D(const LaserDevice);
+    return d->layoutWidth;
+}
+
+void LaserDevice::setLayoutWidth(qreal width)
+{
+    Q_D(LaserDevice);
+    d->layoutWidth = width;
+}
+
+qreal LaserDevice::layoutHeight() const
+{
+    Q_D(const LaserDevice);
+    return d->layoutHeight;
+}
+
+void LaserDevice::setLayoutHeight(qreal height)
+{
+    Q_D(LaserDevice);
+    d->layoutHeight = height;
 }
 
 void LaserDevice::unload()

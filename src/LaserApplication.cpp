@@ -135,7 +135,7 @@ bool LaserApplication::notify(QObject * receiver, QEvent * event)
     catch (LaserDeviceSecurityException* e)
     {
         qLogW << "laser security exception: " << e->toString();
-        mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
+        //mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
     }
     catch (LaserException* e)
     {
