@@ -113,7 +113,7 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
     virtual QRectF boundingRect() const override;
-    QRectF sceneBoundingRect() const;
+    virtual QRectF sceneBoundingRect() const;
     QPointF laserStartPos() const;
 
     virtual void draw(QPainter* painter) {};
@@ -288,6 +288,7 @@ public:
 
     QPolygonF polyline() const;
     void setPolyline(const QPolygonF& poly);
+    virtual QRectF sceneBoundingRect() const;
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);

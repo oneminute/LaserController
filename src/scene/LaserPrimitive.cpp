@@ -142,8 +142,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     {
 		painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
 		painter->drawRect(bounds);
+		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
     }
-	painter->setPen(QPen(color, 1, Qt::SolidLine));
     
     draw(painter);
 
@@ -759,6 +759,14 @@ void LaserPolyline::setPolyline(const QPolygonF& poly)
 {
     Q_D(LaserPolyline);
     d->poly = poly; 
+}
+
+QRectF LaserPolyline::sceneBoundingRect() const
+{
+    Q_D(const LaserPolyline);
+    QPainterPath path;
+    path.addPolygon(sceneTransform().map(d->poly));
+    return path.boundingRect();
 }
 
 std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
