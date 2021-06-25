@@ -70,25 +70,14 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
         painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
-        //qLogD << "drawing: " << m_selectionStartPoint << ", " << m_selectionEndPoint;
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
         //qDebug() << "SelectedEditing paint";
 		QGraphicsView::paintEvent(event);
 		QPainter painter(viewport());
 		painter.setRenderHint(QPainter::Antialiasing);
-		//painter.setPen(QPen(Qt::black, 5, Qt::SolidLine));
-		//painter.drawEllipse(m_selectedRect.bottomRight(), 5, 5);
-		//painter.drawEllipse(m_tempCurrent, 5, 5);
-		
-		
-		//painter.drawEllipse(m_tempOrigin, 5, 5);
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-        //qDebug() << "documentSelectedState paint: " << m_scene->selectedPrimitives();
-		
-		
-		
 		QGraphicsView::paintEvent(event);
 		QPainter painter(viewport());
 		painter.setRenderHint(QPainter::Antialiasing);
@@ -97,9 +86,6 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		rect = QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
 		//painter.eraseRect(rect);
 		paintSelectedState(painter);
-		
-		//painter.restore();
-		//QGraphicsView::paintEvent(event);
     }
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
@@ -223,46 +209,61 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		painter.drawPolygon(boundingRect);
 	}
 }
+void LaserViewer::detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom) {
+	QRectF boundingRect = item.sceneBoundingRect();
+	if (i == 0) {
+		left = boundingRect.left();
+		right = boundingRect.right();
+		top = boundingRect.top();
+		bottom = boundingRect.bottom();
+	}
+	else {
+		qreal curLeft = boundingRect.left();
+		qreal curRight = boundingRect.right();
+		qreal curTop = boundingRect.top();
+		qreal curBottom = boundingRect.bottom();
+		if (curLeft < left) {
+			left = curLeft;
+		}
+		if (curRight > right) {
+			right = curRight;
+		}
+		if (curTop < top) {
+			top = curTop;
+		}
+		if (curBottom > bottom) {
+			bottom = curBottom;
+		}
+	}
+}
 QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	//QList<QGraphicsItem*> items = m_scene->selectedItems();
 	QRectF rect;
 	
 	QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
-	
-	if (items.length() <= 0) {
-		return rect;
-	}
 	qreal left = 0;
 	qreal right = 0;
 	qreal top = 0;
 	qreal bottom = 0;
+	
+	if (items.size() == 0 && m_group) {
+		QList<QGraphicsItem*> group_items = m_group->childItems();
+		if (group_items.size() == 0) {
+			return rect;
+		}
+		for (int i = 0; i < group_items.size(); i++) {
+			LaserPrimitive* item = static_cast<LaserPrimitive*>(group_items[i]);
+			detectRect(*item, i, left, right, top, bottom);
+		}
+		rect = QRectF(left, top, right - left, bottom - top);
+		return rect;
+	}
+	if (items.size() == 0 || !m_group) {
+		return rect;
+	}
 	for (int i = 0; i < items.size(); i++) {
-		LaserPrimitive* item = (LaserPrimitive*)items[i];
-		QRectF boundingRect = item->sceneBoundingRect();
-		if (i == 0) {
-			left = boundingRect.left();
-			right = boundingRect.right();
-			top = boundingRect.top();
-			bottom = boundingRect.bottom();
-		}
-		else {
-			qreal curLeft = boundingRect.left();
-			qreal curRight = boundingRect.right();
-			qreal curTop = boundingRect.top();
-			qreal curBottom = boundingRect.bottom();
-			if (curLeft < left) {
-				left = curLeft;
-			}
-			if (curRight > right) {
-				right = curRight;
-			}
-			if (curTop < top) {
-				top = curTop;
-			}
-			if (curBottom > bottom) {
-				bottom = curBottom;
-			}
-		}
+		LaserPrimitive* item = items[i];
+		detectRect(*item, i, left, right, top, bottom);
 	}
 	rect = QRectF(left, top, right - left, bottom - top);
 	return rect;
@@ -427,14 +428,16 @@ void LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _e
 	//QRectF rect = QRectF(mapToScene(_startPoint.toPoint()), mapToScene(_endPoint.toPoint()));
 	selectionPath.addRect(QRectF(_startPoint, _endPoint));
 	//selectionPath.addRect(rect);
-	m_scene->setSelectionArea(mapToScene(selectionPath));
+	//m_scene->setSelectionArea(mapToScene(selectionPath));
+	qDebug() << "_startPoint: " << _startPoint;
+	qDebug() << "_endPoint: " << _endPoint;
 	//right select
 	if (_endPoint.x() < _startPoint.x()) {
-		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::IntersectsItemShape);
+		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::IntersectsItemShape);
 	}
 	//left selection
-	else if (_endPoint.x() > _startPoint.x()) {
-		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::ContainsItemShape);
+	else if (_endPoint.x() >= _startPoint.x()) {
+		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::ContainsItemBoundingRect);
 	}
 }
 
@@ -568,9 +571,17 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				if (!m_group->isEmpty())
 				{
 					const auto items = m_group->childItems();
-					for (QGraphicsItem *item : items)
-						m_group->removeFromGroup(qgraphicsitem_cast<LaserPrimitive*>(item));
+					for (QGraphicsItem *item : items) {
+						LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+						m_group->removeFromGroup(p_item);
+						p_item->reShape();
+					}
+						
 				}
+				if (m_group->isSelected()) {
+					m_group->setSelected(false);
+				}
+				
 				//m_scene->removeItem(m_group);
 				//delete m_group;
 				//m_scene->destroyItemGroup(m_group);
@@ -838,9 +849,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
 		else
 		{
+			qDebug() << m_scene->selectedPrimitives().length();
 			m_group = m_scene->createItemGroup(m_scene->selectedPrimitives());
+			qDebug() << m_scene->selectedPrimitives().length();
 			m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
 			m_group->setSelected(true);
+			
 		}
 		m_scene->addItem(m_group);
 		

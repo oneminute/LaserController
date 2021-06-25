@@ -1270,10 +1270,9 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 	else if (items.length() > 0) {
 		m_propertyWidget->setEnabled(true);
 		selectedChange();
-	}	
-    //m_ui->tableWidgetLayers->blockSignals(true);
+	}
     qLogD << "selected items count: " << items.length();
-    for (LaserPrimitive* item : items)
+	/*for (LaserPrimitive* item : items)
     {
 		if (items[0]->layer() == nullptr)
 			continue;
@@ -1282,14 +1281,8 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
             m_ui->tableWidgetLayers->selectRow(row);
 
         qDebug().nospace().nospace() << "selected primitive: " << item->nodeName();
-    }
-    //m_ui->tableWidgetLayers->blockSignals(false);
-
-    /*if (items.count() == 1)
-    {
-        LaserPrimitive* item = items[0];
-        PropertiesHelperManager::primitivePropertiesHelper().resetProperties(item, m_ui->tableWidgetParameters);
     }*/
+    
 }
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)

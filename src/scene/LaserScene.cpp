@@ -62,6 +62,7 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
 {
     QList<LaserPrimitive*> primitives;
+	qDebug() << "selectedItems() size: " << selectedItems().size();
     for (QGraphicsItem* item : selectedItems())
     {
         LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
@@ -70,6 +71,7 @@ QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
             primitives.append(primitive);
         }
     }
+	qDebug() << "selectedItems() size: " << selectedItems().size();
     return primitives;
 }
 

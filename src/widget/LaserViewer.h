@@ -8,6 +8,7 @@
 class RulerWidget;
 class LaserScene;
 class LaserPrimitiveGroup;
+class LaserPrimitive;
 //Spline Node Struct
 struct SplineNodeStruct {
 	QPointF node;
@@ -48,7 +49,7 @@ private:
 	void selectedHandleScale();
 	void selectedHandleRotate();
 	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
-
+	void detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom);
 public slots:
     void zoomIn();
     void zoomOut();
