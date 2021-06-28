@@ -9,6 +9,7 @@ class RulerWidget;
 class LaserScene;
 class LaserPrimitiveGroup;
 class LaserPrimitive;
+
 //Spline Node Struct
 struct SplineNodeStruct {
 	QPointF node;
@@ -40,7 +41,7 @@ public:
 	void setVerticalRuler(RulerWidget * _r);
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
-	void resetSelectedItemsGroupRect(QRectF _sceneRect, int _state);
+	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, int _state, int _transformType);//change selection property by tool bar
 private:
     void init();
 	void initSpline();
@@ -170,6 +171,8 @@ private:
 
 	qreal m_selectedEditCount = 0;
 	LaserPrimitiveGroup* m_group;
+
+	
 };
 
 #endif // LASERVIEWER_H

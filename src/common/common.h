@@ -153,6 +153,26 @@ enum RELATION
     INTERSECTION,
     NONE
 };
+//selected
+enum SelectionOriginal
+{
+	SelectionOriginalTopLeft = 0,
+	SelectionOriginalTopCenter = 1,
+	SelectionOriginalTopRight = 2 ,
+	SelectionOriginalLeftCenter = 3,
+	SelectionOriginalCenter = 4,
+	SelectionOriginalRightCenter = 5,
+	SelectionOriginalLeftBottom = 6,
+	SelectionOriginalBottomCenter = 7,
+	SelectionOriginalBottomRight = 8
+};
+//selected
+enum SelectionTransformType {
+	Transform_MOVE = 0,
+	Transform_SCALE = 1,
+	Transform_ROTATE = 2,
+	Transform_RESIZE = 3
+};
 
 class Global
 {

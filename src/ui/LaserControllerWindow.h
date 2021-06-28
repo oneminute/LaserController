@@ -39,6 +39,7 @@ public:
 
 public slots:
     void handleSecurityException(int code, const QString& message);
+	
 
 protected slots:
     void onActionImportSVG(bool checked = false);
@@ -129,6 +130,7 @@ protected slots:
 	void onLaserSceneSelectedChanged();
 	void selectedChange();//items
 	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
+	void onSelectionOriginalClicked(bool clicked);
 
 private:
     QString getFilename(const QString& title, const QStringList& mime);
@@ -181,8 +183,8 @@ private:
 	LaserDoubleSpinBox* m_heightBox;
 	QLabel* m_widthUnit;
 	QLabel* m_heightUnit;
-	QDoubleSpinBox* m_xRateBox;
-	QDoubleSpinBox* m_yRateBox;
+	LaserDoubleSpinBox* m_xRateBox;
+	LaserDoubleSpinBox* m_yRateBox;
 	QRadioButton* m_topLeftBtn;
 	QRadioButton* m_topCenterBtn;
 	QRadioButton* m_topRightBtn;
@@ -195,6 +197,9 @@ private:
 	QDoubleSpinBox* m_rotateBox;
 	QToolButton* m_mmOrIn;
 	bool m_unitIsMM;
+	//selection tool bar
+	int m_selectionOriginalState;
+	int m_selectionTranformState;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

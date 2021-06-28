@@ -1012,9 +1012,6 @@ public:
     {}
 
     QImage image;
-	QPainterPath path;
-	QRectF rect;
-	QTransform allTransform;
     //QRectF bounds;
 };
 
@@ -1022,11 +1019,8 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     : LaserPrimitive(new LaserBitmapPrivate(this), doc, LPT_BITMAP)
 {
     Q_D(LaserBitmap);
-	d->rect = bounds;
-	//d->allTransform = transform();
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
-	d->path.addRect(bounds);
     d->type = LPT_BITMAP;
     d->outline.addRect(bounds);
     d->position = bounds.center();
@@ -1123,8 +1117,8 @@ void LaserBitmap::draw(QPainter * painter)
 {
     Q_D(LaserBitmap);
 	
-	QImage image = d->image.transformed(d->allTransform, Qt::TransformationMode::SmoothTransformation);
-	painter->drawImage(d->boundingRect, image);
+	//QImage image = d->image.transformed(d->allTransform, Qt::TransformationMode::SmoothTransformation);
+	painter->drawImage(d->boundingRect, d->image);
 }
 
 std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
@@ -1157,17 +1151,9 @@ std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
 QRectF LaserBitmap::sceneBoundingRect() const
 {
 	Q_D(const LaserBitmap);
-	return sceneTransform().map(d->path).boundingRect();
-}
-
-void LaserBitmap::reShape()
-{
-	Q_D(LaserBitmap);
-	d->path = transform().map(d->path);
-	d->boundingRect = d->path.controlPointRect();
-	//d->boundingRect = transform().mapRect(d->boundingRect);
-	d->allTransform = sceneTransform() * d->allTransform;
-	setTransform(QTransform());
+	QPainterPath path;
+	path.addRect(d->boundingRect);
+	return sceneTransform().map(path).boundingRect();
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

@@ -358,7 +358,6 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
 	virtual QRectF sceneBoundingRect() const;
-	virtual void  reShape();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
