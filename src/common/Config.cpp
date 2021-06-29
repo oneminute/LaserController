@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
@@ -11,8 +12,7 @@
 #include "widget/InputWidgetWrapper.h"
 
 QList<ConfigItemGroup*> Config::groups;
-QMap<QString, ConfigItem*> Config::items;
-//Config Config::config;
+QMap<QString, ConfigItemGroup*> Config::groupsMap;
 
 Config::Config()
 {
@@ -21,8 +21,9 @@ Config::Config()
 
 void Config::load()
 {
+    qDeleteAll(groups);
     groups.clear();
-    items.clear();
+    groupsMap.clear();
 
     loadGeneralItems();
     loadLayersItems();
@@ -33,15 +34,6 @@ void Config::load()
     loadExportItems();
     loadDeviceItems();
 
-    for (ConfigItemGroup* group : groups)
-    {
-        for (ConfigItem* item : group->items())
-        {
-            items.insert(item->fullName(), item);
-        }
-    }
-
-        
     QFile configFile(configFilePath());
     if (!configFile.open(QFile::Text | QFile::ReadOnly))
     {
@@ -56,19 +48,10 @@ void Config::load()
     QJsonObject json = doc.object();
     for (QJsonObject::ConstIterator g = json.constBegin(); g != json.constEnd(); g++)
     {
-        QString prefix = g.key();
-        QJsonObject group = g.value().toObject();
-
-        for (QJsonObject::ConstIterator i = group.constBegin(); i != group.constEnd(); i++)
+        if (groupsMap.contains(g.key()))
         {
-            QString name = i.key();
-            QJsonObject itemObj = i.value().toObject();
-
-            QString key = QString("%1/%2").arg(prefix).arg(name);
-            //items[key].value = itemObj["value"].toVariant();
-            //items[key].defaultValue = itemObj["defaultValue"].toVariant();
-
-            //qDebug() << items[key].toString();
+            ConfigItemGroup* group = groupsMap[g.key()];
+            group->fromJson(g.value().toObject());
         }
     }
 
@@ -85,32 +68,10 @@ void Config::save()
     }
 
     QJsonObject json;
-    QMap<QString, QJsonObject> groups;
-    for (QMap<QString, ConfigItem*>::ConstIterator i = items.constBegin(); i != items.constEnd(); i++)
+    for (ConfigItemGroup* group : groups)
     {
-        QString key = i.key();
-        const ConfigItem* item = i.value();
-
-        /*if (!groups.contains(item.prefix))
-        {
-            groups.insert(item.prefix, QJsonObject());
-        }
-        QJsonObject& group = groups[item.prefix];
-
-        QJsonObject itemObj;
-        itemObj["name"] = item.name;
-        itemObj["value"] = QJsonValue::fromVariant(item.value);
-        itemObj["defaultValue"] = QJsonValue::fromVariant(item.defaultValue);
-        itemObj["type"] = item.type;
-
-        group[item.name] = itemObj;*/
+        json[group->name()] = group->toJson();
     }
-
-    for (QMap<QString, QJsonObject>::ConstIterator i = groups.constBegin(); i != groups.constEnd(); i++)
-    {
-        json[i.key()] = i.value();
-    }
-
     QJsonDocument doc(json);
     configFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
     configFile.close();
@@ -128,21 +89,20 @@ QString Config::configFilePath()
 bool Config::isModified()
 {
     bool isModified = false;
-    for (QMap<QString, ConfigItem*>::ConstIterator i = items.constBegin(); i != items.constEnd(); i++)
+    /*for (QMap<QString, ConfigItem*>::ConstIterator i = items.constBegin(); i != items.constEnd(); i++)
     {
         if (i.value()->isModified())
         {
             isModified = true;
             break;
         }
-    }
+    }*/
     return isModified;
 }
 
 void Config::loadGeneralItems()
 {
     ConfigItemGroup* group = new Config::General;
-    groups.append(group);
 
     group->addConfigItem(
         "language"
@@ -152,7 +112,7 @@ void Config::loadGeneralItems()
     );
 
     group->addConfigItem(
-        "Unit"
+        "unit"
         , tr("Unit")
         , tr("Global unit")
         , static_cast<int>(SU_MM)
@@ -162,7 +122,6 @@ void Config::loadGeneralItems()
 void Config::loadLayersItems()
 {
     ConfigItemGroup* group = new Config::Layers;
-    groups.append(group);
 
     group->addConfigItem(
         "maxLayersCount"
@@ -175,7 +134,6 @@ void Config::loadLayersItems()
 void Config::loadUiItems()
 {
     ConfigItemGroup* group = new Config::Ui;
-    groups.append(group);
 
     group->addConfigItem(
         "operationButtonIconSize"
@@ -230,7 +188,6 @@ void Config::loadUiItems()
 void Config::loadCuttingLayerItems()
 {
     ConfigItemGroup* group = new Config::CuttingLayer;
-    groups.append(group);
 
     group->addConfigItem(
         "minSpeed",
@@ -271,7 +228,6 @@ void Config::loadCuttingLayerItems()
 void Config::loadEngravingLayerItems()
 {
     ConfigItemGroup* group = new Config::EngravingLayer;
-    groups.append(group);
 
     group->addConfigItem(
         "minSpeed",
@@ -333,7 +289,6 @@ void Config::loadEngravingLayerItems()
 void Config::loadPathOptimizationItems()
 {
     ConfigItemGroup* group = new Config::PathOptimization;
-    groups.append(group);
 
     group->addConfigItem(
         "maxAnts",
@@ -389,7 +344,6 @@ void Config::loadPathOptimizationItems()
 void Config::loadExportItems()
 {
     ConfigItemGroup* group = new Config::Export;
-    groups.append(group);
 
     group->addConfigItem(
         "maxAnglesDiff",
@@ -409,7 +363,6 @@ void Config::loadExportItems()
 void Config::loadDeviceItems()
 {
     ConfigItemGroup* group = new Config::Device;
-    groups.append(group);
 
     group->addConfigItem(
         "autoConnectFirst",

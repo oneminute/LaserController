@@ -1,6 +1,7 @@
 #ifndef CONFIGITEMGROUP_H
 #define CONFIGITEMGROUP_H
 
+#include <QJsonObject>
 #include <QObject>
 #include "common.h"
 
@@ -12,13 +13,15 @@ class ConfigItemGroup: public QObject
 {
     Q_OBJECT
 public:
-    explicit ConfigItemGroup(const QString& name, const QString& title, QObject* parent = nullptr);
+    explicit ConfigItemGroup(const QString& name, const QString& title, const QString& description, QObject* parent = nullptr);
 
     ~ConfigItemGroup();
 
     QString name() const;
 
     QString title() const;
+
+    QString description() const;
 
     void addConfigItem(ConfigItem* item);
 
@@ -32,6 +35,10 @@ public:
     );
 
     QList<ConfigItem*>& items();
+    ConfigItem* configItem(const QString& name);
+
+    QJsonObject toJson() const;
+    void fromJson(const QJsonObject& jsonObject);
 
 protected:
 

@@ -24,7 +24,7 @@ enum ConfigItemType
 #define CONFIG_ITEM(groupName, itemName, returnType, convertionMethod) \
     static ConfigItem* itemName##Item() \
     { \
-        return Config::items[#groupName"/"#itemName]; \
+        return Config::groupsMap[#groupName]->configItem(#itemName); \
     } \
     static returnType itemName() \
     { \
@@ -42,7 +42,7 @@ public:
     {
     protected:
         General(QObject* parent = nullptr)
-            : ConfigItemGroup("general", tr("General"), parent)
+            : ConfigItemGroup("general", tr("General"), tr("General"), parent)
         {}
 
     public:
@@ -57,7 +57,7 @@ public:
     {
     protected:
         Layers(QObject* parent = nullptr)
-            : ConfigItemGroup("layers", tr("Layers"), parent)
+            : ConfigItemGroup("layers", tr("Layers"), tr("Layers"), parent)
         {}
 
     public:
@@ -71,7 +71,7 @@ public:
     {
     protected:
         Ui(QObject* parent = nullptr)
-            : ConfigItemGroup("ui", tr("UI"), parent)
+            : ConfigItemGroup("ui", tr("UI"), tr("UI"), parent)
         {}
 
     public:
@@ -91,7 +91,7 @@ public:
     {
     protected:
         CuttingLayer(QObject* parent = nullptr)
-            : ConfigItemGroup("cuttingLayer", tr("Cutting Layer"), parent)
+            : ConfigItemGroup("cuttingLayer", tr("Cutting Layer"), tr("Cutting Layer"), parent)
         {}
 
     public:
@@ -109,7 +109,7 @@ public:
     {
     protected:
         EngravingLayer(QObject* parent = nullptr)
-            : ConfigItemGroup("engravingLayer", tr("Engraving Layer"), parent)
+            : ConfigItemGroup("engravingLayer", tr("Engraving Layer"), tr("Engraving Layer"), parent)
         {}
 
     public:
@@ -130,7 +130,7 @@ public:
     {
     protected:
         PathOptimization(QObject* parent = nullptr)
-            : ConfigItemGroup("pathOptimization", tr("Path Optimization"), parent)
+            : ConfigItemGroup("pathOptimization", tr("Path Optimization"), tr("Path Optimization"), parent)
         {}
 
     public:
@@ -150,7 +150,7 @@ public:
     {
     protected:
         Export(QObject* parent = nullptr)
-            : ConfigItemGroup("export", tr("Export"), parent)
+            : ConfigItemGroup("export", tr("Export"), tr("Export"), parent)
         {}
 
     public:
@@ -165,7 +165,7 @@ public:
     {
     protected:
         Device(QObject* parent = nullptr)
-            : ConfigItemGroup("device", tr("Device"), parent)
+            : ConfigItemGroup("device", tr("Device"), tr("Device"), parent)
         {}
 
     public:
@@ -197,8 +197,9 @@ protected:
 
 private:
     static QList<ConfigItemGroup*> groups;
-    static QMap<QString, ConfigItem*> items;
-    //static Config config;
+    static QMap<QString, ConfigItemGroup*> groupsMap;
+
+    friend class ConfigItemGroup;
 };
 
 

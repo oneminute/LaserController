@@ -2,6 +2,7 @@
 #define CONFIGITEM_H
 
 #include <QDebug>
+#include <QJsonObject>
 #include <QObject>
 #include "common/common.h"
 
@@ -15,8 +16,7 @@ class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
-    explicit ConfigItem(QObject* parent = nullptr);
-    ConfigItem(const QString& name
+    explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
         , const QString& title
         , const QString& description
@@ -24,7 +24,6 @@ public:
         , bool advanced = false
         , bool visible = true
         , StoreStrategy storeType = StoreStrategy::SS_CONFIRMED
-        , QObject* parent = nullptr
     );
     ~ConfigItem();
 
@@ -67,6 +66,8 @@ public:
     void unbindRegister(LaserRegister* reg);
 
     QString toString() const;
+    QJsonObject toJson() const;
+    void fromJson(const QJsonObject& jsonObject);
 
 public slots:
 

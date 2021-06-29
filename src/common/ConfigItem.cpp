@@ -91,13 +91,6 @@ public:
     LaserRegister* laserRegister;
 };
 
-ConfigItem::ConfigItem(QObject* parent)
-    : QObject(parent)
-    , m_ptr(new ConfigItemPrivate(this))
-{
-
-}
-
 ConfigItem::ConfigItem(
     const QString& name
     , ConfigItemGroup* group
@@ -106,9 +99,8 @@ ConfigItem::ConfigItem(
     , const QVariant& value
     , bool advanced
     , bool visible
-    , StoreStrategy storeType
-    , QObject* parent)
-    : QObject(parent)
+    , StoreStrategy storeType)
+    : QObject(group)
     , m_ptr(new ConfigItemPrivate(this))
 {
     Q_D(ConfigItem);
@@ -126,6 +118,7 @@ ConfigItem::ConfigItem(
 
 ConfigItem::~ConfigItem()
 {
+    qLogD << "ConfigItem " << this << " destroied";
 }
 
 QString ConfigItem::fullName() const
@@ -316,6 +309,23 @@ QString ConfigItem::toString() const
         .arg(description())
         .arg(value().toString());
     return msg;
+}
+
+QJsonObject ConfigItem::toJson() const
+{
+    QJsonObject item;
+    item["value"] = QJsonValue::fromVariant(value());
+    item["defaultValue"] = QJsonValue::fromVariant(defaultValue());
+    return item;
+}
+
+void ConfigItem::fromJson(const QJsonObject& jsonObject)
+{
+    if (jsonObject.contains("value"))
+        setValue(jsonObject["value"].toVariant());
+
+    if (jsonObject.contains("defaultValue"))
+        setDefaultValue(jsonObject["defaultValue"].toVariant());
 }
 
 void ConfigItem::setModified()
