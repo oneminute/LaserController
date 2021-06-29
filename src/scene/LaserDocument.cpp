@@ -514,7 +514,7 @@ void LaserDocument::swapLayers(int i, int j)
 void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
 {
     Q_D(LaserDocument);
-    for (int i = 0; i < Config::LayersMaxLayersCount(); i++)
+    for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
     {
         d->layers[i]->bindButton(layerButtons[i]);
     }
@@ -685,7 +685,7 @@ void LaserDocument::init()
     layer = new LaserLayer(layerName, LLT_CUTTING, this, true);
     addLayer(layer);
 
-    for (int i = 2; i < Config::LayersMaxLayersCount(); i++)
+    for (int i = 2; i < Config::Layers::maxLayersCount(); i++)
     {
         QString layerName = newLayerName();
         LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);

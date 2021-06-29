@@ -56,7 +56,7 @@ bool LaserApplication::initialize()
     qInstallMessageHandler(LaserApplication::handleLogOutput);
 
     Config::load();
-	Global::unit = static_cast<SizeUnit>(Config::GeneralUnit());
+	Global::unit = static_cast<SizeUnit>(Config::General::unit());
 
     QTranslator translator;
     //QLocale locale(QLocale::Config::GeneralLanguage());
@@ -76,8 +76,6 @@ bool LaserApplication::initialize()
     }
 
     QLocale::setDefault(locale);
-
-    Config::loadTitlesAndDescriptions();
 
     QFile file("theme/Dark.qss");
     if (file.open(QFile::ReadOnly | QFile::Text))

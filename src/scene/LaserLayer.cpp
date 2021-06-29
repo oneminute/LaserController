@@ -88,23 +88,23 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
 
     if (type == LLT_ENGRAVING)
     {
-        d->minSpeed = Config::EngravingLayerMinSpeed();
-        d->runSpeed = Config::EngravingLayerRunSpeed();
-        d->laserPower = Config::EngravingLayerLaserPower();
-        d->minSpeedPower = Config::EngravingLayerMinSpeedPower();
-        d->runSpeedPower = Config::EngravingLayerRunSpeedPower();
+        d->minSpeed = Config::EngravingLayer::minSpeed();
+        d->runSpeed = Config::EngravingLayer::runSpeed();
+        d->laserPower = Config::EngravingLayer::laserPower();
+        d->minSpeedPower = Config::EngravingLayer::minPowerRate();
+        d->runSpeedPower = Config::EngravingLayer::maxPowerRate();
     }
     else if (type == LLT_CUTTING)
     {
-        d->minSpeed = Config::CuttingLayerMinSpeed();
-        d->runSpeed = Config::CuttingLayerRunSpeed();
-        d->laserPower = Config::CuttingLayerLaserPower();
-        d->minSpeedPower = Config::CuttingLayerMinSpeedPower();
-        d->runSpeedPower = Config::CuttingLayerRunSpeedPower();
+        d->minSpeed = Config::CuttingLayer::minSpeed();
+        d->runSpeed = Config::CuttingLayer::runSpeed();
+        d->laserPower = Config::CuttingLayer::laserPower();
+        d->minSpeedPower = Config::CuttingLayer::minPowerRate();
+        d->runSpeedPower = Config::CuttingLayer::maxPowerRate();
     }
-	d->useHalftone = Config::EngravingLayerUseHalftone();
-	d->lpi = Config::EngravingLayerLPI();
-	d->dpi = Config::EngravingLayerDPI();
+	d->useHalftone = Config::EngravingLayer::useHalftone();
+	d->lpi = Config::EngravingLayer::LPI();
+	d->dpi = Config::EngravingLayer::DPI();
 }
 
 LaserLayer::~LaserLayer()

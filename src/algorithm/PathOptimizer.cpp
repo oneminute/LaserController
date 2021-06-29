@@ -985,11 +985,11 @@ OptimizerController::OptimizerController(LaserNode* root, int totalNodes, QObjec
     , m_optimizer(new PathOptimizer(
         root,
         totalNodes,
-        Config::OptimizePathMaxIterations(),
-        Config::OptimizePathMaxAnts(),
-        Config::OptimizePathMaxTraverseCount(),
-        Config::OptimizePathVolatileRate(),
-        Config::OptimizePathUseGreedyAlgorithm(),
+        Config::PathOptimization::maxIterations(),
+        Config::PathOptimization::maxAnts(),
+        Config::PathOptimization::maxTraverse(),
+        Config::PathOptimization::volatileRate(),
+        Config::PathOptimization::useGreedyAlgorithm(),
         true))
 {
     qLogD << "OptimizerController";

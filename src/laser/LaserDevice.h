@@ -19,9 +19,17 @@ public:
     QString portName() const;
 
     qreal layoutWidth() const;
-    void setLayoutWidth(qreal width);
     qreal layoutHeight() const;
-    void setLayoutHeight(qreal height);
+    void setLayoutRect(const QRectF& rect, bool toCard = true);
+
+    int printerDrawUnit() const;
+    void setPrinterDrawUnit(int unit, bool toCard = true);
+
+    QString hardwareId() const;
+    QString mainCardId() const;
+    QString dongleId() const;
+
+    void requestMainCardInfo();
     
 public slots:
     void load();
@@ -39,6 +47,9 @@ public slots:
         const QString& trademark,
         const QString& model
     );
+    bool requestTemporaryLicense();
+    bool createLicenseFile(const QString& licenseCode);
+    void moveToOrigin(qreal speed = 15);
 
 protected:
     void unbindDriver();
@@ -50,6 +61,9 @@ protected slots:
     void onLibraryLoaded(bool success);
     void onLibraryInitialized();
     void onComPortsFetched(const QStringList& portNames);
+    void onConnected();
+    void onMainCardRegistered();
+    void onMainCardActivated(bool temp);
 
 signals:
     void comPortsFetched(const QStringList& ports);
@@ -57,7 +71,8 @@ signals:
     void connected();
     void disconnected();
     void mainCardRegistered();
-    void mainCardActivated();
+    void mainCardActivated(bool temp);
+    void mainCardInfoFetched(QMap<QString, QString> info);
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

@@ -87,6 +87,9 @@ protected slots:
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
 
+    void onActionShowMainCardInfo(bool checked = false);
+    void onActionTemporaryLicense(bool checked = false);
+
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
     void onDeviceDisconnected();

@@ -13,10 +13,10 @@
 #include "widget/EditSlider.h"
 #include <QLabel>
 
-InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, Config::ConfigItem* configItem, QLabel* labelName, QLabel* labelDesc)
+InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     : QObject(widget)
-    , m_labelName(labelName)
-    , m_labelDesc(labelDesc)
+    , m_labelName(nullptr)
+    , m_labelDesc(nullptr)
     , m_configItem(configItem)
     , m_type(WT_Unknown)
 {
@@ -105,10 +105,24 @@ InputWidgetWrapper::~InputWidgetWrapper()
 {
 }
 
+void InputWidgetWrapper::setNameLabel(QLabel* label)
+{
+    m_labelName = label;
+}
+
+void InputWidgetWrapper::setDescriptionLabel(QLabel* label)
+{
+    m_labelDesc = label;
+}
+
+QWidget* InputWidgetWrapper::widget() const
+{
+    return qobject_cast<QWidget*>(parent());
+}
+
 void InputWidgetWrapper::updateConfigItem()
 {
-    m_configItem->value = m_value;
-    m_modified = false;
+    m_configItem->setValue(m_value);
 }
 
 void InputWidgetWrapper::restore()
@@ -120,67 +134,67 @@ void InputWidgetWrapper::restore()
     case WT_ComboBox:
     {
         QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        comboBox->setCurrentText(m_configItem->value.toString());
+        comboBox->setCurrentText(m_configItem->value().toString());
     }
         break;
     case WT_LineEdit:
     {
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
-        lineEdit->setText(m_configItem->value.toString());
+        lineEdit->setText(m_configItem->value().toString());
     }
         break;
     case WT_TextEdit:
     {
         QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
-        textEdit->setText(m_configItem->value.toString());
+        textEdit->setText(m_configItem->value().toString());
     }
         break;
     case WT_PlainTextEdit:
     {
         QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
-        plainTextEdit->setPlainText(m_configItem->value.toString());
+        plainTextEdit->setPlainText(m_configItem->value().toString());
     }
         break;
     case WT_SpinBox:
     {
         QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
-        spinBox->setValue(m_configItem->value.toInt());
+        spinBox->setValue(m_configItem->value().toInt());
     }
         break;
     case WT_DoubleSpinBox:
     {
         QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
-        doubleSpinBox->setValue(m_configItem->value.toDouble());
+        doubleSpinBox->setValue(m_configItem->value().toDouble());
     }
         break;
     case WT_TimeEdit:
     {
         QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
-        timeEdit->setTime(m_configItem->value.toTime());
+        timeEdit->setTime(m_configItem->value().toTime());
     }
         break;
     case WT_DateEdit:
     {
         QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
-        dateEdit->setDate(m_configItem->value.toDate());
+        dateEdit->setDate(m_configItem->value().toDate());
     }
         break;
     case WT_DateTimeEdit:
     {
         QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
-        dateTimeEdit->setDateTime(m_configItem->value.toDateTime());
+        dateTimeEdit->setDateTime(m_configItem->value().toDateTime());
     }
         break;
     case WT_Dial:
     {
         QDial* dial = qobject_cast<QDial*>(widget);
-        dial->setValue(m_configItem->value.toInt());
+        dial->setValue(m_configItem->value().toInt());
     }
         break;
     case WT_EditSlider:
     {
         EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
-        editSlider->setValue(m_configItem->value.toInt());
+        editSlider->setValue(m_configItem->value().toInt());
     }
         break;
     }
@@ -195,67 +209,67 @@ void InputWidgetWrapper::restoreDefault()
     case WT_ComboBox:
     {
         QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        comboBox->setCurrentText(m_configItem->defaultValue.toString());
+        comboBox->setCurrentText(m_configItem->defaultValue().toString());
     }
         break;
     case WT_LineEdit:
     {
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
-        lineEdit->setText(m_configItem->defaultValue.toString());
+        lineEdit->setText(m_configItem->defaultValue().toString());
     }
         break;
     case WT_TextEdit:
     {
         QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
-        textEdit->setText(m_configItem->defaultValue.toString());
+        textEdit->setText(m_configItem->defaultValue().toString());
     }
         break;
     case WT_PlainTextEdit:
     {
         QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
-        plainTextEdit->setPlainText(m_configItem->defaultValue.toString());
+        plainTextEdit->setPlainText(m_configItem->defaultValue().toString());
     }
         break;
     case WT_SpinBox:
     {
         QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
-        spinBox->setValue(m_configItem->defaultValue.toInt());
+        spinBox->setValue(m_configItem->defaultValue().toInt());
     }
         break;
     case WT_DoubleSpinBox:
     {
         QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
-        doubleSpinBox->setValue(m_configItem->defaultValue.toDouble());
+        doubleSpinBox->setValue(m_configItem->defaultValue().toDouble());
     }
         break;
     case WT_TimeEdit:
     {
         QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
-        timeEdit->setTime(m_configItem->defaultValue.toTime());
+        timeEdit->setTime(m_configItem->defaultValue().toTime());
     }
         break;
     case WT_DateEdit:
     {
         QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
-        dateEdit->setDate(m_configItem->defaultValue.toDate());
+        dateEdit->setDate(m_configItem->defaultValue().toDate());
     }
         break;
     case WT_DateTimeEdit:
     {
         QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
-        dateTimeEdit->setDateTime(m_configItem->defaultValue.toDateTime());
+        dateTimeEdit->setDateTime(m_configItem->defaultValue().toDateTime());
     }
         break;
     case WT_Dial:
     {
         QDial* dial = qobject_cast<QDial*>(widget);
-        dial->setValue(m_configItem->defaultValue.toInt());
+        dial->setValue(m_configItem->defaultValue().toInt());
     }
         break;
     case WT_EditSlider:
     {
         EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
-        editSlider->setValue(m_configItem->defaultValue.toInt());
+        editSlider->setValue(m_configItem->defaultValue().toInt());
     }
         break;
     }
@@ -263,7 +277,7 @@ void InputWidgetWrapper::restoreDefault()
 
 bool InputWidgetWrapper::isModified()
 {
-    return m_modified;
+    return m_configItem->isModified();
 }
 
 void InputWidgetWrapper::onTextChanged(const QString & text)
@@ -318,14 +332,12 @@ void InputWidgetWrapper::setValue(const QVariant & value)
     QPalette::ColorRole role = m_labelName->foregroundRole();
     QPalette palette = m_labelName->palette();
 
-    if (m_configItem->value == value)
+    if (m_configItem->value() == value)
     {
-        m_modified = false;
         palette.setColor(role, Qt::black);
     }
     else
     {
-        m_modified = true;
         palette.setColor(role, Qt::red);
     }
 

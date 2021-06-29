@@ -270,9 +270,11 @@ private:
     typedef wchar_t* (__stdcall *FNActivationMainCard)(wchar_t* name, wchar_t* address, wchar_t* phone, wchar_t* qq,
         wchar_t* wx, wchar_t* email, wchar_t* country, wchar_t* distributor, wchar_t* trademark, wchar_t* model,
         wchar_t* cardId);
-    //typedef char* (__stdcall *FNActivationMainCard)(char* name, char* address, char* phone, char* qq,
-        //char* wx, char* email, char* country, char* distributor, char* trademark, char* model,
-        //char* cardId);
+
+    typedef wchar_t* (__stdcall* FN_WCHART_BOOL)(bool reload);
+
+    typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t* licenseCode);
+
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -327,6 +329,11 @@ public:
         const QString& model,
         const QString& cardId
     );
+    QString getDeviceId(bool reload = true);
+    QString getDongleId();
+    void getMainCardRegisterState();
+    QString getMainCardInfo();
+    bool createLicenseFile(const QString& licenseCode);
 
     QVector3D GetCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
@@ -427,6 +434,11 @@ private:
 
     FN_WCHART_VOID m_fnGetMainCardID;
     FNActivationMainCard m_fnActiveMainCard;
+    FN_WCHART_BOOL m_fnGetDeviceId;
+    FN_WCHART_VOID m_fnGetHardwareKeyID;
+    FN_VOID_VOID m_fnGetMainCardRegState;
+    FN_WCHART_VOID m_fnGetMainCardInfo;
+    FN_BOOL_WCHART m_fnCreateLicenseFile;
 
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FNSmallScaleMovement m_fnSmallScaleMovement;

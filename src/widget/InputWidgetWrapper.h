@@ -34,9 +34,13 @@ public:
         WT_EditSlider
     };
 
-    explicit InputWidgetWrapper(QWidget* widget, Config::ConfigItem* configItem, QLabel* labelName = nullptr, QLabel* labelDesc = nullptr);
+    explicit InputWidgetWrapper(QWidget* widget, ConfigItem* configItem);
     virtual ~InputWidgetWrapper();
 
+    void setNameLabel(QLabel* label);
+    void setDescriptionLabel(QLabel* label);
+
+    QWidget* widget() const;
     void updateConfigItem();
     void restore();
     void restoreDefault();
@@ -67,8 +71,7 @@ private:
     QLabel* m_labelDesc;
     WidgetType m_type;
     QVariant m_value;
-    Config::ConfigItem* m_configItem;
-    bool m_modified;
+    ConfigItem* m_configItem;
 };
 
 #endif // INPUTWIDGETWRAPPER_H
