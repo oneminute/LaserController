@@ -23,3 +23,9 @@ void LaserDoubleSpinBox::keyPressEvent(QKeyEvent * event)
 	}
 	
 }
+
+void LaserDoubleSpinBox::focusOutEvent(QFocusEvent * event)
+{
+	QDoubleSpinBox::focusOutEvent(event);
+	qDebug() << "lost focus";
+}

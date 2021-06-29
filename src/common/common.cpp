@@ -36,6 +36,15 @@ float Global::pixels2mmY(int pixels)
 {
 	return pixels * 25.4f / dpiY;
 }
+float Global::pixelsF2mmX(float pixels)
+{
+	return pixels * 25.4f / dpiX;
+}
+
+float Global::pixelsF2mmY(float pixels)
+{
+	return pixels * 25.4f / dpiY;
+}
 
 float Global::convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation)
 {

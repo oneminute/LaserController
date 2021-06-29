@@ -119,10 +119,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     
     QColor color = Qt::blue;
 	painter->setPen(QPen(color, 1, Qt::SolidLine));
-    if (d->layer)
+    /*if (d->layer)
     {
         color = d->layer->color();
-    }
+    }*/
 
 	if (isSelected())
 	{
@@ -142,7 +142,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     {
 		painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
 		painter->drawRect(bounds);
-		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+		painter->setPen(QPen(Qt::gray, 1.2f, Qt::SolidLine));
     }
     
     draw(painter);
@@ -156,7 +156,6 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
-    //QRectF bounds = transform().mapRect(d->boundingRect);
 	QRectF bounds = d->boundingRect;
     return bounds;
 }
@@ -352,6 +351,10 @@ QPainterPath LaserPrimitive::outline() const
     return d->outline;
 }
 
+void LaserPrimitive::reShape()
+{
+}
+
 QString LaserPrimitive::typeName(LaserPrimitiveType typeId) const
 {
     static QMap<LaserPrimitiveType, QString> TypeNamesMap{
@@ -444,6 +447,7 @@ public:
     {}
 
     QRectF bounds;
+	QPainterPath path;
 };
 
 LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc)
@@ -451,6 +455,7 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc)
 {
     Q_D(LaserEllipse);
     d->bounds = bounds;
+	d->path.addEllipse(d->bounds);
     d->boundingRect = bounds;
     d->outline.addEllipse(bounds);
 
@@ -467,6 +472,9 @@ void LaserEllipse::setBounds(const QRectF& bounds)
 {
     Q_D(LaserEllipse);
     d->bounds = bounds; 
+	QPainterPath path;
+	path.addEllipse(d->bounds);
+	d->path = path;
 }
 
 std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& canvas)
@@ -483,7 +491,8 @@ std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& canvas)
 void LaserEllipse::draw(QPainter* painter)
 {
     Q_D(LaserEllipse);
-    painter->drawEllipse(d->bounds);
+    //painter->drawEllipse(d->bounds);
+	painter->drawPath(d->path);
 }
 
 QPainterPath LaserEllipse::toPath() const
@@ -498,6 +507,20 @@ QPainterPath LaserEllipse::toPath() const
     return path;
 }
 
+QRectF LaserEllipse::sceneBoundingRect() const
+{
+	Q_D(const LaserEllipse);
+	return sceneTransform().map(d->path).boundingRect();
+}
+
+void LaserEllipse::reShape()
+{
+	Q_D(LaserEllipse);
+	d->path = transform().map(d->path);
+	d->boundingRect = d->path.boundingRect();
+	setTransform(QTransform());
+}
+
 class LaserRectPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserRect)
@@ -507,6 +530,7 @@ public:
     {}
 
     QRectF rect;
+	QPainterPath path;
 };
 
 LaserRect::LaserRect(const QRectF rect, LaserDocument * doc)
@@ -514,6 +538,7 @@ LaserRect::LaserRect(const QRectF rect, LaserDocument * doc)
 {
     Q_D(LaserRect);
     d->rect = rect;
+	d->path.addRect(rect);
     d->boundingRect = rect;
     d->outline.addRect(rect);
     d->position = rect.center();
@@ -529,12 +554,15 @@ void LaserRect::setRect(const QRectF& rect)
 {
     Q_D(LaserRect);
     d->rect = rect; 
+	QPainterPath path;
+	path.addEllipse(d->rect);
+	d->path = path;
 }
 
 void LaserRect::draw(QPainter* painter)
 {
     Q_D(LaserRect);
-    painter->drawRect(d->rect);
+    painter->drawPath(d->path);
 }
 
 std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& canvas)
@@ -576,6 +604,21 @@ QPainterPath LaserRect::toPath() const
 
     return path;
 }
+
+QRectF LaserRect::sceneBoundingRect() const
+{
+	Q_D(const LaserRect);
+	return sceneTransform().map(d->path).boundingRect();
+}
+
+void LaserRect::reShape()
+{
+	Q_D(LaserRect);
+	d->path = transform().map(d->path);
+	d->boundingRect = d->path.boundingRect();
+	setTransform(QTransform());
+}
+
 
 class LaserLinePrivate : public LaserShapePrivate
 {
@@ -641,6 +684,29 @@ QPainterPath LaserLine::toPath() const
     path = transform.map(path);
 
     return path;
+}
+
+QRectF LaserLine::sceneBoundingRect() const
+{
+	Q_D(const LaserLine);
+	QPainterPath path;
+	QLineF line = sceneTransform().map(d->line);
+	path.moveTo(line.p1());
+	path.lineTo(line.p2());
+	return path.boundingRect();
+}
+//after removeFromGroup
+void LaserLine::reShape()
+{
+	Q_D(LaserLine);
+	setLine(transform().map(d->line));
+	QPainterPath path;
+	//QLineF line = sceneTransform().map(d->line);
+	path.moveTo(d->line.p1());
+	path.lineTo(d->line.p2());
+	d->boundingRect = path.boundingRect();
+	d->line = d->line;
+	setTransform(QTransform());
 }
 
 class LaserPathPrivate : public LaserShapePrivate
@@ -718,6 +784,21 @@ QList<QPainterPath> LaserPath::subPaths() const
         paths.append(subPath);
     }
     return paths;
+}
+
+QRectF LaserPath::sceneBoundingRect() const
+{
+	Q_D(const LaserPath);
+	return sceneTransform().map(d->path).boundingRect();
+	
+}
+
+void LaserPath::reShape()
+{
+	Q_D(LaserPath);
+	d->path = transform().map(d->path);
+	d->boundingRect = d->path.boundingRect();
+	setTransform(QTransform());
 }
 
 class LaserPolylinePrivate : public LaserShapePrivate
@@ -812,6 +893,16 @@ QPainterPath LaserPolyline::toPath() const
     return path;
 }
 
+void LaserPolyline::reShape()
+{
+	Q_D(LaserPolyline);
+	d->poly = transform().map(d->poly);
+	QPainterPath path;
+	path.addPolygon(d->poly);
+	d->boundingRect = path.boundingRect();
+	setTransform(QTransform());
+}
+
 class LaserPolygonPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserPolygon)
@@ -892,6 +983,24 @@ QPainterPath LaserPolygon::toPath() const
     path = transform.map(path);
 
     return path;
+}
+
+QRectF LaserPolygon::sceneBoundingRect() const
+{
+	Q_D(const LaserPolygon);
+	QPainterPath path;
+	path.addPolygon(sceneTransform().map(d->poly));
+	return path.boundingRect();
+}
+
+void LaserPolygon::reShape()
+{
+	Q_D(LaserPolygon);
+	d->poly = transform().map(d->poly);
+	QPainterPath path;
+	path.addPolygon(d->poly);
+	d->boundingRect = path.boundingRect();
+	setTransform(QTransform());
 }
 
 class LaserBitmapPrivate : public LaserPrimitivePrivate
@@ -1007,7 +1116,9 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
 void LaserBitmap::draw(QPainter * painter)
 {
     Q_D(LaserBitmap);
-    painter->drawImage(d->boundingRect, d->image);
+	
+	//QImage image = d->image.transformed(d->allTransform, Qt::TransformationMode::SmoothTransformation);
+	painter->drawImage(d->boundingRect, d->image);
 }
 
 std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
@@ -1035,6 +1146,14 @@ std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
 
     d->mechiningPoints = points;
     return points;
+}
+
+QRectF LaserBitmap::sceneBoundingRect() const
+{
+	Q_D(const LaserBitmap);
+	QPainterPath path;
+	path.addRect(d->boundingRect);
+	return sceneTransform().map(path).boundingRect();
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

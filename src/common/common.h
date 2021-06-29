@@ -153,6 +153,26 @@ enum RELATION
     INTERSECTION,
     NONE
 };
+//selected
+enum SelectionOriginal
+{
+	SelectionOriginalTopLeft = 0,
+	SelectionOriginalTopCenter = 1,
+	SelectionOriginalTopRight = 2 ,
+	SelectionOriginalLeftCenter = 3,
+	SelectionOriginalCenter = 4,
+	SelectionOriginalRightCenter = 5,
+	SelectionOriginalLeftBottom = 6,
+	SelectionOriginalBottomCenter = 7,
+	SelectionOriginalBottomRight = 8
+};
+//selected
+enum SelectionTransformType {
+	Transform_MOVE = 0,
+	Transform_SCALE = 1,
+	Transform_ROTATE = 2,
+	Transform_RESIZE = 3
+};
 
 /// <summary>
 /// 当前选项的修改方式
@@ -189,6 +209,8 @@ public:
 	static qreal mm2PixelsYF(float mm);
     static float pixels2mmX(int pixels);
     static float pixels2mmY(int pixels);
+	static float pixelsF2mmX(float pixels);
+	static float pixelsF2mmY(float pixels);
 
 	static float convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
 	static float convertToMM(SizeUnit from, float num, Qt::Orientation orientation = Qt::Horizontal);

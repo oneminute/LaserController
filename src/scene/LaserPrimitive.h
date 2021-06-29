@@ -143,6 +143,8 @@ public:
 
     virtual QPainterPath outline() const;
 
+	virtual void reShape();
+
 	/*void setScaleValue(qreal x, qreal y);
 	void setScaleTranslate(qreal x, qreal y);
 	void setSelectedEditingState(int state);
@@ -155,7 +157,8 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-
+	
+	
 protected:
     static QMap<int, int> g_itemsMaxIndex;
 
@@ -206,6 +209,8 @@ public:
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
+	virtual QRectF sceneBoundingRect() const;
+	virtual void reShape();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)
@@ -227,7 +232,8 @@ public:
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
 
     virtual QPainterPath toPath() const;
-	
+	virtual QRectF sceneBoundingRect() const;
+	virtual void reShape();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
@@ -249,6 +255,8 @@ public:
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
+	virtual QRectF sceneBoundingRect() const;
+	virtual void reShape();
 
 private:
     Q_DISABLE_COPY(LaserLine);
@@ -272,6 +280,9 @@ public:
     virtual QPainterPath toPath() const;
 
     virtual QList<QPainterPath> subPaths() const;
+	virtual QRectF sceneBoundingRect() const;
+
+	virtual void reShape();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPath);
@@ -295,6 +306,8 @@ public:
 
     virtual QPainterPath toPath() const;
 
+	virtual void reShape();
+
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
     Q_DISABLE_COPY(LaserPolyline)
@@ -315,6 +328,10 @@ public:
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
+
+	virtual QRectF sceneBoundingRect() const;
+
+	virtual void reShape();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
@@ -340,6 +357,7 @@ public:
     virtual QString typeName() { return tr("Bitmap"); }
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+	virtual QRectF sceneBoundingRect() const;
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
