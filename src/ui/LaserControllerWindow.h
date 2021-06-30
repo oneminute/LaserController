@@ -194,7 +194,7 @@ private:
 	QRadioButton* m_leftCenterBtn;
 	QRadioButton* m_centerBtn;
 	QRadioButton* m_rightCenterBtn;
-	QDoubleSpinBox* m_rotateBox;
+	LaserDoubleSpinBox* m_rotateBox;
 	QToolButton* m_mmOrIn;
 	bool m_unitIsMM;
 	//selection tool bar

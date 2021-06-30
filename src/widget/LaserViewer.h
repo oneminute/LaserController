@@ -41,7 +41,7 @@ public:
 	void setVerticalRuler(RulerWidget * _r);
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
-	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, int _state, int _transformType);//change selection property by tool bar
+	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
 private:
     void init();
 	void initSpline();
@@ -56,7 +56,7 @@ public slots:
     void zoomOut();
     void resetZoom();
 	void textAreaChanged();
-
+	void onDocumentIdle();
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -109,7 +109,7 @@ private:
     //LaserScene* m_scene;
     bool m_rubberBandActive;
     QPoint m_rubberBandOrigin;
-    bool m_mousePressed;
+    //bool m_mousePressed;
     QPoint m_lastDragPos;
 
     QPointF m_selectionStartPoint;
