@@ -1213,6 +1213,8 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
             m_scene->document()->removePrimitive(primitive);
         }
 		m_ui->tableWidgetLayers->updateItems();
+		//change state
+		m_viewer->onCancelSelected();
     }
 }
 

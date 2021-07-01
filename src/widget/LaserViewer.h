@@ -57,6 +57,7 @@ public slots:
     void resetZoom();
 	void textAreaChanged();
 	void onDocumentIdle();
+	void onCancelSelected();
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);

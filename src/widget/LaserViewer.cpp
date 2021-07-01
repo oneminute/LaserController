@@ -1106,28 +1106,11 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             }
             else
             {
-				if (!m_group->isEmpty())
-				{
-					const auto items = m_group->childItems();
-					for (QGraphicsItem *item : items) {
-						LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
-						m_group->removeFromGroup(p_item);
-						p_item->reShape();
-					}
-						
-				}
-				if (m_group->isSelected()) {
-					m_group->setSelected(false);
-				}
-				
-				//m_scene->removeItem(m_group);
-				//delete m_group;
-				//m_scene->destroyItemGroup(m_group);
-				m_group->setMatrix(QMatrix());
-                emit cancelSelected();
-                m_selectionStartPoint = event->pos();
-                m_selectionEndPoint = m_selectionStartPoint;
-                emit beginSelecting();
+				onCancelSelected();
+				//viewport()->repaint();
+                //m_selectionStartPoint = event->pos();
+				//m_selectionEndPoint = m_selectionStartPoint;
+                //emit beginSelecting();
             }
         }
 
@@ -1935,13 +1918,34 @@ void LaserViewer::textAreaChanged()
 
 void LaserViewer::onDocumentIdle()
 {
-	if (m_group) {
+	if (m_group && m_group->isSelected()) {
 		QList<QGraphicsItem*> items = m_group->childItems();
 		int size = items.size();
 		if (items.size() > 0) {
 			emit endSelecting();
-			//viewport()->repaint();
+			//
 		}
 
 	}
+	//viewport()->repaint();
+}
+
+void LaserViewer::onCancelSelected()
+{
+	if (!m_group->isEmpty())
+	{
+		const auto items = m_group->childItems();
+		for (QGraphicsItem *item : items) {
+			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+			m_group->removeFromGroup(p_item);
+			p_item->reShape();
+		}
+
+	}
+	if (m_group->isSelected()) {
+		m_group->setSelected(false);
+	}
+	m_group->setMatrix(QMatrix());
+	m_scene->clearSelection();
+	emit cancelSelected();
 }
