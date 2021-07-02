@@ -49,8 +49,13 @@ private:
 	void releaseTextEdit();
 	void selectedHandleScale();
 	void selectedHandleRotate();
+	
 	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
 	void detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom);
+	bool checkTwoPointEqueal(const QPointF& point1, const QPointF& point2);
+	bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
+	bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
+	bool isAllPolygonStartPoint();
 public slots:
     void zoomIn();
     void zoomOut();
@@ -58,6 +63,7 @@ public slots:
 	void textAreaChanged();
 	void onDocumentIdle();
 	void onCancelSelected();
+	void onSelectedFillGroup();
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -74,7 +80,7 @@ signals:
 	void readyEllipse();
 	void creatingLine();
 	void readyLine();
-	void creatingPolygonStartRect();
+	//void creatingPolygonStartRect();
 	void creatingPolygon();
 	void readyPolygon();
 	void creatingSpline();
@@ -104,6 +110,7 @@ protected:
 
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
+	
 
 private:
     QScopedPointer<LaserScene> m_scene;
@@ -118,6 +125,7 @@ private:
 
 	QPointF m_creatingRectStartPoint;
 	QPointF m_creatingRectEndPoint;
+	QPointF m_creatingRectBeforeShiftPoint;
 
 	QPointF m_creatingEllipseStartPoint;
 	QPointF m_creatingEllipseStartInitPoint;
@@ -130,8 +138,9 @@ private:
 	QPointF m_creatingPolygonStartPoint;
 	QPointF m_creatingPolygonEndPoint;
 	QVector<QPointF> m_creatingPolygonPoints;
-	QRectF m_polygonStartRect;
-	bool m_isMouseInStartRect;
+	QList<QLineF> m_creatingPolygonLines;
+	/*QRectF m_polygonStartRect;
+	bool m_isMouseInStartRect;*/
 	//Spline
 	SplineStruct m_handlingSpline;//creating and editing
 	QList<SplineStruct> m_splineList;

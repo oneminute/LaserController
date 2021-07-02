@@ -30,12 +30,16 @@ public:
 
 	LaserPrimitiveGroup *createItemGroup(const QList<LaserPrimitive*> &items);
 	void destroyItemGroup(LaserPrimitiveGroup *group);
-
-private:
+	virtual bool eventFilter(QObject *watched, QEvent *event)override;
+	bool mousePressBlock();
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
     LaserDocument* m_doc;
     QGraphicsRectItem* m_background;
+	bool m_mousePressBlock = false;
 };
 
 #endif // LASERSCENE_H

@@ -358,6 +358,9 @@ public:
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
 	virtual QRectF sceneBoundingRect() const;
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)

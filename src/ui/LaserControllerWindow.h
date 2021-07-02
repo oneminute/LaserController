@@ -87,6 +87,7 @@ protected slots:
 	void onActionSpline(bool checked = false);
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
+	void onActionBitmap(bool checked = false);
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();

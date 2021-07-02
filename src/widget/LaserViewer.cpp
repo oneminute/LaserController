@@ -28,7 +28,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     //, m_mousePressed(false)
     , m_isKeyDelPress(false)
     , m_isKeyShiftPressed(false)
-    , m_isMouseInStartRect(false)
+    //, m_isMouseInStartRect(false)
     , m_splineNodeDrawWidth(3)
     , m_splineHandlerWidth(5)
     , m_splineNodeEditWidth(5)
@@ -87,6 +87,33 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		if (m_isKeyShiftPressed) {
+			qreal width = m_creatingRectEndPoint.x() - m_creatingRectStartPoint.x();
+			qreal height = m_creatingRectEndPoint.y() - m_creatingRectStartPoint.y();
+			qreal absWidth = qAbs(width);
+			qreal absHeight = qAbs(height);
+			QPoint point;
+			if (absWidth > absHeight) {
+				point.setX(m_creatingRectEndPoint.x());
+				if (height > 0) {
+					point.setY(m_creatingRectStartPoint.y() + absWidth);
+				}
+				else {
+					point.setY(m_creatingRectStartPoint.y() - absWidth);
+				}
+			}
+			else {
+				point.setY(m_creatingRectEndPoint.y());
+				if (width > 0) {
+					point.setX(m_creatingRectStartPoint.x() + absHeight);
+				}
+				else {
+					point.setX(m_creatingRectStartPoint.x() - absHeight);
+				}
+			}
+			m_creatingRectEndPoint = point;
+		}
+		
         painter.drawRect(QRectF(mapFromScene(m_creatingRectStartPoint), mapFromScene(m_creatingRectEndPoint)));
     }
     //Ellipse
@@ -118,7 +145,20 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        QRectF rect = QRectF(mapFromScene(m_polygonStartRect.topLeft()), mapFromScene(m_polygonStartRect.bottomRight()));
+		int size = m_creatingPolygonPoints.size();
+		if (size == 0) {
+			return;
+		}
+		else if (size > 1) {
+			for (int i = 0; i < size; i++) {
+				if (i == size - 1) {
+					break;
+				}
+				painter.drawLine(mapFromScene(m_creatingPolygonPoints[i]), mapFromScene(m_creatingPolygonPoints[i+1]));
+			}			
+		}
+		painter.drawLine(mapFromScene(m_creatingPolygonPoints[size - 1]), mapFromScene(m_creatingPolygonEndPoint));
+        /*QRectF rect = QRectF(mapFromScene(m_polygonStartRect.topLeft()), mapFromScene(m_polygonStartRect.bottomRight()));
         if (m_isMouseInStartRect) {
             painter.fillRect(rect, QBrush(Qt::red, Qt::SolidPattern));
         }
@@ -133,7 +173,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
                 painter.drawLine(start, end);
             }
         }
-        painter.drawLine(mapFromScene(m_creatingPolygonPoints.at(m_creatingPolygonPoints.length() - 1)), mapFromScene(m_creatingPolygonEndPoint));
+        painter.drawLine(mapFromScene(m_creatingPolygonPoints.at(m_creatingPolygonPoints.length() - 1)), mapFromScene(m_creatingPolygonEndPoint));*/
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
@@ -1019,16 +1059,17 @@ void LaserViewer::enterEvent(QEvent* event)
 
 void LaserViewer::mousePressEvent(QMouseEvent* event)
 {
-    // 若事件已被处理，则跳过
-    //if (event->isAccepted())
-        //return;
+	QGraphicsView::mousePressEvent(event);
 
 // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
-            QGraphicsView::mousePressEvent(event);
+            //事件被Item截断
+			if (m_scene->mousePressBlock()) {
+				return;
+			}
             // 获取选框起点
             m_selectionStartPoint = event->pos();
             m_selectionEndPoint = m_selectionStartPoint;
@@ -1127,6 +1168,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             m_creatingEllipseStartPoint = mapToScene(event->pos());
             m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
             m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
+			m_EllipseEndPoint = m_creatingEllipseEndPoint;
             emit creatingEllipse();
         }
         //Line
@@ -1139,8 +1181,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         //Polygon Ready
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
             //clear
-            m_creatingPolygonPoints.clear();
-            emit creatingPolygonStartRect();
+            //m_creatingPolygonPoints.clear();
+			//m_creatingPolygonLines.clear();
+
+            //emit creatingPolygonStartRect();
         }
         //Spline
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineReadyState())) {
@@ -1164,20 +1208,20 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     m_verticalRuler->setMousePoint(m_mousePoint);
     m_horizontalRuler->repaint();
     m_verticalRuler->repaint();
+	QGraphicsView::mouseMoveEvent(event);
     //shift keyboard
-    if (event->modifiers() & Qt::ShiftModifier) {
+    /*if (event->modifiers() & Qt::ShiftModifier) {
         m_isKeyShiftPressed = true;
     }
     else {
         m_isKeyShiftPressed = false;
-    }
+    }*/
 
     // 当在DocumentSelecting状态时
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-        m_selectionEndPoint = m_mousePoint;
-        QGraphicsView::mouseMoveEvent(event);
-        viewport()->repaint();
+		m_selectionEndPoint = m_mousePoint;
+		viewport()->repaint();
         return;
     }
     // 当在DocumentSelected状态时
@@ -1288,19 +1332,22 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			
 		}
 		this->viewport()->repaint();
-		QGraphicsView::mouseMoveEvent(event);
+		//QGraphicsView::mouseMoveEvent(event);
         
     }
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
         m_creatingRectEndPoint = mapToScene(m_mousePoint);
+		m_creatingRectBeforeShiftPoint = m_creatingRectEndPoint;
+		this->viewport()->repaint();
+		//QGraphicsView::mouseMoveEvent(event);
         return;
 
     }
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
         m_creatingEllipseEndPoint = mapToScene(m_mousePoint);
-
+		this->viewport()->repaint();
         return;
     }
     //Line
@@ -1331,8 +1378,21 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     //Polygon
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 
-        m_isMouseInStartRect = m_polygonStartRect.contains(mapToScene(event->pos()));
+        //m_isMouseInStartRect = m_polygonStartRect.contains(mapToScene(event->pos()));
         m_creatingPolygonEndPoint = mapToScene(m_mousePoint);
+
+		if (detectPoint(m_creatingPolygonPoints, m_creatingPolygonLines, m_creatingPolygonEndPoint)) {
+			this->setCursor(Qt::CrossCursor);
+		}
+		else {
+			this->setCursor(Qt::ArrowCursor);
+			//detectLine(m_creatingPolygonLines, m_creatingPolygonEndPoint);
+
+		}
+		//;
+		
+		this->viewport()->repaint();
+		return;
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
@@ -1346,55 +1406,21 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 {
-	
+	QGraphicsView::mouseReleaseEvent(event);
     //select
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-        qreal distance = (m_selectionEndPoint - m_selectionStartPoint).manhattanLength();
-        qDebug() << "distance:" << distance;
-        if (distance <= 0.000001f)
+		
+        if (checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
             m_scene->clearSelection();
             emit cancelSelecting();
-            //QGraphicsView::mouseReleaseEvent(event);
-            //m_mousePressed = false;
             m_isKeyShiftPressed = false;
             viewport()->repaint();
             return;
         }
 		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
-		if (m_scene->selectedItems().size() == 0) {
-			m_scene->clearSelection();
-			emit cancelSelecting();
-			//QGraphicsView::mouseReleaseEvent(event);
-			m_isKeyShiftPressed = false;
-			viewport()->repaint();
-			return;
-		}
-		if (m_group)
-		{
-			for (LaserPrimitive* item : m_scene->selectedPrimitives())
-			{
-				if (m_group->childItems().contains(item))
-					continue;
-				m_group->addToGroup(item);
-			}
-			m_group->setSelected(true);
-		}
-		else
-		{
-			//qDebug() << m_scene->selectedPrimitives().length();
-			m_group = m_scene->createItemGroup(m_scene->selectedPrimitives());
-			//qDebug() << m_scene->selectedPrimitives().length();
-			m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-			m_group->setSelected(true);
-			
-		}
-		m_scene->addItem(m_group);
-		
-        emit endSelecting();
-        m_selectedHandleList.clear();
-        m_curSelectedHandleIndex = -1;
+		onSelectedFillGroup();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -1405,6 +1431,10 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+		if (checkTwoPointEqueal(m_creatingRectStartPoint, m_creatingRectEndPoint)) {
+			emit readyRectangle();
+			return;
+		}
         QRectF rect(m_creatingRectStartPoint, m_creatingRectEndPoint);
         LaserRect* rectItem = new LaserRect(rect, m_scene->document());
         m_scene->addLaserPrimitive(rectItem);
@@ -1412,6 +1442,10 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     }
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
+		if (checkTwoPointEqueal(m_creatingEllipseStartPoint, m_EllipseEndPoint)) {
+			emit readyEllipse();
+			return;
+		}
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
         LaserEllipse* ellipseItem = new LaserEllipse(rect, m_scene->document());
         m_scene->addLaserPrimitive(ellipseItem);
@@ -1440,7 +1474,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
 	}
     //Polygon Start
-    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonStartRectState())) {
+    /*else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonStartRectState())) {
         //init
         m_creatingPolygonStartPoint = mapToScene(event->pos());
         m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
@@ -1451,26 +1485,49 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         m_polygonStartRect = QRectF(m_creatingPolygonStartPoint.x() - halfWidth, m_creatingPolygonStartPoint.y() - halfWidth, width, width);
 
         emit creatingPolygon();
-    }
-    //Polygon Creating
+    }*/
+    //Polygon
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
+		if (event->button() == Qt::LeftButton) {
+			m_creatingPolygonStartPoint = mapToScene(event->pos());
+			m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
+			m_creatingPolygonPoints.append(m_creatingPolygonStartPoint);
+			
+			emit creatingPolygon();
+		}
+		else if (event->button() == Qt::RightButton) {
+			emit readyPolygon();
+		}
+	}
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
-        m_creatingPolygonEndPoint = mapToScene(event->pos());
-        if (m_polygonStartRect.contains(m_creatingPolygonEndPoint)) {
-            m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
-            if (m_creatingPolygonPoints.length() > 1) {
-                m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
-                for (int i = 0; i < m_creatingPolygonPoints.length(); i++) {
-                    m_creatingPolygonPoints[i] = m_creatingPolygonPoints[i];
-                }
-                QPolygonF qPolygon(m_creatingPolygonPoints);
-                LaserPolygon* polygon = new LaserPolygon(qPolygon, m_scene->document());
-                m_scene->addLaserPrimitive(polygon);
-                emit readyPolygon();
-            }
-        }
-        else {
-            m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
-        }
+		
+		if (event->button() == Qt::LeftButton) {
+			//if()
+			m_creatingPolygonLines.append(QLineF(m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1], m_creatingPolygonEndPoint));
+			m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
+			
+			if (!isAllPolygonStartPoint()) {
+				if (m_creatingPolygonEndPoint == m_creatingPolygonStartPoint) {
+					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints), m_scene->document());
+					m_scene->addLaserPrimitive(polygon);
+					m_creatingPolygonPoints.clear();
+					setCursor(Qt::ArrowCursor);
+					emit readyPolygon();
+				}
+			}
+			
+			
+		}
+		else if (event->button() == Qt::RightButton) {
+			if (!isAllPolygonStartPoint()) {
+				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document());
+				m_scene->addLaserPrimitive(polyLine);
+			}
+			
+			m_creatingPolygonPoints.clear();
+			setCursor(Qt::ArrowCursor);
+			emit readyPolygon();
+		}
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
@@ -1503,19 +1560,24 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     //m_mousePressed = false;
     m_isKeyShiftPressed = false;
     this->viewport()->repaint();
-	QGraphicsView::mouseReleaseEvent(event);
+	//QGraphicsView::mouseReleaseEvent(event);
 }
 
 void LaserViewer::keyPressEvent(QKeyEvent* event)
 {
     switch (event->key())
     {
-    case Qt::Key_Shift:
-        m_isKeyShiftPressed = true;
-        break;
-    case Qt::Key_Delete:
-        m_isKeyDelPress = true;
-        break;
+		case Qt::Key_Shift: {
+			m_isKeyShiftPressed = true;
+			viewport()->repaint();
+			break;
+		}
+        
+		case Qt::Key_Delete: {
+			m_isKeyDelPress = true;
+			break;
+		}
+        
     }
     QGraphicsView::keyPressEvent(event);
 }
@@ -1525,19 +1587,25 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 
     switch (event->key())
     {
-    case Qt::Key_Escape:
-        if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+		case Qt::Key_Escape:
+			if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
 
-            releaseTextEdit();
-            emit readyText();
-        }
-        break;
-    case Qt::Key_Shift:
-        m_isKeyShiftPressed = false;
-    case Qt::Key_Delete:
-        m_isKeyDelPress = false;
-        break;
-        break;
+				releaseTextEdit();
+				emit readyText();
+			}
+			break;
+		case Qt::Key_Shift: {
+			m_isKeyShiftPressed = false;
+			m_creatingRectEndPoint = m_creatingRectBeforeShiftPoint;
+			viewport()->repaint();
+			break;
+		}
+        
+		case Qt::Key_Delete: {
+			m_isKeyDelPress = false;
+			break;
+		}
+        
     }
     QGraphicsView::keyReleaseEvent(event);
 }
@@ -1565,6 +1633,69 @@ bool LaserViewer::isOnControllHandlers(const QPoint& point, int& handlerIndex, Q
         }
     }
     return isIn;
+}
+
+bool LaserViewer::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2)
+{
+	qreal distance = (point2 - point1).manhattanLength();
+	if (distance <= 0.000001f)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool LaserViewer::detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point)
+{
+	for each (QPointF p in points)
+	{
+		QRectF rect(QPointF(p.x() - 2, p.y() - 2), QPointF(p.x() + 2, p.y() + 2));
+		if (rect.contains(point)) {
+			point = p;
+			return true;
+		}
+	}
+	for each (QLineF line in lines)
+	{
+		QRectF rect(QPointF(line.center().x() - 3, line.center().y() - 3), QPointF(line.center().x() + 3, line.center().y() + 3));
+		if (rect.contains(point)) {
+			point = line.center();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool LaserViewer::detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point)
+{
+	for each(QLineF line in lines) {
+		
+		QPointF p1(line.p1());
+		QPointF p2(line.p2());
+		QVector2D standarVec(p2 - p1);
+		standarVec.normalize();
+		QVector2D vector(point - startPoint);
+		vector.normalize();
+		//QRectF rect(;
+		if (standarVec == vector) {
+			setCursor(Qt::IBeamCursor);
+			return true;
+		}
+	}
+	setCursor(Qt::ArrowCursor);
+	return false;
+}
+
+bool LaserViewer::isAllPolygonStartPoint()
+{
+	bool bl = true;
+	for (int i = 0; i < m_creatingPolygonPoints.size(); i++)
+	{
+		if (m_creatingPolygonPoints[i] != m_creatingPolygonStartPoint) {
+			bl = false;
+		}
+	}
+	return bl;
 }
 
 qreal LaserViewer::zoomValue() const
@@ -1608,9 +1739,9 @@ void LaserViewer::init()
     ADD_TRANSITION(documentPrimitiveEllipseCreatingState, documentPrimitiveEllipseReadyState, this, SIGNAL(readyEllipse()));
     ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveLineCreatingState, this, SIGNAL(creatingLine()));
     ADD_TRANSITION(documentPrimitiveLineCreatingState, documentPrimitiveLineReadyState, this, SIGNAL(readyLine()));
-    ADD_TRANSITION(documentPrimitivePolygonStartRectState, documentPrimitivePolygonCreatingState, this, SIGNAL(creatingPolygon()));
+    ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonCreatingState, this, SIGNAL(creatingPolygon()));
     ADD_TRANSITION(documentPrimitivePolygonCreatingState, documentPrimitivePolygonReadyState, this, SIGNAL(readyPolygon()));
-    ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonStartRectState, this, SIGNAL(creatingPolygonStartRect()));
+    //ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonStartRectState, this, SIGNAL(creatingPolygonStartRect()));
     ADD_TRANSITION(documentPrimitiveSplineReadyState, documentPrimitiveSplineCreatingState, this, SIGNAL(creatingSpline()));
     ADD_TRANSITION(documentPrimitiveSplineCreatingState, documentPrimitiveSplineReadyState, this, SIGNAL(readySpline()));
     ADD_TRANSITION(documentPrimitiveTextReadyState, documentPrimitiveTextCreatingState, this, SIGNAL(creatingText()));
@@ -1652,6 +1783,40 @@ void LaserViewer::releaseTextEdit()
 
 void LaserViewer::selectedHandleRotate() {
 
+}
+
+void LaserViewer::onSelectedFillGroup()
+{
+	if (m_scene->selectedItems().size() == 0) {
+		m_scene->clearSelection();
+		emit cancelSelecting();
+		m_isKeyShiftPressed = false;
+		viewport()->repaint();
+		return;
+	}
+	if (m_group)
+	{
+		for (LaserPrimitive* item : m_scene->selectedPrimitives())
+		{
+			if (m_group->childItems().contains(item))
+				continue;
+			m_group->addToGroup(item);
+		}
+		m_group->setSelected(true);
+	}
+	else
+	{
+		m_group = m_scene->createItemGroup(m_scene->selectedPrimitives());
+		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+		m_group->setSelected(true);
+
+	}
+	m_scene->addItem(m_group);
+
+	emit endSelecting();
+	//绘制操作柄之前先清理一下
+	m_selectedHandleList.clear();
+	m_curSelectedHandleIndex = -1;
 }
 
 void LaserViewer::selectedHandleScale()
@@ -1932,20 +2097,28 @@ void LaserViewer::onDocumentIdle()
 
 void LaserViewer::onCancelSelected()
 {
+	
 	if (!m_group->isEmpty())
 	{
+		/*if (m_group->isSelected()) {
+			m_group->setSelected(false);
+		}*/
 		const auto items = m_group->childItems();
 		for (QGraphicsItem *item : items) {
 			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+			
 			m_group->removeFromGroup(p_item);
+			if (p_item->isSelected()) {
+				p_item->setSelected(false);
+			}
 			p_item->reShape();
 		}
-
+		
 	}
-	if (m_group->isSelected()) {
-		m_group->setSelected(false);
-	}
+	
+	
 	m_group->setMatrix(QMatrix());
 	m_scene->clearSelection();
+	m_scene->removeItem(m_group);
 	emit cancelSelected();
 }
