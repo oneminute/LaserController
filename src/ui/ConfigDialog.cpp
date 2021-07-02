@@ -13,6 +13,7 @@
 #include <QAbstractButton>
 
 #include "common/Config.h"
+#include "widget/EditSlider.h"
 
 ConfigDialog::ConfigDialog(QWidget* parent)
     : QDialog(parent)
@@ -39,6 +40,9 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     connect(m_ui->treeWidgetCatalogue, &QTreeWidget::currentItemChanged, this, &ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged);
     connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &ConfigDialog::onButtonClicked);
+
+    addConfigItem(Config::General::languageItem(), m_ui->groupBoxInternationalization);
+    addConfigItem(Config::Layers::maxLayersCountItem(), m_ui->groupBoxLayers);
 
     //// setup general config items
     //QComboBox* comboBoxLanguages = new QComboBox;
@@ -231,7 +235,7 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
         {
             if ((*i)->isModified())
             {
-                (*i)->updateConfigItem();
+                //(*i)->updateConfigItem();
             }
         }
         Config::save();
@@ -250,7 +254,7 @@ void ConfigDialog::setCurrentPanel(const QString & title)
     m_ui->treeWidgetCatalogue->setCurrentItem(items[0]);
 }
 
-void ConfigDialog::addConfigItem(QWidget * widget, ConfigItem * item, QWidget* parent, const QString& exlusion)
+void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QString& exlusion)
 {
     QGridLayout * layout = qobject_cast<QGridLayout*>(parent->layout());
     if (layout == nullptr)
@@ -267,34 +271,48 @@ void ConfigDialog::addConfigItem(QWidget * widget, ConfigItem * item, QWidget* p
 
     int row = layout->rowCount();
 
+    QWidget* widget;
+
+    switch (item->inputWidgetType())
+    {
+    case IWT_EditSlider:
+    {
+        widget = new EditSlider(Qt::Horizontal);
+        break;
+    }
+    case IWT_ComboBox:
+    {
+        widget = new QComboBox;
+        break;
+    }
+    default:
+    {
+        widget = nullptr;
+        break;
+    }
+    }
+    if (!widget)
+        return;
+    for (QMap<QString, QVariant>::ConstIterator i = item->inputWidgetProperties().constBegin(); i != item->inputWidgetProperties().constEnd(); i++)
+    {
+        widget->setProperty(i.key().toStdString().c_str(), i.value());
+    }
+    item->initWidget(widget);
     layout->addWidget(widget, row, 1);
     widget->setParent(parent);
 
-    /*QRegularExpression re("[A-Z][^A-Z]*");
-    QRegularExpressionMatchIterator match = re.globalMatch(item->title);
-    QStringList segs;
-    while (match.hasNext())
-    {
-        QStringList seg = match.next().capturedTexts();
-        if (seg[0] != exlusion)
-            segs.append(seg[0]);
-    }
     QLabel* labelName = new QLabel(parent);
-    QString title = segs.join(" ");
-    if (title.trimmed().isEmpty()) 
-    {
-        title = item->title;
-    }
-    labelName->setText(title);
+    labelName->setText(item->title());
     layout->addWidget(labelName, row, 0);
 
     QLabel* labelDesc = new QLabel(parent);
-    labelDesc->setText(item->description);
+    labelDesc->setText(item->description());
     layout->addWidget(labelDesc, row, 2);
 
-    InputWidgetWrapper* wrapper = new InputWidgetWrapper(widget, item, labelName, labelDesc);
-    connect(wrapper, &InputWidgetWrapper::valueChanged, this, &ConfigDialog::onValueChanged);
-    m_wrappers.append(wrapper);*/
+    InputWidgetWrapper* wrapper = item->bindWidget(widget);
+    wrapper->setNameLabel(labelName);
+    wrapper->setDescriptionLabel(labelDesc);
+    m_wrappers.append(wrapper);
 }
 
 void ConfigDialog::onValueChanged(const QVariant& value)

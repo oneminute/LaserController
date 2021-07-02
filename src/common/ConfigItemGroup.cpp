@@ -62,7 +62,7 @@ void ConfigItemGroup::addConfigItem(ConfigItem* item)
     d->itemsMap.insert(item->name(), item);
 }
 
-ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& title, const QString& description, const QVariant& value, bool advanced, bool visible, StoreStrategy storeType)
+ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& title, const QString& description, const QVariant& value, DataType dataType, bool advanced, bool visible, StoreStrategy storeType)
 {
     ConfigItem* item = new ConfigItem(
         name
@@ -70,6 +70,7 @@ ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& t
         , title
         , description
         , value
+        , dataType
         , advanced
         , visible
         , storeType

@@ -74,7 +74,7 @@
     "general": {
         "language": {
             "defaultValue": 25,
-            "value": 25
+            "value": null
         },
         "unit": {
             "defaultValue": 4,

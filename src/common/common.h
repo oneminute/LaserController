@@ -195,6 +195,38 @@ enum StoreStrategy
     SS_LAZY
 };
 
+enum InputWidgetType
+{
+    IWT_Unknown,
+    IWT_CheckBox,
+    IWT_ComboBox,
+    IWT_LineEdit,
+    IWT_TextEdit,
+    IWT_PlainTextEdit,
+    IWT_SpinBox,
+    IWT_DoubleSpinBox,
+    IWT_TimeEdit,
+    IWT_DateEdit,
+    IWT_DateTimeEdit,
+    IWT_Dial,
+    IWT_EditSlider,
+    IWT_FloatEditSlider
+};
+
+enum DataType
+{
+    DT_INT,
+    DT_FLOAT,
+    DT_DOUBLE,
+    DT_REAL,
+    DT_BOOL,
+    DT_STRING,
+    DT_DATETIME,
+    DT_RECT,
+    DT_POINT,
+    DT_SIZE
+};
+
 class Global
 {
 public:

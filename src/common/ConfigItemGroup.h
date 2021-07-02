@@ -29,6 +29,7 @@ public:
         , const QString& title
         , const QString& description
         , const QVariant& value
+        , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
         , StoreStrategy storeType = StoreStrategy::SS_CONFIRMED

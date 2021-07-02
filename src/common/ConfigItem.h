@@ -16,11 +16,13 @@ class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
+    typedef void (*CreateWidgetFn)(QWidget*, ConfigItem*);
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
         , const QString& title
         , const QString& description
         , const QVariant& value
+        , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
         , StoreStrategy storeType = StoreStrategy::SS_CONFIRMED
@@ -44,7 +46,6 @@ public:
     void setStoreType(StoreStrategy type);
 
     QVariant value() const;
-    void setValue(const QVariant& value);
 
     QVariant defaultValue() const;
     void setDefaultValue(const QVariant& value);
@@ -62,14 +63,29 @@ public:
 
     InputWidgetWrapper* bindWidget(QWidget* widget);
     LaserRegister* bindRegister(LaserRegister* reg);
-    void unbindWidget(InputWidgetWrapper* widgetWrapper);
+    //void unbindWidget(InputWidgetWrapper* widgetWrapper);
     void unbindRegister(LaserRegister* reg);
 
     QString toString() const;
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
 
+    DataType dataType() const;
+
+    void setInputWidgetType(InputWidgetType widgetType);
+    InputWidgetType inputWidgetType() const;
+
+    QMap<QString, QVariant>& inputWidgetProperties();
+    void setInputWidgetProperty(const QString& key, const QVariant& value);
+
+    CreateWidgetFn createWidgetFunction();
+    void setCreateWidgetFunction(CreateWidgetFn fn);
+
+    void initWidget(QWidget* widget);
+
 public slots:
+    void setValue(const QVariant& value);
+    void restore();
 
 protected:
     void setModified();
@@ -80,14 +96,13 @@ protected:
     void setValueConfirmed(const QVariant& value);
     void setValueLazy(const QVariant& value);
 
-    InputWidgetWrapper* findWidget(QWidget* widget) const;
+    //InputWidgetWrapper* findWidget(QWidget* widget) const;
 
 signals:
-    void dirtyChanged(bool value);
     void visibleChanged(bool value);
     void valueChanged(const QVariant& value);
     void defaultValueChanged(const QVariant& value);
-    void modified();
+    void modifiedChanged(bool modified);
 
 private:
     QScopedPointer<ConfigItemPrivate> m_ptr;

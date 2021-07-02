@@ -11,15 +11,7 @@
 #include <QVariant>
 #include <QMap>
 
-enum ConfigItemType
-{
-    CIT_INT,
-    CIT_FLOAT,
-    CIT_DOUBLE,
-    CIT_BOOL,
-    CIT_STRING,
-    CIT_DATETIME
-};
+
 
 #define CONFIG_ITEM(groupName, itemName, returnType, convertionMethod) \
     static ConfigItem* itemName##Item() \

@@ -32,7 +32,7 @@ protected:
     void setCurrentPanel(QWidget* panel);
     void setCurrentPanel(const QString& title);
 
-    void addConfigItem(QWidget* widget, ConfigItem* item, QWidget* parent, const QString& exlusion = "");
+    void addConfigItem(ConfigItem* item, QWidget* parent, const QString& exlusion = "");
 
 protected slots:
     void onValueChanged(const QVariant& value);

@@ -1,4 +1,5 @@
 #include "TypeUtils.h"
+#include <QDateTime>
 
 cv::Point2f typeUtils::qtPointF2CVPoint2f(const QPointF & pt)
 {
@@ -44,4 +45,54 @@ cv::Rect typeUtils::qtRect2cvRect(const QRectF & rect, float scale)
     return cv::Rect(
         cv::Point2f(rect.left() * scale, rect.top() * scale), 
         cv::Point2f(rect.right() * scale, rect.bottom() * scale));
+}
+
+QVariant typeUtils::textToVariant(const QString& src, DataType dataType)
+{
+    QVariant dst;
+    switch (dataType)
+    {
+    case DT_INT:
+    {
+        dst = src.toInt();
+        break;
+    }
+    case DT_FLOAT:
+    {
+        dst = src.toFloat();
+        break;
+    }
+    case DT_DOUBLE:
+    {
+        dst = src.toDouble();
+        break;
+    }
+    case DT_REAL:
+    {
+        dst = static_cast<qreal>(src.toDouble());
+        break;
+    }
+    case DT_BOOL:
+    {
+        dst = src.toLower() == "true";
+        break;
+    }
+    case DT_STRING:
+    {
+        dst = src;
+        break;
+    }
+    case DT_DATETIME:
+    {
+        dst = QDateTime::fromString(src);
+        break;
+    }
+    case DT_RECT:
+    case DT_POINT:
+    case DT_SIZE:
+    {
+        break;
+    }
+    }
+    return QVariant();
 }

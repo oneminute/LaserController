@@ -1,6 +1,7 @@
 ﻿#include "Config.h"
 
-#include <QDebug>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -104,18 +105,42 @@ void Config::loadGeneralItems()
 {
     ConfigItemGroup* group = new Config::General;
 
-    group->addConfigItem(
+    ConfigItem* language = group->addConfigItem(
         "language"
         , tr("Language")
         , tr("Language for both UI and Business.")
         , 25
     );
+    language->setInputWidgetType(IWT_ComboBox);
+    language->setCreateWidgetFunction(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
 
-    group->addConfigItem(
+            comboBox->addItem(QLocale::languageToString(QLocale::English), QLocale::English);
+            comboBox->addItem(QLocale::languageToString(QLocale::Chinese), QLocale::Chinese);
+            comboBox->setCurrentText(QLocale::languageToString(static_cast<QLocale::Language>(item->value().toInt())));
+        }
+    );
+
+    ConfigItem* unit = group->addConfigItem(
         "unit"
         , tr("Unit")
         , tr("Global unit")
         , static_cast<int>(SU_MM)
+    );
+    unit->setInputWidgetType(IWT_ComboBox);
+    unit->setCreateWidgetFunction(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("mm"), 4);
+        }
     );
 }
 
@@ -123,106 +148,139 @@ void Config::loadLayersItems()
 {
     ConfigItemGroup* group = new Config::Layers;
 
-    group->addConfigItem(
+    ConfigItem* maxLayersCount = group->addConfigItem(
         "maxLayersCount"
         , tr("Max Layers Count")
         , tr("Max Layers count.")
         , 16
     );
+    maxLayersCount->setInputWidgetType(IWT_EditSlider);
+    maxLayersCount->setInputWidgetProperty("minimum", 8);
+    maxLayersCount->setInputWidgetProperty("maximum", 40);
 }
 
 void Config::loadUiItems()
 {
     ConfigItemGroup* group = new Config::Ui;
 
-    group->addConfigItem(
+    ConfigItem* operationButtonIconSize = group->addConfigItem(
         "operationButtonIconSize"
         , tr("Operation Button Icon Size")
         , tr("Size of operation buttons' icons.")
         , 32
     );
+    operationButtonIconSize->setInputWidgetProperty("minimum", 16);
+    operationButtonIconSize->setInputWidgetProperty("maximum", 64);
 
-    group->addConfigItem(
+    ConfigItem* operationButtonWidth = group->addConfigItem(
         "operationButtonWidth"
         , tr("Operation Button Width")
         , tr("Width of operation buttons.")
         , 60
     );
+    operationButtonWidth->setInputWidgetProperty("minimum", 32);
+    operationButtonWidth->setInputWidgetProperty("maximum", 120);
 
-    group->addConfigItem(
+    ConfigItem* operationButtonHeight = group->addConfigItem(
         "operationButtonHeight",
         tr("Operation Button Height"),
         tr("Height of operation buttons."),
         60
     );
+    operationButtonHeight->setInputWidgetProperty("minimum", 32);
+    operationButtonHeight->setInputWidgetProperty("maximum", 120);
 
-    group->addConfigItem(
+    ConfigItem* operationButtonShowText = group->addConfigItem(
         "operationButtonShowText",
         tr("Show Operation Button Text"),
         tr("Show text of operation button or not."),
-        false
+        false,
+        DT_BOOL
     );
+    operationButtonShowText->setInputWidgetType(IWT_CheckBox);
 
-    group->addConfigItem(
+    ConfigItem* toolButtonSize = group->addConfigItem(
         "toolButtonSize",
         tr("Tool Button Size"),
         tr("Size of tool buttons."),
         32
     );
+    toolButtonSize->setInputWidgetProperty("minimum", 16);
+    toolButtonSize->setInputWidgetProperty("maximum", 64);
 
-    group->addConfigItem(
+    ConfigItem* colorButtonWidth = group->addConfigItem(
         "colorButtonWidth",
         tr("Color Button Width"),
         tr("Width of color buttons."),
         30
     );
+    colorButtonWidth->setInputWidgetProperty("minimum", 20);
+    colorButtonWidth->setInputWidgetProperty("maximum", 60);
 
-    group->addConfigItem(
+    ConfigItem* colorButtonHeight = group->addConfigItem(
         "colorButtonHeight",
         tr("Color Button Height"),
         tr("Height of color buttons."),
         30
     );
+    colorButtonHeight->setInputWidgetProperty("minimum", 20);
+    colorButtonHeight->setInputWidgetProperty("maximum", 60);
 }
 
 void Config::loadCuttingLayerItems()
 {
     ConfigItemGroup* group = new Config::CuttingLayer;
 
-    group->addConfigItem(
+    ConfigItem* minSpeed = group->addConfigItem(
         "minSpeed",
         tr("Min Speed"),
         tr("Min speed for cutting layers."),
         15
     );
+    minSpeed->setInputWidgetProperty("minimum", 1);
+    minSpeed->setInputWidgetProperty("maximum", 1000);
 
-    group->addConfigItem(
+    ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
         tr("Run Speed"),
         tr("Running speed for cutting layers."),
         60
     );
+    runSpeed->setInputWidgetProperty("minimum", 1);
+    runSpeed->setInputWidgetProperty("maximum", 1000);
 
-    group->addConfigItem(
+    ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
         tr("Laser Power"),
         tr("Laser power for cutting layers."),
-        80
+        80,
+        DT_REAL
     );
+    laserPower->setInputWidgetProperty("minimum", 1);
+    laserPower->setInputWidgetProperty("maximum", 100);
+    laserPower->setInputWidgetProperty("textTemplate", "%");
 
-    group->addConfigItem(
+    ConfigItem* minPowerRate = group->addConfigItem(
         "minPowerRate",
         tr("Min Power Rate"),
         tr("The minimum power rate for cutting layers"),
-        700
+        70,
+        DT_REAL
     );
+    minPowerRate->setInputWidgetProperty("minimum", 1);
+    minPowerRate->setInputWidgetProperty("maximum", 100);
+    minPowerRate->setInputWidgetProperty("textTemplate", "%");
 
-    group->addConfigItem(
+    ConfigItem* maxPowerRate = group->addConfigItem(
         "maxPowerRate",
         tr("Max Power Rate"),
         tr("The maximum power rate for cutting layers"),
-        1000
+        100,
+        DT_REAL
     );
+    maxPowerRate->setInputWidgetProperty("minimum", 1);
+    maxPowerRate->setInputWidgetProperty("maximum", 100);
+    maxPowerRate->setInputWidgetProperty("textTemplate", "%");
 }
 
 void Config::loadEngravingLayerItems()
@@ -315,7 +373,8 @@ void Config::loadPathOptimizationItems()
         "volatileRate",
         tr("Volatile Rate"),
         tr("Volatile of pheromones each iteration."),
-        0.65
+        0.65,
+        DT_REAL
     );
 
     group->addConfigItem(
@@ -336,7 +395,8 @@ void Config::loadPathOptimizationItems()
         "maxStartingPointAnglesDiff",
         tr("Max Angles Diff"),
         tr("Max angles between starting points."),
-        45
+        45,
+        DT_REAL
     );
 
 }
@@ -349,14 +409,16 @@ void Config::loadExportItems()
         "maxAnglesDiff",
         tr("Max Angles Diff"),
         tr("Max angles diff between tow points."),
-        5.0
+        5.0,
+        DT_REAL
     );
 
     group->addConfigItem(
         "maxIntervalDistance",
         tr("Max Interval Distance"),
         tr("Max interval distance between tow points."),
-        10.0
+        10.0,
+        DT_REAL
     );
 }
 
@@ -368,6 +430,7 @@ void Config::loadDeviceItems()
         "autoConnectFirst",
         tr("Auto Connect First"),
         tr("Auto connect to first com port when found multiple laser devices."),
-        true
+        true,
+        DT_BOOL
     );
 }
