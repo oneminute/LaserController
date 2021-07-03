@@ -5,6 +5,8 @@
 #include "LaserLayer.h"
 #include "LaserPrimitiveGroup.h"
 
+#include<QGraphicsSceneMouseEvent>
+
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
     , m_doc(nullptr)
@@ -128,4 +130,42 @@ void LaserScene::destroyItemGroup(LaserPrimitiveGroup * group)
 	removeItem(group);
 	delete group;
 }
+
+bool LaserScene::eventFilter(QObject * watched, QEvent * event)
+{
+	m_mousePressBlock = false;
+	if (event->type() == QEvent::GraphicsSceneMousePress) {
+		QString name = watched->metaObject()->className();
+		qDebug() << name;
+		if (name == "LaserBitmap") {
+			m_mousePressBlock = true;
+			return false;
+		}
+		
+	}
+	
+	return QGraphicsScene::eventFilter(watched, event);
+}
+
+bool LaserScene::mousePressBlock()
+{
+	return m_mousePressBlock;
+}
+//rewrite mouse event
+void LaserScene::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+	QGraphicsScene::mousePressEvent(event);
+}
+
+void LaserScene::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+{
+	QGraphicsScene::mouseMoveEvent(event);
+	
+}
+
+void LaserScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+{
+	QGraphicsScene::mouseReleaseEvent(event);
+}
+
 

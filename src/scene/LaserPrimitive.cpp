@@ -413,7 +413,8 @@ void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 }
 
 void LaserPrimitive::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
-	event->accept();
+	//QGraphicsObject::mouseMoveEvent(event);
+	//event->accept();
 	
 }
 
@@ -1024,6 +1025,10 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     d->type = LPT_BITMAP;
     d->outline.addRect(bounds);
     d->position = bounds.center();
+
+	setFlags(ItemIsSelectable | ItemIsMovable);
+	installEventFilter(doc->scene());
+	//this->setAcceptedMouseButtons(Qt::LeftButton);
 }
 
 QImage LaserBitmap::image() const 
@@ -1031,6 +1036,8 @@ QImage LaserBitmap::image() const
     Q_D(const LaserBitmap);
     return d->image; 
 }
+
+
 
 void LaserBitmap::setImage(const QImage& image)
 {
@@ -1154,6 +1161,29 @@ QRectF LaserBitmap::sceneBoundingRect() const
 	QPainterPath path;
 	path.addRect(d->boundingRect);
 	return sceneTransform().map(path).boundingRect();
+}
+
+void LaserBitmap::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+	QGraphicsItem::mousePressEvent(event);
+	//event->accept();
+	//event->ignore();
+}
+
+void LaserBitmap::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+{
+	QGraphicsItem::mouseMoveEvent(event);
+	QList<QGraphicsView*> views = scene()->views();
+	views[0]->viewport()->repaint();
+	//event->accept();
+}
+
+void LaserBitmap::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+{
+	QGraphicsItem::mouseReleaseEvent(event);
+	QList<QGraphicsView*> views = scene()->views();
+	LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
+	viewer->onSelectedFillGroup();
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

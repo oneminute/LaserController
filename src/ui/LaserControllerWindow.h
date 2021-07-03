@@ -87,6 +87,7 @@ protected slots:
 	void onActionSpline(bool checked = false);
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
+	void onActionBitmap(bool checked = false);
 
     void onActionShowMainCardInfo(bool checked = false);
     void onActionTemporaryLicense(bool checked = false);
@@ -197,7 +198,7 @@ private:
 	QRadioButton* m_leftCenterBtn;
 	QRadioButton* m_centerBtn;
 	QRadioButton* m_rightCenterBtn;
-	QDoubleSpinBox* m_rotateBox;
+	LaserDoubleSpinBox* m_rotateBox;
 	QToolButton* m_mmOrIn;
 	bool m_unitIsMM;
 	//selection tool bar

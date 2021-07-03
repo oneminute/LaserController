@@ -41,7 +41,7 @@ public:
 	void setVerticalRuler(RulerWidget * _r);
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
-	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, int _state, int _transformType);//change selection property by tool bar
+	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
 private:
     void init();
 	void initSpline();
@@ -49,14 +49,21 @@ private:
 	void releaseTextEdit();
 	void selectedHandleScale();
 	void selectedHandleRotate();
+	
 	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
 	void detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom);
+	bool checkTwoPointEqueal(const QPointF& point1, const QPointF& point2);
+	bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
+	bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
+	bool isAllPolygonStartPoint();
 public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
 	void textAreaChanged();
-
+	void onDocumentIdle();
+	void onCancelSelected();
+	void onSelectedFillGroup();
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -73,7 +80,7 @@ signals:
 	void readyEllipse();
 	void creatingLine();
 	void readyLine();
-	void creatingPolygonStartRect();
+	//void creatingPolygonStartRect();
 	void creatingPolygon();
 	void readyPolygon();
 	void creatingSpline();
@@ -103,13 +110,14 @@ protected:
 
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
+	
 
 private:
     QScopedPointer<LaserScene> m_scene;
     //LaserScene* m_scene;
     bool m_rubberBandActive;
     QPoint m_rubberBandOrigin;
-    bool m_mousePressed;
+    //bool m_mousePressed;
     QPoint m_lastDragPos;
 
     QPointF m_selectionStartPoint;
@@ -117,6 +125,7 @@ private:
 
 	QPointF m_creatingRectStartPoint;
 	QPointF m_creatingRectEndPoint;
+	QPointF m_creatingRectBeforeShiftPoint;
 
 	QPointF m_creatingEllipseStartPoint;
 	QPointF m_creatingEllipseStartInitPoint;
@@ -129,8 +138,9 @@ private:
 	QPointF m_creatingPolygonStartPoint;
 	QPointF m_creatingPolygonEndPoint;
 	QVector<QPointF> m_creatingPolygonPoints;
-	QRectF m_polygonStartRect;
-	bool m_isMouseInStartRect;
+	QList<QLineF> m_creatingPolygonLines;
+	/*QRectF m_polygonStartRect;
+	bool m_isMouseInStartRect;*/
 	//Spline
 	SplineStruct m_handlingSpline;//creating and editing
 	QList<SplineStruct> m_splineList;

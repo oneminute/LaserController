@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QTreeWidgetItem>
 #include <QGridLayout>
+#include <QFileDialog> 
 #include "scene/LaserPrimitiveGroup.h"
 
 #include "LaserApplication.h"
@@ -406,9 +407,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_propertyLayout->addWidget(rotateWidget,0, 9, 2, 2);
 	//rotate
 	QLabel* rotateLabel = new QLabel("Rotate");
-	m_rotateBox = new QDoubleSpinBox();
+	m_rotateBox = new LaserDoubleSpinBox();
 	m_rotateBox->setMinimum(-360.0);
 	m_rotateBox->setMaximum(360.0);
+	m_rotateBox->setDecimals(1);
 	m_mmOrIn = new QToolButton();
 	m_ui->actionUnitChange->setText("mm");
 	m_mmOrIn->setDefaultAction(m_ui->actionUnitChange);
@@ -471,6 +473,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSpline);
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
+	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
 
 	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -507,6 +510,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
+	connect(StateController::instance().documentIdleState(), &QState::entered, m_viewer, &LaserViewer::onDocumentIdle);
+	
+	connect(StateController::instance().documentPrimitiveState(), &QState::entered, m_viewer, [=] {
+		m_viewer->viewport()->repaint();
+	});
+	connect(StateController::instance().documentSelectedState(), &QState::entered, m_viewer, [=] {
+		m_viewer->viewport()->repaint();
+	});
 	
 	//selected properties
 	//connect(m_scene, &LaserScene::selectionChanged,this, &LaserControllerWindow::selectionChange);
@@ -570,6 +581,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_yRateBox->value() <= 0) {
 			m_yRateBox->setValue(0.001);
 		}
+		selectionPropertyBoxChange();
+	});
+	//rotate
+	connect(m_rotateBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+		m_selectionTranformState = SelectionTransformType::Transform_ROTATE;
 		selectionPropertyBoxChange();
 	});
 	//selection original raido button
@@ -1203,6 +1219,8 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
             m_scene->document()->removePrimitive(primitive);
         }
 		m_ui->tableWidgetLayers->updateItems();
+		//change state
+		m_viewer->onCancelSelected();
     }
 }
 
@@ -1269,6 +1287,7 @@ void LaserControllerWindow::onActionLine(bool checked)
 	else
 	{
 		m_ui->actionLineTool->setChecked(true);
+		
 	}
 }
 
@@ -1334,6 +1353,20 @@ void LaserControllerWindow::onActionTemporaryLicense(bool checked)
     {
         QMessageBox::information(this, tr("Request failure"), tr("Your application for temporary license is failure."));
     }
+}
+
+void LaserControllerWindow::onActionBitmap(bool checked)
+{
+	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
+	//qDebug() <<"name: "<< name;
+	if (name == "") {
+		return;
+	}
+	QImage image(name);
+	qreal width = image.size().width();
+	qreal height = image.size().height();
+	LaserBitmap* bitmap = new LaserBitmap(image, QRectF(0, 0, width, height), m_scene->document());
+	m_scene->addLaserPrimitive(bitmap);
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -1823,6 +1856,8 @@ void LaserControllerWindow::selectionPropertyBoxChange()
 	qreal xScale = m_xRateBox->value() * 0.01;
 	qreal yScale = m_yRateBox->value() * 0.01;
 
+	qreal rotate = m_rotateBox->value() / 180 * M_PI;
+
 	if (m_unitIsMM) {
 		x = Global::mm2PixelsXF(x);
 		y = Global::mm2PixelsYF(y);
@@ -1830,14 +1865,12 @@ void LaserControllerWindow::selectionPropertyBoxChange()
 		height = Global::mm2PixelsYF(height);
 	}
 	
-	//repaint window
-	QSize size = m_viewer->size();
-	QSize newSize(size.width()+1, size.height()+1);
-	m_viewer->resize(newSize);
-	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, m_selectionOriginalState, m_selectionTranformState);
-	m_viewer->resize(size);
+	//repaint 
+	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, m_selectionTranformState);
 	m_xRateBox->setValue(100);
 	m_yRateBox->setValue(100);
+	m_rotateBox->setValue(0);
+	m_viewer->viewport()->repaint();
 }
 void LaserControllerWindow::onSelectionOriginalClicked(bool clicked)
 {
@@ -2116,10 +2149,10 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentSelectionState);
+	
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, initState);	
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveEllipseState);
@@ -2136,8 +2169,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveEllipseState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveLineState);
@@ -2154,8 +2186,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveLineState);
@@ -2172,8 +2203,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveEllipseState);
@@ -2190,8 +2220,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveEllipseState);
@@ -2208,8 +2237,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveEllipseState);
@@ -2226,8 +2254,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveEllipseState);
@@ -2244,8 +2271,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectingState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectedState);
+	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectionState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveRectState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveEllipseState);
@@ -2255,6 +2281,12 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", true, documentPrimitiveTextState);
 	// end actionTextTool
+
+	// actionBitmapTool
+	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentWorkingState);
+	// end actionBitmapTool
 
     // actionRemoveLayer
 	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, initState);
