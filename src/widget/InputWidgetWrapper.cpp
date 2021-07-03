@@ -236,6 +236,57 @@ QVariant InputWidgetWrapper::value() const
     return m_configItem->value();
 }
 
+QWidget* InputWidgetWrapper::createWidget(InputWidgetType widgetType, Qt::Orientation orientation)
+{
+    QWidget* widget = nullptr;
+    switch (widgetType)
+    {
+    case IWT_CheckBox:
+        widget = new QCheckBox;
+        break;
+    case IWT_ComboBox:
+        widget = new QComboBox;
+        break;
+    case IWT_LineEdit:
+        widget = new QLineEdit;
+        break;
+    case IWT_TextEdit:
+        widget = new QTextEdit;
+        break;
+    case IWT_PlainTextEdit:
+        widget = new QPlainTextEdit;
+        break;
+    case IWT_SpinBox:
+        widget = new QSpinBox;
+        break;
+    case IWT_DoubleSpinBox:
+        widget = new QDoubleSpinBox;
+        break;
+    case IWT_TimeEdit:
+        widget = new QTimeEdit;
+        break;
+    case IWT_DateEdit:
+        widget = new QDateEdit;
+        break;
+    case IWT_DateTimeEdit:
+        widget = new QDateTimeEdit;
+        break;
+    case IWT_Dial:
+        widget = new QDial;
+        break;
+    case IWT_EditSlider:
+        widget = new EditSlider(orientation);
+        break;
+    case IWT_FloatEditSlider:
+        widget = new FloatEditSlider(orientation);
+        break;
+    default:
+        widget = nullptr;
+        break;
+    }
+    return widget;
+}
+
 void InputWidgetWrapper::onTextChanged(const QString & text)
 {
     emit valueChanged(typeUtils::textToVariant(text, m_configItem->dataType()));

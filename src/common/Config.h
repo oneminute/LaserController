@@ -11,8 +11,6 @@
 #include <QVariant>
 #include <QMap>
 
-
-
 #define CONFIG_ITEM(groupName, itemName, returnType, convertionMethod) \
     static ConfigItem* itemName##Item() \
     { \
@@ -147,7 +145,7 @@ public:
 
     public:
         CONFIG_ITEM(export, maxAnglesDiff, qreal, toReal)
-        CONFIG_ITEM(export, maxIntervalDistance, qreal, toReal)
+        CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
 
     private:
         friend class Config;
@@ -176,6 +174,7 @@ public:
     static void restore();
     static QString configFilePath();
     static bool isModified();
+    static QList<ConfigItemGroup*> getGroups();
 
 protected:
     static void loadGeneralItems();

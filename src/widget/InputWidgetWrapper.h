@@ -32,6 +32,8 @@ public:
     bool isModified();
     QVariant value() const;
 
+    static QWidget* createWidget(InputWidgetType widgetType, Qt::Orientation orientation);
+
 signals:
     void valueChanged(const QVariant& newValue);
 

@@ -239,6 +239,8 @@ void Config::loadCuttingLayerItems()
     );
     minSpeed->setInputWidgetProperty("minimum", 1);
     minSpeed->setInputWidgetProperty("maximum", 1000);
+    minSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    minSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
@@ -248,17 +250,19 @@ void Config::loadCuttingLayerItems()
     );
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
+    runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
         tr("Laser Power"),
         tr("Laser power for cutting layers."),
-        80,
+        8,
         DT_REAL
     );
-    laserPower->setInputWidgetProperty("minimum", 1);
+    laserPower->setInputWidgetProperty("minimum", 0);
     laserPower->setInputWidgetProperty("maximum", 100);
-    laserPower->setInputWidgetProperty("textTemplate", "%");
+    laserPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* minPowerRate = group->addConfigItem(
         "minPowerRate",
@@ -267,9 +271,9 @@ void Config::loadCuttingLayerItems()
         70,
         DT_REAL
     );
-    minPowerRate->setInputWidgetProperty("minimum", 1);
+    minPowerRate->setInputWidgetProperty("minimum", 0);
     minPowerRate->setInputWidgetProperty("maximum", 100);
-    minPowerRate->setInputWidgetProperty("textTemplate", "%");
+    minPowerRate->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* maxPowerRate = group->addConfigItem(
         "maxPowerRate",
@@ -278,126 +282,170 @@ void Config::loadCuttingLayerItems()
         100,
         DT_REAL
     );
-    maxPowerRate->setInputWidgetProperty("minimum", 1);
+    maxPowerRate->setInputWidgetProperty("minimum", 0);
     maxPowerRate->setInputWidgetProperty("maximum", 100);
-    maxPowerRate->setInputWidgetProperty("textTemplate", "%");
+    maxPowerRate->setInputWidgetProperty("textTemplate", "%1%");
 }
 
 void Config::loadEngravingLayerItems()
 {
     ConfigItemGroup* group = new Config::EngravingLayer;
 
-    group->addConfigItem(
+    ConfigItem* minSpeed = group->addConfigItem(
         "minSpeed",
         tr("Min Speed"),
         tr("Min speed for engraving layers."),
         15
     );
+    minSpeed->setInputWidgetProperty("minimum", 1);
+    minSpeed->setInputWidgetProperty("maximum", 1000);
+    minSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    minSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
-    group->addConfigItem(
+    ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
         tr("Run Speed"),
         tr("Running speed for engraving layers."),
         60
     );
+    runSpeed->setInputWidgetProperty("minimum", 1);
+    runSpeed->setInputWidgetProperty("maximum", 1000);
+    runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
-    group->addConfigItem(
+    ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
         tr("Laser Power"),
         tr("Laser power for engraving layers."),
-        80
+        8
     );
+    laserPower->setInputWidgetType(IWT_FloatEditSlider);
+    laserPower->setInputWidgetProperty("minimum", 0);
+    laserPower->setInputWidgetProperty("maximum", 100);
+    laserPower->setInputWidgetProperty("textTemplate", "%1%");
 
-    group->addConfigItem(
+    ConfigItem* minPowerRate = group->addConfigItem(
         "minPowerRate",
         tr("Min Power Rate"),
         tr("The minimum power rate for engraving layers"),
-        700
+        70,
+        DT_REAL
     );
+    minPowerRate->setInputWidgetType(IWT_FloatEditSlider);
+    minPowerRate->setInputWidgetProperty("minimum", 0);
+    minPowerRate->setInputWidgetProperty("maximum", 100);
+    minPowerRate->setInputWidgetProperty("textTemplate", "%1%");
 
-    group->addConfigItem(
+    ConfigItem* maxPowerRate = group->addConfigItem(
         "maxPowerRate",
         tr("Max Power Rate"),
         tr("The maximum power rate for engraving layers"),
-        1000
+        100,
+        DT_REAL
     );
+    maxPowerRate->setInputWidgetProperty("minimum", 0);
+    maxPowerRate->setInputWidgetProperty("maximum", 100);
+    maxPowerRate->setInputWidgetProperty("textTemplate", "%1%");
 
     group->addConfigItem(
         "useHalftone",
         tr("Use Halftone"),
         tr("Use halftone algorithm for bitmaps."),
-        1000
+        true,
+        DT_BOOL
     );
 
-    group->addConfigItem(
+    ConfigItem* lpi = group->addConfigItem(
         "LPI",
         tr("LPI"),
         tr("Lines per inch."),
-        600
+        600,
+        DT_INT
     );
+    lpi->setInputWidgetProperty("minimum", 1);
+    lpi->setInputWidgetProperty("maximum", 1200);
 
-    group->addConfigItem(
+    ConfigItem* dpi = group->addConfigItem(
         "DPI",
         tr("DPI"),
         tr("Dots per inch."),
-        600
+        600,
+        DT_INT
     );
+    dpi->setInputWidgetProperty("minimum", 1);
+    dpi->setInputWidgetProperty("maximum", 1200);
 }
 
 void Config::loadPathOptimizationItems()
 {
     ConfigItemGroup* group = new Config::PathOptimization;
 
-    group->addConfigItem(
+    ConfigItem* maxAnts = group->addConfigItem(
         "maxAnts",
         tr("Max ants"),
         tr("Max ants count."),
         100
     );
+    maxAnts->setInputWidgetProperty("minimum", 1);
+    maxAnts->setInputWidgetProperty("maximum", 100000);
 
-    group->addConfigItem(
+    ConfigItem* maxIterations = group->addConfigItem(
         "maxIterations",
         tr("Max Iterations"),
         tr("Max iterations count."),
         500
     );
+    maxIterations->setInputWidgetProperty("minimum", 1);
+    maxIterations->setInputWidgetProperty("maximum", 2000);
 
-    group->addConfigItem(
+    ConfigItem* maxTraverse = group->addConfigItem(
         "maxTraverse",
         tr("Max Traverse"),
         tr("Max Traverse count."),
         2000
     );
+    maxTraverse->setInputWidgetProperty("minimum", 1);
+    maxTraverse->setInputWidgetProperty("maximum", 200000000);
 
-    group->addConfigItem(
+    ConfigItem* volatileRate = group->addConfigItem(
         "volatileRate",
         tr("Volatile Rate"),
         tr("Volatile of pheromones each iteration."),
         0.65,
         DT_REAL
     );
+    volatileRate->setInputWidgetProperty("minimum", 0);
+    volatileRate->setInputWidgetProperty("maximum", 1);
+    volatileRate->setInputWidgetProperty("step", 0.01);
+    volatileRate->setInputWidgetProperty("page", 0.1);
+    volatileRate->setInputWidgetProperty("decimals", 2);
 
     group->addConfigItem(
         "useGreedyAlgorithm",
         tr("Use Greedy Algorithm"),
         tr("Use greedy algorithm form path optimization."),
-        true
+        true,
+        DT_BOOL
     );
 
-    group->addConfigItem(
+    ConfigItem* maxStartingPoints = group->addConfigItem(
         "maxStartingPoints",
         tr("Max Starting Points"),
         tr("Max starting points of each primitive."),
         8
     );
+    maxStartingPoints->setInputWidgetProperty("minimum", 1);
+    maxStartingPoints->setInputWidgetProperty("maximum", 16);
 
-    group->addConfigItem(
+    ConfigItem* maxStartingPointAnglesDiff = group->addConfigItem(
         "maxStartingPointAnglesDiff",
         tr("Max Angles Diff"),
         tr("Max angles between starting points."),
         45,
         DT_REAL
     );
+    maxStartingPointAnglesDiff->setInputWidgetProperty("minimum", 1.0);
+    maxStartingPointAnglesDiff->setInputWidgetProperty("maximum", 90.0);
 
 }
 
@@ -405,21 +453,24 @@ void Config::loadExportItems()
 {
     ConfigItemGroup* group = new Config::Export;
 
-    group->addConfigItem(
+    ConfigItem* maxAnglesDiff = group->addConfigItem(
         "maxAnglesDiff",
         tr("Max Angles Diff"),
         tr("Max angles diff between tow points."),
         5.0,
         DT_REAL
     );
+    maxAnglesDiff->setInputWidgetProperty("minimum", 1.0);
+    maxAnglesDiff->setInputWidgetProperty("maximum", 90.0);
 
-    group->addConfigItem(
+    ConfigItem* maxIntervalDistance = group->addConfigItem(
         "maxIntervalDistance",
         tr("Max Interval Distance"),
         tr("Max interval distance between tow points."),
-        10.0,
-        DT_REAL
+        10
     );
+    maxIntervalDistance->setInputWidgetProperty("minimum", 1);
+    maxIntervalDistance->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadDeviceItems()
@@ -433,4 +484,9 @@ void Config::loadDeviceItems()
         true,
         DT_BOOL
     );
+}
+
+QList<ConfigItemGroup*> Config::getGroups()
+{
+    return groups;
 }

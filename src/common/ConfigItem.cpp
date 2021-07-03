@@ -17,7 +17,7 @@ public:
         , laserRegister(nullptr)
         , createWidgetFunction(nullptr)
     {
-
+        
     }
 
     ConfigItem* q_ptr;
@@ -138,6 +138,24 @@ ConfigItem::ConfigItem(
     d->advanced = advanced;
     d->visible = visible;
     d->storeType = storeType;
+
+    switch (d->dataType)
+        {
+        case DT_BOOL:
+            d->inputWidgetType = IWT_CheckBox;
+            break;
+        case DT_FLOAT:
+        case DT_DOUBLE:
+        case DT_REAL:
+            d->inputWidgetType = IWT_FloatEditSlider;
+            break;
+        case DT_STRING:
+            d->inputWidgetType = IWT_LineEdit;
+            break;
+        case DT_DATETIME:
+            d->inputWidgetType = IWT_DateTimeEdit;
+            break;
+        }
 }
 
 ConfigItem::~ConfigItem()
@@ -305,17 +323,10 @@ bool ConfigItem::isModified() const
     return d->modified;
 }
 
-InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
+InputWidgetWrapper* ConfigItem::createInputWidgetWrapper(QWidget* widget)
 {
     Q_D(ConfigItem);
-    /*InputWidgetWrapper* wrapper = findWidget(widget);
-    if (wrapper)
-    {
-        return wrapper;
-    }*/
-
     return new InputWidgetWrapper(widget, this);
-    //d->widgetWrappers.append(wrapper);
 }
 
 LaserRegister* ConfigItem::bindRegister(LaserRegister* reg)
@@ -324,12 +335,6 @@ LaserRegister* ConfigItem::bindRegister(LaserRegister* reg)
     d->laserRegister = reg;
     return reg;
 }
-
-//void ConfigItem::unbindWidget(InputWidgetWrapper* widgetWrapper)
-//{
-//    Q_D(ConfigItem);
-//    d->widgetWrappers.removeOne(widgetWrapper);
-//}
 
 void ConfigItem::unbindRegister(LaserRegister* reg)
 {

@@ -61,9 +61,8 @@ public:
 
     bool isModified() const;
 
-    InputWidgetWrapper* bindWidget(QWidget* widget);
+    InputWidgetWrapper* createInputWidgetWrapper(QWidget* widget);
     LaserRegister* bindRegister(LaserRegister* reg);
-    //void unbindWidget(InputWidgetWrapper* widgetWrapper);
     void unbindRegister(LaserRegister* reg);
 
     QString toString() const;
