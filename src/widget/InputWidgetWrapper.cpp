@@ -127,9 +127,9 @@ QWidget* InputWidgetWrapper::widget() const
     return qobject_cast<QWidget*>(parent());
 }
 
-void InputWidgetWrapper::restore()
+void InputWidgetWrapper::reset()
 {
-    m_configItem->restore();
+    m_configItem->reset();
     updateValue(m_configItem->value());
 }
 

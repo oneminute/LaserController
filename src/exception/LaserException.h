@@ -19,6 +19,17 @@
 #define DEFINE_LASER_EXCEPTION(className) \
     DEFINE_LASER_EXCEPTION_D(className, LaserException)
 
+#define DEFINE_LASER_EXCEPTION_CODE(className, errorCode) \
+    class className: public LaserException \
+    { \
+    public: \
+        explicit className(const QString& errorMessage) \
+            : LaserException(errorCode, errorMessage) \
+        {} \
+        void raise() const override { throw* this; } \
+        className* clone() const override { return new className(m_errorMessage); } \
+    }
+
 class LaserException : public QException
 {
 public:
@@ -48,6 +59,8 @@ protected:
     QString m_errorMessage;
 };
 
+DEFINE_LASER_EXCEPTION_CODE(LaserFileException, E_FileException);
+DEFINE_LASER_EXCEPTION_CODE(LaserFatalException, E_SystemFatalError);
 DEFINE_LASER_EXCEPTION(LaserDeviceFatalException);
 DEFINE_LASER_EXCEPTION(LaserDeviceException);
 DEFINE_LASER_EXCEPTION_D(LaserDeviceSecurityException, LaserDeviceException);
@@ -56,16 +69,6 @@ DEFINE_LASER_EXCEPTION_D(LaserDeviceIOException, LaserDeviceException);
 DEFINE_LASER_EXCEPTION_D(LaserNetworkException, LaserException);
 DEFINE_LASER_EXCEPTION_D(LaserDeviceDataException, LaserDeviceException);
 DEFINE_LASER_EXCEPTION_D(LaserDeviceMachiningException, LaserDeviceException);
-
-class LaserFatalException : public LaserException
-{
-public:
-    LaserFatalException(const QString& message)
-        : LaserException(E_SystemFatalError, message)
-    {}
-    void raise() const override { throw* this; } 
-    LaserFatalException* clone() const override { return new LaserFatalException(m_errorMessage); }
-};
 
 class LaserDeviceUnknownException : public LaserException
 {

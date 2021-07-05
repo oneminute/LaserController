@@ -1,20 +1,20 @@
 {
     "cuttingLayer": {
         "laserPower": {
-            "defaultValue": 80,
+            "defaultValue": 8,
             "value": 8
         },
         "maxPowerRate": {
-            "defaultValue": 1000,
+            "defaultValue": 100,
             "value": 100
         },
         "minPowerRate": {
-            "defaultValue": 700,
+            "defaultValue": 70,
             "value": 70
         },
         "minSpeed": {
             "defaultValue": 15,
-            "value": 15
+            "value": 55
         },
         "runSpeed": {
             "defaultValue": 60,
@@ -37,15 +37,15 @@
             "value": 600
         },
         "laserPower": {
-            "defaultValue": 80,
+            "defaultValue": 8,
             "value": 8
         },
         "maxPowerRate": {
-            "defaultValue": 1000,
+            "defaultValue": 100,
             "value": 100
         },
         "minPowerRate": {
-            "defaultValue": 700,
+            "defaultValue": 70,
             "value": 70
         },
         "minSpeed": {
@@ -57,7 +57,7 @@
             "value": 60
         },
         "useHalftone": {
-            "defaultValue": 1000,
+            "defaultValue": true,
             "value": true
         }
     },

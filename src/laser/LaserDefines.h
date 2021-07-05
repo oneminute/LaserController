@@ -3,7 +3,10 @@
 
 enum LaserErrorCode
 {
-    E_Base = 1000,
+    E_Base = 0,
+    E_FileException = 1,
+
+    // laser device exception
     E_SystemFatalError = 1000,
     E_UnknownError = 1001,
 

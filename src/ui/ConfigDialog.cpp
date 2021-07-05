@@ -98,7 +98,7 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
         {
             if ((*i)->isModified())
             {
-                (*i)->restore();
+                (*i)->reset();
             }
         }
     }
@@ -114,13 +114,6 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
     }
     else if (stdButton == QDialogButtonBox::Save)
     {
-        for (QList<InputWidgetWrapper*>::ConstIterator i = m_wrappers.constBegin(); i != m_wrappers.constEnd(); i++)
-        {
-            if ((*i)->isModified())
-            {
-                //(*i)->updateConfigItem();
-            }
-        }
         Config::save();
         onValueChanged(QVariant());
     }
