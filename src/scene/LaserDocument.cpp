@@ -11,6 +11,8 @@
 #include <QSaveFile>
 #include <QStack>
 #include <QSharedData>
+#include <QJsonArray>
+#include <QByteArray>
 
 #include <opencv2/opencv.hpp>
 
@@ -23,6 +25,8 @@
 #include "LaserLayer.h"
 #include "state/StateController.h"
 #include "LaserNodePrivate.h"
+#include "svg/qsvgtinydocument.h"
+#include "LaserScene.h"
 
 class LaserDocumentPrivate : public LaserNodePrivate
 {
@@ -650,10 +654,97 @@ void LaserDocument::optimize()
 
 void LaserDocument::save(const QString& filename)
 {
+	QJsonDocument doc;
+	QJsonObject obj;
+	QJsonArray array;
+	QList<LaserLayer*> layers = this->layers();
+
+	for(int i = 0; i < layers.size(); i ++)
+	{
+		LaserLayer* layer = layers[i];
+		array.append(layer->toJson());
+	}
+	obj.insert("layers", array);
+
+	doc.setObject(obj);
+	QFile file(filename);
+	if (!file.open(QIODevice::WriteOnly)) {
+		return;
+	}
+	file.write(doc.toJson());
+	file.close();
 }
 
 void LaserDocument::load(const QString& filename)
 {
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly)){
+		return;
+	}
+	QJsonParseError *error = new QJsonParseError;
+	QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), error);
+	//判断文件是否完整
+	if (error->error != QJsonParseError::NoError)
+	{
+		qDebug() << "parseJson:" << error->errorString();
+		return;
+	}
+	QJsonArray layers = doc.object()["layers"].toArray();
+	for (int i = 0; i < layers.size(); i++) {
+		QJsonObject layer = layers[i].toObject();
+		QJsonArray array = layer["primitives"].toArray();
+		
+		//创建layer
+		LaserLayerType type = (LaserLayerType)layer["type"].toInt();
+		LaserLayer* laserLayer = new LaserLayer(layer["name"].toString(), type, this);
+		this->addLayer(laserLayer);
+		//创建primitive
+		for (int j = 0; j < array.size(); j++) {
+			QJsonObject primitiveJson = array[j].toObject();
+			QString className = primitiveJson["className"].toString();
+			if (className == "LaserEllipse") {
+				//path
+				QJsonArray polygonArray = primitiveJson["path"].toArray();
+				QVector<QPoint> list;
+				for each(QJsonValue point in polygonArray) {
+					QJsonArray pointArray = point.toArray();
+					list.append(QPoint(pointArray[0].toDouble(), pointArray[1].toDouble()));
+				}
+				
+				//postion
+				QJsonArray posArray = primitiveJson["position"].toArray();
+				QPointF position(posArray[0].toDouble(), posArray[1].toDouble());
+				//transform
+				QJsonArray matrixArray = primitiveJson["matrix"].toArray();
+				QTransform transform;
+				transform.setMatrix(matrixArray[0].toDouble(), matrixArray[1].toDouble(), matrixArray[2].toDouble(),
+					matrixArray[3].toDouble(), matrixArray[4].toDouble(), matrixArray[5].toDouble(),
+					matrixArray[6].toDouble(), matrixArray[7].toDouble(), matrixArray[8].toDouble());
+				//parent transform
+				QTransform transformP;
+				QJsonValue matrixPJson = primitiveJson["matrixParent"];
+				if (!matrixPJson.isNull()) {
+					QJsonArray matrixPArray = matrixPJson.toArray();
+					transformP.setMatrix(matrixPArray[0].toDouble(), matrixPArray[1].toDouble(), matrixPArray[2].toDouble(),
+						matrixPArray[3].toDouble(), matrixPArray[4].toDouble(), matrixPArray[5].toDouble(),
+						matrixPArray[6].toDouble(), matrixPArray[7].toDouble(), matrixPArray[8].toDouble());
+				}
+				
+				//polygon
+				QPolygon polygon(list);
+				QPainterPath path;
+				path.addPolygon(polygon);
+				LaserEllipse* ellipse = new LaserEllipse(QRectF(polygon.boundingRect()), this);
+				ellipse->setTransform(transform * transformP);
+				ellipse->setPos(position);
+
+				this->scene()->addItem(ellipse);
+				laserLayer->addPrimitive(ellipse);
+
+			}
+		}
+		
+	}
 }
 
 int LaserDocument::totalNodes()

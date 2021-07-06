@@ -1,6 +1,7 @@
 #include "LaserLayer.h"
 
 #include <QMessageBox>
+#include <QJsonArray>
 
 #include "util/Utils.h"
 #include "LaserDocument.h"
@@ -452,6 +453,27 @@ bool LaserLayer::isAvailable() const
 {
     Q_D(const LaserLayer);
     return !d->primitives.isEmpty();
+}
+
+QJsonObject LaserLayer::toJson()
+{
+	QJsonObject object;
+	QJsonArray array;
+	object.insert("name", this->name());
+	object.insert("type", this->type());
+	QList<LaserPrimitive*> primitives = this->primitives();
+	for (int i = 0; i < primitives.size(); i++) {
+		LaserPrimitive* primitive = primitives[i];
+		QString className = primitive->metaObject()->className();
+		if (className == "LaserEllipse") {
+			LaserEllipse* ellipse = qobject_cast<LaserEllipse*>(primitive);
+			//array.insert(i, ellipse->toJson());
+			array.append(ellipse->toJson());
+		}
+		
+	}
+	object.insert("primitives", array);
+	return object;
 }
 
 void LaserLayer::onClicked()

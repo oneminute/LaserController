@@ -11,6 +11,8 @@
 #include <Eigen/Core>
 #include <QTextEdit>
 #include <QGraphicsSceneMouseEvent>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
@@ -118,7 +120,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     bounds = QRectF(topLeft, bottomRight);
     
     QColor color = Qt::blue;
-	painter->setPen(QPen(color, 1, Qt::SolidLine));
+	//painter->setPen(QPen(color, 1, Qt::SolidLine));
     /*if (d->layer)
     {
         color = d->layer->color();
@@ -126,22 +128,28 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
 	if (isSelected())
 	{
-		isSelected();
+		//isSelected();
+		QString name = this->metaObject()->className();
+		if (name == "LaserBitmap") {
+			painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+			painter->drawRect(bounds);
+		}
+		else {
+			painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+		}
 		
-		painter->setPen(QPen(Qt::green, 1.2f, Qt::DashLine));
-	    painter->drawRect(bounds);
-		painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+		
 	}
 	//else if (isUnderMouse())
 	else if (d->isHover)
 	{
-		painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
-		painter->drawRect(bounds);
+		//painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
+		//painter->drawRect(bounds);
 	}
     else
     {
-		painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
-		painter->drawRect(bounds);
+		//painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
+		//painter->drawRect(bounds);
 		painter->setPen(QPen(Qt::gray, 1.2f, Qt::SolidLine));
     }
     
@@ -149,8 +157,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
     QPainterPath outline = this->outline();
     QPointF startPos = outline.pointAtPercent(0);
-    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
-    painter->drawText(startPos, name());
+    //painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
+    //painter->drawText(startPos, name());
 }
 
 QRectF LaserPrimitive::boundingRect() const
@@ -355,6 +363,11 @@ void LaserPrimitive::reShape()
 {
 }
 
+QJsonObject LaserPrimitive::toJson()
+{
+	return QJsonObject();
+}
+
 QString LaserPrimitive::typeName(LaserPrimitiveType typeId) const
 {
     static QMap<LaserPrimitiveType, QString> TypeNamesMap{
@@ -415,6 +428,7 @@ void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 void LaserPrimitive::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 	//QGraphicsObject::mouseMoveEvent(event);
 	//event->accept();
+	qDebug() << "";
 	
 }
 
@@ -520,6 +534,38 @@ void LaserEllipse::reShape()
 	d->path = transform().map(d->path);
 	d->boundingRect = d->path.boundingRect();
 	setTransform(QTransform());
+}
+
+QJsonObject LaserEllipse::toJson()
+{
+	Q_D(const LaserEllipse);
+	QJsonObject object;
+	//object.insert("transform", QJsonValue::fromVariant(QVariant::fromValue<QTransform>(transform())));
+	QJsonArray position = { pos() .x(), pos() .y()};
+	QJsonArray matrix = { transform().m11(), transform().m12(), transform().m13(), transform().m21(), transform().m22(), transform().m23(), transform().m31(), transform().m32(), transform().m33()};
+	QGraphicsItem* parentItem = this->parentItem();
+	if (parentItem) {
+		QTransform parentTransform = parentItem->transform();
+		QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
+		object.insert("parentMatrix", parentMatrix);
+	}
+	
+	QPolygonF polygon = d->path.toFillPolygon();
+	QJsonArray path;
+	for (int i = 0; i < polygon.toList().size(); i++) {
+		QPointF p = polygon.toList()[i];
+		QJsonArray point = {p.x(), p.y()};
+		//path.insert(i, point);
+		path.append(point);
+	}
+	QJsonArray();
+	object.insert("name", name());
+	object.insert("className", this->metaObject()->className());
+	object.insert("position", position);
+	object.insert("matrix", matrix);
+	object.insert("path", path);
+
+	return object;
 }
 
 class LaserRectPrivate : public LaserShapePrivate
@@ -1166,6 +1212,8 @@ QRectF LaserBitmap::sceneBoundingRect() const
 void LaserBitmap::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	QGraphicsItem::mousePressEvent(event);
+	QList<QGraphicsView*> views = scene()->views();
+	views[0]->viewport()->repaint();
 	//event->accept();
 	//event->ignore();
 }
@@ -1183,7 +1231,7 @@ void LaserBitmap::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	QGraphicsItem::mouseReleaseEvent(event);
 	QList<QGraphicsView*> views = scene()->views();
 	LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
-	viewer->onSelectedFillGroup();
+	viewer->onEndSelecting();
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

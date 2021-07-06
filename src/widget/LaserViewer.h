@@ -61,9 +61,11 @@ public slots:
     void zoomOut();
     void resetZoom();
 	void textAreaChanged();
+	void onEndSelecting();
 	void onDocumentIdle();
 	void onCancelSelected();
 	void onSelectedFillGroup();
+	void onReplaceGroup(LaserPrimitive* item);
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -93,7 +95,7 @@ signals:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 	void paintSelectedState(QPainter& painter);
-	void setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
+	int setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
 	
@@ -181,7 +183,7 @@ private:
 
 	qreal m_selectedEditCount = 0;
 	LaserPrimitiveGroup* m_group;
-
+	bool m_isLeftSelecting = true;//在左边开始选择还是右边开始选择
 	
 };
 

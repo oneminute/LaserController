@@ -2,6 +2,7 @@
 
 #include "LaserPrimitive.h"
 
+//class QGraphicsItem;
 class LaserPrimitiveGroupPrivate
 {
 	Q_DECLARE_PUBLIC(LaserPrimitiveGroup)
@@ -97,6 +98,12 @@ QRectF LaserPrimitiveGroup::sceneBoundingRect() const
 bool LaserPrimitiveGroup::isEmpty() const
 {
 	return childItems().isEmpty();
+}
+
+void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+{
+	//ªÊ÷∆group
+	//QGraphicsItemGroup::paint(painter, option, widget);
 }
 
 //QRectF LaserPrimitiveGroup::updateBoundingRect()
