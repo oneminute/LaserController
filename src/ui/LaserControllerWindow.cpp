@@ -439,6 +439,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionLaserCut, &QAction::triggered, this, &LaserControllerWindow::onActionLaserCut);
     connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
 	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::onActionNew);
+	connect(m_ui->actionSave, &QAction::triggered, this, &LaserControllerWindow::onActionSave);
+	connect(m_ui->actionOpen, &QAction::triggered, this, &LaserControllerWindow::onActionOpen);
 
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
@@ -859,13 +861,33 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
 }
 void LaserControllerWindow::onActionNew(bool checked)
 {
-	LaserDocument* doc = new LaserDocument(m_scene);
-	PageInformation page;
-	page.setWidth(320);
-	page.setHeight(280);
-	doc->setPageInformation(page);
-	doc->open();
-    initDocument(doc);
+	createNewDocument();
+}
+
+void LaserControllerWindow::onActionSave(bool checked)
+{
+	//QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
+	QString name = QFileDialog::getSaveFileName(nullptr, "save file", ".", "File(*lc)");
+	if (name == "") {
+		return;
+	}
+	if (!name.endsWith(".lc")) {
+		name += ".lc";
+	}
+	qDebug() << name;
+	m_scene->document()->save(name);
+	
+}
+
+void LaserControllerWindow::onActionOpen(bool checked)
+{
+	QString name = QFileDialog::getOpenFileName(nullptr, "open file", ".", "File(*lc)");
+	if (name == "") {
+		return;
+	}
+	//创建document
+	createNewDocument();
+	m_scene->document()->load(name);
 }
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
@@ -1367,6 +1389,7 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 	qreal height = image.size().height();
 	LaserBitmap* bitmap = new LaserBitmap(image, QRectF(0, 0, width, height), m_scene->document());
 	m_scene->addLaserPrimitive(bitmap);
+	m_viewer->onReplaceGroup(bitmap);
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -2326,6 +2349,17 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
         m_created = true;
         QTimer::singleShot(100, this, &LaserControllerWindow::windowCreated);
     }
+}
+
+void LaserControllerWindow::createNewDocument()
+{
+	LaserDocument* doc = new LaserDocument(m_scene);
+	PageInformation page;
+	page.setWidth(Global::mm2PixelsXF(LaserApplication::device->layoutWidth()));
+	page.setHeight(Global::mm2PixelsYF(LaserApplication::device->layoutHeight()));
+	doc->setPageInformation(page);
+	doc->open();
+	initDocument(doc);
 }
 
 QString LaserControllerWindow::getFilename(const QString& title, const QStringList & mime)

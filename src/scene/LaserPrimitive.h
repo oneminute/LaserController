@@ -145,6 +145,8 @@ public:
 
 	virtual void reShape();
 
+	virtual QJsonObject toJson();
+
 	/*void setScaleValue(qreal x, qreal y);
 	void setScaleTranslate(qreal x, qreal y);
 	void setSelectedEditingState(int state);
@@ -211,6 +213,7 @@ public:
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
 	virtual void reShape();
+	virtual QJsonObject toJson();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)

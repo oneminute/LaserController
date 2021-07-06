@@ -20,6 +20,9 @@ public:
 	bool isEmpty() const;
 	//QRectF updateBoundingRect();
 
+	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+
+
 private:
 	QScopedPointer<LaserPrimitiveGroupPrivate> m_ptr;
 

@@ -34,15 +34,16 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
-
     LaserDocument* laserDoc = new LaserDocument(scene);
-    QRectF viewBox = svgDoc->viewBox();
-    if (svgDoc == nullptr)
-    {
+	if (svgDoc == nullptr)
+	{
 		qWarning() << "Load SVG document failure!";
 		laserDoc->deleteLater();
-        return nullptr;
-    }
+		return nullptr;
+	}
+
+    QRectF viewBox = svgDoc->viewBox();
+    
 	laserDoc->setUnit(svgDoc->sizeUnit());
 
     QSize svgSize = svgDoc->size();

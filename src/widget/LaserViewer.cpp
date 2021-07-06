@@ -54,6 +54,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 {
 	QGraphicsView::paintEvent(event);
 	QPainter painter(viewport());
+	painter.setRenderHint(QPainter::Antialiasing);
     if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
     {
 		painter.setRenderHint(QPainter::Antialiasing);
@@ -66,26 +67,31 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     {
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
+		if (m_isLeftSelecting) {
+			painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
+		}
+		else {
+			painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+		}
+        
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
         //qDebug() << "SelectedEditing paint";
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-		QGraphicsView::paintEvent(event);
-		QPainter painter(viewport());
-		painter.setRenderHint(QPainter::Antialiasing);
-		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-		QRect rect = m_scene->backgroundItem()->boundingRect().toRect();
-		rect = QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
-		//painter.eraseRect(rect);
+		//QGraphicsView::paintEvent(event);
+		//QPainter painter(viewport());
+		//painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		//QRect rect = m_scene->backgroundItem()->boundingRect().toRect();
+		//rect = QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
 		paintSelectedState(painter);
     }
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 		if (m_isKeyShiftPressed) {
 			qreal width = m_creatingRectEndPoint.x() - m_creatingRectStartPoint.x();
@@ -510,414 +516,13 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				break;
 			}
 		}
-		/*switch (_state) {
-			case SelectionOriginalTopLeft: {//topLeft
-				switch (_transformType) {
-					case Transform_MOVE: {
-						// move
-						
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = bounds.topLeft();
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = bounds.topLeft();
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(bounds.topLeft());
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalTopCenter: {//topCenter
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - QPointF(bounds.center().x(), bounds.topLeft().y());
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = QPointF(bounds.center().x(), bounds.top());
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = QPointF(bounds.center().x(), bounds.topLeft().y());
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalTopRight: {//topRight
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - QPointF(bounds.bottomRight().x(), bounds.topLeft().y());
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = QPointF(bounds.right(), bounds.top());
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = bounds.topRight();
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalLeftCenter: {//leftCenter
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - QPointF(bounds.topLeft().x(), bounds.center().y());
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = QPointF(bounds.left(), bounds.center().y());
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = QPointF(bounds.topLeft().x(), bounds.center().y());
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalCenter: {//center
-				switch (_transformType) {
-					case Transform_MOVE: {
-						// move
-						QPointF diff = point - bounds.center();
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31()+diff.x(), t.m32()+ diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = bounds.center();
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						QPointF original = bounds.center();
-						QTransform t1;
-						t = t * t1.scale(rateX, rateY);
-						QPointF newOriginal = original * t1;
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31()+diff.x(), t.m32()+diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalRightCenter: {//rightCenter
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - QPointF(bounds.bottomRight().x(), bounds.center().y());
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = QPointF(bounds.right(), bounds.center().y());
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = QPointF(bounds.bottomRight().x(), bounds.center().y());
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-					
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalLeftBottom: {//leftBottom
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - QPointF(bounds.topLeft().x(), bounds.bottomRight().y());
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = QPointF(bounds.left(), bounds.bottom());
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = QPointF(bounds.topLeft().x(), bounds.bottomRight().y());
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalBottomCenter: {//bottomCenter
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - QPointF(bounds.center().x(), bounds.bottomRight().y());
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = QPointF(bounds.center().x(), bounds.bottom());
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = QPointF(bounds.center().x(), bounds.bottom());
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-			case SelectionOriginalBottomRight: {//rightBottom
-				switch (_transformType) {
-					case Transform_MOVE: {
-						QPointF diff = point - bounds.bottomRight();
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_SCALE: {
-						QTransform t1;
-						t1.scale(_xscale, _yscale);
-						t = t * t1;
-						QPointF origi = bounds.bottomRight();
-						QPointF newOrigi = t1.map(origi);
-						QPointF diff = origi - newOrigi;
-						QTransform t2;
-						t2.translate(diff.x(), diff.y());
-						t = t * t2;
-						m_group->setTransform(t);
-						emit selectedChange();
-						break;
-					}
-					case Transform_RESIZE: {
-						//resize
-						qreal rateX = width / bounds.width();
-						qreal rateY = height / bounds.height();
-						qLogD << "scale: " << rateX << ", " << rateY;
-						QPointF original = bounds.bottomRight();
-						QTransform t1;
-						t1.scale(rateX, rateY);
-						t = t * t1;
-						QPointF newOriginal = t1.map(original);
-						QPointF diff = original - newOriginal;
-						t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-						m_group->setTransform(t);
-						break;
-					}
-					case Transform_ROTATE: {
-						break;
-					}
-				}
-				break;
-			}
-		}*/
 		
-		
-		//t.scale(rateX, )
 	}
 }
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
 	
     qreal left, right, top, bottom;
-	/*QRectF rect;
-	if (m_group && !m_group->isEmpty()) {
-		rect = m_group->sceneBoundingRect();
-		qDebug() << "paintSelectedState group" ;
-	}
-	else {
-		rect = selectedItemsSceneBoundingRect();
-		qDebug() << "paintSelectedState primi";
-	}*/
 	QRectF rect = selectedItemsSceneBoundingRect();
 	qDebug() << "paintSelectedState: "<<rect;
 	left = rect.left();
@@ -1000,7 +605,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     painter.drawRect(m_selectedHandleList[12]);
 }
 
-void LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint)
+int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint)
 {
 	//m_selectionStartPoint, m_selectionEndPoint
 	QPainterPath selectionPath;
@@ -1018,6 +623,7 @@ void LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _e
 	else if (_endPoint.x() >= _startPoint.x()) {
 		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::ContainsItemBoundingRect);
 	}
+	return m_scene->selectedPrimitives().size();
 }
 
 void LaserViewer::wheelEvent(QWheelEvent* event)
@@ -1059,13 +665,14 @@ void LaserViewer::enterEvent(QEvent* event)
 
 void LaserViewer::mousePressEvent(QMouseEvent* event)
 {
-	QGraphicsView::mousePressEvent(event);
+	
 
 // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
+			QGraphicsView::mousePressEvent(event);
             //事件被Item截断
 			if (m_scene->mousePressBlock()) {
 				return;
@@ -1078,6 +685,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         }
         // 若在DocumentSelected状态下
         else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+			
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
@@ -1147,6 +755,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             }
             else
             {
+				QGraphicsView::mousePressEvent(event);
 				onCancelSelected();
 				//viewport()->repaint();
                 //m_selectionStartPoint = event->pos();
@@ -1221,11 +830,19 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
 		m_selectionEndPoint = m_mousePoint;
+		//start right
+		if (m_selectionEndPoint.x() < m_selectionStartPoint.x()) {
+			m_isLeftSelecting = false;
+		}
+		else {
+			m_isLeftSelecting = true;
+		}
 		viewport()->repaint();
         return;
     }
     // 当在DocumentSelected状态时
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+		
         int handlerIndex;
         QRectF handlerRect;
         if (isOnControllHandlers(event->pos(), handlerIndex, handlerRect))
@@ -1419,8 +1036,15 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             viewport()->repaint();
             return;
         }
-		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
-		onSelectedFillGroup();
+		int selectedCount = setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
+		if (selectedCount <= 0) {
+			m_scene->clearSelection();
+			emit cancelSelecting();
+			m_isKeyShiftPressed = false;
+			viewport()->repaint();
+			return;
+		}
+		onEndSelecting();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -1438,6 +1062,9 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(m_creatingRectStartPoint, m_creatingRectEndPoint);
         LaserRect* rectItem = new LaserRect(rect, m_scene->document());
         m_scene->addLaserPrimitive(rectItem);
+		//m_scene->addItem(rectItem);
+		onReplaceGroup(rectItem);
+		viewport()->repaint();
         emit readyRectangle();
     }
     //Ellipse
@@ -1449,6 +1076,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
         LaserEllipse* ellipseItem = new LaserEllipse(rect, m_scene->document());
         m_scene->addLaserPrimitive(ellipseItem);
+		onReplaceGroup(ellipseItem);
         emit readyEllipse();
     }
     //Line
@@ -1456,6 +1084,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 	{
 		m_creatingLineStartPoint = mapToScene(event->pos());
 		m_creatingLineEndPoint = m_creatingLineStartPoint;
+
 		emit creatingLine();
 
 	}
@@ -1466,6 +1095,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
 				LaserLine* lineItem = new LaserLine(line, m_scene->document());
 				m_scene->addLaserPrimitive(lineItem);
+				onReplaceGroup(lineItem);
 				emit readyLine();
 			}
 			else if (event->button() == Qt::RightButton) {
@@ -1510,6 +1140,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				if (m_creatingPolygonEndPoint == m_creatingPolygonStartPoint) {
 					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints), m_scene->document());
 					m_scene->addLaserPrimitive(polygon);
+					onReplaceGroup(polygon);
 					m_creatingPolygonPoints.clear();
 					setCursor(Qt::ArrowCursor);
 					emit readyPolygon();
@@ -1522,6 +1153,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			if (!isAllPolygonStartPoint()) {
 				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document());
 				m_scene->addLaserPrimitive(polyLine);
+				onReplaceGroup(polyLine);
 			}
 			
 			m_creatingPolygonPoints.clear();
@@ -1784,7 +1416,11 @@ void LaserViewer::releaseTextEdit()
 void LaserViewer::selectedHandleRotate() {
 
 }
+void LaserViewer::onEndSelecting() {
+	onSelectedFillGroup();
+	emit endSelecting();
 
+}
 void LaserViewer::onSelectedFillGroup()
 {
 	if (m_scene->selectedItems().size() == 0) {
@@ -1812,11 +1448,18 @@ void LaserViewer::onSelectedFillGroup()
 
 	}
 	m_scene->addItem(m_group);
-
-	emit endSelecting();
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
 	m_curSelectedHandleIndex = -1;
+}
+
+void LaserViewer::onReplaceGroup(LaserPrimitive* item)
+{
+	
+	onCancelSelected();
+	item->setSelected(true);
+	//onSelectedFillGroup();
+	onEndSelecting();
 }
 
 void LaserViewer::selectedHandleScale()
@@ -2097,7 +1740,9 @@ void LaserViewer::onDocumentIdle()
 
 void LaserViewer::onCancelSelected()
 {
-	
+	if (!m_group) {
+		return;
+	}
 	if (!m_group->isEmpty())
 	{
 		/*if (m_group->isSelected()) {
@@ -2121,4 +1766,5 @@ void LaserViewer::onCancelSelected()
 	m_scene->clearSelection();
 	m_scene->removeItem(m_group);
 	emit cancelSelected();
+	viewport()->repaint();
 }

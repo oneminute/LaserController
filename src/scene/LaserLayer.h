@@ -8,6 +8,7 @@
 #include <QList>
 #include <QSharedDataPointer>
 #include <QExplicitlySharedDataPointer>
+#include <QJsonObject>
 
 #include "LaserNode.h"
 
@@ -107,6 +108,8 @@ public:
     bool isDefault() const;
 
     virtual bool isAvailable() const;
+
+	virtual QJsonObject toJson();
 
 protected:
     void onClicked();

@@ -62,6 +62,8 @@ protected slots:
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
 	void onActionNew(bool checked = false);
+	void onActionSave(bool checked = false);
+	void onActionOpen(bool checked = false);
 
     void onActionMoveTop(bool checked = false);
     void onActionMoveBottom(bool checked = false);
@@ -140,6 +142,7 @@ private:
     QString getFilename(const QString& title, const QStringList& mime);
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
+	void createNewDocument();
 
 signals:
     void windowCreated();
