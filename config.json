@@ -1,207 +1,149 @@
 {
-    "CuttingLayer": {
-        "LaserPower": {
+    "cuttingLayer": {
+        "laserPower": {
             "defaultValue": 80,
-            "name": "LaserPower",
-            "type": 0,
-            "value": 115
+            "value": 8
         },
-        "MinSpeed": {
-            "defaultValue": 15,
-            "name": "MinSpeed",
-            "type": 0,
-            "value": 60
-        },
-        "MinSpeedPower": {
-            "defaultValue": 700,
-            "name": "MinSpeedPower",
-            "type": 0,
-            "value": 0
-        },
-        "RunSpeed": {
-            "defaultValue": 60,
-            "name": "RunSpeed",
-            "type": 0,
-            "value": 423
-        },
-        "RunSpeedPower": {
+        "maxPowerRate": {
             "defaultValue": 1000,
-            "name": "RunSpeedPower",
-            "type": 0,
-            "value": 669
+            "value": 100
+        },
+        "minPowerRate": {
+            "defaultValue": 700,
+            "value": 70
+        },
+        "minSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "runSpeed": {
+            "defaultValue": 60,
+            "value": 60
         }
     },
-    "EngravingLayer": {
+    "device": {
+        "autoConnectFirst": {
+            "defaultValue": true,
+            "value": true
+        }
+    },
+    "engravingLayer": {
         "DPI": {
             "defaultValue": 600,
-            "name": "DPI",
-            "type": 0,
             "value": 600
         },
         "LPI": {
             "defaultValue": 600,
-            "name": "LPI",
-            "type": 0,
+            "value": 600
+        },
+        "laserPower": {
+            "defaultValue": 80,
+            "value": 8
+        },
+        "maxPowerRate": {
+            "defaultValue": 1000,
             "value": 100
         },
-        "LaserPower": {
-            "defaultValue": 115,
-            "name": "LaserPower",
-            "type": 0,
-            "value": 115
+        "minPowerRate": {
+            "defaultValue": 700,
+            "value": 70
         },
-        "MinSpeed": {
+        "minSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "runSpeed": {
             "defaultValue": 60,
-            "name": "MinSpeed",
-            "type": 0,
             "value": 60
         },
-        "MinSpeedPower": {
-            "defaultValue": 0,
-            "name": "MinSpeedPower",
-            "type": 0,
-            "value": 0
-        },
-        "RunSpeed": {
-            "defaultValue": 300,
-            "name": "RunSpeed",
-            "type": 0,
-            "value": 423
-        },
-        "RunSpeedPower": {
-            "defaultValue": 900,
-            "name": "RunSpeedPower",
-            "type": 0,
-            "value": 669
-        },
-        "UseHalftone": {
-            "defaultValue": true,
-            "name": "UseHalftone",
-            "type": 3,
-            "value": false
+        "useHalftone": {
+            "defaultValue": 1000,
+            "value": true
         }
     },
-    "General": {
-        "Language": {
-            "defaultValue": 31,
-            "name": "Language",
-            "type": 0,
+    "export": {
+        "maxAnglesDiff": {
+            "defaultValue": 5,
+            "value": 5
+        },
+        "maxIntervalDistance": {
+            "defaultValue": 10,
+            "value": 10
+        }
+    },
+    "general": {
+        "language": {
+            "defaultValue": 25,
             "value": 25
         },
-        "Unit": {
+        "unit": {
             "defaultValue": 4,
-            "name": "Unit",
-            "type": 0,
             "value": 4
         }
     },
-    "Layers": {
-        "MaxLayersCount": {
+    "layers": {
+        "maxLayersCount": {
             "defaultValue": 16,
-            "name": "MaxLayersCount",
-            "type": 0,
             "value": 16
         }
     },
-    "OptimizePath": {
-        "MaxAnts": {
+    "pathOptimization": {
+        "maxAnts": {
             "defaultValue": 100,
-            "name": "MaxAnts",
-            "type": 0,
             "value": 100
         },
-        "MaxIterations": {
+        "maxIterations": {
             "defaultValue": 500,
-            "name": "MaxIterations",
-            "type": 0,
-            "value": 1000
+            "value": 500
         },
-        "MaxStartingPointAnglesDiff": {
+        "maxStartingPointAnglesDiff": {
             "defaultValue": 45,
-            "name": "MaxStartingPointAnglesDiff",
-            "type": 0,
             "value": 45
         },
-        "MaxStartingPoints": {
+        "maxStartingPoints": {
             "defaultValue": 8,
-            "name": "MaxStartingPoints",
-            "type": 0,
             "value": 8
         },
-        "MaxTraverseCount": {
-            "defaultValue": 10000,
-            "name": "MaxTraverseCount",
-            "type": 0,
-            "value": 10000
+        "maxTraverse": {
+            "defaultValue": 2000,
+            "value": 2000
         },
-        "UseGreedyAlgorithm": {
+        "useGreedyAlgorithm": {
             "defaultValue": true,
-            "name": "UseGreedyAlgorithm",
-            "type": 3,
-            "value": null
-        },
-        "VolatileRate": {
-            "defaultValue": 0.65,
-            "name": "VolatileRate",
-            "type": 1,
-            "value": 0.9
-        }
-    },
-    "PltUtils": {
-        "MaxAnglesDiff": {
-            "defaultValue": 5,
-            "name": "MaxAnglesDiff",
-            "type": 1,
-            "value": 10
-        },
-        "MaxIntervalDistance": {
-            "defaultValue": 10,
-            "name": "MaxIntervalDistance",
-            "type": 1,
-            "value": 30
-        }
-    },
-    "UI": {
-        "ColorButtonHeight": {
-            "defaultValue": 30,
-            "name": "ColorButtonHeight",
-            "type": 0,
-            "value": 30
-        },
-        "ColorButtonWidth": {
-            "defaultValue": 30,
-            "name": "ColorButtonWidth",
-            "type": 0,
-            "value": 30
-        },
-        "OperationButtonHeight": {
-            "defaultValue": 60,
-            "name": "OperationButtonHeight",
-            "type": 0,
-            "value": 60
-        },
-        "OperationButtonIconSize": {
-            "defaultValue": 32,
-            "name": "OperationButtonIconSize",
-            "type": 0,
-            "value": 32
-        },
-        "OperationButtonShowText": {
-            "defaultValue": true,
-            "name": "OperationButtonShowText",
-            "type": 3,
             "value": true
         },
-        "OperationButtonWidth": {
+        "volatileRate": {
+            "defaultValue": 0.65,
+            "value": 0.65
+        }
+    },
+    "ui": {
+        "colorButtonHeight": {
+            "defaultValue": 30,
+            "value": 30
+        },
+        "colorButtonWidth": {
+            "defaultValue": 30,
+            "value": 30
+        },
+        "operationButtonHeight": {
             "defaultValue": 60,
-            "name": "OperationButtonWidth",
-            "type": 0,
             "value": 60
         },
-        "ToolButtonSize": {
+        "operationButtonIconSize": {
             "defaultValue": 32,
-            "name": "ToolButtonSize",
-            "type": 0,
+            "value": 32
+        },
+        "operationButtonShowText": {
+            "defaultValue": false,
+            "value": false
+        },
+        "operationButtonWidth": {
+            "defaultValue": 60,
+            "value": 60
+        },
+        "toolButtonSize": {
+            "defaultValue": 32,
             "value": 32
         }
     }

@@ -174,6 +174,59 @@ enum SelectionTransformType {
 	Transform_RESIZE = 3
 };
 
+/// <summary>
+/// 当前选项的修改方式
+/// </summary>
+enum StoreStrategy
+{
+    /// <summary>
+    /// 直接修改
+    /// </summary>
+    SS_DIRECTLY,
+
+    /// <summary>
+    /// 该策略是在用户确认保存后，再直接将选项值通过setValue函数写入到文件中。
+    /// </summary>
+    SS_CONFIRMED,
+
+    /// <summary>
+    /// 延后保存，一般是与寄存器相关，由板卡返回寄存器的值后再修改当前内存中的值
+    /// </summary>
+    SS_LAZY
+};
+
+enum InputWidgetType
+{
+    IWT_Unknown,
+    IWT_CheckBox,
+    IWT_ComboBox,
+    IWT_LineEdit,
+    IWT_TextEdit,
+    IWT_PlainTextEdit,
+    IWT_SpinBox,
+    IWT_DoubleSpinBox,
+    IWT_TimeEdit,
+    IWT_DateEdit,
+    IWT_DateTimeEdit,
+    IWT_Dial,
+    IWT_EditSlider,
+    IWT_FloatEditSlider
+};
+
+enum DataType
+{
+    DT_INT,
+    DT_FLOAT,
+    DT_DOUBLE,
+    DT_REAL,
+    DT_BOOL,
+    DT_STRING,
+    DT_DATETIME,
+    DT_RECT,
+    DT_POINT,
+    DT_SIZE
+};
+
 class Global
 {
 public:

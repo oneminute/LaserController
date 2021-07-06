@@ -10,6 +10,15 @@ class LaserRegister : public QObject
 {
     Q_OBJECT
 public:
+
+    enum StoreStrategy
+    {
+        SS_DIRECTLY,
+        SS_LAZY
+    };
+
+    Q_ENUM(StoreStrategy)
+
     explicit LaserRegister(int addr, const QString& name = "", const QString& description = "", 
         bool isSystem = true, bool readOnly = false, LaserDriver* parent = nullptr);
     virtual ~LaserRegister();

@@ -70,7 +70,7 @@ LaserDriver::~LaserDriver()
     qLogD << "driver destroyed";
 }
 
-LaserDriver & LaserDriver::instance()
+LaserDriver& LaserDriver::instance()
 {
     return *g_driver;
 }
@@ -82,20 +82,20 @@ void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCoun
 
     float progress = position * 1.0f / totalCount;
     qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4)
-;
+        ;
     if (instance().m_isDownloading)
     {
         emit instance().downloading(position, totalCount, progress);
     }
 }
 
-void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t * sysEventData)
+void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
 {
     if (instance().m_isClosed)
         return;
 
     QString eventData = QString::fromWCharArray(sysEventData);
-    qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event id = " << eventData;
+    qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
     if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
     {
         emit instance().raiseError(sysMsgCode, eventData);
@@ -106,7 +106,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     }
 }
 
-void LaserDriver::parseAndRefreshRegisters(QString &eventData, RegistersMap& registers)
+void LaserDriver::parseAndRefreshRegisters(QString& eventData, RegistersMap& registers)
 {
     //instance().m_registers.clear();
     for (QString i : eventData.split(";"))
@@ -126,7 +126,7 @@ void LaserDriver::parseAndRefreshRegisters(QString &eventData, RegistersMap& reg
             continue;
 
         QVariant value = tokens[1];
-        
+
         if (registers.contains(addr))
         {
             registers[addr] = value;
@@ -154,7 +154,7 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 {
     float progress = position * 1.0f / totalCount;
     qDebug() << "Proc progress callback handler:" << position << totalCount << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
-    
+
 }
 
 bool LaserDriver::load()
@@ -241,6 +241,11 @@ bool LaserDriver::load()
 
     m_fnGetMainCardID = (FN_WCHART_VOID)m_library.resolve("GetMainCardID");
     m_fnActiveMainCard = (FNActivationMainCard)m_library.resolve("ActivationMainCard");
+    m_fnGetDeviceId = (FN_WCHART_BOOL)m_library.resolve("GetDeviceID");
+    m_fnGetHardwareKeyID = (FN_WCHART_VOID)m_library.resolve("GetHardwareKeyID");
+    m_fnGetMainCardRegState = (FN_VOID_VOID)m_library.resolve("GetMainCardRegState");
+    m_fnGetMainCardInfo = (FN_WCHART_VOID)m_library.resolve("GetMainCardInfo");
+    m_fnCreateLicenseFile = (FN_BOOL_WCHART)m_library.resolve("CreateLicenseFile");
 
     m_fnGetCurrentLaserPos = (FN_WCHART_VOID)m_library.resolve("GetCurrentLaserPos");
     m_fnSmallScaleMovement = (FNSmallScaleMovement)m_library.resolve("SmallScaleMovement");
@@ -314,11 +319,11 @@ QStringList LaserDriver::getPortList()
 {
     QString portList = QString::fromWCharArray(m_fnGetComPortList());
     QStringList portNames = portList.split(";");
-    
+
     return portNames;
 }
 
-bool LaserDriver::initComPort(const QString & name)
+bool LaserDriver::initComPort(const QString& name)
 {
     int port = utils::parsePortName(name);
     int result = m_fnInitComPort(port);
@@ -377,7 +382,7 @@ bool LaserDriver::writeSysParamToCard(const RegistersMap& values)
 
     qDebug() << "address list: " << addrBuf;
     qDebug() << "values list: " << valuesBuf;
-    
+
     bool success = m_fnWriteSysParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
     delete[] wcValues;
@@ -396,7 +401,7 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
     }
     QString addrStr = addrList.join(",");
     wchar_t* addrBuf = typeUtils::qStringToWCharPtr(addrStr);
-    
+
     bool success = m_fnReadSysParamFromCard(addrBuf) != -1;
     delete[] addrBuf;
     return success;
@@ -433,7 +438,7 @@ bool LaserDriver::writeUserParamToCard(const RegistersMap& values)
 
     qDebug() << "address list: " << addrBuf;
     qDebug() << "values list: " << valuesBuf;
-    
+
     bool success = m_fnWriteUserParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
     delete[] wcValues;
@@ -452,7 +457,7 @@ bool LaserDriver::readUserParamFromCard(QList<int> addresses)
     }
     QString addrStr = addrList.join(",");
     wchar_t* addrBuf = typeUtils::qStringToWCharPtr(addrStr);
-    
+
     bool success = m_fnReadUserParamFromCard(addrBuf) != -1;
     delete[] addrBuf;
     return success;
@@ -474,7 +479,7 @@ void LaserDriver::showAboutWindow()
     m_fnShowAboutWindow();
 }
 
-bool LaserDriver::checkFactoryPassword(const QString & password)
+bool LaserDriver::checkFactoryPassword(const QString& password)
 {
     wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
     bool success = m_fnCheckFactoryPassword(wcPassword) != -1;
@@ -482,7 +487,7 @@ bool LaserDriver::checkFactoryPassword(const QString & password)
     return success;
 }
 
-bool LaserDriver::changeFactoryPassword(const QString & oldPassword, const QString & newPassword)
+bool LaserDriver::changeFactoryPassword(const QString& oldPassword, const QString& newPassword)
 {
     wchar_t* wcOldPassword = typeUtils::qStringToWCharPtr(oldPassword);
     wchar_t* wcNewPassword = typeUtils::qStringToWCharPtr(newPassword);
@@ -513,9 +518,9 @@ QString LaserDriver::getMainCardID()
     return id;
 }
 
-QString LaserDriver::activateMainCard(const QString& name, const QString& address, 
-    const QString& phone, const QString& qq, const QString& wx, const QString& email, 
-    const QString& country, const QString& distributor, const QString& trademark, 
+QString LaserDriver::activateMainCard(const QString& name, const QString& address,
+    const QString& phone, const QString& qq, const QString& wx, const QString& email,
+    const QString& country, const QString& distributor, const QString& trademark,
     const QString& model, const QString& cardId)
 {
     wchar_t* nameBuf = typeUtils::qStringToWCharPtr(name);
@@ -530,21 +535,9 @@ QString LaserDriver::activateMainCard(const QString& name, const QString& addres
     wchar_t* modelBuf = typeUtils::qStringToWCharPtr(model);
     wchar_t* cardIdBuf = typeUtils::qStringToWCharPtr(cardId);
 
-    /*char* nameBuf = typeUtils::qStringToCharPtr(name);
-    char* addressBuf = typeUtils::qStringToCharPtr(address);
-    char* phoneBuf = typeUtils::qStringToCharPtr(phone);
-    char* qqBuf = typeUtils::qStringToCharPtr(qq);
-    char* wxBuf = typeUtils::qStringToCharPtr(wx);
-    char* emailBuf = typeUtils::qStringToCharPtr(email);
-    char* countryBuf = typeUtils::qStringToCharPtr(country);
-    char* distributorBuf = typeUtils::qStringToCharPtr(distributor);
-    char* trademarkBuf = typeUtils::qStringToCharPtr(trademark);
-    char* modelBuf = typeUtils::qStringToCharPtr(model);
-    char* cardIdBuf = typeUtils::qStringToCharPtr(cardId);*/
     wchar_t* resultBuf = m_fnActiveMainCard(nameBuf, addressBuf, phoneBuf, qqBuf, wxBuf,
         emailBuf, countryBuf, distributorBuf, trademarkBuf, modelBuf, cardIdBuf);
     QString result = QString::fromWCharArray(resultBuf);
-    //QString result = QString::fromLatin1(resultBuf);
     delete[] nameBuf;
     delete[] addressBuf;
     delete[] phoneBuf;
@@ -556,6 +549,35 @@ QString LaserDriver::activateMainCard(const QString& name, const QString& addres
     delete[] trademarkBuf;
     delete[] modelBuf;
     delete[] cardIdBuf;
+    return result;
+}
+
+QString LaserDriver::getDeviceId(bool reload)
+{
+    wchar_t* result = m_fnGetDeviceId(reload);
+    return QString::fromWCharArray(result);
+}
+
+QString LaserDriver::getDongleId()
+{
+    return QString::fromWCharArray(m_fnGetHardwareKeyID());
+}
+
+void LaserDriver::getMainCardRegisterState()
+{
+    m_fnGetMainCardRegState();
+}
+
+QString LaserDriver::getMainCardInfo()
+{
+    return QString::fromWCharArray(m_fnGetMainCardInfo());
+}
+
+bool LaserDriver::createLicenseFile(const QString& licenseCode)
+{
+    wchar_t* licBuf = typeUtils::qStringToWCharPtr(licenseCode);
+    bool result = m_fnCreateLicenseFile(licBuf);
+    delete[] licBuf;
     return result;
 }
 
@@ -578,7 +600,7 @@ void LaserDriver::smallScaleMovement(bool fromZeroPoint, bool laserOn, char moto
 {
     m_fnSmallScaleMovement(fromZeroPoint, laserOn, motorAxis, deviation, laserPower, moveSpeed);
 }
- 
+
 void LaserDriver::startMachining(bool zeroPointStyle)
 {
     m_fnStartMachining(zeroPointStyle);
@@ -604,7 +626,7 @@ int LaserDriver::testLaserLight(bool open)
     return m_fnTestLaserLight(open);
 }
 
-int LaserDriver::loadDataFromFile(const QString & filename, bool withMachining)
+int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
 {
     int ret = 0;
     m_isWithMachining = withMachining;
@@ -628,7 +650,7 @@ void LaserDriver::setSystemRegister(LaserDriver::SystemRegisterType rt, QVariant
     m_registers[rt] = value;
 }
 
-bool LaserDriver::getSystemRegister(LaserDriver::SystemRegisterType rt, QVariant & value)
+bool LaserDriver::getSystemRegister(LaserDriver::SystemRegisterType rt, QVariant& value)
 {
     if (m_registers.contains(rt))
     {
@@ -645,9 +667,9 @@ bool LaserDriver::getSystemRegister(LaserDriver::SystemRegisterType rt, QVariant
 //    return QString("");
 //}
 
-bool LaserDriver::getLayout(float & width, float & height)
+bool LaserDriver::getLayout(float& width, float& height)
 {
-    if (!m_registers.contains(LaserDriver::RT_X_MAX_LENGTH) || 
+    if (!m_registers.contains(LaserDriver::RT_X_MAX_LENGTH) ||
         !m_registers.contains(LaserDriver::RT_Y_MAX_LENGTH))
         return false;
 

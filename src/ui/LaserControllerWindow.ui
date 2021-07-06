@@ -64,7 +64,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -124,6 +124,7 @@
     </property>
     <addaction name="actionMainboardInformation"/>
     <addaction name="actionUpdateFirmware"/>
+    <addaction name="actionShowMainCardInfo"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -144,6 +145,7 @@
     <addaction name="actionUpdate"/>
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionContactUs"/>
+    <addaction name="actionTemporaryLicense"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -2179,6 +2181,22 @@
    </property>
    <property name="toolTip">
     <string>mm</string>
+   </property>
+  </action>
+  <action name="actionShowMainCardInfo">
+   <property name="text">
+    <string>Show Main Card Info</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Main Card Info</string>
+   </property>
+  </action>
+  <action name="actionTemporaryLicense">
+   <property name="text">
+    <string>Temporary License</string>
+   </property>
+   <property name="toolTip">
+    <string>Apply for temporary license</string>
    </property>
   </action>
  </widget>

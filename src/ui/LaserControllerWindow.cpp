@@ -29,9 +29,10 @@
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
 #include "ui/ConfigDialog.h"
-#include "ui/LaserLayerDialog.h"
-#include "ui/HalftoneDialog.h"
 #include "ui/DeviceSettingsDialog.h"
+#include "ui/HalftoneDialog.h"
+#include "ui/LaserLayerDialog.h"
+#include "ui/MainCardInfoDialog.h"
 #include "ui/RegistersDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
@@ -129,12 +130,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		//m_ui->vertical_ruler->refresh();
 	});
 	
-    int colorTick = 360 / Config::LayersMaxLayersCount();
-    for (int i = 0; i < Config::LayersMaxLayersCount(); i++)
+    int colorTick = 360 / Config::Layers::maxLayersCount();
+    for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
     {
         LayerButton* button = new LayerButton;
-        button->setMinimumWidth(Config::UIColorButtonWidth());
-        button->setFixedHeight(Config::UIColorButtonHeight());
+        button->setMinimumWidth(Config::Ui::colorButtonWidth());
+        button->setFixedHeight(Config::Ui::colorButtonHeight());
         button->setColor(colors[i]);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
@@ -475,6 +476,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
+
+	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
+	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
 
     connect(m_ui->toolButtonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
     connect(m_ui->toolButtonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
@@ -1355,6 +1359,24 @@ void LaserControllerWindow::onActionText(bool checked)
 	}
 }
 
+void LaserControllerWindow::onActionShowMainCardInfo(bool checked)
+{
+    MainCardInfoDialog dialog;
+    dialog.exec();
+}
+
+void LaserControllerWindow::onActionTemporaryLicense(bool checked)
+{
+    if (LaserApplication::device->requestTemporaryLicense())
+    {
+        QMessageBox::information(this, tr("Request successful"), tr("Your application for temporary license is successful. Please restart your program."));
+    }
+    else
+    {
+        QMessageBox::information(this, tr("Request failure"), tr("Your application for temporary license is failure."));
+    }
+}
+
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
@@ -1691,6 +1713,7 @@ void LaserControllerWindow::laserBackToMachiningOriginalPoint(bool checked)
 
 void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 {
+    LaserApplication::device->moveToOrigin();
     /*QVariant value;
     if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_TO_ORI_SPEED,value))
     {

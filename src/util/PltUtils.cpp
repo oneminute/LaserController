@@ -78,7 +78,7 @@ int pltUtils::path2Points(const QPainterPath & path, std::vector<cv::Point2f>& p
         qreal dist = QLineF(pt, anchor).length();
 
         diff = qRadiansToDegrees(diff);
-        if (diff >= Config::PltUtilsMaxAnglesDiff() || radians * anchorRadians < 0)
+        if (diff >= Config::Export::maxAnglesDiff() || radians * anchorRadians < 0)
         {
             if (!canvas.empty())
             {
@@ -90,7 +90,7 @@ int pltUtils::path2Points(const QPainterPath & path, std::vector<cv::Point2f>& p
             anchorSlope = slope;
             anchorRadians = radians;
         }
-        else if (diff != 0 && dist >= Config::PltUtilsMaxIntervalDistance())
+        else if (diff != 0 && dist >= Config::Export::maxIntervalDistance())
         {
             if (!canvas.empty())
             {

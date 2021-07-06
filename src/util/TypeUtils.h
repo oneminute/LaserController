@@ -4,8 +4,10 @@
 #include <QObject>
 #include <QPoint>
 #include <QRect>
-#include <comutil.h>
+#include <QVariant>
 
+#include "common/common.h"
+#include <comutil.h>
 #include <opencv2/opencv.hpp>
 
 namespace typeUtils
@@ -29,6 +31,8 @@ namespace typeUtils
     cv::Rect qtRect2cvRect(const QRect& rect);
 
     cv::Rect qtRect2cvRect(const QRectF& rect, float scale = 1.f);
+
+    QVariant textToVariant(const QString& src, DataType dataType);
 }
 
 #endif // TYPEUTILS_H

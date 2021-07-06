@@ -93,7 +93,7 @@ void LaserLayerDialog::resetParameters()
 
 void LaserLayerDialog::restoreParameters()
 {	
-	m_ui->editSliderCuttingMinSpeed->setValue(Config::defaultCuttingLayerMinSpeed());
+	/*m_ui->editSliderCuttingMinSpeed->setValue(Config::defaultCuttingLayerMinSpeed());
     m_ui->editSliderCuttingRunSpeed->setValue(Config::defaultCuttingLayerRunSpeed());
     m_ui->editSliderCuttingLaserPower->setValue(Config::defaultCuttingLayerLaserPower());
     m_ui->editSliderCuttingMinSpeedPower->setValue(Config::defaultCuttingLayerMinSpeedPower());
@@ -106,7 +106,7 @@ void LaserLayerDialog::restoreParameters()
     m_ui->editSliderEngravingRunSpeedPower->setValue(Config::defaultEngravingLayerRunSpeedPower());
     m_ui->checkBoxUseHalftone->setChecked(Config::defaultEngravingLayerUseHalftone());
     m_ui->editSliderDPI->setValue(Config::defaultEngravingLayerDPI());
-    m_ui->editSliderLPI->setValue(Config::defaultEngravingLayerLPI());
+    m_ui->editSliderLPI->setValue(Config::defaultEngravingLayerLPI());*/
 }
 
 void LaserLayerDialog::onCuttingToggled(bool checked)
@@ -152,7 +152,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 	}
 	else if (stdButton == QDialogButtonBox::Save)
 	{
-		Config::setCuttingLayerMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
+		/*Config::setCuttingLayerMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
 		Config::setCuttingLayerRunSpeed(m_ui->editSliderCuttingRunSpeed->value());
 		Config::setCuttingLayerLaserPower(m_ui->editSliderCuttingLaserPower->value());
 		Config::setCuttingLayerMinSpeedPower(m_ui->editSliderCuttingMinSpeedPower->value());
@@ -165,7 +165,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::setEngravingLayerRunSpeedPower(m_ui->editSliderEngravingRunSpeedPower->value());
 		Config::setEngravingLayerLPI(m_ui->editSliderLPI->value());
 		Config::setEngravingLayerDPI(m_ui->editSliderDPI->value());
-		Config::setEngravingLayerUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
+		Config::setEngravingLayerUseHalftone(m_ui->checkBoxUseHalftone->isChecked());*/
 
 		if (Config::isModified())
 		{

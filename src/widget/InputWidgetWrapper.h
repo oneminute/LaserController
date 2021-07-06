@@ -18,57 +18,46 @@ class InputWidgetWrapper : public QObject
 {
     Q_OBJECT
 public:
-    enum WidgetType
-    {
-        WT_Unknown,
-        WT_ComboBox,
-        WT_LineEdit,
-        WT_TextEdit,
-        WT_PlainTextEdit,
-        WT_SpinBox,
-        WT_DoubleSpinBox,
-        WT_TimeEdit,
-        WT_DateEdit,
-        WT_DateTimeEdit,
-        WT_Dial,
-        WT_EditSlider
-    };
-
-    explicit InputWidgetWrapper(QWidget* widget, Config::ConfigItem* configItem, QLabel* labelName = nullptr, QLabel* labelDesc = nullptr);
+    explicit InputWidgetWrapper(QWidget* widget, ConfigItem* configItem);
     virtual ~InputWidgetWrapper();
 
-    void updateConfigItem();
+    void setNameLabel(QLabel* label);
+    void setDescriptionLabel(QLabel* label);
+
+    QWidget* widget() const;
     void restore();
     void restoreDefault();
+    void updateValue(const QVariant& value);
 
     bool isModified();
-    QVariant value()
-    {
-        return m_value;
-    }
+    QVariant value() const;
+
+    static QWidget* createWidget(InputWidgetType widgetType, Qt::Orientation orientation);
 
 signals:
     void valueChanged(const QVariant& newValue);
 
 protected:
     void onTextChanged(const QString& text);
+    void onCheckBoxStateChanged(int state);
+    void onComboBoxIndexChanged(int index);
     void onTextEditTextChanged();
     void onPlainTextEditTextChanged();
+    void onEditingFinished();
     void onValueChanged(int value);
     void onValueChanged(double value);
     void onTimeChanged(const QTime& time);
     void onDateChanged(const QDate& date);
     void onDateTimeChanged(const QDateTime& dateTime);
 
-    void setValue(const QVariant& value);
+    void onConfigItemModifiedChanged(bool modified);
+    void onConfigItemValueChanged(const QVariant& value);
 
 private:
     QLabel* m_labelName;
     QLabel* m_labelDesc;
-    WidgetType m_type;
-    QVariant m_value;
-    Config::ConfigItem* m_configItem;
-    bool m_modified;
+    InputWidgetType m_type;
+    ConfigItem* m_configItem;
 };
 
 #endif // INPUTWIDGETWRAPPER_H

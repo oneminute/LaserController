@@ -16,15 +16,16 @@ public:
         : q_ptr(ptr)
         , driver(nullptr)
         , portName("")
-        , layoutWidth(320)
-        , layoutHeight(210)
+        , layoutRect(0, 0, 320, 210)
+        , printerDrawUnit(1016)
     {}
 
-    LaserDriver* driver;
-    QString portName;
-    qreal layoutWidth;
-    qreal layoutHeight;
     LaserDevice* q_ptr;
+    LaserDriver* driver;
+
+    QString portName;
+    QRectF layoutRect;      // 加工的幅面宽
+    int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
 };
 
 LaserDevice::LaserDevice(QObject* parent)
@@ -33,6 +34,11 @@ LaserDevice::LaserDevice(QObject* parent)
 {
     ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDevice::connected);
     ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDevice::disconnected);
+
+    connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
+    connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
+    connect(this, &LaserDevice::mainCardRegistered, this, &LaserDevice::onMainCardRegistered);
+    connect(this, &LaserDevice::mainCardActivated, this, &LaserDevice::onMainCardActivated);
 }
 
 LaserDevice::~LaserDevice()
@@ -51,7 +57,6 @@ void LaserDevice::resetDriver(LaserDriver* driver)
     connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
 
-    connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     load();
 }
 
@@ -70,31 +75,121 @@ void LaserDevice::load()
 qreal LaserDevice::layoutWidth() const
 {
     Q_D(const LaserDevice);
-    return d->layoutWidth;
-}
-
-void LaserDevice::setLayoutWidth(qreal width)
-{
-    Q_D(LaserDevice);
-    d->layoutWidth = width;
+    return d->layoutRect.width();
 }
 
 qreal LaserDevice::layoutHeight() const
 {
     Q_D(const LaserDevice);
-    return d->layoutHeight;
+    return d->layoutRect.height();
 }
 
-void LaserDevice::setLayoutHeight(qreal height)
+void LaserDevice::setLayoutRect(const QRectF& rect, bool toCard)
 {
     Q_D(LaserDevice);
-    d->layoutHeight = height;
+    d->layoutRect = rect;
+    if (d->driver && toCard && d->layoutRect.isValid())
+    {
+        d->driver->setSoftwareInitialization(
+            d->printerDrawUnit,
+            d->layoutRect.left(),
+            d->layoutRect.right(),
+            d->layoutRect.width(),
+            d->layoutRect.height());
+    }
+}
+
+int LaserDevice::printerDrawUnit() const
+{
+    Q_D(const LaserDevice);
+    return d->printerDrawUnit;
+}
+
+void LaserDevice::setPrinterDrawUnit(int unit, bool toCard)
+{
+    Q_D(LaserDevice);
+    d->printerDrawUnit = unit;
+    setLayoutRect(d->layoutRect, toCard);
+}
+
+QString LaserDevice::hardwareId() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        d->driver->getDeviceId(true);
+        QString id = d->driver->getDeviceId(false);
+        int count = 0;
+        while (id.isEmpty())
+        {
+            QThread::sleep(0);
+            id = d->driver->getDeviceId(false);
+            count++;
+        }
+        qLogD << "get device id count: " << count;
+        return id;
+    }
+    return "";
+}
+
+QString LaserDevice::mainCardId() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->getMainCardID();
+    }
+    return "";
+}
+
+QString LaserDevice::dongleId() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->getDongleId();
+    }
+    return "";
+}
+
+void LaserDevice::requestMainCardInfo()
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        QString infoString = d->driver->getMainCardInfo();
+        /*if (infoString.isEmpty())
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
+        }
+        QStringList items = infoString.split(";");
+        if (items.length() != 13)
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
+        }
+        QMap<QString, QString> info;
+        info.insert("mainCard", items[0]);
+        info.insert("mainCardRegisteredDate", items[1]);
+        info.insert("mainCardActivatedDate", items[2]);
+        info.insert("boundDongle", items[3]);
+        info.insert("boundDongleRegisteredDate", items[4]);
+        info.insert("boundDongleActivatedDate", items[5]);
+        info.insert("boundDongleBindingTimes", items[6]);
+        info.insert("dongle", items[7]);
+        info.insert("dongleRegisteredDate", items[8]);
+        info.insert("dongleActivatedDate", items[9]);
+        info.insert("dongleBindingTimes", items[10]);
+        info.insert("hardwareRegisteredDate", items[11]);
+        info.insert("hardwareActivatedDate", items[12]);
+        info.insert("hardwareMaintainingTimes", items[13]);
+        emit mainCardInfoFetched(info);*/
+
+    }
 }
 
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);
-    //d->driver->unload();
 }
 
 void LaserDevice::connectDevice(const QString& portName)
@@ -117,10 +212,35 @@ void LaserDevice::disconnectDevice()
 QString LaserDevice::activateMainCard(const QString& name, const QString& address, const QString& phone, const QString& qq, const QString& wx, const QString& email, const QString& country, const QString& distributor, const QString& trademark, const QString& model)
 {
     Q_D(LaserDevice);
-    QString cardId = d->driver->getMainCardID();
+    QString cardId = mainCardId();
+    qLogD << "cardId: " << cardId;
     QString result = d->driver->activateMainCard(name, address, phone, qq, wx, email, country, distributor, trademark, model, cardId);
     qLogD << "activation result: " << result;
     return result;
+}
+
+bool LaserDevice::requestTemporaryLicense()
+{
+    return createLicenseFile("{FFFD38EB-DC3A-45A8-A06D-B10671CF18B3}");
+}
+
+bool LaserDevice::createLicenseFile(const QString& licenseCode)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->createLicenseFile(licenseCode);
+    }
+    return false;
+}
+
+void LaserDevice::moveToOrigin(qreal speed)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        d->driver->lPenMoveToOriginalPoint(speed);
+    }
 }
 
 void LaserDevice::unbindDriver()
@@ -331,10 +451,45 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_MainCardIsGenuine:
     {
-        emit mainCardActivated();
+        emit mainCardActivated(false);
+        break;
+    }
+    case M_MainCardIsGenuineEx:
+    {
+        emit mainCardActivated(true);
+        break;
+    }
+    case M_MainCardMachineMoreInfo:
+    {
+        if (message.isEmpty())
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
+        }
+        QStringList items = message.split(";");
+        if (items.length() != 13)
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
+        }
+        QMap<QString, QString> info;
+        info.insert("mainCard", items[0]);
+        info.insert("mainCardRegisteredDate", items[1]);
+        info.insert("mainCardActivatedDate", items[2]);
+        info.insert("boundDongle", items[3]);
+        info.insert("boundDongleRegisteredDate", items[4]);
+        info.insert("boundDongleActivatedDate", items[5]);
+        info.insert("boundDongleBindingTimes", items[6]);
+        info.insert("dongle", items[7]);
+        info.insert("dongleRegisteredDate", items[8]);
+        info.insert("dongleActivatedDate", items[9]);
+        info.insert("dongleBindingTimes", items[10]);
+        info.insert("hardwareRegisteredDate", items[11]);
+        info.insert("hardwareActivatedDate", items[12]);
+        info.insert("hardwareMaintainingTimes", items[13]);
+        emit mainCardInfoFetched(info);
         break;
     }
     }
+
 }
 
 void LaserDevice::onLibraryLoaded(bool success)
@@ -365,10 +520,33 @@ void LaserDevice::onComPortsFetched(const QStringList& portNames)
     }
     else if (portNames.length() > 1)
     {
-        if (Config::DeviceAutoConnectFirst())
+        if (Config::Device::autoConnectFirst())
         {
             connectDevice(portNames[0]);
         }
     }
+}
+
+void LaserDevice::onConnected()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        d->driver->getMainCardRegisterState();
+    }
+}
+
+void LaserDevice::onMainCardRegistered()
+{
+    Q_D(LaserDevice);
+    qLogD << "Hardware id: " << hardwareId();
+    qLogD << "Main card id: " << mainCardId();
+    qLogD << "Dongle id: " << dongleId();
+}
+
+void LaserDevice::onMainCardActivated(bool temp)
+{
+    Q_D(LaserDevice);
+    qLogD << "main card activated. temp? " << temp;
 }
 
