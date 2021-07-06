@@ -258,6 +258,8 @@ void ConfigItem::setValue(const QVariant& value)
     d->dirtyValue = value;
     if (changed)
     {
+        d->modified = true;
+        d->dirty = true;
         emit valueChanged(value);
         emit modifiedChanged(true);
     }
@@ -428,12 +430,42 @@ void ConfigItem::initWidget(QWidget* widget)
     }
 }
 
+void ConfigItem::reset()
+{
+    Q_D(ConfigItem);
+    if (d->modified)
+    {
+        d->dirtyValue = d->value;
+        d->dirty = false;
+        d->modified = false;
+
+        emit modifiedChanged(false);
+    }
+}
+
+void ConfigItem::doModify()
+{
+    Q_D(ConfigItem);
+    if (d->modified)
+    {
+        d->value = d->dirtyValue;
+        d->modified = false;
+        d->dirty = false;
+
+        emit modifiedChanged(false);
+    }
+}
+
 void ConfigItem::restore()
 {
     Q_D(ConfigItem);
-    d->value = d->dirty;
-    d->dirty = false;
-    d->modified = false;
+    setValue(d->defaultValue);
+}
+
+void ConfigItem::restoreSystem()
+{
+    Q_D(ConfigItem);
+    setValue(d->systemDefaultValue);
 }
 
 void ConfigItem::setModified()

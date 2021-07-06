@@ -9,6 +9,7 @@
 #include <QMessageBox>
 
 #include "ConfigItem.h"
+#include "exception/LaserException.h"
 #include "laser/LaserRegister.h"
 #include "widget/InputWidgetWrapper.h"
 
@@ -61,21 +62,32 @@ void Config::load()
 
 void Config::save()
 {
-    QFile configFile(configFilePath());
-    if (!configFile.open(QFile::Truncate | QFile::WriteOnly))
-    {
-        QMessageBox::warning(nullptr, QObject::tr("Save Failure"), QObject::tr("An error occured when saving configuration file!"));
-        return;
-    }
+    try {
+        QFile configFile(configFilePath());
+        if (!configFile.open(QFile::Truncate | QFile::WriteOnly))
+        {
+            QMessageBox::warning(nullptr, QObject::tr("Save Failure"), QObject::tr("An error occured when saving configuration file!"));
+            return;
+        }
 
-    QJsonObject json;
-    for (ConfigItemGroup* group : groups)
-    {
-        json[group->name()] = group->toJson();
+        QJsonObject json;
+        for (ConfigItemGroup* group : groups)
+        {
+            json[group->name()] = group->toJson();
+        }
+        QJsonDocument doc(json);
+        configFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
+        configFile.close();
+
+        for (ConfigItemGroup* group : groups)
+        {
+            group->doModify();
+        }
     }
-    QJsonDocument doc(json);
-    configFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
-    configFile.close();
+    catch (...)
+    {
+        throw new LaserFileException(tr("Save config file error."));
+    }
 }
 
 void Config::restore()
@@ -90,14 +102,14 @@ QString Config::configFilePath()
 bool Config::isModified()
 {
     bool isModified = false;
-    /*for (QMap<QString, ConfigItem*>::ConstIterator i = items.constBegin(); i != items.constEnd(); i++)
+    for (ConfigItemGroup* group : groups)
     {
-        if (i.value()->isModified())
+        if (group->isModified())
         {
             isModified = true;
             break;
         }
-    }*/
+    }
     return isModified;
 }
 

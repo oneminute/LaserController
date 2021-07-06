@@ -41,6 +41,10 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
 
+    bool isModified() const;
+
+    void doModify();
+
 protected:
 
 private:

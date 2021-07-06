@@ -84,7 +84,10 @@ public:
 
 public slots:
     void setValue(const QVariant& value);
+    void reset();
+    void doModify();
     void restore();
+    void restoreSystem();
 
 protected:
     void setModified();

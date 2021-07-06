@@ -27,6 +27,28 @@ class InputWidgetWrapper;
 class Config: public QObject
 {
     Q_OBJECT
+
+private:
+    Config();
+
+public:
+    static void load();
+    static void save();
+    static void restore();
+    static QString configFilePath();
+    static bool isModified();
+    static QList<ConfigItemGroup*> getGroups();
+
+protected:
+    static void loadGeneralItems();
+    static void loadLayersItems();
+    static void loadUiItems();
+    static void loadCuttingLayerItems();
+    static void loadEngravingLayerItems();
+    static void loadPathOptimizationItems();
+    static void loadExportItems();
+    static void loadDeviceItems();
+
 public:
     class General : public ConfigItemGroup
     {
@@ -164,27 +186,6 @@ public:
     private:
         friend class Config;
     };
-
-private:
-    Config();
-
-public:
-    static void load();
-    static void save();
-    static void restore();
-    static QString configFilePath();
-    static bool isModified();
-    static QList<ConfigItemGroup*> getGroups();
-
-protected:
-    static void loadGeneralItems();
-    static void loadLayersItems();
-    static void loadUiItems();
-    static void loadCuttingLayerItems();
-    static void loadEngravingLayerItems();
-    static void loadPathOptimizationItems();
-    static void loadExportItems();
-    static void loadDeviceItems();
 
 private:
     static QList<ConfigItemGroup*> groups;

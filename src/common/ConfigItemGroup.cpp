@@ -118,3 +118,27 @@ void ConfigItemGroup::fromJson(const QJsonObject& jsonObject)
         }
     }
 }
+
+bool ConfigItemGroup::isModified() const
+{
+    Q_D(const ConfigItemGroup);
+    bool modified = false;
+    for (ConfigItem* item : d->items)
+    {
+        if (item->isModified())
+        {
+            modified = true;
+            break;
+        }
+    }
+    return modified;
+}
+
+void ConfigItemGroup::doModify()
+{
+    Q_D(const ConfigItemGroup);
+    for (ConfigItem* item : d->items)
+    {
+        item->doModify();
+    }
+}

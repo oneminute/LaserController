@@ -25,7 +25,7 @@ public:
     void setDescriptionLabel(QLabel* label);
 
     QWidget* widget() const;
-    void restore();
+    void reset();
     void restoreDefault();
     void updateValue(const QVariant& value);
 
