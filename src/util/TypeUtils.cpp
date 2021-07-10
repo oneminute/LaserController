@@ -94,5 +94,5 @@ QVariant typeUtils::textToVariant(const QString& src, DataType dataType)
         break;
     }
     }
-    return QVariant();
+    return dst;
 }

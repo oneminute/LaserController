@@ -183,7 +183,7 @@ private:
 
 	qreal m_selectedEditCount = 0;
 	LaserPrimitiveGroup* m_group;
-	bool m_isLeftSelecting = true;//ÔÚ×ó±ß¿ªÊ¼Ñ¡Ôñ»¹ÊÇÓÒ±ß¿ªÊ¼Ñ¡Ôñ
+	bool m_isLeftSelecting = true;//ï¿½ï¿½ï¿½ï¿½ß¿ï¿½Ê¼Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½Ò±ß¿ï¿½Ê¼Ñ¡ï¿½ï¿½
 	
 };
 

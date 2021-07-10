@@ -16,22 +16,22 @@ MainCardInfoDialog::MainCardInfoDialog(QWidget* parent)
     LaserApplication::device->requestMainCardInfo();
 }
 
-void MainCardInfoDialog::onGetMainCardInfo(QMap<QString, QString> info)
+void MainCardInfoDialog::onGetMainCardInfo()
 {
-    m_ui->labelMainCard->setText(info["mainCard"]);
-    m_ui->labelMainCardRegisteredDate->setText(info["mainCardRegisteredDate"]);
-    m_ui->labelMainCardActivatedDate->setText(info["mainCardActivatedDate"]);
-    m_ui->labelBoundDongle->setText(info["boundDongle"]);
-    m_ui->labelBoundDongleRegisteredDate->setText(info["boundDongleRegisteredDate"]);
-    m_ui->labelBoundDongleActivatedDate->setText(info["boundDongleActivatedDate"]);
-    m_ui->labelBoundDongleBindingTimes->setText(info["boundDongleBindingTimes"]);
-    m_ui->labelCurrentDongle->setText(info["dongle"]);
-    m_ui->labelCurrentDongleRegisteredDate->setText(info["dongleRegisteredDate"]);
-    m_ui->labelCurrentDongleActivatedDate->setText(info["dongleActivatedDate"]);
-    m_ui->labelCurrentDongleBindingTimes->setText(info["dongleBindingTimes"]);
-    m_ui->labelHardwareRegisteredDate->setText(info["hardwareRegisteredDate"]);
-    m_ui->labelHardwareActivatedDate->setText(info["hardwareActivatedDate"]);
-    m_ui->labelHardwareMaintainingTimes->setText(info["hardwareMaintainingTimes"]);
+    m_ui->labelMainCard->setText(LaserApplication::device->mainCardId());;
+    m_ui->labelMainCardRegisteredDate->setText(LaserApplication::device->mainCardRegisteredDate());;
+    m_ui->labelMainCardActivatedDate->setText(LaserApplication::device->mainCardActivatedDate());;
+    m_ui->labelBoundDongle->setText(LaserApplication::device->boundDongleId());;
+    m_ui->labelBoundDongleRegisteredDate->setText(LaserApplication::device->boundDongleRegisteredDate());;
+    m_ui->labelBoundDongleActivatedDate->setText(LaserApplication::device->boundDongleActivatedDate());;
+    m_ui->labelBoundDongleBindingTimes->setText(LaserApplication::device->boundDongleBindingTimes());;
+    m_ui->labelCurrentDongle->setText(LaserApplication::device->dongleId());;
+    m_ui->labelCurrentDongleRegisteredDate->setText(LaserApplication::device->dongleRegisteredDate());;
+    m_ui->labelCurrentDongleActivatedDate->setText(LaserApplication::device->dongleActivatedDate());;
+    m_ui->labelCurrentDongleBindingTimes->setText(LaserApplication::device->dongleBindingTimes());;
+    m_ui->labelHardwareRegisteredDate->setText(LaserApplication::device->hardwareRegisteredDate());;
+    m_ui->labelHardwareActivatedDate->setText(LaserApplication::device->hardwareActivatedDate());;
+    m_ui->labelHardwareMaintainingTimes->setText(LaserApplication::device->hardwareMaintainingTimes());;
 }
 
 MainCardInfoDialog::~MainCardInfoDialog()

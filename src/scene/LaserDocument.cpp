@@ -683,7 +683,7 @@ void LaserDocument::load(const QString& filename)
 	}
 	QJsonParseError *error = new QJsonParseError;
 	QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), error);
-	//ÅÐ¶ÏÎÄ¼þÊÇ·ñÍêÕû
+	//ï¿½Ð¶ï¿½ï¿½Ä¼ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (error->error != QJsonParseError::NoError)
 	{
 		qDebug() << "parseJson:" << error->errorString();
@@ -694,11 +694,11 @@ void LaserDocument::load(const QString& filename)
 		QJsonObject layer = layers[i].toObject();
 		QJsonArray array = layer["primitives"].toArray();
 		
-		//´´½¨layer
+		//ï¿½ï¿½ï¿½ï¿½layer
 		LaserLayerType type = (LaserLayerType)layer["type"].toInt();
 		LaserLayer* laserLayer = new LaserLayer(layer["name"].toString(), type, this);
 		this->addLayer(laserLayer);
-		//´´½¨primitive
+		//ï¿½ï¿½ï¿½ï¿½primitive
 		for (int j = 0; j < array.size(); j++) {
 			QJsonObject primitiveJson = array[j].toObject();
 			QString className = primitiveJson["className"].toString();

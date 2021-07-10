@@ -103,9 +103,9 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         connect(floatEditSlider, &FloatEditSlider::valueChanged, this, QOverload<qreal>::of(&InputWidgetWrapper::onValueChanged));
     }
     updateValue(m_configItem->value());
-    connect(this, &InputWidgetWrapper::valueChanged, m_configItem, &ConfigItem::setValue);
+    connect(this, &InputWidgetWrapper::valueChanged, m_configItem, &ConfigItem::fromWidget);
     connect(m_configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
-    connect(m_configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
+    connect(m_configItem, &ConfigItem::widgetValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
 }
 
 InputWidgetWrapper::~InputWidgetWrapper()
@@ -138,8 +138,9 @@ void InputWidgetWrapper::restoreDefault()
     updateValue(m_configItem->defaultValue());
 }
 
-void InputWidgetWrapper::updateValue(const QVariant& value)
+void InputWidgetWrapper::updateValue(const QVariant& newValue)
 {
+    QVariant value = m_configItem->doLoadDataHook(newValue);
     QWidget* widget = qobject_cast<QWidget*>(parent());
     widget->blockSignals(true);
     switch (m_type)
@@ -226,6 +227,12 @@ void InputWidgetWrapper::updateValue(const QVariant& value)
     widget->blockSignals(false);
 }
 
+void InputWidgetWrapper::changeValue(const QVariant& value)
+{
+    QVariant newValue = m_configItem->doSaveDataHook(value);
+    emit valueChanged(newValue);
+}
+
 bool InputWidgetWrapper::isModified()
 {
     return m_configItem->isModified();
@@ -289,65 +296,65 @@ QWidget* InputWidgetWrapper::createWidget(InputWidgetType widgetType, Qt::Orient
 
 void InputWidgetWrapper::onTextChanged(const QString & text)
 {
-    emit valueChanged(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
 }
 
 void InputWidgetWrapper::onCheckBoxStateChanged(int state)
 {
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
-    emit valueChanged(state == Qt::Checked);
+    changeValue(state == Qt::Checked);
 }
 
 void InputWidgetWrapper::onComboBoxIndexChanged(int index)
 {
     QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
-    emit valueChanged(comboBox->currentData());
+    changeValue(comboBox->currentData());
 }
 
 void InputWidgetWrapper::onTextEditTextChanged()
 {
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    emit valueChanged(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
 }
 
 void InputWidgetWrapper::onPlainTextEditTextChanged()
 {
     QPlainTextEdit* textEdit = qobject_cast<QPlainTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    emit valueChanged(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
 }
 
 void InputWidgetWrapper::onEditingFinished()
 {
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
     QString text = lineEdit->text();
-    emit valueChanged(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
 }
 
 void InputWidgetWrapper::onValueChanged(int value)
 {
-    emit valueChanged(value);
+    changeValue(value);
 }
 
 void InputWidgetWrapper::onValueChanged(double value)
 {
-    emit valueChanged(value);
+    changeValue(value);
 }
 
 void InputWidgetWrapper::onTimeChanged(const QTime & time)
 {
-    emit valueChanged(time);
+    changeValue(time);
 }
 
 void InputWidgetWrapper::onDateChanged(const QDate & date)
 {
-    emit valueChanged(date);
+    changeValue(date);
 }
 
 void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
 {
-    emit valueChanged(dateTime);
+    changeValue(dateTime);
 }
 
 void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)

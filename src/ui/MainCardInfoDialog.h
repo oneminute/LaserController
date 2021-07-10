@@ -16,7 +16,7 @@ public:
     virtual ~MainCardInfoDialog();
 
 protected slots:
-    void onGetMainCardInfo(QMap<QString, QString> info);
+    void onGetMainCardInfo();
 
 private:
     QScopedPointer<Ui::MainCardInfoDialog> m_ui;

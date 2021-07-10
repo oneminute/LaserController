@@ -16,7 +16,9 @@ class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
-    typedef void (*CreateWidgetFn)(QWidget*, ConfigItem*);
+    typedef void (*WidgetInitializeHook)(QWidget*, ConfigItem*);
+    typedef QVariant (*ValueHook)(const QVariant&);
+
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
         , const QString& title
@@ -42,6 +44,9 @@ public:
     bool isVisible() const;
     void setVisible(bool visible);
 
+    bool readOnly() const;
+    void setReadOnly(bool readOnly = true);
+
     StoreStrategy storeType() const;
     void setStoreType(StoreStrategy type);
 
@@ -62,8 +67,6 @@ public:
     bool isModified() const;
 
     InputWidgetWrapper* createInputWidgetWrapper(QWidget* widget);
-    LaserRegister* bindRegister(LaserRegister* reg);
-    void unbindRegister(LaserRegister* reg);
 
     QString toString() const;
     QJsonObject toJson() const;
@@ -77,19 +80,33 @@ public:
     QMap<QString, QVariant>& inputWidgetProperties();
     void setInputWidgetProperty(const QString& key, const QVariant& value);
 
-    CreateWidgetFn createWidgetFunction();
-    void setCreateWidgetFunction(CreateWidgetFn fn);
+    WidgetInitializeHook widgetInitializeHook();
+    void setWidgetInitializeHook(WidgetInitializeHook fn);
+
+    ValueHook loadDataHook();
+    void setLoadDataHook(ValueHook fn);
+    QVariant doLoadDataHook(const QVariant& value) const;
+
+    ValueHook saveDataHook();
+    void setSaveDataHook(ValueHook fn);
+    QVariant doSaveDataHook(const QVariant& value);
 
     void initWidget(QWidget* widget);
 
+    LaserRegister* laserRegister() const;
+    void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
+
 public slots:
     void setValue(const QVariant& value);
+    void fromWidget(const QVariant& value);
+    void loadValue(const QVariant& value);
     void reset();
     void doModify();
     void restore();
     void restoreSystem();
 
 protected:
+    bool modifyValue(const QVariant& value);
     void setModified();
     void setName(const QString& name);
     void setDescription(const QString& description);
@@ -103,6 +120,7 @@ protected:
 signals:
     void visibleChanged(bool value);
     void valueChanged(const QVariant& value);
+    void widgetValueChanged(const QVariant& value);
     void defaultValueChanged(const QVariant& value);
     void modifiedChanged(bool modified);
 

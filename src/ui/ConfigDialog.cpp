@@ -1,34 +1,42 @@
 #include "ConfigDialog.h"
 #include "ui_ConfigDialog.h"
 
+#include <QAbstractButton>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QMessageBox>
-#include <QTreeWidgetItem>
-#include <QComboBox>
-#include <widget/EditSlider.h>
+#include <QInputDialog>
 #include <QLabel>
+#include <QMessageBox>
 #include <QRegularExpression>
-#include <QAbstractButton>
+#include <QScrollBar>
+#include <QTreeWidgetItem>
+#include <widget/EditSlider.h>
 
+#include "LaserApplication.h"
 #include "common/Config.h"
+#include "laser/LaserDevice.h"
 #include "widget/EditSlider.h"
 
 ConfigDialog::ConfigDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::ConfigDialog)
     , m_windowTitle(tr("Config Dialog"))
+    , m_systemRegisterPage(nullptr)
 {
     m_ui->setupUi(this);
     m_ui->splitter->setStretchFactor(0, 0);
     m_ui->splitter->setStretchFactor(1, 1);
 
+    //m_ui->stackedWidgetPanels->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
     for (ConfigItemGroup* group : Config::getGroups())
     {
         QWidget* page = new QWidget(this);
+        page->setWindowTitle(group->name());
         m_ui->stackedWidgetPanels->addWidget(page);
 
         QVBoxLayout* pageLayout = new QVBoxLayout(page);
@@ -58,10 +66,18 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         int row = gridLayout->rowCount();
         gridLayout->addWidget(new QWidget, row, 0);
         gridLayout->setRowStretch(row, 1);
+
+        if (group->name() == "systemRegister")
+        {
+            m_systemRegisterPage = page;
+        }
     }
+    m_ui->stackedWidgetPanels->setCurrentIndex(0);
+    m_ui->treeWidgetCatalogue->setCurrentItem(m_ui->treeWidgetCatalogue->topLevelItem(0));
 
     connect(m_ui->treeWidgetCatalogue, &QTreeWidget::currentItemChanged, this, &ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged);
     connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &ConfigDialog::onButtonClicked);
+    connect(LaserApplication::device, &LaserDevice::manufacturePasswordVerified, this, &ConfigDialog::onManufacturePasswordVerified);
 
     setWindowTitle(m_windowTitle);
 }
@@ -114,14 +130,35 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
     }
     else if (stdButton == QDialogButtonBox::Save)
     {
-        Config::save();
+        Config::save(LaserApplication::device->mainCardId());
         onValueChanged(QVariant());
     }
 }
 
 void ConfigDialog::setCurrentPanel(QWidget * panel)
 {
-    m_ui->stackedWidgetPanels->setCurrentWidget(panel);
+    if (panel == m_systemRegisterPage)
+    {
+        QString password = QInputDialog::getText(
+            this,
+            tr("Manufacture Password"),
+            tr("Password"),
+            QLineEdit::Normal
+        );
+
+        password = password.trimmed();
+        if (password.isEmpty() || password.isNull())
+        {
+            return;
+        }
+
+        LaserApplication::device->verifyManufacturePassword(password);
+    }
+    else
+    {
+        m_ui->stackedWidgetPanels->setCurrentWidget(panel);
+        m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
+    }
 }
 
 void ConfigDialog::setCurrentPanel(const QString & title)
@@ -161,6 +198,12 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
     wrapper->setNameLabel(labelName);
     wrapper->setDescriptionLabel(labelDesc);
     m_wrappers.append(wrapper);
+}
+
+void ConfigDialog::onManufacturePasswordVerified(bool pass)
+{
+    m_ui->stackedWidgetPanels->setCurrentWidget(m_systemRegisterPage);
+    m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
 }
 
 void ConfigDialog::onValueChanged(const QVariant& value)

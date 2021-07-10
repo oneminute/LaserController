@@ -15,7 +15,9 @@ public:
         , modified(false)
         , inputWidgetType(IWT_EditSlider)
         , laserRegister(nullptr)
-        , createWidgetFunction(nullptr)
+        , widgetInitializeHook(nullptr)
+        , loadDataHook(nullptr)
+        , saveDataHook(nullptr)
     {
         
     }
@@ -51,6 +53,11 @@ public:
     /// 是否在选项窗口中出现
     /// </summary>
     bool visible;
+
+    /// <summary>
+    /// 是否为只读选项
+    /// </summary>
+    bool readOnly;
 
     /// <summary>
     /// 保存方式
@@ -110,7 +117,9 @@ public:
 
     //QList<InputWidgetWrapper*> widgetWrappers;
     LaserRegister* laserRegister;
-    ConfigItem::CreateWidgetFn createWidgetFunction;
+    ConfigItem::WidgetInitializeHook widgetInitializeHook;
+    ConfigItem::ValueHook loadDataHook;
+    ConfigItem::ValueHook saveDataHook;
 };
 
 ConfigItem::ConfigItem(
@@ -226,6 +235,18 @@ void ConfigItem::setVisible(bool visible)
         emit visibleChanged(visible);
 }
 
+bool ConfigItem::readOnly() const
+{
+    Q_D(const ConfigItem);
+    return d->readOnly;
+}
+
+void ConfigItem::setReadOnly(bool readOnly)
+{
+    Q_D(ConfigItem);
+    d->readOnly = readOnly;
+}
+
 StoreStrategy ConfigItem::storeType() const
 {
     Q_D(const ConfigItem);
@@ -248,24 +269,6 @@ QVariant ConfigItem::value() const
     else
     {
         return d->value;
-    }
-}
-
-void ConfigItem::setValue(const QVariant& value)
-{
-    Q_D(ConfigItem);
-    bool changed = value != d->value;
-    d->dirtyValue = value;
-    if (changed)
-    {
-        d->modified = true;
-        d->dirty = true;
-        emit valueChanged(value);
-        emit modifiedChanged(true);
-    }
-    else
-    {
-        emit modifiedChanged(false);
     }
 }
 
@@ -331,19 +334,6 @@ InputWidgetWrapper* ConfigItem::createInputWidgetWrapper(QWidget* widget)
     return new InputWidgetWrapper(widget, this);
 }
 
-LaserRegister* ConfigItem::bindRegister(LaserRegister* reg)
-{
-    Q_D(ConfigItem);
-    d->laserRegister = reg;
-    return reg;
-}
-
-void ConfigItem::unbindRegister(LaserRegister* reg)
-{
-    Q_D(ConfigItem);
-    d->laserRegister = nullptr;
-}
-
 QString ConfigItem::toString() const
 {
     QString msg = QString("[group=%1, name=%2, title=%3, description=%4, value=%5]")
@@ -365,11 +355,18 @@ QJsonObject ConfigItem::toJson() const
 
 void ConfigItem::fromJson(const QJsonObject& jsonObject)
 {
+    Q_D(ConfigItem);
     if (jsonObject.contains("value"))
-        setValue(jsonObject["value"].toVariant());
+    {
+        d->value = d->dirtyValue = jsonObject["value"].toVariant();
+        d->dirty = d->modified = false;
+        emit valueChanged(d->value);
+    }
 
     if (jsonObject.contains("defaultValue"))
+    {
         setDefaultValue(jsonObject["defaultValue"].toVariant());
+    }
 }
 
 DataType ConfigItem::dataType() const
@@ -409,24 +406,118 @@ void ConfigItem::setInputWidgetProperty(const QString& key, const QVariant& valu
     }
 }
 
-ConfigItem::CreateWidgetFn ConfigItem::createWidgetFunction()
+ConfigItem::WidgetInitializeHook ConfigItem::widgetInitializeHook()
 {
     Q_D(ConfigItem);
-    return d->createWidgetFunction;
+    return d->widgetInitializeHook;
 }
 
-void ConfigItem::setCreateWidgetFunction(ConfigItem::CreateWidgetFn fn)
+void ConfigItem::setWidgetInitializeHook(ConfigItem::WidgetInitializeHook fn)
 {
     Q_D(ConfigItem);
-    d->createWidgetFunction = fn;
+    d->widgetInitializeHook = fn;
+}
+
+ConfigItem::ValueHook ConfigItem::loadDataHook()
+{
+    Q_D(ConfigItem);
+    return d->loadDataHook;
+}
+
+void ConfigItem::setLoadDataHook(ValueHook fn)
+{
+    Q_D(ConfigItem);
+    d->loadDataHook = fn;
+}
+
+QVariant ConfigItem::doLoadDataHook(const QVariant& value) const
+{
+    Q_D(const ConfigItem);
+    if (d->loadDataHook)
+    {
+        return d->loadDataHook(value);
+    }
+    return value;
+}
+
+ConfigItem::ValueHook ConfigItem::saveDataHook()
+{
+    Q_D(ConfigItem);
+    return d->saveDataHook;
+}
+
+void ConfigItem::setSaveDataHook(ValueHook fn)
+{
+    Q_D(ConfigItem);
+    d->saveDataHook = fn;
+}
+
+QVariant ConfigItem::doSaveDataHook(const QVariant& value)
+{
+    Q_D(ConfigItem);
+    if (d->saveDataHook)
+    {
+        return d->saveDataHook(value);
+    }
+    return value;
 }
 
 void ConfigItem::initWidget(QWidget* widget)
 {
     Q_D(ConfigItem);
-    if (widget && d->createWidgetFunction)
+    if (widget && d->widgetInitializeHook)
     {
-        d->createWidgetFunction(widget, this);
+        d->widgetInitializeHook(widget, this);
+    }
+}
+
+LaserRegister* ConfigItem::laserRegister() const
+{
+    Q_D(const ConfigItem);
+    return d->laserRegister;
+}
+
+void ConfigItem::bindLaserRegister(int addr, bool isSystem, StoreStrategy storeStrategy)
+{
+    Q_D(ConfigItem);
+    d->laserRegister = new LaserRegister(addr, title(), dataType(), description(), isSystem, readOnly(), storeStrategy, this);
+    QVariant regValue = d->laserRegister->value();
+    regValue = (regValue.isValid() && !regValue.isNull()) ? regValue : defaultValue();
+    d->value = d->dirtyValue = doLoadDataHook(regValue);
+    d->dirty = d->modified = false;
+    connect(d->laserRegister, &LaserRegister::valueChanged, this, &ConfigItem::loadValue);
+}
+
+void ConfigItem::setValue(const QVariant& value)
+{
+    if (!value.isValid() || value.isNull())
+        return;
+
+    if (modifyValue(value))
+    {
+        emit valueChanged(value);
+        emit widgetValueChanged(value);
+    }
+}
+
+void ConfigItem::fromWidget(const QVariant& value)
+{
+    if (!value.isValid() || value.isNull())
+        return;
+
+    if (modifyValue(value))
+    {
+        emit valueChanged(value);
+    }
+}
+
+void ConfigItem::loadValue(const QVariant& value)
+{
+    Q_D(ConfigItem);
+    if (value != d->value)
+    {
+        d->value = d->dirtyValue = value;
+        emit valueChanged(d->value);
     }
 }
 
@@ -466,6 +557,24 @@ void ConfigItem::restoreSystem()
 {
     Q_D(ConfigItem);
     setValue(d->systemDefaultValue);
+}
+
+bool ConfigItem::modifyValue(const QVariant& value)
+{
+    Q_D(ConfigItem);
+    bool changed = value != d->value;
+    d->dirtyValue = value;
+    if (changed)
+    {
+        d->modified = true;
+        d->dirty = true;
+        emit modifiedChanged(true);
+    }
+    else
+    {
+        emit modifiedChanged(false);
+    }
+    return changed;
 }
 
 void ConfigItem::setModified()
@@ -508,19 +617,6 @@ void ConfigItem::setValueLazy(const QVariant& value)
     d->dirtyValue = value;
     d->dirty = true;
 }
-
-//InputWidgetWrapper* ConfigItem::findWidget(QWidget* widget) const
-//{
-//    Q_D(const ConfigItem);
-//    for (InputWidgetWrapper* wrapper : d->widgetWrappers)
-//    {
-//        if (wrapper->widget() == widget)
-//        {
-//            return wrapper;
-//        }
-//    }
-//    return nullptr;
-//}
 
 QDebug operator<<(QDebug debug, const ConfigItem& item)
 {
