@@ -105,7 +105,7 @@ class LaserPrimitive : public QGraphicsObject, public LaserNode
 {
     Q_OBJECT
 public:
-    LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc = nullptr, LaserPrimitiveType type = LPT_SHAPE);
+    LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc = nullptr, LaserPrimitiveType type = LPT_SHAPE, QTransform saveTransform = QTransform());
     virtual ~LaserPrimitive();
 
     LaserDocument* document() const;
@@ -185,7 +185,7 @@ class LaserShape : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type);
+    LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
     virtual QPainterPath toPath() const = 0;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) override;
@@ -201,7 +201,7 @@ class LaserEllipse : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserEllipse(const QRectF bounds, LaserDocument* doc);
+    LaserEllipse(const QRectF bounds, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserEllipse() {}
 
     QRectF bounds() const;
@@ -225,7 +225,7 @@ class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserRect(const QRectF rect, LaserDocument* doc);
+    LaserRect(const QRectF rect, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserRect() {}
 
     QRectF rect() const;
@@ -237,6 +237,7 @@ public:
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
 	virtual void reShape();
+	virtual QJsonObject toJson();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
@@ -248,7 +249,7 @@ class LaserLine : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserLine(const QLineF& line, LaserDocument* doc);
+    LaserLine(const QLineF& line, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserLine() {}
 
     QLineF line() const;
@@ -260,6 +261,7 @@ public:
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
 	virtual void reShape();
+	virtual QJsonObject toJson();
 
 private:
     Q_DISABLE_COPY(LaserLine);
@@ -271,7 +273,7 @@ class LaserPath : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPath(const QPainterPath& path, LaserDocument* doc);
+    LaserPath(const QPainterPath& path, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserPath() {}
 
     QPainterPath path() const;
@@ -297,7 +299,7 @@ class LaserPolyline : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolyline(const QPolygonF& poly, LaserDocument* doc);
+    LaserPolyline(const QPolygonF& poly, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserPolyline() {}
 
     QPolygonF polyline() const;
@@ -310,6 +312,7 @@ public:
     virtual QPainterPath toPath() const;
 
 	virtual void reShape();
+	virtual QJsonObject toJson();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
@@ -321,7 +324,7 @@ class LaserPolygon : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolygon(const QPolygonF& poly, LaserDocument* doc);
+    LaserPolygon(const QPolygonF& poly, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserPolygon() {}
 
     QPolygonF polyline() const;
@@ -335,6 +338,7 @@ public:
 	virtual QRectF sceneBoundingRect() const;
 
 	virtual void reShape();
+	virtual QJsonObject toJson();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
@@ -346,7 +350,7 @@ class LaserBitmap : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc);
+    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc, QTransform transform = QTransform());
     virtual ~LaserBitmap() {}
 
     QImage image() const;
@@ -358,6 +362,7 @@ public:
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }
     virtual QString typeName() { return tr("Bitmap"); }
+	virtual QJsonObject toJson();
 
     virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
 	virtual QRectF sceneBoundingRect() const;
@@ -375,7 +380,7 @@ class LaserText : public LaserPrimitive
 {
 	Q_OBJECT
 public:
-	LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type);
+	LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type, QTransform transform = QTransform());
     virtual ~LaserText() {}
 
     QRect rect() const;

@@ -64,7 +64,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -81,6 +81,7 @@
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
     <addaction name="actionCloseDocument"/>
     <addaction name="actionExportJSON"/>
     <addaction name="menuImport"/>
@@ -1537,11 +1538,18 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/save_as.png</normaloff>:/ui/icons/images/save_as.png</iconset>
+   </property>
    <property name="text">
     <string>Save As</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionNew">

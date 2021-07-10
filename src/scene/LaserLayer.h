@@ -109,7 +109,7 @@ public:
 
     virtual bool isAvailable() const;
 
-	virtual QJsonObject toJson();
+	virtual QJsonObject toJson(QWidget* window);
 
 protected:
     void onClicked();

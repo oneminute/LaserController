@@ -42,6 +42,7 @@ public:
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
+
 private:
     void init();
 	void initSpline();
@@ -113,6 +114,7 @@ protected:
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
 	
+	void clearGroup();
 
 private:
     QScopedPointer<LaserScene> m_scene;
@@ -185,6 +187,7 @@ private:
 	LaserPrimitiveGroup* m_group;
 	bool m_isLeftSelecting = true;//在左边开始选择还是右边开始选择
 	
+	friend class LaserScene;
 };
 
 #endif // LASERVIEWER_H

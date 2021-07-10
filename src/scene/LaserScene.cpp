@@ -4,6 +4,7 @@
 #include "LaserPrimitive.h"
 #include "LaserLayer.h"
 #include "LaserPrimitiveGroup.h"
+#include "widget/LaserViewer.h"
 
 #include<QGraphicsSceneMouseEvent>
 
@@ -47,6 +48,8 @@ void LaserScene::updateDocument(LaserDocument * doc)
 void LaserScene::clearDocument(bool delDoc)
 {
     this->clear();
+	LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
+	viewer->clearGroup();
 
     if (delDoc && m_doc)
     {

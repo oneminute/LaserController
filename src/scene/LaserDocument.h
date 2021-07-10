@@ -78,12 +78,12 @@ public slots:
     void printOutline(LaserNode* node, int level);
     void arrange();
     void optimize();
-    void save(const QString& filename);
-    void load(const QString& filename);
+    void save(const QString& filename, QWidget* window);
+    void load(const QString& filename, QWidget* window);
     int totalNodes();
 
 protected:
-    void init();
+	void init();
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
     void outlineByLayers(LaserNode* node);
     void outlineByGroups(LaserNode* node);

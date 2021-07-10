@@ -628,11 +628,15 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 
 void LaserViewer::wheelEvent(QWheelEvent* event)
 {
+	QGraphicsView::wheelEvent(event);
+	if (!m_scene->document()) {
+		return;
+	}
     //qreal wheelZoomValue = qPow(1.2, event->delta() / 240.0);
     qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
     //qLogD << "wheelZoomValue: " << wheelZoomValue << ", delta: " << event->delta();
     zoomBy(wheelZoomValue);
-    QGraphicsView::wheelEvent(event);
+    
 }
 
 void LaserViewer::zoomBy(qreal factor)
@@ -1267,6 +1271,11 @@ bool LaserViewer::isOnControllHandlers(const QPoint& point, int& handlerIndex, Q
     return isIn;
 }
 
+void LaserViewer::clearGroup()
+{
+	m_group = nullptr;
+}
+
 bool LaserViewer::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2)
 {
 	qreal distance = (point2 - point1).manhattanLength();
@@ -1447,7 +1456,7 @@ void LaserViewer::onSelectedFillGroup()
 		m_group->setSelected(true);
 
 	}
-	m_scene->addItem(m_group);
+	//m_scene->addItem(m_group);
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
 	m_curSelectedHandleIndex = -1;
@@ -1762,9 +1771,10 @@ void LaserViewer::onCancelSelected()
 	}
 	
 	
-	m_group->setMatrix(QMatrix());
+	//m_group->setMatrix(QMatrix());
+	m_group->setTransform(QTransform());
 	m_scene->clearSelection();
-	m_scene->removeItem(m_group);
+	//m_scene->removeItem(m_group);
 	emit cancelSelected();
 	viewport()->repaint();
 }

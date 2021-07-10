@@ -455,13 +455,17 @@ bool LaserLayer::isAvailable() const
     return !d->primitives.isEmpty();
 }
 
-QJsonObject LaserLayer::toJson()
+QJsonObject LaserLayer::toJson(QWidget* window)
 {
 	QJsonObject object;
+	QList<LaserPrimitive*> primitives = this->primitives();
+	if (primitives.size() <= 0) {
+		return object;
+	}
 	QJsonArray array;
 	object.insert("name", this->name());
 	object.insert("type", this->type());
-	QList<LaserPrimitive*> primitives = this->primitives();
+	
 	for (int i = 0; i < primitives.size(); i++) {
 		LaserPrimitive* primitive = primitives[i];
 		QString className = primitive->metaObject()->className();
@@ -469,6 +473,30 @@ QJsonObject LaserLayer::toJson()
 			LaserEllipse* ellipse = qobject_cast<LaserEllipse*>(primitive);
 			//array.insert(i, ellipse->toJson());
 			array.append(ellipse->toJson());
+		}
+		else if (className == "LaserLine") {
+			LaserLine* line = qobject_cast<LaserLine*>(primitive);
+			array.append(line->toJson());
+		}
+		else if (className == "LaserRect") {
+			LaserRect* rect = qobject_cast<LaserRect*>(primitive);
+			array.append(rect->toJson());
+		}
+		else if (className == "LaserPolyline") {
+			LaserPolyline* polyline = qobject_cast<LaserPolyline*>(primitive);
+			array.append(polyline->toJson());
+		}
+		else if (className == "LaserPolygon") {
+			LaserPolygon* polygon = qobject_cast<LaserPolygon*>(primitive);
+			array.append(polygon->toJson());
+		}
+		else if (className == "LaserBitmap") {
+			LaserBitmap* bitmap = qobject_cast<LaserBitmap*>(primitive);
+			array.append(bitmap->toJson());
+		}
+		else {
+			QMessageBox::critical(window, "critical", "can't save, the primitive class don't exit.");
+			qLogD << "无法完整保存，存在无法解析的图元";
 		}
 		
 	}

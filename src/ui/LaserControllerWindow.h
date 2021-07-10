@@ -63,6 +63,7 @@ protected slots:
     void onActionWorkState(bool checked = false);
 	void onActionNew(bool checked = false);
 	void onActionSave(bool checked = false);
+	void onActionSaveAs(bool checked = false);
 	void onActionOpen(bool checked = false);
 
     void onActionMoveTop(bool checked = false);
@@ -143,6 +144,8 @@ private:
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
 	void createNewDocument();
+	QString getCurrentFileName();
+	void documentClose();
 
 signals:
     void windowCreated();
@@ -207,6 +210,10 @@ private:
 	//selection tool bar
 	int m_selectionOriginalState;
 	int m_selectionTranformState;
+
+	QString m_fileDirection;
+	QString m_fileName;
+	QString m_windowTitle;
 };
 
 #endif // LASERCONTROLLERWINDOW_H
