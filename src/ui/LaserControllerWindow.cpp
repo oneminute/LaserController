@@ -47,6 +47,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_useLoadedJson(false)
 	, m_unitIsMM(true)
 	, m_selectionOriginalState(SelectionOriginalCenter)
+	, m_windowTitle("Laser Controller")
 {
     m_ui->setupUi(this);
 	
@@ -327,6 +328,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_posYUnit = new QLabel("mm");
 	m_lockOrUnlock = new QToolButton();
 	m_lockOrUnlock->setDefaultAction(m_ui->actionLock);
+	m_lockOrUnlock->setEnabled(false);
 
 	m_propertyLayout->addWidget(m_posXLabel, 0, 0);
 	m_propertyLayout->addWidget(m_posYLabel, 1, 0);
@@ -414,6 +416,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_mmOrIn = new QToolButton();
 	m_ui->actionUnitChange->setText("mm");
 	m_mmOrIn->setDefaultAction(m_ui->actionUnitChange);
+	m_mmOrIn->setEnabled(false);
 
 	m_propertyLayout->addWidget(rotateLabel, 0, 11, 2, 1);
 	m_propertyLayout->addWidget(m_rotateBox, 0, 12, 2, 1);
@@ -440,6 +443,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
 	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::onActionNew);
 	connect(m_ui->actionSave, &QAction::triggered, this, &LaserControllerWindow::onActionSave);
+	connect(m_ui->actionSaveAs, &QAction::triggered, this, &LaserControllerWindow::onActionSaveAs);
 	connect(m_ui->actionOpen, &QAction::triggered, this, &LaserControllerWindow::onActionOpen);
 
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
@@ -861,33 +865,50 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
 }
 void LaserControllerWindow::onActionNew(bool checked)
 {
+	this->setWindowTitle("<Untitled> - " + m_windowTitle);
 	createNewDocument();
 }
 
 void LaserControllerWindow::onActionSave(bool checked)
 {
-	//QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
+	if (m_fileDirection.isEmpty()) {
+		onActionSaveAs(false);
+	}
+	else {
+		m_scene->document()->save(m_fileDirection, this);
+	}
+	
+}
+
+void LaserControllerWindow::onActionSaveAs(bool checked)
+{
 	QString name = QFileDialog::getSaveFileName(nullptr, "save file", ".", "File(*lc)");
+	
+	
 	if (name == "") {
 		return;
 	}
+
 	if (!name.endsWith(".lc")) {
 		name += ".lc";
 	}
 	qDebug() << name;
-	m_scene->document()->save(name);
-	
+	m_fileDirection = name;
+	setWindowTitle(getCurrentFileName() + " - " + m_windowTitle);
+	m_scene->document()->save(name, this);
 }
 
 void LaserControllerWindow::onActionOpen(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open file", ".", "File(*lc)");
+	m_fileDirection = name;
 	if (name == "") {
 		return;
 	}
+	setWindowTitle(getCurrentFileName() + " - " + m_windowTitle);
 	//创建document
 	createNewDocument();
-	m_scene->document()->load(name);
+	m_scene->document()->load(name, this);
 }
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
@@ -1248,11 +1269,24 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
 
 void LaserControllerWindow::onActionCloseDocument(bool checked)
 {
-    if (QMessageBox::Apply == QMessageBox::question(this, tr("Close document?"), tr("Do you want to close current document?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
-    {
-        m_scene->clearDocument(true);
-		m_ui->tableWidgetLayers->updateItems();
-    }
+	QMessageBox msgBox;
+	msgBox.setText(tr("Close document?"));
+	msgBox.setInformativeText(tr("Do you want to save current document?"));
+	msgBox.setStandardButtons(QMessageBox::Save
+		| QMessageBox::Close
+		| QMessageBox::Cancel);
+	int result = msgBox.exec();
+	switch (result) {
+		case QMessageBox::StandardButton::Save: {
+			onActionSave();
+			documentClose();
+			break;
+		}
+		case QMessageBox::StandardButton::Close: {
+			documentClose();
+			break;
+		}
+	}
 }
 
 void LaserControllerWindow::onActionSettings(bool checked)
@@ -1899,18 +1933,6 @@ void LaserControllerWindow::onSelectionOriginalClicked(bool clicked)
 {
 	
 }
-//selection areas change
-/*void LaserControllerWindow::
-
-{
-	if (m_scene->selectedItems().size() == 0) {
-		m_propertyWidget->setEnabled(false);
-	}
-	else if (m_scene->selectedItems().size() > 0) {
-		m_propertyWidget->setEnabled(true);
-		selectedChange();
-	}
-}*/
 
 void LaserControllerWindow::bindWidgetsProperties()
 {
@@ -1954,6 +1976,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
+
     // end actionSaveAs
 
     // actionCloseDocument
@@ -2257,7 +2280,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// actionSplineTool
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentIdleState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentSelectionState);
@@ -2274,7 +2297,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// actionSplineEditTool
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentIdleState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectionState);
@@ -2291,7 +2314,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// actionTextTool
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentIdleState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectionState);
@@ -2360,6 +2383,27 @@ void LaserControllerWindow::createNewDocument()
 	doc->setPageInformation(page);
 	doc->open();
 	initDocument(doc);
+	
+}
+
+QString LaserControllerWindow::getCurrentFileName()
+{
+	QString name = "";
+	if (m_fileDirection.isEmpty()) {
+		return name;
+	}
+	QStringList list = m_fileDirection.split("/");
+	name = list[list.size() - 1];
+	return name;
+}
+
+void LaserControllerWindow::documentClose()
+{
+	m_scene->clearDocument(true);
+	m_ui->tableWidgetLayers->updateItems();
+	this->m_fileDirection = "";
+	this->m_fileName = "";
+	this->setWindowTitle(m_windowTitle);
 }
 
 QString LaserControllerWindow::getFilename(const QString& title, const QStringList & mime)
