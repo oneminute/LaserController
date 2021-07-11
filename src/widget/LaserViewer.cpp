@@ -55,6 +55,9 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	QGraphicsView::paintEvent(event);
 	QPainter painter(viewport());
 	painter.setRenderHint(QPainter::Antialiasing);
+	
+	//网格
+	drawGrids(painter);
     if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
     {
 		painter.setRenderHint(QPainter::Antialiasing);
@@ -62,6 +65,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		
         ///qLogD << "SelectedEditing paint";
     }
+	
     //selectioin
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
@@ -822,14 +826,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     m_horizontalRuler->repaint();
     m_verticalRuler->repaint();
 	QGraphicsView::mouseMoveEvent(event);
-    //shift keyboard
-    /*if (event->modifiers() & Qt::ShiftModifier) {
-        m_isKeyShiftPressed = true;
-    }
-    else {
-        m_isKeyShiftPressed = false;
-    }*/
-
+    
     // 当在DocumentSelecting状态时
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
@@ -1337,6 +1334,72 @@ bool LaserViewer::isAllPolygonStartPoint()
 		}
 	}
 	return bl;
+}
+
+void LaserViewer::drawGrids(QPainter& painter)
+{
+	
+	QGraphicsRectItem* backgroudItem = this->scene()->backgroundItem();
+	if (!backgroudItem) {
+		return;
+	}
+	qreal intervalH = Global::mm2PixelsYF(10);
+	qreal intervalV = Global::mm2PixelsXF(10);
+	qreal width = backgroudItem->boundingRect().width();
+	qreal height = backgroudItem->boundingRect().height();
+	int sizeH = height / intervalH;
+	int sizeV = width / intervalV;
+	int count = 10;
+	for (int i = 0; i <= sizeH; i++) {
+		painter.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
+		qreal startY = intervalH * i;
+		if (i > 0) {
+			QPointF p1 = mapFromScene(backgroudItem->mapToScene(QPointF(0, startY)));
+			QPointF p2 = mapFromScene(backgroudItem->mapToScene(QPointF(width, startY)));
+			painter.drawLine(p1, p2);
+		}
+		
+		if (zoomValue() > 2) {
+			painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
+			for (int ic = 1; ic < count; ic++) {
+				qreal intervalH_1 = intervalH / count;
+				QPointF p1_h1 = mapFromScene(backgroudItem->mapToScene(QPointF(0, startY + intervalH_1 * ic)));
+				QPointF p2_h1 = mapFromScene(backgroudItem->mapToScene(QPointF(width, startY + intervalH_1 * ic)));
+				painter.drawLine(p1_h1, p2_h1);
+			}
+			
+		}
+	}
+	for (int j = 0; j <= sizeV; j++) {
+		qreal startX = intervalV * j;
+		if (j > 0) {
+			QPointF p1 = mapFromScene(backgroudItem->mapToScene(QPointF(startX, 0)));
+			QPointF p2 = mapFromScene(backgroudItem->mapToScene(QPointF(startX, height)));
+			painter.drawLine(p1, p2);
+		}
+		
+		if (zoomValue() > 2) {
+			painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
+			for (int jc = 0; jc < count; jc++) {
+				qreal intervalV_1 = intervalV / count;
+				QPointF p1_v1 = mapFromScene(backgroudItem->mapToScene(QPointF(startX + intervalV_1 * jc, 0)));
+				QPointF p2_v1 = mapFromScene(backgroudItem->mapToScene(QPointF(startX + intervalV_1 * jc, height)));
+				painter.drawLine(p1_v1, p2_v1);
+			}
+		}
+	}
+	if (zoomValue() > 2) {
+		painter.setPen(QPen(QColor(238, 238, 238), 1, Qt::SolidLine));
+		int count = 10;
+		for (int ic = 0; ic < count; ic++) {
+			QPointF p1 = mapFromScene(backgroudItem->mapToScene(QPointF(0, intervalH * ic)));
+			QPointF p2 = mapFromScene(backgroudItem->mapToScene(QPointF(width, intervalH * ic)));
+			painter.drawLine(p1, p2);
+		}
+		for (int jc = 0; jc < count; jc++) {
+
+		}
+	}
 }
 
 qreal LaserViewer::zoomValue() const

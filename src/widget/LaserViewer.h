@@ -57,6 +57,7 @@ private:
 	bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
 	bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
 	bool isAllPolygonStartPoint();
+	void drawGrids(QPainter& painter);
 public slots:
     void zoomIn();
     void zoomOut();
