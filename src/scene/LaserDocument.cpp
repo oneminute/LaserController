@@ -691,7 +691,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 	}
 	QJsonParseError *error = new QJsonParseError;
 	QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), error);
-	//ÅÐ¶ÏÎÄ¼þÊÇ·ñÍêÕû
+	//ï¿½Ð¶ï¿½ï¿½Ä¼ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (error->error != QJsonParseError::NoError)
 	{
 		qDebug() << "parseJson:" << error->errorString();
@@ -708,7 +708,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		QJsonObject layer = layers[i].toObject();
 		QJsonArray array = layer["primitives"].toArray();
 		
-		//´´½¨layer
+		//ï¿½ï¿½ï¿½ï¿½layer
 		/*LaserLayerType type = (LaserLayerType)layer["type"].toInt();
 		qDebug() << layer["name"].toString();
 		LaserLayer* laserLayer = new LaserLayer(layer["name"].toString(), type, this, true);
@@ -716,11 +716,11 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		this->addLayer(laserLayer);*/
 		int index = layer["index"].toInt();
 		if (index < 0 || index > laserLayers.size() - 1) {
-			QMessageBox::critical(window, "critical", "´ËÎÄ¼þµÄ²ãÊýÁ¿Óëµ±Ç°ÅäÖÃ²»Æ¥Åä£¬ ÎÞ·¨´ò¿ª");
-			qLogD << "´ËÎÄ¼þµÄ²ãÊýÁ¿Óëµ±Ç°ÅäÖÃ²»Æ¥Åä£¬ ÎÞ·¨´ò¿ª";
+			QMessageBox::critical(window, "critical", "ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ëµ±Ç°ï¿½ï¿½ï¿½Ã²ï¿½Æ¥ï¿½ä£¬ ï¿½Þ·ï¿½ï¿½ï¿½");
+			qLogD << "ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ëµ±Ç°ï¿½ï¿½ï¿½Ã²ï¿½Æ¥ï¿½ä£¬ ï¿½Þ·ï¿½ï¿½ï¿½";
 			return;
 		}
-		//´´½¨primitive
+		//ï¿½ï¿½ï¿½ï¿½primitive
 		for (int j = 0; j < array.size(); j++) {
 			QJsonObject primitiveJson = array[j].toObject();
 			QString className = primitiveJson["className"].toString();
@@ -743,7 +743,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					matrixPArray[6].toDouble(), matrixPArray[7].toDouble(), matrixPArray[8].toDouble());
 			}
 			QTransform saveTransform = transform * transformP;
-			//Í¼Ôª²»Í¬·ÖÖ§
+			//Í¼Ôªï¿½ï¿½Í¬ï¿½ï¿½Ö§
 			if (className == "LaserEllipse" || className == "LaserRect" || className == "LaserBitmap") {
 				//QTransform saveTransform = transform * transformP;
 				//bounds

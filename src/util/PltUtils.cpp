@@ -125,7 +125,7 @@ QByteArray pltUtils::points2Plt(const std::vector<cv::Point2f>& points)
     //cv::Point2f pt = points[points.size() - 1];
     cv::Point2f pt = points[0];
     buffer.append(QString("PU%1 %2;").arg(qRound(pt.x)).arg(-qRound(pt.y)));
-    for (int i = 0; i < points.size(); i++)
+    for (size_t i = 0; i < points.size(); i++)
     {
         pt = points[i];
         buffer.append(QString("PD%1 %2;").arg(qRound(pt.x)).arg(-qRound(pt.y)));

@@ -122,7 +122,7 @@ void LaserApplication::destroy()
     m_deviceThread.exit();
     m_deviceThread.wait();
 
-    Config::save();
+    //Config::save();
 }
 
 bool LaserApplication::notify(QObject * receiver, QEvent * event)

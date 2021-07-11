@@ -123,3 +123,5 @@ crash.bin
 ~$*.*
 
 *.lic
+
+config/

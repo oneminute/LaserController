@@ -28,6 +28,7 @@ public:
     void reset();
     void restoreDefault();
     void updateValue(const QVariant& value);
+    void changeValue(const QVariant& value);
 
     bool isModified();
     QVariant value() const;

@@ -117,6 +117,188 @@
             "value": 0.65
         }
     },
+    "systemRegister": {
+        "laserMaxPower": {
+            "defaultValue": 700,
+            "value": 70
+        },
+        "laserMinPower": {
+            "defaultValue": 700,
+            "value": 700
+        },
+        "laserPowerFreq": {
+            "defaultValue": 10,
+            "value": 0
+        },
+        "laserRunTime": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "sysRunNum": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "sysRunTime": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "xDirPhase": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "xLimitNum": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "xLimitPhase": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "xMaxAcceleration": {
+            "defaultValue": 45,
+            "value": 1234
+        },
+        "xMaxLength": {
+            "defaultValue": 320,
+            "value": 19840112
+        },
+        "xMaxSpeed": {
+            "defaultValue": 45,
+            "value": 19840112
+        },
+        "xMotorCurrent": {
+            "defaultValue": 50,
+            "value": 19840112
+        },
+        "xMotorNum": {
+            "defaultValue": 0,
+            "value": 19840112
+        },
+        "xResetEnabled": {
+            "defaultValue": true,
+            "value": false
+        },
+        "xStartSpeed": {
+            "defaultValue": 15,
+            "value": 19840112
+        },
+        "xStepLength": {
+            "defaultValue": 1,
+            "value": 19840112
+        },
+        "xUrgentAcceleration": {
+            "defaultValue": 45,
+            "value": 8
+        },
+        "xZeroDev": {
+            "defaultValue": 2000,
+            "value": 19840112
+        },
+        "yDirPhase": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "yLimitNum": {
+            "defaultValue": 0,
+            "value": 1313754177
+        },
+        "yLimitPhase": {
+            "defaultValue": 0,
+            "value": 600
+        },
+        "yMaxAcceleration": {
+            "defaultValue": 45,
+            "value": 0
+        },
+        "yMaxLength": {
+            "defaultValue": 210,
+            "value": 600
+        },
+        "yMaxSpeed": {
+            "defaultValue": 45,
+            "value": 0
+        },
+        "yMotorCurrent": {
+            "defaultValue": 50,
+            "value": 0
+        },
+        "yMotorNum": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "yResetEnabled": {
+            "defaultValue": true,
+            "value": false
+        },
+        "yStartSpeed": {
+            "defaultValue": 15,
+            "value": 0
+        },
+        "yStepLength": {
+            "defaultValue": 1000,
+            "value": 1093677574
+        },
+        "yUrgentAcceleration": {
+            "defaultValue": 20,
+            "value": 2043195413
+        },
+        "yZeroDev": {
+            "defaultValue": 1000,
+            "value": 3211317
+        },
+        "zDirPhase": {
+            "defaultValue": 0,
+            "value": 1016
+        },
+        "zLimitNum": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "zLimitPhase": {
+            "defaultValue": 0,
+            "value": 15
+        },
+        "zMaxAcceleration": {
+            "defaultValue": 30,
+            "value": 0
+        },
+        "zMaxLength": {
+            "defaultValue": 200,
+            "value": 17694920
+        },
+        "zMaxSpeed": {
+            "defaultValue": 10,
+            "value": 0
+        },
+        "zMotorCurrent": {
+            "defaultValue": 50,
+            "value": 0
+        },
+        "zMotorNum": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "zResetEnabled": {
+            "defaultValue": true,
+            "value": false
+        },
+        "zStartSpeed": {
+            "defaultValue": 15,
+            "value": 0
+        },
+        "zStepLength": {
+            "defaultValue": 20,
+            "value": 0
+        },
+        "zUrgentAcceleration": {
+            "defaultValue": 30,
+            "value": 0
+        },
+        "zZeroDev": {
+            "defaultValue": 2000,
+            "value": 0
+        }
+    },
     "ui": {
         "colorButtonHeight": {
             "defaultValue": 30,
@@ -145,6 +327,104 @@
         "toolButtonSize": {
             "defaultValue": 32,
             "value": 32
+        }
+    },
+    "userRegister": {
+        "accMode": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "backlashXInterval": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "backlashYInterval": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "cuttingMoveAcc": {
+            "defaultValue": 45,
+            "value": 45
+        },
+        "cuttingMoveSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "cuttingMoveSpeedFactor": {
+            "defaultValue": 2,
+            "value": 2
+        },
+        "cuttingSpotSize": {
+            "defaultValue": 30,
+            "value": 30
+        },
+        "cuttingTurnAcc": {
+            "defaultValue": 45,
+            "value": 45
+        },
+        "cuttingTurnSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "cuttingWorkAcc": {
+            "defaultValue": 60,
+            "value": 60
+        },
+        "cuttingWorkSpeedFactor": {
+            "defaultValue": 2,
+            "value": 2
+        },
+        "head": {
+            "defaultValue": 305419896,
+            "value": "0x12345678"
+        },
+        "scanLaserPower": {
+            "defaultValue": 70,
+            "value": 7
+        },
+        "scanReturnError": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "scanReturnPos": {
+            "defaultValue": 0,
+            "value": 0
+        },
+        "scanRowInterval": {
+            "defaultValue": 7,
+            "value": 7
+        },
+        "scanRowSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "scanXAcc": {
+            "defaultValue": 5,
+            "value": 5
+        },
+        "scanXResetEnabled": {
+            "defaultValue": true,
+            "value": true
+        },
+        "scanXStartSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "scanYAcc": {
+            "defaultValue": 45,
+            "value": 45
+        },
+        "scanYResetEnabled": {
+            "defaultValue": true,
+            "value": true
+        },
+        "scanYStartSpeed": {
+            "defaultValue": 15,
+            "value": 15
+        },
+        "scanZResetEnabled": {
+            "defaultValue": true,
+            "value": true
         }
     }
 }

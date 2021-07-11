@@ -33,7 +33,7 @@ private:
 
 public:
     static void load();
-    static void save();
+    static void save(const QString& mainCardId = "");
     static void restore();
     static QString configFilePath();
     static bool isModified();
@@ -49,6 +49,9 @@ protected:
     static void loadExportItems();
     static void loadDeviceItems();
 
+    static void loadUserReigsters();
+    static void loadSystemRegisters();
+
 public:
     class General : public ConfigItemGroup
     {
@@ -58,6 +61,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(general, language, QString, toString)
         CONFIG_ITEM(general, unit, int, toInt)
 
@@ -73,6 +77,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(layers, maxLayersCount, int, toInt)
 
     private:
@@ -87,6 +92,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(ui, operationButtonIconSize, int, toInt)
         CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
         CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
@@ -107,6 +113,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(cuttingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(cuttingLayer, runSpeed, int, toInt)
         CONFIG_ITEM(cuttingLayer, laserPower, int, toInt)
@@ -125,6 +132,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(engravingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, runSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, laserPower, int, toInt)
@@ -146,6 +154,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(pathOptimization, maxAnts, int, toInt)
         CONFIG_ITEM(pathOptimization, maxIterations, int, toInt)
         CONFIG_ITEM(pathOptimization, maxTraverse, int, toInt)
@@ -166,6 +175,7 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(export, maxAnglesDiff, qreal, toReal)
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
 
@@ -181,7 +191,108 @@ public:
         {}
 
     public:
+        static ConfigItemGroup* group;
         CONFIG_ITEM(device, autoConnectFirst, bool, toBool)
+
+    private:
+        friend class Config;
+    };
+
+    class UserRegister : public ConfigItemGroup
+    {
+    protected:
+        UserRegister(QObject* parent = nullptr)
+            : ConfigItemGroup("userRegister", tr("User Registers"), tr("User registers"), parent)
+        {}
+
+    public:
+        static ConfigItemGroup* group;
+        CONFIG_ITEM(userRegister, head, QString, toString)
+        CONFIG_ITEM(userRegister, accMode, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingMoveSpeed, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingMoveAcc, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingTurnSpeed, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingTuenAcc, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingMoveSpeedFactor, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingWorkSpeedFactor, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingSpotSize, int, toInt)
+        CONFIG_ITEM(userRegister, scanXStartSpeed, int, toInt)
+        CONFIG_ITEM(userRegister, scanYStartSpeed, int, toInt)
+        CONFIG_ITEM(userRegister, scanXAcc, int, toInt)
+        CONFIG_ITEM(userRegister, scanYAcc, int, toInt)
+        CONFIG_ITEM(userRegister, scanRowSpeed, int, toInt)
+        CONFIG_ITEM(userRegister, scanRowInterval, int, toInt)
+        CONFIG_ITEM(userRegister, scanReturnError, int, toInt)
+        CONFIG_ITEM(userRegister, scanLaserPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, scanXResetEnabled, bool, toBool)
+        CONFIG_ITEM(userRegister, scanYResetEnabled, bool, toBool)
+        CONFIG_ITEM(userRegister, scanZResetEnabled, bool, toBool)
+        CONFIG_ITEM(userRegister, scanReturnPos, int, toInt)
+        CONFIG_ITEM(userRegister, backlashXInterval, int, toInt)
+        CONFIG_ITEM(userRegister, backlashYInterval, int, toInt)
+
+    private:
+        friend class Config;
+    };
+
+    class SystemRegister : public ConfigItemGroup
+    {
+    protected:
+        SystemRegister(QObject* parent = nullptr)
+            : ConfigItemGroup("systemRegister", tr("System Registers"), tr("System registers"), parent)
+        {}
+
+    public:
+        static ConfigItemGroup* group;
+        CONFIG_ITEM(systemRegister, sysRunTime, int, toInt)
+        CONFIG_ITEM(systemRegister, laserRunTime, int, toInt)
+        CONFIG_ITEM(systemRegister, sysRunNum, int, toInt)
+
+        CONFIG_ITEM(systemRegister, xMaxLength, int, toInt)
+        CONFIG_ITEM(systemRegister, xDirPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, xLimitPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, xZeroDev, int, toInt)
+        CONFIG_ITEM(systemRegister, xStepLength, int, toInt)
+        CONFIG_ITEM(systemRegister, xLimitNum, int, toInt)
+        CONFIG_ITEM(systemRegister, xResetEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, xMotorNum, int, toInt)
+        CONFIG_ITEM(systemRegister, xMotorCurrent, int, toInt)
+        CONFIG_ITEM(systemRegister, xStartSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, xMaxSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, xMaxAcceleration, int, toInt)
+        CONFIG_ITEM(systemRegister, xUrgentAcceleration, int, toInt)
+
+        CONFIG_ITEM(systemRegister, yMaxLength, qreal, toReal)
+        CONFIG_ITEM(systemRegister, yDirPhase, bool, toBool)
+        CONFIG_ITEM(systemRegister, yLimitPhase, bool, toBool)
+        CONFIG_ITEM(systemRegister, yZeroDev, bool, toBool)
+        CONFIG_ITEM(systemRegister, yStepLength, int, toInt)
+        CONFIG_ITEM(systemRegister, yLimitNum, int, toInt)
+        CONFIG_ITEM(systemRegister, yResetEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, yMotorNum, int, toInt)
+        CONFIG_ITEM(systemRegister, yMotorCurrent, int, toInt)
+        CONFIG_ITEM(systemRegister, yStartSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, yMaxSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, yMaxAcceleration, int, toInt)
+        CONFIG_ITEM(systemRegister, yUrgentAcceleration, int, toInt)
+
+        CONFIG_ITEM(systemRegister, zMaxLength, int, toInt)
+        CONFIG_ITEM(systemRegister, zDirPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, zLimitPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, zZeroDev, int, toInt)
+        CONFIG_ITEM(systemRegister, zStepLength, int, toInt)
+        CONFIG_ITEM(systemRegister, zLimitNum, int, toInt)
+        CONFIG_ITEM(systemRegister, zResetEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, zMotorNum, int, toInt)
+        CONFIG_ITEM(systemRegister, zMotorCurrent, int, toInt)
+        CONFIG_ITEM(systemRegister, zStartSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, zMaxSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, zMaxAcceleration, int, toInt)
+        CONFIG_ITEM(systemRegister, zUrgentAcceleration, int, toInt)
+
+        CONFIG_ITEM(systemRegister, LaserMaxPower, int, toInt)
+        CONFIG_ITEM(systemRegister, LaserMinPower, int, toInt)
+        CONFIG_ITEM(systemRegister, LaserPowerFreq, int, toInt)
 
     private:
         friend class Config;

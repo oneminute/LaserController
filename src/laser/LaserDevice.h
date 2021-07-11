@@ -16,6 +16,8 @@ public:
 
     void resetDriver(LaserDriver* driver);
 
+    bool isConnected() const;
+
     QString portName() const;
 
     qreal layoutWidth() const;
@@ -25,12 +27,28 @@ public:
     int printerDrawUnit() const;
     void setPrinterDrawUnit(int unit, bool toCard = true);
 
-    QString hardwareId() const;
-    QString mainCardId() const;
-    QString dongleId() const;
+    QString requestHardwareId() const;
+    QString requestMainCardId() const;
+    QString requestDongleId() const;
 
     void requestMainCardInfo();
-    
+    QString mainCardId() const;
+    QString mainCardRegisteredDate() const;
+    QString mainCardActivatedDate() const;
+    QString boundDongleId() const;
+    QString boundDongleRegisteredDate() const;
+    QString boundDongleActivatedDate() const;
+    QString boundDongleBindingTimes() const;
+    QString dongleId() const;
+    QString dongleRegisteredDate() const;
+    QString dongleActivatedDate() const;
+    QString dongleBindingTimes() const;
+    QString hardwareRegisteredDate() const;
+    QString hardwareActivatedDate() const;
+    QString hardwareMaintainingTimes() const;
+
+    bool verifyManufacturePassword(const QString& password);
+
 public slots:
     void load();
     void unload();
@@ -72,7 +90,8 @@ signals:
     void disconnected();
     void mainCardRegistered();
     void mainCardActivated(bool temp);
-    void mainCardInfoFetched(QMap<QString, QString> info);
+    void mainCardInfoFetched();
+    void manufacturePasswordVerified(bool pass);
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

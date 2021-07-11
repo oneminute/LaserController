@@ -15,6 +15,7 @@ public:
     LaserDevicePrivate(LaserDevice* ptr)
         : q_ptr(ptr)
         , driver(nullptr)
+        , connected(false)
         , portName("")
         , layoutRect(0, 0, 320, 210)
         , printerDrawUnit(1016)
@@ -22,10 +23,25 @@ public:
 
     LaserDevice* q_ptr;
     LaserDriver* driver;
+    bool connected;
 
     QString portName;
     QRectF layoutRect;      // 加工的幅面宽
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
+    QString mainCard;
+    QString mainCardRegisteredDate;
+    QString mainCardActivatedDate;
+    QString boundDongle;
+    QString boundDongleRegisteredDate;
+    QString boundDongleActivatedDate;
+    QString boundDongleBindingTimes;
+    QString dongle;
+    QString dongleRegisteredDate;
+    QString dongleActivatedDate;
+    QString dongleBindingTimes;
+    QString hardwareRegisteredDate;
+    QString hardwareActivatedDate;
+    QString hardwareMaintainingTimes;
 };
 
 LaserDevice::LaserDevice(QObject* parent)
@@ -58,6 +74,12 @@ void LaserDevice::resetDriver(LaserDriver* driver)
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
 
     load();
+}
+
+bool LaserDevice::isConnected() const
+{
+    Q_D(const LaserDevice);
+    return d->connected;
 }
 
 QString LaserDevice::portName() const
@@ -112,7 +134,7 @@ void LaserDevice::setPrinterDrawUnit(int unit, bool toCard)
     setLayoutRect(d->layoutRect, toCard);
 }
 
-QString LaserDevice::hardwareId() const
+QString LaserDevice::requestHardwareId() const
 {
     Q_D(const LaserDevice);
     if (d->driver)
@@ -132,7 +154,7 @@ QString LaserDevice::hardwareId() const
     return "";
 }
 
-QString LaserDevice::mainCardId() const
+QString LaserDevice::requestMainCardId() const
 {
     Q_D(const LaserDevice);
     if (d->driver)
@@ -142,7 +164,7 @@ QString LaserDevice::mainCardId() const
     return "";
 }
 
-QString LaserDevice::dongleId() const
+QString LaserDevice::requestDongleId() const
 {
     Q_D(const LaserDevice);
     if (d->driver)
@@ -187,6 +209,96 @@ void LaserDevice::requestMainCardInfo()
     }
 }
 
+QString LaserDevice::mainCardId() const
+{
+    Q_D(const LaserDevice);
+    return d->mainCard;
+}
+
+QString LaserDevice::mainCardRegisteredDate() const
+{
+    Q_D(const LaserDevice);
+    return d->mainCardRegisteredDate;
+}
+
+QString LaserDevice::mainCardActivatedDate() const
+{
+    Q_D(const LaserDevice);
+    return d->mainCardActivatedDate;
+}
+
+QString LaserDevice::boundDongleId() const
+{
+    Q_D(const LaserDevice);
+    return d->boundDongle;
+}
+
+QString LaserDevice::boundDongleRegisteredDate() const
+{
+    Q_D(const LaserDevice);
+    return d->boundDongleRegisteredDate;
+}
+
+QString LaserDevice::boundDongleActivatedDate() const
+{
+    Q_D(const LaserDevice);
+    return d->boundDongleActivatedDate;
+}
+
+QString LaserDevice::boundDongleBindingTimes() const
+{
+    Q_D(const LaserDevice);
+    return d->boundDongleBindingTimes;
+}
+
+QString LaserDevice::dongleId() const
+{
+    Q_D(const LaserDevice);
+    return d->dongle;
+}
+
+QString LaserDevice::dongleRegisteredDate() const
+{
+    Q_D(const LaserDevice);
+    return d->dongleRegisteredDate;
+}
+
+QString LaserDevice::dongleActivatedDate() const
+{
+    Q_D(const LaserDevice);
+    return d->dongleActivatedDate;
+}
+
+QString LaserDevice::dongleBindingTimes() const
+{
+    Q_D(const LaserDevice);
+    return d->dongleBindingTimes;
+}
+
+QString LaserDevice::hardwareRegisteredDate() const
+{
+    Q_D(const LaserDevice);
+    return d->hardwareRegisteredDate;
+}
+
+QString LaserDevice::hardwareActivatedDate() const
+{
+    Q_D(const LaserDevice);
+    return d->hardwareActivatedDate;
+}
+
+QString LaserDevice::hardwareMaintainingTimes() const
+{
+    Q_D(const LaserDevice);
+    return d->hardwareMaintainingTimes;
+}
+
+bool LaserDevice::verifyManufacturePassword(const QString& password)
+{
+    Q_D(LaserDevice);
+    return d->driver->checkFactoryPassword(password);
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);
@@ -212,7 +324,7 @@ void LaserDevice::disconnectDevice()
 QString LaserDevice::activateMainCard(const QString& name, const QString& address, const QString& phone, const QString& qq, const QString& wx, const QString& email, const QString& country, const QString& distributor, const QString& trademark, const QString& model)
 {
     Q_D(LaserDevice);
-    QString cardId = mainCardId();
+    QString cardId = requestMainCardId();
     qLogD << "cardId: " << cardId;
     QString result = d->driver->activateMainCard(name, address, phone, qq, wx, email, country, distributor, trademark, model, cardId);
     qLogD << "activation result: " << result;
@@ -311,6 +423,7 @@ void LaserDevice::handleError(int code, const QString& message)
         break;
     case E_FactoryPasswordIncorrect:
         throw new LaserDeviceSecurityException(code, tr("Incorrect factory password"));
+        emit manufacturePasswordVerified(false);
         break;
     case E_FactoryPasswordLengthError:
         throw new LaserDeviceSecurityException(code, tr("Invalid length of factory password"));
@@ -431,12 +544,14 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_ComPortOpened:
     {
+        d->connected = true;
         emit comPortConnected(portName());
         emit connected();
         break;
     }
     case M_ComPortClosed:
     {
+        d->connected = false;
         emit disconnected();
         break;
     }
@@ -470,22 +585,268 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
         }
-        QMap<QString, QString> info;
-        info.insert("mainCard", items[0]);
-        info.insert("mainCardRegisteredDate", items[1]);
-        info.insert("mainCardActivatedDate", items[2]);
-        info.insert("boundDongle", items[3]);
-        info.insert("boundDongleRegisteredDate", items[4]);
-        info.insert("boundDongleActivatedDate", items[5]);
-        info.insert("boundDongleBindingTimes", items[6]);
-        info.insert("dongle", items[7]);
-        info.insert("dongleRegisteredDate", items[8]);
-        info.insert("dongleActivatedDate", items[9]);
-        info.insert("dongleBindingTimes", items[10]);
-        info.insert("hardwareRegisteredDate", items[11]);
-        info.insert("hardwareActivatedDate", items[12]);
-        info.insert("hardwareMaintainingTimes", items[13]);
-        emit mainCardInfoFetched(info);
+        d->mainCard = items[0];
+        d->mainCardRegisteredDate = items[1];
+        d->mainCardActivatedDate = items[2];
+        d->boundDongle = items[3];
+        d->boundDongleRegisteredDate = items[4];
+        d->boundDongleActivatedDate = items[5];
+        d->boundDongleBindingTimes = items[6];
+        d->dongle = items[7];
+        d->dongleRegisteredDate = items[8];
+        d->dongleActivatedDate = items[9];
+        d->dongleBindingTimes = items[10];
+        d->hardwareRegisteredDate = items[11];
+        d->hardwareActivatedDate = items[12];
+        d->hardwareMaintainingTimes = items[13];
+        emit mainCardInfoFetched();
+        break;
+    }
+    case M_CardDongleBindOK:
+    {
+        break;
+    }
+    case M_LaserTubeZeroClearingOK:
+    {
+        break;
+    }
+    case M_ReadSysParamFromCardOK:
+    {
+        if (message.isEmpty())
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
+        }
+        LaserRegister::batchParse(message, true);
+        break;
+    }
+    case M_WriteSysParamToCardOK:
+    {
+        break;
+    }
+    case M_ReadUserParamFromCardOK:
+    {
+        if (message.isEmpty())
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
+        }
+        LaserRegister::batchParse(message, false);
+        break;
+    }
+    case M_WriteUserParamToCardOK:
+    {
+        break;
+    }
+    case M_ReadComputerParamFromCardOK:
+    {
+        break;
+    }
+    case M_WriteComputerParamToCardOK:
+    {
+        break;
+    }
+    case M_FactoryPasswordValid:
+    {
+        emit manufacturePasswordVerified(true);
+        break;
+    }
+    case M_ChangeFactoryPasswordOK:
+    {
+        break;
+    }
+    case M_ReturnTextMsgFromCallback:
+    {
+        break;
+    }
+    case M_ImportFromFile:
+    {
+        break;
+    }
+    case M_CancelCurrentWork:
+    {
+        break;
+    }
+    case M_TimeConsuming:
+    {
+        break;
+    }
+    case M_EstimatedWorkTime:
+    {
+        break;
+    }
+    case M_StartProcData:
+    {
+        break;
+    }
+    case M_DataTransCompleted:
+    {
+        break;
+    }
+    case M_RequestAndContinue:
+    {
+        break;
+    }
+    case M_MotorLock:
+    {
+        break;
+    }
+    case M_MotorUnlock:
+    {
+        break;
+    }
+    case M_LaserLightOn:
+    {
+        break;
+    }
+    case M_LaserLightOff:
+    {
+        break;
+    }
+    case M_StartWorking:
+    {
+        break;
+    }
+    case M_PauseWorking:
+    {
+        break;
+    }
+    case M_ContinueWorking:
+    {
+        break;
+    }
+    case M_StopWorking:
+    {
+        break;
+    }
+    case M_MachineWorking:
+    {
+        break;
+    }
+    case M_Idle:
+    {
+        break;
+    }
+    case M_WorkFinished:
+    {
+        break;
+    }
+    case M_DeviceIdInfo:
+    {
+        break;
+    }
+    case M_ClientAddressInfo:
+    {
+        break;
+    }
+    case M_ConnectedServer:
+    {
+        break;
+    }
+    case M_DisconnectServer:
+    {
+        break;
+    }
+    case M_ConnectServerOK:
+    {
+        break;
+    }
+    case M_SubmitToServerOK:
+    {
+        break;
+    }
+    case M_DownloadBegin:
+    {
+        break;
+    }
+    case M_DownloadEnd:
+    {
+        break;
+    }
+    case M_NewVersionChecking:
+    {
+        break;
+    }
+    case M_NewVersionCheckFinished:
+    {
+        break;
+    }
+    case M_IsLatestVersion:
+    {
+        break;
+    }
+    case M_ReadyToUpdateFile:
+    {
+        break;
+    }
+    case M_DownloadUpdateInfoFile:
+    {
+        break;
+    }
+    case M_FoundSoftNewVersion:
+    {
+        break;
+    }
+    case M_DownloadFileCounts:
+    {
+        break;
+    }
+    case M_DownloadFileIndex:
+    {
+        break;
+    }
+    case M_DownloadSoftDataStart:
+    {
+        break;
+    }
+    case M_StartSoftUpdate:
+    {
+        break;
+    }
+    case M_CancelSoftUpdate:
+    {
+        break;
+    }
+    case M_SoftUpdateFinished:
+    {
+        break;
+    }
+    case M_FoundFirmwareNewVersion:
+    {
+        break;
+    }
+    case M_DownloadFirmwareDataStart:
+    {
+        break;
+    }
+    case M_DownloadFirmwareDataEnd:
+    {
+        break;
+    }
+    case M_SendFirmwareDataStart:
+    {
+        break;
+    }
+    case M_SendFirmwareDataEnd:
+    {
+        break;
+    }
+    case M_UpdateFirmwareStart:
+    {
+        break;
+    }
+    case M_UpdateFirmwareEnd:
+    {
+        break;
+    }
+    case M_UpdateFirmwareAbort:
+    {
+        break;
+    }
+    case M_SaveParamsToServerOK:
+    {
+        break;
+    }
+    case M_ReadParamsFromServerOK:
+    {
         break;
     }
     }
@@ -539,9 +900,11 @@ void LaserDevice::onConnected()
 void LaserDevice::onMainCardRegistered()
 {
     Q_D(LaserDevice);
-    qLogD << "Hardware id: " << hardwareId();
-    qLogD << "Main card id: " << mainCardId();
-    qLogD << "Dongle id: " << dongleId();
+    d->mainCard = requestMainCardId();
+    qLogD << "Hardware id: " << d->mainCard;
+    qLogD << "Main card id: " << requestMainCardId();
+    qLogD << "Dongle id: " << requestDongleId();
+    requestMainCardInfo();
 }
 
 void LaserDevice::onMainCardActivated(bool temp)

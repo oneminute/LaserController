@@ -38,12 +38,14 @@ protected:
 
 protected slots:
     void onValueChanged(const QVariant& value);
+    void onManufacturePasswordVerified(bool pass);
 
 private:
     QScopedPointer<Ui::ConfigDialog> m_ui;
     QMap<QString, QWidget*> m_panels;
     QList<InputWidgetWrapper*> m_wrappers;
     QString m_windowTitle;
+    QWidget* m_systemRegisterPage;
 };
 
 #endif // CONFIG_DIALOG
