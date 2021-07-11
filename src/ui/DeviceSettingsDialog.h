@@ -22,7 +22,7 @@ public:
     void makeDefault();
 
 protected slots:
-    void registersFetched(const LaserDriver::RegistersMap& datas);
+    void registersFetched(const LaserRegister::RegistersMap& datas);
     void rightManufactorPassword();
     void wrongManufactorPassword();
 

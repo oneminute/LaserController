@@ -117,7 +117,7 @@ protected slots:
     void onEditSliderLaserEngergyMinChanged(int value);
     void onEditSliderLaserEngergyMaxChanged(int value);
 
-    void onLaserRegistersFetched(const LaserDriver::RegistersMap& registers);
+    void onLaserRegistersFetched(const LaserRegister::RegistersMap& registers);
     void onLaserReturnWorkState(LaserState state);
 
 	void onCreatSpline();

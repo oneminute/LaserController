@@ -229,6 +229,8 @@ void InputWidgetWrapper::updateValue(const QVariant& newValue)
 
 void InputWidgetWrapper::changeValue(const QVariant& value)
 {
+    if (m_configItem->readOnly())
+        return;
     QVariant newValue = m_configItem->doSaveDataHook(value);
     emit valueChanged(newValue);
 }

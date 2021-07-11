@@ -64,7 +64,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -111,7 +111,6 @@
      <string>&amp;Options</string>
     </property>
     <addaction name="actionSettings"/>
-    <addaction name="actionDeviceSettings"/>
    </widget>
    <widget class="QMenu" name="menuDraw">
     <property name="title">
@@ -190,7 +189,6 @@
    <addaction name="actionDeletePrimitive"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
-   <addaction name="actionDeviceSettings"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLayers">

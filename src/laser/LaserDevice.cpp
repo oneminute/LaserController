@@ -299,6 +299,18 @@ bool LaserDevice::verifyManufacturePassword(const QString& password)
     return d->driver->checkFactoryPassword(password);
 }
 
+bool LaserDevice::writeUserRegisters()
+{
+    Q_D(LaserDevice);
+    return d->driver->writeUserParamToCard(Config::UserRegister::group->keyValuePairs());
+}
+
+bool LaserDevice::writeSystemRegisters()
+{
+    Q_D(LaserDevice);
+    return d->driver->writeUserParamToCard(Config::SystemRegister::group->keyValuePairs());
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);

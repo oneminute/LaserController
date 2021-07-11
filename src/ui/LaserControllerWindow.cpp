@@ -1584,7 +1584,7 @@ void LaserControllerWindow::onEditSliderLaserEngergyMaxChanged(int value)
     }
 }
 
-void LaserControllerWindow::onLaserRegistersFetched(const LaserDriver::RegistersMap & registers)
+void LaserControllerWindow::onLaserRegistersFetched(const LaserRegister::RegistersMap & registers)
 {
     /*if (registers.contains(LaserDriver::RT_CUTTING_LASER_POWER))
     {

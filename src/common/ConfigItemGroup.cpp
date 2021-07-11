@@ -142,3 +142,28 @@ void ConfigItemGroup::doModify()
         item->doModify();
     }
 }
+
+QStringList ConfigItemGroup::registerValues() const
+{
+    Q_D(const ConfigItemGroup);
+    QStringList values;
+    for (ConfigItem* item : d->items)
+    {
+        values.append(item->toRegisterString());
+    }
+    return values;
+}
+
+LaserRegister::RegistersMap ConfigItemGroup::keyValuePairs() const
+{
+    Q_D(const ConfigItemGroup);
+    LaserRegister::RegistersMap map;
+    for (ConfigItem* item : d->items)
+    {
+        LaserRegister::RegisterPair pair = item->keyValuePair();
+        if (!pair.second.isValid())
+            continue;
+        map.insert(pair.first, pair.second);
+    }
+    return map;
+}

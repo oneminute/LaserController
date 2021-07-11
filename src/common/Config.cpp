@@ -103,6 +103,7 @@ void Config::save(const QString& mainCardId)
                 QJsonDocument doc(json);
                 registerFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
                 registerFile.close();
+
             }
         }
 
@@ -548,14 +549,14 @@ void Config::loadUserReigsters()
     head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
-    head->setLoadDataHook(
+    /*head->setLoadDataHook(
         [](const QVariant& value)
         {
             int intValue = value.toInt();
             QString hexValue = QString("0x%1").arg(intValue, 0, 16);
             return QVariant(hexValue);
         }
-    );
+    );*/
     head->bindLaserRegister(0, false);
 
     ConfigItem* accMode = group->addConfigItem(
@@ -586,9 +587,14 @@ void Config::loadUserReigsters()
         "cuttingMoveSpeed",
         tr("Cutting Move Speed"),
         tr("Cutting move speed"),
-        15
+        15,
+        DT_REAL
     );
-    cuttingMoveSpeed->setInputWidgetProperty("minimum", 1);
+    cuttingMoveSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    cuttingMoveSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingMoveSpeed->setInputWidgetProperty("step", 0.001);
+    cuttingMoveSpeed->setInputWidgetProperty("page", 10);
+    cuttingMoveSpeed->setInputWidgetProperty("minimum", 0.0011);
     cuttingMoveSpeed->setInputWidgetProperty("maximum", 1000);
     cuttingMoveSpeed->bindLaserRegister(2, false);
 
@@ -596,9 +602,14 @@ void Config::loadUserReigsters()
         "cuttingMoveAcc",
         tr("Cutting Move Acceleration"),
         tr("Cutting Move Acceleration"),
-        45
+        45,
+        DT_REAL
     );
-    cuttingMoveAcc->setInputWidgetProperty("minimum", 1);
+    cuttingMoveAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    cuttingMoveAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingMoveAcc->setInputWidgetProperty("step", 0.001);
+    cuttingMoveAcc->setInputWidgetProperty("page", 10);
+    cuttingMoveAcc->setInputWidgetProperty("minimum", 0.001);
     cuttingMoveAcc->setInputWidgetProperty("maximum", 1000);
     cuttingMoveAcc->bindLaserRegister(3, false);
 
@@ -606,8 +617,13 @@ void Config::loadUserReigsters()
         "cuttingTurnSpeed",
         tr("Cutting Turn Speed"),
         tr("Cutting turn speed"),
-        15
+        15,
+        DT_REAL
     );
+    cuttingTurnSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    cuttingTurnSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingTurnSpeed->setInputWidgetProperty("step", 0.001);
+    cuttingTurnSpeed->setInputWidgetProperty("page", 10);
     cuttingTurnSpeed->setInputWidgetProperty("minimum", 1);
     cuttingTurnSpeed->setInputWidgetProperty("maximum", 1000);
     cuttingTurnSpeed->bindLaserRegister(4, false);

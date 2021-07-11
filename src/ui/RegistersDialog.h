@@ -21,14 +21,14 @@ public:
     virtual ~RegistersDialog();
 
 protected slots:
-    void registersFetched(const LaserDriver::RegistersMap& datas);
+    void registersFetched(const LaserRegister::RegistersMap& datas);
     void onActionReload(bool checked = false);
     void onActionSave(bool checked = false);
     void onRegistersItemChanged(QTableWidgetItem* item);
 
 private:
     QScopedPointer<Ui::RegistersDialog> m_ui;
-    LaserDriver::RegistersMap m_changedRegisters;
+    LaserRegister::RegistersMap m_changedRegisters;
 };
 
 #endif // REGISTERSDIALOG_H

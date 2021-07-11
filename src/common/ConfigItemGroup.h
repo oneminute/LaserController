@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QObject>
 #include "common.h"
+#include "laser/LaserRegister.h"
 
 class Config;
 class ConfigItem;
@@ -44,6 +45,9 @@ public:
     bool isModified() const;
 
     void doModify();
+
+    QStringList registerValues() const;
+    LaserRegister::RegistersMap keyValuePairs() const;
 
 protected:
 

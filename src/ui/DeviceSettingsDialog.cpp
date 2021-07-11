@@ -130,7 +130,7 @@ void DeviceSettingsDialog::onPushButtonReadClicked(bool checked)
 
 void DeviceSettingsDialog::onPushButtonWriteClicked(bool checked)
 {
-    LaserDriver::RegistersMap values;
+    LaserRegister::RegistersMap values;
     /*values[LaserDriver::REG_18] = QString::number(m_ui->editSliderCuttingPower->value());
     values[LaserDriver::REG_20] = QString::number(m_ui->editSliderCuttingStartPowerRate->value());
     values[LaserDriver::REG_19] = QString::number(m_ui->editSliderCuttingRunPowerRate->value());
@@ -190,7 +190,7 @@ void DeviceSettingsDialog::onPushButtonResetClicked(bool checked)
     connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &DeviceSettingsDialog::rightManufactorPassword);
 }
 
-void DeviceSettingsDialog::registersFetched(const LaserDriver::RegistersMap& datas)
+void DeviceSettingsDialog::registersFetched(const LaserRegister::RegistersMap& datas)
 {
     /*m_ui->editSliderCuttingStartSpeed->setValue(15);
     m_ui->editSliderCuttingRunSpeed->setValue(50);

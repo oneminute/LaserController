@@ -67,13 +67,13 @@ void RegistersDialog::onRegistersItemChanged(QTableWidgetItem * item)
     }
 }
 
-void RegistersDialog::registersFetched(const LaserDriver::RegistersMap& datas)
+void RegistersDialog::registersFetched(const LaserRegister::RegistersMap& datas)
 {
     m_ui->tableWidgetRegisters->blockSignals(true);
     m_ui->tableWidgetRegisters->setRowCount(datas.count());
 
     int i = 0;
-    for (LaserDriver::RegistersMap::ConstIterator it = datas.constBegin(); it != datas.constEnd(); it++)
+    for (LaserRegister::RegistersMap::ConstIterator it = datas.constBegin(); it != datas.constEnd(); it++)
     {
         int addr = it.key();
         QVariant value = it.value();

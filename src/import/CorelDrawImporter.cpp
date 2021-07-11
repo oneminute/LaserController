@@ -17,9 +17,9 @@
 #include <QWindow>
 
 //#import "libid:95E23C91-BC5A-49F3-8CD1-1FC515597048" version("12.0") \
-      rename("GetCommandLine", "VGGetCommandLine") \
-      rename("CopyFile", "VGCopyFile") \
-      rename("FindWindow", "VGFindWindow")
+      //rename("GetCommandLine", "VGGetCommandLine") \
+      //rename("CopyFile", "VGCopyFile") \
+      //rename("FindWindow", "VGFindWindow")
 
 CorelDrawImporter::CorelDrawImporter(QObject* parent)
     : Importer(parent)

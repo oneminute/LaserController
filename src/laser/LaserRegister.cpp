@@ -164,7 +164,7 @@ bool LaserRegister::write()
 {
     Q_D(LaserRegister);
     LaserDriver* driver = qobject_cast<LaserDriver*>(parent());
-    LaserDriver::RegistersMap registerMap;
+    RegistersMap registerMap;
     registerMap.insert(d->address, d->value);
     if (d->isSystem)
     {
@@ -174,6 +174,18 @@ bool LaserRegister::write()
     {
         return driver->writeUserParamToCard(registerMap);
     }
+}
+
+QString LaserRegister::toString() const
+{
+    Q_D(const LaserRegister);
+    return QString("%1,%2").arg(d->address).arg(d->value.toString());
+}
+
+LaserRegister::RegisterPair LaserRegister::keyValuePair() const
+{
+    Q_D(const LaserRegister);
+    return RegisterPair(d->address, d->value);
 }
 
 void LaserRegister::batchParse(const QString& raw, bool isSystem)

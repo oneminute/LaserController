@@ -8,6 +8,7 @@
 #include <QWidget>
 
 #include "LaserDefines.h"
+#include "laser/LaserRegister.h"
 #include "task/Task.h"
 
 class LaserDevice;
@@ -232,7 +233,6 @@ public:
         RT_BACKLASH_Y = 23
     };
 
-    typedef QMap<int, QVariant> RegistersMap;
 
 private:
     typedef wchar_t* (*FN_WCHART_VOID)();
@@ -282,7 +282,7 @@ public:
     static LaserDriver& instance();
     static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
     static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
-    static void parseAndRefreshRegisters(QString &eventData, RegistersMap& registers);
+    static void parseAndRefreshRegisters(QString &eventData, LaserRegister::RegistersMap& registers);
     static void ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount);
 
     bool load();
@@ -302,10 +302,10 @@ public:
     void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
 
-    bool writeSysParamToCard(const RegistersMap& values);
+    bool writeSysParamToCard(const LaserRegister::RegistersMap& values);
     bool readSysParamFromCard(QList<int> addresses);
     bool readAllSysParamFromCard();
-    bool writeUserParamToCard(const RegistersMap& values);
+    bool writeUserParamToCard(const LaserRegister::RegistersMap& values);
     bool readUserParamFromCard(QList<int> addresses);
     bool readAllUserParamFromCard();
 
@@ -375,7 +375,7 @@ signals:
     void workStateUpdated(LaserState state);
     void idle();
     void sysParamFromCardArrived(const QString& data);
-    void registersFectched(const RegistersMap& data);
+    void registersFectched(const LaserRegister::RegistersMap& data);
     void sysParamFromCardError();
     void unknownError();
     void workingCanceled();
@@ -397,7 +397,7 @@ private:
     QString m_portName;
     QWidget* m_parentWidget;
     LaserWorkMode m_workMode;
-    RegistersMap m_registers;
+    LaserRegister::RegistersMap m_registers;
 
     QLibrary m_library;
 

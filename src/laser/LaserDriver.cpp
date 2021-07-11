@@ -106,7 +106,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     }
 }
 
-void LaserDriver::parseAndRefreshRegisters(QString& eventData, RegistersMap& registers)
+void LaserDriver::parseAndRefreshRegisters(QString& eventData, LaserRegister::RegistersMap& registers)
 {
     //instance().m_registers.clear();
     for (QString i : eventData.split(";"))
@@ -361,7 +361,7 @@ void LaserDriver::setHardwareInitialization(double curveToSpeedRatio, int logica
     m_fnSetHardwareInitialization(curveToSpeedRatio, logicalResolution, maxSpeed, zeroCoordinates);
 }
 
-bool LaserDriver::writeSysParamToCard(const RegistersMap& values)
+bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
 {
     if (values.count() == 0)
         return false;
@@ -369,7 +369,7 @@ bool LaserDriver::writeSysParamToCard(const RegistersMap& values)
     QString addrBuf, valuesBuf;
     QStringList addrList;
     QStringList valuesList;
-    for (LaserDriver::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
+    for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
         valuesList.append(i.value().toString());
@@ -417,7 +417,7 @@ bool LaserDriver::readAllSysParamFromCard()
     return readSysParamFromCard(params);
 }
 
-bool LaserDriver::writeUserParamToCard(const RegistersMap& values)
+bool LaserDriver::writeUserParamToCard(const LaserRegister::RegistersMap& values)
 {
     if (values.count() == 0)
         return false;
@@ -425,7 +425,7 @@ bool LaserDriver::writeUserParamToCard(const RegistersMap& values)
     QString addrBuf, valuesBuf;
     QStringList addrList;
     QStringList valuesList;
-    for (LaserDriver::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
+    for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
         valuesList.append(i.value().toString());

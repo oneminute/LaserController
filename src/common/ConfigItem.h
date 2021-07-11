@@ -4,7 +4,9 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QObject>
+
 #include "common/common.h"
+#include "laser/LaserRegister.h"
 
 class Config;
 class ConfigItemGroup;
@@ -72,6 +74,9 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
 
+    QString toRegisterString() const;
+    LaserRegister::RegisterPair keyValuePair() const;
+
     DataType dataType() const;
 
     void setInputWidgetType(InputWidgetType widgetType);
@@ -95,6 +100,7 @@ public:
 
     LaserRegister* laserRegister() const;
     void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
+    bool hasRegister() const;
 
 public slots:
     void setValue(const QVariant& value);

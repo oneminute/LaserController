@@ -31,9 +31,21 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     m_ui->splitter->setStretchFactor(0, 0);
     m_ui->splitter->setStretchFactor(1, 1);
 
-    //m_ui->stackedWidgetPanels->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    QList<ConfigItemGroup*> groups;
+    groups  
+        //<< Config::General::group
+        //<< Config::Layers::group
+        //<< Config::Ui::group
+        //<< Config::CuttingLayer::group
+        //<< Config::EngravingLayer::group
+        //<< Config::PathOptimization::group
+        //<< Config::Export::group
+        //<< Config::Device::group
+        << Config::UserRegister::group
+        //<< Config::SystemRegister::group
+        ;
 
-    for (ConfigItemGroup* group : Config::getGroups())
+    for (ConfigItemGroup* group : groups)
     {
         QWidget* page = new QWidget(this);
         page->setWindowTitle(group->name());
@@ -67,7 +79,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         gridLayout->addWidget(new QWidget, row, 0);
         gridLayout->setRowStretch(row, 1);
 
-        if (group->name() == "systemRegister")
+        if (group == Config::SystemRegister::group)
         {
             m_systemRegisterPage = page;
         }
@@ -131,6 +143,8 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
     else if (stdButton == QDialogButtonBox::Save)
     {
         Config::save(LaserApplication::device->mainCardId());
+        LaserApplication::device->writeUserRegisters();
+        LaserApplication::device->writeSystemRegisters();
         onValueChanged(QVariant());
     }
 }

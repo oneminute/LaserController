@@ -11,6 +11,9 @@ class LaserRegister : public QObject
 {
     Q_OBJECT
 public:
+    typedef QMap<int, QVariant> RegistersMap;
+    typedef QPair<int, QVariant> RegisterPair;
+
     explicit LaserRegister(int addr, const QString& name = "", DataType dataType = DT_INT, const QString& description = "", 
         bool isSystem = true, bool readOnly = false, StoreStrategy storeStrategy = SS_CONFIRMED, QObject* parent = nullptr);
     virtual ~LaserRegister();
@@ -32,6 +35,9 @@ public:
 
     bool read();
     bool write();
+
+    QString toString() const;
+    RegisterPair keyValuePair() const;
 
 protected slots:
     void loadValue(const QVariant& value);

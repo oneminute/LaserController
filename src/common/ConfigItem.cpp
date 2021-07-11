@@ -369,6 +369,29 @@ void ConfigItem::fromJson(const QJsonObject& jsonObject)
     }
 }
 
+QString ConfigItem::toRegisterString() const
+{
+    Q_D(const ConfigItem);
+    if (hasRegister())
+    {
+        return d->laserRegister->toString();
+    }
+}
+
+LaserRegister::RegisterPair ConfigItem::keyValuePair() const
+{
+    Q_D(const ConfigItem);
+    if (hasRegister())
+    {
+        return d->laserRegister->keyValuePair();
+    }
+    else
+    {
+        LaserRegister::RegisterPair pair(-1, QVariant::Invalid);
+        return pair;
+    }
+}
+
 DataType ConfigItem::dataType() const
 {
     Q_D(const ConfigItem);
@@ -483,9 +506,15 @@ void ConfigItem::bindLaserRegister(int addr, bool isSystem, StoreStrategy storeS
     d->laserRegister = new LaserRegister(addr, title(), dataType(), description(), isSystem, readOnly(), storeStrategy, this);
     QVariant regValue = d->laserRegister->value();
     regValue = (regValue.isValid() && !regValue.isNull()) ? regValue : defaultValue();
-    d->value = d->dirtyValue = doLoadDataHook(regValue);
+    d->value = d->dirtyValue = regValue; //doLoadDataHook(regValue);
     d->dirty = d->modified = false;
     connect(d->laserRegister, &LaserRegister::valueChanged, this, &ConfigItem::loadValue);
+}
+
+bool ConfigItem::hasRegister() const
+{
+    Q_D(const ConfigItem);
+    return d->laserRegister != nullptr;
 }
 
 void ConfigItem::setValue(const QVariant& value)

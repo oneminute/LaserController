@@ -49,6 +49,9 @@ public:
 
     bool verifyManufacturePassword(const QString& password);
 
+    bool writeUserRegisters();
+    bool writeSystemRegisters();
+
 public slots:
     void load();
     void unload();
