@@ -35,6 +35,7 @@ protected:
     void addConfigItem(ConfigItem* item, QWidget* parent, const QString& exlusion = "");
 
     //virtual void closeEvent(QCloseEvent* e) override;
+    virtual void keyPressEvent(QKeyEvent* e) override;
 
 protected slots:
     void onValueChanged(const QVariant& value);

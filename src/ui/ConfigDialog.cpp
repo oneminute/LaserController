@@ -9,6 +9,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QInputDialog>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMessageBox>
 #include <QRegularExpression>
@@ -33,16 +34,16 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     QList<ConfigItemGroup*> groups;
     groups  
-        //<< Config::General::group
-        //<< Config::Layers::group
-        //<< Config::Ui::group
-        //<< Config::CuttingLayer::group
-        //<< Config::EngravingLayer::group
-        //<< Config::PathOptimization::group
-        //<< Config::Export::group
-        //<< Config::Device::group
+        << Config::General::group
+        << Config::Layers::group
+        << Config::Ui::group
+        << Config::CuttingLayer::group
+        << Config::EngravingLayer::group
+        << Config::PathOptimization::group
+        << Config::Export::group
+        << Config::Device::group
         << Config::UserRegister::group
-        //<< Config::SystemRegister::group
+        << Config::SystemRegister::group
         ;
 
     for (ConfigItemGroup* group : groups)
@@ -151,7 +152,7 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
 
 void ConfigDialog::setCurrentPanel(QWidget * panel)
 {
-    if (panel == m_systemRegisterPage)
+    /*if (panel == m_systemRegisterPage)
     {
         QString password = QInputDialog::getText(
             this,
@@ -172,7 +173,9 @@ void ConfigDialog::setCurrentPanel(QWidget * panel)
     {
         m_ui->stackedWidgetPanels->setCurrentWidget(panel);
         m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
-    }
+    }*/
+    m_ui->stackedWidgetPanels->setCurrentWidget(panel);
+    m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
 }
 
 void ConfigDialog::setCurrentPanel(const QString & title)
@@ -212,6 +215,13 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
     wrapper->setNameLabel(labelName);
     wrapper->setDescriptionLabel(labelDesc);
     m_wrappers.append(wrapper);
+}
+
+void ConfigDialog::keyPressEvent(QKeyEvent* e)
+{
+    if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+        return;
+    QDialog::keyPressEvent(e);
 }
 
 void ConfigDialog::onManufacturePasswordVerified(bool pass)

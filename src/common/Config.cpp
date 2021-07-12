@@ -103,7 +103,6 @@ void Config::save(const QString& mainCardId)
                 QJsonDocument doc(json);
                 registerFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
                 registerFile.close();
-
             }
         }
 
@@ -549,14 +548,6 @@ void Config::loadUserReigsters()
     head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
-    /*head->setLoadDataHook(
-        [](const QVariant& value)
-        {
-            int intValue = value.toInt();
-            QString hexValue = QString("0x%1").arg(intValue, 0, 16);
-            return QVariant(hexValue);
-        }
-    );*/
     head->bindLaserRegister(0, false);
 
     ConfigItem* accMode = group->addConfigItem(
@@ -632,8 +623,13 @@ void Config::loadUserReigsters()
         "cuttingTurnAcc",
         tr("Cutting Turn Acceleration"),
         tr("Cutting turn acceleration"),
-        45
+        45,
+        DT_REAL
     );
+    cuttingTurnAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    cuttingTurnAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingTurnAcc->setInputWidgetProperty("step", 0.001);
+    cuttingTurnAcc->setInputWidgetProperty("page", 10);
     cuttingTurnAcc->setInputWidgetProperty("minimum", 1);
     cuttingTurnAcc->setInputWidgetProperty("maximum", 1000);
     cuttingTurnAcc->bindLaserRegister(5, false);
@@ -642,8 +638,13 @@ void Config::loadUserReigsters()
         "cuttingWorkAcc",
         tr("Cutting Work Acceleration"),
         tr("Cutting Work acceleration"),
-        60
+        60,
+        DT_REAL
     );
+    cuttingWorkAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    cuttingWorkAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingWorkAcc->setInputWidgetProperty("step", 0.001);
+    cuttingWorkAcc->setInputWidgetProperty("page", 10);
     cuttingWorkAcc->setInputWidgetProperty("minimum", 1);
     cuttingWorkAcc->setInputWidgetProperty("maximum", 1000);
     cuttingWorkAcc->bindLaserRegister(6, false);
@@ -682,8 +683,13 @@ void Config::loadUserReigsters()
         "scanXStartSpeed",
         tr("Scan X Start Speed"),
         tr("Scan x start speed"),
-        15
+        15,
+        DT_REAL
     );
+    scanXStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    scanXStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanXStartSpeed->setInputWidgetProperty("step", 0.001);
+    scanXStartSpeed->setInputWidgetProperty("page", 10);
     scanXStartSpeed->setInputWidgetProperty("minimum", 1);
     scanXStartSpeed->setInputWidgetProperty("maximum", 1000);
     scanXStartSpeed->bindLaserRegister(10, false);
@@ -692,8 +698,13 @@ void Config::loadUserReigsters()
         "scanYStartSpeed",
         tr("Scan Y Start Speed"),
         tr("Scan y start speed"),
-        15
+        15,
+        DT_REAL
     );
+    scanYStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    scanYStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanYStartSpeed->setInputWidgetProperty("step", 0.001);
+    scanYStartSpeed->setInputWidgetProperty("page", 10);
     scanYStartSpeed->setInputWidgetProperty("minimum", 1);
     scanYStartSpeed->setInputWidgetProperty("maximum", 1000);
     scanYStartSpeed->bindLaserRegister(11, false);
@@ -702,8 +713,13 @@ void Config::loadUserReigsters()
         "scanXAcc",
         tr("Scan X Acceleration"),
         tr("Scan x acceleration"),
-        5
+        5,
+        DT_REAL
     );
+    scanXAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    scanXAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanXAcc->setInputWidgetProperty("step", 0.001);
+    scanXAcc->setInputWidgetProperty("page", 10);
     scanXAcc->setInputWidgetProperty("minimum", 1);
     scanXAcc->setInputWidgetProperty("maximum", 1000);
     scanXAcc->bindLaserRegister(12, false);
@@ -712,18 +728,28 @@ void Config::loadUserReigsters()
         "scanYAcc",
         tr("Scan Y Acceleration"),
         tr("Scan y acceleration"),
-        45
+        45,
+        DT_REAL
     );
+    scanYAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    scanYAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanYAcc->setInputWidgetProperty("step", 0.001);
+    scanYAcc->setInputWidgetProperty("page", 10);
     scanYAcc->setInputWidgetProperty("minimum", 1);
     scanYAcc->setInputWidgetProperty("maximum", 1000);
-    scanXAcc->bindLaserRegister(13, false);
+    scanYAcc->bindLaserRegister(13, false);
 
     ConfigItem* scanRowSpeed = group->addConfigItem(
         "scanRowSpeed",
         tr("Scan Row Speed"),
         tr("Scan row speed"),
-        15
+        15,
+        DT_REAL
     );
+    scanRowSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    scanRowSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanRowSpeed->setInputWidgetProperty("step", 0.001);
+    scanRowSpeed->setInputWidgetProperty("page", 10);
     scanRowSpeed->setInputWidgetProperty("minimum", 1);
     scanRowSpeed->setInputWidgetProperty("maximum", 1000);
     scanRowSpeed->bindLaserRegister(14, false);
@@ -744,6 +770,10 @@ void Config::loadUserReigsters()
         tr("Scan return error"),
         0
     );
+    scanReturnError->setInputWidgetProperty("textTemplate", "%1mm/s");
+    scanReturnError->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanReturnError->setInputWidgetProperty("step", 0.001);
+    scanReturnError->setInputWidgetProperty("page", 10);
     scanReturnError->setInputWidgetProperty("minimum", 1);
     scanReturnError->setInputWidgetProperty("maximum", 100);
     scanReturnError->bindLaserRegister(16, false);
@@ -810,8 +840,12 @@ void Config::loadUserReigsters()
         "backlashXInterval",
         tr("Backlash X Interval"),
         tr("Backlash x interval"),
-        0
+        0,
+        DT_REAL
     );
+    backlashXInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    backlashXInterval->setInputWidgetProperty("step", 0.001);
+    backlashXInterval->setInputWidgetProperty("page", 10);
     backlashXInterval->setInputWidgetProperty("minimum", 1);
     backlashXInterval->setInputWidgetProperty("maximum", 100);
     backlashXInterval->bindLaserRegister(22, false);
@@ -820,8 +854,12 @@ void Config::loadUserReigsters()
         "backlashYInterval",
         tr("Backlash Y Interval"),
         tr("Backlash y interval"),
-        0
+        0,
+        DT_REAL
     );
+    backlashYInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    backlashYInterval->setInputWidgetProperty("step", 0.001);
+    backlashYInterval->setInputWidgetProperty("page", 10);
     backlashYInterval->setInputWidgetProperty("minimum", 1);
     backlashYInterval->setInputWidgetProperty("maximum", 100);
     backlashXInterval->bindLaserRegister(23, false);
@@ -872,14 +910,15 @@ void Config::loadSystemRegisters()
         320,
         DT_INT
     );
+    xMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     xMaxLength->setInputWidgetProperty("minimum", 1);
     xMaxLength->setInputWidgetProperty("maximum", 5000);
     xMaxLength->bindLaserRegister(12);
 
     ConfigItem* xDirPhase = group->addConfigItem(
         "xDirPhase",
-        tr("X Max Length"),
-        tr("X Max Length"),
+        tr("X Dir Phase"),
+        tr("X Dir Phase"),
         0,
         DT_INT
     );
@@ -899,8 +938,8 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xLimitPhase = group->addConfigItem(
         "xLimitPhase",
-        tr("X Limit Length"),
-        tr("X Limit Length"),
+        tr("X Limit Phase"),
+        tr("X Limit Phase"),
         0
     );
     xLimitPhase->setInputWidgetType(IWT_ComboBox);
@@ -921,20 +960,55 @@ void Config::loadSystemRegisters()
         "xZeroDev",
         tr("X Zero Dev"),
         tr("X Zero Dev"),
-        2000
+        2,
+        DT_REAL
     );
-    xZeroDev->setInputWidgetProperty("minimum", 1);
-    xZeroDev->setInputWidgetProperty("maximum", 10000);
+    xZeroDev->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    xZeroDev->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    xZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
+    xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xZeroDev->setInputWidgetProperty("step", 0.001);
+    xZeroDev->setInputWidgetProperty("page", 1);
+    xZeroDev->setInputWidgetProperty("minimum", 0);
+    xZeroDev->setInputWidgetProperty("maximum", 10);
+    xZeroDev->setInputWidgetProperty("decimals", 3);
     xZeroDev->bindLaserRegister(15);
 
     ConfigItem* xStepLength = group->addConfigItem(
         "xStepLength",
         tr("X Step Length"),
         tr("X Step Length"),
-        1
+        1,
+        DT_REAL
     );
+    xStepLength->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000000));
+        }
+    );
+    xStepLength->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000000.0);
+        }
+    );
+    xStepLength->setInputWidgetProperty("textTemplate", "%1mm");
+    xStepLength->setInputWidgetProperty("maximumLineEditWidth", 80);
+    xStepLength->setInputWidgetProperty("step", 0.000001);
+    xStepLength->setInputWidgetProperty("page", 0.001);
     xStepLength->setInputWidgetProperty("minimum", 1);
-    xStepLength->setInputWidgetProperty("maximum", 1000);
+    xStepLength->setInputWidgetProperty("maximum", 10);
     xStepLength->bindLaserRegister(16);
 
     ConfigItem* xLimitNum = group->addConfigItem(
@@ -996,9 +1070,25 @@ void Config::loadSystemRegisters()
         tr("X Motor current"),
         tr("X Motor current"),
         50,
-        DT_INT
+        DT_REAL
     );
-    xMotorCurrent->setInputWidgetProperty("minimum", 1);
+    xMotorCurrent->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    xMotorCurrent->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    xMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
+    xMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xMotorCurrent->setInputWidgetProperty("step", 0.1);
+    xMotorCurrent->setInputWidgetProperty("page", 10);
+    xMotorCurrent->setInputWidgetProperty("minimum", 0.1);
     xMotorCurrent->setInputWidgetProperty("maximum", 100);
     xMotorCurrent->bindLaserRegister(20);
 
@@ -1009,8 +1099,11 @@ void Config::loadSystemRegisters()
         15,
         DT_REAL
     );
+    xStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    xStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStartSpeed->setInputWidgetProperty("step", 0.001);
-    xStartSpeed->setInputWidgetProperty("minimum", 1);
+    xStartSpeed->setInputWidgetProperty("page", 10);
+    xStartSpeed->setInputWidgetProperty("minimum", 0.001);
     xStartSpeed->setInputWidgetProperty("maximum", 1000);
     xStartSpeed->bindLaserRegister(21);
 
@@ -1021,8 +1114,11 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
+    xMaxSpeed->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    xMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxSpeed->setInputWidgetProperty("step", 0.001);
-    xMaxSpeed->setInputWidgetProperty("minimum", 1);
+    xMaxSpeed->setInputWidgetProperty("page", 10);
+    xMaxSpeed->setInputWidgetProperty("minimum", 0.001);
     xMaxSpeed->setInputWidgetProperty("maximum", 1000);
     xMaxSpeed->bindLaserRegister(22);
 
@@ -1033,8 +1129,10 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    xMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    xMaxAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    xMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    xMaxAcceleration->setInputWidgetProperty("page", 10);
     xMaxAcceleration->setInputWidgetProperty("minimum", 1);
     xMaxAcceleration->setInputWidgetProperty("maximum", 1000);
     xMaxAcceleration->bindLaserRegister(23);
@@ -1046,8 +1144,10 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    xUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    xUrgentAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    xUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    xUrgentAcceleration->setInputWidgetProperty("page", 10);
     xUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     xUrgentAcceleration->setInputWidgetProperty("maximum", 1000);
     xUrgentAcceleration->bindLaserRegister(24);
@@ -1059,6 +1159,7 @@ void Config::loadSystemRegisters()
         210,
         DT_INT
     );
+    yMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     yMaxLength->setInputWidgetProperty("minimum", 1);
     yMaxLength->setInputWidgetProperty("maximum", 5000);
     yMaxLength->bindLaserRegister(25);
@@ -1109,22 +1210,42 @@ void Config::loadSystemRegisters()
         "yZeroDev",
         tr("Y Zero Dev"),
         tr("Y Zero Dev"),
-        1000,
-        DT_INT
+        2000,
+        DT_REAL
     );
+    yZeroDev->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    yZeroDev->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    yZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
+    yZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yZeroDev->setInputWidgetProperty("step", 0.001);
+    yZeroDev->setInputWidgetProperty("page", 1);
     yZeroDev->setInputWidgetProperty("minimum", 1);
-    yZeroDev->setInputWidgetProperty("maximum", 10000);
+    yZeroDev->setInputWidgetProperty("maximum", 10);
     yZeroDev->bindLaserRegister(28);
 
     ConfigItem* yStepLength = group->addConfigItem(
         "yStepLength",
         tr("Y Step Length"),
         tr("Y Step Length"),
-        1000,
-        DT_INT
+        1,
+        DT_REAL
     );
+    yStepLength->setInputWidgetProperty("textTemplate", "%1mm");
+    yStepLength->setInputWidgetProperty("maximumLineEditWidth", 80);
+    yStepLength->setInputWidgetProperty("step", 0.000001);
+    yStepLength->setInputWidgetProperty("page", 0.001);
     yStepLength->setInputWidgetProperty("minimum", 1);
-    yStepLength->setInputWidgetProperty("maximum", 10000);
+    yStepLength->setInputWidgetProperty("maximum", 10);
     yStepLength->bindLaserRegister(29);
 
     ConfigItem* yLimitNum = group->addConfigItem(
@@ -1187,8 +1308,12 @@ void Config::loadSystemRegisters()
         tr("Y Motor current"),
         tr("Y Motor current"),
         50,
-        DT_INT
+        DT_REAL
     );
+    yMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
+    yMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yMotorCurrent->setInputWidgetProperty("step", 0.1);
+    yMotorCurrent->setInputWidgetProperty("page", 10);
     yMotorCurrent->setInputWidgetProperty("minimum", 1);
     yMotorCurrent->setInputWidgetProperty("maximum", 100);
     yMotorCurrent->bindLaserRegister(33);
@@ -1198,8 +1323,12 @@ void Config::loadSystemRegisters()
         tr("Y Start speed"),
         tr("Y Start speed"),
         15,
-        DT_INT
+        DT_REAL
     );
+    yStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    yStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yStartSpeed->setInputWidgetProperty("step", 0.001);
+    yStartSpeed->setInputWidgetProperty("page", 10);
     yStartSpeed->setInputWidgetProperty("minimum", 1);
     yStartSpeed->setInputWidgetProperty("maximum", 100);
     yStartSpeed->bindLaserRegister(34);
@@ -1211,8 +1340,10 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    yMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    yMaxSpeed->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    yMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxSpeed->setInputWidgetProperty("step", 0.001);
+    yMaxSpeed->setInputWidgetProperty("page", 10);
     yMaxSpeed->setInputWidgetProperty("minimum", 1);
     yMaxSpeed->setInputWidgetProperty("maximum", 1000);
     yMaxSpeed->bindLaserRegister(35);
@@ -1224,8 +1355,10 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    yMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    yMaxAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    yMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    yMaxAcceleration->setInputWidgetProperty("page", 10);
     yMaxAcceleration->setInputWidgetProperty("minimum", 1);
     yMaxAcceleration->setInputWidgetProperty("maximum", 1000);
     yMaxAcceleration->bindLaserRegister(36);
@@ -1237,8 +1370,10 @@ void Config::loadSystemRegisters()
         20,
         DT_REAL
     );
-    yUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    yUrgentAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    yUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    yUrgentAcceleration->setInputWidgetProperty("page", 10);
     yUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     yUrgentAcceleration->setInputWidgetProperty("maximum", 1000);
     yUrgentAcceleration->bindLaserRegister(37);
@@ -1250,6 +1385,7 @@ void Config::loadSystemRegisters()
         200,
         DT_INT
     );
+    zMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     zMaxLength->setInputWidgetProperty("minimum", 1);
     zMaxLength->setInputWidgetProperty("maximum", 5000);
     zMaxLength->bindLaserRegister(38);
@@ -1301,10 +1437,26 @@ void Config::loadSystemRegisters()
         tr("Z Zero Dev"),
         tr("Z Zero Dev"),
         2000,
-        DT_INT
+        DT_REAL
     );
+    zZeroDev->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    zZeroDev->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    zZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
+    zZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zZeroDev->setInputWidgetProperty("step", 0.001);
+    zZeroDev->setInputWidgetProperty("page", 1);
     zZeroDev->setInputWidgetProperty("minimum", 1);
-    zZeroDev->setInputWidgetProperty("maximum", 10000);
+    zZeroDev->setInputWidgetProperty("maximum", 10);
     zZeroDev->bindLaserRegister(41);
 
     ConfigItem* zStepLength = group->addConfigItem(
@@ -1312,8 +1464,12 @@ void Config::loadSystemRegisters()
         tr("Z Step Length"),
         tr("Z Step Length"),
         20,
-        DT_INT
+        DT_REAL
     );
+    zStepLength->setInputWidgetProperty("textTemplate", "%1mm");
+    zStepLength->setInputWidgetProperty("maximumLineEditWidth", 80);
+    zStepLength->setInputWidgetProperty("step", 0.000001);
+    zStepLength->setInputWidgetProperty("page", 0.001);
     zStepLength->setInputWidgetProperty("minimum", 1);
     zStepLength->setInputWidgetProperty("maximum", 10000);
     zStepLength->bindLaserRegister(42);
@@ -1378,8 +1534,12 @@ void Config::loadSystemRegisters()
         tr("Z Motor current"),
         tr("Z Motor current"),
         50,
-        DT_INT
+        DT_REAL
     );
+    zMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
+    zMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zMotorCurrent->setInputWidgetProperty("step", 0.1);
+    zMotorCurrent->setInputWidgetProperty("page", 10);
     zMotorCurrent->setInputWidgetProperty("minimum", 1);
     zMotorCurrent->setInputWidgetProperty("maximum", 100);
     zMotorCurrent->bindLaserRegister(46);
@@ -1389,8 +1549,12 @@ void Config::loadSystemRegisters()
         tr("Z Start speed"),
         tr("Z Start speed"),
         15,
-        DT_INT
+        DT_REAL
     );
+    zStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    zStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zStartSpeed->setInputWidgetProperty("step", 0.001);
+    zStartSpeed->setInputWidgetProperty("page", 10);
     zStartSpeed->setInputWidgetProperty("minimum", 1);
     zStartSpeed->setInputWidgetProperty("maximum", 100);
     zStartSpeed->bindLaserRegister(47);
@@ -1402,8 +1566,10 @@ void Config::loadSystemRegisters()
         10,
         DT_REAL
     );
-    zMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    zMaxSpeed->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    zMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxSpeed->setInputWidgetProperty("step", 0.001);
+    zMaxSpeed->setInputWidgetProperty("page", 10);
     zMaxSpeed->setInputWidgetProperty("minimum", 1);
     zMaxSpeed->setInputWidgetProperty("maximum", 1000);
     zMaxSpeed->bindLaserRegister(48);
@@ -1415,8 +1581,10 @@ void Config::loadSystemRegisters()
         30,
         DT_REAL
     );
-    zMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    zMaxAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    zMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    zMaxAcceleration->setInputWidgetProperty("page", 10);
     zMaxAcceleration->setInputWidgetProperty("minimum", 1);
     zMaxAcceleration->setInputWidgetProperty("maximum", 1000);
     zMaxAcceleration->bindLaserRegister(49);
@@ -1428,8 +1596,10 @@ void Config::loadSystemRegisters()
         30,
         DT_REAL
     );
-    zUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    zUrgentAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
+    zUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    zUrgentAcceleration->setInputWidgetProperty("page", 10);
     zUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     zUrgentAcceleration->setInputWidgetProperty("maximum", 1000);
     zUrgentAcceleration->bindLaserRegister(50);
