@@ -122,6 +122,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     bounds = QRectF(topLeft, bottomRight);
     
     QColor color = Qt::blue;
+	QList<QGraphicsView*> views = scene()->views();
+	LaserViewer* view = qobject_cast<LaserViewer*>(views[0]);
 	//painter->setPen(QPen(color, 1, Qt::SolidLine));
     /*if (d->layer)
     {
@@ -132,12 +134,13 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	{
 		//isSelected();
 		QString name = this->metaObject()->className();
+		
 		if (name == "LaserBitmap") {
-			painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+			painter->setPen(QPen(Qt::black, 1.2f / view->zoomValue(), Qt::DashLine));
 			painter->drawRect(bounds);
 		}
 		else {
-			painter->setPen(QPen(Qt::black, 1.2f, Qt::DashLine));
+			painter->setPen(QPen(Qt::black, 1.2f / view->zoomValue(), Qt::DashLine));
 		}
 		
 		
@@ -152,7 +155,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     {
 		//painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
 		//painter->drawRect(bounds);
-		painter->setPen(QPen(Qt::gray, 1.2f, Qt::SolidLine));
+		painter->setPen(QPen(Qt::gray, 1.2f / view->zoomValue(), Qt::SolidLine));
     }
     
     draw(painter);
