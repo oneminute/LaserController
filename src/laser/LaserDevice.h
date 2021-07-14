@@ -51,6 +51,8 @@ public:
 
     bool writeUserRegisters();
     bool writeSystemRegisters();
+    bool readUserRegisters();
+    bool readSystemRegisters();
 
 public slots:
     void load();

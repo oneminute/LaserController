@@ -230,6 +230,7 @@ public:
         CONFIG_ITEM(userRegister, scanReturnPos, int, toInt)
         CONFIG_ITEM(userRegister, backlashXInterval, int, toInt)
         CONFIG_ITEM(userRegister, backlashYInterval, int, toInt)
+        CONFIG_ITEM(userRegister, backlashZInterval, int, toInt)
 
     private:
         friend class Config;
@@ -290,9 +291,12 @@ public:
         CONFIG_ITEM(systemRegister, zMaxAcceleration, int, toInt)
         CONFIG_ITEM(systemRegister, zUrgentAcceleration, int, toInt)
 
-        CONFIG_ITEM(systemRegister, LaserMaxPower, int, toInt)
-        CONFIG_ITEM(systemRegister, LaserMinPower, int, toInt)
-        CONFIG_ITEM(systemRegister, LaserPowerFreq, int, toInt)
+        CONFIG_ITEM(systemRegister, laserMaxPower, int, toInt)
+        CONFIG_ITEM(systemRegister, laserMinPower, int, toInt)
+        CONFIG_ITEM(systemRegister, laserPowerFreq, int, toInt)
+        CONFIG_ITEM(systemRegister, xPhaseEnabled, bool, toBool)
+        CONFIG_ITEM(systemRegister, yPhaseEnabled, bool, toBool)
+        CONFIG_ITEM(systemRegister, zPhaseEnabled, bool, toBool)
 
     private:
         friend class Config;

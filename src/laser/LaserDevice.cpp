@@ -311,6 +311,18 @@ bool LaserDevice::writeSystemRegisters()
     return d->driver->writeUserParamToCard(Config::SystemRegister::group->keyValuePairs());
 }
 
+bool LaserDevice::readUserRegisters()
+{
+    Q_D(LaserDevice);
+    return d->driver->readAllUserParamFromCard();
+}
+
+bool LaserDevice::readSystemRegisters()
+{
+    Q_D(LaserDevice);
+    return d->driver->readAllSysParamFromCard();
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);

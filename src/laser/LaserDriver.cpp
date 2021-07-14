@@ -410,7 +410,7 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllSysParamFromCard()
 {
     QList<int> params;
-    for (int i = 0; i < 52; i++)
+    for (int i = 0; i < 54; i++)
     {
         params << i;
     }
@@ -466,11 +466,11 @@ bool LaserDriver::readUserParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllUserParamFromCard()
 {
     QList<int> params;
-    for (int i = 0; i < 23; i++)
+    for (int i = 0; i < 24; i++)
     {
         params << i;
     }
-    return readSysParamFromCard(params);
+    return readUserParamFromCard(params);
 
 }
 

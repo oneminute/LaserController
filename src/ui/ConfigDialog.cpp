@@ -93,6 +93,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::manufacturePasswordVerified, this, &ConfigDialog::onManufacturePasswordVerified);
 
     setWindowTitle(m_windowTitle);
+    LaserApplication::device->readUserRegisters();
 }
 
 ConfigDialog::~ConfigDialog()
@@ -226,8 +227,16 @@ void ConfigDialog::keyPressEvent(QKeyEvent* e)
 
 void ConfigDialog::onManufacturePasswordVerified(bool pass)
 {
-    m_ui->stackedWidgetPanels->setCurrentWidget(m_systemRegisterPage);
-    m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
+    if (pass)
+    {
+        LaserApplication::device->readSystemRegisters();
+        m_ui->stackedWidgetPanels->setCurrentWidget(m_systemRegisterPage);
+        m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Invalid Manufacture Password"), tr("Invalid manufacture password!"));
+    }
 }
 
 void ConfigDialog::onValueChanged(const QVariant& value)

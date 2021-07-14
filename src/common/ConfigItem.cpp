@@ -386,7 +386,7 @@ LaserRegister::RegisterPair ConfigItem::keyValuePair() const
     Q_D(const ConfigItem);
     if (hasRegister())
     {
-        return d->laserRegister->keyValuePair();
+        return LaserRegister::RegisterPair(d->laserRegister->address(), value());
     }
     else
     {

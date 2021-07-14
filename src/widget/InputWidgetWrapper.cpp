@@ -154,7 +154,14 @@ void InputWidgetWrapper::updateValue(const QVariant& newValue)
     case IWT_ComboBox:
     {
         QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        comboBox->setCurrentText(value.toString());
+        if (value.type() == QVariant::String)
+        {
+            comboBox->setCurrentText(value.toString());
+        }
+        else if (value.type() == QVariant::Int)
+        {
+            comboBox->setCurrentIndex(value.toInt());
+        }
         break;
     }
     case IWT_LineEdit:

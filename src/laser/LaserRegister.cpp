@@ -185,7 +185,7 @@ QString LaserRegister::toString() const
 LaserRegister::RegisterPair LaserRegister::keyValuePair() const
 {
     Q_D(const LaserRegister);
-    return RegisterPair(d->address, d->value);
+    return RegisterPair(d->address, value());
 }
 
 void LaserRegister::batchParse(const QString& raw, bool isSystem)
@@ -210,6 +210,13 @@ void LaserRegister::batchParse(const QString& raw, bool isSystem)
             if (systemRegisters.contains(addr))
             {
                 systemRegisters[addr]->parse(value);
+            }
+        }
+        else
+        {
+            if (userRegisters.contains(addr))
+            {
+                userRegisters[addr]->parse(value);
             }
         }
     }
