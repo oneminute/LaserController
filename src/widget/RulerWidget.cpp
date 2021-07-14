@@ -99,7 +99,11 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	qreal minification = 1 / m_scale;
 	int pow_10 = qLn(minification) / qLn(10);
 	m_flag = qRound(qPow(10, pow_10));//1,10,100,1000...��С����
-	m_original = m_viewer->mapFromScene(m_viewer->scene()->backgroundItem()->pos());
+	QGraphicsRectItem* backgroundItem = m_viewer->scene()->backgroundItem();
+	if (!backgroundItem) {
+		return;
+	}
+	m_original = m_viewer->mapFromScene(backgroundItem->pos());
 	int textCoef = 1 * m_flag;
 	if (m_scale >= 1.0) {
 		m_unit = m_millimeter;

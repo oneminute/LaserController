@@ -26,6 +26,7 @@
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserNodePrivate.h"
+#include "scene/LaserPrimitiveGroup.h"
 
 QMap<LaserPrimitiveType, int> g_counter{
     { LPT_LINE, 0 },
@@ -120,30 +121,25 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
-    
-    QColor color = Qt::blue;
+	QColor color = Qt::blue;
 	QList<QGraphicsView*> views = scene()->views();
 	LaserViewer* view = qobject_cast<LaserViewer*>(views[0]);
 	//painter->setPen(QPen(color, 1, Qt::SolidLine));
-    /*if (d->layer)
+    if (d->layer)
     {
         color = d->layer->color();
-    }*/
+    }
 
 	if (isSelected())
 	{
 		//isSelected();
 		QString name = this->metaObject()->className();
-		
+		QPen pen = QPen(color, 1.2f, Qt::DashLine);
+		pen.setCosmetic(true);
+		painter->setPen(pen);
 		if (name == "LaserBitmap") {
-			painter->setPen(QPen(Qt::black, 1.2f / view->zoomValue(), Qt::DashLine));
 			painter->drawRect(bounds);
 		}
-		else {
-			painter->setPen(QPen(Qt::black, 1.2f / view->zoomValue(), Qt::DashLine));
-		}
-		
-		
 	}
 	//else if (isUnderMouse())
 	else if (d->isHover)
@@ -155,9 +151,12 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     {
 		//painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
 		//painter->drawRect(bounds);
-		painter->setPen(QPen(Qt::gray, 1.2f / view->zoomValue(), Qt::SolidLine));
+		
+		QPen pen = QPen(color, 1.2f, Qt::SolidLine);
+		pen.setCosmetic(true);
+		painter->setPen(pen);
     }
-    
+	
     draw(painter);
 
     QPainterPath outline = this->outline();
@@ -673,22 +672,18 @@ QJsonObject LaserRect::toJson()
 {
 	Q_D(const LaserRect);
 	QJsonObject object;
-	//QJsonArray position = { pos().x(), pos().y() };
 	QTransform transform = d->allTransform;
 	QJsonArray matrix = {
 		transform.m11(), transform.m12(), transform.m13(),
 		transform.m21(), transform.m22(), transform.m23(),
 		transform.m31(), transform.m32(), transform.m33()
 	};
-	QGraphicsItem* parentItem = this->parentItem();
-	if (parentItem) {
-		QTransform parentTransform = parentItem->transform();
-		QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
-		object.insert("parentMatrix", parentMatrix);
-	}
+	QTransform parentTransform = sceneTransform();
+	QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
+	object.insert("parentMatrix", parentMatrix);
 	//rect
 	QJsonArray bounds = { d->rect.x(), d->rect.y(),d->rect.width(), d->rect.height() };
-	QJsonArray();
+	//QJsonArray();
 	object.insert("name", name());
 	object.insert("className", this->metaObject()->className());
 	//object.insert("position", position);
@@ -1010,10 +1005,6 @@ void LaserPolyline::reShape()
 	qDebug() << transform();
 	qDebug() << sceneTransform();
 	QGraphicsItem* parentItem = this->parentItem();
-	if (parentItem) {
-		qDebug() << parentItem->transform();
-	}
-	
 	setTransform(QTransform());
 }
 

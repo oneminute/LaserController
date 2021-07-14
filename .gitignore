@@ -85,3 +85,5 @@ config/
 
 temp/
 tmp/
+
+src/widget/LRWidgets

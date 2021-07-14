@@ -52,15 +52,14 @@ LaserViewer::~LaserViewer()
 
 void LaserViewer::paintEvent(QPaintEvent* event)
 {
-	QGraphicsView::paintEvent(event);
+	QGraphicsView::paintEvent(event);	
 	QPainter painter(viewport());
 	painter.setRenderHint(QPainter::Antialiasing);
 	
-	//网格
-	drawGrids(painter);
+	
     if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
     {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 		
         ///qLogD << "SelectedEditing paint";
@@ -69,7 +68,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     //selectioin
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 		if (m_isLeftSelecting) {
 			painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
@@ -128,7 +127,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     }
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
         m_EllipseEndPoint = m_creatingEllipseEndPoint;
         if (m_isKeyShiftPressed) {
@@ -147,13 +146,13 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     }
     //Line
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
         painter.drawLine(mapFromScene(m_creatingLineStartPoint), mapFromScene(m_creatingLineEndPoint));
     }
     //Polygon
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
 		int size = m_creatingPolygonPoints.size();
 		if (size == 0) {
@@ -187,7 +186,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
-		painter.setRenderHint(QPainter::Antialiasing);
+		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
         QList<SplineNodeStruct>& nodeList = m_handlingSpline.nodeList;
         int nodesLength = nodeList.length();
@@ -621,7 +620,7 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 	qDebug() << "_endPoint: " << _endPoint;
 	//right select
 	if (_endPoint.x() < _startPoint.x()) {
-		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::IntersectsItemShape);
+		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::IntersectsItemBoundingRect);
 	}
 	//left selection
 	else if (_endPoint.x() >= _startPoint.x()) {
@@ -640,7 +639,12 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
     qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
     //qLogD << "wheelZoomValue: " << wheelZoomValue << ", delta: " << event->delta();
     zoomBy(wheelZoomValue);
-	onChangeGrids();
+	//更新网格
+	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+	if (backgroundItem) {
+		backgroundItem->onChangeGrids();
+	}
+	
 }
 
 void LaserViewer::zoomBy(qreal factor)
@@ -700,6 +704,8 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				m_selectedRect = selectedItemsSceneBoundingRect();
 				m_oldTransform = m_group->transform();
 				m_rate = 1;
+				m_isItemScaleChangeX = true;
+				m_isItemScaleChangeY = true;
 				//QRectF boundRect = m_group->sceneBoundingRect();
 				QRectF boundRect = selectedItemsSceneBoundingRect();
 				qLogD << "group bounding rect: " << boundRect;
@@ -777,8 +783,14 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         //Rect
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectReadyState()))
         {
+
 			QPointF point = mapToScene(event->pos());
-			detectGridNode(point);
+			//网格点吸附判断
+			LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+			if (backgroundItem) {
+				backgroundItem->detectGridNode(point);
+			}
+			
             m_creatingRectStartPoint = point;
             m_creatingRectEndPoint = m_creatingRectStartPoint;
             emit creatingRectangle();
@@ -921,17 +933,6 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		switch (m_curSelectedHandleIndex) {
-			/*case 0: {
-				QPointF lastPos = m_selectedHandleList[0].center();
-				QPointF offsetPos = m_mousePoint - lastPos;
-				//offsetPos = QPoint(0.11, 0.1);
-				qDebug() << "offsetPos: " << offsetPos;
-				QPointF curHandleTopLeft = m_selectedHandleList[0].topLeft() + offsetPos;
-				m_selectedHandleList[0] = QRectF(curHandleTopLeft.x(), curHandleTopLeft.y(), m_selectedHandleList[0].width(), m_selectedHandleList[0].height());
-				m_group->setPos(m_group->pos() + offsetPos);
-				
-				break;
-			}*/
 			case 0:
 			case 1:
 			case 3:
@@ -941,7 +942,6 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			case 9:
 			case 10:
 			case 12:
-
 			case 2:
 			case 5:
 			case 8:
@@ -999,8 +999,6 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     }
     //Polygon
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
-
-        //m_isMouseInStartRect = m_polygonStartRect.contains(mapToScene(event->pos()));
         m_creatingPolygonEndPoint = mapToScene(m_mousePoint);
 
 		if (detectPoint(m_creatingPolygonPoints, m_creatingPolygonLines, m_creatingPolygonEndPoint)) {
@@ -1008,11 +1006,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 		}
 		else {
 			this->setCursor(Qt::ArrowCursor);
-			//detectLine(m_creatingPolygonLines, m_creatingPolygonEndPoint);
-
 		}
-		//;
-		
 		this->viewport()->repaint();
 		return;
     }
@@ -1020,8 +1014,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
         m_creatingSplineMousePos = event->pos();
 
-    }
-  
+    }  
     QPointF pos = mapToScene(m_mousePoint);
     emit mouseMoved(pos);
 }
@@ -1209,12 +1202,10 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
 			viewport()->repaint();
 			break;
 		}
-        
 		case Qt::Key_Delete: {
 			m_isKeyDelPress = true;
 			break;
 		}
-        
     }
     QGraphicsView::keyPressEvent(event);
 }
@@ -1318,7 +1309,6 @@ bool LaserViewer::detectLine(QList<QLineF> lines, QPointF startPoint, QPointF po
 		standarVec.normalize();
 		QVector2D vector(point - startPoint);
 		vector.normalize();
-		//QRectF rect(;
 		if (standarVec == vector) {
 			setCursor(Qt::IBeamCursor);
 			return true;
@@ -1340,154 +1330,80 @@ bool LaserViewer::isAllPolygonStartPoint()
 	return bl;
 }
 
-void LaserViewer::onChangeGrids()
+qreal LaserViewer::leftScaleMirror(qreal rate, qreal x)
 {
-	QGraphicsRectItem* backgroudItem = this->scene()->backgroundItem();
-	if (!backgroudItem) {
-		return;
-	}
-	if (!m_gridNodeXList.isEmpty()) {
-		m_gridNodeXList.clear();
-	}
-	if (!m_gridNodeYList.isEmpty()) {
-		m_gridNodeYList.clear();
-	}
-	if (!m_gridSecondNodeXList.isEmpty()) {
-		m_gridSecondNodeXList.clear();
-	}
-	if (!m_gridSecondNodeYList.isEmpty()) {
-		m_gridSecondNodeYList.clear();
-	}
-	qreal intervalH = Global::mm2PixelsYF(10);
-	qreal intervalV = Global::mm2PixelsXF(10);
-	qreal width = backgroudItem->boundingRect().width();
-	qreal height = backgroudItem->boundingRect().height();
-	int sizeH = height / intervalH;
-	int sizeV = width / intervalV;
-	int count = 10;
-	for (int i = 0; i <= sizeH; i++) {
-		//painter.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
-		qreal startY = intervalH * i;
-		m_gridNodeYList.append(startY);
-
-		if (zoomValue() > 2 && i < sizeH) {
-			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
-			for (int ic = 1; ic < count; ic++) {
-				qreal intervalH_1 = intervalH / count;
-				qreal y_1 = startY + intervalH_1 * ic;
-				m_gridSecondNodeYList.append(y_1);
-			}
-
+	qreal xRate = rate;
+	//判断左右反转
+	if (m_isItemScaleChangeX) {
+		if (x > 0) {
+			xRate = -rate;
+			m_isItemScaleChangeX = false;
 		}
 	}
-	for (int j = 0; j <= sizeV; j++) {
-		qreal startX = intervalV * j;
-		m_gridNodeXList.append(startX);
-		
-		if (zoomValue() > 2 && j < sizeV) {
-			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
-			for (int jc = 0; jc < count; jc++) {
-				qreal intervalV_1 = intervalV / count;
-				qreal x_1 = startX + intervalV_1 * jc;
-				m_gridSecondNodeXList.append(x_1);
-			}
+	else {
+		if (x < 0) {
+			xRate = -rate;
+			m_isItemScaleChangeX = true;
 		}
 	}
+	return xRate;
 }
 
-void LaserViewer::drawGrids(QPainter& painter)
+qreal LaserViewer::rightScaleMirror(qreal rate, qreal x)
 {
-	QGraphicsRectItem* backgroudItem = this->scene()->backgroundItem();
-	if (!backgroudItem) {
-		return;
+	qreal xRate = rate;
+	//判断左右反转
+	if (m_isItemScaleChangeX) {
+		if (x < 0) {
+			xRate = -rate;
+			m_isItemScaleChangeX = false;
+		}
 	}
-	qreal width = backgroudItem->boundingRect().width();
-	qreal height = backgroudItem->boundingRect().height();
-	painter.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
-	for (int i = 1; i < m_gridNodeYList.size(); i++) {
-		QPointF p1H = mapFromScene(backgroudItem->mapToScene(QPointF(0, m_gridNodeYList[i])));
-		QPointF p2H = mapFromScene(backgroudItem->mapToScene(QPointF(width, m_gridNodeYList[i])));
-		painter.drawLine(p1H, p2H);
+	else {
+		if (x > 0) {
+			xRate = -rate;
+			m_isItemScaleChangeX = true;
+		}
 	}
-	for (int j = 1; j < m_gridNodeXList.size(); j++) {
-		QPointF p1V = mapFromScene(backgroudItem->mapToScene(QPointF(m_gridNodeXList[j], 0)));
-		QPointF p2V = mapFromScene(backgroudItem->mapToScene(QPointF(m_gridNodeXList[j], height)));
-		painter.drawLine(p1V, p2V);
-	}
-	//2级网格
-	painter.setPen(QPen(QColor(238, 238, 238), 1, Qt::SolidLine));
-	for (int i1 = 1; i1 < m_gridSecondNodeYList.size(); i1++) {
-		QPointF p1SecondH = mapFromScene(backgroudItem->mapToScene(QPointF(0, m_gridSecondNodeYList[i1])));
-		QPointF p2SecondH = mapFromScene(backgroudItem->mapToScene(QPointF(width, m_gridSecondNodeYList[i1])));
-		painter.drawLine(p1SecondH, p2SecondH);
-	}
-	for (int j1 = 1; j1 < m_gridSecondNodeXList.size(); j1++) {
-		QPointF p1SecondV = mapFromScene(backgroudItem->mapToScene(QPointF(m_gridSecondNodeXList[j1], 0)));
-		QPointF p2SecondV = mapFromScene(backgroudItem->mapToScene(QPointF(m_gridSecondNodeXList[j1], height)));
-		painter.drawLine(p1SecondV, p2SecondV);
-	}
+	return xRate;
 }
 
-bool LaserViewer::detectGridNode(QPointF & point)
+qreal LaserViewer::topScaleMirror(qreal rate, qreal y)
 {
-	if (m_gridNodeYList.isEmpty() || m_gridNodeXList.isEmpty()) {
-		return false;
-	}
-	//pont从view到document转换
-	QGraphicsRectItem* backgroundItem = m_scene->backgroundItem();
-	if (!backgroundItem) {
-		return false;
-	}
-	QPointF documentPoint = backgroundItem->mapFromScene(point);
-	qreal valueX = 5 / zoomValue();//5个像素
-	qreal valueY = 5 / zoomValue();
-	for (int i = 0; i < m_gridNodeXList.size(); i++) {
-		for (int j = 0; j < m_gridNodeYList.size(); j++) {
-			QPointF node = QPointF(m_gridNodeXList[i], m_gridNodeYList[j]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
-			if (absX < valueX && absY < valueY) {
-				//node 从document转换到view
-				point = backgroundItem->mapToScene(node);
-				return true;
-			}
-		}
-		for (int j2 = 0; j2 < m_gridSecondNodeYList.size(); j2++) {
-			QPointF node = QPointF(m_gridNodeXList[i], m_gridSecondNodeYList[j2]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
-			if (absX < valueX && absY < valueY) {
-				//node 从document转换到view
-				point = backgroundItem->mapToScene(node);
-				return true;
-			}
+	qreal yRate = rate;
+	//判断上下反转
+	if (m_isItemScaleChangeY) {
+		if (y > 0) {
+			yRate = -rate;
+			m_isItemScaleChangeY = false;
 		}
 	}
+	else {
+		if (y < 0) {
+			yRate = -rate;
+			m_isItemScaleChangeY = true;
+		}
+	}
+	return yRate;
+}
 
-	for (int i2 = 0; i2 < m_gridSecondNodeXList.size(); i2++) {
-		for (int j = 0; j < m_gridNodeYList.size(); j++) {
-			QPointF node = QPointF(m_gridSecondNodeXList[i2], m_gridNodeYList[j]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
-			if (absX < valueX && absY < valueY) {
-				//node 从document转换到view
-				point = backgroundItem->mapToScene(node);
-				return true;
-			}
-		}
-		for (int j2 = 0; j2 < m_gridSecondNodeYList.size(); j2++) {
-			QPointF node = QPointF(m_gridSecondNodeXList[i2], m_gridSecondNodeYList[j2]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
-			if (absX < valueX && absY < valueY) {
-				//node 从document转换到view
-				point = backgroundItem->mapToScene(node);
-				return true;
-			}
+qreal LaserViewer::bottomScaleMirror(qreal rate, qreal y)
+{
+	qreal yRate = rate;
+	//判断上下反转
+	if (m_isItemScaleChangeY) {
+		if (y < 0) {
+			yRate = -rate;
+			m_isItemScaleChangeY = false;
 		}
 	}
-
-	return false;
+	else {
+		if (y > 0) {
+			yRate = -rate;
+			m_isItemScaleChangeY = true;
+		}
+	}
+	return yRate;
 }
 
 qreal LaserViewer::zoomValue() const
@@ -1615,10 +1531,8 @@ void LaserViewer::onSelectedFillGroup()
 
 void LaserViewer::onReplaceGroup(LaserPrimitive* item)
 {
-	
 	onCancelSelected();
 	item->setSelected(true);
-	//onSelectedFillGroup();
 	onEndSelecting();
 }
 
@@ -1631,50 +1545,71 @@ void LaserViewer::selectedHandleScale()
 	qreal rate = 1;
 	qreal xRate = 1;
 	qreal yRate = 1;
-	qreal scaleSpeed = 0.0000015;
 	switch (m_curSelectedHandleIndex) {
 		case 0: {
 			break;
 		}
 		//scale
+		//lefttop
 		case 1: {
 			QPointF lastVect = m_lastPos - mapFromScene(m_selectedRect.bottomRight());
 			QPointF currVect = m_mousePoint - mapFromScene(m_selectedRect.bottomRight());
 			
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = leftScaleMirror(rate, v2.x());
+			yRate = topScaleMirror(rate, v2.y());
 			break;
 		}
+		//righttop
 		case 4: {
 			QPointF lastVect = m_lastPos - mapFromScene(m_selectedRect.bottomLeft());
 			QPointF currVect = m_mousePoint - mapFromScene(m_selectedRect.bottomLeft());
 
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = rightScaleMirror(rate, v2.x());
+			yRate = topScaleMirror(rate, v2.y());
 			break;
 		}
+		//rightbottom
 		case 7: {
 			QPointF lastVect = m_lastPos - m_selectedRect.topLeft();
 			QPointF currVect = m_mousePoint - m_selectedRect.topLeft();
 			
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
-			
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = rightScaleMirror(rate, v2.x());
+			yRate = bottomScaleMirror(rate, v2.y());
 			break;
 		}
+		//leftbottom
 		case 10: {
 			QPointF lastVect = m_lastPos - mapFromScene(m_selectedRect.topRight());
 			QPointF currVect = m_mousePoint - mapFromScene(m_selectedRect.topRight());
 
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+				
+			}
+			xRate = leftScaleMirror(rate, v2.x());
+			yRate = bottomScaleMirror(rate, v2.y());
+			
 			break;
 		}
 		//stretch
+		//topCenter
 		case 3: {
 			qreal bottom = mapFromScene(m_selectedRect.bottomLeft()).y();
 			QPointF lastVect = m_lastPos - QPointF(m_lastPos.x(), bottom);
@@ -1682,9 +1617,14 @@ void LaserViewer::selectedHandleScale()
 
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = 1;
+			yRate = topScaleMirror(rate, v2.y());
 			break;
 		}
+		//bottomCenter
 		case 9: {
 			qreal top = mapFromScene(m_selectedRect.topLeft()).y();
 			QPointF lastVect = m_lastPos - QPointF(m_lastPos.x(), top);
@@ -1692,9 +1632,14 @@ void LaserViewer::selectedHandleScale()
 
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = 1;
+			yRate = bottomScaleMirror(rate, v2.y());
 			break;
 		}
+		//rightCenter
 		case 6: {
 			qreal left = mapFromScene(m_selectedRect.topLeft()).x();
 			QPointF lastVect = m_lastPos - QPointF(left, m_lastPos.y());
@@ -1702,9 +1647,14 @@ void LaserViewer::selectedHandleScale()
 
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = rightScaleMirror(rate, v2.x());
+			yRate = 1;
 			break;
 		}
+		//leftCenter
 		case 12: {
 			qreal right = mapFromScene(m_selectedRect.topRight()).x();
 			QPointF lastVect = m_lastPos - QPointF(right, m_lastPos.y());
@@ -1712,23 +1662,24 @@ void LaserViewer::selectedHandleScale()
 
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);
-			rate = v2.length() / v1.length();
+			if (v1.length() != 0 && v2.length() != 0) {
+				rate = v2.length() / v1.length();
+			}
+			xRate = leftScaleMirror(rate, v2.x());
+			yRate = 1;
 			break;
 		}
-		case 2:
-		case 5:
-		case 8:
-		case 11: {
+		case 2://lefttop_rotate
+		case 5://righttop_rotate
+		case 8://rightbottom_rotate
+		case 11: //leftbottom_rotate
+		{
 
 			break;
 		}
 	}
-	//qreal oldScaleX = m_oldTransform.m11();
-	//qreal oldScaleY = m_oldTransform.m22();
-	qreal oldDx = m_oldTransform.dx();
-	qreal oldDy = m_oldTransform.dy();
-
 	QTransform t;
+	qDebug() << " rate: "<< rate;
 	switch (m_curSelectedHandleIndex) {
 		case 0: {
 			//QPointF diff = m_group->mapFromScene(this->mapToScene(QPointF(m_mousePoint - m_origin).toPoint()));
@@ -1740,78 +1691,57 @@ void LaserViewer::selectedHandleScale()
 			m_group->setTransform(t * t1);
 			break;
 		}
+		//scale
 		case 1:
 		case 4:
 		case 7:
-		case 10: {
-			m_rate *= rate;
-			m_newOrigin = m_origin * m_rate;
-			QPointF diff = m_origin - m_newOrigin;
-			t.scale(m_rate, m_rate);
-			t = m_oldTransform * t;
-			t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), diff.x() + oldDx * m_rate, diff.y() + oldDy * m_rate, t.m33());
-			m_group->setTransform(t);
-			break;
-		}
-		case 3: 
-		case 9: {
-			m_rate *= rate;
-			m_newOrigin = m_origin * m_rate;
-			QPointF diff = m_origin - m_newOrigin;
-			t.scale(1, m_rate);
-			t = m_oldTransform * t;
-			t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), oldDx * 1, diff.y() + oldDy * m_rate, t.m33());
-			m_group->setTransform(t);
-			break;
-		}
+		case 10: 
+		//stretch
+		case 3:
+		case 9:
 		case 12:
-		case 6: {
-			m_rate *= rate;
-			m_newOrigin = m_origin * m_rate;
+		case 6:
+		{
+			QTransform t1;
+			t1.scale(xRate, yRate);
+			m_newOrigin = t1.map(m_origin);
 			QPointF diff = m_origin - m_newOrigin;
-			t.scale(m_rate, 1);
-			t = m_oldTransform * t;
-			t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), diff.x() + oldDx * m_rate, oldDy * 1, t.m33());
-			m_group->setTransform(t);
+			t = m_group->transform();
+			QTransform t2;
+			t2.translate(diff.x(), diff.y());
+			m_group->setTransform(t * t1*t2);
 			break;
 		}
 		case 2:
 		case 5:
 		case 8:
 		case 11: {
-			//QPointF vec2 = m_mousePoint - mapFromScene(m_group->sceneBoundingRect().center());
-			//QPointF vec1 = m_lastPos - mapFromScene(m_group->sceneBoundingRect().center());
 			QPointF vec2 = m_mousePoint - mapFromScene(selectedItemsSceneBoundingRect().center());
 			QPointF vec1 = m_lastPos - mapFromScene(selectedItemsSceneBoundingRect().center());
 			QVector2D v1(vec1);
 			QVector2D v2(vec2);
-			v1.normalize();
-			v2.normalize();
-			qreal radians = qAcos(QVector2D::dotProduct(v1, v2));
+			qreal radians = 0;
+			if (v1.length() != 0 || v2.length() != 0) {
+				v1.normalize();
+				v2.normalize();
+				radians = qAcos(QVector2D::dotProduct(v1, v2));
+			}
 			if (QVector3D::crossProduct(QVector3D(v1, 0), QVector3D(v2, 0)).z() < 0) {
 				radians = -radians;
 			}
 			m_radians += radians;
-			//QPointF diff = m_origin - m_group->sceneBoundingRect().center();
-			//t.setMatrix(qCos(radians)+t.m11(), qSin(radians) + t.m12(), t.m13(), t.m21()-qSin(radians), t.m21()+qCos(radians), t.m23(), t.m31()+ diff.x(), t.m32()+ diff.y(), t.m33());
-			qDebug() << "m_radians: " << m_radians;
 			t = m_group->transform();
 			QTransform t1;
 			t1.setMatrix(qCos(radians), qSin(radians), t1.m13(), -qSin(radians), qCos(radians), t.m23(), t1.m31(), t1.m32(), t1.m33());
 			m_newOrigin = m_origin * t1;
-			//m_group->setTransform(t * t1);
 			QTransform t2;
-			//m_newOrigin = m_group->sceneBoundingRect().center();
 			QPointF diff = m_origin - m_newOrigin;
-			//QPointF diff = QPointF(0.1, 0.1);
 			t2.setMatrix(t2.m11(), t2.m12(), t2.m13(), t2.m21(), t2.m22(), t2.m23(), diff.x(), diff.y(), t2.m33());
 			m_group->setTransform(t * t1 * t2);
 			m_origin = m_origin * t1 * t2;
 			break;
 		}
 	}
-	
-	qLogD << "rate: " << rate << ", transform: " << t;
 	m_lastPos = m_mousePoint;
 	this->repaint();
 }

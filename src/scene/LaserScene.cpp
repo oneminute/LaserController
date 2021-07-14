@@ -36,7 +36,9 @@ void LaserScene::updateDocument(LaserDocument * doc)
     m_doc->setParent(this);
 
     qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
-    m_background = addRect(m_doc->pageBounds(), QPen(Qt::black, 1.0f, Qt::SolidLine), QBrush(Qt::white));
+    m_background = new LaserBackgroundItem(m_doc->pageBounds());
+	addItem(m_background);
+	//m_background = qgraphicsitem_cast<LaserBackgroundItem*> (addRect(m_doc->pageBounds(), QPen(Qt::black, 1.0f, Qt::SolidLine), QBrush(Qt::white)));
 	setSceneRect(m_doc->pageBounds());
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
@@ -47,6 +49,7 @@ void LaserScene::updateDocument(LaserDocument * doc)
 
 void LaserScene::clearDocument(bool delDoc)
 {
+	m_background = nullptr;
     this->clear();
 	LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
 	viewer->clearGroup();

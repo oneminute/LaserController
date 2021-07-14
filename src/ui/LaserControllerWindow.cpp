@@ -869,24 +869,27 @@ void LaserControllerWindow::onActionNew(bool checked)
 	createNewDocument();
 }
 
-void LaserControllerWindow::onActionSave(bool checked)
+bool LaserControllerWindow::onActionSave(bool checked)
 {
 	if (m_fileDirection.isEmpty()) {
-		onActionSaveAs(false);
+		if (!onActionSaveAs()) {
+			return false;
+		}
+
 	}
 	else {
 		m_scene->document()->save(m_fileDirection, this);
 	}
-	
+	return true;
 }
 
-void LaserControllerWindow::onActionSaveAs(bool checked)
+bool LaserControllerWindow::onActionSaveAs(bool checked)
 {
 	QString name = QFileDialog::getSaveFileName(nullptr, "save file", ".", "File(*lc)");
 	
 	
 	if (name == "") {
-		return;
+		return false;
 	}
 
 	if (!name.endsWith(".lc")) {
@@ -896,6 +899,7 @@ void LaserControllerWindow::onActionSaveAs(bool checked)
 	m_fileDirection = name;
 	setWindowTitle(getCurrentFileName() + " - " + m_windowTitle);
 	m_scene->document()->save(name, this);
+	return true;
 }
 
 void LaserControllerWindow::onActionOpen(bool checked)
@@ -1269,16 +1273,22 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
 
 void LaserControllerWindow::onActionCloseDocument(bool checked)
 {
-	QMessageBox msgBox;
+	//documentClose();
+	/*QMessageBox msgBox;
 	msgBox.setText(tr("Close document?"));
 	msgBox.setInformativeText(tr("Do you want to save current document?"));
 	msgBox.setStandardButtons(QMessageBox::Save
 		| QMessageBox::Close
-		| QMessageBox::Cancel);
+		| QMessageBox::Cancel);*/
+	QMessageBox msgBox(QMessageBox::NoIcon,
+		"Close document?", "Do you want to save current document?",
+		QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
 	int result = msgBox.exec();
 	switch (result) {
 		case QMessageBox::StandardButton::Save: {
-			onActionSave();
+			if (!onActionSave()) {
+				return;
+			}
 			documentClose();
 			break;
 		}
@@ -1286,6 +1296,8 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
 			documentClose();
 			break;
 		}
+		default:
+			break;
 	}
 }
 
@@ -1820,7 +1832,11 @@ void LaserControllerWindow::selectedChange()
 		if (rect.width() == 0 && rect.height() == 0) {
 			return;
 		}
-		QRectF rectReal = QRectF(m_scene->backgroundItem()->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
+		QGraphicsRectItem* backgroudItem = m_scene->backgroundItem();
+		if (!backgroudItem) {
+			return;
+		}
+		QRectF rectReal = QRectF(backgroudItem->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
 		qDebug() << rectReal.top();
 		qreal x = 0, y = 0, width = 0, height = 0; 
 		if (m_unitIsMM) {
@@ -2384,7 +2400,11 @@ void LaserControllerWindow::createNewDocument()
 	doc->open();
 	initDocument(doc);
 	//创建网格
-	m_viewer->onChangeGrids();
+	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+	if (backgroundItem) {
+		backgroundItem->onChangeGrids();
+	}
+	
 }
 
 QString LaserControllerWindow::getCurrentFileName()
