@@ -2383,7 +2383,8 @@ void LaserControllerWindow::createNewDocument()
 	doc->setPageInformation(page);
 	doc->open();
 	initDocument(doc);
-	
+	//创建网格
+	m_viewer->onChangeGrids();
 }
 
 QString LaserControllerWindow::getCurrentFileName()
