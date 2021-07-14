@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsScene>
+#include "scene/LaserBackgroundItem.h"
 
 class QPaintEvent;
 class QPushButton;
@@ -22,7 +23,7 @@ public:
     void updateDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
     void addLaserPrimitive(LaserPrimitive* primitive);
-	QGraphicsRectItem* backgroundItem() { return m_background; }
+	LaserBackgroundItem* backgroundItem() { return m_background; }
 
     LaserDocument* document() { return m_doc; }
 
@@ -36,10 +37,9 @@ public:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-
 private:
     LaserDocument* m_doc;
-    QGraphicsRectItem* m_background;
+	LaserBackgroundItem* m_background;
 	bool m_mousePressBlock = false;
 	bool m_mouseMoveBlock = false;
 	

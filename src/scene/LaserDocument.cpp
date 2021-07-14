@@ -676,9 +676,10 @@ void LaserDocument::save(const QString& filename, QWidget* window)
 
 	doc.setObject(obj);
 	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly)) {
+	if (!file.open(QIODevice::WriteOnly | QFile::Truncate)) {
 		return;
 	}
+
 	file.write(doc.toJson());
 	file.close();
 }

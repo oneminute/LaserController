@@ -42,7 +42,7 @@ public:
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
-	void onChangeGrids();
+	
 private:
     void init();
 	void initSpline();
@@ -57,8 +57,10 @@ private:
 	bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
 	bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
 	bool isAllPolygonStartPoint();
-	void drawGrids(QPainter& painter);
-	bool detectGridNode(QPointF& point);//检测绘制时的起点或终点是否应该被设为网格中的node点
+	qreal leftScaleMirror(qreal rate, qreal x);
+	qreal rightScaleMirror(qreal rate, qreal x);
+	qreal topScaleMirror(qreal rate, qreal y);
+	qreal bottomScaleMirror(qreal rate, qreal y);
 public slots:
     void zoomIn();
     void zoomOut();
@@ -184,15 +186,14 @@ private:
 	qreal m_rate;
 	QTransform m_oldTransform;
 	qreal m_radians;
+	bool m_isItemScaleChangeX = true;
+	bool m_isItemScaleChangeY = true;
 
 	qreal m_selectedEditCount = 0;
 	LaserPrimitiveGroup* m_group;
 	bool m_isLeftSelecting = true;//����߿�ʼѡ�����ұ߿�ʼѡ��
 
-	QList<qreal> m_gridNodeXList;
-	QList<qreal> m_gridNodeYList;
-	QList<qreal> m_gridSecondNodeXList;
-	QList<qreal> m_gridSecondNodeYList;
+	
 	
 	friend class LaserScene;
 };
