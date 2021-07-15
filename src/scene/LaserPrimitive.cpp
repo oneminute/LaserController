@@ -93,21 +93,39 @@ LaserDocument* LaserPrimitive::document() const
     Q_D(const LaserPrimitive);
     return d->doc; 
 }
-/*void LaserPrimitive::setScaleValue(qreal x, qreal y) {
-	m_scaleX = x;
-	m_scaleY = y;
-}
-void LaserPrimitive::setScaleTranslate(qreal x, qreal y) {
-	m_scaleTX = x;
-	m_scaleTY = y;
-}
-void LaserPrimitive::setSelectedEditingMatrix(QMatrix mat) {
-	m_selectedEditingMatrix = mat;
-}
+//PolyLine or Polygon
+QVector<QLineF> LaserPrimitive::edges(QPainterPath path, bool isPolyline)
+{
+	QPolygonF polygon = path.toFillPolygon();
+	QVector<QLineF> edgeList;
+	int c = polygon.count();
+	qDebug() << c;
+	for (int i = 0; i < polygon.count()-1; i++) {
+		
+		QLineF edge;
+		if (!isPolyline) {
+			//polygon
+			edge.setPoints(polygon.at(i), polygon.at(i + 1));
+		}
+		else {
+			//polygon
+			if (i < polygon.count() - 2) {
+				edge.setPoints(polygon.at(i), polygon.at(i + 1));
+			}
+			else {
+				break;
+			}
+		}
+		
+		edgeList << edge;
+	}
 
-void LaserPrimitive::setSelectedEditingState(int state) {
-	m_selectedEditingState = state;
-}*/
+	return edgeList;
+}
+QVector<QLineF> LaserPrimitive::edges()
+{
+	return QVector<QLineF>();
+}
 void setSelectedInGroup(bool selected) {
 
 }
@@ -568,6 +586,12 @@ QJsonObject LaserEllipse::toJson()
 	return object;
 }
 
+QVector<QLineF> LaserEllipse::edges()
+{
+	Q_D(const LaserEllipse);
+	return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+
 class LaserRectPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserRect)
@@ -603,7 +627,7 @@ void LaserRect::setRect(const QRectF& rect)
     Q_D(LaserRect);
     d->rect = rect; 
 	QPainterPath path;
-	path.addEllipse(d->rect);
+	path.addRect(d->rect);
 	d->path = path;
 }
 
@@ -692,6 +716,11 @@ QJsonObject LaserRect::toJson()
 	return object;
 }
 
+QVector<QLineF> LaserRect::edges()
+{
+	Q_D(const LaserRect);
+	return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
 
 class LaserLinePrivate : public LaserShapePrivate
 {
@@ -807,6 +836,14 @@ QJsonObject LaserLine::toJson()
 	return object;
 }
 
+QVector<QLineF> LaserLine::edges()
+{
+	Q_D(const LaserLine);
+	QVector<QLineF>list;
+	list.append(sceneTransform().map(transform().map(d->line)));
+	return list;
+}
+
 class LaserPathPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserPath)
@@ -899,6 +936,12 @@ void LaserPath::reShape()
 	d->boundingRect = d->path.boundingRect();
 	d->allTransform = d->allTransform * transform();
 	setTransform(QTransform());
+}
+
+QVector<QLineF> LaserPath::edges()
+{
+	Q_D(LaserPath);
+	return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
 class LaserPolylinePrivate : public LaserShapePrivate
@@ -1038,6 +1081,14 @@ QJsonObject LaserPolyline::toJson()
 	return object;
 }
 
+QVector<QLineF> LaserPolyline::edges()
+{
+	Q_D(const LaserPolyline);
+	QPainterPath path;
+	path.addPolygon(sceneTransform().map(d->poly));
+	return LaserPrimitive::edges(path, true);
+}
+
 class LaserPolygonPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserPolygon)
@@ -1167,6 +1218,14 @@ QJsonObject LaserPolygon::toJson()
 	object.insert("matrix", matrix);
 	object.insert("poly", poly);
 	return object;
+}
+
+QVector<QLineF> LaserPolygon::edges()
+{
+	Q_D(const LaserPolygon);
+	QPainterPath path;
+	path.addPolygon(sceneTransform().map(d->poly));
+	return LaserPrimitive::edges(path);
 }
 
 class LaserBitmapPrivate : public LaserPrimitivePrivate
@@ -1387,6 +1446,14 @@ void LaserBitmap::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	QList<QGraphicsView*> views = scene()->views();
 	LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
 	viewer->onEndSelecting();
+}
+
+QVector<QLineF> LaserBitmap::edges()
+{
+	Q_D(const LaserBitmap);
+	QPainterPath path;
+	path.addPolygon(sceneTransform().map(d->boundingRect));
+	return LaserPrimitive::edges(path);
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

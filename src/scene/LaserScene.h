@@ -37,6 +37,8 @@ public:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
+	void findSelectedByLine(QRectF rect);
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;

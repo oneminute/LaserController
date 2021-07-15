@@ -613,18 +613,20 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 	//m_selectionStartPoint, m_selectionEndPoint
 	QPainterPath selectionPath;
 	//QRectF rect = QRectF(mapToScene(_startPoint.toPoint()), mapToScene(_endPoint.toPoint()));
-	selectionPath.addRect(QRectF(_startPoint, _endPoint));
+	QRectF rect = QRectF(mapToScene(_startPoint.toPoint()), mapToScene(_endPoint.toPoint()));
+	selectionPath.addRect(rect);
 	//selectionPath.addRect(rect);
 	//m_scene->setSelectionArea(mapToScene(selectionPath));
 	qDebug() << "_startPoint: " << _startPoint;
 	qDebug() << "_endPoint: " << _endPoint;
 	//right select
 	if (_endPoint.x() < _startPoint.x()) {
-		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::IntersectsItemBoundingRect);
+		//m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionOperation::ReplaceSelection, Qt::ItemSelectionMode::IntersectsItemShape);
+		m_scene->findSelectedByLine(rect);
 	}
 	//left selection
 	else if (_endPoint.x() >= _startPoint.x()) {
-		m_scene->setSelectionArea(mapToScene(selectionPath), Qt::ItemSelectionMode::ContainsItemBoundingRect);
+		m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
 	}
 	return m_scene->selectedPrimitives().size();
 }

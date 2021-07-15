@@ -146,7 +146,8 @@ public:
 	virtual void reShape();
 
 	virtual QJsonObject toJson();
-
+	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
+	virtual QVector<QLineF> edges();
 	/*void setScaleValue(qreal x, qreal y);
 	void setScaleTranslate(qreal x, qreal y);
 	void setSelectedEditingState(int state);
@@ -214,6 +215,7 @@ public:
 	virtual QRectF sceneBoundingRect() const;
 	virtual void reShape();
 	virtual QJsonObject toJson();
+	QVector<QLineF> edges();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)
@@ -238,7 +240,7 @@ public:
 	virtual QRectF sceneBoundingRect() const;
 	virtual void reShape();
 	virtual QJsonObject toJson();
-
+	QVector<QLineF> edges();
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
     Q_DISABLE_COPY(LaserRect)
@@ -262,6 +264,7 @@ public:
 	virtual QRectF sceneBoundingRect() const;
 	virtual void reShape();
 	virtual QJsonObject toJson();
+	QVector<QLineF> edges();
 
 private:
     Q_DISABLE_COPY(LaserLine);
@@ -288,6 +291,7 @@ public:
 	virtual QRectF sceneBoundingRect() const;
 
 	virtual void reShape();
+	QVector<QLineF> edges();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPath);
@@ -313,6 +317,7 @@ public:
 
 	virtual void reShape();
 	virtual QJsonObject toJson();
+	QVector<QLineF> edges();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
@@ -339,6 +344,7 @@ public:
 
 	virtual void reShape();
 	virtual QJsonObject toJson();
+	QVector<QLineF> edges();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
@@ -369,6 +375,8 @@ public:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
+	QVector<QLineF> edges();
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)

@@ -187,4 +187,50 @@ void LaserScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	QGraphicsScene::mouseReleaseEvent(event);
 }
 
+void LaserScene::findSelectedByLine(QRectF selection)
+{
+	//selection lines
+	QVector<QLineF> selectionEdges;
+	selectionEdges.append(QLineF(selection.topLeft(), selection.topRight()));
+	selectionEdges.append(QLineF(selection.topRight(), selection.bottomRight()));
+	selectionEdges.append(QLineF(selection.bottomLeft(), selection.bottomRight()));
+	selectionEdges.append(QLineF(selection.topLeft(), selection.bottomLeft()));
+	//items
+	QMap<QString, LaserPrimitive*> list = this->document()->primitives();
+	
+	for (int i = 0; i < list.size(); i++) {
+		bool breakdown = false;
+		LaserPrimitive* item = list.values()[i];
+		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
+			continue;
+		}
+		if (item->isSelected()) {
+			continue;
+		}
+		QVector<QLineF> edges = item->edges();
+		if (edges.size() <= 0) {
+			continue;
+		}
+		for (int si = 0; si < selectionEdges.size(); si++) {
+			QLineF sEdge = selectionEdges[si];
+			for (int ei = 0; ei < edges.size(); ei++) {
+				QLineF edge = edges[ei];
+				QPointF point;
+				if (sEdge.intersect(edge, &point) == QLineF::BoundedIntersection) {
+					item->setSelected(true);
+					breakdown = true;
+					break;
+				}
+			}
+			if (breakdown)
+				break;
+		}
+		/*QString name = item->metaObject()->className();
+		if (name == "LaserRect") {
+			LaserRect* rect = qgraphicsitem_cast<LaserRect*>(item);
+			
+		}*/
+	}
+}
+
 
