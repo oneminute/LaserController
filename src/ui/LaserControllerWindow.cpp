@@ -234,12 +234,18 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolButtonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
 	m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
 
-    m_ui->editSliderLaserPower->setMinimum(0);
-    m_ui->editSliderLaserPower->setMaximum(1000);
-    m_ui->editSliderLaserEnergyMin->setMinimum(0);
-    m_ui->editSliderLaserEnergyMin->setMaximum(1000);
-    m_ui->editSliderLaserEnergyMax->setMinimum(0);
-    m_ui->editSliderLaserEnergyMax->setMaximum(1000);
+    m_ui->floatEditSliderLaserPower->setMinimum(0);
+    m_ui->floatEditSliderLaserPower->setMaximum(100);
+    m_ui->floatEditSliderLaserPower->setStep(0.1);
+    m_ui->floatEditSliderLaserPower->setPage(10);
+    m_ui->floatEditSliderLaserPower->setTextTemplate("%1%");
+    m_ui->floatEditSliderLaserPower->setMaximumLineEditWidth(40);
+
+    m_ui->floatEditDualSliderLaserRange->setMinimum(0);
+    m_ui->floatEditDualSliderLaserRange->setMaximum(100);
+    m_ui->floatEditDualSliderLaserRange->setStep(0.1);
+    m_ui->floatEditDualSliderLaserRange->setTextTemplate("%1%");
+    m_ui->floatEditDualSliderLaserRange->setEditMaxWidth(40);
 
     // init status bar
     m_statusBarStatus = new QLabel;
@@ -495,8 +501,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
-    connect(m_ui->editSliderLaserEnergyMin, &EditSlider::valueChanged, this, &LaserControllerWindow::onEditSliderLaserEngergyMinChanged);
-    connect(m_ui->editSliderLaserEnergyMax, &EditSlider::valueChanged, this, &LaserControllerWindow::onEditSliderLaserEngergyMaxChanged);
+    //connect(m_ui->editSliderLaserEnergyMin, &EditSlider::valueChanged, this, &LaserControllerWindow::onEditSliderLaserEngergyMinChanged);
+    //connect(m_ui->editSliderLaserEnergyMax, &EditSlider::valueChanged, this, &LaserControllerWindow::onEditSliderLaserEngergyMaxChanged);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
@@ -778,9 +784,6 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
         QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
         return;
     }
-    
-    // Get Laser power;
-    int power = m_ui->editSliderLaserPower->value();
     
     // Get current pos;
     QVector3D dest = utils::putToQuadrant(abstractDest, quad);
@@ -1576,25 +1579,25 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
     }
 }
 
-void LaserControllerWindow::onEditSliderLaserEngergyMinChanged(int value)
-{
-    if (m_ui->editSliderLaserEnergyMax->value() < value)
-    {
-        m_ui->editSliderLaserEnergyMax->blockSignals(true);
-        m_ui->editSliderLaserEnergyMax->setValue(value);
-        m_ui->editSliderLaserEnergyMax->blockSignals(false);
-    }
-}
-
-void LaserControllerWindow::onEditSliderLaserEngergyMaxChanged(int value)
-{
-    if (m_ui->editSliderLaserEnergyMin->value() > value)
-    {
-        m_ui->editSliderLaserEnergyMin->blockSignals(true);
-        m_ui->editSliderLaserEnergyMin->setValue(value);
-        m_ui->editSliderLaserEnergyMin->blockSignals(false);
-    }
-}
+//void LaserControllerWindow::onEditSliderLaserEngergyMinChanged(int value)
+//{
+//    if (m_ui->editSliderLaserEnergyMax->value() < value)
+//    {
+//        m_ui->editSliderLaserEnergyMax->blockSignals(true);
+//        m_ui->editSliderLaserEnergyMax->setValue(value);
+//        m_ui->editSliderLaserEnergyMax->blockSignals(false);
+//    }
+//}
+//
+//void LaserControllerWindow::onEditSliderLaserEngergyMaxChanged(int value)
+//{
+//    if (m_ui->editSliderLaserEnergyMin->value() > value)
+//    {
+//        m_ui->editSliderLaserEnergyMin->blockSignals(true);
+//        m_ui->editSliderLaserEnergyMin->setValue(value);
+//        m_ui->editSliderLaserEnergyMin->blockSignals(false);
+//    }
+//}
 
 void LaserControllerWindow::onLaserRegistersFetched(const LaserRegister::RegistersMap & registers)
 {

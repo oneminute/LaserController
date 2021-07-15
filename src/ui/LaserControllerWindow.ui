@@ -680,22 +680,6 @@
      </item>
      <item>
       <layout class="QFormLayout" name="formLayout_2">
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="text">
-          <string>Laser Power</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="EditSlider" name="editSliderLaserPower" native="true"/>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_14">
          <property name="text">
@@ -722,25 +706,31 @@
          </item>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_15">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
          <property name="text">
-          <string>Min Energy</string>
+          <string>Laser Power</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_16">
+       <item row="2" column="1">
+        <widget class="FloatEditSlider" name="floatEditSliderLaserPower" native="true"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_15">
          <property name="text">
-          <string>Max Energy</string>
+          <string>Laser Range</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="EditSlider" name="editSliderLaserEnergyMin" native="true"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="EditSlider" name="editSliderLaserEnergyMax" native="true"/>
+        <widget class="FloatEditDualSlider" name="floatEditDualSliderLaserRange" native="true"/>
        </item>
       </layout>
      </item>
@@ -2208,12 +2198,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>EditSlider</class>
-   <extends>QWidget</extends>
-   <header>widget/LRWidgets/widget/EditSlider.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>LaserLayerTableWidget</class>
    <extends>QTableWidget</extends>
    <header>widget/LaserLayerTableWidget.h</header>
@@ -2227,6 +2211,18 @@
    <class>RulerWidget</class>
    <extends>QWidget</extends>
    <header>widget/RulerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FloatEditDualSlider</class>
+   <extends>QWidget</extends>
+   <header>widget/LRWidgets/widget/FloatEditDualSlider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FloatEditSlider</class>
+   <extends>QWidget</extends>
+   <header>widget/LRWidgets/widget/FloatEditSlider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

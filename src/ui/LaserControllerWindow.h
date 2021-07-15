@@ -114,8 +114,8 @@ protected slots:
     void onComboBoxSxaleIndexChanged(int index);
     void onComboBoxSxaleTextChanged(const QString& text);
 
-    void onEditSliderLaserEngergyMinChanged(int value);
-    void onEditSliderLaserEngergyMaxChanged(int value);
+    //void onEditSliderLaserEngergyMinChanged(int value);
+    //void onEditSliderLaserEngergyMaxChanged(int value);
 
     void onLaserRegistersFetched(const LaserRegister::RegistersMap& registers);
     void onLaserReturnWorkState(LaserState state);
