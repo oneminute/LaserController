@@ -100,6 +100,7 @@ public:
         CONFIG_ITEM(ui, toolButtonSize, int, toInt)
         CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
         CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
+        CONFIG_ITEM(ui, gridContrast, int, toInt)
 
     private:
         friend class Config;

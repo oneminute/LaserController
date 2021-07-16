@@ -267,6 +267,28 @@ void Config::loadUiItems()
     );
     colorButtonHeight->setInputWidgetProperty("minimum", 20);
     colorButtonHeight->setInputWidgetProperty("maximum", 60);
+
+    ConfigItem* gridContrast = group->addConfigItem(
+        "gridContrast",
+        tr("Grid Contrast"),
+        tr("Grid contrast"),
+        0,
+        DT_INT
+    );
+    gridContrast->setInputWidgetType(IWT_ComboBox);
+    gridContrast->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("T"), 0);
+            comboBox->addItem(tr("S1"), 1);
+            comboBox->addItem(tr("S2"), 2);
+            comboBox->addItem(tr("S3"), 3);
+        }
+    );
 }
 
 void Config::loadCuttingLayerItems()
