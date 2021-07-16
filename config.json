@@ -322,7 +322,7 @@
         },
         "gridContrast": {
             "defaultValue": 0,
-            "value": 1
+            "value": 2
         },
         "operationButtonHeight": {
             "defaultValue": 60,
@@ -348,7 +348,7 @@
     "userRegister": {
         "accMode": {
             "defaultValue": 0,
-            "value": 0
+            "value": 4
         },
         "backlashXInterval": {
             "defaultValue": 0,
