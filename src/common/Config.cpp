@@ -283,10 +283,10 @@ void Config::loadUiItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("T"), 0);
-            comboBox->addItem(tr("S1"), 1);
-            comboBox->addItem(tr("S2"), 2);
-            comboBox->addItem(tr("S3"), 3);
+            comboBox->addItem(tr("Off"), 0);
+            comboBox->addItem(tr("Low Contrast"), 1);
+            comboBox->addItem(tr("Medium Contrast"), 2);
+            comboBox->addItem(tr("High Contrast"), 3);
         }
     );
 }
