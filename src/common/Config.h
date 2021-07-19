@@ -93,14 +93,15 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(ui, operationButtonIconSize, int, toInt)
-        CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
-        CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
-        CONFIG_ITEM(ui, operationButtonShowText, bool, toBool)
-        CONFIG_ITEM(ui, toolButtonSize, int, toInt)
-        CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
-        CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
-        CONFIG_ITEM(ui, gridContrast, int, toInt)
+		CONFIG_ITEM(ui, operationButtonIconSize, int, toInt)
+			CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
+			CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
+			CONFIG_ITEM(ui, operationButtonShowText, bool, toBool)
+			CONFIG_ITEM(ui, toolButtonSize, int, toInt)
+			CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
+			CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
+			CONFIG_ITEM(ui, gridContrast, int, toInt)
+			CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble);
 
     private:
         friend class Config;

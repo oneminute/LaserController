@@ -297,6 +297,15 @@ void Config::loadUiItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
         }
     );
+	ConfigItem* gridShapeDistance = group->addConfigItem(
+		"gridShapeDistance",
+		tr("Grid Shape Distance"),
+		tr("(Pixel)"),
+		3
+	);
+	gridShapeDistance->setInputWidgetProperty("minimum", 0);
+	gridShapeDistance->setInputWidgetProperty("maximum", 10);
+	
 }
 
 void Config::loadCuttingLayerItems()

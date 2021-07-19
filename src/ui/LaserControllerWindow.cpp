@@ -50,8 +50,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	, m_windowTitle("Laser Controller")
 {
     m_ui->setupUi(this);
-	
-
     setDockNestingEnabled(true);
 
     QList<QColor> colors;
