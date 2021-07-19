@@ -234,6 +234,15 @@ public:
 	static int dpiY;
 	static SizeUnit unit;
 	//static QWidget* mainWindow;
+	//grid pen
+	static qreal lowPen1;
+	static qreal lowPen2;
+
+	static qreal mediumPen1;
+	static qreal mediumPen2;
+
+	static qreal highPen1;
+	static qreal highPen2;
 
     static int mm2PixelsX(float mm);
 	static qreal Global::mm2PixelsXF(float mm);

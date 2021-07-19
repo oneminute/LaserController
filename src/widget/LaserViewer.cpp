@@ -1582,8 +1582,8 @@ void LaserViewer::selectedHandleScale()
 		}
 		//rightbottom
 		case 7: {
-			QPointF lastVect = m_lastPos - m_selectedRect.topLeft();
-			QPointF currVect = m_mousePoint - m_selectedRect.topLeft();
+			QPointF lastVect = m_lastPos - mapFromScene(m_selectedRect.topLeft());
+			QPointF currVect = m_mousePoint - mapFromScene(m_selectedRect.topLeft());
 			
 			QVector2D v1(lastVect);
 			QVector2D v2(currVect);

@@ -5,6 +5,7 @@
 
 #include "widget//LaserViewer.h"
 #include "common/common.h"
+#include "common/Config.h"
 LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem *parent) 
 	:QGraphicsRectItem(parent)
 {
@@ -91,12 +92,43 @@ void LaserBackgroundItem::onChangeGrids()
 
 void LaserBackgroundItem::drawGrids(QPainter& painter)
 {
-	
 	qreal width = this->boundingRect().width();
 	qreal height = this->boundingRect().height();
-	//2级网格
-	QPen pen2(QColor(238, 238, 238), 1, Qt::SolidLine);
+	int contrastValue = Config::Ui::gridContrast();
+	qDebug() << "contrastValue: " << contrastValue;
+	bool isShow = true;
+	//一级网格
+	QPen pen1(QColor(0, 0, 0), 1, Qt::SolidLine);
+	pen1.setCosmetic(true);
+	//二级网格
+	QPen pen2(QColor(0, 0, 0), 1, Qt::SolidLine);
 	pen2.setCosmetic(true);
+	switch (contrastValue) {
+		case 0: {
+			isShow = false;
+			break;
+		}
+		case 1: {
+			pen1.setColor(QColor(Global::lowPen1, Global::lowPen1, Global::lowPen1));
+			pen2.setColor(QColor(Global::lowPen2, Global::lowPen2, Global::lowPen2));
+			break;
+		}
+		case 2: {
+			pen1.setColor(QColor(Global::mediumPen1, Global::mediumPen1, Global::mediumPen1));
+			pen2.setColor(QColor(Global::mediumPen2, Global::mediumPen2, Global::mediumPen2));
+			break;
+		}
+		case 3: {
+			pen1.setColor(QColor(Global::highPen1, Global::highPen1, Global::highPen1));
+			pen2.setColor(QColor(Global::highPen2, Global::highPen2, Global::highPen2));
+			break;
+		}
+
+	}
+	if (!isShow) {
+		return;
+	}
+	//2级网格
 	painter.setPen(pen2);
 	for (int i1 = 1; i1 < m_gridSecondNodeYList.size()-1; i1++) {
 		//QPointF p1SecondH = mapFromScene(mapToScene(QPointF(0, m_gridSecondNodeYList[i1])));
@@ -113,8 +145,6 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 		painter.drawLine(p1SecondV, p2SecondV);
 	}
 	//1级网格
-	QPen pen1(QColor(210, 210, 210), 1, Qt::SolidLine);
-	pen1.setCosmetic(true);
 	painter.setPen(pen1);
 	for (int i = 1; i < m_gridNodeYList.size()-1; i++) {
 		//QPointF p1H = mapFromScene(mapToScene(QPointF(0, m_gridNodeYList[i])));
@@ -147,8 +177,9 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point)
 	}
 	//pont从view到document转换
 	QPointF documentPoint = mapFromScene(point);
-	qreal valueX = 5 / view->zoomValue();//5个像素
-	qreal valueY = 5 / view->zoomValue();
+	qreal distance = Config::Ui::gridShapeDistance();
+	qreal valueX = distance / view->zoomValue();//5个像素
+	qreal valueY = distance / view->zoomValue();
 	for (int i = 0; i < m_gridNodeXList.size(); i++) {
 		for (int j = 0; j < m_gridNodeYList.size(); j++) {
 			QPointF node = QPointF(m_gridNodeXList[i], m_gridNodeYList[j]);

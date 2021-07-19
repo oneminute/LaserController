@@ -314,7 +314,7 @@
     "ui": {
         "colorButtonHeight": {
             "defaultValue": 30,
-            "value": 30
+            "value": 28
         },
         "colorButtonWidth": {
             "defaultValue": 30,
@@ -323,6 +323,10 @@
         "gridContrast": {
             "defaultValue": 0,
             "value": 2
+        },
+        "gridShapeDistance": {
+            "defaultValue": 3,
+            "value": 10
         },
         "operationButtonHeight": {
             "defaultValue": 60,
