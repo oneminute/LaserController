@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QTimer>
 
 #include "ConfigItem.h"
 #include "exception/LaserException.h"
@@ -160,9 +161,15 @@ void Config::loadGeneralItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(QLocale::languageToString(QLocale::English), QLocale::English);
-            comboBox->addItem(QLocale::languageToString(QLocale::Chinese), QLocale::Chinese);
-            comboBox->setCurrentText(QLocale::languageToString(static_cast<QLocale::Language>(item->value().toInt())));
+            comboBox->addItem("English", static_cast<int>(QLocale::English));
+            comboBox->addItem("Chinese", static_cast<int>(QLocale::Chinese));
+
+            QTimer::singleShot(0, 
+                [=]() {
+                    int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+                    comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+                }
+            );
         }
     );
 
@@ -183,8 +190,8 @@ void Config::loadGeneralItems()
 
             comboBox->addItem(tr("mm"), 4);
 
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
 }
@@ -293,8 +300,8 @@ void Config::loadUiItems()
             comboBox->addItem(tr("Medium Contrast"), 2);
             comboBox->addItem(tr("High Contrast"), 3);
 
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
 
@@ -611,8 +618,8 @@ void Config::loadUserReigsters()
             comboBox->addItem(tr("S4"), 4);
             comboBox->addItem(tr("S5"), 5);
 
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     accMode->bindLaserRegister(1, false);
@@ -1189,8 +1196,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
 
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     xDirPhase->bindLaserRegister(13);
@@ -1212,8 +1219,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
 
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     xLimitPhase->bindLaserRegister(14);
@@ -1292,8 +1299,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("1"), 1);
             comboBox->addItem(tr("2"), 1);
             comboBox->addItem(tr("3"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     xLimitNum->bindLaserRegister(17);
@@ -1326,8 +1333,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("1"), 1);
             comboBox->addItem(tr("2"), 1);
             comboBox->addItem(tr("3"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     xMotorNum->bindLaserRegister(19);
@@ -1516,8 +1523,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     yDirPhase->bindLaserRegister(26);
@@ -1539,8 +1546,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     yLimitPhase->bindLaserRegister(27);
@@ -1620,8 +1627,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("1"), 1);
             comboBox->addItem(tr("2"), 1);
             comboBox->addItem(tr("3"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     yLimitNum->bindLaserRegister(30);
@@ -1654,8 +1661,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("1"), 1);
             comboBox->addItem(tr("2"), 1);
             comboBox->addItem(tr("3"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     yMotorNum->bindLaserRegister(32);
@@ -1844,8 +1851,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     zDirPhase->bindLaserRegister(39);
@@ -1867,8 +1874,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     zLimitPhase->bindLaserRegister(40);
@@ -1948,8 +1955,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("1"), 1);
             comboBox->addItem(tr("2"), 1);
             comboBox->addItem(tr("3"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     zLimitNum->bindLaserRegister(43);
@@ -1982,8 +1989,8 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("1"), 1);
             comboBox->addItem(tr("2"), 1);
             comboBox->addItem(tr("3"), 1);
-            int index = widgetUtils::findComboBoxItemByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
     zMotorNum->bindLaserRegister(45);
@@ -2220,4 +2227,8 @@ void Config::loadSystemRegisters()
 QList<ConfigItemGroup*> Config::getGroups()
 {
     return groups;
+}
+
+void Config::refreshTranslation()
+{
 }

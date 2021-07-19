@@ -38,6 +38,7 @@ public:
     static QString configFilePath();
     static bool isModified();
     static QList<ConfigItemGroup*> getGroups();
+    static void refreshTranslation();
 
 protected:
     static void loadGeneralItems();
@@ -62,7 +63,7 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(general, language, QString, toString)
+        CONFIG_ITEM(general, language, int, toInt)
         CONFIG_ITEM(general, unit, int, toInt)
 
     private:
