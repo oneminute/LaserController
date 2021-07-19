@@ -2140,7 +2140,7 @@ void Config::loadSystemRegisters()
     laserMaxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMaxPower->setInputWidgetProperty("minimum", 1);
     laserMaxPower->setInputWidgetProperty("maximum", 100);
-    laserMaxPower->bindLaserRegister(51);
+    laserMaxPower->bindLaserRegister(51, true, SS_DIRECTLY);
 
     ConfigItem* laserMinPower = group->addConfigItem(
         "laserMinPower",
@@ -2165,7 +2165,7 @@ void Config::loadSystemRegisters()
     laserMinPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMinPower->setInputWidgetProperty("minimum", 1);
     laserMinPower->setInputWidgetProperty("maximum", 100);
-    laserMinPower->bindLaserRegister(52);
+    laserMinPower->bindLaserRegister(52, true, SS_DIRECTLY);
 
     ConfigItem* laserPowerFreq = group->addConfigItem(
         "laserPowerFreq",
@@ -2177,7 +2177,7 @@ void Config::loadSystemRegisters()
     laserPowerFreq->setInputWidgetProperty("page", 1000);
     laserPowerFreq->setInputWidgetProperty("minimum", 1);
     laserPowerFreq->setInputWidgetProperty("maximum", 10000);
-    laserPowerFreq->bindLaserRegister(53);
+    laserPowerFreq->bindLaserRegister(53, true, SS_DIRECTLY);
 
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",

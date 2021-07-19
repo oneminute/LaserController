@@ -2,7 +2,9 @@
 
 #include <QVariant>
 
-#include "LaserDriver.h"
+#include "LaserApplication.h"
+#include "LaserDevice.h"
+//#include "LaserDriver.h"
 #include "util/TypeUtils.h"
 
 QMap<int, LaserRegister*> LaserRegister::userRegisters;
@@ -30,7 +32,6 @@ public:
     }
 
     int address;
-    QVariant value;
     QString name;
     QString description;
     bool readOnly;
@@ -84,21 +85,15 @@ bool LaserRegister::readOnly() const
     return d->readOnly;
 }
 
-QVariant LaserRegister::value() const
-{
-    Q_D(const LaserRegister);
-    return d->value;
-}
-
-void LaserRegister::loadValue(const QVariant& value)
+void LaserRegister::setValue(const QVariant& value)
 {
     Q_D(LaserRegister);
-    if (!value.isValid() || value.isNull())
+    if (readOnly())
         return;
-    if (value != d->value)
+
+    if (storeStrategy() == SS_DIRECTLY)
     {
-        d->value = value;
-        emit valueChanged(value);
+        write(value);
     }
 }
 
@@ -126,66 +121,41 @@ void LaserRegister::setStoreStrategy(StoreStrategy storeStrategy)
     d->storeStrategy = storeStrategy;
 }
 
-void LaserRegister::setValue(const QVariant& value)
-{
-    Q_D(LaserRegister);
-    if (readOnly())
-        return;
-
-    d->value = value;
-    if (storeStrategy() == SS_DIRECTLY)
-    {
-        write();
-    }
-}
-
 void LaserRegister::parse(const QString& raw)
 {
-    loadValue(typeUtils::textToVariant(raw, dataType()));
+    emit valueLoaded(typeUtils::textToVariant(raw, dataType()));
 }
 
 bool LaserRegister::read()
 {
     Q_D(LaserRegister);
-    LaserDriver* driver = qobject_cast<LaserDriver*>(parent());
-    QList<int> addresses;
-    addresses << d->address;
     if (d->isSystem)
     {
-        return driver->readSysParamFromCard(addresses);
+        return LaserApplication::device->readSystemRegister(d->address);
     }
     else
     {
-        return driver->readUserParamFromCard(addresses);
+        return LaserApplication::device->readUserRegister(d->address);
     }
 }
 
-bool LaserRegister::write()
+bool LaserRegister::write(const QVariant& value)
 {
     Q_D(LaserRegister);
-    LaserDriver* driver = qobject_cast<LaserDriver*>(parent());
-    RegistersMap registerMap;
-    registerMap.insert(d->address, d->value);
     if (d->isSystem)
     {
-        return driver->writeSysParamToCard(registerMap);
+        return LaserApplication::device->writeSystemReigister(d->address, value);
     }
     else
     {
-        return driver->writeUserParamToCard(registerMap);
+        return LaserApplication::device->writeUserReigister(d->address, value);
     }
 }
 
 QString LaserRegister::toString() const
 {
     Q_D(const LaserRegister);
-    return QString("%1,%2").arg(d->address).arg(d->value.toString());
-}
-
-LaserRegister::RegisterPair LaserRegister::keyValuePair() const
-{
-    Q_D(const LaserRegister);
-    return RegisterPair(d->address, value());
+    return QString("%1").arg(d->address);
 }
 
 void LaserRegister::batchParse(const QString& raw, bool isSystem)

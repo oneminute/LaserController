@@ -121,8 +121,6 @@ protected:
     void setValueConfirmed(const QVariant& value);
     void setValueLazy(const QVariant& value);
 
-    //InputWidgetWrapper* findWidget(QWidget* widget) const;
-
 signals:
     void visibleChanged(bool value);
     void valueChanged(const QVariant& value);

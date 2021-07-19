@@ -302,25 +302,73 @@ bool LaserDevice::verifyManufacturePassword(const QString& password)
 bool LaserDevice::writeUserRegisters()
 {
     Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
     return d->driver->writeUserParamToCard(Config::UserRegister::group->keyValuePairs());
 }
 
 bool LaserDevice::writeSystemRegisters()
 {
     Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
     return d->driver->writeUserParamToCard(Config::SystemRegister::group->keyValuePairs());
 }
 
 bool LaserDevice::readUserRegisters()
 {
     Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
     return d->driver->readAllUserParamFromCard();
 }
 
 bool LaserDevice::readSystemRegisters()
 {
     Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
     return d->driver->readAllSysParamFromCard();
+}
+
+bool LaserDevice::readUserRegister(int address)
+{
+    Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
+    QList<int> addresses;
+    addresses << address;
+    return d->driver->readUserParamFromCard(addresses);
+}
+
+bool LaserDevice::writeUserReigister(int address, const QVariant& value)
+{
+    Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
+    LaserRegister::RegistersMap pair;
+    pair.insert(address, value);
+    return d->driver->writeUserParamToCard(pair);
+}
+
+bool LaserDevice::readSystemRegister(int address)
+{
+    Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
+    QList<int> addresses;
+    addresses << address;
+    return d->driver->readSysParamFromCard(addresses);
+}
+
+bool LaserDevice::writeSystemReigister(int address, const QVariant& value)
+{
+    Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
+    LaserRegister::RegistersMap pair;
+    pair.insert(address, value);
+    return d->driver->writeSysParamToCard(pair);
 }
 
 void LaserDevice::unload()

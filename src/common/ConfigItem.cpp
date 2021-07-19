@@ -167,6 +167,8 @@ ConfigItem::ConfigItem(
         case DT_DATETIME:
             d->inputWidgetType = IWT_DateTimeEdit;
             break;
+        default:
+            d->inputWidgetType = IWT_Unknown;
         }
 }
 
@@ -363,7 +365,7 @@ void ConfigItem::fromJson(const QJsonObject& jsonObject)
     {
         d->value = d->dirtyValue = jsonObject["value"].toVariant();
         d->dirty = d->modified = false;
-        emit valueChanged(d->value);
+        //emit valueChanged(d->value);
     }
 
     if (jsonObject.contains("defaultValue"))
@@ -507,11 +509,12 @@ void ConfigItem::bindLaserRegister(int addr, bool isSystem, StoreStrategy storeS
 {
     Q_D(ConfigItem);
     d->laserRegister = new LaserRegister(addr, title(), dataType(), description(), isSystem, readOnly(), storeStrategy, this);
-    QVariant regValue = d->laserRegister->value();
-    regValue = (regValue.isValid() && !regValue.isNull()) ? regValue : defaultValue();
-    d->value = d->dirtyValue = regValue; //doLoadDataHook(regValue);
-    d->dirty = d->modified = false;
-    connect(d->laserRegister, &LaserRegister::valueChanged, this, &ConfigItem::loadValue);
+    //QVariant regValue = d->laserRegister->value();
+    //regValue = (regValue.isValid() && !regValue.isNull()) ? regValue : defaultValue();
+    //d->value = d->dirtyValue = regValue; //doLoadDataHook(regValue);
+    //d->dirty = d->modified = false;
+    connect(d->laserRegister, &LaserRegister::valueLoaded, this, &ConfigItem::loadValue);
+    connect(this, &ConfigItem::valueChanged, d->laserRegister, &LaserRegister::setValue);
 }
 
 bool ConfigItem::hasRegister() const

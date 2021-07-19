@@ -14,6 +14,7 @@ class QSpinBox;
 class QDoubleSpinBox;
 class QLabel;
 
+class InputWidgetWrapperPrivate;
 class InputWidgetWrapper : public QObject
 {
     Q_OBJECT
@@ -55,10 +56,10 @@ protected:
     void onConfigItemValueChanged(const QVariant& value);
 
 private:
-    QLabel* m_labelName;
-    QLabel* m_labelDesc;
-    InputWidgetType m_type;
-    ConfigItem* m_configItem;
+
+    QScopedPointer<InputWidgetWrapperPrivate> m_ptr;
+    Q_DECLARE_PRIVATE_D(m_ptr, InputWidgetWrapper)
+    Q_DISABLE_COPY(InputWidgetWrapper)
 };
 
 #endif // INPUTWIDGETWRAPPER_H

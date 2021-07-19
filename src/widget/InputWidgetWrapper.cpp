@@ -16,13 +16,33 @@
 #include "widget/EditSlider.h"
 #include "widget/FloatEditSlider.h"
 
+class InputWidgetWrapperPrivate
+{
+    Q_DECLARE_PUBLIC(InputWidgetWrapper)
+public:
+    InputWidgetWrapperPrivate(InputWidgetWrapper* ptr, ConfigItem* configItem)
+        : q_ptr(ptr)
+        , labelName(nullptr)
+        , labelDesc(nullptr)
+        , configItem(configItem)
+        , type(IWT_Unknown)
+    {
+
+    }
+
+    InputWidgetWrapper* q_ptr;
+
+    QLabel* labelName;
+    QLabel* labelDesc;
+    InputWidgetType type;
+    ConfigItem* configItem;
+};
+
 InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     : QObject(widget)
-    , m_labelName(nullptr)
-    , m_labelDesc(nullptr)
-    , m_configItem(configItem)
-    , m_type(IWT_Unknown)
+    , m_ptr(new InputWidgetWrapperPrivate(this, configItem))
 {
+    Q_D(InputWidgetWrapper);
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
     QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
@@ -39,73 +59,73 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
 
     if (checkBox != nullptr)
     {
-        m_type = IWT_CheckBox;
+        d->type = IWT_CheckBox;
         connect(checkBox, &QCheckBox::stateChanged, this, &InputWidgetWrapper::onCheckBoxStateChanged);
     }
     else if (comboBox != nullptr)
     {
-        m_type = IWT_ComboBox;
+        d->type = IWT_ComboBox;
         connect(comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &InputWidgetWrapper::onComboBoxIndexChanged);
     }
     else if (lineEdit != nullptr)
     {
-        m_type = IWT_LineEdit;
+        d->type = IWT_LineEdit;
         connect(lineEdit, &QLineEdit::editingFinished, this, &InputWidgetWrapper::onEditingFinished);
     }
     else if (textEdit != nullptr)
     {
-        m_type = IWT_TextEdit;
+        d->type = IWT_TextEdit;
         connect(textEdit, &QTextEdit::textChanged, this, &InputWidgetWrapper::onTextEditTextChanged);
     }
     else if (plainTextEdit != nullptr)
     {
-        m_type = IWT_PlainTextEdit;
+        d->type = IWT_PlainTextEdit;
         connect(plainTextEdit, &QPlainTextEdit::textChanged, this, &InputWidgetWrapper::onPlainTextEditTextChanged);
     }
     else if (spinBox != nullptr)
     {
-        m_type = IWT_SpinBox;
+        d->type = IWT_SpinBox;
         connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
     }
     else if (doubleSpinBox != nullptr)
     {
-        m_type = IWT_DoubleSpinBox;
+        d->type = IWT_DoubleSpinBox;
         connect(doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, QOverload<double>::of(&InputWidgetWrapper::onValueChanged));
     }
     else if (timeEdit != nullptr)
     {
-        m_type = IWT_TimeEdit;
+        d->type = IWT_TimeEdit;
         connect(timeEdit, &QTimeEdit::timeChanged, this, &InputWidgetWrapper::onTimeChanged);
     }
     else if (dateEdit != nullptr)
     {
-        m_type = IWT_DateEdit;
+        d->type = IWT_DateEdit;
         connect(dateEdit, &QDateEdit::dateChanged, this, &InputWidgetWrapper::onDateChanged);
     }
     else if (dateTimeEdit != nullptr)
     {
-        m_type = IWT_DateTimeEdit;
+        d->type = IWT_DateTimeEdit;
         connect(dateTimeEdit, &QDateTimeEdit::dateTimeChanged, this, &InputWidgetWrapper::onDateTimeChanged);
     }
     else if (dial != nullptr)
     {
-        m_type = IWT_Dial;
+        d->type = IWT_Dial;
         connect(dial, &QDial::valueChanged, this, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
     }
     else if (editSlider != nullptr)
     {
-        m_type = IWT_EditSlider;
+        d->type = IWT_EditSlider;
         connect(editSlider, &EditSlider::valueChanged, this, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
     }
     else if (floatEditSlider != nullptr)
     {
-        m_type = IWT_FloatEditSlider;
+        d->type = IWT_FloatEditSlider;
         connect(floatEditSlider, &FloatEditSlider::valueChanged, this, QOverload<qreal>::of(&InputWidgetWrapper::onValueChanged));
     }
-    updateValue(m_configItem->value());
-    connect(this, &InputWidgetWrapper::valueChanged, m_configItem, &ConfigItem::fromWidget);
-    connect(m_configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
-    connect(m_configItem, &ConfigItem::widgetValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
+    updateValue(d->configItem->value());
+    connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::fromWidget);
+    connect(d->configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
+    connect(d->configItem, &ConfigItem::widgetValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
 }
 
 InputWidgetWrapper::~InputWidgetWrapper()
@@ -114,12 +134,14 @@ InputWidgetWrapper::~InputWidgetWrapper()
 
 void InputWidgetWrapper::setNameLabel(QLabel* label)
 {
-    m_labelName = label;
+    Q_D(InputWidgetWrapper);
+    d->labelName = label;
 }
 
 void InputWidgetWrapper::setDescriptionLabel(QLabel* label)
 {
-    m_labelDesc = label;
+    Q_D(InputWidgetWrapper);
+    d->labelDesc = label;
 }
 
 QWidget* InputWidgetWrapper::widget() const
@@ -129,21 +151,24 @@ QWidget* InputWidgetWrapper::widget() const
 
 void InputWidgetWrapper::reset()
 {
-    m_configItem->reset();
-    updateValue(m_configItem->value());
+    Q_D(InputWidgetWrapper);
+    d->configItem->reset();
+    updateValue(d->configItem->value());
 }
 
 void InputWidgetWrapper::restoreDefault()
 {
-    updateValue(m_configItem->defaultValue());
+    Q_D(InputWidgetWrapper);
+    updateValue(d->configItem->defaultValue());
 }
 
 void InputWidgetWrapper::updateValue(const QVariant& newValue)
 {
-    QVariant value = m_configItem->doLoadDataHook(newValue);
+    Q_D(InputWidgetWrapper);
+    QVariant value = d->configItem->doLoadDataHook(newValue);
     QWidget* widget = qobject_cast<QWidget*>(parent());
     widget->blockSignals(true);
-    switch (m_type)
+    switch (d->type)
     {
     case IWT_CheckBox:
     {
@@ -236,20 +261,23 @@ void InputWidgetWrapper::updateValue(const QVariant& newValue)
 
 void InputWidgetWrapper::changeValue(const QVariant& value)
 {
-    if (m_configItem->readOnly())
+    Q_D(InputWidgetWrapper);
+    if (d->configItem->readOnly())
         return;
-    QVariant newValue = m_configItem->doSaveDataHook(value);
+    QVariant newValue = d->configItem->doSaveDataHook(value);
     emit valueChanged(newValue);
 }
 
 bool InputWidgetWrapper::isModified()
 {
-    return m_configItem->isModified();
+    Q_D(InputWidgetWrapper);
+    return d->configItem->isModified();
 }
 
 QVariant InputWidgetWrapper::value() const
 {
-    return m_configItem->value();
+    Q_D(const InputWidgetWrapper);
+    return d->configItem->value();
 }
 
 QWidget* InputWidgetWrapper::createWidget(InputWidgetType widgetType, Qt::Orientation orientation)
@@ -305,7 +333,8 @@ QWidget* InputWidgetWrapper::createWidget(InputWidgetType widgetType, Qt::Orient
 
 void InputWidgetWrapper::onTextChanged(const QString & text)
 {
-    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
+    Q_D(InputWidgetWrapper);
+    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onCheckBoxStateChanged(int state)
@@ -322,23 +351,26 @@ void InputWidgetWrapper::onComboBoxIndexChanged(int index)
 
 void InputWidgetWrapper::onTextEditTextChanged()
 {
+    Q_D(InputWidgetWrapper);
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onPlainTextEditTextChanged()
 {
+    Q_D(InputWidgetWrapper);
     QPlainTextEdit* textEdit = qobject_cast<QPlainTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onEditingFinished()
 {
+    Q_D(InputWidgetWrapper);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
     QString text = lineEdit->text();
-    changeValue(typeUtils::textToVariant(text, m_configItem->dataType()));
+    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onValueChanged(int value)
@@ -368,10 +400,11 @@ void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
 
 void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
 {
-	if (!m_labelName)
+    Q_D(InputWidgetWrapper);
+	if (!d->labelName)
 		return;
-    QPalette::ColorRole role = m_labelName->foregroundRole();
-    QPalette palette = m_labelName->palette();
+    QPalette::ColorRole role = d->labelName->foregroundRole();
+    QPalette palette = d->labelName->palette();
     if (modified)
     {
         palette.setColor(role, Qt::red);
@@ -380,7 +413,7 @@ void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
     {
         palette.setColor(role, Qt::black);
     }
-    m_labelName->setPalette(palette);
+    d->labelName->setPalette(palette);
 }
 
 void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value)

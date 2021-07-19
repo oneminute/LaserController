@@ -496,7 +496,7 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 		}
 		else {
 			QMessageBox::critical(window, "critical", "can't save, the primitive class don't exit.");
-			qLogD << "ÎÞ·¨ÍêÕû±£´æ£¬´æÔÚÎÞ·¨½âÎöµÄÍ¼Ôª";
+			qLogD << "ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôª";
 		}
 		
 	}

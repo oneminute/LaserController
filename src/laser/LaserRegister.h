@@ -23,31 +23,26 @@ public:
     QString description() const;
     bool readOnly() const;
 
-    QVariant value() const;
-
     DataType dataType() const;
     void setDataType(DataType dataType);
 
     StoreStrategy storeStrategy() const;
     void setStoreStrategy(StoreStrategy storeStrategy);
 
-    void setValue(const QVariant& value);
-
     bool read();
-    bool write();
+    bool write(const QVariant& value);
 
     QString toString() const;
-    RegisterPair keyValuePair() const;
 
 protected slots:
-    void loadValue(const QVariant& value);
+    void setValue(const QVariant& value);
     void parse(const QString& raw);
     static void batchParse(const QString& raw, bool isSystem);
 
 signals:
     void readyRead(const QVariant& value);
     void readyWritten();
-    void valueChanged(const QVariant& value);
+    void valueLoaded(const QVariant& value);
 
 private:
     static QMap<int, LaserRegister*> userRegisters;
@@ -58,6 +53,7 @@ private:
     Q_DISABLE_COPY(LaserRegister);
 
     friend class LaserDevice;
+    friend class ConfigItem;
 };
 
 #endif // LASERREGISTER_H

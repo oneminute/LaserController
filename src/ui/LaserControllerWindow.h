@@ -108,17 +108,17 @@ protected slots:
     void onActionMoveLayerUp(bool checked = false);
     void onActionMoveLayerDown(bool checked = false);
 
-    
     void onLaserViewerMouseMoved(const QPointF& pos);
     void onLaserViewerScaleChanged(qreal factor);
     void onComboBoxSxaleIndexChanged(int index);
     void onComboBoxSxaleTextChanged(const QString& text);
 
-    //void onEditSliderLaserEngergyMinChanged(int value);
-    //void onEditSliderLaserEngergyMaxChanged(int value);
-
-    void onLaserRegistersFetched(const LaserRegister::RegistersMap& registers);
     void onLaserReturnWorkState(LaserState state);
+    void onFloatEditSliderLaserPower(qreal value);
+    void onFloatDualEditSliderLowerValueChanged(qreal value);
+    void onFloatDualEditSliderHigherValueChanged(qreal value);
+    void onLaserMinPowerChanged(const QVariant& value);
+    void onLaserMaxPowerChanged(const QVariant& value);
 
 	void onCreatSpline();
 

@@ -234,6 +234,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolButtonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
 	m_ui->toolButtonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
 
+
     m_ui->floatEditSliderLaserPower->setMinimum(0);
     m_ui->floatEditSliderLaserPower->setMaximum(100);
     m_ui->floatEditSliderLaserPower->setStep(0.1);
@@ -246,6 +247,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->floatEditDualSliderLaserRange->setStep(0.1);
     m_ui->floatEditDualSliderLaserRange->setTextTemplate("%1%");
     m_ui->floatEditDualSliderLaserRange->setEditMaxWidth(40);
+    m_ui->floatEditDualSliderLaserRange->setLowerValue(Config::SystemRegister::laserMinPower());
+    m_ui->floatEditDualSliderLaserRange->setHigherValue(Config::SystemRegister::laserMaxPower());
 
     // init status bar
     m_statusBarStatus = new QLabel;
@@ -501,8 +504,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
     connect(m_ui->tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
-    //connect(m_ui->editSliderLaserEnergyMin, &EditSlider::valueChanged, this, &LaserControllerWindow::onEditSliderLaserEngergyMinChanged);
-    //connect(m_ui->editSliderLaserEnergyMax, &EditSlider::valueChanged, this, &LaserControllerWindow::onEditSliderLaserEngergyMaxChanged);
+    connect(m_ui->floatEditSliderLaserPower, &FloatEditSlider::valueChanged, this, &LaserControllerWindow::onFloatEditSliderLaserPower);
+    connect(m_ui->floatEditDualSliderLaserRange, &FloatEditDualSlider::lowerValueChanged, this, &LaserControllerWindow::onFloatDualEditSliderLowerValueChanged);
+    connect(m_ui->floatEditDualSliderLaserRange, &FloatEditDualSlider::higherValueChanged, this, &LaserControllerWindow::onFloatDualEditSliderHigherValueChanged);
+    connect(Config::SystemRegister::laserMinPowerItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::onLaserMinPowerChanged);
+    connect(Config::SystemRegister::laserMaxPowerItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::onLaserMaxPowerChanged);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
@@ -516,7 +522,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::mainCardRegistered, this, &LaserControllerWindow::onMainCardRegistered);
     connect(LaserApplication::device, &LaserDevice::mainCardActivated, this, &LaserControllerWindow::onMainCardActivated);
     connect(&LaserDriver::instance(), &LaserDriver::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
-    connect(&LaserDriver::instance(), &LaserDriver::registersFectched, this, &LaserControllerWindow::onLaserRegistersFetched);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
@@ -1579,80 +1584,46 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
     }
 }
 
-//void LaserControllerWindow::onEditSliderLaserEngergyMinChanged(int value)
-//{
-//    if (m_ui->editSliderLaserEnergyMax->value() < value)
-//    {
-//        m_ui->editSliderLaserEnergyMax->blockSignals(true);
-//        m_ui->editSliderLaserEnergyMax->setValue(value);
-//        m_ui->editSliderLaserEnergyMax->blockSignals(false);
-//    }
-//}
-//
-//void LaserControllerWindow::onEditSliderLaserEngergyMaxChanged(int value)
-//{
-//    if (m_ui->editSliderLaserEnergyMin->value() > value)
-//    {
-//        m_ui->editSliderLaserEnergyMin->blockSignals(true);
-//        m_ui->editSliderLaserEnergyMin->setValue(value);
-//        m_ui->editSliderLaserEnergyMin->blockSignals(false);
-//    }
-//}
-
-void LaserControllerWindow::onLaserRegistersFetched(const LaserRegister::RegistersMap & registers)
-{
-    /*if (registers.contains(LaserDriver::RT_CUTTING_LASER_POWER))
-    {
-        m_ui->editSliderLaserPower->setValue(registers[LaserDriver::RT_CUTTING_LASER_POWER].toInt());
-    }
-    if (registers.contains(LaserDriver::RT_MAX_LASER_ENERGY))
-    {
-        m_ui->editSliderLaserEnergyMax->setValue(registers[LaserDriver::RT_MAX_LASER_ENERGY].toInt());
-    }
-    if (registers.contains(LaserDriver::RT_MIN_LASER_ENERGY))
-    {
-        m_ui->editSliderLaserEnergyMin->setValue(registers[LaserDriver::RT_MIN_LASER_ENERGY].toInt());
-    }
-    if (registers.contains(LaserDriver::RT_CUSTOM_1_X))
-    {
-        m_ui->doubleSpinBoxOrigin1X->setValue(registers[LaserDriver::RT_CUSTOM_1_X].toDouble());
-    }
-    if (registers.contains(LaserDriver::RT_CUSTOM_1_Y))
-    {
-        m_ui->doubleSpinBoxOrigin2Y->setValue(registers[LaserDriver::RT_CUSTOM_1_Y].toDouble());
-    }
-    if (registers.contains(LaserDriver::RT_CUSTOM_2_X))
-    {
-        m_ui->doubleSpinBoxOrigin2X->setValue(registers[LaserDriver::RT_CUSTOM_2_X].toDouble());
-    }
-    if (registers.contains(LaserDriver::RT_CUSTOM_2_Y))
-    {
-        m_ui->doubleSpinBoxOrigin2Y->setValue(registers[LaserDriver::RT_CUSTOM_2_Y].toDouble());
-    }
-    if (registers.contains(LaserDriver::RT_CUSTOM_3_X))
-    {
-        m_ui->doubleSpinBoxOrigin3X->setValue(registers[LaserDriver::RT_CUSTOM_3_X].toDouble());
-    }
-    if (registers.contains(LaserDriver::RT_CUSTOM_3_Y))
-    {
-        m_ui->doubleSpinBoxOrigin3Y->setValue(registers[LaserDriver::RT_CUSTOM_3_Y].toDouble());
-    }
-    if (registers.contains(LaserDriver::RT_LAYOUT_SIZE))
-    {
-        float width, height;
-        LaserDriver::instance().getLayout(width, height);
-        m_ui->doubleSpinBoxOrigin1X->setMaximum(width);
-        m_ui->doubleSpinBoxOrigin2X->setMaximum(width);
-        m_ui->doubleSpinBoxOrigin3X->setMaximum(width);
-        m_ui->doubleSpinBoxOrigin1Y->setMaximum(height);
-        m_ui->doubleSpinBoxOrigin2Y->setMaximum(height);
-        m_ui->doubleSpinBoxOrigin3Y->setMaximum(height);
-    }*/
-}
-
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
+}
+
+void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
+{
+    //qLogD << "real time laser power: " << value;
+}
+
+void LaserControllerWindow::onFloatDualEditSliderLowerValueChanged(qreal value)
+{
+    Config::SystemRegister::laserMinPowerItem()->setValue(value);
+}
+
+void LaserControllerWindow::onFloatDualEditSliderHigherValueChanged(qreal value)
+{
+    Config::SystemRegister::laserMaxPowerItem()->setValue(value);
+}
+
+void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value)
+{
+    bool ok;
+    qreal lower = value.toReal(&ok);
+    if (!ok)
+        return;
+    m_ui->floatEditDualSliderLaserRange->blockSignals(true);
+    m_ui->floatEditDualSliderLaserRange->setLowerValue(lower);
+    m_ui->floatEditDualSliderLaserRange->blockSignals(false);
+}
+
+void LaserControllerWindow::onLaserMaxPowerChanged(const QVariant& value)
+{
+    bool ok;
+    qreal higher = value.toReal(&ok);
+    if (!ok)
+        return;
+    m_ui->floatEditDualSliderLaserRange->blockSignals(true);
+    m_ui->floatEditDualSliderLaserRange->setHigherValue(higher);
+    m_ui->floatEditDualSliderLaserRange->blockSignals(false);
 }
 
 void LaserControllerWindow::onCreatSpline()

@@ -54,6 +54,11 @@ public:
     bool readUserRegisters();
     bool readSystemRegisters();
 
+    bool readUserRegister(int address);
+    bool writeUserReigister(int address, const QVariant& value);
+    bool readSystemRegister(int address);
+    bool writeSystemReigister(int address, const QVariant& value);
+
 public slots:
     void load();
     void unload();
