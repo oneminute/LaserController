@@ -297,6 +297,7 @@ void Config::loadUiItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxItemByValue(comboBox, item->defaultValue()) : index);
         }
     );
+
 	ConfigItem* gridShapeDistance = group->addConfigItem(
 		"gridShapeDistance",
 		tr("Grid Shape Distance"),

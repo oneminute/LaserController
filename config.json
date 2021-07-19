@@ -326,7 +326,7 @@
         },
         "gridShapeDistance": {
             "defaultValue": 3,
-            "value": 10
+            "value": 6
         },
         "operationButtonHeight": {
             "defaultValue": 60,
