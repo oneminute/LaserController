@@ -34,16 +34,16 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     QList<ConfigItemGroup*> groups;
     groups  
-        //<< Config::General::group
-        //<< Config::Layers::group
+        << Config::General::group
+        << Config::Layers::group
         << Config::Ui::group
-        //<< Config::CuttingLayer::group
-        //<< Config::EngravingLayer::group
-        //<< Config::PathOptimization::group
-        //<< Config::Export::group
-        //<< Config::Device::group
-        //<< Config::UserRegister::group
-        //<< Config::SystemRegister::group
+        << Config::CuttingLayer::group
+        << Config::EngravingLayer::group
+        << Config::PathOptimization::group
+        << Config::Export::group
+        << Config::Device::group
+        << Config::UserRegister::group
+        << Config::SystemRegister::group
         ;
 
     for (ConfigItemGroup* group : groups)
