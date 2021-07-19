@@ -152,24 +152,27 @@ ConfigItem::ConfigItem(
     d->storeType = storeType;
 
     switch (d->dataType)
-        {
-        case DT_BOOL:
-            d->inputWidgetType = IWT_CheckBox;
-            break;
-        case DT_FLOAT:
-        case DT_DOUBLE:
-        case DT_REAL:
-            d->inputWidgetType = IWT_FloatEditSlider;
-            break;
-        case DT_STRING:
-            d->inputWidgetType = IWT_LineEdit;
-            break;
-        case DT_DATETIME:
-            d->inputWidgetType = IWT_DateTimeEdit;
-            break;
-        default:
-            d->inputWidgetType = IWT_Unknown;
-        }
+    {
+    case DT_INT:
+        d->inputWidgetType = IWT_EditSlider;
+        break;
+    case DT_BOOL:
+        d->inputWidgetType = IWT_CheckBox;
+        break;
+    case DT_FLOAT:
+    case DT_DOUBLE:
+    case DT_REAL:
+        d->inputWidgetType = IWT_FloatEditSlider;
+        break;
+    case DT_STRING:
+        d->inputWidgetType = IWT_LineEdit;
+        break;
+    case DT_DATETIME:
+        d->inputWidgetType = IWT_DateTimeEdit;
+        break;
+    default:
+        d->inputWidgetType = IWT_Unknown;
+    }
 }
 
 ConfigItem::~ConfigItem()
