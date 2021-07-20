@@ -1,6 +1,7 @@
 #ifndef LASERCONTROLLERWINDOW_H
 #define LASERCONTROLLERWINDOW_H
 
+#include <DockManager.h>
 #include <QObject>
 #include <QMainWindow>
 #include <QScopedPointer>
@@ -14,17 +15,17 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
 
-class QWidget;
 class LaserViewer;
 class LaserScene;
 class QComboBox;
+class QDoubleSpinBox;
 class QLabel;
-class QTreeWidgetItem;
 class QPushButton;
 class QGridLayout;
-class QDoubleSpinBox;
-class QToolButton;
 class QRadioButton;
+class QToolButton;
+class QTreeWidgetItem;
+class QWidget;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -94,6 +95,7 @@ protected slots:
 
     void onActionShowMainCardInfo(bool checked = false);
     void onActionTemporaryLicense(bool checked = false);
+    void onActionAbout(bool checked = false);
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -102,6 +104,7 @@ protected slots:
     void onMainCardActivated();
 
     void onWindowCreated();
+    virtual void closeEvent(QCloseEvent* event) override;
 
     void onEnterDeviceUnconnectedState();
     void onEnterDeviceConnectedState();
@@ -160,6 +163,8 @@ signals:
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
+
+    ads::CDockManager* m_dockManager;
     LaserViewer* m_viewer;
     LaserScene* m_scene;
     QComboBox* m_comboBoxScale;

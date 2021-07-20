@@ -50,6 +50,8 @@ set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
 configure_file(${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tlh.in VGCoreAuto.tlh)
 
 add_subdirectory(src/widget/LRWidgets)
+add_subdirectory(src/widget/ADS)
+
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
     src
@@ -208,6 +210,7 @@ set(LINK_LIBRARIES
     glog::glog
     ${GFLAGS_LIBRARIES}
     LRWidgets
+    qtadvanceddocking
 )
 
 if(ANDROID)

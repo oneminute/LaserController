@@ -43,7 +43,6 @@ public:
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
     PageInformation pageInfo;
-    //qreal scale;
     bool blockSignals;
     bool isOpened;
     LaserScene* scene;

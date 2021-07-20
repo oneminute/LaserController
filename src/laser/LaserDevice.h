@@ -59,6 +59,8 @@ public:
     bool readSystemRegister(int address);
     bool writeSystemReigister(int address, const QVariant& value);
 
+    void showLibraryVersion();
+
 public slots:
     void load();
     void unload();

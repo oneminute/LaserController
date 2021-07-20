@@ -1,6 +1,11 @@
 ﻿#include "LaserControllerWindow.h"
 #include "ui_LaserControllerWindow.h"
 
+#include <DockAreaTabBar.h>
+#include <DockAreaTitleBar.h>
+#include <DockAreaWidget.h>
+#include <DockComponentsFactory.h>
+#include <FloatingDockContainer.h>
 #include <QErrorMessage>
 #include <QFileDialog>
 #include <QImage>
@@ -40,6 +45,8 @@
 #include "widget/LayerButton.h"
 #include "widget/PropertiesHelperManager.h"
 
+using namespace ads;
+
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::LaserControllerWindow)
@@ -50,6 +57,19 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	, m_windowTitle("Laser Controller")
 {
     m_ui->setupUi(this);
+
+    // initialize Dock Manager
+    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
+    CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+    m_dockManager = new CDockManager(this);
+
+    // create center widget
+    CDockWidget* centralDockWidget = new CDockWidget(tr("work space"));
+
+    m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
+    m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
+
     setDockNestingEnabled(true);
 
     QList<QColor> colors;
@@ -70,8 +90,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         << QColor(qRgb(0, 0, 196))
         << QColor(qRgb(196, 48, 172));
 
-    m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
-    m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
 
 	// 初始化整个工作区。这是一个网格布局的9宫格。
 
@@ -490,6 +508,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
+	connect(m_ui->actionAbout, &QAction::triggered, this, &LaserControllerWindow::onActionAbout);
 
     connect(m_ui->toolButtonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
     connect(m_ui->toolButtonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
@@ -1429,6 +1448,11 @@ void LaserControllerWindow::onActionTemporaryLicense(bool checked)
     }
 }
 
+void LaserControllerWindow::onActionAbout(bool checked)
+{
+    LaserApplication::device->showLibraryVersion();
+}
+
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
@@ -1479,6 +1503,12 @@ void LaserControllerWindow::onMainCardActivated()
 
 void LaserControllerWindow::onWindowCreated()
 {
+}
+
+void LaserControllerWindow::closeEvent(QCloseEvent* event)
+{
+    m_dockManager->deleteLater();
+    QMainWindow::closeEvent(event);
 }
 
 void LaserControllerWindow::onEnterDeviceUnconnectedState()

@@ -146,6 +146,8 @@
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionContactUs"/>
     <addaction name="actionTemporaryLicense"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>

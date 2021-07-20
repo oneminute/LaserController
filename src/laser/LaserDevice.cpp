@@ -371,6 +371,12 @@ bool LaserDevice::writeSystemReigister(int address, const QVariant& value)
     return d->driver->writeSysParamToCard(pair);
 }
 
+void LaserDevice::showLibraryVersion()
+{
+    Q_D(LaserDevice);
+    d->driver->showAboutWindow();
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);
