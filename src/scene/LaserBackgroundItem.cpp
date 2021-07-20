@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QList>
+#include <QtCore/qmath.h>  
 
 #include "widget//LaserViewer.h"
 #include "common/common.h"
@@ -31,6 +32,7 @@ void LaserBackgroundItem::paint(QPainter * painter, const QStyleOptionGraphicsIt
 	//网格
 	drawGrids(*painter);
 }
+//重新计算node值
 void LaserBackgroundItem::onChangeGrids()
 {
 	QGraphicsScene* scene = this->scene();
@@ -53,13 +55,31 @@ void LaserBackgroundItem::onChangeGrids()
 	if (!m_gridSecondNodeYList.isEmpty()) {
 		m_gridSecondNodeYList.clear();
 	}
-	qreal intervalH = Global::mm2PixelsYF(10);
-	qreal intervalV = Global::mm2PixelsXF(10);
+	qreal spacing = Config::Ui::visualGridSpacing();//mm
+	qreal intervalH = Global::mm2PixelsYF(spacing);
+	qreal intervalV = Global::mm2PixelsXF(spacing);
 	qreal width = this->boundingRect().width();
 	qreal height = this->boundingRect().height();
-	int sizeH = height / intervalH;
-	int sizeV = width / intervalV;
+	qreal sH = height / intervalH;
+	qreal sV = width / intervalV;
+
+	int sizeH = qCeil(sH);
+	int sizeV = qCeil(sV);
+	//计算差值是否超过2个像素
+	qreal diffH = (sH - qFloor(sH)) * intervalH * view->zoomValue();
+	qreal diffV = (sV - qFloor(sV)) * intervalV * view->zoomValue();
+	if (diffH < 2) {
+		sizeH -= 1;
+	}
+	if (diffV < 2) {
+		sizeV -= 1;
+	}
+	qDebug() <<"diffH: " << diffH ;
+	qDebug() <<"diffV: " << diffV ;
 	int count = 10;
+	//二级网格大小
+	//qreal intervalH_1 = intervalH * 0.1;
+	//qreal intervalV_1 = intervalV * 0.1;
 	for (int i = 0; i <= sizeH; i++) {
 		//painter.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
 		qreal startY = intervalH * i;
@@ -67,7 +87,8 @@ void LaserBackgroundItem::onChangeGrids()
 
 		if (view->zoomValue() > 2 && i < sizeH) {
 			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
-			for (int ic = 1; ic < count; ic++) {
+			//int count = 
+			for (int ic = 0; ic < count; ic++) {
 				qreal intervalH_1 = intervalH / count;
 				qreal y_1 = startY + intervalH_1 * ic;
 				m_gridSecondNodeYList.append(y_1);
@@ -175,7 +196,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point)
 	if (m_gridNodeYList.isEmpty() || m_gridNodeXList.isEmpty()) {
 		return false;
 	}
-	//pont从view到document转换
+	//pont从scene到document转换
 	QPointF documentPoint = mapFromScene(point);
 	qreal distance = Config::Ui::gridShapeDistance();
 	qreal valueX = distance / view->zoomValue();//5个像素
@@ -209,7 +230,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point)
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
-				//node 从document转换到view
+				//node 从document转换到scene
 				point = mapToScene(node);
 				return true;
 			}
@@ -219,7 +240,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point)
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
-				//node 从document转换到view
+				//node 从document转换到scene
 				point = mapToScene(node);
 				return true;
 			}

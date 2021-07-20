@@ -11,7 +11,7 @@ public:
 
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-	void onChangeGrids();
+	void onChangeGrids();//重新计算node值
 	void drawGrids(QPainter& painter);
 	bool detectGridNode(QPointF& point);//检测绘制时的起点或终点是否应该被设为网格中的node点
 private:

@@ -633,20 +633,93 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 
 void LaserViewer::wheelEvent(QWheelEvent* event)
 {
+	//verticalScrollBar()->setSliderPosition(0);
+	//horizontalScrollBar()->setSliderPosition(0);
+	horizontalScrollBar()->setEnabled(false);
+	verticalScrollBar()->setEnabled(false);
+	//setScroll
 	QGraphicsView::wheelEvent(event);
+	if (!m_scene) {
+		return;
+	}
 	if (!m_scene->document()) {
 		return;
 	}
     //qreal wheelZoomValue = qPow(1.2, event->delta() / 240.0);
     qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
     //qLogD << "wheelZoomValue: " << wheelZoomValue << ", delta: " << event->delta();
-    zoomBy(wheelZoomValue);
-	//更新网格
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+	if (!backgroundItem) {
+		return;
+	}
+	/*setMouseTracking(true);//跟踪鼠标位置
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏水平条
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏竖条
+	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+	setResizeAnchor(QGraphicsView::AnchorViewCenter);*/
+	QPointF mousePoint1 = backgroundItem->mapFromScene(mapToScene(event->pos()));
+	//QPointF mousePoint1 = mapToParent(event->pos());
+	
+	//QPointF p1 = mapToScene(event->pos());
+	QPointF p1 = backgroundItem->pos();
+    zoomBy(wheelZoomValue);
+	qDebug() << "this->pos(): " << this->sceneRect();
+	this->pos();
+	QPointF p2 = mapToScene(event->pos());
+	QPointF p = p1 - p2;
+	QPointF diff = mapFromScene(p1);
+	//backgroundItem->setPos(p1);
+	QTransform t = backgroundItem->transform();
+	QTransform t1;
+	//t1.scale(factor, factor);
+	QTransform t2;
+	t2.translate(diff.x(), diff.y());
+	//backgroundItem->setTransform(t*t2);
+	QMap<QString, LaserPrimitive*> map = m_scene->document()->primitives();
+	for (int i = 0; i < map.values().size(); i++) {
+		LaserPrimitive* item = map.values()[i];
+		QTransform t = item->transform();
+		//QTransform t1;
+		//t1.scale(factor, factor);
+		//QTransform t2;
+		//QPointF mousePos = mapFromGlobal(QCursor().pos());
+		//QPointF newMousePos = t1.map(mousePos);
+		//QPointF diff = mousePos - newMousePos;
+
+		//t2.translate(diff.x(), diff.y());
+		//item->setTransform(t * t2);
+	}
+	//this->translate(50, 50);
+	
+	QPointF mousePoint2 = backgroundItem->mapFromScene(mapToScene(event->pos()));
+	//QPointF mousePoint2 = mapToParent(event->pos());
+	//QTransform t = backgroundItem->transform();
+	//QTransform t1;
+	//QPointF diff = mousePoint2 - mousePoint1;
+	//QPointF diff = mapFromScene(backgroundItem->mapToScene(mousePoint1 - mousePoint2));
+	//this->ensureVisible(event->pos().x(), event->pos().y(), 0, 0);
+	//this->scrollContentsBy(50, 50);
+	this->viewport()->repaint();
+	//this->viewport()->move(this->viewport()->pos() + diff.toPoint());
+	//QPointF diff = mapToParent(mapFromScene(backgroundItem->mapToScene(mousePoint1 - mousePoint2)));
+	//qDebug() << "this->pos(): " << this->pos();
+	//qDebug() << "diff.toPoint(): " << diff.toPoint();
+	//this->move(this->pos() + diff.toPoint());
+	//this->setContentsMargins(100, 100, 0, 0);
+	//(QFrame::NoFrame);//无Frame边框
+	//setWindowFlags(Qt::FramelessWindowHint);//无边框
+	
+	/*t.translate(diff. x(), diff.y());
+	//t1.scale(factor, factor);
+	backgroundItem->setTransform(t * t1);*/
+	/*qDebug() << "p1: " << mousePoint1;
+	qDebug() << "p2: " << mousePoint2;*/
+	//更新网格
+	backgroundItem->onChangeGrids();
+	/*LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (backgroundItem) {
 		backgroundItem->onChangeGrids();
-	}
-	
+	}*/
 }
 
 void LaserViewer::zoomBy(qreal factor)
@@ -654,9 +727,27 @@ void LaserViewer::zoomBy(qreal factor)
     const qreal currentZoom = zoomValue();
     if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
         return;
-    scale(factor, factor);
-    //m_scene->document()->setScale(factor);
-    //qDebug() << "scale:" << m_scene->document()->scale();
+	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+	if (!backgroundItem) {
+		return;
+	}
+	
+	QTransform t = backgroundItem->transform();
+	QTransform t1;
+	t1.scale(factor, factor);
+	QTransform t2;
+	QPointF mousePos = backgroundItem->mapFromScene( mapToScene(mapFromGlobal(QCursor().pos())));
+
+	QPointF newMousePos = t1.map(mousePos);
+	QPointF diff = mousePos.toPoint() - newMousePos.toPoint();
+	
+	//t2.translate(diff.x(), diff.y());
+	setTransform(t * t1 * t2);
+	backgroundItem->setTransform(t * t1 * t2);
+	//scale(factor, factor);
+	
+	
+    
     emit zoomChanged(mapFromScene(m_scene->backgroundItem()->pos()));
     emit scaleChanged(zoomValue());
 }
@@ -962,6 +1053,11 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
         m_creatingRectEndPoint = mapToScene(m_mousePoint);
+		//网格点吸附判断
+		LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+		if (backgroundItem) {
+			backgroundItem->detectGridNode(m_creatingRectEndPoint);
+		}
 		m_creatingRectBeforeShiftPoint = m_creatingRectEndPoint;
 		this->viewport()->repaint();
 		//QGraphicsView::mouseMoveEvent(event);
@@ -1055,10 +1151,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
+		
 		if (checkTwoPointEqueal(m_creatingRectStartPoint, m_creatingRectEndPoint)) {
 			emit readyRectangle();
 			return;
 		}
+		
         QRectF rect(m_creatingRectStartPoint, m_creatingRectEndPoint);
         LaserRect* rectItem = new LaserRect(rect, m_scene->document());
         m_scene->addLaserPrimitive(rectItem);
@@ -1410,6 +1508,7 @@ qreal LaserViewer::bottomScaleMirror(qreal rate, qreal y)
 
 qreal LaserViewer::zoomValue() const
 {
+	
     return transform().m11();
 }
 
@@ -1422,10 +1521,16 @@ void LaserViewer::setZoomValue(qreal zoomValue)
 
 void LaserViewer::init()
 {
-    setRubberBandSelectionMode(Qt::ItemSelectionMode::IntersectsItemBoundingRect);
+    /*setRubberBandSelectionMode(Qt::ItemSelectionMode::IntersectsItemBoundingRect);
     setInteractive(true);
+	setDragMode(QGraphicsView::NoDrag);
     setMouseTracking(true);
-
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	setResizeAnchor(AnchorUnderMouse);
+	setInteractive(true);
+	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);*/
+	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 
     ADD_TRANSITION(documentSelectionState, documentIdleState, this, &LaserViewer::cancelSelecting);

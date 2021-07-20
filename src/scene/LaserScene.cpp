@@ -7,13 +7,13 @@
 #include "widget/LaserViewer.h"
 
 #include<QGraphicsSceneMouseEvent>
+#include<QGraphicsSceneWheelEvent>
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
     , m_doc(nullptr)
 	, m_background(nullptr)
 {
-
 }
 
 LaserScene::~LaserScene()
@@ -38,13 +38,16 @@ void LaserScene::updateDocument(LaserDocument * doc)
     qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
     m_background = new LaserBackgroundItem(m_doc->pageBounds());
 	addItem(m_background);
-	//m_background = qgraphicsitem_cast<LaserBackgroundItem*> (addRect(m_doc->pageBounds(), QPen(Qt::black, 1.0f, Qt::SolidLine), QBrush(Qt::white)));
-	setSceneRect(m_doc->pageBounds());
+	//setSceneRect(m_doc->pageBounds());
+	setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
+	//setSceneRect(QRectF(QPointF(0, 0), QPointF(0, 0)));
+	
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {
         this->addItem(i.value());
     }
+	
 }
 
 void LaserScene::clearDocument(bool delDoc)
@@ -158,6 +161,7 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 			return false;//scene 没有过滤掉此事件，继续向item传递， true则过滤掉了
 		}
 	}
+	
 	
 	return QGraphicsScene::eventFilter(watched, event);
 }
