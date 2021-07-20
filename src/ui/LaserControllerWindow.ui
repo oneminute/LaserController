@@ -2204,6 +2204,14 @@
     <string>Apply for temporary license</string>
    </property>
   </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="toolTip">
+    <string>About</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

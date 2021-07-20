@@ -59,8 +59,9 @@ bool LaserApplication::initialize()
 	Global::unit = static_cast<SizeUnit>(Config::General::unit());
 
     QTranslator translator;
-    //QLocale locale(QLocale::Config::GeneralLanguage());
-    QLocale locale(QLocale::Chinese);
+    QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
+    //QLocale locale(QLocale::Chinese);
+    qLogD << "language code: " << Config::General::language() << ", " << QLocale::Chinese;
     qLogD << "language name: " << QLocale::languageToString(locale.language());
     if (translator.load(locale, applicationName(), QLatin1String("_"), QLatin1String("translations")))
     {
@@ -76,6 +77,7 @@ bool LaserApplication::initialize()
     }
 
     QLocale::setDefault(locale);
+    Config::load();
 
     QFile file("theme/Dark.qss");
     if (file.open(QFile::ReadOnly | QFile::Text))

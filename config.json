@@ -356,7 +356,7 @@
     "userRegister": {
         "accMode": {
             "defaultValue": 0,
-            "value": 4
+            "value": 0
         },
         "backlashXInterval": {
             "defaultValue": 0,

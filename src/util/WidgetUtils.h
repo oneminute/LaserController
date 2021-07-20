@@ -7,7 +7,9 @@ class QComboBox;
 
 namespace widgetUtils
 {
-    int findComboBoxItemByValue(QComboBox* widget, const QVariant& value);
+    int findComboBoxIndexByValue(QComboBox* widget, const QVariant& value);
+
+    QString findComboBoxStringByValue(QComboBox* widget, const QVariant& value);
 }
 
 #endif // WIDGETUTILS_H
