@@ -99,11 +99,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     viewHoriBottomLayout->setSpacing(0);
     viewHoriBottomLayout->setMargin(0);
     viewHoriBottomLayout->addWidget(m_comboBoxScale);
-    viewHoriBottomLayout->addWidget(m_viewer->horizontalScrollBar());
+    //viewHoriBottomLayout->addWidget(m_viewer->horizontalScrollBar());
     viewHoriBottomLayout->setStretch(0, 0);
     viewHoriBottomLayout->setStretch(1, 1);
 	m_ui->gridLayout->setSpacing(0);
-    m_ui->gridLayout->addWidget(const_cast<QScrollBar*>(m_viewer->verticalScrollBar()), 0, 2, 2, 1);
+    //m_ui->gridLayout->addWidget(const_cast<QScrollBar*>(m_viewer->verticalScrollBar()), 0, 2, 2, 1);
     m_ui->gridLayout->addLayout(viewHoriBottomLayout, 2, 0, 1, 2);
 	m_ui->horizontal_ruler->setViewer(m_viewer);
 	
@@ -1311,6 +1311,14 @@ void LaserControllerWindow::onActionSettings(bool checked)
 {
     ConfigDialog dialog;
     dialog.exec();
+	//关闭窗口
+	if (m_scene) {
+		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
+		if (backgroudItem) {
+			backgroudItem->onChangeGrids();
+		}
+	}
+	
 }
 
 void LaserControllerWindow::onActionDeviceSettings(bool checked)

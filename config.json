@@ -326,7 +326,7 @@
         },
         "gridShapeDistance": {
             "defaultValue": 3,
-            "value": 6
+            "value": 9
         },
         "operationButtonHeight": {
             "defaultValue": 60,
@@ -347,6 +347,10 @@
         "toolButtonSize": {
             "defaultValue": 32,
             "value": 32
+        },
+        "visualGridSpacing": {
+            "defaultValue": 3,
+            "value": 10
         }
     },
     "userRegister": {

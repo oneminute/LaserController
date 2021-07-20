@@ -101,7 +101,8 @@ public:
 			CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
 			CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
 			CONFIG_ITEM(ui, gridContrast, int, toInt)
-			CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble);
+			CONFIG_ITEM(ui, visualGridSpacing, qreal, toDouble);
+			CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
 
     private:
         friend class Config;

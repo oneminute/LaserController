@@ -306,7 +306,16 @@ void Config::loadUiItems()
 	);
 	gridShapeDistance->setInputWidgetProperty("minimum", 0);
 	gridShapeDistance->setInputWidgetProperty("maximum", 10);
+
 	
+	ConfigItem* visualGridSpacing = group->addConfigItem(
+		"visualGridSpacing",
+		tr("Visual Grid Spacing"),
+		tr("(mm)"),
+		3
+	);
+	visualGridSpacing->setInputWidgetProperty("minimum", 0);
+	visualGridSpacing->setInputWidgetProperty("maximum", 10);
 }
 
 void Config::loadCuttingLayerItems()
