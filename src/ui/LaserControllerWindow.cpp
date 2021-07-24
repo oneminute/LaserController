@@ -59,16 +59,18 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->setupUi(this);
 
     // initialize Dock Manager
-    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
-    CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
-    CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
-    m_dockManager = new CDockManager(this);
+    //CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    //CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
+    //CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+    //m_dockManager = new CDockManager(this);
 
     // create center widget
-    CDockWidget* centralDockWidget = new CDockWidget(tr("work space"));
+    //CDockWidget* centralDockWidget = new CDockWidget(tr("work space"));
 
     m_viewer = reinterpret_cast<LaserViewer*>(m_ui->graphicsView);
     m_scene = reinterpret_cast<LaserScene*>(m_viewer->scene());
+	m_viewer->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+	m_viewer->setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);
 
     setDockNestingEnabled(true);
 
@@ -118,8 +120,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     viewHoriBottomLayout->setMargin(0);
     viewHoriBottomLayout->addWidget(m_comboBoxScale);
     //viewHoriBottomLayout->addWidget(m_viewer->horizontalScrollBar());
+	m_viewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_viewer->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     viewHoriBottomLayout->setStretch(0, 0);
     viewHoriBottomLayout->setStretch(1, 1);
+	
 	m_ui->gridLayout->setSpacing(0);
     //m_ui->gridLayout->addWidget(const_cast<QScrollBar*>(m_viewer->verticalScrollBar()), 0, 2, 2, 1);
     m_ui->gridLayout->addLayout(viewHoriBottomLayout, 2, 0, 1, 2);
@@ -1515,7 +1520,7 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    m_dockManager->deleteLater();
+    //m_dockManager->deleteLater();
     QMainWindow::closeEvent(event);
 }
 
@@ -1842,7 +1847,7 @@ void LaserControllerWindow::selectedChange()
 		if (rect.width() == 0 && rect.height() == 0) {
 			return;
 		}
-		QGraphicsRectItem* backgroudItem = m_scene->backgroundItem();
+		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
 		if (!backgroudItem) {
 			return;
 		}
@@ -2409,6 +2414,19 @@ void LaserControllerWindow::createNewDocument()
 	doc->setPageInformation(page);
 	doc->open();
 	initDocument(doc);
+	
+	LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+	if (m_viewer) {
+		//m_viewer->setZoomValue(1.0);
+		//m_viewer->centerOn(0, 0);
+		QRectF rect = m_scene->document()->pageBounds();
+		m_scene->setSceneRect(rect);
+		m_viewer->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+		m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+		
+		m_viewer->setTransform(QTransform());
+		m_viewer->centerOn(rect.center());
+	}
 	//创建网格
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (backgroundItem) {

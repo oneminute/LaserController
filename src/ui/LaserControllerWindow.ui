@@ -39,16 +39,16 @@
        <bool>true</bool>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
       <property name="transformationAnchor">
-       <enum>QGraphicsView::AnchorUnderMouse</enum>
+       <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
       <property name="resizeAnchor">
-       <enum>QGraphicsView::AnchorUnderMouse</enum>
+       <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
      </widget>
     </item>
@@ -1948,6 +1948,9 @@
    </property>
    <property name="text">
     <string>Delete Primitive</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
   <action name="actionMoveLayerUp">

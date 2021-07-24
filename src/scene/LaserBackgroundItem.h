@@ -2,7 +2,8 @@
 #define LASERBACKGROUNDITEM_H
 
 #include <QGraphicsRectItem>
-class LaserBackgroundItem : public QGraphicsRectItem
+#include <QGraphicsItemGroup>
+class LaserBackgroundItem : public QGraphicsItemGroup
 {
 public:
 	explicit LaserBackgroundItem(QGraphicsItem *parent = nullptr);
@@ -14,11 +15,13 @@ public:
 	void onChangeGrids();//重新计算node值
 	void drawGrids(QPainter& painter);
 	bool detectGridNode(QPointF& point);//检测绘制时的起点或终点是否应该被设为网格中的node点
+	QRectF rect();
 private:
 	QList<qreal> m_gridNodeXList;
 	QList<qreal> m_gridNodeYList;
 	QList<qreal> m_gridSecondNodeXList;
 	QList<qreal> m_gridSecondNodeYList;
+	QGraphicsRectItem* m_rectItem;
 
 };
 #endif // LASERBACKGROUNDITEM_H
