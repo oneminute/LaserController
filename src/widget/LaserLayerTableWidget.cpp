@@ -1,9 +1,10 @@
 #include "LaserLayerTableWidget.h"
 
+#include <QBoxLayout>
+#include <QCheckBox>
+#include <QHeaderView>
 #include <QLabel>
 #include <QPushButton>
-#include <QCheckBox>
-#include <QBoxLayout>
 
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
@@ -12,7 +13,33 @@ LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
     : QTableWidget(parent)
     , m_doc(nullptr)
 {
+    QStringList columnHeaders;
+    columnHeaders 
+        << tr("#")
+        << tr("Layer")
+        << tr("Mode")
+        << tr("Count")
+        << tr("Speed/Power")
+        << tr("Output")
+        << tr("Visible");
 
+    setColumnCount(7);
+    setHorizontalHeaderLabels(columnHeaders);
+
+    // initialize layers Tree Widget
+    setColumnWidth(0, 45);
+    setColumnWidth(1, 30);
+    setColumnWidth(2, 75);
+    setColumnWidth(3, 45);
+    setColumnWidth(4, 75);
+    setColumnWidth(5, 30);
+    setColumnWidth(6, 30);
+
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setShowGrid(false);
+    verticalHeader()->setVisible(false);
 }
 
 LaserLayerTableWidget::~LaserLayerTableWidget()

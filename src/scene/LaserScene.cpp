@@ -158,7 +158,7 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 	else if (event->type() == QEvent::GraphicsSceneMouseMove) {
 		if (name == "LaserBitmap") {
 			m_mouseMoveBlock = true;
-			return false;//scene Ã»ÓĞ¹ıÂËµô´ËÊÂ¼ş£¬¼ÌĞøÏòitem´«µİ£¬ trueÔò¹ıÂËµôÁË
+			return false;//scene Ã»ï¿½Ğ¹ï¿½ï¿½Ëµï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½itemï¿½ï¿½ï¿½İ£ï¿½ trueï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½
 		}
 	}
 	

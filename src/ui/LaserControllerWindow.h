@@ -15,8 +15,17 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
 
+namespace ads 
+{
+    class CDockAreaWidget;
+}
+
+class FloatEditDualSlider;
+class FloatEditSlider;
+class LaserLayerTableWidget;
 class LaserViewer;
 class LaserScene;
+class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QLabel;
@@ -24,8 +33,10 @@ class QPushButton;
 class QGridLayout;
 class QRadioButton;
 class QToolButton;
+class QTreeWidget;
 class QTreeWidgetItem;
 class QWidget;
+class RulerWidget;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -36,11 +47,17 @@ public:
 
     void moveLaser(const QVector3D& delta, bool relative = true, const QVector3D& abstractDest = QVector3D());
     FinishRun finishRun();
-    void setFinishRun(const FinishRun& finishRun);
 
 public slots:
     void handleSecurityException(int code, const QString& message);
 	
+protected:
+    void createCentralDockPanel();
+    void createLayersDockPanel();
+    void createCameraDockPanel();
+    void createOperationsDockPanel();
+    void createOutlineDockPanel();
+    void createMovementDockPanel();
 
 protected slots:
     void onActionImportSVG(bool checked = false);
@@ -129,8 +146,6 @@ protected slots:
     void lightOffLaser();
     void readMachiningOrigins(bool checked = false);
     void writeMachiningOrigins(bool checked = false);
-    void readMachiningPower(bool checked = false);
-    void writeMachiningPower(bool checked = false);
     void updatePostEventWidgets(int index);
     void laserBackToMachiningOriginalPoint(bool checked = false);
     void laserResetToOriginalPoint(bool checked = false);
@@ -164,10 +179,87 @@ signals:
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
 
+    // Central Panel widgets
     ads::CDockManager* m_dockManager;
     LaserViewer* m_viewer;
     LaserScene* m_scene;
+    RulerWidget* m_hRuler;
+    RulerWidget* m_vRuler;
     QComboBox* m_comboBoxScale;
+
+    // Layers Panel widgets
+    LaserLayerTableWidget* m_tableWidgetLayers;
+    QToolButton* m_buttonMoveLayerUp;
+    QToolButton* m_buttonMoveLayerDown;
+    QToolButton* m_buttonRemoveLayer;
+    ads::CDockAreaWidget* m_dockAreaLayers;
+
+    // Camera Panel widgets
+    QComboBox* m_comboBoxCameras;
+    QToolButton* m_buttonCameraUpdateOverlay;
+    QToolButton* m_buttonCameraTrace;
+    QToolButton* m_buttonCameraSaveSettings;
+    QCheckBox* m_checkBoxCameraFade;
+    QDoubleSpinBox* m_doubleSpinBoxCameraFadeWidth;
+    QDoubleSpinBox* m_doubleSpinBoxCameraFadeHeight;
+    QCheckBox* m_checkBoxCameraShow;
+    QDoubleSpinBox* m_doubleSpinBoxCameraXShift;
+    QDoubleSpinBox* m_doubleSpinBoxCameraYShift;
+    ads::CDockAreaWidget* m_dockAreaCameras;
+
+    // Operations Panel widgets
+    QToolButton* m_buttonOperationStart;
+    QToolButton* m_buttonOperationPause;
+    QToolButton* m_buttonOperationStop;
+    QToolButton* m_buttonOperationBounding;
+    QToolButton* m_buttonOperationSpotShot;
+    QToolButton* m_buttonOperationReset;
+    QToolButton* m_buttonOperationOrigin;
+    QToolButton* m_buttonOperationOptimize;
+    QComboBox* m_comboBoxStartPosition;
+    FloatEditSlider* m_floatEditSliderLaserPower;
+    FloatEditDualSlider* m_floatEditDualSliderLaserRange;
+    QComboBox* m_comboBoxDevices;
+    QToolButton* m_buttonConnect;
+    QToolButton* m_buttonRefresh;
+    ads::CDockAreaWidget* m_dockAreaOperations;
+
+    // Outline Panel widgets
+    QTreeWidget* m_treeWidgetOutline;
+    ads::CDockAreaWidget* m_dockAreaOutline;
+
+    // Movement Panel widgets
+    QLineEdit* m_lineEditCoordinatesX;
+    QLineEdit* m_lineEditCoordinatesY;
+    QLineEdit* m_lineEditCoordinatesZ;
+    QDoubleSpinBox* m_doubleSpinBoxDistanceX;
+    QDoubleSpinBox* m_doubleSpinBoxDistanceY;
+    QDoubleSpinBox* m_doubleSpinBoxDistanceZ;
+    QToolButton* m_buttonMoveTopLeft;
+    QToolButton* m_buttonMoveTop;
+    QToolButton* m_buttonMoveTopRight;
+    QToolButton* m_buttonMoveLeft;
+    QToolButton* m_buttonMoveToOrigin;
+    QToolButton* m_buttonMoveRight;
+    QToolButton* m_buttonMoveBottomLeft;
+    QToolButton* m_buttonMoveBottom;
+    QToolButton* m_buttonMoveBottomRight;
+    QToolButton* m_buttonMoveUp;
+    QToolButton* m_buttonMoveDown;
+    QComboBox* m_comboBoxPostEvent;
+    QRadioButton* m_radioButtonMachiningOrigin1;
+    QRadioButton* m_radioButtonMachiningOrigin2;
+    QRadioButton* m_radioButtonMachiningOrigin3;
+    QDoubleSpinBox* m_doubleSpinBoxOrigin1X;
+    QDoubleSpinBox* m_doubleSpinBoxOrigin1Y;
+    QDoubleSpinBox* m_doubleSpinBoxOrigin2X;
+    QDoubleSpinBox* m_doubleSpinBoxOrigin2Y;
+    QDoubleSpinBox* m_doubleSpinBoxOrigin3X;
+    QDoubleSpinBox* m_doubleSpinBoxOrigin3Y;
+    QToolButton* m_buttonReadOrigins;
+    QToolButton* m_buttonWriteOrigins;
+    ads::CDockAreaWidget* m_dockAreaMovement;
+
     bool m_created;
     QDir m_tmpDir;
     QString m_currentJson;

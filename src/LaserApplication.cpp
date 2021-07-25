@@ -96,7 +96,7 @@ bool LaserApplication::initialize()
 
     StateController::start();
     mainWindow = new LaserControllerWindow;
-    mainWindow->show();
+    mainWindow->showMaximized();
 
     device->resetDriver(driver);
 

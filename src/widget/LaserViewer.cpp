@@ -48,6 +48,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 
 LaserViewer::~LaserViewer()
 {
+	m_horizontalRuler = m_verticalRuler = nullptr;
 }
 
 void LaserViewer::paintEvent(QPaintEvent* event)
