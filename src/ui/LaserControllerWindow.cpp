@@ -68,10 +68,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->setupUi(this);
 
     // initialize Dock Manager
-    //CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
-    //CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
-    //CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
-    //m_dockManager = new CDockManager(this);
+    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
+    CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+    m_dockManager = new CDockManager(this);
 
     createCentralDockPanel();
     createLayersDockPanel();
