@@ -68,10 +68,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->setupUi(this);
 
     // initialize Dock Manager
-    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
-    CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
-    CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
-    m_dockManager = new CDockManager(this);
+    //CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    //CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
+    //CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+    //m_dockManager = new CDockManager(this);
 
     createCentralDockPanel();
     createLayersDockPanel();
@@ -1913,7 +1913,7 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    m_dockManager->deleteLater();
+    //m_dockManager->deleteLater();
     QMainWindow::closeEvent(event);
 }
 
@@ -2225,7 +2225,7 @@ void LaserControllerWindow::selectedChange()
 		if (rect.width() == 0 && rect.height() == 0) {
 			return;
 		}
-		QGraphicsRectItem* backgroudItem = m_scene->backgroundItem();
+		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
 		if (!backgroudItem) {
 			return;
 		}
@@ -2775,6 +2775,19 @@ void LaserControllerWindow::createNewDocument()
 	page.setHeight(Global::mm2PixelsYF(LaserApplication::device->layoutHeight()));
 	doc->setPageInformation(page);
 	initDocument(doc);
+	
+	LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+	if (m_viewer) {
+		//m_viewer->setZoomValue(1.0);
+		//m_viewer->centerOn(0, 0);
+		QRectF rect = m_scene->document()->pageBounds();
+		m_scene->setSceneRect(rect);
+		m_viewer->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+		m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+		
+		m_viewer->setTransform(QTransform());
+		m_viewer->centerOn(rect.center());
+	}
 	//创建网格
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (backgroundItem) {

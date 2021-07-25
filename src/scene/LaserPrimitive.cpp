@@ -140,8 +140,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
 	QColor color = Qt::blue;
-	QList<QGraphicsView*> views = scene()->views();
-	LaserViewer* view = qobject_cast<LaserViewer*>(views[0]);
+	/*QList<QGraphicsView*> views = scene()->views();
+	LaserViewer* view = qobject_cast<LaserViewer*>(views[0]);*/
 	//painter->setPen(QPen(color, 1, Qt::SolidLine));
     if (d->layer)
     {

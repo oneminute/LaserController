@@ -37,9 +37,12 @@ void LaserScene::updateDocument(LaserDocument * doc)
 
     qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
     m_background = new LaserBackgroundItem(m_doc->pageBounds());
-	addItem(m_background);
-	//setSceneRect(m_doc->pageBounds());
-	setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
+	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
+	setSceneRect(m_doc->pageBounds());
+	//setSceneRect(QRectF(0, 0, 2000, 2000));
+	//setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
+	
+	//m_background->setPos(100, 100);
 	//setSceneRect(QRectF(QPointF(0, 0), QPointF(0, 0)));
 	
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
@@ -67,7 +70,15 @@ void LaserScene::clearDocument(bool delDoc)
 void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
     m_doc->addPrimitive(primitive);
-    addItem(primitive);
+	addItem(primitive);
+	/*if (m_background) {
+		//addItem(primitive);
+		m_background->addToGroup(primitive);
+	}
+	else {
+		addItem(primitive);
+	}*/
+    
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const

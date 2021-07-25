@@ -103,6 +103,8 @@ protected:
 	int setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
     void zoomBy(qreal factor);
+	void resizeEvent(QResizeEvent *event) override;
+
 	
 	//mouse
 	virtual void leaveEvent(QEvent *event) override;
@@ -193,7 +195,8 @@ private:
 	LaserPrimitiveGroup* m_group;
 	bool m_isLeftSelecting = true;//����߿�ʼѡ�����ұ߿�ʼѡ��
 
-	
+	bool m_isFirstPaint = true;
+	QRectF m_fitInRect;
 	
 	friend class LaserScene;
 };

@@ -2,19 +2,33 @@
 #include <QPainter>
 #include <QDebug>
 #include <QList>
+#include <QGraphicsItemGroup>
 #include <QtCore/qmath.h>  
+#include <QTransform>
+#include <QStyleOptionGraphicsItem>
+#include "scene/LaserPrimitive.h"
+
+#include"scene/LaserNode.h"
 
 #include "widget//LaserViewer.h"
 #include "common/common.h"
 #include "common/Config.h"
 LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem *parent) 
-	:QGraphicsRectItem(parent)
+	:QGraphicsItemGroup(parent)
 {
-
+	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
 }
 LaserBackgroundItem::LaserBackgroundItem(const QRectF & rect, QGraphicsItem * parent)
-	: QGraphicsRectItem(rect, parent)
+	: QGraphicsItemGroup(parent)
 {
+	m_rectItem = new QGraphicsRectItem(rect);
+	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
+	//this->setBrush(QBrush(Qt::white));
+	pen.setCosmetic(true);
+	m_rectItem->setPen(pen);
+	addToGroup(m_rectItem);
+	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
+	//setSelected(true);
 }
 LaserBackgroundItem::~LaserBackgroundItem()
 {
@@ -22,20 +36,34 @@ LaserBackgroundItem::~LaserBackgroundItem()
 
 void LaserBackgroundItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
-	//QGraphicsRectItem::paint(painter, option, widget);
+	//QGraphicsItemGroup::paint(painter, option, widget);
 	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
-	this->setBrush(QBrush(Qt::white));
+	//this->setBrush(QBrush(Qt::white));
 	pen.setCosmetic(true);
 	painter->setPen(pen);
-	
-	painter->drawRect(this->rect());
+	//painter->drawRect(this->rect());
+	//QGraphicsItemGroup::setSelected(true);
 	//网格
 	drawGrids(*painter);
+	//QGraphicsItemGroup::paint(painter, option, widget);
+	/*QList<QGraphicsItem*> list = QGraphicsItemGroup::childItems();
+	for (int i = 0; i < list.size(); i++) {
+		LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>( list[i]);
+		QString name = primitive->metaObject()->className();
+		if (name == "LaserRect") {
+			primitive->paint(painter, option, widget);
+			primitive->setSelected(true);
+		}
+		
+	}*/
+	
+	
+	
 }
 //重新计算node值
 void LaserBackgroundItem::onChangeGrids()
 {
-	QGraphicsScene* scene = this->scene();
+	QGraphicsScene* scene = this->QGraphicsItemGroup::scene();
 	if (!scene) {
 		return;
 	}
@@ -43,6 +71,7 @@ void LaserBackgroundItem::onChangeGrids()
 	if (!view) {
 		return;
 	}
+	qreal zoomValue = view->zoomValue();
 	if (!m_gridNodeXList.isEmpty()) {
 		m_gridNodeXList.clear();
 	}
@@ -58,20 +87,20 @@ void LaserBackgroundItem::onChangeGrids()
 	qreal spacing = Config::Ui::visualGridSpacing();//mm
 	qreal intervalH = Global::mm2PixelsYF(spacing);
 	qreal intervalV = Global::mm2PixelsXF(spacing);
-	qreal width = this->boundingRect().width();
-	qreal height = this->boundingRect().height();
+	qreal width = this->rect().width();
+	qreal height = this->rect().height();
 	qreal sH = height / intervalH;
 	qreal sV = width / intervalV;
 
 	int sizeH = qCeil(sH);
 	int sizeV = qCeil(sV);
 	//计算差值是否超过2个像素
-	qreal diffH = (sH - qFloor(sH)) * intervalH * view->zoomValue();
-	qreal diffV = (sV - qFloor(sV)) * intervalV * view->zoomValue();
-	if (diffH < 2) {
+	qreal diffH = (sH - qFloor(sH)) * intervalH * zoomValue;
+	qreal diffV = (sV - qFloor(sV)) * intervalV * zoomValue;
+	if (diffH < 2 && diffH > 0) {
 		sizeH -= 1;
 	}
-	if (diffV < 2) {
+	if (diffV < 2 && diffV > 0) {
 		sizeV -= 1;
 	}
 	qDebug() <<"diffH: " << diffH ;
@@ -84,8 +113,8 @@ void LaserBackgroundItem::onChangeGrids()
 		//painter.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
 		qreal startY = intervalH * i;
 		m_gridNodeYList.append(startY);
-
-		if (view->zoomValue() > 2 && i < sizeH) {
+		
+		if (zoomValue > 2 && i < sizeH) {
 			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
 			//int count = 
 			for (int ic = 0; ic < count; ic++) {
@@ -100,7 +129,7 @@ void LaserBackgroundItem::onChangeGrids()
 		qreal startX = intervalV * j;
 		m_gridNodeXList.append(startX);
 
-		if (view->zoomValue() > 2 && j < sizeV) {
+		if (zoomValue > 2 && j < sizeV) {
 			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
 			for (int jc = 0; jc < count; jc++) {
 				qreal intervalV_1 = intervalV / count;
@@ -113,8 +142,8 @@ void LaserBackgroundItem::onChangeGrids()
 
 void LaserBackgroundItem::drawGrids(QPainter& painter)
 {
-	qreal width = this->boundingRect().width();
-	qreal height = this->boundingRect().height();
+	qreal width = this->rect().width();
+	qreal height = this->rect().height();
 	int contrastValue = Config::Ui::gridContrast();
 	qDebug() << "contrastValue: " << contrastValue;
 	bool isShow = true;
@@ -248,4 +277,9 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point)
 	}
 
 	return false;
+}
+
+QRectF LaserBackgroundItem::rect()
+{
+	return m_rectItem->rect();
 }

@@ -99,7 +99,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	qreal minification = 1 / m_scale;
 	int pow_10 = qLn(minification) / qLn(10);
 	m_flag = qRound(qPow(10, pow_10));//1,10,100,1000...��С����
-	QGraphicsRectItem* backgroundItem = m_viewer->scene()->backgroundItem();
+	LaserBackgroundItem* backgroundItem = m_viewer->scene()->backgroundItem();
 	if (!backgroundItem) {
 		return;
 	}
