@@ -12,6 +12,7 @@
 #include <QLabel> 
 #include <QImage>
 #include <QVector3D>
+#include <QMouseEvent>
 
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserPrimitive.h"
@@ -46,6 +47,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     Global::dpiY = logicalDpiY();
 	
 	m_fitInRect = QRectF(0, 0, 0, 0);
+	
 }
 
 LaserViewer::~LaserViewer()
@@ -534,6 +536,10 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 		
 	}
 }
+void LaserViewer::setAnchorPoint(QPointF point)
+{
+	m_anchorPoint = point;
+}
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
 	
@@ -646,7 +652,9 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 
 void LaserViewer::wheelEvent(QWheelEvent* event)
 {
+	
 	QGraphicsView::wheelEvent(event);
+	//
 	if (!m_scene) {
 		return;
 	}
@@ -658,21 +666,26 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 	if (!backgroundItem) {
 		return;
 	}
-	horizontalScrollBar()->setEnabled(false);
-	verticalScrollBar()->setEnabled(false);
-	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-	setResizeAnchor(QGraphicsView::AnchorUnderMouse);
-	setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
-	//fitInView(m_fitInRect, Qt::KeepAspectRatio);
+	//setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+	//horizontalScrollBar()->setEnabled(false);
+	//verticalScrollBar()->setEnabled(false);
+	//setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+	//setInteractive(true);
+	//setTransformationAnchor(QGraphicsView::NoAnchor);
+	//setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+	//setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
 	
-	zoomBy(wheelZoomValue);
+	//fitInView(m_fitInRect, Qt::KeepAspectRatio);
+	//setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+
+	zoomBy(wheelZoomValue, false);
 	this->viewport()->repaint();
 	//更新网格
 	backgroundItem->onChangeGrids();
 	
 }
 
-void LaserViewer::zoomBy(qreal factor)
+void LaserViewer::zoomBy(qreal factor, bool isCenter)
 {
     const qreal currentZoom = zoomValue();
     if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
@@ -681,25 +694,29 @@ void LaserViewer::zoomBy(qreal factor)
 	if (!backgroundItem) {
 		return;
 	}
+	//QPointF point = mapFromGlobal(QCursor::pos());
 	QTransform t = transform();
 	QTransform t1;
 	t1.scale(factor, factor);
 	QTransform t2;
-	QPointF mousePos = mapFromGlobal(QCursor::pos());
-	QPointF newMousePos = t1.map(mousePos);
-	QPointF diff =  mousePos - newMousePos;
-	qDebug() << "transformationAnchor(): " << transformationAnchor();
+	QPointF diff;
+	if (isCenter) {
+		QRectF rect = this->rect();
+		QPointF center = rect.center();
+		center = center - m_anchorPoint;
+		QPointF newCenter = t1.map(center);
+		diff = center - newCenter;
+	}
+	//mouse point is anchor
+	else {
+		QPointF mousePos = mapFromGlobal(QCursor::pos());
+		mousePos = mousePos - m_anchorPoint;
+		QPointF newMousePos = t1.map(mousePos);
+		diff = mousePos - newMousePos;
+	}
 	t2.translate(diff.x(), diff.y());
 	setTransform(t*t1*t2);
-	//m_fitInRect = QRectF(0, 0, m_fitInRect.width(), m_fitInRect.height());
-	//QPointF fitInRectTopLeft = m_fitInRect.topLeft() + diff;
-	//QPointF point = mapFromScene(backgroundItem->mapToScene(backgroundItem->rect().topLeft()));
 	
-	//m_fitInRect = QRect(point.x(), point.y(), m_fitInRect.width() / factor, m_fitInRect.height() / factor);
-	//QPainterPath path;
-	//path.addPolygon(transform().map(m_fitInRect));
-	//m_fitInRect = path.boundingRect();
-	//qDebug() << "m_fitInRect_zoomBy: " << m_fitInRect;
     emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
     emit scaleChanged(zoomValue());
 }
@@ -845,7 +862,15 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 //emit beginSelecting();
             }
         }
-
+		//View Drag Ready
+		else if (StateControllerInst.isInState(StateControllerInst.documentViewDragReadyState())) {
+			
+			QPixmap cMap(":/ui/icons/images/dragging_hand.png");
+			this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
+			m_lastViewDragPoint = event->pos();
+			
+			emit beginViewDraging();
+		}
         //Rect
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectReadyState()))
         {
@@ -896,6 +921,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             creatTextEdit();
             emit creatingText();
         }
+		else {
+			QGraphicsView::mousePressEvent(event);
+			//setInteractive(false);
+		}
     }
 }
 
@@ -1027,6 +1056,19 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 		//QGraphicsView::mouseMoveEvent(event);
         
     }
+	//View Draging
+	else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
+		//QGraphicsView::mouseMoveEvent(event);
+		//QPixmap cMap(":/ui/icons/images/dragging_hand.png");
+		//this->setCursor(cMap.scaled(32, 32, Qt::KeepAspectRatio));
+		QPointF viewDragPoint = event->pos();
+		QPointF diff = viewDragPoint - m_lastViewDragPoint;
+		QTransform t = transform();
+		QTransform t1;
+		t1.translate(diff.x(), diff.y());
+		setTransform(t * t1);
+		m_lastViewDragPoint = viewDragPoint;
+	}
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
         m_creatingRectEndPoint = mapToScene(m_mousePoint);
@@ -1089,7 +1131,11 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
         m_creatingSplineMousePos = event->pos();
 
-    }  
+	}
+	else {
+		//setAnchorPoint(mapFromScene(QPointF(0, 0)));
+	}
+	
     QPointF pos = mapToScene(m_mousePoint);
     emit mouseMoved(pos);
 }
@@ -1129,7 +1175,14 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		m_radians = 0;
         emit endSelectedEditing();
     }
-
+	//View Drag Ready
+	else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
+		//setInteractive(true);
+		QGraphicsView::mouseReleaseEvent(event);
+		QPixmap cMap(":/ui/icons/images/drag_hand.png");
+		this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
+		emit endViewDraging();
+	}
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
 		
@@ -1275,6 +1328,27 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 	//QGraphicsView::mouseReleaseEvent(event);
 }
 
+void LaserViewer::dragEnterEvent(QDragEnterEvent * event)
+{
+	QGraphicsView::dragEnterEvent(event);
+	qDebug() << event->pos();
+}
+
+void LaserViewer::dragLeaveEvent(QDragLeaveEvent * event)
+{
+	QGraphicsView::dragLeaveEvent(event);
+}
+
+void LaserViewer::dragMoveEvent(QDragMoveEvent * event)
+{
+	QGraphicsView::dragMoveEvent(event);
+}
+
+void LaserViewer::dropEvent(QDropEvent * event)
+{
+	QGraphicsView::dropEvent(event);
+}
+
 void LaserViewer::keyPressEvent(QKeyEvent* event)
 {
     switch (event->key())
@@ -1323,12 +1397,14 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 void LaserViewer::scrollContentsBy(int dx, int dy)
 {
     QGraphicsView::scrollContentsBy(dx, dy);
+	//setAnchorPoint(mapFromScene(0, 0));
     if (m_horizontalRuler != nullptr) {
         m_horizontalRuler->repaint();
     }
     if (m_verticalRuler != nullptr) {
         m_verticalRuler->repaint();
     }
+
 }
 
 bool LaserViewer::isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect)
@@ -1510,11 +1586,16 @@ void LaserViewer::init()
 	setResizeAnchor(AnchorUnderMouse);
 	setInteractive(true);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);*/
-
+	setMouseTracking(true);
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);
-	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	//setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	//setAcceptDrops(true);
+	//setDragMode(QGraphicsView::ScrollHandDrag);
+	horizontalScrollBar()->setEnabled(false);
+	verticalScrollBar()->setEnabled(false);
+	
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 
@@ -1546,8 +1627,22 @@ void LaserViewer::init()
     ADD_TRANSITION(documentPrimitiveSplineCreatingState, documentPrimitiveSplineReadyState, this, SIGNAL(readySpline()));
     ADD_TRANSITION(documentPrimitiveTextReadyState, documentPrimitiveTextCreatingState, this, SIGNAL(creatingText()));
     ADD_TRANSITION(documentPrimitiveTextCreatingState, documentPrimitiveTextReadyState, this, SIGNAL(readyText()));
+	ADD_TRANSITION(documentViewDragReadyState, documentViewDragingState, this, SIGNAL(beginViewDraging()));
+	ADD_TRANSITION(documentViewDragingState, documentViewDragReadyState, this, SIGNAL(endViewDraging()));
+
+	connect(StateController::instance().documentViewDragState(), &QState::entered,this,  [=] {
+
+		QPixmap cMap(":/ui/icons/images/drag_hand.png");
+		this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
+
+	});
+	connect(StateController::instance().documentViewDragState(), &QState::exited,this, [=] {
+		this->setCursor(Qt::ArrowCursor);
+		
+	});
 
 	m_group = nullptr;
+
 }
 
 void LaserViewer::initSpline()
@@ -1895,12 +1990,12 @@ LaserPrimitiveGroup* LaserViewer::group()
 
 void LaserViewer::zoomIn()
 {
-    zoomBy(2);
+    zoomBy(1.1);
 }
 
 void LaserViewer::zoomOut()
 {
-    zoomBy(0.5);
+    zoomBy(0.9);
 }
 
 void LaserViewer::resetZoom()

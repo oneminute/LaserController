@@ -83,6 +83,8 @@ protected slots:
 	bool onActionSave(bool checked = false);
 	bool onActionSaveAs(bool checked = false);
 	void onActionOpen(bool checked = false);
+	void onActionZoomIn(bool checked = false);
+	void onActionZoomOut(bool checked = false);
 
     void onActionMoveTop(bool checked = false);
     void onActionMoveBottom(bool checked = false);
@@ -101,6 +103,7 @@ protected slots:
     void onActionSettings(bool checked = false);
     void onActionDeviceSettings(bool checked = false);
     void onActionSelectionTool(bool checked = false);
+	void onActionViewDrag(bool checked = false);
 	void onActionRectangle(bool checked = false);
 	void onActionEllipse(bool checked = false);
 	void onActionLine(bool checked = false);
@@ -175,6 +178,7 @@ signals:
 	void readySpline();
 	void readySplineEdit();
 	void readyText();
+	void readyViewDrag();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;

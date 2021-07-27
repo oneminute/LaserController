@@ -149,8 +149,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     QToolButton* toolButtonLineTool = new QToolButton;
     QToolButton* toolButtonSplineTool = new QToolButton;
     QToolButton* toolButtonBitmapTool = new QToolButton;
+	//QToolButton* toolButtonViewDragTool = new QToolButton;
 
+	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
+	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
     toolButtonRectangleTool->setDefaultAction(m_ui->actionRectangleTool);
     toolButtonEllipseTool->setDefaultAction(m_ui->actionEllipseTool);
     toolButtonPolygonTool->setDefaultAction(m_ui->actionPolygonTool);
@@ -168,6 +171,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonLineTool);
     m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
+	//m_ui->toolBarTools->addWidget(toolButtonViewDragTool);
 
     // init status bar
     m_statusBarStatus = new QLabel;
@@ -235,6 +239,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->actionSplineTool->setCheckable(true);
 	m_ui->actionEditSplineTool->setCheckable(true);
 	m_ui->actionTextTool->setCheckable(true);
+	m_ui->actionDragView->setCheckable(true);
 	//init selected items properties
 	m_propertyLayout = new QGridLayout(m_ui->properties);
 	m_propertyLayout->setMargin(0);
@@ -371,6 +376,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionSave, &QAction::triggered, this, &LaserControllerWindow::onActionSave);
 	connect(m_ui->actionSaveAs, &QAction::triggered, this, &LaserControllerWindow::onActionSaveAs);
 	connect(m_ui->actionOpen, &QAction::triggered, this, &LaserControllerWindow::onActionOpen);
+	connect(m_ui->actionZoomIn, &QAction::triggered, this, &LaserControllerWindow::onActionZoomIn);
+	connect(m_ui->actionZoomOut, &QAction::triggered, this, &LaserControllerWindow::onActionZoomOut);
 
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
@@ -401,6 +408,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionRectangleTool, &QAction::triggered, this, &LaserControllerWindow::onActionRectangle);
 	connect(m_ui->actionEllipseTool, &QAction::triggered, this, &LaserControllerWindow::onActionEllipse);
 	connect(m_ui->actionSelectionTool, &QAction::triggered, this, &LaserControllerWindow::onActionSelectionTool);
+	connect(m_ui->actionDragView, &QAction::triggered, this, &LaserControllerWindow::onActionViewDrag);
 	connect(m_ui->actionPolygonTool, &QAction::triggered, this, &LaserControllerWindow::onActionPolygon);
 	connect(m_ui->actionSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSpline);
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
@@ -576,6 +584,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
@@ -585,6 +594,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
@@ -594,6 +604,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
@@ -603,6 +614,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
@@ -612,6 +624,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
@@ -621,6 +634,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveTextState, this, SIGNAL(readyText()));
@@ -630,8 +644,19 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+	ADD_TRANSITION(documentViewDragState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+
+	ADD_TRANSITION(documentIdleState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentSelectionState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentPrimitiveRectState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentPrimitiveEllipseState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentPrimitiveLineState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentPrimitivePolygonState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentPrimitiveSplineState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+	ADD_TRANSITION(documentPrimitiveSplineEditState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
+	ADD_TRANSITION(documentViewDragState, documentIdleState, this, SIGNAL(isIdle()));
 
     bindWidgetsProperties();
 
@@ -1337,6 +1362,16 @@ void LaserControllerWindow::onActionOpen(bool checked)
 	m_scene->document()->load(name, this);
 }
 
+void LaserControllerWindow::onActionZoomIn(bool checked)
+{
+	m_viewer->zoomIn();
+}
+
+void LaserControllerWindow::onActionZoomOut(bool checked)
+{
+	m_viewer->zoomOut();
+}
+
 
 void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 {
@@ -1754,6 +1789,18 @@ void LaserControllerWindow::onActionSelectionTool(bool checked)
     {
         m_ui->actionSelectionTool->setChecked(true);
     }
+}
+
+void LaserControllerWindow::onActionViewDrag(bool checked)
+{
+	if (checked)
+	{
+		emit readyViewDrag();
+	}
+	else
+	{
+		m_ui->actionDragView->setChecked(true);
+	}
 }
 
 void LaserControllerWindow::onActionRectangle(bool checked)
@@ -2385,8 +2432,19 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
-
     // end actionSaveAs
+
+	// actionZoomIn
+	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", true, documentWorkingState);
+	// end actionZoomIn
+
+	// actionZoomOut
+	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", true, documentWorkingState);
+	// end actionZoomOut
 
     // actionCloseDocument
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
@@ -2600,7 +2658,26 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentViewDragState);
     // end 
+	// actionViewDragTool
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentIdleState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragState);
+
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectionState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveEllipseState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveLineState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitivePolygonState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineEditState);
+	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveTextState);
+	// end 
 
     // actionRectangleTool
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, initState);
@@ -2617,6 +2694,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentViewDragState);
     // end actionRectangleTool
 
 	// actionElippseTool
@@ -2634,6 +2712,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentViewDragState);
 	// end actionElippseTool
 
 	// actionLineTool
@@ -2651,6 +2730,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentViewDragState);
 	// end actionLineTool
 
 	// actionPolygonTool
@@ -2668,6 +2748,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", true, documentPrimitivePolygonState);
 	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentViewDragState);
 	// end actionPolygonTool
 
 	// actionSplineTool
@@ -2685,6 +2766,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", true, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentViewDragState);
 	// end actionSplineTool
 
 	// actionSplineEditTool
@@ -2702,6 +2784,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", true, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentViewDragState);
 	// end actionSplineEditTool
 
 	// actionTextTool
@@ -2719,6 +2802,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineEditState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", true, documentPrimitiveTextState);
+	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentViewDragState);
 	// end actionTextTool
 
 	// actionBitmapTool
@@ -2781,12 +2865,17 @@ void LaserControllerWindow::createNewDocument()
 		//m_viewer->setZoomValue(1.0);
 		//m_viewer->centerOn(0, 0);
 		QRectF rect = m_scene->document()->pageBounds();
-		m_scene->setSceneRect(rect);
-		m_viewer->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-		m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 		
-		m_viewer->setTransform(QTransform());
-		m_viewer->centerOn(rect.center());
+		//m_scene->setSceneRect(rect);
+		m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+		//m_viewer->centerOn(rect.center());
+		m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
+		m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));
+		
+		//m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+		
+		//m_viewer->setTransform(QTransform());
+		//m_viewer->centerOn(rect.center());
 	}
 	//创建网格
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();

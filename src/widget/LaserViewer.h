@@ -42,7 +42,7 @@ public:
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
-	
+	void setAnchorPoint(QPointF point);
 private:
     void init();
 	void initSpline();
@@ -96,13 +96,15 @@ signals:
 	void readyText();
 	void selectedEding();
 	void selectedChange();
+	void beginViewDraging();
+	void endViewDraging();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 	void paintSelectedState(QPainter& painter);
 	int setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
-    void zoomBy(qreal factor);
+    void zoomBy(qreal factor, bool isCenter = true);
 	void resizeEvent(QResizeEvent *event) override;
 
 	
@@ -112,6 +114,14 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
+
+	virtual void dragEnterEvent(QDragEnterEvent *event) override;
+
+	virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
+	virtual void dragMoveEvent(QDragMoveEvent *event) override;
+	virtual void dropEvent(QDropEvent *event) override;
+
+
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -197,6 +207,9 @@ private:
 
 	bool m_isFirstPaint = true;
 	QRectF m_fitInRect;
+
+	QPointF m_lastViewDragPoint;
+	QPointF m_anchorPoint;
 	
 	friend class LaserScene;
 };

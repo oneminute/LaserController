@@ -8,6 +8,7 @@
 
 #include<QGraphicsSceneMouseEvent>
 #include<QGraphicsSceneWheelEvent>
+#include <QScrollBar>
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
@@ -38,9 +39,13 @@ void LaserScene::updateDocument(LaserDocument * doc)
     qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
     m_background = new LaserBackgroundItem(m_doc->pageBounds());
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
-	setSceneRect(m_doc->pageBounds());
+	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));
-	//setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
+	setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
+	QRectF rect = m_doc->pageBounds();
+	//views()[0]->horizontalScrollBar()->setSliderPosition(rect.center().x());
+	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
+	views()[0]->centerOn(rect.center());
 	
 	//m_background->setPos(100, 100);
 	//setSceneRect(QRectF(QPointF(0, 0), QPointF(0, 0)));
@@ -160,10 +165,16 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 	qDebug() << event->type();
 	if (event->type() == QEvent::GraphicsSceneMousePress) {
 		
-		if (name == "LaserBitmap") {
-			m_mousePressBlock = true;
-			return false;
+		LaserViewer* viewer = qobject_cast<LaserViewer*>( views()[0]);
+		if (viewer) {
+			
+			if (name == "LaserBitmap") {
+				m_mousePressBlock = true;
+				return false;
+			}
 		}
+			
+		
 		
 	}
 	else if (event->type() == QEvent::GraphicsSceneMouseMove) {
