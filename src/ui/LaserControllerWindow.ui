@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -153,6 +153,10 @@
    <addaction name="actionCut"/>
    <addaction name="actionPaste"/>
    <addaction name="actionDeletePrimitive"/>
+   <addaction name="separator"/>
+   <addaction name="actionDragView"/>
+   <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOut"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
@@ -1021,6 +1025,48 @@
    </property>
    <property name="toolTip">
     <string>Write Origins</string>
+   </property>
+  </action>
+  <action name="actionDragView">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/drag.png</normaloff>:/ui/icons/images/drag.png</iconset>
+   </property>
+   <property name="text">
+    <string>DragView</string>
+   </property>
+   <property name="toolTip">
+    <string>Drag View</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/add.png</normaloff>:/ui/icons/images/add.png</iconset>
+   </property>
+   <property name="text">
+    <string>ZoomIn</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom In</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/subtract.png</normaloff>:/ui/icons/images/subtract.png</iconset>
+   </property>
+   <property name="text">
+    <string>ZoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
  </widget>

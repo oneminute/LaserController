@@ -180,14 +180,14 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	}
 	//2¼¶Íø¸ñ
 	painter.setPen(pen2);
-	for (int i1 = 1; i1 < m_gridSecondNodeYList.size()-1; i1++) {
+	for (int i1 = 0; i1 < m_gridSecondNodeYList.size(); i1++) {
 		//QPointF p1SecondH = mapFromScene(mapToScene(QPointF(0, m_gridSecondNodeYList[i1])));
 		//QPointF p2SecondH = mapFromScene(mapToScene(QPointF(width, m_gridSecondNodeYList[i1])));
 		QPointF p1SecondH = QPointF(0, m_gridSecondNodeYList[i1]);
 		QPointF p2SecondH = QPointF(width, m_gridSecondNodeYList[i1]);
 		painter.drawLine(p1SecondH, p2SecondH);
 	}
-	for (int j1 = 1; j1 < m_gridSecondNodeXList.size()-1; j1++) {
+	for (int j1 = 0; j1 < m_gridSecondNodeXList.size(); j1++) {
 		//QPointF p1SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], 0)));
 		//QPointF p2SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], height)));
 		QPointF p1SecondV = QPointF(m_gridSecondNodeXList[j1], 0);
