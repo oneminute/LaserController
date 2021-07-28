@@ -14,8 +14,14 @@ class DxfNodePrivate
 public:
     DxfNodePrivate(DxfNode* ptr)
         : q_ptr(ptr)
+        , sectionType(DxfNode::ST_Section)
     {
 
+    }
+
+    ~DxfNodePrivate()
+    {
+        qDeleteAll(children);
     }
 
     DxfNode* q_ptr;
@@ -23,6 +29,7 @@ public:
     int groupCode;
     QString variable;
     QList<DxfNode*> children;
+    DxfNode::SectionType sectionType;
     QVariantMap values;
 };
 
@@ -32,6 +39,11 @@ DxfNode::DxfNode(int groupCode, const QString& variable)
     Q_D(DxfNode);
     d->groupCode = groupCode;
     d->variable = variable;
+
+    if (variable == "SECTION")
+    {
+        d->sectionType = ST_Section;
+    }
 }
 
 DxfNode::~DxfNode()
@@ -61,6 +73,12 @@ DxfNode* DxfNode::addChildNode(DxfNode* node)
     Q_D(DxfNode);
     d->children.append(node);
     return node;
+}
+
+DxfNode::SectionType DxfNode::sectionType() const
+{
+    Q_D(const DxfNode);
+    return d->sectionType;
 }
 
 QVariantMap& DxfNode::values()
@@ -100,6 +118,7 @@ class DxfImporterPrivate
 public:
     DxfImporterPrivate(DxfImporter* ptr)
         : q_ptr(ptr)
+        , lineNumber(0)
     {
 
     }
@@ -112,6 +131,7 @@ public:
     DxfImporter* q_ptr;
 
     QStack<DxfNode*> nodes;
+    int lineNumber;
 };
 
 DxfImporter::DxfImporter(QObject* parent)
@@ -127,64 +147,27 @@ DxfImporter::~DxfImporter()
 
 LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, const QVariantMap& params)
 {
+    Q_D(DxfImporter);
     qLogD << "import from dxf";
 
     QFile file(filename);
     if (!file.open(QFile::ReadOnly))
         return nullptr;
 
-    //bool foundGroup = false;
-    QRegularExpression reGroupCode("^\\s{2}(\\d+)");
-    QRegularExpression reContent("^(\\s*)(.*)");
-    int currentGroupCode = std::numeric_limits<int>::min();
+    d->lineNumber = 0;
 
     QTextStream stream(&file);
-    QString line = file.readLine();
-    while (!line.isEmpty() && !line.isNull())
+    DxfNode* lastNode = nullptr;
+    DxfNode* currentNode = readLines(&stream);
+    while (currentNode)
     {
-        //qLogD << "line: " << line;
-        // 先判断当前是不是已经找到一个组代码了
-        QRegularExpressionMatch matchGroupCode = reGroupCode.match(line);
-        if (matchGroupCode.hasMatch())
+        if (!lastNode)
         {
-            // 当前行为组代码
-            QString groupCodeString = matchGroupCode.captured(1);
-            bool ok;
-            currentGroupCode = groupCodeString.toInt(&ok);
-            if (ok)
-            {
-                qLogD << "group code: " << groupCodeString;
-            }
-            else
-            {
-                currentGroupCode = std::numeric_limits<int>::min();
-            }
+            
         }
-        else
-        {
-            // 当前行为内容
-            QRegularExpressionMatch matchContent = reContent.match(line);
-            if (matchContent.hasMatch())
-            {
-                int capturedLength = matchContent.lastCapturedIndex();
-                QString spaces;
-                QString content;
-                if (capturedLength == 1)
-                {
-                    content = matchContent.captured(1);
-                }
-                else if (capturedLength == 2)
-                {
-                    spaces = matchContent.captured(1);
-                    content = matchContent.captured(2);
-                }
-                qLogD << "content: spaces length = " << spaces.size() << ", content = " << content;
-
-                
-            }
-        }
-
-        line = file.readLine();
+        d->nodes.push(currentNode);
+        qLogD << *currentNode;
+        currentNode = readLines(&stream);
     }
 
     return nullptr;
@@ -194,19 +177,21 @@ DxfNode* DxfImporter::readLines(QTextStream* stream)
 {
     Q_D(DxfImporter);
     QString line = stream->readLine().trimmed();
+    d->lineNumber++;
     bool ok;
     int groupCode = line.toInt(&ok);
     if (!ok)
     {
-        qLogW << "read dxf line\"" << line << "\" error";
+        qLogW << "read dxf line(" << d->lineNumber << ")\"" << line << "\" error";
         return nullptr;
     }
     line = stream->readLine().trimmed();
-    if (line.isEmpty() || line.isNull())
+    d->lineNumber++;
+    /*if (line.isEmpty() || line.isNull())
     {
-        qLogW << "read dxf line\"" << line << "\" error";
+        qLogW << "read dxf line(" << d->lineNumber << ")\"" << line << "\" error";
         return nullptr;
-    }
+    }*/
     DxfNode* node = new DxfNode(groupCode, line);
     return node;
 }

@@ -11,7 +11,7 @@ class DxfNode
 public:
     enum SectionType
     {
-        ST_Unknown,
+        ST_Section,
         ST_Classes,
         ST_Tables,
         ST_Blocks,
@@ -27,6 +27,11 @@ public:
 
     int groupCodes() const;
     QString variable() const;
+
+    QList<DxfNode*>& children();
+    DxfNode* addChildNode(DxfNode* node);
+
+    SectionType sectionType() const;
 
     QVariantMap& values();
     void insertValue(const QString& key, const QVariant& value);
