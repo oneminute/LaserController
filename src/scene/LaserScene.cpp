@@ -41,10 +41,11 @@ void LaserScene::updateDocument(LaserDocument * doc)
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
 	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));
-	setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
+	setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
 	QRectF rect = m_doc->pageBounds();
 	//views()[0]->horizontalScrollBar()->setSliderPosition(rect.center().x());
 	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
+	views()[0]->setTransform(QTransform());
 	views()[0]->centerOn(rect.center());
 	
 	//m_background->setPos(100, 100);

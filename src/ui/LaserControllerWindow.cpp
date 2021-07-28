@@ -1312,8 +1312,17 @@ void LaserControllerWindow::onActionImportSVG(bool checked)
 }
 void LaserControllerWindow::onActionNew(bool checked)
 {
+	
+	LaserDocument* doc = m_scene->document();
+	if (doc) {
+		if (!onActionCloseDocument()) {
+			return;
+		}
+	}
 	this->setWindowTitle("<Untitled> - " + m_windowTitle);
 	createNewDocument();
+	
+	
 }
 
 bool LaserControllerWindow::onActionSave(bool checked)
@@ -1351,6 +1360,13 @@ bool LaserControllerWindow::onActionSaveAs(bool checked)
 
 void LaserControllerWindow::onActionOpen(bool checked)
 {
+	LaserDocument* doc = m_scene->document();
+	if (doc) {
+		if (!onActionCloseDocument()) {
+			return;
+		}
+	}
+	//create title
 	QString name = QFileDialog::getOpenFileName(nullptr, "open file", ".", "File(*lc)");
 	m_fileDirection = name;
 	if (name == "") {
@@ -1729,7 +1745,7 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
     }
 }
 
-void LaserControllerWindow::onActionCloseDocument(bool checked)
+bool LaserControllerWindow::onActionCloseDocument(bool checked)
 {
 	//documentClose();
 	/*QMessageBox msgBox;
@@ -1745,17 +1761,17 @@ void LaserControllerWindow::onActionCloseDocument(bool checked)
 	switch (result) {
 		case QMessageBox::StandardButton::Save: {
 			if (!onActionSave()) {
-				return;
+				return false;
 			}
 			documentClose();
-			break;
+			return true;
 		}
 		case QMessageBox::StandardButton::Close: {
 			documentClose();
-			break;
+			return true;
 		}
 		default:
-			break;
+			return false;
 	}
 }
 
@@ -2395,7 +2411,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // actionOpen
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentWorkingState);
     // end actionOpen
 
     // actionImportSVG
@@ -2407,7 +2423,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// actionNew
 	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentWorkingState);
 	// end actionNew
 
     // actionImportCorelDraw
@@ -2445,6 +2461,12 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", true, documentWorkingState);
 	// end actionZoomOut
+
+	// ZoomInput comboBoxScale
+	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", true, documentWorkingState);
+	// end ZoomInput comboBoxScale
 
     // actionCloseDocument
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
@@ -2877,6 +2899,8 @@ void LaserControllerWindow::createNewDocument()
 		//m_viewer->setTransform(QTransform());
 		//m_viewer->centerOn(rect.center());
 	}
+	//初始化缩放输入
+	m_comboBoxScale->setCurrentText("100%");
 	//创建网格
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (backgroundItem) {

@@ -99,7 +99,7 @@ protected slots:
 
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
-    void onActionCloseDocument(bool checked = false);
+    bool onActionCloseDocument(bool checked = false);
     void onActionSettings(bool checked = false);
     void onActionDeviceSettings(bool checked = false);
     void onActionSelectionTool(bool checked = false);

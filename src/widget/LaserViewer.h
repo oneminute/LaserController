@@ -69,7 +69,8 @@ public slots:
 	void onEndSelecting();
 	void onDocumentIdle();
 	void onCancelSelected();
-	void onSelectedFillGroup();
+	void onMultiSelection();
+	bool onSelectedFillGroup();
 	void onReplaceGroup(LaserPrimitive* item);
 signals:
     void zoomChanged(const QPointF& topleft);
@@ -179,6 +180,7 @@ private:
 
 	bool m_isKeyShiftPressed;
 	bool m_isKeyDelPress;
+	bool m_isKeyCtrlPress;
 	//Ruller
 	RulerWidget* m_horizontalRuler;
 	RulerWidget* m_verticalRuler;

@@ -29,6 +29,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     //, m_mousePressed(false)
     , m_isKeyDelPress(false)
     , m_isKeyShiftPressed(false)
+	, m_isKeyCtrlPress(false)
     //, m_isMouseInStartRect(false)
     , m_splineNodeDrawWidth(3)
     , m_splineHandlerWidth(5)
@@ -679,9 +680,9 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 	//setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
 
 	zoomBy(wheelZoomValue, false);
+
 	this->viewport()->repaint();
-	//更新网格
-	backgroundItem->onChangeGrids();
+	
 	
 }
 
@@ -716,7 +717,8 @@ void LaserViewer::zoomBy(qreal factor, bool isCenter)
 	}
 	t2.translate(diff.x(), diff.y());
 	setTransform(t*t1*t2);
-	
+	//更新网格
+	backgroundItem->onChangeGrids();
     emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
     emit scaleChanged(zoomValue());
 }
@@ -853,13 +855,15 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				QGraphicsView::mousePressEvent(event);
 				m_selectionStartPoint = event->pos();
 				m_selectionEndPoint = m_selectionStartPoint;
-				onCancelSelected();
-				// 获取选框起点
+				if (m_isKeyCtrlPress) { 
+					//multi selection
+					onMultiSelection();
+				}
+				else {
+					onCancelSelected();
+				}
 				
-				//viewport()->repaint();
-                //m_selectionStartPoint = event->pos();
-				//m_selectionEndPoint = m_selectionStartPoint;
-                //emit beginSelecting();
+				
             }
         }
 		//View Drag Ready
@@ -1153,20 +1157,37 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		
         if (checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
-            m_scene->clearSelection();
-            emit cancelSelecting();
-            m_isKeyShiftPressed = false;
-            viewport()->repaint();
-            return;
+			if (m_isKeyCtrlPress) {
+				onEndSelecting();
+				return;
+			}
+			else {
+				m_scene->clearSelection();
+				emit cancelSelecting();
+				m_isKeyShiftPressed = false;
+				viewport()->repaint();
+				return;
+			}
+            
         }
-		int selectedCount = setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
-		if (selectedCount <= 0) {
+		QList<LaserPrimitive*> selectedList = m_scene->selectedPrimitives();
+		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
+		//setSelectionArea function cleared selected items
+		if (m_isKeyCtrlPress) {
+			for each (LaserPrimitive* item in selectedList) {
+				item->setSelected(true);
+			}
+		}
+
+		/*if (selectedCount <= 0) {
+			
 			m_scene->clearSelection();
 			emit cancelSelecting();
 			m_isKeyShiftPressed = false;
 			viewport()->repaint();
 			return;
-		}
+			
+		}*/
 		onEndSelecting();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
@@ -1362,6 +1383,10 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
 			m_isKeyDelPress = true;
 			break;
 		}
+		case Qt::Key_Control: {
+			m_isKeyCtrlPress = true;
+			break;
+		}
     }
     QGraphicsView::keyPressEvent(event);
 }
@@ -1389,7 +1414,10 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 			m_isKeyDelPress = false;
 			break;
 		}
-        
+		case Qt::Key_Control: {
+			m_isKeyCtrlPress = false;
+			break;
+		}
     }
     QGraphicsView::keyReleaseEvent(event);
 }
@@ -1572,27 +1600,18 @@ qreal LaserViewer::zoomValue() const
 
 void LaserViewer::setZoomValue(qreal zoomValue)
 {
-    scale(1 / transform().m11(), 1 / transform().m22());
-    scale(zoomValue, zoomValue);
-    emit scaleChanged(zoomValue);
+    //scale(1 / transform().m11(), 1 / transform().m22());
+    //scale(zoomValue, zoomValue);
+	zoomBy(zoomValue / this->zoomValue() );
+    //emit scaleChanged(zoomValue);
 }
 
 void LaserViewer::init()
 {
-    /*setRubberBandSelectionMode(Qt::ItemSelectionMode::IntersectsItemBoundingRect);
-    setInteractive(true);
-	setDragMode(QGraphicsView::NoDrag);
-    setMouseTracking(true);
-	setResizeAnchor(AnchorUnderMouse);
-	setInteractive(true);
-	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);*/
+    
 	setMouseTracking(true);
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);
-	//setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	//setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	//setAcceptDrops(true);
-	//setDragMode(QGraphicsView::ScrollHandDrag);
+    setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);	
 	horizontalScrollBar()->setEnabled(false);
 	verticalScrollBar()->setEnabled(false);
 	
@@ -1610,10 +1629,6 @@ void LaserViewer::init()
 
     ADD_TRANSITION(documentSelectedEditingState, documentSelectedState, this, &LaserViewer::endSelectedEditing);
 
-    //ADD_TRANSITION(documentSelectedState, documentIdleState, this, &LaserViewer::cancelSelecting);
-    //ADD_TRANSITION(documentSelectingState, documentIdleState, this, &LaserViewer::cancelSelecting);
-    //ADD_TRANSITION(documentSelectedState, documentIdleState, this, &LaserViewer::cancelSelected);
-
     ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRectCreatingState, this, SIGNAL(creatingRectangle()));
     ADD_TRANSITION(documentPrimitiveRectCreatingState, documentPrimitiveRectReadyState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveEllipseCreatingState, this, SIGNAL(creatingEllipse()));
@@ -1622,7 +1637,6 @@ void LaserViewer::init()
     ADD_TRANSITION(documentPrimitiveLineCreatingState, documentPrimitiveLineReadyState, this, SIGNAL(readyLine()));
     ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonCreatingState, this, SIGNAL(creatingPolygon()));
     ADD_TRANSITION(documentPrimitivePolygonCreatingState, documentPrimitivePolygonReadyState, this, SIGNAL(readyPolygon()));
-    //ADD_TRANSITION(documentPrimitivePolygonReadyState, documentPrimitivePolygonStartRectState, this, SIGNAL(creatingPolygonStartRect()));
     ADD_TRANSITION(documentPrimitiveSplineReadyState, documentPrimitiveSplineCreatingState, this, SIGNAL(creatingSpline()));
     ADD_TRANSITION(documentPrimitiveSplineCreatingState, documentPrimitiveSplineReadyState, this, SIGNAL(readySpline()));
     ADD_TRANSITION(documentPrimitiveTextReadyState, documentPrimitiveTextCreatingState, this, SIGNAL(creatingText()));
@@ -1680,18 +1694,20 @@ void LaserViewer::selectedHandleRotate() {
 
 }
 void LaserViewer::onEndSelecting() {
-	onSelectedFillGroup();
-	emit endSelecting();
+	if (onSelectedFillGroup()) {
+		emit endSelecting();
+	}
+	
 
 }
-void LaserViewer::onSelectedFillGroup()
+bool LaserViewer::onSelectedFillGroup()
 {
-	if (m_scene->selectedItems().size() == 0) {
+	if (m_scene->selectedPrimitives().size() == 0) {
 		m_scene->clearSelection();
 		emit cancelSelecting();
 		m_isKeyShiftPressed = false;
 		viewport()->repaint();
-		return;
+		return false;
 	}
 	if (m_group)
 	{
@@ -1713,6 +1729,7 @@ void LaserViewer::onSelectedFillGroup()
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
 	m_curSelectedHandleIndex = -1;
+	return true;
 }
 
 void LaserViewer::onReplaceGroup(LaserPrimitive* item)
@@ -1873,7 +1890,6 @@ void LaserViewer::selectedHandleScale()
 			t = m_group->transform();
 			QTransform t1;
 			t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-			//t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), diff.x()+ t.dx(), diff.y()+ t.dy(), t.m33());
 			m_group->setTransform(t * t1);
 			break;
 		}
@@ -1987,12 +2003,12 @@ LaserPrimitiveGroup* LaserViewer::group()
 {
 	return m_group;
 }
-
+// by center
 void LaserViewer::zoomIn()
 {
     zoomBy(1.1);
 }
-
+// by center
 void LaserViewer::zoomOut()
 {
     zoomBy(0.9);
@@ -2053,6 +2069,29 @@ void LaserViewer::onCancelSelected()
 	m_scene->clearSelection();
 	//emit cancelSelected();
 	
+	emit beginSelecting();
+	viewport()->repaint();
+}
+
+void LaserViewer::onMultiSelection()
+{
+	if (!m_group) {
+		return;
+	}
+	if (!m_group->isEmpty())
+	{
+		const auto items = m_group->childItems();
+		for (QGraphicsItem *item : items) {
+			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+
+			m_group->removeFromGroup(p_item);
+			/*if (p_item->isSelected()) {
+				p_item->setSelected(false);
+			}*/
+			p_item->reShape();
+		}
+	}
+	m_group->setTransform(QTransform());
 	emit beginSelecting();
 	viewport()->repaint();
 }
