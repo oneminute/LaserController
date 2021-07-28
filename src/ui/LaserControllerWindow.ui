@@ -38,7 +38,7 @@
      <property name="title">
       <string>Import</string>
      </property>
-     <addaction name="actionImportSVG"/>
+     <addaction name="actionImport"/>
      <addaction name="actionImportCorelDraw"/>
     </widget>
     <addaction name="actionNew"/>
@@ -142,7 +142,7 @@
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
-   <addaction name="actionImportSVG"/>
+   <addaction name="actionImport"/>
    <addaction name="actionImportCorelDraw"/>
    <addaction name="actionExportJSON"/>
    <addaction name="actionCloseDocument"/>
@@ -242,19 +242,19 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionImportSVG">
+  <action name="actionImport">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/import_svg.png</normaloff>:/ui/icons/images/import_svg.png</iconset>
+     <normaloff>:/ui/icons/images/import.png</normaloff>:/ui/icons/images/import.png</iconset>
    </property>
    <property name="text">
-    <string>Import SVG</string>
+    <string>Import Document</string>
    </property>
    <property name="toolTip">
-    <string>Import SVG</string>
+    <string>Import From External Document</string>
    </property>
   </action>
   <action name="actionExportJSON">

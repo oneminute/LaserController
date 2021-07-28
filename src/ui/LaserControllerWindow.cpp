@@ -356,7 +356,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//init selection original radio button
 	m_centerBtn->setChecked(true);
 
-    connect(m_ui->actionImportSVG, &QAction::triggered, this, &LaserControllerWindow::onActionImportSVG);
+    connect(m_ui->actionImport, &QAction::triggered, this, &LaserControllerWindow::onActionImport);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
@@ -1274,17 +1274,27 @@ void LaserControllerWindow::createMovementDockPanel()
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
 
-void LaserControllerWindow::onActionImportSVG(bool checked)
+void LaserControllerWindow::onActionImport(bool checked)
 {
-    qLogD << "onActionImportSVG";
-    QString filename = getFilename(tr("Open SVG File"), QStringList() << "image/svg+xml" << "image/svg+xml-compressed");
+    qLogD << "onActionImport";
+    //QStringList filters;
+    //filters << "image/svg+xml" << "image/svg+xml-compressed"
+        //<< "application/dxf";
+    QString filters = tr("SVG (*.svg);;CAD (*.dxf)");
+    QString filename = getFilename(tr("Open Supported File"), filters);
     qLogD << "importing filename is " << filename;
     if (filename.isEmpty())
         return;
-    QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::SVG);
-    LaserDocument* doc = importer->import(filename, m_scene);
-    initDocument(doc);
+
+    QFileInfo file(filename);
+    QSharedPointer<Importer> importer = Importer::getImporter(this, file.suffix());
+    if (!importer.isNull())
+    {
+        LaserDocument* doc = importer->import(filename, m_scene);
+        initDocument(doc);
+    }
 }
+
 void LaserControllerWindow::onActionNew(bool checked)
 {
 	this->setWindowTitle("<Untitled> - " + m_windowTitle);
@@ -2351,10 +2361,10 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentWorkingState);
     // end actionOpen
 
-    // actionImportSVG
-    BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionImportSVG, "enabled", false, documentWorkingState);
+    // actionImport
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentWorkingState);
     // end actionImportSVG
 
 	// actionNew
@@ -2817,14 +2827,14 @@ void LaserControllerWindow::documentClose()
 	this->setWindowTitle(m_windowTitle);
 }
 
-QString LaserControllerWindow::getFilename(const QString& title, const QStringList & mime)
+QString LaserControllerWindow::getFilename(const QString& title, const QString& filters)
 {
-    qLogD << "getFilename:" << title << mime;
+    qLogD << "getFilename:" << title << filters;
     QFileDialog dialog(this);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setMimeTypeFilters(mime);
-    dialog.setWindowTitle(tr("Open SVG File"));
-    qLogD << "preparing open dialog";
+    //dialog.setMimeTypeFilters(mime);
+    dialog.setNameFilter(filters);
+    dialog.setWindowTitle(title);
     if (dialog.exec() == QDialog::Accepted)
         return dialog.selectedFiles().constFirst();
     else

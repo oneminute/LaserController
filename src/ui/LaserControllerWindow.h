@@ -60,7 +60,7 @@ protected:
     void createMovementDockPanel();
 
 protected slots:
-    void onActionImportSVG(bool checked = false);
+    void onActionImport(bool checked = false);
     void onActionImportCorelDraw(bool checked = false);
     void onActionRemoveLayer(bool checked = false);
     void onTableWidgetLayersCellDoubleClicked(int row, int column);
@@ -158,7 +158,7 @@ protected slots:
 	void onSelectionOriginalClicked(bool clicked);
 
 private:
-    QString getFilename(const QString& title, const QStringList& mime);
+    QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
 	void createNewDocument();

@@ -25,6 +25,8 @@ public:
     
     static QSharedPointer<Importer> getImporter(QWidget* parentWnd, Types type);
 
+    static QSharedPointer<Importer> getImporter(QWidget* parentWnd, const QString& type);
+
 signals:
     void imported();
 
