@@ -646,12 +646,12 @@ void LaserDocument::arrange()
 void LaserDocument::optimize()
 {
     Q_D(LaserDocument);
-    float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
-    float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
+    //float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
+    //float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
 
-    qLogD << "LaserDocument::optimize";
-    OptimizerController* optimizer = new OptimizerController(this, totalNodes());
-    optimizer->optimize(pageWidth, pageHeight);
+    //qLogD << "LaserDocument::optimize";
+    //OptimizerController* optimizer = new OptimizerController(this, totalNodes());
+    //optimizer->optimize(pageWidth, pageHeight);
 }
 
 void LaserDocument::save(const QString& filename, QWidget* window)

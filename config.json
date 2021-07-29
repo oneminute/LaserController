@@ -34,7 +34,7 @@
         },
         "LPI": {
             "defaultValue": 600,
-            "value": 600
+            "value": 100
         },
         "laserPower": {
             "defaultValue": 8,

@@ -459,7 +459,7 @@ void Config::loadEngravingLayerItems()
         "LPI",
         tr("LPI"),
         tr("Lines per inch."),
-        600,
+        100,
         DT_INT
     );
     lpi->setInputWidgetProperty("minimum", 1);
