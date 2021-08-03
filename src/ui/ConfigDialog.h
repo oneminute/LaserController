@@ -24,13 +24,13 @@ public:
     virtual ~ConfigDialog();
 
     bool isModified();
+    void setCurrentPanel(const QString& title);
 
 protected:
     void onTreeWidgetCatalogueCurrentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem* previous);
     void onButtonClicked(QAbstractButton* button);
 
     void setCurrentPanel(QWidget* panel);
-    void setCurrentPanel(const QString& title);
 
     void addConfigItem(ConfigItem* item, QWidget* parent, const QString& exlusion = "");
 

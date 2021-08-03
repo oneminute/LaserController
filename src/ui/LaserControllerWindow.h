@@ -73,6 +73,7 @@ protected slots:
     void onActionLaserSpotShot(bool checked = false);
     void onActionLaserCut(bool checked = false);
     void onActionLaserMove(bool checked = false);
+    void onActionPathOptimization(bool checked = false);
     void onActionConnect(bool checked = false);
     void onActionDisconnect(bool checked = false);
     void onActionDownload(bool checked = false);
@@ -154,6 +155,8 @@ protected slots:
     void laserResetToOriginalPoint(bool checked = false);
     void updateOutlineTree();
     void initDocument(LaserDocument* doc);
+    void showConfigDialog(const QString& title = QString());
+
 	//selection
 	void onLaserSceneSelectedChanged();
 	void selectedChange();//items

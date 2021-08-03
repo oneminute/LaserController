@@ -392,6 +392,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
     connect(m_ui->actionDeviceSettings, &QAction::triggered, this, &LaserControllerWindow::onActionDeviceSettings);
     connect(m_ui->actionSettings, &QAction::triggered, this, &LaserControllerWindow::onActionSettings);
+    connect(m_ui->actionPathOptimization, &QAction::triggered, this, &LaserControllerWindow::onActionPathOptimization);
 
     connect(m_ui->actionMoveTop, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTop);
     connect(m_ui->actionMoveBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottom);
@@ -1612,6 +1613,11 @@ void LaserControllerWindow::onActionLaserMove(bool checked)
 {
 }
 
+void LaserControllerWindow::onActionPathOptimization(bool checked)
+{
+    showConfigDialog(tr("Path Optimization"));
+}
+
 void LaserControllerWindow::onActionConnect(bool checked)
 {
     if (m_comboBoxDevices->count() == 0)
@@ -1787,16 +1793,7 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 
 void LaserControllerWindow::onActionSettings(bool checked)
 {
-    ConfigDialog dialog;
-    dialog.exec();
-	//关闭窗口
-	if (m_scene) {
-		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
-		if (backgroudItem) {
-			backgroudItem->onChangeGrids();
-		}
-	}
-	
+    showConfigDialog();
 }
 
 void LaserControllerWindow::onActionDeviceSettings(bool checked)
@@ -2275,7 +2272,6 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
     {
 		connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
         connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
-        connect(m_ui->actionPathOptimization, &QAction::triggered, doc, &LaserDocument::optimize);
         doc->bindLayerButtons(m_layerButtons);
         m_scene->updateDocument(doc);
         doc->outline();
@@ -2283,6 +2279,20 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         m_tableWidgetLayers->updateItems();
 		
     }
+}
+void LaserControllerWindow::showConfigDialog(const QString& title)
+{
+    ConfigDialog dialog;
+    if (!title.isEmpty() && !title.isNull())
+        dialog.setCurrentPanel(title);
+    dialog.exec();
+	//关闭窗口
+	if (m_scene) {
+		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
+		if (backgroudItem) {
+			backgroudItem->onChangeGrids();
+		}
+	}
 }
 //selected items change
 void LaserControllerWindow::selectedChange()
@@ -2868,9 +2878,9 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end actionAnalysisDocument
 
     // actionPathOptimization
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", true, documentIdleState);
+    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);
+    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentEmptyState);
+    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", true, documentIdleState);
     // end actionPathOptimization
 }
 
