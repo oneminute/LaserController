@@ -61,16 +61,24 @@ void LaserScene::updateDocument(LaserDocument * doc)
 
 void LaserScene::clearDocument(bool delDoc)
 {
-	m_background = nullptr;
-    this->clear();
 	LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
-	viewer->clearGroup();
-
-    if (delDoc && m_doc)
-    {
-        m_doc->close();
-        m_doc = nullptr;
-    }
+	if (delDoc && m_doc)
+	{
+		if (viewer) {
+			viewer->clearGroupSelection();
+			viewer->setGroupNull();
+		}
+	}
+	m_background = nullptr;	
+    this->clear();
+	
+	if (delDoc && m_doc)
+	{
+		m_doc->close();
+		m_doc = nullptr;
+	}
+	
+    
 }
 
 void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
@@ -159,8 +167,10 @@ void LaserScene::destroyItemGroup(LaserPrimitiveGroup * group)
 
 bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 {
+	
 	m_mousePressBlock = false;
 	m_mouseMoveBlock = false;
+	m_detectedBitmap = nullptr;
 	QString name = watched->metaObject()->className();
 	//qDebug() << name;
 	qDebug() << event->type();
@@ -170,7 +180,9 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 		if (viewer) {
 			
 			if (name == "LaserBitmap") {
+				LaserBitmap* map = qobject_cast<LaserBitmap*>(watched);
 				m_mousePressBlock = true;
+				m_detectedBitmap = map;
 				return false;
 			}
 		}
@@ -189,8 +201,9 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 	return QGraphicsScene::eventFilter(watched, event);
 }
 
-bool LaserScene::mousePressBlock()
+bool LaserScene::mousePressDetectBitmap(LaserBitmap* & detected)
 {
+	detected = m_detectedBitmap;
 	return m_mousePressBlock;
 }
 bool LaserScene::mouseMoveBlock()

@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QScopedPointer>
 #include <QDir>
+#include <QState>
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
 #include "laser/LaserDriver.h"
@@ -58,6 +59,9 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+	//key
+	virtual void keyPressEvent(QKeyEvent *event) override;
+	virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 protected slots:
     void onActionImport(bool checked = false);
@@ -185,7 +189,7 @@ signals:
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
-
+	QState* m_lastState;
     // Central Panel widgets
     ads::CDockManager* m_dockManager;
     LaserViewer* m_viewer;

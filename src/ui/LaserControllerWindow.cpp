@@ -675,6 +675,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 LaserControllerWindow::~LaserControllerWindow()
 {
+	m_propertyWidget = nullptr;
 }
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
@@ -1300,6 +1301,85 @@ void LaserControllerWindow::createMovementDockPanel()
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
 
+void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
+{
+	
+	QWidget::keyPressEvent(event);
+	if (!m_viewer) {
+		return;
+	}
+	if (!m_scene || !m_scene->document()) {
+		return;
+	}
+	
+	switch (event->key())
+	{
+		case Qt::Key_Space: {
+			if (!event->isAutoRepeat()) {
+				m_lastState = nullptr;
+				m_lastState = m_viewer->currentState();
+				this->onActionViewDrag(true);
+
+			}
+			break;
+		}
+	
+	}
+	
+}
+
+void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
+{
+	QWidget::keyReleaseEvent(event);
+	if (!m_viewer) {
+		return;
+	}
+	if (!m_scene || !m_scene->document()) {
+		return;
+	}
+	switch (event->key())
+	{
+		case Qt::Key_Space: {
+			if (!event->isAutoRepeat()) {
+				//this->onActionViewDrag(false);
+				if (m_lastState == StateControllerInst.documentPrimitiveRectState()) {
+					emit readyRectangle();
+				}
+				else if (m_lastState == StateControllerInst.documentPrimitiveEllipseState()) {
+					emit readyEllipse();
+				}
+				else if (m_lastState == StateControllerInst.documentPrimitiveLineState()) {
+					emit readyLine();
+				}
+				else if (m_lastState == StateControllerInst.documentPrimitivePolygonState()) {
+					emit readyPolygon();
+				}
+				else if (m_lastState == StateControllerInst.documentPrimitiveSplineState()) {
+					emit readySpline();
+				}
+				else if (m_lastState == StateControllerInst.documentPrimitiveSplineEditState()) {
+					emit readySplineEdit();
+				}
+				else if (m_lastState == StateControllerInst.documentPrimitiveTextState()) {
+					emit readyText();
+				}
+				else if (m_lastState == StateControllerInst.documentIdleState()) {
+					emit isIdle();
+				}
+				else if (m_lastState == StateControllerInst.documentIdleState()) {
+					emit isIdle();
+				}
+				m_lastState = nullptr;
+				m_viewer->viewport()->repaint();
+			}
+			else
+			break;
+		}
+
+	}
+	
+}
+
 void LaserControllerWindow::onActionImport(bool checked)
 {
     qLogD << "onActionImport";
@@ -1819,6 +1899,10 @@ void LaserControllerWindow::onActionViewDrag(bool checked)
 	if (checked)
 	{
 		emit readyViewDrag();
+		if (m_viewer != nullptr && m_viewer->viewport() != nullptr) {
+			m_viewer->viewport()->repaint();
+		}
+		
 	}
 	else
 	{
@@ -2033,12 +2117,17 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 {
     QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
 	if (items.length() == 0) {
-		m_propertyWidget->setEnabled(false);
+		if (m_propertyWidget) {
+			m_propertyWidget->setEnabled(false);
+		}
+		
 		return;
 	}
 	else if (items.length() > 0) {
-		m_propertyWidget->setEnabled(true);
-		selectedChange();
+		if (m_propertyWidget) {
+			m_propertyWidget->setEnabled(true);
+			selectedChange();
+		}		
 	}
     qLogD << "selected items count: " << items.length();
 	/*for (LaserPrimitive* item : items)

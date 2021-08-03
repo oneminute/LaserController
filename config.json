@@ -328,6 +328,10 @@
             "defaultValue": 3,
             "value": 9
         },
+        "objectShapeDistance": {
+            "defaultValue": 3,
+            "value": 5
+        },
         "operationButtonHeight": {
             "defaultValue": 60,
             "value": 60

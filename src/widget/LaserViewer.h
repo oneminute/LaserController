@@ -5,10 +5,12 @@
 #include <QGraphicsView>
 #include <QTime>
 #include <QTextEdit>
+#include <QState>
 class RulerWidget;
 class LaserScene;
 class LaserPrimitiveGroup;
 class LaserPrimitive;
+class LaserBitmap;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -43,6 +45,12 @@ public:
 	QRectF selectedItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
+	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint);
+	bool detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint);
+	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);
+
+	QState* currentState();
+	
 private:
     void init();
 	void initSpline();
@@ -61,6 +69,8 @@ private:
 	qreal rightScaleMirror(qreal rate, qreal x);
 	qreal topScaleMirror(qreal rate, qreal y);
 	qreal bottomScaleMirror(qreal rate, qreal y);
+	void setGroupNull();
+	void pointSelectWhenSelectedState(int handleIndex, LaserPrimitive* primitive);
 public slots:
     void zoomIn();
     void zoomOut();
@@ -69,7 +79,7 @@ public slots:
 	void onEndSelecting();
 	void onDocumentIdle();
 	void onCancelSelected();
-	void onMultiSelection();
+	bool resetGroup();
 	bool onSelectedFillGroup();
 	void onReplaceGroup(LaserPrimitive* item);
 signals:
@@ -77,9 +87,10 @@ signals:
 	void scaleChanged(qreal scale);
     void beginSelecting();
     void endSelecting();
-    void cancelSelecting();
+    void selectionToIdle();
 	void cancelSelected();
 	void beginSelectedEditing();
+	void beginIdelEditing();
 	void endSelectedEditing();
     void mouseMoved(const QPointF& pos);
 	void creatingRectangle();
@@ -131,7 +142,7 @@ protected:
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
 	
-	void clearGroup();
+	void clearGroupSelection();
 
 private:
     QScopedPointer<LaserScene> m_scene;
@@ -212,6 +223,14 @@ private:
 
 	QPointF m_lastViewDragPoint;
 	QPointF m_anchorPoint;
+
+	bool m_isItemEdge;
+	bool m_isItemEdgeCenter;
+	QLine m_detectedEdge;
+	LaserPrimitive* m_detectedPrimitive;
+	QPolygonF testRect;
+	QPolygonF testBoundinRect;
+	LaserBitmap* m_detectedBitmap;
 	
 	friend class LaserScene;
 };

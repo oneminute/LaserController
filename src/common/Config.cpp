@@ -314,6 +314,24 @@ void Config::loadUiItems()
 	gridShapeDistance->setInputWidgetProperty("minimum", 0);
 	gridShapeDistance->setInputWidgetProperty("maximum", 10);
 
+	ConfigItem* objectShapeDistance = group->addConfigItem(
+		"objectShapeDistance",
+		tr("Object Shape Distance"),
+		tr("(Pixel)"),
+		5
+	);
+	objectShapeDistance->setInputWidgetProperty("minimum", 0);
+	objectShapeDistance->setInputWidgetProperty("maximum", 10);
+
+	ConfigItem* clickSelectiontTolerance = group->addConfigItem(
+		"clickSelectiontTolerance",
+		tr("Click-selectiont Tolerance"),
+		tr("(Pixel)"),
+		5
+	);
+	clickSelectiontTolerance->setInputWidgetProperty("minimum", 0);
+	clickSelectiontTolerance->setInputWidgetProperty("maximum", 10);
+
 	
 	ConfigItem* visualGridSpacing = group->addConfigItem(
 		"visualGridSpacing",

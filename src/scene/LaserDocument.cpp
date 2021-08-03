@@ -691,7 +691,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 	}
 	QJsonParseError *error = new QJsonParseError;
 	QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), error);
-	//�ж��ļ��Ƿ�����
 	if (error->error != QJsonParseError::NoError)
 	{
 		qDebug() << "parseJson:" << error->errorString();
@@ -716,8 +715,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		this->addLayer(laserLayer);*/
 		int index = layer["index"].toInt();
 		if (index < 0 || index > laserLayers.size() - 1) {
-			QMessageBox::critical(window, "critical", "���ļ��Ĳ������뵱ǰ���ò�ƥ�䣬 �޷���");
-			qLogD << "���ļ��Ĳ������뵱ǰ���ò�ƥ�䣬 �޷���";
+			QMessageBox::critical(window, "critical", "your layer index have changed");
+			qLogD << "your layer index have changed";
 			return;
 		}
 		//����primitive
@@ -771,6 +770,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					rect = new LaserBitmap(img, bounds, this, saveTransform);
 				}
 				laserLayers[index]->addPrimitive(rect);
+				this->addPrimitive(rect);
 				this->scene()->addItem(rect);
 			}
 			else if (className == "LaserLine") {
@@ -782,6 +782,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 
 				LaserLine* line = new LaserLine(QLineF(p1, p2), this, saveTransform);
 				laserLayers[index]->addPrimitive(line);
+				this->addPrimitive(line);
 				this->scene()->addItem(line);
 			}
 			else if (className == "LaserPolyline" || className == "LaserPolygon") {
@@ -800,6 +801,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				}
 				
 				laserLayers[index]->addPrimitive(poly);
+				this->addPrimitive(poly);
 				this->scene()->addItem(poly);
 			}
 		}

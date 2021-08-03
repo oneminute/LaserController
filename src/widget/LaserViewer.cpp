@@ -21,6 +21,7 @@
 #include "scene/LaserDocument.h"
 #include "state/StateController.h"
 #include "widget/RulerWidget.h"
+#include "common/Config.h"
 
 LaserViewer::LaserViewer(QWidget* parent)
     : QGraphicsView(parent)
@@ -30,6 +31,8 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_isKeyDelPress(false)
     , m_isKeyShiftPressed(false)
 	, m_isKeyCtrlPress(false)
+	, m_isItemEdge(false)
+	, m_isItemEdgeCenter(false)
     //, m_isMouseInStartRect(false)
     , m_splineNodeDrawWidth(3)
     , m_splineHandlerWidth(5)
@@ -71,7 +74,9 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	painter.setRenderHint(QPainter::Antialiasing);
 	
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
-
+	painter.drawPolygon (testRect);
+	painter.drawPolygon(testBoundinRect);
+	
     if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
     {
 		//painter.setRenderHint(QPainter::Antialiasing);
@@ -290,6 +295,7 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	QRectF rect;
 	
 	QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
+
 	qreal left = 0;
 	qreal right = 0;
 	qreal top = 0;
@@ -541,6 +547,121 @@ void LaserViewer::setAnchorPoint(QPointF point)
 {
 	m_anchorPoint = point;
 }
+bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint)
+{
+	qreal delta = Config::Ui::objectShapeDistance();
+	if (delta <= 0) {
+		return false;
+	}
+	return true;
+}
+bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint)
+{
+	
+	qreal delta = Config::Ui::clickSelectiontTolerance();
+	if (delta <= 0) {
+		return false;
+	}
+	QList <LaserPrimitive*> list = m_scene->document()->primitives().values();
+	for each(LaserPrimitive* primitive in list) {
+		QVector<QLineF> edgeList = primitive->edges();
+		//先判断边框
+		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(delta));
+		testBoundinRect = bounding;
+		if (bounding.containsPoint(mousePoint, Qt::OddEvenFill)) {
+			
+			//然后判断边
+			for each(QLineF edge in edgeList) {
+				QVector2D vec(QPointF(edge.p1() - edge.p2()));
+
+				//edges's vertical vector
+				QVector2D verticalV1(-vec.y(), vec.x());
+				verticalV1 = verticalV1.normalized() * delta;
+				QVector2D verticalV2(vec.y(), -vec.x());
+				verticalV2 = verticalV2.normalized() * delta;
+				QVector2D vecNormal = vec.normalized();
+
+				QPointF newP1 = edge.p1() + (vecNormal * delta).toPointF();
+				QPointF newP2 = edge.p2() - (vecNormal * delta).toPointF();
+				QPointF newP1_1 = newP1 + verticalV1.toPointF();
+				QPointF newP1_2 = newP1 + verticalV2.toPointF();
+				QPointF newP2_1 = newP2 + verticalV1.toPointF();
+				QPointF newP2_2 = newP2 + verticalV2.toPointF();
+
+				//QPainterPath path;
+				//QPolygonF polygon = path.toFillPolygon;
+				QVector<QPointF> polVector;
+				polVector.append(mapFromScene(newP1_1));
+				polVector.append(mapFromScene(newP1_2));
+				polVector.append(mapFromScene(newP2_2));
+				polVector.append(mapFromScene(newP2_1));
+				QPolygonF polygon(polVector);
+				qDebug() << "polygon: " << polygon;
+				qDebug() << "mousePoint: " << mousePoint;
+				//QRectF rect(mapFromScene(newP1_1), mapFromScene(newP2_2));
+
+				if (polygon.containsPoint(mousePoint, Qt::OddEvenFill)) {
+					result = primitive;
+					testRect = polygon;
+
+					return true;
+				}
+			}
+		}
+		
+		
+	}
+	return false;
+}
+bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
+{
+	QList<QGraphicsItem*> items = m_scene->items(mapToScene(mousePoint.toPoint()));
+	for each(QGraphicsItem* item in items) {
+		LaserPrimitive* primitive = qobject_cast<LaserPrimitive*> (item->toGraphicsObject());
+		if (primitive != nullptr) {
+			LaserBitmap* bitmap = qobject_cast<LaserBitmap*> (primitive);
+			if (bitmap) {
+				result = bitmap;
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+QState* LaserViewer::currentState()
+{
+	QState* currentState = nullptr;
+	if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectState())) {
+		currentState = StateControllerInst.documentPrimitiveRectState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseState())) {
+		currentState = StateControllerInst.documentPrimitiveEllipseState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineState())) {
+		currentState = StateControllerInst.documentPrimitiveLineState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonState())) {
+		currentState = StateControllerInst.documentPrimitivePolygonState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineState())) {
+		currentState = StateControllerInst.documentPrimitiveSplineState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineEditState())) {
+		currentState = StateControllerInst.documentPrimitiveSplineEditState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+		currentState = StateControllerInst.documentPrimitiveTextState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
+		currentState = StateControllerInst.documentIdleState();
+	}
+	else if (StateControllerInst.isInState(StateControllerInst.documentSelectionState())) {
+		currentState = StateControllerInst.documentIdleState();
+	}
+	
+	return currentState;
+}
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
 	
@@ -767,19 +888,44 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
-			QGraphicsView::mousePressEvent(event);
-            //事件被Item截断
-			if (m_scene->mousePressBlock()) {
+			m_detectedPrimitive = nullptr;
+			m_detectedBitmap = nullptr;
+			//点击选中图元
+			if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
+				clearGroupSelection();
+				m_detectedPrimitive->setSelected(true);
+				if (onSelectedFillGroup()) {
+					m_curSelectedHandleIndex = 13;
+					emit beginIdelEditing();
+				}
 				return;
 			}
-            // 获取选框起点
-            m_selectionStartPoint = event->pos();
-            m_selectionEndPoint = m_selectionStartPoint;
-            qDebug() << "begin to select";
-            emit beginSelecting();
+			else {
+				//detectBitmapByMouse(m_detectedBitmap, event->pos());
+				//QGraphicsView::mousePressEvent(event);
+				//点击选中图片
+				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+					clearGroupSelection();
+					m_detectedBitmap->setSelected(true);
+					if (onSelectedFillGroup()) {
+						m_curSelectedHandleIndex = 14;
+						emit beginIdelEditing();
+					}
+					viewport()->repaint();
+					return;
+				}
+				// 获取选框起点
+				m_selectionStartPoint = event->pos();
+				m_selectionEndPoint = m_selectionStartPoint;
+				qDebug() << "begin to select";
+				emit beginSelecting();
+			}
+            
         }
         // 若在DocumentSelected状态下
         else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+			
+			
 			
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
@@ -846,18 +992,30 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					}
 
 				}
-				qLogD << "origin: " << m_origin;
-				qLogD << "transform: " << m_group->transform();
                 emit beginSelectedEditing();
-            }
+			}
+			else if(detectItemEdgeByMouse(m_detectedPrimitive, event->pos())){
+				pointSelectWhenSelectedState(13, m_detectedPrimitive);
+				
+			}
+			
             else
             {
-				QGraphicsView::mousePressEvent(event);
+				m_detectedBitmap = nullptr;
+				//QGraphicsView::mousePressEvent(event);
+				//事件被Item截断 图片点选
+				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+					pointSelectWhenSelectedState(14, m_detectedBitmap);
+					return;
+				}
+				
 				m_selectionStartPoint = event->pos();
 				m_selectionEndPoint = m_selectionStartPoint;
 				if (m_isKeyCtrlPress) { 
 					//multi selection
-					onMultiSelection();
+					resetGroup();
+					emit beginSelecting();
+					viewport()->repaint();
 				}
 				else {
 					onCancelSelected();
@@ -926,7 +1084,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             emit creatingText();
         }
 		else {
-			QGraphicsView::mousePressEvent(event);
+			//QGraphicsView::mousePressEvent(event); 会使画线时出现Bug
 			//setInteractive(false);
 		}
     }
@@ -940,15 +1098,25 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     m_verticalRuler->setMousePoint(m_mousePoint);
     m_horizontalRuler->repaint();
     m_verticalRuler->repaint();
-	QGraphicsView::mouseMoveEvent(event);
+	//QGraphicsView::mouseMoveEvent(event);
     
     // 当在DocumentSelecting状态时
-    if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
+	if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
+		m_detectedPrimitive = nullptr;
+		if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
+			QPixmap cMap(":/ui/icons/images/arrow.png");
+			this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+		}
+		else {
+			setCursor(Qt::ArrowCursor);
+		}
+
+	}else if(StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
 		//事件被Item截断
-		if (m_scene->mouseMoveBlock()) {
+		/*if (m_scene->mouseMoveBlock()) {
 			return;
-		}
+		}*/
 		m_selectionEndPoint = m_mousePoint;
 		//start right
 		if (m_selectionEndPoint.x() < m_selectionStartPoint.x()) {
@@ -962,9 +1130,10 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     }
     // 当在DocumentSelected状态时
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-		
+		m_detectedPrimitive = nullptr;
         int handlerIndex;
         QRectF handlerRect;
+		
         if (isOnControllHandlers(event->pos(), handlerIndex, handlerRect))
         {
             if (handlerRect.contains(m_mousePoint)) {
@@ -1027,7 +1196,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     break;
                 }
             }
-        }
+        }else if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
+			//when mousepress, detect again
+			m_curSelectedHandleIndex = -1;
+			QPixmap cMap(":/ui/icons/images/arrow.png");
+			this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+		}
         else
         {
             m_curSelectedHandleIndex = -1;
@@ -1035,6 +1209,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
+		
 		switch (m_curSelectedHandleIndex) {
 			case 0:
 			case 1:
@@ -1049,14 +1224,23 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			case 5:
 			case 8:
 			case 11:
+			case 13://点选
+			case 14://点选图片
 			{
 				selectedHandleScale();
 				emit selectedChange();
-				break;
+				this->viewport()->repaint();
+				return;
 			}
 			
 		}
-		this->viewport()->repaint();
+		//QGraphicsView::mouseMoveEvent(event);
+		//事件被Item截断
+		if (m_scene->mouseMoveBlock()) {
+			this->viewport()->repaint();
+			return;
+		}
+		
 		//QGraphicsView::mouseMoveEvent(event);
         
     }
@@ -1146,15 +1330,16 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 {
-	QGraphicsView::mouseReleaseEvent(event);
+	//QGraphicsView::mouseReleaseEvent(event);
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {
+		
 		return;
 	}
     //select
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-		
+		QGraphicsView::mouseReleaseEvent(event);
         if (checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
 			if (m_isKeyCtrlPress) {
@@ -1163,7 +1348,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			}
 			else {
 				m_scene->clearSelection();
-				emit cancelSelecting();
+				emit selectionToIdle();
 				m_isKeyShiftPressed = false;
 				viewport()->repaint();
 				return;
@@ -1172,29 +1357,39 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         }
 		QList<LaserPrimitive*> selectedList = m_scene->selectedPrimitives();
 		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
-		//setSelectionArea function cleared selected items
+		QList<LaserPrimitive*> newSelectedList = m_scene->selectedPrimitives();
+		//setSelectionArea function cleared selected items		
 		if (m_isKeyCtrlPress) {
 			for each (LaserPrimitive* item in selectedList) {
 				item->setSelected(true);
 			}
+			for each(LaserPrimitive* newItem in newSelectedList) {
+				if (selectedList.contains(newItem)) {
+					newItem->setSelected(false);
+				}
+				else {
+					newItem->setSelected(true);
+				}
+			}
+			
 		}
-
-		/*if (selectedCount <= 0) {
-			
-			m_scene->clearSelection();
-			emit cancelSelecting();
-			m_isKeyShiftPressed = false;
-			viewport()->repaint();
-			return;
-			
-		}*/
 		onEndSelecting();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
 		m_selectedEditCount = 0;
 		m_radians = 0;
-        emit endSelectedEditing();
+		//group中没有被选中的item，返回idle状态
+		if (m_group->isEmpty()) {
+			emit selectionToIdle();
+		}
+		//group中有被选中的item，返回selected状态
+		else {
+			emit endSelectedEditing();
+		}
+		
+		this->viewport()->repaint();
+		return;
     }
 	//View Drag Ready
 	else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
@@ -1333,18 +1528,18 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     }
     //Spline Eidt
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineEditState())) {
-        if (m_scene->selectedItems().length() == 1) {
-            LaserPath* path = (LaserPath*)m_scene->selectedItems()[0];
+        if (m_scene->selectedPrimitives().length() == 1) {
+            LaserPath* path = (LaserPath*)m_scene->selectedPrimitives()[0];
             path->setVisible(false);
         }
     }
     else
     {
-        
+		QGraphicsView::mouseReleaseEvent(event);
     }
 	
     //m_mousePressed = false;
-    m_isKeyShiftPressed = false;
+    //m_isKeyShiftPressed = false;
     this->viewport()->repaint();
 	//QGraphicsView::mouseReleaseEvent(event);
 }
@@ -1449,9 +1644,30 @@ bool LaserViewer::isOnControllHandlers(const QPoint& point, int& handlerIndex, Q
     return isIn;
 }
 
-void LaserViewer::clearGroup()
+void LaserViewer::clearGroupSelection()
 {
-	m_group = nullptr;
+	if (!m_group) {
+		return;
+	}
+	if (!m_group->isEmpty())
+	{
+		/*if (m_group->isSelected()) {
+		m_group->setSelected(false);
+		}*/
+		const auto items = m_group->childItems();
+		for (QGraphicsItem *item : items) {
+			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+
+			m_group->removeFromGroup(p_item);
+			if (p_item->isSelected()) {
+				p_item->setSelected(false);
+			}
+			p_item->reShape();
+		}
+
+	}
+	m_group->setTransform(QTransform());
+	m_scene->clearSelection();
 }
 
 bool LaserViewer::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2)
@@ -1592,6 +1808,98 @@ qreal LaserViewer::bottomScaleMirror(qreal rate, qreal y)
 	return yRate;
 }
 
+void LaserViewer::setGroupNull()
+{
+	m_group = nullptr;
+}
+
+void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive * primitive)
+{
+	//因为图片被选中时需要描外框， 所以在LaserPrimitive的draw里会用类型判断是否描外框
+	QString className = primitive->metaObject()->className();
+	if (className == "LaserBitmap") {
+		LaserBitmap* bitmap = qobject_cast<LaserBitmap*> (primitive);
+		if (!m_group->isAncestorOf(bitmap)) {
+			if (bitmap) {
+				if (m_isKeyCtrlPress) {
+
+					resetGroup();
+				}
+				else {
+					clearGroupSelection();
+				}
+
+				bitmap->setSelected(true);
+				if (!onSelectedFillGroup()) {
+					emit selectionToIdle();
+				}
+
+			}
+		}
+		//selected
+		else {
+			if (bitmap) {
+				if (m_isKeyCtrlPress) {
+					resetGroup();
+					if (m_scene->selectedPrimitives().size() == 1) {
+						emit beginSelectedEditing();
+						this->viewport()->repaint();
+						m_curSelectedHandleIndex = handleIndex;//点选
+					}
+					bitmap->setSelected(false);
+					if (!onSelectedFillGroup()) {
+						this->viewport()->repaint();
+						return;
+					}
+				}
+			}
+		}
+		emit beginSelectedEditing();
+		m_curSelectedHandleIndex = handleIndex;//点选
+		this->viewport()->repaint();		
+		return;
+	}
+	
+	if (!m_group->isAncestorOf(primitive)) {
+		if (primitive) {
+			if (m_isKeyCtrlPress) {
+
+				resetGroup();
+			}
+			else {
+				clearGroupSelection();
+			}
+
+			primitive->setSelected(true);
+			if (!onSelectedFillGroup()) {
+				emit selectionToIdle();
+			}
+
+		}
+	}
+	//selected
+	else {
+		if (primitive) {
+			if (m_isKeyCtrlPress) {
+				resetGroup();
+				if (m_scene->selectedPrimitives().size() == 1) {
+					emit beginSelectedEditing();
+					this->viewport()->repaint();
+					m_curSelectedHandleIndex = handleIndex;//点选
+				}
+				primitive->setSelected(false);
+				if (!onSelectedFillGroup()) {
+					this->viewport()->repaint();
+					return;
+				}
+			}
+		}
+	}
+	emit beginSelectedEditing();
+	m_curSelectedHandleIndex = handleIndex;//点选
+	this->viewport()->repaint();
+}
+
 qreal LaserViewer::zoomValue() const
 {
 	
@@ -1617,8 +1925,9 @@ void LaserViewer::init()
 	
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
+	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);
 
-    ADD_TRANSITION(documentSelectionState, documentIdleState, this, &LaserViewer::cancelSelecting);
+    ADD_TRANSITION(documentSelectionState, documentIdleState, this, &LaserViewer::selectionToIdle);
     ADD_TRANSITION(documentSelectionState, documentIdleState, this, &LaserViewer::cancelSelected);
 
     ADD_TRANSITION(documentSelectingState, documentSelectedState, this, &LaserViewer::endSelecting);
@@ -1697,6 +2006,9 @@ void LaserViewer::onEndSelecting() {
 	if (onSelectedFillGroup()) {
 		emit endSelecting();
 	}
+	else {
+		emit selectionToIdle();
+	}
 	
 
 }
@@ -1704,7 +2016,7 @@ bool LaserViewer::onSelectedFillGroup()
 {
 	if (m_scene->selectedPrimitives().size() == 0) {
 		m_scene->clearSelection();
-		emit cancelSelecting();
+		
 		m_isKeyShiftPressed = false;
 		viewport()->repaint();
 		return false;
@@ -1884,13 +2196,52 @@ void LaserViewer::selectedHandleScale()
 	QTransform t;
 	qDebug() << " rate: "<< rate;
 	switch (m_curSelectedHandleIndex) {
-		case 0: {
+		case 0: 
+		{
 			//QPointF diff = m_group->mapFromScene(this->mapToScene(QPointF(m_mousePoint - m_origin).toPoint()));
 			QPointF diff = (m_mousePoint - m_lastPos) ;
 			t = m_group->transform();
 			QTransform t1;
 			t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
 			m_group->setTransform(t * t1);
+			break;
+		}
+		case 13://点选
+		{
+			QPointF diff = (m_mousePoint - m_lastPos);
+			if (m_group->isAncestorOf(m_detectedPrimitive)) {
+				t = m_group->transform();
+				QTransform t1;
+				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
+				m_group->setTransform(t * t1);
+			}
+			else {
+				t = m_detectedPrimitive->transform();
+				QTransform t1;
+				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
+				m_detectedPrimitive->setTransform(t * t1);
+
+			}
+			
+			break;
+		}
+		case 14://点选图片
+		{
+			QPointF diff = (m_mousePoint - m_lastPos);
+			if (m_group->isAncestorOf(m_detectedBitmap)) {
+				t = m_group->transform();
+				QTransform t1;
+				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
+				m_group->setTransform(t * t1);
+			}
+			else {
+				t = m_detectedBitmap->transform();
+				QTransform t1;
+				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
+				m_detectedBitmap->setTransform(t * t1);
+
+			}
+
 			break;
 		}
 		//scale
@@ -1954,9 +2305,9 @@ void LaserViewer::selectedHandleScale()
 			m_origin = m_origin * t1 * t2;
 			break;
 		}
+		
 	}
 	m_lastPos = m_mousePoint;
-	this->repaint();
 }
 
 void LaserViewer::createSpline()
@@ -2045,53 +2396,31 @@ void LaserViewer::onDocumentIdle()
 
 void LaserViewer::onCancelSelected()
 {
-	if (!m_group) {
-		return;
-	}
-	if (!m_group->isEmpty())
-	{
-		/*if (m_group->isSelected()) {
-			m_group->setSelected(false);
-		}*/
-		const auto items = m_group->childItems();
-		for (QGraphicsItem *item : items) {
-			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
-			
-			m_group->removeFromGroup(p_item);
-			if (p_item->isSelected()) {
-				p_item->setSelected(false);
-			}
-			p_item->reShape();
-		}
-		
-	}
-	m_group->setTransform(QTransform());
-	m_scene->clearSelection();
-	//emit cancelSelected();
 	
+	//emit cancelSelected();
+	clearGroupSelection();
 	emit beginSelecting();
 	viewport()->repaint();
 }
 
-void LaserViewer::onMultiSelection()
+bool LaserViewer::resetGroup()
 {
 	if (!m_group) {
-		return;
+		return false;
 	}
-	if (!m_group->isEmpty())
+	if (m_group->isEmpty())
 	{
-		const auto items = m_group->childItems();
-		for (QGraphicsItem *item : items) {
-			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+		m_group->setTransform(QTransform());
+		return false;
+	}
+	const auto items = m_group->childItems();
+	for (QGraphicsItem *item : items) {
+		LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 
-			m_group->removeFromGroup(p_item);
-			/*if (p_item->isSelected()) {
-				p_item->setSelected(false);
-			}*/
-			p_item->reShape();
-		}
+		m_group->removeFromGroup(p_item);
+		p_item->reShape();
+		
 	}
 	m_group->setTransform(QTransform());
-	emit beginSelecting();
-	viewport()->repaint();
+	return true;
 }

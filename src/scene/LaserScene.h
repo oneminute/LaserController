@@ -12,6 +12,7 @@ class LaserViewer;
 class LaserDocument;
 class LaserPrimitive;
 class LaserPrimitiveGroup;
+class LaserBitmap;
 
 class LaserScene : public QGraphicsScene
 {
@@ -32,7 +33,7 @@ public:
 	LaserPrimitiveGroup *createItemGroup(const QList<LaserPrimitive*> &items);
 	void destroyItemGroup(LaserPrimitiveGroup *group);
 	virtual bool eventFilter(QObject *watched, QEvent *event)override;
-	bool mousePressBlock();
+	bool mousePressDetectBitmap(LaserBitmap* & detected);
 	bool mouseMoveBlock();
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
@@ -44,7 +45,7 @@ private:
 	LaserBackgroundItem* m_background;
 	bool m_mousePressBlock = false;
 	bool m_mouseMoveBlock = false;
-	
+	LaserBitmap* m_detectedBitmap = nullptr;
 };
 
 #endif // LASERSCENE_H

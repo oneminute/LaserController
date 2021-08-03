@@ -112,6 +112,9 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
+	QTransform getAllTransform();
+	QRectF originalBoundingRect() const;
+	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
     virtual QRectF sceneBoundingRect() const;
     QPointF laserStartPos() const;
