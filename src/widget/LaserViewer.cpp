@@ -13,6 +13,7 @@
 #include <QImage>
 #include <QVector3D>
 #include <QMouseEvent>
+#include <QUndoStack>
 
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserPrimitive.h"
@@ -22,6 +23,7 @@
 #include "state/StateController.h"
 #include "widget/RulerWidget.h"
 #include "common/Config.h"
+#include "widget/UndoCommand.h";
 
 LaserViewer::LaserViewer(QWidget* parent)
     : QGraphicsView(parent)
@@ -50,19 +52,20 @@ LaserViewer::LaserViewer(QWidget* parent)
     Global::dpiX = logicalDpiX();
     Global::dpiY = logicalDpiY();
 	
-	m_fitInRect = QRectF(0, 0, 0, 0);
+	//m_fitInRect = QRectF(0, 0, 0, 0);
 	
 }
 
 LaserViewer::~LaserViewer()
 {
 	m_horizontalRuler = m_verticalRuler = nullptr;
+	m_undoStack = nullptr;
 }
 
 void LaserViewer::paintEvent(QPaintEvent* event)
 {
 	if (m_isFirstPaint) {
-		m_fitInRect = rect();
+		//m_fitInRect = rect();
 		//fitInView(m_fitInRect, Qt::KeepAspectRatio);
 		qDebug() << "m_fitInRect: " << rect();
 		m_isFirstPaint = false;
@@ -74,8 +77,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	painter.setRenderHint(QPainter::Antialiasing);
 	
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
-	painter.drawPolygon (testRect);
-	painter.drawPolygon(testBoundinRect);
+	//painter.drawPolygon (testRect);
+	//painter.drawPolygon(testBoundinRect);
 	
     if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
     {
@@ -567,7 +570,7 @@ bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePo
 		QVector<QLineF> edgeList = primitive->edges();
 		//先判断边框
 		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(delta));
-		testBoundinRect = bounding;
+		//testBoundinRect = bounding;
 		if (bounding.containsPoint(mousePoint, Qt::OddEvenFill)) {
 			
 			//然后判断边
@@ -602,7 +605,7 @@ bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePo
 
 				if (polygon.containsPoint(mousePoint, Qt::OddEvenFill)) {
 					result = primitive;
-					testRect = polygon;
+					//testRect = polygon;
 
 					return true;
 				}
@@ -662,16 +665,24 @@ QState* LaserViewer::currentState()
 	
 	return currentState;
 }
+QUndoStack * LaserViewer::undoStack()
+{
+	return m_undoStack;
+}
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
 	
     qreal left, right, top, bottom;
 	QRectF rect = selectedItemsSceneBoundingRect();
 	qDebug() << "paintSelectedState: "<<rect;
+	if (rect.width() == 0 || rect.height() == 0) {
+		return;
+	}
 	left = rect.left();
 	right = rect.right();
 	top = rect.top();
 	bottom = rect.bottom();
+
     //qLogD << "viewer painter transform: " << painter.transform();
     painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
     painter.setBrush(QBrush(Qt::gray));
@@ -799,16 +810,17 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 	
 	//fitInView(m_fitInRect, Qt::KeepAspectRatio);
 	//setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
-
-	zoomBy(wheelZoomValue, false);
+	QPointF mousePos = mapFromGlobal(QCursor::pos());
+	zoomBy(wheelZoomValue, mousePos);
 
 	this->viewport()->repaint();
 	
 	
 }
 
-void LaserViewer::zoomBy(qreal factor, bool isCenter)
+void LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
 {
+
     const qreal currentZoom = zoomValue();
     if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
         return;
@@ -822,20 +834,16 @@ void LaserViewer::zoomBy(qreal factor, bool isCenter)
 	t1.scale(factor, factor);
 	QTransform t2;
 	QPointF diff;
-	if (isCenter) {
-		QRectF rect = this->rect();
-		QPointF center = rect.center();
-		center = center - m_anchorPoint;
-		QPointF newCenter = t1.map(center);
-		diff = center - newCenter;
+
+	QPointF newZoomAnchor = zoomAnchor - m_anchorPoint;//映射到以m_anchorPoint为（0， 0）点的坐标系
+	QPointF scaled = t1.map(newZoomAnchor);
+	QPointF newPoint = newZoomAnchor;
+	if (zoomAnchorCenter) {
+		
+		newPoint =  this->rect().center();
+		scaled += m_anchorPoint;
 	}
-	//mouse point is anchor
-	else {
-		QPointF mousePos = mapFromGlobal(QCursor::pos());
-		mousePos = mousePos - m_anchorPoint;
-		QPointF newMousePos = t1.map(mousePos);
-		diff = mousePos - newMousePos;
-	}
+	diff = newPoint - scaled;
 	t2.translate(diff.x(), diff.y());
 	setTransform(t*t1*t2);
 	//更新网格
@@ -852,17 +860,17 @@ void LaserViewer::resizeEvent(QResizeEvent * event)
 	}
 	//QPointF fitInRectTopLeft = mapFromScene(backgroundItem->pos());
 	QGraphicsView::resizeEvent(event);
-	if (m_fitInRect.width() == 0 || m_fitInRect.height() == 0) {
+	/*if (m_fitInRect.width() == 0 || m_fitInRect.height() == 0) {
 		return;
 	}
 	
-	QRectF bounds = QRectF(-m_fitInRect.x(), -m_fitInRect.y(), m_fitInRect.width(), m_fitInRect.height());
+	QRectF bounds = QRectF(-m_fitInRect.x(), -m_fitInRect.y(), m_fitInRect.width(), m_fitInRect.height()); */
 	
 	
 	//m_fitInRect = QRectF(-fitInRectTopLeft.x(), -fitInRectTopLeft.y(), m_fitInRect.width(), m_fitInRect.height());
 	//fitInView(m_fitInRect, Qt::KeepAspectRatio);
 	//centerOn(0, 0);
-	qDebug() << "m_fitInRect: "<< m_fitInRect;
+	//qDebug() << "m_fitInRect: "<< m_fitInRect;
 }
 
 void LaserViewer::leaveEvent(QEvent* event)
@@ -888,6 +896,8 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
+			
+			m_undoSelectionList = m_group->childItems();
 			m_detectedPrimitive = nullptr;
 			m_detectedBitmap = nullptr;
 			//点击选中图元
@@ -898,6 +908,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					m_curSelectedHandleIndex = 13;
 					emit beginIdelEditing();
 				}
+				//undo redo
+				QList<QGraphicsItem*> redoList = m_group->childItems();
+				SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+				m_undoStack->push(selection);
 				return;
 			}
 			else {
@@ -911,6 +925,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 						m_curSelectedHandleIndex = 14;
 						emit beginIdelEditing();
 					}
+					//undo redo
+					QList<QGraphicsItem*> redoList = m_group->childItems();
+					SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+					m_undoStack->push(selection);
 					viewport()->repaint();
 					return;
 				}
@@ -926,7 +944,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
 			
 			
-			
+			m_undoSelectionList = m_group->childItems();
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
@@ -996,7 +1014,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 			}
 			else if(detectItemEdgeByMouse(m_detectedPrimitive, event->pos())){
 				pointSelectWhenSelectedState(13, m_detectedPrimitive);
-				
+				//undo redo
+				QList<QGraphicsItem*> redoList = m_group->childItems();
+				SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+				m_undoStack->push(selection);
 			}
 			
             else
@@ -1006,6 +1027,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				//事件被Item截断 图片点选
 				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
 					pointSelectWhenSelectedState(14, m_detectedBitmap);
+					//undo redo
+					QList<QGraphicsItem*> redoList = m_group->childItems();
+					SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+					m_undoStack->push(selection);
 					return;
 				}
 				
@@ -1344,17 +1369,20 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         {
 			if (m_isKeyCtrlPress) {
 				onEndSelecting();
-				return;
 			}
 			else {
 				m_scene->clearSelection();
 				emit selectionToIdle();
 				m_isKeyShiftPressed = false;
 				viewport()->repaint();
-				return;
 			}
-            
+			//undo redo
+			QList<QGraphicsItem*> redoList = m_group->childItems();
+			SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+			m_undoStack->push(selection);
+			return;
         }
+		//
 		QList<LaserPrimitive*> selectedList = m_scene->selectedPrimitives();
 		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
 		QList<LaserPrimitive*> newSelectedList = m_scene->selectedPrimitives();
@@ -1373,7 +1401,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			}
 			
 		}
+		
 		onEndSelecting();
+		//undo redo
+		QList<QGraphicsItem*> redoList = m_group->childItems();
+		SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+		m_undoStack->push(selection);
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -1910,7 +1943,7 @@ void LaserViewer::setZoomValue(qreal zoomValue)
 {
     //scale(1 / transform().m11(), 1 / transform().m22());
     //scale(zoomValue, zoomValue);
-	zoomBy(zoomValue / this->zoomValue() );
+	zoomBy(zoomValue / this->zoomValue(), this->rect().center());
     //emit scaleChanged(zoomValue);
 }
 
@@ -1922,10 +1955,12 @@ void LaserViewer::init()
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);	
 	horizontalScrollBar()->setEnabled(false);
 	verticalScrollBar()->setEnabled(false);
-	
+	//undo stack
+	m_undoStack = new QUndoStack(this);
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);
+	ADD_TRANSITION(documentIdleState, documentSelectedState, this, &LaserViewer::idleToSelected);
 
     ADD_TRANSITION(documentSelectionState, documentIdleState, this, &LaserViewer::selectionToIdle);
     ADD_TRANSITION(documentSelectionState, documentIdleState, this, &LaserViewer::cancelSelected);
@@ -2023,20 +2058,26 @@ bool LaserViewer::onSelectedFillGroup()
 	}
 	if (m_group)
 	{
+		
 		for (LaserPrimitive* item : m_scene->selectedPrimitives())
 		{
 			if (m_group->childItems().contains(item))
 				continue;
 			m_group->addToGroup(item);
 		}
+		m_group->setZValue(1);
 		m_group->setSelected(true);
 	}
 	else
 	{
-		m_group = m_scene->createItemGroup(m_scene->selectedPrimitives());
+		QList<LaserPrimitive*>list = m_scene->selectedPrimitives();
+		if (list.isEmpty()) {
+			return false;
+		}
+		//m_group->stackBefore(list[list.size() - 1]);
+		m_group = m_scene->createItemGroup(list);
 		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
 		m_group->setSelected(true);
-
 	}
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
@@ -2357,20 +2398,50 @@ LaserPrimitiveGroup* LaserViewer::group()
 // by center
 void LaserViewer::zoomIn()
 {
-    zoomBy(1.1);
+	QRectF rect = this->rect();
+	QPointF center = rect.center();
+    zoomBy(1.1, center);
 }
 // by center
 void LaserViewer::zoomOut()
 {
-    zoomBy(0.9);
+	QRectF rect = this->rect();
+	QPointF center = rect.center();
+    zoomBy(0.9, center);
 }
 
 void LaserViewer::resetZoom()
 {
     if (!qFuzzyCompare(zoomValue(), qreal(1))) {
-        resetTransform();
-        emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
+        //resetTransform();
+		setTransform(QTransform());
+		setZoomValue(1);//zoomBy()中更新网格和标尺
+        //emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
     }
+}
+
+void LaserViewer::zoomToSelection()
+{
+	QRectF rect = selectedItemsSceneBoundingRect();
+	if (rect.width() == 0 && rect.height() == 0) {
+		return;
+	}
+	QRectF viewRect = this->rect();
+	QPointF center = mapFromScene(rect.center());
+	qreal width = rect.width();
+	qreal height = rect.height();
+	qreal viewWidth = viewRect.width() - 58;
+	qreal viewHeight = viewRect.height() - 58;
+	qreal scale = 1;
+
+	if (viewWidth < viewHeight) {
+		scale = viewWidth / width;
+	}
+	else {
+		scale = viewHeight / height;
+	}
+
+	zoomBy(scale / zoomValue(), center, true);
 }
 
 void LaserViewer::textAreaChanged()

@@ -64,6 +64,8 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 protected slots:
+	void onActionUndo(bool checked = false);
+	void onActionRedo(bool checked);
     void onActionImport(bool checked = false);
     void onActionImportCorelDraw(bool checked = false);
     void onActionRemoveLayer(bool checked = false);
@@ -90,6 +92,8 @@ protected slots:
 	void onActionOpen(bool checked = false);
 	void onActionZoomIn(bool checked = false);
 	void onActionZoomOut(bool checked = false);
+	void onActionZoomToPage(bool checked = false);
+	void onActionZoomToSelection(bool checked = false);
 
     void onActionMoveTop(bool checked = false);
     void onActionMoveBottom(bool checked = false);
@@ -166,7 +170,8 @@ protected slots:
 	void selectedChange();//items
 	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
 	void onSelectionOriginalClicked(bool clicked);
-
+	//undo
+	void onUndoStackCleanChanged(int index);
 private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
@@ -322,6 +327,9 @@ private:
 	QString m_fileDirection;
 	QString m_fileName;
 	QString m_windowTitle;
+	//undo redo
+	//QAction* m_undoAction;
+	//QAction* m_redoAction;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

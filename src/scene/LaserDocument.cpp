@@ -846,6 +846,7 @@ void LaserDocument::init()
 	}
 	ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
 	ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
+
 }
 
 RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPainterPath& b)

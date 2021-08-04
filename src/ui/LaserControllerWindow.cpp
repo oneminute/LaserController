@@ -26,6 +26,7 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QTreeWidgetItem>
+#include <QUndoStack>
 
 #include "LaserApplication.h"
 #include "common/common.h"
@@ -360,7 +361,24 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_propertyWidget->setEnabled(false);
 	//init selection original radio button
 	m_centerBtn->setChecked(true);
-
+	//undo
+	//m_undoAction = m_viewer->undoStack()->createUndoAction(this, "Undo");
+	//m_redoAction = m_viewer->undoStack()->createRedoAction(this, "Redo");
+	//m_ui->actionUndo = m_undoAction;
+	//m_ui->actionRedo = m_redoAction;
+	
+	/*QPixmap cMap1(":/ui/icons/images/redo.png");
+	m_redoAction->setIcon(cMap1);
+	m_ui->toolBar->insertAction(m_ui->actionCopy, m_redoAction);
+	QPixmap cMap(":/ui/icons/images/undo.png");
+	m_undoAction->setIcon(cMap);*/
+	//m_ui->toolBar->addAction(m_undoAction);
+	//m_ui->toolBar->insertAction(m_redoAction, m_undoAction);
+	//cleanChanged(bool clean)
+	connect(m_viewer->undoStack(), &QUndoStack::cleanChanged,this, &LaserControllerWindow::onUndoStackCleanChanged);
+	connect(m_ui->actionUndo, &QAction::triggered, this, &LaserControllerWindow::onActionUndo);
+	connect(m_ui->actionRedo, &QAction::triggered, this, &LaserControllerWindow::onActionRedo);
+	//connect(m_ui->actionRedo, &QAction::triggered, this, &LaserControllerWindow::m_redoAction);
     connect(m_ui->actionImport, &QAction::triggered, this, &LaserControllerWindow::onActionImport);
     connect(m_ui->actionImportCorelDraw, &QAction::triggered, this, &LaserControllerWindow::onActionImportCorelDraw);
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
@@ -378,6 +396,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionOpen, &QAction::triggered, this, &LaserControllerWindow::onActionOpen);
 	connect(m_ui->actionZoomIn, &QAction::triggered, this, &LaserControllerWindow::onActionZoomIn);
 	connect(m_ui->actionZoomOut, &QAction::triggered, this, &LaserControllerWindow::onActionZoomOut);
+	connect(m_ui->actionZoomToPage, &QAction::triggered, this, &LaserControllerWindow::onActionZoomToPage);
+	connect(m_ui->actionZoomToSelection, &QAction::triggered, this, &LaserControllerWindow::onActionZoomToSelection);
 
     connect(m_ui->actionConnect, &QAction::triggered, this, &LaserControllerWindow::onActionConnect);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &LaserControllerWindow::onActionDisconnect);
@@ -1379,7 +1399,17 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 	}
 	
 }
-
+void LaserControllerWindow::onActionUndo(bool checked) {
+	int index = m_viewer->undoStack()->index();
+	if (index <= 0) {
+		return;
+	}
+	m_viewer->undoStack()->setIndex(index - 1);
+}
+void LaserControllerWindow::onActionRedo(bool checked) {
+	int index = m_viewer->undoStack()->index();	
+	m_viewer->undoStack()->setIndex(index + 1);
+}
 void LaserControllerWindow::onActionImport(bool checked)
 {
     qLogD << "onActionImport";
@@ -1477,6 +1507,16 @@ void LaserControllerWindow::onActionZoomIn(bool checked)
 void LaserControllerWindow::onActionZoomOut(bool checked)
 {
 	m_viewer->zoomOut();
+}
+
+void LaserControllerWindow::onActionZoomToPage(bool checked)
+{
+	m_viewer->resetZoom();
+}
+
+void LaserControllerWindow::onActionZoomToSelection(bool checked)
+{
+	m_viewer->zoomToSelection();
 }
 
 
@@ -2366,7 +2406,10 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         doc->outline();
         m_tableWidgetLayers->setDocument(doc);
         m_tableWidgetLayers->updateItems();
-		
+		//undo
+		m_viewer->undoStack()->clear();
+		//m_ui->actionUndo->setEnabled(false);
+		//m_ui->actionRedo->setEnabled(false);
     }
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
@@ -2514,6 +2557,30 @@ void LaserControllerWindow::onSelectionOriginalClicked(bool clicked)
 {
 	
 }
+//
+void LaserControllerWindow::onUndoStackCleanChanged(int index)
+{
+	if (!m_viewer) {
+		return;
+	}
+	QUndoStack* stack = m_viewer->undoStack();
+	if (!stack) {
+		return;
+	}
+	if (stack->canUndo()) {
+		m_ui->actionUndo->setEnabled(true);
+	}
+	else {
+		m_ui->actionUndo->setEnabled(false);
+	}
+	
+	if (m_viewer->undoStack()->canRedo()) {
+		m_ui->actionRedo->setEnabled(true);
+	}
+	else {
+		m_ui->actionRedo->setEnabled(false);
+	}
+}
 
 void LaserControllerWindow::bindWidgetsProperties()
 {
@@ -2559,6 +2626,18 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
     // end actionSaveAs
 
+	// actionUndo
+	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentWorkingState);
+	// end actionUndo
+
+	// actionRedo
+	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentWorkingState);
+	// end actionRedo
+
 	// actionZoomIn
 	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentEmptyState);
@@ -2570,6 +2649,18 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", true, documentWorkingState);
 	// end actionZoomOut
+
+	// actionZoomToPage
+	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", true, documentWorkingState);
+	// end actionZoomToPage
+
+	// actionZoomToSelection
+	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", true, documentWorkingState);
+	// end actionZoomToSelection
 
 	// ZoomInput comboBoxScale
 	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, initState);
@@ -3001,7 +3092,7 @@ void LaserControllerWindow::createNewDocument()
 		m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
 		//m_viewer->centerOn(rect.center());
 		m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
-		m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));
+		m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点
 		
 		//m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 		

@@ -6,6 +6,7 @@
 #include <QTime>
 #include <QTextEdit>
 #include <QState>
+#include <QUndoStack>
 class RulerWidget;
 class LaserScene;
 class LaserPrimitiveGroup;
@@ -48,8 +49,11 @@ public:
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint);
 	bool detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint);
 	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);
+	void clearGroupSelection();
 
 	QState* currentState();
+
+	QUndoStack* undoStack();
 	
 private:
     void init();
@@ -75,6 +79,7 @@ public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
+	void zoomToSelection();
 	void textAreaChanged();
 	void onEndSelecting();
 	void onDocumentIdle();
@@ -87,6 +92,7 @@ signals:
 	void scaleChanged(qreal scale);
     void beginSelecting();
     void endSelecting();
+	void idleToSelected();
     void selectionToIdle();
 	void cancelSelected();
 	void beginSelectedEditing();
@@ -116,7 +122,7 @@ protected:
 	void paintSelectedState(QPainter& painter);
 	int setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
-    void zoomBy(qreal factor, bool isCenter = true);
+    void zoomBy(qreal factor, QPointF zoomAnchor = QPointF(0, 0), bool zoomAnchorCenter = false);
 	void resizeEvent(QResizeEvent *event) override;
 
 	
@@ -142,7 +148,7 @@ protected:
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
 	
-	void clearGroupSelection();
+	
 
 private:
     QScopedPointer<LaserScene> m_scene;
@@ -219,7 +225,7 @@ private:
 	bool m_isLeftSelecting = true;//����߿�ʼѡ�����ұ߿�ʼѡ��
 
 	bool m_isFirstPaint = true;
-	QRectF m_fitInRect;
+	//QRectF m_fitInRect;
 
 	QPointF m_lastViewDragPoint;
 	QPointF m_anchorPoint;
@@ -228,9 +234,12 @@ private:
 	bool m_isItemEdgeCenter;
 	QLine m_detectedEdge;
 	LaserPrimitive* m_detectedPrimitive;
-	QPolygonF testRect;
-	QPolygonF testBoundinRect;
+	//QPolygonF testRect;
+	//QPolygonF testBoundinRect;
 	LaserBitmap* m_detectedBitmap;
+	//undo stack
+	QUndoStack* m_undoStack;
+	QList<QGraphicsItem*> m_undoSelectionList;
 	
 	friend class LaserScene;
 };

@@ -155,8 +155,10 @@
    <addaction name="actionDeletePrimitive"/>
    <addaction name="separator"/>
    <addaction name="actionDragView"/>
+   <addaction name="actionZoomToPage"/>
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
+   <addaction name="actionZoomToSelection"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
@@ -849,24 +851,6 @@
     <string>Move Down</string>
    </property>
   </action>
-  <action name="actionUndo">
-   <property name="icon">
-    <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/undo.png</normaloff>:/ui/icons/images/undo.png</iconset>
-   </property>
-   <property name="text">
-    <string>Undo</string>
-   </property>
-  </action>
-  <action name="actionRedo">
-   <property name="icon">
-    <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/redo.png</normaloff>:/ui/icons/images/redo.png</iconset>
-   </property>
-   <property name="text">
-    <string>Redo</string>
-   </property>
-  </action>
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
@@ -1067,6 +1051,54 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionZoomToPage">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/zommToPage.png</normaloff>:/ui/icons/images/zommToPage.png</iconset>
+   </property>
+   <property name="text">
+    <string>ZoomToPage</string>
+   </property>
+   <property name="toolTip">
+    <string>zoom to page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="actionZoomToSelection">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/zoomToSelection.png</normaloff>:/ui/icons/images/zoomToSelection.png</iconset>
+   </property>
+   <property name="text">
+    <string>ZoomToSelection</string>
+   </property>
+   <property name="toolTip">
+    <string>zoom to frame selection</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+A</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/undo.png</normaloff>:/ui/icons/images/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/redo.png</normaloff>:/ui/icons/images/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
    </property>
   </action>
  </widget>
