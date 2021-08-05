@@ -896,8 +896,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
+			if (m_group) {
+				m_undoSelectionList = m_group->childItems();
+			}
 			
-			m_undoSelectionList = m_group->childItems();
 			m_detectedPrimitive = nullptr;
 			m_detectedBitmap = nullptr;
 			//点击选中图元
@@ -909,9 +911,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					emit beginIdelEditing();
 				}
 				//undo redo
-				QList<QGraphicsItem*> redoList = m_group->childItems();
-				SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-				m_undoStack->push(selection);
+				selectionUndoStackPush();
 				return;
 			}
 			else {
@@ -926,10 +926,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 						emit beginIdelEditing();
 					}
 					//undo redo
-					QList<QGraphicsItem*> redoList = m_group->childItems();
-					SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-					m_undoStack->push(selection);
-					viewport()->repaint();
+					selectionUndoStackPush();
 					return;
 				}
 				// 获取选框起点
@@ -943,8 +940,10 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         // 若在DocumentSelected状态下
         else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
 			
+			if (m_group) {
+				m_undoSelectionList = m_group->childItems();
+			}
 			
-			m_undoSelectionList = m_group->childItems();
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
@@ -1015,9 +1014,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 			else if(detectItemEdgeByMouse(m_detectedPrimitive, event->pos())){
 				pointSelectWhenSelectedState(13, m_detectedPrimitive);
 				//undo redo
-				QList<QGraphicsItem*> redoList = m_group->childItems();
-				SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-				m_undoStack->push(selection);
+				selectionUndoStackPush();
 			}
 			
             else
@@ -1028,9 +1025,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
 					pointSelectWhenSelectedState(14, m_detectedBitmap);
 					//undo redo
-					QList<QGraphicsItem*> redoList = m_group->childItems();
-					SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-					m_undoStack->push(selection);
+					selectionUndoStackPush();
 					return;
 				}
 				
@@ -1377,9 +1372,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				viewport()->repaint();
 			}
 			//undo redo
-			QList<QGraphicsItem*> redoList = m_group->childItems();
-			SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-			m_undoStack->push(selection);
+			selectionUndoStackPush();
+			
 			return;
         }
 		//
@@ -1404,9 +1398,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		
 		onEndSelecting();
 		//undo redo
-		QList<QGraphicsItem*> redoList = m_group->childItems();
-		SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-		m_undoStack->push(selection);
+		selectionUndoStackPush();
+		
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -1931,6 +1924,18 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 	emit beginSelectedEditing();
 	m_curSelectedHandleIndex = handleIndex;//点选
 	this->viewport()->repaint();
+}
+
+void LaserViewer::selectionUndoStackPush()
+{
+	QList<QGraphicsItem*> redoList;
+	if (m_group) {
+		redoList = m_group->childItems();
+	}
+	if (redoList != m_undoSelectionList) {
+		SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
+		m_undoStack->push(selection);
+	}
 }
 
 qreal LaserViewer::zoomValue() const

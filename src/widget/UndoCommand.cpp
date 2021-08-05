@@ -8,6 +8,7 @@ SelectionUndoCommand::SelectionUndoCommand(LaserViewer * viewer, QList<QGraphics
 	m_viewer = viewer;
 	m_undoSelectedList = undoList;
 	m_redoSelectedList = redoList;
+	this->setObsolete(true);
 }
 
 SelectionUndoCommand::~SelectionUndoCommand()
@@ -22,9 +23,9 @@ void SelectionUndoCommand::undo()
 
 void SelectionUndoCommand::redo()
 {
-	if(m_viewer->group()->childItems() == m_redoSelectedList){
+	/*if(m_viewer->group()->childItems() == m_redoSelectedList){
 		return;
-	}
+	}*/
 	handle(m_redoSelectedList);
 }
 

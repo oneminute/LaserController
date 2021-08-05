@@ -75,6 +75,7 @@ private:
 	qreal bottomScaleMirror(qreal rate, qreal y);
 	void setGroupNull();
 	void pointSelectWhenSelectedState(int handleIndex, LaserPrimitive* primitive);
+	void selectionUndoStackPush();
 public slots:
     void zoomIn();
     void zoomOut();
