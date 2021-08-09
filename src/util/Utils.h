@@ -18,6 +18,8 @@ namespace utils
     QVector3D putToQuadrant(const QVector3D& pos, QUADRANT quadrant);
 
     void limitToLayout(QVector3D& pos, QUADRANT quadrant, float width, float height);
+
+    quint32 factorial(quint32 n);
 }
 
 #endif // UTILS_H

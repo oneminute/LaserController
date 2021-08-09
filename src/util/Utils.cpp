@@ -106,3 +106,10 @@ void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float
     pos.setX(x);
     pos.setY(y);
 }
+
+quint32 utils::factorial(quint32 n)
+{
+    if (n == 0)
+        return 1;
+    return n * factorial(n - 1);
+}

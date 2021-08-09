@@ -354,6 +354,32 @@ private:
     Q_DISABLE_COPY(LaserPolygon)
 };
 
+class LaserNurbsPrivate;
+class LaserNurbs : public LaserShape
+{
+    Q_OBJECT
+public:
+    enum BasisType
+    {
+        BT_BEZIER,
+        BT_BSPLINE
+    };
+
+    LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, BasisType basisType, LaserDocument* doc, QTransform transform = QTransform());
+    ~LaserNurbs() {}
+
+    virtual void draw(QPainter* painter);
+    virtual QPainterPath toPath() const;
+
+	virtual QRectF sceneBoundingRect() const;
+
+    void updateCurve();
+
+private:
+    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserNurbs)
+    Q_DISABLE_COPY(LaserNurbs)
+};
+
 class LaserBitmapPrivate;
 class LaserBitmap : public LaserPrimitive
 {

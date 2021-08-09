@@ -9,6 +9,9 @@
 #include <QVector2D>
 #include <QVector3D>
 
+class LaserDocument;
+class LaserPrimitive;
+
 enum DxfNodeType
 {
     NT_Unknown,
@@ -26,6 +29,7 @@ enum DxfNodeType
     NT_Block,
     NT_EndBlock,
     NT_Entity,
+    NT_Arc,
     NT_LWPolyline,
     NT_Circle,
     NT_Ellipse,
@@ -74,6 +78,13 @@ public:
     {
         bool ok;
         value = variable.toInt(&ok, base);
+        return ok;
+    }
+
+    bool assign(quint32& value, int base = 10) const
+    {
+        bool ok;
+        value = variable.toUInt(&ok, base);
         return ok;
     }
 
@@ -173,7 +184,7 @@ public:
 
     virtual bool parse(DxfStream* stream) = 0;
 
-    virtual QString toString() const;
+    virtual void debugPrint() const;
 
 protected:
     explicit DxfNode(int groupCode, const QString& variable, DxfNodePrivate* privateData);
@@ -200,8 +211,6 @@ private:
     friend class DxfEntityNode;
 };
 
-QDebug operator<<(QDebug debug, const DxfNode& node);
-
 class DxfDocumentNodePrivate;
 class DxfDocumentNode : public DxfNode
 {
@@ -211,10 +220,11 @@ public:
     {
     }
 
+    const DxfEntitiesNode& entities() const;
+
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
-
+    virtual void debugPrint() const override;
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfDocumentNode)
     Q_DISABLE_COPY(DxfDocumentNode)
@@ -235,8 +245,7 @@ public:
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
-
+    virtual void debugPrint() const override;
 private:
     void setProperty(const QString& name, const QString& value);
 
@@ -256,8 +265,7 @@ public:
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
-
+    virtual void debugPrint() const override;
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfClassNode)
     Q_DISABLE_COPY(DxfClassNode)
@@ -268,15 +276,11 @@ class DxfItemNode : public DxfNode
 {
 public:
     explicit DxfItemNode(int groupCode, const QString& variable, DxfItemNodePrivate* ptr);
-    ~DxfItemNode()
-    {
-
-    }
+    ~DxfItemNode() {}
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
-
+    virtual void debugPrint() const override;
 protected:
     virtual bool parseItem(DxfGroup& group) = 0;
     virtual bool isEnd(DxfGroup& group) = 0;
@@ -291,13 +295,10 @@ class DxfTableNode : public DxfItemNode
 {
 public:
     explicit DxfTableNode(int groupCode = 0);
-    ~DxfTableNode()
-    {
+    ~DxfTableNode() {}
 
-    }
-
-    virtual QString toString() const override;
-
+    virtual void debugPrint() const override;
+    
 protected:
     virtual bool parseItem(DxfGroup& group) override;
     virtual bool isEnd(DxfGroup& group) override;
@@ -312,12 +313,9 @@ class DxfBlockNode : public DxfItemNode
 {
 public:
     explicit DxfBlockNode(int groupCode = 0);
-    ~DxfBlockNode()
-    {
+    ~DxfBlockNode() {}
 
-    }
-
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -333,11 +331,9 @@ class DxfEndBlockNode : public DxfItemNode
 {
 public:
     explicit DxfEndBlockNode(int groupCode = 0);
-    ~DxfEndBlockNode()
-    {
-    }
+    ~DxfEndBlockNode() {}
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -356,7 +352,9 @@ public:
     explicit DxfEntityNode(int groupCode, const QString& variable);
     ~DxfEntityNode() {}
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const { return nullptr; }
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -374,7 +372,9 @@ public:
     explicit DxfLWPolylineNode(int groupCode = 0);
     ~DxfLWPolylineNode() {}
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -391,7 +391,9 @@ public:
     explicit DxfCircleNode(int groupCode = 0);
     ~DxfCircleNode() {}
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -408,7 +410,9 @@ public:
     explicit DxfEllipseNode(int groupCode = 0);
     ~DxfEllipseNode() {}
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -416,6 +420,82 @@ protected:
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfEllipseNode)
     Q_DISABLE_COPY(DxfEllipseNode)
+};
+
+class DxfLineNodePrivate;
+class DxfLineNode : public DxfEntityNode
+{
+public:
+    explicit DxfLineNode(int groupCode = 0);
+    ~DxfLineNode() {}
+
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
+
+protected:
+    virtual bool parseItem(DxfGroup& group) override;
+
+private:
+    Q_DECLARE_PRIVATE_D(m_ptr, DxfLineNode)
+    Q_DISABLE_COPY(DxfLineNode)
+};
+
+class DxfSplineNodePrivate;
+class DxfSplineNode : public DxfEntityNode
+{
+public:
+    explicit DxfSplineNode(int groupCode = 0);
+    ~DxfSplineNode() {}
+
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
+
+    bool isClosed() const;
+
+protected:
+    virtual bool parseItem(DxfGroup& group) override;
+
+private:
+    Q_DECLARE_PRIVATE_D(m_ptr, DxfSplineNode)
+    Q_DISABLE_COPY(DxfSplineNode)
+};
+
+class DxfArcNodePrivate;
+class DxfArcNode : public DxfEntityNode
+{
+public:
+    explicit DxfArcNode(int groupCode = 0);
+    ~DxfArcNode() {}
+
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
+
+protected:
+    virtual bool parseItem(DxfGroup& group) override;
+
+private:
+    Q_DECLARE_PRIVATE_D(m_ptr, DxfArcNode)
+    Q_DISABLE_COPY(DxfArcNode)
+};
+
+class DxfImageNodePrivate;
+class DxfImageNode : public DxfEntityNode
+{
+public:
+    explicit DxfImageNode(int groupCode = 0);
+    ~DxfImageNode() {}
+
+    virtual void debugPrint() const override;
+
+protected:
+    virtual bool parseItem(DxfGroup& group) override;
+
+private:
+    Q_DECLARE_PRIVATE_D(m_ptr, DxfImageNode)
+    Q_DISABLE_COPY(DxfImageNode)
 };
 
 class DxfObjectNodePrivate;
@@ -426,7 +506,7 @@ public:
     explicit DxfObjectNode(int groupCode, const QString& variable);
     ~DxfObjectNode() {}
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -449,6 +529,9 @@ public:
 
     virtual bool parse(DxfStream* stream) override;
 
+    virtual void debugPrint() const override
+    {
+    }
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfThumbnailImageNode)
     Q_DISABLE_COPY(DxfThumbnailImageNode)
@@ -474,13 +557,11 @@ class DxfClassesNode : public DxfCollectionNode, public QList<DxfClassNode*>
 {
 public:
     explicit DxfClassesNode(int groupCode = 2);
-    ~DxfClassesNode()
-    {
-    }
+    ~DxfClassesNode() {}
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfClassesNode)
@@ -492,14 +573,11 @@ class DxfTablesNode : public DxfCollectionNode, public QList<DxfTableNode*>
 {
 public:
     explicit DxfTablesNode(int groupCode = 2);
-    ~DxfTablesNode()
-    {
-
-    }
+    ~DxfTablesNode() {}
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfTablesNode)
@@ -511,14 +589,11 @@ class DxfBlocksNode : public DxfCollectionNode, public QList<DxfBlockNode*>
 {
 public:
     explicit DxfBlocksNode(int groupCode = 2);
-    ~DxfBlocksNode()
-    {
-
-    }
+    ~DxfBlocksNode() {}
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfBlocksNode)
@@ -530,14 +605,11 @@ class DxfEntitiesNode : public DxfCollectionNode, public QList<DxfEntityNode*>
 {
 public:
     explicit DxfEntitiesNode(int groupCode = 2);
-    ~DxfEntitiesNode()
-    {
-
-    }
+    ~DxfEntitiesNode() {}
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfEntitiesNode)
@@ -549,14 +621,11 @@ class DxfObjectsNode : public DxfCollectionNode, public QList<DxfObjectNode*>
 {
 public:
     explicit DxfObjectsNode(int groupCode = 2);
-    ~DxfObjectsNode()
-    {
-
-    }
+    ~DxfObjectsNode() {}
 
     virtual bool parse(DxfStream* stream) override;
 
-    virtual QString toString() const override;
+    virtual void debugPrint() const override;
 
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfObjectsNode)
