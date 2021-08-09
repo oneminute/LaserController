@@ -113,11 +113,13 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
 	QTransform getAllTransform();
+	QPainterPath getPath();
 	QRectF originalBoundingRect() const;
 	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
     virtual QRectF sceneBoundingRect() const;
     QPointF laserStartPos() const;
+	void sceneTransformToItemTransform(QTransform sceneTransform);//根据sceneTransfrom转化为Item的transform和position
 
     virtual void draw(QPainter* painter) {};
 
@@ -146,7 +148,11 @@ public:
 
     virtual QPainterPath outline() const;
 
-	virtual void reShape();
+	//virtual void reShape();
+	void setData(QPainterPath path,
+		QTransform allTransform,
+		QTransform transform,
+		QRectF boundingRect);
 
 	virtual QJsonObject toJson();
 	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
@@ -216,7 +222,7 @@ public:
 
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
-	virtual void reShape();
+	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 
@@ -241,7 +247,7 @@ public:
 
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
-	virtual void reShape();
+	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 private:
@@ -265,7 +271,7 @@ public:
 
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
-	virtual void reShape();
+	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 
@@ -293,7 +299,7 @@ public:
     virtual QList<QPainterPath> subPaths() const;
 	virtual QRectF sceneBoundingRect() const;
 
-	virtual void reShape();
+	//virtual void reShape();
 	QVector<QLineF> edges();
 
 private:
@@ -318,7 +324,7 @@ public:
 
     virtual QPainterPath toPath() const;
 
-	virtual void reShape();
+	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 
@@ -345,7 +351,7 @@ public:
 
 	virtual QRectF sceneBoundingRect() const;
 
-	virtual void reShape();
+	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 

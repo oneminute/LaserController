@@ -92,7 +92,8 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
     Q_D(LaserDocument);
     item->layer()->removePrimitive(item);
     d->primitives.remove(item->nodeName());
-    item->QObject::deleteLater();
+    //item->QObject::deleteLater();
+
 }
 
 PageInformation LaserDocument::pageInformation() const
@@ -123,6 +124,19 @@ LaserPrimitive* LaserDocument::laserPrimitive(const QString& id) const
 {
     Q_D(const LaserDocument);
     return d->primitives[id];
+}
+
+QList<LaserPrimitive*> LaserDocument::selectedPrimitives() const
+{
+	Q_D(const LaserDocument);
+	QList<LaserPrimitive*>list;
+	for each(LaserPrimitive* item in d->primitives) {
+		if (item->isSelected()) {
+			list.append(item);
+		}
+
+	}
+	return list;
 }
 
 QList<LaserLayer*> LaserDocument::layers() const
@@ -707,7 +721,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		QJsonObject layer = layers[i].toObject();
 		QJsonArray array = layer["primitives"].toArray();
 		
-		//����layer
+		//layer
 		/*LaserLayerType type = (LaserLayerType)layer["type"].toInt();
 		qDebug() << layer["name"].toString();
 		LaserLayer* laserLayer = new LaserLayer(layer["name"].toString(), type, this, true);
@@ -719,7 +733,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 			qLogD << "your layer index have changed";
 			return;
 		}
-		//����primitive
+		//primitive
 		for (int j = 0; j < array.size(); j++) {
 			QJsonObject primitiveJson = array[j].toObject();
 			QString className = primitiveJson["className"].toString();
@@ -742,7 +756,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					matrixPArray[6].toDouble(), matrixPArray[7].toDouble(), matrixPArray[8].toDouble());
 			}
 			QTransform saveTransform = transform * transformP;
-			//ͼԪ��ͬ��֧
+			//
 			if (className == "LaserEllipse" || className == "LaserRect" || className == "LaserBitmap") {
 				//QTransform saveTransform = transform * transformP;
 				//bounds

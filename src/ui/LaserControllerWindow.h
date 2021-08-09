@@ -171,7 +171,9 @@ protected slots:
 	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
 	void onSelectionOriginalClicked(bool clicked);
 	//undo
-	void onUndoStackCleanChanged(int index);
+	void onUndoStackCleanChanged(bool clean);
+	void onCanUndoChanged(bool can);
+	void onCanRedoChanged(bool can);
 private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();

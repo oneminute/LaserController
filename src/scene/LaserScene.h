@@ -40,6 +40,7 @@ public:
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 	void findSelectedByLine(QRectF rect);
+	void findSelectedByBoundingRect(QRectF rect);
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;
