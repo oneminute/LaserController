@@ -45,6 +45,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_horizontalRuler(nullptr)
     , m_verticalRuler(nullptr)
 	, m_radians(0)
+	, m_mousePressState(nullptr)
 {
     setScene(m_scene.data());
     init();
@@ -297,14 +298,28 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	//QList<QGraphicsItem*> items = m_scene->selectedItems();
 	QRectF rect;
 	
-	QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
+	//QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
+	//QList<LaserPrimitive*> items = m_;
+	if (!m_group) {
+		return rect;
+	}
 
 	qreal left = 0;
 	qreal right = 0;
 	qreal top = 0;
 	qreal bottom = 0;
-	
-	if (items.size() == 0 && m_group) {
+
+	QList<QGraphicsItem*> group_items = m_group->childItems();
+	if (group_items.size() == 0) {
+		return rect;
+	}
+	for (int i = 0; i < group_items.size(); i++) {
+		LaserPrimitive* item = qgraphicsitem_cast<LaserPrimitive*>(group_items[i]);
+		detectRect(*item, i, left, right, top, bottom);
+	}
+	rect = QRectF(left, top, right - left, bottom - top);
+	return rect;
+	/*if (items.size() == 0 && m_group) {
 		QList<QGraphicsItem*> group_items = m_group->childItems();
 		if (group_items.size() == 0) {
 			return rect;
@@ -323,8 +338,8 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 		LaserPrimitive* item = items[i];
 		detectRect(*item, i, left, right, top, bottom);
 	}
-	rect = QRectF(left, top, right - left, bottom - top);
-	return rect;
+	rect = QRectF(left, top, right - left, bottom - top);*/
+	
 }
 void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, int _state, int _transformType)
 {
@@ -772,15 +787,18 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 	qDebug() << "_endPoint: " << _endPoint;
 	//right select
 	if (_endPoint.x() < _startPoint.x()) {
-		m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
+		//m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
+		//m_scene->findSelectedByBoundingRect(rect);
 		m_scene->findSelectedByLine(rect);
 		
 	}
 	//left selection
 	else if (_endPoint.x() >= _startPoint.x()) {
-		m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
+		//m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
+		m_scene->findSelectedByBoundingRect(rect);
 	}
-	return m_scene->selectedPrimitives().size();
+	viewport()->repaint();
+	return m_scene->document()->selectedPrimitives().size();
 }
 
 void LaserViewer::wheelEvent(QWheelEvent* event)
@@ -893,18 +911,19 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 {
 // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
+		
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
-			if (m_group) {
-				m_undoSelectionList = m_group->childItems();
-			}
-			
+			m_mousePressState = StateControllerInst.documentIdleState();
 			m_detectedPrimitive = nullptr;
 			m_detectedBitmap = nullptr;
 			//点击选中图元
 			if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
-				clearGroupSelection();
+				//undo
+				//qDebug()<<m_group->childItems();
+				selectionUndoStackPushBefore();
+				//clearGroupSelection();
 				m_detectedPrimitive->setSelected(true);
 				if (onSelectedFillGroup()) {
 					m_curSelectedHandleIndex = 13;
@@ -919,7 +938,9 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				//QGraphicsView::mousePressEvent(event);
 				//点击选中图片
 				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
-					clearGroupSelection();
+					//clearGroupSelection();
+					//undo
+					selectionUndoStackPushBefore();
 					m_detectedBitmap->setSelected(true);
 					if (onSelectedFillGroup()) {
 						m_curSelectedHandleIndex = 14;
@@ -939,22 +960,21 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         }
         // 若在DocumentSelected状态下
         else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-			
-			if (m_group) {
-				m_undoSelectionList = m_group->childItems();
-			}
-			
+			m_mousePressState = StateControllerInst.documentSelectedState();
+			//undo
+			selectionUndoStackPushBefore();
+			//
+			m_detectedPrimitive = nullptr;
+			m_detectedBitmap = nullptr;
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
             {
-				//m_selectedRect = m_group->sceneBoundingRect();
 				m_selectedRect = selectedItemsSceneBoundingRect();
 				m_oldTransform = m_group->transform();
 				m_rate = 1;
 				m_isItemScaleChangeX = true;
 				m_isItemScaleChangeY = true;
-				//QRectF boundRect = m_group->sceneBoundingRect();
 				QRectF boundRect = selectedItemsSceneBoundingRect();
 				qLogD << "group bounding rect: " << boundRect;
 				switch (m_curSelectedHandleIndex)
@@ -1009,10 +1029,17 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					}
 
 				}
+				//undo
+				m_undoTransform = m_group->sceneTransform();
                 emit beginSelectedEditing();
 			}
 			else if(detectItemEdgeByMouse(m_detectedPrimitive, event->pos())){
+				//undo redo
+				//reshapeUndoStackPushBefore();
+				//
 				pointSelectWhenSelectedState(13, m_detectedPrimitive);
+				//undo redo
+				//reshapeUndoStackPush();
 				//undo redo
 				selectionUndoStackPush();
 			}
@@ -1020,33 +1047,44 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             else
             {
 				m_detectedBitmap = nullptr;
+				
 				//QGraphicsView::mousePressEvent(event);
 				//事件被Item截断 图片点选
 				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+					//undo redo
+					//reshapeUndoStackPushBefore();
+					//
 					pointSelectWhenSelectedState(14, m_detectedBitmap);
+					//undo redo
+					//reshapeUndoStackPush();
 					//undo redo
 					selectionUndoStackPush();
 					return;
 				}
-				
 				m_selectionStartPoint = event->pos();
 				m_selectionEndPoint = m_selectionStartPoint;
-				if (m_isKeyCtrlPress) { 
+				emit beginSelecting();
+				/*if (m_isKeyCtrlPress) { 
 					//multi selection
-					resetGroup();
+					if (m_group) {
+						//undo
+						reshapeUndoStackPushBefore();
+						resetGroup();
+						reshapeUndoStackPush();
+					}
+					
 					emit beginSelecting();
 					viewport()->repaint();
 				}
 				else {
 					onCancelSelected();
-				}
-				
+				}*/
 				
             }
         }
 		//View Drag Ready
 		else if (StateControllerInst.isInState(StateControllerInst.documentViewDragReadyState())) {
-			
+			m_mousePressState = StateControllerInst.documentViewDragReadyState();
 			QPixmap cMap(":/ui/icons/images/dragging_hand.png");
 			this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
 			m_lastViewDragPoint = event->pos();
@@ -1056,7 +1094,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         //Rect
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectReadyState()))
         {
-
+			m_mousePressState = StateControllerInst.documentPrimitiveRectReadyState();
 			QPointF point = mapToScene(event->pos());
 			//网格点吸附判断
 			LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
@@ -1071,6 +1109,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         //Ellipse
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseReadyState()))
         {
+			m_mousePressState = StateControllerInst.documentPrimitiveEllipseReadyState();
             m_creatingEllipseStartPoint = mapToScene(event->pos());
             m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
             m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
@@ -1086,6 +1125,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         }*/
         //Polygon Ready
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
+			m_mousePressState = StateControllerInst.documentPrimitivePolygonReadyState();
             //clear
             //m_creatingPolygonPoints.clear();
 			//m_creatingPolygonLines.clear();
@@ -1094,16 +1134,19 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         }
         //Spline
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineReadyState())) {
+			m_mousePressState = StateControllerInst.documentPrimitiveSplineReadyState();
             initSpline();
             emit creatingSpline();
         }
         //Text
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {
+			m_mousePressState = StateControllerInst.documentPrimitiveTextReadyState();
             m_textInputPoint = mapToScene(event->pos()).toPoint();
             creatTextEdit();
             emit creatingText();
         }
 		else {
+			m_mousePressState = nullptr;
 			//QGraphicsView::mousePressEvent(event); 会使画线时出现Bug
 			//setInteractive(false);
 		}
@@ -1362,30 +1405,40 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		QGraphicsView::mouseReleaseEvent(event);
         if (checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
-			if (m_isKeyCtrlPress) {
-				onEndSelecting();
-			}
-			else {
-				m_scene->clearSelection();
-				emit selectionToIdle();
-				m_isKeyShiftPressed = false;
-				viewport()->repaint();
-			}
-			//undo redo
-			selectionUndoStackPush();
-			
+			//点中空白且press与release同一个点
+			selectingReleaseInBlank();
 			return;
         }
-		//
-		QList<LaserPrimitive*> selectedList = m_scene->selectedPrimitives();
+		//undo before
+		selectionUndoStackPushBefore();
+		//框选前先将item从group中移除
+		//不然修改完group内的item的selected属性再从group中移除的话，
+		//group子对象selected不论true/false都设为group的isSelected值
+		/*for each(QGraphicsItem* item in m_group->childItems()) {
+			qDebug() << "item:" << item;
+			qDebug() << "item transform:" << item->transform();
+			qDebug() << "scene transform: " << item->sceneTransform();
+		}*/
+		resetGroup();
+		/*qDebug() << " reset: ";
+		for each(LaserPrimitive* primitive in m_scene->document()->selectedPrimitives()) {
+			
+			qDebug() << "item:" << primitive;
+			qDebug() << "item transform:" << primitive->transform();
+			qDebug() << "scene transform: " << primitive->sceneTransform();
+		}*/
+		//框选前被选中的
+		QList<LaserPrimitive*> selectedList = m_scene->document()->selectedPrimitives();
+		//框选区域内被选中的
 		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
-		QList<LaserPrimitive*> newSelectedList = m_scene->selectedPrimitives();
-		//setSelectionArea function cleared selected items		
+		QList<LaserPrimitive*> newSelectedList = m_scene->document()->selectedPrimitives();
+		//框选区域，分情况处理selectionUndo
 		if (m_isKeyCtrlPress) {
-			for each (LaserPrimitive* item in selectedList) {
+			for each(LaserPrimitive* item in selectedList) {
 				item->setSelected(true);
 			}
 			for each(LaserPrimitive* newItem in newSelectedList) {
+				
 				if (selectedList.contains(newItem)) {
 					newItem->setSelected(false);
 				}
@@ -1393,18 +1446,31 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 					newItem->setSelected(true);
 				}
 			}
+			onEndSelectionFillGroup();
+			if (!newSelectedList.isEmpty()) {
+				//undo redo
+				selectionUndoStackPush();
+			}
 			
 		}
-		
-		onEndSelecting();
-		//undo redo
-		selectionUndoStackPush();
-		
+		else {
+			if (selectedList == newSelectedList) {
+				onEndSelectionFillGroup();
+				return;
+			}
+			else {
+				onEndSelectionFillGroup();
+				//undo redo
+				selectionUndoStackPush();
+				
+			}
+		}
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
 		m_selectedEditCount = 0;
 		m_radians = 0;
+		
 		//group中没有被选中的item，返回idle状态
 		if (m_group->isEmpty()) {
 			emit selectionToIdle();
@@ -1413,7 +1479,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		else {
 			emit endSelectedEditing();
 		}
-		
+		//undo
+		if (m_detectedPrimitive) {
+
+		}
+		else {
+			transformUndoStackPush();
+		}
 		this->viewport()->repaint();
 		return;
     }
@@ -1680,6 +1752,7 @@ void LaserViewer::clearGroupSelection()
 		/*if (m_group->isSelected()) {
 		m_group->setSelected(false);
 		}*/
+		//reshapeUndoStackPushBefore();
 		const auto items = m_group->childItems();
 		for (QGraphicsItem *item : items) {
 			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
@@ -1688,12 +1761,13 @@ void LaserViewer::clearGroupSelection()
 			if (p_item->isSelected()) {
 				p_item->setSelected(false);
 			}
-			p_item->reShape();
+			//p_item->reShape();
 		}
 
 	}
 	m_group->setTransform(QTransform());
 	m_scene->clearSelection();
+	//reshapeUndoStackPush();
 }
 
 bool LaserViewer::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2)
@@ -1841,6 +1915,7 @@ void LaserViewer::setGroupNull()
 
 void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive * primitive)
 {
+	
 	//因为图片被选中时需要描外框， 所以在LaserPrimitive的draw里会用类型判断是否描外框
 	QString className = primitive->metaObject()->className();
 	if (className == "LaserBitmap") {
@@ -1848,11 +1923,10 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 		if (!m_group->isAncestorOf(bitmap)) {
 			if (bitmap) {
 				if (m_isKeyCtrlPress) {
-
-					resetGroup();
+						resetGroup();
 				}
 				else {
-					clearGroupSelection();
+						clearGroupSelection();
 				}
 
 				bitmap->setSelected(true);
@@ -1866,7 +1940,7 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 		else {
 			if (bitmap) {
 				if (m_isKeyCtrlPress) {
-					resetGroup();
+						resetGroup();
 					if (m_scene->selectedPrimitives().size() == 1) {
 						emit beginSelectedEditing();
 						this->viewport()->repaint();
@@ -1889,11 +1963,10 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 	if (!m_group->isAncestorOf(primitive)) {
 		if (primitive) {
 			if (m_isKeyCtrlPress) {
-
-				resetGroup();
+					resetGroup();
 			}
 			else {
-				clearGroupSelection();
+					clearGroupSelection();
 			}
 
 			primitive->setSelected(true);
@@ -1907,7 +1980,8 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 	else {
 		if (primitive) {
 			if (m_isKeyCtrlPress) {
-				resetGroup();
+					resetGroup();
+
 				if (m_scene->selectedPrimitives().size() == 1) {
 					emit beginSelectedEditing();
 					this->viewport()->repaint();
@@ -1925,17 +1999,127 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 	m_curSelectedHandleIndex = handleIndex;//点选
 	this->viewport()->repaint();
 }
+//mouse press：idle或selected satate 
+//mouse release：切换到了selecting state 
+//点选或框选都为空白，没有选中图元
+//框选，点选分不同的状态过来，做不同处理
+void LaserViewer::selectingReleaseInBlank()
+{
+	//idle state press mouse
+	if (m_mousePressState == StateControllerInst.documentIdleState()) {
+		//选区不变
+		onEndSelecting();
+	}
+	//selected satate press
+	else {
+		if (m_isKeyCtrlPress) {
+			//选区不变
+			onEndSelectionFillGroup();
+		}
+		else {
+			//m_scene->clearSelection();
+			if (!m_group->isEmpty()) {
+				//undo
+				selectionUndoStackPushBefore();
+				//清理group
+				clearGroupSelection();
+				emit selectionToIdle();
+				//m_isKeyShiftPressed = false;
+				//undo redo
+				selectionUndoStackPush();
+			}
+
+		}
+	}
+	
+	viewport()->repaint();
+}
+
+void LaserViewer::selectionUndoStackPushBefore()
+{
+	if (m_group) {
+		m_undoSelectionList = m_group->childItems();
+		m_undoSelectionTransform = m_group->transform();
+		qDebug() << m_undoSelectionList;
+		/*if (isReshape) {
+			reshapeUndoStackPushBefore();
+		}*/
+		
+	}
+}
 
 void LaserViewer::selectionUndoStackPush()
 {
 	QList<QGraphicsItem*> redoList;
+
 	if (m_group) {
 		redoList = m_group->childItems();
 	}
-	if (redoList != m_undoSelectionList) {
-		SelectionUndoCommand* selection = new SelectionUndoCommand(this, m_undoSelectionList, redoList);
-		m_undoStack->push(selection);
+	if (redoList == m_undoSelectionList) {
+		return;
 	}
+
+	SelectionUndoCommand* selection = new SelectionUndoCommand(this,
+		m_undoSelectionList, m_undoSelectionTransform, redoList, m_group->transform());
+	/*ReshapeUndoCommand* reshape = nullptr;
+	if (isReshape) {
+		reshape = reshapeUndoStackPush();
+	}
+	if (isReshape && reshape) {
+		bool bl = selection->mergeWith(reshape);
+	}*/
+	m_undoStack->push(selection);
+}
+
+void LaserViewer::reshapeUndoStackPushBefore()
+{
+	m_undoReshapMap.clear();
+	//transform group
+	for each(QGraphicsItem* item_g in m_group->childItems()) {
+		LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item_g);
+		qDebug() << primitive->pos();
+		qDebug() << m_group->transform();
+
+		ReshapeUndoPrimitive undoPrimitive(
+			primitive->getPath(), 
+			primitive->getAllTransform(), 
+			primitive->transform(), 
+			primitive->boundingRect(),
+			m_group->transform());
+		m_undoReshapMap.insert(primitive, undoPrimitive);
+	}
+}
+
+ReshapeUndoCommand* LaserViewer::reshapeUndoStackPush()
+{
+	if (m_undoReshapMap.isEmpty()) {
+		return nullptr;
+	}
+	QMap<LaserPrimitive*, ReshapeUndoPrimitive> map;
+	//QTransform g_transform = m_group->transform();
+	//已经被移除出group
+	for each(LaserPrimitive* primitive in m_undoReshapMap.keys()) {
+		qDebug() << primitive->pos();
+		ReshapeUndoPrimitive undoPrimitive(
+			primitive->getPath(),
+			primitive->getAllTransform(),
+			primitive->transform(),
+			primitive->boundingRect(),
+			m_group->transform());
+		map.insert(primitive, undoPrimitive);
+	}
+	return new ReshapeUndoCommand(this, m_undoReshapMap, map);
+	/*if (m_undoReshapMap != map) {
+		m_reshapCmd = new ReshapeUndoCommand(this, m_undoReshapMap, map);
+		//m_undoStack->push(cmd);
+	}*/
+}
+
+void LaserViewer::transformUndoStackPush()
+{
+	QTransform redoTransform = m_group->sceneTransform();
+	TranformUndoCommand* transformCmd = new TranformUndoCommand(this, m_undoTransform, redoTransform);
+	m_undoStack->push(transformCmd);
 }
 
 qreal LaserViewer::zoomValue() const
@@ -2043,39 +2227,52 @@ void LaserViewer::selectedHandleRotate() {
 
 }
 void LaserViewer::onEndSelecting() {
-	if (onSelectedFillGroup()) {
-		emit endSelecting();
+	if (m_scene->document()->selectedPrimitives().size() == 0) {
+		m_scene->clearSelection();
+		viewport()->repaint();
+		emit selectionToIdle();
+		
 	}
 	else {
+		emit endSelecting();
+	}
+	viewport()->repaint();
+}
+void LaserViewer::onEndSelectionFillGroup()
+{
+	if (!onSelectedFillGroup()) {
+		m_scene->clearSelection();
+		viewport()->repaint();
 		emit selectionToIdle();
 	}
-	
-
+	else {
+		emit endSelecting();
+	}
+	int i = m_group->childItems().size();
+	viewport()->repaint();
 }
 bool LaserViewer::onSelectedFillGroup()
 {
-	if (m_scene->selectedPrimitives().size() == 0) {
+	if (m_scene->document()->selectedPrimitives().size() == 0) {
 		m_scene->clearSelection();
-		
-		m_isKeyShiftPressed = false;
 		viewport()->repaint();
 		return false;
 	}
 	if (m_group)
 	{
 		
-		for (LaserPrimitive* item : m_scene->selectedPrimitives())
+		for (LaserPrimitive* item : m_scene->document()->selectedPrimitives())
 		{
 			if (m_group->childItems().contains(item))
 				continue;
 			m_group->addToGroup(item);
 		}
-		m_group->setZValue(1);
+		//m_group->setZValue(1);
 		m_group->setSelected(true);
 	}
 	else
 	{
-		QList<LaserPrimitive*>list = m_scene->selectedPrimitives();
+		QList<LaserPrimitive*>list = m_scene->document()->selectedPrimitives();
 		if (list.isEmpty()) {
 			return false;
 		}
@@ -2083,18 +2280,25 @@ bool LaserViewer::onSelectedFillGroup()
 		m_group = m_scene->createItemGroup(list);
 		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
 		m_group->setSelected(true);
+		m_group->setZValue(1);
 	}
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
 	m_curSelectedHandleIndex = -1;
 	return true;
 }
-
+//目前只在画完图元使用
 void LaserViewer::onReplaceGroup(LaserPrimitive* item)
 {
+	//undo
+	selectionUndoStackPushBefore();
+
 	onCancelSelected();
 	item->setSelected(true);
-	onEndSelecting();
+	//m_group->addToGroup(item);
+	onEndSelectionFillGroup();
+	//undo
+	selectionUndoStackPushBefore();
 }
 
 void LaserViewer::selectedHandleScale()
@@ -2489,14 +2693,16 @@ bool LaserViewer::resetGroup()
 		m_group->setTransform(QTransform());
 		return false;
 	}
+	//reshapeUndoStackPushBefore();
 	const auto items = m_group->childItems();
 	for (QGraphicsItem *item : items) {
 		LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 
 		m_group->removeFromGroup(p_item);
-		p_item->reShape();
+		//p_item->reShape();
 		
 	}
 	m_group->setTransform(QTransform());
+	//reshapeUndoStackPush();
 	return true;
 }

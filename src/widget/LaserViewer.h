@@ -12,6 +12,8 @@ class LaserScene;
 class LaserPrimitiveGroup;
 class LaserPrimitive;
 class LaserBitmap;
+struct ReshapeUndoPrimitive;
+class ReshapeUndoCommand;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -75,7 +77,13 @@ private:
 	qreal bottomScaleMirror(qreal rate, qreal y);
 	void setGroupNull();
 	void pointSelectWhenSelectedState(int handleIndex, LaserPrimitive* primitive);
+	void selectingReleaseInBlank();//释放鼠标时，点选和框选的区域为空白（没有图元）
+	//undo
+	void selectionUndoStackPushBefore();
 	void selectionUndoStackPush();
+	void reshapeUndoStackPushBefore();
+	ReshapeUndoCommand* reshapeUndoStackPush();
+	void transformUndoStackPush();
 public slots:
     void zoomIn();
     void zoomOut();
@@ -83,6 +91,7 @@ public slots:
 	void zoomToSelection();
 	void textAreaChanged();
 	void onEndSelecting();
+	void onEndSelectionFillGroup();
 	void onDocumentIdle();
 	void onCancelSelected();
 	bool resetGroup();
@@ -158,6 +167,7 @@ private:
     QPoint m_rubberBandOrigin;
     //bool m_mousePressed;
     QPoint m_lastDragPos;
+	QState* m_mousePressState;
 
     QPointF m_selectionStartPoint;
     QPointF m_selectionEndPoint;
@@ -241,6 +251,10 @@ private:
 	//undo stack
 	QUndoStack* m_undoStack;
 	QList<QGraphicsItem*> m_undoSelectionList;
+	QTransform m_undoSelectionTransform;
+	QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_undoReshapMap;
+	//ReshapeUndoCommand* m_reshapCmd;
+	QTransform m_undoTransform;
 	
 	friend class LaserScene;
 };

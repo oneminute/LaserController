@@ -62,6 +62,7 @@ public:
     QList<int> startingIndices;
 	QTransform allTransform;
 	QRectF originalBoundingRect;
+	QPainterPath path;//改为最初的图形
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform)
@@ -187,7 +188,14 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 QTransform LaserPrimitive::getAllTransform()
 {
 	Q_D(const LaserPrimitive);
-	return d->allTransform;
+	//return d->allTransform;
+	return sceneTransform();
+}
+
+QPainterPath LaserPrimitive::getPath()
+{
+	Q_D(const LaserPrimitive);
+	return d->path;
 }
 
 QRectF LaserPrimitive::originalBoundingRect() const
@@ -198,13 +206,13 @@ QRectF LaserPrimitive::originalBoundingRect() const
 
 QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
 {
-	QPolygonF bounding = sceneTransform().map(getAllTransform().map(originalBoundingRect()));
+	QPolygonF bounding = sceneTransform().map(boundingRect());
 	//QPolygonF bounding = transform().map(originalBoundingRect());
-	qDebug() << transform();
+	/*qDebug() << transform();
 	qDebug() << getAllTransform();
 	qDebug() << sceneTransform();
 	qDebug() << "originalBoundingRect(): " << originalBoundingRect();
-	qDebug() <<"bounding: " << bounding;
+	qDebug() <<"bounding: " << bounding;*/
 	if (extendPixel != 0) {
 		QVector2D p12 = QVector2D(bounding[1] - bounding[0]).normalized() * extendPixel;
 		QVector2D p23 = QVector2D(bounding[2] - bounding[1]).normalized() * extendPixel;
@@ -236,7 +244,7 @@ QRectF LaserPrimitive::boundingRect() const
 QRectF LaserPrimitive::sceneBoundingRect() const
 {
     Q_D(const LaserPrimitive);
-    QRectF bounds = sceneTransform().mapRect(d->boundingRect);
+    QRectF bounds = sceneTransform().mapRect(boundingRect());
     return bounds;
 }
 
@@ -245,6 +253,17 @@ QPointF LaserPrimitive::laserStartPos() const
     QPointF pos = boundingRect().topLeft();
     pos *= 40;
     return pos;
+}
+
+void LaserPrimitive::sceneTransformToItemTransform(QTransform sceneTransform)
+{
+	
+	QTransform t(
+		sceneTransform.m11(), sceneTransform.m12(), sceneTransform.m13(),
+		sceneTransform.m21(), sceneTransform.m22(), sceneTransform.m23(),
+		0, 0, sceneTransform.m33());
+	setTransform(t);
+	setPos(sceneTransform.m31(), sceneTransform.m32());
 }
 
 std::vector<cv::Point2f> LaserPrimitive::mechiningPoints() const
@@ -424,9 +443,21 @@ QPainterPath LaserPrimitive::outline() const
     return d->outline;
 }
 
-void LaserPrimitive::reShape()
+/*void LaserPrimitive::reShape()
 {
 
+}*/
+
+void LaserPrimitive::setData(QPainterPath path,
+	QTransform allTransform,
+	QTransform transform,
+	QRectF boundingRect)
+{
+	Q_D(LaserPrimitive);
+	d->path = path;
+	d->allTransform = transform;
+	d->boundingRect = boundingRect;
+	setTransform(transform);
 }
 
 QJsonObject LaserPrimitive::toJson()
@@ -528,19 +559,22 @@ public:
     {}
 
     QRectF bounds;
-	QPainterPath path;
+	//QPainterPath path;
 };
 
 LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform saveTransform)
     : LaserShape(new LaserEllipsePrivate(this), doc, LPT_ELLIPSE, saveTransform)
 {
+	
     Q_D(LaserEllipse);
     d->bounds = bounds;
 	d->originalBoundingRect = bounds;
-	
+	sceneTransformToItemTransform(saveTransform);
 	d->path.addEllipse(d->bounds);
-	d->path = saveTransform.map(d->path);
+	//d->path.addEllipse(d->bounds);
+	//d->path = saveTransform.map(d->path);
 	d->boundingRect = d->path.boundingRect();
+	//机械加工中使用
     d->outline.addEllipse(bounds);
     d->position = bounds.center();
 }
@@ -593,21 +627,22 @@ QRectF LaserEllipse::sceneBoundingRect() const
 	return sceneTransform().map(d->path).boundingRect();
 }
 
-void LaserEllipse::reShape()
+/*void LaserEllipse::reShape()
 {
 	Q_D(LaserEllipse);
 	d->path = transform().map(d->path);
 	d->boundingRect = d->path.boundingRect();
 	d->allTransform = d->allTransform * transform();
 	setTransform(QTransform());
-}
+}*/
 
 QJsonObject LaserEllipse::toJson()
 {
 	Q_D(const LaserEllipse);
 	QJsonObject object;
 	//QJsonArray position = { pos() .x(), pos() .y()};
-	QTransform transform = d->allTransform;
+	//QTransform transform = d->allTransform;
+	QTransform transform = QTransform();
 	QJsonArray matrix = { 
 		transform.m11(), transform.m12(), transform.m13(), 
 		transform.m21(), transform.m22(), transform.m23(), 
@@ -643,7 +678,7 @@ public:
     {}
 
     QRectF rect;
-	QPainterPath path;
+	//QPainterPath path;
 };
 
 LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, QTransform saveTransform)
@@ -653,7 +688,8 @@ LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, QTransform saveTran
     d->rect = rect;
 	d->originalBoundingRect = rect;
 	d->path.addRect(rect);
-	d->path = saveTransform.map(d->path);
+	sceneTransformToItemTransform(saveTransform);
+	//d->path = saveTransform.map(d->path);
     d->boundingRect = d->path.boundingRect();
     d->outline.addRect(rect);
     d->position = rect.center();
@@ -727,20 +763,21 @@ QRectF LaserRect::sceneBoundingRect() const
 	return sceneTransform().map(d->path).boundingRect();
 }
 
-void LaserRect::reShape()
+/*void LaserRect::reShape()
 {
 	Q_D(LaserRect);
 	d->path = transform().map(d->path);
 	d->boundingRect = d->path.boundingRect();
 	d->allTransform = d->allTransform * transform();
 	setTransform(QTransform());
-}
+}*/
 
 QJsonObject LaserRect::toJson()
 {
 	Q_D(const LaserRect);
 	QJsonObject object;
-	QTransform transform = d->allTransform;
+	//QTransform transform = d->allTransform;
+	QTransform transform = QTransform();
 	QJsonArray matrix = {
 		transform.m11(), transform.m12(), transform.m13(),
 		transform.m21(), transform.m22(), transform.m23(),
@@ -781,8 +818,9 @@ LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, QTransform saveTr
     : LaserShape(new LaserLinePrivate(this), doc, LPT_LINE, saveTransform)
 {
     Q_D(LaserLine);
-    d->line = saveTransform.map(line);
+    d->line = line;
     d->boundingRect = QRectF(d->line.p1(), d->line.p2());
+	sceneTransformToItemTransform(saveTransform);
 	d->originalBoundingRect = d->boundingRect;
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
@@ -818,6 +856,7 @@ void LaserLine::draw(QPainter * painter)
 {
     Q_D(LaserLine);
     painter->drawLine(d->line);
+	painter->drawRect(d->boundingRect);
 }
 
 QPainterPath LaserLine::toPath() const
@@ -844,7 +883,7 @@ QRectF LaserLine::sceneBoundingRect() const
 	return path.boundingRect();
 }
 //after removeFromGroup
-void LaserLine::reShape()
+/*void LaserLine::reShape()
 {
 	Q_D(LaserLine);
 	setLine(transform().map(d->line));
@@ -856,7 +895,7 @@ void LaserLine::reShape()
 	//d->line = d->line;
 	d->allTransform = d->allTransform * transform();
 	setTransform(QTransform());
-}
+}*/
 
 QJsonObject LaserLine::toJson()
 {
@@ -886,7 +925,7 @@ QVector<QLineF> LaserLine::edges()
 {
 	Q_D(const LaserLine);
 	QVector<QLineF>list;
-	QLineF line = sceneTransform().map(transform().map(d->line));
+	QLineF line = sceneTransform().map(d->line);
 	list.append(line);
 	return list;
 }
@@ -899,7 +938,7 @@ public:
         : LaserShapePrivate(ptr)
     {}
 
-    QPainterPath path;
+    //QPainterPath path;
 };
 
 LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, QTransform saveTransform)
@@ -977,14 +1016,14 @@ QRectF LaserPath::sceneBoundingRect() const
 	
 }
 
-void LaserPath::reShape()
+/*void LaserPath::reShape()
 {
 	Q_D(LaserPath);
 	d->path = transform().map(d->path);
 	d->boundingRect = d->path.boundingRect();
 	d->allTransform = d->allTransform * transform();
 	setTransform(QTransform());
-}
+}*/
 
 QVector<QLineF> LaserPath::edges()
 {
@@ -999,7 +1038,7 @@ public:
     LaserPolylinePrivate(LaserPolyline* ptr)
         : LaserShapePrivate(ptr)
     {}
-
+	//QPainterPath path;
     QPolygonF poly;
 };
 
@@ -1008,7 +1047,10 @@ LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, QTrans
 {
     Q_D(LaserPolyline);
     d->poly = poly;
-	d->poly = saveTransform.map(d->poly);
+	d->path.addPolygon(d->poly);
+	sceneTransformToItemTransform(saveTransform);
+	//d->path = saveTransform.map(d->path);
+	//d->poly = saveTransform.map(d->poly);
     d->boundingRect = d->poly.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
 
@@ -1038,9 +1080,7 @@ void LaserPolyline::setPolyline(const QPolygonF& poly)
 QRectF LaserPolyline::sceneBoundingRect() const
 {
     Q_D(const LaserPolyline);
-    QPainterPath path;
-    path.addPolygon(sceneTransform().map(d->poly));
-    return path.boundingRect();
+    return sceneTransform().map(d->path).boundingRect();
 }
 
 std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
@@ -1070,7 +1110,8 @@ std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
 void LaserPolyline::draw(QPainter * painter)
 {
     Q_D(LaserPolyline);
-    painter->drawPolyline(d->poly);
+    //painter->drawPolyline(d->poly);
+	painter->drawPath(d->path);
 }
 
 QPainterPath LaserPolyline::toPath() const
@@ -1086,19 +1127,21 @@ QPainterPath LaserPolyline::toPath() const
     return path;
 }
 
-void LaserPolyline::reShape()
+/*void LaserPolyline::reShape()
 {
 	Q_D(LaserPolyline);
 	d->poly = transform().map(d->poly);
-	QPainterPath path;
-	path.addPolygon(d->poly);
-	d->boundingRect = path.boundingRect();
+	//QPainterPath path;
+	//path.addPolygon(d->poly);
+	d->path = transform().map(d->path);
+	//d->boundingRect = path.boundingRect();
+	d->boundingRect = d->path.boundingRect();
 	d->allTransform = d->allTransform*transform();
 	qDebug() << transform();
 	qDebug() << sceneTransform();
 	QGraphicsItem* parentItem = this->parentItem();
 	setTransform(QTransform());
-}
+}*/
 
 QJsonObject LaserPolyline::toJson()
 {
@@ -1154,7 +1197,8 @@ LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, QTransfo
 {
     Q_D(LaserPolygon);
 	d->poly = poly;
-    d->poly = saveTransform.map(poly);
+	sceneTransformToItemTransform(saveTransform);
+    //d->poly = saveTransform.map(poly);
     d->boundingRect = d->poly.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
     d->outline.addPolygon(d->poly);
@@ -1230,7 +1274,7 @@ QRectF LaserPolygon::sceneBoundingRect() const
 	return path.boundingRect();
 }
 
-void LaserPolygon::reShape()
+/*void LaserPolygon::reShape()
 {
 	Q_D(LaserPolygon);
 	d->poly = transform().map(d->poly);
@@ -1239,7 +1283,7 @@ void LaserPolygon::reShape()
 	d->boundingRect = path.boundingRect();
 	d->allTransform = d->allTransform * transform();
 	setTransform(QTransform());
-}
+}*/
 
 QJsonObject LaserPolygon::toJson()
 {
@@ -1300,11 +1344,12 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     d->outline.addRect(bounds);
     d->position = bounds.center();
 	d->originalBoundingRect = d->boundingRect;
+	sceneTransformToItemTransform(saveTransform);
 
 	setFlags(ItemIsSelectable | ItemIsMovable);
 	installEventFilter(doc->scene());
 	//this->setAcceptedMouseButtons(Qt::LeftButton);
-	setTransform(saveTransform);
+	//setTransform(saveTransform);
 }
 
 QImage LaserBitmap::image() const 

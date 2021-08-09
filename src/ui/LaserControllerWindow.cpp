@@ -375,7 +375,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//m_ui->toolBar->addAction(m_undoAction);
 	//m_ui->toolBar->insertAction(m_redoAction, m_undoAction);
 	//cleanChanged(bool clean)
-	connect(m_viewer->undoStack(), &QUndoStack::cleanChanged,this, &LaserControllerWindow::onUndoStackCleanChanged);
+	connect(m_viewer->undoStack(), &QUndoStack::canUndoChanged,this, &LaserControllerWindow::onCanUndoChanged);
+	connect(m_viewer->undoStack(), &QUndoStack::canRedoChanged, this, &LaserControllerWindow::onCanRedoChanged);
 	connect(m_ui->actionUndo, &QAction::triggered, this, &LaserControllerWindow::onActionUndo);
 	connect(m_ui->actionRedo, &QAction::triggered, this, &LaserControllerWindow::onActionRedo);
 	//connect(m_ui->actionRedo, &QAction::triggered, this, &LaserControllerWindow::m_redoAction);
@@ -2558,9 +2559,9 @@ void LaserControllerWindow::onSelectionOriginalClicked(bool clicked)
 	
 }
 //
-void LaserControllerWindow::onUndoStackCleanChanged(int index)
+void LaserControllerWindow::onUndoStackCleanChanged(bool clean)
 {
-	if (!m_viewer) {
+	/*if (!m_viewer) {
 		return;
 	}
 	QUndoStack* stack = m_viewer->undoStack();
@@ -2579,7 +2580,18 @@ void LaserControllerWindow::onUndoStackCleanChanged(int index)
 	}
 	else {
 		m_ui->actionRedo->setEnabled(false);
-	}
+	}*/
+
+}
+
+void LaserControllerWindow::onCanUndoChanged(bool can)
+{
+	m_ui->actionUndo->setEnabled(can);
+}
+
+void LaserControllerWindow::onCanRedoChanged(bool can)
+{
+	m_ui->actionRedo->setEnabled(can);
 }
 
 void LaserControllerWindow::bindWidgetsProperties()

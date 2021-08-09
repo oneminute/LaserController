@@ -36,6 +36,7 @@ public:
 
     QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
+	QList<LaserPrimitive*> selectedPrimitives() const;
 
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);

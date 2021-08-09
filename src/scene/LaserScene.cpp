@@ -107,7 +107,7 @@ QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
             primitives.append(primitive);
         }
     }
-	qDebug() << "selectedItems() size: " << selectedItems().size();
+	qDebug() << "primitives size: " << primitives.size();
     return primitives;
 }
 
@@ -244,9 +244,15 @@ void LaserScene::findSelectedByLine(QRectF selection)
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
 			continue;
 		}
+		//如果已经被选中则设为false
 		if (item->isSelected()) {
-			continue;
+			item->setSelected(false);
 		}
+		//先判断是否在整个rect里面
+		if (selection.contains(item->sceneBoundingRect())) {
+			item->setSelected(true);
+		}
+		//按边判断
 		QVector<QLineF> edges = item->edges();
 		if (edges.size() <= 0) {
 			continue;
@@ -259,6 +265,7 @@ void LaserScene::findSelectedByLine(QRectF selection)
 				if (sEdge.intersect(edge, &point) == QLineF::BoundedIntersection) {
 					item->setSelected(true);
 					breakdown = true;
+					qDebug() << item;
 					break;
 				}
 			}
@@ -270,6 +277,25 @@ void LaserScene::findSelectedByLine(QRectF selection)
 			LaserRect* rect = qgraphicsitem_cast<LaserRect*>(item);
 			
 		}*/
+	}
+}
+
+void LaserScene::findSelectedByBoundingRect(QRectF rect)
+{
+	//items
+	QList<LaserPrimitive*> list = this->document()->primitives().values();
+	
+	for each(LaserPrimitive* item in list) {
+		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
+			continue;
+		}
+		//如果已经被选中则设为false
+		if (item->isSelected()) {
+			item->setSelected(false);
+		}
+		if (rect.contains(item->sceneBoundingRect())) {
+			item->setSelected(true);
+		}
 	}
 }
 
