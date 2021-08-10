@@ -1452,8 +1452,8 @@ public:
                         qreal uEnd = knots[i + 1];
                         qreal n = (u >= uBegin && u < uEnd) ? 1 : 0;
                         nCoefs[key] = n;
-                        QString log = QString("N[%1,%2](%3) = %4\n").arg(i).arg(ip).arg(u, 4, 'f', 2).arg(n);
-                        logU.append(log);
+                        //QString log = QString("N[%1,%2](%3) = %4\n").arg(i).arg(ip).arg(u, 4, 'f', 2).arg(n);
+                        //logU.append(log);
                         continue;
                     }
 
@@ -1482,7 +1482,7 @@ public:
 
                     qreal N = exp1 + exp2;
                     nCoefs[key] = N;
-                    QString log = QString(
+                    /*QString log = QString(
                         "N[%1,%2] = %3, N[%4,%5] = %6, N[%7,%8] = %9, "
                         "i = %10, i+1 = %11, i+p = %12, i+p+1 = %13, "
                         "u = %14, u(i) = %15, u(i+1) = %16, u(i+p) = %17, u(i+p+1) = %18, "
@@ -1495,7 +1495,7 @@ public:
                         .arg(u, 4, 'f', 2).arg(u_i, 4, 'f', 2).arg(u_i1, 4, 'f', 2).arg(u_ip, 4, 'f', 2).arg(u_ip1, 4, 'f', 2)
                         .arg(c1, 9, 'f', 6).arg(c2, 9, 'f', 6).arg(exp1, 9, 'f', 6).arg(exp2, 9, 'f', 6)
                         .arg(u_minus_ui, 5, 'f', 2).arg(u_ip_minus_u_i, 5, 'f', 2).arg(u_ip1_minus_u, 5, 'f', 2).arg(u_ip1_minus_u_i1, 5, 'f', 2);
-                    logU.append(log);
+                    logU.append(log);*/
                     
                     if (ip == p)
                     {
@@ -1504,7 +1504,7 @@ public:
                 }
             }
             //if (uIndex == 100)
-                qLogD << logU;
+                //qLogD << logU;
         }
     }
 
@@ -1576,10 +1576,15 @@ void LaserNurbs::draw(QPainter* painter)
     Q_D(LaserNurbs);
     painter->drawPath(d->drawingPath);
     painter->setPen(QPen(Qt::red));
+    QPolygonF polygon;
     for (int i = 0; i < d->controlPoints.count(); i++)
     {
-        painter->drawEllipse(d->controlPoints[i], 2, 2);
+        painter->drawEllipse(d->controlPoints[i], 5, 5);
+        polygon.append(d->controlPoints[i]);
     }
+    
+    painter->setPen(QPen(Qt::gray, 1, Qt::DashLine));
+    painter->drawPolyline(polygon);
 }
 
 QPainterPath LaserNurbs::toPath() const

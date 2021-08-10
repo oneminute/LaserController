@@ -66,10 +66,11 @@ int DxfStream::lineNumber() const
     return m_lineNumber;
 }
 
-DxfNode::DxfNode(int groupCode, const QString& variable, DxfNodePrivate* privateData)
+DxfNode::DxfNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfNodePrivate* privateData)
     : m_ptr(privateData)
 {
     Q_D(DxfNode);
+    d->document = doc;
     d->groupCode = groupCode;
     d->variable = variable;
 }
@@ -124,6 +125,12 @@ DxfNode* DxfNode::addChildNode(DxfNode* node)
     return node;
 }
 
+DxfDocumentNode* DxfNode::document() const
+{
+    Q_D(const DxfNode);
+    return d->document;
+}
+
 DxfNodeType DxfNode::nodeType() const
 {
     Q_D(const DxfNode);
@@ -160,10 +167,12 @@ public:
     DxfEntitiesNode* entities;
     DxfObjectsNode* objects;
     DxfThumbnailImageNode* thumbnailImage;
+
+    QMap<quint32, DxfItemNode*> itemsMap;
 };
 
 DxfDocumentNode::DxfDocumentNode()
-    : DxfNode(0, "DOCUMENT", new DxfDocumentNodePrivate(this))
+    : DxfNode(this, 0, "DOCUMENT", new DxfDocumentNodePrivate(this))
 {
 
 }
@@ -172,6 +181,25 @@ const DxfEntitiesNode& DxfDocumentNode::entities() const
 {
     Q_D(const DxfDocumentNode);
     return *(d->entities);
+}
+
+void DxfDocumentNode::addItem(DxfItemNode* node)
+{
+    Q_D(DxfDocumentNode);
+    d->itemsMap[node->handle()] = node;
+}
+
+DxfItemNode* DxfDocumentNode::item(int handle) const
+{
+    Q_D(const DxfDocumentNode);
+    if (d->itemsMap.contains(handle))
+    {
+        return d->itemsMap[handle];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 bool DxfDocumentNode::parse(DxfStream* stream)
@@ -187,7 +215,6 @@ bool DxfDocumentNode::parse(DxfStream* stream)
             return false;
         }
 
-
         DxfNode* childNode = nullptr;
         if (group.match("SECTION"))
         {
@@ -199,31 +226,31 @@ bool DxfDocumentNode::parse(DxfStream* stream)
             qLogD << stream->lineNumber() << ": " << group.groupCode << ", " << group.variable;
             if (group.match("HEADER"))
             {
-                childNode = d->header = new DxfHeaderNode(group.groupCode);
+                childNode = d->header = new DxfHeaderNode(this, group.groupCode);
             }
             else if (group.match("CLASSES"))
             {
-                childNode = d->classes = new DxfClassesNode(group.groupCode);
+                childNode = d->classes = new DxfClassesNode(this, group.groupCode);
             }
             else if (group.match("TABLES"))
             {
-                childNode = d->tables = new DxfTablesNode(group.groupCode);
+                childNode = d->tables = new DxfTablesNode(this, group.groupCode);
             }
             else if (group.match("BLOCKS"))
             {
-                childNode = d->blocks = new DxfBlocksNode(group.groupCode);
+                childNode = d->blocks = new DxfBlocksNode(this, group.groupCode);
             }
             else if (group.match("ENTITIES"))
             {
-                childNode = d->entities = new DxfEntitiesNode(group.groupCode);
+                childNode = d->entities = new DxfEntitiesNode(this, group.groupCode);
             }
             else if (group.match("OBJECTS"))
             {
-                childNode = d->objects = new DxfObjectsNode(group.groupCode);
+                childNode = d->objects = new DxfObjectsNode(this, group.groupCode);
             }
             else if (group.match("THUMBNAILIMAGE"))
             {
-                childNode = d->thumbnailImage = new DxfThumbnailImageNode(group.groupCode);
+                childNode = d->thumbnailImage = new DxfThumbnailImageNode(this, group.groupCode);
             }
         }
         else if (group.match("EOF"))
@@ -233,12 +260,27 @@ bool DxfDocumentNode::parse(DxfStream* stream)
 
         if (childNode)
         {
-            if (childNode->parse(stream))
-            {
-                addChildNode(childNode);
-            }
+            addChildNode(childNode);
+            if (!childNode->parse(stream))
+                qLogW << "parse error.";
         }
     }
+
+    // post process
+    QStack<DxfNode*> stack;
+    stack.push(this);
+    while (!stack.isEmpty())
+    {
+        DxfNode* node = stack.pop();
+
+        node->postProcess();
+
+        for (DxfNode* child : node->children())
+        {
+            stack.push(child);
+        }
+    }
+
     return true;
 }
 
@@ -272,8 +314,8 @@ public:
     DxfNode::PropertyMap properties;
 };
 
-DxfHeaderNode::DxfHeaderNode(int groupCode)
-    : DxfNode(groupCode, "HEADER", new DxfHeaderNodePrivate(this))
+DxfHeaderNode::DxfHeaderNode(DxfDocumentNode* doc, int groupCode)
+    : DxfNode(doc, groupCode, "HEADER", new DxfHeaderNodePrivate(this))
 {
 }
 
@@ -356,8 +398,8 @@ public:
     bool isAnEntity;
 };
 
-DxfClassNode::DxfClassNode(int groupCode)
-    : DxfNode(groupCode, "CLASS", new DxfClassNodePrivate(this))
+DxfClassNode::DxfClassNode(DxfDocumentNode* doc, int groupCode)
+    : DxfNode(doc, groupCode, "CLASS", new DxfClassNodePrivate(this))
 {
 
 }
@@ -444,10 +486,16 @@ public:
     QStringList subClassMarkers;
 };
 
-DxfItemNode::DxfItemNode(int groupCode, const QString& variable, DxfItemNodePrivate* ptr)
-    : DxfNode(groupCode, variable, ptr)
+DxfItemNode::DxfItemNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfItemNodePrivate* ptr)
+    : DxfNode(doc, groupCode, variable, ptr)
 {
 
+}
+
+int DxfItemNode::handle() const
+{
+    Q_D(const DxfItemNode);
+    return d->handle;
 }
 
 bool DxfItemNode::parse(DxfStream* stream)
@@ -477,6 +525,7 @@ bool DxfItemNode::parse(DxfStream* stream)
         {
             if (!group.assign(d->handle, 16))
                 return false;
+            d->document->addItem(this);
         }
         else if (group.match(102))
         {
@@ -552,8 +601,8 @@ public:
     int maximumEntries;
 };
 
-DxfTableNode::DxfTableNode(int groupCode)
-    : DxfItemNode(groupCode, "TABLE", new DxfTableNodePrivate(this))
+DxfTableNode::DxfTableNode(DxfDocumentNode* doc, int groupCode)
+    : DxfItemNode(doc, groupCode, "TABLE", new DxfTableNodePrivate(this))
 {
 
 }
@@ -628,8 +677,8 @@ public:
     QString blockDescription;
 };
 
-DxfBlockNode::DxfBlockNode(int groupCode)
-    : DxfItemNode(groupCode, "BLOCK", new DxfBlockNodePrivate(this))
+DxfBlockNode::DxfBlockNode(DxfDocumentNode* doc, int groupCode)
+    : DxfItemNode(doc, groupCode, "BLOCK", new DxfBlockNodePrivate(this))
 {
 
 }
@@ -728,8 +777,8 @@ public:
     QString layerName;
 };
 
-DxfEndBlockNode::DxfEndBlockNode(int groupCode)
-    : DxfItemNode(groupCode, "ENDBLK", new DxfEndBlockNodePrivate(this))
+DxfEndBlockNode::DxfEndBlockNode(DxfDocumentNode* doc, int groupCode)
+    : DxfItemNode(doc, groupCode, "ENDBLK", new DxfEndBlockNodePrivate(this))
 {
 }
 
@@ -819,7 +868,7 @@ public:
     /// Lineweight enum value. Stored and moved around as a 16-bit integer.
     /// </summary>
     int lineweight;
-    int linetypeScale;
+    qreal linetypeScale;
 
     /// <summary>
     /// The original value from dxf is as following:
@@ -890,14 +939,14 @@ public:
     QVector3D extrusionDirection;
 };
 
-DxfEntityNode::DxfEntityNode(int groupCode, const QString& variable, DxfEntityNodePrivate* ptr)
-    : DxfItemNode(groupCode, variable, ptr)
+DxfEntityNode::DxfEntityNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfEntityNodePrivate* ptr)
+    : DxfItemNode(doc, groupCode, variable, ptr)
 {
     setName(variable);
 }
 
-DxfEntityNode::DxfEntityNode(int groupCode, const QString& variable)
-    : DxfItemNode(groupCode, variable, new DxfEntityNodePrivate(this, NT_Entity))
+DxfEntityNode::DxfEntityNode(DxfDocumentNode* doc, int groupCode, const QString& variable)
+    : DxfItemNode(doc, groupCode, variable, new DxfEntityNodePrivate(this, NT_Entity))
 {
     setName(variable);
 }
@@ -1113,8 +1162,8 @@ public:
 };
 
 
-DxfLWPolylineNode::DxfLWPolylineNode(int groupCode)
-    : DxfEntityNode(groupCode, "LWPOLYLINE", new DxfLWPolylineNodePrivate(this))
+DxfLWPolylineNode::DxfLWPolylineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "LWPOLYLINE", new DxfLWPolylineNodePrivate(this))
 {
 }
 
@@ -1257,8 +1306,8 @@ public:
     qreal radius;
 };
 
-DxfCircleNode::DxfCircleNode(int groupCode)
-    : DxfEntityNode(groupCode, "CIRCLE", new DxfCircleNodePrivate(this))
+DxfCircleNode::DxfCircleNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "CIRCLE", new DxfCircleNodePrivate(this))
 {
 
 }
@@ -1352,8 +1401,8 @@ public:
     qreal endParameter;
 };
 
-DxfEllipseNode::DxfEllipseNode(int groupCode)
-    : DxfEntityNode(groupCode, "ELLIPSE", new DxfEllipseNodePrivate(this))
+DxfEllipseNode::DxfEllipseNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "ELLIPSE", new DxfEllipseNodePrivate(this))
 {
 
 }
@@ -1472,8 +1521,8 @@ public:
     QVector3D endPoint;
 };
 
-DxfLineNode::DxfLineNode(int groupCode)
-    : DxfEntityNode(groupCode, "LINE", new DxfLineNodePrivate(this))
+DxfLineNode::DxfLineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "LINE", new DxfLineNodePrivate(this))
 {
 
 }
@@ -1622,8 +1671,8 @@ public:
 };
 
 
-DxfSplineNode::DxfSplineNode(int groupCode)
-    : DxfEntityNode(groupCode, "SPLINE", new DxfSplineNodePrivate(this))
+DxfSplineNode::DxfSplineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "SPLINE", new DxfSplineNodePrivate(this))
 {
 }
 
@@ -1742,7 +1791,7 @@ bool DxfSplineNode::parseItem(DxfGroup& group)
             return false;
         d->controlPoints.last().setZ(value);
     }
-    if (group.match(11))
+    else if (group.match(11))
     {
         qreal value;
         if (!group.assign(value))
@@ -1903,8 +1952,8 @@ public:
     qreal endAngle;
 };
 
-DxfArcNode::DxfArcNode(int groupCode)
-    : DxfEntityNode(groupCode, "ARC", new DxfArcNodePrivate(this))
+DxfArcNode::DxfArcNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "ARC", new DxfArcNodePrivate(this))
 {
 
 }
@@ -1993,6 +2042,7 @@ public:
         , imageReactorHandle(0)
         , clipBoundaryVerticesCount(0)
         , clipMode(0)
+        , defObject(nullptr)
     {}
 
     int classVersion;
@@ -2074,12 +2124,35 @@ public:
     /// 1 = Inside Mode
     /// </summary>
     int clipMode;
+
+    DxfImageDefNode* defObject;
 };
 
-DxfImageNode::DxfImageNode(int groupCode)
-    : DxfEntityNode(groupCode, "IMAGE", new DxfImageNodePrivate(this))
+DxfImageNode::DxfImageNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "IMAGE", new DxfImageNodePrivate(this))
 {
 
+}
+
+QString DxfImageNode::fileName() const
+{
+    Q_D(const DxfImageNode);
+    if (d->defObject)
+    {
+        return d->defObject->fileName();
+    }
+    return "";
+}
+
+void DxfImageNode::postProcess()
+{
+    Q_D(DxfImageNode);
+    DxfItemNode* obj = d->document->item(d->imageObjectHandle);
+    DxfImageDefNode* imageDef = dynamic_cast<DxfImageDefNode*>(obj);
+    if (!imageDef)
+        return;
+
+    d->defObject = imageDef;
 }
 
 void DxfImageNode::debugPrint() const
@@ -2107,6 +2180,25 @@ void DxfImageNode::debugPrint() const
     }
     qLogD << "    clipMode = " << d->clipMode << "\n";
 }
+
+LaserPrimitive* DxfImageNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfImageNode);
+
+    QFileInfo fileInfo(fileName());
+    if (!fileInfo.exists())
+        return nullptr;
+
+    QImage image;
+    if (!image.load(fileName()))
+        return nullptr;
+
+    QRectF bounding(d->insertionPoint.toPointF(), 
+        QSize(d->uVector.x() * d->imageSize.width(), d->vVector.y() * d->imageSize.height()));
+    LaserBitmap* primitive = new LaserBitmap(image, t.mapRect(bounding), doc);
+    return primitive;
+}
+
 
 bool DxfImageNode::parseItem(DxfGroup& group)
 {
@@ -2265,18 +2357,19 @@ public:
     {}
 };
 
-DxfObjectNode::DxfObjectNode(int groupCode, const QString& variable, DxfObjectNodePrivate* ptr)
-    : DxfItemNode(groupCode, variable, ptr)
+DxfObjectNode::DxfObjectNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfObjectNodePrivate* ptr)
+    : DxfItemNode(doc, groupCode, variable, ptr)
 {}
 
-DxfObjectNode::DxfObjectNode(int groupCode, const QString & variable)
-    : DxfItemNode(groupCode, variable, new DxfObjectNodePrivate(this, NT_Object))
+DxfObjectNode::DxfObjectNode(DxfDocumentNode* doc, int groupCode, const QString & variable)
+    : DxfItemNode(doc, groupCode, variable, new DxfObjectNodePrivate(this, NT_Object))
 {
 }
 
 void DxfObjectNode::debugPrint() const
 {
     Q_D(const DxfObjectNode);
+    DxfItemNode::debugPrint();
     qLogD << "OBJECT " << name() << "\n";
     DxfItemNode::debugPrint();
 }
@@ -2300,6 +2393,112 @@ bool DxfObjectNode::isEnd(DxfGroup& group)
     return false;
 }
 
+class DxfImageDefNodePrivate : public DxfObjectNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfImageDefNode)
+public:
+    DxfImageDefNodePrivate(DxfImageDefNode* ptr)
+        : DxfObjectNodePrivate(ptr, NT_ImageDef)
+        , version(0)
+        , imageSize(0, 0)
+        , unitsPerPixel(0, 0)
+        , loadedFlag(0)
+        , resolutionUnits(0)
+    {}
+
+    int version;
+    QString fileName;
+    QSizeF imageSize;
+    QSizeF unitsPerPixel;
+
+    /// <summary>
+    /// Image-is-loaded flag. 0 = Unloaded; 1 = Loaded
+    /// </summary>
+    int loadedFlag;
+
+    /// <summary>
+    /// Resolution units. 0 = No units; 2 = Centimeters; 5 = Inch
+    /// </summary>
+    int resolutionUnits;
+};
+
+DxfImageDefNode::DxfImageDefNode(DxfDocumentNode* doc, int groupCode)
+    : DxfObjectNode(doc, groupCode, "IMAGEDEF", new DxfImageDefNodePrivate(this))
+{
+
+}
+
+QString DxfImageDefNode::fileName() const
+{
+    Q_D(const DxfImageDefNode);
+    return d->fileName;
+}
+
+void DxfImageDefNode::debugPrint() const
+{
+    Q_D(const DxfImageDefNode);
+    DxfObjectNode::debugPrint();
+    qLogD << "    version = " << d->version << "\n";
+    qLogD << "    fileName = " << d->fileName << "\n";
+    qLogD << "    imageSize = " << d->imageSize.width() << ", " << d->imageSize.height() << "\n";
+    qLogD << "    unitsPerPixel = " << d->unitsPerPixel.width() << ", " << d->unitsPerPixel.height() << "\n";
+    qLogD << "    loadedFlag = " << d->loadedFlag << "\n";
+    qLogD << "    resolutionUnits = " << d->resolutionUnits << "\n";
+}
+
+bool DxfImageDefNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfImageDefNode);
+    if (group.match(1))
+    {
+        group.assign(d->fileName);
+    }
+    else if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->imageSize.setWidth(value);
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->imageSize.setHeight(value);
+    }
+    if (group.match(11))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->unitsPerPixel.setWidth(value);
+    }
+    else if (group.match(21))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->unitsPerPixel.setHeight(value);
+    }
+    else if (group.match(90))
+    {
+        if (!group.assign(d->version))
+            return false;
+    }
+    else if (group.match(280))
+    {
+        if (!group.assign(d->loadedFlag))
+            return false;
+    }
+    else if (group.match(51))
+    {
+        if (!group.assign(d->resolutionUnits))
+            return false;
+    }
+    return true;
+}
+
 class DxfThumbnailImageNodePrivate : public DxfNodePrivate
 {
     Q_DECLARE_PUBLIC(DxfThumbnailImageNode)
@@ -2309,8 +2508,8 @@ public:
     {}
 };
 
-DxfThumbnailImageNode::DxfThumbnailImageNode(int groupCode)
-    : DxfNode(groupCode, "THUMBNAILIMAGE", new DxfThumbnailImageNodePrivate(this))
+DxfThumbnailImageNode::DxfThumbnailImageNode(DxfDocumentNode* doc, int groupCode)
+    : DxfNode(doc, groupCode, "THUMBNAILIMAGE", new DxfThumbnailImageNodePrivate(this))
 {
 
 }
@@ -2333,8 +2532,8 @@ public:
     QList<DxfNode*> items;
 };
 
-DxfCollectionNode::DxfCollectionNode(int groupCode, const QString& variable, DxfCollectionNodePrivate* ptr)
-    : DxfNode(groupCode, variable, ptr)
+DxfCollectionNode::DxfCollectionNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfCollectionNodePrivate* ptr)
+    : DxfNode(doc, groupCode, variable, ptr)
 {
 
 }
@@ -2348,8 +2547,8 @@ public:
     {}
 };
 
-DxfClassesNode::DxfClassesNode(int groupCode)
-    : DxfCollectionNode(groupCode, "CLASSES", new DxfClassesNodePrivate(this))
+DxfClassesNode::DxfClassesNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "CLASSES", new DxfClassesNodePrivate(this))
 {
 
 }
@@ -2367,7 +2566,7 @@ bool DxfClassesNode::parse(DxfStream* stream)
 
         if (group.match(0, "CLASS"))
         {
-            DxfClassNode* childNode = new DxfClassNode(group.groupCode);
+            DxfClassNode* childNode = new DxfClassNode(d->document, group.groupCode);
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -2400,8 +2599,8 @@ public:
     {}
 };
 
-DxfTablesNode::DxfTablesNode(int groupCode)
-    : DxfCollectionNode(groupCode, "TABLES", new DxfTablesNodePrivate(this))
+DxfTablesNode::DxfTablesNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "TABLES", new DxfTablesNodePrivate(this))
 {
 
 }
@@ -2419,7 +2618,7 @@ bool DxfTablesNode::parse(DxfStream* stream)
 
         if (group.match(0, "TABLE"))
         {
-            DxfTableNode* childNode = new DxfTableNode(group.groupCode);
+            DxfTableNode* childNode = new DxfTableNode(d->document, group.groupCode);
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -2455,8 +2654,8 @@ public:
     {}
 };
 
-DxfBlocksNode::DxfBlocksNode(int groupCode)
-    : DxfCollectionNode(groupCode, "BLOCKS", new DxfBlocksNodePrivate(this))
+DxfBlocksNode::DxfBlocksNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "BLOCKS", new DxfBlocksNodePrivate(this))
 {
 
 }
@@ -2474,7 +2673,7 @@ bool DxfBlocksNode::parse(DxfStream* stream)
 
         if (group.match(0, "BLOCK"))
         {
-            DxfBlockNode* childNode = new DxfBlockNode(group.groupCode);
+            DxfBlockNode* childNode = new DxfBlockNode(d->document, group.groupCode);
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -2482,7 +2681,7 @@ bool DxfBlocksNode::parse(DxfStream* stream)
         }
         else if (group.match(0, "ENDBLK"))
         {
-            DxfEndBlockNode* childNode = new DxfEndBlockNode(group.groupCode);
+            DxfEndBlockNode* childNode = new DxfEndBlockNode(d->document, group.groupCode);
             last()->addChildNode(childNode);
             if (!childNode->parse(stream))
                 return false;
@@ -2515,8 +2714,8 @@ public:
     {}
 };
 
-DxfEntitiesNode::DxfEntitiesNode(int groupCode)
-    : DxfCollectionNode(groupCode, "ENTITIES", new DxfEntitiesNodePrivate(this))
+DxfEntitiesNode::DxfEntitiesNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "ENTITIES", new DxfEntitiesNodePrivate(this))
 {
 
 }
@@ -2539,35 +2738,35 @@ bool DxfEntitiesNode::parse(DxfStream* stream)
         }
         else if (group.match(0, "ARC"))
         {
-            childNode = new DxfArcNode(group.groupCode);
+            childNode = new DxfArcNode(d->document, group.groupCode);
         }
         else if (group.match(0, "LWPOLYLINE"))
         {
-            childNode = new DxfLWPolylineNode(group.groupCode);
+            childNode = new DxfLWPolylineNode(d->document, group.groupCode);
         }
         else if (group.match(0, "CIRCLE"))
         {
-            childNode = new DxfCircleNode(group.groupCode);
+            childNode = new DxfCircleNode(d->document, group.groupCode);
         }
         else if (group.match(0, "ELLIPSE"))
         {
-            childNode = new DxfEllipseNode(group.groupCode);
+            childNode = new DxfEllipseNode(d->document, group.groupCode);
         }
         else if (group.match(0, "LINE"))
         {
-            childNode = new DxfLineNode(group.groupCode);
+            childNode = new DxfLineNode(d->document, group.groupCode);
         }
         else if (group.match(0, "SPLINE"))
         {
-            childNode = new DxfSplineNode(group.groupCode);
+            childNode = new DxfSplineNode(d->document, group.groupCode);
         }
         else if (group.match(0, "IMAGE"))
         {
-            childNode = new DxfImageNode(group.groupCode);
+            childNode = new DxfImageNode(d->document, group.groupCode);
         }
         else if (group.match(0))
         {
-            childNode = new DxfEntityNode(group.groupCode, group.variable);
+            childNode = new DxfEntityNode(d->document, group.groupCode, group.variable);
         }
 
         if (childNode)
@@ -2601,8 +2800,8 @@ public:
     {}
 };
 
-DxfObjectsNode::DxfObjectsNode(int groupCode)
-    : DxfCollectionNode(groupCode, "OBJECTS", new DxfObjectsNodePrivate(this))
+DxfObjectsNode::DxfObjectsNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "OBJECTS", new DxfObjectsNodePrivate(this))
 {
 
 }
@@ -2612,6 +2811,7 @@ bool DxfObjectsNode::parse(DxfStream* stream)
     Q_D(DxfObjectsNode);
     while (true)
     {
+        DxfObjectNode* childNode = nullptr;
         DxfGroup group;
         if (!stream->readGroup(group))
         {
@@ -2622,9 +2822,17 @@ bool DxfObjectsNode::parse(DxfStream* stream)
         {
             break;
         }
-        if (group.match(0))
+        else if (group.match(0, "IMAGEDEF"))
         {
-            DxfObjectNode* childNode = new DxfObjectNode(group.groupCode, group.variable);
+            childNode = new DxfImageDefNode(d->document);
+        }
+        else if (group.match(0))
+        {
+            childNode = new DxfObjectNode(d->document, group.groupCode, group.variable);
+        }
+
+        if (childNode)
+        {
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))

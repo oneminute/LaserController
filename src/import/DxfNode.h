@@ -11,6 +11,7 @@
 
 class LaserDocument;
 class LaserPrimitive;
+class DxfDocumentNode;
 
 enum DxfNodeType
 {
@@ -37,7 +38,8 @@ enum DxfNodeType
     NT_Spline,
     NT_Text,
     NT_Polyline,
-    NT_Object
+    NT_Object,
+    NT_ImageDef
 };
 
 struct DxfGroup
@@ -142,6 +144,7 @@ public:
         , name(QString())
         , parent(nullptr)
         , nodeType(_nodeType)
+        , document(nullptr)
     {
 
     }
@@ -159,6 +162,7 @@ public:
     DxfNode* parent;
     QList<DxfNode*> children;
     DxfNodeType nodeType;
+    DxfDocumentNode* document;
 };
 
 class DxfNode
@@ -180,14 +184,18 @@ public:
     QList<DxfNode*>& children();
     DxfNode* addChildNode(DxfNode* node);
 
+    DxfDocumentNode* document() const;
+
     DxfNodeType nodeType() const;
 
     virtual bool parse(DxfStream* stream) = 0;
 
+    virtual void postProcess() {}
+
     virtual void debugPrint() const;
 
 protected:
-    explicit DxfNode(int groupCode, const QString& variable, DxfNodePrivate* privateData);
+    explicit DxfNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfNodePrivate* privateData);
 
     void setName(const QString& name);
 
@@ -222,6 +230,10 @@ public:
 
     const DxfEntitiesNode& entities() const;
 
+    void addItem(DxfItemNode* node);
+
+    DxfItemNode* item(int handle) const;
+
     virtual bool parse(DxfStream* stream) override;
 
     virtual void debugPrint() const override;
@@ -235,7 +247,7 @@ class DxfHeaderNodePrivate;
 class DxfHeaderNode : public DxfNode
 {
 public:
-    explicit DxfHeaderNode(int groupCode = 2);
+    explicit DxfHeaderNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfHeaderNode()
     {
 
@@ -257,7 +269,7 @@ class DxfClassNodePrivate;
 class DxfClassNode : public DxfNode
 {
 public:
-    explicit DxfClassNode(int groupCode = 0);
+    explicit DxfClassNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfClassNode()
     {
 
@@ -275,8 +287,10 @@ class DxfItemNodePrivate;
 class DxfItemNode : public DxfNode
 {
 public:
-    explicit DxfItemNode(int groupCode, const QString& variable, DxfItemNodePrivate* ptr);
+    explicit DxfItemNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfItemNodePrivate* ptr);
     ~DxfItemNode() {}
+
+    int handle() const;
 
     virtual bool parse(DxfStream* stream) override;
 
@@ -294,7 +308,7 @@ class DxfTableNodePrivate;
 class DxfTableNode : public DxfItemNode
 {
 public:
-    explicit DxfTableNode(int groupCode = 0);
+    explicit DxfTableNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfTableNode() {}
 
     virtual void debugPrint() const override;
@@ -312,7 +326,7 @@ class DxfBlockNodePrivate;
 class DxfBlockNode : public DxfItemNode
 {
 public:
-    explicit DxfBlockNode(int groupCode = 0);
+    explicit DxfBlockNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfBlockNode() {}
 
     virtual void debugPrint() const override;
@@ -330,7 +344,7 @@ class DxfEndBlockNodePrivate;
 class DxfEndBlockNode : public DxfItemNode
 {
 public:
-    explicit DxfEndBlockNode(int groupCode = 0);
+    explicit DxfEndBlockNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfEndBlockNode() {}
 
     virtual void debugPrint() const override;
@@ -348,8 +362,8 @@ class DxfEntityNodePrivate;
 class DxfEntityNode : public DxfItemNode
 {
 public:
-    explicit DxfEntityNode(int groupCode, const QString& variable, DxfEntityNodePrivate* ptr);
-    explicit DxfEntityNode(int groupCode, const QString& variable);
+    explicit DxfEntityNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfEntityNodePrivate* ptr);
+    explicit DxfEntityNode(DxfDocumentNode* doc, int groupCode, const QString& variable);
     ~DxfEntityNode() {}
 
     virtual void debugPrint() const override;
@@ -369,7 +383,7 @@ class DxfLWPolylineNodePrivate;
 class DxfLWPolylineNode : public DxfEntityNode
 {
 public:
-    explicit DxfLWPolylineNode(int groupCode = 0);
+    explicit DxfLWPolylineNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfLWPolylineNode() {}
 
     virtual void debugPrint() const override;
@@ -388,7 +402,7 @@ class DxfCircleNodePrivate;
 class DxfCircleNode : public DxfEntityNode
 {
 public:
-    explicit DxfCircleNode(int groupCode = 0);
+    explicit DxfCircleNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfCircleNode() {}
 
     virtual void debugPrint() const override;
@@ -407,7 +421,7 @@ class DxfEllipseNodePrivate;
 class DxfEllipseNode : public DxfEntityNode
 {
 public:
-    explicit DxfEllipseNode(int groupCode = 0);
+    explicit DxfEllipseNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfEllipseNode() {}
 
     virtual void debugPrint() const override;
@@ -426,7 +440,7 @@ class DxfLineNodePrivate;
 class DxfLineNode : public DxfEntityNode
 {
 public:
-    explicit DxfLineNode(int groupCode = 0);
+    explicit DxfLineNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfLineNode() {}
 
     virtual void debugPrint() const override;
@@ -445,7 +459,7 @@ class DxfSplineNodePrivate;
 class DxfSplineNode : public DxfEntityNode
 {
 public:
-    explicit DxfSplineNode(int groupCode = 0);
+    explicit DxfSplineNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfSplineNode() {}
 
     virtual void debugPrint() const override;
@@ -466,7 +480,7 @@ class DxfArcNodePrivate;
 class DxfArcNode : public DxfEntityNode
 {
 public:
-    explicit DxfArcNode(int groupCode = 0);
+    explicit DxfArcNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfArcNode() {}
 
     virtual void debugPrint() const override;
@@ -485,10 +499,16 @@ class DxfImageNodePrivate;
 class DxfImageNode : public DxfEntityNode
 {
 public:
-    explicit DxfImageNode(int groupCode = 0);
+    explicit DxfImageNode(DxfDocumentNode* doc, int groupCode = 0);
     ~DxfImageNode() {}
 
+    QString fileName() const;
+
+    virtual void postProcess() override;
+
     virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
 
 protected:
     virtual bool parseItem(DxfGroup& group) override;
@@ -502,8 +522,8 @@ class DxfObjectNodePrivate;
 class DxfObjectNode : public DxfItemNode
 {
 public:
-    explicit DxfObjectNode(int groupCode, const QString& variable, DxfObjectNodePrivate* ptr);
-    explicit DxfObjectNode(int groupCode, const QString& variable);
+    explicit DxfObjectNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfObjectNodePrivate* ptr);
+    explicit DxfObjectNode(DxfDocumentNode* doc, int groupCode, const QString& variable);
     ~DxfObjectNode() {}
 
     virtual void debugPrint() const override;
@@ -517,11 +537,30 @@ private:
     Q_DISABLE_COPY(DxfObjectNode)
 };
 
+class DxfImageDefNodePrivate;
+class DxfImageDefNode : public DxfObjectNode
+{
+public:
+    explicit DxfImageDefNode(DxfDocumentNode* doc, int groupCode = 0);
+    ~DxfImageDefNode() {}
+
+    QString fileName() const;
+
+    virtual void debugPrint() const override;
+
+protected:
+    virtual bool parseItem(DxfGroup& group) override;
+
+private:
+    Q_DECLARE_PRIVATE_D(m_ptr, DxfImageDefNode)
+    Q_DISABLE_COPY(DxfImageDefNode)
+};
+
 class DxfThumbnailImageNodePrivate;
 class DxfThumbnailImageNode : public DxfNode
 {
 public:
-    explicit DxfThumbnailImageNode(int groupCode = 2);
+    explicit DxfThumbnailImageNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfThumbnailImageNode()
     {
 
@@ -541,7 +580,7 @@ class DxfCollectionNodePrivate;
 class DxfCollectionNode : public DxfNode
 {
 public:
-    explicit DxfCollectionNode(int groupCode, const QString& variable, DxfCollectionNodePrivate* ptr);
+    explicit DxfCollectionNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfCollectionNodePrivate* ptr);
     ~DxfCollectionNode()
     {
 
@@ -556,7 +595,7 @@ class DxfClassesNodePrivate;
 class DxfClassesNode : public DxfCollectionNode, public QList<DxfClassNode*>
 {
 public:
-    explicit DxfClassesNode(int groupCode = 2);
+    explicit DxfClassesNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfClassesNode() {}
 
     virtual bool parse(DxfStream* stream) override;
@@ -572,7 +611,7 @@ class DxfTablesNodePrivate;
 class DxfTablesNode : public DxfCollectionNode, public QList<DxfTableNode*>
 {
 public:
-    explicit DxfTablesNode(int groupCode = 2);
+    explicit DxfTablesNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfTablesNode() {}
 
     virtual bool parse(DxfStream* stream) override;
@@ -588,7 +627,7 @@ class DxfBlocksNodePrivate;
 class DxfBlocksNode : public DxfCollectionNode, public QList<DxfBlockNode*>
 {
 public:
-    explicit DxfBlocksNode(int groupCode = 2);
+    explicit DxfBlocksNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfBlocksNode() {}
 
     virtual bool parse(DxfStream* stream) override;
@@ -604,7 +643,7 @@ class DxfEntitiesNodePrivate;
 class DxfEntitiesNode : public DxfCollectionNode, public QList<DxfEntityNode*>
 {
 public:
-    explicit DxfEntitiesNode(int groupCode = 2);
+    explicit DxfEntitiesNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfEntitiesNode() {}
 
     virtual bool parse(DxfStream* stream) override;
@@ -620,7 +659,7 @@ class DxfObjectsNodePrivate;
 class DxfObjectsNode : public DxfCollectionNode, public QList<DxfObjectNode*>
 {
 public:
-    explicit DxfObjectsNode(int groupCode = 2);
+    explicit DxfObjectsNode(DxfDocumentNode* doc, int groupCode = 2);
     ~DxfObjectsNode() {}
 
     virtual bool parse(DxfStream* stream) override;

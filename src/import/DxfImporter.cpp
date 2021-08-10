@@ -66,10 +66,11 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
     d->documentNode = new DxfDocumentNode;
     if (!d->documentNode->parse(&stream))
     {
+        delete d->documentNode;
+        d->documentNode = nullptr;
+        return nullptr;
     }
-    else
-    {
-    }
+
 #ifdef _DEBUG
     //d->documentNode->debugPrint();
 #endif
