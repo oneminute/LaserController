@@ -119,15 +119,15 @@ public:
     virtual QRectF boundingRect() const override;
     virtual QRectF sceneBoundingRect() const;
     QPointF laserStartPos() const;
-	void sceneTransformToItemTransform(QTransform sceneTransform);//¸ù¾ÝsceneTransfrom×ª»¯ÎªItemµÄtransformºÍposition
+	void sceneTransformToItemTransform(QTransform sceneTransform);//ï¿½ï¿½ï¿½ï¿½sceneTransfrom×ªï¿½ï¿½ÎªItemï¿½ï¿½transformï¿½ï¿½position
 
     virtual void draw(QPainter* painter) {};
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return std::vector<cv::Point2f>(); }
-    std::vector<cv::Point2f> mechiningPoints() const;
-    std::vector<cv::Point2f> mechiningPoints(cv::Point2f& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return QVector<QPointF>(); }
+    QVector<QPointF> mechiningPoints() const;
+    QVector<QPointF> mechiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
     QList<int> startingIndices() const;
-    std::vector<cv::Point2f> startingPoints() const;
+    QVector<QPointF> startingPoints() const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
 
     LaserPrimitiveType primitiveType() const;
@@ -217,7 +217,7 @@ public:
     QRectF bounds() const;
     void setBounds(const QRectF& bounds);
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -243,7 +243,7 @@ public:
     void setRect(const QRectF& rect);
 
     virtual void draw(QPainter* painter);
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
 
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
@@ -266,7 +266,7 @@ public:
     QLineF line() const;
     void setLine(const QLineF& line);
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -291,7 +291,7 @@ public:
     QPainterPath path() const;
     void setPath(const QPainterPath& path);
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -319,7 +319,7 @@ public:
     void setPolyline(const QPolygonF& poly);
     virtual QRectF sceneBoundingRect() const;
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -344,7 +344,7 @@ public:
     QPolygonF polyline() const;
     void setPolyline(const QPolygonF& poly);
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -405,7 +405,7 @@ public:
     virtual QString typeName() { return tr("Bitmap"); }
 	virtual QJsonObject toJson();
 
-    virtual std::vector<cv::Point2f> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
 	virtual QRectF sceneBoundingRect() const;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;

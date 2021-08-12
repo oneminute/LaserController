@@ -27,6 +27,7 @@
 #include <QToolButton>
 #include <QTreeWidgetItem>
 #include <QUndoStack>
+#include <QWindow>
 
 #include "LaserApplication.h"
 #include "common/common.h"
@@ -436,6 +437,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
+    connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
 
 	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -1322,6 +1324,27 @@ void LaserControllerWindow::createMovementDockPanel()
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
 
+void LaserControllerWindow::createUpdateDockPanel(int winId)
+{
+    QWindow* externalWindow = QWindow::fromWinId(winId);
+    //externalWindow->showMaximized();
+    QWidget* externalWidget = createWindowContainer(externalWindow);
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->addWidget(externalWidget);
+    //layout->addStretch(1);
+
+    QWidget* panelWidget = new QWidget;
+    panelWidget->setLayout(layout);
+
+    CDockWidget* dockWidget = new CDockWidget(tr("Update"));
+    dockWidget->setWidget(panelWidget);
+    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+
+    m_dockAreaUpdate = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+}
+
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
 {
 	
@@ -2067,6 +2090,11 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 	LaserBitmap* bitmap = new LaserBitmap(image, QRectF(0, 0, width, height), m_scene->document());
 	m_scene->addLaserPrimitive(bitmap);
 	m_viewer->onReplaceGroup(bitmap);
+}
+
+void LaserControllerWindow::onActionUpdate(bool checked)
+{
+    LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)

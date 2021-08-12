@@ -61,6 +61,8 @@ public:
 
     void showLibraryVersion();
 
+    void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
+
 public slots:
     void load();
     void unload();

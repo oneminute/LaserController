@@ -3,6 +3,7 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserNode.h"
 #include "scene/LaserPrimitive.h"
+#include "util/TypeUtils.h"
 
 #include <flann/flann.hpp>
 #include <QDateTime>
@@ -15,12 +16,11 @@
 #include <QVector>
 #include <opencv2/opencv.hpp>
 #include <omp.h>
-//#include <opencv2/flann.hpp>
 
-double distance(const cv::Point2f& p1, const cv::Point2f& p2)
+double distance(const QPointF& p1, const QPointF& p2)
 {
-    double diffX = p2.x - p1.x;
-    double diffY = p2.y - p1.y;
+    double diffX = p2.x() - p1.x();
+    double diffY = p2.y() - p1.y();
     return std::sqrtf(diffX * diffX + diffY * diffY);
 }
 
@@ -39,24 +39,21 @@ public:
         if (laserNode)
         {
             name = laserNode->nodeName();
-            QPointF c = laserNode->position();
-            center = cv::Point2f(c.x(), c.y());
+            center = laserNode->position();
         }
         if (primitive)
         {
             points = primitive->cuttingPoints();
-            //points = primitive->mechiningPoints();
-            //if (points.empty())
-                //points = primitive->cuttingPoints();
-            center.x = center.y = 0;
+            center.setX(0);
+            center.setY(0);
 
-            double distBetweenHeadAndTail = cv::norm(points[0] - points[points.size() - 1]);
+            double distBetweenHeadAndTail = QVector2D(points[0] - points[points.size() - 1]).length();
             // check the primitive is whether closour
             if (qFuzzyCompare(distBetweenHeadAndTail, 0))
             {
                 for (size_t i = 0; i < points.size(); i++)
                 {
-                    cv::Point2f point = points[i];
+                    QPointF point = points[i];
                     center += point;
                 }
                 center /= static_cast<int>(points.size());
@@ -64,32 +61,26 @@ public:
             }
             else
             {
-                points = std::vector<cv::Point2f>(2);
-                cv::Point2f head = points[0];
-                cv::Point2f tail = points[points.size() - 1];
-                points[0] = head;
-                points[1] = tail;
-                center = (head + tail) / 2;
+                points = QVector<QPointF>();
+                points.append(primitive->cuttingPoints().first());
+                points.append(primitive->cuttingPoints().last());
+                center = (points.first() + points.last()) / 2;
                 isClosour = false;
             }
             {
-                cv::Point2f origin;
-                origin.x = 0;
-                origin.y = 0;
+                //flann::Matrix<float> samplePoints = flann::Matrix<float>((float*)(points.data()), points.size(), 2);
 
-                flann::Matrix<float> samplePoints = flann::Matrix<float>(&points[0].x, points.size(), 2);
-
-                flann::KDTreeSingleIndexParams indexParams = flann::KDTreeSingleIndexParams();
-                kdTree = new flann::KDTreeSingleIndex<flann::L2<float>>(samplePoints, indexParams);
-                kdTree->buildIndex();
+                //flann::KDTreeSingleIndexParams indexParams = flann::KDTreeSingleIndexParams();
+                //kdTree = new flann::KDTreeSingleIndex<flann::L2<float>>(samplePoints, indexParams);
+                //kdTree->buildIndex();
             }
         }
     }
 
     ~NodePrivate()
     {
-        if (kdTree)
-            delete kdTree;
+        //if (kdTree)
+            //delete kdTree;
         qLogD << "Node " << name << " destroyed.";
     }
 
@@ -104,9 +95,8 @@ public:
 
     QList<Edge*> edges;
     Edge* outEdge;
-    cv::Point2f center;
-    std::vector<cv::Point2f> points;
-    //cv::flann::Index* flannIndex;
+    QPointF center;
+    QVector<QPointF> points;
     flann::KDTreeSingleIndex<flann::L2<float>>* kdTree;
     bool isClosour;
     QString name;
@@ -156,13 +146,13 @@ Edge* Node::outEdge() const
     return d->outEdge;
 }
 
-cv::Point2f Node::startPos() const
+QPointF Node::startPos() const
 {
     Q_D(const Node);
     return d->center;
 }
 
-cv::Point2f Node::nearestPoint(cv::Point2f point, int& index, float& dist)
+QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
 {
     Q_D(Node);
 
@@ -185,12 +175,15 @@ cv::Point2f Node::nearestPoint(cv::Point2f point, int& index, float& dist)
 
         int* indices = new int[1];
         float* dists = new float[1];
-        cv::Point2f target(0, 0);
+        QPointF target(0, 0);
         {
             flann::Matrix<int> indicesMatrix(indices, 1, 1);
             flann::Matrix<float> distsMatrix(dists, 1, 1);
-            flann::Matrix<float> queryPoint = flann::Matrix<float>(&point.x, 1, 2);
-            d->kdTree->knnSearch(queryPoint, indicesMatrix, distsMatrix, 1, searchParams);
+            float data[2];
+            data[0] = point.x();
+            data[1] = point.y();
+            flann::Matrix<float> queryPoint = flann::Matrix<float>(data, 1, 2);
+            //d->kdTree->knnSearch(queryPoint, indicesMatrix, distsMatrix, 1, searchParams);
 
             index = indicesMatrix.ptr()[0];
             target = d->points[index];
@@ -204,13 +197,13 @@ cv::Point2f Node::nearestPoint(cv::Point2f point, int& index, float& dist)
     }
 }
 
-cv::Point2f Node::currentPos() const
+QPointF Node::currentPos() const
 {
     Q_D(const Node);
     return d->center;
 }
 
-std::vector<cv::Point2f> Node::points() const
+QVector<QPointF> Node::points() const
 {
     Q_D(const Node);
     return d->points;
@@ -222,7 +215,7 @@ bool Node::isClosour() const
     return d->isClosour;
 }
 
-cv::Point2f Node::headPoint() const
+QPointF Node::headPoint() const
 {
     Q_D(const Node);
     if (d->isVirtual())
@@ -232,7 +225,7 @@ cv::Point2f Node::headPoint() const
     return d->points[0];
 }
 
-cv::Point2f Node::tailPoint() const
+QPointF Node::tailPoint() const
 {
     Q_D(const Node);
     if (d->isVirtual())
@@ -242,7 +235,7 @@ cv::Point2f Node::tailPoint() const
     return d->points[d->points.size() - 1];
 }
 
-cv::Point2f Node::point(int index) const
+QPointF Node::point(int index) const
 {
     Q_D(const Node);
     if (d->isVirtual())
@@ -299,7 +292,7 @@ Edge::Edge(Node* a, Node* b, bool force, bool forward)
     d->force = force;
     d->forward = forward;
 
-    d->length = cv::norm(a->startPos() - b->startPos());
+    d->length = QVector2D(a->startPos() - b->startPos()).length();
 }
 
 void Edge::clear()
@@ -319,7 +312,7 @@ void Edge::setLength(double length)
     d->length = length;
 }
 
-void Edge::setLength(const cv::Point2f& p1, const cv::Point2f& p2)
+void Edge::setLength(const QPointF& p1, const QPointF& p2)
 {
     setLength(distance(p1, p2));
 }
@@ -398,7 +391,7 @@ void Ant::initialize()
     d->totalLength = 0.;
 }
 
-void Ant::arrived(Node* node, const cv::Point2f& lastPos)
+void Ant::arrived(Node* node, const QPointF& lastPos)
 {
     Q_D(Ant);
     float dist;
@@ -427,10 +420,10 @@ Node* Ant::currentNode() const
     return d->currentNode;
 }
 
-cv::Point2f Ant::currentPos() const
+QPointF Ant::currentPos() const
 {
     Q_D(const Ant);
-    cv::Point2f target;
+    QPointF target;
     if (d->currentNode->isVirtual())
     {
         target = d->currentNode->currentPos();
@@ -547,14 +540,14 @@ void drawPath(cv::Mat& canvas, const QQueue<Node*>& path, const QMap<Node*, int>
         if (i != 0 && node->isVirtual())
             continue;
         int pointIndex = arrivedNodes[node];
-        cv::Point2f startPos = node->point(pointIndex);
+        cv::Point2f startPos = typeUtils::qtPointF2CVPoint2f(node->point(pointIndex));
         cv::circle(canvas, startPos, 20, cv::Scalar(0, 0, 255), 5);
         if (i != 0)
         {
             cv::line(canvas, lastPos, startPos, cv::Scalar(0, 0, 255), 3);
         }
-        std::vector<cv::Point2f> points = node->points();
-        cv::Mat pointsMat(points);
+        QVector<QPointF> points = node->points();
+        cv::Mat pointsMat(points.count(), 2, CV_32S, points.data());
         pointsMat.convertTo(pointsMat, CV_32S);
         cv::polylines(canvas, pointsMat, false, cv::Scalar(random.bounded(256), random.bounded(256), random.bounded(256)), 5);
         lastPos = startPos;
@@ -562,11 +555,11 @@ void drawPath(cv::Mat& canvas, const QQueue<Node*>& path, const QMap<Node*, int>
         {
             if (pointIndex == 0)
             {
-                lastPos = node->tailPoint();
+                lastPos = typeUtils::qtPointF2CVPoint2f(node->tailPoint());
             }
             else
             {
-                lastPos = node->headPoint();
+                lastPos = typeUtils::qtPointF2CVPoint2f(node->headPoint());
             }
             cv::circle(canvas, lastPos, 18, cv::Scalar(0, 255, 0), 6);
             cv::line(canvas, lastPos, startPos, cv::Scalar(0, 0, 255), 3);
@@ -724,7 +717,7 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
             {
                 Ant* ant = ants[i];
                 ant->initialize();
-                ant->arrived(d->rootNode, cv::Point2f(0, 0));
+                ant->arrived(d->rootNode, QPointF(0, 0));
             }
         }
 

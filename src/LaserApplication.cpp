@@ -44,12 +44,24 @@ bool LaserApplication::initialize()
 {
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
-    LaserApplication::setApplicationName(QObject::tr("LaserController"));
-    LaserApplication::setApplicationDisplayName(QObject::tr("Laser Controller"));
-    LaserApplication::setOrganizationName("OneMinute");
-    LaserApplication::setApplicationVersion(QString("%1.%2.%3.%4").arg(LC_VERSION_MAJOR).arg(LC_VERSION_MINOR).arg(LC_VERSION_BUILD).arg(LC_VERSION_REVISION));
+    LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
+    LaserApplication::setApplicationDisplayName(QObject::tr("CNE Laser"));
+    LaserApplication::setOrganizationName(tr(""));
+    LaserApplication::setApplicationVersion(QString("version: %1").arg(LC_VERSION_STR));
     LaserApplication::setStyle(QStyleFactory::create("Fusion"));
-    qDebug() << "product name:" << LaserApplication::applicationName() << ", version:" << LaserApplication::applicationVersion();
+    
+    qLogD << "product name:" << LaserApplication::applicationName() << ", version:" << LaserApplication::applicationVersion();
+    qLogD << "Styles that current operation system supported:";
+    for (QString style : QStyleFactory::keys())
+    {
+        qLogD << "  style: " << style;
+    }
+
+    QLocale currentLocale = QLocale::system();
+    qLogD << "Current locale: " << currentLocale;
+    QStringList currentDisplayLanguages = QLocale::system().uiLanguages();
+    QLocale displayLocale = QLocale(currentDisplayLanguages.first());
+    qLogD << "Display languages: " << displayLocale << ", code: " << displayLocale.language();
 
     checkCrash();
     initLog();
@@ -83,7 +95,7 @@ bool LaserApplication::initialize()
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
         //QTextStream stream(&file);
-        //app.setStyleSheet(stream.readAll());
+        //setStyleSheet(stream.readAll());
     }
 
     driver = new LaserDriver;

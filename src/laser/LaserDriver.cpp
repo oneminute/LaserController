@@ -159,41 +159,6 @@ void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int t
 
 bool LaserDriver::load()
 {
-    /*m_registerComments.insert(REG_03, tr("Reset calib speed."));
-    m_registerComments.insert(REG_04, tr("Engraving Launching Speed."));
-    m_registerComments.insert(REG_05, tr("Move fast speed."));
-    m_registerComments.insert(REG_06, tr("Cutting speed."));
-    m_registerComments.insert(REG_07, tr("Move to origin speed."));
-    m_registerComments.insert(REG_08, tr("Working quadrant."));
-    m_registerComments.insert(REG_09, tr("X Axis pulse length."));
-    m_registerComments.insert(REG_10, tr("Y Axis pulse length."));
-    m_registerComments.insert(REG_11, tr("X Axis backlash."));
-    m_registerComments.insert(REG_12, tr("Y Axis backlash."));
-    m_registerComments.insert(REG_13, tr("Engraving column step."));
-    m_registerComments.insert(REG_14, tr("Engraving row step."));
-    m_registerComments.insert(REG_15, tr("Engraving laser power."));
-    m_registerComments.insert(REG_16, tr("Max engraving gray value."));
-    m_registerComments.insert(REG_17, tr("Min engraving gray value."));
-    m_registerComments.insert(REG_18, tr("Cutting laser power."));
-    m_registerComments.insert(REG_19, tr("Cutting running speed ratio."));
-    m_registerComments.insert(REG_20, tr("Cutting launching speed ratio."));
-    m_registerComments.insert(REG_21, tr("Motor phase."));
-    m_registerComments.insert(REG_22, tr("Limit phase."));
-    m_registerComments.insert(REG_23, tr("Total working duration."));
-    m_registerComments.insert(REG_24, tr("Total laser duration."));
-    m_registerComments.insert(REG_25, tr("Cutting laser frequency."));
-    m_registerComments.insert(REG_26, tr("Registion."));
-    m_registerComments.insert(REG_27, tr("Engraving laser frequency."));
-    m_registerComments.insert(REG_31, tr("Custom 1 X."));
-    m_registerComments.insert(REG_32, tr("Custom 1 Y."));
-    m_registerComments.insert(REG_33, tr("Custom 2 X."));
-    m_registerComments.insert(REG_34, tr("Custom 2 Y."));
-    m_registerComments.insert(REG_35, tr("Custom 3 X."));
-    m_registerComments.insert(REG_36, tr("Custom 3 Y."));
-    m_registerComments.insert(REG_38, tr("Layout size."));
-    m_registerComments.insert(REG_39, tr("Painting unit."));
-    m_registerComments.insert(REG_40, tr("Move fast launching speed."));*/
-
     if (m_isLoaded)
         return true;
 
@@ -232,7 +197,9 @@ bool LaserDriver::load()
     m_fnReadUserParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadUserParamFromCard");
 
     m_fnShowAboutWindow = (FN_VOID_VOID)m_library.resolve("ShowAboutWindow");
-    m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactoryPassWord");
+    m_fnGetLaserLibInfo = (FN_VOID_VOID)m_library.resolve("GetLaserLibInfo");
+    m_fnSetFactoryType = (FN_VOID_WCHART)m_library.resolve("SetFactoryType");
+    m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactroyPassWord");
     m_fnWriteFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("WriteFactoryPassWord");
 
     m_fnLPenMoveToOriginalPoint = (FN_VOID_DOUBLE)m_library.resolve("LPenMoveToOriginalPoint");
@@ -259,6 +226,9 @@ bool LaserDriver::load()
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
 
     m_fnMillimeter2MicroStep = (FN_INT_DOUBLE_BOOL)m_library.resolve("Millimeter2MicroStep");
+
+    m_fnCheckVersionUpdate = (FN_BOOL_WCHART_INT_WCHART)m_library.resolve("CheckVersionUpdate");
+    m_fnGetUpdatePanelHandle = (FN_INT_INT)m_library.resolve("GetUpdatePanelHandle");
 
     Q_ASSERT(m_fnLoadDataFromFile);
 
@@ -479,6 +449,20 @@ void LaserDriver::showAboutWindow()
     m_fnShowAboutWindow();
 }
 
+QString LaserDriver::getLaserLibraryInfo()
+{
+    wchar_t* strInfo = m_fnGetMainCardID();
+    QString info = QString::fromWCharArray(strInfo);
+    return info;
+}
+
+void LaserDriver::setFactoryType(const QString& factory)
+{
+    wchar_t* strFactory = typeUtils::qStringToWCharPtr(factory);
+    m_fnSetFactoryType(strFactory);
+    delete[] strFactory;
+}
+
 bool LaserDriver::checkFactoryPassword(const QString& password)
 {
     wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
@@ -514,7 +498,8 @@ void LaserDriver::controlHDAction(int action)
 
 QString LaserDriver::getMainCardID()
 {
-    QString id = QString::fromWCharArray(m_fnGetMainCardID());
+    wchar_t* strId = m_fnGetMainCardID();
+    QString id = QString::fromWCharArray(strId);
     return id;
 }
 
@@ -643,6 +628,20 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
 void LaserDriver::getDeviceWorkState()
 {
     m_fnGetDeviceWorkState();
+}
+
+void LaserDriver::checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile)
+{
+    wchar_t* flagBuf = typeUtils::qStringToWCharPtr(flag);
+    wchar_t* vntjfBuf = typeUtils::qStringToWCharPtr(versionNoteToJsonFile);
+    m_fnCheckVersionUpdate(hardware, flagBuf, currentVersion, vntjfBuf);
+    delete[] flagBuf;
+    delete[] vntjfBuf;
+}
+
+int LaserDriver::getUpdatePanelHandle(int version)
+{
+    return m_fnGetUpdatePanelHandle(version);
 }
 
 void LaserDriver::setSystemRegister(LaserDriver::SystemRegisterType rt, QVariant value)

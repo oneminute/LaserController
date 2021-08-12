@@ -1,18 +1,18 @@
-INSTALL(TARGETS LaserController
+INSTALL(TARGETS ${PROJECT_NAME}
     DESTINATION "${CMAKE_INSTALL_PREFIX}_Release" COMPONENT runtime
 	CONFIGURATIONS Release)
 
 INSTALL(FILES 
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
-            "${CMAKE_SOURCE_DIR}/ReleaseNotes.txt"
+            "${CMAKE_SOURCE_DIR}/ReleaseNotes.md"
             "${CMAKE_SOURCE_DIR}/config.json"
             "${CMAKE_SOURCE_DIR}/dev_cache.bin"
         DESTINATION ${CMAKE_INSTALL_PREFIX}_Release
 		CONFIGURATIONS Release)
 
 INSTALL(FILES 
-	"${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.qm"
+	"${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.qm"
 	DESTINATION ${CMAKE_INSTALL_PREFIX}_Release/translations
 	CONFIGURATIONS Release)
 
@@ -63,5 +63,5 @@ INSTALL(CODE "
 			--verbose 1
 			--release
 			--no-translations
-			${CMAKE_INSTALL_PREFIX}_Release/LaserController.exe)"
+			${CMAKE_INSTALL_PREFIX}_Release/${PROJECT_NAME}.exe)"
 	CONFIGURATIONS Release)

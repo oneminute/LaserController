@@ -30,17 +30,6 @@ public:
     DxfDocumentNode* documentNode;
 };
 
-//QMap<QString, DxfNode::NodeType> DxfImporter::sectionClassMap
-//    {
-//        {"SECTION", DxfNode::NT_Section},
-//        {"HEADER", DxfNode::NT_Section},
-//        {"CLASSES", DxfNode::NT_Collection},
-//        {"CLASS", DxfNode::NT_Section},
-//        {"TABLES", DxfNode::NT_Collection},
-//        {"TABLE", DxfNode::NT_Section}
-//    }
-//;
-
 DxfImporter::DxfImporter(QObject* parent)
     : Importer(parent)
     , m_ptr(new DxfImporterPrivate(this))
