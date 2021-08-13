@@ -294,7 +294,7 @@ void Config::loadUiItems()
         "gridContrast",
         tr("Grid Contrast"),
         tr("Grid contrast"),
-        0,
+        2,
         DT_INT
     );
     gridContrast->setInputWidgetType(IWT_ComboBox);
@@ -347,7 +347,7 @@ void Config::loadUiItems()
 		"visualGridSpacing",
 		tr("Visual Grid Spacing"),
 		tr("(mm)"),
-		3
+		10
 	);
 	visualGridSpacing->setInputWidgetProperty("minimum", 0);
 	visualGridSpacing->setInputWidgetProperty("maximum", 10);

@@ -47,6 +47,8 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_verticalRuler(nullptr)
 	, m_radians(0)
 	, m_mousePressState(nullptr)
+	, m_isPrimitiveInteractPoint(false)
+	, m_isGridNode(false)
 {
     setScene(m_scene.data());
     init();
@@ -60,8 +62,6 @@ LaserViewer::LaserViewer(QWidget* parent)
 
 LaserViewer::~LaserViewer()
 {
-	
-	
 	m_undoStack = nullptr;
 	m_horizontalRuler = m_verticalRuler = nullptr;
 }
@@ -248,7 +248,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
         }
     }
-	
+	painter.setPen(QPen(Qt::red, 5, Qt::SolidLine));
+	painter.drawPoint(testPoint);
 	/*if (m_group && !m_group->isEmpty())
 	{
 		QPainter painter(viewport());
@@ -568,42 +569,110 @@ void LaserViewer::setAnchorPoint(QPointF point)
 {
 	m_anchorPoint = point;
 }
-bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint)
+bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint)
 {
+	isSpecialPoint = false;
 	qreal delta = Config::Ui::objectShapeDistance();
 	if (delta <= 0) {
 		return false;
 	}
-	return true;
-}
-bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint)
-{
-	
-	qreal delta = Config::Ui::clickSelectiontTolerance();
-	if (delta <= 0) {
+	LaserPrimitive *primitive = nullptr;
+	//返回的是在scene中的坐标
+	QLineF edge = detectItemEdge(primitive, mapFromScene(mousePoint), delta);
+	if (!primitive) {
 		return false;
 	}
+	else {
+		qDebug() << "true";
+	}
+	//QPointF point = mapToScene(mousePoint.toPoint());
+	QPointF point = mousePoint;
+	QVector2D v1 = QVector2D(point - edge.p1());
+	QVector2D v2 = QVector2D(edge.p2() - edge.p1()).normalized();
+	float projectorDistance = QVector2D::dotProduct(v1, v2);
+	
+	/*if (projectorDistance < 0) {
+		float dis1 = QVector2D(point - edge.p1()).lengthSquared();
+		float dis2 = QVector2D(point - edge.p2()).lengthSquared();
+		if (dis1 < dis2) {
+			result = edge.p1();
+			isSpecialPoint = true;
+		}
+		else {
+			result = edge.p2();
+			isSpecialPoint = true;
+		}
+
+	}*/
+	QVector2D projectorV = v2 * projectorDistance;
+	result = edge.p1() + projectorV.toPointF();
+	QString className = primitive->metaObject()->className();
+	if (className == "LaserEllipse") {
+		LaserEllipse* ellipse = qgraphicsitem_cast<LaserEllipse*>(primitive);
+		QPolygonF rect = ellipse->sceneTransform().map(ellipse->boundingRect());
+		QLineF top = QLineF(rect[0], rect[1]);
+		QLineF bottom = QLineF(rect[1], rect[2]);
+		QLineF left = QLineF(rect[2], rect[3]);
+		QLineF right = QLineF(rect[3], rect[0]);
+		if (utils::checkTwoPointEqueal(top.center(), result, 5.0f)) {
+			result = top.center();
+			isSpecialPoint = true;
+		}
+		else if (utils::checkTwoPointEqueal(left.center(), result, delta)) {
+			result = left.center();
+			isSpecialPoint = true;
+		}
+		else if (utils::checkTwoPointEqueal(bottom.center(), result, delta)) {
+			result = bottom.center();
+			isSpecialPoint = true;
+		}
+		else if (utils::checkTwoPointEqueal(right.center(), result, delta)) {
+			result = right.center();
+			isSpecialPoint = true;
+		}
+	}
+	else {
+		if (utils::checkTwoPointEqueal(edge.center(), result, 5.0f)) {
+			result = edge.center();
+			isSpecialPoint = true;
+		}
+		else if (utils::checkTwoPointEqueal(edge.p1(), result, delta)) {
+			result = edge.p1();
+			isSpecialPoint = true;
+		}
+		else if (utils::checkTwoPointEqueal(edge.p2(), result, delta)) {
+			result = edge.p2();
+			isSpecialPoint = true;
+		}
+	}
+	
+	return true;
+}
+QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint, float scop)
+{
+
+	QLine line;
 	QList <LaserPrimitive*> list = m_scene->document()->primitives().values();
 	for each(LaserPrimitive* primitive in list) {
 		QVector<QLineF> edgeList = primitive->edges();
 		//先判断边框
-		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(delta));
+		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(scop));
 		//testBoundinRect = bounding;
 		if (bounding.containsPoint(mousePoint, Qt::OddEvenFill)) {
-			
+
 			//然后判断边
 			for each(QLineF edge in edgeList) {
 				QVector2D vec(QPointF(edge.p1() - edge.p2()));
 
 				//edges's vertical vector
 				QVector2D verticalV1(-vec.y(), vec.x());
-				verticalV1 = verticalV1.normalized() * delta;
+				verticalV1 = verticalV1.normalized() * scop;
 				QVector2D verticalV2(vec.y(), -vec.x());
-				verticalV2 = verticalV2.normalized() * delta;
+				verticalV2 = verticalV2.normalized() * scop;
 				QVector2D vecNormal = vec.normalized();
 
-				QPointF newP1 = edge.p1() + (vecNormal * delta).toPointF();
-				QPointF newP2 = edge.p2() - (vecNormal * delta).toPointF();
+				QPointF newP1 = edge.p1() + (vecNormal * scop).toPointF();
+				QPointF newP2 = edge.p2() - (vecNormal * scop).toPointF();
 				QPointF newP1_1 = newP1 + verticalV1.toPointF();
 				QPointF newP1_2 = newP1 + verticalV2.toPointF();
 				QPointF newP2_1 = newP2 + verticalV1.toPointF();
@@ -617,20 +686,33 @@ bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePo
 				polVector.append(mapFromScene(newP2_2));
 				polVector.append(mapFromScene(newP2_1));
 				QPolygonF polygon(polVector);
-				qDebug() << "polygon: " << polygon;
-				qDebug() << "mousePoint: " << mousePoint;
+				//qDebug() << "polygon: " << polygon;
+				//qDebug() << "mousePoint: " << mousePoint;
 				//QRectF rect(mapFromScene(newP1_1), mapFromScene(newP2_2));
 
 				if (polygon.containsPoint(mousePoint, Qt::OddEvenFill)) {
 					result = primitive;
 					//testRect = polygon;
 
-					return true;
+					return edge;
 				}
 			}
 		}
-		
-		
+	}
+
+	return line;
+}
+bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint)
+{
+	
+	qreal delta = Config::Ui::clickSelectiontTolerance();
+	if (delta <= 0) {
+		return false;
+	}
+	result = nullptr;
+	detectItemEdge(result, mousePoint, delta);
+	if (result != nullptr) {
+		return true;
 	}
 	return false;
 }
@@ -921,6 +1003,15 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
 		m_mousePressState = nullptr;
+
+		//附近的图元交点
+		/*if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
+			bool isEdgeSpecailPoint = false;
+			if (detectIntersectionByMouse(intersePoint, point, isEdgeSpecailPoint)) {
+				point = intersePoint;
+			}
+		}*/
+			
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
@@ -1103,13 +1194,15 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         {
 			m_mousePressState = StateControllerInst.documentPrimitiveRectReadyState();
 			QPointF point = mapToScene(event->pos());
-			//网格点吸附判断
-			LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-			if (backgroundItem) {
-				backgroundItem->detectGridNode(point);
-			}
-			
             m_creatingRectStartPoint = point;
+			//
+			if (m_isPrimitiveInteractPoint) {
+				m_creatingRectStartPoint = m_primitiveInteractPoint;
+			}
+			//是否网格点
+			if (m_isGridNode) {
+				m_creatingRectStartPoint = m_gridNode;
+			}
             m_creatingRectEndPoint = m_creatingRectStartPoint;
             emit creatingRectangle();
         }
@@ -1118,6 +1211,13 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         {
 			m_mousePressState = StateControllerInst.documentPrimitiveEllipseReadyState();
             m_creatingEllipseStartPoint = mapToScene(event->pos());
+			if (m_isPrimitiveInteractPoint) {
+				m_creatingEllipseStartPoint = m_primitiveInteractPoint;
+			}
+			//是否网格点
+			if (m_isGridNode) {
+				m_creatingEllipseStartPoint = m_gridNode;
+			}
             m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
             m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
 			m_EllipseEndPoint = m_creatingEllipseEndPoint;
@@ -1151,6 +1251,13 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {
 			m_mousePressState = StateControllerInst.documentPrimitiveTextReadyState();
             m_textInputPoint = mapToScene(event->pos()).toPoint();
+			if (m_isPrimitiveInteractPoint) {
+				m_textInputPoint = m_primitiveInteractPoint.toPoint();
+			}
+			//是否网格点
+			if (m_isGridNode) {
+				m_textInputPoint = m_gridNode.toPoint();
+			}
             creatTextEdit();
             emit creatingText();
         }
@@ -1170,8 +1277,37 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     m_verticalRuler->setMousePoint(m_mousePoint);
     m_horizontalRuler->repaint();
     m_verticalRuler->repaint();
-	//QGraphicsView::mouseMoveEvent(event);
-    
+	m_isPrimitiveInteractPoint = false;
+	m_isGridNode = false;
+	//所有的图元draw
+	if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
+		//获取鼠标附近图元的最近点
+		bool isSpecailPoint = false;
+		m_isPrimitiveInteractPoint = detectIntersectionByMouse(m_primitiveInteractPoint, mapToScene(event->pos()), isSpecailPoint);
+		testPoint = mapFromScene(m_primitiveInteractPoint);
+		viewport()->repaint();
+		if (m_isPrimitiveInteractPoint) {
+			if (!isSpecailPoint) {
+				QPixmap cMap(":/ui/icons/images/lineCursor.png");
+				this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+			}
+			else {
+				QPixmap cMap(":/ui/icons/images/center.png");
+				this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+			}
+			
+		}
+		else {
+			this->setCursor(Qt::ArrowCursor);
+			//是否为网格上的点
+			//网格点吸附判断
+			LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+			if (backgroundItem) {
+				m_isGridNode = backgroundItem->detectGridNode(m_gridNode, mapToScene(event->pos()));
+			}
+		}
+		
+	}
     // 当在DocumentSelecting状态时
 	if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
 		
@@ -1333,10 +1469,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
         m_creatingRectEndPoint = mapToScene(m_mousePoint);
-		//网格点吸附判断
-		LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-		if (backgroundItem) {
-			backgroundItem->detectGridNode(m_creatingRectEndPoint);
+		if (m_isPrimitiveInteractPoint) {
+			m_creatingRectEndPoint = m_primitiveInteractPoint;
+		}
+		//是否网格点
+		if (m_isGridNode) {
+			m_creatingRectEndPoint = m_gridNode;
 		}
 		m_creatingRectBeforeShiftPoint = m_creatingRectEndPoint;
 		this->viewport()->repaint();
@@ -1347,14 +1485,28 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
         m_creatingEllipseEndPoint = mapToScene(m_mousePoint);
+		if (m_isPrimitiveInteractPoint) {
+			m_creatingEllipseEndPoint = m_primitiveInteractPoint;
+		}
+		//是否网格点
+		if (m_isGridNode) {
+			m_creatingEllipseEndPoint = m_gridNode;
+		}
 		this->viewport()->repaint();
         return;
     }
-    
+    //Line
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
         m_creatingLineEndPoint = mapToScene(m_mousePoint);
 		if (utils::checkTwoPointEqueal(m_creatingLineEndPoint, m_creatingLineStartPoint)) {
 			return;
+		}
+		if (m_isPrimitiveInteractPoint) {
+			m_creatingLineEndPoint = m_primitiveInteractPoint;
+		}
+		//是否网格点
+		if (m_isGridNode) {
+			m_creatingLineEndPoint = m_gridNode;
 		}
 		qreal yLength = qAbs(m_creatingLineStartPoint.x() - m_creatingLineEndPoint.x()) * qTan(M_PI *0.25);
         if (m_isKeyShiftPressed) {
@@ -1381,20 +1533,32 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     //Polygon
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
         m_creatingPolygonEndPoint = mapToScene(m_mousePoint);
-
-		if (detectPoint(m_creatingPolygonPoints, m_creatingPolygonLines, m_creatingPolygonEndPoint)) {
+		if (m_isPrimitiveInteractPoint) {
+			m_creatingPolygonEndPoint = m_primitiveInteractPoint;
+		}
+		//是否网格点
+		if (m_isGridNode) {
+			m_creatingPolygonEndPoint = m_gridNode;
+		}
+		/*if (detectPoint(m_creatingPolygonPoints, m_creatingPolygonLines, m_creatingPolygonEndPoint)) {
 			this->setCursor(Qt::CrossCursor);
 		}
 		else {
 			this->setCursor(Qt::ArrowCursor);
-		}
+		}*/
 		this->viewport()->repaint();
 		return;
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
         m_creatingSplineMousePos = event->pos();
-
+		if (m_isPrimitiveInteractPoint) {
+			m_creatingSplineMousePos = m_primitiveInteractPoint;
+		}
+		//是否网格点
+		if (m_isGridNode) {
+			m_creatingSplineMousePos = m_gridNode;
+		}
 	}
 	else {
 		//setAnchorPoint(mapFromScene(QPointF(0, 0)));
@@ -1553,6 +1717,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineReadyState())) {
 		if (event->button() == Qt::LeftButton) {
 			m_creatingLineStartPoint = mapToScene(m_mousePoint);
+			if (m_isPrimitiveInteractPoint) {
+				m_creatingLineStartPoint = m_primitiveInteractPoint;
+			}
+			//是否网格点
+			if (m_isGridNode) {
+				m_creatingLineStartPoint = m_gridNode;
+			}
 			m_creatingLineEndPoint = m_creatingLineStartPoint;
 			emit creatingLine();
 		}
@@ -1596,6 +1767,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
 		if (event->button() == Qt::LeftButton) {
 			m_creatingPolygonStartPoint = mapToScene(event->pos());
+			if (m_isPrimitiveInteractPoint) {
+				m_creatingPolygonStartPoint = m_primitiveInteractPoint;
+			}
+			//是否网格点
+			if (m_isGridNode) {
+				m_creatingPolygonStartPoint = m_gridNode;
+			}
 			m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
 			m_creatingPolygonPoints.append(m_creatingPolygonStartPoint);
 			emit creatingPolygon();
@@ -1813,7 +1991,7 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 	return selectedList;
 }
 
-bool LaserViewer::detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point)
+/*bool LaserViewer::detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point)
 {
 	for each (QPointF p in points)
 	{
@@ -1851,7 +2029,7 @@ bool LaserViewer::detectLine(QList<QLineF> lines, QPointF startPoint, QPointF po
 	}
 	setCursor(Qt::ArrowCursor);
 	return false;
-}
+}*/
 
 bool LaserViewer::isRepeatPoint()
 {

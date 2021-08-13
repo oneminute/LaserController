@@ -60,6 +60,7 @@
     <file>images/subtract.png</file>
     <file>images/arrow.png</file>
     <file>images/zommToPage.png</file>
-    <file>images/zoomToSelection.png</file>
+    <file>images/lineCursor.png</file>
+    <file>images/center.png</file>
   </qresource>
 </RCC>

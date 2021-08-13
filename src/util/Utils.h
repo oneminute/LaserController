@@ -20,7 +20,7 @@ namespace utils
 
     void limitToLayout(QVector3D& pos, QUADRANT quadrant, float width, float height);
 
-	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2);
+	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, float scop = 0.00001f);
 
 
     quint32 factorial(quint32 n);

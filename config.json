@@ -326,11 +326,11 @@
         },
         "gridContrast": {
             "defaultValue": 0,
-            "value": 0
+            "value": 2
         },
         "gridShapeDistance": {
             "defaultValue": 3,
-            "value": 3
+            "value": 10
         },
         "objectShapeDistance": {
             "defaultValue": 5,
@@ -358,7 +358,7 @@
         },
         "visualGridSpacing": {
             "defaultValue": 3,
-            "value": 3
+            "value": 10
         }
     },
     "userRegister": {

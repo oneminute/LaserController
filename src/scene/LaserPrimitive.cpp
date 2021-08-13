@@ -609,6 +609,8 @@ void LaserEllipse::draw(QPainter* painter)
     Q_D(LaserEllipse);
 	//painter->drawRect(boundingRect());
 	painter->drawPath(d->path);
+	//painter->setPen(QPen(Qt::black, 1));
+	//painter->drawLine(edges()[0]);
 }
 
 QPainterPath LaserEllipse::toPath() const
@@ -661,7 +663,7 @@ QJsonObject LaserEllipse::toJson()
 
 	return object;
 }
-
+//scene
 QVector<QLineF> LaserEllipse::edges()
 {
 	Q_D(const LaserEllipse);

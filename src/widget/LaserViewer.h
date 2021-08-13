@@ -46,9 +46,11 @@ public:
 	QRectF selectedItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
-	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint);
+	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);
+	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);
 	bool detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint);
 	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);
+	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
 
 	QState* currentState();
@@ -65,8 +67,8 @@ private:
 	
 	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
 	void detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom);
-	bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
-	bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
+	//bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
+	//bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
 	bool isRepeatPoint();
 	bool isStartPoint();
 	qreal leftScaleMirror(qreal rate, qreal x);
@@ -160,6 +162,7 @@ protected:
 	
 
 private:
+	QPointF testPoint;
     QScopedPointer<LaserScene> m_scene;
     //LaserScene* m_scene;
     bool m_rubberBandActive;
@@ -167,6 +170,12 @@ private:
     //bool m_mousePressed;
     QPoint m_lastDragPos;
 	QState* m_mousePressState;
+
+	bool m_isGridNode;//是否为网格交点node
+	QPointF m_gridNode;
+	bool m_isPrimitiveInteractPoint;//绘制是否获取附近图元的最近点
+	QPointF m_primitiveInteractPoint;//scene
+	//QPointF m_isPrimitiveInteractPoint;
 
     QPointF m_selectionStartPoint;
     QPointF m_selectionEndPoint;

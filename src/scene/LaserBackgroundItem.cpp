@@ -212,7 +212,7 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	}
 	
 }
-bool LaserBackgroundItem::detectGridNode(QPointF & point)
+bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 {
 	QGraphicsScene* scene = this->scene();
 	if (!scene) {
@@ -225,8 +225,8 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point)
 	if (m_gridNodeYList.isEmpty() || m_gridNodeXList.isEmpty()) {
 		return false;
 	}
-	//pont从scene到document转换
-	QPointF documentPoint = mapFromScene(point);
+	//point从scene到document转换
+	QPointF documentPoint = mapFromScene(mousePoint);
 	qreal distance = Config::Ui::gridShapeDistance();
 	qreal valueX = distance / view->zoomValue();//5个像素
 	qreal valueY = distance / view->zoomValue();
