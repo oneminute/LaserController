@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QFrame>
 #include <QVector3D>
+#include <QVector2D>
 
 namespace utils
 {
@@ -18,6 +19,9 @@ namespace utils
     QVector3D putToQuadrant(const QVector3D& pos, QUADRANT quadrant);
 
     void limitToLayout(QVector3D& pos, QUADRANT quadrant, float width, float height);
+
+	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2);
+
 
     quint32 factorial(quint32 n);
 }

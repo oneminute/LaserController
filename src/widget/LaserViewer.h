@@ -12,8 +12,6 @@ class LaserScene;
 class LaserPrimitiveGroup;
 class LaserPrimitive;
 class LaserBitmap;
-struct ReshapeUndoPrimitive;
-class ReshapeUndoCommand;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -51,7 +49,7 @@ public:
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint);
 	bool detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint);
 	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);
-	void clearGroupSelection();
+	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
 
 	QState* currentState();
 
@@ -67,10 +65,10 @@ private:
 	
 	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
 	void detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom);
-	bool checkTwoPointEqueal(const QPointF& point1, const QPointF& point2);
 	bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
 	bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
-	bool isAllPolygonStartPoint();
+	bool isRepeatPoint();
+	bool isStartPoint();
 	qreal leftScaleMirror(qreal rate, qreal x);
 	qreal rightScaleMirror(qreal rate, qreal x);
 	qreal topScaleMirror(qreal rate, qreal y);
@@ -81,9 +79,10 @@ private:
 	//undo
 	void selectionUndoStackPushBefore();
 	void selectionUndoStackPush();
-	void reshapeUndoStackPushBefore();
-	ReshapeUndoCommand* reshapeUndoStackPush();
-	void transformUndoStackPush();
+	//void reshapeUndoStackPushBefore();
+	//ReshapeUndoCommand* reshapeUndoStackPush();
+	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
+	void transformUndoStackPush(LaserPrimitive* item = nullptr);
 public slots:
     void zoomIn();
     void zoomOut();
@@ -93,10 +92,10 @@ public slots:
 	void onEndSelecting();
 	void onEndSelectionFillGroup();
 	void onDocumentIdle();
-	void onCancelSelected();
+	QMap<QGraphicsItem*, QTransform> onCancelSelected();
 	bool resetGroup();
 	bool onSelectedFillGroup();
-	void onReplaceGroup(LaserPrimitive* item);
+	QMap<QGraphicsItem*, QTransform> onReplaceGroup(LaserPrimitive* item);
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -188,6 +187,7 @@ private:
 	QPointF m_creatingPolygonEndPoint;
 	QVector<QPointF> m_creatingPolygonPoints;
 	QList<QLineF> m_creatingPolygonLines;
+	LaserPrimitive* m_lastPolygon;
 	/*QRectF m_polygonStartRect;
 	bool m_isMouseInStartRect;*/
 	//Spline
@@ -250,11 +250,12 @@ private:
 	LaserBitmap* m_detectedBitmap;
 	//undo stack
 	QUndoStack* m_undoStack;
-	QList<QGraphicsItem*> m_undoSelectionList;
-	QTransform m_undoSelectionTransform;
-	QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_undoReshapMap;
+	QMap<QGraphicsItem*, QTransform> m_undoSelectionList;
+	//QTransform m_undoSelectionTransform;
+	//QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_undoReshapMap;
 	//ReshapeUndoCommand* m_reshapCmd;
-	QTransform m_undoTransform;
+	//QTransform m_undoTransform;
+	QMap<QGraphicsItem*, QTransform> m_undoTransformList;
 	
 	friend class LaserScene;
 };

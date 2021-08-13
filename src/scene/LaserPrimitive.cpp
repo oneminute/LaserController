@@ -101,8 +101,6 @@ QVector<QLineF> LaserPrimitive::edges(QPainterPath path, bool isPolyline)
 {
 	QPolygonF polygon = path.toFillPolygon();
 	QVector<QLineF> edgeList;
-	int c = polygon.count();
-	qDebug() << c;
 	for (int i = 0; i < polygon.count()-1; i++) {
 		
 		QLineF edge;
@@ -609,7 +607,7 @@ QVector<QPointF> LaserEllipse::updateMachiningPoints(cv::Mat& canvas)
 void LaserEllipse::draw(QPainter* painter)
 {
     Q_D(LaserEllipse);
-	painter->drawRect(boundingRect());
+	//painter->drawRect(boundingRect());
 	painter->drawPath(d->path);
 }
 
@@ -857,7 +855,7 @@ void LaserLine::draw(QPainter * painter)
 {
     Q_D(LaserLine);
     painter->drawLine(d->line);
-	painter->drawRect(d->boundingRect);
+	//painter->drawRect(d->boundingRect);
 }
 
 QPainterPath LaserLine::toPath() const

@@ -85,20 +85,17 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
     m_doc->addPrimitive(primitive);
 	addItem(primitive);
-	/*if (m_background) {
-		//addItem(primitive);
-		m_background->addToGroup(primitive);
-	}
-	else {
-		addItem(primitive);
-	}*/
-    
+}
+
+void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
+{
+	m_doc->removePrimitive(primitive);
+	removeItem(primitive);
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
 {
     QList<LaserPrimitive*> primitives;
-	qDebug() << "selectedItems() size: " << selectedItems().size();
     for (QGraphicsItem* item : selectedItems())
     {
         LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
@@ -107,7 +104,8 @@ QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
             primitives.append(primitive);
         }
     }
-	qDebug() << "primitives size: " << primitives.size();
+
+	qDebug() << "primitives size: " << selectedItems().size();
     return primitives;
 }
 
