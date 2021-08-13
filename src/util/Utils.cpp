@@ -106,3 +106,13 @@ void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float
     pos.setX(x);
     pos.setY(y);
 }
+
+bool utils::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2)
+{
+	qreal distance = QVector2D(point2 - point1).length();
+	if (distance <= 0.00001f)
+	{
+		return true;
+	}
+	return false;
+}

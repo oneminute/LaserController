@@ -6,23 +6,73 @@
 
 class SelectionUndoCommand :public QUndoCommand {
 public :
-	SelectionUndoCommand(LaserViewer* viewer, 
-		QList<QGraphicsItem*> undoList, QTransform groupUndoTransform,
-		QList<QGraphicsItem*> redoList, QTransform groupRedoTransform);
+	SelectionUndoCommand(LaserViewer * viewer,
+		QMap<QGraphicsItem*, QTransform> undoList,
+		QMap<QGraphicsItem*, QTransform> redoList);
 	~SelectionUndoCommand();
 	virtual void undo() override;
 	virtual void redo() override;
 	virtual bool mergeWith(const QUndoCommand *command) override;
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);//根据sceneTransfrom转化为Item的transform和position
 private:
 	LaserViewer* m_viewer;
-	QList<QGraphicsItem*> m_undoSelectedList;
-	QList<QGraphicsItem*> m_redoSelectedList;
-	void handle(QList<QGraphicsItem*> resetList, QList<QGraphicsItem*> list, QTransform groupTransform);
+	QMap<QGraphicsItem*, QTransform> m_undoSelectedList;
+	QMap<QGraphicsItem*, QTransform> m_redoSelectedList;
+	void handle(QMap<QGraphicsItem*, QTransform> list);
 	QTransform m_groupUndoTransform;
 	QTransform m_groupRedoTransform;
 	//ReshapeUndoCommand* m_reshapeCmd;
 };
-struct ReshapeUndoPrimitive {
+class TranformUndoCommand :public QUndoCommand {
+public:
+	TranformUndoCommand(LaserViewer* viewer,
+		QMap<QGraphicsItem*, QTransform> undoList,
+		QMap<QGraphicsItem*, QTransform> redoList);
+	~TranformUndoCommand();
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);//根据sceneTransfrom转化为Item的transform和position
+	virtual void undo() override;
+	virtual void redo() override;
+	void handle(QMap<QGraphicsItem*, QTransform> list);
+private:
+	LaserViewer * m_viewer;
+	//LaserPrimitive* m_item;
+	QMap<QGraphicsItem*, QTransform> m_undoList;
+	QMap<QGraphicsItem*, QTransform> m_redoList;
+	//QTransform m_undoTransform;
+	//QTransform m_redoTransform;
+};
+class AddDelUndoCommand : public QUndoCommand {
+public :
+	AddDelUndoCommand(LaserScene* scene, QList<QGraphicsItem*> list, bool isDel = false);
+	~AddDelUndoCommand();
+	virtual void undo() override;
+	virtual void redo() override;
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);
+private:
+	LaserScene * m_scene;
+	LaserViewer* m_viewer;
+	QList<QGraphicsItem*> m_list;
+	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
+	//QTransform m_addRedoTransform;
+	//QTransform m_delRedoTransform;
+	//QMap<QList<QGraphicsItem*>, QTransform> m_selectedBeforeAdd;
+	bool m_isDel;
+};
+class PolygonUndoCommand : public QUndoCommand {
+public:
+	PolygonUndoCommand(LaserScene* scene, LaserPrimitive* lastPrimitive, LaserPrimitive* curPrimitive);
+	~PolygonUndoCommand();
+	virtual void undo() override;
+	virtual void redo() override;
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);
+private:
+	LaserScene * m_scene;
+	LaserPrimitive* m_lastItem;
+	LaserPrimitive* m_curItem;
+	LaserViewer* m_viewer;
+	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
+};
+/*struct ReshapeUndoPrimitive {
 private:
 	QPainterPath m_path;
 	QTransform m_allTransform;
@@ -66,18 +116,6 @@ private:
 	QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_redoMap;
 	void handle(QMap<LaserPrimitive*, ReshapeUndoPrimitive>& map);
 };
+*/
 
-class TranformUndoCommand :public QUndoCommand {
-public:
-	TranformUndoCommand(LaserViewer* viewer, QTransform undoTransform, QTransform redoTransform, LaserPrimitive* item = nullptr);
-	~TranformUndoCommand();
-	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);//根据sceneTransfrom转化为Item的transform和position
-	virtual void undo() override;
-	virtual void redo() override;
-private:
-	LaserViewer* m_viewer;
-	LaserPrimitive* m_item;
-	QTransform m_undoTransform;
-	QTransform m_redoTransform;
-};
 #endif // UNDOCOMMAND_H

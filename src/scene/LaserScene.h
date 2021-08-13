@@ -24,6 +24,7 @@ public:
     void updateDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
     void addLaserPrimitive(LaserPrimitive* primitive);
+	void removeLaserPrimitive(LaserPrimitive* primitive);
 	LaserBackgroundItem* backgroundItem() { return m_background; }
 
     LaserDocument* document() { return m_doc; }

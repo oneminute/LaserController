@@ -1,5 +1,6 @@
 ﻿#include "LaserControllerWindow.h"
 #include "ui_LaserControllerWindow.h"
+#include "widget/UndoCommand.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -697,6 +698,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 LaserControllerWindow::~LaserControllerWindow()
 {
 	m_propertyWidget = nullptr;
+	if (m_viewer->undoStack()) {
+		delete m_viewer->undoStack();
+	}
 }
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
@@ -1870,16 +1874,44 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
 
 void LaserControllerWindow::onActionDeletePrimitive(bool checked)
 {
-    if (QMessageBox::Apply == QMessageBox::question(this, tr("Delete primitives?"), tr("Do you want to delete primitives selected?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
-    {
-        for (LaserPrimitive* primitive : m_scene->selectedPrimitives())
-        {
-            m_scene->document()->removePrimitive(primitive);
-        }
-		m_tableWidgetLayers->updateItems();
-		//change state
-		m_viewer->onCancelSelected();
-    }
+    /*if (QMessageBox::Apply == QMessageBox::question(this, tr("Delete primitives?"), tr("Do you want to delete primitives selected?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
+    {        
+    }*/
+	if (!m_scene) {
+		return;
+	}
+	QGraphicsView* qv = m_scene->views()[0];
+	LaserViewer* viewer = qobject_cast<LaserViewer*>(qv);
+	if (!viewer) {
+		return;
+	}
+
+	if (!viewer->group() || viewer->group()->isEmpty()) {
+		return;
+	}
+	for each(QGraphicsItem* itemed in m_scene->selectedPrimitives()) {
+		if (!m_viewer->group()->isAncestorOf(itemed)) {
+			qLogW << "Exit many items have selected but not in group When Delete,Please check.";
+			return;
+		}
+	}
+	for (QGraphicsItem* item : viewer->group()->childItems())
+	{
+		if (!item->isSelected()) {
+			qLogW << "Exit many items selected are false When Delete,Please check.";
+			return;
+		}
+		
+	}
+	//undo 创建完后先执行redo
+	AddDelUndoCommand* delCmd = new AddDelUndoCommand(m_scene, viewer->group()->childItems(), true);
+	m_viewer->undoStack()->push(delCmd);
+	m_tableWidgetLayers->updateItems();
+	//change state
+	m_viewer->onCancelSelected();
+	//由被选中状态切换到Idle
+	emit m_viewer->selectionToIdle();
+	m_viewer->viewport()->repaint();
 }
 
 bool LaserControllerWindow::onActionCloseDocument(bool checked)
@@ -2065,7 +2097,12 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 	qreal width = image.size().width();
 	qreal height = image.size().height();
 	LaserBitmap* bitmap = new LaserBitmap(image, QRectF(0, 0, width, height), m_scene->document());
-	m_scene->addLaserPrimitive(bitmap);
+	//undo 创建完后会执行redo
+	QList<QGraphicsItem*> list;
+	list.append(bitmap);
+	AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene, list);
+	m_viewer->undoStack()->push(addCmd);
+	//m_scene->addLaserPrimitive(bitmap);
 	m_viewer->onReplaceGroup(bitmap);
 }
 
@@ -2586,12 +2623,18 @@ void LaserControllerWindow::onUndoStackCleanChanged(bool clean)
 
 void LaserControllerWindow::onCanUndoChanged(bool can)
 {
-	m_ui->actionUndo->setEnabled(can);
+	if (m_ui && m_ui->actionUndo) {
+		m_ui->actionUndo->setEnabled(can);
+	}
+	
 }
 
 void LaserControllerWindow::onCanRedoChanged(bool can)
 {
-	m_ui->actionRedo->setEnabled(can);
+	if (m_ui && m_ui->actionRedo) {
+		m_ui->actionRedo->setEnabled(can);
+	}
+	
 }
 
 void LaserControllerWindow::bindWidgetsProperties()
