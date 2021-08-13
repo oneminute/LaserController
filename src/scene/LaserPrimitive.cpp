@@ -19,7 +19,7 @@
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
 #include "util/ImageUtils.h"
-#include "util/PltUtils.h"
+#include "util/MachiningUtils.h"
 #include "util/TypeUtils.h"
 #include "util/UnitUtils.h"
 #include "util/Utils.h"
