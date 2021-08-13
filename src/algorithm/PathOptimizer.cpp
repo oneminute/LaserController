@@ -5,7 +5,7 @@
 #include "scene/LaserPrimitive.h"
 #include "util/TypeUtils.h"
 
-#include <flann/flann.hpp>
+#include <opencv2/opencv.hpp>
 #include <QDateTime>
 #include <QList>
 #include <QMap>
@@ -14,15 +14,8 @@
 #include <QStack>
 #include <QtMath>
 #include <QVector>
-#include <opencv2/opencv.hpp>
 #include <omp.h>
-
-double distance(const QPointF& p1, const QPointF& p2)
-{
-    double diffX = p2.x() - p1.x();
-    double diffY = p2.y() - p1.y();
-    return std::sqrtf(diffX * diffX + diffY * diffY);
-}
+#include <flann/flann.hpp>
 
 class NodePrivate
 {
@@ -43,7 +36,7 @@ public:
         }
         if (primitive)
         {
-            points = primitive->cuttingPoints();
+            points = primitive->updateMachiningPoints();
             center.setX(0);
             center.setY(0);
 
@@ -62,25 +55,24 @@ public:
             else
             {
                 points = QVector<QPointF>();
-                points.append(primitive->cuttingPoints().first());
-                points.append(primitive->cuttingPoints().last());
+                points.append(primitive->updateMachiningPoints().first());
+                points.append(primitive->updateMachiningPoints().last());
                 center = (points.first() + points.last()) / 2;
                 isClosour = false;
             }
             {
-                //flann::Matrix<float> samplePoints = flann::Matrix<float>((float*)(points.data()), points.size(), 2);
-
-                //flann::KDTreeSingleIndexParams indexParams = flann::KDTreeSingleIndexParams();
-                //kdTree = new flann::KDTreeSingleIndex<flann::L2<float>>(samplePoints, indexParams);
-                //kdTree->buildIndex();
+                flann::Matrix<float> samplePoints = flann::Matrix<float>((float*)(points.data()), points.size(), 2);
+                flann::KDTreeSingleIndexParams indexParams = flann::KDTreeSingleIndexParams();
+                kdTree = new flann::KDTreeSingleIndex<flann::L2<float>>(samplePoints, indexParams);
+                kdTree->buildIndex();
             }
         }
     }
 
     ~NodePrivate()
     {
-        //if (kdTree)
-            //delete kdTree;
+        if (kdTree)
+            delete kdTree;
         qLogD << "Node " << name << " destroyed.";
     }
 
@@ -183,7 +175,7 @@ QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
             data[0] = point.x();
             data[1] = point.y();
             flann::Matrix<float> queryPoint = flann::Matrix<float>(data, 1, 2);
-            //d->kdTree->knnSearch(queryPoint, indicesMatrix, distsMatrix, 1, searchParams);
+            d->kdTree->knnSearch(queryPoint, indicesMatrix, distsMatrix, 1, searchParams);
 
             index = indicesMatrix.ptr()[0];
             target = d->points[index];
@@ -314,7 +306,7 @@ void Edge::setLength(double length)
 
 void Edge::setLength(const QPointF& p1, const QPointF& p2)
 {
-    setLength(distance(p1, p2));
+    setLength(QVector2D(p1 - p2).length());
 }
 
 double Edge::pheromones() const

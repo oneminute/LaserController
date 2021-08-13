@@ -17,6 +17,8 @@ public:
     bool initialize();
     void destroy();
 
+    bool checkEnvironment();
+
     bool notify(QObject* receiver, QEvent* event) override;
 
 protected:

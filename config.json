@@ -68,7 +68,7 @@
         },
         "maxIntervalDistance": {
             "defaultValue": 10,
-            "value": 10
+            "value": 40
         }
     },
     "general": {

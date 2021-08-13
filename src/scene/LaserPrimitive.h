@@ -123,9 +123,9 @@ public:
 
     virtual void draw(QPainter* painter) {};
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat()) { return QVector<QPointF>(); }
-    QVector<QPointF> mechiningPoints() const;
-    QVector<QPointF> mechiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat()) { return QVector<QPointF>(); }
+    QVector<QPointF> machiningPoints() const;
+    QVector<QPointF> machiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
     QList<int> startingIndices() const;
     QVector<QPointF> startingPoints() const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
@@ -217,7 +217,7 @@ public:
     QRectF bounds() const;
     void setBounds(const QRectF& bounds);
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -243,7 +243,7 @@ public:
     void setRect(const QRectF& rect);
 
     virtual void draw(QPainter* painter);
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
 
     virtual QPainterPath toPath() const;
 	virtual QRectF sceneBoundingRect() const;
@@ -266,7 +266,7 @@ public:
     QLineF line() const;
     void setLine(const QLineF& line);
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -291,7 +291,7 @@ public:
     QPainterPath path() const;
     void setPath(const QPainterPath& path);
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -319,7 +319,7 @@ public:
     void setPolyline(const QPolygonF& poly);
     virtual QRectF sceneBoundingRect() const;
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -344,7 +344,7 @@ public:
     QPolygonF polyline() const;
     void setPolyline(const QPolygonF& poly);
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toPath() const;
@@ -405,7 +405,7 @@ public:
     virtual QString typeName() { return tr("Bitmap"); }
 	virtual QJsonObject toJson();
 
-    virtual QVector<QPointF> cuttingPoints(cv::Mat& canvas = cv::Mat());
+    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
 	virtual QRectF sceneBoundingRect() const;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;

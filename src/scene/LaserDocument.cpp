@@ -310,11 +310,11 @@ void LaserDocument::exportJSON1(const QString& filename)
                 QList<QPainterPath> paths = laserItem->subPaths();
                 if (paths.isEmpty())
                 {
-                    QVector<QPointF> points = laserItem->cuttingPoints(canvas);
+                    QVector<QPointF> points = laserItem->updateMachiningPoints(canvas);
                     if (!points.empty())
                     {
                         itemObj["Type"] = laserItem->typeLatinName();
-                        itemObj["Data"] = QString(pltUtils::points2Plt(points));
+                        itemObj["Data"] = QString(machiningUtils::points2Plt(points));
                         add = true;
                     }
                 }
@@ -324,9 +324,9 @@ void LaserDocument::exportJSON1(const QString& filename)
                     for (QPainterPath subPath : paths)
                     {
                         QVector<QPointF> points;
-                        if (pltUtils::path2Points(subPath, points, canvas))
+                        if (machiningUtils::path2Points(subPath, points, canvas))
                         {
-                            pltString.append(QString(pltUtils::points2Plt(points)));
+                            pltString.append(QString(machiningUtils::points2Plt(points)));
                         }
                     }
                     if (!pltString.isEmpty())
@@ -431,12 +431,12 @@ void LaserDocument::exportJSON2(const QString& filename)
         {
             itemObj["Layer"] = layerId;
             QList<QPainterPath> paths = primitive->subPaths();
-            //std::vector<cv::Point2f> points = primitive->cuttingPoints(canvas);
-            QVector<QPointF> points = primitive->mechiningPoints(lastPoint, pointIndex, canvas);
+            //std::vector<cv::Point2f> points = primitive->updateMachiningPoints(canvas);
+            QVector<QPointF> points = primitive->machiningPoints(lastPoint, pointIndex, canvas);
             if (!points.empty())
             {
                 itemObj["Type"] = primitive->typeLatinName();
-                itemObj["Data"] = QString(pltUtils::points2Plt(points));
+                itemObj["Data"] = QString(machiningUtils::points2Plt(points));
                 items.append(itemObj);
             }
         }

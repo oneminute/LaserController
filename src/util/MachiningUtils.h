@@ -1,5 +1,5 @@
-#ifndef PLTUTILS_H
-#define PLTUTILS_H
+#ifndef MACHININGUTILS_H
+#define MACHININGUTILS_H
 
 #include <Eigen/Core>
 #include <QImage>
@@ -9,7 +9,7 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace pltUtils
+namespace machiningUtils
 {
     //void linePoints(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, QVector<Eigen::Vector2d> points, qreal factor);
     int linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform);
@@ -23,4 +23,4 @@ namespace pltUtils
     bool pointsEql(const QPointF& pt1, const QPointF& pt2);
 }
 
-#endif // PLTUTILS_H
+#endif // MACHININGUTILS_H

@@ -59,7 +59,7 @@ public:
     LaserPrimitiveType type;
     bool isHover;
     QPainterPath outline;
-    QVector<QPointF> mechiningPoints;
+    QVector<QPointF> updateMachiningPoints;
     QList<int> startingIndices;
 	QTransform allTransform;
 	QRectF originalBoundingRect;
@@ -267,18 +267,18 @@ void LaserPrimitive::sceneTransformToItemTransform(QTransform sceneTransform)
 	setPos(sceneTransform.m31(), sceneTransform.m32());
 }
 
-QVector<QPointF> LaserPrimitive::mechiningPoints() const
+QVector<QPointF> LaserPrimitive::machiningPoints() const
 {
     Q_D(const LaserPrimitive);
-    return d->mechiningPoints;
+    return d->updateMachiningPoints;
 }
 
-QVector<QPointF> LaserPrimitive::mechiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas) const
+QVector<QPointF> LaserPrimitive::machiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas) const
 {
     Q_D(const LaserPrimitive);
-    int pointsCount = d->mechiningPoints.size();
-    QPointF head = d->mechiningPoints[0];
-    QPointF tail = d->mechiningPoints[pointsCount - 1];
+    int pointsCount = d->updateMachiningPoints.size();
+    QPointF head = d->updateMachiningPoints[0];
+    QPointF tail = d->updateMachiningPoints[pointsCount - 1];
     double distBetweenHeadAndTail = QVector2D(head - tail).length();
     QVector<QPointF> points;
 
@@ -287,9 +287,9 @@ QVector<QPointF> LaserPrimitive::mechiningPoints(QPointF& lastPoint, int pointIn
     {
         int prevIndex = (pointIndex - 1 + pointsCount) % pointsCount;
         int nextIndex = (pointIndex + 1) % pointsCount;
-        QPointF currentPoint = d->mechiningPoints[pointIndex];
-        QPointF prevPoint = d->mechiningPoints[prevIndex];
-        QPointF nextPoint = d->mechiningPoints[nextIndex];
+        QPointF currentPoint = d->updateMachiningPoints[pointIndex];
+        QPointF prevPoint = d->updateMachiningPoints[prevIndex];
+        QPointF nextPoint = d->updateMachiningPoints[nextIndex];
 
         QVector2D inDir(currentPoint - lastPoint);
         QVector2D prevDir(prevPoint - currentPoint);
@@ -321,7 +321,7 @@ QVector<QPointF> LaserPrimitive::mechiningPoints(QPointF& lastPoint, int pointIn
         points.reserve(pointsCount);
         for (int i = 0; i < pointsCount; i++)
         {
-            QPointF point = d->mechiningPoints[cursor];
+            QPointF point = d->updateMachiningPoints[cursor];
             points.push_back(point);
             cursor = (cursor + step + pointsCount) % pointsCount;
         }
@@ -332,14 +332,14 @@ QVector<QPointF> LaserPrimitive::mechiningPoints(QPointF& lastPoint, int pointIn
     {
         if (pointIndex == 0)
         {
-            points = d->mechiningPoints;
+            points = d->updateMachiningPoints;
             lastPoint = tail;
         }
         else
         {
             for (int i = pointsCount - 1; i >= 0; i--)
             {
-                points.push_back(d->mechiningPoints[i]);
+                points.push_back(d->updateMachiningPoints[i]);
             }
             lastPoint = head;
         }
@@ -366,14 +366,14 @@ QVector<QPointF> LaserPrimitive::startingPoints() const
     Q_D(const LaserPrimitive);
 
     QVector<QPointF> vertices;
-    if (d->mechiningPoints.empty())
+    if (d->updateMachiningPoints.empty())
     {
         return vertices;
     }
 
     for (int i = 0; i < d->startingIndices.length(); i++)
     {
-        vertices.push_back(d->mechiningPoints[d->startingIndices[i]]);
+        vertices.push_back(d->updateMachiningPoints[d->startingIndices[i]]);
     }
 
     return vertices;
@@ -595,14 +595,14 @@ void LaserEllipse::setBounds(const QRectF& bounds)
 	d->path = path;
 }
 
-QVector<QPointF> LaserEllipse::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserEllipse::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserEllipse);
     QPainterPath path = toPath();
 
     QVector<QPointF> points;
-    pltUtils::path2Points(path, points, canvas);
-    d->mechiningPoints = points;
+    machiningUtils::path2Points(path, points, canvas);
+    d->updateMachiningPoints = points;
     return points;
 }
 
@@ -717,7 +717,7 @@ void LaserRect::draw(QPainter* painter)
     painter->drawPath(d->path);
 }
 
-QVector<QPointF> LaserRect::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserRect::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserRect);
 	QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
@@ -741,7 +741,7 @@ QVector<QPointF> LaserRect::cuttingPoints(cv::Mat& canvas)
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
     }
 
-    d->mechiningPoints = points;
+    d->updateMachiningPoints = points;
     return points;
 }
 
@@ -841,15 +841,15 @@ void LaserLine::setLine(const QLineF& line)
     d->line = line; 
 }
 
-QVector<QPointF> LaserLine::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserLine::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserLine);
     QVector<QPointF> points;
     QPainterPath path = toPath();
     
-    pltUtils::path2Points(path, points, canvas);
+    machiningUtils::path2Points(path, points, canvas);
     
-    d->mechiningPoints = points;
+    d->updateMachiningPoints = points;
     return points;
 }
 
@@ -966,15 +966,15 @@ void LaserPath::setPath(const QPainterPath& path)
     d->path = path; 
 }
 
-QVector<QPointF> LaserPath::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserPath::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserPath);
     QVector<QPointF> points;
     QPainterPath path = toPath();
     
-    pltUtils::path2Points(path, points, canvas);
+    machiningUtils::path2Points(path, points, canvas);
     
-    d->mechiningPoints = points;
+    d->updateMachiningPoints = points;
     return points;
 }
 
@@ -1084,7 +1084,7 @@ QRectF LaserPolyline::sceneBoundingRect() const
     return sceneTransform().map(d->path).boundingRect();
 }
 
-QVector<QPointF> LaserPolyline::cuttingPoints(cv::Mat & canvas)
+QVector<QPointF> LaserPolyline::updateMachiningPoints(cv::Mat & canvas)
 {
     Q_D(LaserPolyline);
     QVector<QPointF> points;
@@ -1104,7 +1104,7 @@ QVector<QPointF> LaserPolyline::cuttingPoints(cv::Mat & canvas)
     if (!canvas.empty())
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(points[points.size() - 1]), typeUtils::qtPointF2CVPoint2f(points[0]), cv::Scalar(0));
     
-    d->mechiningPoints = points;
+    d->updateMachiningPoints = points;
     return points;
 }
 
@@ -1223,7 +1223,7 @@ void LaserPolygon::setPolyline(const QPolygonF& poly)
     d->poly = poly; 
 }
 
-QVector<QPointF> LaserPolygon::cuttingPoints(cv::Mat & canvas)
+QVector<QPointF> LaserPolygon::updateMachiningPoints(cv::Mat & canvas)
 {
     Q_D(LaserPolygon);
     QVector<QPointF> points;
@@ -1244,7 +1244,7 @@ QVector<QPointF> LaserPolygon::cuttingPoints(cv::Mat & canvas)
     if (!canvas.empty())
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(points[points.size() - 1]), typeUtils::qtPointF2CVPoint2f(points[0]), cv::Scalar(0));
     
-    d->mechiningPoints = points;
+    d->updateMachiningPoints = points;
     return points;
 }
 
@@ -1782,7 +1782,7 @@ QJsonObject LaserBitmap::toJson()
 	return object;
 }
 
-QVector<QPointF> LaserBitmap::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserBitmap::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserBitmap);
 	QTransform t = transform() * Global::matrixToMM(SU_PX, 40, 40);
@@ -1805,7 +1805,7 @@ QVector<QPointF> LaserBitmap::cuttingPoints(cv::Mat& canvas)
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
     }
 
-    d->mechiningPoints = points;
+    d->updateMachiningPoints = points;
     return points;
 }
 

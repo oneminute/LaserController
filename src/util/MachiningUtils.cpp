@@ -1,4 +1,4 @@
-#include "PltUtils.h"
+#include "MachiningUtils.h"
 
 #include <QtMath>
 #include <QDebug>
@@ -7,7 +7,7 @@
 #include "common/Config.h"
 #include "TypeUtils.h"
 
-int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
+int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
 {
     Eigen::Vector2d ptStart(x1, y1);
     Eigen::Vector2d ptEnd(x2, y2);
@@ -41,46 +41,55 @@ int pltUtils::linePoints(double x1, double y1, double x2, double y2, std::vector
     return count;
 }
 
-int pltUtils::path2Points(const QPainterPath & path, QVector<QPointF>& points, cv::Mat& canvas)
+int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& points, cv::Mat& canvas)
 {
     qreal length = path.length();
-    QPointF pt = path.pointAtPercent(0);
+    QPointF point = path.pointAtPercent(0);
     qreal slope = path.slopeAtPercent(0);
-    qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
+    //qreal radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
+    qreal radians = qDegreesToRadians(path.angleAtPercent(0));
 
     QList<int> startingIndices;
     int startingPointsCount = 0;
 
-    QPointF startPt = pt;
 
-    QPointF anchor = pt;
+    QPointF anchor = point;
     qreal anchorSlope = slope;
     qreal anchorRadians = radians;
+    qreal angle = 0;
 
-    points.push_back(pt);
+    points.push_back(point);
     if (!canvas.empty())
-        cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+    {
+        cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
+    }
 
     for (int i = 1; i < length; i++)
     {
         qreal percent = i / length;
-        pt = path.pointAtPercent(percent);
+        point = path.pointAtPercent(percent);
         slope = path.slopeAtPercent(percent);
-        radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
+        angle = path.angleAtPercent(percent);
 
-        qreal diff = qAbs(qAbs(radians) - qAbs(anchorRadians));
-        qreal dist = QLineF(pt, anchor).length();
+        //qreal radians2 = qDegreesToRadians(angle);
+        //qLogD << i << ": " << angle << ", " << radians;
+        //radians = qIsInf(slope) ? M_PI_2 : qAtan(slope);
+        radians = qDegreesToRadians(angle);
+
+        //qreal diff = qAbs(qAbs(radians) - qAbs(anchorRadians));
+        qreal diff = qAbs(radians - anchorRadians);
+        qreal dist = QLineF(point, anchor).length();
 
         diff = qRadiansToDegrees(diff);
         if (diff >= Config::Export::maxAnglesDiff() || radians * anchorRadians < 0)
         {
             if (!canvas.empty())
             {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(255, 0, 0));
-                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(point), cv::Scalar(255, 0, 0));
+                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
             }
-            points.push_back(pt);
-            anchor = pt;
+            points.push_back(point);
+            anchor = point;
             anchorSlope = slope;
             anchorRadians = radians;
         }
@@ -88,29 +97,30 @@ int pltUtils::path2Points(const QPainterPath & path, QVector<QPointF>& points, c
         {
             if (!canvas.empty())
             {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(255, 0, 0));
-                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(pt), 1, cv::Scalar(0, 0, 255));
+                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(point), cv::Scalar(255, 0, 0));
+                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
             }
-            points.push_back(pt);
-            anchor = pt;
+            points.push_back(point);
+            anchor = point;
             anchorSlope = slope;
             anchorRadians = radians;
         }
     }
 
-    pt = path.pointAtPercent(1.0);
-    points.push_back(pt);
+    point = path.pointAtPercent(1.0);
+    points.push_back(point);
     if (!canvas.empty()) 
     {
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt), typeUtils::qtPointF2CVPoint2f(startPt), cv::Scalar(0));
+        QPointF startPt = path.pointAtPercent(0);
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(point), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(point), typeUtils::qtPointF2CVPoint2f(startPt), cv::Scalar(0));
     }
 
     qLogD << "path with " << path.elementCount() << " elements convert to " << points.size() << " points.";
     return points.size();
 }
 
-QByteArray pltUtils::points2Plt(const QVector<QPointF>& points)
+QByteArray machiningUtils::points2Plt(const QVector<QPointF>& points)
 {
     QByteArray buffer;
     if (points.empty())
@@ -126,12 +136,12 @@ QByteArray pltUtils::points2Plt(const QVector<QPointF>& points)
     return buffer;
 }
 
-QByteArray pltUtils::image2Plt(const QImage & image)
+QByteArray machiningUtils::image2Plt(const QImage & image)
 {
     return QByteArray();
 }
 
-bool pltUtils::pointsEql(const QPointF & pt1, const QPointF & pt2)
+bool machiningUtils::pointsEql(const QPointF & pt1, const QPointF & pt2)
 {
     return qRound(pt1.x()) == qRound(pt2.x()) && qRound(pt1.y()) == qRound(pt2.y());
 }

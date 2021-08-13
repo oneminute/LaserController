@@ -48,7 +48,7 @@ bool LaserApplication::initialize()
     LaserApplication::setApplicationDisplayName(QObject::tr("CNE Laser"));
     LaserApplication::setOrganizationName(tr(""));
     LaserApplication::setApplicationVersion(QString("version: %1").arg(LC_VERSION_STR));
-    LaserApplication::setStyle(QStyleFactory::create("Fusion"));
+    //LaserApplication::setStyle(QStyleFactory::create("Fusion"));
     
     qLogD << "product name:" << LaserApplication::applicationName() << ", version:" << LaserApplication::applicationVersion();
     qLogD << "Styles that current operation system supported:";
@@ -62,6 +62,8 @@ bool LaserApplication::initialize()
     QStringList currentDisplayLanguages = QLocale::system().uiLanguages();
     QLocale displayLocale = QLocale(currentDisplayLanguages.first());
     qLogD << "Display languages: " << displayLocale << ", code: " << displayLocale.language();
+
+    checkEnvironment();
 
     checkCrash();
     initLog();
@@ -139,6 +141,25 @@ void LaserApplication::destroy()
     //Config::save();
 }
 
+bool LaserApplication::checkEnvironment()
+{
+    QDir baseDir = QDir::current();
+    qLogD << baseDir;
+    if (!baseDir.exists("tmp"))
+    {
+        baseDir.mkdir("tmp");
+    }
+	if (!baseDir.exists("log"))
+	{
+		baseDir.mkdir("log");
+	}
+    if (!baseDir.exists("config"))
+    {
+        baseDir.mkdir("config");
+    }
+    return true;
+}
+
 bool LaserApplication::notify(QObject * receiver, QEvent * event)
 {
     bool done = true;
@@ -172,11 +193,6 @@ bool LaserApplication::notify(QObject * receiver, QEvent * event)
 
 void LaserApplication::initLog()
 {
-    QDir rootDir(".");
-	if (!rootDir.exists("log"))
-	{
-		rootDir.mkdir("log");
-	}
     google::InitGoogleLogging(this->arguments()[0].toStdString().c_str());
     google::InstallFailureSignalHandler();
 
