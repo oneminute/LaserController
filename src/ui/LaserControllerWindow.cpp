@@ -28,6 +28,7 @@
 #include <QToolButton>
 #include <QTreeWidgetItem>
 #include <QUndoStack>
+#include <QWindow>
 
 #include "LaserApplication.h"
 #include "common/common.h"
@@ -437,6 +438,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
+    connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
 
 	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -1326,6 +1328,27 @@ void LaserControllerWindow::createMovementDockPanel()
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
 
+void LaserControllerWindow::createUpdateDockPanel(int winId)
+{
+    QWindow* externalWindow = QWindow::fromWinId(winId);
+    //externalWindow->showMaximized();
+    QWidget* externalWidget = createWindowContainer(externalWindow);
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->addWidget(externalWidget);
+    //layout->addStretch(1);
+
+    QWidget* panelWidget = new QWidget;
+    panelWidget->setLayout(layout);
+
+    CDockWidget* dockWidget = new CDockWidget(tr("Update"));
+    dockWidget->setWidget(panelWidget);
+    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+
+    m_dockAreaUpdate = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+}
+
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
 {
 	
@@ -2106,6 +2129,11 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 	m_viewer->onReplaceGroup(bitmap);
 }
 
+void LaserControllerWindow::onActionUpdate(bool checked)
+{
+    LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
+}
+
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -2437,17 +2465,43 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
 {
     if (doc)
     {
-		connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
+        connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
         connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
         doc->bindLayerButtons(m_layerButtons);
         m_scene->updateDocument(doc);
         doc->outline();
         m_tableWidgetLayers->setDocument(doc);
         m_tableWidgetLayers->updateItems();
-		//undo
-		m_viewer->undoStack()->clear();
-		//m_ui->actionUndo->setEnabled(false);
-		//m_ui->actionRedo->setEnabled(false);
+        //undo
+        m_viewer->undoStack()->clear();
+        //m_ui->actionUndo->setEnabled(false);
+        //m_ui->actionRedo->setEnabled(false);
+        LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        if (m_viewer) {
+            //m_viewer->setZoomValue(1.0);
+            //m_viewer->centerOn(0, 0);
+            QRectF rect = m_scene->document()->pageBounds();
+
+            //m_scene->setSceneRect(rect);
+            m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+            //m_viewer->centerOn(rect.center());
+            m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
+            m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点
+
+            //m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+            //m_viewer->setTransform(QTransform());
+            //m_viewer->centerOn(rect.center());
+        }
+        //初始化缩放输入
+        m_comboBoxScale->setCurrentText("100%");
+        //创建网格
+        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+        if (backgroundItem) {
+            backgroundItem->onChangeGrids();
+        }
+
+        doc->open();
     }
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
@@ -3137,30 +3191,6 @@ void LaserControllerWindow::createNewDocument()
 	doc->setPageInformation(page);
 	initDocument(doc);
 	
-	LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
-	if (m_viewer) {
-		//m_viewer->setZoomValue(1.0);
-		//m_viewer->centerOn(0, 0);
-		QRectF rect = m_scene->document()->pageBounds();
-		
-		//m_scene->setSceneRect(rect);
-		m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
-		//m_viewer->centerOn(rect.center());
-		m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
-		m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点
-		
-		//m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
-		
-		//m_viewer->setTransform(QTransform());
-		//m_viewer->centerOn(rect.center());
-	}
-	//初始化缩放输入
-	m_comboBoxScale->setCurrentText("100%");
-	//创建网格
-	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-	if (backgroundItem) {
-		backgroundItem->onChangeGrids();
-	}
 	doc->open();
 	
 }

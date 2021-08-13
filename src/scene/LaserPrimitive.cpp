@@ -14,6 +14,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QImageReader>
+#include <QStack>
 
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
@@ -58,11 +59,11 @@ public:
     LaserPrimitiveType type;
     bool isHover;
     QPainterPath outline;
-    std::vector<cv::Point2f> mechiningPoints;
+    QVector<QPointF> mechiningPoints;
     QList<int> startingIndices;
 	QTransform allTransform;
 	QRectF originalBoundingRect;
-	QPainterPath path;//¸ÄÎª×î³õµÄÍ¼ÐÎ
+	QPainterPath path;//ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform)
@@ -264,33 +265,33 @@ void LaserPrimitive::sceneTransformToItemTransform(QTransform sceneTransform)
 	setPos(sceneTransform.m31(), sceneTransform.m32());
 }
 
-std::vector<cv::Point2f> LaserPrimitive::mechiningPoints() const
+QVector<QPointF> LaserPrimitive::mechiningPoints() const
 {
     Q_D(const LaserPrimitive);
     return d->mechiningPoints;
 }
 
-std::vector<cv::Point2f> LaserPrimitive::mechiningPoints(cv::Point2f& lastPoint, int pointIndex, cv::Mat& canvas) const
+QVector<QPointF> LaserPrimitive::mechiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas) const
 {
     Q_D(const LaserPrimitive);
     int pointsCount = d->mechiningPoints.size();
-    cv::Point2f head = d->mechiningPoints[0];
-    cv::Point2f tail = d->mechiningPoints[pointsCount - 1];
-    double distBetweenHeadAndTail = cv::norm(head - tail);
-    std::vector<cv::Point2f> points;
+    QPointF head = d->mechiningPoints[0];
+    QPointF tail = d->mechiningPoints[pointsCount - 1];
+    double distBetweenHeadAndTail = QVector2D(head - tail).length();
+    QVector<QPointF> points;
 
     // check the primitive is whether closour
     if (qFuzzyCompare(distBetweenHeadAndTail, 0))
     {
         int prevIndex = (pointIndex - 1 + pointsCount) % pointsCount;
         int nextIndex = (pointIndex + 1) % pointsCount;
-        cv::Point2f currentPoint = d->mechiningPoints[pointIndex];
-        cv::Point2f prevPoint = d->mechiningPoints[prevIndex];
-        cv::Point2f nextPoint = d->mechiningPoints[nextIndex];
+        QPointF currentPoint = d->mechiningPoints[pointIndex];
+        QPointF prevPoint = d->mechiningPoints[prevIndex];
+        QPointF nextPoint = d->mechiningPoints[nextIndex];
 
-        cv::Vec2f inDir = currentPoint - lastPoint;
-        cv::Vec2f prevDir = prevPoint - currentPoint;
-        cv::Vec2f nextDir = nextPoint - currentPoint;
+        QVector2D inDir(currentPoint - lastPoint);
+        QVector2D prevDir(prevPoint - currentPoint);
+        QVector2D nextDir(nextPoint - currentPoint);
 
         int prevScore = 0;
         if (inDir[0] * prevDir[0] >= 0)
@@ -318,7 +319,7 @@ std::vector<cv::Point2f> LaserPrimitive::mechiningPoints(cv::Point2f& lastPoint,
         points.reserve(pointsCount);
         for (int i = 0; i < pointsCount; i++)
         {
-            cv::Point2f point = d->mechiningPoints[cursor];
+            QPointF point = d->mechiningPoints[cursor];
             points.push_back(point);
             cursor = (cursor + step + pointsCount) % pointsCount;
         }
@@ -344,7 +345,7 @@ std::vector<cv::Point2f> LaserPrimitive::mechiningPoints(cv::Point2f& lastPoint,
 
     if (!canvas.empty())
     {
-        cv::Mat pointsMat(points);
+        cv::Mat pointsMat(points.count(), 2, CV_32F, static_cast<void*>(points.data()));
         pointsMat.convertTo(pointsMat, CV_32S);
         cv::polylines(canvas, pointsMat, true, cv::Scalar(0, 0, 255), 5);
     }
@@ -358,22 +359,22 @@ QList<int> LaserPrimitive::startingIndices() const
     return d->startingIndices;
 }
 
-std::vector<cv::Point2f> LaserPrimitive::startingPoints() const
+QVector<QPointF> LaserPrimitive::startingPoints() const
 {
     Q_D(const LaserPrimitive);
 
-    std::vector<cv::Point2f> indices;
+    QVector<QPointF> vertices;
     if (d->mechiningPoints.empty())
     {
-        return indices;
+        return vertices;
     }
 
     for (int i = 0; i < d->startingIndices.length(); i++)
     {
-        indices.push_back(d->mechiningPoints[d->startingIndices[i]]);
+        vertices.push_back(d->mechiningPoints[d->startingIndices[i]]);
     }
 
-    return indices;
+    return vertices;
 }
 
 LaserPrimitiveType LaserPrimitive::primitiveType() const
@@ -572,7 +573,7 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform 
 	//d->path.addEllipse(d->bounds);
 	//d->path = saveTransform.map(d->path);
 	d->boundingRect = d->path.boundingRect();
-	//»úÐµ¼Ó¹¤ÖÐÊ¹ÓÃ
+	//ï¿½ï¿½Ðµï¿½Ó¹ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
     d->outline.addEllipse(bounds);
     d->position = bounds.center();
 }
@@ -592,12 +593,12 @@ void LaserEllipse::setBounds(const QRectF& bounds)
 	d->path = path;
 }
 
-std::vector<cv::Point2f> LaserEllipse::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserEllipse::cuttingPoints(cv::Mat& canvas)
 {
     Q_D(LaserEllipse);
     QPainterPath path = toPath();
 
-    std::vector<cv::Point2f> points;
+    QVector<QPointF> points;
     pltUtils::path2Points(path, points, canvas);
     d->mechiningPoints = points;
     return points;
@@ -714,16 +715,16 @@ void LaserRect::draw(QPainter* painter)
     painter->drawPath(d->path);
 }
 
-std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserRect::cuttingPoints(cv::Mat& canvas)
 {
     Q_D(LaserRect);
 	QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
-    std::vector<cv::Point2f> points;
+    QVector<QPointF> points;
     QPolygonF poly = d->path.toFillPolygon(t);
-    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(poly.at(0));
-    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(poly.at(1));
-    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(poly.at(2));
-    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(poly.at(3));
+    QPointF pt1 = poly.at(0);
+    QPointF pt2 = poly.at(1);
+    QPointF pt3 = poly.at(2);
+    QPointF pt4 = poly.at(3);
     points.push_back(pt1);
     points.push_back(pt2);
     points.push_back(pt3);
@@ -732,10 +733,10 @@ std::vector<cv::Point2f> LaserRect::cuttingPoints(cv::Mat& canvas)
 
     if (!canvas.empty())
     {
-        cv::line(canvas, pt1, pt2, cv::Scalar(0));
-        cv::line(canvas, pt2, pt3, cv::Scalar(0));
-        cv::line(canvas, pt3, pt4, cv::Scalar(0));
-        cv::line(canvas, pt4, pt1, cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt1), typeUtils::qtPointF2CVPoint2f(pt2), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt2), typeUtils::qtPointF2CVPoint2f(pt3), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt3), typeUtils::qtPointF2CVPoint2f(pt4), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
     }
 
     d->mechiningPoints = points;
@@ -838,10 +839,10 @@ void LaserLine::setLine(const QLineF& line)
     d->line = line; 
 }
 
-std::vector<cv::Point2f> LaserLine::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserLine::cuttingPoints(cv::Mat& canvas)
 {
     Q_D(LaserLine);
-    std::vector<cv::Point2f> points;
+    QVector<QPointF> points;
     QPainterPath path = toPath();
     
     pltUtils::path2Points(path, points, canvas);
@@ -963,10 +964,10 @@ void LaserPath::setPath(const QPainterPath& path)
     d->path = path; 
 }
 
-std::vector<cv::Point2f> LaserPath::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserPath::cuttingPoints(cv::Mat& canvas)
 {
     Q_D(LaserPath);
-    std::vector<cv::Point2f> points;
+    QVector<QPointF> points;
     QPainterPath path = toPath();
     
     pltUtils::path2Points(path, points, canvas);
@@ -1081,10 +1082,10 @@ QRectF LaserPolyline::sceneBoundingRect() const
     return sceneTransform().map(d->path).boundingRect();
 }
 
-std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
+QVector<QPointF> LaserPolyline::cuttingPoints(cv::Mat & canvas)
 {
     Q_D(LaserPolyline);
-    std::vector<cv::Point2f> points;
+    QVector<QPointF> points;
     cv::Point2f lastPt;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     for (int i = 0; i < d->poly.size(); i++)
@@ -1096,10 +1097,10 @@ std::vector<cv::Point2f> LaserPolyline::cuttingPoints(cv::Mat & canvas)
             cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
         }
         lastPt = cvPt;
-        points.push_back(cvPt);
+        points.push_back(pt);
     }
     if (!canvas.empty())
-        cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(points[points.size() - 1]), typeUtils::qtPointF2CVPoint2f(points[0]), cv::Scalar(0));
     
     d->mechiningPoints = points;
     return points;
@@ -1220,10 +1221,10 @@ void LaserPolygon::setPolyline(const QPolygonF& poly)
     d->poly = poly; 
 }
 
-std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & canvas)
+QVector<QPointF> LaserPolygon::cuttingPoints(cv::Mat & canvas)
 {
     Q_D(LaserPolygon);
-    std::vector<cv::Point2f> points;
+    QVector<QPointF> points;
     cv::Point2f lastPt;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     for (int i = 0; i < d->poly.size(); i++)
@@ -1235,11 +1236,11 @@ std::vector<cv::Point2f> LaserPolygon::cuttingPoints(cv::Mat & canvas)
             cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
         }
         lastPt = cvPt;
-        points.push_back(cvPt);
+        points.push_back(pt);
     }
     points.push_back(points[0]);
     if (!canvas.empty())
-        cv::line(canvas, points[points.size() - 1], points[0], cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(points[points.size() - 1]), typeUtils::qtPointF2CVPoint2f(points[0]), cv::Scalar(0));
     
     d->mechiningPoints = points;
     return points;
@@ -1318,6 +1319,297 @@ QVector<QLineF> LaserPolygon::edges()
 	QPainterPath path;
 	path.addPolygon(sceneTransform().map(d->poly));
 	return LaserPrimitive::edges(path);
+}
+
+struct UIPair
+{
+public:
+    UIPair(qreal _uIndex = 0, quint32 _i = 0)
+        : uIndex(_uIndex)
+        , i(_i)
+    {}
+
+    quint32 uIndex;
+    quint32 i;
+};
+
+struct UIPPair
+{
+public:
+    UIPPair(qreal _uIndex = 0, quint32 _i = 0, quint32 _p = 0)
+        : uIndex(_uIndex)
+        , i(_i)
+        , p(_p)
+    {}
+
+    quint32 uIndex;
+    quint32 i;
+    quint32 p;
+};
+
+inline bool operator < (const UIPair& v1, const UIPair& v2)
+{
+    if (v1.i < v2.i)
+        return true;
+    else if (v1.i > v2.i)
+        return false;
+    else
+    {
+        return v1.uIndex < v2.uIndex;
+    }
+}
+
+inline bool operator < (const UIPPair& v1, const UIPPair& v2)
+{
+    if (v1.i < v2.i)
+        return true;
+    else if (v1.i > v2.i)
+        return false;
+    else
+    {
+        if (v1.p < v2.p)
+            return true;
+        else if (v1.p > v2.p)
+            return false;
+        else
+        {
+            return v1.uIndex < v2.uIndex;
+        }
+    }
+}
+
+class LaserNurbsPrivate : public LaserShapePrivate
+{
+    Q_DECLARE_PUBLIC(LaserNurbs)
+public:
+    LaserNurbsPrivate(LaserNurbs* ptr, LaserNurbs::BasisType _basisType)
+        : LaserShapePrivate(ptr)
+        , basisType(_basisType)
+        , steps(100)
+    {}
+
+    void updateBezierCoefficient()
+    {
+        coefficients.clear();
+        quint32 n = controlPoints.count();
+        QMap<quint32, quint32> iMap;
+        quint32 nFactorial = utils::factorial(n);
+        for (int i = 0; i <= n; i++)
+        {
+            iMap[i] = utils::factorial(i);
+        }
+
+        qreal u = 0;
+
+        for (int iu = 0; iu < steps; iu++)
+        {
+            qreal u = iu * 1.0 / steps;
+            for (int i = 0; i <= n; i++)
+            {
+                qreal coefficient = nFactorial / (iMap[i] * iMap[n - i]) * qPow(u, i) * qPow(1 - u, n - i);
+                coefficients[UIPair(iu, i)] = coefficient;
+            }
+        }
+    }
+
+    void updateBSplineCoefficient()
+    {
+        coefficients.clear();
+
+        for (int i = 0; i < knots.count(); i++)
+        {
+            knots[i] = knots[i] / knots.last();
+            //knots[i] = 1.0 / (knots.count() - 1) * i;
+            qLogD << "knot " << i << " = " << knots[i];
+        }
+
+        // m: count of knots minus 1
+        // n: count of control points minus 1
+        // p: degree of curve
+        // m, n, p must saticsfy m = n + p + 1
+        // so p = m - n -1
+        quint32 m = knots.count() - 1;
+        quint32 n = controlPoints.count() - 1; 
+        quint32 p = m - n - 1;
+
+        QMap<UIPPair, qreal> nCoefs;
+
+        for (int uIndex = 0; uIndex <= steps; uIndex++)
+        {
+            qreal u = uIndex * 1.0 / steps;
+            QString logU;
+            for (int ip = 0; ip <= p; ip++)
+            {
+                logU.append("\n");
+                for (int i = 0; i <= m - 1 - ip; i++)
+                {
+                    UIPPair key(uIndex, i, ip);
+                    if (ip == 0)
+                    {
+                        qreal uBegin = knots[i];
+                        qreal uEnd = knots[i + 1];
+                        qreal n = (u >= uBegin && u < uEnd) ? 1 : 0;
+                        nCoefs[key] = n;
+                        //QString log = QString("N[%1,%2](%3) = %4\n").arg(i).arg(ip).arg(u, 4, 'f', 2).arg(n);
+                        //logU.append(log);
+                        continue;
+                    }
+
+                    UIPPair key1(uIndex, i, ip - 1);
+                    UIPPair key2(uIndex, i + 1, ip - 1);
+
+                    qreal exp1 = 0;
+                    qreal exp2 = 0;
+
+                    qreal N1 = nCoefs[key1];
+                    qreal N2 = nCoefs[key2];
+                    qreal u_ip = knots[i + ip];
+                    qreal u_ip1 = knots[i + ip + 1];
+                    qreal u_i1 = knots[i + 1];
+                    qreal u_i = knots[i];
+
+                    qreal u_minus_ui = u - u_i;
+                    qreal u_ip_minus_u_i = u_ip - u_i;
+                    qreal u_ip1_minus_u = u_ip1 - u;
+                    qreal u_ip1_minus_u_i1 = u_ip1 - u_i1;
+
+                    qreal c1 = (u_ip_minus_u_i) ? (u_minus_ui / u_ip_minus_u_i) : 0;
+                    exp1 = N1 * c1;
+                    qreal c2 = (u_ip1_minus_u_i1) ? (u_ip1_minus_u / u_ip1_minus_u_i1) : 0;
+                    exp2 = N2 * c2;
+
+                    qreal N = exp1 + exp2;
+                    nCoefs[key] = N;
+                    /*QString log = QString(
+                        "N[%1,%2] = %3, N[%4,%5] = %6, N[%7,%8] = %9, "
+                        "i = %10, i+1 = %11, i+p = %12, i+p+1 = %13, "
+                        "u = %14, u(i) = %15, u(i+1) = %16, u(i+p) = %17, u(i+p+1) = %18, "
+                        "u-u(i) = %23, u(i+p)-u(i) = %24, u(i+p+1)-u = %25, u(i+p+1)-u(i+1) = %26, "
+                        "c1 = %19, c2 = %20, exp1 = %21, exp2 = %22\n")
+                        .arg(i).arg(ip).arg(N, 9, 'f', 6)
+                        .arg(i).arg(ip - 1).arg(N1, 9, 'f', 6)
+                        .arg(i + 1).arg(ip - 1).arg(N2, 9, 'f', 6)
+                        .arg(i).arg(i + 1).arg(i + ip).arg(i + ip + 1)
+                        .arg(u, 4, 'f', 2).arg(u_i, 4, 'f', 2).arg(u_i1, 4, 'f', 2).arg(u_ip, 4, 'f', 2).arg(u_ip1, 4, 'f', 2)
+                        .arg(c1, 9, 'f', 6).arg(c2, 9, 'f', 6).arg(exp1, 9, 'f', 6).arg(exp2, 9, 'f', 6)
+                        .arg(u_minus_ui, 5, 'f', 2).arg(u_ip_minus_u_i, 5, 'f', 2).arg(u_ip1_minus_u, 5, 'f', 2).arg(u_ip1_minus_u_i1, 5, 'f', 2);
+                    logU.append(log);*/
+                    
+                    if (ip == p)
+                    {
+                        coefficients[UIPair(uIndex, i)] = N;
+                    }
+                }
+            }
+            //if (uIndex == 100)
+                //qLogD << logU;
+        }
+    }
+
+    void updateDrawingPoints()
+    {
+        drawingPoints.clear();
+        drawingPath = QPainterPath();
+        for (int uIndex = 0; uIndex <= steps; uIndex++)
+        {
+            qreal u = uIndex * 1.0 / steps;
+            QPointF point(0, 0);
+            if (uIndex == steps)
+            {
+                point = controlPoints.last();
+            }
+            else
+            {
+                qreal sumCoe = 0;
+                for (int i = 0; i < controlPoints.count(); i++)
+                {
+                    UIPair key(uIndex, i);
+                    qreal coe = coefficients.contains(key) ? coefficients[key] : 0;
+                    sumCoe += coe * weights[i];
+                }
+                for (int i = 0; i < controlPoints.count(); i++)
+                {
+                    UIPair key(uIndex, i);
+                    qreal coe = coefficients.contains(key) ? coefficients[key] : 0;
+                    QPointF pi = controlPoints[i];
+                    point += pi * coe * weights[i] / sumCoe;
+                }
+                qLogD << u << ": " << point << ", coe = " << sumCoe;
+            }
+            drawingPoints.append(point);
+            if (drawingPath.elementCount() == 0)
+                drawingPath.moveTo(point);
+            else
+                drawingPath.lineTo(point);
+        }
+
+        boundingRect = drawingPath.boundingRect();
+        qLogD << "size of drawingPath elements: " << drawingPath.elementCount();
+        qLogD << "bounding rect of drawingPath: " << boundingRect;
+    }
+
+    LaserNurbs::BasisType basisType;
+    QList<QPointF> controlPoints;
+    QList<qreal> knots;
+    QList<qreal> weights;
+
+    QMap<UIPair, qreal> coefficients;
+    QList<QPointF> drawingPoints;
+    QPainterPath drawingPath;
+    int steps;
+};
+
+LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, BasisType basisType, LaserDocument* doc, QTransform transform)
+    : LaserShape(new LaserNurbsPrivate(this, basisType), doc, LPT_NURBS, transform)
+{
+    Q_D(LaserNurbs);
+    d->controlPoints = controlPoints;
+    d->knots = knots;
+    d->weights = weights;
+    updateCurve();
+}
+
+void LaserNurbs::draw(QPainter* painter)
+{
+    Q_D(LaserNurbs);
+    painter->drawPath(d->drawingPath);
+    painter->setPen(QPen(Qt::red));
+    QPolygonF polygon;
+    for (int i = 0; i < d->controlPoints.count(); i++)
+    {
+        painter->drawEllipse(d->controlPoints[i], 5, 5);
+        polygon.append(d->controlPoints[i]);
+    }
+    
+    painter->setPen(QPen(Qt::gray, 1, Qt::DashLine));
+    painter->drawPolyline(polygon);
+}
+
+QPainterPath LaserNurbs::toPath() const
+{
+    Q_D(const LaserNurbs);
+    return d->drawingPath;
+}
+
+QRectF LaserNurbs::sceneBoundingRect() const
+{
+	Q_D(const LaserNurbs);
+	return d->drawingPath.boundingRect();
+}
+
+void LaserNurbs::updateCurve()
+{
+    Q_D(LaserNurbs);
+    switch (d->basisType)
+    {
+    case BT_BEZIER:
+        d->updateBezierCoefficient();
+        break;
+    case BT_BSPLINE:
+        d->updateBSplineCoefficient();
+        break;
+    }
+    d->updateDrawingPoints();
 }
 
 class LaserBitmapPrivate : public LaserPrimitivePrivate
@@ -1488,15 +1780,15 @@ QJsonObject LaserBitmap::toJson()
 	return object;
 }
 
-std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
+QVector<QPointF> LaserBitmap::cuttingPoints(cv::Mat& canvas)
 {
     Q_D(LaserBitmap);
 	QTransform t = transform() * Global::matrixToMM(SU_PX, 40, 40);
-    std::vector<cv::Point2f> points;
-    cv::Point2f pt1 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.topLeft()));
-    cv::Point2f pt2 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.topRight()));
-    cv::Point2f pt3 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.bottomRight()));
-    cv::Point2f pt4 = typeUtils::qtPointF2CVPoint2f(t.map(d->boundingRect.bottomLeft()));
+    QVector<QPointF> points;
+    QPointF pt1 = t.map(d->boundingRect.topLeft());
+    QPointF pt2 = t.map(d->boundingRect.topRight());
+    QPointF pt3 = t.map(d->boundingRect.bottomRight());
+    QPointF pt4 = t.map(d->boundingRect.bottomLeft());
     points.push_back(pt1);
     points.push_back(pt2);
     points.push_back(pt3);
@@ -1505,10 +1797,10 @@ std::vector<cv::Point2f> LaserBitmap::cuttingPoints(cv::Mat& canvas)
 
     if (!canvas.empty())
     {
-        cv::line(canvas, pt1, pt2, cv::Scalar(0));
-        cv::line(canvas, pt2, pt3, cv::Scalar(0));
-        cv::line(canvas, pt3, pt4, cv::Scalar(0));
-        cv::line(canvas, pt4, pt1, cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt1), typeUtils::qtPointF2CVPoint2f(pt2), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt2), typeUtils::qtPointF2CVPoint2f(pt3), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt3), typeUtils::qtPointF2CVPoint2f(pt4), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
     }
 
     d->mechiningPoints = points;

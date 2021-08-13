@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QVector>
 #include <QVector2D>
 #include "scene/LaserNode.h"
 #include "scene/LaserPrimitive.h"
@@ -26,14 +27,14 @@ public:
     QList<Edge*> edges() const;
     Edge* outEdge() const;
 
-    cv::Point2f startPos() const;
-    cv::Point2f nearestPoint(cv::Point2f point, int& index, float& dist);
-    cv::Point2f currentPos() const;
-    std::vector<cv::Point2f> points() const;
+    QPointF startPos() const;
+    QPointF nearestPoint(const QPointF& point, int& index, float& dist);
+    QPointF currentPos() const;
+    QVector<QPointF> points() const;
     bool isClosour() const;
-    cv::Point2f headPoint() const;
-    cv::Point2f tailPoint() const;
-    cv::Point2f point(int index) const;
+    QPointF headPoint() const;
+    QPointF tailPoint() const;
+    QPointF point(int index) const;
     QString nodeName() const;
     bool isVirtual() const;
 
@@ -58,7 +59,7 @@ public:
 
     double length() const;
     void setLength(double length);
-    void setLength(const cv::Point2f& p1, const cv::Point2f& p2);
+    void setLength(const QPointF& p1, const QPointF& p2);
 
     double pheromones() const;
     void setPheromones(double pheromones);
@@ -83,9 +84,9 @@ public:
     explicit Ant(int antIndex, PathOptimizer* optimizer);
 
     void initialize();
-    void arrived(Node* node, const cv::Point2f& lastPos);
+    void arrived(Node* node, const QPointF& lastPos);
     Node* currentNode() const;
-    cv::Point2f currentPos() const;
+    QPointF currentPos() const;
     bool moveForward();
     int antIndex() const;
     void updatePheromones();

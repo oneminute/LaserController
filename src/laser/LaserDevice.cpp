@@ -1,5 +1,7 @@
 #include "LaserDevice.h"
 
+#include <QDate>
+
 #include "LaserApplication.h"
 #include "LaserDriver.h"
 #include "common/common.h"
@@ -92,6 +94,7 @@ void LaserDevice::load()
 {
     Q_D(LaserDevice);
     d->driver->load();
+    //d->driver->showAboutWindow();
 }
 
 qreal LaserDevice::layoutWidth() const
@@ -374,7 +377,26 @@ bool LaserDevice::writeSystemReigister(int address, const QVariant& value)
 void LaserDevice::showLibraryVersion()
 {
     Q_D(LaserDevice);
-    d->driver->showAboutWindow();
+    //QString compileInfo = d->driver->getCompileInfo();
+    //qLogD << "compile info: " << compileInfo;
+    QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
+    qLogD << "laser library info: " << laserLibraryInfo;
+    QString mainCardId = d->driver->getMainCardID();
+    qLogD << "main card id: " << mainCardId;
+    //d->driver->showAboutWindow();
+}
+
+void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile)
+{
+    Q_D(LaserDevice);
+    QString systemDate(__DATE__);
+    qLogD << "system date: " << systemDate;
+    QDate compileDate = QLocale("en_US").toDate(systemDate.simplified(), "MMM d yyyy");
+    int year = compileDate.year() % 100;
+    int month = compileDate.month();
+    int day = compileDate.day();
+    int version = year * 10000 + month * 100 + day;
+    d->driver->checkVersionUpdate(hardware, flag, 0, versionNoteToJsonFile);
 }
 
 void LaserDevice::unload()
@@ -935,12 +957,21 @@ void LaserDevice::onLibraryLoaded(bool success)
 {
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryLoaded: success = " << success;
-	try {
-		d->driver->init(LaserApplication::mainWindow->winId());
-	}
-	catch (...) {
+    try {
+        d->driver->init(LaserApplication::mainWindow->winId());
+        QString systemDate(__DATE__);
+        qLogD << "system date: " << systemDate;
+        QDate compileDate = QLocale("en_US").toDate(systemDate.simplified(), "MMM d yyyy");
+        int year = compileDate.year() % 100;
+        int month = compileDate.month();
+        int day = compileDate.day();
+        int version = year * 10000 + month * 100 + day;
+        int winId = d->driver->getUpdatePanelHandle(version);
+        LaserApplication::mainWindow->createUpdateDockPanel(winId);
+    }
+    catch (...) {
 
-	}
+    }
 }
 
 void LaserDevice::onLibraryInitialized()
@@ -971,7 +1002,15 @@ void LaserDevice::onConnected()
     Q_D(LaserDevice);
     if (d->driver)
     {
-        d->driver->getMainCardRegisterState();
+        d->driver->readAllSysParamFromCard();
+        d->driver->setFactoryType("LaserController");
+        //d->driver->getMainCardRegisterState();
+        //QString compileInfo = d->driver->getCompileInfo();
+        //qLogD << "compile info: " << compileInfo;
+        //QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
+        //qLogD << "laser library info: " << laserLibraryInfo;
+        //QString mainCardId = d->driver->getMainCardID();
+        //qLogD << "main card id: " << mainCardId;
     }
 }
 

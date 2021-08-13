@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0074 NEW)
 cmake_policy(SET CMP0087 OLD)
 
-project(LaserController LANGUAGES CXX)
+project(CNELaser LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -45,7 +45,7 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-set(TS_FILES translations/LaserController_zh_CN.ts)
+set(TS_FILES translations/${PROJECT_NAME}_zh_CN.ts)
 set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
 configure_file(${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tlh.in VGCoreAuto.tlh)
 
@@ -116,11 +116,13 @@ LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 set(OTHER_FILES
     config.json
     README.md
-    ReleaseNotes.txt
-	cmake_install_debug.txt
-	cmake_install_release.txt
-	cmake_install_relwithdebinfo.txt
-	third/cdr/include/VGCoreAuto.tlh.in
+    ReleaseNotes.md
+    cmake_install_debug.txt
+    cmake_install_release.txt
+    cmake_install_relwithdebinfo.txt
+    third/cdr/include/VGCoreAuto.tlh.in
+    src/res/icons.qrc
+    src/res/laser.rc
     .gitignore
 )
 
@@ -214,12 +216,12 @@ set(LINK_LIBRARIES
 )
 
 if(ANDROID)
-  add_library(LaserController SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS} ${TS_FILES})
+  add_library(CNELaser SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS} ${TS_FILES})
 else()
-  add_executable(LaserController ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS})
+  add_executable(CNELaser ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS})
 endif()
 
-target_link_libraries(LaserController PRIVATE ${LINK_LIBRARIES})
+target_link_libraries(CNELaser PRIVATE ${LINK_LIBRARIES})
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -236,6 +238,10 @@ target_link_libraries(TestQPainterPath PRIVATE ${LINK_LIBRARIES})
 add_executable(TestException test/TestException.cpp src/exception/LaserException.h src/exception/LaserException.cpp)
 target_link_libraries(TestException PRIVATE ${LINK_LIBRARIES})
 
+FILE(GLOB TestDelphiLibrarySrc test/DelphiLibraryTest/*.*)
+add_executable(TestDelphiLibrary ${TestDelphiLibrarySrc})
+target_link_libraries(TestDelphiLibrary PRIVATE ${LINK_LIBRARIES})
+
 set(QM_FILES
     ${QM_FILES}
     ${SRC_FILES}
@@ -245,7 +251,7 @@ set(QM_FILES
 #qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${TS_FILES})
 
 add_custom_target (GenerateTranslations 
-    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/LaserController_zh_CN.ts
+    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts
 )
 
 include(cmake_install_Debug.txt)

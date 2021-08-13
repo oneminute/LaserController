@@ -1,6 +1,11 @@
-#include "DxfNode.h"
+﻿#include "DxfNode.h"
 
 #include "common/common.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserPrimitive.h"
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 class DxfStreamPrivate
 {
@@ -61,10 +66,11 @@ int DxfStream::lineNumber() const
     return m_lineNumber;
 }
 
-DxfNode::DxfNode(int groupCode, const QString& variable, DxfNodePrivate* privateData)
+DxfNode::DxfNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfNodePrivate* privateData)
     : m_ptr(privateData)
 {
     Q_D(DxfNode);
+    d->document = doc;
     d->groupCode = groupCode;
     d->variable = variable;
 }
@@ -119,23 +125,22 @@ DxfNode* DxfNode::addChildNode(DxfNode* node)
     return node;
 }
 
+DxfDocumentNode* DxfNode::document() const
+{
+    Q_D(const DxfNode);
+    return d->document;
+}
+
 DxfNodeType DxfNode::nodeType() const
 {
     Q_D(const DxfNode);
     return d->nodeType;
 }
 
-QString DxfNode::toString() const 
+void DxfNode::debugPrint() const
 {
     Q_D(const DxfNode);
-    return QString("groupCode = %1, variable = %2\n").arg(d->groupCode).arg(d->variable);
-}
-
-QDebug operator<<(QDebug debug, const DxfNode& node)
-{
-    QDebugStateSaver saver(debug);
-    debug.nospace() << node.toString();
-    return debug;
+    qLogD << QString("groupCode = %1, variable = %2\n").arg(d->groupCode).arg(d->variable);
 }
 
 class DxfDocumentNodePrivate : public DxfNodePrivate
@@ -162,12 +167,39 @@ public:
     DxfEntitiesNode* entities;
     DxfObjectsNode* objects;
     DxfThumbnailImageNode* thumbnailImage;
+
+    QMap<quint32, DxfItemNode*> itemsMap;
 };
 
 DxfDocumentNode::DxfDocumentNode()
-    : DxfNode(0, "DOCUMENT", new DxfDocumentNodePrivate(this))
+    : DxfNode(this, 0, "DOCUMENT", new DxfDocumentNodePrivate(this))
 {
 
+}
+
+const DxfEntitiesNode& DxfDocumentNode::entities() const
+{
+    Q_D(const DxfDocumentNode);
+    return *(d->entities);
+}
+
+void DxfDocumentNode::addItem(DxfItemNode* node)
+{
+    Q_D(DxfDocumentNode);
+    d->itemsMap[node->handle()] = node;
+}
+
+DxfItemNode* DxfDocumentNode::item(int handle) const
+{
+    Q_D(const DxfDocumentNode);
+    if (d->itemsMap.contains(handle))
+    {
+        return d->itemsMap[handle];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 bool DxfDocumentNode::parse(DxfStream* stream)
@@ -183,7 +215,6 @@ bool DxfDocumentNode::parse(DxfStream* stream)
             return false;
         }
 
-
         DxfNode* childNode = nullptr;
         if (group.match("SECTION"))
         {
@@ -195,31 +226,31 @@ bool DxfDocumentNode::parse(DxfStream* stream)
             qLogD << stream->lineNumber() << ": " << group.groupCode << ", " << group.variable;
             if (group.match("HEADER"))
             {
-                childNode = d->header = new DxfHeaderNode(group.groupCode);
+                childNode = d->header = new DxfHeaderNode(this, group.groupCode);
             }
             else if (group.match("CLASSES"))
             {
-                childNode = d->classes = new DxfClassesNode(group.groupCode);
+                childNode = d->classes = new DxfClassesNode(this, group.groupCode);
             }
             else if (group.match("TABLES"))
             {
-                childNode = d->tables = new DxfTablesNode(group.groupCode);
+                childNode = d->tables = new DxfTablesNode(this, group.groupCode);
             }
             else if (group.match("BLOCKS"))
             {
-                childNode = d->blocks = new DxfBlocksNode(group.groupCode);
+                childNode = d->blocks = new DxfBlocksNode(this, group.groupCode);
             }
             else if (group.match("ENTITIES"))
             {
-                childNode = d->entities = new DxfEntitiesNode(group.groupCode);
+                childNode = d->entities = new DxfEntitiesNode(this, group.groupCode);
             }
             else if (group.match("OBJECTS"))
             {
-                childNode = d->objects = new DxfObjectsNode(group.groupCode);
+                childNode = d->objects = new DxfObjectsNode(this, group.groupCode);
             }
             else if (group.match("THUMBNAILIMAGE"))
             {
-                childNode = d->thumbnailImage = new DxfThumbnailImageNode(group.groupCode);
+                childNode = d->thumbnailImage = new DxfThumbnailImageNode(this, group.groupCode);
             }
         }
         else if (group.match("EOF"))
@@ -229,35 +260,47 @@ bool DxfDocumentNode::parse(DxfStream* stream)
 
         if (childNode)
         {
-            if (childNode->parse(stream))
-            {
-                addChildNode(childNode);
-            }
+            addChildNode(childNode);
+            if (!childNode->parse(stream))
+                qLogW << "parse error.";
         }
     }
+
+    // post process
+    QStack<DxfNode*> stack;
+    stack.push(this);
+    while (!stack.isEmpty())
+    {
+        DxfNode* node = stack.pop();
+
+        node->postProcess();
+
+        for (DxfNode* child : node->children())
+        {
+            stack.push(child);
+        }
+    }
+
     return true;
 }
 
-QString DxfDocumentNode::toString() const
+void DxfDocumentNode::debugPrint() const
 {
     Q_D(const DxfDocumentNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "\n";
-    stream << DxfNode::toString();
+    qLogD << "\n";
+    DxfNode::debugPrint();
     if (d->header)
-        stream << d->header->toString();
+        d->header->debugPrint();
     if (d->classes)
-        stream << d->classes->toString();
+        d->classes->debugPrint();
     if (d->tables)
-        stream << d->tables->toString();
+        d->tables->debugPrint();
     if (d->blocks)
-        stream << d->blocks->toString();
+        d->blocks->debugPrint();
     if (d->entities)
-        stream << d->entities->toString();
+        d->entities->debugPrint();
     if (d->objects)
-        stream << d->objects->toString();
-    return buf;
+        d->objects->debugPrint();
 }
 
 class DxfHeaderNodePrivate : public DxfNodePrivate
@@ -271,8 +314,8 @@ public:
     DxfNode::PropertyMap properties;
 };
 
-DxfHeaderNode::DxfHeaderNode(int groupCode)
-    : DxfNode(groupCode, "HEADER", new DxfHeaderNodePrivate(this))
+DxfHeaderNode::DxfHeaderNode(DxfDocumentNode* doc, int groupCode)
+    : DxfNode(doc, groupCode, "HEADER", new DxfHeaderNodePrivate(this))
 {
 }
 
@@ -325,18 +368,14 @@ bool DxfHeaderNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfHeaderNode::toString() const
+void DxfHeaderNode::debugPrint() const
 {
     Q_D(const DxfHeaderNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "HEADER" << "\n";
+    qLogD << "HEADER" << "\n";
     for (PropertyMap::ConstIterator i = d->properties.constBegin(); i != d->properties.constEnd(); i++)
     {
-        stream << "  " << i.key() << " = " << i.value() << "\n";
+        qLogD << "  " << i.key() << " = " << i.value() << "\n";
     }
-    return buf;
-    return buf;
 }
 
 class DxfClassNodePrivate : public DxfNodePrivate
@@ -359,8 +398,8 @@ public:
     bool isAnEntity;
 };
 
-DxfClassNode::DxfClassNode(int groupCode)
-    : DxfNode(groupCode, "CLASS", new DxfClassNodePrivate(this))
+DxfClassNode::DxfClassNode(DxfDocumentNode* doc, int groupCode)
+    : DxfNode(doc, groupCode, "CLASS", new DxfClassNodePrivate(this))
 {
 
 }
@@ -419,20 +458,17 @@ bool DxfClassNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfClassNode::toString() const
+void DxfClassNode::debugPrint() const
 {
     Q_D(const DxfClassNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "CLASS " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << "    dxfRecordName: " << d->dxfRecordName << "\n";
-    stream << "    applicationName: " << d->applicationName << "\n";
-    stream << "    proxyCapabilitiesFlag: " << d->proxyCapabilitiesFlag << "\n";
-    stream << "    instanceCount: " << d->instanceCount << "\n";
-    stream << "    wasAProxy: " << d->wasAProxy << "\n";
-    stream << "    isAnEntity: " << d->isAnEntity << "\n";
-    return buf;
+    qLogD << "CLASS " << name() << "\n";
+    DxfNode::debugPrint();
+    qLogD << "    dxfRecordName: " << d->dxfRecordName << "\n";
+    qLogD << "    applicationName: " << d->applicationName << "\n";
+    qLogD << "    proxyCapabilitiesFlag: " << d->proxyCapabilitiesFlag << "\n";
+    qLogD << "    instanceCount: " << d->instanceCount << "\n";
+    qLogD << "    wasAProxy: " << d->wasAProxy << "\n";
+    qLogD << "    isAnEntity: " << d->isAnEntity << "\n";
 }
 
 class DxfItemNodePrivate : public DxfNodePrivate
@@ -447,13 +483,19 @@ public:
     int handle;
     QStringList appDefinedGroups;
     int softPointerId;
-    QString subClassMarker;
+    QStringList subClassMarkers;
 };
 
-DxfItemNode::DxfItemNode(int groupCode, const QString& variable, DxfItemNodePrivate* ptr)
-    : DxfNode(groupCode, variable, ptr)
+DxfItemNode::DxfItemNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfItemNodePrivate* ptr)
+    : DxfNode(doc, groupCode, variable, ptr)
 {
 
+}
+
+int DxfItemNode::handle() const
+{
+    Q_D(const DxfItemNode);
+    return d->handle;
 }
 
 bool DxfItemNode::parse(DxfStream* stream)
@@ -483,6 +525,7 @@ bool DxfItemNode::parse(DxfStream* stream)
         {
             if (!group.assign(d->handle, 16))
                 return false;
+            d->document->addItem(this);
         }
         else if (group.match(102))
         {
@@ -504,9 +547,9 @@ bool DxfItemNode::parse(DxfStream* stream)
             if (!group.assign(d->softPointerId, 16))
                 return false;
         }
-        else if (group.match(100) && d->subClassMarker.isEmpty())
+        else if (group.match(100))
         {
-            d->subClassMarker = group.variable;
+            d->subClassMarkers.append(group.variable);
         }
         else if (group.match(0, "ENDSEC"))
         {
@@ -527,21 +570,22 @@ bool DxfItemNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfItemNode::toString() const
+void DxfItemNode::debugPrint() const
 {
     Q_D(const DxfItemNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "    handle = " << d->handle << "\n";
-    stream << "    appDefinedGroups = \n";
+    DxfNode::debugPrint();
+    qLogD << "    handle = " << d->handle << "\n";
+    qLogD << "    appDefinedGroups = \n";
     for (QString def : d->appDefinedGroups)
     { 
-        stream << "      " << def << "\n";
+        qLogD << "      " << def << "\n";
     }
-    stream << "    softPointerId = " << d->softPointerId << "\n";
-    stream << "    subClassMarker = " << d->subClassMarker << "\n";
-
-    return buf;
+    qLogD << "    softPointerId = " << d->softPointerId << "\n";
+    qLogD << "    subClassMarker = \n";
+    for (QString marker : d->subClassMarkers)
+    {
+        qLogD << "      " << marker << "\n";
+    }
 }
 
 class DxfTableNodePrivate : public DxfItemNodePrivate
@@ -557,22 +601,19 @@ public:
     int maximumEntries;
 };
 
-DxfTableNode::DxfTableNode(int groupCode)
-    : DxfItemNode(groupCode, "TABLE", new DxfTableNodePrivate(this))
+DxfTableNode::DxfTableNode(DxfDocumentNode* doc, int groupCode)
+    : DxfItemNode(doc, groupCode, "TABLE", new DxfTableNodePrivate(this))
 {
 
 }
 
-QString DxfTableNode::toString() const
+void DxfTableNode::debugPrint() const
 {
     Q_D(const DxfTableNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "TABLE " << name() << "\n";
-    stream << DxfItemNode::toString();
-    stream << "    entityName: " << d->entityName << "\n";
-    stream << "    maximumEntries: " << d->maximumEntries << "\n";
-    return buf;
+    qLogD << "TABLE " << name() << "\n";
+    DxfItemNode::debugPrint();
+    qLogD << "    entityName: " << d->entityName << "\n";
+    qLogD << "    maximumEntries: " << d->maximumEntries << "\n";
 }
 
 bool DxfTableNode::parseItem(DxfGroup& group)
@@ -636,29 +677,25 @@ public:
     QString blockDescription;
 };
 
-DxfBlockNode::DxfBlockNode(int groupCode)
-    : DxfItemNode(groupCode, "BLOCK", new DxfBlockNodePrivate(this))
+DxfBlockNode::DxfBlockNode(DxfDocumentNode* doc, int groupCode)
+    : DxfItemNode(doc, groupCode, "BLOCK", new DxfBlockNodePrivate(this))
 {
 
 }
 
-QString DxfBlockNode::toString() const
+void DxfBlockNode::debugPrint() const
 {
     Q_D(const DxfBlockNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "BLOCK " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    stream << "    layerName = " << d->layerName << "\n";
-    stream << "    subClassMarkerBlockBegin = " << d->subClassMarkerBlockBegin << "\n";
-    stream << "    blockTypeFlags = " << d->blockTypeFlags << "\n";
-    stream << "    basePoint = " << d->basePoint.x() << ", " << d->basePoint.y() << ", " << d->basePoint.z() << "\n";
-    stream << "    blockName3 = " << d->blockName3 << "\n";
-    stream << "    xrefPathName = " << d->xrefPathName << "\n";
-    stream << "    blockDescription = " << d->blockDescription << "\n";
-    stream << d->children[0]->toString();
-    return buf;
+    qLogD << "BLOCK " << name() << "\n";
+    DxfItemNode::debugPrint();
+    qLogD << "    layerName = " << d->layerName << "\n";
+    qLogD << "    subClassMarkerBlockBegin = " << d->subClassMarkerBlockBegin << "\n";
+    qLogD << "    blockTypeFlags = " << d->blockTypeFlags << "\n";
+    qLogD << "    basePoint = " << d->basePoint.x() << ", " << d->basePoint.y() << ", " << d->basePoint.z() << "\n";
+    qLogD << "    blockName3 = " << d->blockName3 << "\n";
+    qLogD << "    xrefPathName = " << d->xrefPathName << "\n";
+    qLogD << "    blockDescription = " << d->blockDescription << "\n";
+    d->children[0]->debugPrint();
 }
 
 bool DxfBlockNode::parseItem(DxfGroup& group)
@@ -738,25 +775,19 @@ public:
     {}
 
     QString layerName;
-    QString subClassMarkerBlockEnd;
 };
 
-DxfEndBlockNode::DxfEndBlockNode(int groupCode)
-    : DxfItemNode(groupCode, "ENDBLK", new DxfEndBlockNodePrivate(this))
+DxfEndBlockNode::DxfEndBlockNode(DxfDocumentNode* doc, int groupCode)
+    : DxfItemNode(doc, groupCode, "ENDBLK", new DxfEndBlockNodePrivate(this))
 {
 }
 
-QString DxfEndBlockNode::toString() const
+void DxfEndBlockNode::debugPrint() const
 {
     Q_D(const DxfEndBlockNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "ENDBLK " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    stream << "    layerName = " << d->layerName << "\n";
-    stream << "    subClassMarkerBlockEnd = " << d->subClassMarkerBlockEnd << "\n";
-    return buf;
+    qLogD << "ENDBLK " << name() << "\n";
+    DxfItemNode::debugPrint();
+    qLogD << "    layerName = " << d->layerName << "\n";
 }
 
 bool DxfEndBlockNode::parseItem(DxfGroup& group)
@@ -765,10 +796,6 @@ bool DxfEndBlockNode::parseItem(DxfGroup& group)
     if (group.match(8))
     {
         d->layerName = group.variable;
-    }
-    else if (group.match(100))
-    {
-        d->subClassMarkerBlockEnd = group.variable;
     }
     return true;
 }
@@ -800,6 +827,7 @@ public:
         , transparency(0)
         , plotStyleObjectId(0)
         , shadowMode(0)
+        , extrusionDirection(0, 0, 1)
     {}
 
     /// <summary>
@@ -840,7 +868,7 @@ public:
     /// Lineweight enum value. Stored and moved around as a 16-bit integer.
     /// </summary>
     int lineweight;
-    int linetypeScale;
+    qreal linetypeScale;
 
     /// <summary>
     /// The original value from dxf is as following:
@@ -902,45 +930,49 @@ public:
     /// still supported for backwards compatibility.
     /// </summary>
     int shadowMode;
+
+    /// <summary>
+    ///	Extrusion direction(optional; default = 0, 0, 1)
+    /// DXF: X value; APP: 3D vector
+    /// DXF : Y and Z values of extrusion direction(optional)
+    /// </summary>
+    QVector3D extrusionDirection;
 };
 
-DxfEntityNode::DxfEntityNode(int groupCode, const QString& variable, DxfEntityNodePrivate* ptr)
-    : DxfItemNode(groupCode, variable, ptr)
+DxfEntityNode::DxfEntityNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfEntityNodePrivate* ptr)
+    : DxfItemNode(doc, groupCode, variable, ptr)
 {
     setName(variable);
 }
 
-DxfEntityNode::DxfEntityNode(int groupCode, const QString& variable)
-    : DxfItemNode(groupCode, variable, new DxfEntityNodePrivate(this, NT_Entity))
+DxfEntityNode::DxfEntityNode(DxfDocumentNode* doc, int groupCode, const QString& variable)
+    : DxfItemNode(doc, groupCode, variable, new DxfEntityNodePrivate(this, NT_Entity))
 {
     setName(variable);
 }
 
-QString DxfEntityNode::toString() const
+void DxfEntityNode::debugPrint() const
 {
     Q_D(const DxfEntityNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "ENTITY " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    stream << "    entityName = " << d->layerName << "\n";
-    stream << "    entityType = " << d->entityType << "\n";
-    stream << "    spaceType = " << d->spaceType << "\n";
-    stream << "    layerName = " << d->layerName << "\n";
-    stream << "    lineTypeName = " << d->lineTypeName << "\n";
-    stream << "    materialObjectId = " << d->materialObjectId << "\n";
-    stream << "    colorNumber = " << d->colorNumber << "\n";
-    stream << "    lineweight = " << d->lineweight << "\n";
-    stream << "    linetypeScale = " << d->linetypeScale << "\n";
-    stream << "    visibility = " << d->visibility << "\n";
-    stream << "    proxyGraphicsDataLength = " << d->proxyGraphicsDataLength << "\n";
-    stream << "    proxyGraphicsData = " << d->proxyGraphicsData << "\n";
-    stream << "    colorValue = " << d->colorValue << "\n";
-    stream << "    transparency = " << d->transparency << "\n";
-    stream << "    plotStyleObjectId = " << d->plotStyleObjectId << "\n";
-    stream << "    shadowMode = " << d->shadowMode << "\n";
-    return buf;
+    qLogD << "ENTITY " << name() << "\n";
+    DxfItemNode::debugPrint();
+    qLogD << "    entityName = " << d->entityName << "\n";
+    qLogD << "    entityType = " << d->entityType << "\n";
+    qLogD << "    spaceType = " << d->spaceType << "\n";
+    qLogD << "    layerName = " << d->layerName << "\n";
+    qLogD << "    lineTypeName = " << d->lineTypeName << "\n";
+    qLogD << "    materialObjectId = " << d->materialObjectId << "\n";
+    qLogD << "    colorNumber = " << d->colorNumber << "\n";
+    qLogD << "    lineweight = " << d->lineweight << "\n";
+    qLogD << "    linetypeScale = " << d->linetypeScale << "\n";
+    qLogD << "    visibility = " << d->visibility << "\n";
+    qLogD << "    proxyGraphicsDataLength = " << d->proxyGraphicsDataLength << "\n";
+    qLogD << "    proxyGraphicsData = " << d->proxyGraphicsData << "\n";
+    qLogD << "    colorValue = " << d->colorValue << "\n";
+    qLogD << "    transparency = " << d->transparency << "\n";
+    qLogD << "    plotStyleObjectId = " << d->plotStyleObjectId << "\n";
+    qLogD << "    shadowMode = " << d->shadowMode << "\n";
+    qLogD << "    extrusionDirection = " << d->extrusionDirection.x() << ", " << d->extrusionDirection.y() << ", " << d->extrusionDirection.z() << " \n";
 }
 
 bool DxfEntityNode::parseItem(DxfGroup& group)
@@ -984,6 +1016,27 @@ bool DxfEntityNode::parseItem(DxfGroup& group)
     {
         if (!group.assign(d->proxyGraphicsDataLength))
             return false;
+    }
+    else if (group.match(210))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->extrusionDirection.setX(value);
+    }
+    else if (group.match(220))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->extrusionDirection.setY(value);
+    }
+    else if (group.match(230))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->extrusionDirection.setZ(value);
     }
     else if (group.match(284))
     {
@@ -1106,57 +1159,59 @@ public:
     /// Bulge (multiple entries; one entry for each vertex) (optional; default = 0)
     /// </summary>
     QList<qreal> bulges;
-
-    /// <summary>
-    ///	Extrusion direction(optional; default = 0, 0, 1)
-    /// DXF: X value; APP: 3D vector
-    /// DXF : Y and Z values of extrusion direction(optional)
-    /// </summary>
-    QList<QVector3D> extrusionDirection;
 };
 
 
-DxfLWPolylineNode::DxfLWPolylineNode(int groupCode)
-    : DxfEntityNode(groupCode, "LWPOLYLINE", new DxfLWPolylineNodePrivate(this))
+DxfLWPolylineNode::DxfLWPolylineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "LWPOLYLINE", new DxfLWPolylineNodePrivate(this))
 {
 }
 
-QString DxfLWPolylineNode::toString() const
+void DxfLWPolylineNode::debugPrint() const
 {
     Q_D(const DxfLWPolylineNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "ENTITY " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    stream << "    entityName = " << d->layerName << "\n";
-    stream << "    verticesCount = " << d->verticesCount << "\n";
-    stream << "    polylineFlag = " << d->polylineFlag << "\n";
-    stream << "    constantWidth = " << d->constantWidth << "\n";
-    stream << "    elevation = " << d->elevation << "\n";
-    stream << "    thickness = " << d->thickness << "\n";
-    stream << "    points = \n";
+    DxfEntityNode::debugPrint();
+    qLogD << "    verticesCount = " << d->verticesCount << "\n";
+    qLogD << "    polylineFlag = " << d->polylineFlag << "\n";
+    qLogD << "    constantWidth = " << d->constantWidth << "\n";
+    qLogD << "    elevation = " << d->elevation << "\n";
+    qLogD << "    thickness = " << d->thickness << "\n";
+    qLogD << "    points = \n";
     for (QPointF point : d->points)
     {
-        stream << "      " << point.x() << ", " << point.y() << "\n";
+        qLogD << "      " << point.x() << ", " << point.y() << "\n";
     }
-    stream << "    vertexIdentifier = " << d->vertexIdentifier << "\n";
-    stream << "    verticesWidth = \n";
+    qLogD << "    vertexIdentifier = " << d->vertexIdentifier << "\n";
+    qLogD << "    verticesWidth = \n";
     for (QVector2D point : d->verticesWidth)
     {
-        stream << "      " << point.x() << ", " << point.y() << "\n";
+        qLogD << "      " << point.x() << ", " << point.y() << "\n";
     }
-    stream << "    bulges = \n";
+    qLogD << "    bulges = \n";
     for (qreal bulge : d->bulges)
     {
-        stream << "      " << bulge << "\n";
+        qLogD << "      " << bulge << "\n";
     }
-    stream << "    extrusionDirection = \n";
-    for (QVector3D point : d->extrusionDirection)
+}
+
+LaserPrimitive* DxfLWPolylineNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfLWPolylineNode);
+    QPolygonF polygon;
+    LaserPrimitive* primitive;
+    for (QPointF point : d->points)
     {
-        stream << "      " << point.x() << ", " << point.y() << ", " << point.z() << "\n";
+        polygon.append(point);
     }
-    return buf;
+    if (d->polylineFlag == 0)
+    {
+        primitive = new LaserPolyline(t.map(polygon), doc);
+    }
+    else if (d->polylineFlag == 1)
+    {
+        primitive = new LaserPolygon(t.map(polygon), doc);
+    }
+    return primitive;
 }
 
 bool DxfLWPolylineNode::parseItem(DxfGroup& group)
@@ -1232,27 +1287,7 @@ bool DxfLWPolylineNode::parseItem(DxfGroup& group)
         if (!group.assign(d->vertexIdentifier, 16))
             return false;
     }
-    else if (group.match(210))
-    {
-        qreal value;
-        if (!group.assign(value))
-            return false;
-        d->extrusionDirection.append(QVector3D(value, 0, 0));
-    }
-    else if (group.match(220))
-    {
-        qreal value;
-        if (!group.assign(value))
-            return false;
-        d->extrusionDirection.last().setY(value);
-    }
-    else if (group.match(230))
-    {
-        qreal value;
-        if (!group.assign(value))
-            return false;
-        d->extrusionDirection.last().setZ(value);
-    }
+    
 
     return true;
 }
@@ -1269,39 +1304,30 @@ public:
 
     QVector3D center;
     qreal radius;
-
-    /// <summary>
-    ///	Extrusion direction(optional; default = 0, 0, 1)
-    /// DXF: X value; APP: 3D vector
-    /// DXF : Y and Z values of extrusion direction(optional)
-    /// </summary>
-    QList<QVector3D> extrusionDirection;
 };
 
-DxfCircleNode::DxfCircleNode(int groupCode)
-    : DxfEntityNode(groupCode, "CIRCLE", new DxfCircleNodePrivate(this))
+DxfCircleNode::DxfCircleNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "CIRCLE", new DxfCircleNodePrivate(this))
 {
 
 }
 
-QString DxfCircleNode::toString() const
+void DxfCircleNode::debugPrint() const
 {
     Q_D(const DxfCircleNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "ENTITY " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    stream << "    entityName = " << d->layerName << "\n";
-    stream << "    thickness = " << d->thickness << "\n";
-    stream << "    center = " << d->center.x() << ", " << d->center.y() << ", " << d->center.z() << "\n";
-    stream << "    radius = " << d->radius << "\n";
-    stream << "    extrusionDirection = \n";
-    for (QVector3D point : d->extrusionDirection)
-    {
-        stream << "      " << point.x() << ", " << point.y() << ", " << point.z() << "\n";
-    }
-    return buf;
+    DxfEntityNode::debugPrint();
+    qLogD << "    thickness = " << d->thickness << "\n";
+    qLogD << "    center = " << d->center.x() << ", " << d->center.y() << ", " << d->center.z() << "\n";
+    qLogD << "    radius = " << d->radius << "\n";
+}
+
+LaserPrimitive* DxfCircleNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfCircleNode);
+    QPointF center = d->center.toPointF();
+    QRectF rect(center.x() - d->radius, center.y() - d->radius, d->radius * 2, d->radius * 2);
+    LaserEllipse* primitive = new LaserEllipse(t.mapRect(rect), doc);
+    return primitive;
 }
 
 bool DxfCircleNode::parseItem(DxfGroup& group)
@@ -1338,27 +1364,7 @@ bool DxfCircleNode::parseItem(DxfGroup& group)
         if (!group.assign(d->radius))
             return false;
     }
-    else if (group.match(210))
-    {
-        qreal value;
-        if (!group.assign(value))
-            return false;
-        d->extrusionDirection.append(QVector3D(value, 0, 0));
-    }
-    else if (group.match(220))
-    {
-        qreal value;
-        if (!group.assign(value))
-            return false;
-        d->extrusionDirection.last().setY(value);
-    }
-    else if (group.match(230))
-    {
-        qreal value;
-        if (!group.assign(value))
-            return false;
-        d->extrusionDirection.last().setZ(value);
-    }
+    
     return true;
 }
 
@@ -1373,14 +1379,11 @@ public:
     qreal thickness;
 
     QVector3D center;
-    QVector3D endPoint;
 
     /// <summary>
-    ///	Extrusion direction(optional; default = 0, 0, 1)
-    /// DXF: X value; APP: 3D vector
-    /// DXF : Y and Z values of extrusion direction(optional)
+    /// 该向量是从中心点指向长轴一个端点的向量，该向量长度即为长轴的半长
     /// </summary>
-    QList<QVector3D> extrusionDirection;
+    QVector3D endPoint;
 
     /// <summary>
     /// Ratio of minor axis to major axis
@@ -1398,33 +1401,41 @@ public:
     qreal endParameter;
 };
 
-DxfEllipseNode::DxfEllipseNode(int groupCode)
-    : DxfEntityNode(groupCode, "ELLIPSE", new DxfEllipseNodePrivate(this))
+DxfEllipseNode::DxfEllipseNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "ELLIPSE", new DxfEllipseNodePrivate(this))
 {
 
 }
 
-QString DxfEllipseNode::toString() const
+void DxfEllipseNode::debugPrint() const
 {
     Q_D(const DxfEllipseNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "ENTITY " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    stream << "    entityName = " << d->layerName << "\n";
-    stream << "    thickness = " << d->thickness << "\n";
-    stream << "    center = " << d->center.x() << ", " << d->center.y() << ", " << d->center.z() << "\n";
-    stream << "    endPoint = " << d->endPoint.x() << ", " << d->endPoint.y() << ", " << d->endPoint.z() << "\n";
-    stream << "    extrusionDirection = \n";
-    for (QVector3D point : d->extrusionDirection)
-    {
-        stream << "      " << point.x() << ", " << point.y() << ", " << point.z() << "\n";
-    }
-    stream << "    ratio = " << d->ratio << "\n";
-    stream << "    startParameter = " << d->startParameter << "\n";
-    stream << "    endParameter = " << d->endParameter << "\n";
-    return buf;
+    DxfEntityNode::debugPrint();
+    qLogD << "    thickness = " << d->thickness << "\n";
+    qLogD << "    center = " << d->center.x() << ", " << d->center.y() << ", " << d->center.z() << "\n";
+    qLogD << "    endPoint = " << d->endPoint.x() << ", " << d->endPoint.y() << ", " << d->endPoint.z() << "\n";
+    qLogD << "    ratio = " << d->ratio << "\n";
+    qLogD << "    startParameter = " << d->startParameter << "\n";
+    qLogD << "    endParameter = " << d->endParameter << "\n";
+}
+
+LaserPrimitive* DxfEllipseNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfEllipseNode);
+    QVector2D halfMajor = d->endPoint.toVector2D();
+    qreal halfMajorLength = halfMajor.length();
+    qreal halfMinorLength = halfMajorLength * d->ratio;
+
+    qreal angle = qAtan2(halfMajor.y(), halfMajor.x());
+    QTransform savedT;
+    savedT.rotateRadians(angle);
+    savedT = QTransform(savedT.m11(), savedT.m12(), savedT.m21(), savedT.m22(), d->center.x(), d->center.y());
+    savedT = savedT * t;
+
+    QRect rect(-halfMajorLength, -halfMinorLength, halfMajorLength * 2, halfMinorLength * 2);
+
+    LaserEllipse* primitive = new LaserEllipse(rect, doc, savedT);
+    return primitive;
 }
 
 bool DxfEllipseNode::parseItem(DxfGroup& group)
@@ -1492,27 +1503,848 @@ bool DxfEllipseNode::parseItem(DxfGroup& group)
         if (!group.assign(d->endParameter))
             return false;
     }
+    
+    return true;
+}
+
+class DxfLineNodePrivate : public DxfEntityNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfLineNode)
+public:
+    DxfLineNodePrivate(DxfLineNode* ptr)
+        : DxfEntityNodePrivate(ptr, NT_Line)
+        , thickness(0)
+    {}
+
+    qreal thickness;
+    QVector3D startPoint;
+    QVector3D endPoint;
+};
+
+DxfLineNode::DxfLineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "LINE", new DxfLineNodePrivate(this))
+{
+
+}
+
+void DxfLineNode::debugPrint() const
+{
+    Q_D(const DxfLineNode);
+    DxfEntityNode::debugPrint();
+    qLogD << "    thickness = " << d->thickness << "\n";
+    qLogD << "    startPoint = " << d->startPoint.x() << ", " << d->startPoint.y() << ", " << d->startPoint.z() << "\n";
+    qLogD << "    endPoint = " << d->endPoint.x() << ", " << d->endPoint.y() << ", " << d->endPoint.z() << "\n";
+}
+
+LaserPrimitive* DxfLineNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfLineNode);
+    QLineF line(d->startPoint.toPointF(), d->endPoint.toPointF());
+    LaserLine* primitive = new LaserLine(t.map(line), doc);
+    return primitive;
+}
+
+bool DxfLineNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfLineNode);
+    if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->startPoint.setX(value);
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->startPoint.setY(value);
+    }
+    else if (group.match(30))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->startPoint.setZ(value);
+    }
+    else if (group.match(11))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->endPoint.setX(value);
+    }
+    else if (group.match(21))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->endPoint.setY(value);
+    }
+    else if (group.match(31))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->endPoint.setZ(value);
+    }
+    else if (group.match(39))
+    {
+        if (!group.assign(d->thickness))
+            return false;
+    }
+    return true;
+}
+
+class DxfSplineNodePrivate : public DxfEntityNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfSplineNode)
+public:
+    DxfSplineNodePrivate(DxfSplineNode* ptr)
+        : DxfEntityNodePrivate(ptr, NT_Spline)
+        , splineFlag(0)
+        , curveDegree(0)
+        , knotsCount(0)
+        , controlPointsCount(0)
+        , fitPointsCount(0)
+        , knotTolerance(0.0000001)
+        , controlPointTolerance(0.0000001)
+        , fitTolerance(0.0000000001)
+    {}
+
+    /// <summary>
+    /// Normal vector(omitted if the spline is nonplanar)
+    /// DXF: X value; APP: 3D vector
+    /// DXF: Y and Z values of normal vector (optional)
+    /// </summary>
+    QVector3D normalVector;
+
+    /// <summary>
+    /// Spline flag (bit coded):
+    /// 1 = Closed spline
+    /// 2 = Periodic spline
+    /// 4 = Rational spline
+    /// 8 = Planar
+    /// 16 = Linear(planar bit is also set)
+    /// </summary>
+    quint32 splineFlag;
+
+    /// <summary>
+    /// Degree of the spline curve
+    /// </summary>
+    quint32 curveDegree;
+
+    quint32 knotsCount;
+
+    quint32 controlPointsCount;
+
+    /// <summary>
+    /// Number of fit points (if any)
+    /// </summary>
+    quint32 fitPointsCount;
+
+    /// <summary>
+    /// Knot tolerance (default = 0.0000001)
+    /// </summary>
+    qreal knotTolerance;
+
+    /// <summary>
+    /// Control-point tolerance (default = 0.0000001)
+    /// </summary>
+    qreal controlPointTolerance;
+
+    /// <summary>
+    /// Fit tolerance (default = 0.0000000001)
+    /// </summary>
+    qreal fitTolerance;
+
+    QVector3D startTangent;
+    QVector3D endTangent;
+
+    QList<qreal> knots;
+
+    QList<qreal> weights;
+
+    QList<QVector3D> controlPoints;
+    QList<QVector3D> fitPoints;
+};
+
+
+DxfSplineNode::DxfSplineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "SPLINE", new DxfSplineNodePrivate(this))
+{
+}
+
+void DxfSplineNode::debugPrint() const
+{
+    Q_D(const DxfSplineNode);
+    DxfEntityNode::debugPrint();
+    qLogD << "    normalVector = " << d->normalVector.x() << ", " << d->normalVector.y() << ", " << d->normalVector.z() << "\n";
+    qLogD << "    splineFlag = " << d->splineFlag << "\n";
+    qLogD << "    curveDegree = " << d->curveDegree << "\n";
+    qLogD << "    knotsCount = " << d->knotsCount << "\n";
+    qLogD << "    controlPointsCount = " << d->controlPointsCount << "\n";
+    qLogD << "    fitPointsCount = " << d->fitPointsCount << "\n";
+    qLogD << "    knotTolerance = " << d->knotTolerance << "\n";
+    qLogD << "    controlPointTolerance = " << d->controlPointTolerance << "\n";
+    qLogD << "    fitTolerance = " << d->fitTolerance << "\n";
+    qLogD << "    startTangent = " << d->startTangent.x() << ", " << d->startTangent.y() << ", " << d->startTangent.z() << "\n";
+    qLogD << "    endTangent = " << d->endTangent.x() << ", " << d->endTangent.y() << ", " << d->endTangent.z() << "\n";
+    qLogD << "    knots = \n";
+    for (qreal knot : d->knots)
+    {
+        qLogD << "      " << knot << "\n";
+    }
+    qLogD << "    weights = \n";
+    for (qreal weight : d->weights)
+    {
+        qLogD << "      " << weight << "\n";
+    }
+    qLogD << "    controlPoints = \n";
+    for (QVector3D point : d->controlPoints)
+    {
+        qLogD << "      " << point.x() << ", " << point.y() << ", " << point.z() << "\n";
+    }
+    qLogD << "    fitPoints = \n";
+    for (QVector3D point : d->fitPoints)
+    {
+        qLogD << "      " << point.x() << ", " << point.y() << ", " << point.z() << "\n";
+    }
+}
+
+LaserPrimitive* DxfSplineNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfSplineNode);
+    if (d->controlPoints.count() == 0)
+        return nullptr;
+    QList<QPointF> controlPoints;
+    for (int i = 0; i < d->controlPoints.count(); i++)
+    {
+        QPointF point = t.map(d->controlPoints[i].toPointF());
+        controlPoints.append(point);
+    }
+    QList<qreal> knots(d->knots);
+
+    QList<qreal> weights(d->weights);
+    if (d->weights.isEmpty())
+    {
+        for (int i = 0; i < controlPoints.count(); i++)
+        {
+            weights.append(1);
+        }
+    }
+
+    quint32 p = d->curveDegree;
+    quint32 n = d->controlPointsCount;
+
+    if (isClosed())
+    {
+        //controlPoints.append(controlPoints[0]);
+        /*for (int i = 0; i < p + 2; i++)
+        {
+            knots.append(knots[i]);
+        }*/
+        /*for (int i = 0; i < p; i++)
+        {
+            controlPoints[n - p + i] = controlPoints[i];
+        }*/
+    }
+
+    //controlPoints.append(controlPoints[0]);
+    LaserNurbs* primitive = new LaserNurbs(controlPoints, knots, weights, LaserNurbs::BasisType::BT_BSPLINE, doc);
+    return primitive;
+}
+
+bool DxfSplineNode::isClosed() const
+{
+    Q_D(const DxfSplineNode);
+    return d->splineFlag & 0x00000001;
+}
+
+bool DxfSplineNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfSplineNode);
+    if (!DxfEntityNode::parseItem(group))
+        return false;
+    if (group.matched)
+        return true;
+
+    if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->controlPoints.append(QVector3D(value, 0, 0));
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->controlPoints.last().setY(value);
+    }
+    else if (group.match(30))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->controlPoints.last().setZ(value);
+    }
+    else if (group.match(11))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->fitPoints.append(QVector3D(value, 0, 0));
+    }
+    else if (group.match(21))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->fitPoints.last().setY(value);
+    }
+    else if (group.match(31))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->fitPoints.last().setZ(value);
+    }
+    else if (group.match(12))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->startTangent.setX(value);
+    }
+    else if (group.match(22))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->startTangent.setY(value);
+    }
+    else if (group.match(32))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->startTangent.setZ(value);
+    }
+    else if (group.match(13))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->endTangent.setX(value);
+    }
+    else if (group.match(23))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->endTangent.setY(value);
+    }
+    else if (group.match(33))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->endTangent.setZ(value);
+    }
+    else if (group.match(40))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->knots.append(value);
+    }
+    else if (group.match(41))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->weights.append(value);
+    }
+    else if (group.match(42))
+    {
+        if (!group.assign(d->knotTolerance))
+            return false;
+    }
+    else if (group.match(43))
+    {
+        if (!group.assign(d->controlPointTolerance))
+            return false;
+    }
+    else if (group.match(44))
+    {
+        if (!group.assign(d->fitTolerance))
+            return false;
+    }
+    else if (group.match(70))
+    {
+        if (!group.assign(d->splineFlag))
+            return false;
+    }
+    else if (group.match(71))
+    {
+        if (!group.assign(d->curveDegree))
+            return false;
+    }
+    else if (group.match(72))
+    {
+        if (!group.assign(d->knotsCount))
+            return false;
+    }
+    else if (group.match(73))
+    {
+        if (!group.assign(d->controlPointsCount))
+            return false;
+    }
+    else if (group.match(74))
+    {
+        if (!group.assign(d->fitPointsCount))
+            return false;
+    }
     else if (group.match(210))
     {
         qreal value;
         if (!group.assign(value))
             return false;
-        d->extrusionDirection.append(QVector3D(value, 0, 0));
+        d->normalVector.setX(value);
     }
     else if (group.match(220))
     {
         qreal value;
         if (!group.assign(value))
             return false;
-        d->extrusionDirection.last().setY(value);
+        d->normalVector.setY(value);
     }
     else if (group.match(230))
     {
         qreal value;
         if (!group.assign(value))
             return false;
-        d->extrusionDirection.last().setZ(value);
+        d->normalVector.setZ(value);
     }
+
+    return true;
+}
+
+class DxfArcNodePrivate : public DxfEntityNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfArcNode)
+public:
+    DxfArcNodePrivate(DxfArcNode* ptr)
+        : DxfEntityNodePrivate(ptr, NT_Line)
+        , thickness(0)
+        , radius(0)
+        , startAngle(0)
+        , endAngle(0)
+    {}
+
+    qreal thickness;
+    QVector3D centerPoint;
+    qreal radius;
+    qreal startAngle;
+    qreal endAngle;
+};
+
+DxfArcNode::DxfArcNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "ARC", new DxfArcNodePrivate(this))
+{
+
+}
+
+void DxfArcNode::debugPrint() const
+{
+    Q_D(const DxfArcNode);
+    DxfEntityNode::debugPrint();
+    qLogD << "    thickness = " << d->thickness << "\n";
+    qLogD << "    centerPoint = " << d->centerPoint.x() << ", " << d->centerPoint.y() << ", " << d->centerPoint.z() << "\n";
+    qLogD << "    radius = " << d->radius << "\n";
+    qLogD << "    startAngle = " << d->startAngle << "\n";
+    qLogD << "    endAngle = " << d->endAngle << "\n";
+}
+
+LaserPrimitive* DxfArcNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfArcNode);
+    QPainterPath path;
+    QRect rect(d->centerPoint.x() - d->radius, d->centerPoint.y() - d->radius, d->radius * 2, d->radius * 2);
+    //path.moveTo(d->centerPoint.toPointF());
+    path.arcMoveTo(rect, d->startAngle);
+
+    // 因为cad是在第一象限而本软件是在第四象限，所以传入的t做了一个垂直镜像翻转，在这种情况下，
+    // 画弧的时候，需要返着画，即顺时针。否则正好与cad原图逆着方向。
+    path.arcTo(rect, d->startAngle, d->startAngle - d->endAngle);
+    LaserPath* primitive = new LaserPath(t.map(path), doc);
+    return primitive;
+}
+
+bool DxfArcNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfArcNode);
+    if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->centerPoint.setX(value);
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->centerPoint.setY(value);
+    }
+    else if (group.match(30))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->centerPoint.setZ(value);
+    }
+    else if (group.match(40))
+    {
+        if (!group.assign(d->radius))
+            return false;
+    }
+    else if (group.match(50))
+    {
+        if (!group.assign(d->startAngle))
+            return false;
+    }
+    else if (group.match(51))
+    {
+        if (!group.assign(d->endAngle))
+            return false;
+    }
+    return true;
+}
+
+class DxfImageNodePrivate : public DxfEntityNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfImageNode)
+public:
+    DxfImageNodePrivate(DxfImageNode* ptr)
+        : DxfEntityNodePrivate(ptr, NT_Line)
+        , classVersion(0)
+        , displayProperties(0)
+        , clippingState(0)
+        , brightness(50)
+        , contrast(50)
+        , fade(0)
+        , imageObjectHandle(0)
+        , imageReactorHandle(0)
+        , clipBoundaryVerticesCount(0)
+        , clipMode(0)
+        , defObject(nullptr)
+    {}
+
+    int classVersion;
+
+    QVector3D insertionPoint;
+
+    /// <summary>
+    /// U-vector of a single pixel (points along the visual bottom of the image, 
+    /// starting at the insertion point) (in WCS)
+    /// </summary>
+    QVector3D uVector;
+
+    /// <summary>
+    /// V-vector of a single pixel (points along the visual left side of the 
+    /// image, starting at the insertion point) (in WCS)
+    /// </summary>
+    QVector3D vVector;
+
+    QSize imageSize;
+
+    int imageObjectHandle;
+
+    /// <summary>
+    /// Image display properties:
+    /// 1 = Show image
+    /// 2 = Show image when not aligned with screen
+    /// 4 = Use clipping boundary
+    /// 8 = Transparency is on
+    /// </summary>
+    int displayProperties;
+
+    /// <summary>
+    /// Clipping state:
+    /// 0 = Off
+    /// 1 = On
+    /// </summary>
+    int clippingState;
+
+    /// <summary>
+    /// Brightness value (0-100; default = 50)
+    /// </summary>
+    int brightness;
+
+    /// <summary>
+    /// Contrast value (0-100; default = 50)
+    /// </summary>
+    int contrast;
+
+    /// <summary>
+    /// Fade value(0 - 100; default = 0)
+    /// </summary>
+    int fade;
+
+    int imageReactorHandle;
+
+    /// <summary>
+    /// Clipping boundary type. 1 = Rectangular; 2 = Polygonal
+    /// </summary>
+    int clippingBoundaryType;
+
+    /// <summary>
+    /// Number of clip boundary vertices that follow
+    /// </summary>
+    int clipBoundaryVerticesCount;
+
+    /// <summary>
+    /// Clip boundary vertex (in OCS)
+    /// DXF: X value; APP: 2D point(multiple entries)
+    /// NOTE 1) For rectangular clip boundary type, two opposite corners must be
+    /// specified.Default is(-0.5, -0.5), (size.x - 0.5, size.y - 0.5). 2) For 
+    /// polygonal clip boundary type, three or more vertices must be specified.
+    /// Polygonal vertices must be listed sequentially
+    /// </summary>
+    QList<QPointF> clipBoundaryVertices;
+
+    /// <summary>
+    /// Clip Mode:
+    /// 0 = Outside Mode
+    /// 1 = Inside Mode
+    /// </summary>
+    int clipMode;
+
+    DxfImageDefNode* defObject;
+};
+
+DxfImageNode::DxfImageNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "IMAGE", new DxfImageNodePrivate(this))
+{
+
+}
+
+QString DxfImageNode::fileName() const
+{
+    Q_D(const DxfImageNode);
+    if (d->defObject)
+    {
+        return d->defObject->fileName();
+    }
+    return "";
+}
+
+void DxfImageNode::postProcess()
+{
+    Q_D(DxfImageNode);
+    DxfItemNode* obj = d->document->item(d->imageObjectHandle);
+    DxfImageDefNode* imageDef = dynamic_cast<DxfImageDefNode*>(obj);
+    if (!imageDef)
+        return;
+
+    d->defObject = imageDef;
+}
+
+void DxfImageNode::debugPrint() const
+{
+    Q_D(const DxfImageNode);
+    DxfEntityNode::debugPrint();
+    qLogD << "    classVersion = " << d->classVersion << "\n";
+    qLogD << "    insertionPoint = " << d->insertionPoint.x() << ", " << d->insertionPoint.y() << ", " << d->insertionPoint.z() << "\n";
+    qLogD << "    uVector = " << d->uVector.x() << ", " << d->uVector.y() << ", " << d->uVector.z() << "\n";
+    qLogD << "    vVector = " << d->vVector.x() << ", " << d->vVector.y() << ", " << d->vVector.z() << "\n";
+    qLogD << "    imageSize = " << d->imageSize.width() << ", " << d->imageSize.height() << "\n";
+    qLogD << "    imageObjectHandle = " << d->imageObjectHandle << "\n";
+    qLogD << "    displayProperties = " << d->displayProperties << "\n";
+    qLogD << "    clippingState = " << d->clippingState << "\n";
+    qLogD << "    brightness = " << d->brightness << "\n";
+    qLogD << "    contrast = " << d->contrast << "\n";
+    qLogD << "    fade = " << d->fade << "\n";
+    qLogD << "    imageReactorHandle = " << d->imageReactorHandle << "\n";
+    qLogD << "    clippingBoundaryType = " << d->clippingBoundaryType << "\n";
+    qLogD << "    clipBoundaryVerticesCount = " << d->clipBoundaryVerticesCount << "\n";
+    qLogD << "    clipBoundaryVertices = \n";
+    for (QPointF point : d->clipBoundaryVertices)
+    {
+        qLogD << "      " << point.x() << ", " << point.y() << "\n";
+    }
+    qLogD << "    clipMode = " << d->clipMode << "\n";
+}
+
+LaserPrimitive* DxfImageNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfImageNode);
+
+    QFileInfo fileInfo(fileName());
+    if (!fileInfo.exists())
+        return nullptr;
+
+    QImage image;
+    if (!image.load(fileName()))
+        return nullptr;
+
+    QRectF bounding(d->insertionPoint.toPointF(), 
+        QSize(d->uVector.x() * d->imageSize.width(), d->vVector.y() * d->imageSize.height()));
+    LaserBitmap* primitive = new LaserBitmap(image, t.mapRect(bounding), doc);
+    return primitive;
+}
+
+
+bool DxfImageNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfImageNode);
+    if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->insertionPoint.setX(value);
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->insertionPoint.setY(value);
+    }
+    else if (group.match(30))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->insertionPoint.setZ(value);
+    }
+    else if (group.match(11))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->uVector.setX(value);
+    }
+    else if (group.match(21))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->uVector.setY(value);
+    }
+    else if (group.match(31))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->uVector.setZ(value);
+    }
+    else if (group.match(12))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->vVector.setX(value);
+    }
+    else if (group.match(22))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->vVector.setY(value);
+    }
+    else if (group.match(32))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->vVector.setZ(value);
+    }
+    else if (group.match(13))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->imageSize.setWidth(value);
+    }
+    else if (group.match(23))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->imageSize.setHeight(value);
+    }
+    else if (group.match(14))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->clipBoundaryVertices.append(QPointF(value, 0));
+    }
+    else if (group.match(24))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->clipBoundaryVertices.last().setY(value);
+    }
+    else if (group.match(70))
+    {
+        if (!group.assign(d->displayProperties))
+            return false;
+    }
+    else if (group.match(71))
+    {
+        if (!group.assign(d->clippingBoundaryType))
+            return false;
+    }
+    else if (group.match(91))
+    {
+        if (!group.assign(d->clipBoundaryVerticesCount))
+            return false;
+    }
+    else if (group.match(280))
+    {
+        if (!group.assign(d->clippingState))
+            return false;
+    }
+    else if (group.match(281))
+    {
+        if (!group.assign(d->brightness))
+            return false;
+    }
+    else if (group.match(282))
+    {
+        if (!group.assign(d->contrast))
+            return false;
+    }
+    else if (group.match(283))
+    {
+        if (!group.assign(d->fade))
+            return false;
+    }
+    else if (group.match(290))
+    {
+        if (!group.assign(d->clipMode))
+            return false;
+    }
+    else if (group.match(340))
+    {
+        if (!group.assign(d->imageObjectHandle, 16))
+            return false;
+    }
+    else if (group.match(360))
+    {
+        if (!group.assign(d->imageReactorHandle, 16))
+            return false;
+    }
+    
     return true;
 }
 
@@ -1525,24 +2357,21 @@ public:
     {}
 };
 
-DxfObjectNode::DxfObjectNode(int groupCode, const QString& variable, DxfObjectNodePrivate* ptr)
-    : DxfItemNode(groupCode, variable, ptr)
+DxfObjectNode::DxfObjectNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfObjectNodePrivate* ptr)
+    : DxfItemNode(doc, groupCode, variable, ptr)
 {}
 
-DxfObjectNode::DxfObjectNode(int groupCode, const QString & variable)
-    : DxfItemNode(groupCode, variable, new DxfObjectNodePrivate(this, NT_Object))
+DxfObjectNode::DxfObjectNode(DxfDocumentNode* doc, int groupCode, const QString & variable)
+    : DxfItemNode(doc, groupCode, variable, new DxfObjectNodePrivate(this, NT_Object))
 {
 }
 
-QString DxfObjectNode::toString() const
+void DxfObjectNode::debugPrint() const
 {
     Q_D(const DxfObjectNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "OBJECT " << name() << "\n";
-    stream << DxfNode::toString();
-    stream << DxfItemNode::toString();
-    return buf;
+    DxfItemNode::debugPrint();
+    qLogD << "OBJECT " << name() << "\n";
+    DxfItemNode::debugPrint();
 }
 
 bool DxfObjectNode::parseItem(DxfGroup& group)
@@ -1564,6 +2393,112 @@ bool DxfObjectNode::isEnd(DxfGroup& group)
     return false;
 }
 
+class DxfImageDefNodePrivate : public DxfObjectNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfImageDefNode)
+public:
+    DxfImageDefNodePrivate(DxfImageDefNode* ptr)
+        : DxfObjectNodePrivate(ptr, NT_ImageDef)
+        , version(0)
+        , imageSize(0, 0)
+        , unitsPerPixel(0, 0)
+        , loadedFlag(0)
+        , resolutionUnits(0)
+    {}
+
+    int version;
+    QString fileName;
+    QSizeF imageSize;
+    QSizeF unitsPerPixel;
+
+    /// <summary>
+    /// Image-is-loaded flag. 0 = Unloaded; 1 = Loaded
+    /// </summary>
+    int loadedFlag;
+
+    /// <summary>
+    /// Resolution units. 0 = No units; 2 = Centimeters; 5 = Inch
+    /// </summary>
+    int resolutionUnits;
+};
+
+DxfImageDefNode::DxfImageDefNode(DxfDocumentNode* doc, int groupCode)
+    : DxfObjectNode(doc, groupCode, "IMAGEDEF", new DxfImageDefNodePrivate(this))
+{
+
+}
+
+QString DxfImageDefNode::fileName() const
+{
+    Q_D(const DxfImageDefNode);
+    return d->fileName;
+}
+
+void DxfImageDefNode::debugPrint() const
+{
+    Q_D(const DxfImageDefNode);
+    DxfObjectNode::debugPrint();
+    qLogD << "    version = " << d->version << "\n";
+    qLogD << "    fileName = " << d->fileName << "\n";
+    qLogD << "    imageSize = " << d->imageSize.width() << ", " << d->imageSize.height() << "\n";
+    qLogD << "    unitsPerPixel = " << d->unitsPerPixel.width() << ", " << d->unitsPerPixel.height() << "\n";
+    qLogD << "    loadedFlag = " << d->loadedFlag << "\n";
+    qLogD << "    resolutionUnits = " << d->resolutionUnits << "\n";
+}
+
+bool DxfImageDefNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfImageDefNode);
+    if (group.match(1))
+    {
+        group.assign(d->fileName);
+    }
+    else if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->imageSize.setWidth(value);
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->imageSize.setHeight(value);
+    }
+    if (group.match(11))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->unitsPerPixel.setWidth(value);
+    }
+    else if (group.match(21))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->unitsPerPixel.setHeight(value);
+    }
+    else if (group.match(90))
+    {
+        if (!group.assign(d->version))
+            return false;
+    }
+    else if (group.match(280))
+    {
+        if (!group.assign(d->loadedFlag))
+            return false;
+    }
+    else if (group.match(51))
+    {
+        if (!group.assign(d->resolutionUnits))
+            return false;
+    }
+    return true;
+}
+
 class DxfThumbnailImageNodePrivate : public DxfNodePrivate
 {
     Q_DECLARE_PUBLIC(DxfThumbnailImageNode)
@@ -1573,8 +2508,8 @@ public:
     {}
 };
 
-DxfThumbnailImageNode::DxfThumbnailImageNode(int groupCode)
-    : DxfNode(groupCode, "THUMBNAILIMAGE", new DxfThumbnailImageNodePrivate(this))
+DxfThumbnailImageNode::DxfThumbnailImageNode(DxfDocumentNode* doc, int groupCode)
+    : DxfNode(doc, groupCode, "THUMBNAILIMAGE", new DxfThumbnailImageNodePrivate(this))
 {
 
 }
@@ -1597,8 +2532,8 @@ public:
     QList<DxfNode*> items;
 };
 
-DxfCollectionNode::DxfCollectionNode(int groupCode, const QString& variable, DxfCollectionNodePrivate* ptr)
-    : DxfNode(groupCode, variable, ptr)
+DxfCollectionNode::DxfCollectionNode(DxfDocumentNode* doc, int groupCode, const QString& variable, DxfCollectionNodePrivate* ptr)
+    : DxfNode(doc, groupCode, variable, ptr)
 {
 
 }
@@ -1612,8 +2547,8 @@ public:
     {}
 };
 
-DxfClassesNode::DxfClassesNode(int groupCode)
-    : DxfCollectionNode(groupCode, "CLASSES", new DxfClassesNodePrivate(this))
+DxfClassesNode::DxfClassesNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "CLASSES", new DxfClassesNodePrivate(this))
 {
 
 }
@@ -1631,7 +2566,7 @@ bool DxfClassesNode::parse(DxfStream* stream)
 
         if (group.match(0, "CLASS"))
         {
-            DxfClassNode* childNode = new DxfClassNode(group.groupCode);
+            DxfClassNode* childNode = new DxfClassNode(d->document, group.groupCode);
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -1645,18 +2580,14 @@ bool DxfClassesNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfClassesNode::toString() const
+void DxfClassesNode::debugPrint() const
 {
-    Q_D(const DxfClassesNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "CLASSES\n";
-    stream << DxfNode::toString();
+    qLogD << "CLASSES\n";
+    DxfNode::debugPrint();
     for (DxfClassNode* node : *this)
     {
-        stream << node->toString();
+        node->debugPrint();
     }
-    return buf;
 }
 
 class DxfTablesNodePrivate : public DxfCollectionNodePrivate
@@ -1668,8 +2599,8 @@ public:
     {}
 };
 
-DxfTablesNode::DxfTablesNode(int groupCode)
-    : DxfCollectionNode(groupCode, "TABLES", new DxfTablesNodePrivate(this))
+DxfTablesNode::DxfTablesNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "TABLES", new DxfTablesNodePrivate(this))
 {
 
 }
@@ -1687,7 +2618,7 @@ bool DxfTablesNode::parse(DxfStream* stream)
 
         if (group.match(0, "TABLE"))
         {
-            DxfTableNode* childNode = new DxfTableNode(group.groupCode);
+            DxfTableNode* childNode = new DxfTableNode(d->document, group.groupCode);
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -1701,18 +2632,17 @@ bool DxfTablesNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfTablesNode::toString() const
+void DxfTablesNode::debugPrint() const
 {
     Q_D(const DxfTablesNode);
     QString buf;
     QTextStream stream(&buf);
     stream << "TABLES\n";
-    stream << DxfNode::toString();
+    DxfNode::debugPrint();
     for (DxfTableNode* node : *this)
     {
-        stream << node->toString();
+        node->debugPrint();
     }
-    return buf;
 }
 
 class DxfBlocksNodePrivate : public DxfCollectionNodePrivate
@@ -1724,8 +2654,8 @@ public:
     {}
 };
 
-DxfBlocksNode::DxfBlocksNode(int groupCode)
-    : DxfCollectionNode(groupCode, "BLOCKS", new DxfBlocksNodePrivate(this))
+DxfBlocksNode::DxfBlocksNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "BLOCKS", new DxfBlocksNodePrivate(this))
 {
 
 }
@@ -1743,7 +2673,7 @@ bool DxfBlocksNode::parse(DxfStream* stream)
 
         if (group.match(0, "BLOCK"))
         {
-            DxfBlockNode* childNode = new DxfBlockNode(group.groupCode);
+            DxfBlockNode* childNode = new DxfBlockNode(d->document, group.groupCode);
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -1751,7 +2681,7 @@ bool DxfBlocksNode::parse(DxfStream* stream)
         }
         else if (group.match(0, "ENDBLK"))
         {
-            DxfEndBlockNode* childNode = new DxfEndBlockNode(group.groupCode);
+            DxfEndBlockNode* childNode = new DxfEndBlockNode(d->document, group.groupCode);
             last()->addChildNode(childNode);
             if (!childNode->parse(stream))
                 return false;
@@ -1764,18 +2694,15 @@ bool DxfBlocksNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfBlocksNode::toString() const
+void DxfBlocksNode::debugPrint() const
 {
     Q_D(const DxfBlocksNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "BLOCKS\n";
-    stream << DxfNode::toString();
+    qLogD << "BLOCKS\n";
+    DxfNode::debugPrint();
     for (DxfBlockNode* node : *this)
     {
-        stream << node->toString();
+        node->debugPrint();
     }
-    return buf;
 }
 
 class DxfEntitiesNodePrivate : public DxfCollectionNodePrivate
@@ -1787,8 +2714,8 @@ public:
     {}
 };
 
-DxfEntitiesNode::DxfEntitiesNode(int groupCode)
-    : DxfCollectionNode(groupCode, "ENTITIES", new DxfEntitiesNodePrivate(this))
+DxfEntitiesNode::DxfEntitiesNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "ENTITIES", new DxfEntitiesNodePrivate(this))
 {
 
 }
@@ -1804,37 +2731,46 @@ bool DxfEntitiesNode::parse(DxfStream* stream)
             return false;
         }
 
+        DxfEntityNode* childNode = nullptr;
         if (group.match(0, "ENDSEC"))
         {
             break;
         }
+        else if (group.match(0, "ARC"))
+        {
+            childNode = new DxfArcNode(d->document, group.groupCode);
+        }
         else if (group.match(0, "LWPOLYLINE"))
         {
-            DxfLWPolylineNode* childNode = new DxfLWPolylineNode(group.groupCode);
-            addChildNode(childNode);
-            append(childNode);
-            if (!childNode->parse(stream))
-                return false;
+            childNode = new DxfLWPolylineNode(d->document, group.groupCode);
         }
         else if (group.match(0, "CIRCLE"))
         {
-            DxfCircleNode* childNode = new DxfCircleNode(group.groupCode);
-            addChildNode(childNode);
-            append(childNode);
-            if (!childNode->parse(stream))
-                return false;
+            childNode = new DxfCircleNode(d->document, group.groupCode);
         }
         else if (group.match(0, "ELLIPSE"))
         {
-            DxfEllipseNode* childNode = new DxfEllipseNode(group.groupCode);
-            addChildNode(childNode);
-            append(childNode);
-            if (!childNode->parse(stream))
-                return false;
+            childNode = new DxfEllipseNode(d->document, group.groupCode);
+        }
+        else if (group.match(0, "LINE"))
+        {
+            childNode = new DxfLineNode(d->document, group.groupCode);
+        }
+        else if (group.match(0, "SPLINE"))
+        {
+            childNode = new DxfSplineNode(d->document, group.groupCode);
+        }
+        else if (group.match(0, "IMAGE"))
+        {
+            childNode = new DxfImageNode(d->document, group.groupCode);
         }
         else if (group.match(0))
         {
-            DxfEntityNode* childNode = new DxfEntityNode(group.groupCode, group.variable);
+            childNode = new DxfEntityNode(d->document, group.groupCode, group.variable);
+        }
+
+        if (childNode)
+        {
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -1844,18 +2780,15 @@ bool DxfEntitiesNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfEntitiesNode::toString() const
+void DxfEntitiesNode::debugPrint() const
 {
     Q_D(const DxfEntitiesNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "ENTITIES\n";
-    stream << DxfNode::toString();
+    qLogD << "ENTITIES\n";
+    DxfNode::debugPrint();
     for (DxfEntityNode* node : *this)
     {
-        stream << node->toString();
+        node->debugPrint();
     }
-    return buf;
 }
 
 class DxfObjectsNodePrivate : public DxfCollectionNodePrivate
@@ -1867,8 +2800,8 @@ public:
     {}
 };
 
-DxfObjectsNode::DxfObjectsNode(int groupCode)
-    : DxfCollectionNode(groupCode, "OBJECTS", new DxfObjectsNodePrivate(this))
+DxfObjectsNode::DxfObjectsNode(DxfDocumentNode* doc, int groupCode)
+    : DxfCollectionNode(doc, groupCode, "OBJECTS", new DxfObjectsNodePrivate(this))
 {
 
 }
@@ -1878,6 +2811,7 @@ bool DxfObjectsNode::parse(DxfStream* stream)
     Q_D(DxfObjectsNode);
     while (true)
     {
+        DxfObjectNode* childNode = nullptr;
         DxfGroup group;
         if (!stream->readGroup(group))
         {
@@ -1888,9 +2822,17 @@ bool DxfObjectsNode::parse(DxfStream* stream)
         {
             break;
         }
-        if (group.match(0))
+        else if (group.match(0, "IMAGEDEF"))
         {
-            DxfObjectNode* childNode = new DxfObjectNode(group.groupCode, group.variable);
+            childNode = new DxfImageDefNode(d->document);
+        }
+        else if (group.match(0))
+        {
+            childNode = new DxfObjectNode(d->document, group.groupCode, group.variable);
+        }
+
+        if (childNode)
+        {
             addChildNode(childNode);
             append(childNode);
             if (!childNode->parse(stream))
@@ -1900,17 +2842,14 @@ bool DxfObjectsNode::parse(DxfStream* stream)
     return true;
 }
 
-QString DxfObjectsNode::toString() const
+void DxfObjectsNode::debugPrint() const
 {
     Q_D(const DxfObjectsNode);
-    QString buf;
-    QTextStream stream(&buf);
-    stream << "OBJECTS\n";
-    stream << DxfNode::toString();
+    qLogD << "OBJECTS\n";
+    DxfNode::debugPrint();
     for (DxfObjectNode* node : *this)
     {
-        stream << node->toString();
+        node->debugPrint();
     }
-    return buf;
 }
 

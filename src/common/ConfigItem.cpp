@@ -177,7 +177,7 @@ ConfigItem::ConfigItem(
 
 ConfigItem::~ConfigItem()
 {
-    qLogD << "ConfigItem " << this << " destroied";
+    //qLogD << "ConfigItem " << this << " destroied";
 }
 
 QString ConfigItem::fullName() const

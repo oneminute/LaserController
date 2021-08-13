@@ -52,27 +52,35 @@ void Config::load()
     loadSystemRegisters();
 
     QFile configFile(configFilePath());
-    if (!configFile.open(QFile::Text | QFile::ReadOnly))
+    if (configFile.exists())
     {
-        QMessageBox::warning(nullptr, QObject::tr("Open Failure"), QObject::tr("An error occured when opening configuration file!"));
-        return;
-    }
-
-    QByteArray data = configFile.readAll();
-
-    QJsonDocument doc(QJsonDocument::fromJson(data));
-
-    QJsonObject json = doc.object();
-    for (QJsonObject::ConstIterator g = json.constBegin(); g != json.constEnd(); g++)
-    {
-        if (groupsMap.contains(g.key()))
+        if (!configFile.open(QFile::Text | QFile::ReadOnly))
         {
-            ConfigItemGroup* group = groupsMap[g.key()];
-            group->fromJson(g.value().toObject());
+            //QMessageBox::warning(nullptr, QObject::tr("Open Failure"), QObject::tr("An error occured when opening configuration file!"));
+            configFile.close();
+            return;
+        }
+
+        QByteArray data = configFile.readAll();
+
+        QJsonDocument doc(QJsonDocument::fromJson(data));
+
+        QJsonObject json = doc.object();
+        for (QJsonObject::ConstIterator g = json.constBegin(); g != json.constEnd(); g++)
+        {
+            if (groupsMap.contains(g.key()))
+            {
+                ConfigItemGroup* group = groupsMap[g.key()];
+                group->fromJson(g.value().toObject());
+            }
         }
     }
-
-    configFile.close();
+    else
+    {
+        configFile.close();
+        qLogD << "No valid config.json file found! We will create one.";
+        save();
+    }
 }
 
 void Config::save(const QString& mainCardId)
@@ -147,11 +155,13 @@ void Config::loadGeneralItems()
     ConfigItemGroup* group = new Config::General;
     Config::General::group = group;
 
+    QStringList currentDisplayLanguages = QLocale::system().uiLanguages();
+    QLocale displayLocale = QLocale(currentDisplayLanguages.first());
     ConfigItem* language = group->addConfigItem(
         "language"
         , tr("Language")
         , tr("Language for both UI and Business.")
-        , 25
+        , displayLocale.language()
     );
     language->setInputWidgetType(IWT_ComboBox);
     language->setWidgetInitializeHook(

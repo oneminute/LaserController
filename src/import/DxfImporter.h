@@ -20,7 +20,6 @@ public:
 protected:
 
 private:
-    //static QMap<QString, DxfNode::NodeType> sectionClassMap;
     QScopedPointer<DxfImporterPrivate> m_ptr;
     Q_DECLARE_PRIVATE_D(m_ptr, DxfImporter)
     Q_DISABLE_COPY(DxfImporter)

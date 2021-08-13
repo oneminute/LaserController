@@ -238,6 +238,7 @@ private:
     typedef wchar_t* (*FN_WCHART_VOID)();
     typedef void(__stdcall *FN_VOID_INT)(int value);
     typedef void(*FN_VOID_VOID)();
+    typedef void(__stdcall* FN_VOID_WCHART)(wchar_t*);
 
     typedef void(__cdecl *FNProgressCallBackHandler)(void* ptr, int position, int totalCount);
     typedef void(*FNProgressCallBack)(FNProgressCallBackHandler callback);
@@ -248,7 +249,7 @@ private:
     typedef void(__cdecl *FNProcDataProgressCallBackHandler)(void* ptr, int position, int totalCount);
     typedef void(*FNProcDataProgressCallBack)(FNProcDataProgressCallBackHandler callback);
 
-    typedef int(__stdcall *FN_INT_INT)(int comPort);
+    typedef int(__stdcall *FN_INT_INT)(int);
     typedef int(*FN_INT_VOID)();
 
     typedef void(__stdcall *FNSetSoftwareInitialization)(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
@@ -274,6 +275,8 @@ private:
     typedef wchar_t* (__stdcall* FN_WCHART_BOOL)(bool reload);
 
     typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t* licenseCode);
+
+    typedef void(__stdcall* FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
@@ -310,6 +313,8 @@ public:
     bool readAllUserParamFromCard();
 
     void showAboutWindow();
+    QString getLaserLibraryInfo();
+    void setFactoryType(const QString& factory);
     bool checkFactoryPassword(const QString& password);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
@@ -344,6 +349,8 @@ public:
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
     void getDeviceWorkState();
+    void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
+    int getUpdatePanelHandle(int version);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
@@ -425,6 +432,8 @@ private:
     FN_INT_WCHART m_fnReadUserParamFromCard;
 
     FN_VOID_VOID m_fnShowAboutWindow;
+    FN_VOID_VOID m_fnGetLaserLibInfo;
+    FN_VOID_WCHART m_fnSetFactoryType;
     FN_INT_WCHART m_fnCheckFactoryPassword;
     FN_INT_WCHART_WCHART m_fnWriteFactoryPassword;
 
@@ -453,6 +462,9 @@ private:
     FN_VOID_VOID m_fnGetDeviceWorkState;
 
     FN_INT_DOUBLE_BOOL m_fnMillimeter2MicroStep;
+
+    FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
+    FN_INT_INT m_fnGetUpdatePanelHandle;
 
     wchar_t m_wcharBuffer[2048];
 

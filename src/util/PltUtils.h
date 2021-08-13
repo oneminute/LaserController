@@ -14,9 +14,9 @@ namespace pltUtils
     //void linePoints(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, QVector<Eigen::Vector2d> points, qreal factor);
     int linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform);
 
-    int path2Points(const QPainterPath& path, std::vector<cv::Point2f>& points, cv::Mat& canvas = cv::Mat());
+    int path2Points(const QPainterPath& path, QVector<QPointF>& points, cv::Mat& canvas = cv::Mat());
 
-    QByteArray points2Plt(const std::vector<cv::Point2f>& points);
+    QByteArray points2Plt(const QVector<QPointF>& points);
 
     QByteArray image2Plt(const QImage& image);
 

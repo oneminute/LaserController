@@ -22,6 +22,8 @@ namespace utils
 
 	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2);
 
+
+    quint32 factorial(quint32 n);
 }
 
 #endif // UTILS_H

@@ -95,7 +95,8 @@ enum LaserPrimitiveType
     LPT_PATH,
     LPT_SHAPE,
     LPT_BITMAP,
-	LPT_TEXT
+	LPT_TEXT,
+    LPT_NURBS
 };
 
 enum LaserLayerType

@@ -116,3 +116,9 @@ bool utils::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2)
 	}
 	return false;
 }
+quint32 utils::factorial(quint32 n)
+{
+    if (n == 0)
+        return 1;
+    return n * factorial(n - 1);
+}

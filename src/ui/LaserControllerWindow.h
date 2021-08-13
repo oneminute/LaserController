@@ -49,6 +49,8 @@ public:
     void moveLaser(const QVector3D& delta, bool relative = true, const QVector3D& abstractDest = QVector3D());
     FinishRun finishRun();
 
+    void createUpdateDockPanel(int winId);
+
 public slots:
     void handleSecurityException(int code, const QString& message);
 	
@@ -59,6 +61,7 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -121,6 +124,7 @@ protected slots:
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
+    void onActionUpdate(bool checked = false);
 
     void onActionShowMainCardInfo(bool checked = false);
     void onActionTemporaryLicense(bool checked = false);
@@ -277,6 +281,9 @@ private:
     QToolButton* m_buttonReadOrigins;
     QToolButton* m_buttonWriteOrigins;
     ads::CDockAreaWidget* m_dockAreaMovement;
+
+    // Update Panel widgets
+    ads::CDockAreaWidget* m_dockAreaUpdate;
 
     bool m_created;
     QDir m_tmpDir;

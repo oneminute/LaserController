@@ -310,7 +310,7 @@ void LaserDocument::exportJSON1(const QString& filename)
                 QList<QPainterPath> paths = laserItem->subPaths();
                 if (paths.isEmpty())
                 {
-                    std::vector<cv::Point2f> points = laserItem->cuttingPoints(canvas);
+                    QVector<QPointF> points = laserItem->cuttingPoints(canvas);
                     if (!points.empty())
                     {
                         itemObj["Type"] = laserItem->typeLatinName();
@@ -323,7 +323,7 @@ void LaserDocument::exportJSON1(const QString& filename)
                     QString pltString;
                     for (QPainterPath subPath : paths)
                     {
-                        std::vector<cv::Point2f> points;
+                        QVector<QPointF> points;
                         if (pltUtils::path2Points(subPath, points, canvas))
                         {
                             pltString.append(QString(pltUtils::points2Plt(points)));
@@ -391,7 +391,7 @@ void LaserDocument::exportJSON2(const QString& filename)
     QJsonArray layers;
     QJsonArray items;
     cv::Mat canvas(pageHeight, pageWidth, CV_8UC3, cv::Scalar(255, 255, 255));
-    cv::Point2f lastPoint(0, 0);
+    QPointF lastPoint(0, 0);
 
     QList<LaserLayer*> layerList;
 
@@ -432,7 +432,7 @@ void LaserDocument::exportJSON2(const QString& filename)
             itemObj["Layer"] = layerId;
             QList<QPainterPath> paths = primitive->subPaths();
             //std::vector<cv::Point2f> points = primitive->cuttingPoints(canvas);
-            std::vector<cv::Point2f> points = primitive->mechiningPoints(lastPoint, pointIndex, canvas);
+            QVector<QPointF> points = primitive->mechiningPoints(lastPoint, pointIndex, canvas);
             if (!points.empty())
             {
                 itemObj["Type"] = primitive->typeLatinName();
