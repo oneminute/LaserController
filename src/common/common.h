@@ -225,7 +225,8 @@ enum DataType
     DT_DATETIME,
     DT_RECT,
     DT_POINT,
-    DT_SIZE
+    DT_SIZE,
+    DT_CUSTOM
 };
 
 class Global

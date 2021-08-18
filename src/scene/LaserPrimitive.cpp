@@ -18,6 +18,7 @@
 
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
+#include "common/Config.h"
 #include "util/ImageUtils.h"
 #include "util/MachiningUtils.h"
 #include "util/TypeUtils.h"
@@ -599,7 +600,7 @@ QVector<QPointF> LaserEllipse::updateMachiningPoints(cv::Mat& canvas)
     QPainterPath path = toPath();
 
     QVector<QPointF> points;
-    machiningUtils::path2Points(path, points, canvas);
+    machiningUtils::path2Points(path, points, d->startingIndices, Config::Export::maxStartingPoints(), 0, canvas);
     d->updateMachiningPoints = points;
     return points;
 }
@@ -847,7 +848,7 @@ QVector<QPointF> LaserLine::updateMachiningPoints(cv::Mat& canvas)
     QVector<QPointF> points;
     QPainterPath path = toPath();
     
-    machiningUtils::path2Points(path, points, canvas);
+    machiningUtils::path2Points(path, points, d->startingIndices, Config::Export::maxStartingPoints(), 0, canvas);
     
     d->updateMachiningPoints = points;
     return points;
@@ -972,7 +973,7 @@ QVector<QPointF> LaserPath::updateMachiningPoints(cv::Mat& canvas)
     QVector<QPointF> points;
     QPainterPath path = toPath();
     
-    machiningUtils::path2Points(path, points, canvas);
+    machiningUtils::path2Points(path, points, d->startingIndices, Config::Export::maxStartingPoints(), 0, canvas);
     
     d->updateMachiningPoints = points;
     return points;

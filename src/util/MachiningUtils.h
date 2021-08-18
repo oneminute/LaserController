@@ -11,10 +11,22 @@
 
 namespace machiningUtils
 {
-    //void linePoints(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2, QVector<Eigen::Vector2d> points, qreal factor);
     int linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform);
 
-    int path2Points(const QPainterPath& path, QVector<QPointF>& points, cv::Mat& canvas = cv::Mat());
+    /// <summary>
+    /// 通过QPainterPath对象创建加工用的多边形。每一个点的单位均为1/40毫米。
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="points"></param>
+    /// <param name="startingIndices"></param>
+    /// <param name="startingIndiciesCount"></param>
+    /// <param name="diagonalThreshold"></param>
+    /// <param name="canvas"></param>
+    /// <returns></returns>
+    int path2Points(const QPainterPath& path, QVector<QPointF>& points, 
+        QList<int>& startingIndices, int startingIndiciesCount = 8, 
+        int diagonalThreshold = 2 * 40,
+        cv::Mat& canvas = cv::Mat());
 
     QByteArray points2Plt(const QVector<QPointF>& points);
 

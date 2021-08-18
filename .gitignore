@@ -88,3 +88,5 @@ tmp/
 src/widget/LRWidgets
 
 src/widget/ADS
+
+.vscode/

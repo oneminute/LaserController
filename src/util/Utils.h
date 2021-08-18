@@ -22,6 +22,7 @@ namespace utils
 
 	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, float scop = 0.00001f);
 
+    bool fuzzyEquals(const QPointF& pt1, const QPointF& pt2);
 
     quint32 factorial(quint32 n);
 }

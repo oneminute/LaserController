@@ -597,10 +597,37 @@ void Config::loadExportItems()
         "maxIntervalDistance",
         tr("Max Interval Distance"),
         tr("Max interval distance between tow points."),
-        10
+        40
     );
     maxIntervalDistance->setInputWidgetProperty("minimum", 1);
     maxIntervalDistance->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* maxStartingPoints = group->addConfigItem(
+        "maxStartingPoints",
+        tr("Max starting points"),
+        tr("Max starting points."),
+        8
+    );
+    maxStartingPoints->setInputWidgetProperty("minimum", 1);
+    maxStartingPoints->setInputWidgetProperty("maximum", 20);
+
+    ConfigItem* enableSmallDiagonal = group->addConfigItem(
+        "enableSmallDiagonal",
+        tr("Enable small diagonal"),
+        tr("Enable small diagonal limitation"),
+        false,
+        DT_BOOL
+    );
+
+    QVariant smallDiagonalLimitationVar;
+    smallDiagonalLimitationVar.setValue(SmallDiagonalLimitation());
+    ConfigItem* smallDiagonalLimitation = group->addConfigItem(
+        "smallDiagonalLimitation",
+        tr("Small diagonal limitation"),
+        tr("Small diagonal limitation"),
+        smallDiagonalLimitationVar,
+        DT_CUSTOM
+    );
 }
 
 void Config::loadDeviceItems()

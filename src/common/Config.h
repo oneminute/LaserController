@@ -5,6 +5,7 @@
 #include "ConfigItemGroup.h"
 #include "ConfigItem.h"
 #include "laser/LaserRegister.h"
+#include "scene/SmallDiagonalLimitation.h"
 
 #include <QObject>
 #include <QString>
@@ -19,6 +20,16 @@
     static returnType itemName() \
     { \
         return itemName##Item()->value().convertionMethod(); \
+    }
+
+#define CONFIG_ITEM_T(groupName, itemName, returnType, T) \
+    static ConfigItem* itemName##Item() \
+    { \
+        return Config::groupsMap[#groupName]->configItem(#itemName); \
+    } \
+    static returnType itemName() \
+    { \
+        return itemName##Item()->value<T>(); \
     }
 
 class ConfigItem;
@@ -184,6 +195,9 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(export, maxAnglesDiff, qreal, toReal)
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
+        CONFIG_ITEM(export, maxStartingPoints, int, toInt)
+        CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
+        CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
 
     private:
         friend class Config;

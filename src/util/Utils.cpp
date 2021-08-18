@@ -116,6 +116,13 @@ bool utils::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, 
 	}
 	return false;
 }
+
+bool utils::fuzzyEquals(const QPointF& pt1, const QPointF& pt2)
+{
+    qreal length = QVector2D(pt1 - pt2).length();
+    return qFuzzyIsNull(length);
+}
+
 quint32 utils::factorial(quint32 n)
 {
     if (n == 0)
