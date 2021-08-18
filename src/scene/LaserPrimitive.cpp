@@ -127,6 +127,10 @@ QVector<QLineF> LaserPrimitive::edges()
 {
 	return QVector<QLineF>();
 }
+/*LaserPrimitive* LaserPrimitive::clone(const LaserPrimitive * primitive)
+{
+	return nullptr;
+}*/
 void setSelectedInGroup(bool selected) {
 
 }
@@ -256,13 +260,8 @@ QPointF LaserPrimitive::laserStartPos() const
 
 void LaserPrimitive::sceneTransformToItemTransform(QTransform sceneTransform)
 {
-	
-	QTransform t(
-		sceneTransform.m11(), sceneTransform.m12(), sceneTransform.m13(),
-		sceneTransform.m21(), sceneTransform.m22(), sceneTransform.m23(),
-		0, 0, sceneTransform.m33());
-	setTransform(t);
-	setPos(sceneTransform.m31(), sceneTransform.m32());
+	setTransform(sceneTransform);
+	setPos(0, 0);
 }
 
 QVector<QPointF> LaserPrimitive::machiningPoints() const
@@ -670,6 +669,13 @@ QVector<QLineF> LaserEllipse::edges()
 	return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
+LaserPrimitive * LaserEllipse::clone(QTransform t)
+{
+	Q_D(LaserEllipse);
+	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), t);
+	return ellipse;
+}
+
 class LaserRectPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserRect)
@@ -804,6 +810,12 @@ QVector<QLineF> LaserRect::edges()
 	return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
+LaserPrimitive * LaserRect::clone(QTransform t)
+{
+	LaserRect* cloneRect = new LaserRect(this->rect(), this->document(), t);
+	return cloneRect;
+}
+
 class LaserLinePrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserLine)
@@ -931,6 +943,12 @@ QVector<QLineF> LaserLine::edges()
 	return list;
 }
 
+LaserPrimitive * LaserLine::clone(QTransform t)
+{
+	LaserLine* line = new LaserLine(this->line(), document(), t);
+	return line;
+}
+
 class LaserPathPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserPath)
@@ -1030,6 +1048,12 @@ QVector<QLineF> LaserPath::edges()
 {
 	Q_D(LaserPath);
 	return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+
+LaserPrimitive * LaserPath::clone(QTransform t)
+{
+	LaserPath* path = new LaserPath(this->path(), document(), t);
+	return path;
 }
 
 class LaserPolylinePrivate : public LaserShapePrivate
@@ -1182,6 +1206,13 @@ QVector<QLineF> LaserPolyline::edges()
 	return LaserPrimitive::edges(path, true);
 }
 
+LaserPrimitive * LaserPolyline::clone(QTransform t)
+{
+	Q_D(LaserPolyline);
+	LaserPolyline* polyline = new LaserPolyline(d->poly, document(), t);
+	return polyline;
+}
+
 class LaserPolygonPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserPolygon)
@@ -1321,6 +1352,13 @@ QVector<QLineF> LaserPolygon::edges()
 	QPainterPath path;
 	path.addPolygon(sceneTransform().map(d->poly));
 	return LaserPrimitive::edges(path);
+}
+
+LaserPrimitive * LaserPolygon::clone(QTransform t)
+{
+	Q_D(const LaserPolygon);
+	LaserPolygon* polygon = new LaserPolygon(d->poly, document(), t);
+	return polygon;
 }
 
 struct UIPair
@@ -1568,6 +1606,7 @@ LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> kn
     d->controlPoints = controlPoints;
     d->knots = knots;
     d->weights = weights;
+	utils::sceneTransformToItemTransform(transform, this);
     updateCurve();
 }
 
@@ -1612,6 +1651,13 @@ void LaserNurbs::updateCurve()
         break;
     }
     d->updateDrawingPoints();
+}
+
+LaserPrimitive * LaserNurbs::clone(QTransform t)
+{
+	Q_D(LaserNurbs);
+	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, d->basisType, document(), t);
+	return nurbs;
 }
 
 class LaserBitmapPrivate : public LaserPrimitivePrivate
@@ -1850,6 +1896,13 @@ QVector<QLineF> LaserBitmap::edges()
 	return LaserPrimitive::edges(path);
 }
 
+LaserPrimitive * LaserBitmap::clone(QTransform t)
+{
+	Q_D(LaserBitmap);
+	LaserBitmap* bitmap = new LaserBitmap(d->image, d->boundingRect, document(), t);
+	return bitmap;
+}
+
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)
 {
     QDebugStateSaver saver(debug);
@@ -1978,4 +2031,11 @@ void LaserText::draw(QPainter * painter)
 	doc.setHtml(d->content);
 	painter->translate(d->rect.topLeft());
 	doc.drawContents(painter, QRect(0, 0, d->rect.width(), d->rect.height()));
+}
+
+LaserPrimitive * LaserText::clone(QTransform t)
+{
+	Q_D(LaserText);
+	LaserText* text = new LaserText(d->rect, d->content, document(), d->type, t);
+	return nullptr;
 }

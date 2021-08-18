@@ -116,6 +116,11 @@ bool utils::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, 
 	}
 	return false;
 }
+void utils::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)
+{
+	item->setTransform(sceneTransform);
+	item->setPos(0, 0);
+}
 quint32 utils::factorial(quint32 n)
 {
     if (n == 0)

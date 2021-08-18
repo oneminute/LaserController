@@ -72,50 +72,42 @@ private:
 	LaserViewer* m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
 };
-/*struct ReshapeUndoPrimitive {
-private:
-	QPainterPath m_path;
-	QTransform m_allTransform;
-	QTransform m_transform;
-	QRectF m_boundingRect;
-	QTransform m_groupTransform;
+class MirrorHCommand : public QUndoCommand {
 public:
-	ReshapeUndoPrimitive(
-		QPainterPath path,
-		QTransform allTransform,
-		QTransform transform,
-		QRectF boundingRect,
-		QTransform groupTransform) {
-		m_path = path;
-		m_allTransform = allTransform;
-		m_transform = transform;
-		m_boundingRect = boundingRect;
-		m_groupTransform = groupTransform;
-	}
-	ReshapeUndoPrimitive() {
-
-	}
-	~ReshapeUndoPrimitive() {}
-	friend bool operator==(const ReshapeUndoPrimitive &t1, const ReshapeUndoPrimitive &t2);
-	QPainterPath path() const { return m_path; }
-	QTransform allTransform() const { return m_allTransform; }
-	QTransform transform() const  { return m_transform; }
-	QRectF boundingRect() const { return m_boundingRect; }
-	QTransform groupTransform() const { return m_groupTransform; }
+	MirrorHCommand(LaserViewer* v);
+	~MirrorHCommand();
+	virtual void undo() override;
+	virtual void redo() override;
+private:
+	LaserViewer* m_viewer;
 };
-
-class ReshapeUndoCommand :public QUndoCommand {
-public :
-	ReshapeUndoCommand(LaserViewer* viewer, QMap<LaserPrimitive*, ReshapeUndoPrimitive> undoMap, QMap<LaserPrimitive*, ReshapeUndoPrimitive> redoMap);
-	~ReshapeUndoCommand();
+class MirrorVCommand : public QUndoCommand {
+public:
+	MirrorVCommand(LaserViewer* v);
+	~MirrorVCommand();
 	virtual void undo() override;
 	virtual void redo() override;
 private:
 	LaserViewer * m_viewer;
-	QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_undoMap;
-	QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_redoMap;
-	void handle(QMap<LaserPrimitive*, ReshapeUndoPrimitive>& map);
 };
-*/
+class PasteCommand : public QUndoCommand {
+public:
+	PasteCommand(LaserViewer* ,bool isPasteInline = false, bool isDuplication = false);
+	~PasteCommand();
+	virtual void undo() override;
+	virtual void redo() override;
+	void redoImp();
+	void duplicationRedo();
+private :
+	LaserViewer *  m_viewer;
+	QMap<QGraphicsItem*, QTransform> m_pastedBeforeAdd;
+	QList<LaserPrimitive*> m_pasteList;
+	LaserPrimitiveGroup* m_group;
+	LaserScene* m_scene;
+	bool m_isDuplication;
+	bool m_isPasteInline;
+	//QPointF m_position;
+
+};
 
 #endif // UNDOCOMMAND_H

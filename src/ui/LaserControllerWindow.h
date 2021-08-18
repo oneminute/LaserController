@@ -65,6 +65,7 @@ protected:
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
+	virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
 protected slots:
 	void onActionUndo(bool checked = false);
@@ -111,7 +112,14 @@ protected slots:
 
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
-    bool onActionCloseDocument(bool checked = false);
+	void onActionCopy(bool checked = false);
+	void onActionPaste(bool checked = false);
+	void onActionPasteInLine(bool checked = false);
+	void onActionCut(bool checked = false);
+	void onActionDuplication(bool checked = false);
+	void onActionGroup(bool checked = false);
+	void onActionUngroup(bool checked = false);
+	bool onActionCloseDocument(bool checked = false);
     void onActionSettings(bool checked = false);
     void onActionDeviceSettings(bool checked = false);
     void onActionSelectionTool(bool checked = false);
@@ -125,6 +133,9 @@ protected slots:
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
     void onActionUpdate(bool checked = false);
+
+	void onActionMirrorHorizontal(bool checked = false);
+	void onActionMirrorVertical(bool checked = false);
 
     void onActionShowMainCardInfo(bool checked = false);
     void onActionTemporaryLicense(bool checked = false);
@@ -336,9 +347,9 @@ private:
 	QString m_fileDirection;
 	QString m_fileName;
 	QString m_windowTitle;
-	//undo redo
-	//QAction* m_undoAction;
-	//QAction* m_redoAction;
+	//selection arrange
+	//QWidget* m_mirrorHWidget;
+	//QWidget* m_mirrorVWidget;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

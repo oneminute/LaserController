@@ -146,6 +146,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 			m_longUnit = 50 * m_millimeter * m_flag;
 			m_mediumUnit = 0;
 		}
+		
 	}
 	
 	
@@ -205,6 +206,9 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 			//text
 			if (m_longUnit > 38 || i%2==0) {
 				QString number_str = QString::number(i * textCoef);
+				if (textCoef == 0) {
+					number_str = QString::number(i);
+				}
 				if (i % 2 == 0) {
 					painter.setPen(QPen(QColor(63, 63, 63), 1));
 				}
@@ -227,13 +231,16 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 			//text
 			if (m_longUnit > 38 || i % 2 == 0) {
 				QString number_str = QString::number(i * textCoef);
+				if (textCoef == 0) {
+					number_str = QString::number(i);
+				}
 				if (i % 2 == 0) {
 					painter.setPen(QPen(QColor(63, 63, 63), 1));
 				}
 				else {
 					painter.setPen(QPen(QColor(8, 137, 246), 1));
 				}
-				painter.drawText(QPointF(longStart + 2, edge + 8), QString::number(i * textCoef));
+				painter.drawText(QPointF(longStart + 2, edge + 8), number_str);
 				painter.setPen(QPen(QColor(200, 200, 200), 1));
 			}
 			

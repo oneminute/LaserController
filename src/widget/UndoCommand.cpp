@@ -4,6 +4,7 @@
 #include "state/StateController.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
+#include  "util/Utils.h"
 
 SelectionUndoCommand::SelectionUndoCommand(
 	LaserViewer * viewer, 
@@ -144,6 +145,7 @@ void TranformUndoCommand::undo()
 void TranformUndoCommand::redo()
 {
 	handle(m_redoList);
+	qDebug() << "TranformUndoCommand::redo()";
 	/*if (m_item) {
 		if (m_item->sceneTransform() == m_redoTransform) {
 			return;
@@ -185,60 +187,6 @@ void TranformUndoCommand::handle(QMap<QGraphicsItem*, QTransform> list)
 	}
 	m_viewer->viewport()->repaint();
 }
-
-
-/*ReshapeUndoCommand::ReshapeUndoCommand(LaserViewer * viewer, QMap<LaserPrimitive*, ReshapeUndoPrimitive> undoMap, QMap<LaserPrimitive*, ReshapeUndoPrimitive> redoMap)
-{
-m_viewer = viewer;
-m_undoMap = undoMap;
-m_redoMap = redoMap;
-}
-
-ReshapeUndoCommand::~ReshapeUndoCommand()
-{
-}
-
-void ReshapeUndoCommand::undo()
-{
-handle(m_undoMap);
-}
-
-void ReshapeUndoCommand::redo()
-{
-handle(m_redoMap);
-}
-
-void ReshapeUndoCommand::handle(QMap<LaserPrimitive*, ReshapeUndoPrimitive>& map)
-{
-QList<LaserPrimitive*> list = map.keys();
-if (list.isEmpty()) {
-return;
-}
-
-for each(LaserPrimitive* item in list) {
-ReshapeUndoPrimitive tp = map[item];
-item->setPos(0, 0);//操作都是在group中做的，所以Iitem的pos应该还是0
-item->setData(tp.path(), tp.allTransform(), tp.transform(), tp.boundingRect());
-//m_viewer->setTransform(QTransform());
-}
-//每一个item都存了group，任取一个即可
-m_viewer->group()->setTransform(map[list[0]].groupTransform());
-m_viewer->viewport()->repaint();
-}
-
-bool operator==(const ReshapeUndoPrimitive & t1, const ReshapeUndoPrimitive & t2)
-{
-if (t1.path() == t2.path() &&
-t1.allTransform() == t2.allTransform() &&
-t1.transform() == t2.transform() &&
-t1.boundingRect() == t2.boundingRect()&&
-t1.groupTransform() == t2.groupTransform()) {
-return true;
-}
-else {
-return false;
-}
-}*/
 
 AddDelUndoCommand::AddDelUndoCommand(LaserScene * scene, QList<QGraphicsItem*> list, bool isDel)
 {
@@ -407,12 +355,176 @@ void PolygonUndoCommand::redo()
 }
 void PolygonUndoCommand::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item)
 {
-	/*QTransform t(
-		sceneTransform.m11(), sceneTransform.m12(), sceneTransform.m13(),
-		sceneTransform.m21(), sceneTransform.m22(), sceneTransform.m23(),
-		0, 0, sceneTransform.m33());*/
 	item->setTransform(sceneTransform);
 	item->setPos(0, 0);
 }
 
+MirrorHCommand::MirrorHCommand(LaserViewer * v)
+{
+	m_viewer = v;
+}
 
+MirrorHCommand::~MirrorHCommand()
+{
+}
+
+void MirrorHCommand::undo()
+{
+	redo();
+}
+
+void MirrorHCommand::redo()
+{
+	LaserPrimitiveGroup* group = m_viewer->group();
+	QTransform t = group->transform();
+	QTransform ts = group->sceneTransform();
+	QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
+	QPointF pos = rect.center();
+	QTransform t1 = QTransform(-1, 0, 0, 0, 1, 0, 2 * pos.x(), 0, 1);
+
+	group->setTransform(t * t1);
+	m_viewer->viewport()->repaint();
+}
+
+MirrorVCommand::MirrorVCommand(LaserViewer * v)
+{
+	m_viewer = v;
+}
+
+MirrorVCommand::~MirrorVCommand()
+{
+}
+
+void MirrorVCommand::undo()
+{
+	redo();
+}
+
+void MirrorVCommand::redo()
+{
+	LaserPrimitiveGroup* group = m_viewer->group();
+	QTransform t = group->transform();
+	QTransform ts = group->sceneTransform();
+	QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
+	QPointF pos = rect.center();
+	QTransform t1 = QTransform(1, 0, 0, 0, -1, 0, 0, 2 * pos.y(), 1);
+
+	group->setTransform(t * t1);
+	m_viewer->viewport()->repaint();
+}
+
+PasteCommand::PasteCommand(LaserViewer * v, bool isPasteInline, bool isDuplication)
+{
+	m_viewer = v;
+	m_group = m_viewer->group();
+	m_scene = m_viewer->scene();
+	m_isDuplication = isDuplication;
+	m_isPasteInline = isPasteInline;
+}
+
+PasteCommand::~PasteCommand()
+{
+}
+
+void PasteCommand::undo()
+{
+	
+	for each(LaserPrimitive* primitive in m_pasteList) {
+		//LaserPrimitive* copyP = new LaserPrimitive(primitive->, primitive->document());
+		qDebug() << primitive->sceneTransform();
+		utils::sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
+		primitive->setSelected(false);
+		m_scene->removeLaserPrimitive(primitive);
+	}
+	m_viewer->clearGroupSelection();
+	//恢复之前的group
+	for (QMap<QGraphicsItem*, QTransform>::Iterator i = m_pastedBeforeAdd.begin(); i != m_pastedBeforeAdd.end(); i++) {
+		
+		utils::sceneTransformToItemTransform(i.value(), i.key());
+		i.key()->setSelected(true);
+	}
+	m_viewer->onSelectedFillGroup();
+	m_viewer->viewport()->repaint();
+}
+
+void PasteCommand::redo()
+{
+	//第一次进入是创建Item
+	if (m_pasteList.isEmpty()) {
+		if (!m_isDuplication) {
+			for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_viewer->copyedList().begin(); 
+				i != m_viewer->copyedList().end(); i++) {
+				LaserPrimitive* copyP = i.key()->clone(i.value());
+				m_pasteList.append(copyP);
+			}
+		}
+		else {
+			for each(QGraphicsItem* item in m_group->childItems()){
+				LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+				LaserPrimitive* copyP = primitive->clone(primitive->sceneTransform());
+				m_pasteList.append(copyP);
+			}
+		}
+		
+		//copy
+		if (!m_isDuplication) {
+			
+			redoImp();
+			if (!m_isPasteInline) {
+				//设置位置
+				QPointF mousePos = m_viewer->mapFromGlobal(QCursor::pos());
+				if (mousePos.x() < 0 || mousePos.y() < 0) {
+					mousePos = m_viewer->rect().center();
+				}
+				QPointF initPos = m_viewer->selectedItemsSceneBoundingRect().center();
+				QPointF diff = m_viewer->mapToScene(mousePos.toPoint()) - initPos;
+				QTransform t = m_group->transform();
+				QTransform t1;
+				t1.translate(diff.x(), diff.y());
+				m_group->setTransform(t * t1);
+			}
+			
+		}
+		//duplication
+		else {
+			redoImp();
+		}
+		
+	}
+	else {
+		redoImp();
+		//copy
+		/*if (!m_isDuplication) {
+			redoImp();
+		}
+		//duplication
+		else {
+			duplicationRedo();
+		}*/
+	}
+	if (!m_viewer->group()->isEmpty() && StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
+		emit m_viewer->idleToSelected();
+	}
+	m_viewer->viewport()->repaint();
+}
+
+void PasteCommand::redoImp()
+{
+	m_pastedBeforeAdd.clear();
+	for each(QGraphicsItem* item in m_group->childItems()) {
+		m_pastedBeforeAdd.insert(item, item->sceneTransform());
+	}
+	m_viewer->clearGroupSelection();
+	for each(LaserPrimitive* primitive in m_pasteList) {
+		//LaserPrimitive* copyP = new LaserPrimitive(primitive->, primitive->document());
+
+		primitive->setSelected(true);
+		m_scene->addLaserPrimitive(primitive);
+	}
+	m_viewer->onSelectedFillGroup();
+}
+
+void PasteCommand::duplicationRedo()
+{
+	
+}

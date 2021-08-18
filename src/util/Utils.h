@@ -7,6 +7,7 @@
 #include <QFrame>
 #include <QVector3D>
 #include <QVector2D>
+#include <QGraphicsItem>
 
 namespace utils
 {
@@ -22,7 +23,8 @@ namespace utils
 
 	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, float scop = 0.00001f);
 
-
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);
+	
     quint32 factorial(quint32 n);
 }
 

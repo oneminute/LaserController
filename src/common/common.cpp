@@ -6,12 +6,12 @@
 int Global::dpiX(96);
 int Global::dpiY(96);
 //grid
-qreal Global::lowPen1(228);
-qreal Global::lowPen2(240);
-qreal Global::mediumPen1(218);
-qreal Global::mediumPen2(235);
-qreal Global::highPen1(200);
-qreal Global::highPen2(225);
+qreal Global::lowPen1(224);
+qreal Global::lowPen2(236);
+qreal Global::mediumPen1(208);
+qreal Global::mediumPen2(228);
+qreal Global::highPen1(192);
+qreal Global::highPen2(220);
 SizeUnit Global::unit(SU_MM);
 //QWidget* Global::mainWindow(nullptr);
 
