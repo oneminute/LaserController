@@ -2515,7 +2515,7 @@ void LaserViewer::onEndSelectionFillGroup()
 	else {
 		emit endSelecting();
 	}
-	int i = m_group->childItems().size();
+
 	viewport()->repaint();
 }
 bool LaserViewer::onSelectedFillGroup()
