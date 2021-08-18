@@ -123,6 +123,11 @@ bool utils::fuzzyEquals(const QPointF& pt1, const QPointF& pt2)
     return qFuzzyIsNull(length);
 }
 
+void utils::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)
+{
+	item->setTransform(sceneTransform);
+	item->setPos(0, 0);
+}
 quint32 utils::factorial(quint32 n)
 {
     if (n == 0)

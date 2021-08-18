@@ -7,6 +7,7 @@
 #include <QFrame>
 #include <QVector3D>
 #include <QVector2D>
+#include <QGraphicsItem>
 
 namespace utils
 {
@@ -24,6 +25,8 @@ namespace utils
 
     bool fuzzyEquals(const QPointF& pt1, const QPointF& pt2);
 
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);
+	
     quint32 factorial(quint32 n);
 }
 

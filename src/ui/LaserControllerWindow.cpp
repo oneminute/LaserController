@@ -359,24 +359,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_propertyWidget = new QWidget();
 	m_propertyWidget->setLayout(m_propertyLayout);
 	m_ui->properties->addWidget(m_propertyWidget);
-	//m_ui->properties->addWidget(m_posXLabel);
 	m_propertyWidget->setEnabled(false);
-	//init selection original radio button
 	m_centerBtn->setChecked(true);
-	//undo
-	//m_undoAction = m_viewer->undoStack()->createUndoAction(this, "Undo");
-	//m_redoAction = m_viewer->undoStack()->createRedoAction(this, "Redo");
-	//m_ui->actionUndo = m_undoAction;
-	//m_ui->actionRedo = m_redoAction;
+	//arrange
+	/*m_mirrorHWidget = new QWidget();
+	m_mirrorVWidget = new QWidget();
+	m_ui->actionMirrorHorizontal->addWidget(m_mirrorHWidget);
+	m_ui->actionMirrorVertical->addWidget(m_mirrorVWidget);*/
 	
-	/*QPixmap cMap1(":/ui/icons/images/redo.png");
-	m_redoAction->setIcon(cMap1);
-	m_ui->toolBar->insertAction(m_ui->actionCopy, m_redoAction);
-	QPixmap cMap(":/ui/icons/images/undo.png");
-	m_undoAction->setIcon(cMap);*/
-	//m_ui->toolBar->addAction(m_undoAction);
-	//m_ui->toolBar->insertAction(m_redoAction, m_undoAction);
-	//cleanChanged(bool clean)
 	connect(m_viewer->undoStack(), &QUndoStack::canUndoChanged,this, &LaserControllerWindow::onCanUndoChanged);
 	connect(m_viewer->undoStack(), &QUndoStack::canRedoChanged, this, &LaserControllerWindow::onCanRedoChanged);
 	connect(m_ui->actionUndo, &QAction::triggered, this, &LaserControllerWindow::onActionUndo);
@@ -410,12 +400,23 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionWorkState, &QAction::triggered, this, &LaserControllerWindow::onActionWorkState);
     connect(m_ui->actionHalfTone, &QAction::triggered, this, &LaserControllerWindow::onActionHalfTone);
     connect(m_ui->actionDeletePrimitive, &QAction::triggered, this, &LaserControllerWindow::onActionDeletePrimitive);
+	connect(m_ui->actionCopy, &QAction::triggered, this, &LaserControllerWindow::onActionCopy);
+	connect(m_ui->actionPaste, &QAction::triggered, this, &LaserControllerWindow::onActionPaste);
+	connect(m_ui->actionPasteInLine, &QAction::triggered, this, &LaserControllerWindow::onActionPasteInLine);
+	connect(m_ui->actionCut, &QAction::triggered, this, &LaserControllerWindow::onActionCut);
+	connect(m_ui->actionDuplication, &QAction::triggered, this, &LaserControllerWindow::onActionDuplication);
+	connect(m_ui->actionGroup, &QAction::triggered, this, &LaserControllerWindow::onActionGroup);
+	connect(m_ui->actionUngroup, &QAction::triggered, this, &LaserControllerWindow::onActionUngroup);
+	
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
     connect(m_ui->actionDeviceSettings, &QAction::triggered, this, &LaserControllerWindow::onActionDeviceSettings);
     connect(m_ui->actionSettings, &QAction::triggered, this, &LaserControllerWindow::onActionSettings);
     connect(m_ui->actionPathOptimization, &QAction::triggered, this, &LaserControllerWindow::onActionPathOptimization);
+
+	connect(m_ui->actionMirrorHorizontal, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorHorizontal);
+	connect(m_ui->actionMirrorVertical, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorVertical);
 
     connect(m_ui->actionMoveTop, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTop);
     connect(m_ui->actionMoveBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottom);
@@ -921,7 +922,7 @@ void LaserControllerWindow::createLayersDockPanel()
 
     CDockWidget* dockWidget = new CDockWidget(tr("Layers"));
     dockWidget->setWidget(panelWidget);
-    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaLayers = m_dockManager->addDockWidget(RightDockWidgetArea, dockWidget);
 }
@@ -989,7 +990,7 @@ void LaserControllerWindow::createCameraDockPanel()
 
     CDockWidget* dockWidget = new CDockWidget(tr("Camera"));
     dockWidget->setWidget(panelWidget);
-    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaCameras = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
@@ -1115,7 +1116,7 @@ void LaserControllerWindow::createOperationsDockPanel()
 
     CDockWidget* dockWidget = new CDockWidget(tr("Operations"));
     dockWidget->setWidget(panelWidget);
-    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaOperations = m_dockManager->addDockWidget(BottomDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
@@ -1133,7 +1134,7 @@ void LaserControllerWindow::createOutlineDockPanel()
 
     CDockWidget* dockWidget = new CDockWidget(tr("Outline"));
     dockWidget->setWidget(panelWidget);
-    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaOutline = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
@@ -1323,7 +1324,7 @@ void LaserControllerWindow::createMovementDockPanel()
 
     CDockWidget* dockWidget = new CDockWidget(tr("Movement"));
     dockWidget->setWidget(panelWidget);
-    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
@@ -1344,7 +1345,7 @@ void LaserControllerWindow::createUpdateDockPanel(int winId)
 
     CDockWidget* dockWidget = new CDockWidget(tr("Update"));
     dockWidget->setWidget(panelWidget);
-    m_ui->menuView->addAction(dockWidget->toggleViewAction());
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaUpdate = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
@@ -1426,6 +1427,22 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 
 	}
 	
+}
+void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
+{
+	if (StateControllerInst.isInState(StateControllerInst.documentWorkingState())) {
+		QMenu Context;
+		Context.addAction(m_ui->actionCopy);
+		Context.addAction(m_ui->actionCut);
+		Context.addAction(m_ui->actionPaste);
+		Context.addAction(m_ui->actionDuplication);
+		Context.addSeparator();
+		Context.addAction(m_ui->actionGroup);
+		Context.addAction(m_ui->actionUngroup);
+		Context.exec(QCursor::pos());
+	}
+	
+
 }
 void LaserControllerWindow::onActionUndo(bool checked) {
 	int index = m_viewer->undoStack()->index();
@@ -1937,6 +1954,61 @@ void LaserControllerWindow::onActionDeletePrimitive(bool checked)
 	m_viewer->viewport()->repaint();
 }
 
+void LaserControllerWindow::onActionCopy(bool checked)
+{
+	if (!m_viewer) {
+		return;
+	}
+	//QList<LaserPrimitive>* list =  m_viewer->copyedList();
+	
+	m_viewer->copyedList().clear();
+	for each(QGraphicsItem* item in m_viewer->group()->childItems()) {
+		LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+		m_viewer->copyedList().insert(p, p->sceneTransform());
+	}
+}
+
+void LaserControllerWindow::onActionPaste(bool checked)
+{
+	if (!m_viewer || m_viewer->copyedList().isEmpty()) {
+		return;
+	}
+	PasteCommand* cmd = new PasteCommand(m_viewer);
+	m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionPasteInLine(bool checked)
+{
+	if (!m_viewer || m_viewer->copyedList().isEmpty()) {
+		return;
+	}
+	PasteCommand* cmd = new PasteCommand(m_viewer, true);
+	m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionCut(bool checked)
+{
+	onActionCopy();
+	onActionDeletePrimitive();
+}
+
+void LaserControllerWindow::onActionDuplication(bool checked) {
+	if (!m_viewer || m_viewer->group()->isEmpty()) {
+		return;
+	}
+	PasteCommand* cmd = new PasteCommand(m_viewer, false, true);
+	m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionGroup(bool checked)
+{
+
+}
+
+void LaserControllerWindow::onActionUngroup(bool checked)
+{
+}
+
 bool LaserControllerWindow::onActionCloseDocument(bool checked)
 {
 	//documentClose();
@@ -2134,6 +2206,24 @@ void LaserControllerWindow::onActionUpdate(bool checked)
     LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
 }
 
+void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
+{
+	if (!m_viewer || !m_viewer->group()) {
+		return;
+	}
+	MirrorHCommand* cmd = new MirrorHCommand(m_viewer);
+	m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMirrorVertical(bool checked)
+{
+	if (!m_viewer || !m_viewer->group()) {
+		return;
+	}
+	MirrorVCommand* cmd = new MirrorVCommand(m_viewer);
+	m_viewer->undoStack()->push(cmd);
+}
+
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -2227,25 +2317,49 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 			m_propertyWidget->setEnabled(false);
 		}
 		
+		m_ui->actionMirrorHorizontal->setEnabled(false);
+		m_ui->actionMirrorVertical->setEnabled(false);
+		m_ui->actionCopy->setEnabled(false);
+		//m_ui->actionPaste->setEnabled(false);
+		m_ui->actionCut->setEnabled(false);
+		m_ui->actionDuplication->setEnabled(false);
+		m_ui->actionDeletePrimitive->setEnabled(false);
+		m_ui->actionGroup->setEnabled(false);
+		m_ui->actionUngroup->setEnabled(false);
 		return;
 	}
 	else if (items.length() > 0) {
 		if (m_propertyWidget) {
 			m_propertyWidget->setEnabled(true);
 			selectedChange();
-		}		
+		}	
+		m_ui->actionMirrorHorizontal->setEnabled(true);
+		m_ui->actionMirrorVertical->setEnabled(true);
+		m_ui->actionCopy->setEnabled(true);
+		//m_ui->actionPaste->setEnabled(true);
+		m_ui->actionCut->setEnabled(true);
+		m_ui->actionDuplication->setEnabled(true);
+		m_ui->actionDeletePrimitive->setEnabled(true);
+		//m_ui->actionGroup->setEnabled(true);
+		//m_ui->actionUngroup->setEnabled(true);
+		if (items.length() > 1) {
+			if (m_viewer->selectedGroupedList().isEmpty()) {
+				m_ui->actionUngroup->setEnabled(false);
+				m_ui->actionGroup->setEnabled(true);
+			}
+			else {
+				m_ui->actionGroup->setEnabled(true);
+				m_ui->actionUngroup->setEnabled(false);
+			}
+		}
+		else {
+			m_ui->actionGroup->setEnabled(false);
+			m_ui->actionUngroup->setEnabled(false);
+		}
+		
 	}
-    qLogD << "selected items count: " << items.length();
-	/*for (LaserPrimitive* item : items)
-    {
-		if (items[0]->layer() == nullptr)
-			continue;
-        int row = items[0]->layer()->row();
-        if (row != -1)
-            m_ui->tableWidgetLayers->selectRow(row);
+	
 
-        qDebug().nospace().nospace() << "selected primitive: " << item->nodeName();
-    }*/
     
 }
 
@@ -2782,6 +2896,60 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentWorkingState);
     // end actionCloseDocument
+
+	// actionDeletePrimitive
+	BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentEmptyState);
+	// end actionDeletePrimitive
+
+	// actionCopy
+	BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentEmptyState);
+	// end actionCopy
+
+	// actionGroup
+	BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentEmptyState);
+	// end actionGroup
+
+	// actionUngroup
+	BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentEmptyState);
+	// end actionUngroup
+
+	// actionPaste
+	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", true, documentWorkingState);
+	// end actionPaste
+
+	// actionPasteInLine
+	BIND_PROP_TO_STATE(m_ui->actionPasteInLine, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionPasteInLine, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionPasteInLine, "enabled", true, documentWorkingState);
+	// end actionPasteInLine
+
+	// actionCut
+	BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentEmptyState);
+	// end actionCut
+
+	// actionDuplication
+	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentEmptyState);
+	// end actionDuplication
+
+	// actionMirrorHorizontal
+	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
+	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
+	// end actionMirrorHorizontal
+
+	// actionMirrorVertical
+	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
+	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
+	// end actionMirrorVertical
 
     // actionAddEngravingLayer
     BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, initState);

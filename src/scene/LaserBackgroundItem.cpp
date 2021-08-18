@@ -23,12 +23,10 @@ LaserBackgroundItem::LaserBackgroundItem(const QRectF & rect, QGraphicsItem * pa
 {
 	m_rectItem = new QGraphicsRectItem(rect);
 	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
-	//this->setBrush(QBrush(Qt::white));
 	pen.setCosmetic(true);
 	m_rectItem->setPen(pen);
 	addToGroup(m_rectItem);
 	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
-	//setSelected(true);
 }
 LaserBackgroundItem::~LaserBackgroundItem()
 {

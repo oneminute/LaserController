@@ -326,7 +326,7 @@
         },
         "gridContrast": {
             "defaultValue": 0,
-            "value": 2
+            "value": 1
         },
         "gridShapeDistance": {
             "defaultValue": 3,

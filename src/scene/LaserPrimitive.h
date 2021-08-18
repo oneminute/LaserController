@@ -157,6 +157,7 @@ public:
 	virtual QJsonObject toJson();
 	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
 	virtual QVector<QLineF> edges();
+	virtual LaserPrimitive* clone(QTransform t) = 0;
 	/*void setScaleValue(qreal x, qreal y);
 	void setScaleTranslate(qreal x, qreal y);
 	void setSelectedEditingState(int state);
@@ -225,6 +226,7 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
+	LaserPrimitive * clone(QTransform t);
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)
@@ -250,6 +252,7 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
+	virtual LaserPrimitive* clone(QTransform t);
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
     Q_DISABLE_COPY(LaserRect)
@@ -274,6 +277,7 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
+	LaserPrimitive * clone(QTransform t);
 
 private:
     Q_DISABLE_COPY(LaserLine);
@@ -301,6 +305,7 @@ public:
 
 	//virtual void reShape();
 	QVector<QLineF> edges();
+	LaserPrimitive * clone(QTransform t);
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPath);
@@ -327,7 +332,7 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
-
+	LaserPrimitive * clone(QTransform t);
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
     Q_DISABLE_COPY(LaserPolyline)
@@ -354,6 +359,7 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
+	LaserPrimitive * clone(QTransform t);
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
@@ -380,6 +386,8 @@ public:
 	virtual QRectF sceneBoundingRect() const;
 
     void updateCurve();
+
+	LaserPrimitive * clone(QTransform t);
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserNurbs)
@@ -412,6 +420,7 @@ public:
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 	QVector<QLineF> edges();
+	LaserPrimitive * clone(QTransform t);
 
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
@@ -432,6 +441,7 @@ public:
 	virtual void draw(QPainter* painter);
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
+	LaserPrimitive * clone(QTransform t);
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)

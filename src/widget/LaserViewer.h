@@ -48,7 +48,7 @@ public:
 	void setAnchorPoint(QPointF point);
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);
 	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);
-	bool detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint);
+	bool detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint);
 	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);
 	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
@@ -56,6 +56,10 @@ public:
 	QState* currentState();
 
 	QUndoStack* undoStack();
+
+	QMap<LaserPrimitive*, QTransform>& copyedList();
+	QMap<QString, QList<LaserPrimitive*>>& groupedMap();
+	QList<QString>& selectedGroupedList();
 	
 private:
     void init();
@@ -162,7 +166,7 @@ protected:
 	
 
 private:
-	QPointF testPoint;
+	//QPointF testPoint;
     QScopedPointer<LaserScene> m_scene;
     //LaserScene* m_scene;
     bool m_rubberBandActive;
@@ -260,11 +264,11 @@ private:
 	//undo stack
 	QUndoStack* m_undoStack;
 	QMap<QGraphicsItem*, QTransform> m_undoSelectionList;
-	//QTransform m_undoSelectionTransform;
-	//QMap<LaserPrimitive*, ReshapeUndoPrimitive> m_undoReshapMap;
-	//ReshapeUndoCommand* m_reshapCmd;
-	//QTransform m_undoTransform;
 	QMap<QGraphicsItem*, QTransform> m_undoTransformList;
+	//arrange
+	QMap<LaserPrimitive*, QTransform> m_copyedList;
+	QMap<QString, QList<LaserPrimitive*>> m_groupedMap;
+	QList<QString> m_selectedGroupedList;
 	
 	friend class LaserScene;
 };

@@ -27,43 +27,43 @@
 #include "util/utils.h"
 
 LaserViewer::LaserViewer(QWidget* parent)
-    : QGraphicsView(parent)
-    , m_scene(new LaserScene)
-    , m_rubberBandActive(false)
-    //, m_mousePressed(false)
-    , m_isKeyDelPress(false)
-    , m_isKeyShiftPressed(false)
+	: QGraphicsView(parent)
+	, m_scene(new LaserScene)
+	, m_rubberBandActive(false)
+	//, m_mousePressed(false)
+	, m_isKeyDelPress(false)
+	, m_isKeyShiftPressed(false)
 	, m_isKeyCtrlPress(false)
 	, m_isItemEdge(false)
 	, m_isItemEdgeCenter(false)
-    //, m_isMouseInStartRect(false)
-    , m_splineNodeDrawWidth(3)
-    , m_splineHandlerWidth(5)
-    , m_splineNodeEditWidth(5)
-    , m_handlingSpline(SplineStruct())
-    , m_lastTime(0)
-    , m_curTime(0)
-    , m_horizontalRuler(nullptr)
-    , m_verticalRuler(nullptr)
+	//, m_isMouseInStartRect(false)
+	, m_splineNodeDrawWidth(3)
+	, m_splineHandlerWidth(5)
+	, m_splineNodeEditWidth(5)
+	, m_handlingSpline(SplineStruct())
+	, m_lastTime(0)
+	, m_curTime(0)
+	, m_horizontalRuler(nullptr)
+	, m_verticalRuler(nullptr)
 	, m_radians(0)
 	, m_mousePressState(nullptr)
 	, m_isPrimitiveInteractPoint(false)
 	, m_isGridNode(false)
+	
 {
     setScene(m_scene.data());
     init();
 
     Global::dpiX = logicalDpiX();
     Global::dpiY = logicalDpiY();
-	
-	//m_fitInRect = QRectF(0, 0, 0, 0);
-	
 }
 
 LaserViewer::~LaserViewer()
 {
 	m_undoStack = nullptr;
 	m_horizontalRuler = m_verticalRuler = nullptr;
+	//delete m_copyedList;
+	//m_copyedList = nullptr;
 }
 
 void LaserViewer::paintEvent(QPaintEvent* event)
@@ -249,7 +249,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         }
     }
 	painter.setPen(QPen(Qt::red, 5, Qt::SolidLine));
-	painter.drawPoint(testPoint);
+	//painter.drawPoint(testPoint);
 	/*if (m_group && !m_group->isEmpty())
 	{
 		QPainter painter(viewport());
@@ -653,7 +653,10 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 
 	QLine line;
 	QList <LaserPrimitive*> list = m_scene->document()->primitives().values();
-	for each(LaserPrimitive* primitive in list) {
+	//先遍历新添加的
+	for(QList<LaserPrimitive*>::Iterator i = list.end()-1; i != list.begin()-1; i--){
+	//for each(LaserPrimitive* primitive in list) {
+		LaserPrimitive* primitive = *i;
 		QVector<QLineF> edgeList = primitive->edges();
 		//先判断边框
 		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(scop));
@@ -702,7 +705,7 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 
 	return line;
 }
-bool LaserViewer::detectItemEdgeByMouse(LaserPrimitive*& result, QPointF mousePoint)
+bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
 {
 	
 	qreal delta = Config::Ui::clickSelectiontTolerance();
@@ -774,6 +777,18 @@ QState* LaserViewer::currentState()
 QUndoStack * LaserViewer::undoStack()
 {
 	return m_undoStack;
+}
+QMap<LaserPrimitive*, QTransform>& LaserViewer::copyedList()
+{
+	return m_copyedList;
+}
+QMap<QString, QList<LaserPrimitive*>>& LaserViewer::groupedMap()
+{
+	return m_groupedMap;
+}
+QList<QString>& LaserViewer::selectedGroupedList()
+{
+	return m_selectedGroupedList;
 }
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
@@ -1003,7 +1018,8 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
 		m_mousePressState = nullptr;
-
+		//qDebug() << mapFromGlobal(QCursor::pos());
+		//qDebug() << mapToScene(mapFromGlobal(QCursor::pos()));
 		//附近的图元交点
 		/*if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
 			bool isEdgeSpecailPoint = false;
@@ -1019,7 +1035,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 			m_detectedPrimitive = nullptr;
 			m_detectedBitmap = nullptr;
 			//点击选中图元
-			if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
+			if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
 				//undo
 				//qDebug()<<m_group->childItems();
 				selectionUndoStackPushBefore();
@@ -1139,7 +1155,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				transformUndoStackPushBefore();
                 emit beginSelectedEditing();
 			}
-			else if(detectItemEdgeByMouse(m_detectedPrimitive, event->pos())){
+			else if(detectItemByMouse(m_detectedPrimitive, event->pos())){
 				//undo before
 				selectionUndoStackPushBefore();
 				pointSelectWhenSelectedState(13, m_detectedPrimitive);
@@ -1284,7 +1300,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 		//获取鼠标附近图元的最近点
 		bool isSpecailPoint = false;
 		m_isPrimitiveInteractPoint = detectIntersectionByMouse(m_primitiveInteractPoint, mapToScene(event->pos()), isSpecailPoint);
-		testPoint = mapFromScene(m_primitiveInteractPoint);
+		//testPoint = mapFromScene(m_primitiveInteractPoint);
 		viewport()->repaint();
 		if (m_isPrimitiveInteractPoint) {
 			if (!isSpecailPoint) {
@@ -1312,7 +1328,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 	if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
 		
 		m_detectedPrimitive = nullptr;
-		if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
+		if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
 			QPixmap cMap(":/ui/icons/images/arrow.png");
 			this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
 		}
@@ -1405,7 +1421,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     break;
                 }
             }
-        }else if (detectItemEdgeByMouse(m_detectedPrimitive, event->pos())) {
+        }else if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
 			//when mousepress, detect again
 			m_curSelectedHandleIndex = -1;
 			QPixmap cMap(":/ui/icons/images/arrow.png");
@@ -2392,6 +2408,11 @@ void LaserViewer::init()
 	verticalScrollBar()->setEnabled(false);
 	//undo stack
 	m_undoStack = new QUndoStack(this);
+	m_copyedList = QMap<LaserPrimitive*, QTransform>();
+	//arrange
+	m_copyedList = QMap<LaserPrimitive*, QTransform>();
+	m_groupedMap = QMap<QString, QList<LaserPrimitive*>>();
+	m_selectedGroupedList = QList<QString>();
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);
@@ -2494,7 +2515,7 @@ void LaserViewer::onEndSelectionFillGroup()
 	else {
 		emit endSelecting();
 	}
-	int i = m_group->childItems().size();
+
 	viewport()->repaint();
 }
 bool LaserViewer::onSelectedFillGroup()
