@@ -69,6 +69,7 @@ bool LaserApplication::initialize()
     initLog();
     qInstallMessageHandler(LaserApplication::handleLogOutput);
 
+    Config::init();
     Config::load();
 	Global::unit = static_cast<SizeUnit>(Config::General::unit());
 
@@ -138,7 +139,7 @@ void LaserApplication::destroy()
     m_deviceThread.exit();
     m_deviceThread.wait();
 
-    //Config::save();
+    Config::destroy();
 }
 
 bool LaserApplication::checkEnvironment()

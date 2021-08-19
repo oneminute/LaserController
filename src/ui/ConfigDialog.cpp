@@ -191,7 +191,7 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
 
     int row = layout->rowCount();
 
-    QWidget* widget = InputWidgetWrapper::createWidget(item->inputWidgetType(), Qt::Horizontal);
+    QWidget* widget = InputWidgetWrapper::createWidget(item, Qt::Horizontal);
 
     if (!widget)
         return;

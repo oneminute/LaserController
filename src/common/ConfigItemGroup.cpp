@@ -34,7 +34,9 @@ ConfigItemGroup::ConfigItemGroup(const QString& name, const QString& title, cons
 
 ConfigItemGroup::~ConfigItemGroup()
 {
+    Q_D(ConfigItemGroup);
     qLogD << "ConfigItemGroup: " << this << " destroied";
+    qDeleteAll(d->items);
 }
 
 QString ConfigItemGroup::name() const

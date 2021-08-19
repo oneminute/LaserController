@@ -4,17 +4,20 @@
 #include <QObject>
 #include <QDebug>
 #include <QJsonObject>
+#include <QList>
+#include <QMap>
 
 struct SmallDiagonalLimitationItem
 {
 public:
-    SmallDiagonalLimitationItem()
-        : diagonal(0)
-        , laserPower(0)
-        , speed(0)
+    SmallDiagonalLimitationItem(qreal _diagonal = 0, qreal _laserPower = 0, qreal _speed = 0)
+        : diagonal(_diagonal)
+        , laserPower(_laserPower)
+        , speed(_speed)
     {}
 
     QJsonObject toJson() const;
+    void fromJson(const QJsonObject& json);
 
     qreal diagonal;
     qreal laserPower;
@@ -26,28 +29,27 @@ bool operator==(const SmallDiagonalLimitationItem& v1, const SmallDiagonalLimita
 
 QDebug operator<<(QDebug dbg, const SmallDiagonalLimitationItem& item);
 
-class SmallDiagonalLimitation
+typedef QMap<qreal, SmallDiagonalLimitationItem> LimitationMap;
+
+class SmallDiagonalLimitation : public QMap<qreal, SmallDiagonalLimitationItem>
 {
 public:
-    typedef QList<SmallDiagonalLimitationItem> ItemList;
     SmallDiagonalLimitation();
-    SmallDiagonalLimitation(const ItemList& list);
+    SmallDiagonalLimitation(const SmallDiagonalLimitation& limitation);
 
     ~SmallDiagonalLimitation() {}
 
     qreal maxDiagonal() const;
 
-    ItemList& items();
-    void addItem(const SmallDiagonalLimitationItem& item);
-
     QJsonObject toJson() const;
+    void fromJson(const QJsonObject& json);
 
-private:
-    ItemList m_items;
+    SmallDiagonalLimitationItem& createNewItem();
 };
 
 QDebug operator<<(QDebug dbg, const SmallDiagonalLimitation& limitation);
 
 Q_DECLARE_METATYPE(SmallDiagonalLimitation);
+Q_DECLARE_METATYPE(SmallDiagonalLimitation*);
 
 #endif // SMALLDIAGONALLIMITATION_H

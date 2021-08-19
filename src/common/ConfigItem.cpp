@@ -21,6 +21,12 @@ public:
         , widgetInitializeHook(nullptr)
         , loadDataHook(nullptr)
         , saveDataHook(nullptr)
+        , createWidgetHook(nullptr)
+        , destroyHook(nullptr)
+        , toJsonHook(nullptr)
+        , fromJsonHook(nullptr)
+        , resetHook(nullptr)
+        , restoreHook(nullptr)
     {
         
     }
@@ -123,6 +129,12 @@ public:
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
     ConfigItem::ValueHook loadDataHook;
     ConfigItem::ValueHook saveDataHook;
+    ConfigItem::CreateWidgetHook createWidgetHook;
+    ConfigItem::DestroyHook destroyHook;
+    ConfigItem::ToJsonHook toJsonHook;
+    ConfigItem::FromJsonHook fromJsonHook;
+    ConfigItem::ResetHook resetHook;
+    ConfigItem::RestoreHook restoreHook;
 };
 
 ConfigItem::ConfigItem(
@@ -177,7 +189,7 @@ ConfigItem::ConfigItem(
 
 ConfigItem::~ConfigItem()
 {
-    //qLogD << "ConfigItem " << this << " destroied";
+    doDestroyHook();
 }
 
 QString ConfigItem::fullName() const
@@ -355,25 +367,42 @@ QString ConfigItem::toString() const
 
 QJsonObject ConfigItem::toJson() const
 {
-    QJsonObject item;
-    item["value"] = QJsonValue::fromVariant(value());
-    item["defaultValue"] = QJsonValue::fromVariant(defaultValue());
-    return item;
+    Q_D(const ConfigItem);
+    if (d->toJsonHook)
+    {
+        return doToJsonHook();
+    }
+    else
+    {
+        QJsonObject item;
+        item["value"] = QJsonValue::fromVariant(value());
+        item["defaultValue"] = QJsonValue::fromVariant(defaultValue());
+        return item;
+    }
 }
 
 void ConfigItem::fromJson(const QJsonObject& jsonObject)
 {
     Q_D(ConfigItem);
-    if (jsonObject.contains("value"))
+    if (d->fromJsonHook)
     {
-        d->value = d->dirtyValue = jsonObject["value"].toVariant();
+        doFromJsonHook(jsonObject);
+        d->dirtyValue = d->value;
         d->dirty = d->modified = false;
-        //emit valueChanged(d->value);
     }
-
-    if (jsonObject.contains("defaultValue"))
+    else
     {
-        setDefaultValue(jsonObject["defaultValue"].toVariant());
+        if (jsonObject.contains("value"))
+        {
+
+            d->value = d->dirtyValue = jsonObject["value"].toVariant();
+            d->dirty = d->modified = false;
+        }
+
+        if (jsonObject.contains("defaultValue"))
+        {
+            setDefaultValue(jsonObject["defaultValue"].toVariant());
+        }
     }
 }
 
@@ -493,6 +522,134 @@ QVariant ConfigItem::doSaveDataHook(const QVariant& value)
     return value;
 }
 
+ConfigItem::CreateWidgetHook ConfigItem::createWidgetHook()
+{
+    Q_D(ConfigItem);
+    return d->createWidgetHook;
+}
+
+void ConfigItem::setCreateWidgetHook(CreateWidgetHook fn)
+{
+    Q_D(ConfigItem);
+    d->createWidgetHook = fn;
+}
+
+QWidget* ConfigItem::doCreateWidgetHook()
+{
+    Q_D(ConfigItem);
+    if (d->createWidgetHook)
+    {
+        return d->createWidgetHook(this);
+    }
+    return nullptr;
+}
+
+ConfigItem::DestroyHook ConfigItem::destroyHook()
+{
+    Q_D(ConfigItem);
+    return d->destroyHook;
+}
+
+void ConfigItem::setDestroyHook(DestroyHook fn)
+{
+    Q_D(ConfigItem);
+    d->destroyHook = fn;
+}
+
+void ConfigItem::doDestroyHook()
+{
+    Q_D(ConfigItem);
+    if (d->destroyHook)
+    {
+        d->destroyHook(this);
+    }
+}
+
+ConfigItem::ToJsonHook ConfigItem::toJsonHook()
+{
+    Q_D(ConfigItem);
+    return d->toJsonHook;
+}
+
+void ConfigItem::setToJsonHook(ToJsonHook fn)
+{
+    Q_D(ConfigItem);
+    d->toJsonHook = fn;
+}
+
+QJsonObject ConfigItem::doToJsonHook() const
+{
+    Q_D(const ConfigItem);
+    if (d->toJsonHook)
+    {
+        return d->toJsonHook(this);
+    }
+    return QJsonObject();
+}
+
+ConfigItem::FromJsonHook ConfigItem::fromJsonHook()
+{
+    Q_D(ConfigItem);
+    return d->fromJsonHook;
+}
+
+void ConfigItem::setFromJsonHook(FromJsonHook fn)
+{
+    Q_D(ConfigItem);
+    d->fromJsonHook = fn;
+}
+
+void ConfigItem::doFromJsonHook(const QJsonObject& json)
+{
+    Q_D(ConfigItem);
+    if (d->fromJsonHook)
+    {
+        d->fromJsonHook(d->value, d->defaultValue, json, this);
+    }
+}
+
+ConfigItem::ResetHook ConfigItem::resetHook()
+{
+    Q_D(ConfigItem);
+    return d->resetHook;
+}
+
+void ConfigItem::setResetHook(ResetHook fn)
+{
+    Q_D(ConfigItem);
+    d->resetHook = fn;
+}
+
+void ConfigItem::doResetHook()
+{
+    Q_D(ConfigItem);
+    if (d->resetHook)
+    {
+        d->resetHook(this);
+    }
+}
+
+ConfigItem::RestoreHook ConfigItem::restoreHook()
+{
+    Q_D(ConfigItem);
+    return d->restoreHook;
+}
+
+void ConfigItem::setRestoreHook(RestoreHook fn)
+{
+    Q_D(ConfigItem);
+    d->restoreHook = fn;
+}
+
+void ConfigItem::doRestoreHook()
+{
+    Q_D(ConfigItem);
+    if (d->restoreHook)
+    {
+        d->restoreHook(this);
+    }
+}
+
 void ConfigItem::initWidget(QWidget* widget)
 {
     Q_D(ConfigItem);
@@ -564,9 +721,16 @@ void ConfigItem::reset()
     Q_D(ConfigItem);
     if (d->modified)
     {
-        d->dirtyValue = d->value;
-        d->dirty = false;
-        d->modified = false;
+        if (d->resetHook)
+        {
+            doResetHook();
+        }
+        else
+        {
+            d->dirtyValue = d->value;
+            d->dirty = false;
+            d->modified = false;
+        }
 
         emit modifiedChanged(false);
     }
@@ -588,7 +752,14 @@ void ConfigItem::doModify()
 void ConfigItem::restore()
 {
     Q_D(ConfigItem);
-    setValue(d->defaultValue);
+    if (d->restoreHook)
+    {
+        doRestoreHook();
+    }
+    else
+    {
+        setValue(d->defaultValue);
+    }
 }
 
 void ConfigItem::restoreSystem()

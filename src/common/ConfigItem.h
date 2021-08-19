@@ -18,8 +18,14 @@ class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
+    typedef QWidget* (*CreateWidgetHook)(ConfigItem*);
     typedef void (*WidgetInitializeHook)(QWidget*, ConfigItem*);
     typedef QVariant (*ValueHook)(const QVariant&);
+    typedef void(*DestroyHook)(ConfigItem*);
+    typedef QJsonObject(*ToJsonHook)(const ConfigItem*);
+    typedef void(*FromJsonHook)(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*);
+    typedef void(*ResetHook)(ConfigItem*);
+    typedef void(*RestoreHook)(ConfigItem*);
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
@@ -95,6 +101,30 @@ public:
     ValueHook saveDataHook();
     void setSaveDataHook(ValueHook fn);
     QVariant doSaveDataHook(const QVariant& value);
+
+    CreateWidgetHook createWidgetHook();
+    void setCreateWidgetHook(CreateWidgetHook fn);
+    QWidget* doCreateWidgetHook();
+
+    DestroyHook destroyHook();
+    void setDestroyHook(DestroyHook fn);
+    void doDestroyHook();
+
+    ToJsonHook toJsonHook();
+    void setToJsonHook(ToJsonHook fn);
+    QJsonObject doToJsonHook() const;
+
+    FromJsonHook fromJsonHook();
+    void setFromJsonHook(FromJsonHook fn);
+    void doFromJsonHook(const QJsonObject& json);
+
+    ResetHook resetHook();
+    void setResetHook(ResetHook fn);
+    void doResetHook();
+
+    RestoreHook restoreHook();
+    void setRestoreHook(RestoreHook fn);
+    void doRestoreHook();
 
     void initWidget(QWidget* widget);
 

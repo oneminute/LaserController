@@ -211,7 +211,8 @@ enum InputWidgetType
     IWT_DateTimeEdit,
     IWT_Dial,
     IWT_EditSlider,
-    IWT_FloatEditSlider
+    IWT_FloatEditSlider,
+    //IWT_LimitationWidget
 };
 
 enum DataType

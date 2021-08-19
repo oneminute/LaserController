@@ -15,6 +15,7 @@
 #include "util/TypeUtils.h"
 #include "widget/EditSlider.h"
 #include "widget/FloatEditSlider.h"
+#include "widget/SmallDiagonalLimitationWidget.h"
 
 class InputWidgetWrapperPrivate
 {
@@ -43,84 +44,89 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     , m_ptr(new InputWidgetWrapperPrivate(this, configItem))
 {
     Q_D(InputWidgetWrapper);
-    QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
-    QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
-    QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
-    QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
-    QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
-    QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
-    QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
-    QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
-    QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
-    QDial* dial = qobject_cast<QDial*>(widget);
-    EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
-    FloatEditSlider* floatEditSlider = qobject_cast<FloatEditSlider*>(widget);
 
-    if (checkBox != nullptr)
+    d->type = configItem->inputWidgetType();
+
+    switch (d->type)
     {
-        d->type = IWT_CheckBox;
+    case IWT_CheckBox:
+    {
+        QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
         connect(checkBox, &QCheckBox::stateChanged, this, &InputWidgetWrapper::onCheckBoxStateChanged);
+        break;
     }
-    else if (comboBox != nullptr)
+    case IWT_ComboBox:
     {
-        d->type = IWT_ComboBox;
+        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
         connect(comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &InputWidgetWrapper::onComboBoxIndexChanged);
+        break;
     }
-    else if (lineEdit != nullptr)
+    case IWT_LineEdit:
     {
-        d->type = IWT_LineEdit;
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
         connect(lineEdit, &QLineEdit::editingFinished, this, &InputWidgetWrapper::onEditingFinished);
+        break;
     }
-    else if (textEdit != nullptr)
+    case IWT_TextEdit:
     {
-        d->type = IWT_TextEdit;
+        QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
         connect(textEdit, &QTextEdit::textChanged, this, &InputWidgetWrapper::onTextEditTextChanged);
+        break;
     }
-    else if (plainTextEdit != nullptr)
+    case IWT_PlainTextEdit:
     {
-        d->type = IWT_PlainTextEdit;
+        QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
         connect(plainTextEdit, &QPlainTextEdit::textChanged, this, &InputWidgetWrapper::onPlainTextEditTextChanged);
+        break;
     }
-    else if (spinBox != nullptr)
+    case IWT_SpinBox:
     {
-        d->type = IWT_SpinBox;
+        QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
         connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
+        break;
     }
-    else if (doubleSpinBox != nullptr)
+    case IWT_DoubleSpinBox:
     {
-        d->type = IWT_DoubleSpinBox;
+        QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
         connect(doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, QOverload<double>::of(&InputWidgetWrapper::onValueChanged));
+        break;
     }
-    else if (timeEdit != nullptr)
+    case IWT_TimeEdit:
     {
-        d->type = IWT_TimeEdit;
+        QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
         connect(timeEdit, &QTimeEdit::timeChanged, this, &InputWidgetWrapper::onTimeChanged);
+        break;
     }
-    else if (dateEdit != nullptr)
+    case IWT_DateEdit:
     {
-        d->type = IWT_DateEdit;
+        QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
         connect(dateEdit, &QDateEdit::dateChanged, this, &InputWidgetWrapper::onDateChanged);
+        break;
     }
-    else if (dateTimeEdit != nullptr)
+    case IWT_DateTimeEdit:
     {
-        d->type = IWT_DateTimeEdit;
+        QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
         connect(dateTimeEdit, &QDateTimeEdit::dateTimeChanged, this, &InputWidgetWrapper::onDateTimeChanged);
+        break;
     }
-    else if (dial != nullptr)
+    case IWT_Dial:
     {
-        d->type = IWT_Dial;
+        QDial* dial = qobject_cast<QDial*>(widget);
         connect(dial, &QDial::valueChanged, this, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
+        break;
     }
-    else if (editSlider != nullptr)
+    case IWT_EditSlider:
     {
-        d->type = IWT_EditSlider;
+        EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
         connect(editSlider, &EditSlider::valueChanged, this, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
+        break;
     }
-    else if (floatEditSlider != nullptr)
+    case IWT_FloatEditSlider:
     {
-        d->type = IWT_FloatEditSlider;
+        FloatEditSlider* floatEditSlider = qobject_cast<FloatEditSlider*>(widget);
         connect(floatEditSlider, &FloatEditSlider::valueChanged, this, QOverload<qreal>::of(&InputWidgetWrapper::onValueChanged));
+        break;
+    }
     }
     updateValue(d->configItem->value());
     connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::fromWidget);
@@ -280,10 +286,10 @@ QVariant InputWidgetWrapper::value() const
     return d->configItem->value();
 }
 
-QWidget* InputWidgetWrapper::createWidget(InputWidgetType widgetType, Qt::Orientation orientation)
+QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orientation)
 {
     QWidget* widget = nullptr;
-    switch (widgetType)
+    switch (item->inputWidgetType())
     {
     case IWT_CheckBox:
         widget = new QCheckBox;
@@ -324,8 +330,11 @@ QWidget* InputWidgetWrapper::createWidget(InputWidgetType widgetType, Qt::Orient
     case IWT_FloatEditSlider:
         widget = new FloatEditSlider(orientation);
         break;
+    //case IWT_LimitationWidget:
+        //widget = new SmallDiagonalLimitationWidget;
+        //break;
     default:
-        widget = nullptr;
+        widget = item->doCreateWidgetHook();
         break;
     }
     return widget;
@@ -381,6 +390,13 @@ void InputWidgetWrapper::onValueChanged(int value)
 void InputWidgetWrapper::onValueChanged(double value)
 {
     changeValue(value);
+}
+
+void InputWidgetWrapper::onValueChanged(const SmallDiagonalLimitation& value)
+{
+    QVariant var;
+    var.setValue(value);
+    changeValue(var);
 }
 
 void InputWidgetWrapper::onTimeChanged(const QTime & time)
