@@ -56,6 +56,7 @@ public:
 
     LaserDocument* doc;
     LaserLayer* layer;
+	int layerIndex;
     QRectF boundingRect;
     LaserPrimitiveType type;
     bool isHover;
@@ -67,7 +68,7 @@ public:
 	QPainterPath path;//��Ϊ�����ͼ��
 };
 
-LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform)
+LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
     : LaserNode(data, LNT_PRIMITIVE)
 {
     Q_D(LaserPrimitive);
@@ -84,6 +85,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     //this->setAcceptHoverEvents(true);
     d->nodeName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
 	d->allTransform = saveTransform;
+	d->layerIndex = layerIndex;
 }
 
 LaserPrimitive::~LaserPrimitive()
@@ -187,6 +189,12 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QPointF startPos = outline.pointAtPercent(0);
     //painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
     //painter->drawText(startPos, name());
+}
+
+int LaserPrimitive::layerIndex()
+{
+	Q_D(const LaserPrimitive);
+	return d->layerIndex;
 }
 
 QTransform LaserPrimitive::getAllTransform()
@@ -428,7 +436,14 @@ LaserLayer* LaserPrimitive::layer() const
 void LaserPrimitive::setLayer(LaserLayer* layer) 
 {
     Q_D(LaserPrimitive);
-    d->layer = layer; 
+    d->layer = layer;
+	if (layer) {
+		d->layerIndex = layer->index();
+	}
+	else {
+		d->layerIndex = -1;
+	}
+	
 }
 
 QString LaserPrimitive::toString() const
@@ -543,10 +558,12 @@ public:
     {}
 };
 
-LaserShape::LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform)
-    : LaserPrimitive(data, doc, type, saveTransform)
+LaserShape::LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, int layerIndex, QTransform saveTransform)
+    : LaserPrimitive(data, doc, type,  saveTransform, layerIndex)
 {
+	Q_D(LaserShape);
     //m_type = LPT_SHAPE;
+	d->layerIndex = layerIndex;
 }
 
 class LaserEllipsePrivate : public LaserShapePrivate
@@ -561,8 +578,8 @@ public:
 	//QPainterPath path;
 };
 
-LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform saveTransform)
-    : LaserShape(new LaserEllipsePrivate(this), doc, LPT_ELLIPSE, saveTransform)
+LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserShape(new LaserEllipsePrivate(this), doc, LPT_ELLIPSE, layerIndex, saveTransform)
 {
 	
     Q_D(LaserEllipse);
@@ -576,6 +593,7 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform 
 	//��е�ӹ���ʹ��
     d->outline.addEllipse(bounds);
     d->position = bounds.center();
+	//d->layerIndex = layerIndex;
 }
 
 QRectF LaserEllipse::bounds() const 
@@ -660,7 +678,7 @@ QJsonObject LaserEllipse::toJson()
 	//object.insert("position", position);
 	object.insert("matrix", matrix);
 	object.insert("bounds", bounds);
-
+	object.insert("layerIndex", layerIndex());
 	return object;
 }
 //scene
@@ -673,7 +691,7 @@ QVector<QLineF> LaserEllipse::edges()
 LaserPrimitive * LaserEllipse::clone(QTransform t)
 {
 	Q_D(LaserEllipse);
-	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), t);
+	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), t, d->layerIndex);
 	return ellipse;
 }
 
@@ -689,8 +707,8 @@ public:
 	//QPainterPath path;
 };
 
-LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, QTransform saveTransform)
-    : LaserShape(new LaserRectPrivate(this), doc, LPT_RECT, saveTransform)
+LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserShape(new LaserRectPrivate(this), doc, LPT_RECT, layerIndex, saveTransform)
 {
     Q_D(LaserRect);
     d->rect = rect;
@@ -802,6 +820,7 @@ QJsonObject LaserRect::toJson()
 	//object.insert("position", position);
 	object.insert("matrix", matrix);
 	object.insert("bounds", bounds);
+	object.insert("layerIndex", layerIndex());
 	return object;
 }
 
@@ -813,7 +832,8 @@ QVector<QLineF> LaserRect::edges()
 
 LaserPrimitive * LaserRect::clone(QTransform t)
 {
-	LaserRect* cloneRect = new LaserRect(this->rect(), this->document(), t);
+	Q_D(const LaserRect);
+	LaserRect* cloneRect = new LaserRect(this->rect(), this->document(), t, d->layerIndex);
 	return cloneRect;
 }
 
@@ -828,8 +848,8 @@ public:
     QLineF line;
 };
 
-LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, QTransform saveTransform)
-    : LaserShape(new LaserLinePrivate(this), doc, LPT_LINE, saveTransform)
+LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserShape(new LaserLinePrivate(this), doc, LPT_LINE, layerIndex, saveTransform)
 {
     Q_D(LaserLine);
     d->line = line;
@@ -932,6 +952,7 @@ QJsonObject LaserLine::toJson()
 	//object.insert("position", position);
 	object.insert("matrix", matrix);
 	object.insert("line", line);
+	object.insert("layerIndex", layerIndex());
 	return object;
 }
 
@@ -946,7 +967,8 @@ QVector<QLineF> LaserLine::edges()
 
 LaserPrimitive * LaserLine::clone(QTransform t)
 {
-	LaserLine* line = new LaserLine(this->line(), document(), t);
+	Q_D(const LaserLine);
+	LaserLine* line = new LaserLine(this->line(), document(), t, d->layerIndex);
 	return line;
 }
 
@@ -961,8 +983,8 @@ public:
     //QPainterPath path;
 };
 
-LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, QTransform saveTransform)
-    : LaserShape(new LaserPathPrivate(this), doc, LPT_PATH, saveTransform)
+LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserShape(new LaserPathPrivate(this), doc,  LPT_PATH, layerIndex, saveTransform)
 {
     Q_D(LaserPath);
     d->path = path;
@@ -1053,7 +1075,8 @@ QVector<QLineF> LaserPath::edges()
 
 LaserPrimitive * LaserPath::clone(QTransform t)
 {
-	LaserPath* path = new LaserPath(this->path(), document(), t);
+	Q_D(LaserPath);
+	LaserPath* path = new LaserPath(this->path(), document(), t, d->layerIndex);
 	return path;
 }
 
@@ -1068,8 +1091,8 @@ public:
     QPolygonF poly;
 };
 
-LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, QTransform saveTransform)
-    : LaserShape(new LaserPolylinePrivate(this), doc, LPT_POLYLINE, saveTransform)
+LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserShape(new LaserPolylinePrivate(this), doc, LPT_POLYLINE, layerIndex, saveTransform)
 {
     Q_D(LaserPolyline);
     d->poly = poly;
@@ -1196,6 +1219,7 @@ QJsonObject LaserPolyline::toJson()
 	//object.insert("position", position);
 	object.insert("matrix", matrix);
 	object.insert("poly", poly);
+	object.insert("layerIndex", layerIndex());
 	return object;
 }
 
@@ -1210,7 +1234,7 @@ QVector<QLineF> LaserPolyline::edges()
 LaserPrimitive * LaserPolyline::clone(QTransform t)
 {
 	Q_D(LaserPolyline);
-	LaserPolyline* polyline = new LaserPolyline(d->poly, document(), t);
+	LaserPolyline* polyline = new LaserPolyline(d->poly, document(), t, d->layerIndex);
 	return polyline;
 }
 
@@ -1225,8 +1249,8 @@ public:
     QPolygonF poly;
 };
 
-LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, QTransform saveTransform)
-    : LaserShape(new LaserPolygonPrivate(this), doc, LPT_POLYGON, saveTransform)
+LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserShape(new LaserPolygonPrivate(this), doc, LPT_POLYGON, layerIndex, saveTransform)
 {
     Q_D(LaserPolygon);
 	d->poly = poly;
@@ -1344,6 +1368,7 @@ QJsonObject LaserPolygon::toJson()
 	//object.insert("position", position);
 	object.insert("matrix", matrix);
 	object.insert("poly", poly);
+	object.insert("layerIndex", layerIndex());
 	return object;
 }
 
@@ -1358,7 +1383,7 @@ QVector<QLineF> LaserPolygon::edges()
 LaserPrimitive * LaserPolygon::clone(QTransform t)
 {
 	Q_D(const LaserPolygon);
-	LaserPolygon* polygon = new LaserPolygon(d->poly, document(), t);
+	LaserPolygon* polygon = new LaserPolygon(d->poly, document(), t, d->layerIndex);
 	return polygon;
 }
 
@@ -1600,8 +1625,9 @@ public:
     int steps;
 };
 
-LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, BasisType basisType, LaserDocument* doc, QTransform transform)
-    : LaserShape(new LaserNurbsPrivate(this, basisType), doc, LPT_NURBS, transform)
+LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, 
+	BasisType basisType, LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserShape(new LaserNurbsPrivate(this, basisType), doc, LPT_NURBS, layerIndex, transform)
 {
     Q_D(LaserNurbs);
     d->controlPoints = controlPoints;
@@ -1657,7 +1683,7 @@ void LaserNurbs::updateCurve()
 LaserPrimitive * LaserNurbs::clone(QTransform t)
 {
 	Q_D(LaserNurbs);
-	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, d->basisType, document(), t);
+	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, d->basisType, document(), t, d->layerIndex);
 	return nurbs;
 }
 
@@ -1673,8 +1699,8 @@ public:
     //QRectF bounds;
 };
 
-LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocument * doc, QTransform saveTransform)
-    : LaserPrimitive(new LaserBitmapPrivate(this), doc, LPT_BITMAP, saveTransform)
+LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+    : LaserPrimitive(new LaserBitmapPrivate(this), doc,  LPT_BITMAP, saveTransform, layerIndex)
 {
     Q_D(LaserBitmap);
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
@@ -1826,6 +1852,7 @@ QJsonObject LaserBitmap::toJson()
 	object.insert("matrix", matrix);
 	object.insert("bounds", bounds);
 	object.insert("image", QLatin1String(imageBits.toBase64()));
+	object.insert("layerIndex", layerIndex());
 	return object;
 }
 
@@ -1900,7 +1927,7 @@ QVector<QLineF> LaserBitmap::edges()
 LaserPrimitive * LaserBitmap::clone(QTransform t)
 {
 	Q_D(LaserBitmap);
-	LaserBitmap* bitmap = new LaserBitmap(d->image, d->boundingRect, document(), t);
+	LaserBitmap* bitmap = new LaserBitmap(d->image, d->boundingRect, document(), t, d->layerIndex);
 	return bitmap;
 }
 
@@ -1990,6 +2017,12 @@ QByteArray LaserShape::engravingImage(cv::Mat& canvas)
     return bytes;
 }
 
+int LaserShape::layerIndex()
+{
+	Q_D(LaserShape);
+	return d->layerIndex;
+}
+
 class LaserTextPrivate : public LaserPrimitivePrivate
 {
     Q_DECLARE_PUBLIC(LaserText)
@@ -2002,8 +2035,9 @@ public:
 	QRect rect;
 };
 
-LaserText::LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform)
-	: LaserPrimitive(new LaserTextPrivate(this), doc, LPT_TEXT, saveTransform)
+LaserText::LaserText(const QRect rect, const QString content, LaserDocument* doc,  LaserPrimitiveType type, 
+	 QTransform saveTransform, int layerIndex)
+	: LaserPrimitive(new LaserTextPrivate(this),  doc,  LPT_TEXT, saveTransform, layerIndex)
 {
     Q_D(LaserText);
     d->rect = rect;
@@ -2037,6 +2071,6 @@ void LaserText::draw(QPainter * painter)
 LaserPrimitive * LaserText::clone(QTransform t)
 {
 	Q_D(LaserText);
-	LaserText* text = new LaserText(d->rect, d->content, document(), d->type, t);
+	LaserText* text = new LaserText(d->rect, d->content, document(),  d->type, t, d->layerIndex);
 	return nullptr;
 }

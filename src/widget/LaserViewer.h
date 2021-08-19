@@ -12,6 +12,7 @@ class LaserScene;
 class LaserPrimitiveGroup;
 class LaserPrimitive;
 class LaserBitmap;
+class LaserLayer;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -60,6 +61,10 @@ public:
 	QMap<LaserPrimitive*, QTransform>& copyedList();
 	QMap<QString, QList<LaserPrimitive*>>& groupedMap();
 	QList<QString>& selectedGroupedList();
+
+	int curLayerIndex();
+
+	void setCurLayerIndex(int index);
 	
 private:
     void init();
@@ -269,6 +274,8 @@ private:
 	QMap<LaserPrimitive*, QTransform> m_copyedList;
 	QMap<QString, QList<LaserPrimitive*>> m_groupedMap;
 	QList<QString> m_selectedGroupedList;
+	//layer
+	int m_curLayerIndex;
 	
 	friend class LaserScene;
 };

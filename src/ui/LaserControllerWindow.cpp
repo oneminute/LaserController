@@ -108,12 +108,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     int colorTick = 360 / Config::Layers::maxLayersCount();
     for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
     {
-        LayerButton* button = new LayerButton;
+        LayerButton* button = new LayerButton(m_viewer);
         button->setMinimumWidth(Config::Ui::colorButtonWidth());
         button->setFixedHeight(Config::Ui::colorButtonHeight());
         button->setColor(colors[i]);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
+		button->setEnabled(false);
         m_ui->layoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
 
@@ -1430,7 +1431,8 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 }
 void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 {
-	if (StateControllerInst.isInState(StateControllerInst.documentWorkingState())) {
+	if (StateControllerInst.isInState(StateControllerInst.documentIdleState()) ||
+		StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
 		QMenu Context;
 		Context.addAction(m_ui->actionCopy);
 		Context.addAction(m_ui->actionCut);
@@ -2582,6 +2584,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
         connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
         doc->bindLayerButtons(m_layerButtons);
+		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
         m_scene->updateDocument(doc);
         doc->outline();
         m_tableWidgetLayers->setDocument(doc);
@@ -3381,6 +3384,12 @@ void LaserControllerWindow::documentClose()
 	this->m_fileDirection = "";
 	this->m_fileName = "";
 	this->setWindowTitle(m_windowTitle);
+	//layer color buttons not enabled
+	for each(LayerButton* button in m_layerButtons) {
+		button->setEnabled(false);
+		button->setChecked(false);
+	}
+	
 }
 
 QString LaserControllerWindow::getFilename(const QString& title, const QString& filters)

@@ -337,7 +337,7 @@ void LaserLayer::removePrimitive(LaserPrimitive * item)
     if (!d->primitives.contains(item))
         return;
 
-    item->setLayer(nullptr);
+    //item->setLayer(nullptr);
     d->primitives.removeOne(item);
     d->doc->updateLayersStructure();
 }
@@ -387,12 +387,15 @@ LaserDocument * LaserLayer::document() const
     return d->doc;
 }
 
-void LaserLayer::bindButton(LayerButton * button)
+void LaserLayer::bindButton(LayerButton * button, int index)
 {
     Q_D(LaserLayer);
     d->button = button;
+	d->button->setLayerIndex(index);
+	d->button->setEnabled(true);
     connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
     d->nodeName = button->text();
+	m_index = index;
 }
 
 bool LaserLayer::exportable() const 
@@ -501,6 +504,16 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 	}
 	object.insert("primitives", array);
 	return object;
+}
+
+int LaserLayer::index()
+{
+	return m_index;
+}
+
+void LaserLayer::setIndex(int i)
+{
+	m_index = i;
 }
 
 void LaserLayer::onClicked()

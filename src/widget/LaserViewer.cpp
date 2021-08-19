@@ -49,6 +49,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_mousePressState(nullptr)
 	, m_isPrimitiveInteractPoint(false)
 	, m_isGridNode(false)
+	, m_curLayerIndex(1)
 	
 {
     setScene(m_scene.data());
@@ -789,6 +790,14 @@ QMap<QString, QList<LaserPrimitive*>>& LaserViewer::groupedMap()
 QList<QString>& LaserViewer::selectedGroupedList()
 {
 	return m_selectedGroupedList;
+}
+int LaserViewer::curLayerIndex()
+{
+	return m_curLayerIndex;
+}
+void LaserViewer::setCurLayerIndex(int index)
+{
+	m_curLayerIndex = index;
 }
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
@@ -1700,7 +1709,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
 			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));
 		//QRectF rect(0, 0, 500, 300);
-        LaserRect* rectItem = new LaserRect(rect, m_scene->document());
+        LaserRect* rectItem = new LaserRect(rect, m_scene->document(),QTransform(), m_curLayerIndex);
 		//undo 创建完后会执行redo
 		QList<QGraphicsItem*> list;
 		list.append(rectItem);
@@ -1718,7 +1727,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			return;
 		}
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
-        LaserEllipse* ellipseItem = new LaserEllipse(rect, m_scene->document());
+        LaserEllipse* ellipseItem = new LaserEllipse(rect, m_scene->document(), QTransform(), m_curLayerIndex);
         //m_scene->addLaserPrimitive(ellipseItem);
 		//undo 创建完后会执行redo
 		QList<QGraphicsItem*> list;
@@ -1750,7 +1759,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		if (m_creatingLineStartPoint != m_creatingLineEndPoint) {
 			if (event->button() == Qt::LeftButton) {
 				QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
-				LaserLine* lineItem = new LaserLine(line, m_scene->document());
+				LaserLine* lineItem = new LaserLine(line, m_scene->document(), QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(lineItem);
 				//undo 创建完后会执行redo
 				QList<QGraphicsItem*> list;
@@ -1806,11 +1815,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				m_creatingPolygonLines.append(QLineF(m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1], m_creatingPolygonEndPoint));
 				m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
 				LaserPrimitive* primitive;
-				LaserPolyline * curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document());
+				LaserPolyline * curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document(),
+					QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(curPolyline);
 				primitive = curPolyline;
 				if (m_creatingPolygonEndPoint == m_creatingPolygonStartPoint) {
-					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints), m_scene->document());
+					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints), m_scene->document(),
+						QTransform(), m_curLayerIndex);
 					//m_scene->addLaserPrimitive(polygon);
 					//onReplaceGroup(polygon);
 					m_creatingPolygonPoints.clear();
@@ -1827,7 +1838,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
 		else if (event->button() == Qt::RightButton) {
 			if ( m_creatingPolygonPoints.size() > 0) {
-				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document());
+				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document(), 
+					QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(polyLine);
 				//onReplaceGroup(polyLine);
 				//undo
@@ -2414,6 +2426,7 @@ void LaserViewer::init()
 	m_groupedMap = QMap<QString, QList<LaserPrimitive*>>();
 	m_selectedGroupedList = QList<QString>();
 	
+	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);
 	ADD_TRANSITION(documentIdleState, documentSelectedState, this, &LaserViewer::idleToSelected);
@@ -2485,7 +2498,7 @@ void LaserViewer::releaseTextEdit()
 {
     QPoint end(m_textInputPoint.x() + m_textEdit->document()->size().width(), m_textInputPoint.y() + m_textEdit->document()->size().height());
     QRect rect(m_textInputPoint, end);
-    LaserText* text = new LaserText(rect, m_textEdit->toHtml(), m_scene->document(), LaserPrimitiveType::LPT_TEXT);
+    LaserText* text = new LaserText(rect, m_textEdit->toHtml(), m_scene->document(), LaserPrimitiveType::LPT_TEXT, QTransform(), m_curLayerIndex);
     m_scene->addLaserPrimitive(text);
     delete m_textEdit;
 }
@@ -2844,7 +2857,7 @@ void LaserViewer::createSpline()
         path.lineTo(nodeStruct.node.toPoint());
     }
 
-    LaserPath* laserPath = new LaserPath(path, m_scene->document());
+    LaserPath* laserPath = new LaserPath(path, m_scene->document(), QTransform(), m_curLayerIndex);
     m_scene->addLaserPrimitive(laserPath);
     m_handlingSpline.objectName = laserPath->objectName();
     m_splineList.append(m_handlingSpline);

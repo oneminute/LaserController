@@ -105,13 +105,14 @@ class LaserPrimitive : public QGraphicsObject, public LaserNode
 {
     Q_OBJECT
 public:
-    LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc = nullptr, LaserPrimitiveType type = LPT_SHAPE, QTransform saveTransform = QTransform());
+    LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc = nullptr, 
+		LaserPrimitiveType type = LPT_SHAPE, QTransform saveTransform = QTransform(), int layerIndex = 0);
     virtual ~LaserPrimitive();
 
     LaserDocument* document() const;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-
+	int layerIndex();
 	QTransform getAllTransform();
 	QPainterPath getPath();
 	QRectF originalBoundingRect() const;
@@ -158,6 +159,8 @@ public:
 	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
 	virtual QVector<QLineF> edges();
 	virtual LaserPrimitive* clone(QTransform t) = 0;
+
+
 	/*void setScaleValue(qreal x, qreal y);
 	void setScaleTranslate(qreal x, qreal y);
 	void setSelectedEditingState(int state);
@@ -196,12 +199,11 @@ class LaserShape : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform transform = QTransform());
+    LaserShape(LaserShapePrivate* data, LaserDocument* doc,   LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
     virtual QPainterPath toPath() const = 0;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) override;
-	
-
+	int layerIndex();
 private:
     Q_DISABLE_COPY(LaserShape);
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserShape);
@@ -212,7 +214,7 @@ class LaserEllipse : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserEllipse(const QRectF bounds, LaserDocument* doc, QTransform transform = QTransform());
+    LaserEllipse(const QRectF bounds, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserEllipse() {}
 
     QRectF bounds() const;
@@ -238,7 +240,7 @@ class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserRect(const QRectF rect, LaserDocument* doc, QTransform transform = QTransform());
+    LaserRect(const QRectF rect, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserRect() {}
 
     QRectF rect() const;
@@ -263,7 +265,7 @@ class LaserLine : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserLine(const QLineF& line, LaserDocument* doc, QTransform transform = QTransform());
+    LaserLine(const QLineF& line, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserLine() {}
 
     QLineF line() const;
@@ -289,7 +291,7 @@ class LaserPath : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPath(const QPainterPath& path, LaserDocument* doc, QTransform transform = QTransform());
+    LaserPath(const QPainterPath& path, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserPath() {}
 
     QPainterPath path() const;
@@ -317,7 +319,7 @@ class LaserPolyline : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolyline(const QPolygonF& poly, LaserDocument* doc, QTransform transform = QTransform());
+    LaserPolyline(const QPolygonF& poly, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserPolyline() {}
 
     QPolygonF polyline() const;
@@ -343,7 +345,7 @@ class LaserPolygon : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserPolygon(const QPolygonF& poly, LaserDocument* doc, QTransform transform = QTransform());
+    LaserPolygon(const QPolygonF& poly, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserPolygon() {}
 
     QPolygonF polyline() const;
@@ -377,7 +379,8 @@ public:
         BT_BSPLINE
     };
 
-    LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, BasisType basisType, LaserDocument* doc, QTransform transform = QTransform());
+    LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, BasisType basisType, LaserDocument* doc, 
+		QTransform transform = QTransform(), int layerIndex = 1);
     ~LaserNurbs() {}
 
     virtual void draw(QPainter* painter);
@@ -399,7 +402,8 @@ class LaserBitmap : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc, QTransform transform = QTransform());
+    LaserBitmap(const QImage& image, const QRectF& bounds, LaserDocument* doc, QTransform transform = QTransform(), 
+		int layerIndex = 0);
     virtual ~LaserBitmap() {}
 
     QImage image() const;
@@ -432,7 +436,8 @@ class LaserText : public LaserPrimitive
 {
 	Q_OBJECT
 public:
-	LaserText(const QRect rect, const QString content, LaserDocument* doc, LaserPrimitiveType type, QTransform transform = QTransform());
+	LaserText(const QRect rect, const QString content, LaserDocument* doc,  LaserPrimitiveType type, QTransform transform = QTransform(), 
+		int layerIndex = 0);
     virtual ~LaserText() {}
 
     QRect rect() const;

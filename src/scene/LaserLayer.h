@@ -91,7 +91,7 @@ public:
 
     LaserDocument* document() const;
 
-    void bindButton(LayerButton* button);
+    void bindButton(LayerButton* button, int index);
 
     bool exportable() const;
     void setExportable(bool value);
@@ -111,6 +111,10 @@ public:
 
 	virtual QJsonObject toJson(QWidget* window);
 
+	int index();
+
+	void setIndex(int i);
+
 protected:
     void onClicked();
 
@@ -118,6 +122,8 @@ protected:
     
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserLayer);
     Q_DISABLE_COPY(LaserLayer)
+private:
+	int m_index;
 };
 
 #endif // LASERLAYER_H

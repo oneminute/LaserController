@@ -67,15 +67,16 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
 {
     Q_D(LaserDocument);
     d->primitives.insert(item->nodeName(), item);
+	d->layers[item->layerIndex()]->addPrimitive(item);
 
-    if (item->isShape())
+    /*if (item->isShape())
     {
         d->layers[1]->addPrimitive(item);
     }
     else if (item->isBitmap())
     {
         d->layers[0]->addPrimitive(item);
-    }
+    }*/
 
     updateLayersStructure();
 }
@@ -537,7 +538,8 @@ void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
     Q_D(LaserDocument);
     for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
     {
-        d->layers[i]->bindButton(layerButtons[i]);
+        d->layers[i]->bindButton(layerButtons[i], i);
+
     }
     updateLayersStructure();
 }
@@ -738,6 +740,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		for (int j = 0; j < array.size(); j++) {
 			QJsonObject primitiveJson = array[j].toObject();
 			QString className = primitiveJson["className"].toString();
+			int layerIndex = primitiveJson["layerIndex"].toInt();
 			//postion
 			//QJsonArray posArray = primitiveJson["position"].toArray();
 			//QPointF position(posArray[0].toDouble(), posArray[1].toDouble());
@@ -760,15 +763,16 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 			//
 			if (className == "LaserEllipse" || className == "LaserRect" || className == "LaserBitmap") {
 				//QTransform saveTransform = transform * transformP;
+				
 				//bounds
 				QJsonArray boundsArray = primitiveJson["bounds"].toArray();
 				QRectF bounds = QRectF(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
 				LaserPrimitive* rect;
 				if (className == "LaserEllipse") {
-					rect = new LaserEllipse(bounds, this, saveTransform);
+					rect = new LaserEllipse(bounds, this, saveTransform, layerIndex);
 				}
 				else if (className == "LaserRect") {
-					rect = new LaserRect(bounds, this, saveTransform);
+					rect = new LaserRect(bounds, this, saveTransform, layerIndex);
 				}
 				else if (className == "LaserBitmap") {
 					//bounds
@@ -782,7 +786,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					QImage img = QImage::fromData(array, "tiff");
 
 					qDebug() << img.size();
-					rect = new LaserBitmap(img, bounds, this, saveTransform);
+					rect = new LaserBitmap(img, bounds, this, saveTransform, layerIndex);
 				}
 				laserLayers[index]->addPrimitive(rect);
 				this->addPrimitive(rect);
@@ -795,7 +799,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				QPointF p1 = QPointF(lineArray[0].toDouble(), lineArray[1].toDouble());
 				QPointF p2 = QPointF(lineArray[2].toDouble(), lineArray[3].toDouble());
 
-				LaserLine* line = new LaserLine(QLineF(p1, p2), this, saveTransform);
+				LaserLine* line = new LaserLine(QLineF(p1, p2), this, saveTransform, layerIndex);
 				laserLayers[index]->addPrimitive(line);
 				this->addPrimitive(line);
 				this->scene()->addItem(line);
@@ -809,10 +813,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				}
 				LaserPrimitive * poly;
 				if (className == "LaserPolyline") {
-					poly = new LaserPolyline(QPolygonF(vector), this, saveTransform);
+					poly = new LaserPolyline(QPolygonF(vector), this, saveTransform, layerIndex);
 				}
 				else if (className == "LaserPolygon") {
-					poly = new LaserPolygon(QPolygonF(vector), this, saveTransform);
+					poly = new LaserPolygon(QPolygonF(vector), this, saveTransform, layerIndex);
 				}
 				
 				laserLayers[index]->addPrimitive(poly);
