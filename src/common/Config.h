@@ -41,8 +41,10 @@ class Config: public QObject
 
 private:
     Config();
+    ~Config();
 
 public:
+    static void init();
     static void load();
     static void save(const QString& mainCardId = "");
     static void restore();
@@ -50,6 +52,7 @@ public:
     static bool isModified();
     static QList<ConfigItemGroup*> getGroups();
     static void refreshTranslation();
+    static void destroy();
 
 protected:
     static void loadGeneralItems();

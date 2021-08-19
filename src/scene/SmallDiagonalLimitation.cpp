@@ -11,6 +11,22 @@ QJsonObject SmallDiagonalLimitationItem::toJson() const
     return json;
 }
 
+void SmallDiagonalLimitationItem::fromJson(const QJsonObject& json)
+{
+    if (json.contains("diagonal"))
+    {
+        diagonal = json["diagonal"].toDouble();
+    }
+    if (json.contains("laserPower"))
+    {
+        laserPower = json["laserPower"].toDouble();
+    }
+    if (json.contains("speed"))
+    {
+        speed = json["speed"].toDouble();
+    }
+}
+
 bool operator<(const SmallDiagonalLimitationItem& v1, const SmallDiagonalLimitationItem& v2)
 {
     return v1.diagonal < v2.diagonal;
@@ -36,52 +52,72 @@ SmallDiagonalLimitation::SmallDiagonalLimitation()
 
 }
 
-SmallDiagonalLimitation::SmallDiagonalLimitation(const ItemList& list)
-    : m_items(list)
+SmallDiagonalLimitation::SmallDiagonalLimitation(const SmallDiagonalLimitation& list)
+    : QMap<qreal, SmallDiagonalLimitationItem>(list)
 {
 }
 
 qreal SmallDiagonalLimitation::maxDiagonal() const
 {
-    if (m_items.isEmpty())
+    if (isEmpty())
     {
         return 0;
     }
     else
     {
-        return m_items.first().diagonal;
+        return first().diagonal;
     }
-}
-
-SmallDiagonalLimitation::ItemList& SmallDiagonalLimitation::items()
-{
-    return m_items;
-}
-
-void SmallDiagonalLimitation::addItem(const SmallDiagonalLimitationItem& item)
-{
-    m_items.append(item);
-    qSort(m_items);
 }
 
 QJsonObject SmallDiagonalLimitation::toJson() const
 {
     QJsonArray array;
-    for (const SmallDiagonalLimitationItem& item : m_items)
+    for (LimitationMap::ConstIterator i = constBegin(); i != constEnd(); i++)
     {
-        array.append(item.toJson());
+        array.append(i.value().toJson());
     }
     QJsonObject json;
     json.insert("items", array);
     return json;
 }
 
-QDebug operator<<(QDebug dbg, SmallDiagonalLimitation& limitation)
+void SmallDiagonalLimitation::fromJson(const QJsonObject& json)
 {
-    dbg.nospace() << "size of limitation: " << limitation.items().size();
-    for (const SmallDiagonalLimitationItem& item : limitation.items())
+    if (json.contains("items"))
     {
-        dbg.nospace() << "  " << item;
+        clear();
+        QJsonArray array = json["items"].toArray();
+        for (const QJsonValue& value : array)
+        {
+            SmallDiagonalLimitationItem item;
+            item.fromJson(value.toObject());
+            insert(item.diagonal, item);
+        }
+    }
+}
+
+SmallDiagonalLimitationItem& SmallDiagonalLimitation::createNewItem()
+{
+    qreal diagonal = 2;
+    qreal power = 10;
+    qreal speed = 5;
+    if (!isEmpty())
+    {
+        diagonal = last().diagonal + 1;
+        power = last().laserPower;
+        speed = last().speed;
+    }
+    SmallDiagonalLimitationItem item = { diagonal, power, speed };
+    insert(diagonal, item);
+    return last();
+}
+
+QDebug operator<<(QDebug dbg, const SmallDiagonalLimitation& limitation)
+{
+    dbg.nospace() << "size of limitation: " << limitation.size();
+    for (LimitationMap::ConstIterator i = limitation.constBegin(); i != limitation.constEnd(); i++)
+    {
+        dbg.nospace() << "  " << i.value();
     }
     return dbg.maybeSpace();
 }

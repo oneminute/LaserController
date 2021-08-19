@@ -62,6 +62,10 @@
         }
     },
     "export": {
+        "enableSmallDiagonal": {
+            "defaultValue": false,
+            "value": false
+        },
         "maxAnglesDiff": {
             "defaultValue": 5,
             "value": 5
@@ -69,6 +73,60 @@
         "maxIntervalDistance": {
             "defaultValue": 10,
             "value": 40
+        },
+        "maxStartingPoints": {
+            "defaultValue": 8,
+            "value": 8
+        },
+        "smallDiagonalLimitation": {
+            "defaultValue": {
+                "items": [
+                    {
+                        "diagonal": 2,
+                        "laserPower": 10,
+                        "speed": 5
+                    },
+                    {
+                        "diagonal": 3,
+                        "laserPower": 10,
+                        "speed": 5
+                    },
+                    {
+                        "diagonal": 4,
+                        "laserPower": 10,
+                        "speed": 5
+                    },
+                    {
+                        "diagonal": 5,
+                        "laserPower": 10,
+                        "speed": 5
+                    }
+                ]
+            },
+            "value": {
+                "items": [
+                    {
+                        "diagonal": 2,
+                        "laserPower": 10,
+                        "speed": 5
+                    },
+                    {
+                        "diagonal": 3,
+                        "laserPower": 10,
+                        "speed": 5
+                    },
+                    {
+                        "diagonal": 4,
+                        "laserPower": 10,
+                        "speed": 5
+                    },
+                    {
+                        "diagonal": 5,
+                        "laserPower": 10,
+                        "speed": 5
+                    }
+                ]
+            }
         }
     },
     "general": {

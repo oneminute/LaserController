@@ -14,6 +14,7 @@
 #include "laser/LaserRegister.h"
 #include "util/WidgetUtils.h"
 #include "widget/InputWidgetWrapper.h"
+#include "widget/SmallDiagonalLimitationWidget.h"
 
 QList<ConfigItemGroup*> Config::groups;
 QMap<QString, ConfigItemGroup*> Config::groupsMap;
@@ -34,7 +35,11 @@ Config::Config()
 
 }
 
-void Config::load()
+Config::~Config()
+{
+}
+
+void Config::init()
 {
     qDeleteAll(groups);
     groups.clear();
@@ -50,7 +55,10 @@ void Config::load()
     loadDeviceItems();
     loadUserReigsters();
     loadSystemRegisters();
+}
 
+void Config::load()
+{
     QFile configFile(configFilePath());
     if (configFile.exists())
     {
@@ -620,13 +628,46 @@ void Config::loadExportItems()
     );
 
     QVariant smallDiagonalLimitationVar;
-    smallDiagonalLimitationVar.setValue(SmallDiagonalLimitation());
+    smallDiagonalLimitationVar.setValue(new SmallDiagonalLimitation);
+    qLogD << "small diagonal limitation type: " << smallDiagonalLimitationVar.userType();
     ConfigItem* smallDiagonalLimitation = group->addConfigItem(
         "smallDiagonalLimitation",
         tr("Small diagonal limitation"),
         tr("Small diagonal limitation"),
         smallDiagonalLimitationVar,
         DT_CUSTOM
+    );
+    smallDiagonalLimitation->setInputWidgetType(IWT_Unknown);
+    smallDiagonalLimitation->setCreateWidgetHook(
+        [](ConfigItem* item) {
+            return qobject_cast<QWidget*>(new SmallDiagonalLimitationWidget(item));
+        }
+    );
+    smallDiagonalLimitation->setDestroyHook(
+        [](ConfigItem* item) {
+            SmallDiagonalLimitation* limitation = item->value().value<SmallDiagonalLimitation*>();
+            delete limitation;
+        }
+    );
+    smallDiagonalLimitation->setToJsonHook(
+        [](const ConfigItem* item) {
+            SmallDiagonalLimitation* limitation = item->value().value<SmallDiagonalLimitation*>();
+            QJsonObject value = limitation->toJson();
+            QJsonObject json;
+            json["value"] = value;
+            json["defaultValue"] = value;
+            return json;
+        }
+    );
+    smallDiagonalLimitation->setFromJsonHook(
+        [](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
+            if (json.contains("value"))
+            {
+                SmallDiagonalLimitation* limitation = item->value().value<SmallDiagonalLimitation*>();
+                limitation->fromJson(json["value"].toObject());
+                qLogD << *limitation;
+            }
+        }
     );
 }
 
@@ -2295,4 +2336,11 @@ QList<ConfigItemGroup*> Config::getGroups()
 
 void Config::refreshTranslation()
 {
+}
+
+void Config::destroy()
+{
+    qDeleteAll(groups);
+    groups.clear();
+    groupsMap.clear();
 }

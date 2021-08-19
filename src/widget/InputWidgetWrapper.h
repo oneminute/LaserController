@@ -34,7 +34,7 @@ public:
     bool isModified();
     QVariant value() const;
 
-    static QWidget* createWidget(InputWidgetType widgetType, Qt::Orientation orientation);
+    static QWidget* createWidget(ConfigItem* item, Qt::Orientation orientation);
 
 signals:
     void valueChanged(const QVariant& newValue);
@@ -48,6 +48,7 @@ protected:
     void onEditingFinished();
     void onValueChanged(int value);
     void onValueChanged(double value);
+    void onValueChanged(const SmallDiagonalLimitation& value);
     void onTimeChanged(const QTime& time);
     void onDateChanged(const QDate& date);
     void onDateTimeChanged(const QDateTime& dateTime);
