@@ -146,9 +146,21 @@
         }
     },
     "pathOptimization": {
+        "groupingOrientation": {
+            "defaultValue": 2,
+            "value": 1
+        },
         "maxAnts": {
             "defaultValue": 100,
             "value": 100
+        },
+        "maxGroupSize": {
+            "defaultValue": 10,
+            "value": 10
+        },
+        "maxGroupingGridSize": {
+            "defaultValue": 30,
+            "value": 30
         },
         "maxIterations": {
             "defaultValue": 500,

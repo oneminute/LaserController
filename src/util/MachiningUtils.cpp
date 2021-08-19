@@ -45,13 +45,15 @@ int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::
 }
 
 int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& points, 
-    QList<int>& startingIndices, int startingIndiciesCount, int diagonalThreshold, cv::Mat& canvas)
+    QList<int>& startingIndices, QPointF& center, int startingIndiciesCount, 
+    int diagonalThreshold, cv::Mat& canvas)
 {
     qreal length = path.length();
     QPointF firstPoint = path.pointAtPercent(0);
     QPointF lastPoint = path.pointAtPercent(1);
     QPointF point = firstPoint;
     qreal radians = qDegreesToRadians(path.angleAtPercent(0));
+    center = QPointF(0, 0);
 
     // Calculate bounding rect of current path. If the diagonal is less than diagonalThreshold,
     // we just choose the first point as the only starting point for closed curves,
@@ -95,6 +97,7 @@ int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& poi
     // 封闭曲线也不计算起刀点。其他的封闭曲线均按分割数计算起刀点。
 
     points.push_back(point);
+    center += point;
     if (!canvas.empty())
     {
         cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
@@ -126,6 +129,7 @@ int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& poi
                 cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
             }
             points.push_back(point);
+            center += point;
             anchor = point;
             anchorRadians = radians;
         }
@@ -137,12 +141,15 @@ int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& poi
                 cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
             }
             points.push_back(point);
+            center += point;
             anchor = point;
             anchorRadians = radians;
         }
     }
 
     points.push_back(lastPoint);
+    center += point;
+    center = center / points.size();
     if (!ratios.isEmpty())
     {
         startingIndices.append(points.length() - 1);

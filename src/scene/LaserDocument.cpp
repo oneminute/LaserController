@@ -220,7 +220,7 @@ QString LaserDocument::newLayerName() const
 
 void LaserDocument::exportJSON(const QString& filename)
 {
-    exportJSON1(filename);
+    exportJSON2(filename);
 }
 
 void LaserDocument::exportJSON1(const QString& filename)
@@ -933,39 +933,54 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
         return;
 
     QList<LaserNode*> children = node->childNodes();
-    qSort(children.begin(), children.end(), [=](LaserNode* a, LaserNode* b) -> bool {
-        if (a->position().y() < b->position().y())
-        {
-            return true;
-        }
-        else if (a->position().y() > b->position().y())
-        {
-            return false;
-        }
-        else
-        {
-            if (a->position().x() < b->position().x())
+    qSort(children.begin(), children.end(), 
+        [=](LaserNode* a, LaserNode* b) -> bool {
+            int groupIndex1 = 0;
+            int groupIndex2 = 0;
+            if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+            {
+                groupIndex1 = a->position().y() / Config::PathOptimization::maxGroupingGridSize();
+                groupIndex2 = b->position().y() / Config::PathOptimization::maxGroupingGridSize();
+            }
+            else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+            {
+                groupIndex1 = a->position().x() / Config::PathOptimization::maxGroupingGridSize();
+                groupIndex2 = b->position().x() / Config::PathOptimization::maxGroupingGridSize();
+            }
+
+            if (groupIndex1 < groupIndex2)
             {
                 return true;
             }
-            else
+            else if (groupIndex1 > groupIndex2)
             {
                 return false;
             }
+            else
+            {
+                if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+                {
+                    return a->position().x() < b->position().x();
+                }
+                else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+                {
+                    return a->position().y() < b->position().y();
+                }
+            }
         }
-        });
+    );
 
     /*for (LaserNode* item : children)
     {
         qLogD << item->position().x() << ", " << item->position().y();
     }*/
 
-    int maxChildNodes = 11;
+    int maxChildNodes = Config::PathOptimization::maxGroupSize();
     //int batchCount = children.count() / maxChildNodes + 1;
     if (children.count() > maxChildNodes)
     {
         node->childNodes().clear();
-        QPointF center(0, 0);
+        //QPointF center(0, 0);
         LaserNode* newNode = nullptr;
         for (int i = 0, count = 0; i < children.count(); i++)
         {
@@ -975,14 +990,14 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
                 QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
                 newNode->setNodeName(nodeName);
             }
-            center += children[i]->position();
+            //center += children[i]->position();
             newNode->addChildNode(children[i]);
             if (++count == maxChildNodes)
             {
-                center /= newNode->childNodes().count();
-                newNode->setPosition(center);
+                //center /= newNode->childNodes().count();
+                //newNode->setPosition(center);
                 node->addChildNode(newNode);
-                center = QPointF(0, 0);
+                //center = QPointF(0, 0);
                 count = 0;
             }
         }

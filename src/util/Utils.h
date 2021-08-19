@@ -28,6 +28,8 @@ namespace utils
 	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);
 	
     quint32 factorial(quint32 n);
+
+    QPointF center(const QVector<QPointF>& points);
 }
 
 #endif // UTILS_H

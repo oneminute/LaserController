@@ -1677,6 +1677,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
         {
+            m_scene->document()->outline();
             m_scene->document()->setFinishRun(finishRun());
             m_scene->document()->exportJSON(filename);
         }

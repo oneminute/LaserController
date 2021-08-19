@@ -10,14 +10,14 @@ public:
     LaserNodePrivate(LaserNode* ptr)
         : q_ptr(ptr)
         , nodeType(LNT_UNKNOWN)
-        , position(0, 0)
+        //, position(0, 0)
     {}
 
     LaserNode* parentNode;
     QList<LaserNode*> childNodes;
     LaserNodeType nodeType;
     QString nodeName;
-    QPointF position;
+    //QPointF position;
     LaserNode* q_ptr;
 };
 

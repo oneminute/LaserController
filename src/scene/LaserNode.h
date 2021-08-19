@@ -36,9 +36,6 @@ public:
     bool hasChildren() const;
     int childCount() const;
 
-    QPointF position() const;
-    void setPosition(QPointF& value);
-
     virtual bool isAvailable() const;
     bool isVirtual() const;
     bool isDocument() const;
@@ -50,6 +47,8 @@ public:
     void setParentNode(LaserNode* parent);
 
     QList<LaserNode*> findAllLeaves(LaserNode* exclude = nullptr);
+
+    virtual QPointF position() const;
 
 protected:
     QScopedPointer<LaserNodePrivate> d_ptr;

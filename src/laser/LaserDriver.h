@@ -250,6 +250,7 @@ private:
     typedef void(*FNProcDataProgressCallBack)(FNProcDataProgressCallBackHandler callback);
 
     typedef int(__stdcall *FN_INT_INT)(int);
+    typedef int(__stdcall *FN_INT_INT_INT)(int, int);
     typedef int(*FN_INT_VOID)();
 
     typedef void(__stdcall *FNSetSoftwareInitialization)(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
@@ -350,7 +351,7 @@ public:
     int loadDataFromFile(const QString& filename, bool withMachining = true);
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
-    int getUpdatePanelHandle(int version);
+    int getUpdatePanelHandle(int version, int wndId);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
@@ -464,7 +465,7 @@ private:
     FN_INT_DOUBLE_BOOL m_fnMillimeter2MicroStep;
 
     FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
-    FN_INT_INT m_fnGetUpdatePanelHandle;
+    FN_INT_INT_INT m_fnGetUpdatePanelHandle;
 
     wchar_t m_wcharBuffer[2048];
 

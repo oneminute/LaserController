@@ -62,6 +62,8 @@ public:
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
 
+    virtual QPointF position() const { return QPoint(0, 0); }
+
 public slots:
     void exportJSON(const QString& filename);
     void exportJSON1(const QString& filename);

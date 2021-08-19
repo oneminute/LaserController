@@ -584,6 +584,48 @@ void Config::loadPathOptimizationItems()
     maxStartingPointAnglesDiff->setInputWidgetProperty("minimum", 1.0);
     maxStartingPointAnglesDiff->setInputWidgetProperty("maximum", 90.0);
 
+    ConfigItem* maxGroupSize = group->addConfigItem(
+        "maxGroupSize",
+        tr("Max group size"),
+        tr("Max children count in one group."),
+        10
+    );
+    maxStartingPoints->setInputWidgetProperty("minimum", 1);
+    maxStartingPoints->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* groupingOrientation = group->addConfigItem(
+        "groupingOrientation",
+        tr("Grouping Orientation"),
+        tr("Grouping orientation"),
+        Qt::Vertical,
+        DT_INT
+    );
+    groupingOrientation->setInputWidgetType(IWT_ComboBox);
+    groupingOrientation->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("Horizontal"), 1);
+            comboBox->addItem(tr("Vertical"), 2);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
+    ConfigItem* maxGroupingGridSize = group->addConfigItem(
+        "maxGroupingGridSize",
+        tr("Max grouping grid size"),
+        tr("Max grouping grid size."),
+        30,
+        DT_REAL
+    );
+    maxGroupingGridSize->setInputWidgetType(IWT_FloatEditSlider);
+    maxGroupingGridSize->setInputWidgetProperty("minimum", 1.0);
+    maxGroupingGridSize->setInputWidgetProperty("maximum", 1000.0);
 }
 
 void Config::loadExportItems()

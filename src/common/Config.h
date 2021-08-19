@@ -182,6 +182,9 @@ public:
         CONFIG_ITEM(pathOptimization, useGreedyAlgorithm, bool, toBool)
         CONFIG_ITEM(pathOptimization, maxStartingPoints, int, toInt)
         CONFIG_ITEM(pathOptimization, startingPointAnglesDiff, qreal, toReal)
+        CONFIG_ITEM(pathOptimization, maxGroupSize, int, toInt)
+        CONFIG_ITEM(pathOptimization, groupingOrientation, int, toInt)
+        CONFIG_ITEM(pathOptimization, maxGroupingGridSize, qreal, toReal)
 
     private:
         friend class Config;
@@ -331,9 +334,5 @@ private:
 
     friend class ConfigItemGroup;
 };
-
-
-
-
 
 #endif // CONFIG_H

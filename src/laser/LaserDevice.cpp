@@ -966,7 +966,7 @@ void LaserDevice::onLibraryLoaded(bool success)
         int month = compileDate.month();
         int day = compileDate.day();
         int version = year * 10000 + month * 100 + day;
-        int winId = d->driver->getUpdatePanelHandle(version);
+        int winId = d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
         LaserApplication::mainWindow->createUpdateDockPanel(winId);
     }
     catch (...) {

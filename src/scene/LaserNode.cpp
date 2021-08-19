@@ -80,17 +80,17 @@ int LaserNode::childCount() const
     return d->childNodes.count();
 }
 
-QPointF LaserNode::position() const
-{
-    Q_D(const LaserNode);
-    return d->position;
-}
-
-void LaserNode::setPosition(QPointF& value)
-{
-    Q_D(LaserNode);
-    d->position = value;
-}
+//QPointF LaserNode::position() const
+//{
+//    Q_D(const LaserNode);
+//    return d->position;
+//}
+//
+//void LaserNode::setPosition(QPointF& value)
+//{
+//    Q_D(LaserNode);
+//    d->position = value;
+//}
 
 bool LaserNode::isAvailable() const
 {
@@ -164,4 +164,17 @@ QList<LaserNode*> LaserNode::findAllLeaves(LaserNode* exclude)
         }
     }
     return leaves;
+}
+
+QPointF LaserNode::position() const
+{
+    Q_D(const LaserNode);
+    if (d->nodeType == LNT_VIRTUAL && hasChildren())
+    {
+        return d->childNodes.first()->position();
+    }
+    else
+    {
+        return QPointF(0, 0);
+    }
 }

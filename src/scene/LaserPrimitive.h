@@ -119,7 +119,6 @@ public:
 	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
     virtual QRectF sceneBoundingRect() const;
-    QPointF laserStartPos() const;
 	void sceneTransformToItemTransform(QTransform sceneTransform);//����sceneTransfromת��ΪItem��transform��position
 
     virtual void draw(QPainter* painter) {};
@@ -129,7 +128,11 @@ public:
     QVector<QPointF> machiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
     QList<int> startingIndices() const;
     QVector<QPointF> startingPoints() const;
+    QPointF firstStartingPoint() const;
+    QPointF lastStartingPoint() const;
+    QPointF centerMachiningPoint() const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
+    virtual bool isClosed() const = 0;
 
     LaserPrimitiveType primitiveType() const;
     QString typeName() const;
@@ -230,6 +233,9 @@ public:
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
 
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)
     Q_DISABLE_COPY(LaserEllipse)
@@ -255,6 +261,9 @@ public:
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 	virtual LaserPrimitive* clone(QTransform t);
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
     Q_DISABLE_COPY(LaserRect)
@@ -281,6 +290,8 @@ public:
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
 
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DISABLE_COPY(LaserLine);
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserLine);
@@ -309,6 +320,8 @@ public:
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
 
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPath);
     Q_DISABLE_COPY(LaserPath);
@@ -335,6 +348,9 @@ public:
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
     Q_DISABLE_COPY(LaserPolyline)
@@ -363,6 +379,8 @@ public:
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
 
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
     Q_DISABLE_COPY(LaserPolygon)
@@ -392,6 +410,8 @@ public:
 
 	LaserPrimitive * clone(QTransform t);
 
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserNurbs)
     Q_DISABLE_COPY(LaserNurbs)
@@ -426,6 +446,8 @@ public:
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
 
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
     Q_DISABLE_COPY(LaserBitmap)
@@ -447,6 +469,9 @@ public:
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
 	LaserPrimitive * clone(QTransform t);
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
 private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)

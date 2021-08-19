@@ -30,8 +30,8 @@ public:
     QPointF startPos() const;
     QPointF nearestPoint(const QPointF& point, int& index, float& dist);
     QPointF currentPos() const;
-    QVector<QPointF> points() const;
-    bool isClosour() const;
+    QVector<QPointF> startingPoints() const;
+    bool isClosed() const;
     QPointF headPoint() const;
     QPointF tailPoint() const;
     QPointF point(int index) const;

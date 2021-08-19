@@ -115,6 +115,8 @@ public:
 
 	void setIndex(int i);
 
+    virtual QPointF position() const { return QPointF(0, 0); }
+
 protected:
     void onClicked();
 

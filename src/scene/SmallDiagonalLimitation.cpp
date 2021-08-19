@@ -1,5 +1,7 @@
 #include "SmallDiagonalLimitation.h"
 
+#include "common/common.h"
+#include "common/Config.h"
 #include <QJsonArray>
 
 QJsonObject SmallDiagonalLimitationItem::toJson() const
@@ -59,13 +61,20 @@ SmallDiagonalLimitation::SmallDiagonalLimitation(const SmallDiagonalLimitation& 
 
 qreal SmallDiagonalLimitation::maxDiagonal() const
 {
-    if (isEmpty())
+    if (Config::Export::enableSmallDiagonal())
     {
-        return 0;
+        if (isEmpty())
+        {
+            return 0;
+        }
+        else
+        {
+            return first().diagonal;
+        }
     }
     else
     {
-        return first().diagonal;
+        return 0;
     }
 }
 

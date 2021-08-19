@@ -134,3 +134,17 @@ quint32 utils::factorial(quint32 n)
         return 1;
     return n * factorial(n - 1);
 }
+
+QPointF utils::center(const QVector<QPointF>& points)
+{
+    QPointF center(0, 0);
+    if (points.isEmpty())
+        return center;
+
+    for (const QPointF& p : points)
+    {
+        center += p;
+    }
+    center /= points.size();
+    return center;
+}

@@ -228,7 +228,7 @@ bool LaserDriver::load()
     m_fnMillimeter2MicroStep = (FN_INT_DOUBLE_BOOL)m_library.resolve("Millimeter2MicroStep");
 
     m_fnCheckVersionUpdate = (FN_BOOL_WCHART_INT_WCHART)m_library.resolve("CheckVersionUpdate");
-    m_fnGetUpdatePanelHandle = (FN_INT_INT)m_library.resolve("GetUpdatePanelHandle");
+    m_fnGetUpdatePanelHandle = (FN_INT_INT_INT)m_library.resolve("GetUpdatePanelHandle");
 
     Q_ASSERT(m_fnLoadDataFromFile);
 
@@ -639,9 +639,9 @@ void LaserDriver::checkVersionUpdate(bool hardware, const QString& flag, int cur
     delete[] vntjfBuf;
 }
 
-int LaserDriver::getUpdatePanelHandle(int version)
+int LaserDriver::getUpdatePanelHandle(int version, int wndId)
 {
-    return m_fnGetUpdatePanelHandle(version);
+    return m_fnGetUpdatePanelHandle(version, wndId);
 }
 
 void LaserDriver::setSystemRegister(LaserDriver::SystemRegisterType rt, QVariant value)

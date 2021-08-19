@@ -26,46 +26,26 @@ public:
         , laserNode(_laserNode)
         , outEdge(nullptr)
         , kdTree(nullptr)
+        , currentPoint(0, 0)
+        , isClosed(false)
     {
         LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(laserNode);
 
         if (laserNode)
         {
             name = laserNode->nodeName();
-            center = laserNode->position();
         }
         if (primitive)
         {
-            points = primitive->updateMachiningPoints();
-            center.setX(0);
-            center.setY(0);
-
-            double distBetweenHeadAndTail = QVector2D(points[0] - points[points.size() - 1]).length();
-            // check the primitive is whether closour
-            if (qFuzzyCompare(distBetweenHeadAndTail, 0))
-            {
-                for (size_t i = 0; i < points.size(); i++)
-                {
-                    QPointF point = points[i];
-                    center += point;
-                }
-                center /= static_cast<int>(points.size());
-                isClosour = true;
-            }
-            else
-            {
-                points = QVector<QPointF>();
-                points.append(primitive->updateMachiningPoints().first());
-                points.append(primitive->updateMachiningPoints().last());
-                center = (points.first() + points.last()) / 2;
-                isClosour = false;
-            }
-            {
-                flann::Matrix<float> samplePoints = flann::Matrix<float>((float*)(points.data()), points.size(), 2);
-                flann::KDTreeSingleIndexParams indexParams = flann::KDTreeSingleIndexParams();
-                kdTree = new flann::KDTreeSingleIndex<flann::L2<float>>(samplePoints, indexParams);
-                kdTree->buildIndex();
-            }
+            primitive->updateMachiningPoints();
+            isClosed = primitive->isClosed();
+            startingPoints = primitive->startingPoints();
+            flann::Matrix<float> samplePoints = flann::Matrix<float>((float*)(startingPoints.data()), 
+                primitive->startingIndices().size(), 2);
+            flann::KDTreeSingleIndexParams indexParams = flann::KDTreeSingleIndexParams();
+            kdTree = new flann::KDTreeSingleIndex<flann::L2<float>>(samplePoints, indexParams);
+            kdTree->buildIndex();
+            currentPoint = primitive->firstStartingPoint();
         }
     }
 
@@ -87,10 +67,10 @@ public:
 
     QList<Edge*> edges;
     Edge* outEdge;
-    QPointF center;
-    QVector<QPointF> points;
+    QPointF currentPoint;
+    QVector<QPointF> startingPoints;
     flann::KDTreeSingleIndex<flann::L2<float>>* kdTree;
-    bool isClosour;
+    bool isClosed;
     QString name;
     Node* q_ptr;
 };
@@ -141,7 +121,11 @@ Edge* Node::outEdge() const
 QPointF Node::startPos() const
 {
     Q_D(const Node);
-    return d->center;
+    if (d->startingPoints.isEmpty())
+    {
+        return d->currentPoint;
+    }
+    return d->startingPoints.first();
 }
 
 QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
@@ -152,8 +136,7 @@ QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
     {
         index = 0;
         dist = 0;
-        //return d->center;
-        d->center = point;
+        d->currentPoint = point;
         return point;
     }
     else
@@ -178,7 +161,7 @@ QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
             d->kdTree->knnSearch(queryPoint, indicesMatrix, distsMatrix, 1, searchParams);
 
             index = indicesMatrix.ptr()[0];
-            target = d->points[index];
+            target = d->startingPoints[index];
             dist = std::sqrt(distsMatrix.ptr()[0]);
         }
         //qLogD << d->name << " " << index << " " << dist << " " << dist << " " << target.x << ", " << target.y;
@@ -192,19 +175,19 @@ QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
 QPointF Node::currentPos() const
 {
     Q_D(const Node);
-    return d->center;
+    return d->currentPoint;
 }
 
-QVector<QPointF> Node::points() const
+QVector<QPointF> Node::startingPoints() const
 {
     Q_D(const Node);
-    return d->points;
+    return d->startingPoints;
 }
 
-bool Node::isClosour() const
+bool Node::isClosed() const
 {
     Q_D(const Node);
-    return d->isClosour;
+    return d->isClosed;
 }
 
 QPointF Node::headPoint() const
@@ -212,9 +195,9 @@ QPointF Node::headPoint() const
     Q_D(const Node);
     if (d->isVirtual())
     {
-        return d->center;
+        return d->currentPoint;
     }
-    return d->points[0];
+    return d->startingPoints.first();
 }
 
 QPointF Node::tailPoint() const
@@ -222,9 +205,9 @@ QPointF Node::tailPoint() const
     Q_D(const Node);
     if (d->isVirtual())
     {
-        return d->center;
+        return d->currentPoint;
     }
-    return d->points[d->points.size() - 1];
+    return d->startingPoints.last();
 }
 
 QPointF Node::point(int index) const
@@ -232,9 +215,9 @@ QPointF Node::point(int index) const
     Q_D(const Node);
     if (d->isVirtual())
     {
-        return d->center;
+        return d->currentPoint;
     }
-    return d->points[index];
+    return d->startingPoints[index];
 }
 
 QString Node::nodeName() const
@@ -420,7 +403,7 @@ QPointF Ant::currentPos() const
     {
         target = d->currentNode->currentPos();
     }
-    else if (d->currentNode->isClosour())
+    else if (d->currentNode->isClosed())
     {
         target = d->currentNode->point(d->currentPointIndex);
     }
@@ -538,12 +521,12 @@ void drawPath(cv::Mat& canvas, const QQueue<Node*>& path, const QMap<Node*, int>
         {
             cv::line(canvas, lastPos, startPos, cv::Scalar(0, 0, 255), 3);
         }
-        QVector<QPointF> points = node->points();
+        QVector<QPointF> points = node->startingPoints();
         cv::Mat pointsMat(points.count(), 2, CV_32S, points.data());
         pointsMat.convertTo(pointsMat, CV_32S);
         cv::polylines(canvas, pointsMat, false, cv::Scalar(random.bounded(256), random.bounded(256), random.bounded(256)), 5);
         lastPos = startPos;
-        if (!node->isClosour())
+        if (!node->isClosed())
         {
             if (pointIndex == 0)
             {

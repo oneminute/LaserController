@@ -23,8 +23,11 @@ namespace machiningUtils
     /// <param name="diagonalThreshold"></param>
     /// <param name="canvas"></param>
     /// <returns></returns>
-    int path2Points(const QPainterPath& path, QVector<QPointF>& points, 
-        QList<int>& startingIndices, int startingIndiciesCount = 8, 
+    int path2Points(const QPainterPath& path, 
+        QVector<QPointF>& points, 
+        QList<int>& startingIndices,
+        QPointF& center,
+        int startingIndiciesCount = 8, 
         int diagonalThreshold = 2 * 40,
         cv::Mat& canvas = cv::Mat());
 
