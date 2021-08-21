@@ -21,6 +21,24 @@
             "value": 60
         }
     },
+    "debug": {
+        "generateMachiningImage": {
+            "defaultValue": false,
+            "value": true
+        },
+        "generatePathImage": {
+            "defaultValue": false,
+            "value": true
+        },
+        "showPrimitiveFirstPoint": {
+            "defaultValue": false,
+            "value": true
+        },
+        "showPrimitiveName": {
+            "defaultValue": false,
+            "value": true
+        }
+    },
     "device": {
         "autoConnectFirst": {
             "defaultValue": true,
@@ -156,7 +174,7 @@
         },
         "maxGroupSize": {
             "defaultValue": 10,
-            "value": 8
+            "value": 5
         },
         "maxGroupingGridSize": {
             "defaultValue": 30,

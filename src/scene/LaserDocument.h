@@ -87,6 +87,11 @@ protected:
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
     void outlineByLayers(LaserNode* node);
     void outlineByGroups(LaserNode* node);
+    /// <summary>
+    /// 对当前的节点树进行整理，使每个分组树中的叶结点不要超过最大数量。
+    /// </summary>
+    /// <param name="node">待分组节点</param>
+    /// <param name="level">当前的组级别</param>
     void optimizeGroups(LaserNode* node, int level = 1);
     void clearOutline(LaserNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node);

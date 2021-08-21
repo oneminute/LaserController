@@ -44,13 +44,13 @@ public:
             flann::Matrix<qreal> samplePoints = flann::Matrix<qreal>((qreal*)(startingPoints.data()), 
                 primitive->startingIndices().size(), 2);
 
-            for (int i = 0; i < startingPoints.size(); i++)
+            /*for (int i = 0; i < startingPoints.size(); i++)
             {
                 qLogD << startingPoints.at(i) << ((qreal*)(startingPoints.data()))[i * 2] << ", "
                     << ((qreal*)(startingPoints.data()))[i * 2 + 1] << ", " << samplePoints[i][0] 
                     << " at " << &samplePoints[i][0]
                     << ", " << samplePoints[i][1] << " at " << &samplePoints[i][1];
-            }
+            }*/
 
             flann::KDTreeSingleIndexParams singleIndexParams = flann::KDTreeSingleIndexParams(4);
             kdTree = new flann::KDTreeSingleIndex<flann::L2<qreal>>(samplePoints, singleIndexParams);
@@ -182,7 +182,7 @@ QPointF Node::nearestPoint(const QPointF& point, int& index, float& dist)
             }
             target = d->startingPoints[index];
             dist = QVector2D(target - point).length();
-            qLogD << "flann dist: " << dists[0] << ", " << qSqrt(dists[0]) << ", " << distsMatrix.ptr()[0] << ", dist: " << dist;
+            //qLogD << "flann dist: " << dists[0] << ", " << qSqrt(dists[0]) << ", " << distsMatrix.ptr()[0] << ", dist: " << dist;
         }
         //qLogD << d->name << " " << index << " " << dist << " " << dist << " " << target.x << ", " << target.y;
         //qLogD;
@@ -254,23 +254,29 @@ bool Node::isVirtual() const
 
 void Node::debugDraw(cv::Mat& canvas)
 {
+    static LaserNode* parentNode = nullptr;
+    static QColor color;
     Q_D(Node);
     LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(d->laserNode);
 
     if (primitive)
     {
-        //QVector<QPointF> points = primitive->machiningPoints();
-        //cv::Mat pointsMat(points.count(), 2, CV_32S, points.data());
-        //pointsMat.convertTo(pointsMat, CV_32S);
-        //cv::polylines(canvas, pointsMat, false, cv::Scalar(0, 0, 0), 2);
-
+        if (d->laserNode->parentNode() != parentNode)
+        {
+            parentNode = d->laserNode->parentNode();
+            color.setRed(QRandomGenerator::global()->bounded(192));
+            color.setGreen(QRandomGenerator::global()->bounded(192));
+            color.setBlue(QRandomGenerator::global()->bounded(192));
+        }
+        qLogD << color;
         int i = 0;
         QPointF lastPoint;
         for (const QPointF& pt : primitive->machiningPoints())
         {
             if (i != 0)
             {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastPoint), typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(0, 0, 0));
+                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastPoint), 
+                    typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(color.red(), color.green(), color.blue()), 3);
             }
 
             lastPoint = pt;
@@ -502,11 +508,11 @@ bool Ant::moveForward()
         double p = rnd * i.value();
         Edge* edge = i.key();
 
-        qLogD << "  ant " << d->antIndex << " [" << edge->a()->nodeName()
-            << " -> " << edge->b()->nodeName() << ", " << edge->a()->currentPos() << ", " 
-            << edge->b()->currentPos() << ", length: " << edge->length() << qSetRealNumberPrecision(10) << "]"
-            << " rnd = " << rnd << ", pheromones = " << edge->pheromones() << ", weight = "
-            << i.value() << ", p = " << p;
+        //qLogD << "  ant " << d->antIndex << " [" << edge->a()->nodeName()
+            //<< " -> " << edge->b()->nodeName() << ", " << edge->a()->currentPos() << ", " 
+            //<< edge->b()->currentPos() << ", length: " << edge->length() << qSetRealNumberPrecision(10) << "]"
+            //<< " rnd = " << rnd << ", pheromones = " << edge->pheromones() << ", weight = "
+            //<< i.value() << ", p = " << p;
         if (p > maxProb)
         {
             maxProb = p;
@@ -520,14 +526,14 @@ bool Ant::moveForward()
         {
             return false;
         }
-        qLogD << "    ant " << d->antIndex << " walked through all nodes within this group.";
+        //qLogD << "    ant " << d->antIndex << " walked through all nodes within this group.";
         arrived(d->currentNode->outEdge()->b(), currentPos());
         return true;
     }
     else
     {
-        qLogD << "the best edge: " << maxEdge->a()->nodeName() << " --> " << maxEdge->b()->nodeName()
-            << ", maxProb: " << maxProb << ", length: " << maxEdge->length();
+        //qLogD << "the best edge: " << maxEdge->a()->nodeName() << " --> " << maxEdge->b()->nodeName()
+            //<< ", maxProb: " << maxProb << ", length: " << maxEdge->length();
     }
     arrived(maxEdge->b(), currentPos());
     d->pastEdges.insert(maxEdge);

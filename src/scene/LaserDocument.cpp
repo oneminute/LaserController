@@ -825,8 +825,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				this->scene()->addItem(poly);
 			}
 		}
-		
 	}
+    outline();
 }
 
 int LaserDocument::totalNodes()
@@ -933,9 +933,13 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
     if (!node->isAvailable())
         return;
 
+    // 获取当前节点的所有子节点，进行排序。
     QList<LaserNode*> children = node->childNodes();
     qSort(children.begin(), children.end(), 
         [=](LaserNode* a, LaserNode* b) -> bool {
+            // 以下采用的排序方式为按水平或垂直顺序进行排序。
+            // 按水平或垂直方向将整个矩形区域分成mxGroupingGridSize指定的等宽条带。
+            // 在条带内再按垂直或水平方向再次排序。
             int groupIndex1 = 0;
             int groupIndex2 = 0;
             if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
@@ -972,45 +976,32 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
         }
     );
 
-    /*for (LaserNode* item : children)
-    {
-        qLogD << item->position().x() << ", " << item->position().y();
-    }*/
-
+    // 获取每个分组中子节点的最大个数。
     int maxChildNodes = Config::PathOptimization::maxGroupSize();
-    //int batchCount = children.count() / maxChildNodes + 1;
+    // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
+    // 新建一个父节点，将该父节点作为当前父节点的子节点。
     if (children.count() > maxChildNodes)
     {
         node->childNodes().clear();
-        //QPointF center(0, 0);
         LaserNode* newNode = nullptr;
         for (int i = 0, count = 0; i < children.count(); i++)
         {
-            if (count == 0)
+            if ((count++ % maxChildNodes) == 0)
             {
                 newNode = new LaserNode(LaserNodeType::LNT_VIRTUAL);
                 QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
                 newNode->setNodeName(nodeName);
-            }
-            //center += children[i]->position();
-            newNode->addChildNode(children[i]);
-            if (++count == maxChildNodes)
-            {
-                //center /= newNode->childNodes().count();
-                //newNode->setPosition(center);
                 node->addChildNode(newNode);
-                //center = QPointF(0, 0);
-                count = 0;
             }
+            newNode->addChildNode(children.at(i));
         }
-        optimizeGroups(node, level);
+        //optimizeGroups(node, level);
     }
-    else
+
+    // 对每一个子节点再次递归进行整理。
+    for (LaserNode* item : node->childNodes())
     {
-        for (LaserNode* item : node->childNodes())
-        {
-            optimizeGroups(item, level + 1);
-        }
+        optimizeGroups(item, level + 1);
     }
 }
 

@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1216,6 +1216,14 @@
    </property>
    <property name="shortcut">
     <string>Alt+V</string>
+   </property>
+  </action>
+  <action name="actionUpdateOutline">
+   <property name="text">
+    <string>Update Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Update Outline</string>
    </property>
   </action>
  </widget>

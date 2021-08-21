@@ -449,6 +449,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionReset, &QAction::triggered, this, &LaserControllerWindow::laserResetToOriginalPoint);
     connect(m_ui->actionMoveToOrigin, &QAction::triggered, this, &LaserControllerWindow::laserBackToMachiningOriginalPoint);
 
+    connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
+
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
@@ -1125,10 +1127,23 @@ void LaserControllerWindow::createOperationsDockPanel()
 void LaserControllerWindow::createOutlineDockPanel()
 {
     m_treeWidgetOutline = new QTreeWidget;
+    m_treeWidgetOutline->setHeaderHidden(true);
+
+    QHBoxLayout* toolsLayout = new QHBoxLayout;
+    toolsLayout->setMargin(0);
+
+    QToolButton* updateButton = new QToolButton;
+    updateButton->setDefaultAction(m_ui->actionUpdateOutline);
+    QToolButton* showPathOptimizationOpt = new QToolButton;
+    showPathOptimizationOpt->setDefaultAction(m_ui->actionPathOptimization);
+    toolsLayout->addStretch(1);
+    toolsLayout->addWidget(showPathOptimizationOpt);
+    toolsLayout->addWidget(updateButton);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->addWidget(m_treeWidgetOutline);
+    layout->addLayout(toolsLayout);
 
     QWidget* panelWidget = new QWidget;
     panelWidget->setLayout(layout);
@@ -2184,6 +2199,12 @@ void LaserControllerWindow::onActionAbout(bool checked)
     LaserApplication::device->showLibraryVersion();
 }
 
+void LaserControllerWindow::onActionUpdateOutline(bool checked)
+{
+    m_scene->document()->outline();
+    updateOutlineTree();
+}
+
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
@@ -2546,6 +2567,9 @@ void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 
 void LaserControllerWindow::updateOutlineTree()
 {
+    if (!m_scene->document())
+        return;
+
     m_treeWidgetOutline->clear();
 
     QStack<LaserNode*> stack;

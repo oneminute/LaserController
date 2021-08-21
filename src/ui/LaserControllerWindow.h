@@ -141,6 +141,8 @@ protected slots:
     void onActionTemporaryLicense(bool checked = false);
     void onActionAbout(bool checked = false);
 
+    void onActionUpdateOutline(bool checked = false);
+
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
     void onDeviceDisconnected();
