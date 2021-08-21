@@ -22,11 +22,13 @@ namespace machiningUtils
     /// <param name="startingIndiciesCount"></param>
     /// <param name="diagonalThreshold"></param>
     /// <param name="canvas"></param>
+    /// <param name="isClosed">0表示非封闭，1表示封闭，2表示未知，需要由函数本身判断</param>
     /// <returns></returns>
-    int path2Points(const QPainterPath& path, 
-        QVector<QPointF>& points, 
+    int path2Points(const QPainterPath& path,
+        QVector<QPointF>& points,
         QList<int>& startingIndices,
         QPointF& center,
+        int closed = 2,
         int startingIndiciesCount = 8, 
         int diagonalThreshold = 2 * 40,
         cv::Mat& canvas = cv::Mat());

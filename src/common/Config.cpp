@@ -29,6 +29,7 @@ ConfigItemGroup* Config::Export::group(nullptr);
 ConfigItemGroup* Config::Device::group(nullptr);
 ConfigItemGroup* Config::UserRegister::group(nullptr);
 ConfigItemGroup* Config::SystemRegister::group(nullptr);
+ConfigItemGroup* Config::Debug::group(nullptr);
 
 Config::Config()
 {
@@ -55,6 +56,7 @@ void Config::init()
     loadDeviceItems();
     loadUserReigsters();
     loadSystemRegisters();
+    loadDebug();
 }
 
 void Config::load()
@@ -590,8 +592,8 @@ void Config::loadPathOptimizationItems()
         tr("Max children count in one group."),
         10
     );
-    maxStartingPoints->setInputWidgetProperty("minimum", 1);
-    maxStartingPoints->setInputWidgetProperty("maximum", 100);
+    maxGroupSize->setInputWidgetProperty("minimum", 1);
+    maxGroupSize->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* groupingOrientation = group->addConfigItem(
         "groupingOrientation",
@@ -2369,6 +2371,44 @@ void Config::loadSystemRegisters()
         DT_BOOL
     );
     zPhaseEnabled->bindLaserRegister(54);
+}
+
+void Config::loadDebug()
+{
+    ConfigItemGroup* group = new Config::Debug;
+    Config::Debug::group = group;
+
+    ConfigItem* showPrimitiveName = group->addConfigItem(
+        "showPrimitiveName",
+        tr("Show Primitive Name"),
+        tr("Show primitve name."),
+        false,
+        DT_BOOL
+    );
+
+    ConfigItem* showPrimitiveFirstPoint = group->addConfigItem(
+        "showPrimitiveFirstPoint",
+        tr("Show Primitive First Point"),
+        tr("Show primitve first point."),
+        false,
+        DT_BOOL
+    );
+
+    ConfigItem* generatePathImage = group->addConfigItem(
+        "generatePathImage",
+        tr("Generate Path Image"),
+        tr("Generate path image."),
+        false,
+        DT_BOOL
+    );
+
+    ConfigItem* generateMachiningImage = group->addConfigItem(
+        "generateMachiningImage",
+        tr("Generate Machining Image"),
+        tr("Generate machining image."),
+        false,
+        DT_BOOL
+    );
 }
 
 QList<ConfigItemGroup*> Config::getGroups()

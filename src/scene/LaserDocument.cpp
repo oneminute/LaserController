@@ -371,12 +371,14 @@ void LaserDocument::exportJSON2(const QString& filename)
 
     float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
     float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
+    cv::Mat canvas(pageHeight, pageWidth, CV_8UC3, cv::Scalar(255, 255, 255));
 
     QElapsedTimer timer;
     timer.start();
     OptimizerController* optimizer = new OptimizerController(this, totalNodes());
-    PathOptimizer::Path path = optimizer->optimize(pageWidth, pageHeight);
+    PathOptimizer::Path path = optimizer->optimize(pageWidth, pageHeight, canvas);
     qLogD << "optimized duration: " << timer.elapsed() / 1000.0;
+    delete optimizer;
 
     timer.start();
     QFile saveFile(filename);
@@ -392,7 +394,6 @@ void LaserDocument::exportJSON2(const QString& filename)
 
     QJsonArray layers;
     QJsonArray items;
-    cv::Mat canvas(pageHeight, pageWidth, CV_8UC3, cv::Scalar(255, 255, 255));
     QPointF lastPoint(0, 0);
 
     QList<LaserLayer*> layerList;
@@ -966,6 +967,7 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
                 {
                     return a->position().y() < b->position().y();
                 }
+                return false;
             }
         }
     );

@@ -45,15 +45,18 @@ int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::
 }
 
 int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& points, 
-    QList<int>& startingIndices, QPointF& center, int startingIndiciesCount, 
+    QList<int>& startingIndices, QPointF& center, int closed, int startingIndiciesCount, 
     int diagonalThreshold, cv::Mat& canvas)
 {
+    points.clear();
+    startingIndices.clear();
+    center = QPointF(0, 0);
+
     qreal length = path.length();
     QPointF firstPoint = path.pointAtPercent(0);
     QPointF lastPoint = path.pointAtPercent(1);
     QPointF point = firstPoint;
     qreal radians = qDegreesToRadians(path.angleAtPercent(0));
-    center = QPointF(0, 0);
 
     // Calculate bounding rect of current path. If the diagonal is less than diagonalThreshold,
     // we just choose the first point as the only starting point for closed curves,
@@ -69,14 +72,26 @@ int machiningUtils::path2Points(const QPainterPath & path, QVector<QPointF>& poi
     QQueue<qreal> ratios;
     int startingPointsCount = 1;
 
-    bool isClosed = utils::fuzzyEquals(firstPoint, lastPoint);
+    bool isClosed;
+    switch(closed)
+    {
+    case 0:
+        isClosed = false;
+        break;
+    case 1:
+        isClosed = true;
+        break;
+    case 2:
+        isClosed = utils::fuzzyEquals(firstPoint, lastPoint);
+        break;
+    }
     ratios.enqueue(0);
     // If the curve is not closed, we dived it evenly into several segments, and store the 
     // end points of each segment.
     if (isClosed)
     {
         qreal avgRatio = 1.0 / startingIndiciesCount;
-        for (int i = 0; i < startingIndiciesCount; i++)
+        for (int i = 1; i < startingIndiciesCount; i++)
         {
             ratios.append(avgRatio * i);
         }

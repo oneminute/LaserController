@@ -148,7 +148,7 @@
     "pathOptimization": {
         "groupingOrientation": {
             "defaultValue": 2,
-            "value": 1
+            "value": 2
         },
         "maxAnts": {
             "defaultValue": 100,
@@ -156,7 +156,7 @@
         },
         "maxGroupSize": {
             "defaultValue": 10,
-            "value": 10
+            "value": 8
         },
         "maxGroupingGridSize": {
             "defaultValue": 30,

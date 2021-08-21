@@ -44,6 +44,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         << Config::Device::group
         << Config::UserRegister::group
         << Config::SystemRegister::group
+        << Config::Debug::group
         ;
 
     for (ConfigItemGroup* group : groups)

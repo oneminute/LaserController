@@ -161,36 +161,36 @@ bool LaserApplication::checkEnvironment()
     return true;
 }
 
-bool LaserApplication::notify(QObject * receiver, QEvent * event)
-{
-    bool done = true;
-    try {
-        done = QApplication::notify(receiver, event);
-    }
-    catch (LaserDeviceSecurityException* e)
-    {
-        qLogW << "laser security exception: " << e->toString();
-        //mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
-    }
-    catch (LaserException* e)
-    {
-        qLogD << "laser exception: " << e->toString();
-    }
-    catch (QException* e)
-    {
-        qLogD << "QException: " << e;
-    }
-    catch (std::exception* e)
-    {
-        qLogD << "std::exception";
-    }
-    catch (...)
-    {
-        qLogD << "some exception else";
-
-    }
-    return done;
-}
+//bool LaserApplication::notify(QObject * receiver, QEvent * event)
+//{
+//    bool done = true;
+//    try {
+//        done = QApplication::notify(receiver, event);
+//    }
+//    catch (LaserDeviceSecurityException* e)
+//    {
+//        qLogW << "laser security exception: " << e->toString();
+//        //mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
+//    }
+//    catch (LaserException* e)
+//    {
+//        qLogD << "laser exception: " << e->toString();
+//    }
+//    catch (QException* e)
+//    {
+//        qLogD << "QException: " << e;
+//    }
+//    catch (std::exception* e)
+//    {
+//        qLogD << "std::exception";
+//    }
+//    catch (...)
+//    {
+//        qLogD << "some exception else";
+//
+//    }
+//    return done;
+//}
 
 void LaserApplication::initLog()
 {

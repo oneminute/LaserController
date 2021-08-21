@@ -16,7 +16,7 @@ class NodePrivate;
 class Node
 {
 public:
-    explicit Node(LaserNode* laserNode, const QString& name = "");
+    explicit Node(LaserNode* laserNode, const QString& name = "", cv::Mat& canvas = cv::Mat());
     ~Node();
 
     LaserPrimitive* primitive();
@@ -38,6 +38,7 @@ public:
     QString nodeName() const;
     bool isVirtual() const;
 
+    void debugDraw(cv::Mat& canvas);
     //Node* parent();
     //void addChild(Node* node);
     //QList<Node*>& children();
@@ -123,6 +124,9 @@ public:
     bool useGreedyAlgorithm() const;
     Path optimizedPath() const;
 
+    void setCanvas(cv::Mat& canvas);
+
+
 public slots:
     void optimize(int canvasWidth, int canvasHeight);
 
@@ -151,7 +155,7 @@ public:
     OptimizerController(LaserNode* root, int totalNodes, QObject* parent = nullptr);
     ~OptimizerController();
 
-    PathOptimizer::Path optimize(float pageWidth, float pageHeight);
+    PathOptimizer::Path optimize(float pageWidth, float pageHeight, cv::Mat& canvas = cv::Mat());
 
 public slots:
     void finished();

@@ -63,9 +63,9 @@ protected:
     static void loadPathOptimizationItems();
     static void loadExportItems();
     static void loadDeviceItems();
-
     static void loadUserReigsters();
     static void loadSystemRegisters();
+    static void loadDebug();
 
 public:
     class General : public ConfigItemGroup
@@ -323,6 +323,24 @@ public:
         CONFIG_ITEM(systemRegister, xPhaseEnabled, bool, toBool)
         CONFIG_ITEM(systemRegister, yPhaseEnabled, bool, toBool)
         CONFIG_ITEM(systemRegister, zPhaseEnabled, bool, toBool)
+
+    private:
+        friend class Config;
+    };
+
+    class Debug : public ConfigItemGroup
+    {
+    protected:
+        Debug(QObject* parent = nullptr)
+            : ConfigItemGroup("debug", tr("Debug"), tr("Debug"), parent)
+        {}
+
+    public:
+        static ConfigItemGroup* group;
+        CONFIG_ITEM(debug, showPrimitiveName, bool, toBool)
+        CONFIG_ITEM(debug, showPrimitiveFirstPoint, bool, toBool)
+        CONFIG_ITEM(debug, generatePathImage, bool, toBool)
+        CONFIG_ITEM(debug, generateMachiningImage, bool, toBool)
 
     private:
         friend class Config;

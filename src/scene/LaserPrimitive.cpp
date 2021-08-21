@@ -188,9 +188,13 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     draw(painter);
 
     QPainterPath outline = this->outline();
+
     QPointF startPos = outline.pointAtPercent(0);
-    //painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
-    //painter->drawText(startPos, name());
+    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
+    if (Config::Debug::showPrimitiveName())
+        painter->drawText(startPos, name());
+    if (Config::Debug::showPrimitiveFirstPoint())
+        painter->drawEllipse(startPos, 2, 2);
 }
 
 int LaserPrimitive::layerIndex()
@@ -632,7 +636,7 @@ QVector<QPointF> LaserEllipse::updateMachiningPoints(cv::Mat& canvas)
 
     QVector<QPointF> points;
     machiningUtils::path2Points(path, points, d->startingIndices, d->machiningCenter,
-        Config::Export::maxStartingPoints(), 
+        1, Config::Export::maxStartingPoints(), 
         Config::Export::smallDiagonalLimitation().maxDiagonal(), canvas);
     d->machiningPoints = points;
     return points;
@@ -771,19 +775,24 @@ void LaserRect::draw(QPainter* painter)
 QVector<QPointF> LaserRect::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserRect);
+    d->machiningPoints.clear();
+    d->startingIndices.clear();
 	QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
-    QVector<QPointF> points;
     QPolygonF poly = d->path.toFillPolygon(t);
     QPointF pt1 = poly.at(0);
     QPointF pt2 = poly.at(1);
     QPointF pt3 = poly.at(2);
     QPointF pt4 = poly.at(3);
-    points.push_back(pt1);
-    points.push_back(pt2);
-    points.push_back(pt3);
-    points.push_back(pt4);
-    points.push_back(pt1);
-    d->machiningCenter = utils::center(points);
+    d->machiningPoints.push_back(pt1);
+    d->machiningPoints.push_back(pt2);
+    d->machiningPoints.push_back(pt3);
+    d->machiningPoints.push_back(pt4);
+    d->machiningPoints.push_back(pt1);
+    d->startingIndices.append(0);
+    d->startingIndices.append(1);
+    d->startingIndices.append(2);
+    d->startingIndices.append(3);
+    d->machiningCenter = utils::center(d->machiningPoints);
 
     if (!canvas.empty())
     {
@@ -793,8 +802,7 @@ QVector<QPointF> LaserRect::updateMachiningPoints(cv::Mat& canvas)
         cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
     }
 
-    d->machiningPoints = points;
-    return points;
+    return d->machiningPoints;
 }
 
 QPainterPath LaserRect::toPath() const
@@ -914,14 +922,23 @@ void LaserLine::setLine(const QLineF& line)
 QVector<QPointF> LaserLine::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserLine);
-    QVector<QPointF> points;
-    QPainterPath path = toPath();
+    d->machiningPoints.clear();
+    d->startingIndices.clear();
+
+	QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
+    QPointF pt1 = t.map(d->line.p1());
+    QPointF pt2 = t.map(d->line.p2());
+    d->machiningPoints.append(pt1);
+    d->machiningPoints.append(pt2);
+    d->startingIndices.append(0);
+    d->startingIndices.append(1);
     
-    machiningUtils::path2Points(path, points, d->startingIndices, d->machiningCenter,
-        Config::Export::maxStartingPoints(), 0, canvas);
-    
-    d->machiningPoints = points;
-    return points;
+    if (!canvas.empty())
+    {
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt1), typeUtils::qtPointF2CVPoint2f(pt2), cv::Scalar(0));
+    }
+
+    return d->machiningPoints;
 }
 
 void LaserLine::draw(QPainter * painter)
@@ -1058,14 +1075,12 @@ void LaserPath::setPath(const QPainterPath& path)
 QVector<QPointF> LaserPath::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserPath);
-    QVector<QPointF> points;
     QPainterPath path = toPath();
     
-    machiningUtils::path2Points(path, points, d->startingIndices, d->machiningCenter,
+    machiningUtils::path2Points(path, d->machiningPoints, d->startingIndices, d->machiningCenter, 2,
         Config::Export::maxStartingPoints(), 0, canvas);
     
-    d->machiningPoints = points;
-    return points;
+    return d->machiningPoints;
 }
 
 void LaserPath::draw(QPainter * painter)
@@ -1190,34 +1205,44 @@ QRectF LaserPolyline::sceneBoundingRect() const
 QVector<QPointF> LaserPolyline::updateMachiningPoints(cv::Mat & canvas)
 {
     Q_D(LaserPolyline);
-    QVector<QPointF> points;
+    d->machiningPoints.clear();
+    d->startingIndices.clear();
+    bool isClosed = this->isClosed();
+
     cv::Point2f lastPt;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     d->machiningCenter = QPointF(0, 0);
     for (int i = 0; i < d->poly.size(); i++)
     {
-        QPointF pt = t.map(d->poly[i]);
+        QPointF pt = t.map(d->poly.at(i));
         cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
         if (i > 0 && !canvas.empty())
         {
             cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
         }
         lastPt = cvPt;
-        points.push_back(pt);
+        d->machiningPoints.append(pt);
+        if (isClosed)
+        {
+            d->startingIndices.append(i);
+        }
         d->machiningCenter += pt;
     }
+    if (!isClosed)
+    {
+        d->startingIndices.append(0);
+        d->startingIndices.append(d->machiningPoints.size() - 1);
+    }
     if (!canvas.empty())
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(points[points.size() - 1]), typeUtils::qtPointF2CVPoint2f(points[0]), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(d->machiningPoints.last()), typeUtils::qtPointF2CVPoint2f(d->machiningPoints.first()), cv::Scalar(0));
     
-    d->machiningPoints = points;
-    d->machiningCenter /= points.size();
-    return points;
+    d->machiningCenter /= d->machiningPoints.size();
+    return d->machiningPoints;
 }
 
 void LaserPolyline::draw(QPainter * painter)
 {
     Q_D(LaserPolyline);
-    //painter->drawPolyline(d->poly);
 	painter->drawPath(d->path);
 }
 
@@ -1346,7 +1371,9 @@ void LaserPolygon::setPolyline(const QPolygonF& poly)
 QVector<QPointF> LaserPolygon::updateMachiningPoints(cv::Mat & canvas)
 {
     Q_D(LaserPolygon);
-    QVector<QPointF> points;
+    d->machiningPoints.clear();
+    d->startingIndices.clear();
+    bool isClosed = this->isClosed();
     cv::Point2f lastPt;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     d->machiningCenter = QPointF(0, 0);
@@ -1359,16 +1386,25 @@ QVector<QPointF> LaserPolygon::updateMachiningPoints(cv::Mat & canvas)
             cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
         }
         lastPt = cvPt;
-        points.push_back(pt);
+        d->machiningPoints.push_back(pt);
         d->machiningCenter += pt;
+        if (isClosed)
+        {
+            d->startingIndices.append(i);
+        }
     }
-    points.push_back(points[0]);
+    d->machiningPoints.push_back(d->machiningPoints.first());
+    if (!isClosed)
+    {
+        d->startingIndices.append(0);
+        d->startingIndices.append(d->machiningPoints.size() - 1);
+    }
     if (!canvas.empty())
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(points[points.size() - 1]), typeUtils::qtPointF2CVPoint2f(points[0]), cv::Scalar(0));
+        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(d->machiningPoints.last()), 
+            typeUtils::qtPointF2CVPoint2f(d->machiningPoints.first()), cv::Scalar(0));
     
-    d->machiningPoints = points;
-    d->machiningCenter /= points.size();
-    return points;
+    d->machiningCenter /= d->machiningPoints.size();
+    return d->machiningPoints;
 }
 
 void LaserPolygon::draw(QPainter * painter)
@@ -1949,6 +1985,9 @@ QJsonObject LaserBitmap::toJson()
 QVector<QPointF> LaserBitmap::updateMachiningPoints(cv::Mat& canvas)
 {
     Q_D(LaserBitmap);
+    d->machiningPoints.clear();
+    d->startingIndices.clear();
+
 	QTransform t = transform() * Global::matrixToMM(SU_PX, 40, 40);
     QVector<QPointF> points;
     QPointF pt1 = t.map(d->boundingRect.topLeft());
@@ -1960,6 +1999,10 @@ QVector<QPointF> LaserBitmap::updateMachiningPoints(cv::Mat& canvas)
     points.push_back(pt3);
     points.push_back(pt4);
     points.push_back(pt1);
+    d->startingIndices.append(0);
+    d->startingIndices.append(1);
+    d->startingIndices.append(2);
+    d->startingIndices.append(3);
     d->machiningCenter = utils::center(points);
 
     if (!canvas.empty())
