@@ -268,7 +268,7 @@ void Node::debugDraw(cv::Mat& canvas)
             color.setGreen(QRandomGenerator::global()->bounded(192));
             color.setBlue(QRandomGenerator::global()->bounded(192));
         }
-        qLogD << color;
+        //qLogD << color;
         int i = 0;
         QPointF lastPoint;
         for (const QPointF& pt : primitive->machiningPoints())
@@ -962,13 +962,13 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
             for (LaserNode* leafNode : siblingChildren)
             {
                 Edge* edge = new Edge(node, laserNodeMap[leafNode]);
-                QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
+                /*QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
                     .arg(travelled.size())
                     .arg(d->totalNodes)
                     .arg(node->nodeName())
                     .arg(edge->b()->nodeName())
                     .arg(edge->length());
-                emit messageUpdated(msg);
+                emit messageUpdated(msg);*/
                 node->addEdge(edge);
                 d->edges.append(edge);
             }
@@ -977,13 +977,13 @@ void PathOptimizer::initializeByGroups(LaserNode* root)
             if (parentNode)
             {
                 Edge* edge = new Edge(node, parentNode);
-                QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
+                /*QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
                     .arg(travelled.size())
                     .arg(d->totalNodes)
                     .arg(node->nodeName())
                     .arg(edge->b()->nodeName())
                     .arg(edge->length());
-                emit messageUpdated(msg);
+                emit messageUpdated(msg);*/
                 d->avgEdgeLength += edge->length();
                 node->setOutEdge(edge);
                 d->edges.append(edge);

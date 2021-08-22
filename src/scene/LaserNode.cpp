@@ -56,6 +56,15 @@ void LaserNode::addChildNode(LaserNode* node)
     }
 }
 
+void LaserNode::addChildNodes(const QList<LaserNode*>& nodes)
+{
+    Q_D(LaserNode);
+    for (LaserNode* node : nodes)
+    {
+        addChildNode(node);
+    }
+}
+
 void LaserNode::removeChildNode(LaserNode* node)
 {
     Q_D(LaserNode);

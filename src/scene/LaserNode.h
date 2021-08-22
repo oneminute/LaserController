@@ -31,6 +31,7 @@ public:
     void setNodeName(const QString& name);
 
     void addChildNode(LaserNode* node);
+    void addChildNodes(const QList<LaserNode*>& nodes);
     void removeChildNode(LaserNode* node);
     void clearChildren();
     bool hasChildren() const;

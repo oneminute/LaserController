@@ -166,7 +166,7 @@
     "pathOptimization": {
         "groupingOrientation": {
             "defaultValue": 2,
-            "value": 2
+            "value": 1
         },
         "maxAnts": {
             "defaultValue": 100,

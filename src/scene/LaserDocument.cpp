@@ -933,46 +933,58 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
     if (!node->isAvailable())
         return;
 
+    qLogD << "node " << node->nodeName() << " has " << node->childCount() << " child nodes.";
+    if (!node->hasChildren())
+    {
+        return;
+    }
+
+    QMap<int, QList<LaserNode*>> childrenMap;
+    for (LaserNode* node : node->childNodes())
+    {
+        int groupIndex = 0;
+        if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+        {
+            groupIndex = node->position().y() / Config::PathOptimization::maxGroupingGridSize();
+        }
+        else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+        {
+            groupIndex = node->position().x() / Config::PathOptimization::maxGroupingGridSize();
+        }
+        childrenMap[groupIndex].append(node);
+    }
+    qLogD << "  child nodes were seperated into " << childrenMap.size() << " groups by grid.";
+
+    if (childrenMap.size() > 1)
+    {
+        // 清空当前的子节点列表。
+        node->childNodes().clear();
+        for (QMap<int, QList<LaserNode*>>::Iterator i = childrenMap.begin(); i != childrenMap.end(); i++)
+        {
+            LaserNode* newNode = new LaserNode(LaserNodeType::LNT_VIRTUAL);
+            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+            newNode->setNodeName(nodeName);
+            newNode->addChildNodes(i.value());
+            node->addChildNode(newNode);
+
+            // 递归调用
+            optimizeGroups(newNode, level + 1);
+        }
+    }
+
     // 获取当前节点的所有子节点，进行排序。
     QList<LaserNode*> children = node->childNodes();
     qSort(children.begin(), children.end(), 
         [=](LaserNode* a, LaserNode* b) -> bool {
-            // 以下采用的排序方式为按水平或垂直顺序进行排序。
-            // 按水平或垂直方向将整个矩形区域分成mxGroupingGridSize指定的等宽条带。
-            // 在条带内再按垂直或水平方向再次排序。
-            int groupIndex1 = 0;
-            int groupIndex2 = 0;
             if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
             {
-                groupIndex1 = a->position().y() / Config::PathOptimization::maxGroupingGridSize();
-                groupIndex2 = b->position().y() / Config::PathOptimization::maxGroupingGridSize();
+                return a->position().x() < b->position().x();
             }
             else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
             {
-                groupIndex1 = a->position().x() / Config::PathOptimization::maxGroupingGridSize();
-                groupIndex2 = b->position().x() / Config::PathOptimization::maxGroupingGridSize();
+                return a->position().y() < b->position().y();
             }
-
-            if (groupIndex1 < groupIndex2)
-            {
-                return true;
-            }
-            else if (groupIndex1 > groupIndex2)
-            {
-                return false;
-            }
-            else
-            {
-                if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
-                {
-                    return a->position().x() < b->position().x();
-                }
-                else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
-                {
-                    return a->position().y() < b->position().y();
-                }
-                return false;
-            }
+            return false;
         }
     );
 
@@ -996,6 +1008,7 @@ void LaserDocument::optimizeGroups(LaserNode* node, int level)
             newNode->addChildNode(children.at(i));
         }
         //optimizeGroups(node, level);
+        qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
     }
 
     // 对每一个子节点再次递归进行整理。

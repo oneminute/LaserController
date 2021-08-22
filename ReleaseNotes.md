@@ -1,5 +1,22 @@
 #Release Notes
 
+#### 2021-08-21 0.2.0.2
+特性:
+1. 添加了调试参数；
+2. 添加了分组中图元数量设置的功能；
+3. 添加了横向分组与纵向分组的功能；
+4. 修复了路径优化中的多处bug；
+5. 修复了建立拓扑时，分组值修改造成图元丢失的bug；
+6. 可以手动更新文档拓扑树。
+
+Features:
+1. Add debug parameters;
+2. Add a parameter to set primitive count of each group;
+3. Add a parameter to specify grouping by vertical or horizontal;
+4. Fixed many bugs of path optimization;
+5. Fixed a bug causing some primitives missing when generate node tre;
+6. Add a tool button allowing user update node tree manually.
+
 #### 2021-08-19 0.2.0.1
 特性:
 1. 在选项中添加了小圆限速选项；
