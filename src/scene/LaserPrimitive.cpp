@@ -2186,7 +2186,7 @@ LaserText::LaserText(LaserDocument* doc,QTransform saveTransform, int layerIndex
     d->boundingRect = d->path.boundingRect();
     d->rect = d->boundingRect.toRect();
     d->outline.addRect(d->rect);
-    d->position = d->rect.center();
+    //d->position = d->rect.center();
     
 }
 
