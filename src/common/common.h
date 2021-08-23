@@ -174,7 +174,6 @@ enum SelectionTransformType {
 	Transform_ROTATE = 2,
 	Transform_RESIZE = 3
 };
-
 /// <summary>
 /// 当前选项的修改方式
 /// </summary>

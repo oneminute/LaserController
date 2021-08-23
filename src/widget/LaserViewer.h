@@ -13,6 +13,7 @@ class LaserPrimitiveGroup;
 class LaserPrimitive;
 class LaserBitmap;
 class LaserLayer;
+class LaserText;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -47,10 +48,11 @@ public:
 	QRectF selectedItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
-	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);
-	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);
+	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);//draw
+	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);//selection
 	bool detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint);
-	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);
+	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);//selection
+    QPointF dectctTextInsertPosition();//draw text
 	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
 
@@ -65,12 +67,16 @@ public:
 	int curLayerIndex();
 
 	void setCurLayerIndex(int index);
+
+    
 	
 private:
     void init();
 	void initSpline();
-	void creatTextEdit();
-	void releaseTextEdit();
+	//void creatTextEdit();
+	void addText(QString str);
+    void delText();
+    void addTextByKeyInput(QString str);
 	void selectedHandleScale();
 	void selectedHandleRotate();
 	
@@ -99,7 +105,7 @@ public slots:
     void zoomOut();
     void resetZoom();
 	void zoomToSelection();
-	void textAreaChanged();
+	//void textAreaChanged();
 	void onEndSelecting();
 	void onEndSelectionFillGroup();
 	void onDocumentIdle();
@@ -107,6 +113,8 @@ public slots:
 	bool resetGroup();
 	bool onSelectedFillGroup();
 	QMap<QGraphicsItem*, QTransform> onReplaceGroup(LaserPrimitive* item);
+    //text
+    void onEndText();
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -163,6 +171,9 @@ protected:
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
+
+    virtual void inputMethodEvent(QInputMethodEvent *event) override;
+
 	//scroll
 
 	virtual void scrollContentsBy(int dx, int dy) override;
@@ -222,11 +233,11 @@ private:
 	QTime m_time;
 	int m_curTime;
 	int m_lastTime;
-	QTextEdit *m_textEdit;
+	//QTextEdit *m_textEdit;
 
 	bool m_isKeyShiftPressed;
-	bool m_isKeyDelPress;
 	bool m_isKeyCtrlPress;
+    bool m_isCapsLock;
 	//Ruller
 	RulerWidget* m_horizontalRuler;
 	RulerWidget* m_verticalRuler;
@@ -276,6 +287,11 @@ private:
 	QList<QString> m_selectedGroupedList;
 	//layer
 	int m_curLayerIndex;
+    //text
+    QPointF m_textInsertPos;
+    LaserText* m_editingText;
+    QPointF m_textMousePressPos;
+    QFont m_curTextFont;
 	
 	friend class LaserScene;
 };

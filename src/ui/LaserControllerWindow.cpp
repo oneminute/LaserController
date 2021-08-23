@@ -469,6 +469,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
 	connect(StateController::instance().documentIdleState(), &QState::entered, m_viewer, &LaserViewer::onDocumentIdle);
+    connect(StateController::instance().documentPrimitiveTextState(), &QState::exited, this, [=] {
+        //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
+    });
 	
 	connect(StateController::instance().documentPrimitiveState(), &QState::entered, m_viewer, [=] {
 		m_viewer->viewport()->repaint();
@@ -825,6 +828,7 @@ void LaserControllerWindow::createCentralDockPanel()
     m_viewer = new LaserViewer(this);
     m_viewer->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_viewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
     m_scene = qobject_cast<LaserScene*>(m_viewer->scene());
 
      // 初始化缩放列表控件
@@ -1380,8 +1384,11 @@ void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
 	switch (event->key())
 	{
 		case Qt::Key_Space: {
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+                return;
+            }
 			if (!event->isAutoRepeat()) {
-				m_lastState = nullptr;
+  				m_lastState = nullptr;
 				m_lastState = m_viewer->currentState();
 				this->onActionViewDrag(true);
 
@@ -2223,6 +2230,7 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 	m_viewer->undoStack()->push(addCmd);
 	//m_scene->addLaserPrimitive(bitmap);
 	m_viewer->onReplaceGroup(bitmap);
+    
 }
 
 void LaserControllerWindow::onActionUpdate(bool checked)
@@ -3317,7 +3325,7 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// actionTextTool
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentWorkingState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentIdleState);
 	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectionState);
