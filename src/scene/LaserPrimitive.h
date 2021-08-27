@@ -443,13 +443,20 @@ class LaserText : public LaserPrimitive
 {
 	Q_OBJECT
 public:
-	LaserText(const QRect rect, const QString content, LaserDocument* doc,  LaserPrimitiveType type, QTransform transform = QTransform(), 
+	LaserText(LaserDocument* doc,  QTransform transform = QTransform(),
 		int layerIndex = 0);
     virtual ~LaserText() {}
 
     QRect rect() const;
-    QString content() const;
+    //QString content() const;
+    QVector<QLineF> edges();
+    void appendPathList(QPainterPath path);
 
+    QPointF addPath(LaserViewer* view, QString content, QPointF insetPos, QFont font, int type);
+    void delPath(QPainterPath path);
+
+    virtual QRectF boundingRect() const;
+    virtual QRectF sceneBoundingRect() const;
 	virtual void draw(QPainter* painter);
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }

@@ -2187,20 +2187,20 @@ public:
     LaserTextPrivate(LaserText* ptr)
         : LaserPrimitivePrivate(ptr)
     {}
-
-	QString content;
 	QRect rect;
+    QList<QPainterPath> pathList;
+    QPainterPath path;
 };
 
-LaserText::LaserText(const QRect rect, const QString content, LaserDocument* doc,  LaserPrimitiveType type, 
-	 QTransform saveTransform, int layerIndex)
+LaserText::LaserText(LaserDocument* doc,QTransform saveTransform, int layerIndex)
 	: LaserPrimitive(new LaserTextPrivate(this),  doc,  LPT_TEXT, saveTransform, layerIndex)
 {
     Q_D(LaserText);
-    d->rect = rect;
-    d->content = content;
-	d->boundingRect = rect;
-    d->outline.addRect(rect);
+    d->boundingRect = d->path.boundingRect();
+    d->rect = d->boundingRect.toRect();
+    d->outline.addRect(d->rect);
+    //d->position = d->rect.center();
+    
 }
 
 QRect LaserText::rect() const 
@@ -2209,25 +2209,120 @@ QRect LaserText::rect() const
     return d->rect; 
 }
 
-QString LaserText::content() const 
+/*QString LaserText::content() const 
 {
     Q_D(const LaserText);
     return d->content; 
+}*/
+
+QVector<QLineF> LaserText::edges()
+{
+    Q_D(const LaserText);
+    return  LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+
+void LaserText::appendPathList(QPainterPath path)
+{
+    Q_D(LaserText);
+    d->pathList.append(path);
+}
+
+QPointF LaserText::addPath(LaserViewer* view, QString content, QPointF insertPos, QFont font, int type)
+{
+    Q_D(LaserText);
+    //QPainterPaht 
+    //QList<QPolygonF> polys = d->path.toFillPolygons();
+    int count = content.size();
+    QPointF newPos = insertPos;
+    QPainterPath path;
+    QPointF point = view->mapToScene(insertPos.toPoint());
+    qreal diff = font.pointSize() * 0.5;
+    point.setY(point.y() + diff);
+    
+    switch (type) {
+        case Qt::AlignLeft: {
+
+            break;
+        }
+        case Qt::AlignRight: {
+            /*for (QPainterPath poly : d->pathList) {
+                QRectF rect = poly.boundingRect();
+                qDebug() << rect;
+                qreal right = rect.right();
+                if (right > insertPos.x()) {
+                    poly.translate(QPointF(path.boundingRect().width(), 0));
+                }
+            }*/
+            path.addText(point, font, content);
+            qDebug() << path.boundingRect().width();
+            qDebug() << insertPos;
+            newPos = insertPos + sceneTransform().toAffine().map(QPointF(path.boundingRect().width(), 0));
+            qDebug() << newPos;
+            break;
+        }
+        case Qt::AlignHCenter: {
+            
+            break;
+        }
+    }
+    d->path.addPath(path);
+    if (count == 1) {
+        appendPathList(path);
+    }
+    else if (count > 1) {
+        QPainterPath lastPath;
+        for (int i = 0; i < count; i++) {
+            QPainterPath subPath;
+
+            QPointF subPoint;
+            if (i == 0) {
+                subPoint = point;
+            }
+            else {
+                subPoint += sceneTransform().toAffine().map(QPointF(lastPath.boundingRect().width(), 0));
+            }
+            subPath.addText(subPoint, font, QString(content[i]));
+            appendPathList(subPath);
+            lastPath = subPath;
+        }
+    }
+    int i = d->pathList.size();
+    
+    return newPos;
+}
+
+void LaserText::delPath(QPainterPath path)
+{
+    Q_D(LaserText);
+    if (d->path.contains(path)) {
+        d->path = d->path - path;
+    }
+    
+}
+
+QRectF LaserText::boundingRect() const
+{
+    Q_D(const LaserText);
+    //d->boundingRect = d->path.boundingRect();
+    return d->path.boundingRect();
+}
+
+QRectF LaserText::sceneBoundingRect() const
+{
+    Q_D(const LaserText);
+    return sceneTransform().map(this->boundingRect()).boundingRect();
 }
 
 void LaserText::draw(QPainter * painter)
 {
     Q_D(LaserText);
-	QTextDocument doc;
-	doc.setHtml(d->content);
-	painter->translate(d->rect.topLeft());
-	doc.drawContents(painter, QRect(0, 0, d->rect.width(), d->rect.height()));
+    painter->drawPath(d->path);
 }
 
 LaserPrimitive * LaserText::clone(QTransform t)
 {
 	Q_D(LaserText);
-	LaserText* text = new LaserText(d->rect, d->content, document(),  d->primitiveType, t, d->layerIndex);
+	LaserText* text = new LaserText(document(), sceneTransform(), d->layerIndex);
 	return nullptr;
 }
 

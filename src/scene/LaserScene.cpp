@@ -193,7 +193,14 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 			m_mouseMoveBlock = true;
 			return false;//scene û�й��˵���¼���������item���ݣ� true����˵���
 		}
-	}
+    }
+    else if (event->type() == QEvent::InputMethod) {
+        QInputMethodEvent* e = static_cast<QInputMethodEvent*>(event);
+        if (!e->commitString().isEmpty()) {
+            qDebug() << e->commitString();
+        }
+        
+    }
 	
 	
 	return QGraphicsScene::eventFilter(watched, event);
@@ -283,7 +290,7 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 	//items
 	QList<LaserPrimitive*> list = this->document()->primitives().values();
 	
-	for each(LaserPrimitive* item in list) {
+	for(LaserPrimitive* item : list) {
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
 			continue;
 		}
