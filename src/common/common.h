@@ -230,6 +230,14 @@ enum DataType
     DT_CUSTOM
 };
 
+enum LaserNodeType
+{
+    LNT_DOCUMENT,
+    LNT_LAYER,
+    LNT_PRIMITIVE,
+    LNT_VIRTUAL,
+};
+
 class Global
 {
 public:

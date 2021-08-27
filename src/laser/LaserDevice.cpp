@@ -17,6 +17,7 @@ public:
     LaserDevicePrivate(LaserDevice* ptr)
         : q_ptr(ptr)
         , driver(nullptr)
+        , isInit(false)
         , connected(false)
         , portName("")
         , layoutRect(0, 0, 320, 210)
@@ -25,6 +26,7 @@ public:
 
     LaserDevice* q_ptr;
     LaserDriver* driver;
+    bool isInit;
     bool connected;
 
     QString portName;
@@ -64,18 +66,23 @@ LaserDevice::~LaserDevice()
     qDebug() << "device destroyed";
 }
 
-void LaserDevice::resetDriver(LaserDriver* driver)
+bool LaserDevice::resetDriver(LaserDriver* driver)
 {
     Q_D(LaserDevice);
     unbindDriver();
     d->driver = driver;
     connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError, Qt::ConnectionType::QueuedConnection);
     connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage, Qt::ConnectionType::QueuedConnection);
-
     connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
 
-    load();
+    return load();
+}
+
+bool LaserDevice::isInit() const
+{
+    Q_D(const LaserDevice);
+    return d->isInit;
 }
 
 bool LaserDevice::isConnected() const
@@ -90,11 +97,15 @@ QString LaserDevice::portName() const
     return d->portName;
 }
 
-void LaserDevice::load()
+bool LaserDevice::load()
 {
     Q_D(LaserDevice);
-    d->driver->load();
+    if (d->driver->load())
+        return true;
+
+    unbindDriver();
     //d->driver->showAboutWindow();
+    return false;
 }
 
 qreal LaserDevice::layoutWidth() const
@@ -462,6 +473,10 @@ void LaserDevice::unbindDriver()
     {
         disconnect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError);
         disconnect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage);
+        disconnect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
+        disconnect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
+        delete d->driver;
+        d->driver = nullptr;
     }
 }
 
@@ -947,6 +962,11 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_ReadParamsFromServerOK:
     {
+        break;
+    }
+    case M_UpdateComplete:
+    {
+        LaserApplication::mainWindow->close();
         break;
     }
     }

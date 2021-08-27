@@ -14,8 +14,9 @@ public:
     explicit LaserDevice(QObject* parent = nullptr);
     ~LaserDevice();
 
-    void resetDriver(LaserDriver* driver);
+    bool resetDriver(LaserDriver* driver);
 
+    bool isInit() const;
     bool isConnected() const;
 
     QString portName() const;
@@ -64,7 +65,7 @@ public:
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
 public slots:
-    void load();
+    bool load();
     void unload();
     void connectDevice(const QString& portName);
     void disconnectDevice();

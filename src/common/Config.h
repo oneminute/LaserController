@@ -341,6 +341,7 @@ public:
         CONFIG_ITEM(debug, showPrimitiveFirstPoint, bool, toBool)
         CONFIG_ITEM(debug, generatePathImage, bool, toBool)
         CONFIG_ITEM(debug, generateMachiningImage, bool, toBool)
+        CONFIG_ITEM(debug, enableOptimizeInteraction, bool, toBool)
 
     private:
         friend class Config;

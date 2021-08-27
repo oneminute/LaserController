@@ -413,6 +413,7 @@ QString ConfigItem::toRegisterString() const
     {
         return d->laserRegister->toString();
     }
+    return "";
 }
 
 LaserRegister::RegisterPair ConfigItem::keyValuePair() const

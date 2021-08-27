@@ -150,6 +150,7 @@ enum LaserEventType
     M_UpdateFirmwareEnd = 2064,
     M_UpdateFirmwareAbort = 2065,
     M_SaveParamsToServerOK = 2066,
-    M_ReadParamsFromServerOK = 2067
+    M_ReadParamsFromServerOK = 2067,
+    M_UpdateComplete = 2070
 };
 #endif // LASERDEFINES_H

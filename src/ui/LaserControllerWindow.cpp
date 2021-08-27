@@ -31,6 +31,7 @@
 #include <QWindow>
 
 #include "LaserApplication.h"
+#include "algorithm/OptimizeNode.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "import/Importer.h"
@@ -890,7 +891,6 @@ void LaserControllerWindow::createCentralDockPanel()
     centralDockWidget->setWidget(centralWidget);
     CDockAreaWidget* centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
     centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
-
 }
 
 void LaserControllerWindow::createLayersDockPanel()
@@ -1686,7 +1686,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setMimeTypeFilters(QStringList() << "application/json");
     dialog.setWindowTitle(tr("Export"));
-    dialog.selectFile(m_scene->document()->nodeName());
+    dialog.selectFile(m_scene->document()->name());
     if (dialog.exec() == QFileDialog::Accepted)
     {
         QString filename = dialog.selectedFiles().constFirst();
@@ -2572,13 +2572,13 @@ void LaserControllerWindow::updateOutlineTree()
 
     m_treeWidgetOutline->clear();
 
-    QStack<LaserNode*> stack;
-    stack.push(m_scene->document());
+    QStack<OptimizeNode*> stack;
+    stack.push(m_scene->document()->optimizeNode());
 
-    QMap<LaserNode*, QTreeWidgetItem*> nodeItemMap;
+    QMap<OptimizeNode*, QTreeWidgetItem*> nodeItemMap;
     while (!stack.isEmpty())
     {
-        LaserNode* node = stack.pop();
+        OptimizeNode* node = stack.pop();
 
         QTreeWidgetItem* parentItem = nullptr;
         if (node->parentNode() != nullptr && nodeItemMap.contains(node->parentNode()))
@@ -2593,7 +2593,7 @@ void LaserControllerWindow::updateOutlineTree()
             m_treeWidgetOutline->addTopLevelItem(item);
         }
 
-        for (LaserNode* childNode : node->childNodes())
+        for (OptimizeNode* childNode : node->childNodes())
         {
             stack.push(childNode);
         }

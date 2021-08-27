@@ -221,6 +221,15 @@ else()
   add_executable(CNELaser ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS})
 endif()
 
+#if(WIN32)
+#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
+#   set_target_properties(CNELaser PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
+#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
+#   set_target_properties(CNELaser PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
+#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:windows")
+#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows")
+#endif(WIN32)
+
 target_link_libraries(CNELaser PRIVATE ${LINK_LIBRARIES})
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES

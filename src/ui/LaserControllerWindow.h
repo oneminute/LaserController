@@ -16,11 +16,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
 
-namespace ads 
-{
-    class CDockAreaWidget;
-}
-
 class FloatEditDualSlider;
 class FloatEditSlider;
 class LaserLayerTableWidget;

@@ -2409,6 +2409,14 @@ void Config::loadDebug()
         false,
         DT_BOOL
     );
+
+    ConfigItem* enableOptimizeInteraction = group->addConfigItem(
+        "enableOptimizeInteraction",
+        tr("Enable Optimize Interaction"),
+        tr("Enable Optimize Interaction"),
+        false,
+        DT_BOOL
+    );
 }
 
 QList<ConfigItemGroup*> Config::getGroups()

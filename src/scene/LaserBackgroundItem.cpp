@@ -8,8 +8,6 @@
 #include <QStyleOptionGraphicsItem>
 #include "scene/LaserPrimitive.h"
 
-#include"scene/LaserNode.h"
-
 #include "widget//LaserViewer.h"
 #include "common/common.h"
 #include "common/Config.h"
@@ -41,7 +39,7 @@ void LaserBackgroundItem::paint(QPainter * painter, const QStyleOptionGraphicsIt
 	painter->setPen(pen);
 	//painter->drawRect(this->rect());
 	//QGraphicsItemGroup::setSelected(true);
-	//Íø¸ñ
+	//ï¿½ï¿½ï¿½ï¿½
 	drawGrids(*painter);
 	//QGraphicsItemGroup::paint(painter, option, widget);
 	/*QList<QGraphicsItem*> list = QGraphicsItemGroup::childItems();
@@ -58,7 +56,7 @@ void LaserBackgroundItem::paint(QPainter * painter, const QStyleOptionGraphicsIt
 	
 	
 }
-//ÖØÐÂ¼ÆËãnodeÖµ
+//ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½nodeÖµ
 void LaserBackgroundItem::onChangeGrids()
 {
 	QGraphicsScene* scene = this->QGraphicsItemGroup::scene();
@@ -92,7 +90,7 @@ void LaserBackgroundItem::onChangeGrids()
 
 	int sizeH = qCeil(sH);
 	int sizeV = qCeil(sV);
-	//¼ÆËã²îÖµÊÇ·ñ³¬¹ý2¸öÏñËØ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½Ç·ñ³¬¹ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	qreal diffH = (sH - qFloor(sH)) * intervalH * zoomValue;
 	qreal diffV = (sV - qFloor(sV)) * intervalV * zoomValue;
 	if (diffH < 2 && diffH > 0) {
@@ -104,7 +102,7 @@ void LaserBackgroundItem::onChangeGrids()
 	qDebug() <<"diffH: " << diffH ;
 	qDebug() <<"diffV: " << diffV ;
 	int count = 10;
-	//¶þ¼¶Íø¸ñ´óÐ¡
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡
 	//qreal intervalH_1 = intervalH * 0.1;
 	//qreal intervalV_1 = intervalV * 0.1;
 	for (int i = 0; i <= sizeH; i++) {
@@ -145,10 +143,10 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	int contrastValue = Config::Ui::gridContrast();
 	qDebug() << "contrastValue: " << contrastValue;
 	bool isShow = true;
-	//Ò»¼¶Íø¸ñ
+	//Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	QPen pen1(QColor(0, 0, 0), 1, Qt::SolidLine);
 	pen1.setCosmetic(true);
-	//¶þ¼¶Íø¸ñ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	QPen pen2(QColor(0, 0, 0), 1, Qt::SolidLine);
 	pen2.setCosmetic(true);
 	switch (contrastValue) {
@@ -176,7 +174,7 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	if (!isShow) {
 		return;
 	}
-	//2¼¶Íø¸ñ
+	//2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	painter.setPen(pen2);
 	for (int i1 = 0; i1 < m_gridSecondNodeYList.size(); i1++) {
 		//QPointF p1SecondH = mapFromScene(mapToScene(QPointF(0, m_gridSecondNodeYList[i1])));
@@ -192,7 +190,7 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 		QPointF p2SecondV = QPointF(m_gridSecondNodeXList[j1], height);
 		painter.drawLine(p1SecondV, p2SecondV);
 	}
-	//1¼¶Íø¸ñ
+	//1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	painter.setPen(pen1);
 	for (int i = 1; i < m_gridNodeYList.size()-1; i++) {
 		//QPointF p1H = mapFromScene(mapToScene(QPointF(0, m_gridNodeYList[i])));
@@ -223,10 +221,10 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 	if (m_gridNodeYList.isEmpty() || m_gridNodeXList.isEmpty()) {
 		return false;
 	}
-	//point´Ósceneµ½document×ª»»
+	//pointï¿½ï¿½sceneï¿½ï¿½document×ªï¿½ï¿½
 	QPointF documentPoint = mapFromScene(mousePoint);
 	qreal distance = Config::Ui::gridShapeDistance();
-	qreal valueX = distance / view->zoomValue();//5¸öÏñËØ
+	qreal valueX = distance / view->zoomValue();//5ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	qreal valueY = distance / view->zoomValue();
 	for (int i = 0; i < m_gridNodeXList.size(); i++) {
 		for (int j = 0; j < m_gridNodeYList.size(); j++) {
@@ -234,7 +232,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
-				//node ´Ódocument×ª»»µ½view
+				//node ï¿½ï¿½document×ªï¿½ï¿½ï¿½ï¿½view
 				point = mapToScene(node);
 				return true;
 			}
@@ -244,7 +242,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
-				//node ´Ódocument×ª»»µ½view
+				//node ï¿½ï¿½document×ªï¿½ï¿½ï¿½ï¿½view
 				point = mapToScene(node);
 				return true;
 			}
@@ -257,7 +255,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
-				//node ´Ódocument×ª»»µ½scene
+				//node ï¿½ï¿½document×ªï¿½ï¿½ï¿½ï¿½scene
 				point = mapToScene(node);
 				return true;
 			}
@@ -267,7 +265,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
-				//node ´Ódocument×ª»»µ½scene
+				//node ï¿½ï¿½document×ªï¿½ï¿½ï¿½ï¿½scene
 				point = mapToScene(node);
 				return true;
 			}

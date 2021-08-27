@@ -2,7 +2,7 @@
     "cuttingLayer": {
         "laserPower": {
             "defaultValue": 8,
-            "value": 8
+            "value": 22.6
         },
         "maxPowerRate": {
             "defaultValue": 100,
@@ -18,10 +18,14 @@
         },
         "runSpeed": {
             "defaultValue": 60,
-            "value": 60
+            "value": 274
         }
     },
     "debug": {
+        "enableOptimizeInteraction": {
+            "defaultValue": false,
+            "value": false
+        },
         "generateMachiningImage": {
             "defaultValue": false,
             "value": true
@@ -150,7 +154,7 @@
     "general": {
         "language": {
             "defaultValue": 31,
-            "value": 31
+            "value": 25
         },
         "unit": {
             "defaultValue": 4,
@@ -166,7 +170,7 @@
     "pathOptimization": {
         "groupingOrientation": {
             "defaultValue": 2,
-            "value": 1
+            "value": 2
         },
         "maxAnts": {
             "defaultValue": 100,
@@ -178,7 +182,7 @@
         },
         "maxGroupingGridSize": {
             "defaultValue": 30,
-            "value": 30
+            "value": 1000
         },
         "maxIterations": {
             "defaultValue": 500,
@@ -452,103 +456,103 @@
     "userRegister": {
         "accMode": {
             "defaultValue": 0,
-            "value": 0
+            "value": -1884324228
         },
         "backlashXInterval": {
             "defaultValue": 0,
-            "value": 0
+            "value": 19840112
         },
         "backlashYInterval": {
             "defaultValue": 0,
-            "value": 0
+            "value": 2232
         },
         "backlashZInterval": {
             "defaultValue": 0,
-            "value": 0
+            "value": 8
         },
         "cuttingMoveAcc": {
             "defaultValue": 45,
-            "value": 45
+            "value": 19840112
         },
         "cuttingMoveSpeed": {
             "defaultValue": 15,
-            "value": 15
+            "value": 210203
         },
         "cuttingMoveSpeedFactor": {
             "defaultValue": 2,
-            "value": 2
+            "value": 19840112
         },
         "cuttingSpotSize": {
             "defaultValue": 30,
-            "value": 30
+            "value": 19840112
         },
         "cuttingTurnAcc": {
             "defaultValue": 45,
-            "value": 45
+            "value": 19840112
         },
         "cuttingTurnSpeed": {
             "defaultValue": 15,
-            "value": 15
+            "value": 19840112
         },
         "cuttingWorkAcc": {
             "defaultValue": 60,
-            "value": 60
+            "value": 19840112
         },
         "cuttingWorkSpeedFactor": {
             "defaultValue": 2,
-            "value": 2
+            "value": 19840112
         },
         "head": {
             "defaultValue": 305419896,
-            "value": 305419896
+            "value": 536871048
         },
         "scanLaserPower": {
             "defaultValue": 70,
-            "value": 70
+            "value": 19840112
         },
         "scanReturnError": {
             "defaultValue": 0,
-            "value": 0
+            "value": 19840112
         },
         "scanReturnPos": {
             "defaultValue": 0,
-            "value": 0
+            "value": 19840112
         },
         "scanRowInterval": {
             "defaultValue": 0.007,
-            "value": 0.007
+            "value": 19840112
         },
         "scanRowSpeed": {
             "defaultValue": 15,
-            "value": 15
+            "value": 19840112
         },
         "scanXAcc": {
             "defaultValue": 5,
-            "value": 5
+            "value": 19840112
         },
         "scanXResetEnabled": {
             "defaultValue": true,
-            "value": true
+            "value": false
         },
         "scanXStartSpeed": {
             "defaultValue": 15,
-            "value": 15
+            "value": 19840112
         },
         "scanYAcc": {
             "defaultValue": 45,
-            "value": 45
+            "value": 19840112
         },
         "scanYResetEnabled": {
             "defaultValue": true,
-            "value": true
+            "value": false
         },
         "scanYStartSpeed": {
             "defaultValue": 15,
-            "value": 15
+            "value": 19840112
         },
         "scanZResetEnabled": {
             "defaultValue": true,
-            "value": true
+            "value": false
         }
     }
 }

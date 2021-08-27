@@ -209,7 +209,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     {
         docName = "root";
     }
-    laserDoc->setNodeName(docName);
+    laserDoc->setName(docName);
     laserDoc->blockSignals(false);
     
     emit imported();

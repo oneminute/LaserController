@@ -93,7 +93,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
     {
         docName = "root";
     }
-    laserDoc->setNodeName(docName);   
+    laserDoc->setName(docName);   
     laserDoc->blockSignals(false);
     emit imported();
 
