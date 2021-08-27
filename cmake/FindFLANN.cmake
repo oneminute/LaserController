@@ -61,12 +61,12 @@ if(flann_FOUND)
 endif()
 
 # Second try to locate FLANN using pkgconfig
-find_package(PkgConfig QUIET)
-if(FLANN_FIND_VERSION)
-  pkg_check_modules(PC_FLANN flann>=${FLANN_FIND_VERSION})
-else()
-  pkg_check_modules(PC_FLANN flann)
-endif()
+#find_package(PkgConfig QUIET)
+#if(FLANN_FIND_VERSION)
+#  pkg_check_modules(PC_FLANN flann>=${FLANN_FIND_VERSION})
+#else()
+#  pkg_check_modules(PC_FLANN flann)
+#endif()
 
 find_path(FLANN_INCLUDE_DIR
   NAMES
