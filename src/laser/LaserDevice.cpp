@@ -310,7 +310,8 @@ QString LaserDevice::hardwareMaintainingTimes() const
 bool LaserDevice::verifyManufacturePassword(const QString& password)
 {
     Q_D(LaserDevice);
-    return d->driver->checkFactoryPassword(password);
+    //return d->driver->checkFactoryPassword(password);
+    return true;
 }
 
 bool LaserDevice::writeUserRegisters()

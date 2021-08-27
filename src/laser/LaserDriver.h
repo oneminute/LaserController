@@ -254,7 +254,7 @@ private:
     typedef int(*FN_INT_VOID)();
 
     typedef void(__stdcall *FNSetSoftwareInitialization)(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
-    typedef void(__stdcall *FNSetRotateDeviceParam)(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
+    //typedef void(__stdcall *FNSetRotateDeviceParam)(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     typedef void(__stdcall *FNSetHardwareInitialization)(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
 
     typedef int(__stdcall *FN_INT_WCHART_WCHART)(wchar_t* address, wchar_t* data);
@@ -303,7 +303,7 @@ public:
     bool uninitComPort();
     void setTransTimeOutInterval(int interval);
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
-    void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
+    //void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
 
     bool writeSysParamToCard(const LaserRegister::RegistersMap& values);
@@ -316,7 +316,7 @@ public:
     void showAboutWindow();
     QString getLaserLibraryInfo();
     void setFactoryType(const QString& factory);
-    bool checkFactoryPassword(const QString& password);
+    //bool checkFactoryPassword(const QString& password);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
     void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
@@ -424,7 +424,7 @@ private:
 
     FN_VOID_INT m_fnSetTransTimeOutInterval;
     FNSetSoftwareInitialization m_fnSetSoftwareInitialization;
-    FNSetRotateDeviceParam m_fnSetRotateDeviceParam;
+    //FNSetRotateDeviceParam m_fnSetRotateDeviceParam;
     FNSetHardwareInitialization m_fnSetHardwareInitialization;
 
     FN_INT_WCHART_WCHART m_fnWriteSysParamToCard;
@@ -435,7 +435,7 @@ private:
     FN_VOID_VOID m_fnShowAboutWindow;
     FN_VOID_VOID m_fnGetLaserLibInfo;
     FN_VOID_WCHART m_fnSetFactoryType;
-    FN_INT_WCHART m_fnCheckFactoryPassword;
+    //FN_INT_WCHART m_fnCheckFactoryPassword;
     FN_INT_WCHART_WCHART m_fnWriteFactoryPassword;
 
     FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;

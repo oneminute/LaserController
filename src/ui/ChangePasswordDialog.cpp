@@ -36,7 +36,7 @@ void ChangePasswordDialog::onPushButtonChangeClicked(bool checked)
         return;
     }
 
-    LaserDriver::instance().checkFactoryPassword(m_ui->lineEditOldPassword->text());
+    //LaserDriver::instance().checkFactoryPassword(m_ui->lineEditOldPassword->text());
 }
 
 void ChangePasswordDialog::onPushButtonCancelClicked(bool checked)

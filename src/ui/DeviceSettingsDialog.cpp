@@ -174,7 +174,7 @@ void DeviceSettingsDialog::onPushButtonDefaultClicked(bool checked)
 
 void DeviceSettingsDialog::onPushButtonVerifyClicked(bool checked)
 {
-    LaserDriver::instance().checkFactoryPassword(m_ui->lineEditManufacturerPassword->text());
+    //LaserDriver::instance().checkFactoryPassword(m_ui->lineEditManufacturerPassword->text());
 }
 
 void DeviceSettingsDialog::onPushButtonClearClicked(bool checked)
