@@ -116,7 +116,6 @@ protected slots:
 	void onActionUngroup(bool checked = false);
 	bool onActionCloseDocument(bool checked = false);
     void onActionSettings(bool checked = false);
-    void onActionDeviceSettings(bool checked = false);
     void onActionSelectionTool(bool checked = false);
 	void onActionViewDrag(bool checked = false);
 	void onActionRectangle(bool checked = false);

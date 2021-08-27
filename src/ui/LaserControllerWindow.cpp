@@ -43,7 +43,6 @@
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
 #include "ui/ConfigDialog.h"
-#include "ui/DeviceSettingsDialog.h"
 #include "ui/HalftoneDialog.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/MainCardInfoDialog.h"
@@ -413,7 +412,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
-    connect(m_ui->actionDeviceSettings, &QAction::triggered, this, &LaserControllerWindow::onActionDeviceSettings);
     connect(m_ui->actionSettings, &QAction::triggered, this, &LaserControllerWindow::onActionSettings);
     connect(m_ui->actionPathOptimization, &QAction::triggered, this, &LaserControllerWindow::onActionPathOptimization);
 
@@ -2067,12 +2065,6 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 void LaserControllerWindow::onActionSettings(bool checked)
 {
     showConfigDialog();
-}
-
-void LaserControllerWindow::onActionDeviceSettings(bool checked)
-{
-    DeviceSettingsDialog dialog;
-    dialog.exec();
 }
 
 void LaserControllerWindow::onActionSelectionTool(bool checked)

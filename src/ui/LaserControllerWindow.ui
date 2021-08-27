@@ -894,15 +894,6 @@
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionDeviceSettings">
-   <property name="icon">
-    <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/settings_device.png</normaloff>:/ui/icons/images/settings_device.png</iconset>
-   </property>
-   <property name="text">
-    <string>Device Settings</string>
-   </property>
-  </action>
   <action name="actionEditSplineTool">
    <property name="text">
     <string>Edit Spline Tool</string>
