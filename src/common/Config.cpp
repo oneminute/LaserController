@@ -1280,7 +1280,7 @@ void Config::loadUserReigsters()
     backlashXInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     backlashXInterval->setInputWidgetProperty("step", 0.001);
     backlashXInterval->setInputWidgetProperty("page", 10);
-    backlashXInterval->setInputWidgetProperty("minimum", 1);
+    backlashXInterval->setInputWidgetProperty("minimum", 0);
     backlashXInterval->setInputWidgetProperty("maximum", 100);
     backlashXInterval->bindLaserRegister(23, false);
 
@@ -1306,7 +1306,7 @@ void Config::loadUserReigsters()
     backlashYInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     backlashYInterval->setInputWidgetProperty("step", 0.001);
     backlashYInterval->setInputWidgetProperty("page", 10);
-    backlashYInterval->setInputWidgetProperty("minimum", 1);
+    backlashYInterval->setInputWidgetProperty("minimum", 0);
     backlashYInterval->setInputWidgetProperty("maximum", 100);
     backlashYInterval->bindLaserRegister(24, false);
 
@@ -1332,7 +1332,7 @@ void Config::loadUserReigsters()
     backlashZInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     backlashZInterval->setInputWidgetProperty("step", 0.001);
     backlashZInterval->setInputWidgetProperty("page", 10);
-    backlashZInterval->setInputWidgetProperty("minimum", 1);
+    backlashZInterval->setInputWidgetProperty("minimum", 0);
     backlashZInterval->setInputWidgetProperty("maximum", 100);
     backlashZInterval->bindLaserRegister(25, false);
 
@@ -1449,6 +1449,7 @@ void Config::loadUserReigsters()
         800,
         DT_INT
     );
+    maxScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxScanGrayRatio->setInputWidgetProperty("minimum", 1);
     maxScanGrayRatio->setInputWidgetProperty("maximum", 2000);
     maxScanGrayRatio->bindLaserRegister(30, false);
@@ -1460,6 +1461,7 @@ void Config::loadUserReigsters()
         50,
         DT_INT
     );
+    minScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     minScanGrayRatio->setInputWidgetProperty("minimum", 1);
     minScanGrayRatio->setInputWidgetProperty("maximum", 2000);
     minScanGrayRatio->bindLaserRegister(31, false);
