@@ -1,10 +1,10 @@
 #include "LaserDriver.h"
 
+#include <QDataStream>
 #include <QDebug>
 #include <QErrorMessage>
-#include <QMessageBox>
 #include <QFile>
-#include <QDataStream>
+#include <QMessageBox>
 
 #include "LaserDevice.h"
 #include "LaserRegister.h"
@@ -190,7 +190,7 @@ bool LaserDriver::load()
     m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguge");
     CHECK_FN(m_fnSetLanguage)
 
-    m_fnInitLib = (FN_VOID_INT)m_library.resolve("InitLib");
+    m_fnInitLib = (FN_BOOL_INT)m_library.resolve("InitLib");
     CHECK_FN(m_fnInitLib)
 
     m_fnUnInitLib = (FN_VOID_VOID)m_library.resolve("UnInitLib");
@@ -365,12 +365,24 @@ int LaserDriver::setLanguage(int lang)
     return m_fnSetLanguage(lang);
 }
 
-void LaserDriver::init(int winId)
+bool LaserDriver::init(int winId)
 {
-    m_fnInitLib(winId);
+    try 
+    {
+        m_fnInitLib(winId);
+        emit libraryInitialized();
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
+}
+
+void LaserDriver::setupCallbacks()
+{
     m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
     m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
-    emit libraryInitialized();
 }
 
 void LaserDriver::unInit()

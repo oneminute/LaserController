@@ -237,6 +237,7 @@ public:
 private:
     typedef wchar_t* (*FN_WCHART_VOID)();
     typedef void(__stdcall *FN_VOID_INT)(int value);
+    typedef bool(__stdcall *FN_BOOL_INT)(int value);
     typedef void(*FN_VOID_VOID)();
     typedef void(__stdcall* FN_VOID_WCHART)(wchar_t*);
 
@@ -298,7 +299,8 @@ public:
     QString getVersion();
     QString getCompileInfo();
     int setLanguage(int lang);
-    void init(int winId);
+    bool init(int winId);
+    void setupCallbacks();
     void unInit();
     QStringList getPortList();
     bool initComPort(const QString& name);
@@ -415,7 +417,7 @@ private:
     FN_WCHART_VOID m_fnGetAPILibVersion;
     FN_WCHART_VOID m_fnGetAPILibCompileInfo;
     FN_INT_INT m_fnSetLanguage;
-    FN_VOID_INT m_fnInitLib;
+    FN_BOOL_INT m_fnInitLib;
     FN_VOID_VOID m_fnUnInitLib;
 
     FNProgressCallBack m_fnProgressCallBack;

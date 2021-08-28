@@ -759,6 +759,11 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_WriteSysParamToCardOK:
     {
+        if (message.isEmpty())
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
+        }
+        LaserRegister::batchParse(message, true);
         break;
     }
     case M_ReadUserParamFromCardOK:
@@ -772,6 +777,11 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_WriteUserParamToCardOK:
     {
+        if (message.isEmpty())
+        {
+            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
+        }
+        LaserRegister::batchParse(message, false);
         break;
     }
     case M_ReadComputerParamFromCardOK:
@@ -998,19 +1008,8 @@ void LaserDevice::onLibraryLoaded(bool success)
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryLoaded: success = " << success;
     try {
-        d->isInit = true;
+        d->isInit = false;
         d->driver->init(LaserApplication::mainWindow->winId());
-        d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
-
-        QString systemDate(__DATE__);
-        qLogD << "system date: " << systemDate;
-        QDate compileDate = QLocale("en_US").toDate(systemDate.simplified(), "MMM d yyyy");
-        int year = compileDate.year() % 100;
-        int month = compileDate.month();
-        int day = compileDate.day();
-        int version = year * 10000 + month * 100 + day;
-        int winId = d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
-        LaserApplication::mainWindow->createUpdateDockPanel(winId);
     }
     catch (...) {
         d->isInit = false;
@@ -1021,6 +1020,18 @@ void LaserDevice::onLibraryInitialized()
 {
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryInitialized";
+    d->driver->setupCallbacks();
+    d->isInit = true;
+    d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
+    QString systemDate(__DATE__);
+    qLogD << "system date: " << systemDate;
+    QDate compileDate = QLocale("en_US").toDate(systemDate.simplified(), "MMM d yyyy");
+    int year = compileDate.year() % 100;
+    int month = compileDate.month();
+    int day = compileDate.day();
+    int version = year * 10000 + month * 100 + day;
+    int winId = d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
+    LaserApplication::mainWindow->createUpdateDockPanel(winId);
     d->driver->getPortList();
 }
 
