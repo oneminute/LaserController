@@ -74,7 +74,7 @@ QVariant typeUtils::textToVariant(const QString& src, DataType dataType)
     }
     case DT_BOOL:
     {
-        dst = src.toLower() == "true";
+        dst = src.toLower() == "true" || src.toInt() == 1;
         break;
     }
     case DT_STRING:

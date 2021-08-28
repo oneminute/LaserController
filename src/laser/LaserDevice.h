@@ -11,14 +11,14 @@ class LaserDevice : public QObject
 {
     Q_OBJECT
 public:
-    explicit LaserDevice(QObject* parent = nullptr);
+    explicit LaserDevice(LaserDriver* driver, QObject* parent = nullptr);
     ~LaserDevice();
-
-    bool resetDriver(LaserDriver* driver);
 
     bool isInit() const;
     bool isConnected() const;
 
+    QString name() const;
+    void setName(const QString& name);
     QString portName() const;
 
     qreal layoutWidth() const;
@@ -64,6 +64,11 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
+    bool isAvailable() const;
+
+    void showAboutWindow(int interval = 0, bool modal = true);
+    void closeAboutWindow();
+
 public slots:
     bool load();
     void unload();
@@ -85,7 +90,6 @@ public slots:
     void moveToOrigin(qreal speed = 15);
 
 protected:
-    void unbindDriver();
 
 protected slots:
     void handleError(int code, const QString& message);

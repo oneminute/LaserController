@@ -95,6 +95,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
+    LaserApplication::device->readSystemRegisters();
 }
 
 ConfigDialog::~ConfigDialog()

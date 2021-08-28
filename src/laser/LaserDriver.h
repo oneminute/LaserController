@@ -278,6 +278,7 @@ private:
     typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t* licenseCode);
 
     typedef void(__stdcall* FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
+    typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
@@ -296,6 +297,7 @@ public:
 
     QString getVersion();
     QString getCompileInfo();
+    int setLanguage(int lang);
     void init(int winId);
     void unInit();
     QStringList getPortList();
@@ -313,7 +315,8 @@ public:
     bool readUserParamFromCard(QList<int> addresses);
     bool readAllUserParamFromCard();
 
-    void showAboutWindow();
+    int showAboutWindow(int interval = 0, bool modal = true);
+    void closeAboutWindow();
     QString getLaserLibraryInfo();
     void setFactoryType(const QString& factory);
     //bool checkFactoryPassword(const QString& password);
@@ -411,6 +414,7 @@ private:
 
     FN_WCHART_VOID m_fnGetAPILibVersion;
     FN_WCHART_VOID m_fnGetAPILibCompileInfo;
+    FN_INT_INT m_fnSetLanguage;
     FN_VOID_INT m_fnInitLib;
     FN_VOID_VOID m_fnUnInitLib;
 
@@ -432,7 +436,8 @@ private:
     FN_INT_WCHART_WCHART m_fnWriteUserParamToCard;
     FN_INT_WCHART m_fnReadUserParamFromCard;
 
-    FN_VOID_VOID m_fnShowAboutWindow;
+    FN_INT_INT_BOOL m_fnShowAboutWindow;
+    FN_VOID_VOID m_fnCloseAboutWindow;
     FN_VOID_VOID m_fnGetLaserLibInfo;
     FN_VOID_WCHART m_fnSetFactoryType;
     //FN_INT_WCHART m_fnCheckFactoryPassword;

@@ -19,6 +19,7 @@ public:
         , driver(nullptr)
         , isInit(false)
         , connected(false)
+        , name("unknown")
         , portName("")
         , layoutRect(0, 0, 320, 210)
         , printerDrawUnit(1016)
@@ -29,6 +30,7 @@ public:
     bool isInit;
     bool connected;
 
+    QString name;
     QString portName;
     QRectF layoutRect;      // 加工的幅面宽
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
@@ -48,10 +50,13 @@ public:
     QString hardwareMaintainingTimes;
 };
 
-LaserDevice::LaserDevice(QObject* parent)
+LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     : QObject(parent)
     , m_ptr(new LaserDevicePrivate(this))
 {
+    Q_D(LaserDevice);
+    d->driver = driver;
+
     ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDevice::connected);
     ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDevice::disconnected);
 
@@ -66,19 +71,6 @@ LaserDevice::~LaserDevice()
     qDebug() << "device destroyed";
 }
 
-bool LaserDevice::resetDriver(LaserDriver* driver)
-{
-    Q_D(LaserDevice);
-    unbindDriver();
-    d->driver = driver;
-    connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError, Qt::ConnectionType::QueuedConnection);
-    connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage, Qt::ConnectionType::QueuedConnection);
-    connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
-    connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
-
-    return load();
-}
-
 bool LaserDevice::isInit() const
 {
     Q_D(const LaserDevice);
@@ -91,6 +83,18 @@ bool LaserDevice::isConnected() const
     return d->connected;
 }
 
+QString LaserDevice::name() const
+{
+    Q_D(const LaserDevice);
+    return d->name;
+}
+
+void LaserDevice::setName(const QString& name)
+{
+    Q_D(LaserDevice);
+    d->name = name;
+}
+
 QString LaserDevice::portName() const
 {
     Q_D(const LaserDevice);
@@ -100,11 +104,17 @@ QString LaserDevice::portName() const
 bool LaserDevice::load()
 {
     Q_D(LaserDevice);
-    if (d->driver->load())
-        return true;
 
-    unbindDriver();
-    //d->driver->showAboutWindow();
+    connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError, Qt::ConnectionType::QueuedConnection);
+    connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage, Qt::ConnectionType::QueuedConnection);
+    connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
+    connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
+    if (d->driver->load())
+    {
+        showAboutWindow(5);
+        return true;
+    }
+
     return false;
 }
 
@@ -327,7 +337,7 @@ bool LaserDevice::writeSystemRegisters()
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->writeUserParamToCard(Config::SystemRegister::group->keyValuePairs());
+    return d->driver->writeSysParamToCard(Config::SystemRegister::group->keyValuePairs());
 }
 
 bool LaserDevice::readUserRegisters()
@@ -411,6 +421,30 @@ void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int cur
     d->driver->checkVersionUpdate(hardware, flag, 0, versionNoteToJsonFile);
 }
 
+bool LaserDevice::isAvailable() const
+{
+    Q_D(const LaserDevice);
+    return d->driver && d->isInit;
+}
+
+void LaserDevice::showAboutWindow(int interval, bool modal)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        d->driver->showAboutWindow(interval, modal);
+    }
+}
+
+void LaserDevice::closeAboutWindow()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        d->driver->closeAboutWindow();
+    }
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);
@@ -467,22 +501,9 @@ void LaserDevice::moveToOrigin(qreal speed)
     }
 }
 
-void LaserDevice::unbindDriver()
-{
-    Q_D(LaserDevice);
-    if (d->driver)
-    {
-        disconnect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError);
-        disconnect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage);
-        disconnect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
-        disconnect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
-        delete d->driver;
-        d->driver = nullptr;
-    }
-}
-
 void LaserDevice::handleError(int code, const QString& message)
 {
+    Q_D(LaserDevice);
     LaserException* exception = nullptr;
     switch (code)
     {
@@ -493,6 +514,7 @@ void LaserDevice::handleError(int code, const QString& message)
         throw new LaserDeviceUnknownException(code);
         break;
     case E_InitializeError:
+        d->isInit = false;
         throw new LaserDeviceConnectionException(code, tr("Failed to initialize laser device"));
         break;
     case E_UninitializeError:
@@ -838,10 +860,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         break;
     }
     case M_Idle:
-    {
-        break;
-    }
-    case M_WorkFinished:
+    //case M_WorkFinished:
     {
         break;
     }
@@ -979,7 +998,10 @@ void LaserDevice::onLibraryLoaded(bool success)
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryLoaded: success = " << success;
     try {
+        d->isInit = true;
         d->driver->init(LaserApplication::mainWindow->winId());
+        d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
+
         QString systemDate(__DATE__);
         qLogD << "system date: " << systemDate;
         QDate compileDate = QLocale("en_US").toDate(systemDate.simplified(), "MMM d yyyy");
@@ -991,7 +1013,7 @@ void LaserDevice::onLibraryLoaded(bool success)
         LaserApplication::mainWindow->createUpdateDockPanel(winId);
     }
     catch (...) {
-
+        d->isInit = false;
     }
 }
 
@@ -1023,8 +1045,8 @@ void LaserDevice::onConnected()
     Q_D(LaserDevice);
     if (d->driver)
     {
-        d->driver->readAllSysParamFromCard();
         d->driver->setFactoryType("LaserController");
+
         //d->driver->getMainCardRegisterState();
         //QString compileInfo = d->driver->getCompileInfo();
         //qLogD << "compile info: " << compileInfo;

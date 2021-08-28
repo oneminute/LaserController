@@ -28,6 +28,9 @@ enum LaserErrorCode
     E_CardDongleBoundExceedsTimes = 1014,
     E_CardDongleBoundIllegal = 1015,
 
+    /// <summary>
+    /// 激光管清零失败
+    /// </summary>
     E_ClearLaserTubeDurationError = 1016,
 
     // security exception
@@ -72,11 +75,24 @@ enum LaserErrorCode
     E_ConnectServerError = 1043,
     E_ConnectFrequently = 1044,
     E_SubmitToServerError = 1045,
-    E_UpdateInfoFileNotExists = 1046,
-    E_UpdateFileNotExists = 1047,
-    E_UpdateFailed = 1048,
-    E_DownloadFirmwareDataError = 1049,
-    E_UpdateFirmwareTimeout = 1050
+
+    E_ServerAccessDenied = 1046,
+    E_ServerReturnEmpty = 1047,
+
+    E_UpdateInfoFileNotExists,
+    E_UpdateFileNotExists,
+    E_UpdateFailed,
+    E_DownloadFirmwareDataError,
+    E_UpdateFirmwareTimeout,
+
+    E_InadequatePermissions,
+
+    E_SendEmailFailed,
+    E_MainlboxInvalid,
+    E_MailBoxAccountError,
+    E_ActiveCodeInvalid,
+    E_ValidateCodeInvalid,
+    E_MailBoxNameInvalid
 };
 
 enum LaserEventType
@@ -85,72 +101,99 @@ enum LaserEventType
     M_GetComPortListOK = 2000,
     M_ComPortOpened = 2001,
     M_ComPortClosed = 2002,
+
     M_USBArrival = 2003,
-    M_USBRemove = 2004,
-    M_MainCardRegisterOK = 2005,
-    M_MainCardIsGenuine = 2006,
-    M_MainCardIsGenuineEx = 2007,
-    M_MainCardMachineMoreInfo = 2008,
-    M_CardDongleBindOK = 2009,
-    M_LaserTubeZeroClearingOK = 2010,
-    M_ReadSysParamFromCardOK = 2011,
-    M_WriteSysParamToCardOK = 2012,
-    M_ReadUserParamFromCardOK = 2013,
-    M_WriteUserParamToCardOK = 2014,
-    M_ReadComputerParamFromCardOK = 2015,
-    M_WriteComputerParamToCardOK = 2016,
-    M_FactoryPasswordValid = 2017,
-    M_ChangeFactoryPasswordOK = 2018,
-    M_ReturnTextMsgFromCallback = 2019,
-    M_ImportFromFile = 2020,
-    M_CancelCurrentWork = 2021,
-    M_TimeConsuming = 2022,
-    M_EstimatedWorkTime = 2023,
-    M_StartProcData = 2024,
-    M_DataTransCompleted = 2025,
-    M_RequestAndContinue = 2026,
-    M_MotorLock = 2027,
-    M_MotorUnlock = 2028,
-    M_LaserLightOn = 2029,
-    M_LaserLightOff = 2030,
-    M_StartWorking = 2031,
-    M_PauseWorking = 2032,
-    M_ContinueWorking = 2033,
-    M_StopWorking = 2034,
-    M_MachineWorking = 2035,
-    M_NotWorking = 2036,
-    M_Idle = 2036,
-    M_WorkFinished = 2037,
-    M_DeviceIdInfo = 2038,
-    M_ClientAddressInfo = 2039,
-    M_ConnectedServer = 2040,
-    M_DisconnectServer = 2041,
-    M_ConnectServerOK = 2042,
-    M_SubmitToServerOK = 2043,
-    M_DownloadBegin = 2044,
-    M_DownloadEnd = 2045,
-    M_NewVersionChecking = 2046,
-    M_NewVersionCheckFinished = 2047,
-    M_IsLatestVersion = 2048,
-    M_ReadyToUpdateFile = 2049,
-    M_DownloadUpdateInfoFile = 2050,
-    M_FoundSoftNewVersion = 2051,
-    M_DownloadFileCounts = 2052,
-    M_DownloadFileIndex = 2053,
-    M_DownloadSoftDataStart = 2054,
-    M_StartSoftUpdate = 2055,
-    M_CancelSoftUpdate = 2056,
-    M_SoftUpdateFinished = 2057,
-    M_FoundFirmwareNewVersion = 2058,
-    M_DownloadFirmwareDataStart = 2059,
-    M_DownloadFirmwareDataEnd = 2060,
-    M_SendFirmwareDataStart = 2061,
-    M_SendFirmwareDataEnd = 2062,
-    M_UpdateFirmwareStart = 2063,
-    M_UpdateFirmwareEnd = 2064,
-    M_UpdateFirmwareAbort = 2065,
-    M_SaveParamsToServerOK = 2066,
-    M_ReadParamsFromServerOK = 2067,
-    M_UpdateComplete = 2070
+    M_USBRemove,
+
+    M_DongleArrival,
+    M_DongleRemove,
+
+    M_MainCardRegisterOK,
+    M_MainCardIsGenuine,
+    M_MainCardIsGenuineEx,
+    M_MainCardMachineMoreInfo = 2010,
+
+    M_CardDongleBindOK,
+    M_LaserTubeZeroClearingOK,
+
+    M_ReadSysParamFromCardOK,
+    M_WriteSysParamToCardOK,
+
+    M_ReadUserParamFromCardOK,
+    M_WriteUserParamToCardOK,
+
+    M_ReadComputerParamFromCardOK,
+    M_WriteComputerParamToCardOK,
+
+    M_SaveParamsToServerOK,
+    M_ReadParamsFromServerOK,
+
+    M_FactoryPasswordValid,
+    M_ChangeFactoryPasswordOK,
+
+    M_ReturnTextMsgFromCallback,
+
+    M_ImportFromFile = 2024,
+    M_CancelCurrentWork,
+    M_TimeConsuming,
+    M_EstimatedWorkTime,
+    M_StartProcData,
+    M_DataTransCompleted,
+    M_RequestAndContinue,
+
+    M_MotorLock = 2031,
+    M_MotorUnlock,
+    M_LaserLightOn,
+    M_LaserLightOff,
+
+    M_StartWorking,
+    M_PauseWorking,
+    M_ContinueWorking,
+    M_StopWorking,
+
+    M_MachineWorking = 2039,
+    M_NotWorking,
+    M_Idle = 2041,
+    M_WorkFinished = 2041,
+
+    M_DeviceIdInfo,
+    M_ClientAddressInfo,
+
+    M_ConnectedServer,
+    M_DisconnectServer,
+    M_ConnectServerOK,
+    M_SubmitToServerOK,
+
+    M_DownloadBegin = 2048,
+    M_DownloadEnd,
+
+    M_NewVersionChecking,
+    M_NewVersionCheckFinished,
+    M_IsLatestVersion,
+    M_ReadyToUpdateFile,
+    M_DownloadUpdateInfoFile,
+
+    M_FoundSoftNewVersion = 2055,
+    M_DownloadFileCounts,
+    M_DownloadFileIndex,
+    M_DownloadSoftDataStart,
+    M_StartSoftUpdate,
+    M_CancelSoftUpdate,
+    M_SoftUpdateFinished,
+
+    M_FoundFirmwareNewVersion = 2062,
+    M_DownloadFirmwareDataStart,
+    M_DownloadFirmwareDataEnd,
+    M_SendFirmwareDataStart,
+    M_SendFirmwareDataEnd,
+    M_UpdateFirmwareStart,
+    M_UpdateFirmwareEnd,
+    M_UpdateFirmwareAbort,
+
+    M_UpdateComplete = 2070,
+
+    M_SendEmailComplete,
+    M_MainlBoxValid,
+    M_MainlBoxAccountOK
 };
 #endif // LASERDEFINES_H

@@ -102,18 +102,14 @@ bool LaserApplication::initialize()
     }
 
     driver = new LaserDriver;
-    device = new LaserDevice;
-
-    //driver->moveToThread(&m_deviceThread);
-    //device->moveToThread(&m_deviceThread);
+    device = new LaserDevice(driver);
 
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
 
     StateController::start();
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
-
-    device->resetDriver(driver);
+    device->load();
 
     m_deviceThread.start();
 

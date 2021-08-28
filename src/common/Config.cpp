@@ -736,7 +736,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* head = group->addConfigItem(
         "head",
-        tr("Head Data"),
+        tr("[00] Head Data"),
         tr("Head data for testing"),
         0x12345678,
         DT_INT
@@ -748,7 +748,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* accMode = group->addConfigItem(
         "accMode",
-        tr("Acceleration Mode"),
+        tr("[01] Acceleration Mode"),
         tr("Acceleration mode"),
         0
     );
@@ -775,7 +775,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingMoveSpeed = group->addConfigItem(
         "cuttingMoveSpeed",
-        tr("Cutting Move Speed(mm/s)"),
+        tr("[02] Cutting Move Speed(mm/s)"),
         tr("Cutting move speed"),
         15,
         DT_REAL
@@ -802,7 +802,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingMoveAcc = group->addConfigItem(
         "cuttingMoveAcc",
-        tr("Cutting Move Acceleration(mm/s<sup>2</sup>)"),
+        tr("[03] Cutting Move Acceleration(mm/s<sup>2</sup>)"),
         tr("Cutting Move Acceleration"),
         45,
         DT_REAL
@@ -829,7 +829,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingTurnSpeed = group->addConfigItem(
         "cuttingTurnSpeed",
-        tr("Cutting Turn Speed(mm/s)"),
+        tr("[04] Cutting Turn Speed(mm/s)"),
         tr("Cutting turn speed"),
         15,
         DT_REAL
@@ -856,7 +856,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingTurnAcc = group->addConfigItem(
         "cuttingTurnAcc",
-        tr("Cutting Turn Acceleration(mm/s<sup>2</sup>)"),
+        tr("[05] Cutting Turn Acceleration(mm/s<sup>2</sup>)"),
         tr("Cutting turn acceleration"),
         45,
         DT_REAL
@@ -883,7 +883,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingWorkAcc = group->addConfigItem(
         "cuttingWorkAcc",
-        tr("Cutting Work Acceleration(mm/s<sup>2</sup>)"),
+        tr("[06] Cutting Work Acceleration(mm/s<sup>2</sup>)"),
         tr("Cutting Work acceleration"),
         60,
         DT_REAL
@@ -910,7 +910,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingMoveSpeedFactor = group->addConfigItem(
         "cuttingMoveSpeedFactor",
-        tr("Cutting Move Speed Factor"),
+        tr("[07] Cutting Move Speed Factor"),
         tr("Cutting move speed factor"),
         2
     );
@@ -921,7 +921,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingWorkSpeedFactor = group->addConfigItem(
         "cuttingWorkSpeedFactor",
-        tr("Cutting Work Speed Factor"),
+        tr("[08] Cutting Work Speed Factor"),
         tr("Cutting Work speed factor"),
         2
     );
@@ -932,9 +932,10 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingSpotSize = group->addConfigItem(
         "cuttingSpotSize",
-        tr("Cutting Spot Size"),
+        tr("[09] Cutting Spot Size"),
         tr("Cutting spot size"),
-        30
+        1000,
+        DT_INT
     );
     cuttingSpotSize->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingSpotSize->setInputWidgetProperty("minimum", 1);
@@ -943,7 +944,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanXStartSpeed = group->addConfigItem(
         "scanXStartSpeed",
-        tr("Scan X Start Speed(mm/s)"),
+        tr("[10] Scan X Start Speed(mm/s)"),
         tr("Scan x start speed"),
         15,
         DT_REAL
@@ -970,7 +971,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanYStartSpeed = group->addConfigItem(
         "scanYStartSpeed",
-        tr("Scan Y Start Speed(mm/s)"),
+        tr("[11] Scan Y Start Speed(mm/s)"),
         tr("Scan y start speed"),
         15,
         DT_REAL
@@ -997,7 +998,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanXAcc = group->addConfigItem(
         "scanXAcc",
-        tr("Scan X Acceleration(mm/s<sup>2</sup>)"),
+        tr("[12] Scan X Acceleration(mm/s<sup>2</sup>)"),
         tr("Scan x acceleration"),
         5,
         DT_REAL
@@ -1024,7 +1025,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanYAcc = group->addConfigItem(
         "scanYAcc",
-        tr("Scan Y Acceleration(mm/s<sup>2</sup>)"),
+        tr("[13] Scan Y Acceleration(mm/s<sup>2</sup>)"),
         tr("Scan y acceleration"),
         45,
         DT_REAL
@@ -1051,7 +1052,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanRowSpeed = group->addConfigItem(
         "scanRowSpeed",
-        tr("Scan Row Speed(mm/s)"),
+        tr("[14] Scan Row Speed(mm/s)"),
         tr("Scan row speed"),
         15,
         DT_REAL
@@ -1078,7 +1079,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanRowInterval = group->addConfigItem(
         "scanRowInterval",
-        tr("Scan Row Interval(mm)"),
+        tr("[15] Scan Row Interval(mm)"),
         tr("Scan row interval"),
         0.007,
         DT_REAL
@@ -1104,11 +1105,24 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanReturnError = group->addConfigItem(
         "scanReturnError",
-        tr("Scan Return Error(mm/s)"),
+        tr("[16] Scan Return Error(mm/s)"),
         tr("Scan return error"),
-        0
+        1000,
+        DT_REAL
     );
     //scanReturnError->setInputWidgetProperty("textTemplate", "%1mm/s");
+    scanReturnError->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    scanReturnError->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
     scanReturnError->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanReturnError->setInputWidgetProperty("step", 0.001);
     scanReturnError->setInputWidgetProperty("page", 10);
@@ -1118,9 +1132,9 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanLaserPower = group->addConfigItem(
         "scanLaserPower",
-        tr("Scan Laser Power"),
+        tr("[17] Scan Laser Power"),
         tr("Scan laser power"),
-        70,
+        120,
         DT_REAL
     );
     scanLaserPower->setLoadDataHook(
@@ -1145,34 +1159,96 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanXResetEnabled = group->addConfigItem(
         "scanXResetEnabled",
-        tr("Scan X Reset Enabled"),
+        tr("[18] Scan X Reset Enabled"),
         tr("Scan x reset enabled"),
         true,
         DT_BOOL
+    );
+    scanXResetEnabled->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() == 1);
+        }
+    );
+    scanXResetEnabled->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toBool() ? 1 : 0);
+        }
     );
     scanXResetEnabled->bindLaserRegister(18, false);
 
     ConfigItem* scanYResetEnabled = group->addConfigItem(
         "scanYResetEnabled",
-        tr("Scan Y Reset Enabled"),
+        tr("[19] Scan Y Reset Enabled"),
         tr("Scan y reset enabled"),
         true,
         DT_BOOL
+    );
+    scanYResetEnabled->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() == 1);
+        }
+    );
+    scanYResetEnabled->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toBool() ? 1 : 0);
+        }
     );
     scanYResetEnabled->bindLaserRegister(19, false);
 
     ConfigItem* scanZResetEnabled = group->addConfigItem(
         "scanZResetEnabled",
-        tr("Scan Z Reset Enabled"),
+        tr("[20] Scan Z Reset Enabled"),
         tr("Scan z reset enabled"),
         true,
         DT_BOOL
     );
+    scanZResetEnabled->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() == 1);
+        }
+    );
+    scanZResetEnabled->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toBool() ? 1 : 0);
+        }
+    );
     scanZResetEnabled->bindLaserRegister(20, false);
+
+    ConfigItem* resetSpeed = group->addConfigItem(
+        "resetSpeed",
+        tr("[21] Reset speed"),
+        tr("Reset speed(mm/s)"),
+        10,
+        DT_REAL
+    );
+    resetSpeed->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    resetSpeed->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    resetSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    resetSpeed->setInputWidgetProperty("step", 0.001);
+    resetSpeed->setInputWidgetProperty("page", 10);
+    resetSpeed->setInputWidgetProperty("minimum", 0.001);
+    resetSpeed->setInputWidgetProperty("maximum", 10000);
+    resetSpeed->bindLaserRegister(21, false);
 
     ConfigItem* scanReturnPos = group->addConfigItem(
         "scanReturnPos",
-        tr("Scan Return pos"),
+        tr("[22] Scan Return pos"),
         tr("Scan return pos"),
         0
     );
@@ -1180,11 +1256,11 @@ void Config::loadUserReigsters()
     scanReturnPos->setInputWidgetProperty("page", 1000);
     scanReturnPos->setInputWidgetProperty("minimum", 0);
     scanReturnPos->setInputWidgetProperty("maximum", 100000);
-    scanReturnPos->bindLaserRegister(21, false);
+    scanReturnPos->bindLaserRegister(22, false);
 
     ConfigItem* backlashXInterval = group->addConfigItem(
         "backlashXInterval",
-        tr("Backlash X Interval(mm/s)"),
+        tr("[23] Backlash X Interval(mm/s)"),
         tr("Backlash x interval"),
         0,
         DT_REAL
@@ -1206,11 +1282,11 @@ void Config::loadUserReigsters()
     backlashXInterval->setInputWidgetProperty("page", 10);
     backlashXInterval->setInputWidgetProperty("minimum", 1);
     backlashXInterval->setInputWidgetProperty("maximum", 100);
-    backlashXInterval->bindLaserRegister(22, false);
+    backlashXInterval->bindLaserRegister(23, false);
 
     ConfigItem* backlashYInterval = group->addConfigItem(
         "backlashYInterval",
-        tr("Backlash Y Interval(mm/s)"),
+        tr("[24] Backlash Y Interval(mm/s)"),
         tr("Backlash y interval"),
         0,
         DT_REAL
@@ -1232,11 +1308,11 @@ void Config::loadUserReigsters()
     backlashYInterval->setInputWidgetProperty("page", 10);
     backlashYInterval->setInputWidgetProperty("minimum", 1);
     backlashYInterval->setInputWidgetProperty("maximum", 100);
-    backlashYInterval->bindLaserRegister(23, false);
+    backlashYInterval->bindLaserRegister(24, false);
 
     ConfigItem* backlashZInterval = group->addConfigItem(
         "backlashZInterval",
-        tr("Backlash Z Interval(mm/s)"),
+        tr("[25] Backlash Z Interval(mm/s)"),
         tr("Backlash z interval"),
         0,
         DT_REAL
@@ -1258,7 +1334,135 @@ void Config::loadUserReigsters()
     backlashZInterval->setInputWidgetProperty("page", 10);
     backlashZInterval->setInputWidgetProperty("minimum", 1);
     backlashZInterval->setInputWidgetProperty("maximum", 100);
-    backlashZInterval->bindLaserRegister(24, false);
+    backlashZInterval->bindLaserRegister(25, false);
+
+    ConfigItem* defaultRunSpeed = group->addConfigItem(
+        "defaultRunSpeed",
+        tr("[26] Default running speed(mm/s)"),
+        tr("Default running speed(mm/s)"),
+        10000,
+        DT_REAL
+    );
+    defaultRunSpeed->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    defaultRunSpeed->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    defaultRunSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    defaultRunSpeed->setInputWidgetProperty("step", 0.001);
+    defaultRunSpeed->setInputWidgetProperty("page", 10);
+    defaultRunSpeed->setInputWidgetProperty("minimum", 1);
+    defaultRunSpeed->setInputWidgetProperty("maximum", 10000);
+    defaultRunSpeed->bindLaserRegister(26, false);
+
+    ConfigItem* defaultMaxCuttingPower = group->addConfigItem(
+        "defaultMaxCuttingPower",
+        tr("[27] Default max cutting power"),
+        tr("Default max cutting power"),
+        1000,
+        DT_REAL
+    );
+    defaultMaxCuttingPower->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    defaultMaxCuttingPower->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    defaultMaxCuttingPower->setInputWidgetProperty("textTemplate", "%1%");
+    defaultMaxCuttingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
+    defaultMaxCuttingPower->setInputWidgetProperty("step", 0.1);
+    defaultMaxCuttingPower->setInputWidgetProperty("page", 10);
+    defaultMaxCuttingPower->setInputWidgetProperty("minimum", 0);
+    defaultMaxCuttingPower->setInputWidgetProperty("maximum", 100);
+    defaultMaxCuttingPower->bindLaserRegister(27, false);
+
+    ConfigItem* defaultMinCuttingPower = group->addConfigItem(
+        "defaultMinCuttingPower",
+        tr("[28] Default min cutting power"),
+        tr("Default min cutting power"),
+        100,
+        DT_REAL
+    );
+    defaultMinCuttingPower->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    defaultMinCuttingPower->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    defaultMinCuttingPower->setInputWidgetProperty("textTemplate", "%1%");
+    defaultMinCuttingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
+    defaultMinCuttingPower->setInputWidgetProperty("step", 0.1);
+    defaultMinCuttingPower->setInputWidgetProperty("page", 10);
+    defaultMinCuttingPower->setInputWidgetProperty("minimum", 0);
+    defaultMinCuttingPower->setInputWidgetProperty("maximum", 100);
+    defaultMinCuttingPower->bindLaserRegister(28, false);
+
+    ConfigItem* defaultScanSpeed = group->addConfigItem(
+        "defaultScanSpeed",
+        tr("[29] Default scan speed(mm/s)"),
+        tr("Default scan speed(mm/s)"),
+        500000,
+        DT_REAL
+    );
+    defaultScanSpeed->setLoadDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    defaultScanSpeed->setSaveDataHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    defaultScanSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    defaultScanSpeed->setInputWidgetProperty("step", 0.001);
+    defaultScanSpeed->setInputWidgetProperty("page", 10);
+    defaultScanSpeed->setInputWidgetProperty("minimum", 0.001);
+    defaultScanSpeed->setInputWidgetProperty("maximum", 10000);
+    defaultScanSpeed->bindLaserRegister(29, false);
+
+    ConfigItem* maxScanGrayRatio = group->addConfigItem(
+        "maxScanGrayRatio",
+        tr("[30] Max scan gray ratio"),
+        tr("Max scan gray ratio"),
+        800,
+        DT_INT
+    );
+    maxScanGrayRatio->setInputWidgetProperty("minimum", 1);
+    maxScanGrayRatio->setInputWidgetProperty("maximum", 2000);
+    maxScanGrayRatio->bindLaserRegister(30, false);
+
+    ConfigItem* minScanGrayRatio = group->addConfigItem(
+        "minScanGrayRatio",
+        tr("[31] Min scan gray ratio"),
+        tr("Min scan gray ratio"),
+        50,
+        DT_INT
+    );
+    minScanGrayRatio->setInputWidgetProperty("minimum", 1);
+    minScanGrayRatio->setInputWidgetProperty("maximum", 2000);
+    minScanGrayRatio->bindLaserRegister(31, false);
 }
 
 void Config::loadSystemRegisters()

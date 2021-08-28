@@ -3375,6 +3375,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     {
         m_created = true;
         QTimer::singleShot(100, this, &LaserControllerWindow::windowCreated);
+        LaserApplication::device->closeAboutWindow();
     }
 }
 

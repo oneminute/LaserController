@@ -253,10 +253,18 @@ public:
         CONFIG_ITEM(userRegister, scanXResetEnabled, bool, toBool)
         CONFIG_ITEM(userRegister, scanYResetEnabled, bool, toBool)
         CONFIG_ITEM(userRegister, scanZResetEnabled, bool, toBool)
+        CONFIG_ITEM(userRegister, resetSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnPos, int, toInt)
-        CONFIG_ITEM(userRegister, backlashXInterval, int, toInt)
-        CONFIG_ITEM(userRegister, backlashYInterval, int, toInt)
-        CONFIG_ITEM(userRegister, backlashZInterval, int, toInt)
+        CONFIG_ITEM(userRegister, backlashXInterval, qreal, toReal)
+        CONFIG_ITEM(userRegister, backlashYInterval, qreal, toReal)
+        CONFIG_ITEM(userRegister, backlashZInterval, qreal, toReal)
+
+        CONFIG_ITEM(userRegister, defaultRunSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, defaultMaxCuttingPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, defaultMinCuttingPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, defaultScanSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, maxScanGrayRatio, qreal, toReal)
+        CONFIG_ITEM(userRegister, minScanGrayRatio, qreal, toReal)
 
     private:
         friend class Config;

@@ -186,6 +186,10 @@ bool LaserDriver::load()
     m_fnGetAPILibCompileInfo = (FN_WCHART_VOID)m_library.resolve("GetAPILibCompileInfo");
     CHECK_FN(m_fnGetAPILibCompileInfo)
 
+    // TODO: 修改为SetLanguage
+    m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguge");
+    CHECK_FN(m_fnSetLanguage)
+
     m_fnInitLib = (FN_VOID_INT)m_library.resolve("InitLib");
     CHECK_FN(m_fnInitLib)
 
@@ -232,8 +236,11 @@ bool LaserDriver::load()
     m_fnReadUserParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadUserParamFromCard");
     CHECK_FN(m_fnReadUserParamFromCard)
 
-    m_fnShowAboutWindow = (FN_VOID_VOID)m_library.resolve("ShowAboutWindow");
+    m_fnShowAboutWindow = (FN_INT_INT_BOOL)m_library.resolve("ShowAboutWindow");
     CHECK_FN(m_fnShowAboutWindow)
+
+    m_fnCloseAboutWindow = (FN_VOID_VOID)m_library.resolve("CloseAboutWindow");
+    //CHECK_FN(m_fnCloseAboutWindow)
 
     m_fnGetLaserLibInfo = (FN_VOID_VOID)m_library.resolve("GetLaserLibInfo");
     CHECK_FN(m_fnGetLaserLibInfo)
@@ -353,6 +360,11 @@ QString LaserDriver::getCompileInfo()
     return info;
 }
 
+int LaserDriver::setLanguage(int lang)
+{
+    return m_fnSetLanguage(lang);
+}
+
 void LaserDriver::init(int winId)
 {
     m_fnInitLib(winId);
@@ -425,7 +437,10 @@ bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
     for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
-        valuesList.append(i.value().toString());
+        QString value = i.value().toString();
+        if (i.value().type() == QVariant::Bool)
+            value = i.value().toBool() ? "1" : "0";
+        valuesList.append(value);
     }
     addrBuf = addrList.join(",");
     valuesBuf = valuesList.join(",");
@@ -433,8 +448,8 @@ bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
     wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
     wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
 
-    qDebug() << "address list: " << addrBuf;
-    qDebug() << "values list: " << valuesBuf;
+    qDebug() << "writing address list: " << addrBuf;
+    qDebug() << "writing values list: " << valuesBuf;
 
     bool success = m_fnWriteSysParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
@@ -481,7 +496,10 @@ bool LaserDriver::writeUserParamToCard(const LaserRegister::RegistersMap& values
     for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
-        valuesList.append(i.value().toString());
+        QString value = i.value().toString();
+        if (i.value().type() == QVariant::Bool)
+            value = i.value().toBool() ? "1" : "0";
+        valuesList.append(value);
     }
     addrBuf = addrList.join(",");
     valuesBuf = valuesList.join(",");
@@ -489,8 +507,8 @@ bool LaserDriver::writeUserParamToCard(const LaserRegister::RegistersMap& values
     wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
     wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
 
-    qDebug() << "address list: " << addrBuf;
-    qDebug() << "values list: " << valuesBuf;
+    qDebug() << "writing address list: " << addrBuf;
+    qDebug() << "writing values list: " << valuesBuf;
 
     bool success = m_fnWriteUserParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
@@ -519,7 +537,7 @@ bool LaserDriver::readUserParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllUserParamFromCard()
 {
     QList<int> params;
-    for (int i = 0; i < 24; i++)
+    for (int i = 0; i <= 31; i++)
     {
         params << i;
     }
@@ -527,9 +545,16 @@ bool LaserDriver::readAllUserParamFromCard()
 
 }
 
-void LaserDriver::showAboutWindow()
+int LaserDriver::showAboutWindow(int interval, bool modal)
 {
-    m_fnShowAboutWindow();
+    //return m_fnShowAboutWindow(interval, modal);
+    return 0;
+}
+
+void LaserDriver::closeAboutWindow()
+{
+    //if (m_fnCloseAboutWindow)
+        //m_fnCloseAboutWindow();
 }
 
 QString LaserDriver::getLaserLibraryInfo()
