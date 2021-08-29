@@ -279,6 +279,17 @@ public:
 
     public:
         static ConfigItemGroup* group;
+
+        CONFIG_ITEM(systemRegister, head, int, toInt)
+        CONFIG_ITEM(systemRegister, password, QString, toString)
+        CONFIG_ITEM(systemRegister, storedPassword, QString, toString)
+        CONFIG_ITEM(systemRegister, hardwareID1, QString, toString)
+        CONFIG_ITEM(systemRegister, hardwareID2, QString, toString)
+        CONFIG_ITEM(systemRegister, hardwareID3, QString, toString)
+        CONFIG_ITEM(systemRegister, cdKey1, QString, toString)
+        CONFIG_ITEM(systemRegister, cdKey2, QString, toString)
+        CONFIG_ITEM(systemRegister, cdKey3, QString, toString)
+
         CONFIG_ITEM(systemRegister, sysRunTime, int, toInt)
         CONFIG_ITEM(systemRegister, laserRunTime, int, toInt)
         CONFIG_ITEM(systemRegister, sysRunNum, int, toInt)

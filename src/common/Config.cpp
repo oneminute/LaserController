@@ -1472,9 +1472,111 @@ void Config::loadSystemRegisters()
     ConfigItemGroup* group = new Config::SystemRegister;
     Config::SystemRegister::group = group;
 
+    ConfigItem* head = group->addConfigItem(
+        "head",
+        tr("[00] Head Data"),
+        tr("Head data for testing"),
+        0x12345678,
+        DT_INT
+    );
+    head->setReadOnly();
+    head->setInputWidgetType(IWT_LineEdit);
+    head->setInputWidgetProperty("readOnly", true);
+    head->bindLaserRegister(0, true);
+
+    ConfigItem* password = group->addConfigItem(
+        "password",
+        tr("[01] Password"),
+        tr("Password"),
+        "",
+        DT_STRING
+    );
+    password->setWriteOnly();
+    password->setInputWidgetType(IWT_LineEdit);
+    password->setVisible(false);
+    password->bindLaserRegister(1, true);
+
+    ConfigItem* storedPassword = group->addConfigItem(
+        "storedPassword",
+        tr("[02] Stored Password"),
+        tr("Stored password"),
+        "",
+        DT_STRING
+    );
+    storedPassword->setWriteOnly();
+    storedPassword->setInputWidgetType(IWT_LineEdit);
+    storedPassword->setVisible(false);
+    storedPassword->bindLaserRegister(2, true);
+
+    ConfigItem* hardwareID1 = group->addConfigItem(
+        "hardwareID1",
+        tr("[03] Hardware ID1"),
+        tr("Hardware ID1"),
+        "",
+        DT_STRING
+    );
+    hardwareID1->setReadOnly();
+    hardwareID1->setInputWidgetType(IWT_LineEdit);
+    hardwareID1->setInputWidgetProperty("readOnly", true);
+    hardwareID1->bindLaserRegister(3, true);
+
+    ConfigItem* hardwareID2 = group->addConfigItem(
+        "hardwareID1",
+        tr("[04] Hardware ID2"),
+        tr("Hardware ID2"),
+        "",
+        DT_STRING
+    );
+    hardwareID2->setReadOnly();
+    hardwareID2->setInputWidgetType(IWT_LineEdit);
+    hardwareID2->setInputWidgetProperty("readOnly", true);
+    hardwareID2->bindLaserRegister(4, true);
+
+    ConfigItem* hardwareID3 = group->addConfigItem(
+        "hardwareID3",
+        tr("[05] Hardware ID3"),
+        tr("Hardware ID3"),
+        "",
+        DT_STRING
+    );
+    hardwareID3->setReadOnly();
+    hardwareID3->setInputWidgetType(IWT_LineEdit);
+    hardwareID3->setInputWidgetProperty("readOnly", true);
+    hardwareID3->bindLaserRegister(5, true);
+
+    ConfigItem* cdKey1 = group->addConfigItem(
+        "cdKey1",
+        tr("[06] cdKey1"),
+        tr("cdKey1"),
+        "",
+        DT_STRING
+    );
+    cdKey1->setInputWidgetType(IWT_LineEdit);
+    cdKey1->bindLaserRegister(6, true);
+
+    ConfigItem* cdKey2 = group->addConfigItem(
+        "cdKey2",
+        tr("[07] cdKey2"),
+        tr("cdKey2"),
+        "",
+        DT_STRING
+    );
+    cdKey2->setInputWidgetType(IWT_LineEdit);
+    cdKey2->bindLaserRegister(7, true);
+
+    ConfigItem* cdKey3 = group->addConfigItem(
+        "cdKey3",
+        tr("[08] cdKey3"),
+        tr("cdKey3"),
+        "",
+        DT_STRING
+    );
+    cdKey3->setInputWidgetType(IWT_LineEdit);
+    cdKey3->bindLaserRegister(8, true);
+
     ConfigItem* sysRunTime = group->addConfigItem(
         "sysRunTime",
-        tr("System Run Time"),
+        tr("[09] System Run Time"),
         tr("System run time"),
         0,
         DT_INT
@@ -1485,7 +1587,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserRunTime = group->addConfigItem(
         "laserRunTime",
-        tr("Laser Run Time"),
+        tr("[10] Laser Run Time"),
         tr("Laser run time"),
         0,
         DT_INT
@@ -1496,7 +1598,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* sysRunNum = group->addConfigItem(
         "sysRunNum",
-        tr("System Run Times"),
+        tr("[11] System Run Times"),
         tr("System run times"),
         0,
         DT_INT
@@ -1506,7 +1608,7 @@ void Config::loadSystemRegisters()
     sysRunNum->bindLaserRegister(11);
 
     ConfigItem* xMaxLength = group->addConfigItem(
-        "xMaxLength",
+        "[12] xMaxLength",
         tr("X Max Length(mm)"),
         tr("X max length"),
         320,
@@ -1524,7 +1626,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxLength->setInputWidgetProperty("step", 0.001);
     xMaxLength->setInputWidgetProperty("page", 1);
@@ -1535,7 +1636,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xDirPhase = group->addConfigItem(
         "xDirPhase",
-        tr("X Dir Phase"),
+        tr("[13] X Dir Phase"),
         tr("X dir phase"),
         1,
         DT_INT
@@ -1559,7 +1660,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xLimitPhase = group->addConfigItem(
         "xLimitPhase",
-        tr("X Limit Phase"),
+        tr("[14] X Limit Phase"),
         tr("X limit phase"),
         0
     );
@@ -1582,7 +1683,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xZeroDev = group->addConfigItem(
         "xZeroDev",
-        tr("X Zero Dev(mm)"),
+        tr("[15] X Zero Dev(mm)"),
         tr("X zero dev"),
         2,
         DT_REAL
@@ -1599,7 +1700,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
     xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     xZeroDev->setInputWidgetProperty("step", 0.001);
     xZeroDev->setInputWidgetProperty("page", 1);
@@ -1610,7 +1710,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xStepLength = group->addConfigItem(
         "xStepLength",
-        tr("X Step Length(mm)"),
+        tr("[16] X Step Length(mm)"),
         tr("X step length"),
         3.164557,
         DT_REAL
@@ -1627,7 +1727,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
-    //xStepLength->setInputWidgetProperty("textTemplate", "%1mm");
     xStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStepLength->setInputWidgetProperty("step", 0.000001);
     xStepLength->setInputWidgetProperty("page", 0.001);
@@ -1638,7 +1737,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xLimitNum = group->addConfigItem(
         "xLimitNum",
-        tr("X Limit number"),
+        tr("[17] X Limit number"),
         tr("X limit number"),
         0
     );
@@ -1662,7 +1761,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xResetEnabled = group->addConfigItem(
         "xResetEnabled",
-        tr("X Reset Enabled"),
+        tr("[18] X Reset Enabled"),
         tr("X reset enabled"),
         true,
         DT_BOOL
@@ -1671,7 +1770,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMotorNum = group->addConfigItem(
         "xMotorNum",
-        tr("X Motor number"),
+        tr("[19] X Motor number"),
         tr("X motor number"),
         0,
         DT_INT
@@ -1696,12 +1795,12 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMotorCurrent = group->addConfigItem(
         "xMotorCurrent",
-        tr("X Motor current"),
+        tr("[20] X Motor current"),
         tr("X motor current"),
         50,
         DT_REAL
     );
-    xMotorCurrent->setSaveDataHook(
+    /*xMotorCurrent->setSaveDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1712,7 +1811,7 @@ void Config::loadSystemRegisters()
         {
             return QVariant(value.toInt() / 10.0);
         }
-    );
+    );*/
     xMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     xMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMotorCurrent->setInputWidgetProperty("step", 0.1);
@@ -1723,7 +1822,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xStartSpeed = group->addConfigItem(
         "xStartSpeed",
-        tr("X Start speed(mm/s)"),
+        tr("[21] X Start speed(mm/s)"),
         tr("X start speed"),
         15,
         DT_REAL
@@ -1740,7 +1839,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     xStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStartSpeed->setInputWidgetProperty("step", 0.001);
     xStartSpeed->setInputWidgetProperty("page", 10);
@@ -1751,7 +1849,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMaxSpeed = group->addConfigItem(
         "xMaxSpeed",
-        tr("X Max speed(mm/s)"),
+        tr("[22] X Max speed(mm/s)"),
         tr("X max speed"),
         45,
         DT_REAL
@@ -1768,7 +1866,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xMaxSpeed->setInputWidgetProperty("textTemplate", "%1mm/s2");
     xMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxSpeed->setInputWidgetProperty("step", 0.001);
     xMaxSpeed->setInputWidgetProperty("page", 10);
@@ -1779,7 +1876,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMaxAcceleration = group->addConfigItem(
         "xMaxAcceleration",
-        tr("X Max Acceleration(mm/s<sup>2</sup>)"),
+        tr("[23] X Max Acceleration(mm/s<sup>2</sup>)"),
         tr("X max acceleration"),
         45,
         DT_REAL
@@ -1796,7 +1893,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xMaxAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
     xMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxAcceleration->setInputWidgetProperty("step", 0.001);
     xMaxAcceleration->setInputWidgetProperty("page", 10);
@@ -1807,7 +1903,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xUrgentAcceleration = group->addConfigItem(
         "xUrgentAcceleration",
-        tr("X Urgent Acceleration(mm/s<sup>2</sup>)"),
+        tr("[24] X Urgent Acceleration(mm/s<sup>2</sup>)"),
         tr("X urgent acceleration"),
         45,
         DT_REAL
@@ -1824,7 +1920,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xUrgentAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
     xUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     xUrgentAcceleration->setInputWidgetProperty("page", 10);
@@ -1835,7 +1930,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMaxLength = group->addConfigItem(
         "yMaxLength",
-        tr("Y Max Length(mm)"),
+        tr("[25] Y Max Length(mm)"),
         tr("Y max length"),
         200,
         DT_REAL
@@ -1852,7 +1947,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     yMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxLength->setInputWidgetProperty("step", 0.001);
     yMaxLength->setInputWidgetProperty("page", 1);
@@ -1863,7 +1957,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yDirPhase = group->addConfigItem(
         "yDirPhase",
-        tr("Y Dir Phase"),
+        tr("[26] Y Dir Phase"),
         tr("Y dir phase"),
         1,
         DT_INT
@@ -1886,7 +1980,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yLimitPhase = group->addConfigItem(
         "yLimitPhase",
-        tr("Y Limit Phase"),
+        tr("[27] Y Limit Phase"),
         tr("Y limit phase"),
         0,
         DT_INT
@@ -1909,7 +2003,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yZeroDev = group->addConfigItem(
         "yZeroDev",
-        tr("Y Zero Dev(mm)"),
+        tr("[28] Y Zero Dev(mm)"),
         tr("Y zero dev"),
         2000,
         DT_REAL
@@ -1926,7 +2020,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //yZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
     yZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     yZeroDev->setInputWidgetProperty("step", 0.001);
     yZeroDev->setInputWidgetProperty("page", 1);
@@ -1937,7 +2030,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yStepLength = group->addConfigItem(
         "yStepLength",
-        tr("Y Step Length(mm)"),
+        tr("[29] Y Step Length(mm)"),
         tr("Y step length"),
         3.164557,
         DT_REAL
@@ -1954,7 +2047,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
-    //yStepLength->setInputWidgetProperty("textTemplate", "%1mm");
     yStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     yStepLength->setInputWidgetProperty("step", 0.000001);
     yStepLength->setInputWidgetProperty("page", 0.001);
@@ -1965,7 +2057,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yLimitNum = group->addConfigItem(
         "yLimitNum",
-        tr("Y Limit number"),
+        tr("[30] Y Limit number"),
         tr("Y limit number"),
         0,
         DT_INT
@@ -1990,7 +2082,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yResetEnabled = group->addConfigItem(
         "yResetEnabled",
-        tr("Y Reset Enabled"),
+        tr("[31] Y Reset Enabled"),
         tr("Y reset enabled"),
         true,
         DT_BOOL
@@ -1999,7 +2091,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMotorNum = group->addConfigItem(
         "yMotorNum",
-        tr("Y Motor number"),
+        tr("[32] Y Motor number"),
         tr("Y motor number"),
         0,
         DT_INT
@@ -2024,12 +2116,12 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMotorCurrent = group->addConfigItem(
         "yMotorCurrent",
-        tr("Y Motor current"),
+        tr("[33] Y Motor current"),
         tr("Y motor current"),
         50,
         DT_REAL
     );
-    yMotorCurrent->setSaveDataHook(
+    /*yMotorCurrent->setSaveDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2040,8 +2132,8 @@ void Config::loadSystemRegisters()
         {
             return QVariant(value.toInt() / 10.0);
         }
-    );
-    //yMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
+    );*/
+    yMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     yMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMotorCurrent->setInputWidgetProperty("step", 0.1);
     yMotorCurrent->setInputWidgetProperty("page", 10);
@@ -2051,7 +2143,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yStartSpeed = group->addConfigItem(
         "yStartSpeed",
-        tr("Y Start speed(mm/s)"),
+        tr("[34] Y Start speed(mm/s)"),
         tr("Y start speed"),
         15,
         DT_REAL
@@ -2068,7 +2160,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //yStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     yStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yStartSpeed->setInputWidgetProperty("step", 0.001);
     yStartSpeed->setInputWidgetProperty("page", 10);
@@ -2079,7 +2170,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMaxSpeed = group->addConfigItem(
         "yMaxSpeed",
-        tr("Y Max speed(mm/s)"),
+        tr("[35] Y Max speed(mm/s)"),
         tr("Y max speed"),
         45,
         DT_REAL
@@ -2096,7 +2187,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //yMaxSpeed->setInputWidgetProperty("textTemplate", "%1mm/s2");
     yMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxSpeed->setInputWidgetProperty("step", 0.001);
     yMaxSpeed->setInputWidgetProperty("page", 10);
@@ -2107,7 +2197,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMaxAcceleration = group->addConfigItem(
         "yMaxAcceleration",
-        tr("Y Max Acceleration(mm/s<sup>2</sup>)"),
+        tr("[36] Y Max Acceleration(mm/s<sup>2</sup>)"),
         tr("Y max acceleration"),
         45,
         DT_REAL
@@ -2124,7 +2214,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //yMaxAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
     yMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxAcceleration->setInputWidgetProperty("step", 0.001);
     yMaxAcceleration->setInputWidgetProperty("page", 10);
@@ -2135,7 +2224,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yUrgentAcceleration = group->addConfigItem(
         "yUrgentAcceleration",
-        tr("Y Urgent Acceleration(mm/s<sup>2</sup>)"),
+        tr("[37] Y Urgent Acceleration(mm/s<sup>2</sup>)"),
         tr("Y urgent acceleration"),
         20,
         DT_REAL
@@ -2152,7 +2241,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //yUrgentAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
     yUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     yUrgentAcceleration->setInputWidgetProperty("page", 10);
@@ -2163,7 +2251,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMaxLength = group->addConfigItem(
         "zMaxLength",
-        tr("Z Max Length(mm)"),
+        tr("[38] Z Max Length(mm)"),
         tr("Z max length"),
         200,
         DT_INT
@@ -2191,7 +2279,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zDirPhase = group->addConfigItem(
         "zDirPhase",
-        tr("Z Dir Phase"),
+        tr("[39] Z Dir Phase"),
         tr("Z dir phase"),
         1,
         DT_INT
@@ -2214,7 +2302,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zLimitPhase = group->addConfigItem(
         "zLimitPhase",
-        tr("Z Limit Length"),
+        tr("[40] Z Limit Length"),
         tr("Z limit length"),
         0,
         DT_INT
@@ -2237,7 +2325,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zZeroDev = group->addConfigItem(
         "zZeroDev",
-        tr("Z Zero Dev(mm)"),
+        tr("[41] Z Zero Dev(mm)"),
         tr("Z zero dev"),
         2,
         DT_REAL
@@ -2254,7 +2342,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //zZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
     zZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     zZeroDev->setInputWidgetProperty("step", 0.001);
     zZeroDev->setInputWidgetProperty("page", 1);
@@ -2265,7 +2352,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zStepLength = group->addConfigItem(
         "zStepLength",
-        tr("Z Step Length(mm)"),
+        tr("[42] Z Step Length(mm)"),
         tr("Z step length"),
         6.2,
         DT_REAL
@@ -2282,7 +2369,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
-    //zStepLength->setInputWidgetProperty("textTemplate", "%1mm");
     zStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     zStepLength->setInputWidgetProperty("step", 0.000001);
     zStepLength->setInputWidgetProperty("page", 0.001);
@@ -2293,7 +2379,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zLimitNum = group->addConfigItem(
         "zLimitNum",
-        tr("Z Limit number"),
+        tr("[43] Z Limit number"),
         tr("Z limit number"),
         0,
         DT_INT
@@ -2308,8 +2394,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 1);
-            comboBox->addItem(tr("3"), 1);
+            comboBox->addItem(tr("2"), 2);
+            comboBox->addItem(tr("3"), 3);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2318,7 +2404,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zResetEnabled = group->addConfigItem(
         "zResetEnabled",
-        tr("Z Reset Enabled"),
+        tr("[44] Z Reset Enabled"),
         tr("Z reset enabled"),
         true,
         DT_BOOL
@@ -2327,7 +2413,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMotorNum = group->addConfigItem(
         "zMotorNum",
-        tr("Z Motor number"),
+        tr("[45] Z Motor number"),
         tr("Z motor number"),
         0,
         DT_INT
@@ -2342,8 +2428,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 1);
-            comboBox->addItem(tr("3"), 1);
+            comboBox->addItem(tr("2"), 2);
+            comboBox->addItem(tr("3"), 3);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2352,12 +2438,12 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMotorCurrent = group->addConfigItem(
         "zMotorCurrent",
-        tr("Z Motor current"),
+        tr("[46] Z Motor current"),
         tr("Z motor current"),
         50,
         DT_REAL
     );
-    zMotorCurrent->setSaveDataHook(
+    /*zMotorCurrent->setSaveDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2368,7 +2454,7 @@ void Config::loadSystemRegisters()
         {
             return QVariant(value.toInt() / 10.0);
         }
-    );
+    );*/
     zMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     zMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMotorCurrent->setInputWidgetProperty("step", 0.1);
@@ -2379,7 +2465,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zStartSpeed = group->addConfigItem(
         "zStartSpeed",
-        tr("Z Start speed(mm/s)"),
+        tr("[47] Z Start speed(mm/s)"),
         tr("Z start speed"),
         15,
         DT_REAL
@@ -2396,7 +2482,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //zStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     zStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zStartSpeed->setInputWidgetProperty("step", 0.001);
     zStartSpeed->setInputWidgetProperty("page", 10);
@@ -2407,7 +2492,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMaxSpeed = group->addConfigItem(
         "zMaxSpeed",
-        tr("Z Max speed(mm/s)"),
+        tr("[48] Z Max speed(mm/s)"),
         tr("Z max speed"),
         10,
         DT_REAL
@@ -2424,7 +2509,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //zMaxSpeed->setInputWidgetProperty("textTemplate", "%1mm/s2");
     zMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxSpeed->setInputWidgetProperty("step", 0.001);
     zMaxSpeed->setInputWidgetProperty("page", 10);
@@ -2435,7 +2519,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMaxAcceleration = group->addConfigItem(
         "zMaxAcceleration",
-        tr("Z Max Acceleration(mm/s<sup>2</sup>)"),
+        tr("[49] Z Max Acceleration(mm/s<sup>2</sup>)"),
         tr("Z max acceleration"),
         30,
         DT_REAL
@@ -2452,7 +2536,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //zMaxAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
     zMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxAcceleration->setInputWidgetProperty("step", 0.001);
     zMaxAcceleration->setInputWidgetProperty("page", 10);
@@ -2463,7 +2546,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zUrgentAcceleration = group->addConfigItem(
         "zUrgentAcceleration",
-        tr("Z Urgent Acceleration(mm/s<sup>2</sup>)"),
+        tr("[50] Z Urgent Acceleration(mm/s<sup>2</sup>)"),
         tr("Z urgent acceleration"),
         30,
         DT_REAL
@@ -2480,7 +2563,6 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //zUrgentAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s2");
     zUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     zUrgentAcceleration->setInputWidgetProperty("page", 10);
@@ -2491,7 +2573,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserMaxPower = group->addConfigItem(
         "laserMaxPower",
-        tr("Laser Max Power"),
+        tr("[51] Laser Max Power"),
         tr("Laser max power"),
         70,
         DT_REAL
@@ -2516,7 +2598,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserMinPower = group->addConfigItem(
         "laserMinPower",
-        tr("Laser Min Power"),
+        tr("[52] Laser Min Power"),
         tr("Laser min power"),
         70,
         DT_REAL
@@ -2541,7 +2623,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserPowerFreq = group->addConfigItem(
         "laserPowerFreq",
-        tr("Laser Min Power"),
+        tr("[53] Laser Min Power"),
         tr("Laser min power"),
         4000
     );
@@ -2553,7 +2635,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",
-        tr("X Phase Enabled"),
+        tr("[54] X Phase Enabled"),
         tr("X phase enabled"),
         true,
         DT_BOOL
@@ -2562,7 +2644,7 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yPhaseEnabled = group->addConfigItem(
         "yPhaseEnabled",
-        tr("Y Phase Enabled"),
+        tr("[55] Y Phase Enabled"),
         tr("Y phase enabled"),
         true,
         DT_BOOL
@@ -2571,12 +2653,37 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zPhaseEnabled = group->addConfigItem(
         "zPhaseEnabled",
-        tr("Z Phase Enabled"),
+        tr("[56] Z Phase Enabled"),
         tr("Z phase enabled"),
         true,
         DT_BOOL
     );
-    zPhaseEnabled->bindLaserRegister(54);
+    zPhaseEnabled->bindLaserRegister(56);
+
+    ConfigItem* originalPoint = group->addConfigItem(
+        "originalPoint",
+        tr("[57] Original Point"),
+        tr("Original Point"),
+        0
+    );
+    originalPoint->setInputWidgetType(IWT_ComboBox);
+    originalPoint->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("Top Left"), 0);
+            comboBox->addItem(tr("Top Right"), 1);
+            comboBox->addItem(tr("Bottom Right"), 2);
+            comboBox->addItem(tr("Bottom Left"), 3);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+    originalPoint->bindLaserRegister(57);
 }
 
 void Config::loadDebug()

@@ -15,6 +15,7 @@ public:
         , advanced(false)
         , visible(true)
         , readOnly(false)
+        , writeOnly(false)
         , modified(false)
         , inputWidgetType(IWT_EditSlider)
         , laserRegister(nullptr)
@@ -67,6 +68,11 @@ public:
     /// 是否为只读选项
     /// </summary>
     bool readOnly;
+
+    /// <summary>
+    /// 只写
+    /// </summary>
+    bool writeOnly;
 
     /// <summary>
     /// 保存方式
@@ -265,6 +271,18 @@ void ConfigItem::setReadOnly(bool readOnly)
 {
     Q_D(ConfigItem);
     d->readOnly = readOnly;
+}
+
+bool ConfigItem::writeOnly() const
+{
+    Q_D(const ConfigItem);
+    return d->writeOnly;
+}
+
+void ConfigItem::setWriteOnly(bool writeOnly)
+{
+    Q_D(ConfigItem);
+    d->writeOnly = writeOnly;
 }
 
 StoreStrategy ConfigItem::storeType() const

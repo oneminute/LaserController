@@ -55,6 +55,9 @@ public:
     bool readOnly() const;
     void setReadOnly(bool readOnly = true);
 
+    bool writeOnly() const;
+    void setWriteOnly(bool writeOnly = true);
+
     StoreStrategy storeType() const;
     void setStoreType(StoreStrategy type);
 
