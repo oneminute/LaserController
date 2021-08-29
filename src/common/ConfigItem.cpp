@@ -366,7 +366,7 @@ bool ConfigItem::isModified() const
     return d->modified;
 }
 
-InputWidgetWrapper* ConfigItem::createInputWidgetWrapper(QWidget* widget)
+InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
 {
     Q_D(ConfigItem);
     return new InputWidgetWrapper(widget, this);

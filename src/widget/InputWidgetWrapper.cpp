@@ -44,6 +44,8 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     , m_ptr(new InputWidgetWrapperPrivate(this, configItem))
 {
     Q_D(InputWidgetWrapper);
+    Q_ASSERT(widget);
+    setParent(widget);
 
     d->type = configItem->inputWidgetType();
 

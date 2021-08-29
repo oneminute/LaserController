@@ -20,7 +20,7 @@ class InputWidgetWrapper : public QObject
     Q_OBJECT
 public:
     explicit InputWidgetWrapper(QWidget* widget, ConfigItem* configItem);
-    virtual ~InputWidgetWrapper();
+    ~InputWidgetWrapper();
 
     void setNameLabel(QLabel* label);
     void setDescriptionLabel(QLabel* label);

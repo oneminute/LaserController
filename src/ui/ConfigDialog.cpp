@@ -58,14 +58,15 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         page->setLayout(pageLayout);
 
         QGroupBox* groupBox = new QGroupBox(group->title());
-        QGridLayout* gridLayout = new QGridLayout(groupBox);
-        gridLayout->setColumnMinimumWidth(0, 150);
-        gridLayout->setColumnMinimumWidth(1, 240);
-        gridLayout->setColumnMinimumWidth(2, 240);
-        gridLayout->setColumnStretch(0, 0);
-        gridLayout->setColumnStretch(1, 1);
-        gridLayout->setColumnStretch(2, 0);
-        groupBox->setLayout(gridLayout);
+        //QGridLayout* contentLayout = new QGridLayout(groupBox);
+        QFormLayout* contentLayout = new QFormLayout(groupBox);
+        /*contentLayout->setColumnMinimumWidth(0, 150);
+        contentLayout->setColumnMinimumWidth(1, 240);
+        contentLayout->setColumnMinimumWidth(2, 240);
+        contentLayout->setColumnStretch(0, 0);
+        contentLayout->setColumnStretch(1, 1);
+        contentLayout->setColumnStretch(2, 0);*/
+        groupBox->setLayout(contentLayout);
         pageLayout->addWidget(groupBox);
 
         QTreeWidgetItem* treeItem = new QTreeWidgetItem;
@@ -75,11 +76,12 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         for (ConfigItem* item : group->items())
         {
-            addConfigItem(item, groupBox);
+            if (item->isVisible())
+                addConfigItem(item, groupBox);
         }
-        int row = gridLayout->rowCount();
-        gridLayout->addWidget(new QWidget, row, 0);
-        gridLayout->setRowStretch(row, 1);
+        //int row = contentLayout->rowCount();
+        //contentLayout->addWidget(new QWidget, row, 0);
+        //contentLayout->setRowStretch(row, 1);
 
         if (group == Config::SystemRegister::group)
         {
@@ -189,7 +191,7 @@ void ConfigDialog::setCurrentPanel(const QString & title)
 
 void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QString& exlusion)
 {
-    QGridLayout * layout = qobject_cast<QGridLayout*>(parent->layout());
+    QFormLayout * layout = qobject_cast<QFormLayout*>(parent->layout());
 
     int row = layout->rowCount();
 
@@ -202,21 +204,23 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
         widget->setProperty(i.key().toStdString().c_str(), i.value());
     }
     item->initWidget(widget);
-    layout->addWidget(widget, row, 1);
+    //layout->addWidget(widget, row, 1);
     widget->setParent(parent);
 
     QLabel* labelName = new QLabel(parent);
     labelName->setText(item->title());
-    layout->addWidget(labelName, row, 0);
+    labelName->setToolTip(item->description());
+    //layout->addWidget(labelName, row, 0);
 
-    QLabel* labelDesc = new QLabel(parent);
-    labelDesc->setText(item->description());
-    layout->addWidget(labelDesc, row, 2);
-    layout->setRowStretch(row, 0);
+    //QLabel* labelDesc = new QLabel(parent);
+    //labelDesc->setText(item->description());
+    //layout->addWidget(labelDesc, row, 2);
+    //layout->setRowStretch(row, 0);
+    layout->addRow(labelName, widget);
 
-    InputWidgetWrapper* wrapper = item->createInputWidgetWrapper(widget);
+    InputWidgetWrapper* wrapper = item->bindWidget(widget);
     wrapper->setNameLabel(labelName);
-    wrapper->setDescriptionLabel(labelDesc);
+    //wrapper->setDescriptionLabel(labelDesc);
     m_wrappers.append(wrapper);
 }
 

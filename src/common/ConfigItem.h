@@ -77,7 +77,7 @@ public:
 
     bool isModified() const;
 
-    InputWidgetWrapper* createInputWidgetWrapper(QWidget* widget);
+    InputWidgetWrapper* bindWidget(QWidget* widget);
 
     QString toString() const;
     QJsonObject toJson() const;
