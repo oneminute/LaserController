@@ -1,5 +1,18 @@
 #Release Notes
 
+#### 2021-08-29 0.2.0.3
+特性
+1. 重构了分组与路径优化相关的源码结构；
+2. 实现了用户寄存器的读写；
+3. 实现了系统寄存器的读操作；
+4. 修复了若干bug。
+
+Features
+1. Refactored source codes about grouping and path optimization;
+2. Implemented reading and writing user registers;
+3. Implemented reading system registers;
+4. Fixed some other bugs.
+
 #### 2021-08-21 0.2.0.2
 特性:
 1. 添加了调试参数；
