@@ -1,6 +1,7 @@
 #include "LaserDevice.h"
 
 #include <QDate>
+#include <QMessageBox>
 
 #include "LaserApplication.h"
 #include "LaserDriver.h"
@@ -561,7 +562,8 @@ void LaserDevice::handleError(int code, const QString& message)
         break;
     case E_FactoryPasswordIncorrect:
         throw new LaserDeviceSecurityException(code, tr("Incorrect factory password"));
-        emit manufacturePasswordVerified(false);
+        //emit manufacturePasswordVerified(false);
+        QMessageBox::warning(LaserApplication::mainWindow, tr("Invalid password"), tr("Invalid Manufacture password"));
         break;
     case E_FactoryPasswordLengthError:
         throw new LaserDeviceSecurityException(code, tr("Invalid length of factory password"));

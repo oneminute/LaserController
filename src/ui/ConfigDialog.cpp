@@ -188,37 +188,27 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
     }
     else if (stdButton == QDialogButtonBox::Save)
     {
+        if (Config::UserRegister::group->isModified())
+            LaserApplication::device->writeUserRegisters();
+        if (Config::SystemRegister::group->isModified())
+        {
+            // show password input dialog
+            QString password = QInputDialog::getText(
+                this,
+                tr("Manufacture Password"),
+                tr("Password"),
+                QLineEdit::Normal
+            );
+            Config::SystemRegister::passwordItem()->setValue(password);
+            LaserApplication::device->writeSystemRegisters();
+        }
         Config::save(LaserApplication::device->mainCardId());
-        LaserApplication::device->writeUserRegisters();
-        LaserApplication::device->writeSystemRegisters();
         onValueChanged(QVariant());
     }
 }
 
 void ConfigDialog::setCurrentPanel(QWidget * panel)
 {
-    /*if (panel == m_systemRegisterPage)
-    {
-        QString password = QInputDialog::getText(
-            this,
-            tr("Manufacture Password"),
-            tr("Password"),
-            QLineEdit::Normal
-        );
-
-        password = password.trimmed();
-        if (password.isEmpty() || password.isNull())
-        {
-            return;
-        }
-
-        LaserApplication::device->verifyManufacturePassword(password);
-    }
-    else
-    {
-        m_ui->stackedWidgetPanels->setCurrentWidget(panel);
-        m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
-    }*/
     m_ui->stackedWidgetPanels->setCurrentWidget(panel);
     m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
 }
