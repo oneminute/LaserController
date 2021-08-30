@@ -32,7 +32,9 @@ namespace typeUtils
 
     cv::Rect qtRect2cvRect(const QRectF& rect, float scale = 1.f);
 
-    QVariant textToVariant(const QString& src, DataType dataType);
+    QVariant stringToVariant(const QString& src, DataType dataType);
+
+    QString variantToString(const QVariant& src, DataType dataType);
 }
 
 #endif // TYPEUTILS_H

@@ -71,7 +71,7 @@ QVector3D utils::putToQuadrant(const QVector3D & pos, QUADRANT quadrant)
     return QVector3D(x, y, z);
 }
 
-void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float height)
+QVector3D utils::limitToLayout(const QVector3D & pos, QUADRANT quadrant, float width, float height)
 {
     float x = pos.x();
     float y = pos.y();
@@ -103,8 +103,7 @@ void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float
         break;
     }
 
-    pos.setX(x);
-    pos.setY(y);
+    return QVector3D(x, y, pos.z());
 }
 
 bool utils::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, float scop)

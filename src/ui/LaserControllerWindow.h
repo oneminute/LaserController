@@ -215,6 +215,7 @@ private:
     RulerWidget* m_hRuler;
     RulerWidget* m_vRuler;
     QComboBox* m_comboBoxScale;
+    ads::CDockAreaWidget* m_centralDockArea;
 
     // Layers Panel widgets
     LaserLayerTableWidget* m_tableWidgetLayers;

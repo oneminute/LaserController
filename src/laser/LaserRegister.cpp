@@ -123,7 +123,7 @@ void LaserRegister::setStoreStrategy(StoreStrategy storeStrategy)
 
 void LaserRegister::parse(const QString& raw)
 {
-    emit valueLoaded(typeUtils::textToVariant(raw, dataType()));
+    emit valueLoaded(typeUtils::stringToVariant(raw, dataType()));
 }
 
 bool LaserRegister::read()

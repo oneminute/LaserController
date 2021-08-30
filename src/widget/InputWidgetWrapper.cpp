@@ -345,7 +345,7 @@ QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orie
 void InputWidgetWrapper::onTextChanged(const QString & text)
 {
     Q_D(InputWidgetWrapper);
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onCheckBoxStateChanged(int state)
@@ -365,7 +365,7 @@ void InputWidgetWrapper::onTextEditTextChanged()
     Q_D(InputWidgetWrapper);
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onPlainTextEditTextChanged()
@@ -373,7 +373,7 @@ void InputWidgetWrapper::onPlainTextEditTextChanged()
     Q_D(InputWidgetWrapper);
     QPlainTextEdit* textEdit = qobject_cast<QPlainTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onEditingFinished()
@@ -381,7 +381,7 @@ void InputWidgetWrapper::onEditingFinished()
     Q_D(InputWidgetWrapper);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
     QString text = lineEdit->text();
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onValueChanged(int value)

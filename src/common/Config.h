@@ -120,6 +120,7 @@ public:
 			CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
 			CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
 			CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
+            CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
 
     private:
         friend class Config;

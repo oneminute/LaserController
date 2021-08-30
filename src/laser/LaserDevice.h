@@ -1,6 +1,7 @@
 #ifndef LASERDEVICE_H
 #define LASERDEVICE_H
 
+#include "common/common.h"
 #include <QObject>
 #include <QMutex>
 #include <QWaitCondition>
@@ -23,7 +24,7 @@ public:
 
     qreal layoutWidth() const;
     qreal layoutHeight() const;
-    void setLayoutRect(const QRectF& rect, bool toCard = true);
+    //void setLayoutRect(const QRectF& rect, bool toCard = true);
 
     int printerDrawUnit() const;
     void setPrinterDrawUnit(int unit, bool toCard = true);
@@ -63,6 +64,9 @@ public:
     void showLibraryVersion();
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
+
+    void moveTo(const QVector3D& pos, QUADRANT quad);
+    void moveBy(const QVector3D& pos);
 
     bool isAvailable() const;
 

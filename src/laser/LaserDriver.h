@@ -262,7 +262,16 @@ private:
     typedef int(__stdcall *FN_INT_WCHART)(wchar_t* address);
 
     typedef void(__stdcall *FN_VOID_DOUBLE)(double speed);
-    typedef void(__stdcall *FNLPenQuickMoveTo)(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
+    typedef void(__stdcall *FNLPenQuickMoveTo)(
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos);
     typedef void(__stdcall *FNSmallScaleMovement)(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
 
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
@@ -324,7 +333,16 @@ public:
     //bool checkFactoryPassword(const QString& password);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
-    void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
+    void lPenQuickMoveTo(
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos);
     void controlHDAction(int action);
 
     QString getMainCardID();

@@ -92,3 +92,10 @@ src/widget/ADS
 .vscode/
 
 config.json
+
+third/bin/translations/
+
+third/bin/Demo1920x1080.ini
+
+
+*.Lan

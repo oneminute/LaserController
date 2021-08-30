@@ -352,7 +352,6 @@ void Config::loadUiItems()
 	clickSelectiontTolerance->setInputWidgetProperty("minimum", 0);
 	clickSelectiontTolerance->setInputWidgetProperty("maximum", 10);
 
-	
 	ConfigItem* visualGridSpacing = group->addConfigItem(
 		"visualGridSpacing",
 		tr("Visual Grid Spacing"),
@@ -361,6 +360,15 @@ void Config::loadUiItems()
 	);
 	visualGridSpacing->setInputWidgetProperty("minimum", 0);
 	visualGridSpacing->setInputWidgetProperty("maximum", 10);
+
+    ConfigItem* splitterHandleWidth = group->addConfigItem(
+        "splitterHandleWidth",
+        tr("Splitter Handle Width"),
+        tr("Splitter Handle Width"),
+        1
+    );
+	splitterHandleWidth->setInputWidgetProperty("minimum", 1);
+	splitterHandleWidth->setInputWidgetProperty("maximum", 20);
 }
 
 void Config::loadCuttingLayerItems()
@@ -1608,8 +1616,8 @@ void Config::loadSystemRegisters()
     sysRunNum->bindLaserRegister(11);
 
     ConfigItem* xMaxLength = group->addConfigItem(
-        "[12] xMaxLength",
-        tr("X Max Length(mm)"),
+        "xMaxLength",
+        tr("[12] X Max Length(mm)"),
         tr("X max length"),
         320,
         DT_REAL
@@ -1906,7 +1914,7 @@ void Config::loadSystemRegisters()
         tr("[24] X Urgent Acceleration(mm/s<sup>2</sup>)"),
         tr("X urgent acceleration"),
         45,
-        DT_REAL
+        DT_INT
     );
     xUrgentAcceleration->setSaveDataHook(
         [](const QVariant& value)
@@ -1924,7 +1932,7 @@ void Config::loadSystemRegisters()
     xUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     xUrgentAcceleration->setInputWidgetProperty("page", 10);
     xUrgentAcceleration->setInputWidgetProperty("minimum", 1);
-    xUrgentAcceleration->setInputWidgetProperty("maximum", 1000);
+    xUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
     xUrgentAcceleration->setInputWidgetProperty("decimals", 3);
     xUrgentAcceleration->bindLaserRegister(24);
 
@@ -2245,7 +2253,7 @@ void Config::loadSystemRegisters()
     yUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     yUrgentAcceleration->setInputWidgetProperty("page", 10);
     yUrgentAcceleration->setInputWidgetProperty("minimum", 1);
-    yUrgentAcceleration->setInputWidgetProperty("maximum", 1000);
+    yUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
     yUrgentAcceleration->setInputWidgetProperty("decimals", 3);
     yUrgentAcceleration->bindLaserRegister(37);
 
@@ -2567,7 +2575,7 @@ void Config::loadSystemRegisters()
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     zUrgentAcceleration->setInputWidgetProperty("page", 10);
     zUrgentAcceleration->setInputWidgetProperty("minimum", 1);
-    zUrgentAcceleration->setInputWidgetProperty("maximum", 1000);
+    zUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
     zUrgentAcceleration->setInputWidgetProperty("decimals", 3);
     zUrgentAcceleration->bindLaserRegister(50);
 

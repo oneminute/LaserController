@@ -803,6 +803,9 @@
    <property name="text">
     <string>Move Left</string>
    </property>
+   <property name="shortcut">
+    <string>Left</string>
+   </property>
   </action>
   <action name="actionMoveRight">
    <property name="icon">
@@ -811,6 +814,9 @@
    </property>
    <property name="text">
     <string>Move Right</string>
+   </property>
+   <property name="shortcut">
+    <string>Right</string>
    </property>
   </action>
   <action name="actionMoveTop">
@@ -821,6 +827,9 @@
    <property name="text">
     <string>Move Top</string>
    </property>
+   <property name="shortcut">
+    <string>Up</string>
+   </property>
   </action>
   <action name="actionMoveBottom">
    <property name="icon">
@@ -829,6 +838,9 @@
    </property>
    <property name="text">
     <string>Move Bottom</string>
+   </property>
+   <property name="shortcut">
+    <string>Down</string>
    </property>
   </action>
   <action name="actionMoveTopLeft">
@@ -839,6 +851,9 @@
    <property name="text">
     <string>Move Top Left</string>
    </property>
+   <property name="shortcut">
+    <string>Up, Left</string>
+   </property>
   </action>
   <action name="actionMoveTopRight">
    <property name="icon">
@@ -847,6 +862,9 @@
    </property>
    <property name="text">
     <string>Move Top Right</string>
+   </property>
+   <property name="shortcut">
+    <string>Up, Right</string>
    </property>
   </action>
   <action name="actionMoveBottomLeft">
@@ -857,6 +875,9 @@
    <property name="text">
     <string>Move Bottom Left</string>
    </property>
+   <property name="shortcut">
+    <string>Left, Down</string>
+   </property>
   </action>
   <action name="actionMoveBottomRight">
    <property name="icon">
@@ -865,6 +886,9 @@
    </property>
    <property name="text">
     <string>Move Bottom Right</string>
+   </property>
+   <property name="shortcut">
+    <string>Down, Right</string>
    </property>
   </action>
   <action name="actionMoveUp">

@@ -240,7 +240,7 @@ bool LaserDriver::load()
     CHECK_FN(m_fnShowAboutWindow)
 
     m_fnCloseAboutWindow = (FN_VOID_VOID)m_library.resolve("CloseAboutWindow");
-    //CHECK_FN(m_fnCloseAboutWindow)
+    CHECK_FN(m_fnCloseAboutWindow)
 
     m_fnGetLaserLibInfo = (FN_VOID_VOID)m_library.resolve("GetLaserLibInfo");
     CHECK_FN(m_fnGetLaserLibInfo)
@@ -428,11 +428,6 @@ void LaserDriver::setSoftwareInitialization(int printerDrawUnit, double pageZero
     m_fnSetSoftwareInitialization(printerDrawUnit, pageZeroX, pageZeroY, pageWidth, pageHeight);
 }
 
-//void LaserDriver::setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions)
-//{
-//    m_fnSetRotateDeviceParam(type, perimeterPulse, materialPerimeter, deviceDPI, autoScaleDimensions);
-//}
-
 void LaserDriver::setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates)
 {
     m_fnSetHardwareInitialization(curveToSpeedRatio, logicalResolution, maxSpeed, zeroCoordinates);
@@ -449,9 +444,30 @@ bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
     for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
+        if (i.key() == 24)
+            qLogD << "debugging reg: " << i.key() << ", " << i.value();
         QString value = i.value().toString();
-        if (i.value().type() == QVariant::Bool)
+        switch (i.value().type())
+        {
+        case QVariant::Bool:
             value = i.value().toBool() ? "1" : "0";
+            break;
+        case QVariant::Int:
+            value = QString("%1").arg(i.value().toInt());
+            break;
+        case QVariant::UInt:
+            value = QString("%1").arg(i.value().toUInt());
+            break;
+        case QVariant::LongLong:
+            value = QString("%1").arg(i.value().toLongLong());
+            break;
+        case QVariant::ULongLong:
+            value = QString("%1").arg(i.value().toULongLong());
+            break;
+        case QVariant::Double:
+            value = QString("%1").arg(i.value().toDouble(), 0, 'f');
+            break;
+        }
         valuesList.append(value);
     }
     addrBuf = addrList.join(",");
@@ -559,14 +575,14 @@ bool LaserDriver::readAllUserParamFromCard()
 
 int LaserDriver::showAboutWindow(int interval, bool modal)
 {
-    //return m_fnShowAboutWindow(interval, modal);
-    return 0;
+    return m_fnShowAboutWindow(interval, modal);
+    //return 0;
 }
 
 void LaserDriver::closeAboutWindow()
 {
-    //if (m_fnCloseAboutWindow)
-        //m_fnCloseAboutWindow();
+    if (m_fnCloseAboutWindow)
+        m_fnCloseAboutWindow();
 }
 
 QString LaserDriver::getLaserLibraryInfo()
@@ -606,9 +622,22 @@ void LaserDriver::lPenMoveToOriginalPoint(double speed)
     m_fnLPenMoveToOriginalPoint(speed);
 }
 
-void LaserDriver::lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed)
+void LaserDriver::lPenQuickMoveTo(
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos)
 {
-    m_fnLPenQuickMoveTo(xyzStyle, zeroPointStyle, x, y, z, startSpeed, workSpeed);
+    m_fnLPenQuickMoveTo(
+        xMoveEnable, xMoveStyle, xPos,
+        yMoveEnable, yMoveStyle, yPos,
+        zMoveEnable, zMoveStyle, zPos
+        );
 }
 
 void LaserDriver::controlHDAction(int action)

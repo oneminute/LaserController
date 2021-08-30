@@ -19,7 +19,7 @@ namespace utils
 
     QVector3D putToQuadrant(const QVector3D& pos, QUADRANT quadrant);
 
-    void limitToLayout(QVector3D& pos, QUADRANT quadrant, float width, float height);
+    QVector3D limitToLayout(const QVector3D& pos, QUADRANT quadrant, float width, float height);
 
 	bool checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, float scop = 0.00001f);
 

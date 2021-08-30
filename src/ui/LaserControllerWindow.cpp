@@ -6,6 +6,8 @@
 #include <DockAreaTitleBar.h>
 #include <DockAreaWidget.h>
 #include <DockComponentsFactory.h>
+#include <DockContainerWidget.h>
+#include <DockSplitter.h>
 #include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
@@ -18,6 +20,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSplitter>
 #include <QStack>
 #include <QtMath>
 #include <QRadioButton>
@@ -84,6 +87,25 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     createMovementDockPanel();
 
     m_dockAreaLayers->setCurrentIndex(0);
+    // 更改分割条的粗细
+    internal::findParent<QSplitter*>(m_centralDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaLayers)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaCameras)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaOperations)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaOutline)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaMovement)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    for (CDockContainerWidget* container : m_dockManager->dockContainers())
+    {
+        connect(container, &CDockContainerWidget::dockAreasAdded,
+            [=]() {
+                qLogD << container;
+                for (int i = 0; i < container->dockAreaCount(); i++)
+                {
+                    internal::findParent<QSplitter*>(container->dockArea(i))->setHandleWidth(Config::Ui::splitterHandleWidth());
+                }
+            }
+        );
+    }
     
     setDockNestingEnabled(true);
 
@@ -719,53 +741,22 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
         return;
     }
 
-    QVariant value;
+    QVariant value(0);
 
-    // Get Quadrant;
-    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_WORKING_QUADRANT, value))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }*/
     QUADRANT quad = static_cast<QUADRANT>(value.toInt());
 
-    // Get registor #5
-    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_SPEED, value))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }*/
-    int moveFastSpeed = value.toInt();
-
-    // Get registor #40
-    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_LAUNCHING_SPEED, value))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }*/
-    int moveFastLaunchingSpeed = value.toInt();
-
-    // Get layout size
-    float layoutWidth = 0;
-    float layoutHeight = 0;
-    if (!LaserDriver::instance().getLayout(layoutWidth, layoutHeight))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }
-    
-    // Get current pos;
-    QVector3D dest = utils::putToQuadrant(abstractDest, quad);
     if (relative)
     {
+        LaserApplication::device->moveBy(delta);
+    }
+    else
+    {
+        // Get current pos;
+        QVector3D dest = utils::putToQuadrant(abstractDest, quad);
         QVector3D pos = utils::putToQuadrant(LaserDriver::instance().GetCurrentLaserPos(), quad);
         dest = pos + delta;
+        LaserApplication::device->moveTo(dest, quad);
     }
-    utils::limitToLayout(dest, quad, layoutWidth, layoutHeight);
-    char xyzStyle = 0;
-    if (dest.z() != 0.f)
-        xyzStyle = 1;
-    LaserDriver::instance().lPenQuickMoveTo(xyzStyle, true, dest.x(), dest.y(), dest.z(), moveFastSpeed, moveFastLaunchingSpeed);
 }
 
 FinishRun LaserControllerWindow::finishRun()
@@ -891,8 +882,8 @@ void LaserControllerWindow::createCentralDockPanel()
 
     CDockWidget* centralDockWidget = new CDockWidget(tr("work space"));
     centralDockWidget->setWidget(centralWidget);
-    CDockAreaWidget* centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
-    centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
+    m_centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
+    m_centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
 }
 
 void LaserControllerWindow::createLayersDockPanel()
@@ -918,7 +909,7 @@ void LaserControllerWindow::createLayersDockPanel()
     buttonsLayout->addWidget(m_buttonRemoveLayer);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addWidget(m_tableWidgetLayers, 1);
     layout->addLayout(buttonsLayout, 0);
 
@@ -972,7 +963,7 @@ void LaserControllerWindow::createCameraDockPanel()
     m_doubleSpinBoxCameraYShift->setValue(0.0);
 
     QGridLayout* layout = new QGridLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addWidget(labelCameras, 0, 0);
     layout->addWidget(m_comboBoxCameras, 0, 1, 1, 4);
     layout->addWidget(m_buttonCameraUpdateOverlay, 1, 0);
@@ -1109,7 +1100,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     fourthRow->setStretch(3, 0);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addLayout(firstRow);
     layout->addLayout(secondRow);
     layout->addLayout(thirdRow);
@@ -1143,7 +1134,7 @@ void LaserControllerWindow::createOutlineDockPanel()
     toolsLayout->addWidget(updateButton);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addWidget(m_treeWidgetOutline);
     layout->addLayout(toolsLayout);
 
@@ -1210,7 +1201,7 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveTopLeft = new QToolButton;
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
 
-    m_buttonMoveTop= new QToolButton;
+    m_buttonMoveTop = new QToolButton;
     m_buttonMoveTop->setDefaultAction(m_ui->actionMoveTop);
 
     m_buttonMoveTopRight = new QToolButton;
@@ -1219,7 +1210,7 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveLeft = new QToolButton;
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
-    m_buttonMoveToOrigin= new QToolButton;
+    m_buttonMoveToOrigin = new QToolButton;
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
     m_buttonMoveRight = new QToolButton;
@@ -1325,7 +1316,7 @@ void LaserControllerWindow::createMovementDockPanel()
     connect(m_buttonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
 
     QHBoxLayout* fourthRow = new QHBoxLayout;
-    fourthRow->setMargin(0);
+    fourthRow->setMargin(3);
     fourthRow->addWidget(m_buttonReadOrigins);
     fourthRow->addWidget(m_buttonWriteOrigins);
 
@@ -1848,13 +1839,13 @@ void LaserControllerWindow::onActionWorkState(bool checked)
 
 void LaserControllerWindow::onActionMoveTop(bool checked)
 {
-    QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottom(bool checked)
 {
-    QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
@@ -1872,25 +1863,25 @@ void LaserControllerWindow::onActionMoveRight(bool checked)
 
 void LaserControllerWindow::onActionMoveTopLeft(bool checked)
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopRight(bool checked)
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomLeft(bool checked)
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomRight(bool checked)
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
@@ -3375,7 +3366,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     {
         m_created = true;
         QTimer::singleShot(100, this, &LaserControllerWindow::windowCreated);
-        LaserApplication::device->closeAboutWindow();
+        //LaserApplication::device->closeAboutWindow();
     }
 }
 

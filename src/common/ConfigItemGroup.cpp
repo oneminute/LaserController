@@ -156,12 +156,15 @@ QStringList ConfigItemGroup::registerValues() const
     return values;
 }
 
-LaserRegister::RegistersMap ConfigItemGroup::keyValuePairs() const
+LaserRegister::RegistersMap ConfigItemGroup::keyValuePairs(bool onlyModified) const
 {
     Q_D(const ConfigItemGroup);
     LaserRegister::RegistersMap map;
     for (ConfigItem* item : d->items)
     {
+        if (onlyModified && !item->isModified())
+            continue;
+
         LaserRegister::RegisterPair pair = item->keyValuePair();
         if (!pair.second.isValid())
             continue;

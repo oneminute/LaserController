@@ -22,7 +22,7 @@ public:
         , connected(false)
         , name("unknown")
         , portName("")
-        , layoutRect(0, 0, 320, 210)
+        //, layoutRect(0, 0, 320, 210)
         , printerDrawUnit(1016)
     {}
 
@@ -33,7 +33,7 @@ public:
 
     QString name;
     QString portName;
-    QRectF layoutRect;      // 加工的幅面宽
+    //QRectF layoutRect;      // 加工的幅面宽
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
     QString mainCard;
     QString mainCardRegisteredDate;
@@ -112,7 +112,6 @@ bool LaserDevice::load()
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
     if (d->driver->load())
     {
-        showAboutWindow(5);
         return true;
     }
 
@@ -122,29 +121,29 @@ bool LaserDevice::load()
 qreal LaserDevice::layoutWidth() const
 {
     Q_D(const LaserDevice);
-    return d->layoutRect.width();
+    return Config::SystemRegister::xMaxLength();
 }
 
 qreal LaserDevice::layoutHeight() const
 {
     Q_D(const LaserDevice);
-    return d->layoutRect.height();
+    return Config::SystemRegister::yMaxLength();
 }
 
-void LaserDevice::setLayoutRect(const QRectF& rect, bool toCard)
-{
-    Q_D(LaserDevice);
-    d->layoutRect = rect;
-    if (d->driver && toCard && d->layoutRect.isValid())
-    {
-        d->driver->setSoftwareInitialization(
-            d->printerDrawUnit,
-            d->layoutRect.left(),
-            d->layoutRect.right(),
-            d->layoutRect.width(),
-            d->layoutRect.height());
-    }
-}
+//void LaserDevice::setLayoutRect(const QRectF& rect, bool toCard)
+//{
+//    Q_D(LaserDevice);
+//    d->layoutRect = rect;
+//    if (d->driver && toCard && d->layoutRect.isValid())
+//    {
+//        d->driver->setSoftwareInitialization(
+//            d->printerDrawUnit,
+//            d->layoutRect.left(),
+//            d->layoutRect.right(),
+//            d->layoutRect.width(),
+//            d->layoutRect.height());
+//    }
+//}
 
 int LaserDevice::printerDrawUnit() const
 {
@@ -156,7 +155,7 @@ void LaserDevice::setPrinterDrawUnit(int unit, bool toCard)
 {
     Q_D(LaserDevice);
     d->printerDrawUnit = unit;
-    setLayoutRect(d->layoutRect, toCard);
+    //setLayoutRect(d->layoutRect, toCard);
 }
 
 QString LaserDevice::requestHardwareId() const
@@ -330,7 +329,7 @@ bool LaserDevice::writeUserRegisters()
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->writeUserParamToCard(Config::UserRegister::group->keyValuePairs());
+    return d->driver->writeUserParamToCard(Config::UserRegister::group->keyValuePairs(true));
 }
 
 bool LaserDevice::writeSystemRegisters()
@@ -338,7 +337,7 @@ bool LaserDevice::writeSystemRegisters()
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->writeSysParamToCard(Config::SystemRegister::group->keyValuePairs());
+    return d->driver->writeSysParamToCard(Config::SystemRegister::group->keyValuePairs(true));
 }
 
 bool LaserDevice::readUserRegisters()
@@ -420,6 +419,47 @@ void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int cur
     int day = compileDate.day();
     int version = year * 10000 + month * 100 + day;
     d->driver->checkVersionUpdate(hardware, flag, 0, versionNoteToJsonFile);
+}
+
+void LaserDevice::moveTo(const QVector3D& pos, QUADRANT quad)
+{
+    // Get layout size
+    float layoutWidth = LaserApplication::device->layoutWidth();
+    float layoutHeight = LaserApplication::device->layoutHeight();
+
+    QVector3D dest = utils::limitToLayout(pos, quad, layoutWidth, layoutHeight);
+    char xyzStyle = 0;
+    int xPos = qRound(dest.x() * 1000);
+    int yPos = qRound(dest.y() * 1000);
+    int zPos = qRound(dest.z() * 1000);
+    bool xEnabled = xPos != 0;
+    bool yEnabled = yPos != 0;
+    bool zEnabled = zPos != 0;
+    LaserDriver::instance().lPenQuickMoveTo(
+        xEnabled, true, xPos,
+        yEnabled, true, yPos,
+        zEnabled, true, zPos
+    );
+}
+
+void LaserDevice::moveBy(const QVector3D& pos)
+{
+    // Get layout size
+    float layoutWidth = LaserApplication::device->layoutWidth();
+    float layoutHeight = LaserApplication::device->layoutHeight();
+
+    //QVector3D dest = utils::limitToLayout(pos, quad, layoutWidth, layoutHeight);
+    int xPos = qRound(pos.x() * 1000);
+    int yPos = qRound(pos.y() * 1000);
+    int zPos = qRound(pos.z() * 1000);
+    bool xEnabled = xPos != 0;
+    bool yEnabled = yPos != 0;
+    bool zEnabled = zPos != 0;
+    LaserDriver::instance().lPenQuickMoveTo(
+        xEnabled, false, xPos,
+        yEnabled, false, yPos,
+        zEnabled, false, zPos
+    );
 }
 
 bool LaserDevice::isAvailable() const
@@ -1022,6 +1062,7 @@ void LaserDevice::onLibraryInitialized()
 {
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryInitialized";
+    showAboutWindow(5);
     d->driver->setupCallbacks();
     d->isInit = true;
     d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
@@ -1032,8 +1073,8 @@ void LaserDevice::onLibraryInitialized()
     int month = compileDate.month();
     int day = compileDate.day();
     int version = year * 10000 + month * 100 + day;
-    int winId = d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
-    LaserApplication::mainWindow->createUpdateDockPanel(winId);
+    //int winId = d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
+    //LaserApplication::mainWindow->createUpdateDockPanel(winId);
     d->driver->getPortList();
 }
 
