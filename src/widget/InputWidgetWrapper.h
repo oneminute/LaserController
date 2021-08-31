@@ -36,6 +36,9 @@ public:
 
     static QWidget* createWidget(ConfigItem* item, Qt::Orientation orientation);
 
+public slots:
+    void setEnabled(bool enabled);
+
 signals:
     void valueChanged(const QVariant& newValue);
 

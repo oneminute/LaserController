@@ -14,6 +14,8 @@ public:
         , dirty(false)
         , advanced(false)
         , visible(true)
+        , enabled(true)
+        , exportable(true)
         , readOnly(false)
         , writeOnly(false)
         , modified(false)
@@ -63,6 +65,16 @@ public:
     /// 是否在选项窗口中出现
     /// </summary>
     bool visible;
+
+    /// <summary>
+    /// 是否启用
+    /// </summary>
+    bool enabled;
+
+    /// <summary>
+    /// 是否可导出
+    /// </summary>
+    bool exportable;
 
     /// <summary>
     /// 是否为只读选项
@@ -261,6 +273,31 @@ void ConfigItem::setVisible(bool visible)
         emit visibleChanged(visible);
 }
 
+bool ConfigItem::isEnabled() const
+{
+    Q_D(const ConfigItem);
+    return d->enabled;
+}
+
+void ConfigItem::setEnabled(bool enabled)
+{
+    Q_D(ConfigItem);
+    d->enabled = enabled;
+    emit enabledChanged(enabled);
+}
+
+bool ConfigItem::exportable() const
+{
+    Q_D(const ConfigItem);
+    return d->exportable;
+}
+
+void ConfigItem::setExportable(bool exportable)
+{
+    Q_D(ConfigItem);
+    d->exportable = exportable;
+}
+
 bool ConfigItem::readOnly() const
 {
     Q_D(const ConfigItem);
@@ -369,7 +406,9 @@ bool ConfigItem::isModified() const
 InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
 {
     Q_D(ConfigItem);
-    return new InputWidgetWrapper(widget, this);
+    InputWidgetWrapper* wrapper = new InputWidgetWrapper(widget, this);
+    connect(this, &ConfigItem::enabledChanged, wrapper, &InputWidgetWrapper::setEnabled);
+    return wrapper;
 }
 
 QString ConfigItem::toString() const
@@ -790,18 +829,23 @@ void ConfigItem::restoreSystem()
 bool ConfigItem::modifyValue(const QVariant& value)
 {
     Q_D(ConfigItem);
-    bool changed = value != d->value;
-    d->dirtyValue = value;
-    if (changed)
+    bool changed;
+    if (d->storeType == SS_DIRECTLY)
     {
+        changed = true;
+        d->value = d->dirtyValue = value;
+        d->dirty = false;
         d->modified = true;
-        d->dirty = true;
-        emit modifiedChanged(true);
     }
     else
     {
-        emit modifiedChanged(false);
+        changed = value != d->value;
+        d->dirtyValue = value;
+        d->dirty = changed;
+        d->modified = changed;
     }
+    emit modifiedChanged(changed);
+    
     return changed;
 }
 

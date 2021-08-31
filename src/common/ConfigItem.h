@@ -52,6 +52,12 @@ public:
     bool isVisible() const;
     void setVisible(bool visible);
 
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
+    bool exportable() const;
+    void setExportable(bool exportable);
+
     bool readOnly() const;
     void setReadOnly(bool readOnly = true);
 
@@ -160,6 +166,7 @@ signals:
     void widgetValueChanged(const QVariant& value);
     void defaultValueChanged(const QVariant& value);
     void modifiedChanged(bool modified);
+    void enabledChanged(bool enabled);
 
 private:
     QScopedPointer<ConfigItemPrivate> m_ptr;

@@ -342,6 +342,12 @@ QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orie
     return widget;
 }
 
+void InputWidgetWrapper::setEnabled(bool enabled)
+{
+    Q_D(InputWidgetWrapper);
+    qobject_cast<QWidget*>(parent())->setEnabled(enabled);
+}
+
 void InputWidgetWrapper::onTextChanged(const QString & text)
 {
     Q_D(InputWidgetWrapper);

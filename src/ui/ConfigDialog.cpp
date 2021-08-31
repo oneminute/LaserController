@@ -79,6 +79,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
             m_systemRegisterPage = page;
         }
     }
+    Config::Export::smallDiagonalLimitationItem()->setEnabled(Config::Export::enableSmallDiagonal());
 
     // 生成系统寄存器面板
     {

@@ -696,6 +696,7 @@ void Config::loadExportItems()
         false,
         DT_BOOL
     );
+    enableSmallDiagonal->setStoreType(SS_DIRECTLY);
 
     QVariant smallDiagonalLimitationVar;
     smallDiagonalLimitationVar.setValue(new SmallDiagonalLimitation);
@@ -737,6 +738,12 @@ void Config::loadExportItems()
                 limitation->fromJson(json["value"].toObject());
                 qLogD << *limitation;
             }
+        }
+    );
+    connect(enableSmallDiagonal, &ConfigItem::valueChanged,
+        [=](const QVariant& value) {
+            bool enabled = value.toBool();
+            smallDiagonalLimitation->setEnabled(enabled);
         }
     );
 }
