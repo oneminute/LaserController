@@ -185,6 +185,11 @@ protected slots:
 	void onUndoStackCleanChanged(bool clean);
 	void onCanUndoChanged(bool can);
 	void onCanRedoChanged(bool can);
+
+    // config items
+    void updateAutoRepeatDelayChanged(const QVariant& value);
+    void updateAutoRepeatIntervalChanged(const QVariant& value);
+
 private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();

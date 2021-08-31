@@ -121,6 +121,8 @@ public:
         CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
         CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
         CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
+        CONFIG_ITEM(ui, autoRepeatDelay, int, toInt)
+        CONFIG_ITEM(ui, autoRepeatInterval, int, toInt)
 
     private:
         friend class Config;

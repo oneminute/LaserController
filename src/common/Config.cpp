@@ -367,8 +367,26 @@ void Config::loadUiItems()
         tr("Splitter Handle Width"),
         1
     );
-	splitterHandleWidth->setInputWidgetProperty("minimum", 1);
-	splitterHandleWidth->setInputWidgetProperty("maximum", 20);
+    splitterHandleWidth->setInputWidgetProperty("minimum", 1);
+    splitterHandleWidth->setInputWidgetProperty("maximum", 20);
+
+    ConfigItem* autoRepeatDelay = group->addConfigItem(
+        "autoRepeatDelay",
+        tr("Auto repeat delay"),
+        tr("Auto repeat delay when press down on a button"),
+        1000
+    );
+    autoRepeatDelay->setInputWidgetProperty("minimum", 0);
+    autoRepeatDelay->setInputWidgetProperty("maximum", 5000);
+
+    ConfigItem* autoRepeatInterval = group->addConfigItem(
+        "autoRepeatInterval",
+        tr("Auto repeat interval"),
+        tr("Auto repeat interval when pressing a button"),
+        200
+    );
+    autoRepeatInterval->setInputWidgetProperty("minimum", 0);
+    autoRepeatInterval->setInputWidgetProperty("maximum", 5000);
 }
 
 void Config::loadCuttingLayerItems()

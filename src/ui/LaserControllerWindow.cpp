@@ -626,6 +626,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		}
 	});
 	
+    // config items
+    connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
+    connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -1199,37 +1202,50 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->setColumnStretch(6, 1);
 
     m_buttonMoveTopLeft = new QToolButton;
+    m_buttonMoveTopLeft->setAutoRepeat(true);
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
 
     m_buttonMoveTop = new QToolButton;
+    m_buttonMoveTop->setAutoRepeat(true);
     m_buttonMoveTop->setDefaultAction(m_ui->actionMoveTop);
 
     m_buttonMoveTopRight = new QToolButton;
+    m_buttonMoveTopRight->setAutoRepeat(true);
     m_buttonMoveTopRight->setDefaultAction(m_ui->actionMoveTopRight);
 
     m_buttonMoveLeft = new QToolButton;
+    m_buttonMoveLeft->setAutoRepeat(true);
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
     m_buttonMoveToOrigin = new QToolButton;
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
     m_buttonMoveRight = new QToolButton;
+    m_buttonMoveRight->setAutoRepeat(true);
     m_buttonMoveRight->setDefaultAction(m_ui->actionMoveRight);
 
     m_buttonMoveBottomLeft = new QToolButton;
+    m_buttonMoveBottomLeft->setAutoRepeat(true);
     m_buttonMoveBottomLeft->setDefaultAction(m_ui->actionMoveBottomLeft);
 
     m_buttonMoveBottom = new QToolButton;
+    m_buttonMoveBottom->setAutoRepeat(true);
     m_buttonMoveBottom->setDefaultAction(m_ui->actionMoveBottom);
 
     m_buttonMoveBottomRight = new QToolButton;
+    m_buttonMoveBottomRight->setAutoRepeat(true);
     m_buttonMoveBottomRight->setDefaultAction(m_ui->actionMoveBottomRight);
 
     m_buttonMoveUp = new QToolButton;
+    m_buttonMoveUp->setAutoRepeat(true);
     m_buttonMoveUp->setDefaultAction(m_ui->actionMoveUp);
 
     m_buttonMoveDown = new QToolButton;
+    m_buttonMoveDown->setAutoRepeat(true);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
+
+    updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay());
+    updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval());
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
@@ -3407,6 +3423,34 @@ void LaserControllerWindow::documentClose()
 		button->setChecked(false);
 	}
 	
+}
+
+void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value)
+{
+    m_buttonMoveTopLeft->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveTop->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveTopRight->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveLeft->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveRight->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveBottomLeft->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveBottom->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveBottomRight->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveUp->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
+}
+
+void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value)
+{
+    m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveTop->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveTopRight->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveLeft->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveRight->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveBottomLeft->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveBottom->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveBottomRight->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveUp->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveDown->setAutoRepeatInterval(value.toInt());
 }
 
 QString LaserControllerWindow::getFilename(const QString& title, const QString& filters)
