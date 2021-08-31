@@ -109,18 +109,18 @@ public:
     public:
         static ConfigItemGroup* group;
 		CONFIG_ITEM(ui, operationButtonIconSize, int, toInt)
-			CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
-			CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
-			CONFIG_ITEM(ui, operationButtonShowText, bool, toBool)
-			CONFIG_ITEM(ui, toolButtonSize, int, toInt)
-			CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
-			CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
-			CONFIG_ITEM(ui, gridContrast, int, toInt)
-			CONFIG_ITEM(ui, visualGridSpacing, qreal, toDouble)
-			CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
-			CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
-			CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
-            CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
+        CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
+        CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
+        CONFIG_ITEM(ui, operationButtonShowText, bool, toBool)
+        CONFIG_ITEM(ui, toolButtonSize, int, toInt)
+        CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
+        CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
+        CONFIG_ITEM(ui, gridContrast, int, toInt)
+        CONFIG_ITEM(ui, visualGridSpacing, qreal, toDouble)
+        CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
+        CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
+        CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
+        CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
 
     private:
         friend class Config;

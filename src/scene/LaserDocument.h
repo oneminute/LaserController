@@ -107,9 +107,8 @@ signals:
     void outlineUpdated();
 
 protected:
-    QScopedPointer<LaserDocumentPrivate> m_ptr;
     Q_DISABLE_COPY(LaserDocument)
-    Q_DECLARE_PRIVATE_D(m_ptr, LaserDocument)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserDocument)
 
     friend class OptimizeNode;
     friend class OptimizeNodePrivate;
