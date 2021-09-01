@@ -26,7 +26,7 @@ public:
         , labelName(nullptr)
         , labelDesc(nullptr)
         , configItem(configItem)
-        , type(IWT_Unknown)
+        , type(IWT_Custom)
     {
 
     }

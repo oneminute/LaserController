@@ -141,6 +141,8 @@ public:
     void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
     bool hasRegister() const;
 
+    const QList<QWidget*>& boundedWidgets() const;
+
 public slots:
     void setValue(const QVariant& value);
     void fromWidget(const QVariant& value);

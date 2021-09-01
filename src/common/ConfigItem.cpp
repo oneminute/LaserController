@@ -142,6 +142,8 @@ public:
     /// </summary>
     QMap<QString, QVariant> inputWidgetProperties;
 
+    QList<QWidget*> widgets;
+
     //QList<InputWidgetWrapper*> widgetWrappers;
     LaserRegister* laserRegister;
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
@@ -201,7 +203,7 @@ ConfigItem::ConfigItem(
         d->inputWidgetType = IWT_DateTimeEdit;
         break;
     default:
-        d->inputWidgetType = IWT_Unknown;
+        d->inputWidgetType = IWT_Custom;
     }
 }
 
@@ -407,7 +409,13 @@ InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
 {
     Q_D(ConfigItem);
     InputWidgetWrapper* wrapper = new InputWidgetWrapper(widget, this);
+    d->widgets.append(widget);
     connect(this, &ConfigItem::enabledChanged, wrapper, &InputWidgetWrapper::setEnabled);
+    connect(widget, &QWidget::destroyed,
+        [=]() {
+            d->widgets.removeOne(widget);
+        }
+    );
     return wrapper;
 }
 
@@ -739,6 +747,12 @@ bool ConfigItem::hasRegister() const
 {
     Q_D(const ConfigItem);
     return d->laserRegister != nullptr;
+}
+
+const QList<QWidget*>& ConfigItem::boundedWidgets() const
+{
+    Q_D(const ConfigItem);
+    return d->widgets;
 }
 
 void ConfigItem::setValue(const QVariant& value)

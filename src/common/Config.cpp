@@ -14,6 +14,7 @@
 #include "laser/LaserRegister.h"
 #include "util/WidgetUtils.h"
 #include "widget/InputWidgetWrapper.h"
+#include "widget/RadioButtonGroup.h"
 #include "widget/SmallDiagonalLimitationWidget.h"
 
 QList<ConfigItemGroup*> Config::groups;
@@ -708,7 +709,7 @@ void Config::loadExportItems()
         smallDiagonalLimitationVar,
         DT_CUSTOM
     );
-    smallDiagonalLimitation->setInputWidgetType(IWT_Unknown);
+    smallDiagonalLimitation->setInputWidgetType(IWT_Custom);
     smallDiagonalLimitation->setCreateWidgetHook(
         [](ConfigItem* item) {
             return qobject_cast<QWidget*>(new SmallDiagonalLimitationWidget(item));
@@ -759,6 +760,89 @@ void Config::loadDeviceItems()
         tr("Auto connect to first com port when found multiple laser devices."),
         true,
         DT_BOOL
+    );
+
+    ConfigItem* originalPoint = group->addConfigItem(
+        "originalPoint",
+        tr("[57] Original Point"),
+        tr("Original Point"),
+        0
+    );
+    originalPoint->setInputWidgetType(IWT_ComboBox);
+    originalPoint->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("Top Left"), 0);
+            comboBox->addItem(tr("Top Right"), 1);
+            comboBox->addItem(tr("Bottom Right"), 2);
+            comboBox->addItem(tr("Bottom Left"), 3);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+    originalPoint->bindLaserRegister(57);
+
+    ConfigItem* startFrom = group->addConfigItem(
+        "startFrom",
+        tr("Start From"),
+        tr("Start From"),
+        0,
+        DT_INT
+    );
+    startFrom->setInputWidgetType(IWT_ComboBox);
+    startFrom->setStoreType(SS_DIRECTLY);
+    startFrom->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("Current Position"), 1);
+            comboBox->addItem(tr("User Origin"), 0);
+            comboBox->addItem(tr("Absolute Coords"), 2);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
+    ConfigItem* jobOrigin = group->addConfigItem(
+        "jobOrigin",
+        tr("Job Origin"),
+        tr("Job Origin"),
+        0,
+        DT_INT
+    );
+    jobOrigin->setInputWidgetType(IWT_Custom);
+    jobOrigin->setCreateWidgetHook(
+        [](ConfigItem* item) {
+            return qobject_cast<QWidget*>(new RadioButtonGroup());
+        }
+    );
+    connect(startFrom, &ConfigItem::valueChanged,
+        [=](const QVariant& value) {
+            for (QWidget* widget : jobOrigin->boundedWidgets())
+            {
+                RadioButtonGroup* group = qobject_cast<RadioButtonGroup*>(widget);
+                int index = value.toInt();
+                switch (index)
+                {
+                case SFT_CurrentPosition:
+                case SFT_UserOrigin:
+                    group->setRowsCols(3, 3);
+                    break;
+                case SFT_AbsoluteCoords:
+                    group->setRowsCols(2, 2);
+                    break;
+                }
+            }
+        }
     );
 }
 
@@ -2693,30 +2777,6 @@ void Config::loadSystemRegisters()
     );
     zPhaseEnabled->bindLaserRegister(56);
 
-    ConfigItem* originalPoint = group->addConfigItem(
-        "originalPoint",
-        tr("[57] Original Point"),
-        tr("Original Point"),
-        0
-    );
-    originalPoint->setInputWidgetType(IWT_ComboBox);
-    originalPoint->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
-        {
-            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-            if (!comboBox)
-                return;
-
-            comboBox->addItem(tr("Top Left"), 0);
-            comboBox->addItem(tr("Top Right"), 1);
-            comboBox->addItem(tr("Bottom Right"), 2);
-            comboBox->addItem(tr("Bottom Left"), 3);
-
-            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
-        }
-    );
-    originalPoint->bindLaserRegister(57);
 }
 
 void Config::loadDebug()
