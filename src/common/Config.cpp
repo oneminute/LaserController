@@ -880,7 +880,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingMoveSpeed->setSaveDataHook(
+    cuttingMoveSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -905,7 +905,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingMoveAcc->setSaveDataHook(
+    cuttingMoveAcc->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -930,7 +930,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingTurnSpeed->setSaveDataHook(
+    cuttingTurnSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -955,7 +955,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingTurnAcc->setSaveDataHook(
+    cuttingTurnAcc->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -980,7 +980,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingWorkAcc->setSaveDataHook(
+    cuttingWorkAcc->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1036,7 +1036,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanXStartSpeed->setSaveDataHook(
+    scanXStartSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1061,7 +1061,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanYStartSpeed->setSaveDataHook(
+    scanYStartSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1086,7 +1086,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanXAcc->setSaveDataHook(
+    scanXAcc->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1111,7 +1111,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanYAcc->setSaveDataHook(
+    scanYAcc->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1136,7 +1136,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanRowSpeed->setSaveDataHook(
+    scanRowSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1161,7 +1161,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanRowInterval->setSaveDataHook(
+    scanRowInterval->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1186,7 +1186,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanReturnError->setSaveDataHook(
+    scanReturnError->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1211,7 +1211,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 10.0);
         }
     );
-    scanLaserPower->setSaveDataHook(
+    scanLaserPower->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1237,7 +1237,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() == 1);
         }
     );
-    scanXResetEnabled->setSaveDataHook(
+    scanXResetEnabled->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(value.toBool() ? 1 : 0);
@@ -1257,7 +1257,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() == 1);
         }
     );
-    scanYResetEnabled->setSaveDataHook(
+    scanYResetEnabled->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(value.toBool() ? 1 : 0);
@@ -1277,7 +1277,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() == 1);
         }
     );
-    scanZResetEnabled->setSaveDataHook(
+    scanZResetEnabled->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(value.toBool() ? 1 : 0);
@@ -1297,7 +1297,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    resetSpeed->setSaveDataHook(
+    resetSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1333,7 +1333,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    backlashXInterval->setSaveDataHook(
+    backlashXInterval->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1358,7 +1358,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    backlashYInterval->setSaveDataHook(
+    backlashYInterval->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1383,7 +1383,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    backlashZInterval->setSaveDataHook(
+    backlashZInterval->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1408,7 +1408,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    defaultRunSpeed->setSaveDataHook(
+    defaultRunSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1433,7 +1433,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 10.0);
         }
     );
-    defaultMaxCuttingPower->setSaveDataHook(
+    defaultMaxCuttingPower->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1459,7 +1459,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 10.0);
         }
     );
-    defaultMinCuttingPower->setSaveDataHook(
+    defaultMinCuttingPower->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1485,7 +1485,7 @@ void Config::loadUserReigsters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    defaultScanSpeed->setSaveDataHook(
+    defaultScanSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1655,7 +1655,7 @@ void Config::loadSystemRegisters()
         320000,
         DT_INT
     );
-    xMaxLength->setSaveDataHook(
+    xMaxLength->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1726,7 +1726,7 @@ void Config::loadSystemRegisters()
         2000,
         DT_INT
     );
-    xZeroDev->setSaveDataHook(
+    xZeroDev->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1752,7 +1752,7 @@ void Config::loadSystemRegisters()
         3164557,
         DT_INT
     );
-    xStepLength->setSaveDataHook(
+    xStepLength->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000000));
@@ -1833,7 +1833,7 @@ void Config::loadSystemRegisters()
         500,
         DT_INT
     );
-    xMotorCurrent->setSaveDataHook(
+    xMotorCurrent->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1859,7 +1859,7 @@ void Config::loadSystemRegisters()
         15000,
         DT_INT
     );
-    xStartSpeed->setSaveDataHook(
+    xStartSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1885,7 +1885,7 @@ void Config::loadSystemRegisters()
         4500,
         DT_INT
     );
-    xMaxSpeed->setSaveDataHook(
+    xMaxSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1911,7 +1911,7 @@ void Config::loadSystemRegisters()
         45,
         DT_INT
     );
-    xMaxAcceleration->setSaveDataHook(
+    xMaxAcceleration->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1937,7 +1937,7 @@ void Config::loadSystemRegisters()
         45,
         DT_INT
     );
-    xUrgentAcceleration->setSaveDataHook(
+    xUrgentAcceleration->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1963,7 +1963,7 @@ void Config::loadSystemRegisters()
         200000,
         DT_INT
     );
-    yMaxLength->setSaveDataHook(
+    yMaxLength->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2033,7 +2033,7 @@ void Config::loadSystemRegisters()
         2000,
         DT_INT
     );
-    yZeroDev->setSaveDataHook(
+    yZeroDev->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2059,7 +2059,7 @@ void Config::loadSystemRegisters()
         3164557,
         DT_INT
     );
-    yStepLength->setSaveDataHook(
+    yStepLength->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000000));
@@ -2141,7 +2141,7 @@ void Config::loadSystemRegisters()
         500,
         DT_INT
     );
-    yMotorCurrent->setSaveDataHook(
+    yMotorCurrent->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2167,7 +2167,7 @@ void Config::loadSystemRegisters()
         15,
         DT_INT
     );
-    yStartSpeed->setSaveDataHook(
+    yStartSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2193,7 +2193,7 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    yMaxSpeed->setSaveDataHook(
+    yMaxSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2219,7 +2219,7 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    yMaxAcceleration->setSaveDataHook(
+    yMaxAcceleration->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2245,7 +2245,7 @@ void Config::loadSystemRegisters()
         20,
         DT_REAL
     );
-    yUrgentAcceleration->setSaveDataHook(
+    yUrgentAcceleration->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2271,7 +2271,7 @@ void Config::loadSystemRegisters()
         200000,
         DT_INT
     );
-    zMaxLength->setSaveDataHook(
+    zMaxLength->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2341,7 +2341,7 @@ void Config::loadSystemRegisters()
         2000,
         DT_INT
     );
-    zZeroDev->setSaveDataHook(
+    zZeroDev->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2367,7 +2367,7 @@ void Config::loadSystemRegisters()
         6200000,
         DT_INT
     );
-    zStepLength->setSaveDataHook(
+    zStepLength->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000000));
@@ -2449,7 +2449,7 @@ void Config::loadSystemRegisters()
         500,
         DT_INT
     );
-    zMotorCurrent->setSaveDataHook(
+    zMotorCurrent->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2475,7 +2475,7 @@ void Config::loadSystemRegisters()
         15000,
         DT_INT
     );
-    zStartSpeed->setSaveDataHook(
+    zStartSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2501,7 +2501,7 @@ void Config::loadSystemRegisters()
         10000,
         DT_INT
     );
-    zMaxSpeed->setSaveDataHook(
+    zMaxSpeed->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2527,7 +2527,7 @@ void Config::loadSystemRegisters()
         30000,
         DT_INT
     );
-    zMaxAcceleration->setSaveDataHook(
+    zMaxAcceleration->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2553,7 +2553,7 @@ void Config::loadSystemRegisters()
         30000,
         DT_INT
     );
-    zUrgentAcceleration->setSaveDataHook(
+    zUrgentAcceleration->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -2579,7 +2579,7 @@ void Config::loadSystemRegisters()
         1000,
         DT_INT
     );
-    laserMaxPower->setSaveDataHook(
+    laserMaxPower->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2604,7 +2604,7 @@ void Config::loadSystemRegisters()
         100,
         DT_INT
     );
-    laserMinPower->setSaveDataHook(
+    laserMinPower->setModifyDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));

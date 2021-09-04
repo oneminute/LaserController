@@ -22,7 +22,7 @@ public:
         , modifiedBy(MB_Manual)
         , widgetInitializeHook(nullptr)
         , loadDataHook(nullptr)
-        , saveDataHook(nullptr)
+        , modifyDataHook(nullptr)
         , createWidgetHook(nullptr)
         , destroyHook(nullptr)
         , toJsonHook(nullptr)
@@ -141,11 +141,11 @@ public:
 
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
     ConfigItem::ValueHook loadDataHook;
-    ConfigItem::ValueHook saveDataHook;
+    ConfigItem::ValueHook modifyDataHook;
     ConfigItem::CreateWidgetHook createWidgetHook;
     ConfigItem::DestroyHook destroyHook;
     ConfigItem::ToJsonHook toJsonHook;
-    std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> fromJsonHook;
+    ConfigItem::FromJsonHook fromJsonHook;
     ConfigItem::ResetHook resetHook;
     ConfigItem::RestoreHook restoreHook;
 };
@@ -461,30 +461,6 @@ void ConfigItem::fromJson(const QJsonObject& jsonObject)
     }
 }
 
-//QString ConfigItem::toRegisterString() const
-//{
-//    Q_D(const ConfigItem);
-//    if (hasRegister())
-//    {
-//        return d->laserRegister->toString();
-//    }
-//    return "";
-//}
-//
-//LaserRegister::RegisterPair ConfigItem::keyValuePair() const
-//{
-//    Q_D(const ConfigItem);
-//    if (hasRegister())
-//    {
-//        return LaserRegister::RegisterPair(d->laserRegister->address(), value());
-//    }
-//    else
-//    {
-//        LaserRegister::RegisterPair pair(-1, QVariant::Invalid);
-//        return pair;
-//    }
-//}
-
 DataType ConfigItem::dataType() const
 {
     Q_D(const ConfigItem);
@@ -556,24 +532,24 @@ QVariant ConfigItem::doLoadDataHook(const QVariant& value) const
     return value;
 }
 
-ConfigItem::ValueHook ConfigItem::saveDataHook()
+ConfigItem::ValueHook ConfigItem::modifyDataHook()
 {
     Q_D(ConfigItem);
-    return d->saveDataHook;
+    return d->modifyDataHook;
 }
 
-void ConfigItem::setSaveDataHook(ValueHook fn)
+void ConfigItem::setModifyDataHook(ValueHook fn)
 {
     Q_D(ConfigItem);
-    d->saveDataHook = fn;
+    d->modifyDataHook = fn;
 }
 
-QVariant ConfigItem::doSaveDataHook(const QVariant& value)
+QVariant ConfigItem::doModifyDataHook(const QVariant& value)
 {
     Q_D(ConfigItem);
-    if (d->saveDataHook)
+    if (d->modifyDataHook)
     {
-        return d->saveDataHook(value);
+        return d->modifyDataHook(value);
     }
     return value;
 }
@@ -643,13 +619,13 @@ QJsonObject ConfigItem::doToJsonHook() const
     return QJsonObject();
 }
 
-std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> ConfigItem::fromJsonHook()
+ConfigItem::FromJsonHook ConfigItem::fromJsonHook()
 {
     Q_D(ConfigItem);
     return d->fromJsonHook;
 }
 
-void ConfigItem::setFromJsonHook(std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> fn)
+void ConfigItem::setFromJsonHook(ConfigItem::FromJsonHook fn)
 {
     Q_D(ConfigItem);
     d->fromJsonHook = fn;

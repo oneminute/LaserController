@@ -15,14 +15,22 @@ class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
-    typedef QWidget* (*CreateWidgetHook)(ConfigItem*);
-    typedef void (*WidgetInitializeHook)(QWidget*, ConfigItem*);
-    typedef QVariant (*ValueHook)(const QVariant&);
-    typedef void(*DestroyHook)(ConfigItem*);
-    typedef QJsonObject(*ToJsonHook)(const ConfigItem*);
-    typedef void(*FromJsonHook)(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*);
-    typedef void(*ResetHook)(ConfigItem*);
-    typedef void(*RestoreHook)(ConfigItem*);
+    //typedef QWidget* (*CreateWidgetHook)(ConfigItem*);
+    typedef std::function<QWidget*(ConfigItem*)> CreateWidgetHook;
+    //typedef void (*WidgetInitializeHook)(QWidget*, ConfigItem*);
+    typedef std::function<void(QWidget*, ConfigItem*)> WidgetInitializeHook;
+    //typedef QVariant (*ValueHook)(const QVariant&);
+    typedef std::function<QVariant(const QVariant&)> ValueHook;
+    //typedef void(*DestroyHook)(ConfigItem*);
+    typedef std::function<void(ConfigItem*)> DestroyHook;
+    //typedef QJsonObject(*ToJsonHook)(const ConfigItem*);
+    typedef std::function<QJsonObject(const ConfigItem*)> ToJsonHook;
+    //typedef void(*FromJsonHook)(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*);
+    typedef std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> FromJsonHook;
+    //typedef void(*ResetHook)(ConfigItem*);
+    typedef std::function<void(ConfigItem*)> ResetHook;
+    //typedef void(*RestoreHook)(ConfigItem*);
+    typedef std::function<void(ConfigItem*)> RestoreHook;
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
@@ -83,9 +91,6 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
 
-    //QString toRegisterString() const;
-    //LaserRegister::RegisterPair keyValuePair() const;
-
     DataType dataType() const;
 
     void setInputWidgetType(InputWidgetType widgetType);
@@ -101,9 +106,9 @@ public:
     void setLoadDataHook(ValueHook fn);
     QVariant doLoadDataHook(const QVariant& value) const;
 
-    ValueHook saveDataHook();
-    void setSaveDataHook(ValueHook fn);
-    QVariant doSaveDataHook(const QVariant& value);
+    ValueHook modifyDataHook();
+    void setModifyDataHook(ValueHook fn);
+    QVariant doModifyDataHook(const QVariant& value);
 
     CreateWidgetHook createWidgetHook();
     void setCreateWidgetHook(CreateWidgetHook fn);
@@ -117,9 +122,8 @@ public:
     void setToJsonHook(ToJsonHook fn);
     QJsonObject doToJsonHook() const;
 
-    std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> fromJsonHook();
-    //void setFromJsonHook(FromJsonHook fn);
-    void setFromJsonHook(std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)>);
+    FromJsonHook fromJsonHook();
+    void setFromJsonHook(FromJsonHook fn);
     void doFromJsonHook(const QJsonObject& json);
 
     ResetHook resetHook();
