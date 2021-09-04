@@ -116,7 +116,7 @@ DataType LaserRegister::dataType() const
 StoreStrategy LaserRegister::storeStrategy() const
 {
     Q_D(const LaserRegister);
-    return d->configItem->storeType();
+    return d->configItem->storeStrategy();
 }
 
 ConfigItem* LaserRegister::configItem() const

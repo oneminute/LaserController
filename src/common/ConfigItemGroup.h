@@ -33,7 +33,7 @@ public:
         , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
-        , StoreStrategy storeType = StoreStrategy::SS_CONFIRMED
+        , StoreStrategy storeStrategy = StoreStrategy::SS_CONFIRMED
     );
 
     QList<ConfigItem*>& items();

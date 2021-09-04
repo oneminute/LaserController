@@ -697,7 +697,7 @@ void Config::loadExportItems()
         false,
         DT_BOOL
     );
-    enableSmallDiagonal->setStoreType(SS_DIRECTLY);
+    enableSmallDiagonal->setStoreStrategy(SS_DIRECTLY);
 
     QVariant smallDiagonalLimitationVar;
     SmallDiagonalLimitation* limitation = new SmallDiagonalLimitation;
@@ -773,7 +773,7 @@ void Config::loadDeviceItems()
         DT_INT
     );
     startFrom->setInputWidgetType(IWT_ComboBox);
-    startFrom->setStoreType(SS_DIRECTLY);
+    startFrom->setStoreStrategy(SS_DIRECTLY);
     startFrom->setWidgetInitializeHook(
         [](QWidget* widget, ConfigItem* item)
         {
@@ -2595,7 +2595,7 @@ void Config::loadSystemRegisters()
     laserMaxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMaxPower->setInputWidgetProperty("minimum", 1);
     laserMaxPower->setInputWidgetProperty("maximum", 100);
-    laserMaxPower->setStoreType(SS_DIRECTLY);
+    laserMaxPower->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* laserMinPower = group->addConfigItem(
         "laserMinPower",
@@ -2620,7 +2620,7 @@ void Config::loadSystemRegisters()
     laserMinPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMinPower->setInputWidgetProperty("minimum", 1);
     laserMinPower->setInputWidgetProperty("maximum", 100);
-    laserMinPower->setStoreType(SS_DIRECTLY);
+    laserMinPower->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* laserPowerFreq = group->addConfigItem(
         "laserPowerFreq",
@@ -2632,7 +2632,7 @@ void Config::loadSystemRegisters()
     laserPowerFreq->setInputWidgetProperty("page", 1000);
     laserPowerFreq->setInputWidgetProperty("minimum", 1);
     laserPowerFreq->setInputWidgetProperty("maximum", 10000);
-    laserPowerFreq->setStoreType(SS_DIRECTLY);
+    laserPowerFreq->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",

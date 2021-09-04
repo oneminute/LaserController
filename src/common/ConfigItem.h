@@ -32,7 +32,7 @@ public:
         , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
-        , StoreStrategy storeType = StoreStrategy::SS_CONFIRMED
+        , StoreStrategy storeStrategy = StoreStrategy::SS_CONFIRMED
     );
     ~ConfigItem();
 
@@ -61,8 +61,8 @@ public:
     bool writeOnly() const;
     void setWriteOnly(bool writeOnly = true);
 
-    StoreStrategy storeType() const;
-    void setStoreType(StoreStrategy type);
+    StoreStrategy storeStrategy() const;
+    void setStoreStrategy(StoreStrategy type);
 
     QVariant value() const;
 

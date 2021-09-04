@@ -88,7 +88,7 @@ public:
     /// <summary>
     /// 保存方式
     /// </summary>
-    StoreStrategy storeType;
+    StoreStrategy storeStrategy;
 
     /// <summary>
     /// 选项值
@@ -159,7 +159,7 @@ ConfigItem::ConfigItem(
     , DataType dataType
     , bool advanced
     , bool visible
-    , StoreStrategy storeType)
+    , StoreStrategy storeStrategy)
     : QObject(group)
     , m_ptr(new ConfigItemPrivate(this))
 {
@@ -174,7 +174,7 @@ ConfigItem::ConfigItem(
     d->dataType = dataType;
     d->advanced = advanced;
     d->visible = visible;
-    d->storeType = storeType;
+    d->storeStrategy = storeStrategy;
     d->modifiedBy = MB_Manual;
 
     switch (d->dataType)
@@ -318,16 +318,16 @@ void ConfigItem::setWriteOnly(bool writeOnly)
     d->writeOnly = writeOnly;
 }
 
-StoreStrategy ConfigItem::storeType() const
+StoreStrategy ConfigItem::storeStrategy() const
 {
     Q_D(const ConfigItem);
-    return d->storeType;
+    return d->storeStrategy;
 }
 
-void ConfigItem::setStoreType(StoreStrategy type)
+void ConfigItem::setStoreStrategy(StoreStrategy type)
 {
     Q_D(ConfigItem);
-    d->storeType = type;
+    d->storeStrategy = type;
 }
 
 QVariant ConfigItem::value() const
@@ -760,7 +760,7 @@ void ConfigItem::setValue(const QVariant& value, ModifiedBy modifiedBy)
 
     // 如果当前的保存策略是SS_DIRECTLY，那么无论前述值如何处理，
     // dirtyValue和value都会一致。
-    if (d->storeType == SS_DIRECTLY)
+    if (d->storeStrategy == SS_DIRECTLY)
     {
         d->value = d->dirtyValue = value;
     }
@@ -814,7 +814,7 @@ void ConfigItem::restoreSystem()
 void ConfigItem::confirm()
 {
     Q_D(ConfigItem);
-    if (d->storeType == SS_CONFIRMED)
+    if (d->storeStrategy == SS_CONFIRMED)
         d->value = d->dirtyValue;
 }
 
