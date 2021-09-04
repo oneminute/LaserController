@@ -38,11 +38,6 @@ public:
 
 public slots:
     void setEnabled(bool enabled);
-
-signals:
-    void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
-
-protected:
     void onTextChanged(const QString& text);
     void onCheckBoxStateChanged(int state);
     void onComboBoxIndexChanged(int index);
@@ -58,6 +53,9 @@ protected:
 
     void onConfigItemModifiedChanged(bool modified);
     void onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy);
+
+signals:
+    void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
 
 private:
 

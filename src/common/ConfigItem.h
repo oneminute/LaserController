@@ -15,22 +15,15 @@ class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
-    //typedef QWidget* (*CreateWidgetHook)(ConfigItem*);
     typedef std::function<QWidget*(ConfigItem*)> CreateWidgetHook;
-    //typedef void (*WidgetInitializeHook)(QWidget*, ConfigItem*);
-    typedef std::function<void(QWidget*, ConfigItem*)> WidgetInitializeHook;
-    //typedef QVariant (*ValueHook)(const QVariant&);
+    typedef std::function<void(QWidget*, ConfigItem*, InputWidgetWrapper*)> WidgetInitializeHook;
     typedef std::function<QVariant(const QVariant&)> ValueHook;
-    //typedef void(*DestroyHook)(ConfigItem*);
     typedef std::function<void(ConfigItem*)> DestroyHook;
-    //typedef QJsonObject(*ToJsonHook)(const ConfigItem*);
     typedef std::function<QJsonObject(const ConfigItem*)> ToJsonHook;
-    //typedef void(*FromJsonHook)(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*);
     typedef std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> FromJsonHook;
-    //typedef void(*ResetHook)(ConfigItem*);
     typedef std::function<void(ConfigItem*)> ResetHook;
-    //typedef void(*RestoreHook)(ConfigItem*);
     typedef std::function<void(ConfigItem*)> RestoreHook;
+    typedef std::function<void(QWidget* widget, const QVariant& value)> UpdateWidgetValueHook;
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
@@ -101,14 +94,15 @@ public:
 
     WidgetInitializeHook widgetInitializeHook();
     void setWidgetInitializeHook(WidgetInitializeHook fn);
+    void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
 
-    ValueHook loadDataHook();
-    void setLoadDataHook(ValueHook fn);
-    QVariant doLoadDataHook(const QVariant& value) const;
+    ValueHook valueToWidgetHook();
+    void setValueToWidgetHook(ValueHook fn);
+    QVariant doValueToWidgetHook(const QVariant& value) const;
 
-    ValueHook modifyDataHook();
-    void setModifyDataHook(ValueHook fn);
-    QVariant doModifyDataHook(const QVariant& value);
+    ValueHook valueFromWidgetHook();
+    void setValueFromWidgetHook(ValueHook fn);
+    QVariant doValueFromWidgetHook(const QVariant& value);
 
     CreateWidgetHook createWidgetHook();
     void setCreateWidgetHook(CreateWidgetHook fn);
@@ -134,11 +128,9 @@ public:
     void setRestoreHook(RestoreHook fn);
     void doRestoreHook();
 
-    void initWidget(QWidget* widget);
-
-    //LaserRegister* laserRegister() const;
-    //void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
-    //bool hasRegister() const;
+    UpdateWidgetValueHook updateWidgetValueHook();
+    void setUpdateWidgetValueHook(UpdateWidgetValueHook fn);
+    bool doUpdateWidgetValueHook(QWidget* widget, const QVariant& value);
 
     const QList<QWidget*>& boundedWidgets() const;
 

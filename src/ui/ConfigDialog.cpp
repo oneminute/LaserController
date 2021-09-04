@@ -232,7 +232,6 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
     {
         widget->setProperty(i.key().toStdString().c_str(), i.value());
     }
-    item->initWidget(widget);
     widget->setParent(parent);
 
     QLabel* labelName = new QLabel(parent);

@@ -2389,16 +2389,17 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		}
 		
 	}
-	
-
-    
 }
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
     qreal x = Global::convertToMM(SU_PX, pos.x());
     qreal y = Global::convertToMM(SU_PX, pos.y());
-    QString posStr = QString("%1mm,%2mm | %3px,%4px").arg(x).arg(y).arg(qFloor(pos.x())).arg(qFloor(pos.y()));
+    QPointF posMM = QPointF(x, y);
+    posMM = LaserApplication::device->deviceTransform().map(posMM);
+    QString posStr = QString("%1mm,%2mm | %3px,%4px")
+        .arg(posMM.x()).arg(posMM.y())
+        .arg(qFloor(pos.x())).arg(qFloor(pos.y()));
     m_statusBarLocation->setText(posStr);
 }
 

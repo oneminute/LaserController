@@ -25,7 +25,12 @@ public:
         , portName("")
         , printerDrawUnit(1016)
         , deviceTransform()
+        , deviceOrigin(0, 0)
+        , transform()
+        , origin(0, 0)
     {}
+
+    void updateDeviceOriginAndTransform();
 
     LaserDevice* q_ptr;
     LaserDriver* driver;
@@ -37,6 +42,9 @@ public:
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
 
     QTransform deviceTransform;
+    QPointF deviceOrigin;
+    QTransform transform;
+    QPointF origin;
 
     QString mainCard;
     QString mainCardRegisteredDate;
@@ -56,6 +64,34 @@ public:
     QMap<int, LaserRegister*> userRegisters;
     QMap<int, LaserRegister*> systemRegisters;
 };
+
+void LaserDevicePrivate::updateDeviceOriginAndTransform()
+{
+    qreal dx = 0;
+    qreal dy = 0;
+    switch (Config::SystemRegister::deviceOrigin())
+    {
+    case 0:
+        dx = 0;
+        dy = 0;
+        break;
+    case 1:
+        dx = Config::SystemRegister::xMaxLength() / 1000.0;
+        dy = 0;
+        break;
+    case 2:
+        dx = Config::SystemRegister::xMaxLength() / 1000.0;
+        dy = Config::SystemRegister::yMaxLength() / 1000.0;
+        break;
+    case 3:
+        dx = 0;
+        dy = Config::SystemRegister::yMaxLength() / 1000.0;
+        break;
+    }
+
+    deviceTransform = QTransform::fromTranslate(-dx, -dy);
+    deviceOrigin = QPointF(dx, dy);
+}
 
 LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     : QObject(parent)
@@ -163,6 +199,11 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
     connect(this, &LaserDevice::mainCardRegistered, this, &LaserDevice::onMainCardRegistered);
     connect(this, &LaserDevice::mainCardActivated, this, &LaserDevice::onMainCardActivated);
+    connect(Config::SystemRegister::deviceOriginItem(),
+        &ConfigItem::valueChanged, this,
+        &LaserDevice::onConfigStartFromChanged);
+
+    d->updateDeviceOriginAndTransform();
 }
 
 LaserDevice::~LaserDevice()
@@ -613,17 +654,20 @@ QPointF LaserDevice::origin() const
 
 QPointF LaserDevice::deviceOrigin() const
 {
-    return QPointF();
+    Q_D(const LaserDevice);
+    return d->deviceOrigin;
 }
 
 QTransform LaserDevice::transform() const
 {
-    return QTransform();
+    Q_D(const LaserDevice);
+    return d->transform;
 }
 
 QTransform LaserDevice::deviceTransform() const
 {
-    return QTransform();
+    Q_D(const LaserDevice);
+    return d->deviceTransform;
 }
 
 void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)
@@ -1334,5 +1378,17 @@ void LaserDevice::onMainCardActivated(bool temp)
 {
     Q_D(LaserDevice);
     qLogD << "main card activated. temp? " << temp;
+}
+
+void LaserDevice::onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy)
+{
+    Q_D(LaserDevice);
+    d->updateDeviceOriginAndTransform();
+}
+
+void LaserDevice::onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy)
+{
+    Q_D(LaserDevice);
+    d->updateDeviceOriginAndTransform();
 }
 

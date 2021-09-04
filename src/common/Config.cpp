@@ -176,7 +176,7 @@ void Config::loadGeneralItems()
     );
     language->setInputWidgetType(IWT_ComboBox);
     language->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -203,7 +203,7 @@ void Config::loadGeneralItems()
     );
     unit->setInputWidgetType(IWT_ComboBox);
     unit->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -310,7 +310,7 @@ void Config::loadUiItems()
     );
     gridContrast->setInputWidgetType(IWT_ComboBox);
     gridContrast->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -631,7 +631,7 @@ void Config::loadPathOptimizationItems()
     );
     groupingOrientation->setInputWidgetType(IWT_ComboBox);
     groupingOrientation->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -775,7 +775,7 @@ void Config::loadDeviceItems()
     startFrom->setInputWidgetType(IWT_ComboBox);
     startFrom->setStoreStrategy(SS_DIRECTLY);
     startFrom->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -849,7 +849,7 @@ void Config::loadUserReigsters()
     );
     accMode->setInputWidgetType(IWT_ComboBox);
     accMode->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -874,13 +874,13 @@ void Config::loadUserReigsters()
         15,
         DT_INT
     );
-    cuttingMoveSpeed->setLoadDataHook(
+    cuttingMoveSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingMoveSpeed->setModifyDataHook(
+    cuttingMoveSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -899,13 +899,13 @@ void Config::loadUserReigsters()
         45,
         DT_INT
     );
-    cuttingMoveAcc->setLoadDataHook(
+    cuttingMoveAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingMoveAcc->setModifyDataHook(
+    cuttingMoveAcc->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -924,13 +924,13 @@ void Config::loadUserReigsters()
         15,
         DT_INT
     );
-    cuttingTurnSpeed->setLoadDataHook(
+    cuttingTurnSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingTurnSpeed->setModifyDataHook(
+    cuttingTurnSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -949,13 +949,13 @@ void Config::loadUserReigsters()
         45,
         DT_INT
     );
-    cuttingTurnAcc->setLoadDataHook(
+    cuttingTurnAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingTurnAcc->setModifyDataHook(
+    cuttingTurnAcc->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -974,13 +974,13 @@ void Config::loadUserReigsters()
         60,
         DT_INT
     );
-    cuttingWorkAcc->setLoadDataHook(
+    cuttingWorkAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    cuttingWorkAcc->setModifyDataHook(
+    cuttingWorkAcc->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1030,13 +1030,13 @@ void Config::loadUserReigsters()
         15,
         DT_INT
     );
-    scanXStartSpeed->setLoadDataHook(
+    scanXStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanXStartSpeed->setModifyDataHook(
+    scanXStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1055,13 +1055,13 @@ void Config::loadUserReigsters()
         15,
         DT_INT
     );
-    scanYStartSpeed->setLoadDataHook(
+    scanYStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanYStartSpeed->setModifyDataHook(
+    scanYStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1080,13 +1080,13 @@ void Config::loadUserReigsters()
         5,
         DT_INT
     );
-    scanXAcc->setLoadDataHook(
+    scanXAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanXAcc->setModifyDataHook(
+    scanXAcc->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1105,13 +1105,13 @@ void Config::loadUserReigsters()
         45,
         DT_INT
     );
-    scanYAcc->setLoadDataHook(
+    scanYAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanYAcc->setModifyDataHook(
+    scanYAcc->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1130,13 +1130,13 @@ void Config::loadUserReigsters()
         15,
         DT_REAL
     );
-    scanRowSpeed->setLoadDataHook(
+    scanRowSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanRowSpeed->setModifyDataHook(
+    scanRowSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1155,13 +1155,13 @@ void Config::loadUserReigsters()
         0.007,
         DT_REAL
     );
-    scanRowInterval->setLoadDataHook(
+    scanRowInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanRowInterval->setModifyDataHook(
+    scanRowInterval->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1180,13 +1180,13 @@ void Config::loadUserReigsters()
         1000,
         DT_INT
     );
-    scanReturnError->setLoadDataHook(
+    scanReturnError->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    scanReturnError->setModifyDataHook(
+    scanReturnError->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1205,13 +1205,13 @@ void Config::loadUserReigsters()
         120,
         DT_INT
     );
-    scanLaserPower->setLoadDataHook(
+    scanLaserPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
         }
     );
-    scanLaserPower->setModifyDataHook(
+    scanLaserPower->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1231,13 +1231,13 @@ void Config::loadUserReigsters()
         true,
         DT_BOOL
     );
-    scanXResetEnabled->setLoadDataHook(
+    scanXResetEnabled->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() == 1);
         }
     );
-    scanXResetEnabled->setModifyDataHook(
+    scanXResetEnabled->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toBool() ? 1 : 0);
@@ -1251,13 +1251,13 @@ void Config::loadUserReigsters()
         true,
         DT_BOOL
     );
-    scanYResetEnabled->setLoadDataHook(
+    scanYResetEnabled->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() == 1);
         }
     );
-    scanYResetEnabled->setModifyDataHook(
+    scanYResetEnabled->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toBool() ? 1 : 0);
@@ -1271,13 +1271,13 @@ void Config::loadUserReigsters()
         true,
         DT_BOOL
     );
-    scanZResetEnabled->setLoadDataHook(
+    scanZResetEnabled->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() == 1);
         }
     );
-    scanZResetEnabled->setModifyDataHook(
+    scanZResetEnabled->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toBool() ? 1 : 0);
@@ -1291,13 +1291,13 @@ void Config::loadUserReigsters()
         10,
         DT_INT
     );
-    resetSpeed->setLoadDataHook(
+    resetSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    resetSpeed->setModifyDataHook(
+    resetSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1327,13 +1327,13 @@ void Config::loadUserReigsters()
         0,
         DT_INT
     );
-    backlashXInterval->setLoadDataHook(
+    backlashXInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    backlashXInterval->setModifyDataHook(
+    backlashXInterval->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1352,13 +1352,13 @@ void Config::loadUserReigsters()
         0,
         DT_INT
     );
-    backlashYInterval->setLoadDataHook(
+    backlashYInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    backlashYInterval->setModifyDataHook(
+    backlashYInterval->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1377,13 +1377,13 @@ void Config::loadUserReigsters()
         0,
         DT_INT
     );
-    backlashZInterval->setLoadDataHook(
+    backlashZInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    backlashZInterval->setModifyDataHook(
+    backlashZInterval->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1402,13 +1402,13 @@ void Config::loadUserReigsters()
         10000,
         DT_INT
     );
-    defaultRunSpeed->setLoadDataHook(
+    defaultRunSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    defaultRunSpeed->setModifyDataHook(
+    defaultRunSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1427,13 +1427,13 @@ void Config::loadUserReigsters()
         1000,
         DT_INT
     );
-    defaultMaxCuttingPower->setLoadDataHook(
+    defaultMaxCuttingPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
         }
     );
-    defaultMaxCuttingPower->setModifyDataHook(
+    defaultMaxCuttingPower->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1453,13 +1453,13 @@ void Config::loadUserReigsters()
         100,
         DT_INT
     );
-    defaultMinCuttingPower->setLoadDataHook(
+    defaultMinCuttingPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
         }
     );
-    defaultMinCuttingPower->setModifyDataHook(
+    defaultMinCuttingPower->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1479,13 +1479,13 @@ void Config::loadUserReigsters()
         500000,
         DT_INT
     );
-    defaultScanSpeed->setLoadDataHook(
+    defaultScanSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    defaultScanSpeed->setModifyDataHook(
+    defaultScanSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
@@ -1655,13 +1655,13 @@ void Config::loadSystemRegisters()
         320000,
         DT_INT
     );
-    xMaxLength->setModifyDataHook(
+    xMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    xMaxLength->setLoadDataHook(
+    xMaxLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1683,7 +1683,7 @@ void Config::loadSystemRegisters()
     );
     xDirPhase->setInputWidgetType(IWT_ComboBox);
     xDirPhase->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -1705,7 +1705,7 @@ void Config::loadSystemRegisters()
     );
     xLimitPhase->setInputWidgetType(IWT_ComboBox);
     xLimitPhase->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -1726,13 +1726,13 @@ void Config::loadSystemRegisters()
         2000,
         DT_INT
     );
-    xZeroDev->setModifyDataHook(
+    xZeroDev->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    xZeroDev->setLoadDataHook(
+    xZeroDev->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1752,13 +1752,13 @@ void Config::loadSystemRegisters()
         3164557,
         DT_INT
     );
-    xStepLength->setModifyDataHook(
+    xStepLength->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000000));
         }
     );
-    xStepLength->setLoadDataHook(
+    xStepLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000000.0);
@@ -1779,7 +1779,7 @@ void Config::loadSystemRegisters()
     );
     xLimitNum->setInputWidgetType(IWT_ComboBox);
     xLimitNum->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -1811,7 +1811,7 @@ void Config::loadSystemRegisters()
     );
     xMotorNum->setInputWidgetType(IWT_ComboBox);
     xMotorNum->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -1833,13 +1833,13 @@ void Config::loadSystemRegisters()
         500,
         DT_INT
     );
-    xMotorCurrent->setModifyDataHook(
+    xMotorCurrent->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
         }
     );
-    xMotorCurrent->setLoadDataHook(
+    xMotorCurrent->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
@@ -1859,13 +1859,13 @@ void Config::loadSystemRegisters()
         15000,
         DT_INT
     );
-    xStartSpeed->setModifyDataHook(
+    xStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    xStartSpeed->setLoadDataHook(
+    xStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1885,13 +1885,13 @@ void Config::loadSystemRegisters()
         4500,
         DT_INT
     );
-    xMaxSpeed->setModifyDataHook(
+    xMaxSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    xMaxSpeed->setLoadDataHook(
+    xMaxSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1911,13 +1911,13 @@ void Config::loadSystemRegisters()
         45,
         DT_INT
     );
-    xMaxAcceleration->setModifyDataHook(
+    xMaxAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    xMaxAcceleration->setLoadDataHook(
+    xMaxAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1937,13 +1937,13 @@ void Config::loadSystemRegisters()
         45,
         DT_INT
     );
-    xUrgentAcceleration->setModifyDataHook(
+    xUrgentAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    xUrgentAcceleration->setLoadDataHook(
+    xUrgentAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1963,13 +1963,13 @@ void Config::loadSystemRegisters()
         200000,
         DT_INT
     );
-    yMaxLength->setModifyDataHook(
+    yMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    yMaxLength->setLoadDataHook(
+    yMaxLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -1991,7 +1991,7 @@ void Config::loadSystemRegisters()
     );
     yDirPhase->setInputWidgetType(IWT_ComboBox);
     yDirPhase->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2013,7 +2013,7 @@ void Config::loadSystemRegisters()
     );
     yLimitPhase->setInputWidgetType(IWT_ComboBox);
     yLimitPhase->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2033,13 +2033,13 @@ void Config::loadSystemRegisters()
         2000,
         DT_INT
     );
-    yZeroDev->setModifyDataHook(
+    yZeroDev->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    yZeroDev->setLoadDataHook(
+    yZeroDev->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2059,13 +2059,13 @@ void Config::loadSystemRegisters()
         3164557,
         DT_INT
     );
-    yStepLength->setModifyDataHook(
+    yStepLength->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000000));
         }
     );
-    yStepLength->setLoadDataHook(
+    yStepLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000000.0);
@@ -2087,7 +2087,7 @@ void Config::loadSystemRegisters()
     );
     yLimitNum->setInputWidgetType(IWT_ComboBox);
     yLimitNum->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2119,7 +2119,7 @@ void Config::loadSystemRegisters()
     );
     yMotorNum->setInputWidgetType(IWT_ComboBox);
     yMotorNum->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2141,13 +2141,13 @@ void Config::loadSystemRegisters()
         500,
         DT_INT
     );
-    yMotorCurrent->setModifyDataHook(
+    yMotorCurrent->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
         }
     );
-    yMotorCurrent->setLoadDataHook(
+    yMotorCurrent->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
@@ -2167,13 +2167,13 @@ void Config::loadSystemRegisters()
         15,
         DT_INT
     );
-    yStartSpeed->setModifyDataHook(
+    yStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    yStartSpeed->setLoadDataHook(
+    yStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2193,13 +2193,13 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    yMaxSpeed->setModifyDataHook(
+    yMaxSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    yMaxSpeed->setLoadDataHook(
+    yMaxSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2219,13 +2219,13 @@ void Config::loadSystemRegisters()
         45,
         DT_REAL
     );
-    yMaxAcceleration->setModifyDataHook(
+    yMaxAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    yMaxAcceleration->setLoadDataHook(
+    yMaxAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2245,13 +2245,13 @@ void Config::loadSystemRegisters()
         20,
         DT_REAL
     );
-    yUrgentAcceleration->setModifyDataHook(
+    yUrgentAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    yUrgentAcceleration->setLoadDataHook(
+    yUrgentAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2271,13 +2271,13 @@ void Config::loadSystemRegisters()
         200000,
         DT_INT
     );
-    zMaxLength->setModifyDataHook(
+    zMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    zMaxLength->setLoadDataHook(
+    zMaxLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2299,7 +2299,7 @@ void Config::loadSystemRegisters()
     );
     zDirPhase->setInputWidgetType(IWT_ComboBox);
     zDirPhase->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2321,7 +2321,7 @@ void Config::loadSystemRegisters()
     );
     zLimitPhase->setInputWidgetType(IWT_ComboBox);
     zLimitPhase->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2341,13 +2341,13 @@ void Config::loadSystemRegisters()
         2000,
         DT_INT
     );
-    zZeroDev->setModifyDataHook(
+    zZeroDev->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    zZeroDev->setLoadDataHook(
+    zZeroDev->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2367,13 +2367,13 @@ void Config::loadSystemRegisters()
         6200000,
         DT_INT
     );
-    zStepLength->setModifyDataHook(
+    zStepLength->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000000));
         }
     );
-    zStepLength->setLoadDataHook(
+    zStepLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000000.0);
@@ -2395,7 +2395,7 @@ void Config::loadSystemRegisters()
     );
     zLimitNum->setInputWidgetType(IWT_ComboBox);
     zLimitNum->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2427,7 +2427,7 @@ void Config::loadSystemRegisters()
     );
     zMotorNum->setInputWidgetType(IWT_ComboBox);
     zMotorNum->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
             if (!comboBox)
@@ -2449,13 +2449,13 @@ void Config::loadSystemRegisters()
         500,
         DT_INT
     );
-    zMotorCurrent->setModifyDataHook(
+    zMotorCurrent->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
         }
     );
-    zMotorCurrent->setLoadDataHook(
+    zMotorCurrent->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
@@ -2475,13 +2475,13 @@ void Config::loadSystemRegisters()
         15000,
         DT_INT
     );
-    zStartSpeed->setModifyDataHook(
+    zStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    zStartSpeed->setLoadDataHook(
+    zStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2501,13 +2501,13 @@ void Config::loadSystemRegisters()
         10000,
         DT_INT
     );
-    zMaxSpeed->setModifyDataHook(
+    zMaxSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    zMaxSpeed->setLoadDataHook(
+    zMaxSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2527,13 +2527,13 @@ void Config::loadSystemRegisters()
         30000,
         DT_INT
     );
-    zMaxAcceleration->setModifyDataHook(
+    zMaxAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    zMaxAcceleration->setLoadDataHook(
+    zMaxAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2553,13 +2553,13 @@ void Config::loadSystemRegisters()
         30000,
         DT_INT
     );
-    zUrgentAcceleration->setModifyDataHook(
+    zUrgentAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    zUrgentAcceleration->setLoadDataHook(
+    zUrgentAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 1000.0);
@@ -2579,13 +2579,13 @@ void Config::loadSystemRegisters()
         1000,
         DT_INT
     );
-    laserMaxPower->setModifyDataHook(
+    laserMaxPower->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
         }
     );
-    laserMaxPower->setLoadDataHook(
+    laserMaxPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
@@ -2604,13 +2604,13 @@ void Config::loadSystemRegisters()
         100,
         DT_INT
     );
-    laserMinPower->setModifyDataHook(
+    laserMinPower->setValueFromWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
         }
     );
-    laserMinPower->setLoadDataHook(
+    laserMinPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
             return QVariant(value.toInt() / 10.0);
@@ -2667,10 +2667,22 @@ void Config::loadSystemRegisters()
     );
     deviceOrigin->setInputWidgetType(IWT_Custom);
     deviceOrigin->setCreateWidgetHook(
-        [](ConfigItem* item) {
+        [=](ConfigItem* item) {
             RadioButtonGroup* widget = new RadioButtonGroup(2, 2);
             widget->setValues(QList<int>() << 0 << 1 << 3 << 2);
             return qobject_cast<QWidget*>(widget);
+        }
+    );
+    deviceOrigin->setWidgetInitializeHook(
+        [=](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper) {
+            RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
+            QObject::connect(radioGroup, &RadioButtonGroup::valueChanged, wrapper, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
+        }
+    );
+    deviceOrigin->setUpdateWidgetValueHook(
+        [=](QWidget* widget, const QVariant& value) {
+            RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
+            radioGroup->setValue(value.toInt());
         }
     );
 }

@@ -27,7 +27,6 @@ public:
 
     qreal layoutWidth() const;
     qreal layoutHeight() const;
-    //void setLayoutRect(const QRectF& rect, bool toCard = true);
 
     int printerDrawUnit() const;
     void setPrinterDrawUnit(int unit, bool toCard = true);
@@ -121,6 +120,9 @@ protected slots:
     void onConnected();
     void onMainCardRegistered();
     void onMainCardActivated(bool temp);
+
+    void onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 signals:
     void comPortsFetched(const QStringList& ports);

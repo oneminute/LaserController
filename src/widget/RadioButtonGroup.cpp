@@ -195,7 +195,10 @@ void RadioButtonGroup::updateLayout()
             d->buttons.append(button);
             connect(button, &QRadioButton::toggled,
                 [=](bool checked) {
+                    if (!checked)
+                        return;
                     d->currentIndex = index;
+                    emit valueChanged(d->values.at(d->currentIndex));
                 }
             );
             if (index == d->currentIndex)

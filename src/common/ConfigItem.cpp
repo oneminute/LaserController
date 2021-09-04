@@ -21,14 +21,15 @@ public:
         , inputWidgetType(IWT_EditSlider)
         , modifiedBy(MB_Manual)
         , widgetInitializeHook(nullptr)
-        , loadDataHook(nullptr)
-        , modifyDataHook(nullptr)
+        , valueToWidgetHook(nullptr)
+        , valueFromWidgetHook(nullptr)
         , createWidgetHook(nullptr)
         , destroyHook(nullptr)
         , toJsonHook(nullptr)
         , fromJsonHook(nullptr)
         , resetHook(nullptr)
         , restoreHook(nullptr)
+        , updateWidgetValueHook(nullptr)
     {
         
     }
@@ -140,14 +141,15 @@ public:
     ModifiedBy modifiedBy;
 
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
-    ConfigItem::ValueHook loadDataHook;
-    ConfigItem::ValueHook modifyDataHook;
+    ConfigItem::ValueHook valueToWidgetHook;
+    ConfigItem::ValueHook valueFromWidgetHook;
     ConfigItem::CreateWidgetHook createWidgetHook;
     ConfigItem::DestroyHook destroyHook;
     ConfigItem::ToJsonHook toJsonHook;
     ConfigItem::FromJsonHook fromJsonHook;
     ConfigItem::ResetHook resetHook;
     ConfigItem::RestoreHook restoreHook;
+    ConfigItem::UpdateWidgetValueHook updateWidgetValueHook;
 };
 
 ConfigItem::ConfigItem(
@@ -400,6 +402,7 @@ InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
             d->widgets.removeOne(widget);
         }
     );
+    doInitWidget(widget, wrapper);
     return wrapper;
 }
 
@@ -510,46 +513,55 @@ void ConfigItem::setWidgetInitializeHook(ConfigItem::WidgetInitializeHook fn)
     d->widgetInitializeHook = fn;
 }
 
-ConfigItem::ValueHook ConfigItem::loadDataHook()
+void ConfigItem::doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper)
 {
     Q_D(ConfigItem);
-    return d->loadDataHook;
+    if (widget && d->widgetInitializeHook)
+    {
+        d->widgetInitializeHook(widget, this, wrapper);
+    }
 }
 
-void ConfigItem::setLoadDataHook(ValueHook fn)
+ConfigItem::ValueHook ConfigItem::valueToWidgetHook()
 {
     Q_D(ConfigItem);
-    d->loadDataHook = fn;
+    return d->valueToWidgetHook;
 }
 
-QVariant ConfigItem::doLoadDataHook(const QVariant& value) const
+void ConfigItem::setValueToWidgetHook(ValueHook fn)
+{
+    Q_D(ConfigItem);
+    d->valueToWidgetHook = fn;
+}
+
+QVariant ConfigItem::doValueToWidgetHook(const QVariant& value) const
 {
     Q_D(const ConfigItem);
-    if (d->loadDataHook)
+    if (d->valueToWidgetHook)
     {
-        return d->loadDataHook(value);
+        return d->valueToWidgetHook(value);
     }
     return value;
 }
 
-ConfigItem::ValueHook ConfigItem::modifyDataHook()
+ConfigItem::ValueHook ConfigItem::valueFromWidgetHook()
 {
     Q_D(ConfigItem);
-    return d->modifyDataHook;
+    return d->valueFromWidgetHook;
 }
 
-void ConfigItem::setModifyDataHook(ValueHook fn)
+void ConfigItem::setValueFromWidgetHook(ValueHook fn)
 {
     Q_D(ConfigItem);
-    d->modifyDataHook = fn;
+    d->valueFromWidgetHook = fn;
 }
 
-QVariant ConfigItem::doModifyDataHook(const QVariant& value)
+QVariant ConfigItem::doValueFromWidgetHook(const QVariant& value)
 {
     Q_D(ConfigItem);
-    if (d->modifyDataHook)
+    if (d->valueFromWidgetHook)
     {
-        return d->modifyDataHook(value);
+        return d->valueFromWidgetHook(value);
     }
     return value;
 }
@@ -682,13 +694,27 @@ void ConfigItem::doRestoreHook()
     }
 }
 
-void ConfigItem::initWidget(QWidget* widget)
+ConfigItem::UpdateWidgetValueHook ConfigItem::updateWidgetValueHook()
 {
     Q_D(ConfigItem);
-    if (widget && d->widgetInitializeHook)
+    return d->updateWidgetValueHook;
+}
+
+void ConfigItem::setUpdateWidgetValueHook(UpdateWidgetValueHook fn)
+{
+    Q_D(ConfigItem);
+    d->updateWidgetValueHook = fn;
+}
+
+bool ConfigItem::doUpdateWidgetValueHook(QWidget* widget, const QVariant& value)
+{
+    Q_D(ConfigItem);
+    if (d->updateWidgetValueHook)
     {
-        d->widgetInitializeHook(widget, this);
+        d->updateWidgetValueHook(widget, value);
+        return true;
     }
+    return false;
 }
 
 const QList<QWidget*>& ConfigItem::boundedWidgets() const
