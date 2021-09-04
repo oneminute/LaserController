@@ -2,59 +2,57 @@
 
 #include <QVariant>
 
+#include "common/common.h"
+#include "common/ConfigItem.h"
 #include "LaserApplication.h"
 #include "LaserDevice.h"
-//#include "LaserDriver.h"
 #include "util/TypeUtils.h"
-
-QMap<int, LaserRegister*> LaserRegister::userRegisters;
-QMap<int, LaserRegister*> LaserRegister::systemRegisters;
 
 class LaserRegisterPrivate
 {
     Q_DECLARE_PUBLIC(LaserRegister)
 public:
-    LaserRegisterPrivate(int addr, const QString& name, DataType dataType, const QString& description, bool isSystem, bool readOnly, LaserRegister* ptr)
+    LaserRegisterPrivate(LaserRegister* ptr)
         : q_ptr(ptr)
-        , address(addr)
-        , name(name)
-        , dataType(dataType)
-        , description(description)
-        , isSystem(isSystem)
-        , readOnly(readOnly)
+        , address(-1)
+        , readOnly(false)
+        , writeOnly(false)
+        , isSystem(true)
+        , configItem(nullptr)
     {
 
     }
 
     ~LaserRegisterPrivate()
     {
-        qLogD << "register " << address << "(" << name << ") destroyed";
+        qLogD << (isSystem ? "System" : "User") << " register " << address << "(" << address << ") destroyed";
     }
+
+    LaserRegister* q_ptr;
 
     int address;
-    QString name;
-    QString description;
     bool readOnly;
+    bool writeOnly;
     bool isSystem;
-    DataType dataType;
-    StoreStrategy storeStrategy;
-    LaserRegister* q_ptr;
+    QVariant value;
+    ConfigItem* configItem;
 };
 
-LaserRegister::LaserRegister(int addr, const QString& name, DataType dataType, const QString& description, bool isSystem, bool readOnly, StoreStrategy storeStrategy, QObject* parent)
+LaserRegister::LaserRegister(int addr, ConfigItem* configItem, 
+    bool isSystem, bool readOnly, bool writeOnly, QObject* parent)
     : QObject(parent)
-    , m_ptr(new LaserRegisterPrivate(addr, name, dataType, description, isSystem, readOnly, this))
+    , d_ptr(new LaserRegisterPrivate(this))
 {
+    Q_ASSERT(configItem);
+
     Q_D(LaserRegister);
-    d->storeStrategy = storeStrategy;
-    if (isSystem)
-    {
-        systemRegisters.insert(addr, this);
-    }
-    else
-    {
-        userRegisters.insert(addr, this);
-    }
+    d->address = addr;
+    d->isSystem = isSystem;
+    d->readOnly = readOnly;
+    d->writeOnly = writeOnly;
+    d->configItem = configItem;
+
+    connect(configItem, &ConfigItem::valueChanged, this, &LaserRegister::setValue);
 }
 
 LaserRegister::~LaserRegister()
@@ -70,13 +68,13 @@ int LaserRegister::address() const
 QString LaserRegister::name() const
 {
     Q_D(const LaserRegister);
-    return d->name;
+    return d->configItem->name();
 }
 
 QString LaserRegister::description() const
 {
     Q_D(const LaserRegister);
-    return d->description;
+    return d->configItem->description();
 }
 
 bool LaserRegister::readOnly() const
@@ -85,11 +83,23 @@ bool LaserRegister::readOnly() const
     return d->readOnly;
 }
 
-void LaserRegister::setValue(const QVariant& value)
+bool LaserRegister::writeOnly() const
+{
+    Q_D(const LaserRegister);
+    return d->writeOnly;
+}
+
+void LaserRegister::setValue(const QVariant& value, ModifiedBy modifiedBy)
 {
     Q_D(LaserRegister);
     if (readOnly())
         return;
+
+    if (modifiedBy == MB_Register ||
+        modifiedBy == MB_RegisterConfirmed)
+        return;
+
+    d->value = value;
 
     if (storeStrategy() == SS_DIRECTLY)
     {
@@ -100,30 +110,32 @@ void LaserRegister::setValue(const QVariant& value)
 DataType LaserRegister::dataType() const
 {
     Q_D(const LaserRegister);
-    return d->dataType;
-}
-
-void LaserRegister::setDataType(DataType dataType)
-{
-    Q_D(LaserRegister);
-    d->dataType = dataType;
+    return d->configItem->dataType();
 }
 
 StoreStrategy LaserRegister::storeStrategy() const
 {
     Q_D(const LaserRegister);
-    return d->storeStrategy;
+    return d->configItem->storeType();
 }
 
-void LaserRegister::setStoreStrategy(StoreStrategy storeStrategy)
+ConfigItem* LaserRegister::configItem() const
+{
+    Q_D(const LaserRegister);
+    return d->configItem;
+}
+
+QVariant LaserRegister::value() const
+{
+    Q_D(const LaserRegister);
+    return d->value;
+}
+
+void LaserRegister::parse(const QString& raw, ModifiedBy modifiedBy)
 {
     Q_D(LaserRegister);
-    d->storeStrategy = storeStrategy;
-}
-
-void LaserRegister::parse(const QString& raw)
-{
-    emit valueLoaded(typeUtils::stringToVariant(raw, dataType()));
+    d->value = typeUtils::stringToVariant(raw, dataType());
+    d->configItem->setValue(d->value, modifiedBy);
 }
 
 bool LaserRegister::read()
@@ -158,37 +170,3 @@ QString LaserRegister::toString() const
     return QString("%1").arg(d->address);
 }
 
-void LaserRegister::batchParse(const QString& raw, bool isSystem)
-{
-    QStringList segments = raw.split(";");
-    for (QString seg : segments)
-    {
-        QStringList segItem = seg.split(",");
-        if (segItem.length() != 2)
-        {
-            continue;
-        }
-        bool ok;
-        int addr = segItem[0].toInt(&ok);
-        if (!ok)
-        {
-            continue;
-        }
-        QString value = segItem[1];
-        if (isSystem)
-        {
-            if (systemRegisters.contains(addr))
-            {
-                systemRegisters[addr]->parse(value);
-            }
-        }
-        else
-        {
-            if (userRegisters.contains(addr))
-            {
-                userRegisters[addr]->parse(value);
-            }
-        }
-    }
-
-}

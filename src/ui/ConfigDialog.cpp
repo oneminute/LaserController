@@ -95,17 +95,17 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         QWidget* xPanel = new QWidget(page);
         QFormLayout* xLayout = new QFormLayout(xPanel);
-        generalPanel->setLayout(xLayout);
+        xPanel->setLayout(xLayout);
         page->addTab(xPanel, tr("X"));
 
         QWidget* yPanel = new QWidget(page);
         QFormLayout* yLayout = new QFormLayout(yPanel);
-        generalPanel->setLayout(yLayout);
+        yPanel->setLayout(yLayout);
         page->addTab(yPanel, tr("Y"));
 
         QWidget* zPanel = new QWidget(page);
         QFormLayout* zLayout = new QFormLayout(zPanel);
-        generalPanel->setLayout(zLayout);
+        zPanel->setLayout(zLayout);
         page->addTab(zPanel, tr("Z"));
 
         for (ConfigItem* item : Config::SystemRegister::group->items())
@@ -200,7 +200,7 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
                 tr("Password"),
                 QLineEdit::Normal
             );
-            Config::SystemRegister::passwordItem()->setValue(password);
+            Config::SystemRegister::passwordItem()->setValue(password, MB_Manual);
             LaserApplication::device->writeSystemRegisters();
         }
         Config::save(LaserApplication::device->mainCardId());

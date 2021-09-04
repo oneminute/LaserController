@@ -40,7 +40,7 @@ public slots:
     void setEnabled(bool enabled);
 
 signals:
-    void valueChanged(const QVariant& newValue);
+    void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
 
 protected:
     void onTextChanged(const QString& text);
@@ -57,7 +57,7 @@ protected:
     void onDateTimeChanged(const QDateTime& dateTime);
 
     void onConfigItemModifiedChanged(bool modified);
-    void onConfigItemValueChanged(const QVariant& value);
+    void onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 private:
 

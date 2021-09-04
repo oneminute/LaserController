@@ -6,12 +6,9 @@
 #include <QObject>
 
 #include "common/common.h"
-#include "laser/LaserRegister.h"
 
-class Config;
 class ConfigItemGroup;
 class InputWidgetWrapper;
-class LaserRegister;
 
 class ConfigItemPrivate;
 class ConfigItem: public QObject
@@ -78,9 +75,6 @@ public:
     QVariant lastValue() const;
     void setLastValue(const QVariant& value);
 
-    bool isDirty() const;
-    void setDirty(bool dirty);
-
     bool isModified() const;
 
     InputWidgetWrapper* bindWidget(QWidget* widget);
@@ -89,8 +83,8 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
 
-    QString toRegisterString() const;
-    LaserRegister::RegisterPair keyValuePair() const;
+    //QString toRegisterString() const;
+    //LaserRegister::RegisterPair keyValuePair() const;
 
     DataType dataType() const;
 
@@ -123,8 +117,9 @@ public:
     void setToJsonHook(ToJsonHook fn);
     QJsonObject doToJsonHook() const;
 
-    FromJsonHook fromJsonHook();
-    void setFromJsonHook(FromJsonHook fn);
+    std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> fromJsonHook();
+    //void setFromJsonHook(FromJsonHook fn);
+    void setFromJsonHook(std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)>);
     void doFromJsonHook(const QJsonObject& json);
 
     ResetHook resetHook();
@@ -137,35 +132,32 @@ public:
 
     void initWidget(QWidget* widget);
 
-    LaserRegister* laserRegister() const;
-    void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
-    bool hasRegister() const;
+    //LaserRegister* laserRegister() const;
+    //void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
+    //bool hasRegister() const;
 
     const QList<QWidget*>& boundedWidgets() const;
 
+    ModifiedBy modifiedBy() const;
+
+    void setValue(const QVariant& value, ModifiedBy modifiedBy);
+
 public slots:
-    void setValue(const QVariant& value);
-    void fromWidget(const QVariant& value);
-    void loadValue(const QVariant& value);
     void reset();
-    void doModify();
     void restore();
     void restoreSystem();
+    void confirm();
 
 protected:
-    bool modifyValue(const QVariant& value);
-    void setModified();
     void setName(const QString& name);
     void setDescription(const QString& description);
 
-    void setValueDirectly(const QVariant& value);
-    void setValueConfirmed(const QVariant& value);
-    void setValueLazy(const QVariant& value);
+protected slots:
+    void onRegisterLoaded(const QVariant& value);
 
 signals:
     void visibleChanged(bool value);
-    void valueChanged(const QVariant& value);
-    void widgetValueChanged(const QVariant& value);
+    void valueChanged(const QVariant& value, ModifiedBy modifiedBy);
     void defaultValueChanged(const QVariant& value);
     void modifiedChanged(bool modified);
     void enabledChanged(bool enabled);

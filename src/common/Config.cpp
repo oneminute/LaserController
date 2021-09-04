@@ -129,7 +129,7 @@ void Config::save(const QString& mainCardId)
 
         for (ConfigItemGroup* group : groups)
         {
-            group->doModify();
+            group->confirm();
         }
     }
     catch (...)
@@ -700,7 +700,8 @@ void Config::loadExportItems()
     enableSmallDiagonal->setStoreType(SS_DIRECTLY);
 
     QVariant smallDiagonalLimitationVar;
-    smallDiagonalLimitationVar.setValue(new SmallDiagonalLimitation);
+    SmallDiagonalLimitation* limitation = new SmallDiagonalLimitation;
+    smallDiagonalLimitationVar.setValue(limitation);
     qLogD << "small diagonal limitation type: " << smallDiagonalLimitationVar.userType();
     ConfigItem* smallDiagonalLimitation = group->addConfigItem(
         "smallDiagonalLimitation",
@@ -732,17 +733,19 @@ void Config::loadExportItems()
         }
     );
     smallDiagonalLimitation->setFromJsonHook(
-        [](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
+        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
             if (json.contains("value"))
             {
-                SmallDiagonalLimitation* limitation = item->value().value<SmallDiagonalLimitation*>();
+                //void* ptr = item->value().value<void*>();
+                //SmallDiagonalLimitation* limitation = item->value().value<SmallDiagonalLimitation*>();
+                //SmallDiagonalLimitation* limitation = static_cast<SmallDiagonalLimitation*>(ptr);
+                //if (limitation)
                 limitation->fromJson(json["value"].toObject());
-                qLogD << *limitation;
             }
         }
     );
     connect(enableSmallDiagonal, &ConfigItem::valueChanged,
-        [=](const QVariant& value) {
+        [=](const QVariant& value, ModifiedBy modifiedBy) {
             bool enabled = value.toBool();
             smallDiagonalLimitation->setEnabled(enabled);
         }
@@ -761,31 +764,6 @@ void Config::loadDeviceItems()
         true,
         DT_BOOL
     );
-
-    ConfigItem* originalPoint = group->addConfigItem(
-        "originalPoint",
-        tr("[57] Original Point"),
-        tr("Original Point"),
-        0
-    );
-    originalPoint->setInputWidgetType(IWT_ComboBox);
-    originalPoint->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item)
-        {
-            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-            if (!comboBox)
-                return;
-
-            comboBox->addItem(tr("Top Left"), 0);
-            comboBox->addItem(tr("Top Right"), 1);
-            comboBox->addItem(tr("Bottom Right"), 2);
-            comboBox->addItem(tr("Bottom Left"), 3);
-
-            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
-        }
-    );
-    originalPoint->bindLaserRegister(57);
 
     ConfigItem* startFrom = group->addConfigItem(
         "startFrom",
@@ -826,7 +804,7 @@ void Config::loadDeviceItems()
         }
     );
     connect(startFrom, &ConfigItem::valueChanged,
-        [=](const QVariant& value) {
+        [=](const QVariant& value, ModifiedBy modifiedBy) {
             for (QWidget* widget : jobOrigin->boundedWidgets())
             {
                 RadioButtonGroup* group = qobject_cast<RadioButtonGroup*>(widget);
@@ -835,10 +813,11 @@ void Config::loadDeviceItems()
                 {
                 case SFT_CurrentPosition:
                 case SFT_UserOrigin:
+                    group->setEnabled(true);
                     group->setRowsCols(3, 3);
                     break;
                 case SFT_AbsoluteCoords:
-                    group->setRowsCols(2, 2);
+                    group->setEnabled(false);
                     break;
                 }
             }
@@ -861,7 +840,6 @@ void Config::loadUserReigsters()
     head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
-    head->bindLaserRegister(0, false);
 
     ConfigItem* accMode = group->addConfigItem(
         "accMode",
@@ -888,14 +866,13 @@ void Config::loadUserReigsters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    accMode->bindLaserRegister(1, false);
 
     ConfigItem* cuttingMoveSpeed = group->addConfigItem(
         "cuttingMoveSpeed",
         tr("[02] Cutting Move Speed(mm/s)"),
         tr("Cutting move speed"),
         15,
-        DT_REAL
+        DT_INT
     );
     cuttingMoveSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -909,20 +886,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //cuttingMoveSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     cuttingMoveSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveSpeed->setInputWidgetProperty("step", 0.001);
     cuttingMoveSpeed->setInputWidgetProperty("page", 10);
     cuttingMoveSpeed->setInputWidgetProperty("minimum", 0.001);
     cuttingMoveSpeed->setInputWidgetProperty("maximum", 100000);
-    cuttingMoveSpeed->bindLaserRegister(2, false);
 
     ConfigItem* cuttingMoveAcc = group->addConfigItem(
         "cuttingMoveAcc",
         tr("[03] Cutting Move Acceleration(mm/s<sup>2</sup>)"),
         tr("Cutting Move Acceleration"),
         45,
-        DT_REAL
+        DT_INT
     );
     cuttingMoveAcc->setLoadDataHook(
         [](const QVariant& value)
@@ -936,20 +911,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //cuttingMoveAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
     cuttingMoveAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveAcc->setInputWidgetProperty("step", 0.001);
     cuttingMoveAcc->setInputWidgetProperty("page", 10);
     cuttingMoveAcc->setInputWidgetProperty("minimum", 0.001);
     cuttingMoveAcc->setInputWidgetProperty("maximum", 10000);
-    cuttingMoveAcc->bindLaserRegister(3, false);
 
     ConfigItem* cuttingTurnSpeed = group->addConfigItem(
         "cuttingTurnSpeed",
         tr("[04] Cutting Turn Speed(mm/s)"),
         tr("Cutting turn speed"),
         15,
-        DT_REAL
+        DT_INT
     );
     cuttingTurnSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -963,20 +936,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //cuttingTurnSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     cuttingTurnSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingTurnSpeed->setInputWidgetProperty("step", 0.001);
     cuttingTurnSpeed->setInputWidgetProperty("page", 10);
     cuttingTurnSpeed->setInputWidgetProperty("minimum", 1);
     cuttingTurnSpeed->setInputWidgetProperty("maximum", 1000);
-    cuttingTurnSpeed->bindLaserRegister(4, false);
 
     ConfigItem* cuttingTurnAcc = group->addConfigItem(
         "cuttingTurnAcc",
         tr("[05] Cutting Turn Acceleration(mm/s<sup>2</sup>)"),
         tr("Cutting turn acceleration"),
         45,
-        DT_REAL
+        DT_INT
     );
     cuttingTurnAcc->setLoadDataHook(
         [](const QVariant& value)
@@ -990,20 +961,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //cuttingTurnAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
     cuttingTurnAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingTurnAcc->setInputWidgetProperty("step", 0.001);
     cuttingTurnAcc->setInputWidgetProperty("page", 10);
     cuttingTurnAcc->setInputWidgetProperty("minimum", 1);
     cuttingTurnAcc->setInputWidgetProperty("maximum", 1000);
-    cuttingTurnAcc->bindLaserRegister(5, false);
 
     ConfigItem* cuttingWorkAcc = group->addConfigItem(
         "cuttingWorkAcc",
         tr("[06] Cutting Work Acceleration(mm/s<sup>2</sup>)"),
         tr("Cutting Work acceleration"),
         60,
-        DT_REAL
+        DT_INT
     );
     cuttingWorkAcc->setLoadDataHook(
         [](const QVariant& value)
@@ -1017,13 +986,11 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //cuttingWorkAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
     cuttingWorkAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingWorkAcc->setInputWidgetProperty("step", 0.001);
     cuttingWorkAcc->setInputWidgetProperty("page", 10);
     cuttingWorkAcc->setInputWidgetProperty("minimum", 1);
     cuttingWorkAcc->setInputWidgetProperty("maximum", 10000);
-    cuttingWorkAcc->bindLaserRegister(6, false);
 
     ConfigItem* cuttingMoveSpeedFactor = group->addConfigItem(
         "cuttingMoveSpeedFactor",
@@ -1034,7 +1001,6 @@ void Config::loadUserReigsters()
     cuttingMoveSpeedFactor->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveSpeedFactor->setInputWidgetProperty("minimum", 1);
     cuttingMoveSpeedFactor->setInputWidgetProperty("maximum", 100);
-    cuttingMoveSpeedFactor->bindLaserRegister(7, false);
 
     ConfigItem* cuttingWorkSpeedFactor = group->addConfigItem(
         "cuttingWorkSpeedFactor",
@@ -1045,7 +1011,6 @@ void Config::loadUserReigsters()
     cuttingWorkSpeedFactor->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingWorkSpeedFactor->setInputWidgetProperty("minimum", 1);
     cuttingWorkSpeedFactor->setInputWidgetProperty("maximum", 100);
-    cuttingWorkSpeedFactor->bindLaserRegister(8, false);
 
     ConfigItem* cuttingSpotSize = group->addConfigItem(
         "cuttingSpotSize",
@@ -1057,14 +1022,13 @@ void Config::loadUserReigsters()
     cuttingSpotSize->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingSpotSize->setInputWidgetProperty("minimum", 1);
     cuttingSpotSize->setInputWidgetProperty("maximum", 1000);
-    cuttingSpotSize->bindLaserRegister(9, false);
 
     ConfigItem* scanXStartSpeed = group->addConfigItem(
         "scanXStartSpeed",
         tr("[10] Scan X Start Speed(mm/s)"),
         tr("Scan x start speed"),
         15,
-        DT_REAL
+        DT_INT
     );
     scanXStartSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -1078,20 +1042,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //scanXStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     scanXStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanXStartSpeed->setInputWidgetProperty("step", 0.001);
     scanXStartSpeed->setInputWidgetProperty("page", 10);
     scanXStartSpeed->setInputWidgetProperty("minimum", 1);
     scanXStartSpeed->setInputWidgetProperty("maximum", 10000);
-    scanXStartSpeed->bindLaserRegister(10, false);
 
     ConfigItem* scanYStartSpeed = group->addConfigItem(
         "scanYStartSpeed",
         tr("[11] Scan Y Start Speed(mm/s)"),
         tr("Scan y start speed"),
         15,
-        DT_REAL
+        DT_INT
     );
     scanYStartSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -1105,20 +1067,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //scanYStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     scanYStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanYStartSpeed->setInputWidgetProperty("step", 0.001);
     scanYStartSpeed->setInputWidgetProperty("page", 10);
     scanYStartSpeed->setInputWidgetProperty("minimum", 1);
     scanYStartSpeed->setInputWidgetProperty("maximum", 10000);
-    scanYStartSpeed->bindLaserRegister(11, false);
 
     ConfigItem* scanXAcc = group->addConfigItem(
         "scanXAcc",
         tr("[12] Scan X Acceleration(mm/s<sup>2</sup>)"),
         tr("Scan x acceleration"),
         5,
-        DT_REAL
+        DT_INT
     );
     scanXAcc->setLoadDataHook(
         [](const QVariant& value)
@@ -1132,20 +1092,18 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //scanXAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
     scanXAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanXAcc->setInputWidgetProperty("step", 0.001);
     scanXAcc->setInputWidgetProperty("page", 10);
     scanXAcc->setInputWidgetProperty("minimum", 1);
     scanXAcc->setInputWidgetProperty("maximum", 10000);
-    scanXAcc->bindLaserRegister(12, false);
 
     ConfigItem* scanYAcc = group->addConfigItem(
         "scanYAcc",
         tr("[13] Scan Y Acceleration(mm/s<sup>2</sup>)"),
         tr("Scan y acceleration"),
         45,
-        DT_REAL
+        DT_INT
     );
     scanYAcc->setLoadDataHook(
         [](const QVariant& value)
@@ -1159,13 +1117,11 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //scanYAcc->setInputWidgetProperty("textTemplate", "%1mm/s2");
     scanYAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanYAcc->setInputWidgetProperty("step", 0.001);
     scanYAcc->setInputWidgetProperty("page", 10);
     scanYAcc->setInputWidgetProperty("minimum", 1);
     scanYAcc->setInputWidgetProperty("maximum", 10000);
-    scanYAcc->bindLaserRegister(13, false);
 
     ConfigItem* scanRowSpeed = group->addConfigItem(
         "scanRowSpeed",
@@ -1186,13 +1142,11 @@ void Config::loadUserReigsters()
             return QVariant(qRound(value.toReal() * 1000));
         }
     );
-    //scanRowSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     scanRowSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanRowSpeed->setInputWidgetProperty("step", 0.001);
     scanRowSpeed->setInputWidgetProperty("page", 10);
     scanRowSpeed->setInputWidgetProperty("minimum", 1);
     scanRowSpeed->setInputWidgetProperty("maximum", 10000);
-    scanRowSpeed->bindLaserRegister(14, false);
 
     ConfigItem* scanRowInterval = group->addConfigItem(
         "scanRowInterval",
@@ -1218,16 +1172,14 @@ void Config::loadUserReigsters()
     scanRowInterval->setInputWidgetProperty("page", 0.01);
     scanRowInterval->setInputWidgetProperty("minimum", 0);
     scanRowInterval->setInputWidgetProperty("maximum", 1);
-    scanRowInterval->bindLaserRegister(15, false);
 
     ConfigItem* scanReturnError = group->addConfigItem(
         "scanReturnError",
         tr("[16] Scan Return Error(mm/s)"),
         tr("Scan return error"),
         1000,
-        DT_REAL
+        DT_INT
     );
-    //scanReturnError->setInputWidgetProperty("textTemplate", "%1mm/s");
     scanReturnError->setLoadDataHook(
         [](const QVariant& value)
         {
@@ -1245,14 +1197,13 @@ void Config::loadUserReigsters()
     scanReturnError->setInputWidgetProperty("page", 10);
     scanReturnError->setInputWidgetProperty("minimum", 1);
     scanReturnError->setInputWidgetProperty("maximum", 100);
-    scanReturnError->bindLaserRegister(16, false);
 
     ConfigItem* scanLaserPower = group->addConfigItem(
         "scanLaserPower",
         tr("[17] Scan Laser Power"),
         tr("Scan laser power"),
         120,
-        DT_REAL
+        DT_INT
     );
     scanLaserPower->setLoadDataHook(
         [](const QVariant& value)
@@ -1272,7 +1223,6 @@ void Config::loadUserReigsters()
     scanLaserPower->setInputWidgetProperty("page", 10);
     scanLaserPower->setInputWidgetProperty("minimum", 1);
     scanLaserPower->setInputWidgetProperty("maximum", 100);
-    scanLaserPower->bindLaserRegister(17, false);
 
     ConfigItem* scanXResetEnabled = group->addConfigItem(
         "scanXResetEnabled",
@@ -1293,7 +1243,6 @@ void Config::loadUserReigsters()
             return QVariant(value.toBool() ? 1 : 0);
         }
     );
-    scanXResetEnabled->bindLaserRegister(18, false);
 
     ConfigItem* scanYResetEnabled = group->addConfigItem(
         "scanYResetEnabled",
@@ -1314,7 +1263,6 @@ void Config::loadUserReigsters()
             return QVariant(value.toBool() ? 1 : 0);
         }
     );
-    scanYResetEnabled->bindLaserRegister(19, false);
 
     ConfigItem* scanZResetEnabled = group->addConfigItem(
         "scanZResetEnabled",
@@ -1335,14 +1283,13 @@ void Config::loadUserReigsters()
             return QVariant(value.toBool() ? 1 : 0);
         }
     );
-    scanZResetEnabled->bindLaserRegister(20, false);
 
     ConfigItem* resetSpeed = group->addConfigItem(
         "resetSpeed",
         tr("[21] Reset speed"),
         tr("Reset speed(mm/s)"),
         10,
-        DT_REAL
+        DT_INT
     );
     resetSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -1361,7 +1308,6 @@ void Config::loadUserReigsters()
     resetSpeed->setInputWidgetProperty("page", 10);
     resetSpeed->setInputWidgetProperty("minimum", 0.001);
     resetSpeed->setInputWidgetProperty("maximum", 10000);
-    resetSpeed->bindLaserRegister(21, false);
 
     ConfigItem* scanReturnPos = group->addConfigItem(
         "scanReturnPos",
@@ -1373,14 +1319,13 @@ void Config::loadUserReigsters()
     scanReturnPos->setInputWidgetProperty("page", 1000);
     scanReturnPos->setInputWidgetProperty("minimum", 0);
     scanReturnPos->setInputWidgetProperty("maximum", 100000);
-    scanReturnPos->bindLaserRegister(22, false);
 
     ConfigItem* backlashXInterval = group->addConfigItem(
         "backlashXInterval",
         tr("[23] Backlash X Interval(mm/s)"),
         tr("Backlash x interval"),
         0,
-        DT_REAL
+        DT_INT
     );
     backlashXInterval->setLoadDataHook(
         [](const QVariant& value)
@@ -1399,14 +1344,13 @@ void Config::loadUserReigsters()
     backlashXInterval->setInputWidgetProperty("page", 10);
     backlashXInterval->setInputWidgetProperty("minimum", 0);
     backlashXInterval->setInputWidgetProperty("maximum", 100);
-    backlashXInterval->bindLaserRegister(23, false);
 
     ConfigItem* backlashYInterval = group->addConfigItem(
         "backlashYInterval",
         tr("[24] Backlash Y Interval(mm/s)"),
         tr("Backlash y interval"),
         0,
-        DT_REAL
+        DT_INT
     );
     backlashYInterval->setLoadDataHook(
         [](const QVariant& value)
@@ -1425,14 +1369,13 @@ void Config::loadUserReigsters()
     backlashYInterval->setInputWidgetProperty("page", 10);
     backlashYInterval->setInputWidgetProperty("minimum", 0);
     backlashYInterval->setInputWidgetProperty("maximum", 100);
-    backlashYInterval->bindLaserRegister(24, false);
 
     ConfigItem* backlashZInterval = group->addConfigItem(
         "backlashZInterval",
         tr("[25] Backlash Z Interval(mm/s)"),
         tr("Backlash z interval"),
         0,
-        DT_REAL
+        DT_INT
     );
     backlashZInterval->setLoadDataHook(
         [](const QVariant& value)
@@ -1451,14 +1394,13 @@ void Config::loadUserReigsters()
     backlashZInterval->setInputWidgetProperty("page", 10);
     backlashZInterval->setInputWidgetProperty("minimum", 0);
     backlashZInterval->setInputWidgetProperty("maximum", 100);
-    backlashZInterval->bindLaserRegister(25, false);
 
     ConfigItem* defaultRunSpeed = group->addConfigItem(
         "defaultRunSpeed",
         tr("[26] Default running speed(mm/s)"),
         tr("Default running speed(mm/s)"),
         10000,
-        DT_REAL
+        DT_INT
     );
     defaultRunSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -1477,14 +1419,13 @@ void Config::loadUserReigsters()
     defaultRunSpeed->setInputWidgetProperty("page", 10);
     defaultRunSpeed->setInputWidgetProperty("minimum", 1);
     defaultRunSpeed->setInputWidgetProperty("maximum", 10000);
-    defaultRunSpeed->bindLaserRegister(26, false);
 
     ConfigItem* defaultMaxCuttingPower = group->addConfigItem(
         "defaultMaxCuttingPower",
         tr("[27] Default max cutting power"),
         tr("Default max cutting power"),
         1000,
-        DT_REAL
+        DT_INT
     );
     defaultMaxCuttingPower->setLoadDataHook(
         [](const QVariant& value)
@@ -1504,14 +1445,13 @@ void Config::loadUserReigsters()
     defaultMaxCuttingPower->setInputWidgetProperty("page", 10);
     defaultMaxCuttingPower->setInputWidgetProperty("minimum", 0);
     defaultMaxCuttingPower->setInputWidgetProperty("maximum", 100);
-    defaultMaxCuttingPower->bindLaserRegister(27, false);
 
     ConfigItem* defaultMinCuttingPower = group->addConfigItem(
         "defaultMinCuttingPower",
         tr("[28] Default min cutting power"),
         tr("Default min cutting power"),
         100,
-        DT_REAL
+        DT_INT
     );
     defaultMinCuttingPower->setLoadDataHook(
         [](const QVariant& value)
@@ -1531,14 +1471,13 @@ void Config::loadUserReigsters()
     defaultMinCuttingPower->setInputWidgetProperty("page", 10);
     defaultMinCuttingPower->setInputWidgetProperty("minimum", 0);
     defaultMinCuttingPower->setInputWidgetProperty("maximum", 100);
-    defaultMinCuttingPower->bindLaserRegister(28, false);
 
     ConfigItem* defaultScanSpeed = group->addConfigItem(
         "defaultScanSpeed",
         tr("[29] Default scan speed(mm/s)"),
         tr("Default scan speed(mm/s)"),
         500000,
-        DT_REAL
+        DT_INT
     );
     defaultScanSpeed->setLoadDataHook(
         [](const QVariant& value)
@@ -1557,7 +1496,6 @@ void Config::loadUserReigsters()
     defaultScanSpeed->setInputWidgetProperty("page", 10);
     defaultScanSpeed->setInputWidgetProperty("minimum", 0.001);
     defaultScanSpeed->setInputWidgetProperty("maximum", 10000);
-    defaultScanSpeed->bindLaserRegister(29, false);
 
     ConfigItem* maxScanGrayRatio = group->addConfigItem(
         "maxScanGrayRatio",
@@ -1569,7 +1507,6 @@ void Config::loadUserReigsters()
     maxScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxScanGrayRatio->setInputWidgetProperty("minimum", 1);
     maxScanGrayRatio->setInputWidgetProperty("maximum", 2000);
-    maxScanGrayRatio->bindLaserRegister(30, false);
 
     ConfigItem* minScanGrayRatio = group->addConfigItem(
         "minScanGrayRatio",
@@ -1581,7 +1518,6 @@ void Config::loadUserReigsters()
     minScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     minScanGrayRatio->setInputWidgetProperty("minimum", 1);
     minScanGrayRatio->setInputWidgetProperty("maximum", 2000);
-    minScanGrayRatio->bindLaserRegister(31, false);
 }
 
 void Config::loadSystemRegisters()
@@ -1599,7 +1535,6 @@ void Config::loadSystemRegisters()
     head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
-    head->bindLaserRegister(0, true);
 
     ConfigItem* password = group->addConfigItem(
         "password",
@@ -1611,7 +1546,6 @@ void Config::loadSystemRegisters()
     password->setWriteOnly();
     password->setInputWidgetType(IWT_LineEdit);
     password->setVisible(false);
-    password->bindLaserRegister(1, true);
 
     ConfigItem* storedPassword = group->addConfigItem(
         "storedPassword",
@@ -1623,7 +1557,6 @@ void Config::loadSystemRegisters()
     storedPassword->setWriteOnly();
     storedPassword->setInputWidgetType(IWT_LineEdit);
     storedPassword->setVisible(false);
-    storedPassword->bindLaserRegister(2, true);
 
     ConfigItem* hardwareID1 = group->addConfigItem(
         "hardwareID1",
@@ -1635,10 +1568,9 @@ void Config::loadSystemRegisters()
     hardwareID1->setReadOnly();
     hardwareID1->setInputWidgetType(IWT_LineEdit);
     hardwareID1->setInputWidgetProperty("readOnly", true);
-    hardwareID1->bindLaserRegister(3, true);
 
     ConfigItem* hardwareID2 = group->addConfigItem(
-        "hardwareID1",
+        "hardwareID2",
         tr("[04] Hardware ID2"),
         tr("Hardware ID2"),
         "",
@@ -1647,7 +1579,6 @@ void Config::loadSystemRegisters()
     hardwareID2->setReadOnly();
     hardwareID2->setInputWidgetType(IWT_LineEdit);
     hardwareID2->setInputWidgetProperty("readOnly", true);
-    hardwareID2->bindLaserRegister(4, true);
 
     ConfigItem* hardwareID3 = group->addConfigItem(
         "hardwareID3",
@@ -1659,7 +1590,6 @@ void Config::loadSystemRegisters()
     hardwareID3->setReadOnly();
     hardwareID3->setInputWidgetType(IWT_LineEdit);
     hardwareID3->setInputWidgetProperty("readOnly", true);
-    hardwareID3->bindLaserRegister(5, true);
 
     ConfigItem* cdKey1 = group->addConfigItem(
         "cdKey1",
@@ -1669,7 +1599,6 @@ void Config::loadSystemRegisters()
         DT_STRING
     );
     cdKey1->setInputWidgetType(IWT_LineEdit);
-    cdKey1->bindLaserRegister(6, true);
 
     ConfigItem* cdKey2 = group->addConfigItem(
         "cdKey2",
@@ -1679,7 +1608,6 @@ void Config::loadSystemRegisters()
         DT_STRING
     );
     cdKey2->setInputWidgetType(IWT_LineEdit);
-    cdKey2->bindLaserRegister(7, true);
 
     ConfigItem* cdKey3 = group->addConfigItem(
         "cdKey3",
@@ -1689,7 +1617,6 @@ void Config::loadSystemRegisters()
         DT_STRING
     );
     cdKey3->setInputWidgetType(IWT_LineEdit);
-    cdKey3->bindLaserRegister(8, true);
 
     ConfigItem* sysRunTime = group->addConfigItem(
         "sysRunTime",
@@ -1700,7 +1627,6 @@ void Config::loadSystemRegisters()
     );
     sysRunTime->setReadOnly(true);
     sysRunTime->setInputWidgetType(IWT_LineEdit);
-    sysRunTime->bindLaserRegister(9);
 
     ConfigItem* laserRunTime = group->addConfigItem(
         "laserRunTime",
@@ -1711,7 +1637,6 @@ void Config::loadSystemRegisters()
     );
     laserRunTime->setReadOnly(true);
     laserRunTime->setInputWidgetType(IWT_LineEdit);
-    laserRunTime->bindLaserRegister(10);
 
     ConfigItem* sysRunNum = group->addConfigItem(
         "sysRunNum",
@@ -1722,14 +1647,13 @@ void Config::loadSystemRegisters()
     );
     sysRunNum->setReadOnly(true);
     sysRunNum->setInputWidgetType(IWT_LineEdit);
-    sysRunNum->bindLaserRegister(11);
 
     ConfigItem* xMaxLength = group->addConfigItem(
         "xMaxLength",
         tr("[12] X Max Length(mm)"),
         tr("X max length"),
-        320,
-        DT_REAL
+        320000,
+        DT_INT
     );
     xMaxLength->setSaveDataHook(
         [](const QVariant& value)
@@ -1745,11 +1669,10 @@ void Config::loadSystemRegisters()
     );
     xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxLength->setInputWidgetProperty("step", 0.001);
-    xMaxLength->setInputWidgetProperty("page", 1);
+    xMaxLength->setInputWidgetProperty("page", 10);
     xMaxLength->setInputWidgetProperty("minimum", 1);
     xMaxLength->setInputWidgetProperty("maximum", 5000);
     xMaxLength->setInputWidgetProperty("decimals", 3);
-    xMaxLength->bindLaserRegister(12);
 
     ConfigItem* xDirPhase = group->addConfigItem(
         "xDirPhase",
@@ -1773,7 +1696,6 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    xDirPhase->bindLaserRegister(13);
 
     ConfigItem* xLimitPhase = group->addConfigItem(
         "xLimitPhase",
@@ -1796,14 +1718,13 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    xLimitPhase->bindLaserRegister(14);
 
     ConfigItem* xZeroDev = group->addConfigItem(
         "xZeroDev",
         tr("[15] X Zero Dev(mm)"),
         tr("X zero dev"),
-        2,
-        DT_REAL
+        2000,
+        DT_INT
     );
     xZeroDev->setSaveDataHook(
         [](const QVariant& value)
@@ -1823,14 +1744,13 @@ void Config::loadSystemRegisters()
     xZeroDev->setInputWidgetProperty("minimum", 0);
     xZeroDev->setInputWidgetProperty("maximum", 10);
     xZeroDev->setInputWidgetProperty("decimals", 3);
-    xZeroDev->bindLaserRegister(15);
 
     ConfigItem* xStepLength = group->addConfigItem(
         "xStepLength",
         tr("[16] X Step Length(mm)"),
         tr("X step length"),
-        3.164557,
-        DT_REAL
+        3164557,
+        DT_INT
     );
     xStepLength->setSaveDataHook(
         [](const QVariant& value)
@@ -1850,7 +1770,6 @@ void Config::loadSystemRegisters()
     xStepLength->setInputWidgetProperty("minimum", 0.000001);
     xStepLength->setInputWidgetProperty("maximum", 100);
     xStepLength->setInputWidgetProperty("decimals", 6);
-    xStepLength->bindLaserRegister(16);
 
     ConfigItem* xLimitNum = group->addConfigItem(
         "xLimitNum",
@@ -1874,7 +1793,6 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    xLimitNum->bindLaserRegister(17);
 
     ConfigItem* xResetEnabled = group->addConfigItem(
         "xResetEnabled",
@@ -1883,7 +1801,6 @@ void Config::loadSystemRegisters()
         true,
         DT_BOOL
     );
-    xResetEnabled->bindLaserRegister(18);
 
     ConfigItem* xMotorNum = group->addConfigItem(
         "xMotorNum",
@@ -1908,16 +1825,15 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    xMotorNum->bindLaserRegister(19);
 
     ConfigItem* xMotorCurrent = group->addConfigItem(
         "xMotorCurrent",
         tr("[20] X Motor current"),
         tr("X motor current"),
-        50,
-        DT_REAL
+        500,
+        DT_INT
     );
-    /*xMotorCurrent->setSaveDataHook(
+    xMotorCurrent->setSaveDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -1928,21 +1844,20 @@ void Config::loadSystemRegisters()
         {
             return QVariant(value.toInt() / 10.0);
         }
-    );*/
+    );
     xMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     xMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMotorCurrent->setInputWidgetProperty("step", 0.1);
     xMotorCurrent->setInputWidgetProperty("page", 10);
     xMotorCurrent->setInputWidgetProperty("minimum", 0.1);
     xMotorCurrent->setInputWidgetProperty("maximum", 100);
-    xMotorCurrent->bindLaserRegister(20);
 
     ConfigItem* xStartSpeed = group->addConfigItem(
         "xStartSpeed",
         tr("[21] X Start speed(mm/s)"),
         tr("X start speed"),
-        15,
-        DT_REAL
+        15000,
+        DT_INT
     );
     xStartSpeed->setSaveDataHook(
         [](const QVariant& value)
@@ -1962,14 +1877,13 @@ void Config::loadSystemRegisters()
     xStartSpeed->setInputWidgetProperty("minimum", 0.001);
     xStartSpeed->setInputWidgetProperty("maximum", 1000);
     xStartSpeed->setInputWidgetProperty("decimals", 3);
-    xStartSpeed->bindLaserRegister(21);
 
     ConfigItem* xMaxSpeed = group->addConfigItem(
         "xMaxSpeed",
         tr("[22] X Max speed(mm/s)"),
         tr("X max speed"),
-        45,
-        DT_REAL
+        4500,
+        DT_INT
     );
     xMaxSpeed->setSaveDataHook(
         [](const QVariant& value)
@@ -1989,14 +1903,13 @@ void Config::loadSystemRegisters()
     xMaxSpeed->setInputWidgetProperty("minimum", 0.001);
     xMaxSpeed->setInputWidgetProperty("maximum", 1000);
     xMaxSpeed->setInputWidgetProperty("decimals", 3);
-    xMaxSpeed->bindLaserRegister(22);
 
     ConfigItem* xMaxAcceleration = group->addConfigItem(
         "xMaxAcceleration",
         tr("[23] X Max Acceleration(mm/s<sup>2</sup>)"),
         tr("X max acceleration"),
         45,
-        DT_REAL
+        DT_INT
     );
     xMaxAcceleration->setSaveDataHook(
         [](const QVariant& value)
@@ -2016,7 +1929,6 @@ void Config::loadSystemRegisters()
     xMaxAcceleration->setInputWidgetProperty("minimum", 1);
     xMaxAcceleration->setInputWidgetProperty("maximum", 1000);
     xMaxAcceleration->setInputWidgetProperty("decimals", 3);
-    xMaxAcceleration->bindLaserRegister(23);
 
     ConfigItem* xUrgentAcceleration = group->addConfigItem(
         "xUrgentAcceleration",
@@ -2043,14 +1955,13 @@ void Config::loadSystemRegisters()
     xUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     xUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
     xUrgentAcceleration->setInputWidgetProperty("decimals", 3);
-    xUrgentAcceleration->bindLaserRegister(24);
 
     ConfigItem* yMaxLength = group->addConfigItem(
         "yMaxLength",
         tr("[25] Y Max Length(mm)"),
         tr("Y max length"),
-        200,
-        DT_REAL
+        200000,
+        DT_INT
     );
     yMaxLength->setSaveDataHook(
         [](const QVariant& value)
@@ -2070,7 +1981,6 @@ void Config::loadSystemRegisters()
     yMaxLength->setInputWidgetProperty("minimum", 1);
     yMaxLength->setInputWidgetProperty("maximum", 5000);
     yMaxLength->setInputWidgetProperty("decimals", 3);
-    yMaxLength->bindLaserRegister(25);
 
     ConfigItem* yDirPhase = group->addConfigItem(
         "yDirPhase",
@@ -2093,7 +2003,6 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    yDirPhase->bindLaserRegister(26);
 
     ConfigItem* yLimitPhase = group->addConfigItem(
         "yLimitPhase",
@@ -2116,14 +2025,13 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    yLimitPhase->bindLaserRegister(27);
 
     ConfigItem* yZeroDev = group->addConfigItem(
         "yZeroDev",
         tr("[28] Y Zero Dev(mm)"),
         tr("Y zero dev"),
         2000,
-        DT_REAL
+        DT_INT
     );
     yZeroDev->setSaveDataHook(
         [](const QVariant& value)
@@ -2143,14 +2051,13 @@ void Config::loadSystemRegisters()
     yZeroDev->setInputWidgetProperty("minimum", 1);
     yZeroDev->setInputWidgetProperty("maximum", 10);
     yZeroDev->setInputWidgetProperty("decimals", 3);
-    yZeroDev->bindLaserRegister(28);
 
     ConfigItem* yStepLength = group->addConfigItem(
         "yStepLength",
         tr("[29] Y Step Length(mm)"),
         tr("Y step length"),
-        3.164557,
-        DT_REAL
+        3164557,
+        DT_INT
     );
     yStepLength->setSaveDataHook(
         [](const QVariant& value)
@@ -2170,7 +2077,6 @@ void Config::loadSystemRegisters()
     yStepLength->setInputWidgetProperty("minimum", 0.000001);
     yStepLength->setInputWidgetProperty("maximum", 100);
     yStepLength->setInputWidgetProperty("decimals", 6);
-    yStepLength->bindLaserRegister(29);
 
     ConfigItem* yLimitNum = group->addConfigItem(
         "yLimitNum",
@@ -2195,7 +2101,6 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    yLimitNum->bindLaserRegister(30);
 
     ConfigItem* yResetEnabled = group->addConfigItem(
         "yResetEnabled",
@@ -2204,7 +2109,6 @@ void Config::loadSystemRegisters()
         true,
         DT_BOOL
     );
-    yResetEnabled->bindLaserRegister(31);
 
     ConfigItem* yMotorNum = group->addConfigItem(
         "yMotorNum",
@@ -2229,16 +2133,15 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    yMotorNum->bindLaserRegister(32);
 
     ConfigItem* yMotorCurrent = group->addConfigItem(
         "yMotorCurrent",
         tr("[33] Y Motor current"),
         tr("Y motor current"),
-        50,
-        DT_REAL
+        500,
+        DT_INT
     );
-    /*yMotorCurrent->setSaveDataHook(
+    yMotorCurrent->setSaveDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2249,21 +2152,20 @@ void Config::loadSystemRegisters()
         {
             return QVariant(value.toInt() / 10.0);
         }
-    );*/
+    );
     yMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     yMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMotorCurrent->setInputWidgetProperty("step", 0.1);
     yMotorCurrent->setInputWidgetProperty("page", 10);
     yMotorCurrent->setInputWidgetProperty("minimum", 1);
     yMotorCurrent->setInputWidgetProperty("maximum", 100);
-    yMotorCurrent->bindLaserRegister(33);
 
     ConfigItem* yStartSpeed = group->addConfigItem(
         "yStartSpeed",
         tr("[34] Y Start speed(mm/s)"),
         tr("Y start speed"),
         15,
-        DT_REAL
+        DT_INT
     );
     yStartSpeed->setSaveDataHook(
         [](const QVariant& value)
@@ -2283,7 +2185,6 @@ void Config::loadSystemRegisters()
     yStartSpeed->setInputWidgetProperty("minimum", 1);
     yStartSpeed->setInputWidgetProperty("maximum", 100);
     yStartSpeed->setInputWidgetProperty("decimals", 3);
-    yStartSpeed->bindLaserRegister(34);
 
     ConfigItem* yMaxSpeed = group->addConfigItem(
         "yMaxSpeed",
@@ -2310,7 +2211,6 @@ void Config::loadSystemRegisters()
     yMaxSpeed->setInputWidgetProperty("minimum", 1);
     yMaxSpeed->setInputWidgetProperty("maximum", 1000);
     yMaxSpeed->setInputWidgetProperty("decimals", 3);
-    yMaxSpeed->bindLaserRegister(35);
 
     ConfigItem* yMaxAcceleration = group->addConfigItem(
         "yMaxAcceleration",
@@ -2337,7 +2237,6 @@ void Config::loadSystemRegisters()
     yMaxAcceleration->setInputWidgetProperty("minimum", 1);
     yMaxAcceleration->setInputWidgetProperty("maximum", 1000);
     yMaxAcceleration->setInputWidgetProperty("decimals", 3);
-    yMaxAcceleration->bindLaserRegister(36);
 
     ConfigItem* yUrgentAcceleration = group->addConfigItem(
         "yUrgentAcceleration",
@@ -2364,13 +2263,12 @@ void Config::loadSystemRegisters()
     yUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     yUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
     yUrgentAcceleration->setInputWidgetProperty("decimals", 3);
-    yUrgentAcceleration->bindLaserRegister(37);
 
     ConfigItem* zMaxLength = group->addConfigItem(
         "zMaxLength",
         tr("[38] Z Max Length(mm)"),
         tr("Z max length"),
-        200,
+        200000,
         DT_INT
     );
     zMaxLength->setSaveDataHook(
@@ -2385,14 +2283,12 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000.0);
         }
     );
-    //xMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     zMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxLength->setInputWidgetProperty("step", 0.001);
     zMaxLength->setInputWidgetProperty("page", 1);
     zMaxLength->setInputWidgetProperty("minimum", 1);
     zMaxLength->setInputWidgetProperty("maximum", 5000);
     zMaxLength->setInputWidgetProperty("decimals", 3);
-    zMaxLength->bindLaserRegister(38);
 
     ConfigItem* zDirPhase = group->addConfigItem(
         "zDirPhase",
@@ -2415,7 +2311,6 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    zDirPhase->bindLaserRegister(39);
 
     ConfigItem* zLimitPhase = group->addConfigItem(
         "zLimitPhase",
@@ -2438,14 +2333,13 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    zLimitPhase->bindLaserRegister(40);
 
     ConfigItem* zZeroDev = group->addConfigItem(
         "zZeroDev",
         tr("[41] Z Zero Dev(mm)"),
         tr("Z zero dev"),
-        2,
-        DT_REAL
+        2000,
+        DT_INT
     );
     zZeroDev->setSaveDataHook(
         [](const QVariant& value)
@@ -2465,14 +2359,13 @@ void Config::loadSystemRegisters()
     zZeroDev->setInputWidgetProperty("minimum", 1);
     zZeroDev->setInputWidgetProperty("maximum", 10);
     zZeroDev->setInputWidgetProperty("decimals", 3);
-    zZeroDev->bindLaserRegister(41);
 
     ConfigItem* zStepLength = group->addConfigItem(
         "zStepLength",
         tr("[42] Z Step Length(mm)"),
         tr("Z step length"),
-        6.2,
-        DT_REAL
+        6200000,
+        DT_INT
     );
     zStepLength->setSaveDataHook(
         [](const QVariant& value)
@@ -2492,7 +2385,6 @@ void Config::loadSystemRegisters()
     zStepLength->setInputWidgetProperty("minimum", 0.000001);
     zStepLength->setInputWidgetProperty("maximum", 100);
     zStepLength->setInputWidgetProperty("decimals", 6);
-    zStepLength->bindLaserRegister(42);
 
     ConfigItem* zLimitNum = group->addConfigItem(
         "zLimitNum",
@@ -2517,7 +2409,6 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    zLimitNum->bindLaserRegister(43);
 
     ConfigItem* zResetEnabled = group->addConfigItem(
         "zResetEnabled",
@@ -2526,7 +2417,6 @@ void Config::loadSystemRegisters()
         true,
         DT_BOOL
     );
-    zResetEnabled->bindLaserRegister(44);
 
     ConfigItem* zMotorNum = group->addConfigItem(
         "zMotorNum",
@@ -2551,16 +2441,15 @@ void Config::loadSystemRegisters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-    zMotorNum->bindLaserRegister(45);
 
     ConfigItem* zMotorCurrent = group->addConfigItem(
         "zMotorCurrent",
         tr("[46] Z Motor current"),
         tr("Z motor current"),
-        50,
-        DT_REAL
+        500,
+        DT_INT
     );
-    /*zMotorCurrent->setSaveDataHook(
+    zMotorCurrent->setSaveDataHook(
         [](const QVariant& value)
         {
             return QVariant(qRound(value.toReal() * 10));
@@ -2571,21 +2460,20 @@ void Config::loadSystemRegisters()
         {
             return QVariant(value.toInt() / 10.0);
         }
-    );*/
+    );
     zMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     zMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMotorCurrent->setInputWidgetProperty("step", 0.1);
     zMotorCurrent->setInputWidgetProperty("page", 10);
     zMotorCurrent->setInputWidgetProperty("minimum", 1);
     zMotorCurrent->setInputWidgetProperty("maximum", 100);
-    zMotorCurrent->bindLaserRegister(46);
 
     ConfigItem* zStartSpeed = group->addConfigItem(
         "zStartSpeed",
         tr("[47] Z Start speed(mm/s)"),
         tr("Z start speed"),
-        15,
-        DT_REAL
+        15000,
+        DT_INT
     );
     zStartSpeed->setSaveDataHook(
         [](const QVariant& value)
@@ -2605,14 +2493,13 @@ void Config::loadSystemRegisters()
     zStartSpeed->setInputWidgetProperty("minimum", 1);
     zStartSpeed->setInputWidgetProperty("maximum", 100);
     zStartSpeed->setInputWidgetProperty("decimals", 3);
-    zStartSpeed->bindLaserRegister(47);
 
     ConfigItem* zMaxSpeed = group->addConfigItem(
         "zMaxSpeed",
         tr("[48] Z Max speed(mm/s)"),
         tr("Z max speed"),
-        10,
-        DT_REAL
+        10000,
+        DT_INT
     );
     zMaxSpeed->setSaveDataHook(
         [](const QVariant& value)
@@ -2632,14 +2519,13 @@ void Config::loadSystemRegisters()
     zMaxSpeed->setInputWidgetProperty("minimum", 1);
     zMaxSpeed->setInputWidgetProperty("maximum", 1000);
     zMaxSpeed->setInputWidgetProperty("decimals", 3);
-    zMaxSpeed->bindLaserRegister(48);
 
     ConfigItem* zMaxAcceleration = group->addConfigItem(
         "zMaxAcceleration",
         tr("[49] Z Max Acceleration(mm/s<sup>2</sup>)"),
         tr("Z max acceleration"),
-        30,
-        DT_REAL
+        30000,
+        DT_INT
     );
     zMaxAcceleration->setSaveDataHook(
         [](const QVariant& value)
@@ -2659,14 +2545,13 @@ void Config::loadSystemRegisters()
     zMaxAcceleration->setInputWidgetProperty("minimum", 1);
     zMaxAcceleration->setInputWidgetProperty("maximum", 1000);
     zMaxAcceleration->setInputWidgetProperty("decimals", 3);
-    zMaxAcceleration->bindLaserRegister(49);
 
     ConfigItem* zUrgentAcceleration = group->addConfigItem(
         "zUrgentAcceleration",
         tr("[50] Z Urgent Acceleration(mm/s<sup>2</sup>)"),
         tr("Z urgent acceleration"),
-        30,
-        DT_REAL
+        30000,
+        DT_INT
     );
     zUrgentAcceleration->setSaveDataHook(
         [](const QVariant& value)
@@ -2686,14 +2571,13 @@ void Config::loadSystemRegisters()
     zUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     zUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
     zUrgentAcceleration->setInputWidgetProperty("decimals", 3);
-    zUrgentAcceleration->bindLaserRegister(50);
 
     ConfigItem* laserMaxPower = group->addConfigItem(
         "laserMaxPower",
         tr("[51] Laser Max Power"),
         tr("Laser max power"),
-        70,
-        DT_REAL
+        1000,
+        DT_INT
     );
     laserMaxPower->setSaveDataHook(
         [](const QVariant& value)
@@ -2711,14 +2595,14 @@ void Config::loadSystemRegisters()
     laserMaxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMaxPower->setInputWidgetProperty("minimum", 1);
     laserMaxPower->setInputWidgetProperty("maximum", 100);
-    laserMaxPower->bindLaserRegister(51, true, SS_DIRECTLY);
+    laserMaxPower->setStoreType(SS_DIRECTLY);
 
     ConfigItem* laserMinPower = group->addConfigItem(
         "laserMinPower",
         tr("[52] Laser Min Power"),
         tr("Laser min power"),
-        70,
-        DT_REAL
+        100,
+        DT_INT
     );
     laserMinPower->setSaveDataHook(
         [](const QVariant& value)
@@ -2736,7 +2620,7 @@ void Config::loadSystemRegisters()
     laserMinPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMinPower->setInputWidgetProperty("minimum", 1);
     laserMinPower->setInputWidgetProperty("maximum", 100);
-    laserMinPower->bindLaserRegister(52, true, SS_DIRECTLY);
+    laserMinPower->setStoreType(SS_DIRECTLY);
 
     ConfigItem* laserPowerFreq = group->addConfigItem(
         "laserPowerFreq",
@@ -2748,7 +2632,7 @@ void Config::loadSystemRegisters()
     laserPowerFreq->setInputWidgetProperty("page", 1000);
     laserPowerFreq->setInputWidgetProperty("minimum", 1);
     laserPowerFreq->setInputWidgetProperty("maximum", 10000);
-    laserPowerFreq->bindLaserRegister(53, true, SS_DIRECTLY);
+    laserPowerFreq->setStoreType(SS_DIRECTLY);
 
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",
@@ -2757,7 +2641,6 @@ void Config::loadSystemRegisters()
         true,
         DT_BOOL
     );
-    xPhaseEnabled->bindLaserRegister(54);
 
     ConfigItem* yPhaseEnabled = group->addConfigItem(
         "yPhaseEnabled",
@@ -2766,7 +2649,6 @@ void Config::loadSystemRegisters()
         true,
         DT_BOOL
     );
-    yPhaseEnabled->bindLaserRegister(55);
 
     ConfigItem* zPhaseEnabled = group->addConfigItem(
         "zPhaseEnabled",
@@ -2775,8 +2657,22 @@ void Config::loadSystemRegisters()
         true,
         DT_BOOL
     );
-    zPhaseEnabled->bindLaserRegister(56);
 
+    ConfigItem* deviceOrigin = group->addConfigItem(
+        "deviceOrigin",
+        tr("[57] Device Origin"),
+        tr("[57] Device Origin"),
+        0,
+        DT_INT
+    );
+    deviceOrigin->setInputWidgetType(IWT_Custom);
+    deviceOrigin->setCreateWidgetHook(
+        [](ConfigItem* item) {
+            RadioButtonGroup* widget = new RadioButtonGroup(2, 2);
+            widget->setValues(QList<int>() << 0 << 1 << 3 << 2);
+            return qobject_cast<QWidget*>(widget);
+        }
+    );
 }
 
 void Config::loadDebug()

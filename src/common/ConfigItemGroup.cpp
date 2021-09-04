@@ -136,39 +136,13 @@ bool ConfigItemGroup::isModified() const
     return modified;
 }
 
-void ConfigItemGroup::doModify()
+void ConfigItemGroup::confirm()
 {
     Q_D(const ConfigItemGroup);
     for (ConfigItem* item : d->items)
     {
-        item->doModify();
+        item->confirm();
     }
 }
 
-QStringList ConfigItemGroup::registerValues() const
-{
-    Q_D(const ConfigItemGroup);
-    QStringList values;
-    for (ConfigItem* item : d->items)
-    {
-        values.append(item->toRegisterString());
-    }
-    return values;
-}
 
-LaserRegister::RegistersMap ConfigItemGroup::keyValuePairs(bool onlyModified) const
-{
-    Q_D(const ConfigItemGroup);
-    LaserRegister::RegistersMap map;
-    for (ConfigItem* item : d->items)
-    {
-        if (onlyModified && !item->isModified())
-            continue;
-
-        LaserRegister::RegisterPair pair = item->keyValuePair();
-        if (!pair.second.isValid())
-            continue;
-        map.insert(pair.first, pair.second);
-    }
-    return map;
-}

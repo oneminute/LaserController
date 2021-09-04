@@ -244,7 +244,8 @@ public:
         CONFIG_ITEM(userRegister, cuttingMoveSpeed, int, toInt)
         CONFIG_ITEM(userRegister, cuttingMoveAcc, int, toInt)
         CONFIG_ITEM(userRegister, cuttingTurnSpeed, int, toInt)
-        CONFIG_ITEM(userRegister, cuttingTuenAcc, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingTurnAcc, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingWorkAcc, int, toInt)
         CONFIG_ITEM(userRegister, cuttingMoveSpeedFactor, int, toInt)
         CONFIG_ITEM(userRegister, cuttingWorkSpeedFactor, int, toInt)
         CONFIG_ITEM(userRegister, cuttingSpotSize, int, toInt)
@@ -253,7 +254,7 @@ public:
         CONFIG_ITEM(userRegister, scanXAcc, int, toInt)
         CONFIG_ITEM(userRegister, scanYAcc, int, toInt)
         CONFIG_ITEM(userRegister, scanRowSpeed, int, toInt)
-        CONFIG_ITEM(userRegister, scanRowInterval, int, toInt)
+        CONFIG_ITEM(userRegister, scanRowInterval, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnError, int, toInt)
         CONFIG_ITEM(userRegister, scanLaserPower, qreal, toReal)
         CONFIG_ITEM(userRegister, scanXResetEnabled, bool, toBool)
@@ -348,6 +349,7 @@ public:
         CONFIG_ITEM(systemRegister, xPhaseEnabled, bool, toBool)
         CONFIG_ITEM(systemRegister, yPhaseEnabled, bool, toBool)
         CONFIG_ITEM(systemRegister, zPhaseEnabled, bool, toBool)
+        CONFIG_ITEM(systemRegister, deviceOrigin, int, toInt)
 
     private:
         friend class Config;

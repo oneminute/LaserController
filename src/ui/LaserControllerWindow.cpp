@@ -1244,8 +1244,8 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveDown->setAutoRepeat(true);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
 
-    updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay());
-    updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval());
+    updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay(), MB_Manual);
+    updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
@@ -2443,15 +2443,15 @@ void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
 
 void LaserControllerWindow::onFloatDualEditSliderLowerValueChanged(qreal value)
 {
-    Config::SystemRegister::laserMinPowerItem()->setValue(value);
+    Config::SystemRegister::laserMinPowerItem()->setValue(value, MB_Widget);
 }
 
 void LaserControllerWindow::onFloatDualEditSliderHigherValueChanged(qreal value)
 {
-    Config::SystemRegister::laserMaxPowerItem()->setValue(value);
+    Config::SystemRegister::laserMaxPowerItem()->setValue(value, MB_Widget);
 }
 
-void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value)
+void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     bool ok;
     qreal lower = value.toReal(&ok);
@@ -2462,7 +2462,7 @@ void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value)
     m_floatEditDualSliderLaserRange->blockSignals(false);
 }
 
-void LaserControllerWindow::onLaserMaxPowerChanged(const QVariant& value)
+void LaserControllerWindow::onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     bool ok;
     qreal higher = value.toReal(&ok);
@@ -3425,7 +3425,7 @@ void LaserControllerWindow::documentClose()
 	
 }
 
-void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value)
+void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     m_buttonMoveTopLeft->setAutoRepeatDelay(value.toInt());
     m_buttonMoveTop->setAutoRepeatDelay(value.toInt());
@@ -3439,7 +3439,7 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value)
     m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
 }
 
-void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value)
+void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());
     m_buttonMoveTop->setAutoRepeatInterval(value.toInt());

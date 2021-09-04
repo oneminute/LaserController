@@ -5,6 +5,7 @@
 
 #include "LaserApplication.h"
 #include "LaserDriver.h"
+#include "LaserRegister.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "exception/LaserException.h"
@@ -22,8 +23,8 @@ public:
         , connected(false)
         , name("unknown")
         , portName("")
-        //, layoutRect(0, 0, 320, 210)
         , printerDrawUnit(1016)
+        , deviceTransform()
     {}
 
     LaserDevice* q_ptr;
@@ -33,8 +34,10 @@ public:
 
     QString name;
     QString portName;
-    //QRectF layoutRect;      // 加工的幅面宽
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
+
+    QTransform deviceTransform;
+
     QString mainCard;
     QString mainCardRegisteredDate;
     QString mainCardActivatedDate;
@@ -49,6 +52,9 @@ public:
     QString hardwareRegisteredDate;
     QString hardwareActivatedDate;
     QString hardwareMaintainingTimes;
+
+    QMap<int, LaserRegister*> userRegisters;
+    QMap<int, LaserRegister*> systemRegisters;
 };
 
 LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
@@ -60,6 +66,98 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
 
     ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDevice::connected);
     ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDevice::disconnected);
+
+    d->userRegisters.insert(0, new LaserRegister(0, Config::UserRegister::headItem(), false));
+    d->userRegisters.insert(1, new LaserRegister(1, Config::UserRegister::accModeItem(), false));
+    d->userRegisters.insert(2, new LaserRegister(2, Config::UserRegister::cuttingMoveSpeedItem(), false));
+    d->userRegisters.insert(3, new LaserRegister(3, Config::UserRegister::cuttingMoveAccItem(), false));
+    d->userRegisters.insert(4, new LaserRegister(4, Config::UserRegister::cuttingTurnSpeedItem(), false));
+    d->userRegisters.insert(5, new LaserRegister(5, Config::UserRegister::cuttingTurnAccItem(), false));
+    d->userRegisters.insert(6, new LaserRegister(6, Config::UserRegister::cuttingWorkAccItem(), false));
+    d->userRegisters.insert(7, new LaserRegister(7, Config::UserRegister::cuttingMoveSpeedFactorItem(), false));
+    d->userRegisters.insert(8, new LaserRegister(8, Config::UserRegister::cuttingWorkSpeedFactorItem(), false));
+    d->userRegisters.insert(9, new LaserRegister(9, Config::UserRegister::cuttingSpotSizeItem(), false));
+    d->userRegisters.insert(10, new LaserRegister(10, Config::UserRegister::scanXStartSpeedItem(), false));
+    d->userRegisters.insert(11, new LaserRegister(11, Config::UserRegister::scanYStartSpeedItem(), false));
+    d->userRegisters.insert(12, new LaserRegister(12, Config::UserRegister::scanXAccItem(), false));
+    d->userRegisters.insert(13, new LaserRegister(13, Config::UserRegister::scanYAccItem(), false));
+    d->userRegisters.insert(14, new LaserRegister(14, Config::UserRegister::scanRowSpeedItem(), false));
+    d->userRegisters.insert(15, new LaserRegister(15, Config::UserRegister::scanRowIntervalItem(), false));
+    d->userRegisters.insert(16, new LaserRegister(16, Config::UserRegister::scanReturnErrorItem(), false));
+    d->userRegisters.insert(17, new LaserRegister(17, Config::UserRegister::scanLaserPowerItem(), false));
+    d->userRegisters.insert(18, new LaserRegister(18, Config::UserRegister::scanXResetEnabledItem(), false));
+    d->userRegisters.insert(19, new LaserRegister(19, Config::UserRegister::scanYResetEnabledItem(), false));
+    d->userRegisters.insert(20, new LaserRegister(20, Config::UserRegister::scanZResetEnabledItem(), false));
+    d->userRegisters.insert(21, new LaserRegister(21, Config::UserRegister::resetSpeedItem(), false));
+    d->userRegisters.insert(22, new LaserRegister(22, Config::UserRegister::scanReturnPosItem(), false));
+    d->userRegisters.insert(23, new LaserRegister(23, Config::UserRegister::backlashXIntervalItem(), false));
+    d->userRegisters.insert(24, new LaserRegister(24, Config::UserRegister::backlashYIntervalItem(), false));
+    d->userRegisters.insert(25, new LaserRegister(25, Config::UserRegister::backlashZIntervalItem(), false));
+    d->userRegisters.insert(26, new LaserRegister(26, Config::UserRegister::defaultRunSpeedItem(), false));
+    d->userRegisters.insert(27, new LaserRegister(27, Config::UserRegister::defaultMaxCuttingPowerItem(), false));
+    d->userRegisters.insert(28, new LaserRegister(28, Config::UserRegister::defaultMinCuttingPowerItem(), false));
+    d->userRegisters.insert(29, new LaserRegister(29, Config::UserRegister::defaultScanSpeedItem(), false));
+    d->userRegisters.insert(30, new LaserRegister(30, Config::UserRegister::maxScanGrayRatioItem(), false));
+    d->userRegisters.insert(31, new LaserRegister(31, Config::UserRegister::minScanGrayRatioItem(), false));
+
+    d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
+    d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));
+    d->systemRegisters.insert(2, new LaserRegister(2, Config::SystemRegister::storedPasswordItem(), true, false, true));
+    d->systemRegisters.insert(3, new LaserRegister(3, Config::SystemRegister::hardwareID1Item(), true, true));
+    d->systemRegisters.insert(4, new LaserRegister(4, Config::SystemRegister::hardwareID2Item(), true, true));
+    d->systemRegisters.insert(5, new LaserRegister(5, Config::SystemRegister::hardwareID3Item(), true, true));
+    d->systemRegisters.insert(6, new LaserRegister(6, Config::SystemRegister::cdKey1Item(), true));
+    d->systemRegisters.insert(7, new LaserRegister(7, Config::SystemRegister::cdKey2Item(), true));
+    d->systemRegisters.insert(8, new LaserRegister(8, Config::SystemRegister::cdKey3Item(), true));
+    d->systemRegisters.insert(9, new LaserRegister(9, Config::SystemRegister::sysRunTimeItem(), true));
+    d->systemRegisters.insert(10, new LaserRegister(10, Config::SystemRegister::laserRunTimeItem(), true));
+    d->systemRegisters.insert(11, new LaserRegister(11, Config::SystemRegister::sysRunNumItem(), true));
+    d->systemRegisters.insert(12, new LaserRegister(12, Config::SystemRegister::xMaxLengthItem(), true));
+    d->systemRegisters.insert(13, new LaserRegister(13, Config::SystemRegister::xDirPhaseItem(), true));
+    d->systemRegisters.insert(14, new LaserRegister(14, Config::SystemRegister::xLimitPhaseItem(), true));
+    d->systemRegisters.insert(15, new LaserRegister(15, Config::SystemRegister::xZeroDevItem(), true));
+    d->systemRegisters.insert(16, new LaserRegister(16, Config::SystemRegister::xStepLengthItem(), true));
+    d->systemRegisters.insert(17, new LaserRegister(17, Config::SystemRegister::xLimitNumItem(), true));
+    d->systemRegisters.insert(18, new LaserRegister(18, Config::SystemRegister::xResetEnabledItem(), true));
+    d->systemRegisters.insert(19, new LaserRegister(19, Config::SystemRegister::xMotorNumItem(), true));
+    d->systemRegisters.insert(20, new LaserRegister(20, Config::SystemRegister::xMotorCurrentItem(), true));
+    d->systemRegisters.insert(21, new LaserRegister(21, Config::SystemRegister::xStartSpeedItem(), true));
+    d->systemRegisters.insert(22, new LaserRegister(22, Config::SystemRegister::xMaxSpeedItem(), true));
+    d->systemRegisters.insert(23, new LaserRegister(23, Config::SystemRegister::xMaxAccelerationItem(), true));
+    d->systemRegisters.insert(24, new LaserRegister(24, Config::SystemRegister::xUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(25, new LaserRegister(25, Config::SystemRegister::yMaxLengthItem(), true));
+    d->systemRegisters.insert(26, new LaserRegister(26, Config::SystemRegister::yDirPhaseItem(), true));
+    d->systemRegisters.insert(27, new LaserRegister(27, Config::SystemRegister::yLimitPhaseItem(), true));
+    d->systemRegisters.insert(28, new LaserRegister(28, Config::SystemRegister::yZeroDevItem(), true));
+    d->systemRegisters.insert(29, new LaserRegister(29, Config::SystemRegister::yStepLengthItem(), true));
+    d->systemRegisters.insert(30, new LaserRegister(30, Config::SystemRegister::yLimitNumItem(), true));
+    d->systemRegisters.insert(31, new LaserRegister(31, Config::SystemRegister::yResetEnabledItem(), true));
+    d->systemRegisters.insert(32, new LaserRegister(32, Config::SystemRegister::yMotorNumItem(), true));
+    d->systemRegisters.insert(33, new LaserRegister(33, Config::SystemRegister::yMotorCurrentItem(), true));
+    d->systemRegisters.insert(34, new LaserRegister(34, Config::SystemRegister::yStartSpeedItem(), true));
+    d->systemRegisters.insert(35, new LaserRegister(35, Config::SystemRegister::yMaxSpeedItem(), true));
+    d->systemRegisters.insert(36, new LaserRegister(36, Config::SystemRegister::yMaxAccelerationItem(), true));
+    d->systemRegisters.insert(37, new LaserRegister(37, Config::SystemRegister::yUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(38, new LaserRegister(38, Config::SystemRegister::zMaxLengthItem(), true));
+    d->systemRegisters.insert(39, new LaserRegister(39, Config::SystemRegister::zDirPhaseItem(), true));
+    d->systemRegisters.insert(40, new LaserRegister(40, Config::SystemRegister::zLimitPhaseItem(), true));
+    d->systemRegisters.insert(41, new LaserRegister(41, Config::SystemRegister::zZeroDevItem(), true));
+    d->systemRegisters.insert(42, new LaserRegister(42, Config::SystemRegister::zStepLengthItem(), true));
+    d->systemRegisters.insert(43, new LaserRegister(43, Config::SystemRegister::zLimitNumItem(), true));
+    d->systemRegisters.insert(44, new LaserRegister(44, Config::SystemRegister::zResetEnabledItem(), true));
+    d->systemRegisters.insert(45, new LaserRegister(45, Config::SystemRegister::zMotorNumItem(), true));
+    d->systemRegisters.insert(46, new LaserRegister(46, Config::SystemRegister::zMotorCurrentItem(), true));
+    d->systemRegisters.insert(47, new LaserRegister(47, Config::SystemRegister::zStartSpeedItem(), true));
+    d->systemRegisters.insert(48, new LaserRegister(48, Config::SystemRegister::zMaxSpeedItem(), true));
+    d->systemRegisters.insert(49, new LaserRegister(49, Config::SystemRegister::zMaxAccelerationItem(), true));
+    d->systemRegisters.insert(50, new LaserRegister(50, Config::SystemRegister::zUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(51, new LaserRegister(51, Config::SystemRegister::laserMaxPowerItem(), true));
+    d->systemRegisters.insert(52, new LaserRegister(52, Config::SystemRegister::laserMinPowerItem(), true));
+    d->systemRegisters.insert(53, new LaserRegister(53, Config::SystemRegister::laserPowerFreqItem(), true));
+    d->systemRegisters.insert(54, new LaserRegister(54, Config::SystemRegister::xPhaseEnabledItem(), true));
+    d->systemRegisters.insert(55, new LaserRegister(55, Config::SystemRegister::yPhaseEnabledItem(), true));
+    d->systemRegisters.insert(56, new LaserRegister(56, Config::SystemRegister::zPhaseEnabledItem(), true));
+    d->systemRegisters.insert(57, new LaserRegister(57, Config::SystemRegister::deviceOriginItem(), true));
 
     connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
@@ -121,13 +219,13 @@ bool LaserDevice::load()
 qreal LaserDevice::layoutWidth() const
 {
     Q_D(const LaserDevice);
-    return Config::SystemRegister::xMaxLength();
+    return Config::SystemRegister::xMaxLength() / 1000.0;
 }
 
 qreal LaserDevice::layoutHeight() const
 {
     Q_D(const LaserDevice);
-    return Config::SystemRegister::yMaxLength();
+    return Config::SystemRegister::yMaxLength() / 1000.0;
 }
 
 //void LaserDevice::setLayoutRect(const QRectF& rect, bool toCard)
@@ -329,7 +427,7 @@ bool LaserDevice::writeUserRegisters()
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->writeUserParamToCard(Config::UserRegister::group->keyValuePairs(true));
+    return d->driver->writeUserParamToCard(userRegisterValues(true));
 }
 
 bool LaserDevice::writeSystemRegisters()
@@ -337,7 +435,7 @@ bool LaserDevice::writeSystemRegisters()
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->writeSysParamToCard(Config::SystemRegister::group->keyValuePairs(true));
+    return d->driver->writeSysParamToCard(systemRegisterValues(true));
 }
 
 bool LaserDevice::readUserRegisters()
@@ -484,6 +582,117 @@ void LaserDevice::closeAboutWindow()
     {
         d->driver->closeAboutWindow();
     }
+}
+
+LaserRegister* LaserDevice::userRegister(int addr) const
+{
+    Q_D(const LaserDevice);
+    if (d->userRegisters.contains(addr))
+    {
+        return d->userRegisters[addr];
+    }
+    else
+        return nullptr;
+}
+
+LaserRegister* LaserDevice::systemRegister(int addr) const
+{
+    Q_D(const LaserDevice);
+    if (d->systemRegisters.contains(addr))
+    {
+        return d->systemRegisters[addr];
+    }
+    else
+        return nullptr;
+}
+
+QPointF LaserDevice::origin() const
+{
+    return QPointF();
+}
+
+QPointF LaserDevice::deviceOrigin() const
+{
+    return QPointF();
+}
+
+QTransform LaserDevice::transform() const
+{
+    return QTransform();
+}
+
+QTransform LaserDevice::deviceTransform() const
+{
+    return QTransform();
+}
+
+void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)
+{
+    Q_D(LaserDevice);
+    QStringList segments = raw.split(";");
+    for (QString seg : segments)
+    {
+        QStringList segItem = seg.split(",");
+        if (segItem.length() != 2)
+        {
+            continue;
+        }
+        bool ok;
+        int addr = segItem[0].toInt(&ok);
+        if (!ok)
+        {
+            continue;
+        }
+        QString value = segItem[1];
+        if (isSystem)
+        {
+            if (d->systemRegisters.contains(addr))
+            {
+                d->systemRegisters[addr]->parse(value, modifiedBy);
+            }
+        }
+        else
+        {
+            if (d->userRegisters.contains(addr))
+            {
+                d->userRegisters[addr]->parse(value, modifiedBy);
+            }
+        }
+    }
+}
+
+LaserRegister::RegistersMap LaserDevice::userRegisterValues(bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    LaserRegister::RegistersMap map;
+    for (LaserRegister* item : d->userRegisters.values())
+    {
+        if (onlyModified && !item->configItem()->isModified())
+            continue;
+
+        LaserRegister::RegisterPair pair(item->address(), item->value());
+        if (!pair.second.isValid())
+            continue;
+        map.insert(pair.first, pair.second);
+    }
+    return map;
+}
+
+LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    LaserRegister::RegistersMap map;
+    for (LaserRegister* item : d->systemRegisters.values())
+    {
+        if (onlyModified && !item->configItem()->isModified())
+            continue;
+
+        LaserRegister::RegisterPair pair(item->address(), item->value());
+        if (!pair.second.isValid())
+            continue;
+        map.insert(pair.first, pair.second);
+    }
+    return map;
 }
 
 void LaserDevice::unload()
@@ -796,7 +1005,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        LaserRegister::batchParse(message, true);
+        batchParse(message, true, MB_Register);
         break;
     }
     case M_WriteSysParamToCardOK:
@@ -805,7 +1014,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        LaserRegister::batchParse(message, true);
+        batchParse(message, true, MB_RegisterConfirmed);
         break;
     }
     case M_ReadUserParamFromCardOK:
@@ -814,7 +1023,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        LaserRegister::batchParse(message, false);
+        batchParse(message, false, MB_Register);
         break;
     }
     case M_WriteUserParamToCardOK:
@@ -823,7 +1032,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        LaserRegister::batchParse(message, false);
+        batchParse(message, false, MB_RegisterConfirmed);
         break;
     }
     case M_ReadComputerParamFromCardOK:

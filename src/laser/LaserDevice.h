@@ -2,10 +2,13 @@
 #define LASERDEVICE_H
 
 #include "common/common.h"
+#include "LaserRegister.h"
 #include <QObject>
 #include <QMutex>
+#include <QTransform>
 #include <QWaitCondition>
 
+class ConfigItem;
 class LaserDriver;
 class LaserDevicePrivate;
 class LaserDevice : public QObject
@@ -72,6 +75,19 @@ public:
 
     void showAboutWindow(int interval = 0, bool modal = true);
     void closeAboutWindow();
+
+    LaserRegister* userRegister(int addr) const;
+    LaserRegister* systemRegister(int addr) const;
+
+    QPointF origin() const;
+    QPointF deviceOrigin() const;
+    QTransform transform() const;
+    QTransform deviceTransform() const;
+
+    void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
+
+    LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
+    LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
 
 public slots:
     bool load();

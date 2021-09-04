@@ -131,9 +131,9 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     }
     }
     updateValue(d->configItem->value());
-    connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::fromWidget);
+    connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::setValue);
     connect(d->configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
-    connect(d->configItem, &ConfigItem::widgetValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
+    connect(d->configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
 }
 
 InputWidgetWrapper::~InputWidgetWrapper()
@@ -273,7 +273,7 @@ void InputWidgetWrapper::changeValue(const QVariant& value)
     if (d->configItem->readOnly())
         return;
     QVariant newValue = d->configItem->doSaveDataHook(value);
-    emit valueChanged(newValue);
+    emit valueChanged(newValue, MB_Widget);
 }
 
 bool InputWidgetWrapper::isModified()
@@ -440,8 +440,9 @@ void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
     d->labelName->setPalette(palette);
 }
 
-void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value)
+void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
-    updateValue(value);
+    if (modifiedBy != MB_Widget)
+        updateValue(value);
 }
 

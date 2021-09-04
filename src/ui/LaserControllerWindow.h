@@ -160,8 +160,8 @@ protected slots:
     void onFloatEditSliderLaserPower(qreal value);
     void onFloatDualEditSliderLowerValueChanged(qreal value);
     void onFloatDualEditSliderHigherValueChanged(qreal value);
-    void onLaserMinPowerChanged(const QVariant& value);
-    void onLaserMaxPowerChanged(const QVariant& value);
+    void onLaserMinPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 	void onCreatSpline();
 
@@ -187,8 +187,8 @@ protected slots:
 	void onCanRedoChanged(bool can);
 
     // config items
-    void updateAutoRepeatDelayChanged(const QVariant& value);
-    void updateAutoRepeatIntervalChanged(const QVariant& value);
+    void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");

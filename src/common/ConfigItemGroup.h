@@ -44,10 +44,7 @@ public:
 
     bool isModified() const;
 
-    void doModify();
-
-    QStringList registerValues() const;
-    LaserRegister::RegistersMap keyValuePairs(bool onlyModified = false) const;
+    void confirm();
 
 protected:
 
