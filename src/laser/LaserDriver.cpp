@@ -715,7 +715,7 @@ bool LaserDriver::createLicenseFile(const QString& licenseCode)
     return result;
 }
 
-QVector3D LaserDriver::GetCurrentLaserPos()
+QVector3D LaserDriver::getCurrentLaserPos()
 {
     wchar_t* raw = m_fnGetCurrentLaserPos();
     QString posStr = QString::fromWCharArray(raw);

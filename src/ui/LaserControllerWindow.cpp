@@ -462,6 +462,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
     connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
+    connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
 
 	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -756,7 +757,7 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
     {
         // Get current pos;
         QVector3D dest = utils::putToQuadrant(abstractDest, quad);
-        QVector3D pos = utils::putToQuadrant(LaserDriver::instance().GetCurrentLaserPos(), quad);
+        QVector3D pos = utils::putToQuadrant(LaserDriver::instance().getCurrentLaserPos(), quad);
         dest = pos + delta;
         LaserApplication::device->moveTo(dest, quad);
     }
@@ -1244,6 +1245,9 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveDown->setAutoRepeat(true);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
 
+    m_buttonLaserPosition = new QToolButton;
+    m_buttonLaserPosition->setDefaultAction(m_ui->actionLaserPosition);
+
     updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay(), MB_Manual);
     updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
 
@@ -1260,6 +1264,7 @@ void LaserControllerWindow::createMovementDockPanel()
     secondRow->addWidget(m_buttonMoveBottom, 2, 1);
     secondRow->addWidget(m_buttonMoveBottomRight, 2, 2);
     secondRow->addWidget(m_buttonMoveDown, 2, 3);
+    secondRow->addWidget(m_buttonLaserPosition, 3, 0, 1, 4);
 
     m_comboBoxPostEvent = new QComboBox;
     m_comboBoxPostEvent->addItem(tr("Stop at current position"));
@@ -1373,6 +1378,11 @@ void LaserControllerWindow::createUpdateDockPanel(int winId)
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaUpdate = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+}
+
+LaserDocument* LaserControllerWindow::currentDocument() const
+{
+    return m_viewer->scene()->document();
 }
 
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
@@ -2237,6 +2247,14 @@ void LaserControllerWindow::onActionUpdate(bool checked)
     LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
 }
 
+void LaserControllerWindow::onActionLaserPosition(bool checked)
+{
+    QVector3D pos = LaserApplication::device->getCurrentLaserPos();
+    m_lineEditCoordinatesX->setText(QString::number(pos.x(), 'f'));
+    m_lineEditCoordinatesY->setText(QString::number(pos.y(), 'f'));
+    m_lineEditCoordinatesZ->setText(QString::number(pos.z(), 'f'));
+}
+
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
 {
 	if (!m_viewer || !m_viewer->group()) {
@@ -2396,7 +2414,7 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
     qreal x = Global::convertToMM(SU_PX, pos.x());
     qreal y = Global::convertToMM(SU_PX, pos.y());
     QPointF posMM = QPointF(x, y);
-    posMM = LaserApplication::device->deviceTransform().map(posMM);
+    posMM = LaserApplication::device->transform().map(posMM);
     QString posStr = QString("%1mm,%2mm | %3px,%4px")
         .arg(posMM.x()).arg(posMM.y())
         .arg(qFloor(pos.x())).arg(qFloor(pos.y()));

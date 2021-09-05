@@ -62,6 +62,10 @@ public:
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
 
+    QPointF docOrigin() const;
+    QTransform docTransform() const;
+    QRectF docBoundingRect() const;
+
     /// <summary>
     /// 返回相对于当前确定的原点的坐标。
     /// </summary>

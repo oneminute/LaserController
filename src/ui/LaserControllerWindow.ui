@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1248,6 +1248,14 @@
    </property>
    <property name="toolTip">
     <string>Update Outline</string>
+   </property>
+  </action>
+  <action name="actionLaserPosition">
+   <property name="text">
+    <string>Laser Position</string>
+   </property>
+   <property name="toolTip">
+    <string>Laser Position</string>
    </property>
   </action>
  </widget>

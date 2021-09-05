@@ -781,9 +781,9 @@ void Config::loadDeviceItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("Current Position"), 1);
-            comboBox->addItem(tr("User Origin"), 0);
-            comboBox->addItem(tr("Absolute Coords"), 2);
+            comboBox->addItem(tr("Current Position"), SFT_CurrentPosition);
+            comboBox->addItem(tr("User Origin"), SFT_UserOrigin);
+            comboBox->addItem(tr("Absolute Coords"), SFT_AbsoluteCoords);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -799,8 +799,20 @@ void Config::loadDeviceItems()
     );
     jobOrigin->setInputWidgetType(IWT_Custom);
     jobOrigin->setCreateWidgetHook(
-        [](ConfigItem* item) {
+        [=](ConfigItem* item) {
             return qobject_cast<QWidget*>(new RadioButtonGroup());
+        }
+    );
+    jobOrigin->setWidgetInitializeHook(
+        [=](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper) {
+            RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
+            QObject::connect(radioGroup, &RadioButtonGroup::valueChanged, wrapper, QOverload<int>::of(&InputWidgetWrapper::onValueChanged));
+        }
+    );
+    jobOrigin->setUpdateWidgetValueHook(
+        [=](QWidget* widget, const QVariant& value) {
+            RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
+            radioGroup->setValue(value.toInt());
         }
     );
     connect(startFrom, &ConfigItem::valueChanged,
@@ -2327,10 +2339,12 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
+            comboBox->blockSignals(true);
             comboBox->addItem(tr("0"), 0);
             comboBox->addItem(tr("1"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+            comboBox->blockSignals(false);
         }
     );
 

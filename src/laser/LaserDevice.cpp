@@ -6,6 +6,7 @@
 #include "LaserApplication.h"
 #include "LaserDriver.h"
 #include "LaserRegister.h"
+#include "scene/LaserDocument.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "exception/LaserException.h"
@@ -649,7 +650,27 @@ LaserRegister* LaserDevice::systemRegister(int addr) const
 
 QPointF LaserDevice::origin() const
 {
-    return QPointF();
+    Q_D(const LaserDevice);
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        return deviceOrigin();
+        break;
+    case SFT_UserOrigin:
+    case SFT_CurrentPosition:
+    {
+        LaserDocument* document = LaserApplication::mainWindow->currentDocument();
+        if (document)
+        {
+            return document->docOrigin();
+        }
+        else
+        {
+            return deviceOrigin();
+        }
+    }
+        break;
+    }
 }
 
 QPointF LaserDevice::deviceOrigin() const
@@ -661,7 +682,30 @@ QPointF LaserDevice::deviceOrigin() const
 QTransform LaserDevice::transform() const
 {
     Q_D(const LaserDevice);
-    return d->transform;
+    QTransform transform;
+    if (!Config::Device::startFromItem())
+        return QTransform();
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        transform = d->deviceTransform;
+        break;
+    case SFT_UserOrigin:
+    case SFT_CurrentPosition:
+    {
+        LaserDocument* document = LaserApplication::mainWindow->currentDocument();
+        if (document)
+        {
+            transform = document->docTransform();
+        }
+        else
+        {
+            transform = d->deviceTransform;
+        }
+    }
+        break;
+    }
+    return transform;
 }
 
 QTransform LaserDevice::deviceTransform() const
@@ -737,6 +781,16 @@ LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified)
         map.insert(pair.first, pair.second);
     }
     return map;
+}
+
+QVector3D LaserDevice::getCurrentLaserPos()
+{
+    Q_D(LaserDevice);
+    if (isAvailable())
+    {
+        return d->driver->getCurrentLaserPos();
+    }
+    return QVector3D(0, 0, 0);
 }
 
 void LaserDevice::unload()

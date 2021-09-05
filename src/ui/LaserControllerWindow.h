@@ -46,6 +46,8 @@ public:
 
     void createUpdateDockPanel(int winId);
 
+    LaserDocument* currentDocument() const;
+
 public slots:
     void handleSecurityException(int code, const QString& message);
 	
@@ -127,6 +129,7 @@ protected slots:
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
     void onActionUpdate(bool checked = false);
+    void onActionLaserPosition(bool checked = false);
 
 	void onActionMirrorHorizontal(bool checked = false);
 	void onActionMirrorVertical(bool checked = false);
@@ -281,6 +284,7 @@ private:
     QToolButton* m_buttonMoveBottomRight;
     QToolButton* m_buttonMoveUp;
     QToolButton* m_buttonMoveDown;
+    QToolButton* m_buttonLaserPosition;
     QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonMachiningOrigin1;
     QRadioButton* m_radioButtonMachiningOrigin2;

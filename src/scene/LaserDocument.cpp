@@ -18,6 +18,8 @@
 
 #include <opencv2/opencv.hpp>
 
+#include <LaserApplication.h>
+#include <laser/LaserDevice.h>
 #include "LaserPrimitive.h"
 #include "PageInformation.h"
 #include "common/Config.h"
@@ -38,6 +40,7 @@ public:
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
         , blockSignals(false)
         , isOpened(false)
+        //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
@@ -47,6 +50,9 @@ public:
     LaserScene* scene;
     FinishRun finishRun;
     SizeUnit unit;
+
+    //QRectF boundingRect;
+    QElapsedTimer boundingRectTimer;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -567,6 +573,212 @@ void LaserDocument::setUnit(SizeUnit unit)
     d->unit = unit;
 }
 
+QPointF LaserDocument::docOrigin() const
+{
+    Q_D(const LaserDocument);
+    QRectF bounding = LaserApplication::device->deviceTransform().mapRect(docBoundingRect());
+    int posIndex = 0;
+    qreal dx = 0, dy = 0;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        dx = bounding.x();
+        dy = bounding.y();
+        break;
+    case SFT_UserOrigin:
+    {
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            dx = bounding.x();
+            dy = bounding.y();
+            break;
+        case 1:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y();
+            break;
+        case 2:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y();
+            break;
+        case 3:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 4:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 5:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 6:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height();
+            break;
+        case 7:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height();
+            break;
+        case 8:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height();
+            break;
+        }
+    }
+        break;
+    case SFT_CurrentPosition:
+    {
+        QVector3D laserPos = LaserApplication::device->getCurrentLaserPos();
+        dx = laserPos.x();
+        dy = laserPos.y();
+    }
+        break;
+    }
+    return QPointF(dx, dy);
+}
+
+QTransform LaserDocument::docTransform() const
+{
+    Q_D(const LaserDocument);
+    QRectF bounding = LaserApplication::device->deviceTransform().mapRect(docBoundingRect());
+    int posIndex = 0;
+    QPointF origin(0, 0);
+    qreal dx = 0, dy = 0;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        dx = bounding.x();
+        dy = bounding.y();
+        break;
+    case SFT_UserOrigin:
+    {
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            dx = bounding.x();
+            dy = bounding.y();
+            break;
+        case 1:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y();
+            break;
+        case 2:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y();
+            break;
+        case 3:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 4:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 5:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 6:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height();
+            break;
+        case 7:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height();
+            break;
+        case 8:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height();
+            break;
+        }
+    }
+        break;
+    case SFT_CurrentPosition:
+    {
+        QVector3D laserPos = LaserApplication::device->getCurrentLaserPos();
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            dx = laserPos.x();
+            dy = laserPos.y();
+            break;
+        case 1:
+            dx = bounding.x() - bounding.width() / 2;
+            dy = bounding.y();
+            break;
+        case 2:
+            dx = bounding.x() - bounding.width();
+            dy = bounding.y();
+            break;
+        case 3:
+            dx = bounding.x();
+            dy = bounding.y() - bounding.height() / 2;
+            break;
+        case 4:
+            dx = bounding.x() - bounding.width() / 2;
+            dy = bounding.y() - bounding.height() / 2;
+            break;
+        case 5:
+            dx = bounding.x() - bounding.width();
+            dy = bounding.y() - bounding.height() / 2;
+            break;
+        case 6:
+            dx = bounding.x();
+            dy = bounding.y() - bounding.height();
+            break;
+        case 7:
+            dx = bounding.x() - bounding.width() / 2;
+            dy = bounding.y() - bounding.height();
+            break;
+        case 8:
+            dx = bounding.x() - bounding.width();
+            dy = bounding.y() - bounding.height();
+            break;
+        }
+    }
+        break;
+    }
+    return QTransform::fromTranslate(-dx, -dy);
+}
+
+QRectF LaserDocument::docBoundingRect() const
+{
+    Q_D(const LaserDocument);
+    //if (d->boundingRectTimer.elapsed() < 1000)
+        //return d->boundingRect;
+
+    QMap<QString, LaserPrimitive*>& primitives = this->primitives();
+    QRectF bounding(0, 0, 0, 0);
+    int count = 0;
+    for (QMap<QString, LaserPrimitive*>::ConstIterator i = primitives.begin();
+        i != primitives.end(); i++)
+    {
+        QRectF rect = i.value()->sceneBoundingRect();
+        if (count++ == 0)
+        {
+            bounding = rect;
+            continue;
+        }
+        //QMarginsF margins(rect.left(), rect.top(), rect.right(), rect.bottom());
+        //bounding += margins;
+        if (rect.left() < bounding.left())
+            bounding.setLeft(rect.left());
+        if (rect.top() < bounding.top())
+            bounding.setTop(rect.top());
+        if (rect.right() > bounding.right())
+            bounding.setRight(rect.right());
+        if (rect.bottom() > bounding.bottom())
+            bounding.setBottom(rect.bottom());
+    }
+    //d->boundingRect = bounding;
+
+    //d->boundingRectTimer.restart();
+    //return d->boundingRect;
+    return bounding;
+}
+
 void LaserDocument::updateLayersStructure()
 {
     Q_D(LaserDocument);
@@ -865,7 +1077,8 @@ void LaserDocument::init()
 	}
 	ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
 	ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
-
+    
+    d->boundingRectTimer.start();
 }
 
 RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPainterPath& b)

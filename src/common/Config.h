@@ -223,8 +223,8 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(device, autoConnectFirst, bool, toBool)
 
-        CONFIG_ITEM(systemRegister, startFrom, int, toInt)
-        CONFIG_ITEM(systemRegister, jobOrigin, int, toInt)
+        CONFIG_ITEM(device, startFrom, int, toInt)
+        CONFIG_ITEM(device, jobOrigin, int, toInt)
 
     private:
         friend class Config;

@@ -518,7 +518,9 @@ void ConfigItem::doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper)
     Q_D(ConfigItem);
     if (widget && d->widgetInitializeHook)
     {
+        widget->blockSignals(true);
         d->widgetInitializeHook(widget, this, wrapper);
+        widget->blockSignals(false);
     }
 }
 

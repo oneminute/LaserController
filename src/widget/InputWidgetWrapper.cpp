@@ -130,7 +130,9 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         break;
     }
     }
+    configItem->blockSignals(true);
     updateValue(d->configItem->value());
+    configItem->blockSignals(false);
     connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::setValue);
     connect(d->configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
     connect(d->configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);

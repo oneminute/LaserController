@@ -88,6 +88,8 @@ public:
     LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
     LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
 
+    QVector3D getCurrentLaserPos();
+
 public slots:
     bool load();
     void unload();

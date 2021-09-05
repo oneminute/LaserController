@@ -364,7 +364,7 @@ public:
     QString getMainCardInfo();
     bool createLicenseFile(const QString& licenseCode);
 
-    QVector3D GetCurrentLaserPos();
+    QVector3D getCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
     void startMachining(bool zeroPointStyle);
     int pauseContinueMachining(bool pause);
