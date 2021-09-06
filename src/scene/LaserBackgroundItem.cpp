@@ -141,7 +141,7 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	qreal width = this->rect().width();
 	qreal height = this->rect().height();
 	int contrastValue = Config::Ui::gridContrast();
-	qDebug() << "contrastValue: " << contrastValue;
+	//qDebug() << "contrastValue: " << contrastValue;
 	bool isShow = true;
 	//һ������
 	QPen pen1(QColor(0, 0, 0), 1, Qt::SolidLine);

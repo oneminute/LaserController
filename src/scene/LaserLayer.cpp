@@ -506,6 +506,17 @@ void LaserLayer::setIndex(int i)
 	m_index = i;
 }
 
+QRectF LaserLayer::boundingRect() const
+{
+    Q_D(const LaserLayer);
+    return utils::boundingRect(d->primitives);
+}
+
+QPointF LaserLayer::position() const 
+{
+    return boundingRect().topLeft();
+}
+
 void LaserLayer::onClicked()
 {
     Q_D(LaserLayer);

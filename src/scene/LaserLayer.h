@@ -112,7 +112,9 @@ public:
 
 	void setIndex(int i);
 
-    virtual QPointF position() const { return QPointF(0, 0); }
+    QRectF boundingRect() const;
+
+    virtual QPointF position() const;
 
 protected:
     void onClicked();

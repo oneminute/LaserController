@@ -613,14 +613,14 @@ void Config::loadPathOptimizationItems()
     maxStartingPointAnglesDiff->setInputWidgetProperty("minimum", 1.0);
     maxStartingPointAnglesDiff->setInputWidgetProperty("maximum", 90.0);
 
-    ConfigItem* maxGroupSize = group->addConfigItem(
+    /*ConfigItem* maxGroupSize = group->addConfigItem(
         "maxGroupSize",
         tr("Max group size"),
         tr("Max children count in one group."),
         10
     );
     maxGroupSize->setInputWidgetProperty("minimum", 1);
-    maxGroupSize->setInputWidgetProperty("maximum", 100);
+    maxGroupSize->setInputWidgetProperty("maximum", 100);*/
 
     ConfigItem* groupingOrientation = group->addConfigItem(
         "groupingOrientation",

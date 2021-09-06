@@ -746,37 +746,7 @@ QTransform LaserDocument::docTransform() const
 QRectF LaserDocument::docBoundingRect() const
 {
     Q_D(const LaserDocument);
-    //if (d->boundingRectTimer.elapsed() < 1000)
-        //return d->boundingRect;
-
-    QMap<QString, LaserPrimitive*>& primitives = this->primitives();
-    QRectF bounding(0, 0, 0, 0);
-    int count = 0;
-    for (QMap<QString, LaserPrimitive*>::ConstIterator i = primitives.begin();
-        i != primitives.end(); i++)
-    {
-        QRectF rect = i.value()->sceneBoundingRect();
-        if (count++ == 0)
-        {
-            bounding = rect;
-            continue;
-        }
-        //QMarginsF margins(rect.left(), rect.top(), rect.right(), rect.bottom());
-        //bounding += margins;
-        if (rect.left() < bounding.left())
-            bounding.setLeft(rect.left());
-        if (rect.top() < bounding.top())
-            bounding.setTop(rect.top());
-        if (rect.right() > bounding.right())
-            bounding.setRight(rect.right());
-        if (rect.bottom() > bounding.bottom())
-            bounding.setBottom(rect.bottom());
-    }
-    //d->boundingRect = bounding;
-
-    //d->boundingRectTimer.restart();
-    //return d->boundingRect;
-    return bounding;
+    return utils::boundingRect(primitives().values());
 }
 
 void LaserDocument::updateLayersStructure()
@@ -834,10 +804,11 @@ void LaserDocument::outline()
 {
     Q_D(LaserDocument);
     qLogD << "Before outline:";
-    clearOutline(true);
+    //clearOutline(true);
+    clearTree(d->optimizeNode);
     printOutline(d->optimizeNode, 0);
-    //outlineByLayers(this);
-    outlineByGroups(d->optimizeNode);
+    outlineByLayers(d->optimizeNode);
+    //outlineByGroups(d->optimizeNode);
     optimizeGroups(d->optimizeNode);
     qLogD << "After outline:";
     printOutline(d->optimizeNode, 0);
@@ -845,11 +816,11 @@ void LaserDocument::outline()
     emit outlineUpdated();
 }
 
-void LaserDocument::clearOutline(bool clearLayers)
-{
-    Q_D(LaserDocument);
-    clearOutline(d->optimizeNode, clearLayers);
-}
+//void LaserDocument::clearOutline(bool clearLayers)
+//{
+//    Q_D(LaserDocument);
+//    clearOutline(d->optimizeNode, clearLayers);
+//}
 
 void LaserDocument::printOutline(OptimizeNode* node, int level)
 {
@@ -1109,17 +1080,12 @@ RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPain
 
 void LaserDocument::outlineByLayers(OptimizeNode* node)
 {
-    if (node->nodeType() == LNT_DOCUMENT)
+    Q_D(LaserDocument);
+    for (LaserLayer* layer : d->layers)
     {
-        for (QList<OptimizeNode*>::iterator i = node->childNodes().begin(); i != node->childNodes().end(); i++)
-        {
-            outlineByLayers(*i);
-        }
-    }
-    else if (node->nodeType() == LNT_LAYER)
-    {
-        LaserLayer* layer = static_cast<LaserLayer*>(node->documentItem());
-
+        if (layer->isEmpty())
+            continue;
+        d->optimizeNode->addChildNode(layer->optimizeNode());
         for (LaserPrimitive* primitive : layer->primitives())
         {
             addPrimitiveToNodesTree(primitive, layer->optimizeNode());
@@ -1136,6 +1102,26 @@ void LaserDocument::outlineByGroups(OptimizeNode* node)
             addPrimitiveToNodesTree(primitive, this->optimizeNode());
         }
     }
+}
+
+void LaserDocument::clearTree(OptimizeNode* node)
+{
+    QStack<OptimizeNode*> stack;
+    stack.push(node);
+    QList<OptimizeNode*> deletingNodes;
+    while (!stack.isEmpty())
+    {
+        OptimizeNode* topNode = stack.pop();
+        for (OptimizeNode* childNode : topNode->childNodes())
+        {
+            stack.push(childNode);
+        }
+        topNode->clearChildren();
+        if (topNode->nodeType() == LNT_VIRTUAL)
+            deletingNodes.append(topNode);
+    }
+    if (!deletingNodes.isEmpty())
+        qDeleteAll(deletingNodes);
 }
 
 void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
@@ -1196,27 +1182,27 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
     );
 
     // 获取每个分组中子节点的最大个数。
-    int maxChildNodes = Config::PathOptimization::maxGroupSize();
+    //int maxChildNodes = Config::PathOptimization::maxGroupSize();
     // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
     // 新建一个父节点，将该父节点作为当前父节点的子节点。
-    if (children.count() > maxChildNodes)
-    {
-        node->childNodes().clear();
-        OptimizeNode* newNode = nullptr;
-        for (int i = 0, count = 0; i < children.count(); i++)
-        {
-            if ((count++ % maxChildNodes) == 0)
-            {
-                newNode = new OptimizeNode();
-                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-                newNode->setNodeName(nodeName);
-                node->addChildNode(newNode);
-            }
-            newNode->addChildNode(children.at(i));
-        }
-        //optimizeGroups(node, level);
-        qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
-    }
+    //if (children.count() > maxChildNodes)
+    //{
+    //    node->childNodes().clear();
+    //    OptimizeNode* newNode = nullptr;
+    //    for (int i = 0, count = 0; i < children.count(); i++)
+    //    {
+    //        if ((count++ % maxChildNodes) == 0)
+    //        {
+    //            newNode = new OptimizeNode();
+    //            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+    //            newNode->setNodeName(nodeName);
+    //            node->addChildNode(newNode);
+    //        }
+    //        newNode->addChildNode(children.at(i));
+    //    }
+    //    //optimizeGroups(node, level);
+    //    qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
+    //}
 
     // 对每一个子节点再次递归进行整理。
     for (OptimizeNode* item : node->childNodes())
@@ -1225,28 +1211,28 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
     }
 }
 
-void LaserDocument::clearOutline(OptimizeNode* node, bool clearLayers)
-{
-    if (node->hasChildren())
-    {
-        for (OptimizeNode* node : node->childNodes())
-        {
-            clearOutline(node);
-        }
-    }
-
-    node->clearChildren();
-    if (node->nodeType() == LNT_DOCUMENT && !clearLayers)
-    {
-        LaserDocument* doc = static_cast<LaserDocument*>(node->documentItem());
-        for (LaserLayer* layer : doc->layers())
-        {
-            if (layer->isAvailable())
-                layer->optimizeNode()->addChildNode(layer->optimizeNode());
-        }
-    }
-
-}
+//void LaserDocument::clearOutline(OptimizeNode* node, bool clearLayers)
+//{
+//    if (node->hasChildren())
+//    {
+//        for (OptimizeNode* node : node->childNodes())
+//        {
+//            clearOutline(node);
+//        }
+//    }
+//
+//    node->clearChildren();
+//    if (node->nodeType() == LNT_DOCUMENT && !clearLayers)
+//    {
+//        LaserDocument* doc = static_cast<LaserDocument*>(node->documentItem());
+//        for (LaserLayer* layer : doc->layers())
+//        {
+//            if (layer->isAvailable())
+//                layer->optimizeNode()->addChildNode(layer->optimizeNode());
+//        }
+//    }
+//
+//}
 
 void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node)
 {

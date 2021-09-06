@@ -159,6 +159,8 @@ public:
 	virtual QVector<QLineF> edges();
 	virtual LaserPrimitive* clone(QTransform t) = 0;
 
+    virtual QPointF position() const;
+
     static QString typeName(LaserPrimitiveType typeId);
     static QString typeLatinName(LaserPrimitiveType typeId);
     QString newPrimitiveName(LaserPrimitiveType type) const;

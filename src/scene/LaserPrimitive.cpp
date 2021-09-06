@@ -471,6 +471,11 @@ QJsonObject LaserPrimitive::toJson()
 	return QJsonObject();
 }
 
+QPointF LaserPrimitive::position() const 
+{
+    return QPointF(0, 0); 
+}
+
 QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
 {
     static QMap<LaserPrimitiveType, QString> TypeNamesMap{
@@ -523,7 +528,7 @@ QString LaserPrimitive::newPrimitiveName(LaserPrimitiveType type) const
     {
         bool used = true;
         int count = typeCount[type];
-        while (used)
+        while (true)
         {
             used = false;
             QString name = QString("%1_%2").arg(typeName(type)).arg(count);
@@ -535,6 +540,8 @@ QString LaserPrimitive::newPrimitiveName(LaserPrimitiveType type) const
                     break;
                 }
             }
+            if (!used)
+                break;
             count++;
         }
         return QString("%1_%2").arg(typeName(type)).arg(count);

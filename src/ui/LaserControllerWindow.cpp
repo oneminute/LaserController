@@ -1526,8 +1526,6 @@ void LaserControllerWindow::onActionNew(bool checked)
 	}
 	this->setWindowTitle("<Untitled> - " + m_windowTitle);
 	createNewDocument();
-	
-	
 }
 
 bool LaserControllerWindow::onActionSave(bool checked)
@@ -2593,10 +2591,10 @@ void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 
 void LaserControllerWindow::updateOutlineTree()
 {
+    m_treeWidgetOutline->clear();
+
     if (!m_scene->document())
         return;
-
-    m_treeWidgetOutline->clear();
 
     QStack<OptimizeNode*> stack;
     stack.push(m_scene->document()->optimizeNode());
@@ -3441,7 +3439,7 @@ void LaserControllerWindow::documentClose()
 		button->setEnabled(false);
 		button->setChecked(false);
 	}
-	
+    updateOutlineTree();
 }
 
 void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy)

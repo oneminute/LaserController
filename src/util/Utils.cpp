@@ -1,5 +1,6 @@
 #include "Utils.h"
 #include <QUuid>
+#include "scene/LaserPrimitive.h"
 
 QString utils::createUUID(const QString& prefix)
 {
@@ -146,4 +147,28 @@ QPointF utils::center(const QVector<QPointF>& points)
     }
     center /= points.size();
     return center;
+}
+
+QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
+{
+    QRectF bounding(0, 0, 0, 0);
+    int count = 0;
+    for (LaserPrimitive* primitive: primitives)
+    {
+        QRectF rect = primitive->sceneBoundingRect();
+        if (count++ == 0)
+        {
+            bounding = rect;
+            continue;
+        }
+        if (rect.left() < bounding.left())
+            bounding.setLeft(rect.left());
+        if (rect.top() < bounding.top())
+            bounding.setTop(rect.top());
+        if (rect.right() > bounding.right())
+            bounding.setRight(rect.right());
+        if (rect.bottom() > bounding.bottom())
+            bounding.setBottom(rect.bottom());
+    }
+    return bounding;
 }

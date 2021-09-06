@@ -82,7 +82,7 @@ public slots:
     void close();
 	void analysis();
     void outline();
-    void clearOutline(bool clearLayers = false);
+    //void clearOutline(bool clearLayers = false);
     void printOutline(OptimizeNode* node, int level);
     void arrange();
     void optimize();
@@ -95,13 +95,14 @@ protected:
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
     void outlineByLayers(OptimizeNode* node);
     void outlineByGroups(OptimizeNode* node);
+    void clearTree(OptimizeNode* node);
     /// <summary>
     /// 对当前的节点树进行整理，使每个分组树中的叶结点不要超过最大数量。
     /// </summary>
     /// <param name="node">待分组节点</param>
     /// <param name="level">当前的组级别</param>
     void optimizeGroups(OptimizeNode* node, int level = 1);
-    void clearOutline(OptimizeNode* node, bool clearLayers = false);
+    //void clearOutline(OptimizeNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node);
 
 signals:

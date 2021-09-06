@@ -9,6 +9,8 @@
 #include <QVector2D>
 #include <QGraphicsItem>
 
+class LaserPrimitive;
+
 namespace utils
 {
     QString createUUID(const QString& prefix = "");
@@ -30,6 +32,8 @@ namespace utils
     quint32 factorial(quint32 n);
 
     QPointF center(const QVector<QPointF>& points);
+
+    QRectF boundingRect(const QList<LaserPrimitive*>& primitives);
 }
 
 #endif // UTILS_H

@@ -2,6 +2,8 @@
 
 #include "OptimizeEdge.h"
 #include "scene/LaserPrimitive.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
 #include "util/TypeUtils.h"
 #include <QRandomGenerator>
 #include <QStack>
@@ -111,7 +113,19 @@ LaserNodeType OptimizeNode::nodeType() const
 QString OptimizeNode::nodeName() const
 {
     Q_D(const OptimizeNode);
-    return d->nodeName;
+    QString nodeName;
+    switch (d->nodeType)
+    {
+    case LNT_DOCUMENT:
+    case LNT_LAYER:
+    case LNT_PRIMITIVE:
+        nodeName = d->documentItem->name();
+        break;
+    case LNT_VIRTUAL:
+        nodeName = d->nodeName;
+        break;
+    }
+    return nodeName;
 }
 
 void OptimizeNode::setNodeName(const QString& name)
@@ -241,14 +255,31 @@ QList<OptimizeNode*> OptimizeNode::findAllLeaves(OptimizeNode* exclude)
 QPointF OptimizeNode::position() const
 {
     Q_D(const OptimizeNode);
-    if (d->nodeType == LNT_VIRTUAL && hasChildren())
+    switch (d->nodeType)
     {
-        return d->childNodes.first()->position();
-    }
-    else
+    case LNT_DOCUMENT:
     {
-        return QPointF(0, 0);
+        LaserDocument* doc = static_cast<LaserDocument*>(d->documentItem);
+        return doc->docOrigin();
     }
+    case LNT_LAYER:
+    {
+        LaserLayer* layer = static_cast<LaserLayer*>(d->documentItem);
+        return layer->position();
+    }
+    case LNT_PRIMITIVE:
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->position();
+    }
+    case LNT_VIRTUAL:
+    {
+        if (hasChildren())
+            return d->childNodes.first()->position();
+    }
+    }
+    
+    return QPointF(0, 0);
 }
 
 void OptimizeNode::update()
