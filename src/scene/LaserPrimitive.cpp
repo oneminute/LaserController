@@ -27,31 +27,18 @@
 #include "widget/LaserViewer.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
-#include "scene/LaserNodePrivate.h"
 #include "scene/LaserPrimitiveGroup.h"
 
-QMap<LaserPrimitiveType, int> g_counter{
-    { LPT_LINE, 0 },
-    { LPT_CIRCLE, 0},
-    { LPT_ELLIPSE, 0},
-    { LPT_RECT, 0},
-    { LPT_POLYLINE, 0},
-    { LPT_POLYGON, 0},
-    { LPT_PATH, 0},
-    { LPT_BITMAP, 0},
-    { LPT_TEXT, 0},
-};
-
-class LaserPrimitivePrivate: public LaserNodePrivate
+class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
     Q_DECLARE_PUBLIC(LaserPrimitive)
 public:
     LaserPrimitivePrivate(LaserPrimitive* ptr)
-        : LaserNodePrivate(ptr)
+        : ILaserDocumentItemPrivate(ptr, LNT_PRIMITIVE)
         , doc(nullptr)
         , layer(nullptr)
         , isHover(false)
-        , type(LPT_UNKNOWN)
+        , primitiveType(LPT_UNKNOWN)
         , machiningCenter(0, 0)
     {}
 
@@ -59,7 +46,7 @@ public:
     LaserLayer* layer;
 	int layerIndex;
     QRectF boundingRect;
-    LaserPrimitiveType type;
+    LaserPrimitiveType primitiveType;
     bool isHover;
     QPainterPath outline;
     QVector<QPointF> machiningPoints;
@@ -67,25 +54,23 @@ public:
     QList<int> startingIndices;
 	QTransform allTransform;
 	QRectF originalBoundingRect;
-	QPainterPath path;//��Ϊ�����ͼ��
+	QPainterPath path;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
-    : LaserNode(data, LNT_PRIMITIVE)
+    : ILaserDocumentItem(LNT_PRIMITIVE, data)
 {
     Q_D(LaserPrimitive);
     d->doc = doc;
-    d->type = type;
+    d->primitiveType = type;
     Q_ASSERT(doc);
     QObject::setParent(doc);
-
-    g_counter[type]++;
 
     //this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
     //this->setFlag(ItemIsFocusable, true);
     //this->setAcceptHoverEvents(true);
-    d->nodeName = QString("%1_%2").arg(typeLatinName(type)).arg(g_counter[type]);
+    d->name = newPrimitiveName(type);
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
 }
@@ -93,7 +78,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
 LaserPrimitive::~LaserPrimitive()
 {
     Q_D(LaserPrimitive);
-    qDebug() << d->nodeName;
+    qDebug() << d->name;
 }
 
 LaserDocument* LaserPrimitive::document() const 
@@ -412,43 +397,31 @@ QPointF LaserPrimitive::centerMachiningPoint() const
 LaserPrimitiveType LaserPrimitive::primitiveType() const
 {
     Q_D(const LaserPrimitive);
-    return d->type; 
+    return d->primitiveType; 
 }
 
 QString LaserPrimitive::typeName() const
 {
     Q_D(const LaserPrimitive);
-    return typeName(d->type);
+    return typeName(d->primitiveType);
 }
 
 QString LaserPrimitive::typeLatinName() const
 {
     Q_D(const LaserPrimitive);
-    return typeLatinName(d->type);
+    return typeLatinName(d->primitiveType);
 }
 
 bool LaserPrimitive::isShape() const 
 {
     Q_D(const LaserPrimitive);
-    return (int)d->type <= (int)LPT_SHAPE; 
+    return (int)d->primitiveType <= (int)LPT_SHAPE; 
 }
 
 bool LaserPrimitive::isBitmap() const 
 {
     Q_D(const LaserPrimitive);
-    return d->type == LPT_BITMAP; 
-}
-
-QString LaserPrimitive::name() const 
-{
-    Q_D(const LaserPrimitive);
-    return d->nodeName; 
-}
-
-void LaserPrimitive::setName(const QString& name) 
-{
-    Q_D(LaserPrimitive);
-    d->nodeName = name; 
+    return d->primitiveType == LPT_BITMAP; 
 }
 
 LaserLayer* LaserPrimitive::layer() const 
@@ -472,7 +445,7 @@ void LaserPrimitive::setLayer(LaserLayer* layer)
 
 QString LaserPrimitive::toString() const
 {
-    return QString("[LaserPrimitive: name=%1]").arg(nodeName());
+    return QString("[LaserPrimitive: name=%1]").arg(name());
 }
 
 QPainterPath LaserPrimitive::outline() const
@@ -503,7 +476,12 @@ QJsonObject LaserPrimitive::toJson()
 	return QJsonObject();
 }
 
-QString LaserPrimitive::typeName(LaserPrimitiveType typeId) const
+QPointF LaserPrimitive::position() const 
+{
+    return QPointF(0, 0); 
+}
+
+QString LaserPrimitive::typeName(LaserPrimitiveType typeId)
 {
     static QMap<LaserPrimitiveType, QString> TypeNamesMap{
         { LPT_BITMAP, tr("Bitmap") },
@@ -513,13 +491,15 @@ QString LaserPrimitive::typeName(LaserPrimitiveType typeId) const
         { LPT_PATH, tr("Path") },
         { LPT_POLYGON, tr("Polygon") },
         { LPT_POLYLINE, tr("Polyline") },
-        { LPT_RECT, tr("Rect") }
+        { LPT_RECT, tr("Rect") },
+        { LPT_TEXT, tr("Text") },
+        { LPT_NURBS, tr("Nurbs") },
     };
     
     return TypeNamesMap[typeId];
 }
 
-QString LaserPrimitive::typeLatinName(LaserPrimitiveType typeId) const
+QString LaserPrimitive::typeLatinName(LaserPrimitiveType typeId)
 {
     static QMap<LaserPrimitiveType, QString> TypeLatinNamesMap{
         { LPT_BITMAP, "Bitmap" },
@@ -529,9 +509,49 @@ QString LaserPrimitive::typeLatinName(LaserPrimitiveType typeId) const
         { LPT_PATH, "Path" },
         { LPT_POLYGON, "Polygon" },
         { LPT_POLYLINE, "Polyline" },
-        { LPT_RECT, "Rect" }
+        { LPT_RECT, "Rect" },
+        { LPT_TEXT, tr("Text") },
+        { LPT_NURBS, tr("Nurbs") },
     };
     return TypeLatinNamesMap[typeId];
+}
+
+QString LaserPrimitive::newPrimitiveName(LaserPrimitiveType type) const
+{
+    Q_D(const LaserPrimitive);
+    QMap<LaserPrimitiveType, int> typeCount;
+    for (LaserPrimitive* primitive : d->doc->primitives().values())
+    {
+        if (!typeCount.contains(primitive->primitiveType()))
+        {
+            typeCount[primitive->primitiveType()] = 0;
+        }
+        typeCount[primitive->primitiveType()]++;
+    }
+
+    if (typeCount.contains(type))
+    {
+        bool used = true;
+        int count = typeCount[type];
+        while (true)
+        {
+            used = false;
+            QString name = QString("%1_%2").arg(typeName(type)).arg(count);
+            for (LaserPrimitive* primitive : d->doc->primitives().values())
+            {
+                if (name == primitive->name())
+                {
+                    used = true;
+                    break;
+                }
+            }
+            if (!used)
+                break;
+            count++;
+        }
+        return QString("%1_%2").arg(typeName(type)).arg(count);
+    }
+    return QString("%1_0").arg(typeName(type));
 }
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
@@ -551,7 +571,7 @@ void LaserPrimitive::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 void LaserPrimitive::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
 	//QGraphicsObject::mousePressEvent(event);
-    qLogD << "mousePressEvent: " << nodeName();
+    qLogD << "mousePressEvent: " << name();
 	/*if (!this->isSelected()) {
 		LaserDocument* document = (LaserDocument*)this->QObject::parent();
 		document->scene()->clearSelection();
@@ -1838,7 +1858,7 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     Q_D(LaserBitmap);
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
-    d->type = LPT_BITMAP;
+    d->primitiveType = LPT_BITMAP;
     d->outline.addRect(bounds);
 	d->originalBoundingRect = d->boundingRect;
 	sceneTransformToItemTransform(saveTransform);
@@ -2084,7 +2104,7 @@ QPointF LaserBitmap::position() const
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)
 {
     QDebugStateSaver saver(debug);
-    debug.nospace() << "(" << item.name() << ", " << item.type() << ")";
+    debug.nospace() << "[name = " << item.name() << ", type = " << item.primitiveType() << "]";
     return debug;
 }
 

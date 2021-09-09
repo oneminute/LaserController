@@ -64,7 +64,9 @@ void ConfigItemGroup::addConfigItem(ConfigItem* item)
     d->itemsMap.insert(item->name(), item);
 }
 
-ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& title, const QString& description, const QVariant& value, DataType dataType, bool advanced, bool visible, StoreStrategy storeType)
+ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& title, 
+    const QString& description, const QVariant& value, DataType dataType, bool advanced, 
+    bool visible, StoreStrategy storeStrategy)
 {
     ConfigItem* item = new ConfigItem(
         name
@@ -75,7 +77,7 @@ ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& t
         , dataType
         , advanced
         , visible
-        , storeType
+        , storeStrategy
     );
     addConfigItem(item);
     return item;
@@ -136,36 +138,13 @@ bool ConfigItemGroup::isModified() const
     return modified;
 }
 
-void ConfigItemGroup::doModify()
+void ConfigItemGroup::confirm()
 {
     Q_D(const ConfigItemGroup);
     for (ConfigItem* item : d->items)
     {
-        item->doModify();
+        item->confirm();
     }
 }
 
-QStringList ConfigItemGroup::registerValues() const
-{
-    Q_D(const ConfigItemGroup);
-    QStringList values;
-    for (ConfigItem* item : d->items)
-    {
-        values.append(item->toRegisterString());
-    }
-    return values;
-}
 
-LaserRegister::RegistersMap ConfigItemGroup::keyValuePairs() const
-{
-    Q_D(const ConfigItemGroup);
-    LaserRegister::RegistersMap map;
-    for (ConfigItem* item : d->items)
-    {
-        LaserRegister::RegisterPair pair = item->keyValuePair();
-        if (!pair.second.isValid())
-            continue;
-        map.insert(pair.first, pair.second);
-    }
-    return map;
-}

@@ -1,44 +1,46 @@
 #include "LaserDocument.h"
 
+#include <QBuffer>
+#include <QByteArray>
 #include <QDateTime>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QImageReader>
 #include <QList>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QtMath>
+#include <QMessageBox>
 #include <QSaveFile>
-#include <QStack>
 #include <QSharedData>
-#include <QJsonArray>
-#include <QByteArray>
-#include <QBuffer>
-#include <QImageReader>
+#include <QStack>
+#include <QtMath>
 
 #include <opencv2/opencv.hpp>
 
+#include <LaserApplication.h>
+#include <laser/LaserDevice.h>
 #include "LaserPrimitive.h"
 #include "PageInformation.h"
 #include "common/Config.h"
 #include "algorithm/PathOptimizer.h"
+#include "algorithm/OptimizeNode.h"
 #include "laser/LaserDriver.h"
 #include "util/MachiningUtils.h"
 #include "LaserLayer.h"
 #include "state/StateController.h"
-#include "LaserNodePrivate.h"
 #include "svg/qsvgtinydocument.h"
 #include "LaserScene.h"
-#include <QMessageBox>
 
-class LaserDocumentPrivate : public LaserNodePrivate
+class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 {
     Q_DECLARE_PUBLIC(LaserDocument)
 public:
     LaserDocumentPrivate(LaserDocument* ptr)
-        : LaserNodePrivate(ptr)
+        : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
         , blockSignals(false)
         , isOpened(false)
+        //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
@@ -48,10 +50,14 @@ public:
     LaserScene* scene;
     FinishRun finishRun;
     SizeUnit unit;
+
+    //QRectF boundingRect;
+    QElapsedTimer boundingRectTimer;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
-    : LaserNode(new LaserDocumentPrivate(this), LNT_DOCUMENT)
+    : QObject(parent)
+    , ILaserDocumentItem(LNT_DOCUMENT, new LaserDocumentPrivate(this))
 {
     Q_D(LaserDocument);
     d->scene = scene;
@@ -66,7 +72,7 @@ LaserDocument::~LaserDocument()
 void LaserDocument::addPrimitive(LaserPrimitive* item)
 {
     Q_D(LaserDocument);
-    d->primitives.insert(item->nodeName(), item);
+    d->primitives.insert(item->id(), item);
 	d->layers[item->layerIndex()]->addPrimitive(item);
 
     /*if (item->isShape())
@@ -92,7 +98,7 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
 {
     Q_D(LaserDocument);
     item->layer()->removePrimitive(item);
-    d->primitives.remove(item->nodeName());
+    d->primitives.remove(item->id());
     //item->QObject::deleteLater();
 
 }
@@ -150,7 +156,6 @@ void LaserDocument::addLayer(LaserLayer* layer)
 {
     Q_D(LaserDocument);
     d->layers.append(layer);
-    d->childNodes.append(layer);
 
     updateLayersStructure();
 }
@@ -164,7 +169,6 @@ void LaserDocument::removeLayer(LaserLayer* layer)
     if (i < 2)
         return;
     d->layers.removeOne(layer);
-    d->childNodes.removeOne(layer);
 
     updateLayersStructure();
 }
@@ -375,7 +379,7 @@ void LaserDocument::exportJSON2(const QString& filename)
 
     QElapsedTimer timer;
     timer.start();
-    OptimizerController* optimizer = new OptimizerController(this, totalNodes());
+    OptimizerController* optimizer = new OptimizerController(d->optimizeNode, totalNodes());
     PathOptimizer::Path path = optimizer->optimize(pageWidth, pageHeight, canvas);
     qLogD << "optimized duration: " << timer.elapsed() / 1000.0;
     delete optimizer;
@@ -569,6 +573,182 @@ void LaserDocument::setUnit(SizeUnit unit)
     d->unit = unit;
 }
 
+QPointF LaserDocument::docOrigin() const
+{
+    Q_D(const LaserDocument);
+    QRectF bounding = LaserApplication::device->deviceTransform().mapRect(docBoundingRect());
+    int posIndex = 0;
+    qreal dx = 0, dy = 0;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        dx = bounding.x();
+        dy = bounding.y();
+        break;
+    case SFT_UserOrigin:
+    {
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            dx = bounding.x();
+            dy = bounding.y();
+            break;
+        case 1:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y();
+            break;
+        case 2:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y();
+            break;
+        case 3:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 4:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 5:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 6:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height();
+            break;
+        case 7:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height();
+            break;
+        case 8:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height();
+            break;
+        }
+    }
+        break;
+    case SFT_CurrentPosition:
+    {
+        QVector3D laserPos = LaserApplication::device->getCurrentLaserPos();
+        dx = laserPos.x();
+        dy = laserPos.y();
+    }
+        break;
+    }
+    return QPointF(dx, dy);
+}
+
+QTransform LaserDocument::docTransform() const
+{
+    Q_D(const LaserDocument);
+    QRectF bounding = LaserApplication::device->deviceTransform().mapRect(docBoundingRect());
+    int posIndex = 0;
+    QPointF origin(0, 0);
+    qreal dx = 0, dy = 0;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        dx = bounding.x();
+        dy = bounding.y();
+        break;
+    case SFT_UserOrigin:
+    {
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            dx = bounding.x();
+            dy = bounding.y();
+            break;
+        case 1:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y();
+            break;
+        case 2:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y();
+            break;
+        case 3:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 4:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 5:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height() / 2;
+            break;
+        case 6:
+            dx = bounding.x();
+            dy = bounding.y() + bounding.height();
+            break;
+        case 7:
+            dx = bounding.x() + bounding.width() / 2;
+            dy = bounding.y() + bounding.height();
+            break;
+        case 8:
+            dx = bounding.x() + bounding.width();
+            dy = bounding.y() + bounding.height();
+            break;
+        }
+    }
+        break;
+    case SFT_CurrentPosition:
+    {
+        QVector3D laserPos = LaserApplication::device->getCurrentLaserPos();
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            dx = laserPos.x();
+            dy = laserPos.y();
+            break;
+        case 1:
+            dx = bounding.x() - bounding.width() / 2;
+            dy = bounding.y();
+            break;
+        case 2:
+            dx = bounding.x() - bounding.width();
+            dy = bounding.y();
+            break;
+        case 3:
+            dx = bounding.x();
+            dy = bounding.y() - bounding.height() / 2;
+            break;
+        case 4:
+            dx = bounding.x() - bounding.width() / 2;
+            dy = bounding.y() - bounding.height() / 2;
+            break;
+        case 5:
+            dx = bounding.x() - bounding.width();
+            dy = bounding.y() - bounding.height() / 2;
+            break;
+        case 6:
+            dx = bounding.x();
+            dy = bounding.y() - bounding.height();
+            break;
+        case 7:
+            dx = bounding.x() - bounding.width() / 2;
+            dy = bounding.y() - bounding.height();
+            break;
+        case 8:
+            dx = bounding.x() - bounding.width();
+            dy = bounding.y() - bounding.height();
+            break;
+        }
+    }
+        break;
+    }
+    return QTransform::fromTranslate(-dx, -dy);
+}
+
+QRectF LaserDocument::docBoundingRect() const
+{
+    Q_D(const LaserDocument);
+    return utils::boundingRect(primitives().values());
+}
+
 void LaserDocument::updateLayersStructure()
 {
     Q_D(LaserDocument);
@@ -622,28 +802,29 @@ void LaserDocument::analysis()
 
 void LaserDocument::outline()
 {
+    Q_D(LaserDocument);
     qLogD << "Before outline:";
-    clearOutline(true);
-    printOutline(this, 0);
-    //outlineByLayers(this);
-    outlineByGroups(this);
-    optimizeGroups(this);
+    //clearOutline(true);
+    clearTree(d->optimizeNode);
+    printOutline(d->optimizeNode, 0);
+    outlineByLayers(d->optimizeNode);
+    //outlineByGroups(d->optimizeNode);
+    optimizeGroups(d->optimizeNode);
     qLogD << "After outline:";
-    printOutline(this, 0);
+    printOutline(d->optimizeNode, 0);
 
     emit outlineUpdated();
 }
 
-void LaserDocument::clearOutline(bool clearLayers)
-{
-    clearOutline(this, clearLayers);
-}
+//void LaserDocument::clearOutline(bool clearLayers)
+//{
+//    Q_D(LaserDocument);
+//    clearOutline(d->optimizeNode, clearLayers);
+//}
 
-void LaserDocument::printOutline(LaserNode* node, int level)
+void LaserDocument::printOutline(OptimizeNode* node, int level)
 {
-    if (!node->isAvailable())
-        return;
-
+    Q_D(LaserDocument);
     QString space = "";
     for (int i = 0; i < level; i++)
     {
@@ -651,7 +832,7 @@ void LaserDocument::printOutline(LaserNode* node, int level)
     }
     qLogD << space << node->nodeName();
 
-    for (LaserNode* item : node->childNodes())
+    for (OptimizeNode* item : node->childNodes())
     {
         printOutline(item, level + 1);
     }
@@ -850,14 +1031,15 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 
 int LaserDocument::totalNodes()
 {
-    QStack<LaserNode*> stack;
-    stack.push(this);
+    Q_D(LaserDocument);
+    QStack<OptimizeNode*> stack;
+    stack.push(d->optimizeNode);
     int count = 0;
     while (!stack.isEmpty())
     {
-        LaserNode* node = stack.pop();
+        OptimizeNode* node = stack.pop();
         count++;
-        for (LaserNode* child : node->childNodes())
+        for (OptimizeNode* child : node->childNodes())
         {
             stack.push(child);
         }
@@ -868,7 +1050,7 @@ int LaserDocument::totalNodes()
 void LaserDocument::init()
 {
 	Q_D(LaserDocument);
-	d->nodeName = "document";
+	d->name = "document";
 	QString layerName = newLayerName();
 	LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
 	addLayer(layer);
@@ -885,7 +1067,8 @@ void LaserDocument::init()
 	}
 	ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
 	ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
-
+    
+    d->boundingRectTimer.start();
 }
 
 RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPainterPath& b)
@@ -914,160 +1097,183 @@ RELATION LaserDocument::determineRelationship(const QPainterPath& a, const QPain
     return rel;
 }
 
-void LaserDocument::outlineByLayers(LaserNode* node)
+void LaserDocument::outlineByLayers(OptimizeNode* node)
 {
-    if (node->nodeType() == LNT_DOCUMENT)
+    Q_D(LaserDocument);
+    for (LaserLayer* layer : d->layers)
     {
-        for (QList<LaserNode*>::iterator i = node->childNodes().begin(); i != node->childNodes().end(); i++)
-        {
-            outlineByLayers(*i);
-        }
-    }
-    else if (node->nodeType() == LNT_LAYER)
-    {
-        LaserLayer* layer = dynamic_cast<LaserLayer*>(node);
-        if (!layer)
-            return;
-
+        if (layer->isEmpty())
+            continue;
+        d->optimizeNode->addChildNode(layer->optimizeNode());
         for (LaserPrimitive* primitive : layer->primitives())
         {
-            addPrimitiveToNodesTree(primitive, layer);
+            addPrimitiveToNodesTree(primitive, layer->optimizeNode());
         }
     }
 }
 
-void LaserDocument::outlineByGroups(LaserNode* node)
+void LaserDocument::outlineByGroups(OptimizeNode* node)
 {
     if (node->nodeType() == LNT_DOCUMENT)
     {
         for (LaserPrimitive* primitive : primitives())
         {
-            addPrimitiveToNodesTree(primitive, this);
+            addPrimitiveToNodesTree(primitive, this->optimizeNode());
         }
     }
 }
 
-void LaserDocument::optimizeGroups(LaserNode* node, int level)
+void LaserDocument::clearTree(OptimizeNode* node)
 {
-    if (!node->isAvailable())
+    QStack<OptimizeNode*> stack;
+    stack.push(node);
+    QList<OptimizeNode*> deletingNodes;
+    while (!stack.isEmpty())
+    {
+        OptimizeNode* topNode = stack.pop();
+        for (OptimizeNode* childNode : topNode->childNodes())
+        {
+            stack.push(childNode);
+        }
+        topNode->clearChildren();
+        if (topNode->nodeType() == LNT_VIRTUAL)
+            deletingNodes.append(topNode);
+    }
+    if (!deletingNodes.isEmpty())
+        qDeleteAll(deletingNodes);
+}
+
+void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
+{
+    qLogD << "node " << node->nodeName() << " has " << node->childCount() << " child nodes.";
+    if (!node->hasChildren())
+    {
         return;
+    }
+
+    QMap<int, QList<OptimizeNode*>> childrenMap;
+    for (OptimizeNode* node : node->childNodes())
+    {
+        int groupIndex = 0;
+        if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+        {
+            groupIndex = node->position().y() / Config::PathOptimization::maxGroupingGridSize();
+        }
+        else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+        {
+            groupIndex = node->position().x() / Config::PathOptimization::maxGroupingGridSize();
+        }
+        childrenMap[groupIndex].append(node);
+    }
+    qLogD << "  child nodes were seperated into " << childrenMap.size() << " groups by grid.";
+
+    if (childrenMap.size() > 1)
+    {
+        // 清空当前的子节点列表。
+        node->childNodes().clear();
+        for (QMap<int, QList<OptimizeNode*>>::Iterator i = childrenMap.begin(); i != childrenMap.end(); i++)
+        {
+            OptimizeNode* newNode = new OptimizeNode();
+            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+            newNode->setNodeName(nodeName);
+            newNode->addChildNodes(i.value());
+            node->addChildNode(newNode);
+
+            // 递归调用
+            optimizeGroups(newNode, level + 1);
+        }
+    }
 
     // 获取当前节点的所有子节点，进行排序。
-    QList<LaserNode*> children = node->childNodes();
+    QList<OptimizeNode*> children = node->childNodes();
     qSort(children.begin(), children.end(), 
-        [=](LaserNode* a, LaserNode* b) -> bool {
-            // 以下采用的排序方式为按水平或垂直顺序进行排序。
-            // 按水平或垂直方向将整个矩形区域分成mxGroupingGridSize指定的等宽条带。
-            // 在条带内再按垂直或水平方向再次排序。
-            int groupIndex1 = 0;
-            int groupIndex2 = 0;
+        [=](OptimizeNode* a, OptimizeNode* b) -> bool {
             if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
             {
-                groupIndex1 = a->position().y() / Config::PathOptimization::maxGroupingGridSize();
-                groupIndex2 = b->position().y() / Config::PathOptimization::maxGroupingGridSize();
+                return a->position().x() < b->position().x();
             }
             else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
             {
-                groupIndex1 = a->position().x() / Config::PathOptimization::maxGroupingGridSize();
-                groupIndex2 = b->position().x() / Config::PathOptimization::maxGroupingGridSize();
+                return a->position().y() < b->position().y();
             }
-
-            if (groupIndex1 < groupIndex2)
-            {
-                return true;
-            }
-            else if (groupIndex1 > groupIndex2)
-            {
-                return false;
-            }
-            else
-            {
-                if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
-                {
-                    return a->position().x() < b->position().x();
-                }
-                else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
-                {
-                    return a->position().y() < b->position().y();
-                }
-                return false;
-            }
+            return false;
         }
     );
 
     // 获取每个分组中子节点的最大个数。
-    int maxChildNodes = Config::PathOptimization::maxGroupSize();
+    //int maxChildNodes = Config::PathOptimization::maxGroupSize();
     // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
     // 新建一个父节点，将该父节点作为当前父节点的子节点。
-    if (children.count() > maxChildNodes)
-    {
-        node->childNodes().clear();
-        LaserNode* newNode = nullptr;
-        for (int i = 0, count = 0; i < children.count(); i++)
-        {
-            if ((count++ % maxChildNodes) == 0)
-            {
-                newNode = new LaserNode(LaserNodeType::LNT_VIRTUAL);
-                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-                newNode->setNodeName(nodeName);
-                node->addChildNode(newNode);
-            }
-            newNode->addChildNode(children.at(i));
-        }
-        //optimizeGroups(node, level);
-    }
+    //if (children.count() > maxChildNodes)
+    //{
+    //    node->childNodes().clear();
+    //    OptimizeNode* newNode = nullptr;
+    //    for (int i = 0, count = 0; i < children.count(); i++)
+    //    {
+    //        if ((count++ % maxChildNodes) == 0)
+    //        {
+    //            newNode = new OptimizeNode();
+    //            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+    //            newNode->setNodeName(nodeName);
+    //            node->addChildNode(newNode);
+    //        }
+    //        newNode->addChildNode(children.at(i));
+    //    }
+    //    //optimizeGroups(node, level);
+    //    qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
+    //}
 
     // 对每一个子节点再次递归进行整理。
-    for (LaserNode* item : node->childNodes())
+    for (OptimizeNode* item : node->childNodes())
     {
         optimizeGroups(item, level + 1);
     }
 }
 
-void LaserDocument::clearOutline(LaserNode* node, bool clearLayers)
-{
-    if (node->hasChildren())
-    {
-        for (LaserNode* node : node->childNodes())
-        {
-            clearOutline(node);
-        }
-    }
+//void LaserDocument::clearOutline(OptimizeNode* node, bool clearLayers)
+//{
+//    if (node->hasChildren())
+//    {
+//        for (OptimizeNode* node : node->childNodes())
+//        {
+//            clearOutline(node);
+//        }
+//    }
+//
+//    node->clearChildren();
+//    if (node->nodeType() == LNT_DOCUMENT && !clearLayers)
+//    {
+//        LaserDocument* doc = static_cast<LaserDocument*>(node->documentItem());
+//        for (LaserLayer* layer : doc->layers())
+//        {
+//            if (layer->isAvailable())
+//                layer->optimizeNode()->addChildNode(layer->optimizeNode());
+//        }
+//    }
+//
+//}
 
-    node->clearChildren();
-    if (node->nodeType() == LNT_DOCUMENT && !clearLayers)
-    {
-        LaserDocument* doc = dynamic_cast<LaserDocument*>(node);
-        for (LaserLayer* layer : doc->layers())
-        {
-            if (layer->isAvailable())
-                addChildNode(layer);
-        }
-    }
-
-}
-
-void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node)
+void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node)
 {
     if (!node->hasChildren())
     {
-        node->addChildNode(primitive);
+        node->addChildNode(primitive->optimizeNode());
         return;
     }
 
     for (int i = node->childNodes().length() - 1; i >= 0; i--)
     {
-        LaserNode* childNode = node->childNodes()[i];
-        LaserPrimitive* childPrimitive = dynamic_cast<LaserPrimitive*>(childNode);
-        if (!childPrimitive)
+        OptimizeNode* childNode = node->childNodes()[i];
+        if (childNode->nodeType() != LNT_PRIMITIVE)
             continue;
+        LaserPrimitive* childPrimitive = static_cast<LaserPrimitive*>(childNode->documentItem());
 
         RELATION rel = determineRelationship(primitive->outline(), childPrimitive->outline());
         //qDebug().noquote() << primitive->nodeName() << childPrimitive->nodeName() << rel;
         if (rel == A_CONTAINS_B)
         {
-            primitive->addChildNode(childPrimitive);
-            node->removeChildNode(childPrimitive);
+            primitive->optimizeNode()->addChildNode(childPrimitive->optimizeNode());
+            node->removeChildNode(childPrimitive->optimizeNode());
         }
         else if (rel == B_CONTAINS_A)
         {
@@ -1075,7 +1281,7 @@ void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode
             return;
         }
     }
-    node->addChildNode(primitive);
+    node->addChildNode(primitive->optimizeNode());
 }
 
 

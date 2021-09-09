@@ -4,7 +4,7 @@
 #include <QObject>
 #include "common/common.h"
 
-class LaserRegister;
+class ConfigItem;
 class LaserDriver;
 class LaserRegisterPrivate;
 class LaserRegister : public QObject
@@ -14,30 +14,35 @@ public:
     typedef QMap<int, QVariant> RegistersMap;
     typedef QPair<int, QVariant> RegisterPair;
 
-    explicit LaserRegister(int addr, const QString& name = "", DataType dataType = DT_INT, const QString& description = "", 
-        bool isSystem = true, bool readOnly = false, StoreStrategy storeStrategy = SS_CONFIRMED, QObject* parent = nullptr);
-    virtual ~LaserRegister();
+    explicit LaserRegister(int addr, ConfigItem* configItem, 
+        bool isSystem = true, 
+        bool readOnly = false, 
+        bool writeOnly = false,
+        QObject* parent = nullptr);
+    ~LaserRegister();
 
     int address() const;
     QString name() const;
     QString description() const;
     bool readOnly() const;
+    bool writeOnly() const;
 
     DataType dataType() const;
-    void setDataType(DataType dataType);
 
     StoreStrategy storeStrategy() const;
-    void setStoreStrategy(StoreStrategy storeStrategy);
+
+    ConfigItem* configItem() const;
+
+    QVariant value() const;
 
     bool read();
     bool write(const QVariant& value);
+    void parse(const QString& raw, ModifiedBy modifiedBy);
 
     QString toString() const;
 
 protected slots:
-    void setValue(const QVariant& value);
-    void parse(const QString& raw);
-    static void batchParse(const QString& raw, bool isSystem);
+    void setValue(const QVariant& value, ModifiedBy modifiedBy);
 
 signals:
     void readyRead(const QVariant& value);
@@ -45,15 +50,9 @@ signals:
     void valueLoaded(const QVariant& value);
 
 private:
-    static QMap<int, LaserRegister*> userRegisters;
-    static QMap<int, LaserRegister*> systemRegisters;
-
-    QScopedPointer<LaserRegisterPrivate> m_ptr;
-    Q_DECLARE_PRIVATE_D(m_ptr, LaserRegister);
-    Q_DISABLE_COPY(LaserRegister);
-
-    friend class LaserDevice;
-    friend class ConfigItem;
+    QScopedPointer<LaserRegisterPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(LaserRegister)
+    Q_DISABLE_COPY(LaserRegister)
 };
 
 #endif // LASERREGISTER_H

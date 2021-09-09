@@ -20,7 +20,7 @@ class InputWidgetWrapper : public QObject
     Q_OBJECT
 public:
     explicit InputWidgetWrapper(QWidget* widget, ConfigItem* configItem);
-    virtual ~InputWidgetWrapper();
+    ~InputWidgetWrapper();
 
     void setNameLabel(QLabel* label);
     void setDescriptionLabel(QLabel* label);
@@ -36,10 +36,8 @@ public:
 
     static QWidget* createWidget(ConfigItem* item, Qt::Orientation orientation);
 
-signals:
-    void valueChanged(const QVariant& newValue);
-
-protected:
+public slots:
+    void setEnabled(bool enabled);
     void onTextChanged(const QString& text);
     void onCheckBoxStateChanged(int state);
     void onComboBoxIndexChanged(int index);
@@ -54,7 +52,10 @@ protected:
     void onDateTimeChanged(const QDateTime& dateTime);
 
     void onConfigItemModifiedChanged(bool modified);
-    void onConfigItemValueChanged(const QVariant& value);
+    void onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy);
+
+signals:
+    void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
 
 private:
 

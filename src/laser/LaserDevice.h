@@ -1,28 +1,32 @@
 #ifndef LASERDEVICE_H
 #define LASERDEVICE_H
 
+#include "common/common.h"
+#include "LaserRegister.h"
 #include <QObject>
 #include <QMutex>
+#include <QTransform>
 #include <QWaitCondition>
 
+class ConfigItem;
 class LaserDriver;
 class LaserDevicePrivate;
 class LaserDevice : public QObject
 {
     Q_OBJECT
 public:
-    explicit LaserDevice(QObject* parent = nullptr);
+    explicit LaserDevice(LaserDriver* driver, QObject* parent = nullptr);
     ~LaserDevice();
 
-    void resetDriver(LaserDriver* driver);
-
+    bool isInit() const;
     bool isConnected() const;
 
+    QString name() const;
+    void setName(const QString& name);
     QString portName() const;
 
     qreal layoutWidth() const;
     qreal layoutHeight() const;
-    void setLayoutRect(const QRectF& rect, bool toCard = true);
 
     int printerDrawUnit() const;
     void setPrinterDrawUnit(int unit, bool toCard = true);
@@ -63,8 +67,31 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
+    void moveTo(const QVector3D& pos, QUADRANT quad);
+    void moveBy(const QVector3D& pos);
+
+    bool isAvailable() const;
+
+    void showAboutWindow(int interval = 0, bool modal = true);
+    void closeAboutWindow();
+
+    LaserRegister* userRegister(int addr) const;
+    LaserRegister* systemRegister(int addr) const;
+
+    QPointF origin() const;
+    QPointF deviceOrigin() const;
+    QTransform transform() const;
+    QTransform deviceTransform() const;
+
+    void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
+
+    LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
+    LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
+
+    QVector3D getCurrentLaserPos();
+
 public slots:
-    void load();
+    bool load();
     void unload();
     void connectDevice(const QString& portName);
     void disconnectDevice();
@@ -84,7 +111,6 @@ public slots:
     void moveToOrigin(qreal speed = 15);
 
 protected:
-    void unbindDriver();
 
 protected slots:
     void handleError(int code, const QString& message);
@@ -96,6 +122,9 @@ protected slots:
     void onConnected();
     void onMainCardRegistered();
     void onMainCardActivated(bool temp);
+
+    void onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 signals:
     void comPortsFetched(const QStringList& ports);

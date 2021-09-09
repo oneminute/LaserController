@@ -13,8 +13,7 @@
 #include <QVector>
 #include <QTextEdit>
 #include <opencv2/opencv.hpp>
-
-#include "LaserNode.h"
+#include "LaserDocumentItem.h"
 
 class LaserDocument;
 class LaserLayer;
@@ -101,7 +100,7 @@ struct SliceGroup
 };
 
 class LaserPrimitivePrivate;
-class LaserPrimitive : public QGraphicsObject, public LaserNode
+class LaserPrimitive : public QGraphicsObject, public ILaserDocumentItem
 {
     Q_OBJECT
 public:
@@ -140,9 +139,6 @@ public:
     bool isShape() const;
     bool isBitmap() const;
 
-    QString name() const;
-    void setName(const QString& name);
-
     LaserLayer* layer() const;
     void setLayer(LaserLayer* layer);
 
@@ -163,34 +159,25 @@ public:
 	virtual QVector<QLineF> edges();
 	virtual LaserPrimitive* clone(QTransform t) = 0;
 
+    virtual QPointF position() const;
 
-	/*void setScaleValue(qreal x, qreal y);
-	void setScaleTranslate(qreal x, qreal y);
-	void setSelectedEditingState(int state);
-	void setSelectedEditingMatrix(QMatrix mat);*/
+    static QString typeName(LaserPrimitiveType typeId);
+    static QString typeLatinName(LaserPrimitiveType typeId);
+    QString newPrimitiveName(LaserPrimitiveType type) const;
+
 protected:
-    QString typeName(LaserPrimitiveType typeId) const;
-    QString typeLatinName(LaserPrimitiveType typeId) const;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 	
-	
 protected:
-    static QMap<int, int> g_itemsMaxIndex;
 
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPrimitive)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPrimitive)
     Q_DISABLE_COPY(LaserPrimitive)
 
     friend class LaserDocument;
-	/*int m_selectedEditingState;
-	qreal m_scaleX = 1;
-	qreal m_scaleY = 1;
-	qreal m_scaleTX = 0;
-	qreal m_scaleTY = 0;
-	QMatrix m_selectedEditingMatrix;*/
 };
 
 //Q_DECLARE_METATYPE(LaserPrimitive)
@@ -209,7 +196,7 @@ public:
 	int layerIndex();
 private:
     Q_DISABLE_COPY(LaserShape);
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserShape);
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserShape);
 };
 
 class LaserEllipsePrivate;
@@ -237,7 +224,7 @@ public:
     virtual QPointF position() const;
 
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserEllipse)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserEllipse)
     Q_DISABLE_COPY(LaserEllipse)
 };
 
@@ -265,7 +252,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserRect)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserRect)
     Q_DISABLE_COPY(LaserRect)
 };
 
@@ -294,7 +281,7 @@ public:
     virtual QPointF position() const;
 private:
     Q_DISABLE_COPY(LaserLine);
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserLine);
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLine);
 };
 
 class LaserPathPrivate;
@@ -323,7 +310,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPath);
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPath);
     Q_DISABLE_COPY(LaserPath);
 };
 
@@ -352,7 +339,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolyline)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPolyline)
     Q_DISABLE_COPY(LaserPolyline)
 };
 
@@ -382,7 +369,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserPolygon)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPolygon)
     Q_DISABLE_COPY(LaserPolygon)
 };
 
@@ -413,7 +400,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserNurbs)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserNurbs)
     Q_DISABLE_COPY(LaserNurbs)
 };
 
@@ -449,7 +436,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserBitmap)
     Q_DISABLE_COPY(LaserBitmap)
 };
 struct LaserTextRowPath {
@@ -519,7 +506,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserText)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)
 };
 

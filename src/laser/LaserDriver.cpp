@@ -1,10 +1,10 @@
 #include "LaserDriver.h"
 
+#include <QDataStream>
 #include <QDebug>
 #include <QErrorMessage>
-#include <QMessageBox>
 #include <QFile>
-#include <QDataStream>
+#include <QMessageBox>
 
 #include "LaserDevice.h"
 #include "LaserRegister.h"
@@ -12,6 +12,14 @@
 #include "state/StateController.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
+
+#define CHECK_STR(fn) #fn
+#define CHECK_FN(fn) \
+    if (!fn) \
+    { \
+        qLogW << CHECK_STR(fn) << " is nullptr."; \
+        return false; \
+    }
 
 QMap<int, QString> LaserDriver::g_registerComments;
 LaserDriver* LaserDriver::g_driver(nullptr);
@@ -173,62 +181,144 @@ bool LaserDriver::load()
     }
 
     m_fnGetAPILibVersion = (FN_WCHART_VOID)m_library.resolve("GetAPILibVersion");
+    CHECK_FN(m_fnGetAPILibVersion)
+
     m_fnGetAPILibCompileInfo = (FN_WCHART_VOID)m_library.resolve("GetAPILibCompileInfo");
-    m_fnInitLib = (FN_VOID_INT)m_library.resolve("InitLib");
+    CHECK_FN(m_fnGetAPILibCompileInfo)
+
+    // TODO: 修改为SetLanguage
+    m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguge");
+    CHECK_FN(m_fnSetLanguage)
+
+    m_fnInitLib = (FN_BOOL_INT)m_library.resolve("InitLib");
+    CHECK_FN(m_fnInitLib)
+
     m_fnUnInitLib = (FN_VOID_VOID)m_library.resolve("UnInitLib");
+    CHECK_FN(m_fnUnInitLib)
+
     m_fnProgressCallBack = (FNProgressCallBack)m_library.resolve("ProgressCallBack");
+    CHECK_FN(m_fnProgressCallBack)
+
     m_fnSysMessageCallBack = (FNSysMessageCallBack)m_library.resolve("SysMessageCallBack");
+    CHECK_FN(m_fnSysMessageCallBack)
+
     //m_fnProcDataProgressCallBack = (FNProcDataProgressCallBack)m_library.resolve("ProcDataProgressCallBack");
     m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
-
-    //m_fnProcDataProgressCallBack(LaserDriver::ProcDataProgressCallBackHandler);
+    CHECK_FN(m_fnGetComPortList)
 
     m_fnInitComPort = (FN_INT_INT)m_library.resolve("InitComPort");
+    CHECK_FN(m_fnInitComPort)
+
     m_fnUnInitComPort = (FN_INT_VOID)m_library.resolve("UnInitComPort");
+    CHECK_FN(m_fnUnInitComPort)
 
     m_fnSetTransTimeOutInterval = (FN_VOID_INT)m_library.resolve("SetTransTimeOutInterval");
+    CHECK_FN(m_fnSetTransTimeOutInterval)
+
     m_fnSetSoftwareInitialization = (FNSetSoftwareInitialization)m_library.resolve("SetSoftwareInitialization");
-    m_fnSetRotateDeviceParam = (FNSetRotateDeviceParam)m_library.resolve("SetRotateDeviceParam");
+    CHECK_FN(m_fnSetSoftwareInitialization)
+
+    //m_fnSetRotateDeviceParam = (FNSetRotateDeviceParam)m_library.resolve("SetRotateDeviceParam");
+    //CHECK_FN(m_fnSetRotateDeviceParam)
+
     m_fnSetHardwareInitialization = (FNSetHardwareInitialization)m_library.resolve("SetHardwareInitialization");
+    CHECK_FN(m_fnSetHardwareInitialization)
 
     m_fnWriteSysParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteSysParamToCard");
-    m_fnReadSysParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadSysParamFromCard");
-    m_fnWriteUserParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteUserParamToCard");
-    m_fnReadUserParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadUserParamFromCard");
+    CHECK_FN(m_fnWriteSysParamToCard)
 
-    m_fnShowAboutWindow = (FN_VOID_VOID)m_library.resolve("ShowAboutWindow");
+    m_fnReadSysParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadSysParamFromCard");
+    CHECK_FN(m_fnReadSysParamFromCard)
+
+    m_fnWriteUserParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteUserParamToCard");
+    CHECK_FN(m_fnWriteUserParamToCard)
+
+    m_fnReadUserParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadUserParamFromCard");
+    CHECK_FN(m_fnReadUserParamFromCard)
+
+    m_fnShowAboutWindow = (FN_INT_INT_BOOL)m_library.resolve("ShowAboutWindow");
+    CHECK_FN(m_fnShowAboutWindow)
+
+    m_fnCloseAboutWindow = (FN_VOID_VOID)m_library.resolve("CloseAboutWindow");
+    CHECK_FN(m_fnCloseAboutWindow)
+
     m_fnGetLaserLibInfo = (FN_VOID_VOID)m_library.resolve("GetLaserLibInfo");
+    CHECK_FN(m_fnGetLaserLibInfo)
+
     m_fnSetFactoryType = (FN_VOID_WCHART)m_library.resolve("SetFactoryType");
-    m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactroyPassWord");
+    CHECK_FN(m_fnSetFactoryType)
+
+    //m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactroyPassWord");
+    //CHECK_FN(m_fnCheckFactoryPassword)
+
     m_fnWriteFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("WriteFactoryPassWord");
+    CHECK_FN(m_fnWriteFactoryPassword)
 
     m_fnLPenMoveToOriginalPoint = (FN_VOID_DOUBLE)m_library.resolve("LPenMoveToOriginalPoint");
+    CHECK_FN(m_fnLPenMoveToOriginalPoint)
+
     m_fnLPenQuickMoveTo = (FNLPenQuickMoveTo)m_library.resolve("LPenQuickMoveTo");
+    CHECK_FN(m_fnLPenQuickMoveTo)
+
     m_fnControlHDAction = (FN_VOID_INT)m_library.resolve("ControlHDAction");
+    CHECK_FN(m_fnControlHDAction)
 
     m_fnGetMainCardID = (FN_WCHART_VOID)m_library.resolve("GetMainCardID");
+    CHECK_FN(m_fnGetMainCardID)
+
     m_fnActiveMainCard = (FNActivationMainCard)m_library.resolve("ActivationMainCard");
+    CHECK_FN(m_fnActiveMainCard)
+
     m_fnGetDeviceId = (FN_WCHART_BOOL)m_library.resolve("GetDeviceID");
+    CHECK_FN(m_fnGetDeviceId)
+
     m_fnGetHardwareKeyID = (FN_WCHART_VOID)m_library.resolve("GetHardwareKeyID");
+    CHECK_FN(m_fnGetHardwareKeyID)
+
     m_fnGetMainCardRegState = (FN_VOID_VOID)m_library.resolve("GetMainCardRegState");
+    CHECK_FN(m_fnGetMainCardRegState)
+
     m_fnGetMainCardInfo = (FN_WCHART_VOID)m_library.resolve("GetMainCardInfo");
+    CHECK_FN(m_fnGetMainCardInfo)
+
     m_fnCreateLicenseFile = (FN_BOOL_WCHART)m_library.resolve("CreateLicenseFile");
+    CHECK_FN(m_fnCreateLicenseFile)
 
     m_fnGetCurrentLaserPos = (FN_WCHART_VOID)m_library.resolve("GetCurrentLaserPos");
+    CHECK_FN(m_fnGetCurrentLaserPos)
+
     m_fnSmallScaleMovement = (FNSmallScaleMovement)m_library.resolve("SmallScaleMovement");
+    CHECK_FN(m_fnSmallScaleMovement)
+
     m_fnStartMachining = (FN_VOID_BOOL)m_library.resolve("StartMachining");
+    CHECK_FN(m_fnStartMachining)
+
     m_fnPauseContinueMachining = (FN_INT_BOOL)m_library.resolve("PauseContinueMachining");
+    CHECK_FN(m_fnPauseContinueMachining)
+
     m_fnStopMachining = (FN_VOID_VOID)m_library.resolve("StopMachining");
+    CHECK_FN(m_fnStopMachining)
+
     m_fnControlMotor = (FN_INT_BOOL)m_library.resolve("ControlMotor");
+    CHECK_FN(m_fnControlMotor)
+
     m_fnTestLaserLight = (FN_INT_BOOL)m_library.resolve("TestLaserLight");
+    CHECK_FN(m_fnTestLaserLight)
 
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
+    CHECK_FN(m_fnLoadDataFromFile)
+
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
+    CHECK_FN(m_fnGetDeviceWorkState)
 
     m_fnMillimeter2MicroStep = (FN_INT_DOUBLE_BOOL)m_library.resolve("Millimeter2MicroStep");
+    CHECK_FN(m_fnMillimeter2MicroStep)
 
     m_fnCheckVersionUpdate = (FN_BOOL_WCHART_INT_WCHART)m_library.resolve("CheckVersionUpdate");
+    CHECK_FN(m_fnCheckVersionUpdate)
+
     m_fnGetUpdatePanelHandle = (FN_INT_INT_INT)m_library.resolve("GetUpdatePanelHandle");
+    CHECK_FN(m_fnGetUpdatePanelHandle)
 
     Q_ASSERT(m_fnLoadDataFromFile);
 
@@ -270,12 +360,29 @@ QString LaserDriver::getCompileInfo()
     return info;
 }
 
-void LaserDriver::init(int winId)
+int LaserDriver::setLanguage(int lang)
 {
-    m_fnInitLib(winId);
+    return m_fnSetLanguage(lang);
+}
+
+bool LaserDriver::init(int winId)
+{
+    try 
+    {
+        m_fnInitLib(winId);
+        emit libraryInitialized();
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
+}
+
+void LaserDriver::setupCallbacks()
+{
     m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
     m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
-    emit libraryInitialized();
 }
 
 void LaserDriver::unInit()
@@ -321,11 +428,6 @@ void LaserDriver::setSoftwareInitialization(int printerDrawUnit, double pageZero
     m_fnSetSoftwareInitialization(printerDrawUnit, pageZeroX, pageZeroY, pageWidth, pageHeight);
 }
 
-void LaserDriver::setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions)
-{
-    m_fnSetRotateDeviceParam(type, perimeterPulse, materialPerimeter, deviceDPI, autoScaleDimensions);
-}
-
 void LaserDriver::setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates)
 {
     m_fnSetHardwareInitialization(curveToSpeedRatio, logicalResolution, maxSpeed, zeroCoordinates);
@@ -342,7 +444,31 @@ bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
     for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
-        valuesList.append(i.value().toString());
+        if (i.key() == 24)
+            qLogD << "debugging reg: " << i.key() << ", " << i.value();
+        QString value = i.value().toString();
+        switch (i.value().type())
+        {
+        case QVariant::Bool:
+            value = i.value().toBool() ? "1" : "0";
+            break;
+        case QVariant::Int:
+            value = QString("%1").arg(i.value().toInt());
+            break;
+        case QVariant::UInt:
+            value = QString("%1").arg(i.value().toUInt());
+            break;
+        case QVariant::LongLong:
+            value = QString("%1").arg(i.value().toLongLong());
+            break;
+        case QVariant::ULongLong:
+            value = QString("%1").arg(i.value().toULongLong());
+            break;
+        case QVariant::Double:
+            value = QString("%1").arg(i.value().toDouble(), 0, 'f');
+            break;
+        }
+        valuesList.append(value);
     }
     addrBuf = addrList.join(",");
     valuesBuf = valuesList.join(",");
@@ -350,8 +476,8 @@ bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
     wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
     wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
 
-    qDebug() << "address list: " << addrBuf;
-    qDebug() << "values list: " << valuesBuf;
+    qDebug() << "writing address list: " << addrBuf;
+    qDebug() << "writing values list: " << valuesBuf;
 
     bool success = m_fnWriteSysParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
@@ -380,7 +506,7 @@ bool LaserDriver::readSysParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllSysParamFromCard()
 {
     QList<int> params;
-    for (int i = 0; i < 54; i++)
+    for (int i = 0; i <= 57; i++)
     {
         params << i;
     }
@@ -398,7 +524,10 @@ bool LaserDriver::writeUserParamToCard(const LaserRegister::RegistersMap& values
     for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
     {
         addrList.append(QString("%1").arg(i.key()));
-        valuesList.append(i.value().toString());
+        QString value = i.value().toString();
+        if (i.value().type() == QVariant::Bool)
+            value = i.value().toBool() ? "1" : "0";
+        valuesList.append(value);
     }
     addrBuf = addrList.join(",");
     valuesBuf = valuesList.join(",");
@@ -406,8 +535,8 @@ bool LaserDriver::writeUserParamToCard(const LaserRegister::RegistersMap& values
     wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
     wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
 
-    qDebug() << "address list: " << addrBuf;
-    qDebug() << "values list: " << valuesBuf;
+    qDebug() << "writing address list: " << addrBuf;
+    qDebug() << "writing values list: " << valuesBuf;
 
     bool success = m_fnWriteUserParamToCard(wcAddrs, wcValues) != -1;
     delete[] wcAddrs;
@@ -436,7 +565,7 @@ bool LaserDriver::readUserParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllUserParamFromCard()
 {
     QList<int> params;
-    for (int i = 0; i < 24; i++)
+    for (int i = 0; i <= 31; i++)
     {
         params << i;
     }
@@ -444,9 +573,16 @@ bool LaserDriver::readAllUserParamFromCard()
 
 }
 
-void LaserDriver::showAboutWindow()
+int LaserDriver::showAboutWindow(int interval, bool modal)
 {
-    m_fnShowAboutWindow();
+    return m_fnShowAboutWindow(interval, modal);
+    //return 0;
+}
+
+void LaserDriver::closeAboutWindow()
+{
+    if (m_fnCloseAboutWindow)
+        m_fnCloseAboutWindow();
 }
 
 QString LaserDriver::getLaserLibraryInfo()
@@ -463,13 +599,13 @@ void LaserDriver::setFactoryType(const QString& factory)
     delete[] strFactory;
 }
 
-bool LaserDriver::checkFactoryPassword(const QString& password)
-{
-    wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
-    bool success = m_fnCheckFactoryPassword(wcPassword) != -1;
-    delete[] wcPassword;
-    return success;
-}
+//bool LaserDriver::checkFactoryPassword(const QString& password)
+//{
+//    wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
+//    bool success = m_fnCheckFactoryPassword(wcPassword) != -1;
+//    delete[] wcPassword;
+//    return success;
+//}
 
 bool LaserDriver::changeFactoryPassword(const QString& oldPassword, const QString& newPassword)
 {
@@ -486,9 +622,22 @@ void LaserDriver::lPenMoveToOriginalPoint(double speed)
     m_fnLPenMoveToOriginalPoint(speed);
 }
 
-void LaserDriver::lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed)
+void LaserDriver::lPenQuickMoveTo(
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos)
 {
-    m_fnLPenQuickMoveTo(xyzStyle, zeroPointStyle, x, y, z, startSpeed, workSpeed);
+    m_fnLPenQuickMoveTo(
+        xMoveEnable, xMoveStyle, xPos,
+        yMoveEnable, yMoveStyle, yPos,
+        zMoveEnable, zMoveStyle, zPos
+        );
 }
 
 void LaserDriver::controlHDAction(int action)
@@ -566,7 +715,7 @@ bool LaserDriver::createLicenseFile(const QString& licenseCode)
     return result;
 }
 
-QVector3D LaserDriver::GetCurrentLaserPos()
+QVector3D LaserDriver::getCurrentLaserPos()
 {
     wchar_t* raw = m_fnGetCurrentLaserPos();
     QString posStr = QString::fromWCharArray(raw);

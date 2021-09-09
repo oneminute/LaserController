@@ -1,5 +1,6 @@
 #include "Utils.h"
 #include <QUuid>
+#include "scene/LaserPrimitive.h"
 
 QString utils::createUUID(const QString& prefix)
 {
@@ -71,7 +72,7 @@ QVector3D utils::putToQuadrant(const QVector3D & pos, QUADRANT quadrant)
     return QVector3D(x, y, z);
 }
 
-void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float height)
+QVector3D utils::limitToLayout(const QVector3D & pos, QUADRANT quadrant, float width, float height)
 {
     float x = pos.x();
     float y = pos.y();
@@ -103,8 +104,7 @@ void utils::limitToLayout(QVector3D & pos, QUADRANT quadrant, float width, float
         break;
     }
 
-    pos.setX(x);
-    pos.setY(y);
+    return QVector3D(x, y, pos.z());
 }
 
 bool utils::checkTwoPointEqueal(const QPointF & point1, const QPointF & point2, float scop)
@@ -147,4 +147,28 @@ QPointF utils::center(const QVector<QPointF>& points)
     }
     center /= points.size();
     return center;
+}
+
+QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
+{
+    QRectF bounding(0, 0, 0, 0);
+    int count = 0;
+    for (LaserPrimitive* primitive: primitives)
+    {
+        QRectF rect = primitive->sceneBoundingRect();
+        if (count++ == 0)
+        {
+            bounding = rect;
+            continue;
+        }
+        if (rect.left() < bounding.left())
+            bounding.setLeft(rect.left());
+        if (rect.top() < bounding.top())
+            bounding.setTop(rect.top());
+        if (rect.right() > bounding.right())
+            bounding.setRight(rect.right());
+        if (rect.bottom() > bounding.bottom())
+            bounding.setBottom(rect.bottom());
+    }
+    return bounding;
 }

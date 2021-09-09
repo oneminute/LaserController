@@ -237,6 +237,7 @@ public:
 private:
     typedef wchar_t* (*FN_WCHART_VOID)();
     typedef void(__stdcall *FN_VOID_INT)(int value);
+    typedef bool(__stdcall *FN_BOOL_INT)(int value);
     typedef void(*FN_VOID_VOID)();
     typedef void(__stdcall* FN_VOID_WCHART)(wchar_t*);
 
@@ -254,14 +255,23 @@ private:
     typedef int(*FN_INT_VOID)();
 
     typedef void(__stdcall *FNSetSoftwareInitialization)(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
-    typedef void(__stdcall *FNSetRotateDeviceParam)(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
+    //typedef void(__stdcall *FNSetRotateDeviceParam)(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     typedef void(__stdcall *FNSetHardwareInitialization)(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
 
     typedef int(__stdcall *FN_INT_WCHART_WCHART)(wchar_t* address, wchar_t* data);
     typedef int(__stdcall *FN_INT_WCHART)(wchar_t* address);
 
     typedef void(__stdcall *FN_VOID_DOUBLE)(double speed);
-    typedef void(__stdcall *FNLPenQuickMoveTo)(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
+    typedef void(__stdcall *FNLPenQuickMoveTo)(
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos);
     typedef void(__stdcall *FNSmallScaleMovement)(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
 
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
@@ -278,6 +288,7 @@ private:
     typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t* licenseCode);
 
     typedef void(__stdcall* FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
+    typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
@@ -296,14 +307,16 @@ public:
 
     QString getVersion();
     QString getCompileInfo();
-    void init(int winId);
+    int setLanguage(int lang);
+    bool init(int winId);
+    void setupCallbacks();
     void unInit();
     QStringList getPortList();
     bool initComPort(const QString& name);
     bool uninitComPort();
     void setTransTimeOutInterval(int interval);
     void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
-    void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
+    //void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
     void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
 
     bool writeSysParamToCard(const LaserRegister::RegistersMap& values);
@@ -313,13 +326,23 @@ public:
     bool readUserParamFromCard(QList<int> addresses);
     bool readAllUserParamFromCard();
 
-    void showAboutWindow();
+    int showAboutWindow(int interval = 0, bool modal = true);
+    void closeAboutWindow();
     QString getLaserLibraryInfo();
     void setFactoryType(const QString& factory);
-    bool checkFactoryPassword(const QString& password);
+    //bool checkFactoryPassword(const QString& password);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
-    void lPenQuickMoveTo(char xyzStyle, bool zeroPointStyle, double x, double y, double z, int startSpeed, int workSpeed);
+    void lPenQuickMoveTo(
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos);
     void controlHDAction(int action);
 
     QString getMainCardID();
@@ -341,7 +364,7 @@ public:
     QString getMainCardInfo();
     bool createLicenseFile(const QString& licenseCode);
 
-    QVector3D GetCurrentLaserPos();
+    QVector3D getCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
     void startMachining(bool zeroPointStyle);
     int pauseContinueMachining(bool pause);
@@ -411,7 +434,8 @@ private:
 
     FN_WCHART_VOID m_fnGetAPILibVersion;
     FN_WCHART_VOID m_fnGetAPILibCompileInfo;
-    FN_VOID_INT m_fnInitLib;
+    FN_INT_INT m_fnSetLanguage;
+    FN_BOOL_INT m_fnInitLib;
     FN_VOID_VOID m_fnUnInitLib;
 
     FNProgressCallBack m_fnProgressCallBack;
@@ -424,7 +448,7 @@ private:
 
     FN_VOID_INT m_fnSetTransTimeOutInterval;
     FNSetSoftwareInitialization m_fnSetSoftwareInitialization;
-    FNSetRotateDeviceParam m_fnSetRotateDeviceParam;
+    //FNSetRotateDeviceParam m_fnSetRotateDeviceParam;
     FNSetHardwareInitialization m_fnSetHardwareInitialization;
 
     FN_INT_WCHART_WCHART m_fnWriteSysParamToCard;
@@ -432,10 +456,11 @@ private:
     FN_INT_WCHART_WCHART m_fnWriteUserParamToCard;
     FN_INT_WCHART m_fnReadUserParamFromCard;
 
-    FN_VOID_VOID m_fnShowAboutWindow;
+    FN_INT_INT_BOOL m_fnShowAboutWindow;
+    FN_VOID_VOID m_fnCloseAboutWindow;
     FN_VOID_VOID m_fnGetLaserLibInfo;
     FN_VOID_WCHART m_fnSetFactoryType;
-    FN_INT_WCHART m_fnCheckFactoryPassword;
+    //FN_INT_WCHART m_fnCheckFactoryPassword;
     FN_INT_WCHART_WCHART m_fnWriteFactoryPassword;
 
     FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;

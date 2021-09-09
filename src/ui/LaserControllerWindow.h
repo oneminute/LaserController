@@ -18,11 +18,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
 
-namespace ads 
-{
-    class CDockAreaWidget;
-}
-
 class FloatEditDualSlider;
 class FloatEditSlider;
 class LaserLayerTableWidget;
@@ -52,6 +47,8 @@ public:
     FinishRun finishRun();
 
     void createUpdateDockPanel(int winId);
+
+    LaserDocument* currentDocument() const;
 
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -135,7 +132,6 @@ protected slots:
 	void onActionUngroup(bool checked = false);
 	bool onActionCloseDocument(bool checked = false);
     void onActionSettings(bool checked = false);
-    void onActionDeviceSettings(bool checked = false);
     void onActionSelectionTool(bool checked = false);
 	void onActionViewDrag(bool checked = false);
 	void onActionRectangle(bool checked = false);
@@ -147,6 +143,7 @@ protected slots:
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
     void onActionUpdate(bool checked = false);
+    void onActionLaserPosition(bool checked = false);
 
 	void onActionMirrorHorizontal(bool checked = false);
 	void onActionMirrorVertical(bool checked = false);
@@ -181,8 +178,8 @@ protected slots:
     void onFloatEditSliderLaserPower(qreal value);
     void onFloatDualEditSliderLowerValueChanged(qreal value);
     void onFloatDualEditSliderHigherValueChanged(qreal value);
-    void onLaserMinPowerChanged(const QVariant& value);
-    void onLaserMaxPowerChanged(const QVariant& value);
+    void onLaserMinPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 	void onCreatSpline();
 
@@ -207,6 +204,11 @@ protected slots:
 	void onUndoStackCleanChanged(bool clean);
 	void onCanUndoChanged(bool can);
 	void onCanRedoChanged(bool can);
+
+    // config items
+    void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
+
 private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
@@ -237,6 +239,7 @@ private:
     RulerWidget* m_hRuler;
     RulerWidget* m_vRuler;
     QComboBox* m_comboBoxScale;
+    ads::CDockAreaWidget* m_centralDockArea;
 
     // Layers Panel widgets
     LaserLayerTableWidget* m_tableWidgetLayers;
@@ -297,6 +300,7 @@ private:
     QToolButton* m_buttonMoveBottomRight;
     QToolButton* m_buttonMoveUp;
     QToolButton* m_buttonMoveDown;
+    QToolButton* m_buttonLaserPosition;
     QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonMachiningOrigin1;
     QRadioButton* m_radioButtonMachiningOrigin2;

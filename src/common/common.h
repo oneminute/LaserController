@@ -197,7 +197,7 @@ enum StoreStrategy
 
 enum InputWidgetType
 {
-    IWT_Unknown,
+    IWT_Custom,
     IWT_CheckBox,
     IWT_ComboBox,
     IWT_LineEdit,
@@ -227,6 +227,30 @@ enum DataType
     DT_POINT,
     DT_SIZE,
     DT_CUSTOM
+};
+
+enum LaserNodeType
+{
+    LNT_DOCUMENT,
+    LNT_LAYER,
+    LNT_PRIMITIVE,
+    LNT_VIRTUAL,
+};
+
+enum StartFromType
+{
+    SFT_CurrentPosition,
+    SFT_UserOrigin,
+    SFT_AbsoluteCoords
+};
+
+enum ModifiedBy
+{
+    MB_Manual,
+    MB_ConfigFile,
+    MB_Widget,
+    MB_Register,
+    MB_RegisterConfirmed
 };
 
 class Global

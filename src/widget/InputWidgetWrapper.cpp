@@ -26,7 +26,7 @@ public:
         , labelName(nullptr)
         , labelDesc(nullptr)
         , configItem(configItem)
-        , type(IWT_Unknown)
+        , type(IWT_Custom)
     {
 
     }
@@ -44,6 +44,8 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     , m_ptr(new InputWidgetWrapperPrivate(this, configItem))
 {
     Q_D(InputWidgetWrapper);
+    Q_ASSERT(widget);
+    setParent(widget);
 
     d->type = configItem->inputWidgetType();
 
@@ -128,10 +130,12 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         break;
     }
     }
+    configItem->blockSignals(true);
     updateValue(d->configItem->value());
-    connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::fromWidget);
+    configItem->blockSignals(false);
+    connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::setValue);
     connect(d->configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
-    connect(d->configItem, &ConfigItem::widgetValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
+    connect(d->configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
 }
 
 InputWidgetWrapper::~InputWidgetWrapper()
@@ -171,96 +175,99 @@ void InputWidgetWrapper::restoreDefault()
 void InputWidgetWrapper::updateValue(const QVariant& newValue)
 {
     Q_D(InputWidgetWrapper);
-    QVariant value = d->configItem->doLoadDataHook(newValue);
+    QVariant value = d->configItem->doValueToWidgetHook(newValue);
     QWidget* widget = qobject_cast<QWidget*>(parent());
     widget->blockSignals(true);
-    switch (d->type)
+    if (!d->configItem->doUpdateWidgetValueHook(widget, newValue))
     {
-    case IWT_CheckBox:
-    {
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
-        checkBox->setCheckState(value.toBool() ? Qt::Checked : Qt::Unchecked);
-        break;
-    }
-    case IWT_ComboBox:
-    {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        if (value.type() == QVariant::String)
+        switch (d->type)
         {
-            comboBox->setCurrentText(value.toString());
-        }
-        else if (value.type() == QVariant::Int)
+        case IWT_CheckBox:
         {
-            comboBox->setCurrentIndex(value.toInt());
+            QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
+            checkBox->setCheckState(value.toBool() ? Qt::Checked : Qt::Unchecked);
+            break;
         }
-        break;
-    }
-    case IWT_LineEdit:
-    {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
-        lineEdit->setText(value.toString());
-        break;
-    }
-    case IWT_TextEdit:
-    {
-        QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
-        textEdit->setText(value.toString());
-        break;
-    }
-    case IWT_PlainTextEdit:
-    {
-        QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
-        plainTextEdit->setPlainText(value.toString());
-        break;
-    }
-    case IWT_SpinBox:
-    {
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
-        spinBox->setValue(value.toInt());
-        break;
-    }
-    case IWT_DoubleSpinBox:
-    {
-        QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
-        doubleSpinBox->setValue(value.toDouble());
-        break;
-    }
-    case IWT_TimeEdit:
-    {
-        QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
-        timeEdit->setTime(value.toTime());
-        break;
-    }
-    case IWT_DateEdit:
-    {
-        QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
-        dateEdit->setDate(value.toDate());
-        break;
-    }
-    case IWT_DateTimeEdit:
-    {
-        QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
-        dateTimeEdit->setDateTime(value.toDateTime());
-        break;
-    }
-    case IWT_Dial:
-    {
-        QDial* dial = qobject_cast<QDial*>(widget);
-        dial->setValue(value.toInt());
-        break;
-    }
-    case IWT_EditSlider:
-    {
-        EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
-        editSlider->setValue(value.toInt());
-        break;
-    }
-    case IWT_FloatEditSlider:
-    {
-        FloatEditSlider* editSlider = qobject_cast<FloatEditSlider*>(widget);
-        editSlider->setValue(value.toReal());
-        break;
-    }
+        case IWT_ComboBox:
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (value.type() == QVariant::String)
+            {
+                comboBox->setCurrentText(value.toString());
+            }
+            else if (value.type() == QVariant::Int)
+            {
+                comboBox->setCurrentIndex(value.toInt());
+            }
+            break;
+        }
+        case IWT_LineEdit:
+        {
+            QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
+            lineEdit->setText(value.toString());
+            break;
+        }
+        case IWT_TextEdit:
+        {
+            QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
+            textEdit->setText(value.toString());
+            break;
+        }
+        case IWT_PlainTextEdit:
+        {
+            QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
+            plainTextEdit->setPlainText(value.toString());
+            break;
+        }
+        case IWT_SpinBox:
+        {
+            QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
+            spinBox->setValue(value.toInt());
+            break;
+        }
+        case IWT_DoubleSpinBox:
+        {
+            QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
+            doubleSpinBox->setValue(value.toDouble());
+            break;
+        }
+        case IWT_TimeEdit:
+        {
+            QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
+            timeEdit->setTime(value.toTime());
+            break;
+        }
+        case IWT_DateEdit:
+        {
+            QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
+            dateEdit->setDate(value.toDate());
+            break;
+        }
+        case IWT_DateTimeEdit:
+        {
+            QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
+            dateTimeEdit->setDateTime(value.toDateTime());
+            break;
+        }
+        case IWT_Dial:
+        {
+            QDial* dial = qobject_cast<QDial*>(widget);
+            dial->setValue(value.toInt());
+            break;
+        }
+        case IWT_EditSlider:
+        {
+            EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
+            editSlider->setValue(value.toInt());
+            break;
+        }
+        case IWT_FloatEditSlider:
+        {
+            FloatEditSlider* editSlider = qobject_cast<FloatEditSlider*>(widget);
+            editSlider->setValue(value.toReal());
+            break;
+        }
+        }
     }
     widget->blockSignals(false);
 }
@@ -270,8 +277,8 @@ void InputWidgetWrapper::changeValue(const QVariant& value)
     Q_D(InputWidgetWrapper);
     if (d->configItem->readOnly())
         return;
-    QVariant newValue = d->configItem->doSaveDataHook(value);
-    emit valueChanged(newValue);
+    QVariant newValue = d->configItem->doValueFromWidgetHook(value);
+    emit valueChanged(newValue, MB_Widget);
 }
 
 bool InputWidgetWrapper::isModified()
@@ -330,9 +337,6 @@ QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orie
     case IWT_FloatEditSlider:
         widget = new FloatEditSlider(orientation);
         break;
-    //case IWT_LimitationWidget:
-        //widget = new SmallDiagonalLimitationWidget;
-        //break;
     default:
         widget = item->doCreateWidgetHook();
         break;
@@ -340,10 +344,16 @@ QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orie
     return widget;
 }
 
+void InputWidgetWrapper::setEnabled(bool enabled)
+{
+    Q_D(InputWidgetWrapper);
+    qobject_cast<QWidget*>(parent())->setEnabled(enabled);
+}
+
 void InputWidgetWrapper::onTextChanged(const QString & text)
 {
     Q_D(InputWidgetWrapper);
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onCheckBoxStateChanged(int state)
@@ -363,7 +373,7 @@ void InputWidgetWrapper::onTextEditTextChanged()
     Q_D(InputWidgetWrapper);
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onPlainTextEditTextChanged()
@@ -371,7 +381,7 @@ void InputWidgetWrapper::onPlainTextEditTextChanged()
     Q_D(InputWidgetWrapper);
     QPlainTextEdit* textEdit = qobject_cast<QPlainTextEdit*>(sender());
     QString text = textEdit->toPlainText();
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onEditingFinished()
@@ -379,7 +389,7 @@ void InputWidgetWrapper::onEditingFinished()
     Q_D(InputWidgetWrapper);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
     QString text = lineEdit->text();
-    changeValue(typeUtils::textToVariant(text, d->configItem->dataType()));
+    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
 }
 
 void InputWidgetWrapper::onValueChanged(int value)
@@ -432,8 +442,9 @@ void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
     d->labelName->setPalette(palette);
 }
 
-void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value)
+void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
-    updateValue(value);
+    if (modifiedBy != MB_Widget)
+        updateValue(value);
 }
 

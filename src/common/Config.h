@@ -109,17 +109,20 @@ public:
     public:
         static ConfigItemGroup* group;
 		CONFIG_ITEM(ui, operationButtonIconSize, int, toInt)
-			CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
-			CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
-			CONFIG_ITEM(ui, operationButtonShowText, bool, toBool)
-			CONFIG_ITEM(ui, toolButtonSize, int, toInt)
-			CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
-			CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
-			CONFIG_ITEM(ui, gridContrast, int, toInt)
-			CONFIG_ITEM(ui, visualGridSpacing, qreal, toDouble)
-			CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
-			CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
-			CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
+        CONFIG_ITEM(ui, operationButtonWidth, int, toInt)
+        CONFIG_ITEM(ui, operationButtonHeight, int, toInt)
+        CONFIG_ITEM(ui, operationButtonShowText, bool, toBool)
+        CONFIG_ITEM(ui, toolButtonSize, int, toInt)
+        CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
+        CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
+        CONFIG_ITEM(ui, gridContrast, int, toInt)
+        CONFIG_ITEM(ui, visualGridSpacing, qreal, toDouble)
+        CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
+        CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
+        CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
+        CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
+        CONFIG_ITEM(ui, autoRepeatDelay, int, toInt)
+        CONFIG_ITEM(ui, autoRepeatInterval, int, toInt)
 
     private:
         friend class Config;
@@ -182,7 +185,7 @@ public:
         CONFIG_ITEM(pathOptimization, useGreedyAlgorithm, bool, toBool)
         CONFIG_ITEM(pathOptimization, maxStartingPoints, int, toInt)
         CONFIG_ITEM(pathOptimization, startingPointAnglesDiff, qreal, toReal)
-        CONFIG_ITEM(pathOptimization, maxGroupSize, int, toInt)
+        //CONFIG_ITEM(pathOptimization, maxGroupSize, int, toInt)
         CONFIG_ITEM(pathOptimization, groupingOrientation, int, toInt)
         CONFIG_ITEM(pathOptimization, maxGroupingGridSize, qreal, toReal)
 
@@ -220,6 +223,9 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(device, autoConnectFirst, bool, toBool)
 
+        CONFIG_ITEM(device, startFrom, int, toInt)
+        CONFIG_ITEM(device, jobOrigin, int, toInt)
+
     private:
         friend class Config;
     };
@@ -238,7 +244,8 @@ public:
         CONFIG_ITEM(userRegister, cuttingMoveSpeed, int, toInt)
         CONFIG_ITEM(userRegister, cuttingMoveAcc, int, toInt)
         CONFIG_ITEM(userRegister, cuttingTurnSpeed, int, toInt)
-        CONFIG_ITEM(userRegister, cuttingTuenAcc, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingTurnAcc, int, toInt)
+        CONFIG_ITEM(userRegister, cuttingWorkAcc, int, toInt)
         CONFIG_ITEM(userRegister, cuttingMoveSpeedFactor, int, toInt)
         CONFIG_ITEM(userRegister, cuttingWorkSpeedFactor, int, toInt)
         CONFIG_ITEM(userRegister, cuttingSpotSize, int, toInt)
@@ -247,16 +254,24 @@ public:
         CONFIG_ITEM(userRegister, scanXAcc, int, toInt)
         CONFIG_ITEM(userRegister, scanYAcc, int, toInt)
         CONFIG_ITEM(userRegister, scanRowSpeed, int, toInt)
-        CONFIG_ITEM(userRegister, scanRowInterval, int, toInt)
+        CONFIG_ITEM(userRegister, scanRowInterval, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnError, int, toInt)
         CONFIG_ITEM(userRegister, scanLaserPower, qreal, toReal)
         CONFIG_ITEM(userRegister, scanXResetEnabled, bool, toBool)
         CONFIG_ITEM(userRegister, scanYResetEnabled, bool, toBool)
         CONFIG_ITEM(userRegister, scanZResetEnabled, bool, toBool)
+        CONFIG_ITEM(userRegister, resetSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnPos, int, toInt)
-        CONFIG_ITEM(userRegister, backlashXInterval, int, toInt)
-        CONFIG_ITEM(userRegister, backlashYInterval, int, toInt)
-        CONFIG_ITEM(userRegister, backlashZInterval, int, toInt)
+        CONFIG_ITEM(userRegister, backlashXInterval, qreal, toReal)
+        CONFIG_ITEM(userRegister, backlashYInterval, qreal, toReal)
+        CONFIG_ITEM(userRegister, backlashZInterval, qreal, toReal)
+
+        CONFIG_ITEM(userRegister, defaultRunSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, defaultMaxCuttingPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, defaultMinCuttingPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, defaultScanSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, maxScanGrayRatio, qreal, toReal)
+        CONFIG_ITEM(userRegister, minScanGrayRatio, qreal, toReal)
 
     private:
         friend class Config;
@@ -271,6 +286,17 @@ public:
 
     public:
         static ConfigItemGroup* group;
+
+        CONFIG_ITEM(systemRegister, head, int, toInt)
+        CONFIG_ITEM(systemRegister, password, QString, toString)
+        CONFIG_ITEM(systemRegister, storedPassword, QString, toString)
+        CONFIG_ITEM(systemRegister, hardwareID1, QString, toString)
+        CONFIG_ITEM(systemRegister, hardwareID2, QString, toString)
+        CONFIG_ITEM(systemRegister, hardwareID3, QString, toString)
+        CONFIG_ITEM(systemRegister, cdKey1, QString, toString)
+        CONFIG_ITEM(systemRegister, cdKey2, QString, toString)
+        CONFIG_ITEM(systemRegister, cdKey3, QString, toString)
+
         CONFIG_ITEM(systemRegister, sysRunTime, int, toInt)
         CONFIG_ITEM(systemRegister, laserRunTime, int, toInt)
         CONFIG_ITEM(systemRegister, sysRunNum, int, toInt)
@@ -323,6 +349,7 @@ public:
         CONFIG_ITEM(systemRegister, xPhaseEnabled, bool, toBool)
         CONFIG_ITEM(systemRegister, yPhaseEnabled, bool, toBool)
         CONFIG_ITEM(systemRegister, zPhaseEnabled, bool, toBool)
+        CONFIG_ITEM(systemRegister, deviceOrigin, int, toInt)
 
     private:
         friend class Config;
@@ -341,6 +368,7 @@ public:
         CONFIG_ITEM(debug, showPrimitiveFirstPoint, bool, toBool)
         CONFIG_ITEM(debug, generatePathImage, bool, toBool)
         CONFIG_ITEM(debug, generateMachiningImage, bool, toBool)
+        CONFIG_ITEM(debug, enableOptimizeInteraction, bool, toBool)
 
     private:
         friend class Config;

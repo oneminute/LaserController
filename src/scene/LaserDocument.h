@@ -10,7 +10,7 @@
 #include <QGraphicsItem>
 
 #include "PageInformation.h"
-#include "LaserNode.h"
+#include "scene/LaserDocumentItem.h"
 
 class LaserDocumentPrivate;
 class LaserPrimitive;
@@ -19,7 +19,7 @@ class LaserScene;
 class LayerButton;
 
 class LaserDocumentPrivate;
-class LaserDocument : public QObject, public LaserNode
+class LaserDocument : public QObject, public ILaserDocumentItem
 {
     Q_OBJECT
 public:
@@ -62,6 +62,14 @@ public:
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
 
+    QPointF docOrigin() const;
+    QTransform docTransform() const;
+    QRectF docBoundingRect() const;
+
+    /// <summary>
+    /// 返回相对于当前确定的原点的坐标。
+    /// </summary>
+    /// <returns></returns>
     virtual QPointF position() const { return QPoint(0, 0); }
 
 public slots:
@@ -74,8 +82,8 @@ public slots:
     void close();
 	void analysis();
     void outline();
-    void clearOutline(bool clearLayers = false);
-    void printOutline(LaserNode* node, int level);
+    //void clearOutline(bool clearLayers = false);
+    void printOutline(OptimizeNode* node, int level);
     void arrange();
     void optimize();
     void save(const QString& filename, QWidget* window);
@@ -85,16 +93,17 @@ public slots:
 protected:
 	void init();
     RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
-    void outlineByLayers(LaserNode* node);
-    void outlineByGroups(LaserNode* node);
+    void outlineByLayers(OptimizeNode* node);
+    void outlineByGroups(OptimizeNode* node);
+    void clearTree(OptimizeNode* node);
     /// <summary>
     /// 对当前的节点树进行整理，使每个分组树中的叶结点不要超过最大数量。
     /// </summary>
     /// <param name="node">待分组节点</param>
     /// <param name="level">当前的组级别</param>
-    void optimizeGroups(LaserNode* node, int level = 1);
-    void clearOutline(LaserNode* node, bool clearLayers = false);
-    void addPrimitiveToNodesTree(LaserPrimitive* primitive, LaserNode* node);
+    void optimizeGroups(OptimizeNode* node, int level = 1);
+    //void clearOutline(OptimizeNode* node, bool clearLayers = false);
+    void addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node);
 
 signals:
     void layersStructureChanged();
@@ -104,10 +113,10 @@ signals:
 
 protected:
     Q_DISABLE_COPY(LaserDocument)
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserDocument)
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserDocument)
 
-    friend class LaserNode;
-    friend class LaserNodePrivate;
+    friend class OptimizeNode;
+    friend class OptimizeNodePrivate;
 };
 
 #endif // LASERDOCUMENT_H

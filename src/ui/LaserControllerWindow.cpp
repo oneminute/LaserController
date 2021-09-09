@@ -6,6 +6,8 @@
 #include <DockAreaTitleBar.h>
 #include <DockAreaWidget.h>
 #include <DockComponentsFactory.h>
+#include <DockContainerWidget.h>
+#include <DockSplitter.h>
 #include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
@@ -18,6 +20,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSplitter>
 #include <QStack>
 #include <QtMath>
 #include <QRadioButton>
@@ -32,6 +35,7 @@
 #include <QFontComboBox>
 
 #include "LaserApplication.h"
+#include "algorithm/OptimizeNode.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "import/Importer.h"
@@ -43,7 +47,6 @@
 #include "scene/LaserScene.h"
 #include "state/StateController.h"
 #include "ui/ConfigDialog.h"
-#include "ui/DeviceSettingsDialog.h"
 #include "ui/HalftoneDialog.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/MainCardInfoDialog.h"
@@ -88,6 +91,25 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     createMovementDockPanel();
 
     m_dockAreaLayers->setCurrentIndex(0);
+    // 更改分割条的粗细
+    internal::findParent<QSplitter*>(m_centralDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaLayers)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaCameras)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaOperations)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaOutline)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaMovement)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    for (CDockContainerWidget* container : m_dockManager->dockContainers())
+    {
+        connect(container, &CDockContainerWidget::dockAreasAdded,
+            [=]() {
+                qLogD << container;
+                for (int i = 0; i < container->dockAreaCount(); i++)
+                {
+                    internal::findParent<QSplitter*>(container->dockArea(i))->setHandleWidth(Config::Ui::splitterHandleWidth());
+                }
+            }
+        );
+    }
     
     setDockNestingEnabled(true);
 
@@ -473,7 +495,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
     connect(m_ui->actionMoveLayerDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerDown);
-    connect(m_ui->actionDeviceSettings, &QAction::triggered, this, &LaserControllerWindow::onActionDeviceSettings);
     connect(m_ui->actionSettings, &QAction::triggered, this, &LaserControllerWindow::onActionSettings);
     connect(m_ui->actionPathOptimization, &QAction::triggered, this, &LaserControllerWindow::onActionPathOptimization);
 
@@ -503,6 +524,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
     connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
+    connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
 
 	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -674,6 +696,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		}
 	});
 	
+    // config items
+    connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
+    connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -791,53 +816,22 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
         return;
     }
 
-    QVariant value;
+    QVariant value(0);
 
-    // Get Quadrant;
-    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_WORKING_QUADRANT, value))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }*/
     QUADRANT quad = static_cast<QUADRANT>(value.toInt());
 
-    // Get registor #5
-    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_SPEED, value))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }*/
-    int moveFastSpeed = value.toInt();
-
-    // Get registor #40
-    /*if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_FAST_LAUNCHING_SPEED, value))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }*/
-    int moveFastLaunchingSpeed = value.toInt();
-
-    // Get layout size
-    float layoutWidth = 0;
-    float layoutHeight = 0;
-    if (!LaserDriver::instance().getLayout(layoutWidth, layoutHeight))
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Getting register value failure!"));
-        return;
-    }
-    
-    // Get current pos;
-    QVector3D dest = utils::putToQuadrant(abstractDest, quad);
     if (relative)
     {
-        QVector3D pos = utils::putToQuadrant(LaserDriver::instance().GetCurrentLaserPos(), quad);
-        dest = pos + delta;
+        LaserApplication::device->moveBy(delta);
     }
-    utils::limitToLayout(dest, quad, layoutWidth, layoutHeight);
-    char xyzStyle = 0;
-    if (dest.z() != 0.f)
-        xyzStyle = 1;
-    LaserDriver::instance().lPenQuickMoveTo(xyzStyle, true, dest.x(), dest.y(), dest.z(), moveFastSpeed, moveFastLaunchingSpeed);
+    else
+    {
+        // Get current pos;
+        QVector3D dest = utils::putToQuadrant(abstractDest, quad);
+        QVector3D pos = utils::putToQuadrant(LaserDriver::instance().getCurrentLaserPos(), quad);
+        dest = pos + delta;
+        LaserApplication::device->moveTo(dest, quad);
+    }
 }
 
 FinishRun LaserControllerWindow::finishRun()
@@ -1276,9 +1270,8 @@ void LaserControllerWindow::createCentralDockPanel()
 
     CDockWidget* centralDockWidget = new CDockWidget(tr("work space"));
     centralDockWidget->setWidget(centralWidget);
-    CDockAreaWidget* centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
-    centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
-
+    m_centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
+    m_centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
 }
 
 void LaserControllerWindow::createLayersDockPanel()
@@ -1304,7 +1297,7 @@ void LaserControllerWindow::createLayersDockPanel()
     buttonsLayout->addWidget(m_buttonRemoveLayer);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addWidget(m_tableWidgetLayers, 1);
     layout->addLayout(buttonsLayout, 0);
 
@@ -1358,7 +1351,7 @@ void LaserControllerWindow::createCameraDockPanel()
     m_doubleSpinBoxCameraYShift->setValue(0.0);
 
     QGridLayout* layout = new QGridLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addWidget(labelCameras, 0, 0);
     layout->addWidget(m_comboBoxCameras, 0, 1, 1, 4);
     layout->addWidget(m_buttonCameraUpdateOverlay, 1, 0);
@@ -1495,7 +1488,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     fourthRow->setStretch(3, 0);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addLayout(firstRow);
     layout->addLayout(secondRow);
     layout->addLayout(thirdRow);
@@ -1529,7 +1522,7 @@ void LaserControllerWindow::createOutlineDockPanel()
     toolsLayout->addWidget(updateButton);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addWidget(m_treeWidgetOutline);
     layout->addLayout(toolsLayout);
 
@@ -1594,37 +1587,53 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->setColumnStretch(6, 1);
 
     m_buttonMoveTopLeft = new QToolButton;
+    m_buttonMoveTopLeft->setAutoRepeat(true);
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
 
-    m_buttonMoveTop= new QToolButton;
+    m_buttonMoveTop = new QToolButton;
+    m_buttonMoveTop->setAutoRepeat(true);
     m_buttonMoveTop->setDefaultAction(m_ui->actionMoveTop);
 
     m_buttonMoveTopRight = new QToolButton;
+    m_buttonMoveTopRight->setAutoRepeat(true);
     m_buttonMoveTopRight->setDefaultAction(m_ui->actionMoveTopRight);
 
     m_buttonMoveLeft = new QToolButton;
+    m_buttonMoveLeft->setAutoRepeat(true);
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
-    m_buttonMoveToOrigin= new QToolButton;
+    m_buttonMoveToOrigin = new QToolButton;
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
     m_buttonMoveRight = new QToolButton;
+    m_buttonMoveRight->setAutoRepeat(true);
     m_buttonMoveRight->setDefaultAction(m_ui->actionMoveRight);
 
     m_buttonMoveBottomLeft = new QToolButton;
+    m_buttonMoveBottomLeft->setAutoRepeat(true);
     m_buttonMoveBottomLeft->setDefaultAction(m_ui->actionMoveBottomLeft);
 
     m_buttonMoveBottom = new QToolButton;
+    m_buttonMoveBottom->setAutoRepeat(true);
     m_buttonMoveBottom->setDefaultAction(m_ui->actionMoveBottom);
 
     m_buttonMoveBottomRight = new QToolButton;
+    m_buttonMoveBottomRight->setAutoRepeat(true);
     m_buttonMoveBottomRight->setDefaultAction(m_ui->actionMoveBottomRight);
 
     m_buttonMoveUp = new QToolButton;
+    m_buttonMoveUp->setAutoRepeat(true);
     m_buttonMoveUp->setDefaultAction(m_ui->actionMoveUp);
 
     m_buttonMoveDown = new QToolButton;
+    m_buttonMoveDown->setAutoRepeat(true);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
+
+    m_buttonLaserPosition = new QToolButton;
+    m_buttonLaserPosition->setDefaultAction(m_ui->actionLaserPosition);
+
+    updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay(), MB_Manual);
+    updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
@@ -1639,6 +1648,7 @@ void LaserControllerWindow::createMovementDockPanel()
     secondRow->addWidget(m_buttonMoveBottom, 2, 1);
     secondRow->addWidget(m_buttonMoveBottomRight, 2, 2);
     secondRow->addWidget(m_buttonMoveDown, 2, 3);
+    secondRow->addWidget(m_buttonLaserPosition, 3, 0, 1, 4);
 
     m_comboBoxPostEvent = new QComboBox;
     m_comboBoxPostEvent->addItem(tr("Stop at current position"));
@@ -1711,7 +1721,7 @@ void LaserControllerWindow::createMovementDockPanel()
     connect(m_buttonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
 
     QHBoxLayout* fourthRow = new QHBoxLayout;
-    fourthRow->setMargin(0);
+    fourthRow->setMargin(3);
     fourthRow->addWidget(m_buttonReadOrigins);
     fourthRow->addWidget(m_buttonWriteOrigins);
 
@@ -1752,6 +1762,11 @@ void LaserControllerWindow::createUpdateDockPanel(int winId)
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaUpdate = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+}
+
+LaserDocument* LaserControllerWindow::currentDocument() const
+{
+    return m_viewer->scene()->document();
 }
 
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
@@ -1902,8 +1917,6 @@ void LaserControllerWindow::onActionNew(bool checked)
 	}
 	this->setWindowTitle("<Untitled> - " + m_windowTitle);
 	createNewDocument();
-	
-	
 }
 
 bool LaserControllerWindow::onActionSave(bool checked)
@@ -2084,7 +2097,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setMimeTypeFilters(QStringList() << "application/json");
     dialog.setWindowTitle(tr("Export"));
-    dialog.selectFile(m_scene->document()->nodeName());
+    dialog.selectFile(m_scene->document()->name());
     if (dialog.exec() == QFileDialog::Accepted)
     {
         QString filename = dialog.selectedFiles().constFirst();
@@ -2241,13 +2254,13 @@ void LaserControllerWindow::onActionWorkState(bool checked)
 
 void LaserControllerWindow::onActionMoveTop(bool checked)
 {
-    QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottom(bool checked)
 {
-    QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
@@ -2265,25 +2278,25 @@ void LaserControllerWindow::onActionMoveRight(bool checked)
 
 void LaserControllerWindow::onActionMoveTopLeft(bool checked)
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopRight(bool checked)
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomLeft(bool checked)
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomRight(bool checked)
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
@@ -2460,12 +2473,6 @@ void LaserControllerWindow::onActionSettings(bool checked)
     showConfigDialog();
 }
 
-void LaserControllerWindow::onActionDeviceSettings(bool checked)
-{
-    DeviceSettingsDialog dialog;
-    dialog.exec();
-}
-
 void LaserControllerWindow::onActionSelectionTool(bool checked)
 {
     qDebug()<<"";
@@ -2628,6 +2635,14 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 void LaserControllerWindow::onActionUpdate(bool checked)
 {
     LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
+}
+
+void LaserControllerWindow::onActionLaserPosition(bool checked)
+{
+    QVector3D pos = LaserApplication::device->getCurrentLaserPos();
+    m_lineEditCoordinatesX->setText(QString::number(pos.x(), 'f'));
+    m_lineEditCoordinatesY->setText(QString::number(pos.y(), 'f'));
+    m_lineEditCoordinatesZ->setText(QString::number(pos.z(), 'f'));
 }
 
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
@@ -2806,7 +2821,11 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
     qreal x = Global::convertToMM(SU_PX, pos.x());
     qreal y = Global::convertToMM(SU_PX, pos.y());
-    QString posStr = QString("%1mm,%2mm | %3px,%4px").arg(x).arg(y).arg(qFloor(pos.x())).arg(qFloor(pos.y()));
+    QPointF posMM = QPointF(x, y);
+    posMM = LaserApplication::device->transform().map(posMM);
+    QString posStr = QString("%1mm,%2mm | %3px,%4px")
+        .arg(posMM.x()).arg(posMM.y())
+        .arg(qFloor(pos.x())).arg(qFloor(pos.y()));
     m_statusBarLocation->setText(posStr);
 }
 
@@ -2851,15 +2870,15 @@ void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
 
 void LaserControllerWindow::onFloatDualEditSliderLowerValueChanged(qreal value)
 {
-    Config::SystemRegister::laserMinPowerItem()->setValue(value);
+    Config::SystemRegister::laserMinPowerItem()->setValue(value, MB_Widget);
 }
 
 void LaserControllerWindow::onFloatDualEditSliderHigherValueChanged(qreal value)
 {
-    Config::SystemRegister::laserMaxPowerItem()->setValue(value);
+    Config::SystemRegister::laserMaxPowerItem()->setValue(value, MB_Widget);
 }
 
-void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value)
+void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     bool ok;
     qreal lower = value.toReal(&ok);
@@ -2870,7 +2889,7 @@ void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value)
     m_floatEditDualSliderLaserRange->blockSignals(false);
 }
 
-void LaserControllerWindow::onLaserMaxPowerChanged(const QVariant& value)
+void LaserControllerWindow::onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     bool ok;
     qreal higher = value.toReal(&ok);
@@ -2982,18 +3001,18 @@ void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 
 void LaserControllerWindow::updateOutlineTree()
 {
+    m_treeWidgetOutline->clear();
+
     if (!m_scene->document())
         return;
 
-    m_treeWidgetOutline->clear();
+    QStack<OptimizeNode*> stack;
+    stack.push(m_scene->document()->optimizeNode());
 
-    QStack<LaserNode*> stack;
-    stack.push(m_scene->document());
-
-    QMap<LaserNode*, QTreeWidgetItem*> nodeItemMap;
+    QMap<OptimizeNode*, QTreeWidgetItem*> nodeItemMap;
     while (!stack.isEmpty())
     {
-        LaserNode* node = stack.pop();
+        OptimizeNode* node = stack.pop();
 
         QTreeWidgetItem* parentItem = nullptr;
         if (node->parentNode() != nullptr && nodeItemMap.contains(node->parentNode()))
@@ -3008,7 +3027,7 @@ void LaserControllerWindow::updateOutlineTree()
             m_treeWidgetOutline->addTopLevelItem(item);
         }
 
-        for (LaserNode* childNode : node->childNodes())
+        for (OptimizeNode* childNode : node->childNodes())
         {
             stack.push(childNode);
         }
@@ -3799,6 +3818,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     {
         m_created = true;
         QTimer::singleShot(100, this, &LaserControllerWindow::windowCreated);
+        //LaserApplication::device->closeAboutWindow();
     }
 }
 
@@ -3838,7 +3858,35 @@ void LaserControllerWindow::documentClose()
 		button->setEnabled(false);
 		button->setChecked(false);
 	}
-	
+    updateOutlineTree();
+}
+
+void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy)
+{
+    m_buttonMoveTopLeft->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveTop->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveTopRight->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveLeft->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveRight->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveBottomLeft->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveBottom->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveBottomRight->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveUp->setAutoRepeatDelay(value.toInt());
+    m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
+}
+
+void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
+{
+    m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveTop->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveTopRight->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveLeft->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveRight->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveBottomLeft->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveBottom->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveBottomRight->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveUp->setAutoRepeatInterval(value.toInt());
+    m_buttonMoveDown->setAutoRepeatInterval(value.toInt());
 }
 
 QString LaserControllerWindow::getFilename(const QString& title, const QString& filters)

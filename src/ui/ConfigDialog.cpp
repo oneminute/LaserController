@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QScrollBar>
+#include <QTableWidget>
 #include <QTreeWidgetItem>
 #include <widget/EditSlider.h>
 
@@ -42,9 +43,9 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         << Config::PathOptimization::group
         << Config::Export::group
         << Config::Device::group
-        << Config::UserRegister::group
-        << Config::SystemRegister::group
         << Config::Debug::group
+        << Config::UserRegister::group
+        //<< Config::SystemRegister::group
         ;
 
     for (ConfigItemGroup* group : groups)
@@ -58,14 +59,8 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         page->setLayout(pageLayout);
 
         QGroupBox* groupBox = new QGroupBox(group->title());
-        QGridLayout* gridLayout = new QGridLayout(groupBox);
-        gridLayout->setColumnMinimumWidth(0, 150);
-        gridLayout->setColumnMinimumWidth(1, 240);
-        gridLayout->setColumnMinimumWidth(2, 240);
-        gridLayout->setColumnStretch(0, 0);
-        gridLayout->setColumnStretch(1, 1);
-        gridLayout->setColumnStretch(2, 0);
-        groupBox->setLayout(gridLayout);
+        QFormLayout* contentLayout = new QFormLayout(groupBox);
+        groupBox->setLayout(contentLayout);
         pageLayout->addWidget(groupBox);
 
         QTreeWidgetItem* treeItem = new QTreeWidgetItem;
@@ -75,17 +70,65 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         for (ConfigItem* item : group->items())
         {
-            addConfigItem(item, groupBox);
+            if (item->isVisible())
+                addConfigItem(item, groupBox);
         }
-        int row = gridLayout->rowCount();
-        gridLayout->addWidget(new QWidget, row, 0);
-        gridLayout->setRowStretch(row, 1);
 
         if (group == Config::SystemRegister::group)
         {
             m_systemRegisterPage = page;
         }
     }
+    Config::Export::smallDiagonalLimitationItem()->setEnabled(Config::Export::enableSmallDiagonal());
+
+    // 生成系统寄存器面板
+    {
+        QTabWidget* page = new QTabWidget(this);
+        m_systemRegisterPage = page;
+        page->setWindowTitle(Config::SystemRegister::group->name());
+        m_ui->stackedWidgetPanels->addWidget(page);
+
+        QWidget* generalPanel = new QWidget(page);
+        QFormLayout* generalLayout = new QFormLayout(generalPanel);
+        generalPanel->setLayout(generalLayout);
+        page->addTab(generalPanel, tr("General"));
+
+        QWidget* xPanel = new QWidget(page);
+        QFormLayout* xLayout = new QFormLayout(xPanel);
+        xPanel->setLayout(xLayout);
+        page->addTab(xPanel, tr("X"));
+
+        QWidget* yPanel = new QWidget(page);
+        QFormLayout* yLayout = new QFormLayout(yPanel);
+        yPanel->setLayout(yLayout);
+        page->addTab(yPanel, tr("Y"));
+
+        QWidget* zPanel = new QWidget(page);
+        QFormLayout* zLayout = new QFormLayout(zPanel);
+        zPanel->setLayout(zLayout);
+        page->addTab(zPanel, tr("Z"));
+
+        for (ConfigItem* item : Config::SystemRegister::group->items())
+        {
+            if (!item->isVisible())
+                continue;
+
+            if (item->name().startsWith("x"))
+                addConfigItem(item, xPanel);
+            else if (item->name().startsWith("y"))
+                addConfigItem(item, yPanel);
+            else if (item->name().startsWith("z"))
+                addConfigItem(item, zPanel);
+            else
+                addConfigItem(item, generalPanel);
+        }
+
+        QTreeWidgetItem* treeItem = new QTreeWidgetItem;
+        treeItem->setText(0, Config::SystemRegister::group->title());
+        treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
+        m_ui->treeWidgetCatalogue->addTopLevelItem(treeItem);
+    }
+
     m_ui->stackedWidgetPanels->setCurrentIndex(0);
     m_ui->treeWidgetCatalogue->setCurrentItem(m_ui->treeWidgetCatalogue->topLevelItem(0));
 
@@ -95,6 +138,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
+    LaserApplication::device->readSystemRegisters();
 }
 
 ConfigDialog::~ConfigDialog()
@@ -145,37 +189,27 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
     }
     else if (stdButton == QDialogButtonBox::Save)
     {
+        if (Config::UserRegister::group->isModified())
+            LaserApplication::device->writeUserRegisters();
+        if (Config::SystemRegister::group->isModified())
+        {
+            // show password input dialog
+            QString password = QInputDialog::getText(
+                this,
+                tr("Manufacture Password"),
+                tr("Password"),
+                QLineEdit::Normal
+            );
+            Config::SystemRegister::passwordItem()->setValue(password, MB_Manual);
+            LaserApplication::device->writeSystemRegisters();
+        }
         Config::save(LaserApplication::device->mainCardId());
-        LaserApplication::device->writeUserRegisters();
-        LaserApplication::device->writeSystemRegisters();
         onValueChanged(QVariant());
     }
 }
 
 void ConfigDialog::setCurrentPanel(QWidget * panel)
 {
-    /*if (panel == m_systemRegisterPage)
-    {
-        QString password = QInputDialog::getText(
-            this,
-            tr("Manufacture Password"),
-            tr("Password"),
-            QLineEdit::Normal
-        );
-
-        password = password.trimmed();
-        if (password.isEmpty() || password.isNull())
-        {
-            return;
-        }
-
-        LaserApplication::device->verifyManufacturePassword(password);
-    }
-    else
-    {
-        m_ui->stackedWidgetPanels->setCurrentWidget(panel);
-        m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
-    }*/
     m_ui->stackedWidgetPanels->setCurrentWidget(panel);
     m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
 }
@@ -188,9 +222,7 @@ void ConfigDialog::setCurrentPanel(const QString & title)
 
 void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QString& exlusion)
 {
-    QGridLayout * layout = qobject_cast<QGridLayout*>(parent->layout());
-
-    int row = layout->rowCount();
+    QFormLayout * layout = qobject_cast<QFormLayout*>(parent->layout());
 
     QWidget* widget = InputWidgetWrapper::createWidget(item, Qt::Horizontal);
 
@@ -200,22 +232,16 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
     {
         widget->setProperty(i.key().toStdString().c_str(), i.value());
     }
-    item->initWidget(widget);
-    layout->addWidget(widget, row, 1);
     widget->setParent(parent);
 
     QLabel* labelName = new QLabel(parent);
     labelName->setText(item->title());
-    layout->addWidget(labelName, row, 0);
+    labelName->setToolTip(item->description());
 
-    QLabel* labelDesc = new QLabel(parent);
-    labelDesc->setText(item->description());
-    layout->addWidget(labelDesc, row, 2);
-    layout->setRowStretch(row, 0);
+    layout->addRow(labelName, widget);
 
-    InputWidgetWrapper* wrapper = item->createInputWidgetWrapper(widget);
+    InputWidgetWrapper* wrapper = item->bindWidget(widget);
     wrapper->setNameLabel(labelName);
-    wrapper->setDescriptionLabel(labelDesc);
     m_wrappers.append(wrapper);
 }
 

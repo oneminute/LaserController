@@ -47,7 +47,7 @@ cv::Rect typeUtils::qtRect2cvRect(const QRectF & rect, float scale)
         cv::Point2f(rect.right() * scale, rect.bottom() * scale));
 }
 
-QVariant typeUtils::textToVariant(const QString& src, DataType dataType)
+QVariant typeUtils::stringToVariant(const QString& src, DataType dataType)
 {
     QVariant dst;
     switch (dataType)
@@ -74,7 +74,7 @@ QVariant typeUtils::textToVariant(const QString& src, DataType dataType)
     }
     case DT_BOOL:
     {
-        dst = src.toLower() == "true";
+        dst = src.toLower() == "true" || src.toInt() == 1;
         break;
     }
     case DT_STRING:
@@ -93,6 +93,59 @@ QVariant typeUtils::textToVariant(const QString& src, DataType dataType)
     {
         break;
     }
+    }
+    return dst;
+}
+
+QString typeUtils::variantToString(const QVariant& src, DataType dataType)
+{
+    QString dst;
+    switch (dataType)
+    {
+    case DT_INT:
+    {
+        dst = src.toInt();
+        break;
+    }
+    case DT_FLOAT:
+    {
+        dst = src.toFloat();
+        break;
+    }
+    case DT_DOUBLE:
+    {
+        dst = src.toDouble();
+        break;
+    }
+    case DT_REAL:
+    {
+        dst = static_cast<qreal>(src.toDouble());
+        break;
+    }
+    case DT_BOOL:
+    {
+        dst = src.toBool() ? "1" : "0";
+        break;
+    }
+    case DT_STRING:
+    {
+        dst = src.toString();
+        break;
+    }
+    case DT_DATETIME:
+    {
+        dst = src.toDateTime().toString();
+        break;
+    }
+    case DT_RECT:
+    case DT_POINT:
+    case DT_SIZE:
+    {
+        break;
+    }
+    default:
+        dst = src.toString();
+        break;
     }
     return dst;
 }

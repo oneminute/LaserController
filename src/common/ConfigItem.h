@@ -6,26 +6,24 @@
 #include <QObject>
 
 #include "common/common.h"
-#include "laser/LaserRegister.h"
 
-class Config;
 class ConfigItemGroup;
 class InputWidgetWrapper;
-class LaserRegister;
 
 class ConfigItemPrivate;
 class ConfigItem: public QObject
 {
     Q_OBJECT
 public:
-    typedef QWidget* (*CreateWidgetHook)(ConfigItem*);
-    typedef void (*WidgetInitializeHook)(QWidget*, ConfigItem*);
-    typedef QVariant (*ValueHook)(const QVariant&);
-    typedef void(*DestroyHook)(ConfigItem*);
-    typedef QJsonObject(*ToJsonHook)(const ConfigItem*);
-    typedef void(*FromJsonHook)(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*);
-    typedef void(*ResetHook)(ConfigItem*);
-    typedef void(*RestoreHook)(ConfigItem*);
+    typedef std::function<QWidget*(ConfigItem*)> CreateWidgetHook;
+    typedef std::function<void(QWidget*, ConfigItem*, InputWidgetWrapper*)> WidgetInitializeHook;
+    typedef std::function<QVariant(const QVariant&)> ValueHook;
+    typedef std::function<void(ConfigItem*)> DestroyHook;
+    typedef std::function<QJsonObject(const ConfigItem*)> ToJsonHook;
+    typedef std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> FromJsonHook;
+    typedef std::function<void(ConfigItem*)> ResetHook;
+    typedef std::function<void(ConfigItem*)> RestoreHook;
+    typedef std::function<void(QWidget* widget, const QVariant& value)> UpdateWidgetValueHook;
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
@@ -35,7 +33,7 @@ public:
         , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
-        , StoreStrategy storeType = StoreStrategy::SS_CONFIRMED
+        , StoreStrategy storeStrategy = StoreStrategy::SS_CONFIRMED
     );
     ~ConfigItem();
 
@@ -52,11 +50,20 @@ public:
     bool isVisible() const;
     void setVisible(bool visible);
 
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
+    bool exportable() const;
+    void setExportable(bool exportable);
+
     bool readOnly() const;
     void setReadOnly(bool readOnly = true);
 
-    StoreStrategy storeType() const;
-    void setStoreType(StoreStrategy type);
+    bool writeOnly() const;
+    void setWriteOnly(bool writeOnly = true);
+
+    StoreStrategy storeStrategy() const;
+    void setStoreStrategy(StoreStrategy type);
 
     QVariant value() const;
 
@@ -69,19 +76,13 @@ public:
     QVariant lastValue() const;
     void setLastValue(const QVariant& value);
 
-    bool isDirty() const;
-    void setDirty(bool dirty);
-
     bool isModified() const;
 
-    InputWidgetWrapper* createInputWidgetWrapper(QWidget* widget);
+    InputWidgetWrapper* bindWidget(QWidget* widget);
 
     QString toString() const;
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
-
-    QString toRegisterString() const;
-    LaserRegister::RegisterPair keyValuePair() const;
 
     DataType dataType() const;
 
@@ -93,14 +94,15 @@ public:
 
     WidgetInitializeHook widgetInitializeHook();
     void setWidgetInitializeHook(WidgetInitializeHook fn);
+    void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
 
-    ValueHook loadDataHook();
-    void setLoadDataHook(ValueHook fn);
-    QVariant doLoadDataHook(const QVariant& value) const;
+    ValueHook valueToWidgetHook();
+    void setValueToWidgetHook(ValueHook fn);
+    QVariant doValueToWidgetHook(const QVariant& value) const;
 
-    ValueHook saveDataHook();
-    void setSaveDataHook(ValueHook fn);
-    QVariant doSaveDataHook(const QVariant& value);
+    ValueHook valueFromWidgetHook();
+    void setValueFromWidgetHook(ValueHook fn);
+    QVariant doValueFromWidgetHook(const QVariant& value);
 
     CreateWidgetHook createWidgetHook();
     void setCreateWidgetHook(CreateWidgetHook fn);
@@ -126,37 +128,35 @@ public:
     void setRestoreHook(RestoreHook fn);
     void doRestoreHook();
 
-    void initWidget(QWidget* widget);
+    UpdateWidgetValueHook updateWidgetValueHook();
+    void setUpdateWidgetValueHook(UpdateWidgetValueHook fn);
+    bool doUpdateWidgetValueHook(QWidget* widget, const QVariant& value);
 
-    LaserRegister* laserRegister() const;
-    void bindLaserRegister(int addr, bool isSystem = true, StoreStrategy storeStrategy = SS_CONFIRMED);
-    bool hasRegister() const;
+    const QList<QWidget*>& boundedWidgets() const;
+
+    ModifiedBy modifiedBy() const;
+
+    void setValue(const QVariant& value, ModifiedBy modifiedBy);
 
 public slots:
-    void setValue(const QVariant& value);
-    void fromWidget(const QVariant& value);
-    void loadValue(const QVariant& value);
     void reset();
-    void doModify();
     void restore();
     void restoreSystem();
+    void confirm();
 
 protected:
-    bool modifyValue(const QVariant& value);
-    void setModified();
     void setName(const QString& name);
     void setDescription(const QString& description);
 
-    void setValueDirectly(const QVariant& value);
-    void setValueConfirmed(const QVariant& value);
-    void setValueLazy(const QVariant& value);
+protected slots:
+    void onRegisterLoaded(const QVariant& value);
 
 signals:
     void visibleChanged(bool value);
-    void valueChanged(const QVariant& value);
-    void widgetValueChanged(const QVariant& value);
+    void valueChanged(const QVariant& value, ModifiedBy modifiedBy);
     void defaultValueChanged(const QVariant& value);
     void modifiedChanged(bool modified);
+    void enabledChanged(bool enabled);
 
 private:
     QScopedPointer<ConfigItemPrivate> m_ptr;

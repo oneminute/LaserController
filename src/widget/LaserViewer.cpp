@@ -15,6 +15,8 @@
 #include <QMouseEvent>
 #include <QUndoStack>
 
+#include <LaserApplication.h>
+#include "laser/LaserDevice.h"
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
@@ -85,7 +87,33 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	QPainter painter(viewport());
     
 	painter.setRenderHint(QPainter::Antialiasing);
-    
+
+	if (scene()->document())
+	{
+		QRectF rect = scene()->document()->docBoundingRect();
+		if (rect.isValid())
+		{
+			painter.setPen(QPen(Qt::red, 1, Qt::DashDotDotLine));
+			painter.drawPolygon(mapFromScene(rect));
+		}
+	}
+
+	{
+		//painter.setBrush(Qt::BrushStyle::SolidPattern);
+		painter.setPen(QPen(Qt::red, 2));
+		QPointF deviceOrigin = mapFromScene(LaserApplication::device->deviceOrigin());
+		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
+		painter.drawRect(deviceOriginRect);
+        if (scene()->document())
+        {
+			painter.setPen(QPen(Qt::green));
+            QPointF origin = mapFromScene(scene()->document()->docOrigin());
+            QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
+            painter.drawRect(originRect);
+
+        }
+	}
+	
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
 	//painter.drawPolygon (testRect);
 	//painter.drawPolygon(testBoundinRect);

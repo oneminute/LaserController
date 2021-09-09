@@ -121,7 +121,7 @@ bool LayerButton::eventFilter(QObject *watched, QEvent *event)
 		this->repaint();
 	}
 	if (watched == this && event->type() == QEvent::Move) {
-		qDebug() << event->type();
+		//qDebug() << event->type();
 	}
 	if (watched == this && event->type() == QEvent::Leave) {
 		m_moved = false;

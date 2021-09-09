@@ -6,17 +6,16 @@
 #include "util/Utils.h"
 #include "LaserDocument.h"
 #include "LaserPrimitive.h"
-#include "LaserNodePrivate.h"
 #include "LaserScene.h"
 #include "widget/LayerButton.h"
 #include "common/Config.h"
 
-class LaserLayerPrivate: public LaserNodePrivate
+class LaserLayerPrivate: public ILaserDocumentItemPrivate
 {
     Q_DECLARE_PUBLIC(LaserLayer)
 public:
     LaserLayerPrivate(LaserLayer* ptr)
-        : LaserNodePrivate(ptr)
+        : ILaserDocumentItemPrivate(ptr, LNT_LAYER)
         , removable(true)
         , minSpeed(60)
         , runSpeed(300)
@@ -77,14 +76,14 @@ public:
 };
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
-    : LaserNode(new LaserLayerPrivate(this), LNT_LAYER)
+    : ILaserDocumentItem(LNT_LAYER, new LaserLayerPrivate(this))
 {
     Q_D(LaserLayer);
     Q_ASSERT(document);
     d->doc = document;
     d->type = type;
     d->isDefault = isDefault;
-    d->nodeName = utils::createUUID("layer_");
+    d->name = document->newLayerName();
     setParent(document);
 
     if (type == LLT_ENGRAVING)
@@ -110,7 +109,6 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
 
 LaserLayer::~LaserLayer()
 {
-    qLogD << "layer " << nodeName() << " destroyed.";
 }
 
 bool LaserLayer::removable() const 
@@ -123,12 +121,6 @@ void LaserLayer::setRemovable(bool removable)
 { 
     Q_D(LaserLayer);
     d->removable = removable; 
-}
-
-QString LaserLayer::id() const 
-{
-    Q_D(const LaserLayer);
-    return d->nodeName; 
 }
 
 QString LaserLayer::name() const 
@@ -321,7 +313,6 @@ void LaserLayer::addPrimitive(LaserPrimitive * item)
 
     item->setLayer(this);
     d->primitives.append(item);
-    d->childNodes.append(item);
     d->doc->updateLayersStructure();
 }
 
@@ -394,7 +385,6 @@ void LaserLayer::bindButton(LayerButton * button, int index)
 	d->button->setLayerIndex(index);
 	d->button->setEnabled(true);
     connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
-    d->nodeName = button->text();
 	m_index = index;
 }
 
@@ -518,6 +508,17 @@ int LaserLayer::index()
 void LaserLayer::setIndex(int i)
 {
 	m_index = i;
+}
+
+QRectF LaserLayer::boundingRect() const
+{
+    Q_D(const LaserLayer);
+    return utils::boundingRect(d->primitives);
+}
+
+QPointF LaserLayer::position() const 
+{
+    return boundingRect().topLeft();
 }
 
 void LaserLayer::onClicked()

@@ -9,8 +9,7 @@
 #include <QSharedDataPointer>
 #include <QExplicitlySharedDataPointer>
 #include <QJsonObject>
-
-#include "LaserNode.h"
+#include "scene/LaserDocumentItem.h"
 
 class LaserPrimitive;
 class LaserLayerPrivate;
@@ -18,7 +17,7 @@ class LaserDocument;
 class LayerButton;
 
 class LaserLayerPrivate;
-class LaserLayer : public QObject, public LaserNode
+class LaserLayer : public QObject, public ILaserDocumentItem
 {
     Q_OBJECT
 public:
@@ -27,8 +26,6 @@ public:
 
     bool removable() const;
     void setRemovable(bool removable);
-
-    QString id() const;
 
     QString name() const;
     LaserLayerType type() const;
@@ -115,14 +112,16 @@ public:
 
 	void setIndex(int i);
 
-    virtual QPointF position() const { return QPointF(0, 0); }
+    QRectF boundingRect() const;
+
+    virtual QPointF position() const;
 
 protected:
     void onClicked();
 
 protected:
     
-    Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserLayer);
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLayer);
     Q_DISABLE_COPY(LaserLayer)
 private:
 	int m_index;
