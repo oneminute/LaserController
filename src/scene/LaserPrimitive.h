@@ -138,6 +138,7 @@ public:
     QString typeLatinName() const;
     bool isShape() const;
     bool isBitmap() const;
+    bool isText() const;
 
     LaserLayer* layer() const;
     void setLayer(LaserLayer* layer);

@@ -424,6 +424,12 @@ bool LaserPrimitive::isBitmap() const
     return d->primitiveType == LPT_BITMAP; 
 }
 
+bool LaserPrimitive::isText() const
+{
+    Q_D(const LaserPrimitive);
+    return d->primitiveType == LPT_TEXT;
+}
+
 LaserLayer* LaserPrimitive::layer() const 
 {
     Q_D(const LaserPrimitive);
@@ -2588,9 +2594,9 @@ void LaserText::draw(QPainter * painter)
 {
     Q_D(LaserText);
     painter->drawPath(mapFromScene(sceneTransform().map(path())));
-    painter->drawPolygon(mapFromScene(sceneTransform().map(originalBoundingRect(Global::mm2PixelsYF(10.0)))));
+    //painter->drawPolygon(mapFromScene(sceneTransform().map(originalBoundingRect(Global::mm2PixelsYF(10.0)))));
     
-    for (int i = 0; i < d->pathList.size(); i++) {
+    /*for (int i = 0; i < d->pathList.size(); i++) {
         painter->setPen(QPen(Qt::green));
         QColor c(0, 0, 0, 0);
         painter->setPen(QPen(c));
@@ -2602,7 +2608,7 @@ void LaserText::draw(QPainter * painter)
             painter->drawPolygon(mapFromScene(sceneTransform().map(path.boundingRect())));
 
         }
-    }
+    }*/
 }
 
 LaserPrimitive * LaserText::clone(QTransform t)

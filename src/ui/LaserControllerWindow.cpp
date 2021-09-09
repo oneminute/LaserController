@@ -555,6 +555,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
 	connect(StateController::instance().documentIdleState(), &QState::entered, m_viewer, &LaserViewer::onDocumentIdle);
+
     connect(StateController::instance().documentPrimitiveTextState(), &QState::exited, this, [=] {
         //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
     });
