@@ -101,8 +101,8 @@ void LaserBackgroundItem::onChangeGrids()
 	if (diffV < 2 && diffV > 0) {
 		sizeV -= 1;
 	}
-	qDebug() <<"diffH: " << diffH ;
-	qDebug() <<"diffV: " << diffV ;
+	//qDebug() <<"diffH: " << diffH ;
+	//qDebug() <<"diffV: " << diffV ;
 	int count = 10;
 	//二级网格大小
 	//qreal intervalH_1 = intervalH * 0.1;
@@ -143,7 +143,7 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	qreal width = this->rect().width();
 	qreal height = this->rect().height();
 	int contrastValue = Config::Ui::gridContrast();
-	qDebug() << "contrastValue: " << contrastValue;
+	//qDebug() << "contrastValue: " << contrastValue;
 	bool isShow = true;
 	//一级网格
 	QPen pen1(QColor(0, 0, 0), 1, Qt::SolidLine);

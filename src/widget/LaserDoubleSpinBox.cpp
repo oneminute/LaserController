@@ -30,3 +30,5 @@ void LaserDoubleSpinBox::focusOutEvent(QFocusEvent * event)
 	emit enterOrLostFocus();
 	//qDebug() << "lost focus";
 }
+
+

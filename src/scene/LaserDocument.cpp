@@ -308,7 +308,7 @@ void LaserDocument::exportJSON1(const QString& filename)
             else if (layer->type() == LLT_CUTTING)
             {
                 itemObj["Layer"] = layerId;
-                //QList<QPainterPath> paths = laserItem->subPaths();
+                //QList<QPainterPath> modifyPathList = laserItem->subBoundings();
                 QVector<QPointF> points = laserItem->updateMachiningPoints(canvas);
                 if (!points.empty())
                 {
@@ -316,14 +316,14 @@ void LaserDocument::exportJSON1(const QString& filename)
                     itemObj["Data"] = QString(machiningUtils::points2Plt(points));
                     add = true;
                 }
-                /*if (paths.isEmpty())
+                /*if (modifyPathList.isEmpty())
                 {
 
                 }
                 else
                 {
                     QString pltString;
-                    for (QPainterPath subPath : paths)
+                    for (QPainterPath subPath : modifyPathList)
                     {
                         QVector<QPointF> points;
                         if (machiningUtils::path2Points(subPath, points, canvas))
@@ -609,10 +609,10 @@ void LaserDocument::analysis()
         if (primitive->primitiveType() == LPT_PATH)
         {
             LaserPath* laserPath = qobject_cast<LaserPath*>(primitive);
-            QList<QPainterPath> subPaths = laserPath->subPaths();
-            for (int i = 0; i < subPaths.size(); i++)
+            QList<QPainterPath> subBoundings = laserPath->subBoundings();
+            for (int i = 0; i < subBoundings.size(); i++)
             {
-                qLogD << "sub path " << i << ":" << subPaths[i];
+                qLogD << "sub path " << i << ":" << subBoundings[i];
             }
         }
     }*/
@@ -823,7 +823,26 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				laserLayers[index]->addPrimitive(poly);
 				this->addPrimitive(poly);
 				this->scene()->addItem(poly);
-			}
+            }
+            else if (className == "LaserText") {
+                QString content = primitiveJson["content"].toString();
+                QJsonArray startPos = primitiveJson["startPos"].toArray();
+                QJsonObject fontObj = primitiveJson["font"].toObject();
+                QFont font(fontObj["family"].toString());
+                font.setPixelSize(fontObj["size"].toDouble());
+                font.setBold(fontObj["bold"].toBool());
+                font.setItalic(fontObj["italic"].toBool());
+                font.setLetterSpacing(QFont::SpacingType(fontObj["letterSpaceTpye"].toInt()), fontObj["spaceX"].toDouble());
+                font.setWordSpacing(fontObj["spaceY"].toDouble());
+                //create
+                LaserText* text = new LaserText(this, QPointF(startPos[0].toDouble(), startPos[1].toDouble()), 
+                    font, fontObj["alignH"].toInt(), fontObj["alignV"].toInt(), saveTransform, layerIndex);
+                text->setContent(content);
+                text->modifyPathList();   
+                //text->sceneTransformToItemTransform(saveTransform);
+                this->addPrimitive(text);
+                this->scene()->addItem(text);
+            }
 		}
 	}
     outline();

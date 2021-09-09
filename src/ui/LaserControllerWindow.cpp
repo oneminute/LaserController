@@ -29,6 +29,7 @@
 #include <QTreeWidgetItem>
 #include <QUndoStack>
 #include <QWindow>
+#include <QFontComboBox>
 
 #include "LaserApplication.h"
 #include "common/common.h"
@@ -56,6 +57,7 @@
 #include "widget/LayerButton.h"
 #include "widget/PropertiesHelperManager.h"
 #include "widget/RulerWidget.h"
+#include "scene/LaserPrimitive.h"
 
 using namespace ads;
 
@@ -67,6 +69,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	, m_unitIsMM(true)
 	, m_selectionOriginalState(SelectionOriginalCenter)
 	, m_windowTitle("Laser Controller")
+    , m_textFontWidget(nullptr)
+    , m_propertyWidget(nullptr)
 {
     m_ui->setupUi(this);
 
@@ -121,28 +125,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         connect(button, &LayerButton::colorUpdated, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     }
     m_ui->layoutLayerButtons->addStretch();
-
-    //removeDockWidget(m_ui->dockWidgetLayerButtons);
-    //removeDockWidget(m_ui->dockWidgetLayers);
-    //removeDockWidget(m_ui->dockWidgetProperties);
-    //removeDockWidget(m_ui->dockWidgetOperations);
-	//removeDockWidget(m_ui->dockWidgetOutline);
-
-    //addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayerButtons);
-    //addDockWidget(Qt::RightDockWidgetArea, m_ui->dockWidgetLayers);
-    //splitDockWidget(m_ui->dockWidgetLayerButtons, m_ui->dockWidgetLayers, Qt::Horizontal);
-    //splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetLayerButtons, Qt::Horizontal);
-    //splitDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOperations, Qt::Vertical);
-
-    //tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetMovement);
-    //tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetProperties);
-    //tabifyDockWidget(m_ui->dockWidgetLayers, m_ui->dockWidgetOutline);
-
-    //m_ui->dockWidgetLayerButtons->show();
-    //m_ui->dockWidgetLayers->show();
-    //m_ui->dockWidgetProperties->show();
-    //m_ui->dockWidgetOperations->show();
-    //m_ui->dockWidgetOutline->show();
+    //m_ui->actionMirrorAcrossLine->setVisible(false);
 
     // set up tools buttons
     QToolButton* toolButtonSelectionTool = new QToolButton;
@@ -362,12 +345,90 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->properties->addWidget(m_propertyWidget);
 	m_propertyWidget->setEnabled(false);
 	m_centerBtn->setChecked(true);
-	//arrange
-	/*m_mirrorHWidget = new QWidget();
-	m_mirrorVWidget = new QWidget();
-	m_ui->actionMirrorHorizontal->addWidget(m_mirrorHWidget);
-	m_ui->actionMirrorVertical->addWidget(m_mirrorVWidget);*/
-	
+	//text
+    m_textLayout = new QGridLayout();
+    m_textLayout->setMargin(0);
+    m_textLayout->setSpacing(3);
+    m_textFontWidget = new QWidget(this);
+    //family height
+    m_textFontWidget->setLayout(m_textLayout);
+    m_ui->textFontBar->addWidget(m_textFontWidget);
+    m_fontFamily = new LaserFontComboBox();
+    m_fontFamily->setEditable(false);
+    m_fontFamily->setCurrentText("Times New Roman");
+    //m_fontFamily->setWritingSystem(QFontDatabase::SimplifiedChinese);
+    m_fontHeight = new LaserDoubleSpinBox();
+    m_fontHeight->setValue(20);
+    m_fontHeight->setMinimum(0.01);
+    m_fontHeight->setMaximum(2000);
+    //align
+    m_fontAlignX = new QComboBox(this);
+    m_fontAlignY = new QComboBox(this);
+    m_fontAlignX->addItem("Left");
+    m_fontAlignX->addItem("Middle");
+    m_fontAlignX->addItem("Right");
+    m_fontAlignX->setCurrentIndex(0);
+    m_fontAlignY->addItem("Top");
+    m_fontAlignY->addItem("Middle");
+    m_fontAlignY->addItem("Bottom");
+    m_fontAlignY->setCurrentIndex(1);
+    //bold Italic upper
+    m_fontBold = new QCheckBox(this);
+    m_fontItalic = new QCheckBox(this);
+    m_fontUpper = new QCheckBox(this);
+    //sapcex , spacey
+    m_fontSpaceX = new LaserDoubleSpinBox(this);
+    m_fontSpaceY = new LaserDoubleSpinBox(this);
+    //layot
+    m_textLayout->addWidget(new QLabel("Font"), 0, 0);
+    m_textLayout->addWidget(m_fontFamily, 0, 1);
+    m_textLayout->addWidget(new QLabel("Height"), 1, 0);
+    m_textLayout->addWidget(m_fontHeight, 1, 1);
+    m_textLayout->addWidget(new QLabel("AlignX"), 0, 2);
+    m_textLayout->addWidget(m_fontAlignX, 0, 3);
+    m_textLayout->addWidget(new QLabel("AlignY"), 1, 2);
+    m_textLayout->addWidget(m_fontAlignY, 1, 3);
+    m_textLayout->addWidget(new QLabel("SpacingX"), 0, 4);
+    m_textLayout->addWidget(m_fontSpaceX, 0, 5);
+    m_textLayout->addWidget(new QLabel("SpacingY"), 1, 4);
+    m_textLayout->addWidget(m_fontSpaceY, 1, 5);
+    m_textLayout->addWidget(new QLabel("Bold"), 0, 6);
+    m_textLayout->addWidget(m_fontBold, 0, 7);
+    m_textLayout->addWidget(new QLabel("Italic"), 0, 8);
+    m_textLayout->addWidget(m_fontItalic, 0, 9);
+    m_textLayout->addWidget(new QLabel("Upper Case"), 1, 6, 1, 2);
+    m_textLayout->addWidget(m_fontUpper, 1, 8);
+    //text family
+    connect(m_fontFamily, QOverload<int>::of(&QComboBox::highlighted), this, &LaserControllerWindow::onFontComboBoxHighLighted);
+    connect(m_viewer, &LaserViewer::creatingText, this, &LaserControllerWindow::onChangeFontComboBoxByEditingText);
+    connect(m_fontFamily, QOverload<int>::of(&QComboBox::activated), this, &LaserControllerWindow::onFontComboBoxActived);
+    connect(m_fontFamily, &LaserFontComboBox::hidePopupSignal, this, &LaserControllerWindow::onFontComboBoxHidePopup);
+    //text height
+    connect(m_fontHeight, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::onFontHeightBoxEnterOrLostFocus);
+    //bold italic upper
+    connect(m_fontBold, &QCheckBox::stateChanged, this, &LaserControllerWindow::onFontBoldStateChanged);
+    connect(m_fontItalic, &QCheckBox::stateChanged, this, &LaserControllerWindow::onFontItalicStateChanged);
+    connect(m_fontUpper, &QCheckBox::stateChanged, this, &LaserControllerWindow::onFontUpperStateChanged);
+    //space
+    connect(m_fontSpaceX, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::onFontSpaceXEnterOrLostFocus);
+    connect(m_fontSpaceY, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::onFontSpaceYEnterOrLostFocus);
+    //text widget
+    connect(StateController::instance().documentPrimitiveTextState(), &QState::exited, this, [=] {
+        
+        if (m_textFontWidget) {
+            m_textFontWidget->setEnabled(false);
+        }
+        
+    });
+    connect(StateController::instance().documentPrimitiveTextState(), &QState::entered, this, [=] {
+        if (m_textFontWidget) {
+            m_textFontWidget->setEnabled(true);
+        }
+    });
+    //text align
+    connect(m_fontAlignX, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onAlignHBoxChanged);
+    connect(m_fontAlignY, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onAlignVBoxChanged);
+
 	connect(m_viewer->undoStack(), &QUndoStack::canUndoChanged,this, &LaserControllerWindow::onCanUndoChanged);
 	connect(m_viewer->undoStack(), &QUndoStack::canRedoChanged, this, &LaserControllerWindow::onCanRedoChanged);
 	connect(m_ui->actionUndo, &QAction::triggered, this, &LaserControllerWindow::onActionUndo);
@@ -418,6 +479,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 	connect(m_ui->actionMirrorHorizontal, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorHorizontal);
 	connect(m_ui->actionMirrorVertical, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorVertical);
+    connect(m_ui->actionMirrorAcrossLine, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorACrossLine);
 
     connect(m_ui->actionMoveTop, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTop);
     connect(m_ui->actionMoveBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottom);
@@ -452,6 +514,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
+    connect(m_scene, QOverload<QGraphicsItem *, QGraphicsItem *, Qt::FocusReason>::of(&LaserScene::focusItemChanged), 
+        this, &LaserControllerWindow::onLaserSceneFocusItemChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
     connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
@@ -504,19 +568,24 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		selectionPropertyBoxChange();
 	});
 	connect(m_widthBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        if (m_viewer->group()->boundingRect().height() == 0) {
+            m_heightBox->setValue(0);
+            return;
+        }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
 		if (m_widthBox->value() > 20000) {
 			m_widthBox->setValue(20000);
 		}
-		/*if (m_widthBox->value() < -20000) {
-			m_widthBox->setValue(-20000);
-		}*/
 		if (m_widthBox->value() <= 0) {
 			m_widthBox->setValue(0.001);
 		}
 		selectionPropertyBoxChange();
 	});
 	connect(m_heightBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        if (m_viewer->group()->boundingRect().height() == 0) {
+            m_heightBox->setValue(0);
+            return;
+        }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
 		if (m_heightBox->value() > 20000) {
 			m_heightBox->setValue(20000);
@@ -527,7 +596,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_heightBox->value() <= 0) {
 			m_heightBox->setValue(0.001);
 		}
-		
+        
 		selectionPropertyBoxChange();
 	});
 	connect(m_xRateBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
@@ -686,6 +755,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitivePolygonState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 	ADD_TRANSITION(documentPrimitiveSplineState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 	ADD_TRANSITION(documentViewDragState, documentIdleState, this, SIGNAL(isIdle()));
@@ -707,6 +777,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 LaserControllerWindow::~LaserControllerWindow()
 {
 	m_propertyWidget = nullptr;
+    m_textFontWidget = nullptr;
 	if (m_viewer->undoStack()) {
 		delete m_viewer->undoStack();
 	}
@@ -821,6 +892,310 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
     }
 }
 
+void LaserControllerWindow::onFontComboBoxHighLighted(int index)
+{
+    if (m_viewer) {
+        QString family = m_fontFamily->itemText(index);
+        m_viewer->textFont()->setFamily(family);
+        qDebug() << m_fontFamily->itemData(index);
+        LaserText* text = m_viewer->editingText();
+        if (text) {
+            QFont font(text->font());
+            font.setFamily(family);
+            text->setFont(font);
+            
+        }
+        m_fontComboxLightedIndex = index;
+        m_viewer->modifyTextCursor();
+        m_viewer->viewport()->repaint();
+    }
+}
+
+void LaserControllerWindow::onFontComboBoxActived(int index)
+{
+    m_viewer->setFocus();
+    if (m_fontComboxLightedIndex != index) {
+        onFontComboBoxHighLighted(index);
+    }
+    
+    //m_fontFamily->setIsChangedItem(true);
+}
+
+void LaserControllerWindow::onAlignHBoxChanged(int index)
+{
+    int align;
+    switch (index) {
+        case 0: {
+            align = Qt::AlignLeft;
+            break;
+        }
+        case 1: {
+            align = Qt::AlignHCenter;
+            break;
+        }
+        
+        case 2: {
+            align = Qt::AlignRight;
+            break;
+        }
+
+    }
+    m_viewer->setTextAlignH(align);
+    if (m_viewer->editingText()) {
+        m_viewer->editingText()->setAlignH(align);
+        m_viewer->editingText()->modifyPathList();
+    }
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+    m_viewer->setFocus();
+}
+
+void LaserControllerWindow::onAlignVBoxChanged(int index)
+{
+    int align;
+    switch (index) {
+    case 0: {
+        align = Qt::AlignTop;
+        break;
+    }
+    case 1: {
+        align = Qt::AlignVCenter;
+        break;
+    }
+
+    case 2: {
+        align = Qt::AlignBottom;
+        break;
+    }
+
+    }
+    m_viewer->setTextAlignV(align);
+    if (m_viewer->editingText()) {
+        m_viewer->editingText()->setAlignV(align);
+        m_viewer->editingText()->modifyPathList();
+    }
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+    m_viewer->setFocus();
+}
+
+void LaserControllerWindow::onChangeFontComboBoxByEditingText()
+{
+    if (m_viewer->editingText()) {
+        LaserText* text = m_viewer->editingText();
+        //family
+        QFont font = text->font();
+        qreal t = font.pixelSize();
+        m_fontFamily->setCurrentText(font.family());
+        //height
+        m_fontHeight->setValue(Global::pixelsF2mmY(font.pixelSize()));
+        //align
+        int aV = text->alignV();
+        int aH = text->alignH();
+        switch (aV) {
+            case Qt::AlignTop: {
+                m_fontAlignY->setCurrentIndex(0);
+                break;
+            }
+            case Qt::AlignVCenter: {
+                m_fontAlignY->setCurrentIndex(1);
+                break;
+            }
+            case Qt::AlignBottom: {
+                m_fontAlignY->setCurrentIndex(2);
+                break;
+            }
+        }
+        switch (aH) {
+            case Qt::AlignLeft: {
+                m_fontAlignX->setCurrentIndex(0);
+                break;
+            }
+            case Qt::AlignHCenter: {
+                m_fontAlignX->setCurrentIndex(1);
+                break;
+            }
+            case Qt::AlignRight: {
+                m_fontAlignX->setCurrentIndex(2);
+                break;
+            }
+        }
+        //bold italic  upper
+        bool bold = font.bold();
+        m_fontBold->setChecked(bold);
+        bool italic = font.italic();
+        m_fontItalic->setChecked(italic);
+        QFont::Capitalization capitalization = font.capitalization();
+        if (capitalization == QFont::AllUppercase) {
+            m_fontUpper->setChecked(true);
+        }
+        else if (capitalization == QFont::MixedCase) {
+            m_fontUpper->setChecked(false);
+        }  
+        //space
+        qreal spaceX = font.letterSpacing();
+        qreal spaceY = font.wordSpacing();
+        m_fontSpaceX->setValue(spaceX);
+        m_fontSpaceY->setValue(spaceY);
+
+        m_viewer->textFont()->setFamily(font.family());
+        m_viewer->textFont()->setPixelSize(font.pixelSize());
+        m_viewer->textFont()->setBold(bold);
+        m_viewer->textFont()->setItalic(italic);
+        m_viewer->textFont()->setCapitalization(capitalization);
+        m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing,  spaceX);
+        m_viewer->textFont()->setWordSpacing(spaceY);
+        m_viewer->setTextAlignH(aH);
+        m_viewer->setTextAlignV(aV);
+    }
+}
+
+void LaserControllerWindow::onFontComboBoxHidePopup()
+{
+    //qDebug() << m_fontFamily->currentText();
+
+    onFontComboBoxHighLighted(m_fontFamily->currentIndex());
+    
+    
+    /*if (m_viewer) {
+        QString family = m_fontFamily->currentText();
+        m_viewer->textFont()->setFamily(family);
+        LaserText* text = m_viewer->editingText();
+        if (text) {
+            QFont font(text->font());
+            font.setFamily(family);
+            text->setFont(font);
+            m_viewer->modifyTextCursor();
+        }
+
+        m_viewer->viewport()->repaint();
+    }*/
+}
+
+void LaserControllerWindow::onFontHeightBoxEnterOrLostFocus()
+{
+    if (m_viewer) {
+        qreal size = Global::mm2PixelsYF(m_fontHeight->value());
+        m_viewer->textFont()->setPixelSize(size);
+        LaserText* text = m_viewer->editingText();
+        if (text) {
+            QFont font(text->font());
+            //qreal q = m_fontHeight->value();
+            font.setPixelSize(size);
+            m_viewer->editingText()->setFont(font);
+        }
+        m_viewer->modifyTextCursor();
+        m_viewer->setFocus();
+        m_viewer->viewport()->repaint();
+    }
+}
+
+void LaserControllerWindow::onFontBoldStateChanged()
+{
+    if (!m_viewer) {
+        return;
+    }
+    LaserText* text = m_viewer->editingText();
+    QFont font(text->font());
+    if (m_fontBold->isChecked()) {  
+        if (text) {
+            font.setBold(true);
+            m_viewer->editingText()->setFont(font);
+            
+        }     
+        m_viewer->textFont()->setBold(true);
+    }
+    else {
+        if (text) {
+            font.setBold(false);
+            m_viewer->editingText()->setFont(font);
+        }
+        m_viewer->textFont()->setBold(false);
+    }
+    m_viewer->setFocus();
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onFontItalicStateChanged()
+{
+    if (!m_viewer) {
+        return;
+    }
+    LaserText* text = m_viewer->editingText();
+    QFont font(text->font());
+    if (m_fontItalic->isChecked()) {
+        if (text) {
+            font.setItalic(true);
+            m_viewer->editingText()->setFont(font);
+
+        }
+        m_viewer->textFont()->setItalic(true);
+    }
+    else {
+        if (text) {
+            font.setItalic(false);
+            m_viewer->editingText()->setFont(font);
+        }
+        m_viewer->textFont()->setItalic(false);
+    }
+    m_viewer->setFocus();
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onFontUpperStateChanged()
+{
+    if (!m_viewer) {
+        return;
+    }
+    LaserText* text = m_viewer->editingText();
+    QFont font(text->font());
+    if (m_fontUpper->isChecked()) {
+        if (text) {
+            font.setCapitalization(QFont::AllUppercase);
+            m_viewer->editingText()->setFont(font);
+
+        }
+        m_viewer->textFont()->setCapitalization(QFont::AllUppercase);
+    }
+    else {
+        if (text) {
+            font.setCapitalization(QFont::MixedCase);
+            m_viewer->editingText()->setFont(font);
+        }
+        m_viewer->textFont()->setCapitalization(QFont::MixedCase);
+    }
+    m_viewer->setFocus();
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onFontSpaceXEnterOrLostFocus()
+{
+    QFont font = m_viewer->editingText()->font();
+    font.setLetterSpacing(QFont::AbsoluteSpacing, m_fontSpaceX->value());
+    m_viewer->editingText()->setFont(QFont(font));
+    m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing, m_fontSpaceX->value());
+
+    m_viewer->setFocus();
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onFontSpaceYEnterOrLostFocus()
+{
+    QFont font = m_viewer->editingText()->font();
+    font.setWordSpacing(m_fontSpaceY->value());
+    m_viewer->editingText()->setFont(QFont(font));
+    qreal q = m_fontSpaceY->value();
+    m_viewer->textFont()->setWordSpacing(m_fontSpaceY->value());
+
+    m_viewer->setFocus();
+    m_viewer->modifyTextCursor();
+    m_viewer->viewport()->repaint();
+}
+
 void LaserControllerWindow::createCentralDockPanel()
 {
     QWidget* topLeftRuler = new QWidget;
@@ -828,6 +1203,15 @@ void LaserControllerWindow::createCentralDockPanel()
     m_viewer = new LaserViewer(this);
     m_viewer->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_viewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //设置初始值
+    m_viewer->textFont()->setFamily("Times New Roman");
+    m_viewer->textFont()->setPixelSize(Global::mm2PixelsYF(20.0));
+    m_viewer->setTextAlignH(Qt::AlignLeft);
+    m_viewer->setTextAlignV(Qt::AlignVCenter);
+    m_viewer->textFont()->setBold(false);
+    m_viewer->textFont()->setLetterSpacing(QFont::SpacingType::AbsoluteSpacing, 0);
+    m_viewer->textFont()->setWordSpacing(0);
+    
     //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
     m_scene = qobject_cast<LaserScene*>(m_viewer->scene());
 
@@ -1455,7 +1839,16 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 {
 	if (StateControllerInst.isInState(StateControllerInst.documentIdleState()) ||
 		StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+        //across mirror Line
+        m_ui->actionMirrorAcrossLine->setEnabled(false);
+        if (m_viewer->mirrorLine()) {
+            m_ui->actionMirrorAcrossLine->setEnabled(true);
+        }
+        
 		QMenu Context;
+        
+        Context.addAction(m_ui->actionMirrorAcrossLine);
+        Context.addSeparator();
 		Context.addAction(m_ui->actionCopy);
 		Context.addAction(m_ui->actionCut);
 		Context.addAction(m_ui->actionPaste);
@@ -1465,8 +1858,6 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 		Context.addAction(m_ui->actionUngroup);
 		Context.exec(QCursor::pos());
 	}
-	
-
 }
 void LaserControllerWindow::onActionUndo(bool checked) {
 	int index = m_viewer->undoStack()->index();
@@ -2077,6 +2468,7 @@ void LaserControllerWindow::onActionDeviceSettings(bool checked)
 
 void LaserControllerWindow::onActionSelectionTool(bool checked)
 {
+    qDebug()<<"";
     if (checked)
     {
         emit isIdle();
@@ -2256,6 +2648,15 @@ void LaserControllerWindow::onActionMirrorVertical(bool checked)
 	m_viewer->undoStack()->push(cmd);
 }
 
+void LaserControllerWindow::onActionMirrorACrossLine(bool checked)
+{
+    if (!m_viewer || !m_viewer->group()) {
+        return;
+    }
+    MirrorACommand* cmd = new MirrorACommand(m_viewer);
+    m_viewer->undoStack()->push(cmd);
+}
+
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -2351,6 +2752,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		
 		m_ui->actionMirrorHorizontal->setEnabled(false);
 		m_ui->actionMirrorVertical->setEnabled(false);
+        m_ui->actionMirrorAcrossLine->setEnabled(false);
 		m_ui->actionCopy->setEnabled(false);
 		//m_ui->actionPaste->setEnabled(false);
 		m_ui->actionCut->setEnabled(false);
@@ -2358,6 +2760,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionDeletePrimitive->setEnabled(false);
 		m_ui->actionGroup->setEnabled(false);
 		m_ui->actionUngroup->setEnabled(false);
+        m_viewer->setMirrorLine(nullptr);
 		return;
 	}
 	else if (items.length() > 0) {
@@ -2367,6 +2770,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		}	
 		m_ui->actionMirrorHorizontal->setEnabled(true);
 		m_ui->actionMirrorVertical->setEnabled(true);
+        m_ui->actionMirrorAcrossLine->setEnabled(false);
 		m_ui->actionCopy->setEnabled(true);
 		//m_ui->actionPaste->setEnabled(true);
 		m_ui->actionCut->setEnabled(true);
@@ -2382,7 +2786,8 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 			else {
 				m_ui->actionGroup->setEnabled(true);
 				m_ui->actionUngroup->setEnabled(false);
-			}
+			}  
+            
 		}
 		else {
 			m_ui->actionGroup->setEnabled(false);
@@ -2390,9 +2795,11 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		}
 		
 	}
-	
+}
 
-    
+void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
+{
+    qDebug() << "";
 }
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
@@ -2637,21 +3044,20 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             //m_viewer->centerOn(rect.center());
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
             m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点
+                                                                            //创建网格
+            LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+            if (backgroundItem) {
+                backgroundItem->onChangeGrids();
+            }
 
-            //m_viewer->setResizeAnchor(QGraphicsView::AnchorViewCenter);
-
-            //m_viewer->setTransform(QTransform());
-            //m_viewer->centerOn(rect.center());
+            doc->open();
+            
+            //初始化缩放输入
+            QString str = QString::number(qFloor(m_viewer->adapterViewScale() * 100)) + "%";
+            m_comboBoxScale->setCurrentText(str);
         }
-        //初始化缩放输入
-        m_comboBoxScale->setCurrentText("100%");
-        //创建网格
-        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-        if (backgroundItem) {
-            backgroundItem->onChangeGrids();
-        }
-
-        doc->open();
+        
+        
     }
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
@@ -2843,6 +3249,11 @@ void LaserControllerWindow::onCanRedoChanged(bool can)
 
 void LaserControllerWindow::bindWidgetsProperties()
 {
+    //text font bar widget
+    BIND_PROP_TO_STATE(m_textFontWidget, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_textFontWidget, "enabled", false, documentEmptyState);
+    //text font bar widget
+    
     // actionOpen
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentEmptyState);
@@ -2986,6 +3397,11 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
 	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
 	// end actionMirrorVertical
+
+    // actionMirrorAcrossLine
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentEmptyState);
+    // end actionMirrorAcrossLine
 
     // actionAddEngravingLayer
     BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, initState);
@@ -3175,7 +3591,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", false, devicePausedState);
-    // end toolButtonWriteOrigins
+    // end toolButtonWriteOriginse
 
     // actionSelectionTool
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);

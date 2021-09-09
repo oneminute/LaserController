@@ -39,8 +39,8 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_splineHandlerWidth(5)
 	, m_splineNodeEditWidth(5)
 	, m_handlingSpline(SplineStruct())
-	, m_lastTime(0)
-	, m_curTime(0)
+	//, m_lastTime(0)
+	//, m_curTime(0)
 	, m_horizontalRuler(nullptr)
 	, m_verticalRuler(nullptr)
 	, m_radians(0)
@@ -50,11 +50,14 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_curLayerIndex(1)
     , m_editingText(nullptr)
     , m_isCapsLock(false)
+    , m_insertIndex(-1)
+    , m_textAlighH(Qt::AlignLeft)
+    , m_textAlighV(Qt::AlignBottom)
 	
 {
     setScene(m_scene.data());
     init();
-    m_curTextFont = QFont("SimSun", Global::mm2PixelsYF(20), 1);
+    
 
     Global::dpiX = logicalDpiX();
     Global::dpiY = logicalDpiY();
@@ -64,6 +67,7 @@ LaserViewer::~LaserViewer()
 {
 	m_undoStack = nullptr;
 	m_horizontalRuler = m_verticalRuler = nullptr;
+    m_editingText = nullptr;
 	//delete m_copyedList;
 	//m_copyedList = nullptr;
 }
@@ -79,9 +83,9 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	
 	QGraphicsView::paintEvent(event);	
 	QPainter painter(viewport());
-	
+    
 	painter.setRenderHint(QPainter::Antialiasing);
-	
+    
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
 	//painter.drawPolygon (testRect);
 	//painter.drawPolygon(testBoundinRect);
@@ -90,8 +94,6 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     {
 		//painter.setRenderHint(QPainter::Antialiasing);
 		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-		
-        ///qLogD << "SelectedEditing paint";
     }
 	
     //selectioin
@@ -247,15 +249,18 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     }
     //Text
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-        QPointF point = m_textInsertPos;
-        painter.drawLine(QPoint(point.x(), point.y() - Global::mm2PixelsYF(10) * zoomValue()),
-            QPoint(point.x(), point.y() + Global::mm2PixelsYF(10)* zoomValue()));
-        //this->setAttribute(Qt::WA_InputMethodEnabled, true);
+        QLineF l = QLineF(mapFromScene(m_textCursorLine.p1()), mapFromScene(m_textCursorLine.p2()));
+        
+        painter.drawLine(l);
+        /*painter.drawLine(QPoint(point.x(), point.y() - Global::mm2PixelsYF(10) * zoomValue()),
+            QPoint(point.x(), point.y() + Global::mm2PixelsYF(10)* zoomValue()));*/
+        
     }
     else {
         
     }
 	painter.setPen(QPen(Qt::red, 5, Qt::SolidLine));
+    //painter.drawRect(this->rect());
 	//painter.drawPoint(testPoint);
 	/*if (m_group && !m_group->isEmpty())
 	{
@@ -330,27 +335,35 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	}
 	rect = QRectF(left, top, right - left, bottom - top);
 	return rect;
-	/*if (items.size() == 0 && m_group) {
-		QList<QGraphicsItem*> group_items = m_group->childItems();
-		if (group_items.size() == 0) {
-			return rect;
-		}
-		for (int i = 0; i < group_items.size(); i++) {
-			LaserPrimitive* item = static_cast<LaserPrimitive*>(group_items[i]);
-			detectRect(*item, i, left, right, top, bottom);
-		}
-		rect = QRectF(left, top, right - left, bottom - top);
-		return rect;
-	}
-	if (items.size() == 0 || !m_group) {
-		return rect;
-	}
-	for (int i = 0; i < items.size(); i++) {
-		LaserPrimitive* item = items[i];
-		detectRect(*item, i, left, right, top, bottom);
-	}
-	rect = QRectF(left, top, right - left, bottom - top);*/
 	
+}
+QRectF LaserViewer::AllItemsSceneBoundingRect()
+{
+    QList<LaserPrimitive*> list = m_scene->document()->primitives().values();
+    if (list.isEmpty()) {
+        return QRectF();
+    }
+    QRectF firstBound = list[0]->sceneBoundingRect();
+    qreal top = firstBound.top();
+    qreal left = firstBound.left();
+    qreal bottom = firstBound.bottom();
+    qreal right = firstBound.right();
+    for (LaserPrimitive* primitive : list) {
+        QRectF bound = primitive->sceneBoundingRect();
+        if (top > bound.top()) {
+            top = bound.top();
+        }
+        if (left > bound.left()) {
+            left = bound.left();
+        }
+        if (bottom < bound.bottom()) {
+            bottom = bound.bottom();
+        }
+        if (right < bound.right()) {
+            right = bound.right();
+        }
+    }
+    return QRectF(QPointF(left, top), QPointF(right, bottom));
 }
 void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, int _state, int _transformType)
 {
@@ -742,9 +755,175 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
 	
 	return false;
 }
-QPointF LaserViewer::dectctTextInsertPosition()
+ bool LaserViewer::detectTextInsertPosition(QPointF insertPoint, LaserText*& laserText)
 {
-    return QPointF();
+    QPoint global = QCursor::pos();
+    QPointF mousePoint = mapToScene(mapFromGlobal(global));
+    bool isInAllPathBound = false;
+    qreal extend = Global::mm2PixelsXF(10.0);
+    QFontMetrics fontMetrics(m_textFont);
+    
+    
+    //先遍历整个外框
+    for (LaserPrimitive* primitive : m_scene->document()->primitives().values()) {
+        QString name = primitive->metaObject()->className();
+        if ( name != "LaserText") {
+            continue;
+        }
+        LaserText* text = qgraphicsitem_cast<LaserText*>(primitive);
+        QRectF rect = text->originalBoundingRect(extend);
+        qDebug() << text->sceneTransform().map(rect);
+        qDebug() << mousePoint;
+        isInAllPathBound = (text->sceneTransform().map(rect)).containsPoint(mousePoint, Qt::OddEvenFill);
+        if (!isInAllPathBound) {
+            continue;
+        }
+        laserText = text;
+        QPainterPath lastPath;
+        int rowSize = text->subPathList().size();
+
+        //如果只有一个空格
+        if (rowSize == 1 && text->subPathList()[0].subRowPathlist()[0].isEmpty()) {
+            m_scene->removeLaserPrimitive(laserText);
+            laserText = nullptr;
+            return false;
+        }
+        //再遍历每一行的外包框
+        for (int i = 0; i < rowSize; i++) {
+            LaserTextRowPath rowPathStruct = text->subPathList()[i];
+            
+            QList<QPainterPath> subRowPathlist = rowPathStruct.subRowPathlist();
+            QList<QRectF> subRowBoundList = rowPathStruct.subRowBoundList();
+            int subPathSize = subRowPathlist.size();
+            qreal worldSpacing = m_textFont.wordSpacing();
+            QRectF rowPathBoundingRect = rowPathStruct.path().boundingRect();
+            qreal halfWTopSpacing = 0;
+            qreal halfWBottomSpacing = 0;
+            //遍历每一行的外包框,只有一行直接遍历字符path
+            bool isInRowPathBound = false;
+            QRectF extendRowRect;
+            if (rowSize > 1) {
+                if (i + 1 < rowSize) {
+                    QRectF nextRowPathBoundingRect = text->subPathList()[i + 1].path().boundingRect();
+                    halfWBottomSpacing = (nextRowPathBoundingRect.top() - rowPathBoundingRect.bottom()) * 0.5;
+                    if (halfWBottomSpacing < 0) {
+                        halfWBottomSpacing = 0;
+                    }
+                }
+                if (i - 1 >= 0) {
+                    QRectF lastRowPathBoundingRect = text->subPathList()[i - 1].path().boundingRect();
+                    halfWTopSpacing = (rowPathBoundingRect.top() - lastRowPathBoundingRect.bottom()) * 0.5;
+                    if (halfWTopSpacing < 0) {
+                        halfWTopSpacing = 0;
+                    }
+                }
+                if (i == 0) {
+                    extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -extend),
+                        rowPathBoundingRect.bottomRight() + QPointF(extend, halfWBottomSpacing));
+                }
+                else if (i == rowSize - 1) {
+                    
+                    extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -halfWTopSpacing),
+                        rowPathBoundingRect.bottomRight() + QPointF(extend, extend));
+                }
+                else {
+                    extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -halfWTopSpacing),
+                        rowPathBoundingRect.bottomRight() + QPointF(extend, halfWBottomSpacing));
+                }
+                if (text->sceneTransform().map(extendRowRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                    isInRowPathBound = true;
+                }
+
+            }
+            else {
+                extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -extend),
+                    rowPathBoundingRect.bottomRight() + QPointF(extend, extend));
+                isInRowPathBound = true;
+            }
+            if (!isInRowPathBound) {
+                continue;
+            }
+            //遍历这一行的字符
+            for (int j = 0; j < subPathSize; j++) {
+                QPainterPath subPath = subRowPathlist[j];
+                QRectF rect = subRowBoundList[j];
+                //QRectF extendSubRect;
+                qreal halfLLeftSpacing = 0;
+                qreal halfLRightSpacing = 0;
+                qreal halfWidth = rect.width() * 0.5;
+                QRectF frontRect, backRect;
+                if (j + 1 < subPathSize) {
+                    QRectF nextRect = subRowBoundList[j + 1];
+                    halfLRightSpacing = nextRect.left() - rect.right();
+                    if (halfLRightSpacing < 0) {
+                        halfLRightSpacing = 0;
+                    }
+                }
+                if (j - 1 >= 0) {
+                    QRectF lastRect = subRowBoundList[j - 1];
+                    halfLLeftSpacing = rect.left() - lastRect.right();
+                    if (halfLLeftSpacing < 0) {
+                        halfLLeftSpacing = 0;
+                    }
+                }
+                if (subPathSize == 1) {
+                    
+                    qreal cx = extendRowRect.left()+ extendRowRect.width() * 0.5;
+                    frontRect = QRectF(extendRowRect.topLeft(),  QPointF(cx, extendRowRect.bottom()));
+                    backRect = QRectF(QPointF(cx, extendRowRect.top()), extendRowRect.bottomRight());
+                    
+                }
+                else {
+                    qreal cx = rect.left() + rect.width()*0.5;
+                    if (j == 0) {
+                        frontRect = QRectF(extendRowRect.topLeft(), QPointF(cx, extendRowRect.bottom()));
+                        backRect = QRectF(QPointF(cx, extendRowRect.top()), 
+                            QPointF(rect.right() + halfLRightSpacing, extendRowRect.bottom()));
+                    }
+                    else if (j == subPathSize - 1) {
+                        frontRect = QRectF(QPointF(extendRowRect.left() - halfLLeftSpacing, extendRowRect.top()),
+                            QPointF(QPointF(cx, extendRowRect.bottom())));
+                        backRect = QRectF(QPointF(cx, extendRowRect.top()), extendRowRect.bottomRight());
+                    }
+                    else {
+                        frontRect = QRectF(QPointF(extendRowRect.left() - halfLLeftSpacing, extendRowRect.top()),
+                            QPointF(QPointF(cx, extendRowRect.bottom())));
+                        backRect = QRectF(QPointF(cx, extendRowRect.top()),
+                            QPointF(rect.right() + halfLRightSpacing, extendRowRect.bottom()));
+                    }
+                }
+                //前面
+                if (text->sceneTransform().map(frontRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                    int index = i-1;
+                    m_insertIndex = 0;
+                    while (index >= 0) {
+                        m_insertIndex += text->subPathList()[index].subRowPathlist().size()+1;
+                        index--;
+                    }
+                    m_insertIndex += j;
+
+                    return true;
+                }
+                //后面
+                else if(text->sceneTransform().map(backRect).containsPoint(insertPoint, Qt::OddEvenFill)){
+                    int index = i-1;
+                    m_insertIndex = 0;
+                    while (index >= 0) {
+                        m_insertIndex += text->subPathList()[index].subRowPathlist().size()+1;
+                        index--;
+                    }
+                    m_insertIndex += (j + 1);
+
+                    return true;
+                    
+                }
+            }
+        }  
+    }
+    m_insertIndex = -1;
+
+    laserText = nullptr;
+    return false;  
 }
 QState* LaserViewer::currentState()
 {
@@ -809,13 +988,78 @@ void LaserViewer::setCurLayerIndex(int index)
 {
 	m_curLayerIndex = index;
 }
+QLineF LaserViewer::modifyTextCursor()
+{
+    if (m_editingText && m_editingText->subPathList().length() > 0) {
+        int index = m_insertIndex;
+        for (int i = 0; i < m_editingText->subPathList().size(); i++) {
+            LaserTextRowPath rowPathstruct = m_editingText->subPathList()[i];
+            QPointF rowLeftTop = rowPathstruct.leftTopPosition();
+            int size = rowPathstruct.subRowPathlist().size();
+            if (index > size) {
+                index -= (size + 1);
+            }
+            else {
+                qreal height = m_editingText->font().pixelSize();
+                qreal bottom = rowLeftTop.y();
+                qreal top = bottom - height;
+                qreal x;
+                if (index > 0) {
+                    //QRectF rect = rowPathstruct.subRowPathlist()[index - 1].boundingRect();
+                    QRectF rect = rowPathstruct.subRowBoundList()[index - 1];
+                    x = rect.right();
+                }
+                else if (index == 0) {
+                    x = rowLeftTop.x();
+                }
+                m_textCursorLine = m_editingText->sceneTransform().map(QLineF(QPointF(x, top), QPointF(x, bottom)));
+                return m_textCursorLine;
+            }
+        }
+    }
+    else {
+        QPointF p1 = mapToScene(m_textMousePressPos.toPoint());
+        qreal height = m_textFont.pixelSize();
+        switch (m_textAlighV) {
+        case Qt::AlignTop: {
+            QPointF p2(p1.x(), p1.y() + height);
+            m_textCursorLine = QLineF(QLineF(p1, p2));
+            break;
+        }
+        case Qt::AlignBottom: {
+            QPointF p2(p1.x(), p1.y() - height);
+            m_textCursorLine = QLineF(QLineF(p1, p2));
+            break;
+        }
+        case Qt::AlignVCenter: {
+            QPointF p2(p1.x(), p1.y() + height * 0.5);
+            m_textCursorLine = QLineF(QLineF(QPointF(p1.x(), p1.y() - height * 0.5), p2));
+            break;
+        }
+        }
+    }
+    return m_textCursorLine;
+    
+}
+QFont* LaserViewer::textFont()
+{
+    return &m_textFont;
+}
+LaserText * LaserViewer::editingText()
+{
+    return m_editingText;
+}
+void LaserViewer::setEditingText(LaserText* text)
+{
+    m_editingText = text;
+}
 void LaserViewer::paintSelectedState(QPainter& painter)
 {
 	
     qreal left, right, top, bottom;
 	QRectF rect = selectedItemsSceneBoundingRect();
 	qDebug() << "paintSelectedState: "<<rect;
-	if (rect.width() == 0 || rect.height() == 0) {
+	if (rect.width() == 0 && rect.height() == 0) {
 		return;
 	}
 	left = rect.left();
@@ -942,34 +1186,21 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 	if (!backgroundItem) {
 		return;
 	}
-	//setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
-	//horizontalScrollBar()->setEnabled(false);
-	//verticalScrollBar()->setEnabled(false);
-	//setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-	//setInteractive(true);
-	//setTransformationAnchor(QGraphicsView::NoAnchor);
-	//setResizeAnchor(QGraphicsView::AnchorUnderMouse);
-	//setSceneRect(QRectF(QPointF(-DBL_MAX, -DBL_MAX), QPointF(DBL_MAX, DBL_MAX)));
 	
-	//fitInView(m_fitInRect, Qt::KeepAspectRatio);
-	//setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
 	QPointF mousePos = mapFromGlobal(QCursor::pos());
 	zoomBy(wheelZoomValue, mousePos);
-
 	this->viewport()->repaint();
-	
-	
 }
-
-void LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
+//输入的点zoomAnchor是view的widget为坐标系
+bool LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
 {
 
     const qreal currentZoom = zoomValue();
-    if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 10))
-        return;
+    if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 58))
+        return false;
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {
-		return;
+		return false;
 	}
 	//QPointF point = mapFromGlobal(QCursor::pos());
 	QTransform t = transform();
@@ -993,27 +1224,23 @@ void LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter
 	backgroundItem->onChangeGrids();
     emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
     emit scaleChanged(zoomValue());
+    return true;
 }
 
 void LaserViewer::resizeEvent(QResizeEvent * event)
 {
+    if (!m_scene->document()) {
+        return;
+    }
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {
 		return;
 	}
 	//QPointF fitInRectTopLeft = mapFromScene(backgroundItem->pos());
 	QGraphicsView::resizeEvent(event);
-	/*if (m_fitInRect.width() == 0 || m_fitInRect.height() == 0) {
-		return;
-	}
-	
-	QRectF bounds = QRectF(-m_fitInRect.x(), -m_fitInRect.y(), m_fitInRect.width(), m_fitInRect.height()); */
-	
-	
-	//m_fitInRect = QRectF(-fitInRectTopLeft.x(), -fitInRectTopLeft.y(), m_fitInRect.width(), m_fitInRect.height());
-	//fitInView(m_fitInRect, Qt::KeepAspectRatio);
-	//centerOn(0, 0);
-	//qDebug() << "m_fitInRect: "<< m_fitInRect;
+    qreal scale = adapterViewScale();
+    zoomBy(scale/zoomValue(), mapTo(this,mapFromScene(backgroundItem->rect().center().toPoint())), true);
+    viewport()->repaint();
 }
 
 void LaserViewer::leaveEvent(QEvent* event)
@@ -1300,7 +1527,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         }
         //Text
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-            //onEndText();
+            onEndText();
             emit readyText();
             viewport()->repaint();
         }
@@ -1309,6 +1536,9 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 			//QGraphicsView::mousePressEvent(event); 会使画线时出现Bug
 			//setInteractive(false);
 		}
+    }
+    else if (event->button() == Qt::RightButton) {
+        m_mirrorLine = nullptr;
     }
 }
 
@@ -1332,11 +1562,11 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 		if (m_isPrimitiveInteractPoint) {
 			if (!isSpecailPoint) {
 				QPixmap cMap(":/ui/icons/images/lineCursor.png");
-				this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+				this->setCursor(cMap.scaled(20, 20, Qt::KeepAspectRatio));
 			}
 			else {
 				QPixmap cMap(":/ui/icons/images/center.png");
-				this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+				this->setCursor(cMap.scaled(20, 20, Qt::KeepAspectRatio));
 			}
 			
 		}
@@ -1708,6 +1938,36 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		this->viewport()->repaint();
 		return;
     }
+    else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
+        QList<LaserPrimitive*> pList = m_scene->document()->primitives().values();
+        QList<LaserPrimitive*> selectedList = m_scene->document()->selectedPrimitives();
+        LaserPrimitive* selectedOnlyLine = nullptr;
+        if (selectedList.size() == 1) {
+            LaserPrimitive* sp = selectedList[0];
+            QString className = sp->metaObject()->className();
+            if (className == "LaserLine") {
+                selectedOnlyLine = sp;
+            }
+        }
+        if (event->button() == Qt::RightButton && pList.size() > 1) {
+            if (m_detectedPrimitive) {
+                QString className = m_detectedPrimitive->metaObject()->className();
+                if (className == "LaserLine" && !selectedOnlyLine) {
+                    m_mirrorLine = m_detectedPrimitive;
+                }
+            }
+            /*for (LaserPrimitive* p : pList) {
+                QString className = p->metaObject()->className();
+                if (className == "LaserLine") {
+                    if (p->contains(mapToScene(event->pos())) && !selectedOnlyLine) {
+
+                        m_mirrorLine = p;
+                    }
+                }
+            }*/
+        }
+        
+    }
 	//View Drag Ready
 	else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
 		//setInteractive(true);
@@ -1874,9 +2134,14 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     //text
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {
         m_textMousePressPos = event->pos();
-        m_textInsertPos = m_textMousePressPos;
+        LaserText* text = nullptr;
+        detectTextInsertPosition(mapToScene(m_textMousePressPos.toPoint()), text);
+        m_editingText = text;
+        modifyTextCursor();
+        //m_textInsertPos = m_textMousePressPos;
         this->setAttribute(Qt::WA_InputMethodEnabled, true);
         emit creatingText();
+        viewport()->repaint();
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
@@ -2676,20 +2941,29 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 			break;
 		}
         //text
+                              
+        case Qt::Key_Return: {
+            addTextByKeyInput("\n");
+            break;
+        }
         case Qt::Key_Enter: {
-            //addTextByKeyInput("\n");
+            addTextByKeyInput("\n");
             break;
         }
         case Qt::Key_Delete: {
+            removeBackText();
             break;
         }
         case Qt::Key_Backspace: {
+            removeFrontText();
             break;
         }
         case Qt::Key_Space: {
+            addTextByKeyInput(" ");
             break;
         }
         case Qt::Key_nobreakspace: {
+            addTextByKeyInput(" ");
             break;
         }
         
@@ -2899,6 +3173,16 @@ qreal LaserViewer::bottomScaleMirror(qreal rate, qreal y)
 		}
 	}
 	return yRate;
+}
+
+LaserPrimitive* LaserViewer::mirrorLine()
+{
+    return m_mirrorLine;
+}
+
+void LaserViewer::setMirrorLine(LaserPrimitive* l)
+{
+    m_mirrorLine = l;
 }
 
 void LaserViewer::setGroupNull()
@@ -3142,6 +3426,26 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
 	m_undoStack->push(transformCmd);
 }
 
+int LaserViewer::textAlignH()
+{
+    return m_textAlighH;
+}
+
+int LaserViewer::textAlignV()
+{
+    return m_textAlighV;
+}
+
+void LaserViewer::setTextAlignH(int align)
+{
+    m_textAlighH = align;
+}
+
+void LaserViewer::setTextAlignV(int align)
+{
+    m_textAlighV = align;
+}
+
 qreal LaserViewer::zoomValue() const
 {
 	
@@ -3154,6 +3458,22 @@ void LaserViewer::setZoomValue(qreal zoomValue)
     //scale(zoomValue, zoomValue);
 	zoomBy(zoomValue / this->zoomValue(), this->rect().center());
     //emit scaleChanged(zoomValue);
+}
+
+qreal LaserViewer::adapterViewScale()
+{
+    QRectF viewRect = this->rect();
+    QRectF docRect = m_scene->backgroundItem()->rect();
+    qreal wScale = viewRect.width() / docRect.width();
+    qreal hScale = viewRect.height() / docRect.height();
+    qreal scale = 1;
+    if (wScale < hScale) {
+        scale = (viewRect.width() - 20) / docRect.width();
+    }
+    else {
+        scale = (viewRect.height() - 20) / docRect.height();
+    }
+    return scale;
 }
 
 void LaserViewer::init()
@@ -3214,7 +3534,10 @@ void LaserViewer::init()
 		
 	});
     connect(StateController::instance().documentPrimitiveTextCreatingState(), &QState::exited, this, [=] {
-        onEndText();
+        if (scene() && scene()->document()) {
+            onEndText();
+        }
+        
     });
 	m_group = nullptr;
 
@@ -3245,22 +3568,62 @@ void LaserViewer::initSpline()
 void LaserViewer::addText(QString str)
 {
     if (!m_editingText) {
-        m_editingText = new LaserText(m_scene->document(),
-            QTransform(), m_curLayerIndex);
+        m_insertIndex = 0;
+        m_editingText = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
+            m_textFont, m_textAlighH, m_textAlighV,
+            QTransform(),  m_curLayerIndex);
         
-        m_textInsertPos = m_editingText->addPath(this, str, m_textInsertPos, m_curTextFont, Qt::AlignRight);
+        m_editingText->addPath(str, m_insertIndex);
+        m_insertIndex += str.size();
         m_scene->addLaserPrimitive(m_editingText);
     }
     else {
-        m_textInsertPos = m_editingText->addPath(this, str, m_textInsertPos, m_curTextFont, Qt::AlignRight);
+        
+        m_editingText->addPath(str, m_insertIndex);
+        m_insertIndex += str.size();
     }
+    modifyTextCursor();
     viewport()->repaint();
     //delete m_textEdit;
 }
 
-void LaserViewer::delText()
+void LaserViewer::removeBackText()
 {
+    if (!m_editingText) {
+        return;
+    }
+    int size = m_editingText->content().length();
+    if (size > 0 && m_insertIndex >= 0 && m_insertIndex < size) {
+        m_editingText->delPath(m_insertIndex);
+        modifyTextCursor();
+        if (m_editingText->path().isEmpty()) {
+            m_scene->removeLaserPrimitive(m_editingText);
+            m_editingText = nullptr;
+        }
+        viewport()->repaint();
+        
+    }
+    
+}
 
+void LaserViewer::removeFrontText()
+{
+    if (!m_editingText) {
+        return;
+    }
+    int size = m_editingText->content().length();
+    if (size > 0 && m_insertIndex > 0 && m_insertIndex <= size) {
+        m_editingText->delPath(m_insertIndex - 1);
+        m_insertIndex -= 1;
+        modifyTextCursor();
+        if (m_editingText->path().isEmpty()) {
+            m_scene->removeLaserPrimitive(m_editingText);
+            m_editingText = nullptr;
+        }
+        viewport()->repaint();
+        
+    }
+    
 }
 
 void LaserViewer::addTextByKeyInput(QString str)
@@ -3350,7 +3713,8 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* ite
 
 void LaserViewer::onEndText()
 {
-    if (m_editingText) {
+    if (m_editingText  && m_editingText->content().length() > 0) {
+
         clearGroupSelection();
         m_editingText->setSelected(true);
         onSelectedFillGroup();
@@ -3689,25 +4053,37 @@ void LaserViewer::resetZoom()
 void LaserViewer::zoomToSelection()
 {
 	QRectF rect = selectedItemsSceneBoundingRect();
+    if (rect.isEmpty()) {
+        rect = AllItemsSceneBoundingRect();
+    }
 	if (rect.width() == 0 && rect.height() == 0) {
 		return;
 	}
+    rect = QRectF(QPointF(mapFromScene(rect.topLeft())), QPointF(mapFromScene(rect.bottomRight())));
 	QRectF viewRect = this->rect();
-	QPointF center = mapFromScene(rect.center());
+	QPointF center = rect.center();
 	qreal width = rect.width();
 	qreal height = rect.height();
-	qreal viewWidth = viewRect.width() - 58;
-	qreal viewHeight = viewRect.height() - 58;
+	qreal viewWidth = viewRect.width();
+	qreal viewHeight = viewRect.height();
 	qreal scale = 1;
-
-	if (viewWidth < viewHeight) {
-		scale = viewWidth / width;
-	}
-	else {
-		scale = viewHeight / height;
-	}
-
-	zoomBy(scale / zoomValue(), center, true);
+    qreal scaleW = (viewWidth - 20) / width;
+    qreal scaleH = (viewHeight - 20) / height;
+    if (scaleW < scaleH) {
+        scale = scaleW;
+    }
+    else {
+        scale = scaleH;
+    }
+    
+    if (!zoomBy(scale, center, true)) {
+        QPointF diff = mapFrom(this, this->rect().center())- center.toPoint();
+        QTransform t = transform();
+        QTransform t1;
+        t1.translate(diff.x(), diff.y());
+        
+        this->setTransform(t*t1);
+    }
 }
 
 /*void LaserViewer::textAreaChanged()

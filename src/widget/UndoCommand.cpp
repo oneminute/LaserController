@@ -528,3 +528,43 @@ void PasteCommand::duplicationRedo()
 {
 	
 }
+
+MirrorACommand::MirrorACommand(LaserViewer * v)
+{
+    m_viewer = v;
+    m_line = qgraphicsitem_cast<LaserLine*>(m_viewer->mirrorLine());
+}
+
+MirrorACommand::~MirrorACommand()
+{
+    m_viewer = nullptr;
+    m_line = nullptr;
+}
+
+void MirrorACommand::undo()
+{
+    redo();
+}
+
+void MirrorACommand::redo()
+{
+    LaserPrimitiveGroup* group = m_viewer->group();
+    //LaserLine* line = qgraphicsitem_cast<LaserLine*>(m_line);
+    QPointF p1 = m_line->line().p1();
+    QPointF p2 = m_line->line().p2();
+    QVector2D v1(p2 - p1);
+    //QVector2D v1(1, 0);
+    v1.normalize();
+    QVector2D v2(v1.y(), -v1.x());
+    QPointF pos = m_line->transform().map(m_line->pos());
+    QMatrix mat(v1.x(), v1.y(), v2.x(), v2.y(), p1.x(), p1.y());
+    QPointF p = mat.inverted().map(QPointF(1, 0));
+
+    QTransform t(mat.inverted());
+    QTransform t1(1, 0, 0, -1, 0, 0);
+    QTransform t2 = t.inverted();
+    group->setTransform(group->transform() * t * t1 * t2);
+   
+   
+    m_viewer->viewport()->repaint();
+}

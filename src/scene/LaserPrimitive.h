@@ -115,7 +115,7 @@ public:
 	int layerIndex();
 	QTransform getAllTransform();
 	QPainterPath getPath();
-	QRectF originalBoundingRect() const;
+	QRectF originalBoundingRect(qreal extendPixel = 0) const;
 	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
     virtual QRectF sceneBoundingRect() const;
@@ -452,30 +452,69 @@ private:
     Q_DECLARE_PRIVATE_D(LaserNode::d_ptr, LaserBitmap)
     Q_DISABLE_COPY(LaserBitmap)
 };
+struct LaserTextRowPath {
+public:
+    LaserTextRowPath() {};
+    ~LaserTextRowPath() {};
 
+private:
+    QPointF m_leftTop;
+    QPainterPath m_path;
+    QList<QPainterPath> m_subRowPath;
+    QList<QRectF> m_boundList;
+public:
+    QPointF leftTopPosition() { return m_leftTop; };
+    QPainterPath path() { return m_path; };
+    QList<QPainterPath>& subRowPathlist() { return m_subRowPath; };
+    QList<QRectF> subRowBoundList() { return m_boundList; };
+
+    void setLeftTop(QPointF p) { m_leftTop = p; };
+    void setPath(QPainterPath p) { m_path = p; };
+    void setSubRowPathlist(QList<QPainterPath> l) { m_subRowPath = l; };
+    void setSubRowBoundlist(QList<QRectF> l) { m_boundList = l; };
+};
 class LaserTextPrivate;
 class LaserText : public LaserPrimitive
 {
 	Q_OBJECT
 public:
-	LaserText(LaserDocument* doc,  QTransform transform = QTransform(),
+	LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alightHType, int alightVType, QTransform transform = QTransform(),
 		int layerIndex = 0);
-    virtual ~LaserText() {}
+    virtual ~LaserText();
 
     QRect rect() const;
-    //QString content() const;
+    QString content() const;
+    void setContent(QString c);
+    QPainterPath path() const;
     QVector<QLineF> edges();
-    void appendPathList(QPainterPath path);
+    void setFont(QFont font);
+    QFont font();
+    void setAlignH(int a);
+    int alignH();
+    void setAlignV(int a);
+    int alignV();
+    QPointF startPos();
+    void setSaveTransform(QTransform t);
+    QTransform saveTransform();
+    //void setAlignType(int type);
+    //int alignType();
+    void insertContent(QString str, int index);
+    //insertIndex,插入到的index
+    void addPath(QString content, int insertIndex);
+    void delPath(int index);
 
-    QPointF addPath(LaserViewer* view, QString content, QPointF insetPos, QFont font, int type);
-    void delPath(QPainterPath path);
+    //void modifyLinePathList();
+    void modifyPathList();
+    QList<LaserTextRowPath> subPathList();
 
     virtual QRectF boundingRect() const;
     virtual QRectF sceneBoundingRect() const;
+    QRectF originalBoundingRect(qreal extendPixel = 0) const;
 	virtual void draw(QPainter* painter);
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
 	LaserPrimitive * clone(QTransform t);
+    virtual QJsonObject toJson();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

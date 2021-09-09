@@ -216,10 +216,15 @@ QPainterPath LaserPrimitive::getPath()
 	return d->path;
 }
 
-QRectF LaserPrimitive::originalBoundingRect() const
+QRectF LaserPrimitive::originalBoundingRect(qreal extendPixel) const
 {
 	Q_D(const LaserPrimitive);
-	return d->originalBoundingRect;
+    qreal x = d->boundingRect.topLeft().x() - extendPixel;
+    qreal y = d->boundingRect.topLeft().y() - extendPixel;
+    qreal width = d->boundingRect.width() + 2 * extendPixel;
+    qreal height = d->boundingRect.height() + 2 * extendPixel;
+    QRectF rect = QRectF(x, y, width, height);
+	return rect;
 }
 
 QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
@@ -1748,6 +1753,7 @@ LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> kn
     d->controlPoints = controlPoints;
     d->knots = knots;
     d->weights = weights;
+    d->originalBoundingRect = d->boundingRect;
 	utils::sceneTransformToItemTransform(transform, this);
     updateCurve();
 }
@@ -2175,142 +2181,456 @@ public:
         : LaserPrimitivePrivate(ptr)
     {}
 	QRect rect;
-    QList<QPainterPath> pathList;
-    QPainterPath path;
+    QString content;
+    QString lastContent;
+    QPointF startPos;
+    //QList<QPainterPath> pathList;
+    //QMap<QPointF, QList<QPainterPath>> pathList;
+    QList<LaserTextRowPath> pathList;
+    QPainterPath allPath;
+    QFont font;
+    int alignHType;
+    int lastAlignHType;
+    int alignVType;
+    int lastAlignVType;
+    QGraphicsView* view;
+
 };
 
-LaserText::LaserText(LaserDocument* doc,QTransform saveTransform, int layerIndex)
+LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
 	: LaserPrimitive(new LaserTextPrivate(this),  doc,  LPT_TEXT, saveTransform, layerIndex)
 {
     Q_D(LaserText);
-    d->boundingRect = d->path.boundingRect();
-    d->rect = d->boundingRect.toRect();
+    //d->boundingRect = d->path.boundingRect();
+    //d->rect = d->boundingRect.toRect();
     d->outline.addRect(d->rect);
+    //d->baseSpace = Global::mm2PixelsXF(2.0);
+    //d->textSpace = d->baseSpace + space;;
+    d->startPos = startPos;
+    d->font = font;
+    d->alignHType = alighHType;
+    d->lastAlignHType = alighHType;
+    d->alignVType = alighVType;
+    d->lastAlignVType = alighVType;
     //d->position = d->rect.center();
-    
+    d->startPos = mapFromScene(d->startPos);
+    d->view = doc->scene()->views()[0];
+    d->allTransform = saveTransform;
+    sceneTransformToItemTransform(saveTransform);
 }
 
-QRect LaserText::rect() const 
+LaserText::~LaserText()
+{
+}
+
+QRect LaserText::rect() const
 {
     Q_D(const LaserText);
     return d->rect; 
 }
 
-/*QString LaserText::content() const 
+QString LaserText::content() const 
 {
     Q_D(const LaserText);
     return d->content; 
-}*/
+}
+
+void LaserText::setContent(QString c)
+{
+    Q_D(LaserText);
+    d->content = c;
+}
+
+QPainterPath LaserText::path() const
+{
+    Q_D(const LaserText);
+    /*QPainterPath paths;
+
+    for (QMap<QPointF, QList<QPainterPath>>::const_iterator i = d->pathList.begin(); i != d->pathList.end(); i++) {
+        QPainterPath rowPath;
+        QPointF startPos = i.key();
+        QList<QPainterPath> subRowPathList = i.value();
+        for (QPainterPath path : subRowPathList) {
+            rowPath.addPath(path);
+            
+        }
+        
+        paths.addPath(rowPath);
+    }*/
+    
+    return d->allPath;
+}
 
 QVector<QLineF> LaserText::edges()
 {
     Q_D(const LaserText);
-    return  LaserPrimitive::edges(sceneTransform().map(d->path));
+    return  LaserPrimitive::edges(sceneTransform().map(path()));
 }
 
-void LaserText::appendPathList(QPainterPath path)
+void LaserText::setFont(QFont font)
 {
     Q_D(LaserText);
-    d->pathList.append(path);
+    d->font = font;
+    modifyPathList();
+
 }
 
-QPointF LaserText::addPath(LaserViewer* view, QString content, QPointF insertPos, QFont font, int type)
+QFont LaserText::font()
+{
+    Q_D(const LaserText);
+    return d->font;
+}
+
+void LaserText::setAlignH(int a)
 {
     Q_D(LaserText);
-    //QPainterPaht 
-    //QList<QPolygonF> polys = d->path.toFillPolygons();
-    int count = content.size();
-    QPointF newPos = insertPos;
-    QPainterPath path;
-    QPointF point = view->mapToScene(insertPos.toPoint());
-    qreal diff = font.pointSize() * 0.5;
-    point.setY(point.y() + diff);
+    d->alignHType = a;
+
+}
+
+int LaserText::alignH()
+{
+    Q_D(LaserText);
+    return d->alignHType;
+}
+
+void LaserText::setAlignV(int a)
+{
+    Q_D(LaserText);
+    d->alignVType = a;
+}
+
+int LaserText::alignV()
+{
+    Q_D(LaserText);
+    return d->alignVType;
+}
+
+QPointF LaserText::startPos()
+{
+    Q_D(LaserText);
+    return d->startPos;
+}
+
+void LaserText::setSaveTransform(QTransform t)
+{
+
+}
+
+QTransform LaserText::saveTransform()
+{
+    return QTransform();
+}
+
+/*void LaserText::setAlignType(int type)
+{
+    Q_D(LaserText);
+    d->alignType = type;
+}
+
+int LaserText::alignType()
+{
+    Q_D(LaserText);
+    return d->alignType;
+}*/
+
+void LaserText::insertContent(QString str, int index)
+{
+    Q_D(LaserText);
+    d->lastContent = d->content;
+    d->content.insert(index, str);
+}
+
+void LaserText::addPath(QString content, int insertIndex)
+{
+    Q_D(LaserText);
+    insertContent(content, insertIndex);
+    modifyPathList();
+    d->view->viewport()->repaint();
+}
+
+void LaserText::delPath(int index)
+{
+    Q_D(LaserText);
+    d->lastContent = d->content;
+    d->content.remove(index, 1);
+    modifyPathList();
+    d->view->viewport()->repaint();
+}
+
+void LaserText::modifyPathList()
+{
+    Q_D(LaserText);
+    QList<QList<QPainterPath>> subRowPathList;
+    QList<QList<QRectF>> subBoundList;
+    QList<QPainterPath> rowPathList;
+    QList<QPointF> startPosList;
+
+    QList<QPainterPath>* listPtr = &QList<QPainterPath>();
+    QList<QRectF>* boundListPtr = &QList<QRectF>();
+
+    QPainterPath rowPath;
+    QPainterPath* rowPathPtr = &rowPath;
+
+    qreal fontSize = d->font.pixelSize();
+    qreal letterSpacing = d->font.letterSpacing();
+    qreal wordSpacing = d->font.wordSpacing();
     
-    switch (type) {
+    bool isNewLine = true;
+    QRectF lastBound;
+    //QPainterPath allPath;
+    //QPainterPath lastPath;
+    qDebug() << d->lastContent;
+    qDebug() << d->content;
+    //for (QChar c : d->content) {
+    
+    for (int i = 0; i < d->content.size(); i++) {
+        QChar c = d->content[i];
+        qreal rowY = (subRowPathList.size() + 1) * fontSize + subRowPathList.size()* wordSpacing + d->startPos.y();
+        QPointF startP(d->startPos.x(), rowY);
+        if (c == "\n") {
+            subRowPathList.append(*listPtr);
+            rowPathList.append(*rowPathPtr);
+            subBoundList.append(*boundListPtr);
+            startPosList.append(startP);
+            rowY = (subRowPathList.size() + 1) * fontSize + subRowPathList.size()* wordSpacing + d->startPos.y();
+            startP .setY(rowY);
+            //换行
+            isNewLine = true;
+            listPtr = &QList<QPainterPath>();
+            rowPathPtr = &QPainterPath();
+            boundListPtr = &QList<QRectF>();
+        }
+        else {
+            QPainterPath path;
+            QTransform pathT;
+            QRectF bound;
+            QPointF pos;
+            //top left
+            if (isNewLine) {
+                pos = startP;
+            }
+            else {
+                pos = QPointF(lastBound.right() + d->font.letterSpacing(), rowY);
+            }
+            if (c == " ") {
+                QFontMetrics m(d->font);
+                qreal width = m.averageCharWidth();
+                bound = QRectF(pos.x(), pos.y(), width, d->font.pixelSize());
+            }
+            else {
+                path.addText(pos, d->font, c);
+                bound = path.boundingRect();
+            }
+            
+            listPtr->append(path);
+            rowPathPtr->addPath(path);
+            boundListPtr->append(bound);
+            lastBound = bound;
+            isNewLine = false;
+        }
+        if (i == d->content.size() - 1) {
+            subRowPathList.append(*listPtr);
+            rowPathList.append(*rowPathPtr);
+            subBoundList.append(*boundListPtr);
+            startPosList.append(startP);
+        }
+        //allPath.addPath(path);
+        
+        
+    }
+    
+    qreal allHeight = fontSize * subRowPathList.size() + (fontSize * subRowPathList.size()-1)* wordSpacing;
+    d->pathList.clear();
+    d->allPath = QPainterPath();
+    for (int j = 0; j < subRowPathList.size(); j++) {
+        QList<QPainterPath> subRowPath = subRowPathList[j];
+        QList<QRectF> subRowBound = subBoundList[j];
+        QPainterPath rowPath = rowPathList[j];
+        QPointF startLeftTop = startPosList[j];
+        qreal rowWidth = rowPath.boundingRect().width();
+        QPointF diff;
+        
+        switch (d->alignHType) {
         case Qt::AlignLeft: {
-
+            switch (d->alignVType) {
+                case Qt::AlignTop: {
+                    diff = QPointF(0, 0);
+                    break;
+                }
+                case Qt::AlignBottom: {
+                    diff = QPointF(0, -allHeight);
+                    break;
+                }
+                case Qt::AlignVCenter: {
+                    diff = QPointF(0, -allHeight*0.5);
+                    break;
+                }
+            }
             break;
         }
         case Qt::AlignRight: {
-            /*for (QPainterPath poly : d->pathList) {
-                QRectF rect = poly.boundingRect();
-                qDebug() << rect;
-                qreal right = rect.right();
-                if (right > insertPos.x()) {
-                    poly.translate(QPointF(path.boundingRect().width(), 0));
+            switch (d->alignVType) {
+                case Qt::AlignTop: {
+                    diff = QPointF(-rowWidth, 0);
+                    break;
                 }
-            }*/
-            path.addText(point, font, content);
-            qDebug() << path.boundingRect().width();
-            qDebug() << insertPos;
-            newPos = insertPos + sceneTransform().toAffine().map(QPointF(path.boundingRect().width(), 0));
-            qDebug() << newPos;
+                case Qt::AlignBottom: {
+                    diff = QPointF(-rowWidth, -allHeight);
+                    break;
+                }
+                case Qt::AlignVCenter: {
+                    diff = QPointF(-rowWidth, -allHeight*0.5);
+                    break;
+                }   
+            }
             break;
         }
         case Qt::AlignHCenter: {
-            
+            switch (d->alignVType) {
+                case Qt::AlignTop: {
+                    diff = QPointF(-rowWidth*0.5, 0);
+                    break;
+                }
+                case Qt::AlignBottom: {
+                    diff = QPointF(-rowWidth * 0.5, -allHeight);
+                    break;
+                }
+                case Qt::AlignVCenter: {
+                    diff = QPointF(-rowWidth * 0.5, -allHeight*0.5);
+                    break;
+                }
+            }
             break;
         }
-    }
-    d->path.addPath(path);
-    if (count == 1) {
-        appendPathList(path);
-    }
-    else if (count > 1) {
-        QPainterPath lastPath;
-        for (int i = 0; i < count; i++) {
-            QPainterPath subPath;
-
-            QPointF subPoint;
-            if (i == 0) {
-                subPoint = point;
-            }
-            else {
-                subPoint += sceneTransform().toAffine().map(QPointF(lastPath.boundingRect().width(), 0));
-            }
-            subPath.addText(subPoint, font, QString(content[i]));
-            appendPathList(subPath);
-            lastPath = subPath;
         }
+        
+        LaserTextRowPath rowPathStruct;
+        QPainterPath newRowPath;
+        QList<QPainterPath> newRowSubPaths;
+        QList<QRectF> newRowBounds;
+        QPointF rowLeftTop = startLeftTop + diff;
+        for (int subIndex = 0; subIndex < subRowPath.size(); subIndex++ ) {
+            QPainterPath subPath = subRowPath[subIndex];
+            QRectF subBound = subRowBound[subIndex];
+
+            qDebug() << diff;
+            subPath.translate(diff.x(), diff.y());
+            subBound.translate(diff.x(), diff.y());
+
+            newRowPath.addPath(subPath);
+            newRowSubPaths.append(subPath);
+            newRowBounds.append(subBound);
+        }
+        rowPathStruct.setPath(newRowPath);
+        rowPathStruct.setLeftTop(rowLeftTop);
+        rowPathStruct.setSubRowPathlist(newRowSubPaths);
+        rowPathStruct.setSubRowBoundlist(newRowBounds);
+        d->pathList.append(rowPathStruct);
+        d->allPath.addPath(newRowPath);
     }
-    int i = d->pathList.size();
     
-    return newPos;
 }
 
-void LaserText::delPath(QPainterPath path)
+QList<LaserTextRowPath> LaserText::subPathList()
 {
-    Q_D(LaserText);
-    if (d->path.contains(path)) {
-        d->path = d->path - path;
-    }
-    
+    Q_D(const LaserText);
+
+    return d->pathList;
 }
 
 QRectF LaserText::boundingRect() const
 {
     Q_D(const LaserText);
     //d->boundingRect = d->path.boundingRect();
-    return d->path.boundingRect();
+    return path().boundingRect();
 }
 
 QRectF LaserText::sceneBoundingRect() const
 {
     Q_D(const LaserText);
-    return sceneTransform().map(this->boundingRect()).boundingRect();
+    return sceneTransform().map(path()).boundingRect();
+}
+
+QRectF LaserText::originalBoundingRect(qreal extendPixel) const
+{
+    
+    Q_D(const LaserPrimitive);
+    qreal x = boundingRect().topLeft().x() - extendPixel;
+    qreal y = boundingRect().topLeft().y() - extendPixel;
+    qreal width = boundingRect().width() + 2 * extendPixel;
+    qreal height = boundingRect().height() + 2 * extendPixel;
+    QRectF rect = QRectF(x, y, width, height);
+    return rect;
 }
 
 void LaserText::draw(QPainter * painter)
 {
     Q_D(LaserText);
-    painter->drawPath(d->path);
+    painter->drawPath(mapFromScene(sceneTransform().map(path())));
+    painter->drawPolygon(mapFromScene(sceneTransform().map(originalBoundingRect(Global::mm2PixelsYF(10.0)))));
+    
+    for (int i = 0; i < d->pathList.size(); i++) {
+        painter->setPen(QPen(Qt::green));
+        QColor c(0, 0, 0, 0);
+        painter->setPen(QPen(c));
+        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
+        painter->drawPolygon(mapFromScene(sceneTransform().map(d->pathList[i].path().boundingRect())));
+        for (QPainterPath path : rowPathList) {
+            painter->setPen(QPen(Qt::red));
+            //painter->drawPath(mapFromScene(sceneTransform().map(path)));
+            painter->drawPolygon(mapFromScene(sceneTransform().map(path.boundingRect())));
+
+        }
+    }
 }
 
 LaserPrimitive * LaserText::clone(QTransform t)
 {
 	Q_D(LaserText);
-	LaserText* text = new LaserText(document(), sceneTransform(), d->layerIndex);
-	return nullptr;
+	LaserText* text = new LaserText(document(), d->startPos, d->font, d->alignHType, d->alignVType, sceneTransform(), d->layerIndex);
+    text->setContent(d->content);
+    text->modifyPathList();
+	return text;
+}
+
+QJsonObject LaserText::toJson()
+{
+    Q_D(const LaserText);
+    QJsonObject object;
+    //QJsonArray position = { pos() .x(), pos() .y()};
+    //QTransform transform = d->allTransform;
+    QTransform transform = QTransform();
+    QJsonArray matrix = {
+        transform.m11(), transform.m12(), transform.m13(),
+        transform.m21(), transform.m22(), transform.m23(),
+        transform.m31(), transform.m32(), transform.m33()
+    };
+    QTransform parentTransform = this->sceneTransform();
+    QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
+    object.insert("parentMatrix", parentMatrix);
+    object.insert("name", name());
+    object.insert("className", this->metaObject()->className());
+    object.insert("matrix", matrix);
+    object.insert("layerIndex", layerIndex());
+    //content
+    object.insert("content", d->content);
+    QJsonArray startPosArray{ d->startPos.x(), d->startPos.y() };
+    object.insert("startPos", startPosArray);
+    //font
+    QJsonObject font;
+    font.insert("family", d->font.family());
+    font.insert("size", d->font.pixelSize());
+    font.insert("bold", d->font.bold());
+    font.insert("italic", d->font.italic());
+    font.insert("upper", d->font.capitalization());
+    font.insert("spaceX", d->font.letterSpacing());
+    font.insert("letterSpaceTpye", d->font.letterSpacingType());
+    font.insert("spaceY", d->font.wordSpacing());
+    font.insert("alignH", d->alignHType);
+    font.insert("alignV", d->alignVType);
+    object.insert("font", font);
+    return object;
 }
 
 bool LaserText::isClosed() const
@@ -2322,3 +2642,4 @@ QPointF LaserText::position() const
 {
     return QPointF();
 }
+

@@ -3,6 +3,7 @@
 #include <QUndoCommand>
 #include <QGraphicsItem>
 #include "LaserViewer.h"
+#include "scene/LaserPrimitive.h"
 
 class SelectionUndoCommand :public QUndoCommand {
 public :
@@ -58,6 +59,7 @@ private:
 	//QMap<QList<QGraphicsItem*>, QTransform> m_selectedBeforeAdd;
 	bool m_isDel;
 };
+//多边形
 class PolygonUndoCommand : public QUndoCommand {
 public:
 	PolygonUndoCommand(LaserScene* scene, LaserPrimitive* lastPrimitive, LaserPrimitive* curPrimitive);
@@ -72,6 +74,7 @@ private:
 	LaserViewer* m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
 };
+//水平镜像
 class MirrorHCommand : public QUndoCommand {
 public:
 	MirrorHCommand(LaserViewer* v);
@@ -81,6 +84,7 @@ public:
 private:
 	LaserViewer* m_viewer;
 };
+//垂直镜像
 class MirrorVCommand : public QUndoCommand {
 public:
 	MirrorVCommand(LaserViewer* v);
@@ -90,6 +94,7 @@ public:
 private:
 	LaserViewer * m_viewer;
 };
+//黏贴
 class PasteCommand : public QUndoCommand {
 public:
 	PasteCommand(LaserViewer* ,bool isPasteInline = false, bool isDuplication = false);
@@ -109,5 +114,15 @@ private :
 	//QPointF m_position;
 
 };
-
+//交叉线镜像
+class MirrorACommand : public QUndoCommand {
+public:
+    MirrorACommand(LaserViewer* v);
+    ~MirrorACommand();
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserViewer * m_viewer;
+    LaserLine* m_line;
+};
 #endif // UNDOCOMMAND_H

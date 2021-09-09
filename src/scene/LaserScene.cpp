@@ -67,6 +67,7 @@ void LaserScene::clearDocument(bool delDoc)
 		if (viewer) {
 			viewer->clearGroupSelection();
 			viewer->setGroupNull();
+            viewer->setEditingText(nullptr);
 		}
 	}
 	m_background = nullptr;	
@@ -102,10 +103,9 @@ QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
         if (primitive)
         {
             primitives.append(primitive);
+            
         }
     }
-
-	qDebug() << "primitives size: " << selectedItems().size();
     return primitives;
 }
 

@@ -497,6 +497,10 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 			LaserBitmap* bitmap = qobject_cast<LaserBitmap*>(primitive);
 			array.append(bitmap->toJson());
 		}
+        else if (className == "LaserText") {
+            LaserText* text = qobject_cast<LaserText*>(primitive);
+            array.append(text->toJson());
+        }
 		else {
 			QMessageBox::critical(window, "critical", "can't save, the primitive class don't exit.");
 		}

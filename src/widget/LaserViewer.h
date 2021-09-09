@@ -14,6 +14,7 @@ class LaserPrimitive;
 class LaserBitmap;
 class LaserLayer;
 class LaserText;
+class LaserTextRowPath;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -37,22 +38,29 @@ class LaserViewer : public QGraphicsView
 public:
     explicit LaserViewer(QWidget* parent = nullptr);
     ~LaserViewer();
-
+    //zoom
+    //输入的点zoomAnchor是view的widget为坐标系
+    bool zoomBy(qreal factor, QPointF zoomAnchor = QPointF(0, 0), bool zoomAnchorCenter = false);
     qreal zoomValue() const;
 	void setZoomValue(qreal zoomScale);
+    qreal adapterViewScale();
+    LaserPrimitive* mirrorLine();
+    void setMirrorLine(LaserPrimitive* l);
+
 	void createSpline();
 	LaserScene* scene();
 	void setHorizontalRuler(RulerWidget* _r);
 	void setVerticalRuler(RulerWidget * _r);
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
+    QRectF AllItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);//draw
 	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);//selection
 	bool detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint);
 	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);//selection
-    QPointF dectctTextInsertPosition();//draw text
+    bool detectTextInsertPosition(QPointF insertPoint, LaserText*& text);//被找到的text
 	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
 
@@ -67,15 +75,23 @@ public:
 	int curLayerIndex();
 
 	void setCurLayerIndex(int index);
-
-    
+    //text
+    QLineF modifyTextCursor();
+    QFont* textFont();
+    LaserText* editingText();
+    void setEditingText(LaserText * text);
+    int textAlignH();
+    int textAlignV();
+    void setTextAlignH(int align);
+    void setTextAlignV(int align);
 	
 private:
     void init();
 	void initSpline();
 	//void creatTextEdit();
 	void addText(QString str);
-    void delText();
+    void removeBackText();
+    void removeFrontText();
     void addTextByKeyInput(QString str);
 	void selectedHandleScale();
 	void selectedHandleRotate();
@@ -90,6 +106,8 @@ private:
 	qreal rightScaleMirror(qreal rate, qreal x);
 	qreal topScaleMirror(qreal rate, qreal y);
 	qreal bottomScaleMirror(qreal rate, qreal y);
+    
+
 	void setGroupNull();
 	void pointSelectWhenSelectedState(int handleIndex, LaserPrimitive* primitive);
 	void selectingReleaseInBlank();//释放鼠标时，点选和框选的区域为空白（没有图元）
@@ -100,6 +118,7 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
+    
 public slots:
     void zoomIn();
     void zoomOut();
@@ -150,9 +169,8 @@ protected:
 	void paintSelectedState(QPainter& painter);
 	int setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
-    void zoomBy(qreal factor, QPointF zoomAnchor = QPointF(0, 0), bool zoomAnchorCenter = false);
+    
 	void resizeEvent(QResizeEvent *event) override;
-
 	
 	//mouse
 	virtual void leaveEvent(QEvent *event) override;
@@ -229,10 +247,10 @@ private:
 	qreal m_splineNodeEditWidth;
 	qreal m_splineHandlerWidth;
 	//Text
-	QPoint m_textInputPoint;
-	QTime m_time;
-	int m_curTime;
-	int m_lastTime;
+	//QPoint m_textInputPoint;
+	//QTime m_time;
+	//int m_curTime;
+	//int m_lastTime;
 	//QTextEdit *m_textEdit;
 
 	bool m_isKeyShiftPressed;
@@ -288,10 +306,17 @@ private:
 	//layer
 	int m_curLayerIndex;
     //text
-    QPointF m_textInsertPos;
+    //QPointF m_textInsertPos;
     LaserText* m_editingText;
     QPointF m_textMousePressPos;
-    QFont m_curTextFont;
+    QFont m_textFont;
+    QLineF m_textCursorLine;//scene
+    //QLineF m_startTextCursorLine;//scene
+    int m_insertIndex;//-1时说明editingText为null
+    int m_textAlighH;
+    int m_textAlighV;
+    //mirror
+    LaserPrimitive* m_mirrorLine;
 	
 	friend class LaserScene;
 };

@@ -7,10 +7,12 @@
 #include <QScopedPointer>
 #include <QDir>
 #include <QState>
+#include <QFontComboBox>
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
 #include "laser/LaserDriver.h"
 #include "widget/LaserDoubleSpinBox.h"
+#include "widget/LaserFontComboBox.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
@@ -53,6 +55,18 @@ public:
 
 public slots:
     void handleSecurityException(int code, const QString& message);
+    void onFontComboBoxHighLighted(int index);
+    void onFontComboBoxActived(int index);
+    void onAlignHBoxChanged(int index);
+    void onAlignVBoxChanged(int index);
+    void onChangeFontComboBoxByEditingText();
+    void onFontComboBoxHidePopup();
+    void onFontHeightBoxEnterOrLostFocus();
+    void onFontBoldStateChanged();
+    void onFontItalicStateChanged();
+    void onFontUpperStateChanged();
+    void onFontSpaceXEnterOrLostFocus();
+    void onFontSpaceYEnterOrLostFocus();
 	
 protected:
     void createCentralDockPanel();
@@ -136,6 +150,7 @@ protected slots:
 
 	void onActionMirrorHorizontal(bool checked = false);
 	void onActionMirrorVertical(bool checked = false);
+    void onActionMirrorACrossLine(bool checked = false);
 
     void onActionShowMainCardInfo(bool checked = false);
     void onActionTemporaryLicense(bool checked = false);
@@ -184,6 +199,7 @@ protected slots:
 
 	//selection
 	void onLaserSceneSelectedChanged();
+    void onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 	void selectedChange();//items
 	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
 	void onSelectionOriginalClicked(bool clicked);
@@ -349,9 +365,19 @@ private:
 	QString m_fileDirection;
 	QString m_fileName;
 	QString m_windowTitle;
-	//selection arrange
-	//QWidget* m_mirrorHWidget;
-	//QWidget* m_mirrorVWidget;
+	//Text 
+    QGridLayout* m_textLayout;
+    QWidget * m_textFontWidget;
+    LaserFontComboBox* m_fontFamily;
+    LaserDoubleSpinBox* m_fontHeight;
+    QComboBox* m_fontAlignX;
+    QComboBox* m_fontAlignY;
+    QCheckBox* m_fontBold;
+    QCheckBox* m_fontItalic;
+    QCheckBox* m_fontUpper;
+    LaserDoubleSpinBox* m_fontSpaceX;
+    LaserDoubleSpinBox* m_fontSpaceY;
+    int m_fontComboxLightedIndex;
 };
 
 #endif // LASERCONTROLLERWINDOW_H
