@@ -559,6 +559,12 @@ void LaserLayer::onClicked()
                     types.append(LPT_BITMAP);
                 }
             }
+            else if (primitive->isText()) {
+                if (!types.contains(LPT_TEXT))
+                {
+                    types.append(LPT_TEXT);
+                }
+            }
         }
 
         if (types.size() > 1)
@@ -572,6 +578,10 @@ void LaserLayer::onClicked()
         else if (types[0] == LPT_BITMAP)
         {
             setType(LLT_ENGRAVING);
+        }
+        else if (types[0] == LPT_TEXT)
+        {
+            setType(LLT_CUTTING);
         }
         scene->document()->updateLayersStructure();
     }

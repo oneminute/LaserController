@@ -555,6 +555,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
 	connect(StateController::instance().documentIdleState(), &QState::entered, m_viewer, &LaserViewer::onDocumentIdle);
+
     connect(StateController::instance().documentPrimitiveTextState(), &QState::exited, this, [=] {
         //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
     });
@@ -3068,12 +3069,12 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             if (backgroundItem) {
                 backgroundItem->onChangeGrids();
             }
-
-            doc->open();
-            
+            m_comboBoxScale->setCurrentText("100%");
             //初始化缩放输入
+            //LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
             QString str = QString::number(qFloor(m_viewer->adapterViewScale() * 100)) + "%";
             m_comboBoxScale->setCurrentText(str);
+            doc->open();
         }
         
         

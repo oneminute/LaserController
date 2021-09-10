@@ -793,6 +793,7 @@ void LaserDocument::close()
     Q_D(LaserDocument);
     if (d->isOpened)
     {
+        d->primitives.clear();
         destroy();
         d->isOpened = false;
         emit closed();

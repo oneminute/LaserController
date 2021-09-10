@@ -9,6 +9,7 @@
 #include<QGraphicsSceneMouseEvent>
 #include<QGraphicsSceneWheelEvent>
 #include <QScrollBar>
+#include <qmath.h>
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
@@ -47,9 +48,7 @@ void LaserScene::updateDocument(LaserDocument * doc)
 	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
 	views()[0]->setTransform(QTransform());
 	views()[0]->centerOn(rect.center());
-	
-	//m_background->setPos(100, 100);
-	//setSceneRect(QRectF(QPointF(0, 0), QPointF(0, 0)));
+    
 	
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
