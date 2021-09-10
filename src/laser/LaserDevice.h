@@ -80,8 +80,14 @@ public:
 
     QPointF origin() const;
     QPointF deviceOrigin() const;
+    QPointF deviceOriginMM() const;
+    QPointF deviceOriginMachining() const;
+    QRectF boundingRect() const;
+    QRectF boundingRectMM() const;
+    QRectF boundRectMachining() const;
     QTransform transform() const;
     QTransform deviceTransform() const;
+    QTransform deviceTransformMM() const;
 
     void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
 

@@ -31,6 +31,7 @@
 #include "state/StateController.h"
 #include "svg/qsvgtinydocument.h"
 #include "LaserScene.h"
+#include "laser/LaserPointList.h"
 
 class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 {
@@ -313,7 +314,7 @@ void LaserDocument::exportJSON1(const QString& filename)
             {
                 itemObj["Layer"] = layerId;
                 //QList<QPainterPath> modifyPathList = laserItem->subBoundings();
-                QVector<QPointF> points = laserItem->updateMachiningPoints(canvas);
+                LaserPointList points = laserItem->updateMachiningPoints(canvas);
                 if (!points.empty())
                 {
                     itemObj["Type"] = laserItem->typeLatinName();
@@ -379,7 +380,7 @@ void LaserDocument::exportJSON2(const QString& filename)
 
     QElapsedTimer timer;
     timer.start();
-    OptimizerController* optimizer = new OptimizerController(d->optimizeNode, totalNodes());
+    OptimizerController* optimizer = new OptimizerController(d->optimizeNode, primitives().count());
     PathOptimizer::Path path = optimizer->optimize(pageWidth, pageHeight, canvas);
     qLogD << "optimized duration: " << timer.elapsed() / 1000.0;
     delete optimizer;
@@ -398,17 +399,13 @@ void LaserDocument::exportJSON2(const QString& filename)
 
     QJsonArray layers;
     QJsonArray items;
-    QPointF lastPoint(0, 0);
+    LaserPoint lastPoint;
 
     QList<LaserLayer*> layerList;
 
-    for (PathOptimizer::PathNode pathNode : path)
+    for (OptimizeNode* pathNode : path)
     {
-        LaserPrimitive* primitive = pathNode.first;
-        if (!primitive)
-            continue;
-        int pointIndex = pathNode.second;
-
+        LaserPrimitive* primitive = pathNode->primitive();
         LaserLayer* layer = primitive->layer();
         bool newLayer = false;
         if (!layerList.contains(layer))
@@ -439,7 +436,7 @@ void LaserDocument::exportJSON2(const QString& filename)
             itemObj["Layer"] = layerId;
             QList<QPainterPath> paths = primitive->subPaths();
             //std::vector<cv::Point2f> points = primitive->updateMachiningPoints(canvas);
-            QVector<QPointF> points = primitive->machiningPoints(lastPoint, pointIndex, canvas);
+            LaserPointList points = primitive->arrangedPoints();
             if (!points.empty())
             {
                 itemObj["Type"] = primitive->typeLatinName();
@@ -576,7 +573,7 @@ void LaserDocument::setUnit(SizeUnit unit)
 QPointF LaserDocument::docOrigin() const
 {
     Q_D(const LaserDocument);
-    QRectF bounding = LaserApplication::device->deviceTransform().mapRect(docBoundingRect());
+    QRectF bounding = docBoundingRect();
     int posIndex = 0;
     qreal dx = 0, dy = 0;
     switch (Config::Device::startFrom())
@@ -639,10 +636,20 @@ QPointF LaserDocument::docOrigin() const
     return QPointF(dx, dy);
 }
 
+QPointF LaserDocument::docOriginMM() const
+{
+    return Global::matrixToMM(SU_PX).map(docOrigin());
+}
+
+QPointF LaserDocument::docOriginMachining() const
+{
+    return Global::matrixToMM(SU_PX, 40, 40).map(docOrigin());
+}
+
 QTransform LaserDocument::docTransform() const
 {
     Q_D(const LaserDocument);
-    QRectF bounding = LaserApplication::device->deviceTransform().mapRect(docBoundingRect());
+    QRectF bounding = docBoundingRect();
     int posIndex = 0;
     QPointF origin(0, 0);
     qreal dx = 0, dy = 0;
@@ -743,10 +750,23 @@ QTransform LaserDocument::docTransform() const
     return QTransform::fromTranslate(-dx, -dy);
 }
 
+QTransform LaserDocument::docTransformMM() const
+{
+    QTransform t = docTransform();
+    qreal dx = Global::convertToMM(SU_PX, t.dx());
+    qreal dy = Global::convertToMM(SU_PX, t.dy());
+    return QTransform::fromTranslate(dx, dy);
+}
+
 QRectF LaserDocument::docBoundingRect() const
 {
     Q_D(const LaserDocument);
     return utils::boundingRect(primitives().values());
+}
+
+QRectF LaserDocument::docBoundingRectMM() const
+{
+    return Global::matrixToMM(SU_PX).map(docBoundingRect()).boundingRect();
 }
 
 void LaserDocument::updateLayersStructure()
@@ -809,7 +829,7 @@ void LaserDocument::outline()
     printOutline(d->optimizeNode, 0);
     outlineByLayers(d->optimizeNode);
     //outlineByGroups(d->optimizeNode);
-    optimizeGroups(d->optimizeNode);
+    //optimizeGroups(d->optimizeNode);
     qLogD << "After outline:";
     printOutline(d->optimizeNode, 0);
 

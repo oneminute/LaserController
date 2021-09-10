@@ -1,6 +1,7 @@
-#include "OptimizeNode.h"
-
 #include "OptimizeEdge.h"
+#include "LaserApplication.h"
+#include "common/Config.h"
+#include <laser/LaserDevice.h>
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
@@ -8,7 +9,7 @@
 #include <QRandomGenerator>
 #include <QStack>
 
-#include <flann/flann.hpp>
+#include "OptimizeNode.h"
 
 class OptimizeNodePrivate
 {
@@ -16,10 +17,11 @@ class OptimizeNodePrivate
 public:
     OptimizeNodePrivate(OptimizeNode* ptr)
         : q_ptr(ptr)
+        , parentNode(nullptr)
         , nodeType(LNT_VIRTUAL)
         , outEdge(nullptr)
-        , kdTree(nullptr)
-        , currentPoint(0, 0)
+        , currentPoint(0, 0, 0, 0)
+        , index(0)
         , isClosed(false)
     {}
 
@@ -27,7 +29,7 @@ public:
 
     void update();
 
-    bool isVirtual() const;
+    //bool isVirtual() const;
 
     OptimizeNode* q_ptr;
 
@@ -39,10 +41,15 @@ public:
 
     QList<OptimizeEdge*> edges;
     OptimizeEdge* outEdge;
-    QPointF currentPoint;
-    QVector<QPointF> startingPoints;
-    flann::KDTreeSingleIndex<flann::L2_Simple<qreal>>* kdTree;
-    //flann::LinearIndex<flann::L2_Simple<float>>* kdTree;
+    LaserPoint currentPoint;
+
+    LaserPointList startingPoints;
+    //LaserPointList leavesPoints;
+    //LaserPointList outerPoints;
+    LaserPoint lastPoint;
+
+    int index;
+
     bool isClosed;
     QString name;
 
@@ -51,8 +58,6 @@ public:
 
 OptimizeNodePrivate::~OptimizeNodePrivate()
 {
-    if (kdTree)
-        delete kdTree;
     qLogD << "Node " << name << " destroyed.";
 }
 
@@ -65,25 +70,41 @@ void OptimizeNodePrivate::update()
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(documentItem);
         name = primitive->name();
         primitive->updateMachiningPoints(canvas);
-        isClosed = primitive->isClosed();
         startingPoints = primitive->startingPoints();
-        flann::Matrix<qreal> samplePoints = flann::Matrix<qreal>((qreal*)(startingPoints.data()),
-            primitive->startingIndices().size(), 2);
-
-        flann::KDTreeSingleIndexParams singleIndexParams = flann::KDTreeSingleIndexParams(4);
-        kdTree = new flann::KDTreeSingleIndex<flann::L2_Simple<qreal>>(samplePoints, singleIndexParams);
-
-        //flann::LinearIndexParams linearIndexParams = flann::LinearIndexParams();
-        //kdTree = new flann::LinearIndex<flann::L2_Simple<float>>(samplePoints, linearIndexParams);
-
-        kdTree->buildIndex();
+        startingPoints.buildKdtree();
         currentPoint = primitive->firstStartingPoint();
     }
-}
-
-bool OptimizeNodePrivate::isVirtual() const
-{
-    return nodeType == LNT_VIRTUAL;
+    else if (nodeType == LNT_DOCUMENT)
+    {
+        QPointF deviceOriginMM = LaserApplication::device->deviceOriginMachining();
+        LaserDocument* document = static_cast<LaserDocument*>(documentItem);
+        QPointF docOrigin = document->docOriginMachining();
+        QLineF line(deviceOriginMM, docOrigin);
+        qreal angle = 0;
+        if (line.isNull())
+        {
+            switch (Config::SystemRegister::deviceOrigin())
+            {
+            case 0:
+                angle = 315;
+                break;
+            case 1:
+                angle = 225;
+                break;
+            case 2:
+                angle = 135;
+                break;
+            case 4:
+                angle = 45;
+                break;
+            }
+        }
+        else
+        {
+            angle = line.angle();
+        }
+        currentPoint = LaserPoint(docOrigin, angle, angle);
+    }
 }
 
 OptimizeNode::OptimizeNode(LaserNodeType nodeType, ILaserDocumentItem* item)
@@ -189,11 +210,11 @@ int OptimizeNode::childCount() const
 //    d->position = value;
 //}
 
-bool OptimizeNode::isVirtual() const
-{
-    Q_D(const OptimizeNode);
-    return d->nodeType == LaserNodeType::LNT_VIRTUAL;
-}
+//bool OptimizeNode::isVirtual() const
+//{
+    //Q_D(const OptimizeNode);
+    //return d->nodeType == LaserNodeType::LNT_VIRTUAL;
+//}
 
 bool OptimizeNode::isDocument() const
 {
@@ -252,6 +273,46 @@ QList<OptimizeNode*> OptimizeNode::findAllLeaves(OptimizeNode* exclude)
     return leaves;
 }
 
+QList<OptimizeNode*> OptimizeNode::findLeaves()
+{
+    QList<OptimizeNode*> leaves;
+    for (OptimizeNode* childNode : childNodes())
+    {
+        if (childNode->hasChildren())
+            continue;
+        leaves.append(childNode);
+    }
+    return leaves;
+}
+
+QList<OptimizeNode*> OptimizeNode::findSiblings(bool onlyLeaves)
+{
+    QList<OptimizeNode*> siblings;
+
+    OptimizeNode* parent = parentNode();
+    if (!parent)
+        return siblings;
+
+    for (OptimizeNode* node : parent->childNodes())
+    {
+        if (node == this)
+            continue;
+
+        if (onlyLeaves)
+        {
+            if (!node->hasChildren())
+            {
+                siblings.append(node);
+            }
+        }
+        else
+        {
+            siblings.append(node);
+        }
+    }
+    return siblings;
+}
+
 QPointF OptimizeNode::position() const
 {
     Q_D(const OptimizeNode);
@@ -276,6 +337,36 @@ QPointF OptimizeNode::position() const
     {
         if (hasChildren())
             return d->childNodes.first()->position();
+    }
+    }
+    
+    return QPointF(0, 0);
+}
+
+QPointF OptimizeNode::machiningPosition() const
+{
+    Q_D(const OptimizeNode);
+    switch (d->nodeType)
+    {
+    case LNT_DOCUMENT:
+    {
+        LaserDocument* doc = static_cast<LaserDocument*>(d->documentItem);
+        return doc->docOriginMachining();
+    }
+    case LNT_LAYER:
+    {
+        LaserLayer* layer = static_cast<LaserLayer*>(d->documentItem);
+        return layer->positionMachining();
+    }
+    case LNT_PRIMITIVE:
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return Global::matrixToMM(SU_PX, 40, 40).map(primitive->position());
+    }
+    case LNT_VIRTUAL:
+    {
+        if (hasChildren())
+            return d->childNodes.first()->machiningPosition();
     }
     }
     
@@ -318,7 +409,7 @@ OptimizeEdge* OptimizeNode::outEdge() const
     return d->outEdge;
 }
 
-QPointF OptimizeNode::startPos() const
+LaserPoint OptimizeNode::startPos() const
 {
     Q_D(const OptimizeNode);
     if (d->startingPoints.isEmpty())
@@ -328,64 +419,50 @@ QPointF OptimizeNode::startPos() const
     return d->startingPoints.first();
 }
 
-QPointF OptimizeNode::nearestPoint(const QPointF& point, int& index, float& dist)
+LaserPoint OptimizeNode::nearestPoint(const LaserPoint& point)
 {
     Q_D(OptimizeNode);
-
-    if (d->isVirtual())
-    {
-        index = 0;
-        dist = 0;
-        d->currentPoint = point;
-        return point;
-    }
-    else
-    {
-        dist = 0.f;
-
-        flann::SearchParams searchParams = flann::SearchParams();
-        searchParams.checks = -1;
-        searchParams.sorted = false;
-        searchParams.use_heap = flann::FLANN_True;
-
-        int* indices = new int[1];
-        qreal* dists = new qreal[1];
-        QPointF target(0, 0);
-        {
-            flann::Matrix<int> indicesMatrix(indices, 1, 1);
-            flann::Matrix<qreal> distsMatrix(dists, 1, 1);
-            qreal data[2];
-            data[0] = point.x();
-            data[1] = point.y();
-            flann::Matrix<qreal> queryPoint = flann::Matrix<qreal>(data, 1, 2);
-            d->kdTree->knnSearch(queryPoint, indicesMatrix, distsMatrix, 1, searchParams);
-
-            index = indicesMatrix.ptr()[0];
-            if (index < 0 || index >= d->startingPoints.size())
-            {
-                index = 0;
-            }
-            target = d->startingPoints[index];
-            dist = QVector2D(target - point).length();
-            //qLogD << "flann dist: " << dists[0] << ", " << qSqrt(dists[0]) << ", " << distsMatrix.ptr()[0] << ", dist: " << dist;
-        }
-        //qLogD << d->name << " " << index << " " << dist << " " << dist << " " << target.x << ", " << target.y;
-        //qLogD;
-        delete[] indices;
-        delete[] dists;
-        return target;
-    }
-}
-
-QPointF OptimizeNode::currentPos() const
-{
-    Q_D(const OptimizeNode);
+    d->index = d->startingPoints.nearestSearch(point);
+    d->currentPoint = d->startingPoints[d->index];
+    d->lastPoint = point;
     return d->currentPoint;
 }
 
-QVector<QPointF> OptimizeNode::startingPoints() const
+LaserPoint OptimizeNode::nearestPoint(OptimizeNode* node)
+{
+    return nearestPoint(node->currentPos());
+}
+
+LaserPoint OptimizeNode::currentPos(const LaserPoint& hint) const
 {
     Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_LAYER)
+        return hint;
+    return d->currentPoint;
+}
+
+void OptimizeNode::setCurrentIndex(int index)
+{
+    Q_D(OptimizeNode);
+    d->index = index;
+    d->currentPoint = d->startingPoints[index];
+}
+
+LaserPoint OptimizeNode::lastPoint() const
+{
+    Q_D(const OptimizeNode);
+    return d->lastPoint;
+}
+
+void OptimizeNode::setLastPoint(const LaserPoint& point)
+{
+    Q_D(OptimizeNode);
+    d->lastPoint = point;
+}
+
+LaserPointList& OptimizeNode::startingPoints()
+{
+    Q_D(OptimizeNode);
     return d->startingPoints;
 }
 
@@ -395,33 +472,21 @@ bool OptimizeNode::isClosed() const
     return d->isClosed;
 }
 
-QPointF OptimizeNode::headPoint() const
+LaserPoint OptimizeNode::headPoint() const
 {
     Q_D(const OptimizeNode);
-    if (d->isVirtual())
-    {
-        return d->currentPoint;
-    }
     return d->startingPoints.first();
 }
 
-QPointF OptimizeNode::tailPoint() const
+LaserPoint OptimizeNode::tailPoint() const
 {
     Q_D(const OptimizeNode);
-    if (d->isVirtual())
-    {
-        return d->currentPoint;
-    }
     return d->startingPoints.last();
 }
 
-QPointF OptimizeNode::point(int index) const
+LaserPoint OptimizeNode::point(int index) const
 {
     Q_D(const OptimizeNode);
-    if (d->isVirtual())
-    {
-        return d->currentPoint;
-    }
     return d->startingPoints[index];
 }
 
@@ -443,24 +508,69 @@ void OptimizeNode::debugDraw(cv::Mat& canvas)
         }
         //qLogD << color;
         int i = 0;
-        QPointF lastPoint;
-        for (const QPointF& pt : primitive->machiningPoints())
+        LaserPoint lastPoint;
+        for (const LaserPoint& pt : primitive->machiningPoints())
         {
             if (i != 0)
             {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastPoint), 
-                    typeUtils::qtPointF2CVPoint2f(pt), cv::Scalar(color.red(), color.green(), color.blue()), 3);
+                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastPoint.toPointF()), 
+                    typeUtils::qtPointF2CVPoint2f(pt.toPointF()), cv::Scalar(color.red(), color.green(), color.blue()), 3);
             }
 
             lastPoint = pt;
             i++;
         }
 
-        for (const QPointF& pt : primitive->startingPoints())
+        for (const LaserPoint& pt : primitive->startingPoints())
         {
             qreal lineLength = 20;
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt + QPointF(-lineLength, -lineLength)), typeUtils::qtPointF2CVPoint2f(pt + QPointF(lineLength, lineLength)), cv::Scalar(0, 0, 255));
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt + QPointF(-lineLength, lineLength)), typeUtils::qtPointF2CVPoint2f(pt + QPointF(lineLength, -lineLength)), cv::Scalar(0, 0, 255));
+            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(-lineLength, -lineLength)), 
+                typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(lineLength, lineLength)), cv::Scalar(0, 0, 255));
+            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(-lineLength, lineLength)), 
+                typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(lineLength, -lineLength)), cv::Scalar(0, 0, 255));
         }
     }
+}
+
+bool OptimizeNode::isVirtual() const
+{
+    switch (nodeType())
+    {
+    case LNT_DOCUMENT:
+    case LNT_LAYER:
+    case LNT_VIRTUAL:
+        return true;
+    case LNT_PRIMITIVE:
+        return false;
+    }
+}
+
+LaserPrimitive* OptimizeNode::primitive() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+        return static_cast<LaserPrimitive*>(d->documentItem);
+    return nullptr;
+}
+
+LaserPointList OptimizeNode::arrangeMachiningPoints(cv::Mat& canvas)
+{
+    Q_D(OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->arrangeMachiningPoints(d->lastPoint, d->index, canvas);
+    }
+    return LaserPointList();
+}
+
+LaserPointList OptimizeNode::arrangedPoints() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->arrangedPoints();
+    }
+    return LaserPointList();
 }

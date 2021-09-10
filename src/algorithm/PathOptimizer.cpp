@@ -6,6 +6,8 @@
 #include "algorithm/OptimizeEdge.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserPrimitive.h"
+#include "laser/LaserPoint.h"
+#include "laser/LaserPointList.h"
 #include "util/TypeUtils.h"
 #include "util/Utils.h"
 
@@ -57,22 +59,12 @@ void Ant::initialize()
     d->totalLength = 0.;
 }
 
-void Ant::arrived(OptimizeNode* node, const QPointF& lastPos)
+void Ant::arrived(OptimizeNode* node, const LaserPoint& lastPos)
 {
     Q_D(Ant);
     float dist;
-    node->nearestPoint(lastPos, d->currentPointIndex, dist);
-    if (node->isVirtual())
-    {
-        // 对于虚拟父结点，搜索其它叶结点前，要先更新一下各条边。
-        for (OptimizeEdge* edge : node->edges())
-        {
-            float edgeLength;
-            int bPointIndex;
-            edge->b()->nearestPoint(lastPos, bPointIndex, edgeLength);
-            edge->setLength(edgeLength);
-        }
-    }
+    node->nearestPoint(lastPos);
+    
     d->arrivedNodes.insert(node, d->currentPointIndex);
     d->path.push_back(node);
     d->currentNode = node;
@@ -86,15 +78,11 @@ OptimizeNode* Ant::currentNode() const
     return d->currentNode;
 }
 
-QPointF Ant::currentPos() const
+LaserPoint Ant::currentPos() const
 {
     Q_D(const Ant);
-    QPointF target;
-    if (d->currentNode->isVirtual())
-    {
-        target = d->currentNode->currentPos();
-    }
-    else if (d->currentNode->isClosed())
+    LaserPoint target;
+    if (d->currentNode->isClosed())
     {
         target = d->currentNode->point(d->currentPointIndex);
     }
@@ -171,18 +159,18 @@ void drawPath(cv::Mat& canvas, const QQueue<OptimizeNode*>& path, const QMap<Opt
     for (int i = 0; i < path.length(); i++)
     {
         OptimizeNode* node = path[i];
-        if (i != 0 && node->isVirtual())
+        if (i != 0)
             continue;
         node->debugDraw(canvas);
         int pointIndex = arrivedNodes[node];
-        cv::Point2f startPos = typeUtils::qtPointF2CVPoint2f(node->point(pointIndex));
+        cv::Point2f startPos = typeUtils::qtPointF2CVPoint2f(node->point(pointIndex).toPointF());
         cv::circle(canvas, startPos, 20, cv::Scalar(0, 0, 255), 5);
         if (i != 0)
         {
             cv::line(canvas, lastPos, startPos, cv::Scalar(0, 0, 255), 3);
         }
-        QVector<QPointF> points = node->startingPoints();
-        cv::Mat pointsMat(points.count(), 2, CV_32S, points.data());
+        LaserPointList points = node->startingPoints();
+        cv::Mat pointsMat(points.count(), 2, CV_32S, points.toPoints().data());
         pointsMat.convertTo(pointsMat, CV_32S);
         cv::polylines(canvas, pointsMat, false, cv::Scalar(random.bounded(256), random.bounded(256), random.bounded(256)), 5);
         lastPos = startPos;
@@ -190,11 +178,11 @@ void drawPath(cv::Mat& canvas, const QQueue<OptimizeNode*>& path, const QMap<Opt
         {
             if (pointIndex == 0)
             {
-                lastPos = typeUtils::qtPointF2CVPoint2f(node->tailPoint());
+                lastPos = typeUtils::qtPointF2CVPoint2f(node->tailPoint().toPointF());
             }
             else
             {
-                lastPos = typeUtils::qtPointF2CVPoint2f(node->headPoint());
+                lastPos = typeUtils::qtPointF2CVPoint2f(node->headPoint().toPointF());
             }
             cv::circle(canvas, lastPos, 18, cv::Scalar(0, 255, 0), 6);
             cv::line(canvas, lastPos, startPos, cv::Scalar(0, 0, 255), 3);
@@ -233,41 +221,32 @@ public:
     PathOptimizerPrivate(PathOptimizer* ptr)
         : q_ptr(ptr)
         , canvas(nullptr)
+        , totalNodes(0)
+        , arrivedNodes(0)
+        , progress(0)
     {}
 
-    OptimizeNode* root;
-    int totalNodes;
-    QList<QList<QList<OptimizeNode*>>> layerNodes;
-    QList<OptimizeEdge*> edges;
-    QMap<LaserPrimitive*, OptimizeNode*> pritmive2NodeMap;
-    bool containsLayers;
-    QList<OptimizeNode*> nodes;
-    QList<OptimizeNode*> leaves;
-    OptimizeNode* rootNode;
-    int maxAnts;
-    int maxIterations;
-    int maxTraverse;
-    float volatileRate;
-    bool useGreedyAlgorithm;
-    PathOptimizer::Path optimizedPath;
     PathOptimizer* q_ptr;
+    OptimizeNode* root;
+    OptimizeNode* currentNode;
+
+    int totalNodes;
+    int arrivedNodes;
+    QList<OptimizeEdge*> edges;
+    QList<OptimizeNode*> nodes;
+
+    qreal progress;
+
+    PathOptimizer::Path optimizedPath;
     cv::Mat* canvas;
 };
 
-PathOptimizer::PathOptimizer(OptimizeNode* root, int totalNodes, int maxIterations,
-    int maxAnts, int maxTravers, float volatileRate,
-    bool useGreedyAlgorithm, bool containsLayers, QObject* parent)
+PathOptimizer::PathOptimizer(OptimizeNode* root, int totalNodes, QObject* parent)
     : QObject(parent)
     , m_ptr(new PathOptimizerPrivate(this))
 {
     Q_D(PathOptimizer);
     qLogD << "PathOptimizer";
-    d->containsLayers = containsLayers;
-    d->maxAnts = maxAnts;
-    d->maxIterations = maxIterations;
-    d->maxTraverse = maxTravers;
-    d->volatileRate = volatileRate;
-    d->useGreedyAlgorithm = useGreedyAlgorithm;
     d->root = root;
     d->totalNodes = totalNodes;
 }
@@ -275,7 +254,7 @@ PathOptimizer::PathOptimizer(OptimizeNode* root, int totalNodes, int maxIteratio
 PathOptimizer::~PathOptimizer()
 {
     Q_D(PathOptimizer);
-    qDeleteAll(d->nodes);
+    //qDeleteAll(d->nodes);
     qDeleteAll(d->edges);
 }
 
@@ -284,74 +263,34 @@ void PathOptimizer::optimize(int canvasWidth, int canvasHeight)
     Q_D(PathOptimizer);
 
     emit titleUpdated(tr("Initializing optimizer..."));
-    emit progressUpdated(0);
+    d->progress = 0;
+    emit progressUpdated(d->progress);
 
-    initializeByGroups(d->root);
-
-    emit titleUpdated(tr("Begin optimizing..."));
-    emit progressUpdated(10);
-
-    Ant* ant = new Ant(0, this);
-    int initNodesCount = d->leaves.size();
-
-    double minPathLength = std::numeric_limits<double>::max();
-    QQueue<OptimizeNode*> minLengthPath;
-    QMap<OptimizeNode*, int> minLengthArrivedNodes;
-
-    //int coreNumber = omp_get_num_procs();
-    //omp_set_num_threads(coreNumber * 0.6);
-    int badTimes = 0;
-
-    ant->initialize();
-    ant->arrived(d->rootNode, QPointF(0, 0));
-
-    while (true)
-    {
-        if (!ant->moveForward())
-            break;
-    }
-
-
-    minPathLength = ant->totalLength();
-    minLengthPath = ant->path();
-    minLengthArrivedNodes = ant->arrivedNodes();
-
-    emit progressUpdated(10.f + 85);
-
+    d->arrivedNodes = 0;
+    d->currentNode = d->root;
+    d->currentNode->update();
     d->optimizedPath.clear();
-    for (OptimizeNode* node : minLengthPath)
+
+    for (OptimizeNode* layerNode : d->root->childNodes())
     {
-        QPair<LaserPrimitive*, int> pair;
-        pair.first = static_cast<LaserPrimitive*>(node->documentItem());
-        pair.second = minLengthArrivedNodes[node];
-        d->optimizedPath.append(pair);
+        optimizeLayer(layerNode);
     }
+
+    d->progress = 90;
     emit messageUpdated(tr("Optimizing ended."));
-    emit progressUpdated(95);
-    emit titleUpdated(tr("Outputing canvas."));
-
-    qLogD << "min length is " << minPathLength;
-
-    if (Config::Debug::generatePathImage())
+    for (OptimizeNode* node : d->optimizedPath)
     {
-        cv::Mat canvas = cv::Mat(canvasHeight, canvasWidth, CV_8UC3, cv::Scalar(255, 255, 255));
-        ::drawPath(canvas, minLengthPath, minLengthArrivedNodes);
-        QString filename = QString("tmp/path.png");
-        cv::imwrite(filename.toStdString(), canvas);
-        canvas.release();
+        LaserPointList points = node->arrangeMachiningPoints();
+        emit drawPath(points.toPainterPath(), QPen(Qt::red, 2));
+        d->progress += 1.0 * 9 / d->totalNodes;
+        emit messageUpdated(tr("Arranged machining points of node %1.").arg(node->nodeName()));
     }
-    delete ant;
 
-    emit messageUpdated(tr("Generated path canvas at tmp/path.png."));
+    emit progressUpdated(d->progress);
+    d->progress = 100;
     emit progressUpdated(100);
     emit titleUpdated(tr("Done."));
     emit finished();
-}
-
-bool PathOptimizer::isContainsLayers() const
-{
-    Q_D(const PathOptimizer);
-    return d->containsLayers;
 }
 
 QList<OptimizeEdge*> PathOptimizer::edges() const
@@ -366,12 +305,6 @@ int PathOptimizer::edgesCount() const
     return d->edges.size();
 }
 
-bool PathOptimizer::useGreedyAlgorithm() const
-{
-    Q_D(const PathOptimizer);
-    return d->useGreedyAlgorithm;
-}
-
 PathOptimizer::Path PathOptimizer::optimizedPath() const
 {
     Q_D(const PathOptimizer);
@@ -384,11 +317,12 @@ void PathOptimizer::setCanvas(cv::Mat& canvas)
     d->canvas = &canvas;
 }
 
-void PathOptimizer::initializeByGroups(OptimizeNode* root)
+void PathOptimizer::optimizeLayer(OptimizeNode* root)
 {
     Q_D(PathOptimizer);
     QStack<OptimizeNode*> stack;
-
+    QList<OptimizeNode*> leaves;
+    // 获取所有的叶节点
     for (OptimizeNode* node : root->childNodes())
     {
         stack.push(node);
@@ -397,11 +331,18 @@ void PathOptimizer::initializeByGroups(OptimizeNode* root)
     while (!stack.isEmpty())
     {
         OptimizeNode* node = stack.pop();
+        node->update();
+        // 如果当前节点为一个图元
+        if (node->nodeType() == LNT_PRIMITIVE)
+        {
+            // 先更新它的加工点集
+            LaserPrimitive* primitive = static_cast<LaserPrimitive*>(node->documentItem());
+            emit drawPath(primitive->toMachiningPath(), QPen(Qt::blue, 2), primitive->name());
+            emit titleUpdated(tr("Generating machining points of node %1").arg(primitive->name()));
+            d->progress += 1.0 * 0.9 * 90 / d->totalNodes;
+            emit progressUpdated(d->progress);
+        }
         d->nodes.append(node);
-        QString msg = QString(tr("[%1/%2] Node %3 created.")).arg(d->nodes.length()).arg(d->totalNodes).arg(node->nodeName());
-        emit messageUpdated(msg);
-        float progress = 8.f * d->nodes.length() / d->totalNodes;
-        emit progressUpdated(progress);
 
         if (node->hasChildren())
         {
@@ -412,76 +353,117 @@ void PathOptimizer::initializeByGroups(OptimizeNode* root)
         }
         else
         {
-            d->leaves.append(node);
+            leaves.append(node);
         }
-    }
-
-    stack.clear();
-    for (OptimizeNode* node : d->leaves)
-    {
-        if (node->nodeType() == LNT_PRIMITIVE)
-            stack.push(node);
     }
 
     QSet<OptimizeNode*> travelled;
+    stack.clear();
+    stack.push(root);
     while (!stack.isEmpty())
     {
         OptimizeNode* node = stack.pop();
+        // 判断该点是否已经被处理过
         if (travelled.contains(node))
             continue;
-        travelled.insert(node);
+        if (!node->isVirtual())
+            travelled.insert(node);
 
-        QString msg = QString(tr("[%1/%2] Generating edges for node %3.")).arg(travelled.size()).arg(d->totalNodes).arg(node->nodeName());
-        emit messageUpdated(msg);
-        float progress = 8 + 2 * travelled.size() / d->totalNodes;
-        emit progressUpdated(progress);
-        if (node->parentNode())
+        if (node->parentNode() && node->parentNode() != root && node->nodeType() != LNT_LAYER)
         {
-            // find all child nodes from its siblings
-            QList<OptimizeNode*> siblingChildren = node->parentNode()->findAllLeaves(node);
+            // 该节点有父节点，建立从子节点到父节点的边。
+            OptimizeEdge* edge = new OptimizeEdge(node, node->parentNode());
+            node->setOutEdge(edge);
+            QString label = QString("%1 -> %2").arg(node->nodeName()).arg(node->parentNode()->nodeName());
+            //emit drawLine(edge->toLine(), QPen(Qt::lightGray, 1, Qt::DashLine), label);
+            d->edges.append(edge);
+        }
 
-            for (OptimizeNode* leafNode : siblingChildren)
-            {
-                OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
-                /*QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
-                    .arg(travelled.size())
-                    .arg(d->totalNodes)
-                    .arg(node->nodeName())
-                    .arg(edge->b()->nodeName())
-                    .arg(edge->length());
-                emit messageUpdated(msg);*/
-                node->addEdge(edge);
-                d->edges.append(edge);
-            }
+        // find all child nodes from its siblings
+        QList<OptimizeNode*> siblingChildren = node->parentNode()->findAllLeaves(node);
+        for (OptimizeNode* leafNode : siblingChildren)
+        {
+            OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
+            node->addEdge(edge);
+            QString label = QString("%1 -> %2").arg(node->nodeName()).arg(leafNode->nodeName());
+            //emit drawLine(edge->toLine(), QPen(Qt::magenta, 1, Qt::DashLine), label);
+            d->edges.append(edge);
+        }
 
-            OptimizeNode* parentNode = node->parentNode();
-            if (parentNode)
-            {
-                OptimizeEdge* edge = new OptimizeEdge(node, parentNode);
-                /*QString msg = QString(tr("[%1/%2] Created edge from node %3 to node %4 with length is %5."))
-                    .arg(travelled.size())
-                    .arg(d->totalNodes)
-                    .arg(node->nodeName())
-                    .arg(edge->b()->nodeName())
-                    .arg(edge->length());
-                emit messageUpdated(msg);*/
-                node->setOutEdge(edge);
-                d->edges.append(edge);
-                stack.push(node->parentNode());
-            }
+        for (OptimizeNode* childNode : node->childNodes())
+        {
+            stack.push(childNode);
         }
     }
 
-    d->rootNode = root;
-    d->nodes.append(d->rootNode);
-    for (OptimizeNode* node : d->leaves)
+    for (OptimizeNode* node : leaves)
     {
-        OptimizeEdge* edge = new OptimizeEdge(d->rootNode, node);
-        d->rootNode->addEdge(edge);
+        //root->leavesPoints().addOptimizeNode(node);
+        OptimizeEdge* edge = new OptimizeEdge(d->currentNode, node);
+        d->currentNode->addEdge(edge);
+        QString label = QString("%1 -> %2").arg(root->nodeName()).arg(node->nodeName());
+        //emit drawLine(edge->toLine(), QPen(Qt::green, 1, Qt::DashLine), label);
         d->edges.append(edge);
-        qLogD << d->rootNode->nodeName() << " --> " << node->nodeName() << ", length = " << edge->length()
-            << ", at " << node->currentPos();
     }
+    //root->leavesPoints().buildKdtree();
+
+    // 开始图遍历
+    travelled.clear();
+    while (true)
+    {
+        // 访问该节点，添加到访问列表中
+        travelled.insert(d->currentNode);
+        qLogD << "arrived node " << d->currentNode->nodeName();
+
+        if (d->currentNode->nodeType() == LNT_PRIMITIVE)
+        {
+            emit titleUpdated(tr("Arrived node %1").arg(d->currentNode->nodeName()));
+            d->progress += 1.0 * 0.1 * 90 / d->totalNodes;
+            emit progressUpdated(d->progress);
+            d->optimizedPath.append(d->currentNode);
+        }
+
+        // 生成输出边的kdtree
+        LaserPointList siblingPoints;
+        for (OptimizeEdge* edge : d->currentNode->edges())
+        {
+            OptimizeNode* toNode = edge->b();
+            // 如果还没遍历，就加入到kdtree中
+            if (!travelled.contains(toNode))
+            {
+                siblingPoints.addOptimizeNode(toNode);
+            }
+        }
+        if (siblingPoints.isEmpty())
+        { 
+            // 为空表示兄弟节点已经全部遍历完成，向父节点移动
+            OptimizeNode* parentNode = d->currentNode->parentNode();
+            if (parentNode->isVirtual())
+                break;
+
+            if (travelled.contains(parentNode))
+            {
+                d->currentNode = parentNode;
+                continue;
+            }
+
+            LaserPoint point = parentNode->nearestPoint(d->currentNode);
+            emit drawLine(QLineF(d->currentNode->currentPos().toPointF(), 
+                point.toPointF()), QPen(Qt::black, 2));
+
+            d->currentNode = parentNode;
+        }
+        else
+        {
+            // 构建kdtree
+            siblingPoints.buildKdtree();
+            OptimizeNode* candidate = siblingPoints.nearestSearch(d->currentNode);
+            emit drawLine(QLineF(d->currentNode->currentPos().toPointF(), 
+                candidate->currentPos().toPointF()), QPen(Qt::black, 2));
+            d->currentNode = candidate;
+        }
+    }
+    
 }
 
 void PathOptimizer::printNodeAndEdges()
@@ -507,13 +489,7 @@ OptimizerController::OptimizerController(OptimizeNode* root, int totalNodes, QOb
     , m_previewWindow(new PreviewWindow)
     , m_optimizer(new PathOptimizer(
         root,
-        totalNodes,
-        Config::PathOptimization::maxIterations(),
-        Config::PathOptimization::maxAnts(),
-        Config::PathOptimization::maxTraverse(),
-        Config::PathOptimization::volatileRate(),
-        Config::PathOptimization::useGreedyAlgorithm(),
-        true))
+        totalNodes))
 {
     qLogD << "OptimizerController";
     m_optimizer->moveToThread(&m_thread);
@@ -524,6 +500,9 @@ OptimizerController::OptimizerController(OptimizeNode* root, int totalNodes, QOb
     connect(m_optimizer.data(), &PathOptimizer::messageUpdated, m_previewWindow.data(), &PreviewWindow::addMessage);
     connect(m_optimizer.data(), &PathOptimizer::progressUpdated, m_previewWindow.data(), &PreviewWindow::setProgress);
     connect(m_optimizer.data(), &PathOptimizer::titleUpdated, m_previewWindow.data(), &PreviewWindow::setTitle);
+    connect(m_optimizer.data(), &PathOptimizer::drawPrimitive, m_previewWindow.data(), &PreviewWindow::addPrimitive);
+    connect(m_optimizer.data(), &PathOptimizer::drawPath, m_previewWindow.data(), &PreviewWindow::addPath);
+    connect(m_optimizer.data(), &PathOptimizer::drawLine, m_previewWindow.data(), &PreviewWindow::addLine);
 
     m_thread.start();
 }

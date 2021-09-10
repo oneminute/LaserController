@@ -122,14 +122,10 @@ float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
 
 QTransform Global::matrixToMM(SizeUnit from, float hScale, float vScale)
 {
-	QTransform transform;
-	transform.scale(Global::convertToMM(from, 1) * hScale, Global::convertToMM(from, 1, Qt::Vertical) * vScale);
-	return transform;
+	return QTransform::fromScale(Global::convertToMM(from, 1) * hScale, Global::convertToMM(from, 1, Qt::Vertical) * vScale);
 }
 
 QTransform Global::matrix(SizeUnit from, SizeUnit to, float hScale, float vScale)
 {
-	QTransform transform;
-	transform.scale(Global::convertUnit(from, to, 1) * hScale, Global::convertUnit(from, to, 1, Qt::Vertical) * vScale);
-	return transform;
+	return QTransform::fromScale(Global::convertUnit(from, to, 1) * hScale, Global::convertUnit(from, to, 1, Qt::Vertical) * vScale);
 }

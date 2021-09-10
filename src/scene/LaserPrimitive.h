@@ -11,9 +11,11 @@
 #include <QPolygonF>
 #include <QPainterPath>
 #include <QVector>
+#include <QVector4D>
 #include <QTextEdit>
 #include <opencv2/opencv.hpp>
 #include "LaserDocumentItem.h"
+#include "laser/LaserPointList.h"
 
 class LaserDocument;
 class LaserLayer;
@@ -114,6 +116,7 @@ public:
 	int layerIndex();
 	QTransform getAllTransform();
 	QPainterPath getPath();
+	QPainterPath getScenePath();
 	QRectF originalBoundingRect(qreal extendPixel = 0) const;
 	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
@@ -122,13 +125,14 @@ public:
 
     virtual void draw(QPainter* painter) {};
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat()) { return QVector<QPointF>(); }
-    QVector<QPointF> machiningPoints() const;
-    QVector<QPointF> machiningPoints(QPointF& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat()) const;
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat()) { return LaserPointList(); }
+    LaserPointList machiningPoints() const;
+    LaserPointList arrangeMachiningPoints(LaserPoint& lastPoint, int pointIndex, cv::Mat& canvas = cv::Mat());
+    LaserPointList arrangedPoints() const;
     QList<int> startingIndices() const;
-    QVector<QPointF> startingPoints() const;
-    QPointF firstStartingPoint() const;
-    QPointF lastStartingPoint() const;
+    LaserPointList startingPoints() const;
+    LaserPoint firstStartingPoint() const;
+    LaserPoint lastStartingPoint() const;
     QPointF centerMachiningPoint() const;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) { return QByteArray(); }
     virtual bool isClosed() const = 0;
@@ -165,6 +169,8 @@ public:
     static QString typeLatinName(LaserPrimitiveType typeId);
     QString newPrimitiveName(LaserPrimitiveType type) const;
 
+    virtual QPainterPath toMachiningPath() const = 0;
+
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
@@ -191,7 +197,6 @@ class LaserShape : public LaserPrimitive
 public:
     LaserShape(LaserShapePrivate* data, LaserDocument* doc,   LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
-    virtual QPainterPath toPath() const = 0;
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat()) override;
 	int layerIndex();
 private:
@@ -210,10 +215,10 @@ public:
     QRectF bounds() const;
     void setBounds(const QRectF& bounds);
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 	virtual QRectF sceneBoundingRect() const;
 	//virtual void reShape();
 	virtual QJsonObject toJson();
@@ -240,9 +245,9 @@ public:
     void setRect(const QRectF& rect);
 
     virtual void draw(QPainter* painter);
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
 
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 	virtual QRectF sceneBoundingRect() const;
 	//virtual void reShape();
 	virtual QJsonObject toJson();
@@ -267,10 +272,10 @@ public:
     QLineF line() const;
     void setLine(const QLineF& line);
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 	virtual QRectF sceneBoundingRect() const;
 	//virtual void reShape();
 	virtual QJsonObject toJson();
@@ -295,10 +300,10 @@ public:
     QPainterPath path() const;
     void setPath(const QPainterPath& path);
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 
     virtual QList<QPainterPath> subPaths() const;
 	virtual QRectF sceneBoundingRect() const;
@@ -326,10 +331,10 @@ public:
     void setPolyline(const QPolygonF& poly);
     virtual QRectF sceneBoundingRect() const;
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 
 	//virtual void reShape();
 	virtual QJsonObject toJson();
@@ -354,10 +359,10 @@ public:
     QPolygonF polyline() const;
     void setPolyline(const QPolygonF& poly);
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
 
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 
 	virtual QRectF sceneBoundingRect() const;
 
@@ -389,7 +394,7 @@ public:
     ~LaserNurbs() {}
 
     virtual void draw(QPainter* painter);
-    virtual QPainterPath toPath() const;
+    virtual QPainterPath toMachiningPath() const;
 
 	virtual QRectF sceneBoundingRect() const;
 
@@ -420,11 +425,12 @@ public:
 
     virtual QByteArray engravingImage(cv::Mat& canvas = cv::Mat());
     virtual void draw(QPainter* painter);
+    virtual QPainterPath toMachiningPath() const;
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }
     virtual QString typeName() { return tr("Bitmap"); }
 	virtual QJsonObject toJson();
 
-    virtual QVector<QPointF> updateMachiningPoints(cv::Mat& canvas = cv::Mat());
+    virtual LaserPointList updateMachiningPoints(cv::Mat& canvas = cv::Mat());
 	virtual QRectF sceneBoundingRect() const;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
@@ -505,6 +511,7 @@ public:
 
     virtual bool isClosed() const;
     virtual QPointF position() const;
+    virtual QPainterPath toMachiningPath() const;
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)

@@ -5,9 +5,12 @@
 
 #include <QObject>
 #include <QFrame>
-#include <QVector3D>
 #include <QVector2D>
+#include <QVector3D>
+#include <QVector4D>
 #include <QGraphicsItem>
+
+#include "laser/LaserPointList.h"
 
 class LaserPrimitive;
 
@@ -32,6 +35,8 @@ namespace utils
     quint32 factorial(quint32 n);
 
     QPointF center(const QVector<QPointF>& points);
+
+    LaserPoint center(const LaserPointList& points);
 
     QRectF boundingRect(const QList<LaserPrimitive*>& primitives);
 }

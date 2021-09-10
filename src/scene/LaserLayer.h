@@ -115,6 +115,8 @@ public:
     QRectF boundingRect() const;
 
     virtual QPointF position() const;
+    virtual QPointF positionMM() const;
+    virtual QPointF positionMachining() const;
 
 protected:
     void onClicked();

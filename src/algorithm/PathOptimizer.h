@@ -20,9 +20,9 @@ public:
     explicit Ant(int antIndex, PathOptimizer* optimizer);
 
     void initialize();
-    void arrived(OptimizeNode* node, const QPointF& lastPos);
+    void arrived(OptimizeNode* node, const LaserPoint& lastPos);
     OptimizeNode* currentNode() const;
-    QPointF currentPos() const;
+    LaserPoint currentPos() const;
     bool moveForward();
     int antIndex() const;
     double totalLength() const;
@@ -42,18 +42,13 @@ class PathOptimizer : public QObject
     Q_OBJECT
 public:
     typedef QPair<LaserPrimitive*, int> PathNode;
-    typedef QList<PathNode> Path;
-    explicit PathOptimizer(OptimizeNode* root, int totalNodes, int maxIterations, 
-        int maxAnts, int maxTravers, float volatileRate, 
-        bool useGreedyAlgorithm = false, bool containsLayers = true,
+    typedef QList<OptimizeNode*> Path;
+    explicit PathOptimizer(OptimizeNode* root, int totalNodes,
         QObject* parent = nullptr);
     virtual ~PathOptimizer();
 
-    bool isContainsLayers() const;
-
     QList<OptimizeEdge*> edges() const;
     int edgesCount() const;
-    bool useGreedyAlgorithm() const;
     Path optimizedPath() const;
 
     void setCanvas(cv::Mat& canvas);
@@ -68,8 +63,13 @@ signals:
     void titleUpdated(const QString& msg);
     void finished();
 
+    void drawPrimitive(LaserPrimitive* primitive);
+    void drawPath(const QPainterPath& path, QPen pen = QPen(Qt::blue, 1, Qt::SolidLine), const QString& label = QString());
+    void drawLine(const QLineF& line, QPen pen = QPen(Qt::black, 1, Qt::SolidLine),
+        const QString& label = QString());
+
 protected:
-    void initializeByGroups(OptimizeNode* root);
+    void optimizeLayer(OptimizeNode* root);
 
     void printNodeAndEdges();
 

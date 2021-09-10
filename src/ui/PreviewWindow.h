@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <DockManager.h>
 
+class LaserPrimitive;
 class PreviewViewer;
 
 class PreviewWindow : public QMainWindow
@@ -24,6 +25,12 @@ public slots:
     void setTitle(const QString& msg);
     void setProgress(float progress);
     void finished();
+
+    void addPrimitive(LaserPrimitive* primitive);
+    void addPath(const QPainterPath& path, QPen pen = QPen(Qt::blue, 1, Qt::SolidLine), const QString& label = QString());
+    void addLine(const QLineF& line, QPen pen = QPen(Qt::black, 1, Qt::SolidLine), const QString& label = QString());
+
+    void updatePreviewArea();
 
 private:
     ads::CDockManager* m_dockManager;

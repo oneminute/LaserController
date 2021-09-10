@@ -93,7 +93,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		QRectF rect = scene()->document()->docBoundingRect();
 		if (rect.isValid())
 		{
-			painter.setPen(QPen(Qt::red, 1, Qt::DashDotDotLine));
+			painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
 			painter.drawPolygon(mapFromScene(rect));
 		}
 	}
@@ -106,7 +106,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		painter.drawRect(deviceOriginRect);
         if (scene()->document())
         {
-			painter.setPen(QPen(Qt::green));
+			painter.setPen(QPen(Qt::darkGreen));
             QPointF origin = mapFromScene(scene()->document()->docOrigin());
             QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
             painter.drawRect(originRect);

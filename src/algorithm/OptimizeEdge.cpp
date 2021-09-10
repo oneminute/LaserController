@@ -2,6 +2,7 @@
 
 #include "OptimizeNode.h"
 #include <QVector2D>
+#include <QVector4D>
 
 class OptimizeEdgePrivate
 {
@@ -41,7 +42,7 @@ OptimizeEdge::OptimizeEdge(OptimizeNode* a, OptimizeNode* b, bool force, bool fo
     d->force = force;
     d->forward = forward;
 
-    d->length = QVector2D(a->startPos() - b->startPos()).length();
+    d->length = QVector2D(a->startPos().toPointF() - b->startPos().toPointF()).length();
 }
 
 OptimizeEdge::~OptimizeEdge()
@@ -99,5 +100,11 @@ void OptimizeEdge::print()
     Q_D(OptimizeEdge);
     qLogD << "    " << d->a->nodeName() << " --> " << d->b->nodeName() 
         << ", length = " << d->length << ", weight = " << d->weight;
+}
+
+QLineF OptimizeEdge::toLine() const
+{
+    Q_D(const OptimizeEdge);
+    return QLineF(d->a->machiningPosition(), d->b->machiningPosition());
 }
 
