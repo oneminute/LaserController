@@ -277,8 +277,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     }
     //Text
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-        QLineF l = QLineF(mapFromScene(m_textCursorLine.p1()), mapFromScene(m_textCursorLine.p2()));
-        
+        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+        QLineF l = QLineF(mapFromScene(m_textCursorLine.p1()), mapFromScene(m_textCursorLine.p2()));       
         painter.drawLine(l);
         /*painter.drawLine(QPoint(point.x(), point.y() - Global::mm2PixelsYF(10) * zoomValue()),
             QPoint(point.x(), point.y() + Global::mm2PixelsYF(10)* zoomValue()));*/
