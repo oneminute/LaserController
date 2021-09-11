@@ -35,8 +35,7 @@ void LaserPointList::buildKdtree()
     }
 
     // re-calculate weights, making w1/w2 equale to layout(width or height)/gridSize
-    //qreal w = 1.0 / 3;
-    qreal w1 = 0.45;
+    qreal w1 = Config::PathOptimization::searchingXYWeight() / 2;
     qreal w2 = 1 - w1 * 2;
     qreal n = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?
         LaserApplication::device->layoutWidth() / Config::PathOptimization::maxGroupingGridSize() :
