@@ -655,6 +655,20 @@ void Config::loadPathOptimizationItems()
     maxGroupingGridSize->setInputWidgetType(IWT_FloatEditSlider);
     maxGroupingGridSize->setInputWidgetProperty("minimum", 1.0);
     maxGroupingGridSize->setInputWidgetProperty("maximum", 1000.0);
+
+    ConfigItem* searchingXYWeight = group->addConfigItem(
+        "searchingXYWeight",
+        tr("Searching XY Weight"),
+        tr("Weight of xy element of laser point vector against angle element"),
+        0.9,
+        DT_REAL
+    );
+    searchingXYWeight->setInputWidgetType(IWT_FloatEditSlider);
+    searchingXYWeight->setInputWidgetProperty("minimum", 0);
+    searchingXYWeight->setInputWidgetProperty("maximum", 1);
+    searchingXYWeight->setInputWidgetProperty("step", 0.01);
+    searchingXYWeight->setInputWidgetProperty("page", 0.1);
+    searchingXYWeight->setInputWidgetProperty("decimals", 2);
 }
 
 void Config::loadExportItems()
