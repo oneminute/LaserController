@@ -750,6 +750,15 @@ QTransform LaserDevice::deviceTransformMM() const
     return d->deviceTransformMM;
 }
 
+QTransform LaserDevice::deviceTransformMachining() const
+{
+    Q_D(const LaserDevice);
+    return QTransform::fromTranslate(
+        -d->deviceOriginMM.x() * 40,
+        -d->deviceOriginMM.y() * 40
+    );
+}
+
 void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)
 {
     Q_D(LaserDevice);

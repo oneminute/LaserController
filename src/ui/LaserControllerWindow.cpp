@@ -50,6 +50,7 @@
 #include "ui/HalftoneDialog.h"
 #include "ui/LaserLayerDialog.h"
 #include "ui/MainCardInfoDialog.h"
+#include "ui/PreviewWindow.h"
 #include "ui/RegistersDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
@@ -2106,6 +2107,9 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         {
             m_scene->document()->outline();
             m_scene->document()->setFinishRun(finishRun());
+            LaserApplication::previewWindow->reset();
+            LaserApplication::showProgressWindow();
+            m_prepareMachining = false;
             m_scene->document()->exportJSON(filename);
         }
     }
@@ -2131,6 +2135,9 @@ void LaserControllerWindow::onActionLoadJson(bool checked)
 
 void LaserControllerWindow::onActionMachining(bool checked)
 {
+    LaserApplication::previewWindow->reset();
+    LaserApplication::showProgressWindow();
+
     if (m_useLoadedJson)
     {
         qDebug() << "export temp json file for machining" << m_currentJson;
@@ -2151,12 +2158,9 @@ void LaserControllerWindow::onActionMachining(bool checked)
 
         m_scene->document()->setFinishRun(finishRun());
         qDebug() << "exporting to temporary json file:" << filename;
-        m_scene->document()->exportJSON(filename);
+        m_prepareMachining = true;
         qDebug() << "export temp json file for machining" << filename;
-        LaserDriver::instance().loadDataFromFile(filename);
-        LaserDriver::instance().startMachining(m_comboBoxStartPosition->currentIndex() == 3);
-        //MachiningTask* task = LaserDriver::instance().createMachiningTask(filename, false);
-        //task->start();
+        m_scene->document()->exportJSON(filename);
         //}
     }
     m_useLoadedJson = false;
@@ -2230,6 +2234,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
 {
     QString filename = "export.json";
     filename = m_tmpDir.absoluteFilePath(filename);
+    m_prepareMachining = false;
     m_scene->document()->exportJSON(filename);
     qDebug() << "export temp json file for machining" << filename;
     LaserDriver::instance().loadDataFromFile(filename);
@@ -2906,6 +2911,20 @@ void LaserControllerWindow::onCreatSpline()
 	m_viewer->createSpline();
 }
 
+void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
+{
+    if (!m_prepareMachining)
+        return;
+
+    QFileInfo fileInfo(filename);
+    QString filePath = fileInfo.absoluteFilePath();
+#ifdef Q_OS_WIN
+    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
+#endif
+    LaserDriver::instance().loadDataFromFile(filePath);
+    LaserDriver::instance().startMachining(m_comboBoxStartPosition->currentIndex() == 3);
+}
+
 void LaserControllerWindow::lightOnLaser()
 {
     LaserDriver::instance().testLaserLight(true);
@@ -3043,6 +3062,8 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
     {
         connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
         connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
+        connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
+
         doc->bindLayerButtons(m_layerButtons);
 		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
         m_scene->updateDocument(doc);

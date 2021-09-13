@@ -47,7 +47,7 @@ int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::
 
 int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& points, 
     QList<int>& startingIndices, QPointF& center, int closed, int startingIndiciesCount, 
-    int diagonalThreshold, cv::Mat& canvas)
+    int diagonalThreshold)
 {
     points.clear();
     startingIndices.clear();
@@ -116,10 +116,6 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
 
     points.push_back(point4d);
     center += point;
-    if (!canvas.empty())
-    {
-        cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
-    }
 
     for (int i = 1; i < length; i++)
     {
@@ -143,11 +139,6 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
         diff = qRadiansToDegrees(diff);
         if (diff >= Config::Export::maxAnglesDiff() || radians * anchorRadians < 0)
         {
-            if (!canvas.empty())
-            {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(point), cv::Scalar(255, 0, 0));
-                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
-            }
             points.push_back(point4d);
             center += point;
             anchor = point;
@@ -155,11 +146,6 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
         }
         else if (diff != 0 && dist >= Config::Export::maxIntervalDistance())
         {
-            if (!canvas.empty())
-            {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(point), cv::Scalar(255, 0, 0));
-                cv::circle(canvas, typeUtils::qtPointF2CVPoint2f(point), 1, cv::Scalar(0, 0, 255));
-            }
             points.push_back(point4d);
             center += point;
             anchor = point;
@@ -176,36 +162,27 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
     {
         startingIndices.append(points.length() - 1);
     }
-    if (!canvas.empty()) 
-    {
-        QPointF startPt = path.pointAtPercent(0);
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(anchor), typeUtils::qtPointF2CVPoint2f(point), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(point), typeUtils::qtPointF2CVPoint2f(startPt), cv::Scalar(0));
-
-        for (int i : startingIndices)
-        {
-            QPointF pt = points[i].toPointF();
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt + QPointF(-40, -40)), typeUtils::qtPointF2CVPoint2f(pt + QPointF(40, 40)), cv::Scalar(0, 0, 255));
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt + QPointF(-40, 40)), typeUtils::qtPointF2CVPoint2f(pt + QPointF(40, -40)), cv::Scalar(0, 0, 255));
-        }
-    }
 
     qLogD << "path with " << path.elementCount() << " elements convert to " << points.size() << " points.";
     return points.size();
 }
 
-QByteArray machiningUtils::points2Plt(const LaserPointList& points)
+QByteArray machiningUtils::points2Plt(const LaserPointList& points, QPointF& lastPoint)
 {
     QByteArray buffer;
     if (points.empty())
         return buffer;
 
-    QPointF pt = points[0].toPointF();
-    buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(-qRound(pt.y())));
+    QPointF pt = points.first().toPointF();
+    QPointF diff = pt - lastPoint;
+    lastPoint = pt;
+    buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
     for (size_t i = 0; i < points.size(); i++)
     {
         pt = points[i].toPointF();
-        buffer.append(QString("PD%1 %2;").arg(qRound(pt.x())).arg(-qRound(pt.y())));
+        diff = pt - lastPoint;
+        lastPoint = pt;
+        buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
     }
     return buffer;
 }

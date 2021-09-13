@@ -4,12 +4,14 @@
 #include "scene/LaserPrimitive.h"
 #include <LaserApplication.h>
 #include <laser/LaserDevice.h>
+#include <widget/PreviewScene.h>
 #include <QDesktopWidget>
 #include <QEventLoop>
 #include <QMenuBar>
 #include <QPen>
 #include <QPointer>
 #include <QToolBar>
+#include <QtMath>
 #include <QStatusBar>
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -21,6 +23,7 @@ using namespace ads;
 
 PreviewWindow::PreviewWindow(QWidget* parent)
     : QMainWindow(parent)
+    , m_progress(0.0)
 {
     // menu bar
     QMenuBar* menuBar = new QMenuBar;
@@ -45,13 +48,17 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     toolBarProcedure->addAction(m_actionNextStep);
 
     // preview viewer widget
-    m_viewer = new PreviewViewer;
+    m_viewer = new PreviewViewer();
+    m_scene = new PreviewScene(m_viewer);
+    m_viewer->setScene(m_scene);
 
     // log edit widget
     m_textEditLog = new QPlainTextEdit;
 
     // progress widget
     m_progressBar = new QProgressBar;
+    m_progressBar->setMinimum(0);
+    m_progressBar->setMaximum(100);
     statusBar->addWidget(m_progressBar);
 
     // initialize Dock Manager
@@ -70,9 +77,18 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     m_logDockWidget->setWidget(m_textEditLog);
     CDockAreaWidget* bottomDockArea = m_dockManager->addDockWidget(BottomDockWidgetArea, m_logDockWidget);
 
+    connect(this, &PreviewWindow::addPathSignal, this, &PreviewWindow::onAddPath);
+    connect(this, &PreviewWindow::addLineSignal, this, &PreviewWindow::onAddLine);
+    connect(this, &PreviewWindow::setTitleSignal, this, &PreviewWindow::onSetTitle);
+    connect(this, &PreviewWindow::addProgressSignal, this, &PreviewWindow::onAddProgress);
+    connect(this, QOverload<qreal>::of(&PreviewWindow::setProgressSignal), 
+        this, QOverload<qreal>::of(&PreviewWindow::onSetProgress));
+    connect(this, QOverload<quint32, qreal>::of(&PreviewWindow::setProgressSignal), 
+        this, QOverload<quint32, qreal>::of(&PreviewWindow::onSetProgress));
+    connect(this, &PreviewWindow::addMessageSignal, this, &PreviewWindow::onAddMessage);
+
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
-    m_viewer->scene()->addRect(LaserApplication::device->boundRectMachining());
     updatePreviewArea();
 }
 
@@ -80,121 +96,24 @@ PreviewWindow::~PreviewWindow()
 {
 }
 
-int PreviewWindow::exec()
+qreal PreviewWindow::progress() const
 {
-    bool deleteOnClose = testAttribute(Qt::WA_DeleteOnClose);
-    setAttribute(Qt::WA_DeleteOnClose, false);
-
-    bool wasShowModal = testAttribute(Qt::WA_ShowModal);
-    setAttribute(Qt::WA_ShowModal, true);
-
-    show();
-
-    QEventLoop eventLoop;
-    (void) eventLoop.exec(QEventLoop::DialogExec);
-
-    setAttribute(Qt::WA_ShowModal, wasShowModal);
-
-    int res = result();
-    if (deleteOnClose)
-        delete this;
-    return res;
-}
-
-int PreviewWindow::result() const
-{
-    return 0;
-}
-
-void PreviewWindow::addMessage(const QString& msg)
-{
-    qLogD << msg;
-    m_textEditLog->appendPlainText(msg);
+    return m_progress;
 }
 
 void PreviewWindow::setTitle(const QString& msg)
 {
-    m_logDockWidget->setWindowTitle(msg);
-    m_textEditLog->appendPlainText(msg);
-}
-
-void PreviewWindow::setProgress(float progress)
-{
-    qLogD << "progress: " << progress;
-    m_progressBar->setValue(progress);
-}
-
-void PreviewWindow::finished()
-{
-}
-
-void PreviewWindow::addPrimitive(LaserPrimitive* primitive)
-{
-    m_viewer->scene()->addItem(primitive);
-    updatePreviewArea();
+    emit setTitleSignal(msg);
 }
 
 void PreviewWindow::addPath(const QPainterPath& path, QPen pen, const QString& label)
 {
-    QGraphicsPathItem* item = m_viewer->scene()->addPath(path);
-    pen.setCosmetic(true);
-    item->setPen(pen);
-    
-    if (!label.isEmpty())
-    {
-        QPointF pos = path.pointAtPercent(0);
-        QGraphicsTextItem* textItem = m_viewer->scene()->addText(label);
-        textItem->setDefaultTextColor(pen.color());
-        textItem->setPos(pos);
-    }
-    updatePreviewArea();
+    emit addPathSignal(path, pen, label);
 }
 
 void PreviewWindow::addLine(const QLineF& line, QPen pen, const QString& label)
 {
-    QGraphicsLineItem* item = m_viewer->scene()->addLine(line);
-    pen.setCosmetic(true);
-    item->setPen(pen);
-
-    QGraphicsEllipseItem* circleItem = m_viewer->scene()->addEllipse(
-        line.p1().x() - 50, line.p1().y() - 50, 100, 100, pen);
-    circleItem->setParentItem(item);
-
-    QVector2D dir(line.p1() - line.p2());
-    dir.normalize();
-    QTransform t1, t2;
-    t1.rotate(15);
-    t2.rotate(-15);
-    QLineF arrowLine(QPointF(0, 0), (dir * 150).toPointF());
-    QLineF arrowLine1 = t1.map(arrowLine);
-    QLineF arrowLine2 = t2.map(arrowLine);
-    arrowLine1.translate(line.p2());
-    arrowLine2.translate(line.p2());
-    QLineF arrowLine3(arrowLine1.p2(), arrowLine2.p2());
-    //QPointF arrowPt1 = line.p2() + (dir * 150).toPointF() + (vDir * 50).toPointF();
-    //QPointF arrowPt2 = line.p2() + (dir * 150).toPointF() + (-vDir * 50).toPointF();
-    QGraphicsLineItem* arrow1 = m_viewer->scene()->addLine(arrowLine1, pen);
-    QGraphicsLineItem* arrow2 = m_viewer->scene()->addLine(arrowLine2, pen);
-    QGraphicsLineItem* arrow3 = m_viewer->scene()->addLine(arrowLine3, pen);
-    arrow1->setParentItem(item);
-    arrow2->setParentItem(item);
-    arrow3->setParentItem(item);
-    
-    if (!label.isEmpty())
-    {
-        QPointF pos = (line.p1() + line.p2()) / 2;
-        QGraphicsTextItem* textItem = m_viewer->scene()->addText(label);
-        textItem->setParentItem(item);
-        //textItem->setRotation(360 - line.angle());
-        //QRectF bounding = textItem->sceneBoundingRect();
-        //pos -= QPointF(bounding.width() / 2, bounding.height() / 2);
-        textItem->setDefaultTextColor(pen.color());
-        textItem->setPos(pos);
-        QFont font = textItem->font();
-        font.setPointSizeF(font.pointSizeF() * 1.5);
-        textItem->setFont(font);
-    }
-    updatePreviewArea();
+    emit addLineSignal(line, pen, label);
 }
 
 void PreviewWindow::updatePreviewArea()
@@ -205,4 +124,124 @@ void PreviewWindow::updatePreviewArea()
     qreal scaleY = viewSize.height() / sceneSize.height();
     qreal scale = qMax(scaleX, scaleY);
     m_viewer->setTransform(QTransform::fromScale(scale, scale));
+}
+
+void PreviewWindow::reset()
+{
+    m_textEditLog->clear();
+    m_progressBar->setValue(0);
+    m_viewer->scene()->clear();
+    m_viewer->scene()->addRect(LaserApplication::device->boundRectMachining());
+    resetProgress();
+    updatePreviewArea();
+}
+
+void PreviewWindow::resetProgress()
+{
+    m_progress = 0.0;
+    m_progressQuotas.clear();
+    m_sumQuotas = 0;
+}
+
+void PreviewWindow::registerProgressCode(quint32 code, qreal quota)
+{
+    m_progressQuotas[code] = quota;
+    m_sumQuotas = 0;
+    for (QMap<quint32, qreal>::ConstIterator i = m_progressQuotas.constBegin(); i != m_progressQuotas.constEnd(); i++)
+    {
+        m_sumQuotas += i.value();
+    }
+}
+
+void PreviewWindow::registerProgressCode(void* ptr, qreal quota)
+{
+    registerProgressCode((quint32)ptr, quota);
+}
+
+void PreviewWindow::addProgress(quint32 code, qreal deltaProgress, const QString& msg, bool ignoreQuota)
+{
+    emit addProgressSignal(code, deltaProgress, msg, ignoreQuota);
+}
+
+void PreviewWindow::addProgress(void* code, qreal deltaProgress, const QString& msg, bool ignoreQuota)
+{
+    addProgress((quint32)code, deltaProgress, msg, ignoreQuota);
+}
+
+void PreviewWindow::setProgress(qreal progress)
+{
+    emit setProgressSignal(progress);
+}
+
+void PreviewWindow::setProgress(quint32 code, qreal progress)
+{
+    emit setProgressSignal(code, progress);
+}
+
+void PreviewWindow::setProgress(void* ptr, qreal progress)
+{
+    setProgress((quint32)ptr, progress);
+}
+
+void PreviewWindow::addMessage(const QString& message)
+{
+    emit addMessageSignal(message);
+}
+
+void PreviewWindow::onAddPath(const QPainterPath& path, QPen pen, const QString& label)
+{
+    m_scene->addPath(path, pen, label);
+    updatePreviewArea();
+}
+
+void PreviewWindow::onAddLine(const QLineF& line, QPen pen, const QString& label)
+{
+    m_scene->addLine(line, pen, label);
+    updatePreviewArea();
+}
+
+void PreviewWindow::onSetTitle(const QString& msg)
+{
+    m_logDockWidget->setWindowTitle(msg);
+    m_textEditLog->appendPlainText(msg);
+}
+
+void PreviewWindow::onAddProgress(quint32 code, qreal deltaProgress, const QString& msg, bool ignoreQuota)
+{
+    if (!m_progressQuotas.contains(code))
+        return;
+
+    if (!ignoreQuota)
+    {
+        qreal quota = m_progressQuotas[code];
+        deltaProgress = deltaProgress * quota;
+    }
+    onSetProgress(qMin(m_progress + deltaProgress, 1.0));
+
+    if (!msg.isEmpty())
+    {
+        onAddMessage(msg);
+    }
+}
+
+void PreviewWindow::onSetProgress(qreal progress)
+{
+    qLogD << "progress: " << progress;
+    m_progress = progress;
+    m_progressBar->setValue(qRound(progress * 100));
+}
+
+void PreviewWindow::onSetProgress(quint32 code, qreal progress)
+{
+    if (!m_progressQuotas.contains(code))
+        return;
+
+    qreal quota = m_progressQuotas[code];
+    onSetProgress(qMin(progress * quota, 1.0));
+}
+
+void PreviewWindow::onAddMessage(const QString& message)
+{
+    qLogD << message;
+    m_textEditLog->appendPlainText(message);
 }

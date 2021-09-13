@@ -31,10 +31,9 @@ namespace machiningUtils
         QPointF& center,
         int closed = 2,
         int startingIndiciesCount = 8, 
-        int diagonalThreshold = 2 * 40,
-        cv::Mat& canvas = cv::Mat());
+        int diagonalThreshold = 2 * 40);
 
-    QByteArray points2Plt(const LaserPointList& points);
+    QByteArray points2Plt(const LaserPointList& points, QPointF& lastPoint);
 
     QByteArray image2Plt(const QImage& image);
 

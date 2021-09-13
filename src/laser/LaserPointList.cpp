@@ -1,4 +1,4 @@
-#include "LaserPointList.h"
+﻿#include "LaserPointList.h"
 
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
@@ -46,17 +46,6 @@ void LaserPointList::buildKdtree()
         2 * w1 / (n + 1) : 2 * n * w1 / (n + 1);
     m_weights[2] = w2;
 
-    /*qreal sum = 0;
-    for (qreal w : m_weights)
-    {
-        sum += w;
-    }
-    QVector<qreal> weights;
-    for (qreal w : m_weights)
-    {
-        weights.append(w / sum);
-    }*/
-
     m_matrix.clear();
 
     m_matrix.resize(3 * 2 * count());
@@ -97,6 +86,7 @@ int LaserPointList::nearestSearch(const LaserPoint& point)
     QVector<qreal> queries;
     queries.resize(3 * 4);
 
+    // 生成4个角度的数据
     qreal angle1 = point.angle1();
     qreal angle2 = point.angle2();
     qreal angle3 = qMax(angle1, angle2) - 360;

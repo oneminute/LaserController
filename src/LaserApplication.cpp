@@ -13,6 +13,7 @@
 #include "laser/LaserDriver.h"
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"
+#include "ui/PreviewWindow.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -22,6 +23,7 @@
 
 LaserApplication* LaserApplication::app(nullptr);
 LaserControllerWindow* LaserApplication::mainWindow(nullptr);
+PreviewWindow* LaserApplication::previewWindow(nullptr);
 LaserDevice* LaserApplication::device(nullptr);
 LaserDriver* LaserApplication::driver(nullptr);
 
@@ -109,9 +111,10 @@ bool LaserApplication::initialize()
     StateController::start();
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
+    previewWindow = new PreviewWindow(mainWindow);
     device->load();
 
-    m_deviceThread.start();
+    g_deviceThread.start();
 
     return true;
 }
@@ -132,8 +135,8 @@ void LaserApplication::destroy()
         driver->unload();
         delete driver;
     }
-    m_deviceThread.exit();
-    m_deviceThread.wait();
+    g_deviceThread.exit();
+    g_deviceThread.wait();
 
     Config::destroy();
 }
@@ -272,4 +275,14 @@ void LaserApplication::onEnterDeviceUnconnectedState()
         device->load();
         first = false;
     }
+}
+
+void LaserApplication::closeProgressWindow()
+{
+}
+
+void LaserApplication::showProgressWindow()
+{
+    previewWindow->setWindowModality(Qt::ApplicationModal);
+    previewWindow->show();
 }

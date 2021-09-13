@@ -275,7 +275,7 @@ LaserPointList LaserPrimitive::machiningPoints() const
     return d->machiningPoints;
 }
 
-LaserPointList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint, int pointIndex, cv::Mat& canvas)
+LaserPointList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint, int pointIndex)
 {
     Q_D(LaserPrimitive);
     int pointsCount = d->machiningPoints.size();
@@ -323,13 +323,6 @@ LaserPointList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint, int
         }
     }
 
-    if (!canvas.empty())
-    {
-        cv::Mat pointsMat(d->arrangedPoints.count(), 2, CV_32F, static_cast<void*>(d->arrangedPoints.toPoints().data()));
-        pointsMat.convertTo(pointsMat, CV_32S);
-        cv::polylines(canvas, pointsMat, true, cv::Scalar(0, 0, 255), 5);
-    }
-    
     return d->arrangedPoints;
 }
 
@@ -647,14 +640,14 @@ void LaserEllipse::setBounds(const QRectF& bounds)
 	d->path = path;
 }
 
-LaserPointList LaserEllipse::updateMachiningPoints(cv::Mat& canvas)
+LaserPointList LaserEllipse::updateMachiningPoints()
 {
     Q_D(LaserEllipse);
     QPainterPath path = toMachiningPath();
 
     machiningUtils::path2Points(path, d->machiningPoints, d->startingIndices, d->machiningCenter,
         1, Config::Export::maxStartingPoints(), 
-        Config::Export::smallDiagonalLimitation().maxDiagonal(), canvas);
+        Config::Export::smallDiagonalLimitation().maxDiagonal());
     return d->machiningPoints;
 }
 
@@ -788,7 +781,7 @@ void LaserRect::draw(QPainter* painter)
     painter->drawPath(d->path);
 }
 
-LaserPointList LaserRect::updateMachiningPoints(cv::Mat& canvas)
+LaserPointList LaserRect::updateMachiningPoints()
 {
     Q_D(LaserRect);
     d->machiningPoints.clear();
@@ -829,14 +822,6 @@ LaserPointList LaserRect::updateMachiningPoints(cv::Mat& canvas)
     d->startingIndices.append(2);
     d->startingIndices.append(3);
     d->machiningCenter = utils::center(d->machiningPoints).toPointF();
-
-    if (!canvas.empty())
-    {
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt1), typeUtils::qtPointF2CVPoint2f(pt2), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt2), typeUtils::qtPointF2CVPoint2f(pt3), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt3), typeUtils::qtPointF2CVPoint2f(pt4), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
-    }
 
     return d->machiningPoints;
 }
@@ -955,7 +940,7 @@ void LaserLine::setLine(const QLineF& line)
     d->line = line; 
 }
 
-LaserPointList LaserLine::updateMachiningPoints(cv::Mat& canvas)
+LaserPointList LaserLine::updateMachiningPoints()
 {
     Q_D(LaserLine);
     d->machiningPoints.clear();
@@ -973,11 +958,6 @@ LaserPointList LaserLine::updateMachiningPoints(cv::Mat& canvas)
     d->startingIndices.append(0);
     d->startingIndices.append(1);
     
-    if (!canvas.empty())
-    {
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt1), typeUtils::qtPointF2CVPoint2f(pt2), cv::Scalar(0));
-    }
-
     return d->machiningPoints;
 }
 
@@ -1112,13 +1092,13 @@ void LaserPath::setPath(const QPainterPath& path)
     d->path = path; 
 }
 
-LaserPointList LaserPath::updateMachiningPoints(cv::Mat& canvas)
+LaserPointList LaserPath::updateMachiningPoints()
 {
     Q_D(LaserPath);
     QPainterPath path = toMachiningPath();
     
     machiningUtils::path2Points(path, d->machiningPoints, d->startingIndices, d->machiningCenter, 2,
-        Config::Export::maxStartingPoints(), 0, canvas);
+        Config::Export::maxStartingPoints(), 0);
     
     return d->machiningPoints;
 }
@@ -1242,25 +1222,18 @@ QRectF LaserPolyline::sceneBoundingRect() const
     return sceneTransform().map(d->path).boundingRect();
 }
 
-LaserPointList LaserPolyline::updateMachiningPoints(cv::Mat & canvas)
+LaserPointList LaserPolyline::updateMachiningPoints()
 {
     Q_D(LaserPolyline);
     d->machiningPoints.clear();
     d->startingIndices.clear();
     bool isClosed = this->isClosed();
 
-    cv::Point2f lastPt;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     d->machiningCenter = QPointF(0, 0);
     for (int i = 0; i < d->poly.size(); i++)
     {
         QPointF pt = t.map(d->poly.at(i));
-        cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
-        if (i > 0 && !canvas.empty())
-        {
-            cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
-        }
-        lastPt = cvPt;
 
         QPointF cPt = pt;
         QPointF nPt = (i == d->poly.size() - 1) ? pt + (pt - d->poly.at(i - 1)) : d->poly.at(i + 1);
@@ -1281,10 +1254,7 @@ LaserPointList LaserPolyline::updateMachiningPoints(cv::Mat & canvas)
         d->startingIndices.append(0);
         d->startingIndices.append(d->machiningPoints.size() - 1);
     }
-    if (!canvas.empty())
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(d->machiningPoints.last().toPointF()), 
-            typeUtils::qtPointF2CVPoint2f(d->machiningPoints.first().toPointF()), cv::Scalar(0));
-    
+        
     d->machiningCenter /= d->machiningPoints.size();
     return d->machiningPoints;
 }
@@ -1417,25 +1387,18 @@ void LaserPolygon::setPolyline(const QPolygonF& poly)
     d->poly = poly; 
 }
 
-LaserPointList LaserPolygon::updateMachiningPoints(cv::Mat & canvas)
+LaserPointList LaserPolygon::updateMachiningPoints()
 {
     Q_D(LaserPolygon);
     d->machiningPoints.clear();
     d->startingIndices.clear();
     bool isClosed = this->isClosed();
-    cv::Point2f lastPt;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     d->machiningCenter = QPointF(0, 0);
     for (int i = 0; i < d->poly.size(); i++)
     {
         QPointF pt = t.map(d->poly[i]);
-        cv::Point2f cvPt = typeUtils::qtPointF2CVPoint2f(pt);
-        if (i > 0 && !canvas.empty())
-        {
-            cv::line(canvas, lastPt, cvPt, cv::Scalar(0));
-        }
-        lastPt = cvPt;
-
+        
         QPointF cPt = pt;
         QPointF nPt = (i == d->poly.size() - 1) ? d->poly.first() : d->poly.at(i + 1);
         QPointF lPt = (i == 0) ? d->poly.last() : d->poly.at(i - 1);
@@ -1456,10 +1419,7 @@ LaserPointList LaserPolygon::updateMachiningPoints(cv::Mat & canvas)
         d->startingIndices.append(0);
         d->startingIndices.append(d->machiningPoints.size() - 1);
     }
-    if (!canvas.empty())
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(d->machiningPoints.last().toPointF()), 
-            typeUtils::qtPointF2CVPoint2f(d->machiningPoints.first().toPointF()), cv::Scalar(0));
-    
+        
     d->machiningCenter /= d->machiningPoints.size();
     return d->machiningPoints;
 }
@@ -1921,7 +1881,7 @@ QRectF LaserBitmap::bounds() const
     return d->boundingRect; 
 }
 
-QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
+QByteArray LaserBitmap::engravingImage()
 { 
     Q_D(LaserBitmap);
     QByteArray ba;
@@ -1975,24 +1935,7 @@ QByteArray LaserBitmap::engravingImage(cv::Mat& canvas)
     ba = imageUtils::image2EngravingData(outMat, boundingLeft, boundingTop, pixelInterval, boundingWidth);
 
     QTransform t = transform().scale(Global::convertToMM(SU_PX, 1), Global::convertToMM(SU_PX, 1, Qt::Vertical));
-    if (!canvas.empty())
-    {
-        try
-        {
-            QRectF bounds = t.mapRect(boundingRect);
-            cv::Rect roiRect = typeUtils::qtRect2cvRect(bounds, 40);
-            roiRect = cv::Rect(roiRect.x, roiRect.y, outMat.cols, outMat.rows);
-            cv::Mat roi = canvas(roiRect);
-            cv::Mat mat;
-            cv::cvtColor(outMat, mat, cv::COLOR_GRAY2BGR);
-            mat.copyTo(roi);
-        }
-        catch (cv::Exception& e)
-        {
-            std::cout << e.err << std::endl;
-        }
-    }
-
+    
     return ba; 
 }
 
@@ -2053,7 +1996,7 @@ QJsonObject LaserBitmap::toJson()
 	return object;
 }
 
-LaserPointList LaserBitmap::updateMachiningPoints(cv::Mat& canvas)
+LaserPointList LaserBitmap::updateMachiningPoints()
 {
     Q_D(LaserBitmap);
     d->machiningPoints.clear();
@@ -2095,14 +2038,6 @@ LaserPointList LaserBitmap::updateMachiningPoints(cv::Mat& canvas)
     d->startingIndices.append(2);
     d->startingIndices.append(3);
     d->machiningCenter = utils::center(points).toPointF();
-
-    if (!canvas.empty())
-    {
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt1), typeUtils::qtPointF2CVPoint2f(pt2), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt2), typeUtils::qtPointF2CVPoint2f(pt3), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt3), typeUtils::qtPointF2CVPoint2f(pt4), cv::Scalar(0));
-        cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt4), typeUtils::qtPointF2CVPoint2f(pt1), cv::Scalar(0));
-    }
 
     d->machiningPoints = points;
     return points;
@@ -2214,7 +2149,7 @@ QString FinishRun::toString()
     return text;
 }
 
-QByteArray LaserShape::engravingImage(cv::Mat& canvas)
+QByteArray LaserShape::engravingImage()
 {
     QByteArray bytes;
     QPainterPath path = toMachiningPath();

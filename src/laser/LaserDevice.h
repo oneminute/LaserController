@@ -88,6 +88,7 @@ public:
     QTransform transform() const;
     QTransform deviceTransform() const;
     QTransform deviceTransformMM() const;
+    QTransform deviceTransformMachining() const;
 
     void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
 

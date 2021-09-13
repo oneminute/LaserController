@@ -32,6 +32,7 @@ public:
     void addChildNodes(const QList<OptimizeNode*>& nodes);
     void removeChildNode(OptimizeNode* node);
     void clearChildren();
+    void clearEdges();
     bool hasChildren() const;
     int childCount() const;
 
@@ -79,7 +80,7 @@ public:
     bool isVirtual() const;
 
     LaserPrimitive* primitive() const;
-    LaserPointList arrangeMachiningPoints(cv::Mat& canvas = cv::Mat());
+    LaserPointList arrangeMachiningPoints();
     LaserPointList arrangedPoints() const;
 
 protected:

@@ -52,8 +52,6 @@ public:
 
     bool isClosed;
     QString name;
-
-    cv::Mat canvas;
 };
 
 OptimizeNodePrivate::~OptimizeNodePrivate()
@@ -69,7 +67,7 @@ void OptimizeNodePrivate::update()
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(documentItem);
         name = primitive->name();
-        primitive->updateMachiningPoints(canvas);
+        primitive->updateMachiningPoints();
         startingPoints = primitive->startingPoints();
         startingPoints.buildKdtree();
         currentPoint = primitive->firstStartingPoint();
@@ -184,6 +182,12 @@ void OptimizeNode::clearChildren()
 {
     Q_D(OptimizeNode);
     d->childNodes.clear();
+}
+
+void OptimizeNode::clearEdges()
+{
+    Q_D(OptimizeNode);
+    d->edges.clear();
 }
 
 bool OptimizeNode::hasChildren() const
@@ -553,13 +557,13 @@ LaserPrimitive* OptimizeNode::primitive() const
     return nullptr;
 }
 
-LaserPointList OptimizeNode::arrangeMachiningPoints(cv::Mat& canvas)
+LaserPointList OptimizeNode::arrangeMachiningPoints()
 {
     Q_D(OptimizeNode);
     if (d->nodeType == LNT_PRIMITIVE)
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        return primitive->arrangeMachiningPoints(d->lastPoint, d->index, canvas);
+        return primitive->arrangeMachiningPoints(d->lastPoint, d->index);
     }
     return LaserPointList();
 }
