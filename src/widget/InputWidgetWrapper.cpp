@@ -131,6 +131,8 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     }
     }
     configItem->blockSignals(true);
+    //if (d->configItem->name() == "searchingXYWeight")
+        //qLogD << "debugging " << d->configItem->name();
     updateValue(d->configItem->value());
     configItem->blockSignals(false);
     connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::setValue);
@@ -178,6 +180,9 @@ void InputWidgetWrapper::updateValue(const QVariant& newValue)
     QVariant value = d->configItem->doValueToWidgetHook(newValue);
     QWidget* widget = qobject_cast<QWidget*>(parent());
     widget->blockSignals(true);
+    // for debugging
+    //if (d->configItem->name() == "searchingXYWeight")
+        //qLogD << "debugging " << d->configItem->name();
     if (!d->configItem->doUpdateWidgetValueHook(widget, newValue))
     {
         switch (d->type)

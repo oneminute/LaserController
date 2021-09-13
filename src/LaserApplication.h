@@ -5,6 +5,7 @@
 #include <QThread>
 
 class LaserControllerWindow;
+class PreviewWindow;
 class LaserDevice;
 class LaserDriver;
 
@@ -33,12 +34,15 @@ protected slots:
 public:
     static LaserApplication* app;
     static LaserControllerWindow* mainWindow;
+    static PreviewWindow* previewWindow;
     static LaserDevice* device;
     static LaserDriver* driver;
 
-private:
-    QThread m_deviceThread;
+    static void closeProgressWindow();
+    static void showProgressWindow();
 
+private:
+    QThread g_deviceThread;
 };
 
 #endif // LASERAPPLICATION_H

@@ -63,8 +63,12 @@ public:
 	void setUnit(SizeUnit unit);
 
     QPointF docOrigin() const;
+    QPointF docOriginMM() const;
+    QPointF docOriginMachining() const;
     QTransform docTransform() const;
+    QTransform docTransformMM() const;
     QRectF docBoundingRect() const;
+    QRectF docBoundingRectMM() const;
 
     /// <summary>
     /// 返回相对于当前确定的原点的坐标。
@@ -110,6 +114,7 @@ signals:
     void opened();
     void closed();
     void outlineUpdated();
+    void exportFinished(const QString& filename);
 
 protected:
     Q_DISABLE_COPY(LaserDocument)

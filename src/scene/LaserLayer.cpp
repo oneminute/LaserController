@@ -521,6 +521,16 @@ QPointF LaserLayer::position() const
     return boundingRect().topLeft();
 }
 
+QPointF LaserLayer::positionMM() const
+{
+    return Global::matrixToMM(SU_PX).map(position());
+}
+
+QPointF LaserLayer::positionMachining() const
+{
+    return Global::matrixToMM(SU_PX, 40, 40).map(position());
+}
+
 void LaserLayer::onClicked()
 {
     Q_D(LaserLayer);

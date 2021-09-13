@@ -13,63 +13,29 @@ class PathOptimizer;
 class OptimizeNode;
 class OptimizeEdge;
 
-class AntPrivate;
-class Ant
-{
-public:
-    explicit Ant(int antIndex, PathOptimizer* optimizer);
-
-    void initialize();
-    void arrived(OptimizeNode* node, const QPointF& lastPos);
-    OptimizeNode* currentNode() const;
-    QPointF currentPos() const;
-    bool moveForward();
-    int antIndex() const;
-    double totalLength() const;
-    void drawPath(cv::Mat& canvas, int iteration);
-    QQueue<OptimizeNode*> path() const;
-    QMap<OptimizeNode*, int> arrivedNodes() const;
-
-private:
-    QScopedPointer<AntPrivate> m_ptr;
-    Q_DECLARE_PRIVATE_D(m_ptr, Ant)
-    Q_DISABLE_COPY(Ant)
-};
-
 class PathOptimizerPrivate;
 class PathOptimizer : public QObject
 {
     Q_OBJECT
 public:
     typedef QPair<LaserPrimitive*, int> PathNode;
-    typedef QList<PathNode> Path;
-    explicit PathOptimizer(OptimizeNode* root, int totalNodes, int maxIterations, 
-        int maxAnts, int maxTravers, float volatileRate, 
-        bool useGreedyAlgorithm = false, bool containsLayers = true,
+    typedef QList<OptimizeNode*> Path;
+
+    explicit PathOptimizer(OptimizeNode* root, int totalNodes,
         QObject* parent = nullptr);
     virtual ~PathOptimizer();
 
-    bool isContainsLayers() const;
-
-    QList<OptimizeEdge*> edges() const;
-    int edgesCount() const;
-    bool useGreedyAlgorithm() const;
     Path optimizedPath() const;
 
-    void setCanvas(cv::Mat& canvas);
-
-
 public slots:
-    void optimize(int canvasWidth, int canvasHeight);
+    void optimize();
 
 signals:
-    void progressUpdated(float progress);
-    void messageUpdated(const QString& msg);
-    void titleUpdated(const QString& msg);
     void finished();
+    /**/
 
 protected:
-    void initializeByGroups(OptimizeNode* root);
+    void optimizeLayer(OptimizeNode* root);
 
     void printNodeAndEdges();
 
@@ -84,24 +50,26 @@ class OptimizerController : public QObject
 {
     Q_OBJECT
 public:
+    typedef std::function<void(OptimizerController*)> FinishedCallback;
     OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent = nullptr);
     ~OptimizerController();
 
-    PathOptimizer::Path optimize(float pageWidth, float pageHeight, cv::Mat& canvas = cv::Mat());
+    void optimize();
+
+    PathOptimizer::Path path();
+
+    void setFinishedCallback(FinishedCallback callback);
 
 public slots:
     void finished();
 
 signals:
-    void start(float pageWidth, float pageHeight);
+    void start();
 
 private:
-    //QScopedPointer<ProgressDialog> m_dialog;
-    QScopedPointer<PreviewWindow> m_previewWindow;
     QThread m_thread;
+    FinishedCallback m_finishedCallback;
     QScopedPointer<PathOptimizer> m_optimizer;
 };
-
-void drawPath(cv::Mat& canvas, const QQueue<OptimizeNode*>& path, const QMap<OptimizeNode*, int>& arrivedNodes);
 
 #endif // PATHOPTIMIZER_H

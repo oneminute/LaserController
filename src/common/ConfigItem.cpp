@@ -171,6 +171,7 @@ ConfigItem::ConfigItem(
     d->title = title;
     d->description = description;
     d->value = value;
+    d->dirtyValue = value;
     d->defaultValue = value;
     d->systemDefaultValue = value;
     d->dataType = dataType;

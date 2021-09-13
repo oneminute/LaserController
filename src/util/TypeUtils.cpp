@@ -149,3 +149,11 @@ QString typeUtils::variantToString(const QVariant& src, DataType dataType)
     }
     return dst;
 }
+
+QJsonObject typeUtils::point2Json(const QPointF& point)
+{
+    QJsonObject json;
+    json["x"] = point.x();
+    json["y"] = point.y();
+    return json;
+}

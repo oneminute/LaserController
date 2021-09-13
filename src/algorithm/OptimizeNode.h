@@ -7,9 +7,13 @@
 #include <common/common.h>
 #include <opencv2/opencv.hpp>
 
+#include "laser/LaserPointList.h"
+#include "laser/LaserPoint.h"
+
 class ILaserDocumentItem;
 class OptimizeNode;
 class OptimizeEdge;
+class LaserPrimitive;
 
 class OptimizeNodePrivate;
 class OptimizeNode
@@ -28,10 +32,11 @@ public:
     void addChildNodes(const QList<OptimizeNode*>& nodes);
     void removeChildNode(OptimizeNode* node);
     void clearChildren();
+    void clearEdges();
     bool hasChildren() const;
     int childCount() const;
 
-    bool isVirtual() const;
+    //bool isVirtual() const;
     bool isDocument() const;
     bool isLayer() const;
     bool isPrimitive() const;
@@ -40,8 +45,11 @@ public:
     void setParentNode(OptimizeNode* parent);
 
     QList<OptimizeNode*> findAllLeaves(OptimizeNode* exclude = nullptr);
+    QList<OptimizeNode*> findLeaves();
+    QList<OptimizeNode*> findSiblings(bool onlyLeaves = false);
 
     QPointF position() const;
+    QPointF machiningPosition() const;
 
     void update();
 
@@ -53,15 +61,27 @@ public:
     QList<OptimizeEdge*> edges() const;
     OptimizeEdge* outEdge() const;
 
-    QPointF startPos() const;
-    QPointF nearestPoint(const QPointF& point, int& index, float& dist);
-    QPointF currentPos() const;
-    QVector<QPointF> startingPoints() const;
+    LaserPoint startPos() const;
+    LaserPoint nearestPoint(const LaserPoint& point);
+    LaserPoint nearestPoint(OptimizeNode* node);
+    LaserPoint currentPos(const LaserPoint& hint = LaserPoint()) const;
+    void setCurrentIndex(int index);
+    LaserPoint lastPoint() const;
+    void setLastPoint(const LaserPoint& point);
+
+    LaserPointList& startingPoints();
+
     bool isClosed() const;
-    QPointF headPoint() const;
-    QPointF tailPoint() const;
-    QPointF point(int index) const;
+    LaserPoint headPoint() const;
+    LaserPoint tailPoint() const;
+    LaserPoint point(int index) const;
     void debugDraw(cv::Mat& canvas);
+
+    bool isVirtual() const;
+
+    LaserPrimitive* primitive() const;
+    LaserPointList arrangeMachiningPoints();
+    LaserPointList arrangedPoints() const;
 
 protected:
     QScopedPointer<OptimizeNodePrivate> d_ptr;

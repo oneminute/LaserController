@@ -182,6 +182,7 @@ protected slots:
     void onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 	void onCreatSpline();
+    void onDocumentExportFinished(const QString& filename);
 
     void lightOnLaser();
     void lightOffLaser();
@@ -322,6 +323,7 @@ private:
     QDir m_tmpDir;
     QString m_currentJson;
     bool m_useLoadedJson;
+    bool m_prepareMachining;
 
     // widgets on status bar
     QLabel* m_statusBarStatus;

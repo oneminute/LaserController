@@ -25,8 +25,8 @@ public:
         , name("unknown")
         , portName("")
         , printerDrawUnit(1016)
-        , deviceTransform()
-        , deviceOrigin(0, 0)
+        , deviceTransformMM()
+        , deviceOriginMM(0, 0)
         , transform()
         , origin(0, 0)
     {}
@@ -42,8 +42,8 @@ public:
     QString portName;
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
 
-    QTransform deviceTransform;
-    QPointF deviceOrigin;
+    QTransform deviceTransformMM;
+    QPointF deviceOriginMM;
     QTransform transform;
     QPointF origin;
 
@@ -90,8 +90,8 @@ void LaserDevicePrivate::updateDeviceOriginAndTransform()
         break;
     }
 
-    deviceTransform = QTransform::fromTranslate(-dx, -dy);
-    deviceOrigin = QPointF(dx, dy);
+    deviceTransformMM = QTransform::fromTranslate(-dx, -dy);
+    deviceOriginMM = QPointF(dx, dy);
 }
 
 LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
@@ -654,7 +654,7 @@ QPointF LaserDevice::origin() const
     switch (Config::Device::startFrom())
     {
     case SFT_AbsoluteCoords:
-        return deviceOrigin();
+        return deviceOriginMM();
         break;
     case SFT_UserOrigin:
     case SFT_CurrentPosition:
@@ -666,7 +666,7 @@ QPointF LaserDevice::origin() const
         }
         else
         {
-            return deviceOrigin();
+            return deviceOriginMM();
         }
     }
         break;
@@ -675,8 +675,35 @@ QPointF LaserDevice::origin() const
 
 QPointF LaserDevice::deviceOrigin() const
 {
+    return Global::matrix(SU_MM, SU_PX).map(deviceOriginMM());
+}
+
+QPointF LaserDevice::deviceOriginMM() const
+{
     Q_D(const LaserDevice);
-    return d->deviceOrigin;
+    return d->deviceOriginMM;
+}
+
+QPointF LaserDevice::deviceOriginMachining() const
+{
+    return deviceOriginMM() * 40;
+}
+
+QRectF LaserDevice::boundingRect() const
+{
+    return QRectF(0, 0, 
+        Global::convertFromMM(SU_PX, layoutWidth()), 
+        Global::convertFromMM(SU_PX, layoutHeight()));
+}
+
+QRectF LaserDevice::boundingRectMM() const
+{
+    return QRectF(0, 0, layoutWidth(), layoutHeight());
+}
+
+QRectF LaserDevice::boundRectMachining() const
+{
+    return Global::matrixToMM(SU_PX, 40, 40).map(boundingRect()).boundingRect();
 }
 
 QTransform LaserDevice::transform() const
@@ -688,7 +715,7 @@ QTransform LaserDevice::transform() const
     switch (Config::Device::startFrom())
     {
     case SFT_AbsoluteCoords:
-        transform = d->deviceTransform;
+        transform = d->deviceTransformMM;
         break;
     case SFT_UserOrigin:
     case SFT_CurrentPosition:
@@ -700,7 +727,7 @@ QTransform LaserDevice::transform() const
         }
         else
         {
-            transform = d->deviceTransform;
+            transform = d->deviceTransformMM;
         }
     }
         break;
@@ -711,7 +738,25 @@ QTransform LaserDevice::transform() const
 QTransform LaserDevice::deviceTransform() const
 {
     Q_D(const LaserDevice);
-    return d->deviceTransform;
+    QTransform t = deviceTransformMM();
+    return QTransform::fromTranslate(
+        Global::convertFromMM(SU_PX, t.dx()),
+        Global::convertFromMM(SU_PX, t.dy()));
+}
+
+QTransform LaserDevice::deviceTransformMM() const
+{
+    Q_D(const LaserDevice);
+    return d->deviceTransformMM;
+}
+
+QTransform LaserDevice::deviceTransformMachining() const
+{
+    Q_D(const LaserDevice);
+    return QTransform::fromTranslate(
+        -d->deviceOriginMM.x() * 40,
+        -d->deviceOriginMM.y() * 40
+    );
 }
 
 void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)

@@ -149,6 +149,20 @@ QPointF utils::center(const QVector<QPointF>& points)
     return center;
 }
 
+LaserPoint utils::center(const LaserPointList& points)
+{
+    LaserPoint center(0, 0, 0, 0);
+    if (points.isEmpty())
+        return center;
+
+    for (const LaserPoint& p : points)
+    {
+        center += p;
+    }
+    center /= points.size();
+    return center;
+}
+
 QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
 {
     QRectF bounding(0, 0, 0, 0);

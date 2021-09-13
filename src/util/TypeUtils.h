@@ -1,8 +1,10 @@
 #ifndef TYPEUTILS_H
 #define TYPEUTILS_H
 
+#include <QJsonObject>
 #include <QObject>
 #include <QPoint>
+#include <QPointF>
 #include <QRect>
 #include <QVariant>
 
@@ -35,6 +37,8 @@ namespace typeUtils
     QVariant stringToVariant(const QString& src, DataType dataType);
 
     QString variantToString(const QVariant& src, DataType dataType);
+
+    QJsonObject point2Json(const QPointF& point);
 }
 
 #endif // TYPEUTILS_H
