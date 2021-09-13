@@ -170,7 +170,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QTransform t;
             t = node->getCascadeTransform();
-	        qDebug() << t;
+	        //qDebug() << t;
 
 			if (!qFuzzyCompare(t.dx(), 0) || !qFuzzyCompare(t.dy(), 0))
 			{
@@ -181,15 +181,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 					//t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
 					Global::convertFromMM(SU_PX, t.m31() * docScaleWidth), Global::convertFromMM(SU_PX, t.m32() * docScaleHeight, Qt::Vertical), t.m33()
 				);
-				//QTransform t1 = QTransform(
-				//	t.m11(), t.m12(), t.m13(),
-				//	t.m21(), t.m22(), t.m23(),
-				//	0, 0, t.m33()
-				//	//t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
-				//	//Global::convertFromMM(SU_PX, t.m31() * docScaleWidth), Global::convertFromMM(SU_PX, t.m32() * docScaleHeight, Qt::Vertical), t.m33()
-				//);
-                //QTransform t2 = QTransform::fromTranslate(Global::convertFromMM(SU_PX, t.m31() * docScaleWidth), Global::convertFromMM(SU_PX, t.m32() * docScaleHeight, Qt::Vertical));
-                //t = t2 * t1;
+				
                 t = t1;
 				qDebug() << t;
 			}

@@ -61,6 +61,7 @@
 #include "widget/LayerButton.h"
 #include "widget/PropertiesHelperManager.h"
 #include "widget/RulerWidget.h"
+#include "widget/ProgressBar.h"
 #include "scene/LaserPrimitive.h"
 
 using namespace ads;
@@ -208,7 +209,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarTips->setText(tr("Welcome!"));
     m_statusBarTips->setMinimumWidth(120);
     m_statusBarTips->setAlignment(Qt::AlignHCenter);
-    m_ui->statusbar->addWidget(m_statusBarTips);
+    //m_ui->statusbar->addWidget(m_statusBarTips);
+    //m_ui->statusbar->addWidget(utils::createSeparator());
+
+    m_statusBarProgress = new ProgressBar;
+    m_statusBarProgress->setMinimum(0);
+    m_statusBarProgress->setMaximum(100);
+    m_ui->statusbar->addWidget(m_statusBarProgress);
     m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarCoordinate = new QLabel;
@@ -700,6 +707,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     // config items
     connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
     connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
+
+    connect(LaserApplication::previewWindow, &PreviewWindow::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
+    connect(m_statusBarProgress, &ProgressBar::clicked, LaserApplication::previewWindow, &QMainWindow::show);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -2826,8 +2836,8 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
     QPointF posMM = QPointF(x, y);
     posMM = LaserApplication::device->transform().map(posMM);
     QString posStr = QString("%1mm,%2mm | %3px,%4px")
-        .arg(posMM.x()).arg(posMM.y())
-        .arg(qFloor(pos.x())).arg(qFloor(pos.y()));
+        .arg(posMM.x(), 5, 'f', 3).arg(posMM.y(), 5, 'f', 3)
+        .arg(qFloor(pos.x()), 5).arg(qFloor(pos.y()), 5);
     m_statusBarLocation->setText(posStr);
 }
 
@@ -2919,6 +2929,11 @@ void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
 #endif
     LaserDriver::instance().loadDataFromFile(filePath);
     LaserDriver::instance().startMachining(m_comboBoxStartPosition->currentIndex() == 3);
+}
+
+void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
+{
+    m_statusBarProgress->setValue(qRound(progress * 100));
 }
 
 void LaserControllerWindow::lightOnLaser()

@@ -363,7 +363,8 @@ void LaserDocument::exportJSON(const QString& filename)
                 return;
             }
 
-            QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
+            //QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
+            QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
             qLogD << rawJson;
             qint64 writtenBytes = saveFile.write(rawJson);
             LaserApplication::previewWindow->addProgress(this, 0.1 / path.length(), tr("File saved."));
@@ -1091,29 +1092,6 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
             return false;
         }
     );
-
-    // 获取每个分组中子节点的最大个数。
-    //int maxChildNodes = Config::PathOptimization::maxGroupSize();
-    // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
-    // 新建一个父节点，将该父节点作为当前父节点的子节点。
-    //if (children.count() > maxChildNodes)
-    //{
-    //    node->childNodes().clear();
-    //    OptimizeNode* newNode = nullptr;
-    //    for (int i = 0, count = 0; i < children.count(); i++)
-    //    {
-    //        if ((count++ % maxChildNodes) == 0)
-    //        {
-    //            newNode = new OptimizeNode();
-    //            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-    //            newNode->setNodeName(nodeName);
-    //            node->addChildNode(newNode);
-    //        }
-    //        newNode->addChildNode(children.at(i));
-    //    }
-    //    //optimizeGroups(node, level);
-    //    qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
-    //}
 
     // 对每一个子节点再次递归进行整理。
     for (OptimizeNode* item : node->childNodes())

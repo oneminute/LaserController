@@ -109,9 +109,10 @@ bool LaserApplication::initialize()
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
 
     StateController::start();
+    previewWindow = new PreviewWindow(mainWindow);
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
-    previewWindow = new PreviewWindow(mainWindow);
+
     device->load();
 
     g_deviceThread.start();
@@ -134,6 +135,11 @@ void LaserApplication::destroy()
     {
         driver->unload();
         delete driver;
+    }
+
+    if (previewWindow)
+    {
+        delete previewWindow;
     }
     g_deviceThread.exit();
     g_deviceThread.wait();

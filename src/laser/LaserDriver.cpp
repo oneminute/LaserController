@@ -18,7 +18,6 @@
     if (!fn) \
     { \
         qLogW << CHECK_STR(fn) << " is nullptr."; \
-        return false; \
     }
 
 QMap<int, QString> LaserDriver::g_registerComments;

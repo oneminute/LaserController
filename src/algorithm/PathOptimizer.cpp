@@ -121,6 +121,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     while (!stack.isEmpty())
     {
         OptimizeNode* node = stack.pop();
+        LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1").arg(node->nodeName()));
         node->update((quint32)this, 1.0 * 0.9 / d->totalNodes);
         // 如果当前节点为一个图元
         if (node->nodeType() == LNT_PRIMITIVE)
@@ -128,8 +129,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             // 先更新它的加工点集
             LaserPrimitive* primitive = static_cast<LaserPrimitive*>(node->documentItem());
             LaserApplication::previewWindow->addPath(primitive->toMachiningPath(), QPen(Qt::blue, 2), primitive->name());
-            //LaserApplication::previewWindow->addProgress(this, 1.0 * 0.9 / d->totalNodes, tr("Generating machining points of node %1").arg(primitive->name()));
-            LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1"));
+            LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1. Done.").arg(node->nodeName()));
         }
         d->nodes.append(node);
 

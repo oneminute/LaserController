@@ -35,6 +35,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QWidget;
 class RulerWidget;
+class ProgressBar;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -184,6 +185,8 @@ protected slots:
 	void onCreatSpline();
     void onDocumentExportFinished(const QString& filename);
 
+    void onPreviewWindowProgressUpdated(qreal progress);
+
     void lightOnLaser();
     void lightOffLaser();
     void readMachiningOrigins(bool checked = false);
@@ -330,6 +333,7 @@ private:
     QLabel* m_statusBarRegister;
     QLabel* m_statusBarActivation;
     QLabel* m_statusBarTips;
+    ProgressBar* m_statusBarProgress;
     QLabel* m_statusBarCoordinate;
     QLabel* m_statusBarLocation;
     QLabel* m_statusBarPageInfo;
@@ -384,6 +388,8 @@ private:
     LaserDoubleSpinBox* m_fontSpaceX;
     LaserDoubleSpinBox* m_fontSpaceY;
     int m_fontComboxLightedIndex;
+
+    friend class LaserApplication;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

@@ -228,6 +228,7 @@ void PreviewWindow::onSetProgress(qreal progress)
 {
     m_progress = progress;
     m_progressBar->setValue(qRound(progress * 100));
+    emit progressUpdated(m_progress);
 }
 
 void PreviewWindow::onSetProgress(quint32 code, qreal progress)
