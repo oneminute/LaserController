@@ -121,18 +121,15 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     while (!stack.isEmpty())
     {
         OptimizeNode* node = stack.pop();
-        node->update();
+        node->update((quint32)this, 1.0 * 0.9 / d->totalNodes);
         // 如果当前节点为一个图元
         if (node->nodeType() == LNT_PRIMITIVE)
         {
             // 先更新它的加工点集
             LaserPrimitive* primitive = static_cast<LaserPrimitive*>(node->documentItem());
-            //emit drawPath(primitive->toMachiningPath(), QPen(Qt::blue, 2), primitive->name());
             LaserApplication::previewWindow->addPath(primitive->toMachiningPath(), QPen(Qt::blue, 2), primitive->name());
-            LaserApplication::previewWindow->addProgress(this, 1.0 * 0.9 / d->totalNodes, tr("Generating machining points of node %1").arg(primitive->name()));
-            //emit titleUpdated(tr("Generating machining points of node %1").arg(primitive->name()));
-            //d->progress += 1.0 * 0.9 * 90 / d->totalNodes;
-            //emit progressUpdated(d->progress);
+            //LaserApplication::previewWindow->addProgress(this, 1.0 * 0.9 / d->totalNodes, tr("Generating machining points of node %1").arg(primitive->name()));
+            LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1"));
         }
         d->nodes.append(node);
 
@@ -167,7 +164,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             OptimizeEdge* edge = new OptimizeEdge(node, node->parentNode());
             node->setOutEdge(edge);
             QString label = QString("%1 -> %2").arg(node->nodeName()).arg(node->parentNode()->nodeName());
-            //emit drawLine(edge->toLine(), QPen(Qt::lightGray, 1, Qt::DashLine), label);
             edges.append(edge);
         }
 
@@ -178,7 +174,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
             node->addEdge(edge);
             QString label = QString("%1 -> %2").arg(node->nodeName()).arg(leafNode->nodeName());
-            //emit drawLine(edge->toLine(), QPen(Qt::magenta, 1, Qt::DashLine), label);
             edges.append(edge);
         }
 
@@ -190,14 +185,11 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
 
     for (OptimizeNode* node : leaves)
     {
-        //root->leavesPoints().addOptimizeNode(node);
         OptimizeEdge* edge = new OptimizeEdge(d->currentNode, node);
         d->currentNode->addEdge(edge);
         QString label = QString("%1 -> %2").arg(root->nodeName()).arg(node->nodeName());
-        //emit drawLine(edge->toLine(), QPen(Qt::green, 1, Qt::DashLine), label);
         edges.append(edge);
     }
-    //root->leavesPoints().buildKdtree();
 
     // 开始图遍历
     travelled.clear();
@@ -209,9 +201,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
 
         if (d->currentNode->nodeType() == LNT_PRIMITIVE)
         {
-            //emit titleUpdated(tr("Arrived node %1").arg(d->currentNode->nodeName()));
-            //d->progress += 1.0 * 0.1 * 90 / d->totalNodes;
-            //emit progressUpdated(d->progress);
             LaserApplication::previewWindow->addProgress(this, 0.9 * 0.1 / d->totalNodes, tr("Arrived node %1").arg(d->currentNode->nodeName()));
             d->optimizedPath.append(d->currentNode);
         }

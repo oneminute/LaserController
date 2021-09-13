@@ -51,7 +51,7 @@ public:
     QPointF position() const;
     QPointF machiningPosition() const;
 
-    void update();
+    void update(quint32 progressCode = 0, qreal progressQuota = 0);
 
     ILaserDocumentItem* documentItem() const;
 

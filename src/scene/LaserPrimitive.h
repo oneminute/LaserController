@@ -124,7 +124,7 @@ public:
 
     virtual void draw(QPainter* painter) {};
 
-    virtual LaserPointList updateMachiningPoints() { return LaserPointList(); }
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota) { return LaserPointList(); }
     LaserPointList machiningPoints() const;
     LaserPointList arrangeMachiningPoints(LaserPoint& lastPoint, int pointIndex);
     LaserPointList arrangedPoints() const;
@@ -215,7 +215,7 @@ public:
     QRectF bounds() const;
     void setBounds(const QRectF& bounds);
 
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toMachiningPath() const;
@@ -245,7 +245,7 @@ public:
     void setRect(const QRectF& rect);
 
     virtual void draw(QPainter* painter);
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
 
     virtual QPainterPath toMachiningPath() const;
 	virtual QRectF sceneBoundingRect() const;
@@ -272,7 +272,7 @@ public:
     QLineF line() const;
     void setLine(const QLineF& line);
 
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toMachiningPath() const;
@@ -300,7 +300,7 @@ public:
     QPainterPath path() const;
     void setPath(const QPainterPath& path);
 
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toMachiningPath() const;
@@ -331,7 +331,7 @@ public:
     void setPolyline(const QPolygonF& poly);
     virtual QRectF sceneBoundingRect() const;
 
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toMachiningPath() const;
@@ -359,7 +359,7 @@ public:
     QPolygonF polyline() const;
     void setPolyline(const QPolygonF& poly);
 
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
     virtual void draw(QPainter* painter);
 
     virtual QPainterPath toMachiningPath() const;
@@ -430,7 +430,7 @@ public:
     virtual QString typeName() { return tr("Bitmap"); }
 	virtual QJsonObject toJson();
 
-    virtual LaserPointList updateMachiningPoints();
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
 	virtual QRectF sceneBoundingRect() const;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;

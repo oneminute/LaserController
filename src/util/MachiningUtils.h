@@ -26,6 +26,8 @@ namespace machiningUtils
     /// <param name="isClosed">0表示非封闭，1表示封闭，2表示未知，需要由函数本身判断</param>
     /// <returns></returns>
     int path2Points(const QPainterPath& path,
+        quint32 progressCode,
+        qreal progressQuota,
         LaserPointList& points,
         QList<int>& startingIndices,
         QPointF& center,

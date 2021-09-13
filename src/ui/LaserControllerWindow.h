@@ -370,7 +370,7 @@ private:
 
 	QString m_fileDirection;
 	QString m_fileName;
-	QString m_windowTitle;
+	//QString m_windowTitle;
 	//Text 
     QGridLayout* m_textLayout;
     QWidget * m_textFontWidget;

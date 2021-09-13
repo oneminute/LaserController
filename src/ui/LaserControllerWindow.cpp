@@ -72,7 +72,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_useLoadedJson(false)
 	, m_unitIsMM(true)
 	, m_selectionOriginalState(SelectionOriginalCenter)
-	, m_windowTitle("Laser Controller")
     , m_textFontWidget(nullptr)
     , m_propertyWidget(nullptr)
 {
@@ -1890,9 +1889,6 @@ void LaserControllerWindow::onActionRedo(bool checked) {
 void LaserControllerWindow::onActionImport(bool checked)
 {
     qLogD << "onActionImport";
-    //QStringList filters;
-    //filters << "image/svg+xml" << "image/svg+xml-compressed"
-        //<< "application/dxf";
     QString filters = tr("SVG (*.svg);;CAD (*.dxf)");
     QString filename = getFilename(tr("Open Supported File"), filters);
     qLogD << "importing filename is " << filename;
@@ -1917,7 +1913,7 @@ void LaserControllerWindow::onActionNew(bool checked)
 			return;
 		}
 	}
-	this->setWindowTitle("<Untitled> - " + m_windowTitle);
+	this->setWindowTitle("<Untitled> - ");
 	createNewDocument();
 }
 
@@ -1949,7 +1945,7 @@ bool LaserControllerWindow::onActionSaveAs(bool checked)
 	}
 	qDebug() << name;
 	m_fileDirection = name;
-	setWindowTitle(getCurrentFileName() + " - " + m_windowTitle);
+	setWindowTitle(getCurrentFileName() + " - ");
 	m_scene->document()->save(name, this);
 	return true;
 }
@@ -1968,7 +1964,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 	if (name == "") {
 		return;
 	}
-	setWindowTitle(getCurrentFileName() + " - " + m_windowTitle);
+	setWindowTitle(getCurrentFileName() + " - ");
 	//创建document
 	createNewDocument();
 	m_scene->document()->load(name, this);
@@ -3070,6 +3066,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         doc->outline();
         m_tableWidgetLayers->setDocument(doc);
         m_tableWidgetLayers->updateItems();
+        setWindowTitle(doc->name());
         //undo
         m_viewer->undoStack()->clear();
         //m_ui->actionUndo->setEnabled(false);
@@ -3097,8 +3094,6 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             m_comboBoxScale->setCurrentText(str);
             doc->open();
         }
-        
-        
     }
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
@@ -3874,7 +3869,6 @@ void LaserControllerWindow::documentClose()
 	m_tableWidgetLayers->updateItems();
 	this->m_fileDirection = "";
 	this->m_fileName = "";
-	this->setWindowTitle(m_windowTitle);
 	//layer color buttons not enabled
 	for each(LayerButton* button in m_layerButtons) {
 		button->setEnabled(false);

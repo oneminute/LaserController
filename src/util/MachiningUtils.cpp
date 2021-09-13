@@ -8,6 +8,8 @@
 
 #include "common/common.h"
 #include "common/Config.h"
+#include "LaserApplication.h"
+#include "ui/PreviewWindow.h"
 #include "TypeUtils.h"
 #include "Utils.h"
 
@@ -45,7 +47,8 @@ int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::
     return count;
 }
 
-int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& points, 
+int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode, 
+    qreal progressQuota, LaserPointList& points, 
     QList<int>& startingIndices, QPointF& center, int closed, int startingIndiciesCount, 
     int diagonalThreshold)
 {
@@ -151,7 +154,12 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
             anchor = point;
             anchorRadians = radians;
         }
+        if (i % 100 == 0)
+        {
+            LaserApplication::previewWindow->addProgress(progressCode, 100.0 * progressQuota / length);
+        }
     }
+    LaserApplication::previewWindow->addProgress(progressCode, (qFloor(length) % 100) * progressQuota / length);
 
     angle = path.angleAtPercent(1);
     point4d.setAll(lastPoint, angle);
