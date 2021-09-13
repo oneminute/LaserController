@@ -152,7 +152,7 @@ void LayerButton::paintEvent(QPaintEvent * event)
 		}
 		
 	}
-	
+    
     QTransform t;
     //t.translate(width() / 2, height() / 2);
 	t.translate(5, 5);
@@ -165,9 +165,34 @@ void LayerButton::paintEvent(QPaintEvent * event)
 
     painter.setBrush(QBrush(color));
     painter.setPen(QPen(color));
-    //painter.drawRect(0, 0, 20, 20);
-	painter.drawRect(0, 0, width()-10, height()-10);
+    QRect rect(0, 0, width() - 10, height() - 10);
+	painter.drawRect(rect);
+    //»æÖÆlayer index
+    if (this->isEnabled()) {
+        QFont f;
+        f.setPixelSize(height() - 16);
+        f.setBold(true);
+        painter.setFont(f);
+        //qreal val = (255-(color.red() + color.green() + color.blue()) * 0.333) * 1.2;
+        qreal val = (color.red() + color.green() + color.blue()) * 0.3;
+        if (val > 128) {
+            val = 30;
+        }
+        else {
+            val = 255;
+        }
+        QColor textColor(val, val, val);
+        //textColor.s
+        painter.setPen(textColor);
+        QTextOption option;
+        option.setAlignment(Qt::AlignCenter);
+        QString index = QString::number(m_layerIndex);
+        if (index.length() == 1) {
+            index.insert(0, "0");
+        }
 
+        painter.drawText(rect, index, option);
+    }
     t = QTransform::fromTranslate(0, 0);
     painter.setTransform(t);
     painter.setPen(Qt::black);

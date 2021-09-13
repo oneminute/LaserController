@@ -3089,7 +3089,6 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             }
             m_comboBoxScale->setCurrentText("100%");
             //初始化缩放输入
-            //LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
             QString str = QString::number(qFloor(m_viewer->adapterViewScale() * 100)) + "%";
             m_comboBoxScale->setCurrentText(str);
             doc->open();
