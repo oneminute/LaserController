@@ -62,7 +62,7 @@ int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode,
     QPointF point = firstPoint;
     qreal angle = path.angleAtPercent(0);
     qreal radians = qDegreesToRadians(angle);
-    LaserPoint point4d(point, angle, angle - 360);
+    LaserPoint point4d(point, angle, angle - 360, LaserPoint::PT_MoveTo);
 
     // Calculate bounding rect of current path. If the diagonal is less than diagonalThreshold,
     // we just choose the first point as the only starting point for closed curves,
@@ -118,6 +118,7 @@ int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode,
     // 封闭曲线也不计算起刀点。其他的封闭曲线均按分割数计算起刀点。
 
     points.push_back(point4d);
+    point4d.setPointType(LaserPoint::PT_LineTo);
     center += point;
 
     for (int i = 1; i < length; i++)
@@ -181,14 +182,18 @@ QByteArray machiningUtils::points2Plt(const LaserPointList& points, QPointF& las
     if (points.empty())
         return buffer;
 
-    QPointF pt = points.first().toPointF();
-    QPointF diff = pt - lastPoint;
-    lastPoint = pt;
-    buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
+    //QPointF pt = points.first().toPointF();
+    //QPointF diff = pt - lastPoint;
+    //buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
     for (size_t i = 0; i < points.size(); i++)
     {
-        pt = points[i].toPointF();
-        diff = pt - lastPoint;
+        LaserPoint lPt = points.at(i);
+        QPointF pt = lPt.toPointF();
+        QPointF diff = pt - lastPoint;
+        if (lPt.pointType() == LaserPoint::PT_MoveTo)
+        {
+            buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
+        }
         lastPoint = pt;
         buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
     }

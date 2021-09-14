@@ -51,7 +51,6 @@
 #include "ui/LaserLayerDialog.h"
 #include "ui/MainCardInfoDialog.h"
 #include "ui/PreviewWindow.h"
-#include "ui/RegistersDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -62,6 +61,7 @@
 #include "widget/PropertiesHelperManager.h"
 #include "widget/RulerWidget.h"
 #include "widget/ProgressBar.h"
+#include "widget/PressedToolButton.h"
 #include "scene/LaserPrimitive.h"
 
 using namespace ads;
@@ -509,16 +509,26 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionMirrorVertical, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorVertical);
     connect(m_ui->actionMirrorAcrossLine, &QAction::triggered, this, &LaserControllerWindow::onActionMirrorACrossLine);
 
-    connect(m_ui->actionMoveTop, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTop);
-    connect(m_ui->actionMoveBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottom);
-    connect(m_ui->actionMoveLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLeft);
-    connect(m_ui->actionMoveRight, &QAction::triggered, this, &LaserControllerWindow::onActionMoveRight);
-    connect(m_ui->actionMoveTopLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTopLeft);
-    connect(m_ui->actionMoveTopRight, &QAction::triggered, this, &LaserControllerWindow::onActionMoveTopRight);
-    connect(m_ui->actionMoveBottomLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottomLeft);
-    connect(m_ui->actionMoveBottomRight, &QAction::triggered, this, &LaserControllerWindow::onActionMoveBottomRight);
-    connect(m_ui->actionMoveUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveUp);
-    connect(m_ui->actionMoveDown, &QAction::triggered, this, &LaserControllerWindow::onActionMoveDown);
+    connect(m_buttonMoveTop, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveTop);
+    connect(m_buttonMoveBottom, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveBottom);
+    connect(m_buttonMoveLeft, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveLeft);
+    connect(m_buttonMoveRight, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveRight);
+    connect(m_buttonMoveTopLeft, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveTopLeft);
+    connect(m_buttonMoveTopRight, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveTopRight);
+    connect(m_buttonMoveBottomLeft, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveBottomLeft);
+    connect(m_buttonMoveBottomRight, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveBottomRight);
+    connect(m_buttonMoveUp, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveUp);
+    connect(m_buttonMoveDown, &PressedToolButton::pressed, this, &LaserControllerWindow::onActionMoveDown);
+    connect(m_buttonMoveTop, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveBottom, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveLeft, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveRight, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveTopLeft, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveTopRight, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveBottomLeft, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveBottomRight, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveUp, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
+    connect(m_buttonMoveDown, &PressedToolButton::released, this, &LaserControllerWindow::onMovementButtonReleased);
 
 	connect(m_ui->actionLineTool, &QAction::triggered, this, &LaserControllerWindow::onActionLine);
 	connect(m_ui->actionRectangleTool, &QAction::triggered, this, &LaserControllerWindow::onActionRectangle);
@@ -555,7 +565,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::disconnected, this, &LaserControllerWindow::onDeviceDisconnected);
     connect(LaserApplication::device, &LaserDevice::mainCardRegistered, this, &LaserControllerWindow::onMainCardRegistered);
     connect(LaserApplication::device, &LaserDevice::mainCardActivated, this, &LaserControllerWindow::onMainCardActivated);
-    connect(&LaserDriver::instance(), &LaserDriver::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
+    connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
@@ -821,7 +831,7 @@ LaserControllerWindow::~LaserControllerWindow()
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
 {
-    if (!LaserDriver::instance().isConnected())
+    if (!LaserApplication::driver->isConnected())
     {
         QMessageBox::warning(this, tr("Operate failure"), tr("Laser device is not connected!"));
         return;
@@ -839,7 +849,7 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
     {
         // Get current pos;
         QVector3D dest = utils::putToQuadrant(abstractDest, quad);
-        QVector3D pos = utils::putToQuadrant(LaserDriver::instance().getCurrentLaserPos(), quad);
+        QVector3D pos = utils::putToQuadrant(LaserApplication::driver->getCurrentLaserPos(), quad);
         dest = pos + delta;
         LaserApplication::device->moveTo(dest, quad);
     }
@@ -1597,46 +1607,38 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->setColumnStretch(5, 0);
     firstRow->setColumnStretch(6, 1);
 
-    m_buttonMoveTopLeft = new QToolButton;
-    m_buttonMoveTopLeft->setAutoRepeat(true);
+    m_buttonMoveTopLeft = new PressedToolButton;
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
 
-    m_buttonMoveTop = new QToolButton;
-    m_buttonMoveTop->setAutoRepeat(true);
+    m_buttonMoveTop = new PressedToolButton;
     m_buttonMoveTop->setDefaultAction(m_ui->actionMoveTop);
 
-    m_buttonMoveTopRight = new QToolButton;
-    m_buttonMoveTopRight->setAutoRepeat(true);
+    m_buttonMoveTopRight = new PressedToolButton;
     m_buttonMoveTopRight->setDefaultAction(m_ui->actionMoveTopRight);
 
-    m_buttonMoveLeft = new QToolButton;
-    m_buttonMoveLeft->setAutoRepeat(true);
+    m_buttonMoveLeft = new PressedToolButton;
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
-    m_buttonMoveToOrigin = new QToolButton;
+    m_buttonMoveToOrigin = new PressedToolButton;
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
-    m_buttonMoveRight = new QToolButton;
-    m_buttonMoveRight->setAutoRepeat(true);
+    m_buttonMoveRight = new PressedToolButton;
     m_buttonMoveRight->setDefaultAction(m_ui->actionMoveRight);
 
-    m_buttonMoveBottomLeft = new QToolButton;
-    m_buttonMoveBottomLeft->setAutoRepeat(true);
+    m_buttonMoveBottomLeft = new PressedToolButton;
     m_buttonMoveBottomLeft->setDefaultAction(m_ui->actionMoveBottomLeft);
 
-    m_buttonMoveBottom = new QToolButton;
-    m_buttonMoveBottom->setAutoRepeat(true);
+    m_buttonMoveBottom = new PressedToolButton;
     m_buttonMoveBottom->setDefaultAction(m_ui->actionMoveBottom);
 
-    m_buttonMoveBottomRight = new QToolButton;
-    m_buttonMoveBottomRight->setAutoRepeat(true);
+    m_buttonMoveBottomRight = new PressedToolButton;
     m_buttonMoveBottomRight->setDefaultAction(m_ui->actionMoveBottomRight);
 
-    m_buttonMoveUp = new QToolButton;
+    m_buttonMoveUp = new PressedToolButton;
     m_buttonMoveUp->setAutoRepeat(true);
     m_buttonMoveUp->setDefaultAction(m_ui->actionMoveUp);
 
-    m_buttonMoveDown = new QToolButton;
+    m_buttonMoveDown = new PressedToolButton;
     m_buttonMoveDown->setAutoRepeat(true);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
 
@@ -1923,7 +1925,7 @@ void LaserControllerWindow::onActionNew(bool checked)
 			return;
 		}
 	}
-	this->setWindowTitle("<Untitled> - ");
+	this->setWindowTitle("Untitled - ");
 	createNewDocument();
 }
 
@@ -2147,7 +2149,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
     if (m_useLoadedJson)
     {
         qDebug() << "export temp json file for machining" << m_currentJson;
-        LaserDriver::instance().loadDataFromFile(m_currentJson);
+        LaserApplication::driver->loadDataFromFile(m_currentJson);
     }
     else
     {
@@ -2175,7 +2177,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
 void LaserControllerWindow::onActionPauseMechining(bool checked)
 {
     //LaserDriver::instance().pauseContinueMachining(!checked);
-    int result = LaserDriver::instance().pauseContinueMachining(!checked);
+    int result = LaserApplication::driver->pauseContinueMachining(!checked);
     qDebug() << "pause result:" << result << ", checked state:" << checked;
     m_ui->actionPause->blockSignals(true);
     if (result == 1)
@@ -2191,13 +2193,13 @@ void LaserControllerWindow::onActionPauseMechining(bool checked)
 
 void LaserControllerWindow::onActionStopMechining(bool checked)
 {
-    LaserDriver::instance().stopMachining();
+    LaserApplication::driver->stopMachining();
     m_ui->actionPause->setChecked(false);
 }
 
 void LaserControllerWindow::onActionLaserSpotShot(bool checked)
 {
-    int result = LaserDriver::instance().testLaserLight(checked);
+    int result = LaserApplication::driver->testLaserLight(checked);
     if (result == 5)
     {
         qDebug() << "Light on.";
@@ -2228,12 +2230,12 @@ void LaserControllerWindow::onActionConnect(bool checked)
     if (m_comboBoxDevices->count() == 0)
         return;
     QString comName = m_comboBoxDevices->currentText();
-    LaserDriver::instance().initComPort(comName);
+    LaserApplication::driver->initComPort(comName);
 }
 
 void LaserControllerWindow::onActionDisconnect(bool checked)
 {
-    LaserDriver::instance().uninitComPort();
+    LaserApplication::driver->uninitComPort();
 }
 
 void LaserControllerWindow::onActionDownload(bool checked)
@@ -2243,85 +2245,90 @@ void LaserControllerWindow::onActionDownload(bool checked)
     m_prepareMachining = false;
     m_scene->document()->exportJSON(filename);
     qDebug() << "export temp json file for machining" << filename;
-    LaserDriver::instance().loadDataFromFile(filename);
+    LaserApplication::driver->loadDataFromFile(filename);
 }
 
 void LaserControllerWindow::onActionLoadMotor(bool checked)
 {
-    LaserDriver::instance().controlMotor(false);
+    LaserApplication::driver->controlMotor(false);
 }
 
 void LaserControllerWindow::onActionUnloadMotor(bool checked)
 {
     if (QMessageBox::Apply == QMessageBox::question(this, tr("Unload motor"), tr("Do you want to unload motor?"), QMessageBox::StandardButton::Apply, QMessageBox::StandardButton::Discard))
     {
-        LaserDriver::instance().controlMotor(false);
+        LaserApplication::driver->controlMotor(false);
     }
 }
 
 void LaserControllerWindow::onActionWorkState(bool checked)
 {
-    LaserDriver::instance().getDeviceWorkState();
+    LaserApplication::driver->getDeviceWorkState();
 }
 
-void LaserControllerWindow::onActionMoveTop(bool checked)
+void LaserControllerWindow::onActionMoveTop()
 {
     QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveBottom(bool checked)
+void LaserControllerWindow::onActionMoveBottom()
 {
     QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveLeft(bool checked)
+void LaserControllerWindow::onActionMoveLeft()
 {
     QVector3D delta(-m_doubleSpinBoxDistanceX->value(), 0, 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveRight(bool checked)
+void LaserControllerWindow::onActionMoveRight()
 {
     QVector3D delta(m_doubleSpinBoxDistanceX->value(), 0, 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveTopLeft(bool checked)
+void LaserControllerWindow::onActionMoveTopLeft()
 {
     QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveTopRight(bool checked)
+void LaserControllerWindow::onActionMoveTopRight()
 {
     QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveBottomLeft(bool checked)
+void LaserControllerWindow::onActionMoveBottomLeft()
 {
     QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveBottomRight(bool checked)
+void LaserControllerWindow::onActionMoveBottomRight()
 {
     QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveUp(bool checked)
+void LaserControllerWindow::onActionMoveUp()
 {
     QVector3D delta(0, 0, m_doubleSpinBoxDistanceZ->value());
     moveLaser(delta);
 }
 
-void LaserControllerWindow::onActionMoveDown(bool checked)
+void LaserControllerWindow::onActionMoveDown()
 {
     QVector3D delta(0, 0, -m_doubleSpinBoxDistanceZ->value());
     moveLaser(delta);
+}
+
+void LaserControllerWindow::onMovementButtonReleased()
+{
+    LaserApplication::driver->startMoveLaserMotors();
 }
 
 void LaserControllerWindow::onActionHalfTone(bool checked)
@@ -2693,7 +2700,7 @@ void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 
     if (!ports.isEmpty())
     {
-        LaserDriver::instance().initComPort(ports[0]);
+        LaserApplication::driver->initComPort(ports[0]);
     }
 }
 
@@ -2870,9 +2877,9 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     //m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
-    m_lineEditCoordinatesX->setText(QString::number(state.x, 'g'));
-    m_lineEditCoordinatesY->setText(QString::number(state.y, 'g'));
-    m_lineEditCoordinatesZ->setText(QString::number(state.z, 'g'));
+    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f'));
+    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f'));
+    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f'));
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
@@ -2927,8 +2934,8 @@ void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
 #ifdef Q_OS_WIN
     filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
 #endif
-    LaserDriver::instance().loadDataFromFile(filePath);
-    LaserDriver::instance().startMachining(m_comboBoxStartPosition->currentIndex() == 3);
+    LaserApplication::driver->loadDataFromFile(filePath);
+    LaserApplication::driver->startMachining(m_comboBoxStartPosition->currentIndex() == 3);
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
@@ -2938,12 +2945,12 @@ void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
 
 void LaserControllerWindow::lightOnLaser()
 {
-    LaserDriver::instance().testLaserLight(true);
+    LaserApplication::driver->testLaserLight(true);
 }
 
 void LaserControllerWindow::lightOffLaser()
 {
-    LaserDriver::instance().testLaserLight(false);
+    LaserApplication::driver->testLaserLight(false);
 }
 
 void LaserControllerWindow::readMachiningOrigins(bool checked)

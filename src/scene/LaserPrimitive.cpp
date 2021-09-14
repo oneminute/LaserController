@@ -813,7 +813,7 @@ LaserPointList LaserRect::updateMachiningPoints(quint32 progressCode, qreal prog
     qreal angle41 = line41.angle();
     qreal angle42 = line42.angle();
 
-    d->machiningPoints.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
+    d->machiningPoints.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12, LaserPoint::PT_MoveTo));
     d->machiningPoints.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
     d->machiningPoints.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
     d->machiningPoints.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
@@ -953,7 +953,7 @@ LaserPointList LaserLine::updateMachiningPoints(quint32 progressCode, qreal prog
     QLineF line2(pt2, pt1);
     qreal angle1 = line1.angle();
     qreal angle2 = line2.angle();
-    d->machiningPoints.append(LaserPoint(pt1.x(), pt1.y(), angle1, angle2));
+    d->machiningPoints.append(LaserPoint(pt1.x(), pt1.y(), angle1, angle2, LaserPoint::PT_MoveTo));
     d->machiningPoints.append(LaserPoint(pt2.x(), pt2.y(), angle2, angle1));
     d->startingIndices.append(0);
     d->startingIndices.append(1);
@@ -1242,7 +1242,10 @@ LaserPointList LaserPolyline::updateMachiningPoints(quint32 progressCode, qreal 
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        d->machiningPoints.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        LaserPoint::PointType pointType = LaserPoint::PT_LineTo;
+        if (i == 0)
+            pointType = LaserPoint::PT_MoveTo;
+        d->machiningPoints.append(LaserPoint(pt.x(), pt.y(), angle1, angle2, pointType));
         if (isClosed)
         {
             d->startingIndices.append(i);
@@ -1406,7 +1409,10 @@ LaserPointList LaserPolygon::updateMachiningPoints(quint32 progressCode, qreal p
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        d->machiningPoints.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        LaserPoint::PointType pointType = LaserPoint::PT_LineTo;
+        if (i == 0)
+            pointType = LaserPoint::PT_MoveTo;
+        d->machiningPoints.append(LaserPoint(pt.x(), pt.y(), angle1, angle2, pointType));
         d->machiningCenter += pt;
         if (isClosed)
         {
@@ -2029,7 +2035,7 @@ LaserPointList LaserBitmap::updateMachiningPoints(quint32 progressCode, qreal pr
     qreal angle41 = line41.angle();
     qreal angle42 = line42.angle();
 
-    d->machiningPoints.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
+    d->machiningPoints.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12, LaserPoint::PT_MoveTo));
     d->machiningPoints.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
     d->machiningPoints.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
     d->machiningPoints.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
@@ -2672,5 +2678,34 @@ QPainterPath LaserText::toMachiningPath() const
     QTransform transform = Global::matrixToMM(SU_PX, 40, 40);
     path = transform.map(path);
     return path;
+}
+
+LaserPointList LaserText::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
+{
+    Q_D(LaserText);
+    QPainterPath path = toMachiningPath();
+
+    d->machiningPoints.clear();
+    d->startingIndices.clear();
+    for (LaserTextRowPath& rowPath : d->pathList)
+    {
+        LaserPointList points;
+        QList<int> indices;
+        QPointF center;
+        QPainterPath& subPath = rowPath.path();
+
+        machiningUtils::path2Points(path, progressCode, progressQuota / d->pathList.length(),
+            points, indices, center, 2, Config::Export::maxStartingPoints(), 0);
+
+        for (int index : indices)
+        {
+            d->startingIndices.append(index + d->machiningPoints.count());
+        }
+        d->machiningPoints.append(points);
+    }
+    
+    d->machiningCenter = utils::center(d->machiningPoints).toPointF();
+    
+    return d->machiningPoints;
 }
 

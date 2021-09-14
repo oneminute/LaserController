@@ -1,0 +1,41 @@
+{
+    "Items": [
+        {
+            "Data": "PD0 -1577;PD0 1577;PU-1577 0;PD-1577 0;PD0 -1577;",
+            "Layer": 0,
+            "Name": "Rect_0",
+            "Type": "Rect"
+        }
+    ],
+    "LaserDocumentInfo": {
+        "APIVersion": "2.1.0.0",
+        "CreateDate": "2021-09-14 14:12:40",
+        "DeviceOrigin": 3,
+        "FinishRun": 0,
+        "JobOrigin": 2,
+        "Origin": {
+            "x": 4671.815640131633,
+            "y": -6553.519496917725
+        },
+        "PrinterDrawUnit": 1016,
+        "StartFrom": 1
+    },
+    "Layers": [
+        {
+            "Index": 0,
+            "Params": {
+                "CuttingParams": {
+                    "LaserPower": 23,
+                    "LayerId": 0,
+                    "MinSpeed": 15,
+                    "MinSpeedPower": 70,
+                    "RunSpeed": 274,
+                    "RunSpeedPower": 100,
+                    "Type": 1
+                },
+                "EngravingParams": {
+                }
+            }
+        }
+    ]
+}

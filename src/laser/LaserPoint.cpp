@@ -2,27 +2,30 @@
 
 #include <QtMath>
 
-LaserPoint::LaserPoint()
+LaserPoint::LaserPoint(LaserPoint::PointType type)
     : m_x(0)
     , m_y(0)
     , m_angle1(0)
     , m_angle2(0)
+    , m_type(type)
 {
 }
 
-LaserPoint::LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_)
+LaserPoint::LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_, LaserPoint::PointType type)
     : m_x(x_)
     , m_y(y_)
     , m_angle1(angle1_)
     , m_angle2(angle2_)
+    , m_type(type)
 {
 }
 
-LaserPoint::LaserPoint(const QPointF& point, qreal angle1_, qreal angle2_)
+LaserPoint::LaserPoint(const QPointF& point, qreal angle1_, qreal angle2_, LaserPoint::PointType type)
     : m_x(point.x())
     , m_y(point.y())
     , m_angle1(angle1_)
     , m_angle2(angle2_)
+    , m_type(type)
 {
 
 }
@@ -86,3 +89,4 @@ qreal LaserPoint::length() const
 {
     return qSqrt(m_x * m_x + m_y * m_y);
 }
+

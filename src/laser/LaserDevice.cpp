@@ -64,6 +64,8 @@ public:
 
     QMap<int, LaserRegister*> userRegisters;
     QMap<int, LaserRegister*> systemRegisters;
+
+    LaserState lastState;
 };
 
 void LaserDevicePrivate::updateDeviceOriginAndTransform()
@@ -569,13 +571,14 @@ void LaserDevice::moveTo(const QVector3D& pos, QUADRANT quad)
 
     QVector3D dest = utils::limitToLayout(pos, quad, layoutWidth, layoutHeight);
     char xyzStyle = 0;
-    int xPos = qRound(dest.x() * 1000);
-    int yPos = qRound(dest.y() * 1000);
-    int zPos = qRound(dest.z() * 1000);
+    int xPos = qRound(dest.x() * 1000000);
+    int yPos = qRound(dest.y() * 1000000);
+    int zPos = qRound(dest.z() * 1000000);
     bool xEnabled = xPos != 0;
     bool yEnabled = yPos != 0;
     bool zEnabled = zPos != 0;
-    LaserDriver::instance().lPenQuickMoveTo(
+    LaserApplication::driver->checkMoveLaserMotors(
+        Config::Ui::autoRepeatDelay(),
         xEnabled, true, xPos,
         yEnabled, true, yPos,
         zEnabled, true, zPos
@@ -595,7 +598,8 @@ void LaserDevice::moveBy(const QVector3D& pos)
     bool xEnabled = xPos != 0;
     bool yEnabled = yPos != 0;
     bool zEnabled = zPos != 0;
-    LaserDriver::instance().lPenQuickMoveTo(
+    LaserApplication::driver->checkMoveLaserMotors(
+        Config::Ui::autoRepeatDelay(),
         xEnabled, false, xPos,
         yEnabled, false, yPos,
         zEnabled, false, zPos
@@ -1261,6 +1265,12 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_MachineWorking:
     {
+        LaserState state;
+        if (state.parse(message))
+        {
+            d->lastState = state;
+            emit workStateUpdated(state);
+        }
         break;
     }
     case M_Idle:

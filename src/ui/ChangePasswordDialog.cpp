@@ -9,10 +9,10 @@ ChangePasswordDialog::ChangePasswordDialog(QWidget* parent)
 {
     m_ui->setupUi(this);
 
-    connect(&LaserDriver::instance(), &LaserDriver::wrongManufacturerPassword, this, &ChangePasswordDialog::wrongManufacturerPassword);
-    connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &ChangePasswordDialog::rightManufacturerPassword);
-    connect(&LaserDriver::instance(), &LaserDriver::changeManufacturerPasswordOk, this, &ChangePasswordDialog::changeManufacturerPasswordOk);
-    connect(&LaserDriver::instance(), &LaserDriver::changeManufacturerPasswordFailure, this, &ChangePasswordDialog::changeManufacturerPasswordFailure);
+    //connect(&LaserDriver::instance(), &LaserDriver::wrongManufacturerPassword, this, &ChangePasswordDialog::wrongManufacturerPassword);
+    //connect(&LaserDriver::instance(), &LaserDriver::rightManufacturerPassword, this, &ChangePasswordDialog::rightManufacturerPassword);
+    //connect(&LaserDriver::instance(), &LaserDriver::changeManufacturerPasswordOk, this, &ChangePasswordDialog::changeManufacturerPasswordOk);
+    //connect(&LaserDriver::instance(), &LaserDriver::changeManufacturerPasswordFailure, this, &ChangePasswordDialog::changeManufacturerPasswordFailure);
     connect(m_ui->pushButtonChange, &QPushButton::clicked, this, &ChangePasswordDialog::onPushButtonChangeClicked);
     connect(m_ui->pushButtonCancel, &QPushButton::clicked, this, &ChangePasswordDialog::onPushButtonCancelClicked);
 }
@@ -46,7 +46,7 @@ void ChangePasswordDialog::onPushButtonCancelClicked(bool checked)
 
 void ChangePasswordDialog::rightManufacturerPassword()
 {
-    LaserDriver::instance().changeFactoryPassword(m_ui->lineEditOldPassword->text(), m_ui->lineEditNewPassword->text());
+    //LaserDriver::instance().changeFactoryPassword(m_ui->lineEditOldPassword->text(), m_ui->lineEditNewPassword->text());
 }
 
 void ChangePasswordDialog::wrongManufacturerPassword()

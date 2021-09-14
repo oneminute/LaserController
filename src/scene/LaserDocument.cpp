@@ -247,8 +247,7 @@ void LaserDocument::exportJSON(const QString& filename)
             QJsonObject jsonObj;
 
             QJsonObject laserDocumentInfo;
-            qDebug() << &LaserDriver::instance();
-            laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
+            laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
             laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
             laserDocumentInfo["PrinterDrawUnit"] = 1016;
             laserDocumentInfo["FinishRun"] = d->finishRun.code;
@@ -365,7 +364,6 @@ void LaserDocument::exportJSON(const QString& filename)
 
             //QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
             QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
-            qLogD << rawJson;
             qint64 writtenBytes = saveFile.write(rawJson);
             LaserApplication::previewWindow->addProgress(this, 0.1 / path.length(), tr("File saved."));
             qDebug() << "written bytes:" << writtenBytes;
@@ -943,7 +941,7 @@ int LaserDocument::totalNodes()
 void LaserDocument::init()
 {
 	Q_D(LaserDocument);
-	d->name = tr("<untitled>");
+	d->name = tr("Untitled");
 	QString layerName = newLayerName();
 	LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
 	addLayer(layer);

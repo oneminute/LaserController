@@ -169,14 +169,19 @@ QVector<QPointF> LaserPointList::toPoints() const
 QPainterPath LaserPointList::toPainterPath() const
 {
     QPainterPath path;
-    int i = 0;
-    for (const LaserPoint& point : *this)
+    for (int i = 0; i < length(); i++)
     {
-        if (i == 0)
+        LaserPoint point = at(i);
+        if (point.pointType() == LaserPoint::PT_MoveTo)
             path.moveTo(point.toPointF());
-        else
+        else if (point.pointType() == LaserPoint::PT_LineTo)
             path.lineTo(point.toPointF());
-        i++;
+    }
+
+    for (int i = 0; i < path.elementCount(); i++)
+    {
+        QPainterPath::Element e = path.elementAt(i);
+        qLogD << i << ": " << e.x << ", " << e.y;
     }
     return path;
 }

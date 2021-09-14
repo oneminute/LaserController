@@ -69,6 +69,8 @@ void OptimizeNodePrivate::update(quint32 progressCode, qreal progressQuota)
         name = primitive->name();
         primitive->updateMachiningPoints(progressCode, progressQuota);
         startingPoints = primitive->startingPoints();
+        if (startingPoints.isEmpty())
+            return;
         startingPoints.buildKdtree();
         currentPoint = primitive->firstStartingPoint();
     }
@@ -187,7 +189,11 @@ void OptimizeNode::clearChildren()
 void OptimizeNode::clearEdges()
 {
     Q_D(OptimizeNode);
-    d->edges.clear();
+    if (!d->edges.isEmpty())
+    {
+        qDeleteAll(d->edges);
+        d->edges.clear();
+    }
 }
 
 bool OptimizeNode::hasChildren() const

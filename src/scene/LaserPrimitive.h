@@ -148,8 +148,6 @@ public:
 
     QString toString() const;
 
-    virtual QList<QPainterPath> subPaths() const { return QList<QPainterPath>(); }
-
     virtual QPainterPath outline() const;
 
 	//virtual void reShape();
@@ -512,6 +510,8 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual QPainterPath toMachiningPath() const;
+    virtual LaserPointList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
+
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)

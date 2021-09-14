@@ -36,6 +36,7 @@ class QTreeWidgetItem;
 class QWidget;
 class RulerWidget;
 class ProgressBar;
+class PressedToolButton;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -111,16 +112,29 @@ protected slots:
 	void onActionZoomToPage(bool checked = false);
 	void onActionZoomToSelection(bool checked = false);
 
-    void onActionMoveTop(bool checked = false);
-    void onActionMoveBottom(bool checked = false);
-    void onActionMoveLeft(bool checked = false);
-    void onActionMoveRight(bool checked = false);
-    void onActionMoveTopLeft(bool checked = false);
-    void onActionMoveTopRight(bool checked = false);
-    void onActionMoveBottomLeft(bool checked = false);
-    void onActionMoveBottomRight(bool checked = false);
-    void onActionMoveUp(bool checked = false);
-    void onActionMoveDown(bool checked = false);
+    void onActionMoveTop();
+    void onActionMoveBottom();
+    void onActionMoveLeft();
+    void onActionMoveRight();
+    void onActionMoveTopLeft();
+    void onActionMoveTopRight();
+    void onActionMoveBottomLeft();
+    void onActionMoveBottomRight();
+    void onActionMoveUp();
+    void onActionMoveDown();
+
+    /*void onButtonMoveTopLeft();
+    void onButtonMoveTop();
+    void onButtonMoveTopRight();
+    void onButtonMoveBottomLeft();
+    void onButtonMoveBottom();
+    void onButtonMoveBottomRight();
+    void onButtonMoveLeft();
+    void onButtonMoveRight();
+    void onButtonMoveUp();
+    void onButtonMoveDown();*/
+
+    void onMovementButtonReleased();
 
     void onActionHalfTone(bool checked = false);
     void onActionDeletePrimitive(bool checked = false);
@@ -293,17 +307,19 @@ private:
     QDoubleSpinBox* m_doubleSpinBoxDistanceX;
     QDoubleSpinBox* m_doubleSpinBoxDistanceY;
     QDoubleSpinBox* m_doubleSpinBoxDistanceZ;
-    QToolButton* m_buttonMoveTopLeft;
-    QToolButton* m_buttonMoveTop;
-    QToolButton* m_buttonMoveTopRight;
-    QToolButton* m_buttonMoveLeft;
-    QToolButton* m_buttonMoveToOrigin;
-    QToolButton* m_buttonMoveRight;
-    QToolButton* m_buttonMoveBottomLeft;
-    QToolButton* m_buttonMoveBottom;
-    QToolButton* m_buttonMoveBottomRight;
-    QToolButton* m_buttonMoveUp;
-    QToolButton* m_buttonMoveDown;
+
+    PressedToolButton* m_buttonMoveTopLeft;
+    PressedToolButton* m_buttonMoveTop;
+    PressedToolButton* m_buttonMoveTopRight;
+    PressedToolButton* m_buttonMoveLeft;
+    PressedToolButton* m_buttonMoveToOrigin;
+    PressedToolButton* m_buttonMoveRight;
+    PressedToolButton* m_buttonMoveBottomLeft;
+    PressedToolButton* m_buttonMoveBottom;
+    PressedToolButton* m_buttonMoveBottomRight;
+    PressedToolButton* m_buttonMoveUp;
+    PressedToolButton* m_buttonMoveDown;
+
     QToolButton* m_buttonLaserPosition;
     QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonMachiningOrigin1;

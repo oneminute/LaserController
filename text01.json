@@ -1,0 +1,47 @@
+{
+    "Items": [
+        {
+            "Data": "PU0 -2413;PD0 0;PD0 1359;PD-1556 0;PD0 -1359;",
+            "Layer": 0,
+            "Name": "Rect_0",
+            "Type": "Rect"
+        },
+        {
+            "Data": "PU-1055 2051;PD0 0;PD204 0;PD1165 362;PD-13 0;PD-2 -5;PD-2 -7;PD-3 -5;PD-2 -4;PD-3 -4;PD-3 -3;PD-2 -1;PD-2 -2;PD-3 -1;PD-3 -1;PD-3 -1;PD-3 -1;PD-3 0;PD-1 0;PD-2 0;PD-3 1;PD-4 1;PD-19 9;PD-23 10;PD-22 7;PD-21 5;PD-20 3;PD-20 1;PD-26 -1;PD-24 -3;PD-22 -5;PD-22 -7;PD-21 -9;PD-21 -11;PD-19 -12;PD-18 -14;PD-16 -16;PD-15 -17;PD-14 -19;PD-13 -22;PD-12 -24;PD-9 -24;PD-7 -26;PD-5 -26;PD-3 -28;PD0 -30;PD2 -28;PD4 -26;PD6 -24;PD8 -22;PD10 -21;PD12 -20;PD14 -20;PD15 -18;PD15 -15;PD16 -13;PD17 -11;PD18 -10;PD19 -8;PD20 -7;PD23 -5;PD25 -4;PD28 -2;PD27 1;PD24 3;PD21 4;PD19 6;PD18 7;PD16 8;PD15 10;PD15 12;PD15 14;PD17 18;PD17 23;PD18 29;PD-12 8;PD-18 -23;PD-24 -27;PD-17 -17;PD-13 -11;PD-11 -7;PD-12 -6;PD-13 -6;PD-15 -5;PD-15 -4;PD-17 -2;PD-20 -1;PD-5 0;PD-21 1;PD-19 3;PD-17 4;PD-16 5;PD-15 7;PD-14 8;PD-13 9;PD-11 9;PD-10 10;PD-9 11;PD-9 13;PD-9 15;PD-8 18;PD-7 21;PD-6 24;PD-4 28;PD-2 34;PD1 41;PD4 40;PD6 31;PD7 25;PD8 21;PD10 20;PD10 16;PD9 13;PD10 11;PD10 9;PD10 8;PD12 8;PD14 7;PD14 6;PD15 5;PD16 3;PD16 2;PD18 1;PD18 -1;PD16 -2;PD15 -3;PD14 -5;PD13 -6;PD13 -7;PD12 -8;PD10 -8;PD10 -10;PD10 -12;PD10 -15;PD10 -18;PD11 -24;PD11 -31;PD12 -1;PD-12 178;PD-800 -284;PD11 2;PD39 2;PD40 -1;PD24 -3;PD19 -4;PD16 -5;PD13 -5;PD13 -6;PD10 -6;PD9 -7;PD7 -6;PD6 -6;PD5 -7;PD5 -7;PD5 -10;PD4 -10;PD3 -9;PD2 -10;PD1 -10;PD0 -10;PD-1 -10;PD-1 -9;PD-2 -9;PD-3 -8;PD-4 -8;PD-4 -8;PD-5 -7;PD-7 -8;PD-8 -8;PD-8 -6;PD-8 -5;PD-9 -5;PD-11 -5;PD-13 -4;PD-16 -4;PD-19 -3;PD-25 -1;PD-20 0;PD-34 3;PD-36 7;PD0 453;PD6 2;PD20 4;PD24 3;PD29 0;PD23 -2;PD18 -3;PD15 -4;PD13 -4;PD11 -5;PD9 -5;PD8 -6;PD8 -7;PD8 -8;PD6 -8;PD6 -8;PD4 -8;PD3 -8;PD3 -8;PD2 -9;PD1 -9;PD0 -10;PD0 -10;PD-1 -10;PD-2 -10;PD-3 -9;PD-4 -9;PD-5 -9;PD-5 -7;PD-5 -6;PD-6 -5;PD-6 -5;PD-7 -5;PD-8 -4;PD-9 -4;PD-10 -3;PD-14 -3;PD-21 -3;PD-36 -2;PD-9 0;PD-40 2;PD-24 3;PD212 -17;PD15 6;PD13 7;PD11 7;PD9 7;PD7 7;PD7 8;PD6 9;PD6 10;PD4 9;PD3 9;PD2 10;PD2 11;PD1 11;PD0 12;PD-1 11;PD-2 11;PD-3 10;PD-4 10;PD-5 10;PD-6 10;PD-8 10;PD-8 9;PD-9 8;PD-10 7;PD-12 7;PD-13 7;PD-17 7;PD-21 6;PD-23 4;PD-38 4;PD-40 1;PD-227 0;PD0 -14;PD23 -1;PD8 -1;PD6 -1;PD6 -2;PD5 -2;PD4 -2;PD4 -2;PD4 -3;PD3 -3;PD2 -2;PD1 -2;PD2 -3;PD1 -3;PD2 -5;PD2 -8;PD2 -14;PD1 -26;PD0 -311;PD0 -40;PD-1 -21;PD-2 -11;PD-2 -6;PD-1 -4;PD-1 -3;PD-1 -2;PD-2 -3;PD-3 -3;PD-3 -3;PD-4 -3;PD-4 -2;PD-4 -2;PD-5 -2;PD-6 -1;PD-8 -1;PD-27 0;PD-1 -14;PD246 0;PD41 1;PD41 3;PD27 5;PD18 5;PD13 5;PD13 6;PD11 7;PD10 7;PD10 8;PD9 9;PD8 10;PD8 12;PD6 12;PD5 11;PD4 11;PD2 10;PD1 11;PD0 11;PD-1 12;PD-2 11;PD-3 11;PD-3 9;PD-4 9;PD-5 9;PD-6 9;PD-7 9;PD-8 8;PD-7 6;PD-9 6;PD-10 6;PD-13 6;PD-18 6;PD-24 6;PD-759 -64;PD91 212;PD89 -212;PD36 -88;PD15 -38;PD5 -16;PD2 -9;PD1 -6;PD0 -4;PD0 -3;PD-1 -3;PD-1 -3;PD-1 -3;PD-2 -2;PD-2 -2;PD-2 -2;PD-3 -3;PD-2 -2;PD-3 -2;PD-5 -2;PD-6 -2;PD-10 -2;PD-15 -1;PD0 -14;PD207 -1;PD0 14;PD-11 1;PD-9 2;PD-8 2;PD-6 2;PD-6 3;PD-5 3;PD-4 3;PD-4 4;PD-5 5;PD-6 9;PD-10 16;PD-16 34;PD-183 437;PD-13 0;PD-184 -429;PD-17 -37;PD-12 -21;PD-8 -11;PD-6 -7;PD-4 -4;PD-2 -2;PD-2 -2;PD-3 -2;PD-6 -2;PD-10 -3;PD-18 -4;PD-1 -14;PD165 0;PD1 14;PD-14 1;PD-15 2;PD-8 2;PD-5 2;PD-3 2;PD-2 1;PD-2 2;PD-3 3;PD-2 2;PD-2 2;PD-1 3;PD-1 3;PD-1 3;PD0 3;PD0 3;PD0 5;PD1 6;PD3 11;PD8 22;",
+            "Layer": 0,
+            "Name": "Text_0",
+            "Type": "Text"
+        }
+    ],
+    "LaserDocumentInfo": {
+        "APIVersion": "2.1.0.0",
+        "CreateDate": "2021-09-14 09:51:14",
+        "DeviceOrigin": 3,
+        "FinishRun": 0,
+        "JobOrigin": 2,
+        "Origin": {
+            "x": 5439.626143773396,
+            "y": -6144.39077432733
+        },
+        "PrinterDrawUnit": 1016,
+        "StartFrom": 1
+    },
+    "Layers": [
+        {
+            "Index": 0,
+            "Params": {
+                "CuttingParams": {
+                    "LaserPower": 23,
+                    "LayerId": 0,
+                    "MinSpeed": 15,
+                    "MinSpeedPower": 70,
+                    "RunSpeed": 274,
+                    "RunSpeedPower": 100,
+                    "Type": 1
+                },
+                "EngravingParams": {
+                }
+            }
+        }
+    ]
+}
