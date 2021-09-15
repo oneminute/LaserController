@@ -35,7 +35,9 @@ namespace machiningUtils
         int startingIndiciesCount = 8, 
         int diagonalThreshold = 2 * 40);
 
-    QByteArray points2Plt(const LaserPointList& points, QPointF& lastPoint);
+    QByteArray pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint);
+
+    QByteArray pointList2Plt(const LaserPointList& points, QPointF& lastPoint);
 
     QByteArray image2Plt(const QImage& image);
 

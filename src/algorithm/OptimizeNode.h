@@ -75,13 +75,12 @@ public:
     LaserPoint headPoint() const;
     LaserPoint tailPoint() const;
     LaserPoint point(int index) const;
-    void debugDraw(cv::Mat& canvas);
 
     bool isVirtual() const;
 
     LaserPrimitive* primitive() const;
-    LaserPointList arrangeMachiningPoints();
-    LaserPointList arrangedPoints() const;
+    LaserPointListList arrangeMachiningPoints();
+    LaserPointListList arrangedPoints() const;
 
 protected:
     QScopedPointer<OptimizeNodePrivate> d_ptr;

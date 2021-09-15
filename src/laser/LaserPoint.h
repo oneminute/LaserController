@@ -10,15 +10,9 @@ class LaserPrimitive;
 class LaserPoint
 {
 public:
-    enum PointType
-    {
-        PT_MoveTo,
-        PT_LineTo
-    };
-
-    explicit LaserPoint(PointType type = PT_LineTo);
-    explicit LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_, PointType type = PT_LineTo);
-    explicit LaserPoint(const QPointF& point, qreal angle1_ = 0, qreal angle2_ = 360, PointType type = PT_LineTo);
+    explicit LaserPoint();
+    explicit LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_);
+    explicit LaserPoint(const QPointF& point, qreal angle1_ = 0, qreal angle2_ = 360);
 
     static int vectorSize();
     qreal* vector();
@@ -89,9 +83,6 @@ public:
 
     qreal length() const;
 
-    inline PointType pointType() const;
-    inline void setPointType(PointType type);
-
 private:
     union 
     {
@@ -104,8 +95,6 @@ private:
         };
         qreal m_vec[4];
     };
-
-    PointType m_type;
 };
 
 inline bool operator==(const LaserPoint& l1, const LaserPoint& l2)
@@ -208,16 +197,6 @@ inline QPointF LaserPoint::toPointF() const
 inline QVector4D LaserPoint::toVector4D() const
 {
     return QVector4D(m_x, m_y, m_angle1, m_angle2);
-}
-
-inline LaserPoint::PointType LaserPoint::pointType() const
-{
-    return m_type;
-}
-
-inline void LaserPoint::setPointType(PointType type)
-{
-    m_type = type;
 }
 
 #endif // LASERPOINT_H

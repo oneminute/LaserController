@@ -34,4 +34,13 @@ private:
     QMap<int, int> m_indexMap;
 };
 
+class LaserPointListList : public QList<LaserPointList>
+{
+public:
+    explicit LaserPointListList();
+    ~LaserPointListList();
+
+    QPainterPath toPainterPath() const;
+};
+
 #endif // LASERPOINTLIST_H

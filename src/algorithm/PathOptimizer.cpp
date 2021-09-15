@@ -85,8 +85,8 @@ void PathOptimizer::optimize()
     LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
     for (OptimizeNode* node : d->optimizedPath)
     {
-        LaserPointList points = node->arrangeMachiningPoints();
-        LaserApplication::previewWindow->addPath(points.toPainterPath(), QPen(Qt::red, 2));
+        LaserPointListList pointsList = node->arrangeMachiningPoints();
+        LaserApplication::previewWindow->addPath(pointsList.toPainterPath(), QPen(Qt::red, 2));
         d->progress += 1.0 * 9 / d->totalNodes;
         LaserApplication::previewWindow->addProgress(this, 1.0 * 0.1 / d->totalNodes, tr("Arranged machining points of node %1.").arg(node->nodeName()));
     }

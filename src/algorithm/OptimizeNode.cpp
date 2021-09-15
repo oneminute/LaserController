@@ -500,48 +500,6 @@ LaserPoint OptimizeNode::point(int index) const
     return d->startingPoints[index];
 }
 
-void OptimizeNode::debugDraw(cv::Mat& canvas)
-{
-    Q_D(OptimizeNode);
-    static OptimizeNode* parentNode = nullptr;
-    static QColor color;
-
-    if (d->nodeType == LNT_PRIMITIVE)
-    {
-        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        if (d->parentNode != parentNode)
-        {
-            parentNode = d->parentNode;
-            color.setRed(QRandomGenerator::global()->bounded(192));
-            color.setGreen(QRandomGenerator::global()->bounded(192));
-            color.setBlue(QRandomGenerator::global()->bounded(192));
-        }
-        //qLogD << color;
-        int i = 0;
-        LaserPoint lastPoint;
-        for (const LaserPoint& pt : primitive->machiningPoints())
-        {
-            if (i != 0)
-            {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastPoint.toPointF()), 
-                    typeUtils::qtPointF2CVPoint2f(pt.toPointF()), cv::Scalar(color.red(), color.green(), color.blue()), 3);
-            }
-
-            lastPoint = pt;
-            i++;
-        }
-
-        for (const LaserPoint& pt : primitive->startingPoints())
-        {
-            qreal lineLength = 20;
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(-lineLength, -lineLength)), 
-                typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(lineLength, lineLength)), cv::Scalar(0, 0, 255));
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(-lineLength, lineLength)), 
-                typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(lineLength, -lineLength)), cv::Scalar(0, 0, 255));
-        }
-    }
-}
-
 bool OptimizeNode::isVirtual() const
 {
     switch (nodeType())
@@ -563,7 +521,7 @@ LaserPrimitive* OptimizeNode::primitive() const
     return nullptr;
 }
 
-LaserPointList OptimizeNode::arrangeMachiningPoints()
+LaserPointListList OptimizeNode::arrangeMachiningPoints()
 {
     Q_D(OptimizeNode);
     if (d->nodeType == LNT_PRIMITIVE)
@@ -571,10 +529,10 @@ LaserPointList OptimizeNode::arrangeMachiningPoints()
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
         return primitive->arrangeMachiningPoints(d->lastPoint, d->index);
     }
-    return LaserPointList();
+    return LaserPointListList();
 }
 
-LaserPointList OptimizeNode::arrangedPoints() const
+LaserPointListList OptimizeNode::arrangedPoints() const
 {
     Q_D(const OptimizeNode);
     if (d->nodeType == LNT_PRIMITIVE)
@@ -582,5 +540,5 @@ LaserPointList OptimizeNode::arrangedPoints() const
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
         return primitive->arrangedPoints();
     }
-    return LaserPointList();
+    return LaserPointListList();
 }

@@ -297,11 +297,11 @@ void LaserDocument::exportJSON(const QString& filename)
                 else if (layer->type() == LLT_CUTTING)
                 {
                     itemObj["Layer"] = layerId;
-                    LaserPointList points = primitive->arrangedPoints();
+                    LaserPointListList points = primitive->arrangedPoints();
                     if (!points.empty())
                     {
                         itemObj["Type"] = primitive->typeLatinName();
-                        itemObj["Data"] = QString(machiningUtils::points2Plt(points, lastPoint));
+                        itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
                         items.append(itemObj);
                     }
                 }

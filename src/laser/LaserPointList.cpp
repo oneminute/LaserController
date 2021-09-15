@@ -172,9 +172,9 @@ QPainterPath LaserPointList::toPainterPath() const
     for (int i = 0; i < length(); i++)
     {
         LaserPoint point = at(i);
-        if (point.pointType() == LaserPoint::PT_MoveTo)
+        if (i == 0)
             path.moveTo(point.toPointF());
-        else if (point.pointType() == LaserPoint::PT_LineTo)
+        else
             path.lineTo(point.toPointF());
     }
 
@@ -186,3 +186,20 @@ QPainterPath LaserPointList::toPainterPath() const
     return path;
 }
 
+LaserPointListList::LaserPointListList()
+{
+}
+
+LaserPointListList::~LaserPointListList()
+{
+}
+
+QPainterPath LaserPointListList::toPainterPath() const
+{
+    QPainterPath path;
+    for (const LaserPointList& list : *this)
+    {
+        path.addPath(list.toPainterPath());
+    }
+    return path;
+}
