@@ -2,6 +2,7 @@
 #define LASERCONTROLLERWINDOW_H
 
 #include <DockManager.h>
+//#include <DockWidget.h>
 #include <QObject>
 #include <QMainWindow>
 #include <QScopedPointer>
@@ -72,6 +73,8 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+    void createShapePropertyDockPanel();
+    void dockPanelOnlyShowIcon(ads::CDockWidget* dockWidget, QPixmap icon, char* text);
 
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;

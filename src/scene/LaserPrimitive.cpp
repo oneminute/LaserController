@@ -40,6 +40,7 @@ public:
         , isHover(false)
         , primitiveType(LPT_UNKNOWN)
         , machiningCenter(0, 0)
+        , isLocked(false)
     {}
 
     LaserDocument* doc;
@@ -56,6 +57,7 @@ public:
 	QTransform allTransform;
 	QRectF originalBoundingRect;
 	QPainterPath path;
+    bool isLocked;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
@@ -540,6 +542,18 @@ QString LaserPrimitive::newPrimitiveName(LaserPrimitiveType type) const
     return QString("%1_0").arg(typeName(type));
 }
 
+void LaserPrimitive::setLocked(bool isLocked)
+{
+    Q_D(LaserPrimitive);
+    d->isLocked = isLocked;
+}
+
+bool LaserPrimitive::isLocked()
+{
+    Q_D(LaserPrimitive);
+    return d->isLocked;
+}
+
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     Q_D(LaserPrimitive);
@@ -623,6 +637,7 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform 
 	//��е�ӹ���ʹ�
     d->outline.addEllipse(bounds);
 	//d->layerIndex = layerIndex;
+    //setLocked(true);
 }
 
 QRectF LaserEllipse::bounds() const 

@@ -8,6 +8,7 @@
 #include <DockComponentsFactory.h>
 #include <DockContainerWidget.h>
 #include <DockSplitter.h>
+#include <DockWidgetTab.h>
 #include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
@@ -33,6 +34,7 @@
 #include <QUndoStack>
 #include <QWindow>
 #include <QFontComboBox>
+#include <QSize>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -79,7 +81,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->setupUi(this);
 
     // initialize Dock Manager
-    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
     CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
     CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
     m_dockManager = new CDockManager(this);
@@ -90,6 +92,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     createOperationsDockPanel();
     createOutlineDockPanel();
     createMovementDockPanel();
+    createShapePropertyDockPanel();
 
     m_dockAreaLayers->setCurrentIndex(0);
     // 更改分割条的粗细
@@ -1311,12 +1314,12 @@ void LaserControllerWindow::createLayersDockPanel()
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaLayers = m_dockManager->addDockWidget(RightDockWidgetArea, dockWidget);
+    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/layer.png"), "Layers");
 }
 
 void LaserControllerWindow::createCameraDockPanel()
 {
     QLabel* labelCameras = new QLabel(tr("Cameras"));
-
     m_comboBoxCameras = new QComboBox;
     m_comboBoxCameras->addItem(tr("None"));
 
@@ -1373,12 +1376,13 @@ void LaserControllerWindow::createCameraDockPanel()
 
     QWidget* panelWidget = new QWidget;
     panelWidget->setLayout(layout);
-
-    CDockWidget* dockWidget = new CDockWidget(tr("Camera"));
+    CDockWidget* dockWidget = new CDockWidget(tr("Cameras"));
     dockWidget->setWidget(panelWidget);
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
-
     m_dockAreaCameras = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+    //只显示tab中icon
+    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/camera.png"), "Cameras");
+    
 }
 
 void LaserControllerWindow::createOperationsDockPanel()
@@ -1536,6 +1540,7 @@ void LaserControllerWindow::createOutlineDockPanel()
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaOutline = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/outline.png"), "Outline");
 }
 
 void LaserControllerWindow::createMovementDockPanel()
@@ -1743,6 +1748,36 @@ void LaserControllerWindow::createMovementDockPanel()
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/movement.png"), "Movement");
+}
+
+void LaserControllerWindow::createShapePropertyDockPanel()
+{
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setMargin(0);
+    QWidget* panelWidget = new QWidget;
+    panelWidget->setLayout(layout);
+
+    CDockWidget* dockWidget = new CDockWidget(tr("Movement"));
+    dockWidget->setWidget(panelWidget);
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
+
+    m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
+}
+
+void LaserControllerWindow::dockPanelOnlyShowIcon(CDockWidget* dockWidget, QPixmap icon, char* text)
+{
+    CDockWidgetTab* tab = dockWidget->tabWidget();
+    tab->setMinimumWidth(0);
+    tab->setFixedWidth(35);
+    tab->setElideMode(Qt::TextElideMode::ElideNone);
+    tab->setToolTip(tr(text));
+    tab->setIcon(icon);
+    tab->setTitleLabelVisible(false);
+    connect(tab, &CDockWidgetTab::activeTabChanged, this, [=] {
+        tab->closeButton()->setVisible(false);
+    });
 }
 
 void LaserControllerWindow::createUpdateDockPanel(int winId)

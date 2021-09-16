@@ -3701,7 +3701,7 @@ bool LaserViewer::onSelectedFillGroup()
 		
 		for (LaserPrimitive* item : m_scene->document()->selectedPrimitives())
 		{
-			if (m_group->childItems().contains(item))
+			if (m_group->childItems().contains(item) || item->isLocked())
 				continue;
 			m_group->addToGroup(item);
 		}
