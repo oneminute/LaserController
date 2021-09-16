@@ -2210,7 +2210,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
             QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
             return;
         }
-        QString filename = "export.json";
+        QString filename = QDir::current().absoluteFilePath("tmp/export.json");
         //QTemporaryFile file;
         //if (file.open())
         //{
