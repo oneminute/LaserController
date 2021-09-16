@@ -39,6 +39,8 @@ namespace typeUtils
     QString variantToString(const QVariant& src, DataType dataType);
 
     QJsonObject point2Json(const QPointF& point);
+
+    QJsonObject rect2Json(const QRectF& rect);
 }
 
 #endif // TYPEUTILS_H

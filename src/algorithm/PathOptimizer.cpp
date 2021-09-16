@@ -30,7 +30,6 @@ public:
         : q_ptr(ptr)
         , totalNodes(0)
         , arrivedNodes(0)
-        , progress(0)
     {}
 
     PathOptimizer* q_ptr;
@@ -40,8 +39,6 @@ public:
     int totalNodes;
     int arrivedNodes;
     QList<OptimizeNode*> nodes;
-
-    qreal progress;
 
     PathOptimizer::Path optimizedPath;
 };
@@ -81,14 +78,24 @@ void PathOptimizer::optimize()
         optimizeLayer(layerNode);
     }
 
-    d->progress = 90;
     LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
+    OptimizeNode* last = d->root;
     for (OptimizeNode* node : d->optimizedPath)
     {
         LaserPointListList pointsList = node->arrangeMachiningPoints();
         LaserApplication::previewWindow->addPath(pointsList.toPainterPath(), QPen(Qt::red, 2));
-        d->progress += 1.0 * 9 / d->totalNodes;
         LaserApplication::previewWindow->addProgress(this, 1.0 * 0.1 / d->totalNodes, tr("Arranged machining points of node %1.").arg(node->nodeName()));
+        if (last)
+        {
+            QPointF from = last->arrangedEndingPoint().toPointF();
+            QPointF to = node->arrangedStartingPoint().toPointF();
+            qLogD << last->nodeName() << " --> " << node->nodeName() << ": "
+                << from << ", " << to;
+            LaserApplication::previewWindow->addLine(
+                QLineF(from, to),
+                QPen(Qt::blue, 2));
+        }
+        last = node;
     }
 
     emit finished();
@@ -212,7 +219,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
         { 
             // 为空表示兄弟节点已经全部遍历完成，向父节点移动
             OptimizeNode* parentNode = d->currentNode->parentNode();
-            if (parentNode->isVirtual())
+            if (!parentNode || parentNode->isVirtual())
                 break;
 
             if (travelled.contains(parentNode))
@@ -232,8 +239,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             // 构建kdtree
             siblingPoints.buildKdtree();
             OptimizeNode* candidate = siblingPoints.nearestSearch(d->currentNode);
-            LaserApplication::previewWindow->addLine(QLineF(d->currentNode->currentPos().toPointF(), 
-                candidate->currentPos().toPointF()), QPen(Qt::black, 2));
             d->currentNode = candidate;
         }
     }

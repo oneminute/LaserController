@@ -588,6 +588,7 @@ void LaserDriver::lPenQuickMoveTo(
 
 void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMoveStyle, int xPos, bool yMoveEnable, bool yMoveStyle, int yPos, bool zMoveEnable, bool zMoveStyle, int zPos)
 {
+    qLogD << "move " << xPos << ", " << yPos << ", " << zPos;
     m_fnCheckMoveLaserMotors(
         delay,
         xMoveEnable, xMoveStyle, xPos,

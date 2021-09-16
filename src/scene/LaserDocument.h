@@ -69,6 +69,7 @@ public:
     QTransform docTransformMM() const;
     QRectF docBoundingRect() const;
     QRectF docBoundingRectMM() const;
+    QRectF docBoundingRectMachining() const;
 
     /// <summary>
     /// 返回相对于当前确定的原点的坐标。

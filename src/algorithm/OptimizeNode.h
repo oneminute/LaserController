@@ -81,6 +81,8 @@ public:
     LaserPrimitive* primitive() const;
     LaserPointListList arrangeMachiningPoints();
     LaserPointListList arrangedPoints() const;
+    LaserPoint arrangedStartingPoint() const;
+    LaserPoint arrangedEndingPoint() const;
 
 protected:
     QScopedPointer<OptimizeNodePrivate> d_ptr;

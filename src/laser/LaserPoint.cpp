@@ -1,6 +1,7 @@
 #include "LaserPoint.h"
 
 #include <QtMath>
+#include <QDebug>
 
 LaserPoint::LaserPoint()
     : m_x(0)
@@ -85,5 +86,14 @@ LaserPoint& LaserPoint::operator/=(float factor)
 qreal LaserPoint::length() const
 {
     return qSqrt(m_x * m_x + m_y * m_y);
+}
+
+QDebug operator<<(QDebug debug, const LaserPoint& point)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace().noquote() << "[" << point.x() << ", " <<
+        point.y() << ", " << point.angle1() << ", " <<
+        point.angle2() << "]";
+    return debug;
 }
 

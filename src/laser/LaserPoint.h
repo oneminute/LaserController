@@ -97,6 +97,8 @@ private:
     };
 };
 
+QDebug operator<<(QDebug debug, const LaserPoint& point);
+
 inline bool operator==(const LaserPoint& l1, const LaserPoint& l2)
 {
     return l1.m_x == l2.m_x &&

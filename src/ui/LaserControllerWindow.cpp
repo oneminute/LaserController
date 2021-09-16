@@ -841,6 +841,8 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
 
     QUADRANT quad = static_cast<QUADRANT>(value.toInt());
 
+    qLogD << "move by: " << delta;
+
     if (relative)
     {
         LaserApplication::device->moveBy(delta);

@@ -1,4 +1,4 @@
-#include "OptimizeEdge.h"
+﻿#include "OptimizeEdge.h"
 #include "LaserApplication.h"
 #include "common/Config.h"
 #include <laser/LaserDevice.h>
@@ -527,7 +527,9 @@ LaserPointListList OptimizeNode::arrangeMachiningPoints()
     if (d->nodeType == LNT_PRIMITIVE)
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        return primitive->arrangeMachiningPoints(d->lastPoint, d->index);
+        // d->index是startingPoints的index，要换算为machiningPoints的index
+        int index = primitive->startingIndices().at(d->index);
+        return primitive->arrangeMachiningPoints(d->lastPoint, index);
     }
     return LaserPointListList();
 }
@@ -541,4 +543,34 @@ LaserPointListList OptimizeNode::arrangedPoints() const
         return primitive->arrangedPoints();
     }
     return LaserPointListList();
+}
+
+LaserPoint OptimizeNode::arrangedStartingPoint() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->arrangedStartingPoint();
+    }
+    else if (d->nodeType == LNT_DOCUMENT)
+    {
+        return d->currentPoint;
+    }
+    return LaserPoint();
+}
+
+LaserPoint OptimizeNode::arrangedEndingPoint() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->arrangedEndingPoint();
+    }
+    else if (d->nodeType == LNT_DOCUMENT)
+    {
+        return d->currentPoint;
+    }
+    return LaserPoint();
 }

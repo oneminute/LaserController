@@ -126,8 +126,10 @@ public:
 
     virtual LaserPointListList updateMachiningPoints(quint32 progressCode, qreal progressQuota) { return LaserPointListList(); }
     LaserPointListList machiningPoints() const;
-    virtual LaserPointListList arrangeMachiningPoints(LaserPoint& lastPoint, int startingIndex);
+    virtual LaserPointListList arrangeMachiningPoints(LaserPoint& fromPoint, int startingIndex);
     LaserPointListList arrangedPoints() const;
+    LaserPoint arrangedStartingPoint() const;
+    LaserPoint arrangedEndingPoint() const;
     QList<int> startingIndices() const;
     LaserPointList startingPoints() const;
     LaserPoint firstStartingPoint() const;

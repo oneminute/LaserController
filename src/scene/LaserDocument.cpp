@@ -257,6 +257,8 @@ void LaserDocument::exportJSON(const QString& filename)
             QPointF docOrigin = docOriginMachining();
             docOrigin = LaserApplication::device->deviceTransformMachining().map(docOrigin);
             laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
+            QRectF docBoundingRect = docBoundingRectMachining();
+            laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
             jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
             QJsonArray layers;
@@ -637,6 +639,11 @@ QRectF LaserDocument::docBoundingRect() const
 QRectF LaserDocument::docBoundingRectMM() const
 {
     return Global::matrixToMM(SU_PX).map(docBoundingRect()).boundingRect();
+}
+
+QRectF LaserDocument::docBoundingRectMachining() const
+{
+    return Global::matrixToMM(SU_PX, 40, 40).map(docBoundingRect()).boundingRect();
 }
 
 void LaserDocument::updateLayersStructure()

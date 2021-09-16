@@ -157,3 +157,13 @@ QJsonObject typeUtils::point2Json(const QPointF& point)
     json["y"] = point.y();
     return json;
 }
+
+QJsonObject typeUtils::rect2Json(const QRectF& rect)
+{
+    QJsonObject json;
+    json["x1"] = rect.topLeft().x();
+    json["y1"] = rect.topLeft().y();
+    json["x2"] = rect.bottomRight().x();
+    json["y2"] = rect.bottomRight().y();
+    return json;
+}

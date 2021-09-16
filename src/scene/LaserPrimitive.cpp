@@ -275,7 +275,7 @@ LaserPointListList LaserPrimitive::machiningPoints() const
     return d->machiningPointsList;
 }
 
-LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint, int startingIndex)
+LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint, int startingIndex)
 {
     Q_D(LaserPrimitive);
     d->arrangedPointsList.clear();
@@ -286,7 +286,7 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint,
         int pointsCount = machiningPoints.size();
         int pointIndex = startingIndex - indexBase;
         bool ignore = false;
-        if (pointIndex >= pointsCount)
+        if (pointIndex < 0 || pointIndex >= pointsCount)
         {
             // 首点索引不在当前子路径范围内，当前路径的加工点直接复制即可
             pointIndex = 0;
@@ -296,10 +296,10 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint,
         // check closour
         if (isClosed())
         {
-            LaserPoint currentPoint = machiningPoints[pointIndex];
+            LaserPoint firstPoint = machiningPoints[pointIndex];
 
             int step = 0;
-            if (lastPoint.angle1() >= 0)
+            if (fromPoint.angle1() >= 0)
             {
                 step = -1;
             }
@@ -315,15 +315,16 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint,
                 points.push_back(machiningPoints[cursor]);
                 cursor = (cursor + step + pointsCount) % pointsCount;
             }
+            points.push_back(firstPoint);
 
-            lastPoint = currentPoint;
+            fromPoint = firstPoint;
         }
         else
         {
             if (pointIndex == 0)
             {
                 points = machiningPoints;
-                lastPoint = machiningPoints.last();
+                fromPoint = machiningPoints.last();
             }
             else if (!ignore)
             {
@@ -331,7 +332,7 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint,
                 {
                     points.push_back(machiningPoints[i]);
                 }
-                lastPoint = points.first();
+                fromPoint = points.first();
             }
         }
 
@@ -345,6 +346,22 @@ LaserPointListList LaserPrimitive::arrangedPoints() const
 {
     Q_D(const LaserPrimitive);
     return d->arrangedPointsList;
+}
+
+LaserPoint LaserPrimitive::arrangedStartingPoint() const
+{
+    Q_D(const LaserPrimitive);
+    if (d->arrangedPointsList.isEmpty())
+        return LaserPoint();
+    return d->arrangedPointsList.first().first();
+}
+
+LaserPoint LaserPrimitive::arrangedEndingPoint() const
+{
+    Q_D(const LaserPrimitive);
+    if (d->arrangedPointsList.isEmpty())
+        return LaserPoint();
+    return d->arrangedPointsList.last().last();
 }
 
 QList<int> LaserPrimitive::startingIndices() const
@@ -849,11 +866,11 @@ LaserPointListList LaserRect::updateMachiningPoints(quint32 progressCode, qreal 
     points.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
     points.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
     points.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
+    d->machiningCenter = utils::center(points).toPointF();
     d->startingIndices.append(0);
     d->startingIndices.append(1);
     d->startingIndices.append(2);
     d->startingIndices.append(3);
-    d->machiningCenter = utils::center(points).toPointF();
     d->machiningPointsList.append(points);
 
     return d->machiningPointsList;
@@ -1452,12 +1469,6 @@ LaserPointListList LaserPolygon::updateMachiningPoints(quint32 progressCode, qre
         {
             d->startingIndices.append(i);
         }
-    }
-    points.push_back(points.first());
-    if (!isClosed)
-    {
-        d->startingIndices.append(0);
-        d->startingIndices.append(points.size() - 1);
     }
         
     d->machiningCenter /= points.size();
@@ -2717,31 +2728,41 @@ QPainterPath LaserText::toMachiningPath() const
 LaserPointListList LaserText::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserText);
-    QPainterPath path = toMachiningPath();
+
+    QTransform transform = Global::matrixToMM(SU_PX, 40, 40);
+
+    int totalCount = 0;
+    for (int i = 0; i < d->pathList.size(); i++) {
+        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
+        totalCount += rowPathList.count();
+    }
 
     d->machiningPointsList.clear();
-    LaserPointList points;
+    LaserPointList allPoints;
     d->startingIndices.clear();
-    for (LaserTextRowPath& rowPath : d->pathList)
-    {
-        LaserPointList points;
-        QList<int> indices;
-        QPointF center;
-        QPainterPath& subPath = rowPath.path();
+    for (int i = 0; i < d->pathList.size(); i++) {
+        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
+        for (QPainterPath rowPath : rowPathList) {
+            LaserPointList points;
+            QList<int> indices;
+            QPointF center;
 
-        machiningUtils::path2Points(path, progressCode, progressQuota / d->pathList.length(),
-            points, indices, center, 2, Config::Export::maxStartingPoints(), 0);
+            QPainterPath path = sceneTransform().map(rowPath);
+            path = transform.map(path);
 
-        for (int index : indices)
-        {
-            d->startingIndices.append(index + points.count());
+            machiningUtils::path2Points(path, progressCode, progressQuota / totalCount,
+                points, indices, center, 1, Config::Export::maxStartingPoints(), 0);
+
+            for (int index : indices)
+            {
+                d->startingIndices.append(index + allPoints.count());
+            }
+            allPoints.append(points);
+            d->machiningPointsList.append(points);
         }
-        points.append(points);
-        d->machiningPointsList.append(points);
     }
     
-    d->machiningCenter = utils::center(points).toPointF();
-    d->machiningPointsList.append(points);
+    d->machiningCenter = utils::center(allPoints).toPointF();
     
     return d->machiningPointsList;
 }
