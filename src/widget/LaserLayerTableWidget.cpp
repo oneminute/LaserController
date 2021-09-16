@@ -5,9 +5,11 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QPushButton>
+#include <QLabel>
 
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
+#include "LaserHeaderView.h"
 
 LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
     : QTableWidget(parent)
@@ -25,21 +27,41 @@ LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
 
     setColumnCount(7);
     setHorizontalHeaderLabels(columnHeaders);
-
-    // initialize layers Tree Widget
-    setColumnWidth(0, 45);
+    
+    
+    
+    /*setColumnWidth(0, 45);
     setColumnWidth(1, 30);
     setColumnWidth(2, 75);
     setColumnWidth(3, 45);
     setColumnWidth(4, 75);
     setColumnWidth(5, 30);
-    setColumnWidth(6, 30);
+    setColumnWidth(6, 30);*/
 
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setShowGrid(false);
     verticalHeader()->setVisible(false);
+    //My
+    horizontalHeader()->setDefaultAlignment(Qt::AlignHCenter);
+    QAbstractItemModel* itemmode = horizontalHeader()->model();
+    // initialize layers Tree Widget
+    //setting icon
+    LaserHeaderView* h = new LaserHeaderView(Qt::Horizontal, this);
+    setHorizontalHeader(h);
+    
+    for (int i = 0; i < columnHeaders.size(); i++) {
+
+        QTableWidgetItem* header = horizontalHeaderItem(i);
+        header->setToolTip(header->text());
+        header->setText("");
+        setColumnWidth(i, 37);
+        
+    }
+    setColumnWidth(2, 63);
+    setColumnWidth(4, 50);
+    
 }
 
 LaserLayerTableWidget::~LaserLayerTableWidget()

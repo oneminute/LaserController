@@ -171,6 +171,9 @@ public:
 
     virtual QPainterPath toMachiningPath() const = 0;
 
+    void setLocked(bool isLocked);
+    bool isLocked();
+
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

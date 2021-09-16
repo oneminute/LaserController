@@ -65,8 +65,19 @@
     <file>images/center.png</file>
     <file>images/mirrorH.png</file>
     <file>images/mirrorV.png</file>
-      <file>images/mirrorA.png</file>
+    <file>images/mirrorA.png</file>
     <file>images/group.png</file>
     <file>images/ungroup.png</file>
+    <file>images/camera.png</file>
+    <file>images/layer.png</file>
+    <file>images/outline.png</file>
+    <file>images/movement.png</file>
+    <file>images/layerId.png</file>
+    <file>images/mode.png</file>
+    <file>images/count.png</file>
+    <file>images/speed_power.png</file>
+    <file>images/output.png</file>
+    <file>images/visible.png</file>
+    <file>images/shape.png</file>
   </qresource>
 </RCC>
