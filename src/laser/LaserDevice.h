@@ -68,8 +68,8 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
-    void moveTo(const QVector3D& pos, QUADRANT quad);
-    void moveBy(const QVector3D& pos);
+    void moveTo(const QVector3D& pos, QUADRANT quad, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
+    void moveBy(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
 
     bool isAvailable() const;
 
@@ -150,6 +150,8 @@ private:
 
     Q_DECLARE_PRIVATE_D(m_ptr, LaserDevice)
     Q_DISABLE_COPY(LaserDevice)
+
+    friend class LaserDriver;
 };
 
 #endif // LASERDEVICE_H

@@ -849,6 +849,33 @@ void Config::loadDeviceItems()
             }
         }
     );
+
+    ConfigItem* xEnabled = group->addConfigItem(
+        "xEnabled",
+        tr("X Enabled"),
+        tr("X Enabled"),
+        true,
+        DT_BOOL
+    );
+    xEnabled->setStoreStrategy(SS_DIRECTLY);
+
+    ConfigItem* yEnabled = group->addConfigItem(
+        "yEnabled",
+        tr("Y Enabled"),
+        tr("Y Enabled"),
+        true,
+        DT_BOOL
+    );
+    yEnabled->setStoreStrategy(SS_DIRECTLY);
+
+    ConfigItem* zEnabled = group->addConfigItem(
+        "zEnabled",
+        tr("Z Enabled"),
+        tr("Z Enabled"),
+        true,
+        DT_BOOL
+    );
+    zEnabled->setStoreStrategy(SS_DIRECTLY);
 }
 
 void Config::loadUserReigsters()
@@ -2772,6 +2799,7 @@ void Config::refreshTranslation()
 
 void Config::destroy()
 {
+    save();
     qDeleteAll(groups);
     groups.clear();
     groupsMap.clear();

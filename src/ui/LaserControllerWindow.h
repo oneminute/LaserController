@@ -312,13 +312,17 @@ private:
     PressedToolButton* m_buttonMoveTop;
     PressedToolButton* m_buttonMoveTopRight;
     PressedToolButton* m_buttonMoveLeft;
-    PressedToolButton* m_buttonMoveToOrigin;
+    QToolButton* m_buttonMoveToOrigin;
     PressedToolButton* m_buttonMoveRight;
     PressedToolButton* m_buttonMoveBottomLeft;
     PressedToolButton* m_buttonMoveBottom;
     PressedToolButton* m_buttonMoveBottomRight;
     PressedToolButton* m_buttonMoveUp;
     PressedToolButton* m_buttonMoveDown;
+
+    QCheckBox* m_checkBoxXEnabled;
+    QCheckBox* m_checkBoxYEnabled;
+    QCheckBox* m_checkBoxZEnabled;
 
     QToolButton* m_buttonLaserPosition;
     QComboBox* m_comboBoxPostEvent;

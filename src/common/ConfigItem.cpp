@@ -397,6 +397,10 @@ InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
     Q_D(ConfigItem);
     InputWidgetWrapper* wrapper = new InputWidgetWrapper(widget, this);
     d->widgets.append(widget);
+    for (QMap<QString, QVariant>::ConstIterator i = d->inputWidgetProperties.constBegin(); i != d->inputWidgetProperties.constEnd(); i++)
+    {
+        widget->setProperty(i.key().toStdString().c_str(), i.value());
+    }
     connect(this, &ConfigItem::enabledChanged, wrapper, &InputWidgetWrapper::setEnabled);
     connect(widget, &QWidget::destroyed,
         [=]() {

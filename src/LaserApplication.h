@@ -20,7 +20,7 @@ public:
 
     bool checkEnvironment();
 
-    bool notify(QObject* receiver, QEvent* event) override;
+    //bool notify(QObject* receiver, QEvent* event) override;
 
 protected:
     void initLog();

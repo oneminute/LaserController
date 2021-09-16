@@ -228,12 +228,8 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
 
     if (!widget)
         return;
-    for (QMap<QString, QVariant>::ConstIterator i = item->inputWidgetProperties().constBegin(); i != item->inputWidgetProperties().constEnd(); i++)
-    {
-        widget->setProperty(i.key().toStdString().c_str(), i.value());
-    }
-    widget->setParent(parent);
 
+    widget->setParent(parent);
     QLabel* labelName = new QLabel(parent);
     labelName->setText(item->title());
     labelName->setToolTip(item->description());
