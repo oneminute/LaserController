@@ -97,6 +97,8 @@ private:
     };
 };
 
+QDebug operator<<(QDebug debug, const LaserPoint& point);
+
 inline bool operator==(const LaserPoint& l1, const LaserPoint& l2)
 {
     return l1.m_x == l2.m_x &&
@@ -198,6 +200,5 @@ inline QVector4D LaserPoint::toVector4D() const
 {
     return QVector4D(m_x, m_y, m_angle1, m_angle2);
 }
-
 
 #endif // LASERPOINT_H

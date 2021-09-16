@@ -226,9 +226,9 @@ void PreviewWindow::onAddProgress(quint32 code, qreal deltaProgress, const QStri
 
 void PreviewWindow::onSetProgress(qreal progress)
 {
-    qLogD << "progress: " << progress;
     m_progress = progress;
     m_progressBar->setValue(qRound(progress * 100));
+    emit progressUpdated(m_progress);
 }
 
 void PreviewWindow::onSetProgress(quint32 code, qreal progress)

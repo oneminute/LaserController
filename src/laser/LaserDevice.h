@@ -3,6 +3,7 @@
 
 #include "common/common.h"
 #include "LaserRegister.h"
+#include "laser/LaserDefines.h"
 #include <QObject>
 #include <QMutex>
 #include <QTransform>
@@ -142,6 +143,7 @@ signals:
     void mainCardActivated(bool temp);
     void mainCardInfoFetched();
     void manufacturePasswordVerified(bool pass);
+    void workStateUpdated(LaserState state);
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

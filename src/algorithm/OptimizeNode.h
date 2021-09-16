@@ -51,7 +51,7 @@ public:
     QPointF position() const;
     QPointF machiningPosition() const;
 
-    void update();
+    void update(quint32 progressCode = 0, qreal progressQuota = 0);
 
     ILaserDocumentItem* documentItem() const;
 
@@ -75,13 +75,14 @@ public:
     LaserPoint headPoint() const;
     LaserPoint tailPoint() const;
     LaserPoint point(int index) const;
-    void debugDraw(cv::Mat& canvas);
 
     bool isVirtual() const;
 
     LaserPrimitive* primitive() const;
-    LaserPointList arrangeMachiningPoints();
-    LaserPointList arrangedPoints() const;
+    LaserPointListList arrangeMachiningPoints();
+    LaserPointListList arrangedPoints() const;
+    LaserPoint arrangedStartingPoint() const;
+    LaserPoint arrangedEndingPoint() const;
 
 protected:
     QScopedPointer<OptimizeNodePrivate> d_ptr;

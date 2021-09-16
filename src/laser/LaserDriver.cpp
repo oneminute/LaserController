@@ -12,17 +12,14 @@
 #include "state/StateController.h"
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
+#include "LaserApplication.h"
 
 #define CHECK_STR(fn) #fn
 #define CHECK_FN(fn) \
     if (!fn) \
     { \
         qLogW << CHECK_STR(fn) << " is nullptr."; \
-        return false; \
     }
-
-QMap<int, QString> LaserDriver::g_registerComments;
-LaserDriver* LaserDriver::g_driver(nullptr);
 
 LaserDriver::LaserDriver(QObject* parent)
     : QObject(parent)
@@ -37,12 +34,6 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_device(nullptr)
     , m_isClosed(false)
 {
-    if (g_driver)
-    {
-        throw LaserFatalException(tr("Device driver initialize failure."));
-    }
-    g_driver = this;
-
     ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
     ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
     ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
@@ -73,89 +64,38 @@ LaserDriver::LaserDriver(QObject* parent)
 
 LaserDriver::~LaserDriver()
 {
-    //unload();
-    g_driver = nullptr;
     qLogD << "driver destroyed";
-}
-
-LaserDriver& LaserDriver::instance()
-{
-    return *g_driver;
 }
 
 void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCount)
 {
-    if (instance().m_isClosed)
+    if (LaserApplication::driver->m_isClosed)
         return;
 
     float progress = position * 1.0f / totalCount;
     qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4)
         ;
-    if (instance().m_isDownloading)
+    if (LaserApplication::driver->m_isDownloading)
     {
-        emit instance().downloading(position, totalCount, progress);
+        emit LaserApplication::driver->downloading(position, totalCount, progress);
     }
 }
 
 void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
 {
-    if (instance().m_isClosed)
+    if (LaserApplication::driver->m_isClosed)
         return;
 
     QString eventData = QString::fromWCharArray(sysEventData);
     qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
     if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
     {
-        emit instance().raiseError(sysMsgCode, eventData);
+        emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
     }
     else if (sysMsgCode >= M_Base)
     {
-        emit instance().sendMessage(sysMsgCode, eventData);
+        emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
     }
-}
-
-void LaserDriver::parseAndRefreshRegisters(QString& eventData, LaserRegister::RegistersMap& registers)
-{
-    //instance().m_registers.clear();
-    for (QString i : eventData.split(";"))
-    {
-        QString str = i.trimmed();
-        if (str.isEmpty() || str.isNull())
-            continue;
-
-        QStringList tokens = str.split(",");
-        if (tokens.length() != 2)
-            continue;
-
-        int addr = 0;
-        bool ok = false;
-        addr = tokens[0].toInt(&ok);
-        if (!ok)
-            continue;
-
-        QVariant value = tokens[1];
-
-        if (registers.contains(addr))
-        {
-            registers[addr] = value;
-        }
-        else
-        {
-            registers.insert(addr, value);
-        }
-    }
-
-    QFile deviceCache("dev_cache.bin");
-    if (!deviceCache.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qWarning() << "Can not create cache file!";
-        return;
-    }
-
-    QDataStream stream(&deviceCache);
-    stream << instance().m_registers;
-
-    deviceCache.close();
 }
 
 void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount)
@@ -259,6 +199,12 @@ bool LaserDriver::load()
 
     m_fnLPenQuickMoveTo = (FNLPenQuickMoveTo)m_library.resolve("LPenQuickMoveTo");
     CHECK_FN(m_fnLPenQuickMoveTo)
+
+    m_fnCheckMoveLaserMotors = (FNCheckMoveLaserMotors)m_library.resolve("CheckMoveLaserMotors");
+    CHECK_FN(m_fnCheckMoveLaserMotors)
+
+    m_fnStartMoveLaserMotors = (FN_VOID_VOID)m_library.resolve("StartMoveLaserMotors");
+    CHECK_FN(m_fnStartMoveLaserMotors)
 
     m_fnControlHDAction = (FN_VOID_INT)m_library.resolve("ControlHDAction");
     CHECK_FN(m_fnControlHDAction)
@@ -640,6 +586,22 @@ void LaserDriver::lPenQuickMoveTo(
         );
 }
 
+void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMoveStyle, int xPos, bool yMoveEnable, bool yMoveStyle, int yPos, bool zMoveEnable, bool zMoveStyle, int zPos)
+{
+    qLogD << "move " << xPos << ", " << yPos << ", " << zPos;
+    m_fnCheckMoveLaserMotors(
+        delay,
+        xMoveEnable, xMoveStyle, xPos,
+        yMoveEnable, yMoveStyle, yPos,
+        zMoveEnable, zMoveStyle, zPos
+        );
+}
+
+void LaserDriver::startMoveLaserMotors()
+{
+    m_fnStartMoveLaserMotors();
+}
+
 void LaserDriver::controlHDAction(int action)
 {
     m_fnControlHDAction(action);
@@ -791,39 +753,5 @@ void LaserDriver::checkVersionUpdate(bool hardware, const QString& flag, int cur
 int LaserDriver::getUpdatePanelHandle(int version, int wndId)
 {
     return m_fnGetUpdatePanelHandle(version, wndId);
-}
-
-void LaserDriver::setSystemRegister(LaserDriver::SystemRegisterType rt, QVariant value)
-{
-    m_registers[rt] = value;
-}
-
-bool LaserDriver::getSystemRegister(LaserDriver::SystemRegisterType rt, QVariant& value)
-{
-    if (m_registers.contains(rt))
-    {
-        value = m_registers[rt];
-        return true;
-    }
-    return false;
-}
-
-//QString LaserDriver::registerComment(RegisterType rt)
-//{
-//    if (m_registerComments.contains(rt))
-//        return m_registerComments[rt];
-//    return QString("");
-//}
-
-bool LaserDriver::getLayout(float& width, float& height)
-{
-    if (!m_registers.contains(LaserDriver::RT_X_MAX_LENGTH) ||
-        !m_registers.contains(LaserDriver::RT_Y_MAX_LENGTH))
-        return false;
-
-    width = m_registers[RT_X_MAX_LENGTH].toInt();
-    height = m_registers[RT_Y_MAX_LENGTH].toInt();
-
-    return true;
 }
 

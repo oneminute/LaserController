@@ -56,6 +56,8 @@ signals:
     void setProgressSignal(quint32 code, qreal progress);
     void addMessageSignal(const QString& message);
 
+    void progressUpdated(qreal progress);
+
 private:
     ads::CDockManager* m_dockManager;
     ads::CDockWidget* m_logDockWidget;

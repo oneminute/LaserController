@@ -8,6 +8,8 @@
 
 #include "common/common.h"
 #include "common/Config.h"
+#include "LaserApplication.h"
+#include "ui/PreviewWindow.h"
 #include "TypeUtils.h"
 #include "Utils.h"
 
@@ -45,7 +47,8 @@ int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::
     return count;
 }
 
-int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& points, 
+int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode, 
+    qreal progressQuota, LaserPointList& points, 
     QList<int>& startingIndices, QPointF& center, int closed, int startingIndiciesCount, 
     int diagonalThreshold)
 {
@@ -151,7 +154,12 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
             anchor = point;
             anchorRadians = radians;
         }
+        if (i % 100 == 0)
+        {
+            LaserApplication::previewWindow->addProgress(progressCode, 100.0 * progressQuota / length);
+        }
     }
+    LaserApplication::previewWindow->addProgress(progressCode, (qFloor(length) % 100) * progressQuota / length);
 
     angle = path.angleAtPercent(1);
     point4d.setAll(lastPoint, angle);
@@ -167,7 +175,17 @@ int machiningUtils::path2Points(const QPainterPath & path, LaserPointList& point
     return points.size();
 }
 
-QByteArray machiningUtils::points2Plt(const LaserPointList& points, QPointF& lastPoint)
+QByteArray machiningUtils::pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint)
+{
+    QByteArray buffer;
+    for (const LaserPointList& points : pointList)
+    {
+        buffer.append(pointList2Plt(points, lastPoint));
+    }
+    return buffer;
+}
+
+QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& lastPoint)
 {
     QByteArray buffer;
     if (points.empty())
@@ -175,12 +193,12 @@ QByteArray machiningUtils::points2Plt(const LaserPointList& points, QPointF& las
 
     QPointF pt = points.first().toPointF();
     QPointF diff = pt - lastPoint;
-    lastPoint = pt;
     buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
     for (size_t i = 0; i < points.size(); i++)
     {
-        pt = points[i].toPointF();
-        diff = pt - lastPoint;
+        LaserPoint lPt = points.at(i);
+        QPointF pt = lPt.toPointF();
+        QPointF diff = pt - lastPoint;
         lastPoint = pt;
         buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
     }

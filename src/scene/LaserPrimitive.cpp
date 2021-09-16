@@ -50,8 +50,8 @@ public:
     LaserPrimitiveType primitiveType;
     bool isHover;
     QPainterPath outline;
-    LaserPointList machiningPoints;
-    LaserPointList arrangedPoints;
+    LaserPointListList machiningPointsList;
+    LaserPointListList arrangedPointsList;
     QPointF machiningCenter;
     QList<int> startingIndices;
 	QTransform allTransform;
@@ -271,67 +271,99 @@ void LaserPrimitive::sceneTransformToItemTransform(QTransform sceneTransform)
 	setPos(0, 0);
 }
 
-LaserPointList LaserPrimitive::machiningPoints() const
+LaserPointListList LaserPrimitive::machiningPoints() const
 {
     Q_D(const LaserPrimitive);
-    return d->machiningPoints;
+    return d->machiningPointsList;
 }
 
-LaserPointList LaserPrimitive::arrangeMachiningPoints(LaserPoint& lastPoint, int pointIndex)
+LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint, int startingIndex)
 {
     Q_D(LaserPrimitive);
-    int pointsCount = d->machiningPoints.size();
-    d->arrangedPoints.clear();
+    d->arrangedPointsList.clear();
 
-    // check closour
-    if (isClosed())
+    int indexBase = 0;
+    for (const LaserPointList& machiningPoints : d->machiningPointsList)
     {
-        LaserPoint currentPoint = d->machiningPoints[pointIndex];
+        int pointsCount = machiningPoints.size();
+        int pointIndex = startingIndex - indexBase;
+        bool ignore = false;
+        if (pointIndex < 0 || pointIndex >= pointsCount)
+        {
+            // 首点索引不在当前子路径范围内，当前路径的加工点直接复制即可
+            pointIndex = 0;
+            ignore = true;
+        }
+        LaserPointList points;
+        // check closour
+        if (isClosed())
+        {
+            LaserPoint firstPoint = machiningPoints[pointIndex];
 
-        int step = 0;
-        if (lastPoint.angle1() >= 0)
-        {
-            step = -1;
-        }
-        else
-        {
-            step = 1;
-        }
-
-        int cursor = pointIndex;
-        d->arrangedPoints.reserve(pointsCount);
-        for (int i = 0; i < pointsCount; i++)
-        {
-            d->arrangedPoints.push_back(d->machiningPoints[cursor]);
-            cursor = (cursor + step + pointsCount) % pointsCount;
-        }
-
-        lastPoint = currentPoint;
-    }
-    else
-    {
-        if (pointIndex == 0)
-        {
-            d->arrangedPoints = d->machiningPoints;
-            lastPoint = d->machiningPoints.last();
-        }
-        else
-        {
-            for (int i = pointsCount - 1; i >= 0; i--)
+            int step = 0;
+            if (fromPoint.angle1() >= 0)
             {
-                d->arrangedPoints.push_back(d->machiningPoints[i]);
+                step = -1;
             }
-            lastPoint = d->machiningPoints.first();
-        }
-    }
+            else
+            {
+                step = 1;
+            }
 
-    return d->arrangedPoints;
+            int cursor = pointIndex;
+            points.reserve(pointsCount);
+            for (int i = 0; i < pointsCount; i++)
+            {
+                points.push_back(machiningPoints[cursor]);
+                cursor = (cursor + step + pointsCount) % pointsCount;
+            }
+            points.push_back(firstPoint);
+
+            fromPoint = firstPoint;
+        }
+        else
+        {
+            if (pointIndex == 0)
+            {
+                points = machiningPoints;
+                fromPoint = machiningPoints.last();
+            }
+            else if (!ignore)
+            {
+                for (int i = pointsCount - 1; i >= 0; i--)
+                {
+                    points.push_back(machiningPoints[i]);
+                }
+                fromPoint = points.first();
+            }
+        }
+
+        d->arrangedPointsList.append(points);
+        indexBase += machiningPoints.length();
+    }
+    return d->arrangedPointsList;
 }
 
-LaserPointList LaserPrimitive::arrangedPoints() const
+LaserPointListList LaserPrimitive::arrangedPoints() const
 {
     Q_D(const LaserPrimitive);
-    return d->arrangedPoints;
+    return d->arrangedPointsList;
+}
+
+LaserPoint LaserPrimitive::arrangedStartingPoint() const
+{
+    Q_D(const LaserPrimitive);
+    if (d->arrangedPointsList.isEmpty())
+        return LaserPoint();
+    return d->arrangedPointsList.first().first();
+}
+
+LaserPoint LaserPrimitive::arrangedEndingPoint() const
+{
+    Q_D(const LaserPrimitive);
+    if (d->arrangedPointsList.isEmpty())
+        return LaserPoint();
+    return d->arrangedPointsList.last().last();
 }
 
 QList<int> LaserPrimitive::startingIndices() const
@@ -343,16 +375,22 @@ QList<int> LaserPrimitive::startingIndices() const
 LaserPointList LaserPrimitive::startingPoints() const
 {
     Q_D(const LaserPrimitive);
-
     LaserPointList vertices;
-    if (d->machiningPoints.empty())
+    if (d->machiningPointsList.empty())
     {
         return vertices;
     }
 
-    for (int i = 0; i < d->startingIndices.length(); i++)
+    int indexBase = 0;
+    for (const LaserPointList& points : d->machiningPointsList)
     {
-        vertices.push_back(d->machiningPoints[d->startingIndices[i]]);
+        for (int i = 0; i < d->startingIndices.length(); i++)
+        {
+            int index = d->startingIndices[i] - indexBase;
+            if (index < points.length() && index >= 0)
+                vertices.push_back(points.at(index));
+        }
+        indexBase += points.length();
     }
 
     return vertices;
@@ -361,13 +399,20 @@ LaserPointList LaserPrimitive::startingPoints() const
 LaserPoint LaserPrimitive::firstStartingPoint() const
 {
     Q_D(const LaserPrimitive);
-    return d->machiningPoints[d->startingIndices.first()];
+    if (d->machiningPointsList.isEmpty() || d->startingIndices.empty())
+        return LaserPoint();
+    return d->machiningPointsList.first()[d->startingIndices.first()];
 }
 
 LaserPoint LaserPrimitive::lastStartingPoint() const
 {
     Q_D(const LaserPrimitive);
-    return d->machiningPoints[d->startingIndices.last()];
+    if (d->machiningPointsList.isEmpty() || d->startingIndices.empty())
+        return LaserPoint();
+    int indexBase = 0;
+    for (int i = 0; i < d->machiningPointsList.length() - 1; i++)
+        indexBase += d->machiningPointsList.at(i).length();
+    return d->machiningPointsList.last()[d->startingIndices.last() - indexBase];
 }
 
 QPointF LaserPrimitive::centerMachiningPoint() const
@@ -655,15 +700,18 @@ void LaserEllipse::setBounds(const QRectF& bounds)
 	d->path = path;
 }
 
-LaserPointList LaserEllipse::updateMachiningPoints()
+LaserPointListList LaserEllipse::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserEllipse);
     QPainterPath path = toMachiningPath();
 
-    machiningUtils::path2Points(path, d->machiningPoints, d->startingIndices, d->machiningCenter,
+    d->machiningPointsList.clear();
+    LaserPointList points;
+    machiningUtils::path2Points(path, progressCode, progressQuota, points, d->startingIndices, d->machiningCenter,
         1, Config::Export::maxStartingPoints(), 
         Config::Export::smallDiagonalLimitation().maxDiagonal());
-    return d->machiningPoints;
+    d->machiningPointsList.append(points);
+    return d->machiningPointsList;
 }
 
 void LaserEllipse::draw(QPainter* painter)
@@ -796,10 +844,10 @@ void LaserRect::draw(QPainter* painter)
     painter->drawPath(d->path);
 }
 
-LaserPointList LaserRect::updateMachiningPoints()
+LaserPointListList LaserRect::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserRect);
-    d->machiningPoints.clear();
+    d->machiningPointsList.clear();
     d->startingIndices.clear();
 	QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     QPolygonF poly = d->path.toFillPolygon(t);
@@ -828,17 +876,19 @@ LaserPointList LaserRect::updateMachiningPoints()
     qreal angle41 = line41.angle();
     qreal angle42 = line42.angle();
 
-    d->machiningPoints.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
-    d->machiningPoints.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
-    d->machiningPoints.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
-    d->machiningPoints.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
+    LaserPointList points;
+    points.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
+    points.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
+    points.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
+    points.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
+    d->machiningCenter = utils::center(points).toPointF();
     d->startingIndices.append(0);
     d->startingIndices.append(1);
     d->startingIndices.append(2);
     d->startingIndices.append(3);
-    d->machiningCenter = utils::center(d->machiningPoints).toPointF();
+    d->machiningPointsList.append(points);
 
-    return d->machiningPoints;
+    return d->machiningPointsList;
 }
 
 QPainterPath LaserRect::toMachiningPath() const
@@ -955,10 +1005,10 @@ void LaserLine::setLine(const QLineF& line)
     d->line = line; 
 }
 
-LaserPointList LaserLine::updateMachiningPoints()
+LaserPointListList LaserLine::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserLine);
-    d->machiningPoints.clear();
+    d->machiningPointsList.clear();
     d->startingIndices.clear();
 
 	QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
@@ -968,12 +1018,14 @@ LaserPointList LaserLine::updateMachiningPoints()
     QLineF line2(pt2, pt1);
     qreal angle1 = line1.angle();
     qreal angle2 = line2.angle();
-    d->machiningPoints.append(LaserPoint(pt1.x(), pt1.y(), angle1, angle2));
-    d->machiningPoints.append(LaserPoint(pt2.x(), pt2.y(), angle2, angle1));
+    LaserPointList points;
+    points.append(LaserPoint(pt1.x(), pt1.y(), angle1, angle2));
+    points.append(LaserPoint(pt2.x(), pt2.y(), angle2, angle1));
     d->startingIndices.append(0);
     d->startingIndices.append(1);
+    d->machiningPointsList.append(points);
     
-    return d->machiningPoints;
+    return d->machiningPointsList;
 }
 
 void LaserLine::draw(QPainter * painter)
@@ -1107,15 +1159,18 @@ void LaserPath::setPath(const QPainterPath& path)
     d->path = path; 
 }
 
-LaserPointList LaserPath::updateMachiningPoints()
+LaserPointListList LaserPath::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserPath);
     QPainterPath path = toMachiningPath();
-    
-    machiningUtils::path2Points(path, d->machiningPoints, d->startingIndices, d->machiningCenter, 2,
+
+    d->machiningPointsList.clear();
+    LaserPointList points;
+    machiningUtils::path2Points(path, progressCode, progressQuota, points, d->startingIndices, d->machiningCenter, 2,
         Config::Export::maxStartingPoints(), 0);
+    d->machiningPointsList.append(points);
     
-    return d->machiningPoints;
+    return d->machiningPointsList;
 }
 
 void LaserPath::draw(QPainter * painter)
@@ -1237,13 +1292,13 @@ QRectF LaserPolyline::sceneBoundingRect() const
     return sceneTransform().map(d->path).boundingRect();
 }
 
-LaserPointList LaserPolyline::updateMachiningPoints()
+LaserPointListList LaserPolyline::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserPolyline);
-    d->machiningPoints.clear();
+    d->machiningPointsList.clear();
     d->startingIndices.clear();
     bool isClosed = this->isClosed();
-
+    LaserPointList points;
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     d->machiningCenter = QPointF(0, 0);
     for (int i = 0; i < d->poly.size(); i++)
@@ -1257,7 +1312,7 @@ LaserPointList LaserPolyline::updateMachiningPoints()
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        d->machiningPoints.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        points.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
         if (isClosed)
         {
             d->startingIndices.append(i);
@@ -1267,11 +1322,12 @@ LaserPointList LaserPolyline::updateMachiningPoints()
     if (!isClosed)
     {
         d->startingIndices.append(0);
-        d->startingIndices.append(d->machiningPoints.size() - 1);
+        d->startingIndices.append(points.size() - 1);
     }
         
-    d->machiningCenter /= d->machiningPoints.size();
-    return d->machiningPoints;
+    d->machiningCenter /= points.size();
+    d->machiningPointsList.append(points);
+    return d->machiningPointsList;
 }
 
 void LaserPolyline::draw(QPainter * painter)
@@ -1402,11 +1458,12 @@ void LaserPolygon::setPolyline(const QPolygonF& poly)
     d->poly = poly; 
 }
 
-LaserPointList LaserPolygon::updateMachiningPoints()
+LaserPointListList LaserPolygon::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserPolygon);
-    d->machiningPoints.clear();
+    d->machiningPointsList.clear();
     d->startingIndices.clear();
+    LaserPointList points;
     bool isClosed = this->isClosed();
     QTransform t = sceneTransform() * Global::matrixToMM(SU_PX, 40, 40);
     d->machiningCenter = QPointF(0, 0);
@@ -1421,22 +1478,17 @@ LaserPointList LaserPolygon::updateMachiningPoints()
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        d->machiningPoints.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        points.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
         d->machiningCenter += pt;
         if (isClosed)
         {
             d->startingIndices.append(i);
         }
     }
-    d->machiningPoints.push_back(d->machiningPoints.first());
-    if (!isClosed)
-    {
-        d->startingIndices.append(0);
-        d->startingIndices.append(d->machiningPoints.size() - 1);
-    }
         
-    d->machiningCenter /= d->machiningPoints.size();
-    return d->machiningPoints;
+    d->machiningCenter /= points.size();
+    d->machiningPointsList.append(points);
+    return d->machiningPointsList;
 }
 
 void LaserPolygon::draw(QPainter * painter)
@@ -2011,10 +2063,10 @@ QJsonObject LaserBitmap::toJson()
 	return object;
 }
 
-LaserPointList LaserBitmap::updateMachiningPoints()
+LaserPointListList LaserBitmap::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
 {
     Q_D(LaserBitmap);
-    d->machiningPoints.clear();
+    d->machiningPointsList.clear();
     d->startingIndices.clear();
 
 	QTransform t = transform() * Global::matrixToMM(SU_PX, 40, 40);
@@ -2044,18 +2096,18 @@ LaserPointList LaserBitmap::updateMachiningPoints()
     qreal angle41 = line41.angle();
     qreal angle42 = line42.angle();
 
-    d->machiningPoints.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
-    d->machiningPoints.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
-    d->machiningPoints.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
-    d->machiningPoints.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
+    points.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
+    points.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
+    points.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
+    points.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
     d->startingIndices.append(0);
     d->startingIndices.append(1);
     d->startingIndices.append(2);
     d->startingIndices.append(3);
     d->machiningCenter = utils::center(points).toPointF();
 
-    d->machiningPoints = points;
-    return points;
+    d->machiningPointsList.append(points);
+    return d->machiningPointsList;
 }
 
 QRectF LaserBitmap::sceneBoundingRect() const
@@ -2229,7 +2281,6 @@ public:
     int alignVType;
     int lastAlignVType;
     QGraphicsView* view;
-
 };
 
 LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
@@ -2687,5 +2738,47 @@ QPainterPath LaserText::toMachiningPath() const
     QTransform transform = Global::matrixToMM(SU_PX, 40, 40);
     path = transform.map(path);
     return path;
+}
+
+LaserPointListList LaserText::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
+{
+    Q_D(LaserText);
+
+    QTransform transform = Global::matrixToMM(SU_PX, 40, 40);
+
+    int totalCount = 0;
+    for (int i = 0; i < d->pathList.size(); i++) {
+        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
+        totalCount += rowPathList.count();
+    }
+
+    d->machiningPointsList.clear();
+    LaserPointList allPoints;
+    d->startingIndices.clear();
+    for (int i = 0; i < d->pathList.size(); i++) {
+        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
+        for (QPainterPath rowPath : rowPathList) {
+            LaserPointList points;
+            QList<int> indices;
+            QPointF center;
+
+            QPainterPath path = sceneTransform().map(rowPath);
+            path = transform.map(path);
+
+            machiningUtils::path2Points(path, progressCode, progressQuota / totalCount,
+                points, indices, center, 1, Config::Export::maxStartingPoints(), 0);
+
+            for (int index : indices)
+            {
+                d->startingIndices.append(index + allPoints.count());
+            }
+            allPoints.append(points);
+            d->machiningPointsList.append(points);
+        }
+    }
+    
+    d->machiningCenter = utils::center(allPoints).toPointF();
+    
+    return d->machiningPointsList;
 }
 

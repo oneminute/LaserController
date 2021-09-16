@@ -30,7 +30,6 @@ public:
         : q_ptr(ptr)
         , totalNodes(0)
         , arrivedNodes(0)
-        , progress(0)
     {}
 
     PathOptimizer* q_ptr;
@@ -40,8 +39,6 @@ public:
     int totalNodes;
     int arrivedNodes;
     QList<OptimizeNode*> nodes;
-
-    qreal progress;
 
     PathOptimizer::Path optimizedPath;
 };
@@ -72,6 +69,7 @@ void PathOptimizer::optimize()
 
     d->arrivedNodes = 0;
     d->currentNode = d->root;
+    d->currentNode->clearEdges();
     d->currentNode->update();
     d->optimizedPath.clear();
 
@@ -80,22 +78,26 @@ void PathOptimizer::optimize()
         optimizeLayer(layerNode);
     }
 
-    d->progress = 90;
-    //emit messageUpdated(tr("Optimizing ended."));
     LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
+    OptimizeNode* last = d->root;
     for (OptimizeNode* node : d->optimizedPath)
     {
-        LaserPointList points = node->arrangeMachiningPoints();
-        LaserApplication::previewWindow->addPath(points.toPainterPath(), QPen(Qt::red, 2));
-        d->progress += 1.0 * 9 / d->totalNodes;
-        //emit messageUpdated(tr("Arranged machining points of node %1.").arg(node->nodeName()));
+        LaserPointListList pointsList = node->arrangeMachiningPoints();
+        LaserApplication::previewWindow->addPath(pointsList.toPainterPath(), QPen(Qt::red, 2));
         LaserApplication::previewWindow->addProgress(this, 1.0 * 0.1 / d->totalNodes, tr("Arranged machining points of node %1.").arg(node->nodeName()));
+        if (last)
+        {
+            QPointF from = last->arrangedEndingPoint().toPointF();
+            QPointF to = node->arrangedStartingPoint().toPointF();
+            qLogD << last->nodeName() << " --> " << node->nodeName() << ": "
+                << from << ", " << to;
+            LaserApplication::previewWindow->addLine(
+                QLineF(from, to),
+                QPen(Qt::blue, 2));
+        }
+        last = node;
     }
 
-    //emit progressUpdated(d->progress);
-    //d->progress = 100;
-    //emit progressUpdated(100);
-    //emit titleUpdated(tr("Done."));
     emit finished();
 }
 
@@ -110,7 +112,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     Q_D(PathOptimizer);
     QStack<OptimizeNode*> stack;
     QList<OptimizeNode*> leaves;
-    QList<OptimizeEdge*> edges;
 
     // 获取所有的叶节点
     for (OptimizeNode* node : root->childNodes())
@@ -121,18 +122,16 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     while (!stack.isEmpty())
     {
         OptimizeNode* node = stack.pop();
-        node->update();
+        node->clearEdges();
+        LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1").arg(node->nodeName()));
+        node->update((quint32)this, 1.0 * 0.9 / d->totalNodes);
         // 如果当前节点为一个图元
         if (node->nodeType() == LNT_PRIMITIVE)
         {
             // 先更新它的加工点集
             LaserPrimitive* primitive = static_cast<LaserPrimitive*>(node->documentItem());
-            //emit drawPath(primitive->toMachiningPath(), QPen(Qt::blue, 2), primitive->name());
-            LaserApplication::previewWindow->addPath(primitive->toMachiningPath(), QPen(Qt::blue, 2), primitive->name());
-            LaserApplication::previewWindow->addProgress(this, 1.0 * 0.9 / d->totalNodes, tr("Generating machining points of node %1").arg(primitive->name()));
-            //emit titleUpdated(tr("Generating machining points of node %1").arg(primitive->name()));
-            //d->progress += 1.0 * 0.9 * 90 / d->totalNodes;
-            //emit progressUpdated(d->progress);
+            LaserApplication::previewWindow->addPath(primitive->machiningPoints().toPainterPath(), QPen(Qt::blue, 2), primitive->name());
+            LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1. Done.").arg(node->nodeName()));
         }
         d->nodes.append(node);
 
@@ -167,8 +166,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             OptimizeEdge* edge = new OptimizeEdge(node, node->parentNode());
             node->setOutEdge(edge);
             QString label = QString("%1 -> %2").arg(node->nodeName()).arg(node->parentNode()->nodeName());
-            //emit drawLine(edge->toLine(), QPen(Qt::lightGray, 1, Qt::DashLine), label);
-            edges.append(edge);
         }
 
         // find all child nodes from its siblings
@@ -178,8 +175,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
             node->addEdge(edge);
             QString label = QString("%1 -> %2").arg(node->nodeName()).arg(leafNode->nodeName());
-            //emit drawLine(edge->toLine(), QPen(Qt::magenta, 1, Qt::DashLine), label);
-            edges.append(edge);
         }
 
         for (OptimizeNode* childNode : node->childNodes())
@@ -190,14 +185,10 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
 
     for (OptimizeNode* node : leaves)
     {
-        //root->leavesPoints().addOptimizeNode(node);
         OptimizeEdge* edge = new OptimizeEdge(d->currentNode, node);
         d->currentNode->addEdge(edge);
         QString label = QString("%1 -> %2").arg(root->nodeName()).arg(node->nodeName());
-        //emit drawLine(edge->toLine(), QPen(Qt::green, 1, Qt::DashLine), label);
-        edges.append(edge);
     }
-    //root->leavesPoints().buildKdtree();
 
     // 开始图遍历
     travelled.clear();
@@ -209,9 +200,6 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
 
         if (d->currentNode->nodeType() == LNT_PRIMITIVE)
         {
-            //emit titleUpdated(tr("Arrived node %1").arg(d->currentNode->nodeName()));
-            //d->progress += 1.0 * 0.1 * 90 / d->totalNodes;
-            //emit progressUpdated(d->progress);
             LaserApplication::previewWindow->addProgress(this, 0.9 * 0.1 / d->totalNodes, tr("Arrived node %1").arg(d->currentNode->nodeName()));
             d->optimizedPath.append(d->currentNode);
         }
@@ -231,7 +219,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
         { 
             // 为空表示兄弟节点已经全部遍历完成，向父节点移动
             OptimizeNode* parentNode = d->currentNode->parentNode();
-            if (parentNode->isVirtual())
+            if (!parentNode || parentNode->isVirtual())
                 break;
 
             if (travelled.contains(parentNode))
@@ -251,15 +239,12 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             // 构建kdtree
             siblingPoints.buildKdtree();
             OptimizeNode* candidate = siblingPoints.nearestSearch(d->currentNode);
-            LaserApplication::previewWindow->addLine(QLineF(d->currentNode->currentPos().toPointF(), 
-                candidate->currentPos().toPointF()), QPen(Qt::black, 2));
             d->currentNode = candidate;
         }
     }
     
     d->currentNode->clearChildren();
     d->currentNode->clearEdges();
-    qDeleteAll(edges);
 }
 
 void PathOptimizer::printNodeAndEdges()

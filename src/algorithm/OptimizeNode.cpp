@@ -1,4 +1,4 @@
-#include "OptimizeEdge.h"
+﻿#include "OptimizeEdge.h"
 #include "LaserApplication.h"
 #include "common/Config.h"
 #include <laser/LaserDevice.h>
@@ -27,7 +27,7 @@ public:
 
     ~OptimizeNodePrivate();
 
-    void update();
+    void update(quint32 progressCode, qreal progressQuota);
 
     //bool isVirtual() const;
 
@@ -59,7 +59,7 @@ OptimizeNodePrivate::~OptimizeNodePrivate()
     qLogD << "Node " << name << " destroyed.";
 }
 
-void OptimizeNodePrivate::update()
+void OptimizeNodePrivate::update(quint32 progressCode, qreal progressQuota)
 {
     Q_Q(OptimizeNode);
 
@@ -67,8 +67,10 @@ void OptimizeNodePrivate::update()
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(documentItem);
         name = primitive->name();
-        primitive->updateMachiningPoints();
+        primitive->updateMachiningPoints(progressCode, progressQuota);
         startingPoints = primitive->startingPoints();
+        if (startingPoints.isEmpty())
+            return;
         startingPoints.buildKdtree();
         currentPoint = primitive->firstStartingPoint();
     }
@@ -187,7 +189,11 @@ void OptimizeNode::clearChildren()
 void OptimizeNode::clearEdges()
 {
     Q_D(OptimizeNode);
-    d->edges.clear();
+    if (!d->edges.isEmpty())
+    {
+        qDeleteAll(d->edges);
+        d->edges.clear();
+    }
 }
 
 bool OptimizeNode::hasChildren() const
@@ -377,10 +383,10 @@ QPointF OptimizeNode::machiningPosition() const
     return QPointF(0, 0);
 }
 
-void OptimizeNode::update()
+void OptimizeNode::update(quint32 progressCode, qreal progressQuota)
 {
     Q_D(OptimizeNode);
-    d->update();
+    d->update(progressCode, progressQuota);
 }
 
 ILaserDocumentItem* OptimizeNode::documentItem() const
@@ -494,48 +500,6 @@ LaserPoint OptimizeNode::point(int index) const
     return d->startingPoints[index];
 }
 
-void OptimizeNode::debugDraw(cv::Mat& canvas)
-{
-    Q_D(OptimizeNode);
-    static OptimizeNode* parentNode = nullptr;
-    static QColor color;
-
-    if (d->nodeType == LNT_PRIMITIVE)
-    {
-        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        if (d->parentNode != parentNode)
-        {
-            parentNode = d->parentNode;
-            color.setRed(QRandomGenerator::global()->bounded(192));
-            color.setGreen(QRandomGenerator::global()->bounded(192));
-            color.setBlue(QRandomGenerator::global()->bounded(192));
-        }
-        //qLogD << color;
-        int i = 0;
-        LaserPoint lastPoint;
-        for (const LaserPoint& pt : primitive->machiningPoints())
-        {
-            if (i != 0)
-            {
-                cv::line(canvas, typeUtils::qtPointF2CVPoint2f(lastPoint.toPointF()), 
-                    typeUtils::qtPointF2CVPoint2f(pt.toPointF()), cv::Scalar(color.red(), color.green(), color.blue()), 3);
-            }
-
-            lastPoint = pt;
-            i++;
-        }
-
-        for (const LaserPoint& pt : primitive->startingPoints())
-        {
-            qreal lineLength = 20;
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(-lineLength, -lineLength)), 
-                typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(lineLength, lineLength)), cv::Scalar(0, 0, 255));
-            cv::line(canvas, typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(-lineLength, lineLength)), 
-                typeUtils::qtPointF2CVPoint2f(pt.toPointF() + QPointF(lineLength, -lineLength)), cv::Scalar(0, 0, 255));
-        }
-    }
-}
-
 bool OptimizeNode::isVirtual() const
 {
     switch (nodeType())
@@ -557,18 +521,20 @@ LaserPrimitive* OptimizeNode::primitive() const
     return nullptr;
 }
 
-LaserPointList OptimizeNode::arrangeMachiningPoints()
+LaserPointListList OptimizeNode::arrangeMachiningPoints()
 {
     Q_D(OptimizeNode);
     if (d->nodeType == LNT_PRIMITIVE)
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        return primitive->arrangeMachiningPoints(d->lastPoint, d->index);
+        // d->index是startingPoints的index，要换算为machiningPoints的index
+        int index = primitive->startingIndices().at(d->index);
+        return primitive->arrangeMachiningPoints(d->lastPoint, index);
     }
-    return LaserPointList();
+    return LaserPointListList();
 }
 
-LaserPointList OptimizeNode::arrangedPoints() const
+LaserPointListList OptimizeNode::arrangedPoints() const
 {
     Q_D(const OptimizeNode);
     if (d->nodeType == LNT_PRIMITIVE)
@@ -576,5 +542,35 @@ LaserPointList OptimizeNode::arrangedPoints() const
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
         return primitive->arrangedPoints();
     }
-    return LaserPointList();
+    return LaserPointListList();
+}
+
+LaserPoint OptimizeNode::arrangedStartingPoint() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->arrangedStartingPoint();
+    }
+    else if (d->nodeType == LNT_DOCUMENT)
+    {
+        return d->currentPoint;
+    }
+    return LaserPoint();
+}
+
+LaserPoint OptimizeNode::arrangedEndingPoint() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_PRIMITIVE)
+    {
+        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
+        return primitive->arrangedEndingPoint();
+    }
+    else if (d->nodeType == LNT_DOCUMENT)
+    {
+        return d->currentPoint;
+    }
+    return LaserPoint();
 }

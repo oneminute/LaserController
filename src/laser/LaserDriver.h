@@ -13,77 +13,6 @@
 
 class LaserDevice;
 
-enum LaserWorkMode
-{
-    LWM_WORKING,
-    LWM_PAUSE,
-    LWM_STOP
-};
-
-struct LaserState
-{
-public:
-    LaserState()
-        : workingMode(LaserWorkMode::LWM_STOP)
-        , operation(0)
-        , x(0)
-        , y(0)
-        , z(0)
-        , power(0)
-        , gray(0)
-    {}
-    LaserWorkMode workingMode;
-    int operation;
-    double x;
-    double y;
-    double z;
-    double power;
-    double gray;
-
-    bool parse(const QString& data)
-    {
-        QStringList values = data.split(";", QString::SkipEmptyParts);
-        if (values.size() != 7)
-            return false;
-
-        for (int i = 0; i < values.size(); i++)
-        {
-            QString value = values[i];
-            bool ok = false;
-
-            switch (i)
-            {
-            case 0:
-                workingMode = static_cast<LaserWorkMode>(value.toInt(&ok));
-                break;
-            case 1:
-                operation = value.toInt(&ok);
-                break;
-            case 2:
-                x = value.toDouble(&ok);
-                break;
-            case 3:
-                y = value.toDouble(&ok);
-                break;
-            case 4:
-                z = value.toDouble(&ok);
-                break;
-            case 5:
-                power = value.toInt(&ok);
-                break;
-            case 6:
-                gray = value.toInt(&ok);
-                break;
-            }
-            if (!ok)
-                return false;
-        }
-        return true;
-    }
-};
-
-Q_DECLARE_METATYPE(LaserState)
-
 class LaserDriver : public QObject
 {
     Q_OBJECT
@@ -272,6 +201,17 @@ private:
         bool zMoveEnable,
         bool zMoveStyle,
         int zPos);
+    typedef void(__stdcall *FNCheckMoveLaserMotors)(
+        quint16 delay,
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos);
     typedef void(__stdcall *FNSmallScaleMovement)(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
 
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
@@ -294,10 +234,8 @@ public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
 
-    static LaserDriver& instance();
     static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
     static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
-    static void parseAndRefreshRegisters(QString &eventData, LaserRegister::RegistersMap& registers);
     static void ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount);
 
     bool load();
@@ -343,6 +281,18 @@ public:
         bool zMoveEnable,
         bool zMoveStyle,
         int zPos);
+    void checkMoveLaserMotors(
+        quint16 delay,
+        bool xMoveEnable,
+        bool xMoveStyle,
+        int xPos,
+        bool yMoveEnable,
+        bool yMoveStyle,
+        int yPos,
+        bool zMoveEnable,
+        bool zMoveStyle,
+        int zPos);
+    void startMoveLaserMotors();
     void controlHDAction(int action);
 
     QString getMainCardID();
@@ -381,11 +331,6 @@ public:
     bool isMachining() const { return m_isMachining; }
     QString portName() const { return m_portName; }
 
-    void setSystemRegister(SystemRegisterType rt, QVariant value);
-    bool getSystemRegister(SystemRegisterType rt, QVariant& value);
-    //QString registerComment(RegisterType rt);
-    bool getLayout(float& width, float& height);
-
 protected slots:
 
 signals:
@@ -403,7 +348,6 @@ signals:
     void machiningCompleted();
     void downloading(int current, int total, float progress);
     void downloaded();
-    void workStateUpdated(LaserState state);
     void idle();
     void sysParamFromCardArrived(const QString& data);
     void registersFectched(const LaserRegister::RegistersMap& data);
@@ -428,7 +372,6 @@ private:
     QString m_portName;
     QWidget* m_parentWidget;
     LaserWorkMode m_workMode;
-    LaserRegister::RegistersMap m_registers;
 
     QLibrary m_library;
 
@@ -465,6 +408,8 @@ private:
 
     FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;
     FNLPenQuickMoveTo m_fnLPenQuickMoveTo;
+    FNCheckMoveLaserMotors m_fnCheckMoveLaserMotors;
+    FN_VOID_VOID m_fnStartMoveLaserMotors;
     FN_VOID_INT m_fnControlHDAction;
 
     FN_WCHART_VOID m_fnGetMainCardID;
@@ -496,9 +441,6 @@ private:
 
     LaserDevice* m_device;
     bool m_isClosed;
-
-    static QMap<int, QString> g_registerComments;
-    static LaserDriver* g_driver;
 };
 
 #endif // LASERCONTROLLER_H

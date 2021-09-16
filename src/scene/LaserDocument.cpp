@@ -226,154 +226,6 @@ QString LaserDocument::newLayerName() const
 
 void LaserDocument::exportJSON(const QString& filename)
 {
-    exportJSON2(filename);
-}
-
-void LaserDocument::exportJSON1(const QString& filename)
-{
-    Q_D(LaserDocument);
-
-    QFile saveFile(filename);
-    QJsonObject jsonObj;
-
-    QJsonObject laserDocumentInfo;
-    qDebug() << &LaserDriver::instance();
-    laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
-    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-    laserDocumentInfo["PrinterDrawUnit"] = 1016;
-    laserDocumentInfo["FinishRun"] = d->finishRun.code;
-    jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
-    QPointF lastPoint = docOriginMachining();
-
-    QJsonArray layers;
-    float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width());
-    float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical);
-    cv::Mat canvas(pageHeight * 40, pageWidth * 40, CV_8UC3, cv::Scalar(255, 255, 255));
-    int layerId = 0;
-    for (int i = 0; i < d->layers.count(); i++)
-    {
-        LaserLayer* layer = d->layers[i];
-        if (layer->isEmpty())
-            continue;
-        QJsonObject layerObj;
-        QJsonObject paramObj;
-        QJsonObject engravingParamObj;
-        QJsonObject cuttingParamObj;
-        if (layer->type() == LLT_ENGRAVING)
-        {
-            engravingParamObj["LayerId"] = i;
-            engravingParamObj["Type"] = layer->type();
-            engravingParamObj["MinSpeed"] = layer->minSpeed();
-            engravingParamObj["RunSpeed"] = layer->runSpeed();
-            engravingParamObj["LaserPower"] = layer->laserPower();
-            engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
-            engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
-            engravingParamObj["CarveForward"] = layer->engravingForward();
-            engravingParamObj["CarveStyle"] = layer->engravingStyle();
-            engravingParamObj["HStep"] = layer->lineSpacing();
-            engravingParamObj["LStep"] = layer->columnSpacing();
-            engravingParamObj["ErrorX"] = layer->errorX();
-            engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
-            engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
-        }
-        else if (layer->type() == LLT_CUTTING)
-        {
-            cuttingParamObj["LayerId"] = i;
-            cuttingParamObj["Type"] = layer->type();
-            cuttingParamObj["MinSpeed"] = layer->minSpeed();
-            cuttingParamObj["RunSpeed"] = layer->runSpeed();
-            cuttingParamObj["LaserPower"] = layer->laserPower();
-            cuttingParamObj["MinSpeedPower"] = layer->minSpeedPower();
-            cuttingParamObj["RunSpeedPower"] = layer->runSpeedPower();
-        }
-        paramObj["EngravingParams"] = engravingParamObj;
-        paramObj["CuttingParams"] = cuttingParamObj;
-        layerObj["Params"] = paramObj;
-
-        QJsonArray items;
-        QList<LaserPrimitive*> laserItems = layer->primitives();
-        for (int li = 0; li < laserItems.size(); li++)
-        {
-            LaserPrimitive* laserItem = laserItems[li];
-            QJsonObject itemObj;
-            bool add = false;
-            if (layer->type() == LLT_ENGRAVING)
-            {
-                itemObj["Layer"] = layerId;
-                itemObj["Width"] = Global::convertToMM(SU_PX, laserItem->boundingRect().width());
-                itemObj["Height"] = Global::convertToMM(SU_PX, laserItem->boundingRect().height(), Qt::Vertical);
-
-                QByteArray data = laserItem->engravingImage();
-                if (!data.isEmpty())
-                {
-                    itemObj["Type"] = laserItem->typeLatinName();
-                    itemObj["ImageType"] = "PNG";
-                    itemObj["Data"] = QString(data.toBase64());
-                    add = true;
-                }
-            }
-            else if (layer->type() == LLT_CUTTING)
-            {
-                itemObj["Layer"] = layerId;
-                //QList<QPainterPath> modifyPathList = laserItem->subBoundings();
-                LaserPointList points = laserItem->updateMachiningPoints();
-                if (!points.empty())
-                {
-                    itemObj["Type"] = laserItem->typeLatinName();
-                    itemObj["Data"] = QString(machiningUtils::points2Plt(points, lastPoint));
-                    add = true;
-                }
-                /*if (modifyPathList.isEmpty())
-                {
-
-                }
-                else
-                {
-                    QString pltString;
-                    for (QPainterPath subPath : modifyPathList)
-                    {
-                        QVector<QPointF> points;
-                        if (machiningUtils::path2Points(subPath, points, canvas))
-                        {
-                            pltString.append(QString(machiningUtils::points2Plt(points)));
-                        }
-                    }
-                    if (!pltString.isEmpty())
-                    {
-                        itemObj["Type"] = laserItem->typeLatinName();
-                        itemObj["Data"] = pltString;
-                        add = true;
-                    }
-                }*/
-            }
-            if (add)
-                items.append(itemObj);
-        }
-        layerObj["Items"] = items;
-        layers.append(layerObj);
-    }
-
-    QJsonObject actionObj;
-
-    jsonObj["Layers"] = layers;
-
-    QJsonDocument jsonDoc(jsonObj);
-
-    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
-    {
-        qWarning("Couldn't open save file.");
-        return;
-    }
-
-    qint64 writtenBytes = saveFile.write(jsonDoc.toJson(QJsonDocument::Indented));
-    qDebug() << "written bytes:" << writtenBytes;
-
-    if (!canvas.empty())
-        cv::imwrite("tmp/canvas_test.png", canvas);
-}
-
-void LaserDocument::exportJSON2(const QString& filename)
-{
     Q_D(LaserDocument);
 
     LaserApplication::previewWindow->registerProgressCode(this, 0.1);
@@ -395,8 +247,7 @@ void LaserDocument::exportJSON2(const QString& filename)
             QJsonObject jsonObj;
 
             QJsonObject laserDocumentInfo;
-            qDebug() << &LaserDriver::instance();
-            laserDocumentInfo["APIVersion"] = LaserDriver::instance().getVersion();
+            laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
             laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
             laserDocumentInfo["PrinterDrawUnit"] = 1016;
             laserDocumentInfo["FinishRun"] = d->finishRun.code;
@@ -406,6 +257,8 @@ void LaserDocument::exportJSON2(const QString& filename)
             QPointF docOrigin = docOriginMachining();
             docOrigin = LaserApplication::device->deviceTransformMachining().map(docOrigin);
             laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
+            QRectF docBoundingRect = docBoundingRectMachining();
+            laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
             jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
             QJsonArray layers;
@@ -446,11 +299,11 @@ void LaserDocument::exportJSON2(const QString& filename)
                 else if (layer->type() == LLT_CUTTING)
                 {
                     itemObj["Layer"] = layerId;
-                    LaserPointList points = primitive->arrangedPoints();
+                    LaserPointListList points = primitive->arrangedPoints();
                     if (!points.empty())
                     {
                         itemObj["Type"] = primitive->typeLatinName();
-                        itemObj["Data"] = QString(machiningUtils::points2Plt(points, lastPoint));
+                        itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
                         items.append(itemObj);
                     }
                 }
@@ -511,8 +364,8 @@ void LaserDocument::exportJSON2(const QString& filename)
                 return;
             }
 
-            QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
-            qLogD << rawJson;
+            //QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
+            QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
             qint64 writtenBytes = saveFile.write(rawJson);
             LaserApplication::previewWindow->addProgress(this, 0.1 / path.length(), tr("File saved."));
             qDebug() << "written bytes:" << writtenBytes;
@@ -786,6 +639,11 @@ QRectF LaserDocument::docBoundingRect() const
 QRectF LaserDocument::docBoundingRectMM() const
 {
     return Global::matrixToMM(SU_PX).map(docBoundingRect()).boundingRect();
+}
+
+QRectF LaserDocument::docBoundingRectMachining() const
+{
+    return Global::matrixToMM(SU_PX, 40, 40).map(docBoundingRect()).boundingRect();
 }
 
 void LaserDocument::updateLayersStructure()
@@ -1090,7 +948,7 @@ int LaserDocument::totalNodes()
 void LaserDocument::init()
 {
 	Q_D(LaserDocument);
-	d->name = "document";
+	d->name = tr("Untitled");
 	QString layerName = newLayerName();
 	LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
 	addLayer(layer);
@@ -1239,29 +1097,6 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
             return false;
         }
     );
-
-    // 获取每个分组中子节点的最大个数。
-    //int maxChildNodes = Config::PathOptimization::maxGroupSize();
-    // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
-    // 新建一个父节点，将该父节点作为当前父节点的子节点。
-    //if (children.count() > maxChildNodes)
-    //{
-    //    node->childNodes().clear();
-    //    OptimizeNode* newNode = nullptr;
-    //    for (int i = 0, count = 0; i < children.count(); i++)
-    //    {
-    //        if ((count++ % maxChildNodes) == 0)
-    //        {
-    //            newNode = new OptimizeNode();
-    //            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-    //            newNode->setNodeName(nodeName);
-    //            node->addChildNode(newNode);
-    //        }
-    //        newNode->addChildNode(children.at(i));
-    //    }
-    //    //optimizeGroups(node, level);
-    //    qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
-    //}
 
     // 对每一个子节点再次递归进行整理。
     for (OptimizeNode* item : node->childNodes())

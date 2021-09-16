@@ -141,6 +141,8 @@ int LaserPointList::nearestSearch(const LaserPoint& point)
         }
     }
 
+    qLogD << "nearest point: " << m_matrix[index * 3] << ", " << m_matrix[index * 3 + 1] << ", " << m_matrix[index * 3 + 2];
+
     return indices[index] / 2;
 }
 
@@ -150,6 +152,7 @@ OptimizeNode* LaserPointList::nearestSearch(OptimizeNode* srcNode)
     OptimizeNode* node = m_nodeMap[globalIndex];
     int index = m_indexMap[globalIndex];
     node->setCurrentIndex(index);
+    qLogD << node->currentPos();
     node->setLastPoint(srcNode->currentPos());
     return node;
 }
@@ -169,15 +172,32 @@ QVector<QPointF> LaserPointList::toPoints() const
 QPainterPath LaserPointList::toPainterPath() const
 {
     QPainterPath path;
-    int i = 0;
-    for (const LaserPoint& point : *this)
+    for (int i = 0; i < length(); i++)
     {
+        LaserPoint point = at(i);
         if (i == 0)
             path.moveTo(point.toPointF());
         else
             path.lineTo(point.toPointF());
-        i++;
     }
+
     return path;
 }
 
+LaserPointListList::LaserPointListList()
+{
+}
+
+LaserPointListList::~LaserPointListList()
+{
+}
+
+QPainterPath LaserPointListList::toPainterPath() const
+{
+    QPainterPath path;
+    for (const LaserPointList& list : *this)
+    {
+        path.addPath(list.toPainterPath());
+    }
+    return path;
+}

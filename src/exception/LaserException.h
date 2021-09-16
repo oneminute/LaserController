@@ -1,9 +1,9 @@
 #ifndef LASEREXCEPTION_H
 #define LASEREXCEPTION_H
 
-#include "laser/LaserDefines.h"
 #include <QObject>
 #include <QException>
+#include "laser/LaserDefines.h"
 
 #define DEFINE_LASER_EXCEPTION_D(className, parentClassName) \
     class className: public parentClassName \

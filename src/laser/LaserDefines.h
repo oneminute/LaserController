@@ -1,6 +1,10 @@
 #ifndef LASERDEFINES_H
 #define LASERDEFINES_H
 
+#include <QString>
+#include <QStringList>
+#include <QVector3D>
+
 enum LaserErrorCode
 {
     E_Base = 0,
@@ -196,4 +200,45 @@ enum LaserEventType
     M_MainlBoxValid,
     M_MainlBoxAccountOK
 };
+
+enum LaserWorkMode
+{
+    LWM_STOP,
+    LWM_WORKING,
+    LWM_PAUSE
+};
+
+struct LaserState
+{
+public:
+    LaserState()
+        : operation(0)
+        , packageNo(0)
+        , workingMode(LaserWorkMode::LWM_STOP)
+    {}
+    int operation;
+    int packageNo;
+    LaserWorkMode workingMode;
+    int operationId;
+    QVector3D pos;
+
+    bool parse(const QString& data)
+    {
+        QStringList values = data.split(";", QString::SkipEmptyParts);
+        if (values.size() != 7)
+            return false;
+
+        bool ok = true;
+        operation = values.at(0).toInt(&ok);
+        packageNo = values.at(1).toInt(&ok);
+        workingMode = static_cast<LaserWorkMode>(values.at(2).toInt(&ok));
+        operationId = values.at(3).toInt(&ok);
+        pos.setX(values.at(4).toDouble(&ok));
+        pos.setY(values.at(5).toDouble(&ok));
+        pos.setZ(values.at(6).toDouble(&ok));
+        return true;
+    }
+};
+Q_DECLARE_METATYPE(LaserState)
+
 #endif // LASERDEFINES_H

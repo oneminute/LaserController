@@ -69,6 +69,7 @@ public:
     QTransform docTransformMM() const;
     QRectF docBoundingRect() const;
     QRectF docBoundingRectMM() const;
+    QRectF docBoundingRectMachining() const;
 
     /// <summary>
     /// 返回相对于当前确定的原点的坐标。
@@ -78,8 +79,6 @@ public:
 
 public slots:
     void exportJSON(const QString& filename);
-    void exportJSON1(const QString& filename);
-    void exportJSON2(const QString& filename);
     void updateLayersStructure();
     void destroy();
     void open();
