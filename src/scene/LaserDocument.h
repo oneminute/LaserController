@@ -87,8 +87,6 @@ public slots:
     void outline();
     //void clearOutline(bool clearLayers = false);
     void printOutline(OptimizeNode* node, int level);
-    void arrange();
-    void optimize();
     void save(const QString& filename, QWidget* window);
     void load(const QString& filename, QWidget* window);
     int totalNodes();

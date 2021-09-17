@@ -28,6 +28,8 @@ public:
 
     qreal layoutWidth() const;
     qreal layoutHeight() const;
+    qreal layoutWidthMachining() const;
+    qreal layoutHeightMachining() const;
 
     int printerDrawUnit() const;
     void setPrinterDrawUnit(int unit, bool toCard = true);

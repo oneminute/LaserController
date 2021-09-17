@@ -1,7 +1,5 @@
 #include "common.h"
-#include "common.h"
-#include "common.h"
-#include "common.h"
+#include "common/Config.h"
 
 int Global::dpiX(96);
 int Global::dpiY(96);
@@ -120,12 +118,35 @@ float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
 	return num * factor;
 }
 
+float Global::convertToMachining(SizeUnit from, Qt::Orientation orientation)
+{
+	return convertToMM(from, Config::General::machiningUnit(), orientation);
+}
+
 QTransform Global::matrixToMM(SizeUnit from, float hScale, float vScale)
 {
-	return QTransform::fromScale(Global::convertToMM(from, 1) * hScale, Global::convertToMM(from, 1, Qt::Vertical) * vScale);
+	return QTransform::fromScale(Global::convertToMM(from, 1) * hScale, 
+		Global::convertToMM(from, 1, Qt::Vertical) * vScale);
 }
 
 QTransform Global::matrix(SizeUnit from, SizeUnit to, float hScale, float vScale)
 {
-	return QTransform::fromScale(Global::convertUnit(from, to, 1) * hScale, Global::convertUnit(from, to, 1, Qt::Vertical) * vScale);
+	return QTransform::fromScale(Global::convertUnit(from, to, 1) * hScale, 
+		Global::convertUnit(from, to, 1, Qt::Vertical) * vScale);
+}
+
+QTransform Global::matrixToMachining(SizeUnit from)
+{
+	return QTransform::fromScale(Global::convertToMM(from, Config::General::machiningUnit()), 
+		Global::convertToMM(from, Config::General::machiningUnit(), Qt::Vertical));
+}
+
+int Global::pxToMachiningH(qreal x)
+{
+	return qRound(convertToMM(SU_PX, x * Config::General::machiningUnit()));
+}
+
+int Global::pxToMachiningV(qreal y)
+{
+	return qRound(convertToMM(SU_PX, y * Config::General::machiningUnit(), Qt::Vertical));
 }

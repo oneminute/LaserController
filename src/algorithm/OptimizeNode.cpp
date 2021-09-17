@@ -371,7 +371,7 @@ QPointF OptimizeNode::machiningPosition() const
     case LNT_PRIMITIVE:
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        return Global::matrixToMM(SU_PX, 40, 40).map(primitive->position());
+        return Global::matrixToMachining().map(primitive->position());
     }
     case LNT_VIRTUAL:
     {

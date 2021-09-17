@@ -316,7 +316,7 @@ public:
 
     QVector3D getCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
-    void startMachining(bool zeroPointStyle);
+    void startMachining(int packIndex);
     int pauseContinueMachining(bool pause);
     void stopMachining();
     int controlMotor(bool open);
@@ -422,7 +422,7 @@ private:
 
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FNSmallScaleMovement m_fnSmallScaleMovement;
-    FN_VOID_BOOL m_fnStartMachining;
+    FN_VOID_INT m_fnStartMachining;
     FN_INT_BOOL m_fnPauseContinueMachining;
     FN_VOID_VOID m_fnStopMachining;
     FN_INT_BOOL m_fnControlMotor;

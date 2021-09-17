@@ -2989,7 +2989,7 @@ void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
     //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
 #endif
     LaserApplication::driver->loadDataFromFile(filePath);
-    LaserApplication::driver->startMachining(m_comboBoxStartPosition->currentIndex() == 3);
+    //LaserApplication::driver->startMachining(0);
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)

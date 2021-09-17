@@ -79,6 +79,7 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(general, language, int, toInt)
         CONFIG_ITEM(general, unit, int, toInt)
+        CONFIG_ITEM(general, machiningUnit, qreal, toReal)
 
     private:
         friend class Config;
@@ -207,6 +208,7 @@ public:
         CONFIG_ITEM(export, maxStartingPoints, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
+        CONFIG_ITEM(export, relativePoint, bool, toBool)
 
     private:
         friend class Config;

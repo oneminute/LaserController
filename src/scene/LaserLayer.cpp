@@ -528,7 +528,7 @@ QPointF LaserLayer::positionMM() const
 
 QPointF LaserLayer::positionMachining() const
 {
-    return Global::matrixToMM(SU_PX, 40, 40).map(position());
+    return Global::matrixToMachining().map(position());
 }
 
 void LaserLayer::onClicked()

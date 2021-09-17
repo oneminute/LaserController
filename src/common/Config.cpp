@@ -215,6 +215,17 @@ void Config::loadGeneralItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+
+    ConfigItem* machiningUnit = group->addConfigItem(
+        "machiningUnit",
+        tr("Machining Unit"),
+        tr("Machining Unit"),
+        1000,
+        DT_REAL
+    );
+    machiningUnit->setInputWidgetType(IWT_DoubleSpinBox);
+    machiningUnit->setInputWidgetProperty("minimum", 1);
+    machiningUnit->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadLayersItems()
@@ -378,7 +389,7 @@ void Config::loadUiItems()
         1000
     );
     autoRepeatDelay->setInputWidgetProperty("minimum", 0);
-    autoRepeatDelay->setInputWidgetProperty("maximum", 5000);
+    autoRepeatDelay->setInputWidgetProperty("maximum", 2000);
 
     ConfigItem* autoRepeatInterval = group->addConfigItem(
         "autoRepeatInterval",
@@ -387,7 +398,7 @@ void Config::loadUiItems()
         200
     );
     autoRepeatInterval->setInputWidgetProperty("minimum", 0);
-    autoRepeatInterval->setInputWidgetProperty("maximum", 5000);
+    autoRepeatInterval->setInputWidgetProperty("maximum", 2000);
 }
 
 void Config::loadCuttingLayerItems()
@@ -764,6 +775,15 @@ void Config::loadExportItems()
             smallDiagonalLimitation->setEnabled(enabled);
         }
     );
+
+    ConfigItem* relativePoint = group->addConfigItem(
+        "relativePoint",
+        tr("Relative Point"),
+        tr("Relative Point"),
+        false,
+        DT_BOOL
+    );
+    relativePoint->setStoreStrategy(SS_DIRECTLY);
 }
 
 void Config::loadDeviceItems()

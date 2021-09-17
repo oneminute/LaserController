@@ -193,16 +193,21 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
 
     QPointF pt = points.first().toPointF();
     QPointF diff = pt - lastPoint;
-    buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
-    //buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(-qRound(pt.y())));
+    lastPoint = pt;
+    if (Config::Export::relativePoint())
+        buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
+    else
+        buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
     for (size_t i = 1; i < points.size(); i++)
     {
         LaserPoint lPt = points.at(i);
         QPointF pt = lPt.toPointF();
         QPointF diff = pt - lastPoint;
+        if (Config::Export::relativePoint())
+            buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
+        else
+            buffer.append(QString("PD%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
         lastPoint = pt;
-        buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(-qRound(diff.y())));
-        //buffer.append(QString("PD%1 %2;").arg(qRound(pt.x())).arg(-qRound(pt.y())));
     }
     return buffer;
 }

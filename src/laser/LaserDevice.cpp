@@ -272,6 +272,18 @@ qreal LaserDevice::layoutHeight() const
     return Config::SystemRegister::yMaxLength() / 1000.0;
 }
 
+qreal LaserDevice::layoutWidthMachining() const
+{
+    Q_D(const LaserDevice);
+    return Config::SystemRegister::xMaxLength();
+}
+
+qreal LaserDevice::layoutHeightMachining() const
+{
+    Q_D(const LaserDevice);
+    return Config::SystemRegister::yMaxLength();
+}
+
 int LaserDevice::printerDrawUnit() const
 {
     Q_D(const LaserDevice);
@@ -671,7 +683,7 @@ QPointF LaserDevice::deviceOriginMM() const
 
 QPointF LaserDevice::deviceOriginMachining() const
 {
-    return deviceOriginMM() * 40;
+    return deviceOriginMM() * Config::General::machiningUnit();
 }
 
 QRectF LaserDevice::boundingRect() const
@@ -688,7 +700,7 @@ QRectF LaserDevice::boundingRectMM() const
 
 QRectF LaserDevice::boundRectMachining() const
 {
-    return Global::matrixToMM(SU_PX, 40, 40).map(boundingRect()).boundingRect();
+    return Global::matrixToMachining().map(boundingRect()).boundingRect();
 }
 
 QTransform LaserDevice::transform() const
@@ -739,8 +751,8 @@ QTransform LaserDevice::deviceTransformMachining() const
 {
     Q_D(const LaserDevice);
     return QTransform::fromTranslate(
-        -d->deviceOriginMM.x() * 40,
-        -d->deviceOriginMM.y() * 40
+        -d->deviceOriginMM.x() * Config::General::machiningUnit(),
+        -d->deviceOriginMM.y() * Config::General::machiningUnit()
     );
 }
 

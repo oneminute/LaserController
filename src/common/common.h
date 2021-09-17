@@ -281,9 +281,14 @@ public:
 
 	static float convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
 	static float convertToMM(SizeUnit from, float num, Qt::Orientation orientation = Qt::Horizontal);
+	static float convertToMachining(SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
 	static float convertFromMM(SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
 	static QTransform matrixToMM(SizeUnit from, float hScale = 1.f, float vScale = 1.f);
 	static QTransform matrix(SizeUnit from, SizeUnit to, float hScale = 1.0f, float vScale = 1.0f);
+    static QTransform matrixToMachining(SizeUnit from = SU_PX);
+
+    int pxToMachiningH(qreal x);
+    int pxToMachiningV(qreal y);
 };
 
 struct FillStyleAndPixelsCount

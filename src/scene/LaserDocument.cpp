@@ -230,9 +230,6 @@ void LaserDocument::exportJSON(const QString& filename)
 
     LaserApplication::previewWindow->registerProgressCode(this, 0.1);
 
-    float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
-    float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
-
     QElapsedTimer timer;
     timer.start();
     OptimizerController* optimizer = new OptimizerController(d->optimizeNode, primitives().count());
@@ -289,8 +286,8 @@ void LaserDocument::exportJSON(const QString& filename)
                 {
                     //engravingParamObj["LayerId"] = layerList.count();
                     engravingParamObj["Type"] = layer->type();
-                    engravingParamObj["MinSpeed"] = layer->minSpeed();
-                    engravingParamObj["RunSpeed"] = layer->runSpeed();
+                    engravingParamObj["MinSpeed"] = layer->minSpeed() * 1000;
+                    engravingParamObj["RunSpeed"] = layer->runSpeed() * 1000;
                     engravingParamObj["LaserPower"] = layer->laserPower();
                     engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
                     engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
@@ -306,8 +303,8 @@ void LaserDocument::exportJSON(const QString& filename)
                 {
                     //cuttingParamObj["LayerId"] = layerList.count();
                     cuttingParamObj["Type"] = layer->type();
-                    cuttingParamObj["MinSpeed"] = layer->minSpeed();
-                    cuttingParamObj["RunSpeed"] = layer->runSpeed();
+                    cuttingParamObj["MinSpeed"] = layer->minSpeed() * 1000;
+                    cuttingParamObj["RunSpeed"] = layer->runSpeed() * 1000;
                     cuttingParamObj["LaserPower"] = layer->laserPower();
                     cuttingParamObj["MinSpeedPower"] = layer->minSpeedPower();
                     cuttingParamObj["RunSpeedPower"] = layer->runSpeedPower();
@@ -521,7 +518,7 @@ QPointF LaserDocument::docOriginMM() const
 
 QPointF LaserDocument::docOriginMachining() const
 {
-    return Global::matrixToMM(SU_PX, 40, 40).map(docOrigin());
+    return Global::matrixToMachining().map(docOrigin());
 }
 
 QTransform LaserDocument::docTransform() const
@@ -649,7 +646,7 @@ QRectF LaserDocument::docBoundingRectMM() const
 
 QRectF LaserDocument::docBoundingRectMachining() const
 {
-    return Global::matrixToMM(SU_PX, 40, 40).map(docBoundingRect()).boundingRect();
+    return Global::matrixToMachining().map(docBoundingRect()).boundingRect();
 }
 
 void LaserDocument::updateLayersStructure()
@@ -740,21 +737,6 @@ void LaserDocument::printOutline(OptimizeNode* node, int level)
     {
         printOutline(item, level + 1);
     }
-}
-
-void LaserDocument::arrange()
-{
-}
-
-void LaserDocument::optimize()
-{
-    Q_D(LaserDocument);
-    //float pageWidth = Global::convertToMM(SU_PX, d->pageInfo.width()) * 40;
-    //float pageHeight = Global::convertToMM(SU_PX, d->pageInfo.height(), Qt::Vertical) * 40;
-
-    //qLogD << "LaserDocument::optimize";
-    //OptimizerController* optimizer = new OptimizerController(this, totalNodes());
-    //optimizer->optimize(pageWidth, pageHeight);
 }
 
 void LaserDocument::save(const QString& filename, QWidget* window)

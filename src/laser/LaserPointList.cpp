@@ -53,11 +53,11 @@ void LaserPointList::buildKdtree()
     for (LaserPoint& point : *this)
     {
         // convert element value range to 0..1
-        m_matrix[index] = point.x() * m_weights[0] / (LaserApplication::device->layoutWidth() * 40);
-        m_matrix[index + 1] = point.y() * m_weights[1] / (LaserApplication::device->layoutHeight() * 40);
+        m_matrix[index] = point.x() * m_weights[0] / (LaserApplication::device->layoutWidthMachining());
+        m_matrix[index + 1] = point.y() * m_weights[1] / (LaserApplication::device->layoutHeightMachining());
         m_matrix[index + 2] = point.angle1() * m_weights[2] / 360;
-        m_matrix[index + 3] = point.x() * m_weights[0] / (LaserApplication::device->layoutWidth() * 40);
-        m_matrix[index + 4] = point.y() * m_weights[1] / (LaserApplication::device->layoutHeight() * 40);
+        m_matrix[index + 3] = point.x() * m_weights[0] / (LaserApplication::device->layoutWidthMachining());
+        m_matrix[index + 4] = point.y() * m_weights[1] / (LaserApplication::device->layoutHeightMachining());
         m_matrix[index + 5] = point.angle2() * m_weights[2] / 360;
         index += 6;
     }
@@ -92,8 +92,8 @@ int LaserPointList::nearestSearch(const LaserPoint& point)
     qreal angle3 = qMax(angle1, angle2) - 360;
     qreal angle4 = qMin(angle1, angle2) + 360 ;
 
-    qreal x = point.x() * m_weights[0] / (LaserApplication::device->layoutWidth() * 40);
-    qreal y = point.y() * m_weights[1] / (LaserApplication::device->layoutHeight() * 40);
+    qreal x = point.x() * m_weights[0] / (LaserApplication::device->layoutWidthMachining());
+    qreal y = point.y() * m_weights[1] / (LaserApplication::device->layoutHeightMachining());
     angle1 = angle1 * m_weights[2] / 360;
     angle2 = angle2 * m_weights[2] / 360;
     angle3 = angle3 * m_weights[2] / 360;

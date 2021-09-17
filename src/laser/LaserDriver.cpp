@@ -238,7 +238,7 @@ bool LaserDriver::load()
     m_fnSmallScaleMovement = (FNSmallScaleMovement)m_library.resolve("SmallScaleMovement");
     CHECK_FN(m_fnSmallScaleMovement)
 
-    m_fnStartMachining = (FN_VOID_BOOL)m_library.resolve("StartMachining");
+    m_fnStartMachining = (FN_VOID_INT)m_library.resolve("StartMachining");
     CHECK_FN(m_fnStartMachining)
 
     m_fnPauseContinueMachining = (FN_INT_BOOL)m_library.resolve("PauseContinueMachining");
@@ -719,9 +719,9 @@ void LaserDriver::smallScaleMovement(bool fromZeroPoint, bool laserOn, char moto
     m_fnSmallScaleMovement(fromZeroPoint, laserOn, motorAxis, deviation, laserPower, moveSpeed);
 }
 
-void LaserDriver::startMachining(bool zeroPointStyle)
+void LaserDriver::startMachining(int packIndex)
 {
-    m_fnStartMachining(zeroPointStyle);
+    m_fnStartMachining(packIndex);
 }
 
 int LaserDriver::pauseContinueMachining(bool pause)
