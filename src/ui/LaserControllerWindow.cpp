@@ -1403,7 +1403,6 @@ void LaserControllerWindow::createCameraDockPanel()
     m_dockAreaCameras = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
     //只显示tab中icon
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/camera.png"), "Cameras");
-    
 }
 
 void LaserControllerWindow::createOperationsDockPanel()
@@ -1766,17 +1765,227 @@ void LaserControllerWindow::createMovementDockPanel()
 
 void LaserControllerWindow::createShapePropertyDockPanel()
 {
-    QVBoxLayout* layout = new QVBoxLayout;
+    
+    cutOrderPriority = new LaserDoubleSpinBox();
+    cutOrderPriorityLabel = new QLabel("Cut Order Priority");
+    powerScale = new LaserDoubleSpinBox();
+    powerScaleLabel = new QLabel("Power Scale");
+    width = new LaserDoubleSpinBox();
+    widthLabel = new QLabel("Width");
+    height = new LaserDoubleSpinBox();
+    heightLabel = new QLabel("Height");
+    maxWidth = new LaserDoubleSpinBox();
+    maxWidthLabel = new QLabel("Max Width");
+    cornerRadius = new LaserDoubleSpinBox();
+    cornerRadiusLabel = new QLabel("Corner Radius");
+    locked = new QCheckBox();
+    lockedLabel = new QLabel("Locked");
+
+    propertyPanelWidget = new QWidget();
+    propertyDockWidget = new CDockWidget(tr("Movement"));
+    
+    m_ui->menuWindow->addAction(propertyDockWidget->toggleViewAction());
+
+    m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, propertyDockWidget, m_dockAreaLayers);
+    dockPanelOnlyShowIcon(propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
+    createPrimitivePropertiesPanel();
+}
+
+void LaserControllerWindow::showShapePropertyPanel()
+{
+    LaserPrimitiveType type = LaserPrimitiveType::LPT_NULL;
+    QList<LaserPrimitive*> list = m_scene->selectedPrimitives();
+    for (int i = 0; i < list.length(); i ++) {
+        if (i == 0) {
+            type = list[0]->primitiveType();
+        }
+        else {
+            LaserPrimitiveType curType = list[i]->primitiveType();
+            if (curType != type) {
+                type = LaserPrimitiveType::LPT_UNKNOWN;
+            }
+        }
+    }
+    switch(type) {
+        case LPT_UNKNOWN: {
+            mixturePropertyLayout->setMargin(0);
+            mixturePropertyLayout->setSpacing(10);
+            mixturePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            mixturePropertyLayout->addWidget(locked, 0, 1);
+            mixturePropertyWidget->setLayout(mixturePropertyLayout);
+            propertyDockWidget->setWidget(mixturePropertyWidget);
+            //lockedLabel->setText("LPT_UNKNOWN");
+            break;
+        }
+        case LPT_NULL: {
+            nullPropertyWidget->setLayout(nullPropertyLayout);
+            propertyDockWidget->setWidget(nullPropertyWidget);
+            break;
+        }
+        case LPT_LINE: {
+            linePropertyLayout->setMargin(0);
+            linePropertyLayout->setSpacing(100);
+            linePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            linePropertyLayout->addWidget(locked, 0, 1);
+            linePropertyWidget->setLayout(linePropertyLayout);
+            propertyDockWidget->setWidget(linePropertyWidget);
+            //lockedLabel->setText("line");
+            break;
+        }
+        case LPT_RECT: {
+            rectPropertyLayout->setMargin(0);
+            rectPropertyLayout->setSpacing(10);
+            rectPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            rectPropertyLayout->addWidget(locked, 0, 1);
+            rectPropertyWidget->setLayout(rectPropertyLayout);
+            propertyDockWidget->setWidget(rectPropertyWidget);
+
+            //lockedLabel->setText("rect");
+            break;
+        }
+        case LPT_ELLIPSE: {
+            ellipsePropertyLayout->setMargin(0);
+            ellipsePropertyLayout->setSpacing(10);
+            ellipsePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            ellipsePropertyLayout->addWidget(locked, 0, 1);
+            ellipsePropertyWidget->setLayout(ellipsePropertyLayout);
+            propertyDockWidget->setWidget(ellipsePropertyWidget);
+            //lockedLabel->setText("LPT_ELLIPSE");
+            break;
+        }
+        case LPT_POLYLINE: {
+            polylinePropertyLayout->setMargin(0);
+            polylinePropertyLayout->setSpacing(10);
+            polylinePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            polylinePropertyLayout->addWidget(locked, 0, 1);
+            polylinePropertyWidget->setLayout(polylinePropertyLayout);
+            propertyDockWidget->setWidget(polylinePropertyWidget);
+            //lockedLabel->setText("LPT_POLYLINE");
+            break;
+        }
+        case LPT_POLYGON: {
+            polygonPropertyLayout->setMargin(0);
+            polygonPropertyLayout->setSpacing(10);
+            polygonPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            polygonPropertyLayout->addWidget(locked, 0, 1);
+            polygonPropertyWidget->setLayout(polygonPropertyLayout);
+            propertyDockWidget->setWidget(polygonPropertyWidget);
+            //lockedLabel->setText("LPT_POLYGON");
+            break;
+        }
+        case LPT_TEXT: {
+            textPropertyLayout->setMargin(0);
+            textPropertyLayout->setSpacing(10);
+            textPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            textPropertyLayout->addWidget(locked, 0, 1);
+            textPropertyWidget->setLayout(textPropertyLayout);
+            propertyDockWidget->setWidget(textPropertyWidget);
+            //lockedLabel->setText("LPT_TEXT");
+            break;
+        }
+        case LPT_NURBS: {
+            propertyDockWidget->setWidget(nurbsPropertyWidget);
+            //lockedLabel->setText("LPT_NURBS");
+            break;
+        }
+        case LPT_BITMAP: {
+            bitmapPropertyLayout->setMargin(0);
+            bitmapPropertyLayout->setSpacing(10);
+            bitmapPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+            bitmapPropertyLayout->addWidget(locked, 0, 1);
+            bitmapPropertyWidget->setLayout(bitmapPropertyLayout);
+            propertyDockWidget->setWidget(bitmapPropertyWidget);
+            //lockedLabel->setText("LPT_BITMAP");
+            break;
+        }
+    }
+    
+}
+
+void LaserControllerWindow::createPrimitivePropertiesPanel()
+{
+    //rect
+    rectPropertyLayout = new QGridLayout();
+    rectPropertyWidget = new QWidget();
+    
+    //line
+    linePropertyLayout = new QGridLayout();
+    linePropertyWidget = new QWidget();
+    
+    //ellipse
+    ellipsePropertyLayout = new QGridLayout();
+    ellipsePropertyWidget = new QWidget();
+    
+    //ploygon
+    polygonPropertyLayout = new QGridLayout();
+    polygonPropertyWidget = new QWidget();
+    
+    //ployline
+    polylinePropertyLayout = new QGridLayout();
+    polylinePropertyWidget = new QWidget();
+    
+    //bitmap
+    bitmapPropertyLayout = new QGridLayout();
+    bitmapPropertyWidget = new QWidget();
+    
+    //text
+    textPropertyLayout = new QGridLayout();
+    textPropertyWidget = new QWidget();
+    
+    //mix
+    mixturePropertyLayout = new QGridLayout();
+    mixturePropertyWidget = new QWidget();
+    
+    //null
+    nullPropertyLayout = new QGridLayout();
+    nullPropertyWidget = new QWidget();
+    
+}
+
+void LaserControllerWindow::createPrimitiveLinePropertyPanel()
+{
+
+    QGridLayout* layout = new QGridLayout();
+    
     layout->setMargin(0);
-    QWidget* panelWidget = new QWidget;
-    panelWidget->setLayout(layout);
+    layout->setSpacing(10);
+    layout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
+    layout->addWidget(locked, 0, 1);
+    
+    propertyPanelWidget->setLayout(layout);
+    propertyDockWidget->setWidget(propertyPanelWidget);
+}
 
-    CDockWidget* dockWidget = new CDockWidget(tr("Movement"));
-    dockWidget->setWidget(panelWidget);
-    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
+void LaserControllerWindow::createPrimitiveRectPropertyPanel()
+{
+}
 
-    m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
-    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
+void LaserControllerWindow::createPrimitiveEllipsePropertyPanel()
+{
+}
+
+void LaserControllerWindow::createPrimitivePloygonPropertyPanel()
+{
+}
+
+void LaserControllerWindow::createPrimitivePloylinePropertyPanel()
+{
+}
+
+void LaserControllerWindow::createPrimitiveTextPropertyPanel()
+{
+}
+
+void LaserControllerWindow::createPrimitiveBitmapPropertyPanel()
+{
+}
+
+void LaserControllerWindow::createEmptyPropertyPanel()
+{
+}
+
+void LaserControllerWindow::createMixturePropertyPanel()
+{
 }
 
 void LaserControllerWindow::dockPanelOnlyShowIcon(CDockWidget* dockWidget, QPixmap icon, char* text)
@@ -2832,7 +3041,6 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionGroup->setEnabled(false);
 		m_ui->actionUngroup->setEnabled(false);
         m_viewer->setMirrorLine(nullptr);
-		return;
 	}
 	else if (items.length() > 0) {
 		if (m_propertyWidget) {
@@ -2864,8 +3072,9 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 			m_ui->actionGroup->setEnabled(false);
 			m_ui->actionUngroup->setEnabled(false);
 		}
-		
 	}
+    //判断显示哪个属性面板，shape properties panel
+    showShapePropertyPanel();
 }
 
 void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
@@ -3171,10 +3380,6 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
 //selected items change
 void LaserControllerWindow::selectedChange()
 {
-	//QRectF rect = m_viewer->group()->sceneBoundingRect();
-
-	/*m_posXBox->setValue(rect.left());
-	m_posYBox->setValue(rect.top());*/
 	
 	int size = m_scene->selectedPrimitives().length();
 	if (size > 0) {

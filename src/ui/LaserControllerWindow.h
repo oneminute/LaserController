@@ -2,7 +2,7 @@
 #define LASERCONTROLLERWINDOW_H
 
 #include <DockManager.h>
-//#include <DockWidget.h>
+//#include <DockWidgetTab.h>
 #include <QObject>
 #include <QMainWindow>
 #include <QScopedPointer>
@@ -75,7 +75,22 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+    //shape properties panel / dock panel
     void createShapePropertyDockPanel();
+    //show shape properties
+    void showShapePropertyPanel();
+    void createPrimitivePropertiesPanel();
+    //shape properties panel / dock panel
+    void createPrimitiveLinePropertyPanel();
+    void createPrimitiveRectPropertyPanel();
+    void createPrimitiveEllipsePropertyPanel();
+    void createPrimitivePloygonPropertyPanel();
+    void createPrimitivePloylinePropertyPanel();
+    void createPrimitiveTextPropertyPanel();
+    void createPrimitiveBitmapPropertyPanel();
+    void createEmptyPropertyPanel();
+    void createMixturePropertyPanel();
+    //OnlyShowIcon
     void dockPanelOnlyShowIcon(ads::CDockWidget* dockWidget, QPixmap icon, char* text);
 
 	//key
@@ -229,6 +244,8 @@ protected slots:
     // config items
     void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
     void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
+
+    
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");
@@ -407,6 +424,43 @@ private:
     LaserDoubleSpinBox* m_fontSpaceX;
     LaserDoubleSpinBox* m_fontSpaceY;
     int m_fontComboxLightedIndex;
+    //dock panel/ shape properties panel
+    LaserDoubleSpinBox* cutOrderPriority;
+    QLabel* cutOrderPriorityLabel;
+    LaserDoubleSpinBox* powerScale;
+    QLabel* powerScaleLabel;
+    LaserDoubleSpinBox* width;
+    QLabel* widthLabel;
+    LaserDoubleSpinBox* height;
+    QLabel* heightLabel;
+    LaserDoubleSpinBox* maxWidth;
+    QLabel* maxWidthLabel;
+    LaserDoubleSpinBox* cornerRadius;
+    QLabel* cornerRadiusLabel;
+    QCheckBox* locked;
+    QLabel* lockedLabel;
+    QGridLayout* rectPropertyLayout;
+    QGridLayout* linePropertyLayout;
+    QGridLayout* ellipsePropertyLayout;
+    QGridLayout* polygonPropertyLayout;
+    QGridLayout* polylinePropertyLayout;
+    QGridLayout* bitmapPropertyLayout;
+    QGridLayout* textPropertyLayout;
+    QGridLayout* nurbsPropertyLayout;
+    QGridLayout* mixturePropertyLayout;
+    QGridLayout* nullPropertyLayout;
+    QWidget* propertyPanelWidget;
+    QWidget* rectPropertyWidget;
+    QWidget* linePropertyWidget;
+    QWidget* ellipsePropertyWidget;
+    QWidget* polygonPropertyWidget;
+    QWidget* polylinePropertyWidget;
+    QWidget* bitmapPropertyWidget;
+    QWidget* textPropertyWidget;
+    QWidget* nurbsPropertyWidget;
+    QWidget* mixturePropertyWidget;
+    QWidget* nullPropertyWidget;
+    ads::CDockWidget* propertyDockWidget;
 
     friend class LaserApplication;
 };
