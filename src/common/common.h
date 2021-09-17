@@ -85,6 +85,7 @@ enum PageType {
 
 enum LaserPrimitiveType
 {
+    LPT_NULL,
     LPT_UNKNOWN,
     LPT_LINE,
     LPT_CIRCLE,
