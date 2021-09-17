@@ -848,7 +848,7 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
 
     if (relative)
     {
-        LaserApplication::device->moveBy(delta);
+        LaserApplication::device->moveBy(delta, Config::Device::xEnabled(), Config::Device::yEnabled(), Config::Device::zEnabled());
     }
     else
     {
@@ -856,7 +856,7 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
         QVector3D dest = utils::putToQuadrant(abstractDest, quad);
         QVector3D pos = utils::putToQuadrant(LaserApplication::driver->getCurrentLaserPos(), quad);
         dest = pos + delta;
-        LaserApplication::device->moveTo(dest, quad);
+        LaserApplication::device->moveTo(dest, quad, Config::Device::xEnabled(), Config::Device::yEnabled(), Config::Device::zEnabled());
     }
 }
 
@@ -1565,6 +1565,18 @@ void LaserControllerWindow::createOutlineDockPanel()
 
 void LaserControllerWindow::createMovementDockPanel()
 {
+    m_checkBoxXEnabled = new QCheckBox;
+    m_checkBoxXEnabled->setText(tr("X Enabled"));
+    Config::Device::xEnabledItem()->bindWidget(m_checkBoxXEnabled);
+
+    m_checkBoxYEnabled = new QCheckBox;
+    m_checkBoxYEnabled->setText(tr("Y Enabled"));
+    Config::Device::yEnabledItem()->bindWidget(m_checkBoxYEnabled);
+
+    m_checkBoxZEnabled = new QCheckBox;
+    m_checkBoxZEnabled->setText(tr("Z Enabled"));
+    Config::Device::zEnabledItem()->bindWidget(m_checkBoxZEnabled);
+
     m_lineEditCoordinatesX = new QLineEdit;
     m_lineEditCoordinatesX->setReadOnly(true);
     m_lineEditCoordinatesX->setText(QString::number(0.0));
@@ -1591,20 +1603,23 @@ void LaserControllerWindow::createMovementDockPanel()
 
     QGridLayout* firstRow = new QGridLayout;
     firstRow->setMargin(0);
-    firstRow->addWidget(new QLabel(tr("Coordinates")), 0, 0);
-    firstRow->addWidget(new QLabel(tr("X")), 0, 1);
-    firstRow->addWidget(m_lineEditCoordinatesX, 0, 2);
-    firstRow->addWidget(new QLabel(tr("Y")), 0, 3);
-    firstRow->addWidget(m_lineEditCoordinatesY, 0, 4);
-    firstRow->addWidget(new QLabel(tr("Z")), 0, 5);
-    firstRow->addWidget(m_lineEditCoordinatesZ, 0, 6);
-    firstRow->addWidget(new QLabel(tr("Distance(mm)")), 1, 0);
+    firstRow->addWidget(m_checkBoxXEnabled, 0, 1, 1, 2);
+    firstRow->addWidget(m_checkBoxYEnabled, 0, 3, 1, 2);
+    firstRow->addWidget(m_checkBoxZEnabled, 0, 5, 1, 2);
+    firstRow->addWidget(new QLabel(tr("Coordinates")), 1, 0);
     firstRow->addWidget(new QLabel(tr("X")), 1, 1);
-    firstRow->addWidget(m_doubleSpinBoxDistanceX, 1, 2);
+    firstRow->addWidget(m_lineEditCoordinatesX, 1, 2);
     firstRow->addWidget(new QLabel(tr("Y")), 1, 3);
-    firstRow->addWidget(m_doubleSpinBoxDistanceY, 1, 4);
+    firstRow->addWidget(m_lineEditCoordinatesY, 1, 4);
     firstRow->addWidget(new QLabel(tr("Z")), 1, 5);
-    firstRow->addWidget(m_doubleSpinBoxDistanceZ, 1, 6);
+    firstRow->addWidget(m_lineEditCoordinatesZ, 1, 6);
+    firstRow->addWidget(new QLabel(tr("Distance(mm)")), 2, 0);
+    firstRow->addWidget(new QLabel(tr("X")), 2, 1);
+    firstRow->addWidget(m_doubleSpinBoxDistanceX, 2, 2);
+    firstRow->addWidget(new QLabel(tr("Y")), 2, 3);
+    firstRow->addWidget(m_doubleSpinBoxDistanceY, 2, 4);
+    firstRow->addWidget(new QLabel(tr("Z")), 2, 5);
+    firstRow->addWidget(m_doubleSpinBoxDistanceZ, 2, 6);
     firstRow->setColumnStretch(0, 1);
     firstRow->setColumnStretch(1, 0);
     firstRow->setColumnStretch(2, 1);
@@ -1625,7 +1640,7 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveLeft = new PressedToolButton;
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
-    m_buttonMoveToOrigin = new PressedToolButton;
+    m_buttonMoveToOrigin = new QToolButton;
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
     m_buttonMoveRight = new PressedToolButton;
@@ -2404,12 +2419,13 @@ void LaserControllerWindow::onActionMachining(bool checked)
             QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
             return;
         }
-        QString filename = "export.json";
+        QString filename = QDir::current().absoluteFilePath("tmp/export.json");
         //QTemporaryFile file;
         //if (file.open())
         //{
             //QString filename = file.fileName();
 
+        m_scene->document()->outline();
         m_scene->document()->setFinishRun(finishRun());
         qDebug() << "exporting to temporary json file:" << filename;
         m_prepareMachining = true;
@@ -2904,10 +2920,10 @@ void LaserControllerWindow::onActionUpdate(bool checked)
 
 void LaserControllerWindow::onActionLaserPosition(bool checked)
 {
-    QVector3D pos = LaserApplication::device->getCurrentLaserPos();
-    m_lineEditCoordinatesX->setText(QString::number(pos.x(), 'f'));
-    m_lineEditCoordinatesY->setText(QString::number(pos.y(), 'f'));
-    m_lineEditCoordinatesZ->setText(QString::number(pos.z(), 'f'));
+    LaserApplication::device->getCurrentLaserPos();
+    //m_lineEditCoordinatesX->setText(QString::number(pos.x(), 'f'));
+    //m_lineEditCoordinatesY->setText(QString::number(pos.y(), 'f'));
+    //m_lineEditCoordinatesZ->setText(QString::number(pos.z(), 'f'));
 }
 
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
@@ -3179,6 +3195,7 @@ void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
     QString filePath = fileInfo.absoluteFilePath();
 #ifdef Q_OS_WIN
     filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
+    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
 #endif
     LaserApplication::driver->loadDataFromFile(filePath);
     LaserApplication::driver->startMachining(m_comboBoxStartPosition->currentIndex() == 3);

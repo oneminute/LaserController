@@ -90,11 +90,13 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
     if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
     {
-        emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
+        //emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
+        LaserApplication::device->handleError(sysMsgCode, eventData);
     }
     else if (sysMsgCode >= M_Base)
     {
-        emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
+        //emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
+        LaserApplication::device->handleMessage(sysMsgCode, eventData);
     }
 }
 
@@ -329,6 +331,25 @@ void LaserDriver::setupCallbacks()
 {
     m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
     m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
+    //m_fnSysMessageCallBack(
+    //    [=](void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData) {
+    //        if (LaserApplication::driver->m_isClosed)
+    //            return;
+
+    //        QString eventData = QString::fromWCharArray(sysEventData);
+    //        qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
+    //        if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
+    //        {
+    //            //emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
+    //            LaserApplication::device->handleError(sysMsgCode, eventData);
+    //        }
+    //        else if (sysMsgCode >= M_Base)
+    //        {
+    //            //emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
+    //            LaserApplication::device->handleMessage(sysMsgCode, eventData);
+    //        }
+    //    }
+    //);
 }
 
 void LaserDriver::unInit()
@@ -589,6 +610,7 @@ void LaserDriver::lPenQuickMoveTo(
 void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMoveStyle, int xPos, bool yMoveEnable, bool yMoveStyle, int yPos, bool zMoveEnable, bool zMoveStyle, int zPos)
 {
     qLogD << "move " << xPos << ", " << yPos << ", " << zPos;
+    qLogD << "enabled " << xMoveEnable << ", " << yMoveEnable << ", " << zMoveEnable;
     m_fnCheckMoveLaserMotors(
         delay,
         xMoveEnable, xMoveStyle, xPos,
@@ -727,6 +749,7 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
     int ret = 0;
     m_isWithMachining = withMachining;
     wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
+    //wchar_t* filenameBuf = L"D:\\LaserController\\LaserController\\export.json";
     m_isDownloading = true;
     m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
     qDebug() << "packages of transformed data:" << m_packagesCount;

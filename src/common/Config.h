@@ -226,6 +226,10 @@ public:
         CONFIG_ITEM(device, startFrom, int, toInt)
         CONFIG_ITEM(device, jobOrigin, int, toInt)
 
+        CONFIG_ITEM(device, xEnabled, bool, toBool)
+        CONFIG_ITEM(device, yEnabled, bool, toBool)
+        CONFIG_ITEM(device, zEnabled, bool, toBool)
+
     private:
         friend class Config;
     };

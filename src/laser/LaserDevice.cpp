@@ -272,21 +272,6 @@ qreal LaserDevice::layoutHeight() const
     return Config::SystemRegister::yMaxLength() / 1000.0;
 }
 
-//void LaserDevice::setLayoutRect(const QRectF& rect, bool toCard)
-//{
-//    Q_D(LaserDevice);
-//    d->layoutRect = rect;
-//    if (d->driver && toCard && d->layoutRect.isValid())
-//    {
-//        d->driver->setSoftwareInitialization(
-//            d->printerDrawUnit,
-//            d->layoutRect.left(),
-//            d->layoutRect.right(),
-//            d->layoutRect.width(),
-//            d->layoutRect.height());
-//    }
-//}
-
 int LaserDevice::printerDrawUnit() const
 {
     Q_D(const LaserDevice);
@@ -297,7 +282,6 @@ void LaserDevice::setPrinterDrawUnit(int unit, bool toCard)
 {
     Q_D(LaserDevice);
     d->printerDrawUnit = unit;
-    //setLayoutRect(d->layoutRect, toCard);
 }
 
 QString LaserDevice::requestHardwareId() const
@@ -563,7 +547,7 @@ void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int cur
     d->driver->checkVersionUpdate(hardware, flag, 0, versionNoteToJsonFile);
 }
 
-void LaserDevice::moveTo(const QVector3D& pos, QUADRANT quad)
+void LaserDevice::moveTo(const QVector3D& pos, QUADRANT quad, bool xEnabled, bool yEnabled, bool zEnabled)
 {
     // Get layout size
     float layoutWidth = LaserApplication::device->layoutWidth();
@@ -574,18 +558,14 @@ void LaserDevice::moveTo(const QVector3D& pos, QUADRANT quad)
     int xPos = qRound(dest.x() * 1000000);
     int yPos = qRound(dest.y() * 1000000);
     int zPos = qRound(dest.z() * 1000000);
-    bool xEnabled = xPos != 0;
-    bool yEnabled = yPos != 0;
-    bool zEnabled = zPos != 0;
-    LaserApplication::driver->checkMoveLaserMotors(
-        Config::Ui::autoRepeatDelay(),
+    LaserApplication::driver->lPenQuickMoveTo(
         xEnabled, true, xPos,
         yEnabled, true, yPos,
         zEnabled, true, zPos
     );
 }
 
-void LaserDevice::moveBy(const QVector3D& pos)
+void LaserDevice::moveBy(const QVector3D& pos, bool xEnabled, bool yEnabled, bool zEnabled)
 {
     // Get layout size
     float layoutWidth = LaserApplication::device->layoutWidth();
@@ -595,9 +575,10 @@ void LaserDevice::moveBy(const QVector3D& pos)
     int xPos = qRound(pos.x() * 1000);
     int yPos = qRound(pos.y() * 1000);
     int zPos = qRound(pos.z() * 1000);
-    bool xEnabled = xPos != 0;
-    bool yEnabled = yPos != 0;
-    bool zEnabled = zPos != 0;
+    // 相对移动要根据传入的pos判断哪个轴enabled
+    xEnabled = xEnabled && !qFuzzyIsNull(pos.x());
+    yEnabled = yEnabled && !qFuzzyIsNull(pos.y());
+    zEnabled = zEnabled && !qFuzzyIsNull(pos.z());
     LaserApplication::driver->checkMoveLaserMotors(
         Config::Ui::autoRepeatDelay(),
         xEnabled, false, xPos,
@@ -1462,7 +1443,7 @@ void LaserDevice::onConnected()
     if (d->driver)
     {
         d->driver->setFactoryType("LaserController");
-
+        //d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
         //d->driver->getMainCardRegisterState();
         //QString compileInfo = d->driver->getCompileInfo();
         //qLogD << "compile info: " << compileInfo;

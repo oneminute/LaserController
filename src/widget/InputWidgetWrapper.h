@@ -58,7 +58,6 @@ signals:
     void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
 
 private:
-
     QScopedPointer<InputWidgetWrapperPrivate> m_ptr;
     Q_DECLARE_PRIVATE_D(m_ptr, InputWidgetWrapper)
     Q_DISABLE_COPY(InputWidgetWrapper)
