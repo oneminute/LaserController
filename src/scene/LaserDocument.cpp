@@ -15,7 +15,7 @@
 #include <QSharedData>
 #include <QStack>
 #include <QtMath>
-
+#include <QPainterPath>
 #include <opencv2/opencv.hpp>
 
 #include <LaserApplication.h>
@@ -910,6 +910,39 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 this->addPrimitive(text);
                 this->scene()->addItem(text);
             }
+            else if (className == "LaserPath") {
+                QByteArray buffer = QByteArray::fromBase64(primitiveJson["path"].toString().toLatin1());
+                QPainterPath path;
+                QDataStream stream(buffer);
+                stream >> path;
+                LaserPath * laserPath = new LaserPath(path, this, saveTransform, layerIndex);
+                this->addPrimitive(laserPath);
+                this->scene()->addItem(laserPath);
+                /*for each(QJsonValue obj in pathArray) {
+                    QJsonObject element = obj.toObject();
+                    double x = element["x"].toDouble();
+                    double y = element["y"].toDouble();
+                    switch (element["type"].toInt()) {
+                        case QPainterPath::ElementType::MoveToElement: {
+                            path.moveTo(x, y);
+                            break;
+                        }
+                        case QPainterPath::ElementType::LineToElement: {
+                            path.lineTo(x, y);
+                            break;
+                        }
+                        case QPainterPath::ElementType::CurveToElement: {
+                            //path.cubicTo()
+                            break;
+                        }
+                        case QPainterPath::ElementType::CurveToDataElement: {
+                            break;
+                        }
+                    }
+                }*/
+                
+            }
+            
 		}
 	}
     outline();
@@ -939,18 +972,22 @@ void LaserDocument::init()
 	d->name = tr("Untitled");
 	QString layerName = newLayerName();
 	LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
+    layer->setIndex(0);
 	addLayer(layer);
-
+    
 	layerName = newLayerName();
 	layer = new LaserLayer(layerName, LLT_CUTTING, this, true);
+    layer->setIndex(1);
 	addLayer(layer);
 
 	for (int i = 2; i < Config::Layers::maxLayersCount(); i++)
 	{
 		QString layerName = newLayerName();
 		LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
+        layer->setIndex(i);
 		addLayer(layer);
 	}
+
 	ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
 	ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
     

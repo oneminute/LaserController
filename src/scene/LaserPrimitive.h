@@ -311,6 +311,8 @@ public:
     virtual QList<QPainterPath> subPaths() const;
 	virtual QRectF sceneBoundingRect() const;
 
+    virtual QJsonObject toJson();
+
 	//virtual void reShape();
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);

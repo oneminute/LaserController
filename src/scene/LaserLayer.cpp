@@ -37,7 +37,7 @@ public:
         , visible(true)
         , row(-1)
         , useHalftone(true)
-        , isDefault(false)   
+        , isDefault(false)  
     {}
 
     bool removable;
@@ -92,7 +92,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
         d->runSpeed = Config::EngravingLayer::runSpeed();
         d->laserPower = Config::EngravingLayer::laserPower();
         d->minSpeedPower = Config::EngravingLayer::minPowerRate();
-        d->runSpeedPower = Config::EngravingLayer::maxPowerRate();
+        d->runSpeedPower = Config::EngravingLayer::maxPowerRate();       
     }
     else if (type == LLT_CUTTING)
     {
@@ -100,7 +100,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
         d->runSpeed = Config::CuttingLayer::runSpeed();
         d->laserPower = Config::CuttingLayer::laserPower();
         d->minSpeedPower = Config::CuttingLayer::minPowerRate();
-        d->runSpeedPower = Config::CuttingLayer::maxPowerRate();
+        d->runSpeedPower = Config::CuttingLayer::maxPowerRate();        
     }
 	d->useHalftone = Config::EngravingLayer::useHalftone();
 	d->lpi = Config::EngravingLayer::LPI();
@@ -310,7 +310,7 @@ void LaserLayer::addPrimitive(LaserPrimitive * item)
     Q_D(LaserLayer);
     if (d->primitives.contains(item))
         return;
-
+    int i = this->index();
     item->setLayer(this);
     d->primitives.append(item);
     d->doc->updateLayersStructure();
@@ -385,7 +385,7 @@ void LaserLayer::bindButton(LayerButton * button, int index)
 	d->button->setLayerIndex(index);
 	d->button->setEnabled(true);
     connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
-	m_index = index;
+	//m_index = index;
 }
 
 bool LaserLayer::exportable() const 
@@ -491,8 +491,13 @@ QJsonObject LaserLayer::toJson(QWidget* window)
             LaserText* text = qobject_cast<LaserText*>(primitive);
             array.append(text->toJson());
         }
+        else if (className == "LaserPath") {
+            LaserPath* path = qobject_cast<LaserPath*>(primitive);
+            array.append(path->toJson());
+        }
 		else {
-			QMessageBox::critical(window, "critical", "can't save, the primitive class don't exit.");
+			QMessageBox::critical(window, "critical", "can't save, "+className+" can't to json.");
+            break;
 		}
 		
 	}
