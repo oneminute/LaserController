@@ -2117,7 +2117,9 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 				m_lastState = nullptr;
 				m_viewer->viewport()->repaint();
 			}
-			else
+            else {
+
+            }
 			break;
 		}
 
