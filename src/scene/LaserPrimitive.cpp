@@ -299,7 +299,6 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
         // check closour
         if (isClosed)
         {
-            machiningPoints.removeLast();
             LaserPoint firstPoint = machiningPoints[pointIndex];
 
             int step = 0;
@@ -314,10 +313,15 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
 
             int cursor = pointIndex;
             points.reserve(pointsCount);
-            for (int i = 0; i < machiningPoints.length(); i++)
+            LaserPoint lastPoint = firstPoint;
+            points.push_back(firstPoint);
+            for (int i = 1; i < machiningPoints.length(); i++)
             {
-                points.push_back(machiningPoints[cursor]);
+                LaserPoint& currentPoint = machiningPoints[cursor];
+                if (!qFuzzyCompare(lastPoint.toPointF(), currentPoint.toPointF()))
+                    points.push_back(machiningPoints[cursor]);
                 cursor = (cursor + step + machiningPoints.length()) % machiningPoints.length();
+                lastPoint = currentPoint;
             }
             points.push_back(firstPoint);
 
@@ -1998,29 +2002,15 @@ QByteArray LaserBitmap::engravingImage()
     QRectF boundingRect = sceneBoundingRect();
     outImage.save("tmp\\outImage.png");
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
-    //float mmWidth = 1000.f * d->image.width() / d->image.dotsPerMeterX();
-    //float mmHeight = 1000.f * d->image.height() / d->image.dotsPerMeterY();
 
-    int scanInterval = 7;
-    double yPulseLength = 0.006329114;
-    QVariant value;
-    /*if (LaserDriver::instance().getRegister(LaserDriver::RT_SCAN_ROW_SPACING, value))
-    {
-        qDebug() << "row step register:" << value;
-        scanInterval = value.toInt();
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_SCAN_ROW_SPEED, value))
-    {
-        qDebug() << "y pulse register:" << value;
-        yPulseLength = value.toDouble() / 1000.0;
-    }*/
-    qreal pixelInterval = scanInterval * yPulseLength;
+    qreal pixelInterval = 0.07;
 
 	qreal boundingWidth = Global::convertToMM(SU_PX, boundingRect.width());
 	qreal boundingHeight = Global::convertToMM(SU_PX, boundingRect.height(), Qt::Vertical);
     qreal boundingLeft = Global::convertToMM(SU_PX, boundingRect.left());
     qreal boundingTop = Global::convertToMM(SU_PX, boundingRect.top());
-    int outWidth = boundingWidth * MM_TO_INCH * 600;
+    int dpi = d->layer->dpi();
+    int outWidth = boundingWidth * MM_TO_INCH * dpi;
     int outHeight = std::round(boundingHeight / pixelInterval);
     qLogD << "bounding rect: " << boundingRect;
     qDebug() << "out width:" << outWidth;
@@ -2039,7 +2029,7 @@ QByteArray LaserBitmap::engravingImage()
 
     ba = imageUtils::image2EngravingData(outMat, boundingLeft, boundingTop, pixelInterval, boundingWidth);
 
-    QTransform t = transform().scale(Global::convertToMM(SU_PX, 1), Global::convertToMM(SU_PX, 1, Qt::Vertical));
+    //QTransform t = transform().scale(Global::convertToMM(SU_PX, 1), Global::convertToMM(SU_PX, 1, Qt::Vertical));
     
     return ba; 
 }

@@ -915,28 +915,41 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         int yStart = unitUtils::mm2MicroMM(y + r * rowInterval);
         int bitCount = 0;
         quint8 byte = 0;
-        if (forward)
-            stream << yStart << xStart << xEnd << fspc.code;
-        else
-            stream << yStart << xEnd << xStart << fspc.code;
 
+        quint8 binCheck = 0;
+        QList<quint8> rowBytes;
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
             quint8 bin = pixel ? 0 : 1;
+            binCheck |= bin;
             byte = byte << 1;
             byte |= bin;
             bitCount++;
             if (bitCount == 8)
             {
-                stream << byte;
+                rowBytes.append(byte);
+                //stream << byte;
                 bitCount = 0;
                 byte = 0;
             }
         }
         if (mat.cols % 8 != 0)
-            stream << byte;
+            rowBytes.append(byte);
+            //stream << byte;
 
+        if (binCheck)
+        {
+            if (forward)
+                stream << yStart << xStart << xEnd << fspc.code;
+            else
+                stream << yStart << xEnd << xStart << fspc.code;
+
+            for (int i = 0; i < rowBytes.length(); i++)
+            {
+                stream << rowBytes.at(i);
+            }
+        }
         forward = !forward;
     }
 
