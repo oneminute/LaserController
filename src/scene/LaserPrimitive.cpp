@@ -2029,8 +2029,6 @@ QByteArray LaserBitmap::engravingImage()
 
     ba = imageUtils::image2EngravingData(outMat, boundingLeft, boundingTop, pixelInterval, boundingWidth);
 
-    //QTransform t = transform().scale(Global::convertToMM(SU_PX, 1), Global::convertToMM(SU_PX, 1, Qt::Vertical));
-    
     return ba; 
 }
 
@@ -2254,17 +2252,7 @@ QByteArray LaserShape::engravingImage()
 
     int scanInterval = 7;
     double yPulseLength = 0.006329114;
-    QVariant value;
-    /*if (LaserDriver::instance().getRegister(LaserDriver::RT_ENGRAVING_ROW_STEP, value))
-    {
-        qDebug() << "row step register:" << value;
-        scanInterval = value.toInt();
-    }
-    if (LaserDriver::instance().getRegister(LaserDriver::RT_Y_AXIS_PULSE_LENGTH, value))
-    {
-        qDebug() << "y pulse register:" << value;
-        yPulseLength = value.toDouble() / 1000.0;
-    }*/
+    
     qreal pixelInterval = scanInterval * yPulseLength;
 
     QList<SliceGroup> groups;

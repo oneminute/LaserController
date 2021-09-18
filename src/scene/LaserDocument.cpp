@@ -257,6 +257,7 @@ void LaserDocument::exportJSON(const QString& filename)
             laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
             QRectF docBoundingRect = docBoundingRectMachining();
             laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
+            laserDocumentInfo["IsRelative"] = Config::Export::relativePoint();
             jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
             QList<LaserLayer*> layerList;
