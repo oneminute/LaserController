@@ -317,10 +317,10 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
             points.push_back(firstPoint);
             for (int i = 1; i < machiningPoints.length(); i++)
             {
+                cursor = (cursor + step + machiningPoints.length()) % machiningPoints.length();
                 LaserPoint& currentPoint = machiningPoints[cursor];
                 if (!qFuzzyCompare(lastPoint.toPointF(), currentPoint.toPointF()))
-                    points.push_back(machiningPoints[cursor]);
-                cursor = (cursor + step + machiningPoints.length()) % machiningPoints.length();
+                    points.push_back(currentPoint);
                 lastPoint = currentPoint;
             }
             points.push_back(firstPoint);
@@ -2001,7 +2001,7 @@ QPainterPath LaserBitmap::toMachiningPath() const
 {
     Q_D(const LaserBitmap);
     QPainterPath path;
-    QPolygonF rect = transform().map(d->boundingRect);
+    QPolygonF rect = sceneTransform().map(d->boundingRect);
     path.addPolygon(rect);
 
     QTransform transform = Global::matrixToMachining();
@@ -2052,12 +2052,12 @@ LaserPointListList LaserBitmap::updateMachiningPoints(quint32 progressCode, qrea
     d->machiningPointsList.clear();
     d->startingIndices.clear();
 
-	QTransform t = transform() * Global::matrixToMachining();
-    LaserPointList points;
-    QPointF pt1 = t.map(d->boundingRect.topLeft());
-    QPointF pt2 = t.map(d->boundingRect.topRight());
-    QPointF pt3 = t.map(d->boundingRect.bottomRight());
-    QPointF pt4 = t.map(d->boundingRect.bottomLeft());
+	//QTransform t = sceneTransform() * Global::matrixToMachining();
+    QPolygonF poly = this->toMachiningPath().toFillPolygon();
+    QPointF pt1 = poly.at(0);
+    QPointF pt2 = poly.at(1);
+    QPointF pt3 = poly.at(2);
+    QPointF pt4 = poly.at(3);
 
     QLineF line11(pt1, pt2);
     QLineF line12(pt1, pt4);
@@ -2079,6 +2079,7 @@ LaserPointListList LaserBitmap::updateMachiningPoints(quint32 progressCode, qrea
     qreal angle41 = line41.angle();
     qreal angle42 = line42.angle();
 
+    LaserPointList points;
     points.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
     points.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
     points.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
@@ -2089,8 +2090,8 @@ LaserPointListList LaserBitmap::updateMachiningPoints(quint32 progressCode, qrea
     d->startingIndices.append(1);
     d->startingIndices.append(2);
     d->startingIndices.append(3);
-
     d->machiningPointsList.append(points);
+
     return d->machiningPointsList;
 }
 
