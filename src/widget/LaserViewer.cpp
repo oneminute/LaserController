@@ -2168,6 +2168,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         modifyTextCursor();
         //m_textInsertPos = m_textMousePressPos;
         this->setAttribute(Qt::WA_InputMethodEnabled, true);
+        this->setAttribute(Qt::WA_KeyCompression, true);
+        this->setFocusPolicy(Qt::WheelFocus);
         emit creatingText();
         viewport()->repaint();
     }
@@ -2228,12 +2230,20 @@ void LaserViewer::dropEvent(QDropEvent * event)
 
 void LaserViewer::keyPressEvent(QKeyEvent* event)
 {
+    QGraphicsView::keyPressEvent(event);
+    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+        this->setAttribute(Qt::WA_InputMethodEnabled, true);
+    }
     qDebug() << event->key();
     switch (event->key())
     {
 		case Qt::Key_Shift: {
-			m_isKeyShiftPressed = true;
-			viewport()->repaint();
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectState()) ||
+                StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseState())) {
+                m_isKeyShiftPressed = true;
+                viewport()->repaint();
+            }
+            
 			break;
 		}
 		case Qt::Key_Delete: {
@@ -2943,12 +2953,19 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             break;
         }
     }
-    QGraphicsView::keyPressEvent(event);
+    
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 {
-
+    QGraphicsView::keyReleaseEvent(event);
+    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+        this->setAttribute(Qt::WA_InputMethodEnabled, true);
+    }
+    else {
+        this->setAttribute(Qt::WA_InputMethodEnabled, false);
+    }
+    
     switch (event->key())
     {
 		case Qt::Key_Escape:
@@ -2959,9 +2976,14 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 			}*/
 			break;
 		case Qt::Key_Shift: {
-			m_isKeyShiftPressed = false;
-			m_creatingRectEndPoint = m_creatingRectBeforeShiftPoint;
-			viewport()->repaint();
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectState()) ||
+                StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseState())) {
+                m_isKeyShiftPressed = false;
+                m_creatingRectEndPoint = m_creatingRectBeforeShiftPoint;
+                viewport()->repaint();
+            }
+            
+			
 			break;
 		}
 		case Qt::Key_Control: {
@@ -2987,26 +3009,31 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
             break;
         }
         case Qt::Key_Space: {
-            addTextByKeyInput(" ");
+            int v = event->type();
+            if (event->type() != QEvent::InputMethod) {
+                addTextByKeyInput(" ");
+            }
+            
             break;
         }
-        case Qt::Key_nobreakspace: {
-            addTextByKeyInput(" ");
+        /*case Qt::Key_nobreakspace: {
+            //addTextByKeyInput(" ");
             break;
-        }
+        }*/
         
-    }
-    QGraphicsView::keyReleaseEvent(event);
-}
-
-void LaserViewer::inputMethodEvent(QInputMethodEvent * event)
-{
-    if (!event->commitString().isEmpty()) {
-        addTextByKeyInput(event->commitString());;
     }
     
 }
 
+void LaserViewer::inputMethodEvent(QInputMethodEvent * event)
+{
+    QWidget::inputMethodEvent(event);
+    if (!event->commitString().isEmpty()) {
+        addTextByKeyInput(event->commitString());
+        
+    }
+    
+}
 
 void LaserViewer::scrollContentsBy(int dx, int dy)
 {
