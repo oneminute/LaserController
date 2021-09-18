@@ -1,7 +1,7 @@
 #include "LaserPrimitive.h"
 
 #include <iostream>
-
+#include <QPainterPath>
 #include <QSharedData>
 #include <QPaintEvent>
 #include <QBuffer>
@@ -1224,6 +1224,51 @@ QRectF LaserPath::sceneBoundingRect() const
 	Q_D(const LaserPath);
 	return sceneTransform().map(d->path).boundingRect();
 	
+}
+
+QJsonObject LaserPath::toJson()
+{
+    Q_D(const LaserPath);
+    QJsonObject object;
+    //QJsonArray position = { pos().x(), pos().y() };
+    QTransform t = QTransform();
+
+    QJsonArray matrix = {
+        t.m11(), t.m12(), t.m13(),
+        t.m21(), t.m22(), t.m23(),
+        t.m31(), t.m32(), t.m33()
+    };
+    QTransform parentTransform = this->sceneTransform();
+    QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
+    object.insert("parentMatrix", parentMatrix);
+    
+    /*for (int pIndex = 0; pIndex < d->poly.size(); pIndex++) {
+        QPointF point = d->poly[pIndex];
+        QJsonArray pointArray = { point.x(), point.y() };
+        poly.append(pointArray);
+    }*/
+    QByteArray buffer;
+    QDataStream stream(&buffer, QIODevice::WriteOnly);
+    stream << d->path;
+
+    /*QJsonArray pathArray;
+    for (int i = 0; i < d->path.elementCount(); i++) {
+        
+        QPainterPath::Element element = d->path.elementAt(i);
+        QJsonObject obj;
+        obj.insert("x", element.x);
+        obj.insert("y", element.y);
+        obj.insert("type", element.type);
+        pathArray.append(obj);
+    }*/
+    object.insert("path", QLatin1String(buffer.toBase64()));
+    object.insert("name", name());
+    object.insert("className", this->metaObject()->className());
+    //object.insert("position", position);
+    object.insert("matrix", matrix);
+    int i = layerIndex();
+    object.insert("layerIndex", layerIndex());
+    return object;
 }
 
 /*void LaserPath::reShape()

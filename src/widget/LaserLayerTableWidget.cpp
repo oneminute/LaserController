@@ -56,11 +56,11 @@ LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
         QTableWidgetItem* header = horizontalHeaderItem(i);
         header->setToolTip(header->text());
         header->setText("");
-        setColumnWidth(i, 37);
+        setColumnWidth(i, 35);
         
     }
-    setColumnWidth(2, 63);
-    setColumnWidth(4, 50);
+    setColumnWidth(2, 78);
+    setColumnWidth(4, 48);
     
 }
 

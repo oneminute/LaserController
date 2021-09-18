@@ -121,6 +121,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
             item = new LaserPath(path, laserDoc);
+            int i = item->layerIndex();
         }
             break;
         case QSvgNode::POLYGON:
