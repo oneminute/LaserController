@@ -76,7 +76,7 @@ public:
     friend inline const LaserPoint operator/(const LaserPoint& l1, float divisor);
     friend inline const LaserPoint operator/(const LaserPoint& l1, const LaserPoint& l2);
 
-    friend inline const bool qFuzzyCompare(const LaserPoint& l1, const LaserPoint& l2);
+    //friend inline const bool qFuzzyCompare(const LaserPoint& l1, const LaserPoint& l2);
 
     inline QPointF toPointF() const;
     inline QVector4D toVector4D() const;
@@ -183,12 +183,18 @@ inline const LaserPoint operator/(const LaserPoint& l1, const LaserPoint& l2)
     );
 }
 
-inline const bool qFuzzyCompare(const LaserPoint& l1, const LaserPoint& l2)
+//inline const bool qFuzzyCompare(const LaserPoint& l1, const LaserPoint& l2)
+//{
+//    return qFuzzyCompare(l1.m_x, l2.m_x) &&
+//        qFuzzyCompare(l1.m_y, l2.m_y) &&
+//        qFuzzyCompare(l1.m_angle1, l2.m_angle1) &&
+//        qFuzzyCompare(l1.m_angle2, l2.m_angle2);
+//}
+
+inline const bool qFuzzyCompare(const QPointF& p1, const QPointF& p2)
 {
-    return qFuzzyCompare(l1.m_x, l2.m_x) &&
-        qFuzzyCompare(l1.m_y, l2.m_y) &&
-        qFuzzyCompare(l1.m_angle1, l2.m_angle1) &&
-        qFuzzyCompare(l1.m_angle2, l2.m_angle2);
+    return qFuzzyCompare(p1.x(), p2.x()) &&
+        qFuzzyCompare(p1.y(), p2.y());
 }
 
 inline QPointF LaserPoint::toPointF() const

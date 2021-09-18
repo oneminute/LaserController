@@ -87,7 +87,7 @@ void PreviewScene::addLine(const QLineF& line, QPen pen, const QString& label)
     item->setPen(pen);
 
     QGraphicsEllipseItem* circleItem = QGraphicsScene::addEllipse(
-        line.p1().x() - 50, line.p1().y() - 50, 100, 100, pen);
+        line.p1().x() - 1000, line.p1().y() - 1000, 2000, 2000, pen);
     circleItem->setParentItem(item);
 
     QVector2D dir(line.p1() - line.p2());
@@ -95,7 +95,7 @@ void PreviewScene::addLine(const QLineF& line, QPen pen, const QString& label)
     QTransform t1, t2;
     t1.rotate(15);
     t2.rotate(-15);
-    QLineF arrowLine(QPointF(0, 0), (dir * 150).toPointF());
+    QLineF arrowLine(QPointF(0, 0), (dir * 3000).toPointF());
     QLineF arrowLine1 = t1.map(arrowLine);
     QLineF arrowLine2 = t2.map(arrowLine);
     arrowLine1.translate(line.p2());
@@ -116,5 +116,34 @@ void PreviewScene::addLine(const QLineF& line, QPen pen, const QString& label)
         textItem->setDefaultTextColor(pen.color());
         textItem->setPos(pos);
         textItem->setFont(d->labelFont);
+    }
+}
+
+void PreviewScene::addPoints(const QList<QPointF>& points, QPen pen, int style)
+{
+    Q_D(PreviewScene);
+    pen.setCosmetic(true);
+    for (const QPointF& point : points)
+    {
+        addPoint(point, pen, style);
+    }
+}
+
+void PreviewScene::addPoint(const QPointF& point, QPen pen, int style)
+{
+    switch (style)
+    {
+    case 0:
+    {
+        QPointF offset1(1000, 1000);
+        QPointF offset2(1000, -1000);
+        QLineF line1(point - offset1, point + offset1);
+        QLineF line2(point - offset2, point + offset2);
+        QGraphicsLineItem* i1 = QGraphicsScene::addLine(line1);
+        QGraphicsLineItem* i2 = QGraphicsScene::addLine(line2);
+        i1->setPen(pen);
+        i2->setPen(pen);
+    }
+    break;
     }
 }

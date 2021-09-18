@@ -62,10 +62,7 @@ void PathOptimizer::optimize()
 {
     Q_D(PathOptimizer);
 
-    //emit titleUpdated(tr("Initializing optimizer..."));
     LaserApplication::previewWindow->setTitle(tr("Initializing optimizer..."));
-    //d->progress = 0;
-    //emit progressUpdated(d->progress);
 
     d->arrivedNodes = 0;
     d->currentNode = d->root;
@@ -132,6 +129,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             LaserPrimitive* primitive = static_cast<LaserPrimitive*>(node->documentItem());
             LaserApplication::previewWindow->addPath(primitive->machiningPoints().toPainterPath(), QPen(Qt::blue, 2), primitive->name());
             LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1. Done.").arg(node->nodeName()));
+            LaserApplication::previewWindow->addPoints(node->startingPoints().toPoints());
         }
         d->nodes.append(node);
 

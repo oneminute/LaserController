@@ -294,7 +294,7 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
             pointIndex = 0;
             ignore = true;
         }
-        bool isClosed = qFuzzyCompare(machiningPoints.first(), machiningPoints.last());
+        bool isClosed = qFuzzyCompare(machiningPoints.first().toPointF(), machiningPoints.last().toPointF());
         LaserPointList points;
         // check closour
         if (isClosed)
@@ -707,12 +707,22 @@ LaserPointListList LaserEllipse::updateMachiningPoints(quint32 progressCode, qre
     Q_D(LaserEllipse);
     QPainterPath path = toMachiningPath();
 
-    d->machiningPointsList.clear();
-    LaserPointList points;
-    machiningUtils::path2Points(path, progressCode, progressQuota, points, d->startingIndices, d->machiningCenter,
-        1, Config::Export::maxStartingPoints(), 
-        Config::Export::smallDiagonalLimitation().maxDiagonal());
-    d->machiningPointsList.append(points);
+    QList<int> indices;
+    machiningUtils::path2Points(path, d->machiningPointsList, indices, d->machiningCenter);
+
+    if (indices.length() <= Config::PathOptimization::maxStartingPoints())
+    {
+        d->startingIndices = indices;
+    }
+    else
+    {
+        for (int i = 0; i < Config::PathOptimization::maxStartingPoints(); i++)
+        {
+            int index = i * indices.length() / Config::PathOptimization::maxStartingPoints();
+            d->startingIndices.append(indices.at(index));
+        }
+    }
+
     return d->machiningPointsList;
 }
 
@@ -1166,11 +1176,13 @@ LaserPointListList LaserPath::updateMachiningPoints(quint32 progressCode, qreal 
     Q_D(LaserPath);
     QPainterPath path = toMachiningPath();
 
-    d->machiningPointsList.clear();
+    machiningUtils::path2Points(path, d->machiningPointsList, d->startingIndices, d->machiningCenter);
+
+    /*d->machiningPointsList.clear();
     LaserPointList points;
     machiningUtils::path2Points(path, progressCode, progressQuota, points, d->startingIndices, d->machiningCenter, 2,
         Config::Export::maxStartingPoints(), 0);
-    d->machiningPointsList.append(points);
+    d->machiningPointsList.append(points);*/
     
     return d->machiningPointsList;
 }
@@ -1464,31 +1476,10 @@ LaserPointListList LaserPolygon::updateMachiningPoints(quint32 progressCode, qre
 {
     Q_D(LaserPolygon);
     d->machiningPointsList.clear();
-    d->startingIndices.clear();
-    LaserPointList points;
-    bool isClosed = this->isClosed();
     QTransform t = sceneTransform() * Global::matrixToMachining();
-    d->machiningCenter = QPointF(0, 0);
-    for (int i = 0; i < d->poly.size(); i++)
-    {
-        QPointF pt = t.map(d->poly[i]);
-        
-        QPointF cPt = pt;
-        QPointF nPt = (i == d->poly.size() - 1) ? d->poly.first() : d->poly.at(i + 1);
-        QPointF lPt = (i == 0) ? d->poly.last() : d->poly.at(i - 1);
-        QLineF line1(cPt, nPt);
-        QLineF line2(cPt, lPt);
-        qreal angle1 = line1.angle();
-        qreal angle2 = line2.angle();
-        points.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
-        d->machiningCenter += pt;
-        if (isClosed)
-        {
-            d->startingIndices.append(i);
-        }
-    }
-        
-    d->machiningCenter /= points.size();
+    QPolygonF polygon = t.map(d->poly);
+    LaserPointList points;
+    machiningUtils::polygon2Points(polygon, points, d->startingIndices, d->machiningCenter);
     d->machiningPointsList.append(points);
     return d->machiningPointsList;
 }
@@ -2749,52 +2740,43 @@ LaserPointListList LaserText::updateMachiningPoints(quint32 progressCode, qreal 
 
     QTransform transform = Global::matrixToMachining();
 
-    int totalCount = 0;
-    for (int i = 0; i < d->pathList.size(); i++) {
-        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
-        for (QPainterPath rowPath : rowPathList) {
-            QList<QPolygonF> polygons = rowPath.toSubpathPolygons();
-            for (QPolygonF& polygon : polygons)
-            {
-                totalCount += rowPathList.count();
-            }
-        }
-    }
-
     d->machiningPointsList.clear();
-    LaserPointList allPoints;
     d->startingIndices.clear();
+    int totalPoints = 0;
     for (int i = 0; i < d->pathList.size(); i++) {
         QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
         for (QPainterPath rowPath : rowPathList) {
-            LaserPointList points;
+            rowPath = sceneTransform().map(rowPath);
+
             QList<int> indices;
-            QPointF center;
+            LaserPointListList pointsList;
+            machiningUtils::path2Points(rowPath, pointsList, indices, QPointF(), transform);
 
-            QList<QPolygonF> polygons = rowPath.toSubpathPolygons();
-            qLogD << "polygons size: " << polygons.length();
-
-            for (QPolygonF& polygon : polygons)
+            if (indices.length() <= Config::PathOptimization::maxStartingPoints())
             {
-                QPainterPath pPath;
-                pPath.addPolygon(polygon);
-                QPainterPath path = sceneTransform().map(pPath);
-                path = transform.map(path);
-
-                machiningUtils::path2Points(path, progressCode, progressQuota / totalCount,
-                    points, indices, center, 1, Config::Export::maxStartingPoints(), 0);
-
                 for (int index : indices)
                 {
-                    d->startingIndices.append(index + allPoints.count());
+                    d->startingIndices.append(index + totalPoints);
                 }
-                allPoints.append(points);
-                d->machiningPointsList.append(points);
+            }
+            else
+            {
+                for (int i = 0; i < Config::PathOptimization::maxStartingPoints(); i++)
+                {
+                    int index = i * indices.length() / Config::PathOptimization::maxStartingPoints();
+                    d->startingIndices.append(indices.at(index) + totalPoints);
+                }
+            }
+            
+            d->machiningPointsList.append(pointsList);
+            for (LaserPointList& list : pointsList)
+            {
+                totalPoints += list.count();
             }
         }
     }
     
-    d->machiningCenter = utils::center(allPoints).toPointF();
+    d->machiningCenter = transform.mapRect(sceneBoundingRect()).center();
     
     return d->machiningPointsList;
 }

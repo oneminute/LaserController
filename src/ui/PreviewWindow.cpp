@@ -86,6 +86,8 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     connect(this, QOverload<quint32, qreal>::of(&PreviewWindow::setProgressSignal), 
         this, QOverload<quint32, qreal>::of(&PreviewWindow::onSetProgress));
     connect(this, &PreviewWindow::addMessageSignal, this, &PreviewWindow::onAddMessage);
+    connect(this, &PreviewWindow::addPointsSignal, this, &PreviewWindow::onAddPoints);
+    connect(this, &PreviewWindow::addPointSignal, this, &PreviewWindow::onAddPoint);
 
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
@@ -114,6 +116,16 @@ void PreviewWindow::addPath(const QPainterPath& path, QPen pen, const QString& l
 void PreviewWindow::addLine(const QLineF& line, QPen pen, const QString& label)
 {
     emit addLineSignal(line, pen, label);
+}
+
+void PreviewWindow::addPoints(const QList<QPointF>& points, QPen pen, int style)
+{
+    emit addPointsSignal(points, pen, style);
+}
+
+void PreviewWindow::addPoint(const QPointF& point, QPen pen, int style)
+{
+    emit addPointSignal(point, pen, style);
 }
 
 void PreviewWindow::updatePreviewArea()
@@ -197,6 +209,18 @@ void PreviewWindow::onAddPath(const QPainterPath& path, QPen pen, const QString&
 void PreviewWindow::onAddLine(const QLineF& line, QPen pen, const QString& label)
 {
     m_scene->addLine(line, pen, label);
+    updatePreviewArea();
+}
+
+void PreviewWindow::onAddPoints(const QList<QPointF>& points, QPen pen, int style)
+{
+    m_scene->addPoints(points, pen, style);
+    updatePreviewArea();
+}
+
+void PreviewWindow::onAddPoint(const QPointF& point, QPen pen, int style)
+{
+    m_scene->addPoint(point, pen, style);
     updatePreviewArea();
 }
 

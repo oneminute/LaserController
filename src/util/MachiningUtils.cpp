@@ -171,8 +171,63 @@ int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode,
         startingIndices.append(points.length() - 1);
     }
 
-    qLogD << "path with " << path.elementCount() << " elements convert to " << points.size() << " points.";
+    //qLogD << "path with " << path.elementCount() << " elements convert to " << points.size() << " points.";
     return points.size();
+}
+
+void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& pointsList, 
+    QList<int>& startingIndices, QPointF& center, const QTransform& transform)
+{
+    pointsList.clear();
+    startingIndices.clear();
+    QList<QPolygonF> polygons = path.toSubpathPolygons(transform);
+    LaserPointList allPoints;
+    for (QPolygonF& polygon : polygons)
+    {
+        LaserPointList points;
+        QList<int> indices;
+        polygon2Points(polygon, points, indices, QPointF());
+
+        for (int index : indices)
+        {
+            startingIndices.append(index + allPoints.count());
+        }
+        allPoints.append(points);
+        pointsList.append(points);
+    }
+    center = utils::center(allPoints).toPointF();
+}
+
+void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& points, QList<int>& startingIndices, QPointF& center)
+{
+    points.clear();
+    startingIndices.clear();
+    bool isClosed = qFuzzyCompare(polygon.first(), polygon.last());
+    center = QPointF(0, 0);
+    for (int i = 0; i < polygon.size(); i++)
+    {
+        QPointF pt = polygon[i];
+        QPointF cPt = pt;
+        QPointF nPt = (i == polygon.size() - 1) ? polygon.first() : polygon.at(i + 1);
+        QPointF lPt = (i == 0) ? polygon.last() : polygon.at(i - 1);
+        QLineF line1(cPt, nPt);
+        QLineF line2(cPt, lPt);
+        qreal angle1 = line1.angle();
+        qreal angle2 = line2.angle();
+        points.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        center += pt;
+        if (isClosed)
+        {
+            startingIndices.append(i);
+        }
+    }
+    if (!isClosed)
+    {
+        startingIndices.append(0);
+        startingIndices.append(points.length() - 1);
+    }
+        
+    center /= points.size();
 }
 
 QByteArray machiningUtils::pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint)

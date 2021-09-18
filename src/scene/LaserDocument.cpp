@@ -368,7 +368,7 @@ void LaserDocument::exportJSON(const QString& filename)
 
             //QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
             QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
-            qLogD << rawJson;
+            //qLogD << rawJson;
             qint64 writtenBytes = saveFile.write(rawJson);
             LaserApplication::previewWindow->addProgress(this, 0.1 / path.length(), tr("File saved."));
             qDebug() << "written bytes:" << writtenBytes;

@@ -630,9 +630,9 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 	if (!primitive) {
 		return false;
 	}
-	else {
+	/*else {
 		qDebug() << "true";
-	}
+	}*/
 	//QPointF point = mapToScene(mousePoint.toPoint());
 	QPointF point = mousePoint;
 	QVector2D v1 = QVector2D(point - edge.p1());

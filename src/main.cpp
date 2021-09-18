@@ -13,7 +13,10 @@
 int main(int argc, char *argv[])
 {
     LaserApplication *app = new LaserApplication(argc, argv);
+
     qRegisterMetaType<QPainterPath>("QPainterPath");
+    qRegisterMetaType<QList<QPointF>>("QList<QPointF>");
+
     if (!app->initialize())
     {
         return -1;

@@ -4,6 +4,7 @@
 #include "laser/LaserDevice.h"
 #include "algorithm/OptimizeNode.h"
 #include "common/Config.h"
+#include <QtMath>
 
 LaserPointList::LaserPointList()
     : m_kdtree(nullptr)
@@ -143,6 +144,16 @@ int LaserPointList::nearestSearch(const LaserPoint& point)
 
     qLogD << "nearest point: " << m_matrix[index * 3] << ", " << m_matrix[index * 3 + 1] << ", " << m_matrix[index * 3 + 2];
 
+    /*for (int i = 0; i < m_matrix.length() / 3; i++)
+    {
+        qreal dx = queries[0] - m_matrix[i * 3];
+        qreal dy = queries[1] - m_matrix[i * 3 + 1];
+        qreal dz = queries[2] - m_matrix[i * 3 + 2];
+        qreal dist = qSqrt(dx * dx + dy * dy + dz * dz);
+        qLogD << i << ": " << dx << ", " << dy << ", " << dz << ", " << dist
+            << ", [" << m_matrix[i * 3] << ", " << m_matrix[i * 3 + 1] << "," << m_matrix[i * 3 + 2] << "]";
+    }*/
+
     return indices[index] / 2;
 }
 
@@ -152,19 +163,18 @@ OptimizeNode* LaserPointList::nearestSearch(OptimizeNode* srcNode)
     OptimizeNode* node = m_nodeMap[globalIndex];
     int index = m_indexMap[globalIndex];
     node->setCurrentIndex(index);
-    qLogD << node->currentPos();
+    //qLogD << node->currentPos();
     node->setLastPoint(srcNode->currentPos());
     return node;
 }
 
-QVector<QPointF> LaserPointList::toPoints() const
+QList<QPointF> LaserPointList::toPoints() const
 {
-    QVector<QPointF> points;
-    points.resize(count());
-    int i = 0;
+    QList<QPointF> points;
+    points.reserve(count());
     for (const LaserPoint& point : *this)
     {
-        points[i++] = point.toPointF();
+        points.append(point.toPointF());
     }
     return points;
 }

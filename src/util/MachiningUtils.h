@@ -35,6 +35,17 @@ namespace machiningUtils
         int startingIndiciesCount = 8, 
         int diagonalThreshold = 2 * 40);
 
+    void path2Points(const QPainterPath& path,
+        LaserPointListList& pointsList,
+        QList<int>& startingIndices,
+        QPointF& center = QPointF(),
+        const QTransform& transform = QTransform());
+
+    void polygon2Points(const QPolygonF& polygon,
+        LaserPointList& points,
+        QList<int>& startingIndices,
+        QPointF& center);
+
     QByteArray pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint);
 
     QByteArray pointList2Plt(const LaserPointList& points, QPointF& lastPoint);

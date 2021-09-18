@@ -22,7 +22,7 @@ public:
 
     OptimizeNode* nearestSearch(OptimizeNode* srcNode);
 
-    QVector<QPointF> toPoints() const;
+    QList<QPointF> toPoints() const;
 
     QPainterPath toPainterPath() const;
 
