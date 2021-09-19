@@ -136,7 +136,7 @@ public:
 
     ModifiedBy modifiedBy() const;
 
-    void setValue(const QVariant& value, ModifiedBy modifiedBy);
+    void setValue(const QVariant& value, ModifiedBy modifiedBy = MB_Manual);
 
 public slots:
     void reset();

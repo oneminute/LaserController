@@ -46,11 +46,8 @@ public:
     int engravingStyle() const;
     void setEngravingStyle(int engravingStyle);
 
-    int lineSpacing() const;
-    void setLineSpacing(int lineSpacing);
-
-    int columnSpacing() const;
-    void setColumnSpacing(int columnSpacing);
+    int rowInterval() const;
+    void setRowInterval(int rowInterval);
 
     QPoint startPos() const;
     void setStartPos(const QPoint& startPos);

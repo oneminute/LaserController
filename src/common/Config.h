@@ -162,6 +162,7 @@ public:
         CONFIG_ITEM(engravingLayer, laserPower, int, toInt)
         CONFIG_ITEM(engravingLayer, minPowerRate, int, toInt)
         CONFIG_ITEM(engravingLayer, maxPowerRate, int, toInt)
+        CONFIG_ITEM(engravingLayer, rowInterval, int, toInt)
         CONFIG_ITEM(engravingLayer, useHalftone, bool, toBool)
         CONFIG_ITEM(engravingLayer, LPI, int, toInt)
         CONFIG_ITEM(engravingLayer, DPI, int, toInt)

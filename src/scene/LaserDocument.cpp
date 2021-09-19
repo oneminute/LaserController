@@ -294,8 +294,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
                     engravingParamObj["CarveForward"] = layer->engravingForward();
                     engravingParamObj["CarveStyle"] = layer->engravingStyle();
-                    engravingParamObj["HStep"] = layer->lineSpacing();
-                    engravingParamObj["LStep"] = layer->columnSpacing();
+                    engravingParamObj["RowInterval"] = layer->rowInterval();
                     engravingParamObj["ErrorX"] = layer->errorX();
                     engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
                     engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();

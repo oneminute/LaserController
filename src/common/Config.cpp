@@ -523,6 +523,17 @@ void Config::loadEngravingLayerItems()
     maxPowerRate->setInputWidgetProperty("maximum", 100);
     maxPowerRate->setInputWidgetProperty("textTemplate", "%1%");
 
+    ConfigItem* rowInterval = group->addConfigItem(
+        "rowInterval",
+        tr("Row interval"),
+        tr("Row interval"),
+        70,
+        DT_INT
+    );
+    rowInterval->setInputWidgetProperty("minimum", 0);
+    rowInterval->setInputWidgetProperty("maximum", 1000);
+    rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
+
     group->addConfigItem(
         "useHalftone",
         tr("Use Halftone"),

@@ -22,7 +22,7 @@ public:
         , laserPower(115)
         , engravingForward(true)
         , engravingStyle(0)
-        , lineSpacing(7)
+        , rowInterval(70)
         , columnSpacing(0)
         , startX(25)
         , startY(0)
@@ -53,7 +53,7 @@ public:
     // engraving fields
     bool engravingForward;
     int engravingStyle;
-    int lineSpacing;
+    int rowInterval;
     int columnSpacing;
     int startX;
     int startY;
@@ -208,28 +208,16 @@ void LaserLayer::setEngravingStyle(int engravingStyle)
     d->engravingStyle = engravingStyle; 
 }
 
-int LaserLayer::lineSpacing() const 
+int LaserLayer::rowInterval() const 
 { 
     Q_D(const LaserLayer);
-    return d->lineSpacing; 
+    return d->rowInterval; 
 }
 
-void LaserLayer::setLineSpacing(int lineSpacing) 
+void LaserLayer::setRowInterval(int rowInterval) 
 { 
     Q_D(LaserLayer);
-    d->lineSpacing = lineSpacing; 
-}
-
-int LaserLayer::columnSpacing() const 
-{ 
-    Q_D(const LaserLayer);
-    return d->columnSpacing; 
-}
-
-void LaserLayer::setColumnSpacing(int columnSpacing) 
-{ 
-    Q_D(LaserLayer);
-    d->columnSpacing = columnSpacing; 
+    d->rowInterval = rowInterval; 
 }
 
 QPoint LaserLayer::startPos() const 
