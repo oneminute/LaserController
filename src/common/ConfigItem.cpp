@@ -136,6 +136,8 @@ public:
     /// </summary>
     QMap<QString, QVariant> inputWidgetProperties;
 
+    QMap<QString, QVariant> extraProperties;
+
     QList<QWidget*> widgets;
 
     ModifiedBy modifiedBy;
@@ -522,6 +524,24 @@ void ConfigItem::setInputWidgetProperty(const QString& key, const QVariant& valu
     {
         d->inputWidgetProperties.insert(key, value);
     }
+}
+
+QVariantMap& ConfigItem::extraProperties()
+{
+    Q_D(ConfigItem);
+    return d->extraProperties;
+}
+
+void ConfigItem::setExtraProperty(const QString& key, const QVariant& value)
+{
+    Q_D(ConfigItem);
+    d->extraProperties[key] = value;
+}
+
+QVariant& ConfigItem::extraProperty(const QString& key)
+{
+    Q_D(ConfigItem);
+    return d->extraProperties[key];
 }
 
 ConfigItem::WidgetInitializeHook ConfigItem::widgetInitializeHook()

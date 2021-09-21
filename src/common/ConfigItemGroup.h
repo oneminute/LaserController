@@ -46,6 +46,8 @@ public:
 
     void confirm();
 
+    void updateTitleAndDesc(const QString& title, const QString& desc);
+
 protected:
 
 private:

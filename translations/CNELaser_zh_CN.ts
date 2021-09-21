@@ -166,14 +166,14 @@
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2491"/>
-        <location filename="../src/common/Config.cpp" line="2495"/>
+        <location filename="../src/common/Config.cpp" line="2499"/>
+        <location filename="../src/common/Config.cpp" line="2503"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2492"/>
-        <location filename="../src/common/Config.cpp" line="2496"/>
+        <location filename="../src/common/Config.cpp" line="2500"/>
+        <location filename="../src/common/Config.cpp" line="2504"/>
         <source>Language for both UI and Business.</source>
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
@@ -199,13 +199,13 @@
         <translation>mm</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2499"/>
+        <location filename="../src/common/Config.cpp" line="2507"/>
         <source>Machining Unit</source>
         <translation>加工单位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2503"/>
-        <location filename="../src/common/Config.cpp" line="2504"/>
+        <location filename="../src/common/Config.cpp" line="2511"/>
+        <location filename="../src/common/Config.cpp" line="2512"/>
         <source>Max Layers Count</source>
         <translation>最大图层数</translation>
     </message>
@@ -238,7 +238,7 @@
         <translation type="vanished">操作按钮的高度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2519"/>
+        <location filename="../src/common/Config.cpp" line="2527"/>
         <source>Show Operation Button Text</source>
         <translation>显示操作按钮的文字</translation>
     </message>
@@ -271,7 +271,7 @@
         <translation type="vanished">色块按钮的高度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2535"/>
+        <location filename="../src/common/Config.cpp" line="2543"/>
         <source>Grid Contrast</source>
         <translation>网格对比度</translation>
     </message>
@@ -280,22 +280,22 @@
         <translation type="vanished">网格的对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="307"/>
+        <location filename="../src/common/Config.cpp" line="2545"/>
         <source>Off</source>
         <translation>不显示网格</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="308"/>
+        <location filename="../src/common/Config.cpp" line="2546"/>
         <source>Low Contrast</source>
         <translation>低对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="309"/>
+        <location filename="../src/common/Config.cpp" line="2547"/>
         <source>Medium Contrast</source>
         <translation>中对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="310"/>
+        <location filename="../src/common/Config.cpp" line="2548"/>
         <source>High Contrast</source>
         <translation>高对比度</translation>
     </message>
@@ -376,8 +376,8 @@
         <translation type="vanished">行像素间隔</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2607"/>
-        <location filename="../src/common/Config.cpp" line="2611"/>
+        <location filename="../src/common/Config.cpp" line="2619"/>
+        <location filename="../src/common/Config.cpp" line="2623"/>
         <source>Use Halftone</source>
         <translation>使用半色调算法</translation>
     </message>
@@ -386,7 +386,7 @@
         <translation type="vanished">对位图使用半色调算法。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2615"/>
+        <location filename="../src/common/Config.cpp" line="2627"/>
         <source>LPI</source>
         <translation>每英寸线数</translation>
     </message>
@@ -395,7 +395,7 @@
         <translation type="vanished">每英寸的线数。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2619"/>
+        <location filename="../src/common/Config.cpp" line="2631"/>
         <source>DPI</source>
         <translation>每英寸点数</translation>
     </message>
@@ -444,7 +444,7 @@
         <translation type="vanished">是否在路径优化中使用贪婪算法。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2623"/>
+        <location filename="../src/common/Config.cpp" line="2635"/>
         <source>Max Starting Points</source>
         <translation>最大起刀点数</translation>
     </message>
@@ -453,7 +453,7 @@
         <translation type="vanished">每一个图元的最大起刀点数。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2647"/>
+        <location filename="../src/common/Config.cpp" line="2659"/>
         <source>Max Angles Diff</source>
         <translation>最大角度差</translation>
     </message>
@@ -462,7 +462,7 @@
         <translation type="vanished">两个相邻起刀点间的最大角度差。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2627"/>
+        <location filename="../src/common/Config.cpp" line="2639"/>
         <source>Grouping Orientation</source>
         <translation>分组方向</translation>
     </message>
@@ -471,12 +471,12 @@
         <translation type="vanished">按行还是按列分组</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="542"/>
+        <location filename="../src/common/Config.cpp" line="547"/>
         <source>Horizontal</source>
         <translation>水平</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="543"/>
+        <location filename="../src/common/Config.cpp" line="548"/>
         <source>Vertical</source>
         <translation>垂直</translation>
     </message>
@@ -489,8 +489,8 @@
         <translation type="vanished">按行或按列分组时行或列间的最大间隔。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2639"/>
-        <location filename="../src/common/Config.cpp" line="2643"/>
+        <location filename="../src/common/Config.cpp" line="2651"/>
+        <location filename="../src/common/Config.cpp" line="2655"/>
         <source>Searching XY Weight</source>
         <translation>XY搜索权值</translation>
     </message>
@@ -503,8 +503,8 @@
         <translation type="vanished">相邻两个点间的最大角度差。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2651"/>
-        <location filename="../src/common/Config.cpp" line="2655"/>
+        <location filename="../src/common/Config.cpp" line="2663"/>
+        <location filename="../src/common/Config.cpp" line="2667"/>
         <source>Max Interval Distance</source>
         <translation>最大间隔距离</translation>
     </message>
@@ -549,127 +549,127 @@
         <translation type="vanished">开始位置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="678"/>
+        <location filename="../src/common/Config.cpp" line="2689"/>
         <source>Current Position</source>
         <translation>当前位置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="679"/>
+        <location filename="../src/common/Config.cpp" line="2690"/>
         <source>User Origin</source>
         <translation>用户原点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="680"/>
+        <location filename="../src/common/Config.cpp" line="2691"/>
         <source>Absolute Coords</source>
         <translation>绝对坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2500"/>
+        <location filename="../src/common/Config.cpp" line="2508"/>
         <source>Unit for machining</source>
         <translation>加工时用到的坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2507"/>
+        <location filename="../src/common/Config.cpp" line="2515"/>
         <source>Operation Button Icon Size(px)</source>
         <translation>操作按钮图标尺寸(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2508"/>
+        <location filename="../src/common/Config.cpp" line="2516"/>
         <source>Size of operation buttons&apos; icons</source>
         <translation>操作按钮图标的尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2511"/>
+        <location filename="../src/common/Config.cpp" line="2519"/>
         <source>Operation Button Width(px)</source>
         <translation>操作按钮宽(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2512"/>
+        <location filename="../src/common/Config.cpp" line="2520"/>
         <source>Width of operation buttons</source>
         <translation>操作按钮的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2515"/>
+        <location filename="../src/common/Config.cpp" line="2523"/>
         <source>Operation Button Height(px)</source>
         <translation>操作按钮高(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2516"/>
+        <location filename="../src/common/Config.cpp" line="2524"/>
         <source>Height of operation buttons</source>
         <translation>操作按钮的高度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2520"/>
+        <location filename="../src/common/Config.cpp" line="2528"/>
         <source>Show text of operation button or not</source>
         <translation>是否显示操作按钮的文本</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2523"/>
+        <location filename="../src/common/Config.cpp" line="2531"/>
         <source>Tool Button Size(px)</source>
         <translation>工具按钮尺寸(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2524"/>
+        <location filename="../src/common/Config.cpp" line="2532"/>
         <source>Size of tool buttons</source>
         <translation>工具按钮的尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2527"/>
+        <location filename="../src/common/Config.cpp" line="2535"/>
         <source>Color Button Width(px)</source>
         <translation>图层按钮宽度(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2528"/>
+        <location filename="../src/common/Config.cpp" line="2536"/>
         <source>Width of color buttons</source>
         <translation>图层按钮的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2531"/>
+        <location filename="../src/common/Config.cpp" line="2539"/>
         <source>Color Button Height(px)</source>
         <translation>图层按钮高(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2532"/>
+        <location filename="../src/common/Config.cpp" line="2540"/>
         <source>Height of color buttons</source>
         <translation>图层按钮的高度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2536"/>
+        <location filename="../src/common/Config.cpp" line="2544"/>
         <source>Contrast of grid lines</source>
         <translation>网格线对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2539"/>
+        <location filename="../src/common/Config.cpp" line="2551"/>
         <source>Grid Shape Distance(px)</source>
         <translation>网格捕获距离(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2540"/>
+        <location filename="../src/common/Config.cpp" line="2552"/>
         <source>This distance is used for capturing a shape when cursor is moving closed to</source>
         <translation>当鼠标靠近一个形状时，捕获该形状的距离阈值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2543"/>
+        <location filename="../src/common/Config.cpp" line="2555"/>
         <source>Object Shape Distance(px)</source>
         <translation>对象捕获距离(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2544"/>
+        <location filename="../src/common/Config.cpp" line="2556"/>
         <source>This distance is used for capturing an object when cursor is moving closed to</source>
         <translation>当鼠标靠近一个物体时，自动捕获该物体的距离阈值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2547"/>
+        <location filename="../src/common/Config.cpp" line="2559"/>
         <source>Click-selection Tolerance(px)</source>
         <translation>点击选择公差(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2548"/>
+        <location filename="../src/common/Config.cpp" line="2560"/>
         <source>Tolerance of Click-selection in px</source>
         <translation>在点击选择时的公差</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2552"/>
+        <location filename="../src/common/Config.cpp" line="2564"/>
         <source>The visual grid spacing in mm</source>
         <translation>可视网格的间距</translation>
     </message>
@@ -678,32 +678,32 @@
         <translation type="vanished">分割条手柄的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2559"/>
+        <location filename="../src/common/Config.cpp" line="2571"/>
         <source>Auto repeat delay(ms)</source>
         <translation>按钮连动超时时间(ms)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2560"/>
+        <location filename="../src/common/Config.cpp" line="2572"/>
         <source>The delay duration of auto repeat button</source>
         <translation>从按下按钮到触发连动间的超时时间</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2563"/>
+        <location filename="../src/common/Config.cpp" line="2575"/>
         <source>Min Speed(mm)</source>
         <translation>起跳速度(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2564"/>
+        <location filename="../src/common/Config.cpp" line="2576"/>
         <source>Min speed for cutting layers</source>
         <translation>切割图层的起跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2567"/>
+        <location filename="../src/common/Config.cpp" line="2579"/>
         <source>Run Speed(mm)</source>
         <translation>运行速度(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2568"/>
+        <location filename="../src/common/Config.cpp" line="2580"/>
         <source>Run speed for cutting layers</source>
         <translation>切割图层的运行速度</translation>
     </message>
@@ -712,288 +712,288 @@
         <translation type="obsolete">激光功率百分比(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2572"/>
+        <location filename="../src/common/Config.cpp" line="2584"/>
         <source>The power percentage for cutting layers</source>
         <translation>切割图层的功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2583"/>
+        <location filename="../src/common/Config.cpp" line="2595"/>
         <source>Min Speed(mm/s)</source>
         <translation>最小速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2584"/>
+        <location filename="../src/common/Config.cpp" line="2596"/>
         <source>The min speed for engraving layers</source>
         <translation>雕刻图层的最小速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2587"/>
+        <location filename="../src/common/Config.cpp" line="2599"/>
         <source>Run Speed(mm/s)</source>
         <translation>运行速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2588"/>
+        <location filename="../src/common/Config.cpp" line="2600"/>
         <source>The run speed for engraving layers</source>
         <translation>雕刻图层的运行速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2592"/>
+        <location filename="../src/common/Config.cpp" line="2604"/>
         <source>The laser power for engraving layers</source>
         <translation>雕刻图层的激光功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2595"/>
+        <location filename="../src/common/Config.cpp" line="2607"/>
         <source>Min Power(%)</source>
         <translation>最小功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2596"/>
+        <location filename="../src/common/Config.cpp" line="2608"/>
         <source>The min power percentage for engraving layers</source>
         <translation>雕刻图层的最小功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2599"/>
+        <location filename="../src/common/Config.cpp" line="2611"/>
         <source>Max Power(%)</source>
         <translation>最大功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2600"/>
+        <location filename="../src/common/Config.cpp" line="2612"/>
         <source>The max power percentage for engraving layers</source>
         <translation>雕刻图层的最大功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2603"/>
+        <location filename="../src/common/Config.cpp" line="2615"/>
         <source>Row Interval(μm)</source>
         <translation>行间距(μm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2604"/>
+        <location filename="../src/common/Config.cpp" line="2616"/>
         <source>The row interval between lines of bitmap for engraving layers</source>
         <translation>雕刻图层中位图两行间的间距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2608"/>
-        <location filename="../src/common/Config.cpp" line="2612"/>
+        <location filename="../src/common/Config.cpp" line="2620"/>
+        <location filename="../src/common/Config.cpp" line="2624"/>
         <source>Use halftone algorithm when generating bitmap datas</source>
         <translation>生成图片的加工数据时是否使用半色调算法</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2616"/>
+        <location filename="../src/common/Config.cpp" line="2628"/>
         <source>Lines per inch</source>
         <translation>每英寸线数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2620"/>
+        <location filename="../src/common/Config.cpp" line="2632"/>
         <source>Dots per inch</source>
         <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2624"/>
+        <location filename="../src/common/Config.cpp" line="2636"/>
         <source>Max starting points count of each primitive node</source>
         <translation>每一个图元的最大起刀点数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2628"/>
+        <location filename="../src/common/Config.cpp" line="2640"/>
         <source>The orientation of grouping</source>
         <translation>分组时按行还是按列</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2631"/>
+        <location filename="../src/common/Config.cpp" line="2643"/>
         <source>Grouping Grid Interval</source>
         <translation>分组时行列间隔</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2632"/>
+        <location filename="../src/common/Config.cpp" line="2644"/>
         <source>The grid interval</source>
         <translation>分组时的网格间隔</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2635"/>
+        <location filename="../src/common/Config.cpp" line="2647"/>
         <source>Max Group size</source>
         <translation>最大组内数量</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2636"/>
+        <location filename="../src/common/Config.cpp" line="2648"/>
         <source>Max nodes count of each group</source>
         <translation>每一个分组中最大的节点数量</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2640"/>
-        <location filename="../src/common/Config.cpp" line="2644"/>
+        <location filename="../src/common/Config.cpp" line="2652"/>
+        <location filename="../src/common/Config.cpp" line="2656"/>
         <source>Weight of XY for searching using kdtree</source>
         <translation>在使用Kdtree进行搜索时XY坐标相对于其它元素的权重值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2648"/>
+        <location filename="../src/common/Config.cpp" line="2660"/>
         <source>The max angles diff bwteen tow anchor points</source>
         <translation>两个锚点间的最大角度差</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2652"/>
-        <location filename="../src/common/Config.cpp" line="2656"/>
+        <location filename="../src/common/Config.cpp" line="2664"/>
+        <location filename="../src/common/Config.cpp" line="2668"/>
         <source>The max interval distance between tow anchor points</source>
         <translation>两个锚点间的最大间距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2659"/>
+        <location filename="../src/common/Config.cpp" line="2671"/>
         <source>Enable Small Diagonal</source>
         <translation>启用小圆限速</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2660"/>
+        <location filename="../src/common/Config.cpp" line="2672"/>
         <source>Enable small diagonal limitation for small primitives</source>
         <translation>为很小的图元启用小圆限速</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2663"/>
+        <location filename="../src/common/Config.cpp" line="2675"/>
         <source>Small Diagonal Limitation</source>
         <translation>小圆限速</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2664"/>
+        <location filename="../src/common/Config.cpp" line="2676"/>
         <source>Details of small diagonal limitation</source>
         <translation>小圆限速详情</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2667"/>
+        <location filename="../src/common/Config.cpp" line="2679"/>
         <source>Enable Relative Coordinates</source>
         <translation>启用相对坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2668"/>
+        <location filename="../src/common/Config.cpp" line="2680"/>
         <source>Enable relative coordinates for exporting machining points</source>
         <translation>为输出的加工点启用相对坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2671"/>
+        <location filename="../src/common/Config.cpp" line="2683"/>
         <source>Auto Connect First COM</source>
         <translation>自动连接首个COM端口</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2672"/>
+        <location filename="../src/common/Config.cpp" line="2684"/>
         <source>Auto connect to first com port when found multiple laser devices</source>
         <translation>当有多个设备时自动连接列表中的首个设备</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2675"/>
+        <location filename="../src/common/Config.cpp" line="2687"/>
         <source>Start from</source>
         <translation>开始加工</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2676"/>
+        <location filename="../src/common/Config.cpp" line="2688"/>
         <source>Choose the start point type of machining</source>
         <translation>选择开始加工点的方式</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2679"/>
+        <location filename="../src/common/Config.cpp" line="2694"/>
         <source>Job Origin</source>
         <translation>作业原点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2680"/>
+        <location filename="../src/common/Config.cpp" line="2695"/>
         <source>Job origin to start machining with</source>
         <translation>选择开始加工的作业原点的类型</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2683"/>
+        <location filename="../src/common/Config.cpp" line="2698"/>
         <source>X Enabled</source>
         <translation>X轴使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2684"/>
+        <location filename="../src/common/Config.cpp" line="2699"/>
         <source>Enabled x axis movement</source>
         <translation>是否启用X轴运动</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2687"/>
+        <location filename="../src/common/Config.cpp" line="2702"/>
         <source>Y Enabled</source>
         <translation>Y轴使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2688"/>
+        <location filename="../src/common/Config.cpp" line="2703"/>
         <source>Enabled y axis movement</source>
         <translation>是否启用Y轴运动</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2691"/>
+        <location filename="../src/common/Config.cpp" line="2706"/>
         <source>Z Enabled</source>
         <translation>Z轴使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2692"/>
+        <location filename="../src/common/Config.cpp" line="2707"/>
         <source>Enabled z axis movement</source>
         <translation>是否启用Z轴运动</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2695"/>
-        <location filename="../src/common/Config.cpp" line="2823"/>
+        <location filename="../src/common/Config.cpp" line="2710"/>
+        <location filename="../src/common/Config.cpp" line="2838"/>
         <source>[00] Head Data</source>
         <translation>[00]head数据</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2696"/>
-        <location filename="../src/common/Config.cpp" line="2824"/>
+        <location filename="../src/common/Config.cpp" line="2711"/>
+        <location filename="../src/common/Config.cpp" line="2839"/>
         <source>Read-only data used to test the quality of data transmission</source>
         <translation>用于验证数据传输质量的数据序列</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2699"/>
+        <location filename="../src/common/Config.cpp" line="2714"/>
         <source>[01] Acceleration Mode</source>
         <translation>[01] 加速模式</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2703"/>
+        <location filename="../src/common/Config.cpp" line="2718"/>
         <source>[02] Cutting Move Speed(mm/s)</source>
         <translation>[02] 空移速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2715"/>
+        <location filename="../src/common/Config.cpp" line="2730"/>
         <source>[05] Cutting Turn Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
         <translation>[05] 切割拐弯加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2747"/>
+        <location filename="../src/common/Config.cpp" line="2762"/>
         <source>[13] Scan Y Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
         <translation>[12] 扫描Y轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2755"/>
+        <location filename="../src/common/Config.cpp" line="2770"/>
         <source>[15] Scan Row Interval(mm)</source>
         <translation>[15] 行间距(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2759"/>
+        <location filename="../src/common/Config.cpp" line="2774"/>
         <source>[16] Scan Return Error(mm)</source>
         <translation>[16] 扫描回差(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2763"/>
+        <location filename="../src/common/Config.cpp" line="2778"/>
         <source>[17] Scan Laser Power(%)</source>
         <translation>[17] 激光扫描功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2791"/>
+        <location filename="../src/common/Config.cpp" line="2806"/>
         <source>[24] Backlash Y Interval(mm/s)</source>
         <translation>[24] Y轴反向间隙(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2792"/>
+        <location filename="../src/common/Config.cpp" line="2807"/>
         <source>Backlash Y interval</source>
         <translation>Y轴反向间隙</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2795"/>
+        <location filename="../src/common/Config.cpp" line="2810"/>
         <source>[25] Backlash Z Interval(mm/s)</source>
         <translation>[25] Y轴反向间隙(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2796"/>
+        <location filename="../src/common/Config.cpp" line="2811"/>
         <source>Backlash Z interval</source>
         <translation>Z轴反向间隙</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2884"/>
-        <location filename="../src/common/Config.cpp" line="2888"/>
+        <location filename="../src/common/Config.cpp" line="2899"/>
+        <location filename="../src/common/Config.cpp" line="2903"/>
         <source>X Zero Dev</source>
         <translation>X轴原点偏移</translation>
     </message>
@@ -1002,59 +1002,59 @@
         <translation type="vanished">[16] X轴电机步距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2891"/>
+        <location filename="../src/common/Config.cpp" line="2906"/>
         <source>[17] X Limit Num</source>
         <translation>[17] X轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2892"/>
+        <location filename="../src/common/Config.cpp" line="2907"/>
         <source>X limit num</source>
         <translation>X轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2896"/>
+        <location filename="../src/common/Config.cpp" line="2911"/>
         <source>Enable x reset</source>
         <translation>启用x轴重置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2899"/>
+        <location filename="../src/common/Config.cpp" line="2914"/>
         <source>[19] X Motor Num</source>
         <translation>[19] X轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2900"/>
+        <location filename="../src/common/Config.cpp" line="2915"/>
         <source>X motor num</source>
         <translation>X轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2903"/>
+        <location filename="../src/common/Config.cpp" line="2918"/>
         <source>[20] X Motor current(%)</source>
         <translation>[20] X轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2907"/>
+        <location filename="../src/common/Config.cpp" line="2922"/>
         <source>[21] X Start Speed(mm/s)</source>
         <translation>[21] X轴启跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2908"/>
+        <location filename="../src/common/Config.cpp" line="2923"/>
         <source>X Start Speed</source>
         <translation>X轴启跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2911"/>
+        <location filename="../src/common/Config.cpp" line="2926"/>
         <source>[22] X Max Speed(mm/s)</source>
         <translatorcomment>[22] X轴最大速度(mm/s)</translatorcomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2912"/>
+        <location filename="../src/common/Config.cpp" line="2927"/>
         <source>X Max Speed</source>
         <translation>X轴最大速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2936"/>
-        <location filename="../src/common/Config.cpp" line="2940"/>
+        <location filename="../src/common/Config.cpp" line="2951"/>
+        <location filename="../src/common/Config.cpp" line="2955"/>
         <source>Y Zero Dev</source>
         <translation>Y轴原点偏移</translation>
     </message>
@@ -1063,142 +1063,142 @@
         <translation type="vanished">[29] Y轴步长</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2943"/>
+        <location filename="../src/common/Config.cpp" line="2958"/>
         <source>[30] Y Limit Num</source>
         <translation>[30] Y轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2944"/>
+        <location filename="../src/common/Config.cpp" line="2959"/>
         <source>Y limit num</source>
         <translation>Y轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2948"/>
+        <location filename="../src/common/Config.cpp" line="2963"/>
         <source>Enable y reset</source>
         <translation>启用Y轴重置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2951"/>
+        <location filename="../src/common/Config.cpp" line="2966"/>
         <source>[32] Y Motor Num</source>
         <translation>[32] Y轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2952"/>
+        <location filename="../src/common/Config.cpp" line="2967"/>
         <source>Y motor num</source>
         <translation>Y轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2955"/>
+        <location filename="../src/common/Config.cpp" line="2970"/>
         <source>[33] Y Motor current(%)</source>
         <translation>[33] Y轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2959"/>
+        <location filename="../src/common/Config.cpp" line="2974"/>
         <source>[34] Y Start Speed(mm/s)</source>
         <translation>[34] Y轴启跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2960"/>
+        <location filename="../src/common/Config.cpp" line="2975"/>
         <source>Y Start Speed</source>
         <translation>Y轴启跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2963"/>
+        <location filename="../src/common/Config.cpp" line="2978"/>
         <source>[35] Y Max Speed(mm/s)</source>
         <translation>[35] Y轴最大速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2964"/>
+        <location filename="../src/common/Config.cpp" line="2979"/>
         <source>Y Max Speed</source>
         <translation>Y轴最大速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2983"/>
+        <location filename="../src/common/Config.cpp" line="2998"/>
         <source>[40] Z Limit Phase</source>
         <translation>[40] Z轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2984"/>
+        <location filename="../src/common/Config.cpp" line="2999"/>
         <source>Z limit phase</source>
         <translation>Z轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3000"/>
+        <location filename="../src/common/Config.cpp" line="3015"/>
         <source>Enable z reset</source>
         <translation>启用Z轴重置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3003"/>
+        <location filename="../src/common/Config.cpp" line="3018"/>
         <source>[45] Z Motor Num</source>
         <translation>[45] Z轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3004"/>
+        <location filename="../src/common/Config.cpp" line="3019"/>
         <source>Z motor num</source>
         <translation>Z轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3007"/>
+        <location filename="../src/common/Config.cpp" line="3022"/>
         <source>[46] Z Motor current(%)</source>
         <translation>[46] Z轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3011"/>
+        <location filename="../src/common/Config.cpp" line="3026"/>
         <source>[47] Z Start Speed(mm/s)</source>
         <translation>[47] Z轴启动速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3012"/>
+        <location filename="../src/common/Config.cpp" line="3027"/>
         <source>Z Start Speed</source>
         <translation>Z轴启动速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3015"/>
+        <location filename="../src/common/Config.cpp" line="3030"/>
         <source>[48] Z Max Speed(mm/s)</source>
         <translation>[48] Z轴最大速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3016"/>
+        <location filename="../src/common/Config.cpp" line="3031"/>
         <source>Z Max Speed</source>
         <translation>Z最大速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3027"/>
+        <location filename="../src/common/Config.cpp" line="3042"/>
         <source>[51] Laser Max Power(%)</source>
         <translation>[51] 激光最大功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3028"/>
+        <location filename="../src/common/Config.cpp" line="3043"/>
         <source>Laser Max Power</source>
         <translation>激光最大功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3031"/>
+        <location filename="../src/common/Config.cpp" line="3046"/>
         <source>[52] Laser Min Power(%)</source>
         <translation>[52] 激光最小功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3032"/>
+        <location filename="../src/common/Config.cpp" line="3047"/>
         <source>Laser Min Power</source>
         <translation>激光最小功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3035"/>
+        <location filename="../src/common/Config.cpp" line="3050"/>
         <source>[53] Laser Power Frequence</source>
         <translation>[53] 激光频率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3036"/>
+        <location filename="../src/common/Config.cpp" line="3051"/>
         <source>Laser Power Frequence</source>
         <translation>激光频率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3064"/>
+        <location filename="../src/common/Config.cpp" line="3079"/>
         <source>Enabled generate path image</source>
         <translation>启用生成路径图片</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3068"/>
+        <location filename="../src/common/Config.cpp" line="3083"/>
         <source>Enabled generate machining image</source>
         <translation>启用生成加工路径的图片</translation>
     </message>
@@ -1207,7 +1207,7 @@
         <translation type="vanished">[03]空移加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2711"/>
+        <location filename="../src/common/Config.cpp" line="2726"/>
         <source>[04] Cutting Turn Speed(mm/s)</source>
         <translation>[04] 拐弯速度(mm/s)</translation>
     </message>
@@ -1228,147 +1228,147 @@
         <translation type="vanished">[08]切割加速倍率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2731"/>
+        <location filename="../src/common/Config.cpp" line="2746"/>
         <source>[09] Cutting Spot Size</source>
         <translation>[09] 光斑尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2735"/>
+        <location filename="../src/common/Config.cpp" line="2750"/>
         <source>[10] Scan X Start Speed(mm/s)</source>
         <translation>[10] 扫描X轴起跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2739"/>
+        <location filename="../src/common/Config.cpp" line="2754"/>
         <source>[11] Scan Y Start Speed(mm/s)</source>
         <translation>[11] 扫描X轴起跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2751"/>
+        <location filename="../src/common/Config.cpp" line="2766"/>
         <source>[14] Scan Row Speed(mm/s)</source>
         <translation>[14] 扫描行速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2767"/>
+        <location filename="../src/common/Config.cpp" line="2782"/>
         <source>[18] Scan X Reset Enabled</source>
         <translation>[18] X轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2771"/>
+        <location filename="../src/common/Config.cpp" line="2786"/>
         <source>[19] Scan Y Reset Enabled</source>
         <translation>[19] Y轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2775"/>
+        <location filename="../src/common/Config.cpp" line="2790"/>
         <source>[20] Scan Z Reset Enabled</source>
         <translation>[20] Z轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2787"/>
+        <location filename="../src/common/Config.cpp" line="2802"/>
         <source>[23] Backlash X Interval(mm/s)</source>
         <translation>[23] X轴反向间隙(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2804"/>
+        <location filename="../src/common/Config.cpp" line="2819"/>
         <source>Default max cutting power</source>
         <translation>默认最大切割功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2808"/>
+        <location filename="../src/common/Config.cpp" line="2823"/>
         <source>Default min cutting power</source>
         <translation>默认最小切割功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2816"/>
+        <location filename="../src/common/Config.cpp" line="2831"/>
         <source>Max scan gray ratio</source>
         <translation>扫描最大灰度比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2820"/>
+        <location filename="../src/common/Config.cpp" line="2835"/>
         <source>Min scan gray ratio</source>
         <translation>扫描最小灰度比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2827"/>
+        <location filename="../src/common/Config.cpp" line="2842"/>
         <source>[01] Password</source>
         <translation>[01] 写入密码验证</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2831"/>
+        <location filename="../src/common/Config.cpp" line="2846"/>
         <source>[02] Stored Password</source>
         <translation>[02] 系统参数区密码</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2835"/>
+        <location filename="../src/common/Config.cpp" line="2850"/>
         <source>[03] Hardware ID1</source>
         <translation>[03] 硬件序列号ID1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2836"/>
+        <location filename="../src/common/Config.cpp" line="2851"/>
         <source>Hardware ID1</source>
         <translation>硬件序列号ID1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2839"/>
+        <location filename="../src/common/Config.cpp" line="2854"/>
         <source>[04] Hardware ID2</source>
         <translation>[04] 硬件序列号ID2</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2840"/>
+        <location filename="../src/common/Config.cpp" line="2855"/>
         <source>Hardware ID2</source>
         <translation>硬件序列号ID2</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2843"/>
+        <location filename="../src/common/Config.cpp" line="2858"/>
         <source>[05] Hardware ID3</source>
         <translation>[05] 硬件序列号ID3</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2844"/>
+        <location filename="../src/common/Config.cpp" line="2859"/>
         <source>Hardware ID3</source>
         <translation>硬件序列号ID3</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2859"/>
+        <location filename="../src/common/Config.cpp" line="2874"/>
         <source>[09] System Run Time</source>
         <translation>[09] 系统运行时间</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2863"/>
+        <location filename="../src/common/Config.cpp" line="2878"/>
         <source>[10] Laser Run Time</source>
         <translation>[10] 激光管开光时间</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2867"/>
+        <location filename="../src/common/Config.cpp" line="2882"/>
         <source>[11] System Run Times</source>
         <translation>[11] 系统加工次数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2871"/>
+        <location filename="../src/common/Config.cpp" line="2886"/>
         <source>[12] X Max Length(mm)</source>
         <translation>[12] X轴加工幅面</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2875"/>
+        <location filename="../src/common/Config.cpp" line="2890"/>
         <source>[13] X Dir Phase</source>
         <translation>[13] X轴方向极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2879"/>
+        <location filename="../src/common/Config.cpp" line="2894"/>
         <source>[14] X Limit Phase</source>
         <translation>[14] X轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2883"/>
+        <location filename="../src/common/Config.cpp" line="2898"/>
         <source>[15] X Zero Dev(mm)</source>
         <translation>[15] X轴原点偏移(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2887"/>
+        <location filename="../src/common/Config.cpp" line="2902"/>
         <source>[16] X Step Length(mm)</source>
         <translation>[16] X轴电机步距(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2895"/>
+        <location filename="../src/common/Config.cpp" line="2910"/>
         <source>[18] X Reset Enabled</source>
         <translation>[18] X轴复位使能</translation>
     </message>
@@ -1377,37 +1377,37 @@
         <translation type="vanished">[20] X轴电机驱动电流</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2915"/>
+        <location filename="../src/common/Config.cpp" line="2930"/>
         <source>[23] X Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>[23] X轴最大加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2919"/>
+        <location filename="../src/common/Config.cpp" line="2934"/>
         <source>[24] X Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>[24] X轴急停加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2923"/>
+        <location filename="../src/common/Config.cpp" line="2938"/>
         <source>[25] Y Max Length(mm)</source>
         <translation>[25] Y轴加工幅面(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2927"/>
+        <location filename="../src/common/Config.cpp" line="2942"/>
         <source>[26] Y Dir Phase</source>
         <translation>[26] Y轴方向极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2931"/>
+        <location filename="../src/common/Config.cpp" line="2946"/>
         <source>[27] Y Limit Phase</source>
         <translation>[27] Y轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2935"/>
+        <location filename="../src/common/Config.cpp" line="2950"/>
         <source>[28] Y Zero Dev(mm)</source>
         <translation>[28] Y轴原点偏移(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2947"/>
+        <location filename="../src/common/Config.cpp" line="2962"/>
         <source>[31] Y Reset Enabled</source>
         <translation>[31] Y轴复位使能</translation>
     </message>
@@ -1416,136 +1416,136 @@
         <translation type="obsolete">[33] Y轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2967"/>
+        <location filename="../src/common/Config.cpp" line="2982"/>
         <source>[36] Y Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>[36] Y轴最大加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2971"/>
+        <location filename="../src/common/Config.cpp" line="2986"/>
         <source>[37] Y Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>[37] Y轴急停加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2975"/>
+        <location filename="../src/common/Config.cpp" line="2990"/>
         <source>[38] Z Max Length(mm)</source>
         <translation>[38] Z轴加工幅面(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2979"/>
+        <location filename="../src/common/Config.cpp" line="2994"/>
         <source>[39] Z Dir Phase</source>
         <translation>[39] Z轴方向极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2987"/>
+        <location filename="../src/common/Config.cpp" line="3002"/>
         <source>[41] Z Zero Dev(mm)</source>
         <translation>[41] Z轴原点偏移(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2988"/>
-        <location filename="../src/common/Config.cpp" line="2992"/>
+        <location filename="../src/common/Config.cpp" line="3003"/>
+        <location filename="../src/common/Config.cpp" line="3007"/>
         <source>Z Zero Dev</source>
         <translation>Z轴原点偏移</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2991"/>
+        <location filename="../src/common/Config.cpp" line="3006"/>
         <source>[42] Z Step Length(mm)</source>
         <translation>[42] Z轴电机步距(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2995"/>
+        <location filename="../src/common/Config.cpp" line="3010"/>
         <source>[43] Z Limit Num</source>
         <translation>[43] Z轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2996"/>
+        <location filename="../src/common/Config.cpp" line="3011"/>
         <source>Z limit num</source>
         <translation>Z轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2999"/>
+        <location filename="../src/common/Config.cpp" line="3014"/>
         <source>[44] Z Reset Enabled</source>
         <translation>[44] Z轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3019"/>
+        <location filename="../src/common/Config.cpp" line="3034"/>
         <source>[49] Z Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>[49] Z轴最大加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3023"/>
+        <location filename="../src/common/Config.cpp" line="3038"/>
         <source>[50] Z Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>[50] Z轴急停加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3039"/>
+        <location filename="../src/common/Config.cpp" line="3054"/>
         <source>[54] X Phase Enabled</source>
         <translation>[54] X使能相位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3040"/>
+        <location filename="../src/common/Config.cpp" line="3055"/>
         <source>Enabled X phase</source>
         <translation>X使能相位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3043"/>
+        <location filename="../src/common/Config.cpp" line="3058"/>
         <source>[55] Y Phase Enabled</source>
         <translation>[55] Y使能相位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3044"/>
+        <location filename="../src/common/Config.cpp" line="3059"/>
         <source>Enabled Y phase</source>
         <translation>Y使能相位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3047"/>
+        <location filename="../src/common/Config.cpp" line="3062"/>
         <source>[56] Z Phase Enabled</source>
         <translation>[56] Z使能相位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3048"/>
+        <location filename="../src/common/Config.cpp" line="3063"/>
         <source>Enabled Z phase</source>
         <translation>Z使能相位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3051"/>
+        <location filename="../src/common/Config.cpp" line="3066"/>
         <source>[57] Device Origin</source>
         <translation>[57] 设备原点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3052"/>
+        <location filename="../src/common/Config.cpp" line="3067"/>
         <source>Device Origin</source>
         <translation>设备原点，指加工幅面外包矩形的4个四点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3055"/>
-        <location filename="../src/common/Config.cpp" line="3056"/>
+        <location filename="../src/common/Config.cpp" line="3070"/>
+        <location filename="../src/common/Config.cpp" line="3071"/>
         <source>Show Primitive Name</source>
         <translation>显示图元名称</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3059"/>
-        <location filename="../src/common/Config.cpp" line="3060"/>
+        <location filename="../src/common/Config.cpp" line="3074"/>
+        <location filename="../src/common/Config.cpp" line="3075"/>
         <source>Show Primitive First Point</source>
         <translation>显示图元首点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3063"/>
+        <location filename="../src/common/Config.cpp" line="3078"/>
         <source>Generate Path Image</source>
         <translation>生成路径图片</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3067"/>
+        <location filename="../src/common/Config.cpp" line="3082"/>
         <source>Generate Machining Image</source>
         <translation>生成加工点图片</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3071"/>
-        <location filename="../src/common/Config.cpp" line="3072"/>
+        <location filename="../src/common/Config.cpp" line="3086"/>
+        <location filename="../src/common/Config.cpp" line="3087"/>
         <source>Enable Optimize Interaction</source>
         <translation>启用优化交互</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2551"/>
+        <location filename="../src/common/Config.cpp" line="2563"/>
         <source>Visual Grid Spacing(mm)</source>
         <translation>可视网格间距(mm)</translation>
     </message>
@@ -1554,231 +1554,231 @@
         <translation type="obsolete">分割条手柄宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2700"/>
-        <location filename="../src/common/Config.cpp" line="2704"/>
+        <location filename="../src/common/Config.cpp" line="2715"/>
+        <location filename="../src/common/Config.cpp" line="2719"/>
         <source>Acceleration mode</source>
         <translation>加速模式</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="779"/>
+        <location filename="../src/common/Config.cpp" line="787"/>
         <source>T</source>
         <translation>T</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="780"/>
+        <location filename="../src/common/Config.cpp" line="788"/>
         <source>S1</source>
         <translation>S1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="781"/>
+        <location filename="../src/common/Config.cpp" line="789"/>
         <source>S2</source>
         <translation>S2</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="782"/>
+        <location filename="../src/common/Config.cpp" line="790"/>
         <source>S3</source>
         <translation>S3</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="783"/>
+        <location filename="../src/common/Config.cpp" line="791"/>
         <source>S4</source>
         <translation>S4</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="784"/>
+        <location filename="../src/common/Config.cpp" line="792"/>
         <source>S5</source>
         <translation>S5</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2571"/>
-        <location filename="../src/common/Config.cpp" line="2591"/>
+        <location filename="../src/common/Config.cpp" line="2583"/>
+        <location filename="../src/common/Config.cpp" line="2603"/>
         <source>Laser Power(%)</source>
         <translation>激光功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2575"/>
+        <location filename="../src/common/Config.cpp" line="2587"/>
         <source>Min Laser Power(%)</source>
         <translation>最小激光功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2579"/>
+        <location filename="../src/common/Config.cpp" line="2591"/>
         <source>Max Laser Power(%)</source>
         <translation>最大激光功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2736"/>
+        <location filename="../src/common/Config.cpp" line="2751"/>
         <source>Scan x start speed</source>
         <translation>扫描X轴起跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2740"/>
+        <location filename="../src/common/Config.cpp" line="2755"/>
         <source>Scan y start speed</source>
         <translation>扫描Y轴起跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2744"/>
+        <location filename="../src/common/Config.cpp" line="2759"/>
         <source>Scan x acceleration</source>
         <translation>扫描X轴加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2748"/>
+        <location filename="../src/common/Config.cpp" line="2763"/>
         <source>Scan y acceleration</source>
         <translation>扫描Y轴加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2752"/>
+        <location filename="../src/common/Config.cpp" line="2767"/>
         <source>Scan row speed</source>
         <translation>换行速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2756"/>
+        <location filename="../src/common/Config.cpp" line="2771"/>
         <source>Scan row interval</source>
         <translation>换行间距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2760"/>
+        <location filename="../src/common/Config.cpp" line="2775"/>
         <source>Scan return error</source>
         <translation>扫描回差</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2784"/>
+        <location filename="../src/common/Config.cpp" line="2799"/>
         <source>Scan return pos</source>
         <translation>复位位置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2860"/>
+        <location filename="../src/common/Config.cpp" line="2875"/>
         <source>System run time</source>
         <translation>系统运行时间</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2864"/>
+        <location filename="../src/common/Config.cpp" line="2879"/>
         <source>Laser run time</source>
         <translation>激光管开光时间</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2868"/>
+        <location filename="../src/common/Config.cpp" line="2883"/>
         <source>System run times</source>
         <translation>系统加工次数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2872"/>
+        <location filename="../src/common/Config.cpp" line="2887"/>
         <source>X max length</source>
         <translation>X轴加工幅面</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2876"/>
+        <location filename="../src/common/Config.cpp" line="2891"/>
         <source>X dir phase</source>
         <translation>X轴方向极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1529"/>
-        <location filename="../src/common/Config.cpp" line="1549"/>
-        <location filename="../src/common/Config.cpp" line="1618"/>
-        <location filename="../src/common/Config.cpp" line="1646"/>
-        <location filename="../src/common/Config.cpp" line="1812"/>
-        <location filename="../src/common/Config.cpp" line="1832"/>
-        <location filename="../src/common/Config.cpp" line="1900"/>
-        <location filename="../src/common/Config.cpp" line="1928"/>
-        <location filename="../src/common/Config.cpp" line="2094"/>
-        <location filename="../src/common/Config.cpp" line="2115"/>
-        <location filename="../src/common/Config.cpp" line="2184"/>
-        <location filename="../src/common/Config.cpp" line="2212"/>
+        <location filename="../src/common/Config.cpp" line="1537"/>
+        <location filename="../src/common/Config.cpp" line="1557"/>
+        <location filename="../src/common/Config.cpp" line="1626"/>
+        <location filename="../src/common/Config.cpp" line="1654"/>
+        <location filename="../src/common/Config.cpp" line="1820"/>
+        <location filename="../src/common/Config.cpp" line="1840"/>
+        <location filename="../src/common/Config.cpp" line="1908"/>
+        <location filename="../src/common/Config.cpp" line="1936"/>
+        <location filename="../src/common/Config.cpp" line="2102"/>
+        <location filename="../src/common/Config.cpp" line="2123"/>
+        <location filename="../src/common/Config.cpp" line="2192"/>
+        <location filename="../src/common/Config.cpp" line="2220"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1530"/>
-        <location filename="../src/common/Config.cpp" line="1550"/>
-        <location filename="../src/common/Config.cpp" line="1619"/>
-        <location filename="../src/common/Config.cpp" line="1647"/>
-        <location filename="../src/common/Config.cpp" line="1813"/>
-        <location filename="../src/common/Config.cpp" line="1833"/>
-        <location filename="../src/common/Config.cpp" line="1901"/>
-        <location filename="../src/common/Config.cpp" line="1929"/>
-        <location filename="../src/common/Config.cpp" line="2095"/>
-        <location filename="../src/common/Config.cpp" line="2116"/>
-        <location filename="../src/common/Config.cpp" line="2185"/>
-        <location filename="../src/common/Config.cpp" line="2213"/>
+        <location filename="../src/common/Config.cpp" line="1538"/>
+        <location filename="../src/common/Config.cpp" line="1558"/>
+        <location filename="../src/common/Config.cpp" line="1627"/>
+        <location filename="../src/common/Config.cpp" line="1655"/>
+        <location filename="../src/common/Config.cpp" line="1821"/>
+        <location filename="../src/common/Config.cpp" line="1841"/>
+        <location filename="../src/common/Config.cpp" line="1909"/>
+        <location filename="../src/common/Config.cpp" line="1937"/>
+        <location filename="../src/common/Config.cpp" line="2103"/>
+        <location filename="../src/common/Config.cpp" line="2124"/>
+        <location filename="../src/common/Config.cpp" line="2193"/>
+        <location filename="../src/common/Config.cpp" line="2221"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2555"/>
+        <location filename="../src/common/Config.cpp" line="2567"/>
         <source>Splitter Handle Width(px)</source>
         <translation>分割条手柄宽度(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2556"/>
+        <location filename="../src/common/Config.cpp" line="2568"/>
         <source>Width of splitter handle in px</source>
         <translation>分割条手柄的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2576"/>
+        <location filename="../src/common/Config.cpp" line="2588"/>
         <source>The min power percentage for cutting layers</source>
         <translation>切割图层中的最小功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2580"/>
+        <location filename="../src/common/Config.cpp" line="2592"/>
         <source>The max power percentage for cutting layers</source>
         <translation>切割图层的最大功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2707"/>
+        <location filename="../src/common/Config.cpp" line="2722"/>
         <source>[03] Cutting Move Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
         <translation>[03] 切割空移加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2708"/>
+        <location filename="../src/common/Config.cpp" line="2723"/>
         <source>Move acceleration for cutting movement</source>
         <translation>切割空移加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2712"/>
+        <location filename="../src/common/Config.cpp" line="2727"/>
         <source>Turn speed for cutting movement</source>
         <translation>切割拐弯速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2716"/>
+        <location filename="../src/common/Config.cpp" line="2731"/>
         <source>Turn acceleration for cutting movement</source>
         <translation>切割拐弯加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2719"/>
+        <location filename="../src/common/Config.cpp" line="2734"/>
         <source>[06] Cutting Work Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
         <translation>[06]切割加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2720"/>
+        <location filename="../src/common/Config.cpp" line="2735"/>
         <source>Work acceleration for cutting movement</source>
         <translation>切割加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2723"/>
+        <location filename="../src/common/Config.cpp" line="2738"/>
         <source>[07] Move Speed Factor</source>
         <translation>[07] 切割空移加速倍率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2724"/>
+        <location filename="../src/common/Config.cpp" line="2739"/>
         <source>Move speed factor for cutting movement</source>
         <translation>切割空移加速倍率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2727"/>
+        <location filename="../src/common/Config.cpp" line="2742"/>
         <source>[08] Work Speed Factor</source>
         <translation>[08] 切割加速倍率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2728"/>
+        <location filename="../src/common/Config.cpp" line="2743"/>
         <source>Work speed factor for cutting movement</source>
         <translation>切割加速倍率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2732"/>
+        <location filename="../src/common/Config.cpp" line="2747"/>
         <source>Spot size for cutting movement</source>
         <translation>切割光斑尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2743"/>
+        <location filename="../src/common/Config.cpp" line="2758"/>
         <source>[12] Scan X Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
         <translation>[12] 扫描X轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
@@ -1791,42 +1791,42 @@
         <translation type="vanished">[16] 扫描回差(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2764"/>
+        <location filename="../src/common/Config.cpp" line="2779"/>
         <source>The percentage of scan laser power</source>
         <translation>扫描功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2768"/>
+        <location filename="../src/common/Config.cpp" line="2783"/>
         <source>Enabled Scan X reset</source>
         <translation>X轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2772"/>
+        <location filename="../src/common/Config.cpp" line="2787"/>
         <source>Enabled Scan Y reset</source>
         <translation>Y轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2776"/>
+        <location filename="../src/common/Config.cpp" line="2791"/>
         <source>Enabled Scan Z reset</source>
         <translation>Z轴复位使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2779"/>
+        <location filename="../src/common/Config.cpp" line="2794"/>
         <source>[21] Reset Speed(mm/s)</source>
         <translation>[21] X轴启跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2780"/>
+        <location filename="../src/common/Config.cpp" line="2795"/>
         <source>Reset speed</source>
         <translation>复位速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2783"/>
+        <location filename="../src/common/Config.cpp" line="2798"/>
         <source>[22] Scan Return Pos</source>
         <translation>[22] 复位位置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2788"/>
+        <location filename="../src/common/Config.cpp" line="2803"/>
         <source>Backlash X interval</source>
         <translation>X轴反向间隙</translation>
     </message>
@@ -1839,222 +1839,240 @@
         <translation type="obsolete">[23] X轴反向间隙(mm/s) {25]?}</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2799"/>
+        <location filename="../src/common/Config.cpp" line="2814"/>
         <source>[26] Default Run Speed(mm/s)</source>
         <translation>[26] 默认加工速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2800"/>
+        <location filename="../src/common/Config.cpp" line="2815"/>
         <source>Default run speed</source>
         <translation>默认加工速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2803"/>
+        <location filename="../src/common/Config.cpp" line="2818"/>
         <source>[27] Default Max Cutting Power(%)</source>
         <translation>[27] 默认最大切割功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2807"/>
+        <location filename="../src/common/Config.cpp" line="2822"/>
         <source>[28] Default Min Cutting Power(%)</source>
         <translation>[28] 默认最小切割功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2811"/>
+        <location filename="../src/common/Config.cpp" line="2826"/>
         <source>[29] Default Scan Speed(mm/s)</source>
         <translation>[29] 默认扫描速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2812"/>
+        <location filename="../src/common/Config.cpp" line="2827"/>
         <source>Default scan speed</source>
         <translation>默认扫描速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2815"/>
+        <location filename="../src/common/Config.cpp" line="2830"/>
         <source>[30] Max Scan Gray Ratio</source>
         <translation>[30] 扫描最大灰度比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2819"/>
+        <location filename="../src/common/Config.cpp" line="2834"/>
         <source>[31] Min Scan Gray Ratio</source>
         <translation>[31] 扫描最小灰度比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2828"/>
+        <location filename="../src/common/Config.cpp" line="2843"/>
         <source>Manufacture password to modify system registers</source>
         <translation>用于修改系统寄存器的厂商密码</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2832"/>
+        <location filename="../src/common/Config.cpp" line="2847"/>
         <source>Stored manufacture password</source>
         <translation>已保存的厂商密码</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2847"/>
+        <location filename="../src/common/Config.cpp" line="2862"/>
         <source>[06] CDKey1</source>
         <translation>[06] CDKey1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2848"/>
+        <location filename="../src/common/Config.cpp" line="2863"/>
         <source>CDKey1</source>
         <translation>CDKey1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2851"/>
+        <location filename="../src/common/Config.cpp" line="2866"/>
         <source>[07] CDKey2</source>
         <translation>[07] CDKey2</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2852"/>
+        <location filename="../src/common/Config.cpp" line="2867"/>
         <source>CDKey2</source>
         <translation>CDKey2</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2855"/>
+        <location filename="../src/common/Config.cpp" line="2870"/>
         <source>[08] CDKey3</source>
         <translation>[08] CDKey3</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2856"/>
+        <location filename="../src/common/Config.cpp" line="2871"/>
         <source>CDKey3</source>
         <translation>CDKey3</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2880"/>
+        <location filename="../src/common/Config.cpp" line="2895"/>
         <source>X limit phase</source>
         <translation>X轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1620"/>
-        <location filename="../src/common/Config.cpp" line="1648"/>
-        <location filename="../src/common/Config.cpp" line="1902"/>
-        <location filename="../src/common/Config.cpp" line="1930"/>
-        <location filename="../src/common/Config.cpp" line="2186"/>
-        <location filename="../src/common/Config.cpp" line="2214"/>
+        <location filename="../src/common/Config.cpp" line="1628"/>
+        <location filename="../src/common/Config.cpp" line="1656"/>
+        <location filename="../src/common/Config.cpp" line="1910"/>
+        <location filename="../src/common/Config.cpp" line="1938"/>
+        <location filename="../src/common/Config.cpp" line="2194"/>
+        <location filename="../src/common/Config.cpp" line="2222"/>
         <source>2</source>
         <translation>2</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1621"/>
-        <location filename="../src/common/Config.cpp" line="1649"/>
-        <location filename="../src/common/Config.cpp" line="1903"/>
-        <location filename="../src/common/Config.cpp" line="1931"/>
-        <location filename="../src/common/Config.cpp" line="2187"/>
-        <location filename="../src/common/Config.cpp" line="2215"/>
+        <location filename="../src/common/Config.cpp" line="1629"/>
+        <location filename="../src/common/Config.cpp" line="1657"/>
+        <location filename="../src/common/Config.cpp" line="1911"/>
+        <location filename="../src/common/Config.cpp" line="1939"/>
+        <location filename="../src/common/Config.cpp" line="2195"/>
+        <location filename="../src/common/Config.cpp" line="2223"/>
         <source>3</source>
         <translation>3</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2904"/>
+        <location filename="../src/common/Config.cpp" line="2919"/>
         <source>X motor current</source>
         <translation>X轴电机驱动电流</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2916"/>
+        <location filename="../src/common/Config.cpp" line="2931"/>
         <source>X max acceleration</source>
         <translation>X轴最大加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2920"/>
+        <location filename="../src/common/Config.cpp" line="2935"/>
         <source>X urgent acceleration</source>
         <translation>X轴急停加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2924"/>
-        <location filename="../src/common/Config.cpp" line="2976"/>
+        <location filename="../src/common/Config.cpp" line="2939"/>
+        <location filename="../src/common/Config.cpp" line="2991"/>
         <source>Y max length</source>
         <translation>X轴加工幅面</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2928"/>
+        <location filename="../src/common/Config.cpp" line="2943"/>
         <source>Y dir phase</source>
         <translation>Y轴方向极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2932"/>
+        <location filename="../src/common/Config.cpp" line="2947"/>
         <source>Y limit phase</source>
         <translation>Y轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2939"/>
+        <location filename="../src/common/Config.cpp" line="2954"/>
         <source>[29] Y Step Length(mm)</source>
         <translation>[29] Y轴步长(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2956"/>
+        <location filename="../src/common/Config.cpp" line="2971"/>
         <source>Y motor current</source>
         <translation>Y轴电机驱动电流</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2968"/>
+        <location filename="../src/common/Config.cpp" line="2983"/>
         <source>Y max acceleration</source>
         <translation>Y轴最大加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2972"/>
+        <location filename="../src/common/Config.cpp" line="2987"/>
         <source>Y urgent acceleration</source>
         <translation>Y轴急停加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2980"/>
+        <location filename="../src/common/Config.cpp" line="2995"/>
         <source>Z dir phase</source>
         <translation>Z轴方向极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3008"/>
+        <location filename="../src/common/Config.cpp" line="3023"/>
         <source>Z motor current</source>
         <translation>Z轴电机驱动电流</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3020"/>
+        <location filename="../src/common/Config.cpp" line="3035"/>
         <source>Z max acceleration</source>
         <translation>Z轴最大加速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3024"/>
+        <location filename="../src/common/Config.cpp" line="3039"/>
         <source>Z urgent acceleration</source>
         <translation>Z轴急停加速度</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3090"/>
+        <location filename="../src/common/Config.cpp" line="3091"/>
         <location filename="../src/common/Config.h" line="75"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3094"/>
+        <location filename="../src/common/Config.cpp" line="3095"/>
         <location filename="../src/common/Config.h" line="92"/>
         <source>Layers</source>
         <translation>图层</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3098"/>
+        <location filename="../src/common/Config.cpp" line="3099"/>
         <location filename="../src/common/Config.h" line="107"/>
         <source>UI</source>
         <translation>界面</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3102"/>
+        <location filename="../src/common/Config.cpp" line="3103"/>
         <location filename="../src/common/Config.h" line="136"/>
         <source>Cutting Layer</source>
         <translation>切割图层</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3106"/>
+        <location filename="../src/common/Config.cpp" line="3107"/>
         <location filename="../src/common/Config.h" line="155"/>
         <source>Engraving Layer</source>
         <translation>雕刻图层</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3110"/>
+        <location filename="../src/common/Config.cpp" line="3111"/>
         <location filename="../src/common/Config.h" line="178"/>
         <source>Path Optimization</source>
         <translation>路径优化</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3114"/>
+        <location filename="../src/common/Config.cpp" line="3115"/>
         <location filename="../src/common/Config.h" line="197"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3118"/>
+        <location filename="../src/common/Config.cpp" line="3119"/>
         <location filename="../src/common/Config.h" line="216"/>
         <source>Device</source>
         <translation>设备</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3122"/>
+        <location filename="../src/common/Config.cpp" line="3123"/>
         <location filename="../src/common/Config.h" line="238"/>
         <source>User Registers</source>
         <translation>用户寄存器</translation>
@@ -2065,6 +2083,8 @@
         <translation>用户寄存器</translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="3126"/>
+        <location filename="../src/common/Config.cpp" line="3127"/>
         <location filename="../src/common/Config.h" line="285"/>
         <source>System Registers</source>
         <translation>系统寄存器</translation>

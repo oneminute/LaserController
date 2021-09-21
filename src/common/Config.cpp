@@ -304,10 +304,15 @@ void Config::loadUiItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("Off"), 0);
-            comboBox->addItem(tr("Low Contrast"), 1);
-            comboBox->addItem(tr("Medium Contrast"), 2);
-            comboBox->addItem(tr("High Contrast"), 3);
+            //comboBox->addItem(QCoreApplication::translate("Config", ("Off"), nullptr), 0);
+            //comboBox->addItem(QCoreApplication::translate("Config", ("Low Contrast"), nullptr), 1);
+            //comboBox->addItem(QCoreApplication::translate("Config", ("Medium Contrast"), nullptr), 2);
+            //comboBox->addItem(QCoreApplication::translate("Config", ("High Contrast"), nullptr), 3);
+
+            comboBox->addItem(item->extraProperty("Off").toString(), 0);
+            comboBox->addItem(item->extraProperty("Low Contrast").toString(), 1);
+            comboBox->addItem(item->extraProperty("Medium Contrast").toString(), 2);
+            comboBox->addItem(item->extraProperty("High Contrast").toString(), 3);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -456,24 +461,24 @@ void Config::loadEngravingLayerItems()
     laserPower->setInputWidgetProperty("maximum", 100);
     laserPower->setInputWidgetProperty("textTemplate", "%1%");
 
-    ConfigItem* minPowerRate = group->addConfigItem(
-        "minPowerRate",
+    ConfigItem* minPower= group->addConfigItem(
+        "minPower",
         70,
         DT_REAL
     );
-    minPowerRate->setInputWidgetType(IWT_FloatEditSlider);
-    minPowerRate->setInputWidgetProperty("minimum", 0);
-    minPowerRate->setInputWidgetProperty("maximum", 100);
-    minPowerRate->setInputWidgetProperty("textTemplate", "%1%");
+    minPower->setInputWidgetType(IWT_FloatEditSlider);
+    minPower->setInputWidgetProperty("minimum", 0);
+    minPower->setInputWidgetProperty("maximum", 100);
+    minPower->setInputWidgetProperty("textTemplate", "%1%");
 
-    ConfigItem* maxPowerRate = group->addConfigItem(
-        "maxPowerRate",
+    ConfigItem* maxPower= group->addConfigItem(
+        "maxPower",
         100,
         DT_REAL
     );
-    maxPowerRate->setInputWidgetProperty("minimum", 0);
-    maxPowerRate->setInputWidgetProperty("maximum", 100);
-    maxPowerRate->setInputWidgetProperty("textTemplate", "%1%");
+    maxPower->setInputWidgetProperty("minimum", 0);
+    maxPower->setInputWidgetProperty("maximum", 100);
+    maxPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* rowInterval = group->addConfigItem(
         "rowInterval",
@@ -675,9 +680,12 @@ void Config::loadDeviceItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("Current Position"), SFT_CurrentPosition);
-            comboBox->addItem(tr("User Origin"), SFT_UserOrigin);
-            comboBox->addItem(tr("Absolute Coords"), SFT_AbsoluteCoords);
+            //comboBox->addItem(tr("Current Position"), SFT_CurrentPosition);
+            //comboBox->addItem(tr("User Origin"), SFT_UserOrigin);
+            //comboBox->addItem(tr("Absolute Coords"), SFT_AbsoluteCoords);
+            comboBox->addItem(item->extraProperty("Current Position").toString(), SFT_CurrentPosition);
+            comboBox->addItem(item->extraProperty("User Origin").toString(), SFT_UserOrigin);
+            comboBox->addItem(item->extraProperty("Absolute Coords").toString(), SFT_AbsoluteCoords);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -2534,6 +2542,10 @@ void Config::updateTitlesAndDescriptions()
     Ui::gridContrastItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Grid Contrast", nullptr), 
         QCoreApplication::translate("Config", "Contrast of grid lines", nullptr));
+    Ui::gridContrastItem()->setExtraProperty("Off", QCoreApplication::translate("Config", "Off", nullptr));
+    Ui::gridContrastItem()->setExtraProperty("Low Contrast", QCoreApplication::translate("Config", "Low Contrast", nullptr));
+    Ui::gridContrastItem()->setExtraProperty("Medium Contrast", QCoreApplication::translate("Config", "Medium Contrast", nullptr));
+    Ui::gridContrastItem()->setExtraProperty("High Contrast", QCoreApplication::translate("Config", "High Contrast", nullptr));
 
     Ui::gridShapeDistanceItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Grid Shape Distance(px)", nullptr), 
@@ -2674,6 +2686,9 @@ void Config::updateTitlesAndDescriptions()
     Device::startFromItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Start from", nullptr), 
         QCoreApplication::translate("Config", "Choose the start point type of machining", nullptr));
+    Device::startFromItem()->setExtraProperty("Current Position", QCoreApplication::translate("Config", "Current Position", nullptr));
+    Device::startFromItem()->setExtraProperty("User Origin", QCoreApplication::translate("Config", "User Origin", nullptr));
+    Device::startFromItem()->setExtraProperty("Absolute Coords", QCoreApplication::translate("Config", "Absolute Coords", nullptr));
 
     Device::jobOriginItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Job Origin", nullptr), 
@@ -3070,6 +3085,50 @@ void Config::updateTitlesAndDescriptions()
     Debug::enableOptimizeInteractionItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr),
         QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr));
+
+    groupsMap["general"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "General", nullptr),
+        QCoreApplication::translate("Config", "General", nullptr));
+
+    groupsMap["layers"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Layers", nullptr),
+        QCoreApplication::translate("Config", "Layers", nullptr));
+
+    groupsMap["ui"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "UI", nullptr),
+        QCoreApplication::translate("Config", "UI", nullptr));
+
+    groupsMap["cuttingLayer"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Cutting Layer", nullptr),
+        QCoreApplication::translate("Config", "Cutting Layer", nullptr));
+
+    groupsMap["engravingLayer"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Engraving Layer", nullptr),
+        QCoreApplication::translate("Config", "Engraving Layer", nullptr));
+
+    groupsMap["pathOptimization"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Path Optimization", nullptr),
+        QCoreApplication::translate("Config", "Path Optimization", nullptr));
+
+    groupsMap["export"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Export", nullptr),
+        QCoreApplication::translate("Config", "Export", nullptr));
+
+    groupsMap["device"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Device", nullptr),
+        QCoreApplication::translate("Config", "Device", nullptr));
+
+    groupsMap["debug"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Debug", nullptr),
+        QCoreApplication::translate("Config", "Debug", nullptr));
+
+    groupsMap["userRegister"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "User Registers", nullptr),
+        QCoreApplication::translate("Config", "User Registers", nullptr));
+
+    groupsMap["systemRegister"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "System Registers", nullptr),
+        QCoreApplication::translate("Config", "System Registers", nullptr));
 }
 
 void Config::destroy()

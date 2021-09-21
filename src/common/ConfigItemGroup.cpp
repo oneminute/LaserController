@@ -149,4 +149,11 @@ void ConfigItemGroup::confirm()
     }
 }
 
+void ConfigItemGroup::updateTitleAndDesc(const QString& title, const QString& desc)
+{
+    Q_D(ConfigItemGroup);
+    d->title = title;
+    d->description = desc;
+}
+
 

@@ -95,6 +95,10 @@ public:
     QMap<QString, QVariant>& inputWidgetProperties();
     void setInputWidgetProperty(const QString& key, const QVariant& value);
 
+    QVariantMap& extraProperties();
+    void setExtraProperty(const QString& key, const QVariant& value);
+    QVariant& extraProperty(const QString& key);
+
     WidgetInitializeHook widgetInitializeHook();
     void setWidgetInitializeHook(WidgetInitializeHook fn);
     void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
