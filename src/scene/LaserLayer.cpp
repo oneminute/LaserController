@@ -91,16 +91,16 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
         d->minSpeed = Config::EngravingLayer::minSpeed();
         d->runSpeed = Config::EngravingLayer::runSpeed();
         d->laserPower = Config::EngravingLayer::laserPower();
-        d->minSpeedPower = Config::EngravingLayer::minPowerRate();
-        d->runSpeedPower = Config::EngravingLayer::maxPowerRate();       
+        d->minSpeedPower = Config::EngravingLayer::minPower();
+        d->runSpeedPower = Config::EngravingLayer::maxPower();       
     }
     else if (type == LLT_CUTTING)
     {
         d->minSpeed = Config::CuttingLayer::minSpeed();
         d->runSpeed = Config::CuttingLayer::runSpeed();
         d->laserPower = Config::CuttingLayer::laserPower();
-        d->minSpeedPower = Config::CuttingLayer::minPowerRate();
-        d->runSpeedPower = Config::CuttingLayer::maxPowerRate();        
+        d->minSpeedPower = Config::CuttingLayer::minPower();
+        d->runSpeedPower = Config::CuttingLayer::maxPower();        
     }
 	d->useHalftone = Config::EngravingLayer::useHalftone();
 	d->lpi = Config::EngravingLayer::LPI();

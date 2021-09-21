@@ -27,8 +27,8 @@ public:
     void addConfigItem(ConfigItem* item);
 
     ConfigItem* addConfigItem(const QString& name
-        , const QString& title
-        , const QString& description
+        //, const QString& title
+        //, const QString& description
         , const QVariant& value
         , DataType dataType = DT_INT
         , bool advanced = false

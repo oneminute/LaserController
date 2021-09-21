@@ -496,7 +496,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionDeletePrimitive, &QAction::triggered, this, &LaserControllerWindow::onActionDeletePrimitive);
 	connect(m_ui->actionCopy, &QAction::triggered, this, &LaserControllerWindow::onActionCopy);
 	connect(m_ui->actionPaste, &QAction::triggered, this, &LaserControllerWindow::onActionPaste);
-	connect(m_ui->actionPasteInLine, &QAction::triggered, this, &LaserControllerWindow::onActionPasteInLine);
+	connect(m_ui->actionPasteInPlace, &QAction::triggered, this, &LaserControllerWindow::onActionPasteInPlace);
 	connect(m_ui->actionCut, &QAction::triggered, this, &LaserControllerWindow::onActionCut);
 	connect(m_ui->actionDuplication, &QAction::triggered, this, &LaserControllerWindow::onActionDuplication);
 	connect(m_ui->actionGroup, &QAction::triggered, this, &LaserControllerWindow::onActionGroup);
@@ -719,7 +719,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
     // config items
     connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
-    connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
+    //connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
 
     connect(LaserApplication::previewWindow, &PreviewWindow::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(m_statusBarProgress, &ProgressBar::clicked, LaserApplication::previewWindow, &QMainWindow::show);
@@ -1667,7 +1667,7 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonLaserPosition->setDefaultAction(m_ui->actionLaserPosition);
 
     updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay(), MB_Manual);
-    updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
+    //updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
@@ -2689,7 +2689,7 @@ void LaserControllerWindow::onActionPaste(bool checked)
 	m_viewer->undoStack()->push(cmd);
 }
 
-void LaserControllerWindow::onActionPasteInLine(bool checked)
+void LaserControllerWindow::onActionPasteInPlace(bool checked)
 {
 	if (!m_viewer || m_viewer->copyedList().isEmpty()) {
 		return;
@@ -3689,9 +3689,9 @@ void LaserControllerWindow::bindWidgetsProperties()
 	// end actionPaste
 
 	// actionPasteInLine
-	BIND_PROP_TO_STATE(m_ui->actionPasteInLine, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionPasteInLine, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionPasteInLine, "enabled", true, documentWorkingState);
+	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, initState);
+	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentEmptyState);
+	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", true, documentWorkingState);
 	// end actionPasteInLine
 
 	// actionCut
@@ -4173,19 +4173,19 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, 
     m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
 }
 
-void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
-{
-    m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveTop->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveTopRight->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveLeft->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveRight->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveBottomLeft->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveBottom->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveBottomRight->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveUp->setAutoRepeatInterval(value.toInt());
-    m_buttonMoveDown->setAutoRepeatInterval(value.toInt());
-}
+//void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
+//{
+//    m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveTop->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveTopRight->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveLeft->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveRight->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveBottomLeft->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveBottom->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveBottomRight->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveUp->setAutoRepeatInterval(value.toInt());
+//    m_buttonMoveDown->setAutoRepeatInterval(value.toInt());
+//}
 
 QString LaserControllerWindow::getFilename(const QString& title, const QString& filters)
 {

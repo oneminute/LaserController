@@ -58,20 +58,26 @@ void LaserLayerDialog::initUi()
 
     m_ui->editSliderCuttingLaserPower->setMaximum(100);
     m_ui->editSliderCuttingLaserPower->setTextTemplate("%1%");
+    m_ui->editSliderCuttingLaserPower->setStep(0.1);
     m_ui->editSliderCuttingMinSpeedPower->setMaximum(100);
     m_ui->editSliderCuttingMinSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderCuttingMinSpeedPower->setStep(0.1);
     m_ui->editSliderCuttingRunSpeedPower->setMaximum(100);
     m_ui->editSliderCuttingRunSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderCuttingRunSpeedPower->setStep(0.1);
 
     m_ui->editSliderEngravingMinSpeed->setMaximum(2000);
     m_ui->editSliderEngravingRunSpeed->setMaximum(2000);
 
     m_ui->editSliderEngravingLaserPower->setMaximum(100);
     m_ui->editSliderEngravingLaserPower->setTextTemplate("%1%");
+    m_ui->editSliderEngravingLaserPower->setStep(0.1);
     m_ui->editSliderEngravingMinSpeedPower->setMaximum(100);
     m_ui->editSliderEngravingMinSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderEngravingMinSpeedPower->setStep(0.1);
     m_ui->editSliderEngravingRunSpeedPower->setMaximum(100);
     m_ui->editSliderEngravingRunSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderEngravingRunSpeedPower->setStep(0.1);
 
     m_ui->editSliderEngravingRowInterval->setMaximum(1000);
     m_ui->editSliderDPI->setMinimum(0);
@@ -108,14 +114,14 @@ void LaserLayerDialog::restoreParameters()
 	m_ui->editSliderCuttingMinSpeed->setValue(Config::CuttingLayer::minSpeed());
     m_ui->editSliderCuttingRunSpeed->setValue(Config::CuttingLayer::runSpeed());
     m_ui->editSliderCuttingLaserPower->setValue(Config::CuttingLayer::laserPower());
-    m_ui->editSliderCuttingMinSpeedPower->setValue(Config::CuttingLayer::minPowerRate());
-    m_ui->editSliderCuttingRunSpeedPower->setValue(Config::CuttingLayer::maxPowerRate());
+    m_ui->editSliderCuttingMinSpeedPower->setValue(Config::CuttingLayer::minPower());
+    m_ui->editSliderCuttingRunSpeedPower->setValue(Config::CuttingLayer::maxPower());
 
     m_ui->editSliderEngravingMinSpeed->setValue(Config::EngravingLayer::minSpeed());
     m_ui->editSliderEngravingRunSpeed->setValue(Config::EngravingLayer::runSpeed());
     m_ui->editSliderEngravingLaserPower->setValue(Config::EngravingLayer::laserPower());
-    m_ui->editSliderEngravingMinSpeedPower->setValue(Config::EngravingLayer::minPowerRate());
-    m_ui->editSliderEngravingRunSpeedPower->setValue(Config::EngravingLayer::maxPowerRate());
+    m_ui->editSliderEngravingMinSpeedPower->setValue(Config::EngravingLayer::minPower());
+    m_ui->editSliderEngravingRunSpeedPower->setValue(Config::EngravingLayer::maxPower());
     m_ui->checkBoxUseHalftone->setChecked(Config::EngravingLayer::useHalftone());
     m_ui->editSliderDPI->setValue(Config::EngravingLayer::DPI());
     m_ui->editSliderLPI->setValue(Config::EngravingLayer::LPI());
@@ -167,14 +173,14 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::CuttingLayer::minSpeedItem()->setValue(m_ui->editSliderCuttingMinSpeed->value());
 		Config::CuttingLayer::runSpeedItem()->setValue(m_ui->editSliderCuttingRunSpeed->value());
 		Config::CuttingLayer::laserPowerItem()->setValue(m_ui->editSliderCuttingLaserPower->value());
-		Config::CuttingLayer::minPowerRateItem()->setValue(m_ui->editSliderCuttingMinSpeedPower->value());
-		Config::CuttingLayer::maxPowerRateItem()->setValue(m_ui->editSliderCuttingRunSpeedPower->value());
+		Config::CuttingLayer::minPowerItem()->setValue(m_ui->editSliderCuttingMinSpeedPower->value());
+		Config::CuttingLayer::maxPowerItem()->setValue(m_ui->editSliderCuttingRunSpeedPower->value());
 
 		Config::EngravingLayer::minSpeedItem()->setValue(m_ui->editSliderEngravingMinSpeed->value());
 		Config::EngravingLayer::runSpeedItem()->setValue(m_ui->editSliderEngravingRunSpeed->value());
 		Config::EngravingLayer::laserPowerItem()->setValue(m_ui->editSliderEngravingLaserPower->value());
-		Config::EngravingLayer::minPowerRateItem()->setValue(m_ui->editSliderEngravingMinSpeedPower->value());
-		Config::EngravingLayer::maxPowerRateItem()->setValue(m_ui->editSliderEngravingRunSpeedPower->value());
+		Config::EngravingLayer::minPowerItem()->setValue(m_ui->editSliderEngravingMinSpeedPower->value());
+		Config::EngravingLayer::maxPowerItem()->setValue(m_ui->editSliderEngravingRunSpeedPower->value());
         Config::EngravingLayer::rowIntervalItem()->setValue(m_ui->editSliderEngravingRowInterval->value());
 		Config::EngravingLayer::LPIItem()->setValue(m_ui->editSliderLPI->value());
 		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value());

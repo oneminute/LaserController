@@ -257,7 +257,7 @@ void LaserDocument::exportJSON(const QString& filename)
             laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
             QRectF docBoundingRect = docBoundingRectMachining();
             laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
-            laserDocumentInfo["IsRelative"] = Config::Export::relativePoint();
+            laserDocumentInfo["IsRelative"] = Config::Export::enableRelativeCoordinates();
             jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
             QList<LaserLayer*> layerList;
@@ -1080,11 +1080,11 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
         int groupIndex = 0;
         if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
         {
-            groupIndex = node->position().y() / Config::PathOptimization::maxGroupingGridSize();
+            groupIndex = node->position().y() / Config::PathOptimization::groupingGridInterval();
         }
         else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
         {
-            groupIndex = node->position().x() / Config::PathOptimization::maxGroupingGridSize();
+            groupIndex = node->position().x() / Config::PathOptimization::groupingGridInterval();
         }
         childrenMap[groupIndex].append(node);
     }

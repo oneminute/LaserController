@@ -1442,7 +1442,7 @@ void LaserDevice::onComPortsFetched(const QStringList& portNames)
     }
     else if (portNames.length() > 1)
     {
-        if (Config::Device::autoConnectFirst())
+        if (Config::Device::autoConnectFirstCOM())
         {
             connectDevice(portNames[0]);
         }

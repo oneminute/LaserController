@@ -2,6 +2,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -170,8 +171,6 @@ void Config::loadGeneralItems()
     QLocale displayLocale = QLocale(currentDisplayLanguages.first());
     ConfigItem* language = group->addConfigItem(
         "language"
-        , tr("Language")
-        , tr("Language for both UI and Business.")
         , displayLocale.language()
     );
     language->setInputWidgetType(IWT_ComboBox);
@@ -196,8 +195,6 @@ void Config::loadGeneralItems()
 
     ConfigItem* unit = group->addConfigItem(
         "unit"
-        , tr("Unit")
-        , tr("Global unit")
         , static_cast<int>(SU_MM)
         , DT_INT
     );
@@ -218,8 +215,6 @@ void Config::loadGeneralItems()
 
     ConfigItem* machiningUnit = group->addConfigItem(
         "machiningUnit",
-        tr("Machining Unit"),
-        tr("Machining Unit"),
         1000,
         DT_REAL
     );
@@ -235,8 +230,6 @@ void Config::loadLayersItems()
 
     ConfigItem* maxLayersCount = group->addConfigItem(
         "maxLayersCount"
-        , tr("Max Layers Count")
-        , tr("Max Layers count.")
         , 16
     );
     maxLayersCount->setInputWidgetType(IWT_EditSlider);
@@ -251,8 +244,6 @@ void Config::loadUiItems()
 
     ConfigItem* operationButtonIconSize = group->addConfigItem(
         "operationButtonIconSize"
-        , tr("Operation Button Icon Size")
-        , tr("Size of operation buttons' icons.")
         , 32
     );
     operationButtonIconSize->setInputWidgetProperty("minimum", 16);
@@ -260,8 +251,6 @@ void Config::loadUiItems()
 
     ConfigItem* operationButtonWidth = group->addConfigItem(
         "operationButtonWidth"
-        , tr("Operation Button Width")
-        , tr("Width of operation buttons.")
         , 60
     );
     operationButtonWidth->setInputWidgetProperty("minimum", 32);
@@ -269,8 +258,6 @@ void Config::loadUiItems()
 
     ConfigItem* operationButtonHeight = group->addConfigItem(
         "operationButtonHeight",
-        tr("Operation Button Height"),
-        tr("Height of operation buttons."),
         60
     );
     operationButtonHeight->setInputWidgetProperty("minimum", 32);
@@ -278,8 +265,6 @@ void Config::loadUiItems()
 
     ConfigItem* operationButtonShowText = group->addConfigItem(
         "operationButtonShowText",
-        tr("Show Operation Button Text"),
-        tr("Show text of operation button or not."),
         false,
         DT_BOOL
     );
@@ -287,8 +272,6 @@ void Config::loadUiItems()
 
     ConfigItem* toolButtonSize = group->addConfigItem(
         "toolButtonSize",
-        tr("Tool Button Size"),
-        tr("Size of tool buttons."),
         32
     );
     toolButtonSize->setInputWidgetProperty("minimum", 16);
@@ -296,8 +279,6 @@ void Config::loadUiItems()
 
     ConfigItem* colorButtonWidth = group->addConfigItem(
         "colorButtonWidth",
-        tr("Color Button Width"),
-        tr("Width of color buttons."),
         30
     );
     colorButtonWidth->setInputWidgetProperty("minimum", 20);
@@ -305,8 +286,6 @@ void Config::loadUiItems()
 
     ConfigItem* colorButtonHeight = group->addConfigItem(
         "colorButtonHeight",
-        tr("Color Button Height"),
-        tr("Height of color buttons."),
         30
     );
     colorButtonHeight->setInputWidgetProperty("minimum", 20);
@@ -314,8 +293,6 @@ void Config::loadUiItems()
 
     ConfigItem* gridContrast = group->addConfigItem(
         "gridContrast",
-        tr("Grid Contrast"),
-        tr("Grid contrast"),
         2,
         DT_INT
     );
@@ -339,66 +316,61 @@ void Config::loadUiItems()
 
 	ConfigItem* gridShapeDistance = group->addConfigItem(
 		"gridShapeDistance",
-		tr("Grid Shape Distance"),
-		tr("(Pixel)"),
 		3
 	);
+    gridShapeDistance->setInputWidgetProperty("textTemplate", "%1px");
 	gridShapeDistance->setInputWidgetProperty("minimum", 0);
 	gridShapeDistance->setInputWidgetProperty("maximum", 10);
 
 	ConfigItem* objectShapeDistance = group->addConfigItem(
 		"objectShapeDistance",
-		tr("Object Shape Distance"),
-		tr("(Pixel)"),
 		5
 	);
+    objectShapeDistance->setInputWidgetProperty("textTemplate", "%1px");
 	objectShapeDistance->setInputWidgetProperty("minimum", 0);
 	objectShapeDistance->setInputWidgetProperty("maximum", 10);
 
-	ConfigItem* clickSelectiontTolerance = group->addConfigItem(
-		"clickSelectiontTolerance",
-		tr("Click-selectiont Tolerance"),
-		tr("(Pixel)"),
+	ConfigItem* clickSelectionTolerance = group->addConfigItem(
+		"clickSelectionTolerance",
 		5
 	);
-	clickSelectiontTolerance->setInputWidgetProperty("minimum", 0);
-	clickSelectiontTolerance->setInputWidgetProperty("maximum", 10);
+    clickSelectionTolerance->setInputWidgetProperty("textTemplate", "%1px");
+	clickSelectionTolerance->setInputWidgetProperty("minimum", 0);
+	clickSelectionTolerance->setInputWidgetProperty("maximum", 10);
 
 	ConfigItem* visualGridSpacing = group->addConfigItem(
 		"visualGridSpacing",
-		tr("Visual Grid Spacing"),
-		tr("(mm)"),
 		10
 	);
+    visualGridSpacing->setInputWidgetProperty("textTemplate", "%1mm");
 	visualGridSpacing->setInputWidgetProperty("minimum", 0);
 	visualGridSpacing->setInputWidgetProperty("maximum", 10);
 
     ConfigItem* splitterHandleWidth = group->addConfigItem(
         "splitterHandleWidth",
-        tr("Splitter Handle Width"),
-        tr("Splitter Handle Width"),
         1
     );
+    splitterHandleWidth->setInputWidgetProperty("textTemplate", "%1mm");
     splitterHandleWidth->setInputWidgetProperty("minimum", 1);
     splitterHandleWidth->setInputWidgetProperty("maximum", 20);
 
     ConfigItem* autoRepeatDelay = group->addConfigItem(
         "autoRepeatDelay",
-        tr("Auto repeat delay"),
-        tr("Auto repeat delay when press down on a button"),
         1000
     );
+    autoRepeatDelay->setInputWidgetProperty("textTemplate", "%1ms");
     autoRepeatDelay->setInputWidgetProperty("minimum", 0);
     autoRepeatDelay->setInputWidgetProperty("maximum", 2000);
 
-    ConfigItem* autoRepeatInterval = group->addConfigItem(
+    /*ConfigItem* autoRepeatInterval = group->addConfigItem(
         "autoRepeatInterval",
         tr("Auto repeat interval"),
         tr("Auto repeat interval when pressing a button"),
         200
     );
+    autoRepeatInterval->setInputWidgetProperty("textTemplate", "%1ms");
     autoRepeatInterval->setInputWidgetProperty("minimum", 0);
-    autoRepeatInterval->setInputWidgetProperty("maximum", 2000);
+    autoRepeatInterval->setInputWidgetProperty("maximum", 2000);*/
 }
 
 void Config::loadCuttingLayerItems()
@@ -408,8 +380,6 @@ void Config::loadCuttingLayerItems()
 
     ConfigItem* minSpeed = group->addConfigItem(
         "minSpeed",
-        tr("Min Speed"),
-        tr("Min speed for cutting layers."),
         15
     );
     minSpeed->setInputWidgetProperty("minimum", 1);
@@ -419,8 +389,6 @@ void Config::loadCuttingLayerItems()
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
-        tr("Run Speed"),
-        tr("Running speed for cutting layers."),
         60
     );
     runSpeed->setInputWidgetProperty("minimum", 1);
@@ -430,8 +398,6 @@ void Config::loadCuttingLayerItems()
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
-        tr("Laser Power"),
-        tr("Laser power for cutting layers."),
         8,
         DT_REAL
     );
@@ -439,27 +405,23 @@ void Config::loadCuttingLayerItems()
     laserPower->setInputWidgetProperty("maximum", 100);
     laserPower->setInputWidgetProperty("textTemplate", "%1%");
 
-    ConfigItem* minPowerRate = group->addConfigItem(
-        "minPowerRate",
-        tr("Min Power Rate"),
-        tr("The minimum power rate for cutting layers"),
+    ConfigItem* minPower = group->addConfigItem(
+        "minPower",
         70,
         DT_REAL
     );
-    minPowerRate->setInputWidgetProperty("minimum", 0);
-    minPowerRate->setInputWidgetProperty("maximum", 100);
-    minPowerRate->setInputWidgetProperty("textTemplate", "%1%");
+    minPower->setInputWidgetProperty("minimum", 0);
+    minPower->setInputWidgetProperty("maximum", 100);
+    minPower->setInputWidgetProperty("textTemplate", "%1%");
 
-    ConfigItem* maxPowerRate = group->addConfigItem(
-        "maxPowerRate",
-        tr("Max Power Rate"),
-        tr("The maximum power rate for cutting layers"),
+    ConfigItem* maxPower = group->addConfigItem(
+        "maxPower",
         100,
         DT_REAL
     );
-    maxPowerRate->setInputWidgetProperty("minimum", 0);
-    maxPowerRate->setInputWidgetProperty("maximum", 100);
-    maxPowerRate->setInputWidgetProperty("textTemplate", "%1%");
+    maxPower->setInputWidgetProperty("minimum", 0);
+    maxPower->setInputWidgetProperty("maximum", 100);
+    maxPower->setInputWidgetProperty("textTemplate", "%1%");
 }
 
 void Config::loadEngravingLayerItems()
@@ -469,8 +431,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* minSpeed = group->addConfigItem(
         "minSpeed",
-        tr("Min Speed"),
-        tr("Min speed for engraving layers."),
         15
     );
     minSpeed->setInputWidgetProperty("minimum", 1);
@@ -480,8 +440,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
-        tr("Run Speed"),
-        tr("Running speed for engraving layers."),
         60
     );
     runSpeed->setInputWidgetProperty("minimum", 1);
@@ -491,8 +449,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
-        tr("Laser Power"),
-        tr("Laser power for engraving layers."),
         8
     );
     laserPower->setInputWidgetType(IWT_FloatEditSlider);
@@ -502,8 +458,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* minPowerRate = group->addConfigItem(
         "minPowerRate",
-        tr("Min Power Rate"),
-        tr("The minimum power rate for engraving layers"),
         70,
         DT_REAL
     );
@@ -514,8 +468,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* maxPowerRate = group->addConfigItem(
         "maxPowerRate",
-        tr("Max Power Rate"),
-        tr("The maximum power rate for engraving layers"),
         100,
         DT_REAL
     );
@@ -525,8 +477,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* rowInterval = group->addConfigItem(
         "rowInterval",
-        tr("Row interval"),
-        tr("Row interval"),
         70,
         DT_INT
     );
@@ -536,16 +486,12 @@ void Config::loadEngravingLayerItems()
 
     group->addConfigItem(
         "useHalftone",
-        tr("Use Halftone"),
-        tr("Use halftone algorithm for bitmaps."),
         true,
         DT_BOOL
     );
 
     ConfigItem* lpi = group->addConfigItem(
         "LPI",
-        tr("LPI"),
-        tr("Lines per inch."),
         100,
         DT_INT
     );
@@ -554,8 +500,6 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* dpi = group->addConfigItem(
         "DPI",
-        tr("DPI"),
-        tr("Dots per inch."),
         600,
         DT_INT
     );
@@ -568,86 +512,22 @@ void Config::loadPathOptimizationItems()
     ConfigItemGroup* group = new Config::PathOptimization;
     Config::PathOptimization::group = group;
 
-    ConfigItem* maxAnts = group->addConfigItem(
-        "maxAnts",
-        tr("Max ants"),
-        tr("Max ants count."),
-        100
-    );
-    maxAnts->setInputWidgetProperty("minimum", 1);
-    maxAnts->setInputWidgetProperty("maximum", 100000);
-
-    ConfigItem* maxIterations = group->addConfigItem(
-        "maxIterations",
-        tr("Max Iterations"),
-        tr("Max iterations count."),
-        500
-    );
-    maxIterations->setInputWidgetProperty("minimum", 1);
-    maxIterations->setInputWidgetProperty("maximum", 2000);
-
-    ConfigItem* maxTraverse = group->addConfigItem(
-        "maxTraverse",
-        tr("Max Traverse"),
-        tr("Max Traverse count."),
-        2000
-    );
-    maxTraverse->setInputWidgetProperty("minimum", 1);
-    maxTraverse->setInputWidgetProperty("maximum", 200000000);
-
-    ConfigItem* volatileRate = group->addConfigItem(
-        "volatileRate",
-        tr("Volatile Rate"),
-        tr("Volatile of pheromones each iteration."),
-        0.65,
-        DT_REAL
-    );
-    volatileRate->setInputWidgetProperty("minimum", 0);
-    volatileRate->setInputWidgetProperty("maximum", 1);
-    volatileRate->setInputWidgetProperty("step", 0.01);
-    volatileRate->setInputWidgetProperty("page", 0.1);
-    volatileRate->setInputWidgetProperty("decimals", 2);
-
-    group->addConfigItem(
-        "useGreedyAlgorithm",
-        tr("Use Greedy Algorithm"),
-        tr("Use greedy algorithm form path optimization."),
-        true,
-        DT_BOOL
-    );
-
     ConfigItem* maxStartingPoints = group->addConfigItem(
         "maxStartingPoints",
-        tr("Max Starting Points"),
-        tr("Max starting points of each primitive."),
         8
     );
     maxStartingPoints->setInputWidgetProperty("minimum", 1);
     maxStartingPoints->setInputWidgetProperty("maximum", 16);
 
-    ConfigItem* maxStartingPointAnglesDiff = group->addConfigItem(
-        "maxStartingPointAnglesDiff",
-        tr("Max Angles Diff"),
-        tr("Max angles between starting points."),
-        45,
-        DT_REAL
-    );
-    maxStartingPointAnglesDiff->setInputWidgetProperty("minimum", 1.0);
-    maxStartingPointAnglesDiff->setInputWidgetProperty("maximum", 90.0);
-
-    /*ConfigItem* maxGroupSize = group->addConfigItem(
+    ConfigItem* maxGroupSize = group->addConfigItem(
         "maxGroupSize",
-        tr("Max group size"),
-        tr("Max children count in one group."),
         10
     );
     maxGroupSize->setInputWidgetProperty("minimum", 1);
-    maxGroupSize->setInputWidgetProperty("maximum", 100);*/
+    maxGroupSize->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* groupingOrientation = group->addConfigItem(
         "groupingOrientation",
-        tr("Grouping Orientation"),
-        tr("Grouping orientation"),
         Qt::Vertical,
         DT_INT
     );
@@ -667,21 +547,17 @@ void Config::loadPathOptimizationItems()
         }
     );
 
-    ConfigItem* maxGroupingGridSize = group->addConfigItem(
-        "maxGroupingGridSize",
-        tr("Max grouping grid size"),
-        tr("Max grouping grid size."),
+    ConfigItem* groupingGridInterval = group->addConfigItem(
+        "groupingGridInterval",
         30,
         DT_REAL
     );
-    maxGroupingGridSize->setInputWidgetType(IWT_FloatEditSlider);
-    maxGroupingGridSize->setInputWidgetProperty("minimum", 1.0);
-    maxGroupingGridSize->setInputWidgetProperty("maximum", 1000.0);
+    groupingGridInterval->setInputWidgetType(IWT_FloatEditSlider);
+    groupingGridInterval->setInputWidgetProperty("minimum", 1.0);
+    groupingGridInterval->setInputWidgetProperty("maximum", 1000.0);
 
     ConfigItem* searchingXYWeight = group->addConfigItem(
         "searchingXYWeight",
-        tr("Searching XY Weight"),
-        tr("Weight of xy element of laser point vector against angle element"),
         0.9,
         DT_REAL
     );
@@ -700,8 +576,6 @@ void Config::loadExportItems()
 
     ConfigItem* maxAnglesDiff = group->addConfigItem(
         "maxAnglesDiff",
-        tr("Max Angles Diff"),
-        tr("Max angles diff between tow points."),
         5.0,
         DT_REAL
     );
@@ -710,26 +584,13 @@ void Config::loadExportItems()
 
     ConfigItem* maxIntervalDistance = group->addConfigItem(
         "maxIntervalDistance",
-        tr("Max Interval Distance"),
-        tr("Max interval distance between tow points."),
         40
     );
     maxIntervalDistance->setInputWidgetProperty("minimum", 1);
     maxIntervalDistance->setInputWidgetProperty("maximum", 1000);
 
-    ConfigItem* maxStartingPoints = group->addConfigItem(
-        "maxStartingPoints",
-        tr("Max starting points"),
-        tr("Max starting points."),
-        8
-    );
-    maxStartingPoints->setInputWidgetProperty("minimum", 1);
-    maxStartingPoints->setInputWidgetProperty("maximum", 20);
-
     ConfigItem* enableSmallDiagonal = group->addConfigItem(
         "enableSmallDiagonal",
-        tr("Enable small diagonal"),
-        tr("Enable small diagonal limitation"),
         false,
         DT_BOOL
     );
@@ -741,8 +602,6 @@ void Config::loadExportItems()
     qLogD << "small diagonal limitation type: " << smallDiagonalLimitationVar.userType();
     ConfigItem* smallDiagonalLimitation = group->addConfigItem(
         "smallDiagonalLimitation",
-        tr("Small diagonal limitation"),
-        tr("Small diagonal limitation"),
         smallDiagonalLimitationVar,
         DT_CUSTOM
     );
@@ -772,10 +631,6 @@ void Config::loadExportItems()
         [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
             if (json.contains("value"))
             {
-                //void* ptr = item->value().value<void*>();
-                //SmallDiagonalLimitation* limitation = item->value().value<SmallDiagonalLimitation*>();
-                //SmallDiagonalLimitation* limitation = static_cast<SmallDiagonalLimitation*>(ptr);
-                //if (limitation)
                 limitation->fromJson(json["value"].toObject());
             }
         }
@@ -787,14 +642,12 @@ void Config::loadExportItems()
         }
     );
 
-    ConfigItem* relativePoint = group->addConfigItem(
-        "relativePoint",
-        tr("Relative Point"),
-        tr("Relative Point"),
+    ConfigItem* enableRelativeCoordinates = group->addConfigItem(
+        "enableRelativeCoordinates",
         false,
         DT_BOOL
     );
-    relativePoint->setStoreStrategy(SS_DIRECTLY);
+    enableRelativeCoordinates->setStoreStrategy(SS_DIRECTLY);
 }
 
 void Config::loadDeviceItems()
@@ -803,17 +656,13 @@ void Config::loadDeviceItems()
     Config::Device::group = group;
 
     group->addConfigItem(
-        "autoConnectFirst",
-        tr("Auto Connect First"),
-        tr("Auto connect to first com port when found multiple laser devices."),
+        "autoConnectFirstCOM",
         true,
         DT_BOOL
     );
 
     ConfigItem* startFrom = group->addConfigItem(
         "startFrom",
-        tr("Start From"),
-        tr("Start From"),
         0,
         DT_INT
     );
@@ -837,8 +686,6 @@ void Config::loadDeviceItems()
 
     ConfigItem* jobOrigin = group->addConfigItem(
         "jobOrigin",
-        tr("Job Origin"),
-        tr("Job Origin"),
         0,
         DT_INT
     );
@@ -883,8 +730,6 @@ void Config::loadDeviceItems()
 
     ConfigItem* xEnabled = group->addConfigItem(
         "xEnabled",
-        tr("X Enabled"),
-        tr("X Enabled"),
         true,
         DT_BOOL
     );
@@ -892,8 +737,6 @@ void Config::loadDeviceItems()
 
     ConfigItem* yEnabled = group->addConfigItem(
         "yEnabled",
-        tr("Y Enabled"),
-        tr("Y Enabled"),
         true,
         DT_BOOL
     );
@@ -901,8 +744,6 @@ void Config::loadDeviceItems()
 
     ConfigItem* zEnabled = group->addConfigItem(
         "zEnabled",
-        tr("Z Enabled"),
-        tr("Z Enabled"),
         true,
         DT_BOOL
     );
@@ -916,8 +757,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* head = group->addConfigItem(
         "head",
-        tr("[00] Head Data"),
-        tr("Head data for testing"),
         0x12345678,
         DT_INT
     );
@@ -927,8 +766,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* accMode = group->addConfigItem(
         "accMode",
-        tr("[01] Acceleration Mode"),
-        tr("Acceleration mode"),
         0
     );
     accMode->setInputWidgetType(IWT_ComboBox);
@@ -953,8 +790,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingMoveSpeed = group->addConfigItem(
         "cuttingMoveSpeed",
-        tr("[02] Cutting Move Speed(mm/s)"),
-        tr("Cutting move speed"),
         15,
         DT_INT
     );
@@ -978,8 +813,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingMoveAcc = group->addConfigItem(
         "cuttingMoveAcc",
-        tr("[03] Cutting Move Acceleration(mm/s<sup>2</sup>)"),
-        tr("Cutting Move Acceleration"),
         45,
         DT_INT
     );
@@ -1003,8 +836,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingTurnSpeed = group->addConfigItem(
         "cuttingTurnSpeed",
-        tr("[04] Cutting Turn Speed(mm/s)"),
-        tr("Cutting turn speed"),
         15,
         DT_INT
     );
@@ -1028,8 +859,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingTurnAcc = group->addConfigItem(
         "cuttingTurnAcc",
-        tr("[05] Cutting Turn Acceleration(mm/s<sup>2</sup>)"),
-        tr("Cutting turn acceleration"),
         45,
         DT_INT
     );
@@ -1053,8 +882,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingWorkAcc = group->addConfigItem(
         "cuttingWorkAcc",
-        tr("[06] Cutting Work Acceleration(mm/s<sup>2</sup>)"),
-        tr("Cutting Work acceleration"),
         60,
         DT_INT
     );
@@ -1078,8 +905,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingMoveSpeedFactor = group->addConfigItem(
         "cuttingMoveSpeedFactor",
-        tr("[07] Cutting Move Speed Factor"),
-        tr("Cutting move speed factor"),
         2
     );
     cuttingMoveSpeedFactor->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -1088,8 +913,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingWorkSpeedFactor = group->addConfigItem(
         "cuttingWorkSpeedFactor",
-        tr("[08] Cutting Work Speed Factor"),
-        tr("Cutting Work speed factor"),
         2
     );
     cuttingWorkSpeedFactor->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -1098,8 +921,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingSpotSize = group->addConfigItem(
         "cuttingSpotSize",
-        tr("[09] Cutting Spot Size"),
-        tr("Cutting spot size"),
         1000,
         DT_INT
     );
@@ -1109,8 +930,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanXStartSpeed = group->addConfigItem(
         "scanXStartSpeed",
-        tr("[10] Scan X Start Speed(mm/s)"),
-        tr("Scan x start speed"),
         15,
         DT_INT
     );
@@ -1134,8 +953,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanYStartSpeed = group->addConfigItem(
         "scanYStartSpeed",
-        tr("[11] Scan Y Start Speed(mm/s)"),
-        tr("Scan y start speed"),
         15,
         DT_INT
     );
@@ -1159,8 +976,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanXAcc = group->addConfigItem(
         "scanXAcc",
-        tr("[12] Scan X Acceleration(mm/s<sup>2</sup>)"),
-        tr("Scan x acceleration"),
         5,
         DT_INT
     );
@@ -1184,8 +999,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanYAcc = group->addConfigItem(
         "scanYAcc",
-        tr("[13] Scan Y Acceleration(mm/s<sup>2</sup>)"),
-        tr("Scan y acceleration"),
         45,
         DT_INT
     );
@@ -1209,8 +1022,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanRowSpeed = group->addConfigItem(
         "scanRowSpeed",
-        tr("[14] Scan Row Speed(mm/s)"),
-        tr("Scan row speed"),
         15,
         DT_REAL
     );
@@ -1234,8 +1045,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanRowInterval = group->addConfigItem(
         "scanRowInterval",
-        tr("[15] Scan Row Interval(mm)"),
-        tr("Scan row interval"),
         0.007,
         DT_REAL
     );
@@ -1259,8 +1068,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanReturnError = group->addConfigItem(
         "scanReturnError",
-        tr("[16] Scan Return Error(mm/s)"),
-        tr("Scan return error"),
         1000,
         DT_INT
     );
@@ -1284,8 +1091,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanLaserPower = group->addConfigItem(
         "scanLaserPower",
-        tr("[17] Scan Laser Power"),
-        tr("Scan laser power"),
         120,
         DT_INT
     );
@@ -1310,8 +1115,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanXResetEnabled = group->addConfigItem(
         "scanXResetEnabled",
-        tr("[18] Scan X Reset Enabled"),
-        tr("Scan x reset enabled"),
         true,
         DT_BOOL
     );
@@ -1330,8 +1133,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanYResetEnabled = group->addConfigItem(
         "scanYResetEnabled",
-        tr("[19] Scan Y Reset Enabled"),
-        tr("Scan y reset enabled"),
         true,
         DT_BOOL
     );
@@ -1350,8 +1151,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanZResetEnabled = group->addConfigItem(
         "scanZResetEnabled",
-        tr("[20] Scan Z Reset Enabled"),
-        tr("Scan z reset enabled"),
         true,
         DT_BOOL
     );
@@ -1370,8 +1169,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* resetSpeed = group->addConfigItem(
         "resetSpeed",
-        tr("[21] Reset speed"),
-        tr("Reset speed(mm/s)"),
         10,
         DT_INT
     );
@@ -1388,6 +1185,7 @@ void Config::loadUserReigsters()
         }
     );
     resetSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    resetSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     resetSpeed->setInputWidgetProperty("step", 0.001);
     resetSpeed->setInputWidgetProperty("page", 10);
     resetSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1395,8 +1193,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanReturnPos = group->addConfigItem(
         "scanReturnPos",
-        tr("[22] Scan Return pos"),
-        tr("Scan return pos"),
         0
     );
     scanReturnPos->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -1406,8 +1202,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* backlashXInterval = group->addConfigItem(
         "backlashXInterval",
-        tr("[23] Backlash X Interval(mm/s)"),
-        tr("Backlash x interval"),
         0,
         DT_INT
     );
@@ -1431,8 +1225,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* backlashYInterval = group->addConfigItem(
         "backlashYInterval",
-        tr("[24] Backlash Y Interval(mm/s)"),
-        tr("Backlash y interval"),
         0,
         DT_INT
     );
@@ -1456,8 +1248,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* backlashZInterval = group->addConfigItem(
         "backlashZInterval",
-        tr("[25] Backlash Z Interval(mm/s)"),
-        tr("Backlash z interval"),
         0,
         DT_INT
     );
@@ -1481,8 +1271,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* defaultRunSpeed = group->addConfigItem(
         "defaultRunSpeed",
-        tr("[26] Default running speed(mm/s)"),
-        tr("Default running speed(mm/s)"),
         10000,
         DT_INT
     );
@@ -1499,6 +1287,7 @@ void Config::loadUserReigsters()
         }
     );
     defaultRunSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    defaultRunSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     defaultRunSpeed->setInputWidgetProperty("step", 0.001);
     defaultRunSpeed->setInputWidgetProperty("page", 10);
     defaultRunSpeed->setInputWidgetProperty("minimum", 1);
@@ -1506,8 +1295,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* defaultMaxCuttingPower = group->addConfigItem(
         "defaultMaxCuttingPower",
-        tr("[27] Default max cutting power"),
-        tr("Default max cutting power"),
         1000,
         DT_INT
     );
@@ -1532,8 +1319,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* defaultMinCuttingPower = group->addConfigItem(
         "defaultMinCuttingPower",
-        tr("[28] Default min cutting power"),
-        tr("Default min cutting power"),
         100,
         DT_INT
     );
@@ -1558,8 +1343,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* defaultScanSpeed = group->addConfigItem(
         "defaultScanSpeed",
-        tr("[29] Default scan speed(mm/s)"),
-        tr("Default scan speed(mm/s)"),
         500000,
         DT_INT
     );
@@ -1576,6 +1359,7 @@ void Config::loadUserReigsters()
         }
     );
     defaultScanSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1%");
     defaultScanSpeed->setInputWidgetProperty("step", 0.001);
     defaultScanSpeed->setInputWidgetProperty("page", 10);
     defaultScanSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1583,8 +1367,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* maxScanGrayRatio = group->addConfigItem(
         "maxScanGrayRatio",
-        tr("[30] Max scan gray ratio"),
-        tr("Max scan gray ratio"),
         800,
         DT_INT
     );
@@ -1594,8 +1376,6 @@ void Config::loadUserReigsters()
 
     ConfigItem* minScanGrayRatio = group->addConfigItem(
         "minScanGrayRatio",
-        tr("[31] Min scan gray ratio"),
-        tr("Min scan gray ratio"),
         50,
         DT_INT
     );
@@ -1611,8 +1391,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* head = group->addConfigItem(
         "head",
-        tr("[00] Head Data"),
-        tr("Head data for testing"),
         0x12345678,
         DT_INT
     );
@@ -1622,8 +1400,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* password = group->addConfigItem(
         "password",
-        tr("[01] Password"),
-        tr("Password"),
         "",
         DT_STRING
     );
@@ -1633,8 +1409,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* storedPassword = group->addConfigItem(
         "storedPassword",
-        tr("[02] Stored Password"),
-        tr("Stored password"),
         "",
         DT_STRING
     );
@@ -1644,8 +1418,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* hardwareID1 = group->addConfigItem(
         "hardwareID1",
-        tr("[03] Hardware ID1"),
-        tr("Hardware ID1"),
         "",
         DT_STRING
     );
@@ -1655,8 +1427,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* hardwareID2 = group->addConfigItem(
         "hardwareID2",
-        tr("[04] Hardware ID2"),
-        tr("Hardware ID2"),
         "",
         DT_STRING
     );
@@ -1666,8 +1436,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* hardwareID3 = group->addConfigItem(
         "hardwareID3",
-        tr("[05] Hardware ID3"),
-        tr("Hardware ID3"),
         "",
         DT_STRING
     );
@@ -1677,8 +1445,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* cdKey1 = group->addConfigItem(
         "cdKey1",
-        tr("[06] cdKey1"),
-        tr("cdKey1"),
         "",
         DT_STRING
     );
@@ -1686,8 +1452,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* cdKey2 = group->addConfigItem(
         "cdKey2",
-        tr("[07] cdKey2"),
-        tr("cdKey2"),
         "",
         DT_STRING
     );
@@ -1695,8 +1459,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* cdKey3 = group->addConfigItem(
         "cdKey3",
-        tr("[08] cdKey3"),
-        tr("cdKey3"),
         "",
         DT_STRING
     );
@@ -1704,8 +1466,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* sysRunTime = group->addConfigItem(
         "sysRunTime",
-        tr("[09] System Run Time"),
-        tr("System run time"),
         0,
         DT_INT
     );
@@ -1714,8 +1474,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserRunTime = group->addConfigItem(
         "laserRunTime",
-        tr("[10] Laser Run Time"),
-        tr("Laser run time"),
         0,
         DT_INT
     );
@@ -1724,8 +1482,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* sysRunNum = group->addConfigItem(
         "sysRunNum",
-        tr("[11] System Run Times"),
-        tr("System run times"),
         0,
         DT_INT
     );
@@ -1734,8 +1490,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMaxLength = group->addConfigItem(
         "xMaxLength",
-        tr("[12] X Max Length(mm)"),
-        tr("X max length"),
         320000,
         DT_INT
     );
@@ -1752,6 +1506,7 @@ void Config::loadSystemRegisters()
         }
     );
     xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     xMaxLength->setInputWidgetProperty("step", 0.001);
     xMaxLength->setInputWidgetProperty("page", 10);
     xMaxLength->setInputWidgetProperty("minimum", 1);
@@ -1760,8 +1515,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xDirPhase = group->addConfigItem(
         "xDirPhase",
-        tr("[13] X Dir Phase"),
-        tr("X dir phase"),
         1,
         DT_INT
     );
@@ -1783,8 +1536,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xLimitPhase = group->addConfigItem(
         "xLimitPhase",
-        tr("[14] X Limit Phase"),
-        tr("X limit phase"),
         0
     );
     xLimitPhase->setInputWidgetType(IWT_ComboBox);
@@ -1805,8 +1556,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xZeroDev = group->addConfigItem(
         "xZeroDev",
-        tr("[15] X Zero Dev(mm)"),
-        tr("X zero dev"),
         2000,
         DT_INT
     );
@@ -1823,6 +1572,7 @@ void Config::loadSystemRegisters()
         }
     );
     xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
     xZeroDev->setInputWidgetProperty("step", 0.001);
     xZeroDev->setInputWidgetProperty("page", 1);
     xZeroDev->setInputWidgetProperty("minimum", 0);
@@ -1831,8 +1581,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xStepLength = group->addConfigItem(
         "xStepLength",
-        tr("[16] X Step Length(mm)"),
-        tr("X step length"),
         3164557,
         DT_INT
     );
@@ -1857,8 +1605,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xLimitNum = group->addConfigItem(
         "xLimitNum",
-        tr("[17] X Limit number"),
-        tr("X limit number"),
         0
     );
     xLimitNum->setInputWidgetType(IWT_ComboBox);
@@ -1880,16 +1626,12 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xResetEnabled = group->addConfigItem(
         "xResetEnabled",
-        tr("[18] X Reset Enabled"),
-        tr("X reset enabled"),
         true,
         DT_BOOL
     );
 
     ConfigItem* xMotorNum = group->addConfigItem(
         "xMotorNum",
-        tr("[19] X Motor number"),
-        tr("X motor number"),
         0,
         DT_INT
     );
@@ -1912,8 +1654,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMotorCurrent = group->addConfigItem(
         "xMotorCurrent",
-        tr("[20] X Motor current"),
-        tr("X motor current"),
         500,
         DT_INT
     );
@@ -1938,8 +1678,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xStartSpeed = group->addConfigItem(
         "xStartSpeed",
-        tr("[21] X Start speed(mm/s)"),
-        tr("X start speed"),
         15000,
         DT_INT
     );
@@ -1964,8 +1702,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMaxSpeed = group->addConfigItem(
         "xMaxSpeed",
-        tr("[22] X Max speed(mm/s)"),
-        tr("X max speed"),
         4500,
         DT_INT
     );
@@ -1990,8 +1726,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMaxAcceleration = group->addConfigItem(
         "xMaxAcceleration",
-        tr("[23] X Max Acceleration(mm/s<sup>2</sup>)"),
-        tr("X max acceleration"),
         45,
         DT_INT
     );
@@ -2016,8 +1750,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xUrgentAcceleration = group->addConfigItem(
         "xUrgentAcceleration",
-        tr("[24] X Urgent Acceleration(mm/s<sup>2</sup>)"),
-        tr("X urgent acceleration"),
         45,
         DT_INT
     );
@@ -2042,8 +1774,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMaxLength = group->addConfigItem(
         "yMaxLength",
-        tr("[25] Y Max Length(mm)"),
-        tr("Y max length"),
         200000,
         DT_INT
     );
@@ -2068,8 +1798,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yDirPhase = group->addConfigItem(
         "yDirPhase",
-        tr("[26] Y Dir Phase"),
-        tr("Y dir phase"),
         1,
         DT_INT
     );
@@ -2090,8 +1818,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yLimitPhase = group->addConfigItem(
         "yLimitPhase",
-        tr("[27] Y Limit Phase"),
-        tr("Y limit phase"),
         0,
         DT_INT
     );
@@ -2112,8 +1838,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yZeroDev = group->addConfigItem(
         "yZeroDev",
-        tr("[28] Y Zero Dev(mm)"),
-        tr("Y zero dev"),
         2000,
         DT_INT
     );
@@ -2138,8 +1862,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yStepLength = group->addConfigItem(
         "yStepLength",
-        tr("[29] Y Step Length(mm)"),
-        tr("Y step length"),
         3164557,
         DT_INT
     );
@@ -2164,8 +1886,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yLimitNum = group->addConfigItem(
         "yLimitNum",
-        tr("[30] Y Limit number"),
-        tr("Y limit number"),
         0,
         DT_INT
     );
@@ -2188,16 +1908,12 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yResetEnabled = group->addConfigItem(
         "yResetEnabled",
-        tr("[31] Y Reset Enabled"),
-        tr("Y reset enabled"),
         true,
         DT_BOOL
     );
 
     ConfigItem* yMotorNum = group->addConfigItem(
         "yMotorNum",
-        tr("[32] Y Motor number"),
-        tr("Y motor number"),
         0,
         DT_INT
     );
@@ -2220,8 +1936,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMotorCurrent = group->addConfigItem(
         "yMotorCurrent",
-        tr("[33] Y Motor current"),
-        tr("Y motor current"),
         500,
         DT_INT
     );
@@ -2246,8 +1960,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yStartSpeed = group->addConfigItem(
         "yStartSpeed",
-        tr("[34] Y Start speed(mm/s)"),
-        tr("Y start speed"),
         15,
         DT_INT
     );
@@ -2272,8 +1984,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMaxSpeed = group->addConfigItem(
         "yMaxSpeed",
-        tr("[35] Y Max speed(mm/s)"),
-        tr("Y max speed"),
         45,
         DT_REAL
     );
@@ -2298,8 +2008,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMaxAcceleration = group->addConfigItem(
         "yMaxAcceleration",
-        tr("[36] Y Max Acceleration(mm/s<sup>2</sup>)"),
-        tr("Y max acceleration"),
         45,
         DT_REAL
     );
@@ -2324,8 +2032,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yUrgentAcceleration = group->addConfigItem(
         "yUrgentAcceleration",
-        tr("[37] Y Urgent Acceleration(mm/s<sup>2</sup>)"),
-        tr("Y urgent acceleration"),
         20,
         DT_REAL
     );
@@ -2350,8 +2056,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMaxLength = group->addConfigItem(
         "zMaxLength",
-        tr("[38] Z Max Length(mm)"),
-        tr("Z max length"),
         200000,
         DT_INT
     );
@@ -2376,8 +2080,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zDirPhase = group->addConfigItem(
         "zDirPhase",
-        tr("[39] Z Dir Phase"),
-        tr("Z dir phase"),
         1,
         DT_INT
     );
@@ -2398,8 +2100,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zLimitPhase = group->addConfigItem(
         "zLimitPhase",
-        tr("[40] Z Limit Length"),
-        tr("Z limit length"),
         0,
         DT_INT
     );
@@ -2422,8 +2122,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zZeroDev = group->addConfigItem(
         "zZeroDev",
-        tr("[41] Z Zero Dev(mm)"),
-        tr("Z zero dev"),
         2000,
         DT_INT
     );
@@ -2448,8 +2146,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zStepLength = group->addConfigItem(
         "zStepLength",
-        tr("[42] Z Step Length(mm)"),
-        tr("Z step length"),
         6200000,
         DT_INT
     );
@@ -2474,8 +2170,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zLimitNum = group->addConfigItem(
         "zLimitNum",
-        tr("[43] Z Limit number"),
-        tr("Z limit number"),
         0,
         DT_INT
     );
@@ -2498,16 +2192,12 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zResetEnabled = group->addConfigItem(
         "zResetEnabled",
-        tr("[44] Z Reset Enabled"),
-        tr("Z reset enabled"),
         true,
         DT_BOOL
     );
 
     ConfigItem* zMotorNum = group->addConfigItem(
         "zMotorNum",
-        tr("[45] Z Motor number"),
-        tr("Z motor number"),
         0,
         DT_INT
     );
@@ -2530,8 +2220,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMotorCurrent = group->addConfigItem(
         "zMotorCurrent",
-        tr("[46] Z Motor current"),
-        tr("Z motor current"),
         500,
         DT_INT
     );
@@ -2556,8 +2244,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zStartSpeed = group->addConfigItem(
         "zStartSpeed",
-        tr("[47] Z Start speed(mm/s)"),
-        tr("Z start speed"),
         15000,
         DT_INT
     );
@@ -2582,8 +2268,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMaxSpeed = group->addConfigItem(
         "zMaxSpeed",
-        tr("[48] Z Max speed(mm/s)"),
-        tr("Z max speed"),
         10000,
         DT_INT
     );
@@ -2608,8 +2292,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMaxAcceleration = group->addConfigItem(
         "zMaxAcceleration",
-        tr("[49] Z Max Acceleration(mm/s<sup>2</sup>)"),
-        tr("Z max acceleration"),
         30000,
         DT_INT
     );
@@ -2634,8 +2316,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zUrgentAcceleration = group->addConfigItem(
         "zUrgentAcceleration",
-        tr("[50] Z Urgent Acceleration(mm/s<sup>2</sup>)"),
-        tr("Z urgent acceleration"),
         30000,
         DT_INT
     );
@@ -2660,8 +2340,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserMaxPower = group->addConfigItem(
         "laserMaxPower",
-        tr("[51] Laser Max Power"),
-        tr("Laser max power"),
         1000,
         DT_INT
     );
@@ -2685,8 +2363,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserMinPower = group->addConfigItem(
         "laserMinPower",
-        tr("[52] Laser Min Power"),
-        tr("Laser min power"),
         100,
         DT_INT
     );
@@ -2710,8 +2386,6 @@ void Config::loadSystemRegisters()
 
     ConfigItem* laserPowerFreq = group->addConfigItem(
         "laserPowerFreq",
-        tr("[53] Laser Min Power"),
-        tr("Laser min power"),
         4000
     );
     laserPowerFreq->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2722,32 +2396,24 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",
-        tr("[54] X Phase Enabled"),
-        tr("X phase enabled"),
         true,
         DT_BOOL
     );
 
     ConfigItem* yPhaseEnabled = group->addConfigItem(
         "yPhaseEnabled",
-        tr("[55] Y Phase Enabled"),
-        tr("Y phase enabled"),
         true,
         DT_BOOL
     );
 
     ConfigItem* zPhaseEnabled = group->addConfigItem(
         "zPhaseEnabled",
-        tr("[56] Z Phase Enabled"),
-        tr("Z phase enabled"),
         true,
         DT_BOOL
     );
 
     ConfigItem* deviceOrigin = group->addConfigItem(
         "deviceOrigin",
-        tr("[57] Device Origin"),
-        tr("[57] Device Origin"),
         0,
         DT_INT
     );
@@ -2780,40 +2446,30 @@ void Config::loadDebug()
 
     ConfigItem* showPrimitiveName = group->addConfigItem(
         "showPrimitiveName",
-        tr("Show Primitive Name"),
-        tr("Show primitve name."),
         false,
         DT_BOOL
     );
 
     ConfigItem* showPrimitiveFirstPoint = group->addConfigItem(
         "showPrimitiveFirstPoint",
-        tr("Show Primitive First Point"),
-        tr("Show primitve first point."),
         false,
         DT_BOOL
     );
 
     ConfigItem* generatePathImage = group->addConfigItem(
         "generatePathImage",
-        tr("Generate Path Image"),
-        tr("Generate path image."),
         false,
         DT_BOOL
     );
 
     ConfigItem* generateMachiningImage = group->addConfigItem(
         "generateMachiningImage",
-        tr("Generate Machining Image"),
-        tr("Generate machining image."),
         false,
         DT_BOOL
     );
 
     ConfigItem* enableOptimizeInteraction = group->addConfigItem(
         "enableOptimizeInteraction",
-        tr("Enable Optimize Interaction"),
-        tr("Enable Optimize Interaction"),
         false,
         DT_BOOL
     );
@@ -2824,8 +2480,596 @@ QList<ConfigItemGroup*> Config::getGroups()
     return groups;
 }
 
-void Config::refreshTranslation()
+#define TRANS_TITLE_DESC(groupName, itemName, title, desc) \
+    groupName::itemName##Item()->setTitle(QCoreApplication::translate("Config", title, nullptr)); \
+    groupName::itemName##Item()->setDescription(QCoreApplication::translate("Config", desc, nullptr));
+    
+
+void Config::updateTitlesAndDescriptions()
 {
+    General::languageItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Language", nullptr), 
+        QCoreApplication::translate("Config", "Language for both UI and Business.", nullptr));
+
+    General::unitItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Language", nullptr), 
+        QCoreApplication::translate("Config", "Language for both UI and Business.", nullptr));
+
+    General::machiningUnitItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Machining Unit", nullptr), 
+        QCoreApplication::translate("Config", "Unit for machining", nullptr));
+
+    Layers::maxLayersCountItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Layers Count", nullptr), 
+        QCoreApplication::translate("Config", "Max Layers Count", nullptr));
+
+    Ui::operationButtonIconSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Operation Button Icon Size(px)", nullptr), 
+        QCoreApplication::translate("Config", "Size of operation buttons' icons", nullptr));
+
+    Ui::operationButtonWidthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Operation Button Width(px)", nullptr), 
+        QCoreApplication::translate("Config", "Width of operation buttons", nullptr));
+
+    Ui::operationButtonHeightItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Operation Button Height(px)", nullptr), 
+        QCoreApplication::translate("Config", "Height of operation buttons", nullptr));
+
+    Ui::operationButtonShowTextItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Show Operation Button Text", nullptr), 
+        QCoreApplication::translate("Config", "Show text of operation button or not", nullptr));
+
+    Ui::toolButtonSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Tool Button Size(px)", nullptr), 
+        QCoreApplication::translate("Config", "Size of tool buttons", nullptr));
+
+    Ui::colorButtonWidthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Color Button Width(px)", nullptr), 
+        QCoreApplication::translate("Config", "Width of color buttons", nullptr));
+
+    Ui::colorButtonHeightItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Color Button Height(px)", nullptr), 
+        QCoreApplication::translate("Config", "Height of color buttons", nullptr));
+
+    Ui::gridContrastItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Grid Contrast", nullptr), 
+        QCoreApplication::translate("Config", "Contrast of grid lines", nullptr));
+
+    Ui::gridShapeDistanceItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Grid Shape Distance(px)", nullptr), 
+        QCoreApplication::translate("Config", "This distance is used for capturing a shape when cursor is moving closed to", nullptr));
+
+    Ui::objectShapeDistanceItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Object Shape Distance(px)", nullptr), 
+        QCoreApplication::translate("Config", "This distance is used for capturing an object when cursor is moving closed to", nullptr));
+
+    Ui::clickSelectionToleranceItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Click-selection Tolerance(px)", nullptr), 
+        QCoreApplication::translate("Config", "Tolerance of Click-selection in px", nullptr));
+
+    Ui::visualGridSpacingItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Visual Grid Spacing(mm)", nullptr), 
+        QCoreApplication::translate("Config", "The visual grid spacing in mm", nullptr));
+
+    Ui::splitterHandleWidthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Splitter Handle Width(px)", nullptr), 
+        QCoreApplication::translate("Config", "Width of splitter handle in px", nullptr));
+
+    Ui::autoRepeatDelayItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Auto repeat delay(ms)", nullptr), 
+        QCoreApplication::translate("Config", "The delay duration of auto repeat button", nullptr));
+
+    CuttingLayer::minSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Speed(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Min speed for cutting layers", nullptr));
+
+    CuttingLayer::runSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Run Speed(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Run speed for cutting layers", nullptr));
+
+    CuttingLayer::laserPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The power percentage for cutting layers", nullptr));
+
+    CuttingLayer::minPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The min power percentage for cutting layers", nullptr));
+
+    CuttingLayer::maxPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The max power percentage for cutting layers", nullptr));
+
+    EngravingLayer::minSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "The min speed for engraving layers", nullptr));
+
+    EngravingLayer::runSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Run Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "The run speed for engraving layers", nullptr));
+
+    EngravingLayer::laserPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The laser power for engraving layers", nullptr));
+
+    EngravingLayer::minPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The min power percentage for engraving layers", nullptr));
+
+    EngravingLayer::maxPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The max power percentage for engraving layers", nullptr));
+
+    EngravingLayer::rowIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Row Interval(μm)", nullptr), 
+        QCoreApplication::translate("Config", "The row interval between lines of bitmap for engraving layers", nullptr));
+
+    EngravingLayer::useHalftoneItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Use Halftone", nullptr), 
+        QCoreApplication::translate("Config", "Use halftone algorithm when generating bitmap datas", nullptr));
+
+    EngravingLayer::useHalftoneItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Use Halftone", nullptr), 
+        QCoreApplication::translate("Config", "Use halftone algorithm when generating bitmap datas", nullptr));
+
+    EngravingLayer::LPIItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "LPI", nullptr), 
+        QCoreApplication::translate("Config", "Lines per inch", nullptr));
+
+    EngravingLayer::DPIItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "DPI", nullptr), 
+        QCoreApplication::translate("Config", "Dots per inch", nullptr));
+
+    PathOptimization::maxStartingPointsItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Starting Points", nullptr), 
+        QCoreApplication::translate("Config", "Max starting points count of each primitive node", nullptr));
+
+    PathOptimization::groupingOrientationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Grouping Orientation", nullptr), 
+        QCoreApplication::translate("Config", "The orientation of grouping", nullptr));
+
+    PathOptimization::groupingGridIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Grouping Grid Interval", nullptr), 
+        QCoreApplication::translate("Config", "The grid interval", nullptr));
+
+    PathOptimization::maxGroupSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Group size", nullptr), 
+        QCoreApplication::translate("Config", "Max nodes count of each group", nullptr));
+
+    PathOptimization::searchingXYWeightItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Searching XY Weight", nullptr), 
+        QCoreApplication::translate("Config", "Weight of XY for searching using kdtree", nullptr));
+
+    PathOptimization::searchingXYWeightItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Searching XY Weight", nullptr), 
+        QCoreApplication::translate("Config", "Weight of XY for searching using kdtree", nullptr));
+
+    Export::maxAnglesDiffItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Angles Diff", nullptr), 
+        QCoreApplication::translate("Config", "The max angles diff bwteen tow anchor points", nullptr));
+
+    Export::maxIntervalDistanceItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Interval Distance", nullptr), 
+        QCoreApplication::translate("Config", "The max interval distance between tow anchor points", nullptr));
+
+    Export::maxIntervalDistanceItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Interval Distance", nullptr), 
+        QCoreApplication::translate("Config", "The max interval distance between tow anchor points", nullptr));
+
+    Export::enableSmallDiagonalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Small Diagonal", nullptr), 
+        QCoreApplication::translate("Config", "Enable small diagonal limitation for small primitives", nullptr));
+
+    Export::smallDiagonalLimitationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Small Diagonal Limitation", nullptr), 
+        QCoreApplication::translate("Config", "Details of small diagonal limitation", nullptr));
+
+    Export::enableRelativeCoordinatesItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Relative Coordinates", nullptr), 
+        QCoreApplication::translate("Config", "Enable relative coordinates for exporting machining points", nullptr));
+
+    Device::autoConnectFirstCOMItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 
+        QCoreApplication::translate("Config", "Auto connect to first com port when found multiple laser devices", nullptr));
+
+    Device::startFromItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Start from", nullptr), 
+        QCoreApplication::translate("Config", "Choose the start point type of machining", nullptr));
+
+    Device::jobOriginItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Job Origin", nullptr), 
+        QCoreApplication::translate("Config", "Job origin to start machining with", nullptr));
+
+    Device::xEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "X Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled x axis movement", nullptr));
+
+    Device::yEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Y Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled y axis movement", nullptr));
+
+    Device::zEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Z Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled z axis movement", nullptr));
+
+    UserRegister::headItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[00] Head Data", nullptr), 
+        QCoreApplication::translate("Config", "Read-only data used to test the quality of data transmission", nullptr));
+
+    UserRegister::accModeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[01] Acceleration Mode", nullptr), 
+        QCoreApplication::translate("Config", "Acceleration mode", nullptr));
+
+    UserRegister::cuttingMoveSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[02] Cutting Move Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Acceleration mode", nullptr));
+
+    UserRegister::cuttingMoveAccItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[03] Cutting Move Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Move acceleration for cutting movement", nullptr));
+
+    UserRegister::cuttingTurnSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[04] Cutting Turn Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Turn speed for cutting movement", nullptr));
+
+    UserRegister::cuttingTurnAccItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[05] Cutting Turn Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Turn acceleration for cutting movement", nullptr));
+
+    UserRegister::cuttingWorkAccItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[06] Cutting Work Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Work acceleration for cutting movement", nullptr));
+
+    UserRegister::cuttingMoveSpeedFactorItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[07] Move Speed Factor", nullptr), 
+        QCoreApplication::translate("Config", "Move speed factor for cutting movement", nullptr));
+
+    UserRegister::cuttingWorkSpeedFactorItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[08] Work Speed Factor", nullptr), 
+        QCoreApplication::translate("Config", "Work speed factor for cutting movement", nullptr));
+
+    UserRegister::cuttingSpotSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[09] Cutting Spot Size", nullptr), 
+        QCoreApplication::translate("Config", "Spot size for cutting movement", nullptr));
+
+    UserRegister::scanXStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[10] Scan X Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Scan x start speed", nullptr));
+
+    UserRegister::scanYStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[11] Scan Y Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Scan y start speed", nullptr));
+
+    UserRegister::scanXAccItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[12] Scan X Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Scan x acceleration", nullptr));
+
+    UserRegister::scanYAccItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[13] Scan Y Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Scan y acceleration", nullptr));
+
+    UserRegister::scanRowSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[14] Scan Row Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Scan row speed", nullptr));
+
+    UserRegister::scanRowIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[15] Scan Row Interval(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Scan row interval", nullptr));
+
+    UserRegister::scanReturnErrorItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[16] Scan Return Error(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Scan return error", nullptr));
+
+    UserRegister::scanLaserPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[17] Scan Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The percentage of scan laser power", nullptr));
+
+    UserRegister::scanXResetEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[18] Scan X Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled Scan X reset", nullptr));
+
+    UserRegister::scanYResetEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[19] Scan Y Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled Scan Y reset", nullptr));
+
+    UserRegister::scanZResetEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[20] Scan Z Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled Scan Z reset", nullptr));
+
+    UserRegister::resetSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[21] Reset Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Reset speed", nullptr));
+
+    UserRegister::scanReturnPosItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[22] Scan Return Pos", nullptr), 
+        QCoreApplication::translate("Config", "Scan return pos", nullptr));
+
+    UserRegister::backlashXIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[23] Backlash X Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash X interval", nullptr));
+
+    UserRegister::backlashYIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[24] Backlash Y Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash Y interval", nullptr));
+
+    UserRegister::backlashZIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[25] Backlash Z Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash Z interval", nullptr));
+
+    UserRegister::defaultRunSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[26] Default Run Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Default run speed", nullptr));
+
+    UserRegister::defaultMaxCuttingPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[27] Default Max Cutting Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Default max cutting power", nullptr));
+
+    UserRegister::defaultMinCuttingPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[28] Default Min Cutting Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Default min cutting power", nullptr));
+
+    UserRegister::defaultScanSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[29] Default Scan Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Default scan speed", nullptr));
+
+    UserRegister::maxScanGrayRatioItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[30] Max Scan Gray Ratio", nullptr), 
+        QCoreApplication::translate("Config", "Max scan gray ratio", nullptr));
+
+    UserRegister::minScanGrayRatioItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[31] Min Scan Gray Ratio", nullptr), 
+        QCoreApplication::translate("Config", "Min scan gray ratio", nullptr));
+
+    SystemRegister::headItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[00] Head Data", nullptr), 
+        QCoreApplication::translate("Config", "Read-only data used to test the quality of data transmission", nullptr));
+
+    SystemRegister::passwordItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[01] Password", nullptr), 
+        QCoreApplication::translate("Config", "Manufacture password to modify system registers", nullptr));
+
+    SystemRegister::storedPasswordItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[02] Stored Password", nullptr), 
+        QCoreApplication::translate("Config", "Stored manufacture password", nullptr));
+
+    SystemRegister::hardwareID1Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[03] Hardware ID1", nullptr), 
+        QCoreApplication::translate("Config", "Hardware ID1", nullptr));
+
+    SystemRegister::hardwareID2Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[04] Hardware ID2", nullptr), 
+        QCoreApplication::translate("Config", "Hardware ID2", nullptr));
+
+    SystemRegister::hardwareID3Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[05] Hardware ID3", nullptr), 
+        QCoreApplication::translate("Config", "Hardware ID3", nullptr));
+
+    SystemRegister::cdKey1Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[06] CDKey1", nullptr), 
+        QCoreApplication::translate("Config", "CDKey1", nullptr));
+
+    SystemRegister::cdKey2Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[07] CDKey2", nullptr), 
+        QCoreApplication::translate("Config", "CDKey2", nullptr));
+
+    SystemRegister::cdKey3Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[08] CDKey3", nullptr), 
+        QCoreApplication::translate("Config", "CDKey3", nullptr));
+
+    SystemRegister::sysRunTimeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[09] System Run Time", nullptr), 
+        QCoreApplication::translate("Config", "System run time", nullptr));
+
+    SystemRegister::laserRunTimeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[10] Laser Run Time", nullptr), 
+        QCoreApplication::translate("Config", "Laser run time", nullptr));
+
+    SystemRegister::sysRunNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[11] System Run Times", nullptr), 
+        QCoreApplication::translate("Config", "System run times", nullptr));
+
+    SystemRegister::xMaxLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[12] X Max Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "X max length", nullptr));
+
+    SystemRegister::xDirPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[13] X Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "X dir phase", nullptr));
+
+    SystemRegister::xLimitPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[14] X Limit Phase", nullptr), 
+        QCoreApplication::translate("Config", "X limit phase", nullptr));
+
+    SystemRegister::xZeroDevItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[15] X Zero Dev(mm)", nullptr), 
+        QCoreApplication::translate("Config", "X Zero Dev", nullptr));
+
+    SystemRegister::xStepLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[16] X Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "X Zero Dev", nullptr));
+
+    SystemRegister::xLimitNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[17] X Limit Num", nullptr), 
+        QCoreApplication::translate("Config", "X limit num", nullptr));
+
+    SystemRegister::xResetEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[18] X Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enable x reset", nullptr));
+
+    SystemRegister::xMotorNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[19] X Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "X motor num", nullptr));
+
+    SystemRegister::xMotorCurrentItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[20] X Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "X motor current", nullptr));
+
+    SystemRegister::xStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[21] X Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "X Start Speed", nullptr));
+
+    SystemRegister::xMaxSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[22] X Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "X Max Speed", nullptr));
+
+    SystemRegister::xMaxAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[23] X Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "X max acceleration", nullptr));
+
+    SystemRegister::xUrgentAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[24] X Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "X urgent acceleration", nullptr));
+
+    SystemRegister::yMaxLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[25] Y Max Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y max length", nullptr));
+
+    SystemRegister::yDirPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[26] Y Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "Y dir phase", nullptr));
+
+    SystemRegister::yLimitPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[27] Y Limit Phase", nullptr), 
+        QCoreApplication::translate("Config", "Y limit phase", nullptr));
+
+    SystemRegister::yZeroDevItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[28] Y Zero Dev(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y Zero Dev", nullptr));
+
+    SystemRegister::yStepLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[29] Y Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y Zero Dev", nullptr));
+
+    SystemRegister::yLimitNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[30] Y Limit Num", nullptr), 
+        QCoreApplication::translate("Config", "Y limit num", nullptr));
+
+    SystemRegister::yResetEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[31] Y Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enable y reset", nullptr));
+
+    SystemRegister::yMotorNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[32] Y Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "Y motor num", nullptr));
+
+    SystemRegister::yMotorCurrentItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[33] Y Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "Y motor current", nullptr));
+
+    SystemRegister::yStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[34] Y Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Y Start Speed", nullptr));
+
+    SystemRegister::yMaxSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[35] Y Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Y Max Speed", nullptr));
+
+    SystemRegister::yMaxAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[36] Y Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Y max acceleration", nullptr));
+
+    SystemRegister::yUrgentAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[37] Y Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Y urgent acceleration", nullptr));
+
+    SystemRegister::zMaxLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[38] Z Max Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y max length", nullptr));
+
+    SystemRegister::zDirPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[39] Z Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "Z dir phase", nullptr));
+
+    SystemRegister::zLimitPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[40] Z Limit Phase", nullptr), 
+        QCoreApplication::translate("Config", "Z limit phase", nullptr));
+
+    SystemRegister::zZeroDevItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[41] Z Zero Dev(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Z Zero Dev", nullptr));
+
+    SystemRegister::zStepLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[42] Z Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Z Zero Dev", nullptr));
+
+    SystemRegister::zLimitNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[43] Z Limit Num", nullptr), 
+        QCoreApplication::translate("Config", "Z limit num", nullptr));
+
+    SystemRegister::zResetEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[44] Z Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enable z reset", nullptr));
+
+    SystemRegister::zMotorNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[45] Z Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "Z motor num", nullptr));
+
+    SystemRegister::zMotorCurrentItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[46] Z Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "Z motor current", nullptr));
+
+    SystemRegister::zStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[47] Z Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Z Start Speed", nullptr));
+
+    SystemRegister::zMaxSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[48] Z Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Z Max Speed", nullptr));
+
+    SystemRegister::zMaxAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[49] Z Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Z max acceleration", nullptr));
+
+    SystemRegister::zUrgentAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[50] Z Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Z urgent acceleration", nullptr));
+
+    SystemRegister::laserMaxPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[51] Laser Max Power(%)", nullptr),
+        QCoreApplication::translate("Config", "Laser Max Power", nullptr));
+
+    SystemRegister::laserMinPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[52] Laser Min Power(%)", nullptr),
+        QCoreApplication::translate("Config", "Laser Min Power", nullptr));
+
+    SystemRegister::laserPowerFreqItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[53] Laser Power Frequence", nullptr),
+        QCoreApplication::translate("Config", "Laser Power Frequence", nullptr));
+
+    SystemRegister::xPhaseEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[54] X Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "Enabled X phase", nullptr));
+
+    SystemRegister::yPhaseEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[55] Y Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "Enabled Y phase", nullptr));
+
+    SystemRegister::zPhaseEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[56] Z Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "Enabled Z phase", nullptr));
+
+    SystemRegister::deviceOriginItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[57] Device Origin", nullptr),
+        QCoreApplication::translate("Config", "Device Origin", nullptr));
+
+    Debug::showPrimitiveNameItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Show Primitive Name", nullptr),
+        QCoreApplication::translate("Config", "Show Primitive Name", nullptr));
+
+    Debug::showPrimitiveFirstPointItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Show Primitive First Point", nullptr),
+        QCoreApplication::translate("Config", "Show Primitive First Point", nullptr));
+
+    Debug::generatePathImageItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Generate Path Image", nullptr),
+        QCoreApplication::translate("Config", "Enabled generate path image", nullptr));
+
+    Debug::generateMachiningImageItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Generate Machining Image", nullptr),
+        QCoreApplication::translate("Config", "Enabled generate machining image", nullptr));
+
+    Debug::enableOptimizeInteractionItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr),
+        QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr));
 }
 
 void Config::destroy()

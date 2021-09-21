@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -72,7 +72,7 @@
     <addaction name="actionCopy"/>
     <addaction name="actionDuplication"/>
     <addaction name="actionPaste"/>
-    <addaction name="actionPasteInLine"/>
+    <addaction name="actionPasteInPlace"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -1242,12 +1242,12 @@
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="actionPasteInLine">
+  <action name="actionPasteInPlace">
    <property name="text">
-    <string>PasteInLine</string>
+    <string>PasteInPlace</string>
    </property>
    <property name="toolTip">
-    <string>Paste In Line</string>
+    <string>Paste In place</string>
    </property>
    <property name="shortcut">
     <string>Alt+V</string>
