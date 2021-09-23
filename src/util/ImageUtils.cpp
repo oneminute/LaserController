@@ -145,7 +145,7 @@ cv::Mat imageUtils::halftone2(cv::Mat src, float lpi, float dpi, float degrees, 
     float inchWidth = src.cols / dpi;
     float inchHeight = src.rows / dpi;
 
-    // choose the bigger one between gridwidth and grid height
+    // choose the bigger one between gridwidth and grid m_height
     //int gridSize = std::round(std::ceil(dpi / lpi) * sqrt(2));
     int gridSize = std::ceil(dpi / lpi) / 2;
     if (gridSize % 2)
@@ -230,7 +230,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     float inchWidth = src.cols / dpi;
     float inchHeight = src.rows / dpi;
 
-    // choose the bigger one between gridwidth and grid height
+    // choose the bigger one between gridwidth and grid m_height
     int gridSize = qRound(dpi / lpi * cos);
 
     // out image

@@ -1,6 +1,12 @@
 #include "LaserPrimitiveGroup.h"
 
 #include "LaserPrimitive.h"
+#include "widget/LaserViewer.h"
+#include "ui/LaserControllerWindow.h"
+#include "scene/LaserScene.h"
+#include"LaserApplication.h"
+#include <QGraphicsScene>
+
 
 //class QGraphicsItem;
 class LaserPrimitiveGroupPrivate
@@ -104,6 +110,25 @@ void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsIt
 {
 	//»æÖÆgroup
 	//QGraphicsItemGroup::paint(painter, option, widget);
+}
+
+QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
+{
+    
+    int size = this->childItems().size();
+    qDebug() << size;
+    LaserScene* s = qobject_cast<LaserScene*>(scene());
+    if (!s) {
+        return QGraphicsItemGroup::itemChange(change, value);
+    }
+    LaserViewer* view = qobject_cast<LaserViewer*>(s->views()[0]);
+    LaserControllerWindow* window = LaserApplication::mainWindow;   
+    if (window) {
+        window->onLaserPrimitiveGroupItemChanged();
+    }
+    
+
+    return QGraphicsItemGroup::itemChange(change, value);
 }
 
 //QRectF LaserPrimitiveGroup::updateBoundingRect()

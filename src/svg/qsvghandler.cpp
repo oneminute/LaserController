@@ -1203,7 +1203,7 @@ static void parsePen(QSvgNode *node,
                      const QSvgAttributes &attributes,
                      QSvgHandler *handler)
 {
-    //qDebug()<<"Node "<<node->type()<<", attrs are "<<value<<width;
+    //qDebug()<<"Node "<<node->type()<<", attrs are "<<value<<m_width;
 
     if (!attributes.stroke.isEmpty() || !attributes.strokeDashArray.isEmpty() || !attributes.strokeDashOffset.isEmpty() || !attributes.strokeLineCap.isEmpty()
         || !attributes.strokeLineJoin.isEmpty() || !attributes.strokeMiterLimit.isEmpty() || !attributes.strokeOpacity.isEmpty() || !attributes.strokeWidth.isEmpty()
@@ -1235,7 +1235,7 @@ static void parsePen(QSvgNode *node,
             }
         }
 
-        //stroke-width handling
+        //stroke-m_width handling
         if (!attributes.strokeWidth.isEmpty() && attributes.strokeWidth != QT_INHERIT) {
             SizeUnit lt;
             prop->setWidth(parseLength(attributes.strokeWidth, lt, handler));
@@ -3083,7 +3083,7 @@ static QSvgNode *createRectNode(QSvgNode *parent,
         nrx = nry;
 
     //we draw rounded rect from 0...99
-    //svg from 0...bounds.width()/2 so we're adjusting the
+    //svg from 0...bounds.m_width()/2 so we're adjusting the
     //coordinates
     nrx *= (100/(bounds.width()/2));
     nry *= (100/(bounds.height()/2));
@@ -3246,14 +3246,14 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
     if (!widthStr.isEmpty()) {
         width = parseLength(widthStr, type, handler);
         //if (type != QSvgHandler::LT_PT)
-            //width = convertToPixels(width, true, type);
+            //m_width = convertToPixels(m_width, true, type);
         node->setWidth(int(width), type == SU_PERCENT);
     }
     qreal height = 0;
     if (!heightStr.isEmpty()) {
         height = parseLength(heightStr, type, handler);
         //if (type != QSvgHandler::LT_PT)
-            //height = convertToPixels(height, false, type);
+            //m_height = convertToPixels(m_height, false, type);
         node->setHeight(int(height), type == SU_PERCENT);
     }
     node->setSizeUnit(type);

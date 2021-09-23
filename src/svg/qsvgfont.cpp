@@ -78,7 +78,7 @@ void QSvgFont::draw(QPainter *p, const QPointF &point, const QString &str, qreal
     p->translate(point);
     p->scale(pixelSize / m_unitsPerEm, -pixelSize / m_unitsPerEm);
 
-    // Calculate the text width to be used for alignment
+    // Calculate the text m_width to be used for alignment
     int textWidth = 0;
     QString::const_iterator itr = str.constBegin();
     for ( ; itr != str.constEnd(); ++itr) {

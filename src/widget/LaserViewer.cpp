@@ -22,6 +22,8 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
+#include "ui/LaserControllerWindow.h"
+
 #include "state/StateController.h"
 #include "widget/RulerWidget.h"
 #include "common/Config.h"
@@ -143,12 +145,6 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		//painter.setRenderHint(QPainter::Antialiasing);
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-		//QGraphicsView::paintEvent(event);
-		//QPainter painter(viewport());
-		//painter.setRenderHint(QPainter::Antialiasing);
-		//painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-		//QRect rect = m_scene->backgroundItem()->boundingRect().toRect();
-		//rect = QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
 		paintSelectedState(painter);
     }
     //Rect
@@ -1935,7 +1931,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		m_radians = 0;
 		
 		//group中没有被选中的item，返回idle状态
-		if (m_group->isEmpty()) {
+		//if (m_group->isEmpty()) {
+        if (m_scene->selectedPrimitives().isEmpty()) {
 			emit selectionToIdle();
 		}
 		//group中有被选中的item，返回selected状态
@@ -1984,15 +1981,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     m_mirrorLine = m_detectedPrimitive;
                 }
             }
-            /*for (LaserPrimitive* p : pList) {
-                QString className = p->metaObject()->className();
-                if (className == "LaserLine") {
-                    if (p->contains(mapToScene(event->pos())) && !selectedOnlyLine) {
-
-                        m_mirrorLine = p;
-                    }
-                }
-            }*/
+           
         }
         
     }
@@ -2088,9 +2077,9 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
         m_creatingPolygonPoints.append(m_creatingPolygonStartPoint);
 
-        qreal width = 5;
-        qreal halfWidth = width * 0.5;
-        m_polygonStartRect = QRectF(m_creatingPolygonStartPoint.x() - halfWidth, m_creatingPolygonStartPoint.y() - halfWidth, width, width);
+        qreal m_width = 5;
+        qreal halfWidth = m_width * 0.5;
+        m_polygonStartRect = QRectF(m_creatingPolygonStartPoint.x() - halfWidth, m_creatingPolygonStartPoint.y() - halfWidth, m_width, m_width);
 
         emit creatingPolygon();
     }*/
@@ -3065,6 +3054,7 @@ bool LaserViewer::isOnControllHandlers(const QPoint& point, int& handlerIndex, Q
 QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 {
 	QMap<QGraphicsItem*, QTransform> selectedList;
+    
 	if (!m_group) {
 		return selectedList;
 	}
@@ -3077,20 +3067,25 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 
 		//selectedList.insert( m_group->childItems(), m_group->sceneTransform());
 		for (QGraphicsItem *item : m_group->childItems()) {
-			selectedList.insert(item, item->sceneTransform());
+            selectedList.insert(item, item->sceneTransform());
 			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 
 			m_group->removeFromGroup(p_item);
 			if (p_item->isSelected()) {
 				p_item->setSelected(false);
 			}
-			//p_item->reShape();
 		}
 
 	}
+    for (QGraphicsItem *item : m_scene->selectedPrimitives()) {
+
+        item->setSelected(false);
+        selectedList.insert(item, item->sceneTransform());
+    }
 	m_group->setTransform(QTransform());
+    
 	m_scene->clearSelection();
-	//reshapeUndoStackPush();
+    viewport()->repaint();
 	return selectedList;
 }
 
@@ -3292,13 +3287,15 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 		return;
 	}
 	
-	if (!m_group->isAncestorOf(primitive)) {
+	//if (!m_group->isAncestorOf(primitive)) {
+    if (!scene()->selectedPrimitives().contains(primitive)) {
 		if (primitive) {
 			if (m_isKeyCtrlPress) {
 					resetGroup();
 			}
 			else {
 					clearGroupSelection();
+                    
 			}
 
 			primitive->setSelected(true);
@@ -3339,8 +3336,21 @@ void LaserViewer::selectingReleaseInBlank()
 {
 	//idle state press mouse
 	if (m_mousePressState == StateControllerInst.documentIdleState()) {
-		//选区不变
-		onEndSelecting();
+        if (m_isKeyCtrlPress) {
+            //选区不变
+            onEndSelecting();
+        }
+        else {
+            //undo
+            selectionUndoStackPushBefore();
+            for (QGraphicsItem* item : m_scene->selectedPrimitives()) {
+                item->setSelected(false);
+            }
+            emit selectionToIdle();
+            //undo redo
+            selectionUndoStackPush();
+        }
+
 	}
 	//selected satate press
 	else {
@@ -3350,17 +3360,17 @@ void LaserViewer::selectingReleaseInBlank()
 		}
 		else {
 			//m_scene->clearSelection();
-			if (!m_group->isEmpty()) {
+			if (!m_scene->selectedItems().isEmpty()) {
 				//undo
 				selectionUndoStackPushBefore();
-				//清理group
+				//清理group及所有被选中item
 				clearGroupSelection();
 				emit selectionToIdle();
 				//m_isKeyShiftPressed = false;
 				//undo redo
 				selectionUndoStackPush();
 			}
-
+            
 		}
 	}
 	
@@ -3371,7 +3381,7 @@ void LaserViewer::selectionUndoStackPushBefore()
 {
 	m_undoSelectionList.clear();
 	if (m_group) {
-		for each(QGraphicsItem* item in m_group->childItems()) {
+		for each(QGraphicsItem* item in m_scene->selectedPrimitives()) {
 			m_undoSelectionList.insert(item, item->sceneTransform());
 		}
 		//m_undoSelectionList = m_group->childItems();
@@ -3384,7 +3394,7 @@ void LaserViewer::selectionUndoStackPush()
 	QMap<QGraphicsItem*, QTransform> redoList;
 
 	if (m_group) {
-		for each(QGraphicsItem* item in m_group->childItems()) {
+		for each(QGraphicsItem* item in m_scene->selectedPrimitives()) {
 			redoList.insert(item, item->sceneTransform());
 		}
 		//redoList = m_group->childItems();
@@ -3942,10 +3952,13 @@ void LaserViewer::selectedHandleScale()
 				m_group->setTransform(t * t1);
 			}
 			else {
-				t = m_detectedPrimitive->transform();
-				QTransform t1;
-				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-				m_detectedPrimitive->setTransform(t * t1);
+                if (!m_detectedPrimitive->isLocked()) {
+                    t = m_detectedPrimitive->transform();
+                    QTransform t1;
+                    t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
+                    m_detectedPrimitive->setTransform(t * t1);
+                }
+				
 
 			}
 			
@@ -3961,10 +3974,13 @@ void LaserViewer::selectedHandleScale()
 				m_group->setTransform(t * t1);
 			}
 			else {
-				t = m_detectedBitmap->transform();
-				QTransform t1;
-				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-				m_detectedBitmap->setTransform(t * t1);
+                if (!m_detectedBitmap->isLocked()) {
+                    t = m_detectedBitmap->transform();
+                    QTransform t1;
+                    t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
+                    m_detectedBitmap->setTransform(t * t1);
+                }
+				
 
 			}
 
@@ -4143,8 +4159,8 @@ void LaserViewer::zoomToSelection()
 
 /*void LaserViewer::textAreaChanged()
 {
-    int newwidth = m_textEdit->document()->size().width();
-    int newheight = m_textEdit->document()->size().height();
+    int newwidth = m_textEdit->document()->size().m_width();
+    int newheight = m_textEdit->document()->size().m_height();
     m_textEdit->resize(newwidth, newheight);
 }*/
 

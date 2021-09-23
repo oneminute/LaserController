@@ -123,7 +123,7 @@ static void translate_dashPattern(const QVector<qreal> &pattern, qreal width, QS
 {
     Q_ASSERT(pattern_string);
 
-    // Note that SVG operates in absolute lengths, whereas Qt uses a length/width ratio.
+    // Note that SVG operates in absolute lengths, whereas Qt uses a length/m_width ratio.
     for (qreal entry : pattern)
         *pattern_string += QString::fromLatin1("%1,").arg(entry * width);
 
@@ -710,8 +710,8 @@ void QSvgGenerator::setDescription(const QString &description)
     \since 4.5
 
     By default this property is set to \c{QSize(-1, -1)}, which
-    indicates that the generator should not output the width and
-    height attributes of the \c<svg> element.
+    indicates that the generator should not output the m_width and
+    m_height attributes of the \c<svg> element.
 
     \note It is not possible to change this property while a
     QPainter is active on the generator.

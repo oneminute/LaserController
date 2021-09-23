@@ -74,7 +74,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
     qreal scaleX = Global::convertFromMM(SizeUnit::SU_PX, 1);
     qreal scaleY = Global::convertFromMM(SizeUnit::SU_PX, 1, Qt::Vertical);
 
-    QTransform t(scaleX, 0, 0, -scaleY, 0, page.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.height());
+    QTransform t(scaleX, 0, 0, -scaleY, 0, page.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
 
     for (DxfEntityNode* node : d->documentNode->entities())
     {

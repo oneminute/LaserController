@@ -1121,7 +1121,7 @@ public:
     int polylineFlag;
 
     /// <summary>
-    /// Constant width (optional; default = 0). Not used if variable width 
+    /// Constant m_width (optional; default = 0). Not used if variable m_width 
     /// (codes 40 and/or 41) is set 
     /// </summary>
     qreal constantWidth;
@@ -1147,10 +1147,10 @@ public:
     int vertexIdentifier;
 
     /// <summary>
-    /// Starting width(multiple entries; one entry for each vertex) (optional; 
-    /// default = 0; multiple entries).Not used if constant width(code 43) is set
-    /// End width (multiple entries; one entry for each vertex) (optional; 
-    /// default = 0; multiple entries). Not used if constant width (code 43) is 
+    /// Starting m_width(multiple entries; one entry for each vertex) (optional; 
+    /// default = 0; multiple entries).Not used if constant m_width(code 43) is set
+    /// End m_width (multiple entries; one entry for each vertex) (optional; 
+    /// default = 0; multiple entries). Not used if constant m_width (code 43) is 
     /// set
     /// </summary>
     QList<QVector2D> verticesWidth;

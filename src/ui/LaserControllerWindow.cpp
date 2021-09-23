@@ -288,7 +288,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_propertyLayout->addWidget(m_posYUnit, 1, 2);
 	m_propertyLayout->addWidget(m_lockOrUnlock, 0, 3, 2, 1);
 
-	//width, height
+	//m_width, m_height
 	QLabel* widthLabel = new QLabel("Width");
 	QLabel* heightLabel = new QLabel("Height");
 	m_widthBox = new LaserDoubleSpinBox();
@@ -382,7 +382,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_textLayout->setMargin(0);
     m_textLayout->setSpacing(3);
     m_textFontWidget = new QWidget(this);
-    //family height
+    //family m_height
     m_textFontWidget->setLayout(m_textLayout);
     m_ui->textFontBar->addWidget(m_textFontWidget);
     m_fontFamily = new LaserFontComboBox();
@@ -435,7 +435,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_viewer, &LaserViewer::creatingText, this, &LaserControllerWindow::onChangeFontComboBoxByEditingText);
     connect(m_fontFamily, QOverload<int>::of(&QComboBox::activated), this, &LaserControllerWindow::onFontComboBoxActived);
     connect(m_fontFamily, &LaserFontComboBox::hidePopupSignal, this, &LaserControllerWindow::onFontComboBoxHidePopup);
-    //text height
+    //text m_height
     connect(m_fontHeight, &LaserDoubleSpinBox::enterOrLostFocus, this, &LaserControllerWindow::onFontHeightBoxEnterOrLostFocus);
     //bold italic upper
     connect(m_fontBold, &QCheckBox::stateChanged, this, &LaserControllerWindow::onFontBoldStateChanged);
@@ -556,6 +556,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
+    
     connect(m_scene, QOverload<QGraphicsItem *, QGraphicsItem *, Qt::FocusReason>::of(&LaserScene::focusItemChanged), 
         this, &LaserControllerWindow::onLaserSceneFocusItemChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
@@ -1007,7 +1008,7 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         QFont font = text->font();
         qreal t = font.pixelSize();
         m_fontFamily->setCurrentText(font.family());
-        //height
+        //m_height
         m_fontHeight->setValue(Global::pixelsF2mmY(font.pixelSize()));
         //align
         int aV = text->alignV();
@@ -1781,28 +1782,69 @@ void LaserControllerWindow::createMovementDockPanel()
 void LaserControllerWindow::createShapePropertyDockPanel()
 {
     
-    cutOrderPriority = new LaserDoubleSpinBox();
-    cutOrderPriorityLabel = new QLabel("Cut Order Priority");
-    powerScale = new LaserDoubleSpinBox();
-    powerScaleLabel = new QLabel("Power Scale");
-    width = new LaserDoubleSpinBox();
-    widthLabel = new QLabel("Width");
-    height = new LaserDoubleSpinBox();
-    heightLabel = new QLabel("Height");
-    maxWidth = new LaserDoubleSpinBox();
-    maxWidthLabel = new QLabel("Max Width");
-    cornerRadius = new LaserDoubleSpinBox();
-    cornerRadiusLabel = new QLabel("Corner Radius");
-    locked = new QCheckBox();
-    lockedLabel = new QLabel("Locked");
-
-    propertyPanelWidget = new QWidget();
-    propertyDockWidget = new CDockWidget(tr("Movement"));
+    m_cutOrderPriority = new LaserDoubleSpinBox();
+    m_cutOrderPriorityLabel = new QLabel("Cut Order Priority");
+    m_powerScale = new LaserDoubleSpinBox();
+    m_powerScaleLabel = new QLabel("Power Scale");
+    m_width = new LaserDoubleSpinBox();
+    m_widthLabel = new QLabel("Width");
+    m_height = new LaserDoubleSpinBox();
+    m_heightLabel = new QLabel("Height");
+    m_maxWidth = new LaserDoubleSpinBox();
+    m_maxWidthLabel = new QLabel("Max Width");
+    m_cornerRadius = new LaserDoubleSpinBox();
+    m_cornerRadiusLabel = new QLabel("Corner Radius");
+    m_locked = new QCheckBox();
+    m_lockedLabel = new QLabel("Locked");
     
-    m_ui->menuWindow->addAction(propertyDockWidget->toggleViewAction());
+    m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
+        qDebug() << "state:" << m_locked->checkState();
+        LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
+        LaserPrimitiveGroup* group = view->group();
+        switch (m_locked->checkState())
+        {
+        case Qt::Checked:{
+            for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+                primitive->setLocked(true);
+                group->removeFromGroup(primitive);
+                
+            }
+            break;
+        }
+        case Qt::Unchecked: {
+            for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+                primitive->setLocked(false);
+                group->addToGroup(primitive);
+            }
+            break;
 
-    m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, propertyDockWidget, m_dockAreaLayers);
-    dockPanelOnlyShowIcon(propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
+        }
+        case Qt::PartiallyChecked: {
+            for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+                primitive->setLocked(true);
+                group->removeFromGroup(primitive);
+
+            }
+            m_locked->setCheckState(Qt::Checked);
+            break;
+        }
+        default:
+            break;
+        }
+        view->viewport()->repaint();
+
+    });
+    m_locked->connect(m_locked, &QCheckBox::toggled, this, [=] {
+        qDebug() << "state:" << m_locked->checkState();
+    });
+    //m_locked->setCheckState(Qt::PartiallyChecked);
+    m_propertyPanelWidget = new QWidget();
+    m_propertyDockWidget = new CDockWidget(tr("Movement"));
+    
+    m_ui->menuWindow->addAction(m_propertyDockWidget->toggleViewAction());
+
+    m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, m_propertyDockWidget, m_dockAreaLayers);
+    dockPanelOnlyShowIcon(m_propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
     createPrimitivePropertiesPanel();
 }
 
@@ -1810,150 +1852,239 @@ void LaserControllerWindow::showShapePropertyPanel()
 {
     LaserPrimitiveType type = LaserPrimitiveType::LPT_NULL;
     QList<LaserPrimitive*> list = m_scene->selectedPrimitives();
+    bool isLocked = false;
     for (int i = 0; i < list.length(); i ++) {
         if (i == 0) {
             type = list[0]->primitiveType();
+            isLocked = list[0]->isLocked();
+            if (isLocked) {
+                m_locked->setCheckState(Qt::Checked);
+            }
+            else {
+                m_locked->setCheckState(Qt::Unchecked);
+            }
         }
         else {
             LaserPrimitiveType curType = list[i]->primitiveType();
+            bool curIsLocked = list[i]->isLocked();
             if (curType != type) {
                 type = LaserPrimitiveType::LPT_UNKNOWN;
             }
+            if (isLocked != curIsLocked) {
+                m_locked->setCheckState(Qt::PartiallyChecked);
+            }
         }
+
     }
     switch(type) {
         case LPT_UNKNOWN: {
-            mixturePropertyLayout->setMargin(0);
-            mixturePropertyLayout->setSpacing(10);
-            mixturePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            mixturePropertyLayout->addWidget(locked, 0, 1);
-            mixturePropertyWidget->setLayout(mixturePropertyLayout);
-            propertyDockWidget->setWidget(mixturePropertyWidget);
-            //lockedLabel->setText("LPT_UNKNOWN");
+            m_mixturePropertyLayout->setMargin(10);
+            m_mixturePropertyLayout->setSpacing(10);
+            m_mixturePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);  
+
+            m_mixturePropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_mixturePropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_mixturePropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_mixturePropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_mixturePropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_mixturePropertyLayout->addWidget(m_locked, 2, 1);
+            m_mixturePropertyWidget->setLayout(m_mixturePropertyLayout);
+
+
+            m_propertyDockWidget->setWidget(m_mixturePropertyWidget);
+            //m_lockedLabel->setText("LPT_UNKNOWN");
             break;
         }
         case LPT_NULL: {
-            nullPropertyWidget->setLayout(nullPropertyLayout);
-            propertyDockWidget->setWidget(nullPropertyWidget);
+            m_nullPropertyWidget->setLayout(m_nullPropertyLayout);
+            m_propertyDockWidget->setWidget(m_nullPropertyWidget);
             break;
         }
         case LPT_LINE: {
-            linePropertyLayout->setMargin(0);
-            linePropertyLayout->setSpacing(100);
-            linePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            linePropertyLayout->addWidget(locked, 0, 1);
-            linePropertyWidget->setLayout(linePropertyLayout);
-            propertyDockWidget->setWidget(linePropertyWidget);
-            //lockedLabel->setText("line");
+            m_linePropertyLayout->setMargin(10);
+            m_linePropertyLayout->setSpacing(10);
+            m_linePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_linePropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_linePropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_linePropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_linePropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_linePropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_linePropertyLayout->addWidget(m_locked, 2, 1);
+
+            m_linePropertyWidget->setLayout(m_linePropertyLayout);
+            m_propertyDockWidget->setWidget(m_linePropertyWidget);
+            //m_lockedLabel->setText("line");
             break;
         }
         case LPT_RECT: {
-            rectPropertyLayout->setMargin(0);
-            rectPropertyLayout->setSpacing(10);
-            rectPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            rectPropertyLayout->addWidget(locked, 0, 1);
-            rectPropertyWidget->setLayout(rectPropertyLayout);
-            propertyDockWidget->setWidget(rectPropertyWidget);
+            m_rectPropertyLayout->setMargin(0);
+            m_rectPropertyLayout->setSpacing(10);
+            m_rectPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-            //lockedLabel->setText("rect");
+            m_rectPropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_rectPropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_rectPropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_rectPropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_rectPropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_rectPropertyLayout->addWidget(m_locked, 2, 1);
+            m_rectPropertyLayout->addWidget(m_widthLabel, 3, 0, Qt::AlignRight);
+            m_rectPropertyLayout->addWidget(m_width, 3, 1);
+            m_rectPropertyLayout->addWidget(m_heightLabel, 4, 0, Qt::AlignRight);
+            m_rectPropertyLayout->addWidget(m_height, 4, 1);
+            m_rectPropertyLayout->addWidget(m_cornerRadiusLabel, 5, 0, Qt::AlignRight);
+            m_rectPropertyLayout->addWidget(m_cornerRadius, 5, 1);
+
+            m_rectPropertyWidget->setLayout(m_rectPropertyLayout);
+            m_propertyDockWidget->setWidget(m_rectPropertyWidget);
+
+            //m_lockedLabel->setText("rect");
             break;
         }
         case LPT_ELLIPSE: {
-            ellipsePropertyLayout->setMargin(0);
-            ellipsePropertyLayout->setSpacing(10);
-            ellipsePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            ellipsePropertyLayout->addWidget(locked, 0, 1);
-            ellipsePropertyWidget->setLayout(ellipsePropertyLayout);
-            propertyDockWidget->setWidget(ellipsePropertyWidget);
-            //lockedLabel->setText("LPT_ELLIPSE");
+            m_ellipsePropertyLayout->setMargin(0);
+            m_ellipsePropertyLayout->setSpacing(10);
+            m_ellipsePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_ellipsePropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_ellipsePropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_ellipsePropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_ellipsePropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_ellipsePropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_ellipsePropertyLayout->addWidget(m_locked, 2, 1);
+            m_ellipsePropertyLayout->addWidget(m_widthLabel, 3, 0, Qt::AlignRight);
+            m_ellipsePropertyLayout->addWidget(m_width, 3, 1);
+            m_ellipsePropertyLayout->addWidget(m_heightLabel, 4, 0, Qt::AlignRight);
+            m_ellipsePropertyLayout->addWidget(m_height, 4, 1);
+            m_ellipsePropertyWidget->setLayout(m_ellipsePropertyLayout);
+            m_propertyDockWidget->setWidget(m_ellipsePropertyWidget);
+            //m_lockedLabel->setText("LPT_ELLIPSE");
             break;
         }
         case LPT_POLYLINE: {
-            polylinePropertyLayout->setMargin(0);
-            polylinePropertyLayout->setSpacing(10);
-            polylinePropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            polylinePropertyLayout->addWidget(locked, 0, 1);
-            polylinePropertyWidget->setLayout(polylinePropertyLayout);
-            propertyDockWidget->setWidget(polylinePropertyWidget);
-            //lockedLabel->setText("LPT_POLYLINE");
+            m_polylinePropertyLayout->setMargin(0);
+            m_polylinePropertyLayout->setSpacing(10);
+            m_polylinePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_polylinePropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_polylinePropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_polylinePropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_polylinePropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_polylinePropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_polylinePropertyLayout->addWidget(m_locked, 2, 1);
+            m_polylinePropertyWidget->setLayout(m_polylinePropertyLayout);
+            m_propertyDockWidget->setWidget(m_polylinePropertyWidget);
+            //m_lockedLabel->setText("LPT_POLYLINE");
             break;
         }
         case LPT_POLYGON: {
-            polygonPropertyLayout->setMargin(0);
-            polygonPropertyLayout->setSpacing(10);
-            polygonPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            polygonPropertyLayout->addWidget(locked, 0, 1);
-            polygonPropertyWidget->setLayout(polygonPropertyLayout);
-            propertyDockWidget->setWidget(polygonPropertyWidget);
-            //lockedLabel->setText("LPT_POLYGON");
+            m_polygonPropertyLayout->setMargin(0);
+            m_polygonPropertyLayout->setSpacing(10);
+            m_polygonPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_polygonPropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_polygonPropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_polygonPropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_polygonPropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_polygonPropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_polygonPropertyLayout->addWidget(m_locked, 2, 1);
+            m_polygonPropertyWidget->setLayout(m_polygonPropertyLayout);
+            m_propertyDockWidget->setWidget(m_polygonPropertyWidget);
+            //m_lockedLabel->setText("LPT_POLYGON");
             break;
         }
         case LPT_TEXT: {
-            textPropertyLayout->setMargin(0);
-            textPropertyLayout->setSpacing(10);
-            textPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            textPropertyLayout->addWidget(locked, 0, 1);
-            textPropertyWidget->setLayout(textPropertyLayout);
-            propertyDockWidget->setWidget(textPropertyWidget);
-            //lockedLabel->setText("LPT_TEXT");
+            m_textPropertyLayout->setMargin(0);
+            m_textPropertyLayout->setSpacing(10);
+            m_textPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_textPropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_textPropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_textPropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_textPropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_textPropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_textPropertyLayout->addWidget(m_locked, 2, 1);
+            m_textPropertyLayout->addWidget(m_maxWidthLabel, 3, 0, Qt::AlignRight);
+            m_textPropertyLayout->addWidget(m_maxWidth, 3, 1);
+            m_textPropertyWidget->setLayout(m_textPropertyLayout);
+            m_propertyDockWidget->setWidget(m_textPropertyWidget);
+            //m_lockedLabel->setText("LPT_TEXT");
             break;
         }
         case LPT_NURBS: {
-            propertyDockWidget->setWidget(nurbsPropertyWidget);
-            //lockedLabel->setText("LPT_NURBS");
+            m_nurbsPropertyLayout->setMargin(0);
+            m_nurbsPropertyLayout->setSpacing(10);
+            m_nurbsPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_nurbsPropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_nurbsPropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_nurbsPropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_nurbsPropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_nurbsPropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_nurbsPropertyLayout->addWidget(m_locked, 2, 1);
+            m_nurbsPropertyWidget->setLayout(m_nurbsPropertyLayout);
+            m_propertyDockWidget->setWidget(m_nurbsPropertyWidget);
+            //m_lockedLabel->setText("LPT_NURBS");
             break;
         }
         case LPT_BITMAP: {
-            bitmapPropertyLayout->setMargin(0);
-            bitmapPropertyLayout->setSpacing(10);
-            bitmapPropertyLayout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-            bitmapPropertyLayout->addWidget(locked, 0, 1);
-            bitmapPropertyWidget->setLayout(bitmapPropertyLayout);
-            propertyDockWidget->setWidget(bitmapPropertyWidget);
-            //lockedLabel->setText("LPT_BITMAP");
+            m_bitmapPropertyLayout->setMargin(0);
+            m_bitmapPropertyLayout->setSpacing(10);
+            m_bitmapPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_bitmapPropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_bitmapPropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_bitmapPropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_bitmapPropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_bitmapPropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_bitmapPropertyLayout->addWidget(m_locked, 2, 1);
+            m_bitmapPropertyWidget->setLayout(m_bitmapPropertyLayout);
+            m_propertyDockWidget->setWidget(m_bitmapPropertyWidget);
+            //m_lockedLabel->setText("LPT_BITMAP");
             break;
         }
     }
     
+
 }
 
 void LaserControllerWindow::createPrimitivePropertiesPanel()
 {
     //rect
-    rectPropertyLayout = new QGridLayout();
-    rectPropertyWidget = new QWidget();
+    m_rectPropertyLayout = new QGridLayout();
+    m_rectPropertyWidget = new QWidget();
     
     //line
-    linePropertyLayout = new QGridLayout();
-    linePropertyWidget = new QWidget();
+    m_linePropertyLayout = new QGridLayout();
+    m_linePropertyWidget = new QWidget();
     
     //ellipse
-    ellipsePropertyLayout = new QGridLayout();
-    ellipsePropertyWidget = new QWidget();
+    m_ellipsePropertyLayout = new QGridLayout();
+    m_ellipsePropertyWidget = new QWidget();
     
     //ploygon
-    polygonPropertyLayout = new QGridLayout();
-    polygonPropertyWidget = new QWidget();
+    m_polygonPropertyLayout = new QGridLayout();
+    m_polygonPropertyWidget = new QWidget();
     
     //ployline
-    polylinePropertyLayout = new QGridLayout();
-    polylinePropertyWidget = new QWidget();
+    m_polylinePropertyLayout = new QGridLayout();
+    m_polylinePropertyWidget = new QWidget();
     
     //bitmap
-    bitmapPropertyLayout = new QGridLayout();
-    bitmapPropertyWidget = new QWidget();
+    m_bitmapPropertyLayout = new QGridLayout();
+    m_bitmapPropertyWidget = new QWidget();
     
     //text
-    textPropertyLayout = new QGridLayout();
-    textPropertyWidget = new QWidget();
+    m_textPropertyLayout = new QGridLayout();
+    m_textPropertyWidget = new QWidget();
     
     //mix
-    mixturePropertyLayout = new QGridLayout();
-    mixturePropertyWidget = new QWidget();
+    m_mixturePropertyLayout = new QGridLayout();
+    m_mixturePropertyWidget = new QWidget();
     
     //null
-    nullPropertyLayout = new QGridLayout();
-    nullPropertyWidget = new QWidget();
+    m_nullPropertyLayout = new QGridLayout();
+    m_nullPropertyWidget = new QWidget();
     
 }
 
@@ -1964,11 +2095,11 @@ void LaserControllerWindow::createPrimitiveLinePropertyPanel()
     
     layout->setMargin(0);
     layout->setSpacing(10);
-    layout->addWidget(lockedLabel, 0, 0, Qt::AlignRight);
-    layout->addWidget(locked, 0, 1);
+    layout->addWidget(m_lockedLabel, 0, 0, Qt::AlignRight);
+    layout->addWidget(m_locked, 0, 1);
     
-    propertyPanelWidget->setLayout(layout);
-    propertyDockWidget->setWidget(propertyPanelWidget);
+    m_propertyPanelWidget->setLayout(layout);
+    m_propertyDockWidget->setWidget(m_propertyPanelWidget);
 }
 
 void LaserControllerWindow::createPrimitiveRectPropertyPanel()
@@ -3044,9 +3175,9 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 {
     QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
 	if (items.length() == 0) {
-		if (m_propertyWidget) {
+		/*if (m_propertyWidget) {
 			m_propertyWidget->setEnabled(false);
-		}
+		}*/
 		
 		m_ui->actionMirrorHorizontal->setEnabled(false);
 		m_ui->actionMirrorVertical->setEnabled(false);
@@ -3061,10 +3192,11 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
         m_viewer->setMirrorLine(nullptr);
 	}
 	else if (items.length() > 0) {
-		if (m_propertyWidget) {
-			m_propertyWidget->setEnabled(true);
-			selectedChange();
-		}	
+		/*if (m_propertyWidget && m_viewer->group()) {
+            if (m_viewer->group()->childItems().size() > 0) {
+                m_propertyWidget->setEnabled(true);
+            }
+		}*/
 		m_ui->actionMirrorHorizontal->setEnabled(true);
 		m_ui->actionMirrorVertical->setEnabled(true);
         m_ui->actionMirrorAcrossLine->setEnabled(false);
@@ -3093,6 +3225,27 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 	}
     //判断显示哪个属性面板，shape properties panel
     showShapePropertyPanel();
+}
+
+void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
+{
+    qDebug() << "onLaserPrimitiveGroupItemChanged";
+    if (!m_viewer) {
+        return;
+    }
+    LaserPrimitiveGroup* group = m_viewer->group();
+    if (!group) {
+        return;
+    }
+    int i = group->childItems().size();
+    if (i == 0) {
+        m_propertyWidget->setEnabled(false);
+        //emit selectedChange();
+    }
+    else if (i > 0) {
+        m_propertyWidget->setEnabled(true);
+        emit selectedChange();
+    }
 }
 
 void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
@@ -3396,11 +3549,17 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
 		}
 	}
 }
-//selected items change
+//selected items change,被选中的物体，发生移动，缩放，旋转,以线镜像变换时
 void LaserControllerWindow::selectedChange()
 {
-	
-	int size = m_scene->selectedPrimitives().length();
+	//int size = m_scene->selectedPrimitives().length();
+    LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
+    LaserPrimitiveGroup* group =  view->group();
+    if (!group) {
+        return;
+    }
+    m_propertyWidget->setEnabled(true);
+    int size = view->group()->childItems().size();
 	if (size > 0) {
 		QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
 		if (rect.width() == 0 && rect.height() == 0) {

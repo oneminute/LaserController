@@ -15,6 +15,7 @@ class LaserBitmap;
 class LaserLayer;
 class LaserText;
 class LaserTextRowPath;
+class LaserControllerWindow;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -163,6 +164,7 @@ signals:
 	void selectedChange();
 	void beginViewDraging();
 	void endViewDraging();
+    
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;

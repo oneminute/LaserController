@@ -339,7 +339,7 @@ void QSvgText::draw(QPainter *p, QSvgExtraStates &states)
 
     QRectF bounds;
     if (m_size.height() != 0)
-        bounds = QRectF(0, py, 1, scaledSize.height()); // x and width are not used.
+        bounds = QRectF(0, py, 1, scaledSize.height()); // x and m_width are not used.
 
     bool appendSpace = false;
     QVector<QString> paragraphs;
@@ -456,7 +456,7 @@ void QSvgText::draw(QPainter *p, QSvgExtraStates &states)
                 // Check if the current line fits into the bounding rectangle.
                 if ((m_size.width() != 0 && line.naturalTextWidth() > scaledSize.width())
                     || (m_size.height() != 0 && y + line.height() > scaledSize.height())) {
-                    // I need to set the bounds height to 'y-epsilon' to avoid drawing the current
+                    // I need to set the bounds m_height to 'y-epsilon' to avoid drawing the current
                     // line. Since the font is scaled to 100 units, 1 should be a safe epsilon.
                     bounds.setHeight(y - 1);
                     endOfBoundsReached = true;

@@ -465,7 +465,7 @@ public:
     {
         m_stroke.setWidthF(width);
         m_strokeWidthSet = 1;
-        Q_ASSERT(!m_strokeDashArraySet); // set width before dash array.
+        Q_ASSERT(!m_strokeDashArraySet); // set m_width before dash array.
     }
 
     qreal width()
@@ -517,7 +517,7 @@ private:
     // stroke-linejoin   v 	v 	'miter' | 'round' | 'bevel' | 'inherit'
     // stroke-miterlimit v 	v 	'inherit' | <StrokeMiterLimitValue.datatype>
     // stroke-opacity    v 	v 	'inherit' | <OpacityValue.datatype>
-    // stroke-width      v 	v 	'inherit' | <StrokeWidthValue.datatype>
+    // stroke-m_width      v 	v 	'inherit' | <StrokeWidthValue.datatype>
     QPen m_stroke;
     QPen m_oldStroke;
     qreal m_strokeOpacity;
