@@ -202,6 +202,11 @@ bool OptimizeNode::hasChildren() const
     return !d->childNodes.isEmpty();
 }
 
+bool OptimizeNode::isLeaf() const
+{
+    return !hasChildren();
+}
+
 int OptimizeNode::childCount() const
 {
     Q_D(const OptimizeNode);
@@ -295,9 +300,9 @@ QList<OptimizeNode*> OptimizeNode::findLeaves()
     return leaves;
 }
 
-QList<OptimizeNode*> OptimizeNode::findSiblings(bool onlyLeaves)
+QSet<OptimizeNode*> OptimizeNode::findSiblings(bool onlyLeaves)
 {
-    QList<OptimizeNode*> siblings;
+    QSet<OptimizeNode*> siblings;
 
     OptimizeNode* parent = parentNode();
     if (!parent)
@@ -312,15 +317,44 @@ QList<OptimizeNode*> OptimizeNode::findSiblings(bool onlyLeaves)
         {
             if (!node->hasChildren())
             {
-                siblings.append(node);
+                siblings.insert(node);
             }
         }
         else
         {
-            siblings.append(node);
+            siblings.insert(node);
         }
     }
     return siblings;
+}
+
+void OptimizeNode::findSiblings(QSet<OptimizeNode*>& leaves, QSet<OptimizeNode*>& branches,
+        const QSet<OptimizeNode*>& excludes)
+{
+    leaves.clear();
+    branches.clear();
+
+    OptimizeNode* parent = parentNode();
+    if (!parent)
+        return;
+
+    for (OptimizeNode* node : parent->childNodes())
+    {
+        if (node == this)
+            continue;
+
+        if (excludes.contains(node))
+            continue;
+
+        if (node->hasChildren())
+        {
+            branches.insert(node);
+        }
+        else
+        {
+            leaves.insert(node);
+        }
+    }
 }
 
 QPointF OptimizeNode::position() const
@@ -451,6 +485,12 @@ LaserPoint OptimizeNode::currentPos(const LaserPoint& hint) const
     return d->currentPoint;
 }
 
+void OptimizeNode::setCurrentPos(const LaserPoint& point)
+{
+    Q_D(OptimizeNode);
+    d->currentPoint = point;
+}
+
 void OptimizeNode::setCurrentIndex(int index)
 {
     Q_D(OptimizeNode);
@@ -573,4 +613,15 @@ LaserPoint OptimizeNode::arrangedEndingPoint() const
         return d->currentPoint;
     }
     return LaserPoint();
+}
+
+QSet<int> OptimizeNode::laneIndices()
+{
+    Q_D(const OptimizeNode);
+    QSet<int> indices;
+    for (const LaserPoint& point : startingPoints())
+    {
+        indices.insert(point.laneIndex());
+    }
+    return indices;
 }

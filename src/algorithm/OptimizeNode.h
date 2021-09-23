@@ -34,6 +34,7 @@ public:
     void clearChildren();
     void clearEdges();
     bool hasChildren() const;
+    bool isLeaf() const;
     int childCount() const;
 
     //bool isVirtual() const;
@@ -46,7 +47,9 @@ public:
 
     QList<OptimizeNode*> findAllLeaves(OptimizeNode* exclude = nullptr);
     QList<OptimizeNode*> findLeaves();
-    QList<OptimizeNode*> findSiblings(bool onlyLeaves = false);
+    QSet<OptimizeNode*> findSiblings(bool onlyLeaves = false);
+    void findSiblings(QSet<OptimizeNode*>& leaves, QSet<OptimizeNode*>& branches,
+        const QSet<OptimizeNode*>& excludes = QSet<OptimizeNode*>());
 
     QPointF position() const;
     QPointF machiningPosition() const;
@@ -65,6 +68,7 @@ public:
     LaserPoint nearestPoint(const LaserPoint& point);
     LaserPoint nearestPoint(OptimizeNode* node);
     LaserPoint currentPos(const LaserPoint& hint = LaserPoint()) const;
+    void setCurrentPos(const LaserPoint& point);
     void setCurrentIndex(int index);
     LaserPoint lastPoint() const;
     void setLastPoint(const LaserPoint& point);
@@ -83,6 +87,8 @@ public:
     LaserPointListList arrangedPoints() const;
     LaserPoint arrangedStartingPoint() const;
     LaserPoint arrangedEndingPoint() const;
+
+    QSet<int> laneIndices();
 
 protected:
     QScopedPointer<OptimizeNodePrivate> d_ptr;

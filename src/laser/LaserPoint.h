@@ -58,6 +58,8 @@ public:
         m_angle2 = angle2;
     }
 
+    int laneIndex() const;
+
     LaserPoint& operator+=(const LaserPoint& laserPoint);
     LaserPoint& operator-=(const LaserPoint& laserPoint);
     LaserPoint& operator*=(float factor);

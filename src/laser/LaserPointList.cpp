@@ -65,20 +65,42 @@ void LaserPointList::buildKdtree()
 
     flann::Matrix<qreal> samplePoints = flann::Matrix<qreal>((qreal*)(m_matrix.data()),
             count() * 2, 3);
-    flann::KDTreeSingleIndexParams singleIndexParams = flann::KDTreeSingleIndexParams(4);
+    flann::KDTreeSingleIndexParams singleIndexParams = flann::KDTreeSingleIndexParams(10);
     m_kdtree = new flann::KDTreeSingleIndex<flann::L2_Simple<qreal>>(samplePoints, singleIndexParams);
     m_kdtree->buildIndex();
 }
 
-void LaserPointList::addOptimizeNode(OptimizeNode* node)
+void LaserPointList::addNode(OptimizeNode* node)
 {
     int index = 0;
     for (LaserPoint& point : node->startingPoints())
     {
         append(point);
-        m_nodeMap.insert(size() - 1, node);
+        m_indexNodeMap.insert(size() - 1, node);
+        m_nodeIndicesMap.insert(node, size() - 1);
         m_indexMap.insert(size() - 1, index);
         index++;
+    }
+}
+
+void LaserPointList::removeNode(OptimizeNode* node)
+{
+    for (int index : m_nodeIndicesMap.values(node))
+    {
+        m_indexNodeMap.remove(index);
+        m_indexMap.remove(index);
+
+        m_kdtree->removePoint(index * 2);
+        m_kdtree->removePoint(index * 2 + 1);
+    }
+    m_nodeIndicesMap.remove(node);
+}
+
+void LaserPointList::addNodes(const QSet<OptimizeNode*>& nodes)
+{
+    for (OptimizeNode* node : nodes)
+    {
+        addNode(node);
     }
 }
 
@@ -157,11 +179,15 @@ int LaserPointList::nearestSearch(const LaserPoint& point)
     return indices[index] / 2;
 }
 
-OptimizeNode* LaserPointList::nearestSearch(OptimizeNode* srcNode)
+OptimizeNode* LaserPointList::nearestSearch(OptimizeNode* srcNode, bool remove)
 {
     int globalIndex = nearestSearch(srcNode->currentPos());
-    OptimizeNode* node = m_nodeMap[globalIndex];
+    OptimizeNode* node = m_indexNodeMap[globalIndex];
     int index = m_indexMap[globalIndex];
+
+    if (remove)
+        removeNode(node);
+
     node->setCurrentIndex(index);
     //qLogD << node->currentPos();
     node->setLastPoint(srcNode->currentPos());

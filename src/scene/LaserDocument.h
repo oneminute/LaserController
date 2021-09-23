@@ -102,7 +102,7 @@ protected:
     /// </summary>
     /// <param name="node">待分组节点</param>
     /// <param name="level">当前的组级别</param>
-    void optimizeGroups(OptimizeNode* node, int level = 1);
+    void optimizeGroups(OptimizeNode* node, int level = 1, bool sorted = false);
     //void clearOutline(OptimizeNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node);
 

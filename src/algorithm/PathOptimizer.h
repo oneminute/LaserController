@@ -36,6 +36,7 @@ signals:
 
 protected:
     void optimizeLayer(OptimizeNode* root);
+    void optimizeFrom(OptimizeNode* root);
 
     void printNodeAndEdges();
 
@@ -70,6 +71,39 @@ private:
     QThread m_thread;
     FinishedCallback m_finishedCallback;
     QScopedPointer<PathOptimizer> m_optimizer;
+};
+
+class Lane : public QSet<OptimizeNode*>
+{
+public:
+    Lane();
+    ~Lane();
+
+    void buildKdtree();
+    OptimizeNode* nearestSearch(OptimizeNode* node, bool remove = false);
+
+private:
+    LaserPointList m_pointList;
+};
+
+class LaneMap : public QMap<int, Lane>
+{
+public:
+    LaneMap();
+    ~LaneMap();
+
+    void addNode(OptimizeNode* node);
+    void addNodes(const QSet<OptimizeNode*>& nodes);
+    void removeNode(OptimizeNode* node);
+
+    void buildKdtree();
+
+    Lane& nearestLane(OptimizeNode* node);
+    Lane& nearestLane(const LaserPoint& point);
+
+    OptimizeNode* nearestSearch(OptimizeNode* node, bool remove = false, QSet<OptimizeNode*>& externNodes = QSet<OptimizeNode*>());
+
+private:
 };
 
 #endif // PATHOPTIMIZER_H

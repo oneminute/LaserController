@@ -72,7 +72,8 @@ void PathOptimizer::optimize()
 
     for (OptimizeNode* layerNode : d->root->childNodes())
     {
-        optimizeLayer(layerNode);
+        //optimizeLayer(layerNode);
+        optimizeFrom(layerNode);
     }
 
     LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
@@ -110,11 +111,12 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     QStack<OptimizeNode*> stack;
     QList<OptimizeNode*> leaves;
 
+    stack.push(root);
     // 获取所有的叶节点
-    for (OptimizeNode* node : root->childNodes())
+    /*for (OptimizeNode* node : root->childNodes())
     {
         stack.push(node);
-    }
+    }*/
 
     while (!stack.isEmpty())
     {
@@ -129,7 +131,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             LaserPrimitive* primitive = static_cast<LaserPrimitive*>(node->documentItem());
             LaserApplication::previewWindow->addPath(primitive->machiningPoints().toPainterPath(), QPen(Qt::blue, 2), primitive->name());
             LaserApplication::previewWindow->addMessage(tr("Generating machining points of node %1. Done.").arg(node->nodeName()));
-            LaserApplication::previewWindow->addPoints(node->startingPoints().toPoints());
+            //LaserApplication::previewWindow->addPoints(node->startingPoints().toPoints());
         }
         d->nodes.append(node);
 
@@ -158,21 +160,21 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
         if (!node->isVirtual())
             travelled.insert(node);
 
-        if (node->parentNode() && node->parentNode() != root && node->nodeType() != LNT_LAYER)
+        if (node != root)
         {
             // 该节点有父节点，建立从子节点到父节点的边。
             OptimizeEdge* edge = new OptimizeEdge(node, node->parentNode());
             node->setOutEdge(edge);
             QString label = QString("%1 -> %2").arg(node->nodeName()).arg(node->parentNode()->nodeName());
-        }
 
-        // find all child nodes from its siblings
-        QList<OptimizeNode*> siblingChildren = node->parentNode()->findAllLeaves(node);
-        for (OptimizeNode* leafNode : siblingChildren)
-        {
-            OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
-            node->addEdge(edge);
-            QString label = QString("%1 -> %2").arg(node->nodeName()).arg(leafNode->nodeName());
+            // find all child nodes from its siblings
+            QList<OptimizeNode*> siblingChildren = node->parentNode()->findAllLeaves(node);
+            for (OptimizeNode* leafNode : siblingChildren)
+            {
+                OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
+                node->addEdge(edge);
+                QString label = QString("%1 -> %2").arg(node->nodeName()).arg(leafNode->nodeName());
+            }
         }
 
         for (OptimizeNode* childNode : node->childNodes())
@@ -193,14 +195,14 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     while (true)
     {
         // 访问该节点，添加到访问列表中
-            travelled.insert(d->currentNode);
-            qLogD << "arrived node " << d->currentNode->nodeName();
+        travelled.insert(d->currentNode);
+        qLogD << "arrived node " << d->currentNode->nodeName();
 
-            if (d->currentNode->nodeType() == LNT_PRIMITIVE && !d->optimizedPath.contains(d->currentNode))
-            {
-                LaserApplication::previewWindow->addProgress(this, 0.9 * 0.1 / d->totalNodes, tr("Arrived node %1").arg(d->currentNode->nodeName()));
-                d->optimizedPath.append(d->currentNode);
-            }
+        if (d->currentNode->nodeType() == LNT_PRIMITIVE && !d->optimizedPath.contains(d->currentNode))
+        {
+            LaserApplication::previewWindow->addProgress(this, 0.9 * 0.1 / d->totalNodes, tr("Arrived node %1").arg(d->currentNode->nodeName()));
+            d->optimizedPath.append(d->currentNode);
+        }
 
         // 生成输出边的kdtree
         LaserPointList siblingPoints;
@@ -210,14 +212,14 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             // 如果还没遍历，就加入到kdtree中
             if (!travelled.contains(toNode))
             {
-                siblingPoints.addOptimizeNode(toNode);
+                siblingPoints.addNode(toNode);
             }
         }
         if (siblingPoints.isEmpty())
-        { 
+        {
             // 为空表示兄弟节点已经全部遍历完成，向父节点移动
             OptimizeNode* parentNode = d->currentNode->parentNode();
-            if (!parentNode || parentNode->isVirtual())
+            if (!parentNode || parentNode == root)
                 break;
 
             if (travelled.contains(parentNode))
@@ -226,9 +228,16 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
                 continue;
             }
 
-            LaserPoint point = parentNode->nearestPoint(d->currentNode);
-            LaserApplication::previewWindow->addLine(QLineF(d->currentNode->currentPos().toPointF(), 
-                point.toPointF()), QPen(Qt::black, 2));
+            if (parentNode->isVirtual())
+            {
+                parentNode->setCurrentPos(d->currentNode->currentPos());
+            }
+            else
+            {
+                LaserPoint point = parentNode->nearestPoint(d->currentNode);
+                LaserApplication::previewWindow->addLine(QLineF(d->currentNode->currentPos().toPointF(),
+                    point.toPointF()), QPen(Qt::black, 2));
+            }
 
             d->currentNode = parentNode;
         }
@@ -243,6 +252,76 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     
     d->currentNode->clearChildren();
     d->currentNode->clearEdges();
+}
+
+void PathOptimizer::optimizeFrom(OptimizeNode* root)
+{
+    Q_D(PathOptimizer);
+    // 计算泳道宽
+    int laneInterval = qRound(Config::PathOptimization::groupingGridInterval() * 1000);
+    Qt::Orientation orient = static_cast<Qt::Orientation>(Config::PathOptimization::groupingOrientation());
+
+    // 各泳道节点集合
+    LaneMap laneMap;
+
+    QStack<OptimizeNode*> stack;
+    stack.push(root);
+    QSet<OptimizeNode*> leaves;
+    while (!stack.empty())
+    {
+        OptimizeNode* node = stack.pop();
+        node->clearEdges();
+        node->update((quint32)this, 1.0 * 0.9 / d->totalNodes);
+        laneMap.addNode(node);
+
+        if (node->isLeaf())
+        {
+            leaves.insert(node);
+        }
+
+        for (OptimizeNode* childNode : node->childNodes())
+        {
+            stack.push(childNode);
+        }
+    }
+    laneMap.buildKdtree();
+
+    QSet<OptimizeNode*> travelled;
+    // 找到第一个最优节点
+    OptimizeNode* firstNode = laneMap.nearestSearch(d->currentNode, true, leaves);
+    d->currentNode = firstNode;
+    while (travelled.count() != leaves.count())
+    {
+        if (d->currentNode->nodeType() == LNT_PRIMITIVE)
+        {
+            travelled.insert(d->currentNode);
+        }
+
+        // 搜索所有的兄弟节点
+        QSet<OptimizeNode*> siblingLeaves;
+        QSet<OptimizeNode*> siblingBranches;
+        d->currentNode->findSiblings(siblingLeaves, siblingBranches, travelled);
+
+        laneMap.clear();
+        laneMap.addNodes(siblingLeaves);
+        laneMap.buildKdtree();
+
+        while (!siblingLeaves.empty())
+        {
+            // 在兄弟节点中找最优点
+            OptimizeNode* leaveNode = laneMap.nearestSearch(d->currentNode, true);
+
+            // 将该点从兄弟叶节点集合中移除
+            siblingLeaves.remove(leaveNode);
+
+            // 将该点从父节点的子节点中移除
+            leaveNode->parentNode()->removeChildNode(leaveNode);
+
+            d->currentNode = leaveNode;
+            travelled.insert(leaveNode);
+            qLogD << "arrived " << leaveNode->nodeName();
+        }
+    }
 }
 
 void PathOptimizer::printNodeAndEdges()
@@ -307,3 +386,105 @@ void OptimizerController::finished()
     m_thread.quit();
     this->deleteLater();
 }
+
+Lane::Lane()
+{
+}
+
+Lane::~Lane()
+{
+}
+
+void Lane::buildKdtree()
+{
+    m_pointList.clear();
+    m_pointList.addNodes(*this);
+    m_pointList.buildKdtree();
+}
+
+OptimizeNode* Lane::nearestSearch(OptimizeNode* node, bool remove)
+{
+    OptimizeNode* dstNode = m_pointList.nearestSearch(node, remove);
+    if (remove)
+        this->remove(dstNode);
+    return dstNode;
+}
+
+LaneMap::LaneMap()
+    : QMap<int, Lane>()
+{
+}
+
+LaneMap::~LaneMap()
+{
+}
+
+void LaneMap::addNode(OptimizeNode* node)
+{
+    for (int laneIndex : node->laneIndices())
+    {
+        (*this)[laneIndex].insert(node);
+    }
+}
+
+void LaneMap::addNodes(const QSet<OptimizeNode*>& nodes)
+{
+    for (OptimizeNode* node : nodes)
+    {
+        addNode(node);
+    }
+}
+
+void LaneMap::removeNode(OptimizeNode* node)
+{
+    for (int laneIndex : node->laneIndices())
+    {
+        (*this)[laneIndex].remove(node);
+        if ((*this)[laneIndex].empty())
+            remove(laneIndex);
+    }
+}
+
+void LaneMap::buildKdtree()
+{
+    for (LaneMap::Iterator i = begin(); i != end(); i++)
+    {
+        i.value().buildKdtree();
+    }
+}
+
+Lane& LaneMap::nearestLane(OptimizeNode* node)
+{
+    return nearestLane(node->currentPos());
+}
+
+Lane& LaneMap::nearestLane(const LaserPoint& point)
+{
+    int index = point.laneIndex();
+    int lastKey = firstKey();
+    for (LaneMap::Iterator i = this->begin(); i != this->end(); i++)
+    {
+        if (index <= i.key())
+        {
+            int diff1 = qAbs(index - lastKey);
+            int diff2 = qAbs(index - i.key());
+            return diff1 <= diff2 ? (*this)[lastKey] : i.value();
+        }
+    }
+    return last();
+}
+
+OptimizeNode* LaneMap::nearestSearch(OptimizeNode* node, bool remove, QSet<OptimizeNode*>& externNodes)
+{
+    Lane& lane = nearestLane(node->currentPos());
+    if (!externNodes.empty())
+        lane.intersect(externNodes);
+    //lane.buildKdtree();
+    OptimizeNode* dstNode = lane.nearestSearch(node, remove);
+    if (remove)
+    {
+        this->removeNode(node);
+    }
+    return dstNode;
+}
+

@@ -3,6 +3,8 @@
 #include <QtMath>
 #include <QDebug>
 
+#include "common/Config.h"
+
 LaserPoint::LaserPoint()
     : m_x(0)
     , m_y(0)
@@ -36,6 +38,14 @@ int LaserPoint::vectorSize()
 qreal* LaserPoint::vector()
 {
     return m_vec;
+}
+
+int LaserPoint::laneIndex() const
+{
+    qreal coord = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?
+        m_y : m_x;
+    int index = qRound(coord / (Config::PathOptimization::groupingGridInterval() * 1000));
+    return index;
 }
 
 LaserPoint& LaserPoint::operator+=(const LaserPoint& laserPoint)

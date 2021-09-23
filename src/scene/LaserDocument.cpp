@@ -1032,6 +1032,7 @@ void LaserDocument::outlineByLayers(OptimizeNode* node)
         {
             addPrimitiveToNodesTree(primitive, layer->optimizeNode());
         }
+        //optimizeGroups(layer->optimizeNode());
     }
 }
 
@@ -1066,7 +1067,7 @@ void LaserDocument::clearTree(OptimizeNode* node)
         qDeleteAll(deletingNodes);
 }
 
-void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
+void LaserDocument::optimizeGroups(OptimizeNode* node, int level, bool sorted)
 {
     qLogD << "node " << node->nodeName() << " has " << node->childCount() << " child nodes.";
     if (!node->hasChildren())
@@ -1074,54 +1075,87 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level)
         return;
     }
 
-    QMap<int, QList<OptimizeNode*>> childrenMap;
-    for (OptimizeNode* node : node->childNodes())
-    {
-        int groupIndex = 0;
-        if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
-        {
-            groupIndex = node->position().y() / Config::PathOptimization::groupingGridInterval();
-        }
-        else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
-        {
-            groupIndex = node->position().x() / Config::PathOptimization::groupingGridInterval();
-        }
-        childrenMap[groupIndex].append(node);
-    }
-    qLogD << "  child nodes were seperated into " << childrenMap.size() << " groups by grid.";
-
-    if (childrenMap.size() > 1)
-    {
-        // 清空当前的子节点列表。
-        node->childNodes().clear();
-        for (QMap<int, QList<OptimizeNode*>>::Iterator i = childrenMap.begin(); i != childrenMap.end(); i++)
-        {
-            OptimizeNode* newNode = new OptimizeNode();
-            QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-            newNode->setNodeName(nodeName);
-            newNode->addChildNodes(i.value());
-            node->addChildNode(newNode);
-
-            // 递归调用
-            optimizeGroups(newNode, level + 1);
-        }
-    }
-
-    // 获取当前节点的所有子节点，进行排序。
     QList<OptimizeNode*> children = node->childNodes();
-    qSort(children.begin(), children.end(), 
-        [=](OptimizeNode* a, OptimizeNode* b) -> bool {
+    if (!sorted)
+    {
+        // 将当前节点下的子节点按行或列分到不同的组中
+        QMap<int, QList<OptimizeNode*>> childrenMap;
+        for (OptimizeNode* node : node->childNodes())
+        {
+            int groupIndex = 0;
             if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
             {
-                return a->position().x() < b->position().x();
+                groupIndex = Global::convertToMM(SU_PX, node->position().y()) / Config::PathOptimization::groupingGridInterval();
             }
             else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
             {
-                return a->position().y() < b->position().y();
+                groupIndex = Global::convertFromMM(SU_PX, node->position().x()) / Config::PathOptimization::groupingGridInterval();
             }
-            return false;
+            childrenMap[groupIndex].append(node);
         }
-    );
+        qLogD << "  child nodes were seperated into " << childrenMap.size() << " groups by grid.";
+
+        if (childrenMap.size() > 1)
+        {
+            // 清空当前的子节点列表。
+            node->childNodes().clear();
+
+            // 加入新排列的子节点列表
+            for (QMap<int, QList<OptimizeNode*>>::Iterator i = childrenMap.begin(); i != childrenMap.end(); i++)
+            {
+                OptimizeNode* newNode = new OptimizeNode();
+                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+                newNode->setNodeName(nodeName);
+                newNode->addChildNodes(i.value());
+                node->addChildNode(newNode);
+
+                // 递归调用
+                //optimizeGroups(newNode, level + 1);
+            }
+        }
+
+        // 获取当前节点的所有子节点，进行排序。
+        children = node->childNodes();
+        qSort(children.begin(), children.end(),
+            [=](OptimizeNode* a, OptimizeNode* b) -> bool {
+                if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+                {
+                    return a->position().x() < b->position().x();
+                }
+                else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+                {
+                    return a->position().y() < b->position().y();
+                }
+                return false;
+            }
+        );
+    }
+
+    // 获取每个分组中子节点的最大个数。
+    int maxChildNodes = Config::PathOptimization::maxGroupSize();
+    // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
+    // 新建一个父节点，将该父节点作为当前父节点的子节点。
+    if (children.count() > maxChildNodes)
+    {
+        node->childNodes().clear();
+        OptimizeNode* newNode = nullptr;
+        for (int i = 0, count = 0; i < children.count(); i++)
+        {
+            if ((count++ % maxChildNodes) == 0)
+            {
+                newNode = new OptimizeNode();
+                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+                newNode->setNodeName(nodeName);
+                node->addChildNode(newNode);
+            }
+            newNode->addChildNode(children.at(i));
+        }
+        qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
+
+        // 如果子对象数量还是多于最大数，则再递归处理
+        if (node->childCount() > maxChildNodes)
+            optimizeGroups(node, level, true);
+    }
 
     // 对每一个子节点再次递归进行整理。
     for (OptimizeNode* item : node->childNodes())
