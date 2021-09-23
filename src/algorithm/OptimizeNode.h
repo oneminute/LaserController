@@ -45,8 +45,8 @@ public:
     OptimizeNode* parentNode() const;
     void setParentNode(OptimizeNode* parent);
 
-    QList<OptimizeNode*> findAllLeaves(OptimizeNode* exclude = nullptr);
-    QList<OptimizeNode*> findLeaves();
+    QSet<OptimizeNode*> findAllLeaves(const QSet<OptimizeNode*>& excludes = QSet<OptimizeNode*>());
+    QSet<OptimizeNode*> findLeaves(const QSet<OptimizeNode*>& excludes = QSet<OptimizeNode*>());
     QSet<OptimizeNode*> findSiblings(bool onlyLeaves = false);
     void findSiblings(QSet<OptimizeNode*>& leaves, QSet<OptimizeNode*>& branches,
         const QSet<OptimizeNode*>& excludes = QSet<OptimizeNode*>());

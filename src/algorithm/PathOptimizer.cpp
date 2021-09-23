@@ -58,6 +58,21 @@ PathOptimizer::~PathOptimizer()
     Q_D(PathOptimizer);
 }
 
+void PathOptimizer::arriveNode(OptimizeNode* node, QSet<OptimizeNode*>& travelled)
+{
+    Q_D(PathOptimizer);
+    if (node->nodeType() == LNT_PRIMITIVE)
+    {
+        d->optimizedPath.append(node);
+    }
+    // 将该点从父节点的子节点中移除
+    if (node->parentNode())
+        node->parentNode()->removeChildNode(node);
+    d->currentNode = node;
+    travelled.insert(node);
+    qLogD << "arrived " << node->nodeName();
+}
+
 void PathOptimizer::optimize()
 {
     Q_D(PathOptimizer);
@@ -168,7 +183,7 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
             QString label = QString("%1 -> %2").arg(node->nodeName()).arg(node->parentNode()->nodeName());
 
             // find all child nodes from its siblings
-            QList<OptimizeNode*> siblingChildren = node->parentNode()->findAllLeaves(node);
+            QSet<OptimizeNode*> siblingChildren = node->parentNode()->findAllLeaves(QSet<OptimizeNode*>() << node);
             for (OptimizeNode* leafNode : siblingChildren)
             {
                 OptimizeEdge* edge = new OptimizeEdge(node, leafNode);
@@ -272,10 +287,10 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root)
         OptimizeNode* node = stack.pop();
         node->clearEdges();
         node->update((quint32)this, 1.0 * 0.9 / d->totalNodes);
-        laneMap.addNode(node);
 
         if (node->isLeaf())
         {
+            laneMap.addNode(node);
             leaves.insert(node);
         }
 
@@ -289,38 +304,80 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root)
     QSet<OptimizeNode*> travelled;
     // 找到第一个最优节点
     OptimizeNode* firstNode = laneMap.nearestSearch(d->currentNode, true, leaves);
-    d->currentNode = firstNode;
-    while (travelled.count() != leaves.count())
+    arriveNode(firstNode, travelled);
+    //while (travelled.count() != leaves.count())
+    while (d->currentNode != root)
     {
-        if (d->currentNode->nodeType() == LNT_PRIMITIVE)
+        /*if (d->currentNode->nodeType() == LNT_PRIMITIVE)
         {
             travelled.insert(d->currentNode);
-        }
+        }*/
 
         // 搜索所有的兄弟节点
         QSet<OptimizeNode*> siblingLeaves;
         QSet<OptimizeNode*> siblingBranches;
         d->currentNode->findSiblings(siblingLeaves, siblingBranches, travelled);
 
-        laneMap.clear();
-        laneMap.addNodes(siblingLeaves);
-        laneMap.buildKdtree();
+        // 对该组兄弟叶节点建立最优路径
+        if (!siblingLeaves.empty())
+            optimizeNodes(siblingLeaves, travelled);
 
-        while (!siblingLeaves.empty())
+        // 搜索所有的兄弟分支节点下的叶节点
+        QSet<OptimizeNode*> branchLeaves;
+        for (OptimizeNode* branch : siblingBranches)
         {
-            // 在兄弟节点中找最优点
-            OptimizeNode* leaveNode = laneMap.nearestSearch(d->currentNode, true);
-
-            // 将该点从兄弟叶节点集合中移除
-            siblingLeaves.remove(leaveNode);
-
-            // 将该点从父节点的子节点中移除
-            leaveNode->parentNode()->removeChildNode(leaveNode);
-
-            d->currentNode = leaveNode;
-            travelled.insert(leaveNode);
-            qLogD << "arrived " << leaveNode->nodeName();
+            branchLeaves.unite(branch->findAllLeaves(travelled));
         }
+
+        if (branchLeaves.isEmpty())
+        {
+            // 若叶节点为空，则设置父节点为当前节点
+            OptimizeNode* parentNode = d->currentNode->parentNode();
+            if (!parentNode || parentNode == root)
+                break;
+
+            if (parentNode->isVirtual())
+            {
+                parentNode->setCurrentPos(d->currentNode->currentPos());
+            }
+            else
+            {
+                LaserPoint point = parentNode->nearestPoint(d->currentNode);
+                //LaserApplication::previewWindow->addLine(QLineF(d->currentNode->currentPos().toPointF(),
+                    //point.toPointF()), QPen(Qt::black, 2));
+            }
+            arriveNode(parentNode, travelled);
+        }
+        else
+        {
+            // 找到最佳叶结点，设置为当前节点
+            laneMap = LaneMap();
+            laneMap.addNodes(branchLeaves);
+            laneMap.buildKdtree();
+            OptimizeNode* firstNode = laneMap.nearestSearch(d->currentNode, true, leaves);
+            arriveNode(firstNode, travelled);
+        }
+    }
+}
+
+void PathOptimizer::optimizeNodes(QSet<OptimizeNode*>& siblingLeaves, QSet<OptimizeNode*>& travelled)
+{
+    Q_D(PathOptimizer);
+    LaneMap laneMap;
+    laneMap.addNodes(siblingLeaves);
+    laneMap.buildKdtree();
+
+    while (!siblingLeaves.empty())
+    {
+        // 在兄弟节点中找最优点
+        OptimizeNode* leaveNode = laneMap.nearestSearch(d->currentNode, true);
+        if (!leaveNode)
+            break;
+
+        // 将该点从兄弟叶节点集合中移除
+        siblingLeaves.remove(leaveNode);
+
+        arriveNode(leaveNode, travelled);
     }
 }
 
@@ -395,6 +452,12 @@ Lane::~Lane()
 {
 }
 
+void Lane::removeNode(OptimizeNode* node)
+{
+    m_pointList.removeNode(node);
+    this->remove(node);
+}
+
 void Lane::buildKdtree()
 {
     m_pointList.clear();
@@ -406,7 +469,7 @@ OptimizeNode* Lane::nearestSearch(OptimizeNode* node, bool remove)
 {
     OptimizeNode* dstNode = m_pointList.nearestSearch(node, remove);
     if (remove)
-        this->remove(dstNode);
+        this->removeNode(dstNode);
     return dstNode;
 }
 
@@ -439,7 +502,7 @@ void LaneMap::removeNode(OptimizeNode* node)
 {
     for (int laneIndex : node->laneIndices())
     {
-        (*this)[laneIndex].remove(node);
+        (*this)[laneIndex].removeNode(node);
         if ((*this)[laneIndex].empty())
             remove(laneIndex);
     }
@@ -476,6 +539,9 @@ Lane& LaneMap::nearestLane(const LaserPoint& point)
 
 OptimizeNode* LaneMap::nearestSearch(OptimizeNode* node, bool remove, QSet<OptimizeNode*>& externNodes)
 {
+    if (empty())
+        return nullptr;
+
     Lane& lane = nearestLane(node->currentPos());
     if (!externNodes.empty())
         lane.intersect(externNodes);
@@ -483,7 +549,7 @@ OptimizeNode* LaneMap::nearestSearch(OptimizeNode* node, bool remove, QSet<Optim
     OptimizeNode* dstNode = lane.nearestSearch(node, remove);
     if (remove)
     {
-        this->removeNode(node);
+        this->removeNode(dstNode);
     }
     return dstNode;
 }

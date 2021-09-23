@@ -261,9 +261,9 @@ void OptimizeNode::setParentNode(OptimizeNode* parent)
     d->parentNode = parent;
 }
 
-QList<OptimizeNode*> OptimizeNode::findAllLeaves(OptimizeNode* exclude)
+QSet<OptimizeNode*> OptimizeNode::findAllLeaves(const QSet<OptimizeNode*>& excludes)
 {
-    QList<OptimizeNode*> leaves;
+    QSet<OptimizeNode*> leaves;
     QStack<OptimizeNode*> stack;
 
     stack.push(this);
@@ -271,31 +271,30 @@ QList<OptimizeNode*> OptimizeNode::findAllLeaves(OptimizeNode* exclude)
     {
         OptimizeNode* laserNode = stack.pop();
 
-        if (!laserNode->hasChildren())
+        if (laserNode->isLeaf() && !excludes.contains(laserNode))
         {
-            leaves.append(laserNode);
+            leaves.insert(laserNode);
             continue;
         }
 
         for (OptimizeNode* childNode : laserNode->childNodes())
         {
-            if (childNode == exclude)
-                continue;
-
             stack.push(childNode);
         }
     }
     return leaves;
 }
 
-QList<OptimizeNode*> OptimizeNode::findLeaves()
+QSet<OptimizeNode*> OptimizeNode::findLeaves(const QSet<OptimizeNode*>& excludes)
 {
-    QList<OptimizeNode*> leaves;
+    QSet<OptimizeNode*> leaves;
     for (OptimizeNode* childNode : childNodes())
     {
-        if (childNode->hasChildren())
+        if (excludes.contains(childNode))
             continue;
-        leaves.append(childNode);
+
+        if (childNode->isLeaf())
+            leaves.insert(childNode);
     }
     return leaves;
 }

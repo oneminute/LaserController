@@ -25,6 +25,8 @@ public:
         QObject* parent = nullptr);
     virtual ~PathOptimizer();
 
+    void arriveNode(OptimizeNode* node, QSet<OptimizeNode*>& travelled);
+
     Path optimizedPath() const;
 
 public slots:
@@ -37,6 +39,8 @@ signals:
 protected:
     void optimizeLayer(OptimizeNode* root);
     void optimizeFrom(OptimizeNode* root);
+
+    void optimizeNodes(QSet<OptimizeNode*>& siblingLeaves, QSet<OptimizeNode*>& travelled);
 
     void printNodeAndEdges();
 
@@ -78,6 +82,8 @@ class Lane : public QSet<OptimizeNode*>
 public:
     Lane();
     ~Lane();
+
+    void removeNode(OptimizeNode* node);
 
     void buildKdtree();
     OptimizeNode* nearestSearch(OptimizeNode* node, bool remove = false);
