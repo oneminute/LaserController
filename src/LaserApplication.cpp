@@ -44,6 +44,7 @@ LaserApplication::~LaserApplication()
 
 bool LaserApplication::initialize()
 {
+    QString appShortName("CNELaser");
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
     LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
@@ -80,7 +81,7 @@ bool LaserApplication::initialize()
     //QLocale locale(QLocale::Chinese);
     qLogD << "language code: " << Config::General::language() << ", " << QLocale::Chinese;
     qLogD << "language name: " << QLocale::languageToString(locale.language());
-    if (translator.load(locale, applicationName(), QLatin1String("_"), QLatin1String("translations")))
+    if (translator.load(locale, appShortName, QLatin1String("_"), QLatin1String("translations")))
     {
         qDebug() << "load translation file." << applicationName() << locale.name();
         installTranslator(&translator);
@@ -94,7 +95,8 @@ bool LaserApplication::initialize()
     }
 
     QLocale::setDefault(locale);
-    Config::load();
+    //Config::load();
+    Config::updateTitlesAndDescriptions();
 
     QFile file("theme/Dark.qss");
     if (file.open(QFile::ReadOnly | QFile::Text))

@@ -136,6 +136,8 @@ public:
     /// </summary>
     QMap<QString, QVariant> inputWidgetProperties;
 
+    QMap<QString, QVariant> extraProperties;
+
     QList<QWidget*> widgets;
 
     ModifiedBy modifiedBy;
@@ -155,8 +157,8 @@ public:
 ConfigItem::ConfigItem(
     const QString& name
     , ConfigItemGroup* group
-    , const QString& title
-    , const QString& description
+    //, const QString& title
+    //, const QString& description
     , const QVariant& value
     , DataType dataType
     , bool advanced
@@ -168,8 +170,8 @@ ConfigItem::ConfigItem(
     Q_D(ConfigItem);
     d->name = name;
     d->group = group;
-    d->title = title;
-    d->description = description;
+    //d->title = title;
+    //d->description = description;
     d->value = value;
     d->dirtyValue = value;
     d->defaultValue = value;
@@ -239,10 +241,28 @@ QString ConfigItem::title() const
     return d->title;
 }
 
+void ConfigItem::setTitle(const QString& title)
+{
+    Q_D(ConfigItem);
+    d->title = title;
+}
+
 QString ConfigItem::description() const
 {
     Q_D(const ConfigItem);
     return d->description;
+}
+
+void ConfigItem::setDescription(const QString& description)
+{
+    Q_D(ConfigItem);
+    d->description = description;
+}
+
+void ConfigItem::setTitleAndDesc(const QString& title, const QString& desc)
+{
+    setTitle(title);
+    setDescription(desc);
 }
 
 bool ConfigItem::isAdvanced() const
@@ -504,6 +524,24 @@ void ConfigItem::setInputWidgetProperty(const QString& key, const QVariant& valu
     {
         d->inputWidgetProperties.insert(key, value);
     }
+}
+
+QVariantMap& ConfigItem::extraProperties()
+{
+    Q_D(ConfigItem);
+    return d->extraProperties;
+}
+
+void ConfigItem::setExtraProperty(const QString& key, const QVariant& value)
+{
+    Q_D(ConfigItem);
+    d->extraProperties[key] = value;
+}
+
+QVariant& ConfigItem::extraProperty(const QString& key)
+{
+    Q_D(ConfigItem);
+    return d->extraProperties[key];
 }
 
 ConfigItem::WidgetInitializeHook ConfigItem::widgetInitializeHook()
@@ -825,18 +863,6 @@ void ConfigItem::confirm()
     Q_D(ConfigItem);
     if (d->storeStrategy == SS_CONFIRMED)
         d->value = d->dirtyValue;
-}
-
-void ConfigItem::setName(const QString& name)
-{
-    Q_D(ConfigItem);
-    d->name = name;
-}
-
-void ConfigItem::setDescription(const QString& description)
-{
-    Q_D(ConfigItem);
-    d->description = description;
 }
 
 void ConfigItem::onRegisterLoaded(const QVariant& value)

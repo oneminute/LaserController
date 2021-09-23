@@ -51,7 +51,7 @@ public:
     static QString configFilePath();
     static bool isModified();
     static QList<ConfigItemGroup*> getGroups();
-    static void refreshTranslation();
+    static void updateTitlesAndDescriptions();
     static void destroy();
 
 protected:
@@ -120,10 +120,10 @@ public:
         CONFIG_ITEM(ui, visualGridSpacing, qreal, toDouble)
         CONFIG_ITEM(ui, gridShapeDistance, qreal, toDouble)
         CONFIG_ITEM(ui, objectShapeDistance, qreal, toDouble)
-        CONFIG_ITEM(ui, clickSelectiontTolerance, qreal, toDouble)
+        CONFIG_ITEM(ui, clickSelectionTolerance, qreal, toDouble)
         CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
         CONFIG_ITEM(ui, autoRepeatDelay, int, toInt)
-        CONFIG_ITEM(ui, autoRepeatInterval, int, toInt)
+        //CONFIG_ITEM(ui, autoRepeatInterval, int, toInt)
 
     private:
         friend class Config;
@@ -141,8 +141,8 @@ public:
         CONFIG_ITEM(cuttingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(cuttingLayer, runSpeed, int, toInt)
         CONFIG_ITEM(cuttingLayer, laserPower, int, toInt)
-        CONFIG_ITEM(cuttingLayer, minPowerRate, int, toInt)
-        CONFIG_ITEM(cuttingLayer, maxPowerRate, int, toInt)
+        CONFIG_ITEM(cuttingLayer, minPower, int, toInt)
+        CONFIG_ITEM(cuttingLayer, maxPower, int, toInt)
 
     private:
         friend class Config;
@@ -160,8 +160,9 @@ public:
         CONFIG_ITEM(engravingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, runSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, laserPower, int, toInt)
-        CONFIG_ITEM(engravingLayer, minPowerRate, int, toInt)
-        CONFIG_ITEM(engravingLayer, maxPowerRate, int, toInt)
+        CONFIG_ITEM(engravingLayer, minPower, int, toInt)
+        CONFIG_ITEM(engravingLayer, maxPower, int, toInt)
+        CONFIG_ITEM(engravingLayer, rowInterval, int, toInt)
         CONFIG_ITEM(engravingLayer, useHalftone, bool, toBool)
         CONFIG_ITEM(engravingLayer, LPI, int, toInt)
         CONFIG_ITEM(engravingLayer, DPI, int, toInt)
@@ -179,15 +180,10 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(pathOptimization, maxAnts, int, toInt)
-        CONFIG_ITEM(pathOptimization, maxIterations, int, toInt)
-        CONFIG_ITEM(pathOptimization, maxTraverse, int, toInt)
-        CONFIG_ITEM(pathOptimization, volatileRate, qreal, toReal)
-        CONFIG_ITEM(pathOptimization, useGreedyAlgorithm, bool, toBool)
         CONFIG_ITEM(pathOptimization, maxStartingPoints, int, toInt)
-        CONFIG_ITEM(pathOptimization, startingPointAnglesDiff, qreal, toReal)
         CONFIG_ITEM(pathOptimization, groupingOrientation, int, toInt)
-        CONFIG_ITEM(pathOptimization, maxGroupingGridSize, qreal, toReal)
+        CONFIG_ITEM(pathOptimization, groupingGridInterval, qreal, toReal)
+        CONFIG_ITEM(pathOptimization, maxGroupSize, int, toInt)
         CONFIG_ITEM(pathOptimization, searchingXYWeight, qreal, toReal)
 
     private:
@@ -205,10 +201,9 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(export, maxAnglesDiff, qreal, toReal)
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
-        CONFIG_ITEM(export, maxStartingPoints, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
-        CONFIG_ITEM(export, relativePoint, bool, toBool)
+        CONFIG_ITEM(export, enableRelativeCoordinates, bool, toBool)
 
     private:
         friend class Config;
@@ -223,7 +218,7 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(device, autoConnectFirst, bool, toBool)
+        CONFIG_ITEM(device, autoConnectFirstCOM, bool, toBool)
 
         CONFIG_ITEM(device, startFrom, int, toInt)
         CONFIG_ITEM(device, jobOrigin, int, toInt)

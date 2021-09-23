@@ -39,8 +39,8 @@ void LaserPointList::buildKdtree()
     qreal w1 = Config::PathOptimization::searchingXYWeight() / 2;
     qreal w2 = 1 - w1 * 2;
     qreal n = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?
-        LaserApplication::device->layoutWidth() / Config::PathOptimization::maxGroupingGridSize() :
-        LaserApplication::device->layoutHeight() / Config::PathOptimization::maxGroupingGridSize();
+        LaserApplication::device->layoutWidth() / Config::PathOptimization::groupingGridInterval() :
+        LaserApplication::device->layoutHeight() / Config::PathOptimization::groupingGridInterval();
     m_weights[0] = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?
         2 * n * w1 / (n + 1) : 2 * w1 / (n + 1);
     m_weights[1] = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?

@@ -158,7 +158,7 @@ protected slots:
     void onActionDeletePrimitive(bool checked = false);
 	void onActionCopy(bool checked = false);
 	void onActionPaste(bool checked = false);
-	void onActionPasteInLine(bool checked = false);
+	void onActionPasteInPlace(bool checked = false);
 	void onActionCut(bool checked = false);
 	void onActionDuplication(bool checked = false);
 	void onActionGroup(bool checked = false);
@@ -244,7 +244,7 @@ protected slots:
 
     // config items
     void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
-    void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
+    //void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
 
     
 

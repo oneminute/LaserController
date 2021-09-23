@@ -64,15 +64,17 @@ void ConfigItemGroup::addConfigItem(ConfigItem* item)
     d->itemsMap.insert(item->name(), item);
 }
 
-ConfigItem* ConfigItemGroup::addConfigItem(const QString& name, const QString& title, 
-    const QString& description, const QVariant& value, DataType dataType, bool advanced, 
+ConfigItem* ConfigItemGroup::addConfigItem(const QString& name
+    //, const QString& title
+    //, const QString& description
+    , const QVariant& value, DataType dataType, bool advanced, 
     bool visible, StoreStrategy storeStrategy)
 {
     ConfigItem* item = new ConfigItem(
         name
         , this
-        , title
-        , description
+        //, title
+        //, description
         , value
         , dataType
         , advanced
@@ -145,6 +147,13 @@ void ConfigItemGroup::confirm()
     {
         item->confirm();
     }
+}
+
+void ConfigItemGroup::updateTitleAndDesc(const QString& title, const QString& desc)
+{
+    Q_D(ConfigItemGroup);
+    d->title = title;
+    d->description = desc;
 }
 
 

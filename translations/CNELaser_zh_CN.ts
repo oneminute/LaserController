@@ -161,17 +161,19 @@
 <context>
     <name>Config</name>
     <message>
-        <location filename="../src/common/Config.cpp" line="118"/>
+        <location filename="../src/common/Config.cpp" line="138"/>
         <source>Save config file error.</source>
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="152"/>
+        <location filename="../src/common/Config.cpp" line="2499"/>
+        <location filename="../src/common/Config.cpp" line="2503"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="153"/>
+        <location filename="../src/common/Config.cpp" line="2500"/>
+        <location filename="../src/common/Config.cpp" line="2504"/>
         <source>Language for both UI and Business.</source>
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
@@ -184,1226 +186,1925 @@
         <translation type="vanished">中文</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="178"/>
         <source>Unit</source>
-        <translation>单位</translation>
+        <translation type="vanished">单位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="179"/>
         <source>Global unit</source>
-        <translation>全局单位</translation>
+        <translation type="vanished">全局单位</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="191"/>
+        <location filename="../src/common/Config.cpp" line="209"/>
         <source>mm</source>
-        <translation></translation>
+        <translation>mm</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="206"/>
+        <location filename="../src/common/Config.cpp" line="2507"/>
+        <source>Machining Unit</source>
+        <translation>加工单位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2511"/>
+        <location filename="../src/common/Config.cpp" line="2512"/>
         <source>Max Layers Count</source>
         <translation>最大图层数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="207"/>
         <source>Max Layers count.</source>
-        <translation>最大图层数。</translation>
+        <translation type="vanished">最大图层数。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="222"/>
         <source>Operation Button Icon Size</source>
-        <translation>操作按钮图标尺寸</translation>
+        <translation type="vanished">操作按钮图标尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="223"/>
         <source>Size of operation buttons&apos; icons.</source>
-        <translation type="unfinished">操作按钮图标的尺寸。</translation>
+        <translation type="vanished">操作按钮图标的尺寸。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="231"/>
         <source>Operation Button Width</source>
-        <translation type="unfinished">操作按钮宽</translation>
+        <translation type="vanished">操作按钮宽</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="232"/>
         <source>Width of operation buttons.</source>
-        <translation type="unfinished">操作按钮的宽度。</translation>
+        <translation type="vanished">操作按钮的宽度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="240"/>
         <source>Operation Button Height</source>
-        <translation type="unfinished">操作按钮高</translation>
+        <translation type="vanished">操作按钮高</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="241"/>
         <source>Height of operation buttons.</source>
-        <translation type="unfinished">操作按钮的高度。</translation>
+        <translation type="vanished">操作按钮的高度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="249"/>
+        <location filename="../src/common/Config.cpp" line="2527"/>
         <source>Show Operation Button Text</source>
-        <translation type="unfinished"></translation>
+        <translation>显示操作按钮的文字</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="250"/>
         <source>Show text of operation button or not.</source>
-        <translation type="unfinished">是否显示操作按钮的文字。</translation>
+        <translation type="vanished">是否显示操作按钮的文字。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="258"/>
         <source>Tool Button Size</source>
-        <translation type="unfinished">工具按钮尺寸</translation>
+        <translation type="vanished">工具按钮尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="259"/>
         <source>Size of tool buttons.</source>
-        <translation type="unfinished">工具按钮的尺寸。</translation>
+        <translation type="vanished">工具按钮的尺寸。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="267"/>
         <source>Color Button Width</source>
-        <translation type="unfinished">色块按钮宽</translation>
+        <translation type="vanished">色块按钮宽</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="268"/>
         <source>Width of color buttons.</source>
-        <translation type="unfinished">色块按钮的宽度。</translation>
+        <translation type="vanished">色块按钮的宽度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="276"/>
         <source>Color Button Height</source>
-        <translation type="unfinished">色块按钮高</translation>
+        <translation type="vanished">色块按钮高</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="277"/>
         <source>Height of color buttons.</source>
-        <translation type="unfinished">色块按钮的高度。</translation>
+        <translation type="vanished">色块按钮的高度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="285"/>
+        <location filename="../src/common/Config.cpp" line="2543"/>
         <source>Grid Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>网格对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="286"/>
         <source>Grid contrast</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">网格的对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="298"/>
+        <location filename="../src/common/Config.cpp" line="2545"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>不显示网格</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="299"/>
+        <location filename="../src/common/Config.cpp" line="2546"/>
         <source>Low Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>低对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="300"/>
+        <location filename="../src/common/Config.cpp" line="2547"/>
         <source>Medium Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>中对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="301"/>
+        <location filename="../src/common/Config.cpp" line="2548"/>
         <source>High Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>高对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="310"/>
         <source>Grid Shape Distance</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">网格捕获距离</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="311"/>
-        <source>(Pixel)</source>
-        <translation type="unfinished"></translation>
+        <source>Splitter Handle Width</source>
+        <translation type="vanished">分割手柄宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="320"/>
-        <source>Visual Grid Spacing</source>
-        <translation type="unfinished"></translation>
+        <source>Auto repeat delay</source>
+        <translation type="vanished">连动按钮超时值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="321"/>
-        <source>(mm)</source>
-        <translation type="unfinished"></translation>
+        <source>Auto repeat delay when press down on a button</source>
+        <translation type="vanished">当长按按钮时触发连动前的等待时长</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="335"/>
-        <location filename="../src/common/Config.cpp" line="396"/>
         <source>Min Speed</source>
-        <translation type="unfinished">起跳速度</translation>
+        <translation type="vanished">起跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="336"/>
         <source>Min speed for cutting layers.</source>
-        <translation type="unfinished">切割图层的起跳速度。</translation>
+        <translation type="vanished">切割图层的起跳速度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="346"/>
-        <location filename="../src/common/Config.cpp" line="407"/>
         <source>Run Speed</source>
-        <translation type="unfinished">运行速度</translation>
+        <translation type="vanished">运行速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="347"/>
-        <source>Running speed for cutting layers.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="357"/>
-        <location filename="../src/common/Config.cpp" line="418"/>
         <source>Laser Power</source>
-        <translation type="unfinished">激光功率</translation>
+        <translation type="vanished">激光功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="358"/>
         <source>Laser power for cutting layers.</source>
-        <translation type="unfinished">切割图层的切割功率。</translation>
+        <translation type="vanished">切割图层的切割功率。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="368"/>
-        <location filename="../src/common/Config.cpp" line="429"/>
         <source>Min Power Rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">最小功率比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="369"/>
         <source>The minimum power rate for cutting layers</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">切割图层中的最小功率比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="379"/>
-        <location filename="../src/common/Config.cpp" line="441"/>
         <source>Max Power Rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">最大功率比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="380"/>
         <source>The maximum power rate for cutting layers</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">切割图层中的最大功率比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="397"/>
         <source>Min speed for engraving layers.</source>
-        <translation type="unfinished">雕刻图层的起跳速度。</translation>
+        <translation type="vanished">雕刻图层的起跳速度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="408"/>
         <source>Running speed for engraving layers.</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">雕刻图层中的加工速度。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="419"/>
         <source>Laser power for engraving layers.</source>
-        <translation type="unfinished">雕刻图层的激光功率。</translation>
+        <translation type="vanished">雕刻图层的激光功率。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="430"/>
         <source>The minimum power rate for engraving layers</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">雕刻图层中的最小功率比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="442"/>
         <source>The maximum power rate for engraving layers</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">雕刻图层中的最大功率比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="452"/>
+        <source>Row interval</source>
+        <translation type="vanished">行像素间隔</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2619"/>
+        <location filename="../src/common/Config.cpp" line="2623"/>
         <source>Use Halftone</source>
-        <translation type="unfinished">使用半色调算法</translation>
+        <translation>使用半色调算法</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="453"/>
         <source>Use halftone algorithm for bitmaps.</source>
-        <translation type="unfinished">对位图使用半色调算法。</translation>
+        <translation type="vanished">对位图使用半色调算法。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="460"/>
+        <location filename="../src/common/Config.cpp" line="2627"/>
         <source>LPI</source>
-        <translation type="unfinished">每英寸线数</translation>
+        <translation>每英寸线数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="461"/>
         <source>Lines per inch.</source>
-        <translation type="unfinished">每英寸的线数。</translation>
+        <translation type="vanished">每英寸的线数。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="470"/>
+        <location filename="../src/common/Config.cpp" line="2631"/>
         <source>DPI</source>
-        <translation type="unfinished">每英寸点数</translation>
+        <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="471"/>
         <source>Dots per inch.</source>
-        <translation type="unfinished">每英寸的点数。</translation>
+        <translation type="vanished">每英寸的点数。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="486"/>
         <source>Max ants</source>
-        <translation type="unfinished">最大蚂蚁数</translation>
+        <translation type="vanished">最大蚂蚁数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="487"/>
         <source>Max ants count.</source>
-        <translation type="unfinished">最大蚂蚁的数量。</translation>
+        <translation type="vanished">最大蚂蚁的数量。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="495"/>
         <source>Max Iterations</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">最大迭代数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="496"/>
         <source>Max iterations count.</source>
-        <translation type="unfinished">最大迭代的数量。</translation>
+        <translation type="vanished">最大迭代的数量。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="504"/>
         <source>Max Traverse</source>
-        <translation type="unfinished">最大遍历数</translation>
+        <translation type="vanished">最大遍历数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="505"/>
         <source>Max Traverse count.</source>
-        <translation type="unfinished">最大的遍历次数。一只蚂蚁遍历所有节点是一次遍历。</translation>
+        <translation type="vanished">最大的遍历次数。一只蚂蚁遍历所有节点是一次遍历。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="513"/>
         <source>Volatile Rate</source>
-        <translation type="unfinished">挥发速率</translation>
+        <translation type="vanished">挥发速率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="514"/>
         <source>Volatile of pheromones each iteration.</source>
-        <translation type="unfinished">信息素在每次迭代中的挥发速率。</translation>
+        <translation type="vanished">信息素在每次迭代中的挥发速率。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="526"/>
         <source>Use Greedy Algorithm</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">使用贪婪算法</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="527"/>
         <source>Use greedy algorithm form path optimization.</source>
-        <translation type="unfinished">是否在路径优化中使用贪婪算法。</translation>
+        <translation type="vanished">是否在路径优化中使用贪婪算法。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="534"/>
+        <location filename="../src/common/Config.cpp" line="2635"/>
         <source>Max Starting Points</source>
-        <translation type="unfinished"></translation>
+        <translation>最大起刀点数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="535"/>
         <source>Max starting points of each primitive.</source>
-        <translation type="unfinished">每一个图元的最大起刀点数。</translation>
+        <translation type="vanished">每一个图元的最大起刀点数。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="543"/>
-        <location filename="../src/common/Config.cpp" line="560"/>
+        <location filename="../src/common/Config.cpp" line="2659"/>
         <source>Max Angles Diff</source>
-        <translation type="unfinished">最大角度差</translation>
+        <translation>最大角度差</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="544"/>
         <source>Max angles between starting points.</source>
-        <translation type="unfinished">两个相邻起刀点间的最大角度差。</translation>
+        <translation type="vanished">两个相邻起刀点间的最大角度差。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="561"/>
+        <location filename="../src/common/Config.cpp" line="2639"/>
+        <source>Grouping Orientation</source>
+        <translation>分组方向</translation>
+    </message>
+    <message>
+        <source>Grouping orientation</source>
+        <translation type="vanished">按行还是按列分组</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="547"/>
+        <source>Horizontal</source>
+        <translation>水平</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="548"/>
+        <source>Vertical</source>
+        <translation>垂直</translation>
+    </message>
+    <message>
+        <source>Max grouping grid size</source>
+        <translation type="vanished">分组最大间隔</translation>
+    </message>
+    <message>
+        <source>Max grouping grid size.</source>
+        <translation type="vanished">按行或按列分组时行或列间的最大间隔。</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2651"/>
+        <location filename="../src/common/Config.cpp" line="2655"/>
+        <source>Searching XY Weight</source>
+        <translation>XY搜索权值</translation>
+    </message>
+    <message>
+        <source>Weight of xy element of laser point vector against angle element</source>
+        <translation type="vanished">在搜索最优点时XY坐标与其它向量元素相比的权值</translation>
+    </message>
+    <message>
         <source>Max angles diff between tow points.</source>
-        <translation type="unfinished">相邻两个点间的最大角度差。</translation>
+        <translation type="vanished">相邻两个点间的最大角度差。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="570"/>
+        <location filename="../src/common/Config.cpp" line="2663"/>
+        <location filename="../src/common/Config.cpp" line="2667"/>
         <source>Max Interval Distance</source>
-        <translation type="unfinished"></translation>
+        <translation>最大间隔距离</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="571"/>
         <source>Max interval distance between tow points.</source>
-        <translation type="unfinished">相邻两个点间的最大间隔距离 。</translation>
+        <translation type="vanished">相邻两个点间的最大间隔距离 。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="585"/>
+        <source>Max starting points</source>
+        <translation type="vanished">最大起刀点数</translation>
+    </message>
+    <message>
+        <source>Max starting points.</source>
+        <translation type="vanished">最大起刀点数。</translation>
+    </message>
+    <message>
+        <source>Enable small diagonal</source>
+        <translation type="vanished">启用小圆限速</translation>
+    </message>
+    <message>
+        <source>Enable small diagonal limitation</source>
+        <translation type="vanished">启用小圆限速</translation>
+    </message>
+    <message>
+        <source>Small diagonal limitation</source>
+        <translation type="vanished">小圆限速</translation>
+    </message>
+    <message>
+        <source>Relative Point</source>
+        <translation type="vanished">输出相对坐标</translation>
+    </message>
+    <message>
         <source>Auto Connect First</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">自动连接第一个COM端口</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="586"/>
         <source>Auto connect to first com port when found multiple laser devices.</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">当有多个设备连接时自动连接第一个COM商品。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="599"/>
-        <source>Head Data</source>
-        <translation type="unfinished"></translation>
+        <source>Start From</source>
+        <translation type="vanished">开始位置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="600"/>
-        <source>Head data for testing</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2689"/>
+        <source>Current Position</source>
+        <translation>当前位置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="611"/>
-        <source>Acceleration Mode</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2690"/>
+        <source>User Origin</source>
+        <translation>用户原点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="612"/>
-        <source>Acceleration mode</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2691"/>
+        <source>Absolute Coords</source>
+        <translation>绝对坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="623"/>
-        <source>T</source>
-        <translation type="unfinished">上</translation>
+        <location filename="../src/common/Config.cpp" line="2508"/>
+        <source>Unit for machining</source>
+        <translation>加工时用到的坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="624"/>
-        <source>S1</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2515"/>
+        <source>Operation Button Icon Size(px)</source>
+        <translation>操作按钮图标尺寸(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="625"/>
-        <source>S2</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2516"/>
+        <source>Size of operation buttons&apos; icons</source>
+        <translation>操作按钮图标的尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="626"/>
-        <source>S3</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2519"/>
+        <source>Operation Button Width(px)</source>
+        <translation>操作按钮宽(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="627"/>
-        <source>S4</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2520"/>
+        <source>Width of operation buttons</source>
+        <translation>操作按钮的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="628"/>
-        <source>S5</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2523"/>
+        <source>Operation Button Height(px)</source>
+        <translation>操作按钮高(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="638"/>
-        <source>Cutting Move Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2524"/>
+        <source>Height of operation buttons</source>
+        <translation>操作按钮的高度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="639"/>
-        <source>Cutting move speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2528"/>
+        <source>Show text of operation button or not</source>
+        <translation>是否显示操作按钮的文本</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="665"/>
-        <source>Cutting Move Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2531"/>
+        <source>Tool Button Size(px)</source>
+        <translation>工具按钮尺寸(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="666"/>
-        <source>Cutting Move Acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2532"/>
+        <source>Size of tool buttons</source>
+        <translation>工具按钮的尺寸</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="692"/>
-        <source>Cutting Turn Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2535"/>
+        <source>Color Button Width(px)</source>
+        <translation>图层按钮宽度(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="693"/>
-        <source>Cutting turn speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2536"/>
+        <source>Width of color buttons</source>
+        <translation>图层按钮的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="719"/>
-        <source>Cutting Turn Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2539"/>
+        <source>Color Button Height(px)</source>
+        <translation>图层按钮高(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="720"/>
-        <source>Cutting turn acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2540"/>
+        <source>Height of color buttons</source>
+        <translation>图层按钮的高度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="746"/>
-        <source>Cutting Work Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2544"/>
+        <source>Contrast of grid lines</source>
+        <translation>网格线对比度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="747"/>
-        <source>Cutting Work acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2551"/>
+        <source>Grid Shape Distance(px)</source>
+        <translation>网格捕获距离(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="773"/>
-        <source>Cutting Move Speed Factor</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2552"/>
+        <source>This distance is used for capturing a shape when cursor is moving closed to</source>
+        <translation>当鼠标靠近一个形状时，捕获该形状的距离阈值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="774"/>
-        <source>Cutting move speed factor</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2555"/>
+        <source>Object Shape Distance(px)</source>
+        <translation>对象捕获距离(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="784"/>
-        <source>Cutting Work Speed Factor</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2556"/>
+        <source>This distance is used for capturing an object when cursor is moving closed to</source>
+        <translation>当鼠标靠近一个物体时，自动捕获该物体的距离阈值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="785"/>
-        <source>Cutting Work speed factor</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2559"/>
+        <source>Click-selection Tolerance(px)</source>
+        <translation>点击选择公差(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="795"/>
-        <source>Cutting Spot Size</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2560"/>
+        <source>Tolerance of Click-selection in px</source>
+        <translation>在点击选择时的公差</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="796"/>
-        <source>Cutting spot size</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2564"/>
+        <source>The visual grid spacing in mm</source>
+        <translation>可视网格的间距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="806"/>
-        <source>Scan X Start Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <source>Width of splitter handle in mm</source>
+        <translation type="vanished">分割条手柄的宽度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="807"/>
-        <source>Scan x start speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2571"/>
+        <source>Auto repeat delay(ms)</source>
+        <translation>按钮连动超时时间(ms)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="833"/>
-        <source>Scan Y Start Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2572"/>
+        <source>The delay duration of auto repeat button</source>
+        <translation>从按下按钮到触发连动间的超时时间</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="834"/>
-        <source>Scan y start speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2575"/>
+        <source>Min Speed(mm)</source>
+        <translation>起跳速度(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="860"/>
-        <source>Scan X Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2576"/>
+        <source>Min speed for cutting layers</source>
+        <translation>切割图层的起跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="861"/>
-        <source>Scan x acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2579"/>
+        <source>Run Speed(mm)</source>
+        <translation>运行速度(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="887"/>
-        <source>Scan Y Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2580"/>
+        <source>Run speed for cutting layers</source>
+        <translation>切割图层的运行速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="888"/>
-        <source>Scan y acceleration</source>
-        <translation type="unfinished"></translation>
+        <source>Laser Power(%%)</source>
+        <translation type="obsolete">激光功率百分比(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="914"/>
-        <source>Scan Row Speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2584"/>
+        <source>The power percentage for cutting layers</source>
+        <translation>切割图层的功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="915"/>
-        <source>Scan row speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2595"/>
+        <source>Min Speed(mm/s)</source>
+        <translation>最小速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="941"/>
-        <source>Scan Row Interval(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2596"/>
+        <source>The min speed for engraving layers</source>
+        <translation>雕刻图层的最小速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="942"/>
-        <source>Scan row interval</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2599"/>
+        <source>Run Speed(mm/s)</source>
+        <translation>运行速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="967"/>
-        <source>Scan Return Error(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2600"/>
+        <source>The run speed for engraving layers</source>
+        <translation>雕刻图层的运行速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="968"/>
-        <source>Scan return error</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2604"/>
+        <source>The laser power for engraving layers</source>
+        <translation>雕刻图层的激光功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="981"/>
-        <source>Scan Laser Power</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2607"/>
+        <source>Min Power(%)</source>
+        <translation>最小功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="982"/>
-        <source>Scan laser power</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2608"/>
+        <source>The min power percentage for engraving layers</source>
+        <translation>雕刻图层的最小功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1008"/>
-        <source>Scan X Reset Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2611"/>
+        <source>Max Power(%)</source>
+        <translation>最大功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1009"/>
-        <source>Scan x reset enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2612"/>
+        <source>The max power percentage for engraving layers</source>
+        <translation>雕刻图层的最大功率百分比</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1017"/>
-        <source>Scan Y Reset Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2615"/>
+        <source>Row Interval(μm)</source>
+        <translation>行间距(μm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1018"/>
-        <source>Scan y reset enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2616"/>
+        <source>The row interval between lines of bitmap for engraving layers</source>
+        <translation>雕刻图层中位图两行间的间距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1026"/>
-        <source>Scan Z Reset Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2620"/>
+        <location filename="../src/common/Config.cpp" line="2624"/>
+        <source>Use halftone algorithm when generating bitmap datas</source>
+        <translation>生成图片的加工数据时是否使用半色调算法</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1027"/>
-        <source>Scan z reset enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2628"/>
+        <source>Lines per inch</source>
+        <translation>每英寸线数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1035"/>
-        <source>Scan Return pos</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2632"/>
+        <source>Dots per inch</source>
+        <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1036"/>
-        <source>Scan return pos</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2636"/>
+        <source>Max starting points count of each primitive node</source>
+        <translation>每一个图元的最大起刀点数</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1047"/>
-        <source>Backlash X Interval(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2640"/>
+        <source>The orientation of grouping</source>
+        <translation>分组时按行还是按列</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1048"/>
-        <source>Backlash x interval</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2643"/>
+        <source>Grouping Grid Interval</source>
+        <translation>分组时行列间隔</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1073"/>
-        <source>Backlash Y Interval(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2644"/>
+        <source>The grid interval</source>
+        <translation>分组时的网格间隔</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1074"/>
-        <source>Backlash y interval</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2647"/>
+        <source>Max Group size</source>
+        <translation>最大组内数量</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1099"/>
-        <source>Backlash Z Interval(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2648"/>
+        <source>Max nodes count of each group</source>
+        <translation>每一个分组中最大的节点数量</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1100"/>
-        <source>Backlash z interval</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2652"/>
+        <location filename="../src/common/Config.cpp" line="2656"/>
+        <source>Weight of XY for searching using kdtree</source>
+        <translation>在使用Kdtree进行搜索时XY坐标相对于其它元素的权重值</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1131"/>
-        <source>System Run Time</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2660"/>
+        <source>The max angles diff bwteen tow anchor points</source>
+        <translation>两个锚点间的最大角度差</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1132"/>
-        <source>System run time</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2664"/>
+        <location filename="../src/common/Config.cpp" line="2668"/>
+        <source>The max interval distance between tow anchor points</source>
+        <translation>两个锚点间的最大间距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1142"/>
-        <source>Laser Run Time</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2671"/>
+        <source>Enable Small Diagonal</source>
+        <translation>启用小圆限速</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1143"/>
-        <source>Laser run time</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2672"/>
+        <source>Enable small diagonal limitation for small primitives</source>
+        <translation>为很小的图元启用小圆限速</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1153"/>
-        <source>System Run Times</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2675"/>
+        <source>Small Diagonal Limitation</source>
+        <translation>小圆限速</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1154"/>
-        <source>System run times</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2676"/>
+        <source>Details of small diagonal limitation</source>
+        <translation>小圆限速详情</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1164"/>
-        <source>X Max Length(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2679"/>
+        <source>Enable Relative Coordinates</source>
+        <translation>启用相对坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1165"/>
-        <source>X max length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2680"/>
+        <source>Enable relative coordinates for exporting machining points</source>
+        <translation>为输出的加工点启用相对坐标</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1192"/>
-        <source>X Dir Phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2683"/>
+        <source>Auto Connect First COM</source>
+        <translation>自动连接首个COM端口</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1193"/>
-        <source>X dir phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2684"/>
+        <source>Auto connect to first com port when found multiple laser devices</source>
+        <translation>当有多个设备时自动连接列表中的首个设备</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1205"/>
-        <location filename="../src/common/Config.cpp" line="1228"/>
-        <location filename="../src/common/Config.cpp" line="1307"/>
-        <location filename="../src/common/Config.cpp" line="1341"/>
-        <location filename="../src/common/Config.cpp" line="1533"/>
-        <location filename="../src/common/Config.cpp" line="1556"/>
-        <location filename="../src/common/Config.cpp" line="1635"/>
-        <location filename="../src/common/Config.cpp" line="1669"/>
-        <location filename="../src/common/Config.cpp" line="1861"/>
-        <location filename="../src/common/Config.cpp" line="1884"/>
-        <location filename="../src/common/Config.cpp" line="1963"/>
-        <location filename="../src/common/Config.cpp" line="1997"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2687"/>
+        <source>Start from</source>
+        <translation>开始加工</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1206"/>
-        <location filename="../src/common/Config.cpp" line="1229"/>
-        <location filename="../src/common/Config.cpp" line="1308"/>
-        <location filename="../src/common/Config.cpp" line="1342"/>
-        <location filename="../src/common/Config.cpp" line="1534"/>
-        <location filename="../src/common/Config.cpp" line="1557"/>
-        <location filename="../src/common/Config.cpp" line="1636"/>
-        <location filename="../src/common/Config.cpp" line="1670"/>
-        <location filename="../src/common/Config.cpp" line="1862"/>
-        <location filename="../src/common/Config.cpp" line="1885"/>
-        <location filename="../src/common/Config.cpp" line="1964"/>
-        <location filename="../src/common/Config.cpp" line="1998"/>
-        <source>1</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2688"/>
+        <source>Choose the start point type of machining</source>
+        <translation>选择开始加工点的方式</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1216"/>
-        <source>X Limit Phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2694"/>
+        <source>Job Origin</source>
+        <translation>作业原点</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1217"/>
-        <source>X limit phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2695"/>
+        <source>Job origin to start machining with</source>
+        <translation>选择开始加工的作业原点的类型</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1239"/>
-        <source>X Zero Dev(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2698"/>
+        <source>X Enabled</source>
+        <translation>X轴使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1240"/>
-        <source>X zero dev</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2699"/>
+        <source>Enabled x axis movement</source>
+        <translation>是否启用X轴运动</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1267"/>
-        <source>X Step Length(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2702"/>
+        <source>Y Enabled</source>
+        <translation>Y轴使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1268"/>
-        <source>X step length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2703"/>
+        <source>Enabled y axis movement</source>
+        <translation>是否启用Y轴运动</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1295"/>
-        <source>X Limit number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2706"/>
+        <source>Z Enabled</source>
+        <translation>Z轴使能</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1296"/>
-        <source>X limit number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2707"/>
+        <source>Enabled z axis movement</source>
+        <translation>是否启用Z轴运动</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1309"/>
-        <location filename="../src/common/Config.cpp" line="1343"/>
-        <location filename="../src/common/Config.cpp" line="1637"/>
-        <location filename="../src/common/Config.cpp" line="1671"/>
-        <location filename="../src/common/Config.cpp" line="1965"/>
-        <location filename="../src/common/Config.cpp" line="1999"/>
-        <source>2</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2710"/>
+        <location filename="../src/common/Config.cpp" line="2838"/>
+        <source>[00] Head Data</source>
+        <translation>[00]head数据</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1310"/>
-        <location filename="../src/common/Config.cpp" line="1344"/>
-        <location filename="../src/common/Config.cpp" line="1638"/>
-        <location filename="../src/common/Config.cpp" line="1672"/>
-        <location filename="../src/common/Config.cpp" line="1966"/>
-        <location filename="../src/common/Config.cpp" line="2000"/>
-        <source>3</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2711"/>
+        <location filename="../src/common/Config.cpp" line="2839"/>
+        <source>Read-only data used to test the quality of data transmission</source>
+        <translation>用于验证数据传输质量的数据序列</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1319"/>
-        <source>X Reset Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2714"/>
+        <source>[01] Acceleration Mode</source>
+        <translation>[01] 加速模式</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1320"/>
-        <source>X reset enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2718"/>
+        <source>[02] Cutting Move Speed(mm/s)</source>
+        <translation>[02] 空移速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1328"/>
-        <source>X Motor number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2730"/>
+        <source>[05] Cutting Turn Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation>[05] 切割拐弯加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1329"/>
-        <source>X motor number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2762"/>
+        <source>[13] Scan Y Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation>[12] 扫描Y轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1353"/>
-        <source>X Motor current</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2770"/>
+        <source>[15] Scan Row Interval(mm)</source>
+        <translation>[15] 行间距(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1354"/>
-        <source>X motor current</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2774"/>
+        <source>[16] Scan Return Error(mm)</source>
+        <translation>[16] 扫描回差(mm)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1380"/>
-        <source>X Start speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2778"/>
+        <source>[17] Scan Laser Power(%)</source>
+        <translation>[17] 激光扫描功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1381"/>
-        <source>X start speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2806"/>
+        <source>[24] Backlash Y Interval(mm/s)</source>
+        <translation>[24] Y轴反向间隙(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1408"/>
-        <source>X Max speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2807"/>
+        <source>Backlash Y interval</source>
+        <translation>Y轴反向间隙</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1409"/>
-        <source>X max speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2810"/>
+        <source>[25] Backlash Z Interval(mm/s)</source>
+        <translation>[25] Y轴反向间隙(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1436"/>
-        <source>X Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2811"/>
+        <source>Backlash Z interval</source>
+        <translation>Z轴反向间隙</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1437"/>
-        <source>X max acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2899"/>
+        <location filename="../src/common/Config.cpp" line="2903"/>
+        <source>X Zero Dev</source>
+        <translation>X轴原点偏移</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1464"/>
-        <source>X Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <source>[16] X Step Length</source>
+        <translation type="vanished">[16] X轴电机步距</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1465"/>
-        <source>X urgent acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2906"/>
+        <source>[17] X Limit Num</source>
+        <translation>[17] X轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1492"/>
-        <source>Y Max Length(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2907"/>
+        <source>X limit num</source>
+        <translation>X轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1493"/>
-        <source>Y max length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2911"/>
+        <source>Enable x reset</source>
+        <translation>启用x轴重置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1520"/>
-        <source>Y Dir Phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2914"/>
+        <source>[19] X Motor Num</source>
+        <translation>[19] X轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1521"/>
-        <source>Y dir phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2915"/>
+        <source>X motor num</source>
+        <translation>X轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1543"/>
-        <source>Y Limit Phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2918"/>
+        <source>[20] X Motor current(%)</source>
+        <translation>[20] X轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1544"/>
-        <source>Y limit phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2922"/>
+        <source>[21] X Start Speed(mm/s)</source>
+        <translation>[21] X轴启跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1566"/>
-        <source>Y Zero Dev(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2923"/>
+        <source>X Start Speed</source>
+        <translation>X轴启跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1567"/>
-        <source>Y zero dev</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2926"/>
+        <source>[22] X Max Speed(mm/s)</source>
+        <translatorcomment>[22] X轴最大速度(mm/s)</translatorcomment>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1594"/>
-        <source>Y Step Length(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2927"/>
+        <source>X Max Speed</source>
+        <translation>X轴最大速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1595"/>
-        <source>Y step length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2951"/>
+        <location filename="../src/common/Config.cpp" line="2955"/>
+        <source>Y Zero Dev</source>
+        <translation>Y轴原点偏移</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1622"/>
-        <source>Y Limit number</source>
-        <translation type="unfinished"></translation>
+        <source>[29] Y Step Length</source>
+        <translation type="vanished">[29] Y轴步长</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1623"/>
-        <source>Y limit number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2958"/>
+        <source>[30] Y Limit Num</source>
+        <translation>[30] Y轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1647"/>
-        <source>Y Reset Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2959"/>
+        <source>Y limit num</source>
+        <translation>Y轴限位输入选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1648"/>
-        <source>Y reset enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2963"/>
+        <source>Enable y reset</source>
+        <translation>启用Y轴重置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1656"/>
-        <source>Y Motor number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2966"/>
+        <source>[32] Y Motor Num</source>
+        <translation>[32] Y轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1657"/>
-        <source>Y motor number</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2967"/>
+        <source>Y motor num</source>
+        <translation>Y轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1681"/>
-        <source>Y Motor current</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2970"/>
+        <source>[33] Y Motor current(%)</source>
+        <translation>[33] Y轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1682"/>
-        <source>Y motor current</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2974"/>
+        <source>[34] Y Start Speed(mm/s)</source>
+        <translation>[34] Y轴启跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1708"/>
-        <source>Y Start speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2975"/>
+        <source>Y Start Speed</source>
+        <translation>Y轴启跳速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1709"/>
-        <source>Y start speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2978"/>
+        <source>[35] Y Max Speed(mm/s)</source>
+        <translation>[35] Y轴最大速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1736"/>
-        <source>Y Max speed(mm/s)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2979"/>
+        <source>Y Max Speed</source>
+        <translation>Y轴最大速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1737"/>
-        <source>Y max speed</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2998"/>
+        <source>[40] Z Limit Phase</source>
+        <translation>[40] Z轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1764"/>
-        <source>Y Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2999"/>
+        <source>Z limit phase</source>
+        <translation>Z轴限位极性</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1765"/>
-        <source>Y max acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3015"/>
+        <source>Enable z reset</source>
+        <translation>启用Z轴重置</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1792"/>
-        <source>Y Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3018"/>
+        <source>[45] Z Motor Num</source>
+        <translation>[45] Z轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1793"/>
-        <source>Y urgent acceleration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3019"/>
+        <source>Z motor num</source>
+        <translation>Z轴电机驱动接口选择</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1820"/>
-        <source>Z Max Length(mm)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3022"/>
+        <source>[46] Z Motor current(%)</source>
+        <translation>[46] Z轴电机驱动电流(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1821"/>
-        <source>Z max length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3026"/>
+        <source>[47] Z Start Speed(mm/s)</source>
+        <translation>[47] Z轴启动速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1848"/>
-        <source>Z Dir Phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3027"/>
+        <source>Z Start Speed</source>
+        <translation>Z轴启动速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1849"/>
-        <source>Z dir phase</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3030"/>
+        <source>[48] Z Max Speed(mm/s)</source>
+        <translation>[48] Z轴最大速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1871"/>
-        <source>Z Limit Length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3031"/>
+        <source>Z Max Speed</source>
+        <translation>Z最大速度</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1872"/>
-        <source>Z limit length</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3042"/>
+        <source>[51] Laser Max Power(%)</source>
+        <translation>[51] 激光最大功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1894"/>
-        <source>Z Zero Dev(mm)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1895"/>
-        <source>Z zero dev</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1922"/>
-        <source>Z Step Length(mm)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1923"/>
-        <source>Z step length</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1950"/>
-        <source>Z Limit number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1951"/>
-        <source>Z limit number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1975"/>
-        <source>Z Reset Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1976"/>
-        <source>Z reset enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1984"/>
-        <source>Z Motor number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="1985"/>
-        <source>Z motor number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2009"/>
-        <source>Z Motor current</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2010"/>
-        <source>Z motor current</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2036"/>
-        <source>Z Start speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2037"/>
-        <source>Z start speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2064"/>
-        <source>Z Max speed(mm/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2065"/>
-        <source>Z max speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2092"/>
-        <source>Z Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2093"/>
-        <source>Z max acceleration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2120"/>
-        <source>Z Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2121"/>
-        <source>Z urgent acceleration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="2148"/>
+        <location filename="../src/common/Config.cpp" line="3043"/>
         <source>Laser Max Power</source>
-        <translation type="unfinished"></translation>
+        <translation>激光最大功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2149"/>
-        <source>Laser max power</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3046"/>
+        <source>[52] Laser Min Power(%)</source>
+        <translation>[52] 激光最小功率(%)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2173"/>
-        <location filename="../src/common/Config.cpp" line="2198"/>
+        <location filename="../src/common/Config.cpp" line="3047"/>
         <source>Laser Min Power</source>
-        <translation type="unfinished"></translation>
+        <translation>激光最小功率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2174"/>
-        <location filename="../src/common/Config.cpp" line="2199"/>
-        <source>Laser min power</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3050"/>
+        <source>[53] Laser Power Frequence</source>
+        <translation>[53] 激光频率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2210"/>
-        <source>X Phase Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3051"/>
+        <source>Laser Power Frequence</source>
+        <translation>激光频率</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2211"/>
-        <source>X phase enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3079"/>
+        <source>Enabled generate path image</source>
+        <translation>启用生成路径图片</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2219"/>
-        <source>Y Phase Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="3083"/>
+        <source>Enabled generate machining image</source>
+        <translation>启用生成加工路径的图片</translation>
     </message>
     <message>
+        <source>[03] Cutting Move Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation type="vanished">[03]空移加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2726"/>
+        <source>[04] Cutting Turn Speed(mm/s)</source>
+        <translation>[04] 拐弯速度(mm/s)</translation>
+    </message>
+    <message>
+        <source>[05] Cutting Turn Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation type="vanished">[05]拐弯加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <source>[06] Cutting Work Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation type="vanished">[06]切割加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <source>[07] Cutting Move Speed Factor</source>
+        <translation type="vanished">[07]空移加速倍率</translation>
+    </message>
+    <message>
+        <source>[08] Cutting Work Speed Factor</source>
+        <translation type="vanished">[08]切割加速倍率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2746"/>
+        <source>[09] Cutting Spot Size</source>
+        <translation>[09] 光斑尺寸</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2750"/>
+        <source>[10] Scan X Start Speed(mm/s)</source>
+        <translation>[10] 扫描X轴起跳速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2754"/>
+        <source>[11] Scan Y Start Speed(mm/s)</source>
+        <translation>[11] 扫描X轴起跳速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2766"/>
+        <source>[14] Scan Row Speed(mm/s)</source>
+        <translation>[14] 扫描行速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2782"/>
+        <source>[18] Scan X Reset Enabled</source>
+        <translation>[18] X轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2786"/>
+        <source>[19] Scan Y Reset Enabled</source>
+        <translation>[19] Y轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2790"/>
+        <source>[20] Scan Z Reset Enabled</source>
+        <translation>[20] Z轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2802"/>
+        <source>[23] Backlash X Interval(mm/s)</source>
+        <translation>[23] X轴反向间隙(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2819"/>
+        <source>Default max cutting power</source>
+        <translation>默认最大切割功率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2823"/>
+        <source>Default min cutting power</source>
+        <translation>默认最小切割功率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2831"/>
+        <source>Max scan gray ratio</source>
+        <translation>扫描最大灰度比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2835"/>
+        <source>Min scan gray ratio</source>
+        <translation>扫描最小灰度比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2842"/>
+        <source>[01] Password</source>
+        <translation>[01] 写入密码验证</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2846"/>
+        <source>[02] Stored Password</source>
+        <translation>[02] 系统参数区密码</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2850"/>
+        <source>[03] Hardware ID1</source>
+        <translation>[03] 硬件序列号ID1</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2851"/>
+        <source>Hardware ID1</source>
+        <translation>硬件序列号ID1</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2854"/>
+        <source>[04] Hardware ID2</source>
+        <translation>[04] 硬件序列号ID2</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2855"/>
+        <source>Hardware ID2</source>
+        <translation>硬件序列号ID2</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2858"/>
+        <source>[05] Hardware ID3</source>
+        <translation>[05] 硬件序列号ID3</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2859"/>
+        <source>Hardware ID3</source>
+        <translation>硬件序列号ID3</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2874"/>
+        <source>[09] System Run Time</source>
+        <translation>[09] 系统运行时间</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2878"/>
+        <source>[10] Laser Run Time</source>
+        <translation>[10] 激光管开光时间</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2882"/>
+        <source>[11] System Run Times</source>
+        <translation>[11] 系统加工次数</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2886"/>
+        <source>[12] X Max Length(mm)</source>
+        <translation>[12] X轴加工幅面</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2890"/>
+        <source>[13] X Dir Phase</source>
+        <translation>[13] X轴方向极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2894"/>
+        <source>[14] X Limit Phase</source>
+        <translation>[14] X轴限位极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2898"/>
+        <source>[15] X Zero Dev(mm)</source>
+        <translation>[15] X轴原点偏移(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2902"/>
+        <source>[16] X Step Length(mm)</source>
+        <translation>[16] X轴电机步距(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2910"/>
+        <source>[18] X Reset Enabled</source>
+        <translation>[18] X轴复位使能</translation>
+    </message>
+    <message>
+        <source>[20] X Motor current</source>
+        <translation type="vanished">[20] X轴电机驱动电流</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2930"/>
+        <source>[23] X Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>[23] X轴最大加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2934"/>
+        <source>[24] X Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>[24] X轴急停加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2938"/>
+        <source>[25] Y Max Length(mm)</source>
+        <translation>[25] Y轴加工幅面(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2942"/>
+        <source>[26] Y Dir Phase</source>
+        <translation>[26] Y轴方向极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2946"/>
+        <source>[27] Y Limit Phase</source>
+        <translation>[27] Y轴限位极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2950"/>
+        <source>[28] Y Zero Dev(mm)</source>
+        <translation>[28] Y轴原点偏移(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2962"/>
+        <source>[31] Y Reset Enabled</source>
+        <translation>[31] Y轴复位使能</translation>
+    </message>
+    <message>
+        <source>[33] Y Motor current</source>
+        <translation type="obsolete">[33] Y轴电机驱动电流(%)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2982"/>
+        <source>[36] Y Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>[36] Y轴最大加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2986"/>
+        <source>[37] Y Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>[37] Y轴急停加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2990"/>
+        <source>[38] Z Max Length(mm)</source>
+        <translation>[38] Z轴加工幅面(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2994"/>
+        <source>[39] Z Dir Phase</source>
+        <translation>[39] Z轴方向极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3002"/>
+        <source>[41] Z Zero Dev(mm)</source>
+        <translation>[41] Z轴原点偏移(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3003"/>
+        <location filename="../src/common/Config.cpp" line="3007"/>
+        <source>Z Zero Dev</source>
+        <translation>Z轴原点偏移</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3006"/>
+        <source>[42] Z Step Length(mm)</source>
+        <translation>[42] Z轴电机步距(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3010"/>
+        <source>[43] Z Limit Num</source>
+        <translation>[43] Z轴限位输入选择</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3011"/>
+        <source>Z limit num</source>
+        <translation>Z轴限位输入选择</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3014"/>
+        <source>[44] Z Reset Enabled</source>
+        <translation>[44] Z轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3034"/>
+        <source>[49] Z Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>[49] Z轴最大加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3038"/>
+        <source>[50] Z Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>[50] Z轴急停加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3054"/>
+        <source>[54] X Phase Enabled</source>
+        <translation>[54] X使能相位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3055"/>
+        <source>Enabled X phase</source>
+        <translation>X使能相位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3058"/>
+        <source>[55] Y Phase Enabled</source>
+        <translation>[55] Y使能相位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3059"/>
+        <source>Enabled Y phase</source>
+        <translation>Y使能相位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3062"/>
+        <source>[56] Z Phase Enabled</source>
+        <translation>[56] Z使能相位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3063"/>
+        <source>Enabled Z phase</source>
+        <translation>Z使能相位</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3066"/>
+        <source>[57] Device Origin</source>
+        <translation>[57] 设备原点</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3067"/>
+        <source>Device Origin</source>
+        <translation>设备原点，指加工幅面外包矩形的4个四点</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3070"/>
+        <location filename="../src/common/Config.cpp" line="3071"/>
+        <source>Show Primitive Name</source>
+        <translation>显示图元名称</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3074"/>
+        <location filename="../src/common/Config.cpp" line="3075"/>
+        <source>Show Primitive First Point</source>
+        <translation>显示图元首点</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3078"/>
+        <source>Generate Path Image</source>
+        <translation>生成路径图片</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3082"/>
+        <source>Generate Machining Image</source>
+        <translation>生成加工点图片</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3086"/>
+        <location filename="../src/common/Config.cpp" line="3087"/>
+        <source>Enable Optimize Interaction</source>
+        <translation>启用优化交互</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2563"/>
+        <source>Visual Grid Spacing(mm)</source>
+        <translation>可视网格间距(mm)</translation>
+    </message>
+    <message>
+        <source>Splitter Handle Width(mm)</source>
+        <translation type="obsolete">分割条手柄宽度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2715"/>
+        <location filename="../src/common/Config.cpp" line="2719"/>
+        <source>Acceleration mode</source>
+        <translation>加速模式</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="787"/>
+        <source>T</source>
+        <translation>T</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="788"/>
+        <source>S1</source>
+        <translation>S1</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="789"/>
+        <source>S2</source>
+        <translation>S2</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="790"/>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="791"/>
+        <source>S4</source>
+        <translation>S4</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="792"/>
+        <source>S5</source>
+        <translation>S5</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2583"/>
+        <location filename="../src/common/Config.cpp" line="2603"/>
+        <source>Laser Power(%)</source>
+        <translation>激光功率(%)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2587"/>
+        <source>Min Laser Power(%)</source>
+        <translation>最小激光功率(%)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2591"/>
+        <source>Max Laser Power(%)</source>
+        <translation>最大激光功率(%)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2751"/>
+        <source>Scan x start speed</source>
+        <translation>扫描X轴起跳速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2755"/>
+        <source>Scan y start speed</source>
+        <translation>扫描Y轴起跳速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2759"/>
+        <source>Scan x acceleration</source>
+        <translation>扫描X轴加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2763"/>
+        <source>Scan y acceleration</source>
+        <translation>扫描Y轴加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2767"/>
+        <source>Scan row speed</source>
+        <translation>换行速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2771"/>
+        <source>Scan row interval</source>
+        <translation>换行间距</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2775"/>
+        <source>Scan return error</source>
+        <translation>扫描回差</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2799"/>
+        <source>Scan return pos</source>
+        <translation>复位位置</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2875"/>
+        <source>System run time</source>
+        <translation>系统运行时间</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2879"/>
+        <source>Laser run time</source>
+        <translation>激光管开光时间</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2883"/>
+        <source>System run times</source>
+        <translation>系统加工次数</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2887"/>
+        <source>X max length</source>
+        <translation>X轴加工幅面</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2891"/>
+        <source>X dir phase</source>
+        <translation>X轴方向极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="1537"/>
+        <location filename="../src/common/Config.cpp" line="1557"/>
+        <location filename="../src/common/Config.cpp" line="1626"/>
+        <location filename="../src/common/Config.cpp" line="1654"/>
+        <location filename="../src/common/Config.cpp" line="1820"/>
+        <location filename="../src/common/Config.cpp" line="1840"/>
+        <location filename="../src/common/Config.cpp" line="1908"/>
+        <location filename="../src/common/Config.cpp" line="1936"/>
+        <location filename="../src/common/Config.cpp" line="2102"/>
+        <location filename="../src/common/Config.cpp" line="2123"/>
+        <location filename="../src/common/Config.cpp" line="2192"/>
         <location filename="../src/common/Config.cpp" line="2220"/>
-        <source>Y phase enabled</source>
-        <translation type="unfinished"></translation>
+        <source>0</source>
+        <translation>0</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2228"/>
-        <source>Z Phase Enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="1538"/>
+        <location filename="../src/common/Config.cpp" line="1558"/>
+        <location filename="../src/common/Config.cpp" line="1627"/>
+        <location filename="../src/common/Config.cpp" line="1655"/>
+        <location filename="../src/common/Config.cpp" line="1821"/>
+        <location filename="../src/common/Config.cpp" line="1841"/>
+        <location filename="../src/common/Config.cpp" line="1909"/>
+        <location filename="../src/common/Config.cpp" line="1937"/>
+        <location filename="../src/common/Config.cpp" line="2103"/>
+        <location filename="../src/common/Config.cpp" line="2124"/>
+        <location filename="../src/common/Config.cpp" line="2193"/>
+        <location filename="../src/common/Config.cpp" line="2221"/>
+        <source>1</source>
+        <translation>1</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2229"/>
-        <source>Z phase enabled</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/common/Config.cpp" line="2567"/>
+        <source>Splitter Handle Width(px)</source>
+        <translation>分割条手柄宽度(px)</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="61"/>
+        <location filename="../src/common/Config.cpp" line="2568"/>
+        <source>Width of splitter handle in px</source>
+        <translation>分割条手柄的宽度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2588"/>
+        <source>The min power percentage for cutting layers</source>
+        <translation>切割图层中的最小功率百分比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2592"/>
+        <source>The max power percentage for cutting layers</source>
+        <translation>切割图层的最大功率百分比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2722"/>
+        <source>[03] Cutting Move Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation>[03] 切割空移加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2723"/>
+        <source>Move acceleration for cutting movement</source>
+        <translation>切割空移加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2727"/>
+        <source>Turn speed for cutting movement</source>
+        <translation>切割拐弯速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2731"/>
+        <source>Turn acceleration for cutting movement</source>
+        <translation>切割拐弯加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2734"/>
+        <source>[06] Cutting Work Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation>[06]切割加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2735"/>
+        <source>Work acceleration for cutting movement</source>
+        <translation>切割加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2738"/>
+        <source>[07] Move Speed Factor</source>
+        <translation>[07] 切割空移加速倍率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2739"/>
+        <source>Move speed factor for cutting movement</source>
+        <translation>切割空移加速倍率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2742"/>
+        <source>[08] Work Speed Factor</source>
+        <translation>[08] 切割加速倍率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2743"/>
+        <source>Work speed factor for cutting movement</source>
+        <translation>切割加速倍率</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2747"/>
+        <source>Spot size for cutting movement</source>
+        <translation>切割光斑尺寸</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2758"/>
+        <source>[12] Scan X Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation>[12] 扫描X轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+    </message>
+    <message>
+        <source>[15] Scan Row Interval</source>
+        <translation type="vanished">[15] 行间距(mm)</translation>
+    </message>
+    <message>
+        <source>[16] Scan Return Error</source>
+        <translation type="vanished">[16] 扫描回差(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2779"/>
+        <source>The percentage of scan laser power</source>
+        <translation>扫描功率百分比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2783"/>
+        <source>Enabled Scan X reset</source>
+        <translation>X轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2787"/>
+        <source>Enabled Scan Y reset</source>
+        <translation>Y轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2791"/>
+        <source>Enabled Scan Z reset</source>
+        <translation>Z轴复位使能</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2794"/>
+        <source>[21] Reset Speed(mm/s)</source>
+        <translation>[21] X轴启跳速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2795"/>
+        <source>Reset speed</source>
+        <translation>复位速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2798"/>
+        <source>[22] Scan Return Pos</source>
+        <translation>[22] 复位位置</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2803"/>
+        <source>Backlash X interval</source>
+        <translation>X轴反向间隙</translation>
+    </message>
+    <message>
+        <source>[24] Backlash X Interval(mm/s)</source>
+        <translation type="obsolete">[23] X轴反向间隙(mm/s) {24]?}</translation>
+    </message>
+    <message>
+        <source>[25] Backlash X Interval(mm/s)</source>
+        <translation type="obsolete">[23] X轴反向间隙(mm/s) {25]?}</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2814"/>
+        <source>[26] Default Run Speed(mm/s)</source>
+        <translation>[26] 默认加工速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2815"/>
+        <source>Default run speed</source>
+        <translation>默认加工速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2818"/>
+        <source>[27] Default Max Cutting Power(%)</source>
+        <translation>[27] 默认最大切割功率(%)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2822"/>
+        <source>[28] Default Min Cutting Power(%)</source>
+        <translation>[28] 默认最小切割功率(%)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2826"/>
+        <source>[29] Default Scan Speed(mm/s)</source>
+        <translation>[29] 默认扫描速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2827"/>
+        <source>Default scan speed</source>
+        <translation>默认扫描速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2830"/>
+        <source>[30] Max Scan Gray Ratio</source>
+        <translation>[30] 扫描最大灰度比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2834"/>
+        <source>[31] Min Scan Gray Ratio</source>
+        <translation>[31] 扫描最小灰度比</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2843"/>
+        <source>Manufacture password to modify system registers</source>
+        <translation>用于修改系统寄存器的厂商密码</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2847"/>
+        <source>Stored manufacture password</source>
+        <translation>已保存的厂商密码</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2862"/>
+        <source>[06] CDKey1</source>
+        <translation>[06] CDKey1</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2863"/>
+        <source>CDKey1</source>
+        <translation>CDKey1</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2866"/>
+        <source>[07] CDKey2</source>
+        <translation>[07] CDKey2</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2867"/>
+        <source>CDKey2</source>
+        <translation>CDKey2</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2870"/>
+        <source>[08] CDKey3</source>
+        <translation>[08] CDKey3</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2871"/>
+        <source>CDKey3</source>
+        <translation>CDKey3</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2895"/>
+        <source>X limit phase</source>
+        <translation>X轴限位极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="1628"/>
+        <location filename="../src/common/Config.cpp" line="1656"/>
+        <location filename="../src/common/Config.cpp" line="1910"/>
+        <location filename="../src/common/Config.cpp" line="1938"/>
+        <location filename="../src/common/Config.cpp" line="2194"/>
+        <location filename="../src/common/Config.cpp" line="2222"/>
+        <source>2</source>
+        <translation>2</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="1629"/>
+        <location filename="../src/common/Config.cpp" line="1657"/>
+        <location filename="../src/common/Config.cpp" line="1911"/>
+        <location filename="../src/common/Config.cpp" line="1939"/>
+        <location filename="../src/common/Config.cpp" line="2195"/>
+        <location filename="../src/common/Config.cpp" line="2223"/>
+        <source>3</source>
+        <translation>3</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2919"/>
+        <source>X motor current</source>
+        <translation>X轴电机驱动电流</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2931"/>
+        <source>X max acceleration</source>
+        <translation>X轴最大加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2935"/>
+        <source>X urgent acceleration</source>
+        <translation>X轴急停加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2939"/>
+        <location filename="../src/common/Config.cpp" line="2991"/>
+        <source>Y max length</source>
+        <translation>X轴加工幅面</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2943"/>
+        <source>Y dir phase</source>
+        <translation>Y轴方向极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2947"/>
+        <source>Y limit phase</source>
+        <translation>Y轴限位极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2954"/>
+        <source>[29] Y Step Length(mm)</source>
+        <translation>[29] Y轴步长(mm)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2971"/>
+        <source>Y motor current</source>
+        <translation>Y轴电机驱动电流</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2983"/>
+        <source>Y max acceleration</source>
+        <translation>Y轴最大加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2987"/>
+        <source>Y urgent acceleration</source>
+        <translation>Y轴急停加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="2995"/>
+        <source>Z dir phase</source>
+        <translation>Z轴方向极性</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3023"/>
+        <source>Z motor current</source>
+        <translation>Z轴电机驱动电流</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3035"/>
+        <source>Z max acceleration</source>
+        <translation>Z轴最大加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3039"/>
+        <source>Z urgent acceleration</source>
+        <translation>Z轴急停加速度</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3090"/>
+        <location filename="../src/common/Config.cpp" line="3091"/>
+        <location filename="../src/common/Config.h" line="75"/>
         <source>General</source>
-        <translation type="unfinished">通用</translation>
+        <translation>通用</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="77"/>
-        <source>Layers</source>
-        <translation type="unfinished">图层</translation>
-    </message>
-    <message>
+        <location filename="../src/common/Config.cpp" line="3094"/>
+        <location filename="../src/common/Config.cpp" line="3095"/>
         <location filename="../src/common/Config.h" line="92"/>
+        <source>Layers</source>
+        <translation>图层</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3098"/>
+        <location filename="../src/common/Config.cpp" line="3099"/>
+        <location filename="../src/common/Config.h" line="107"/>
         <source>UI</source>
-        <translation type="unfinished"></translation>
+        <translation>界面</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="116"/>
+        <location filename="../src/common/Config.cpp" line="3102"/>
+        <location filename="../src/common/Config.cpp" line="3103"/>
+        <location filename="../src/common/Config.h" line="136"/>
         <source>Cutting Layer</source>
-        <translation type="unfinished">切割图层</translation>
+        <translation>切割图层</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="135"/>
+        <location filename="../src/common/Config.cpp" line="3106"/>
+        <location filename="../src/common/Config.cpp" line="3107"/>
+        <location filename="../src/common/Config.h" line="155"/>
         <source>Engraving Layer</source>
-        <translation type="unfinished">雕刻图层</translation>
+        <translation>雕刻图层</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="157"/>
-        <source>Path Optimization</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+        <location filename="../src/common/Config.cpp" line="3110"/>
+        <location filename="../src/common/Config.cpp" line="3111"/>
         <location filename="../src/common/Config.h" line="178"/>
+        <source>Path Optimization</source>
+        <translation>路径优化</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3114"/>
+        <location filename="../src/common/Config.cpp" line="3115"/>
+        <location filename="../src/common/Config.h" line="197"/>
         <source>Export</source>
-        <translation type="unfinished">导出</translation>
+        <translation>导出</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="194"/>
+        <location filename="../src/common/Config.cpp" line="3118"/>
+        <location filename="../src/common/Config.cpp" line="3119"/>
+        <location filename="../src/common/Config.h" line="216"/>
         <source>Device</source>
-        <translation type="unfinished">设备</translation>
+        <translation>设备</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="209"/>
+        <location filename="../src/common/Config.cpp" line="3122"/>
+        <location filename="../src/common/Config.cpp" line="3123"/>
+        <location filename="../src/common/Config.h" line="238"/>
         <source>User Registers</source>
-        <translation type="unfinished"></translation>
+        <translation>用户寄存器</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="209"/>
+        <location filename="../src/common/Config.h" line="238"/>
         <source>User registers</source>
-        <translation type="unfinished"></translation>
+        <translation>用户寄存器</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="247"/>
+        <location filename="../src/common/Config.cpp" line="3126"/>
+        <location filename="../src/common/Config.cpp" line="3127"/>
+        <location filename="../src/common/Config.h" line="285"/>
         <source>System Registers</source>
-        <translation type="unfinished"></translation>
+        <translation>系统寄存器</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="247"/>
+        <location filename="../src/common/Config.h" line="285"/>
         <source>System registers</source>
-        <translation type="unfinished"></translation>
+        <translation>系统寄存器</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.h" line="363"/>
+        <source>Debug</source>
+        <translation>调试</translation>
     </message>
 </context>
 <context>
     <name>ConfigDialog</name>
     <message>
         <location filename="../src/ui/ConfigDialog.ui" line="14"/>
-        <location filename="../src/ui/ConfigDialog.cpp" line="28"/>
+        <location filename="../src/ui/ConfigDialog.cpp" line="29"/>
         <source>Config Dialog</source>
         <translation>选项对话框</translation>
     </message>
@@ -1444,8 +2145,9 @@
         <translation type="vanished">PLT输出</translation>
     </message>
     <message>
+        <location filename="../src/ui/ConfigDialog.cpp" line="94"/>
         <source>General</source>
-        <translation type="vanished">通用</translation>
+        <translation>通用</translation>
     </message>
     <message>
         <source>Ui</source>
@@ -1472,14 +2174,39 @@
         <translation type="vanished">您选择的语言&quot;%1&quot;无法识别，请检查你的配置文件。</translation>
     </message>
     <message>
-        <location filename="../src/ui/ConfigDialog.cpp" line="238"/>
-        <source>Invalid Manufacture Password</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/ui/ConfigDialog.cpp" line="99"/>
+        <source>X</source>
+        <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/ConfigDialog.cpp" line="238"/>
+        <location filename="../src/ui/ConfigDialog.cpp" line="104"/>
+        <source>Y</source>
+        <translation>Y</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ConfigDialog.cpp" line="109"/>
+        <source>Z</source>
+        <translation>Z</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ConfigDialog.cpp" line="199"/>
+        <source>Manufacture Password</source>
+        <translation>厂商密码</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ConfigDialog.cpp" line="200"/>
+        <source>Password</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ConfigDialog.cpp" line="261"/>
+        <source>Invalid Manufacture Password</source>
+        <translation>原厂商密码不正确</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/ConfigDialog.cpp" line="261"/>
         <source>Invalid manufacture password!</source>
-        <translation type="unfinished"></translation>
+        <translation>原厂商密码不正确！</translation>
     </message>
 </context>
 <context>
@@ -1546,261 +2273,184 @@
 <context>
     <name>DeviceSettingsDialog</name>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="20"/>
         <source>Parameter Dialog</source>
-        <translation>参数对话框</translation>
+        <translation type="vanished">参数对话框</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="30"/>
         <source>Mechining</source>
-        <translation>加工</translation>
+        <translation type="vanished">加工</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="41"/>
         <source>Cutting</source>
-        <translation>切割</translation>
+        <translation type="vanished">切割</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="50"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="112"/>
         <source>Start Speed(mm/s)</source>
-        <translation>起跳速度(mm/s)</translation>
+        <translation type="vanished">起跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="60"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="122"/>
         <source>Run Speed(mm/s)</source>
-        <translation>运行速比</translation>
+        <translation type="vanished">运行速比</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="70"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="132"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="175"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="226"/>
         <source>Power</source>
-        <translation>激光功率</translation>
+        <translation type="vanished">激光功率</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="80"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="142"/>
         <source>Start/Power</source>
-        <translation>速度/功率</translation>
+        <translation type="vanished">速度/功率</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="90"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="152"/>
         <source>Run/Power</source>
-        <translation>运行速比</translation>
+        <translation type="vanished">运行速比</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="103"/>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="188"/>
         <source>Engraving</source>
-        <translation>雕刻</translation>
+        <translation type="vanished">雕刻</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="169"/>
         <source>Cutting tune-up</source>
-        <translation>切割调整</translation>
+        <translation type="vanished">切割调整</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="197"/>
         <source>Row spacing</source>
-        <translation>行间距</translation>
+        <translation type="vanished">行间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="207"/>
         <source>Column Spacing</source>
-        <translation>列间距</translation>
+        <translation type="vanished">列间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="220"/>
         <source>Engraving tune-up</source>
-        <translation>雕刻调整</translation>
+        <translation type="vanished">雕刻调整</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="242"/>
         <source>System</source>
-        <translation>系统</translation>
+        <translation type="vanished">系统</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="251"/>
         <source>Move Start Speed(mm/s)</source>
-        <translation>运行起跳速度(mm/s)</translation>
+        <translation type="vanished">运行起跳速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="261"/>
         <source>Move Run Speed(mm/s)</source>
-        <translation>移动运行速度(mm/s)</translation>
+        <translation type="vanished">移动运行速度(mm/s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="268"/>
         <source>X Backlash</source>
-        <translation>X轴回差</translation>
+        <translation type="vanished">X轴回差</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="275"/>
         <source>Y Backlash</source>
-        <translation>Y轴回差</translation>
+        <translation type="vanished">Y轴回差</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="282"/>
         <source>Total Running Time(Minutes)</source>
-        <translation>系统累计运行时间（分钟）</translation>
+        <translation type="vanished">系统累计运行时间（分钟）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="289"/>
         <source>Laser Total Use Time(Minutes)</source>
-        <translation>激光管累计运行时间（分钟）</translation>
+        <translation type="vanished">激光管累计运行时间（分钟）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="296"/>
         <source>Cut Laser Frequency</source>
-        <translation>激光切割频率</translation>
+        <translation type="vanished">激光切割频率</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="303"/>
         <source>Carving Laser Frequency</source>
-        <translation>激光雕刻频率</translation>
+        <translation type="vanished">激光雕刻频率</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="346"/>
         <source>Manufacturer</source>
-        <translation>厂商</translation>
+        <translation type="vanished">厂商</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="357"/>
         <source>Manufacturer Password</source>
-        <translation>厂商密码</translation>
+        <translation type="vanished">厂商密码</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="367"/>
         <source>Verify</source>
-        <translation>验证</translation>
+        <translation type="vanished">验证</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="374"/>
         <source>Clear</source>
-        <translation>清除</translation>
+        <translation type="vanished">清除</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="381"/>
         <source>Change</source>
-        <translation>更改更改</translation>
+        <translation type="vanished">更改更改</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="406"/>
         <source>Reset Speed(mm/s)</source>
-        <translation>重置速度（mm/s）</translation>
+        <translation type="vanished">重置速度（mm/s）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="416"/>
         <source>Zero Speed(mm/s)</source>
-        <translation>回原点速度（mm/s）</translation>
+        <translation type="vanished">回原点速度（mm/s）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="426"/>
         <source>Zero Position</source>
-        <translation>加工原点位置</translation>
+        <translation type="vanished">加工原点位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="433"/>
         <source>X Step Length(um)</source>
-        <translation>X轴步长（um）</translation>
+        <translation type="vanished">X轴步长（um）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="440"/>
         <source>Y Step Length(um)</source>
-        <translation>Y轴步长（um）</translation>
+        <translation type="vanished">Y轴步长（um）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="447"/>
         <source>Motor Direction</source>
-        <translation>电机方向</translation>
+        <translation type="vanished">电机方向</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="454"/>
         <source>Limit Direction</source>
-        <translation>限位方向</translation>
+        <translation type="vanished">限位方向</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="461"/>
         <source>Page Width(mm)</source>
-        <translation>幅面宽（mm）</translation>
+        <translation type="vanished">幅面宽（mm）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="468"/>
         <source>Page Height(mm)</source>
-        <translation>幅面高（mm）</translation>
+        <translation type="vanished">幅面高（mm）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="475"/>
         <source>Drawing Unit(per inch)</source>
-        <translation>绘制单位（每英寸）</translation>
+        <translation type="vanished">绘制单位（每英寸）</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="572"/>
         <source>Read</source>
-        <translation>读取</translation>
+        <translation type="vanished">读取</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="579"/>
         <source>Write</source>
-        <translation>写入</translation>
+        <translation type="vanished">写入</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.ui" line="586"/>
         <source>Default</source>
-        <translation>默认</translation>
+        <translation type="vanished">默认</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="39"/>
         <source>Top Left</source>
-        <translation>左上左上</translation>
+        <translation type="vanished">左上左上</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="40"/>
         <source>Top Right</source>
-        <translation>右上</translation>
+        <translation type="vanished">右上</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="41"/>
         <source>Bottom Right</source>
-        <translation>右下</translation>
+        <translation type="vanished">右下</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="42"/>
         <source>Bottom Left</source>
-        <translation>左下</translation>
+        <translation type="vanished">左下</translation>
     </message>
     <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="43"/>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="47"/>
-        <source>0</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="44"/>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="48"/>
-        <source>1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="45"/>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="49"/>
-        <source>2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="46"/>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="50"/>
-        <source>3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/DeviceSettingsDialog.cpp" line="122"/>
         <source>Wrong password</source>
-        <translation>密码错误</translation>
+        <translation type="vanished">密码错误</translation>
     </message>
 </context>
 <context>
@@ -2088,15 +2738,15 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserApplication</name>
     <message>
-        <location filename="../src/LaserApplication.cpp" line="33"/>
+        <location filename="../src/LaserApplication.cpp" line="35"/>
         <source>Application startup failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>系统启动失败。</translation>
     </message>
 </context>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="370"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="435"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>
@@ -2104,9 +2754,8 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserControllerWindow</name>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="14"/>
         <source>Laser Controller</source>
-        <translation>激光控制器</translation>
+        <translation type="vanished">激光控制器</translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="35"/>
@@ -2129,37 +2778,36 @@ Would you like to overwrite it?</source>
         <translation>编辑(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="74"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="79"/>
         <source>&amp;Options</source>
         <translation>选项(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="80"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="85"/>
         <source>&amp;Primitive</source>
         <translation>图元(&amp;P)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="86"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="91"/>
         <source>&amp;Mainboard</source>
         <translation>主板(&amp;M)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="94"/>
         <source>&amp;View</source>
-        <translation>视图(&amp;V)</translation>
+        <translation type="vanished">视图(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="106"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="111"/>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="128"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="133"/>
         <source>toolBar</source>
         <translation>工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="868"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1333"/>
         <source>Layers</source>
         <translation>图层</translation>
     </message>
@@ -2204,13 +2852,15 @@ Would you like to overwrite it?</source>
         <translation type="vanished">值</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="162"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="221"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="173"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="236"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="247"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="263"/>
         <source>toolBar_2</source>
         <translation>工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1062"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1527"/>
         <source>Operations</source>
         <translation>操作</translation>
     </message>
@@ -2219,12 +2869,12 @@ Would you like to overwrite it?</source>
         <translation type="vanished">启动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="498"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="543"/>
         <source>Pause</source>
         <translation>暂停</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="597"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="642"/>
         <source>Cut</source>
         <translation>切边</translation>
     </message>
@@ -2233,17 +2883,17 @@ Would you like to overwrite it?</source>
         <translation type="vanished">点射</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="510"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="555"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="895"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="946"/>
         <source>Reset</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="752"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="806"/>
         <source>Origin</source>
         <translation>原点</translation>
     </message>
@@ -2252,27 +2902,27 @@ Would you like to overwrite it?</source>
         <translation type="vanished">优化</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1037"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1502"/>
         <source>Laser Power</source>
         <translation>激光功率</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1036"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1501"/>
         <source>Start Position</source>
         <translation>开始位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="982"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1447"/>
         <source>Current Position</source>
         <translation>当前位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="983"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1448"/>
         <source>Custom Origin</source>
         <translation>自定义原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="984"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1449"/>
         <source>Mechnical Origin</source>
         <translation>机械原点</translation>
     </message>
@@ -2285,7 +2935,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">最大功率</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1038"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1503"/>
         <source>Laser Range</source>
         <translation>激光功率范围</translation>
     </message>
@@ -2302,47 +2952,48 @@ Would you like to overwrite it?</source>
         <translation type="vanished">设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="522"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="567"/>
         <source>Connect</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1270"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1773"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1800"/>
         <source>Movement</source>
         <translation>运动控制</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1115"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1609"/>
         <source>Coordinates</source>
         <translatorcomment>坐标</translatorcomment>
         <translation>坐标</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1122"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1616"/>
         <source>Distance(mm)</source>
         <translation>距离(mm)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1116"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1123"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1224"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1229"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1234"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1610"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1617"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1727"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1732"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1737"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1118"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1125"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1226"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1231"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1236"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1612"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1619"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1729"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1734"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1739"/>
         <source>Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1120"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1127"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1614"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1621"/>
         <source>Z</source>
         <translation></translation>
     </message>
@@ -2391,28 +3042,43 @@ Would you like to overwrite it?</source>
         <translation type="vanished">垂直下降</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1221"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1724"/>
         <source>Post Event</source>
         <translation>加工完成后</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1185"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1688"/>
         <source>Stop at current position</source>
         <translation>激光头停在当前位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1186"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1583"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1569"/>
+        <source>X Enabled</source>
+        <translation>X轴使能</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1573"/>
+        <source>Y Enabled</source>
+        <translation>Y轴使能</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1577"/>
+        <source>Z Enabled</source>
+        <translation>Z轴使能</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1689"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2522"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1187"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1690"/>
         <source>Back to mechnical origin</source>
         <translation>激光头返回机械原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1188"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1691"/>
         <source>Back to machining origin</source>
         <translation>激光头返回机器原点</translation>
     </message>
@@ -2445,585 +3111,857 @@ Would you like to overwrite it?</source>
         <translation type="vanished">继电器3</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1080"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1558"/>
         <source>Outline</source>
         <translation>大纲</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="239"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="281"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="242"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="284"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="254"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="257"/>
         <source>Import SVG</source>
-        <translation>从SVG导入</translation>
+        <translation type="vanished">从SVG导入</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="269"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="14"/>
+        <source>CNE Laser</source>
+        <translation>CNE Laser</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="99"/>
+        <source>&amp;Window</source>
+        <translation>窗口(&amp;W)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="296"/>
+        <source>Import Document</source>
+        <translation>导入文档</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="299"/>
+        <source>Import From External Document</source>
+        <translation>从外部导入文档</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="311"/>
         <source>Export JSON</source>
         <translation>导出JSON</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="281"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="323"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="284"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="326"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="296"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="338"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="299"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="341"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="314"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="317"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="356"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="359"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="325"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="328"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="367"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="370"/>
         <source>Add Engraving Layer</source>
         <translation>添加雕刻图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="336"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="378"/>
         <source>Add Cutting Layer</source>
         <translation>添加切割图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="344"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1365"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1370"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="386"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2293"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2298"/>
         <source>Remove Layer</source>
         <translation>删除图层</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="352"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="394"/>
         <source>Area Selection</source>
         <translation>区域选择</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="360"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="402"/>
         <source>Cancel Selection</source>
         <translation>取消选择</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="372"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="414"/>
         <source>Selection Tool</source>
         <translation>选项工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="384"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="417"/>
+        <source>Esc</source>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="429"/>
         <source>Rectangle Tool</source>
         <translation>矩形工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="396"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="441"/>
         <source>Ellipse Tool</source>
         <translation>椭圆工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="408"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="453"/>
         <source>Polygon Tool</source>
         <translation>多边形工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="420"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="465"/>
         <source>Text Tool</source>
         <translation>文件工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="432"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="477"/>
         <source>Line Tool</source>
         <translation>直线工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="444"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="489"/>
         <source>Bitmap Tool</source>
         <translation>位图工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="456"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="501"/>
         <source>Spline Tool</source>
         <translation>样条线工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="468"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="471"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="513"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="516"/>
         <source>Import CorelDraw</source>
         <translation>从CorelDraw导入</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="483"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="528"/>
         <source>Machining</source>
         <translation>加工</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="534"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="579"/>
         <source>Disconnect</source>
         <translation>断开</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="542"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="545"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="587"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="590"/>
         <source>Load Motor</source>
         <translation>加载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="553"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="598"/>
         <source>Unload Motor</source>
         <translation>卸载电机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="565"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="568"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="610"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="613"/>
         <source>Close Document</source>
         <translation>关闭文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="573"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="618"/>
         <source>Download</source>
         <translation>下发数据</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="578"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="623"/>
         <source>Work State</source>
         <translation>工作状态</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="583"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1462"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="628"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2394"/>
         <source>Load Json</source>
         <translation>加载Json文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="588"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="633"/>
         <source>Half Tone</source>
         <translation>半色调算法</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="606"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="645"/>
+        <source>Ctrl+X</source>
+        <translation>Ctrl+X</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="654"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="615"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="657"/>
+        <source>Ctrl+C</source>
+        <translation>Ctrl+C</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="666"/>
         <source>Paste</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="624"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="669"/>
+        <source>Ctrl+V</source>
+        <translation>Ctrl+V</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="678"/>
         <source>Path Opt</source>
         <translation>路径优化</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="629"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="683"/>
         <source>Remote Assistance</source>
         <translation>远程协助</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="634"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="688"/>
         <source>Mainboard Information</source>
         <translation>主板信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="639"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="693"/>
         <source>Update firmware</source>
         <translation>更新固件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="644"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="698"/>
         <source>Show Toolbar</source>
         <translation>显示工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="649"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="703"/>
         <source>Show Statusbar</source>
         <translation>显示状态栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="654"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="708"/>
         <source>Show Layers Panel</source>
         <translation>显示图层面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="659"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="713"/>
         <source>Show Parameters Panel</source>
         <translation>显示参数面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="662"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="716"/>
         <source>Show Parameters</source>
         <translation>显示参数面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="667"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="721"/>
         <source>Show Operation Panel</source>
         <translation>显示操作面板</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="672"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="726"/>
         <source>Show Ruler</source>
         <translation>显示标尺</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="677"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="731"/>
         <source>Online Help</source>
         <translation>在线帮助</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="682"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="736"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2034"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="687"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="741"/>
         <source>Official Website</source>
         <translation>官方网站</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="692"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="746"/>
         <source>Contact Us</source>
         <translation>联系我们</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="701"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="755"/>
         <source>Delete Primitive</source>
         <translation>删除图元</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="706"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="833"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="760"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="911"/>
         <source>Move Up</source>
         <translation>向上移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="714"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="842"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="768"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="920"/>
         <source>Move Down</source>
         <translation>向下移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="723"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="777"/>
         <source>Spot</source>
         <translation>点射</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="732"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="735"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="786"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="789"/>
         <source>Bounding</source>
         <translation>走边框</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="743"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1375"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="797"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2303"/>
         <source>Move</source>
         <translation>走边</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="761"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="815"/>
         <source>Move Left</source>
         <translation>向左移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="770"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="818"/>
+        <source>Left</source>
+        <translation>左</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="827"/>
         <source>Move Right</source>
         <translation>向右移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="779"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="830"/>
+        <source>Right</source>
+        <translation>右</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="839"/>
         <source>Move Top</source>
         <translation>向上移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="788"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="842"/>
+        <source>Up</source>
+        <translation>上</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="851"/>
         <source>Move Bottom</source>
         <translation>向下移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="797"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="854"/>
+        <source>Down</source>
+        <translation>下</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="863"/>
         <source>Move Top Left</source>
         <translation>向左上移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="806"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="866"/>
+        <source>Up, Left</source>
+        <translation>左上</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="875"/>
         <source>Move Top Right</source>
         <translation>向右上移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="815"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="878"/>
+        <source>Up, Right</source>
+        <translation>右上</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="887"/>
         <source>Move Bottom Left</source>
         <translation>向左下移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="824"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="890"/>
+        <source>Left, Down</source>
+        <translation>左下</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="899"/>
         <source>Move Bottom Right</source>
         <translation>向右下移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="851"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="902"/>
+        <source>Down, Right</source>
+        <translation>右下</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1080"/>
+        <source>DragView</source>
+        <translation>拖动视图</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1083"/>
+        <source>Drag View</source>
+        <translation>拖动视图</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1092"/>
+        <source>ZoomIn</source>
+        <translation>放大</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1095"/>
+        <source>Zoom In</source>
+        <translation>放大</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1098"/>
+        <source>Ctrl+=</source>
+        <translation>Ctrl+=</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1107"/>
+        <source>ZoomOut</source>
+        <translation>缩小</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1110"/>
+        <source>Zoom Out</source>
+        <translation>缩小</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1113"/>
+        <source>Ctrl+-</source>
+        <translation>Ctrl+-</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1122"/>
+        <source>ZoomToPage</source>
+        <translation>缩放到文档</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1125"/>
+        <source>zoom to page</source>
+        <translation>绽放到文档大小</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1128"/>
+        <source>Ctrl+0</source>
+        <translation>Ctrl+0</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1137"/>
+        <source>ZoomToSelection</source>
+        <translation>放大到所选</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1140"/>
+        <source>zoom to frame selection</source>
+        <translation>缩放到框选</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1143"/>
+        <source>Ctrl+Shift+A</source>
+        <translation>Ctrl+Shift+A</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1152"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="860"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1155"/>
+        <source>Ctrl+Z</source>
+        <translation>Ctrl+Z</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1164"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="869"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1167"/>
+        <source>Ctrl+Shift+Z</source>
+        <translation>Ctrl+Shift+Z</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1176"/>
+        <source>MirrorHorizontal</source>
+        <translation>水平镜像</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1179"/>
+        <source>Mirror Selection Horizontally</source>
+        <translation>水平镜像选中</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1182"/>
+        <source>Ctrl+Shift+H</source>
+        <translation>Ctrl+Shift+H</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1191"/>
+        <source>MirrorVertical</source>
+        <translation>垂直镜像</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1194"/>
+        <source>Mirror Selection Vertically</source>
+        <translation>垂直镜像所选</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1197"/>
+        <source>Ctrl+Shift+V</source>
+        <translation>Ctrl+Shift+V</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1206"/>
+        <source>Group</source>
+        <translation>创建组</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1209"/>
+        <source>Group Selection</source>
+        <translation>使用所选创建组</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1212"/>
+        <source>Ctrl+G</source>
+        <translation>Ctrl+G</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1221"/>
+        <source>Ungroup</source>
+        <translation>解组</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1224"/>
+        <source>Ungroup Selection</source>
+        <translation>解组所选</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1227"/>
+        <source>Ctrl+U</source>
+        <translation>Ctrl+U</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1236"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1239"/>
+        <source>Duplication</source>
+        <translation>复制</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1242"/>
+        <source>Ctrl+D</source>
+        <translation>Ctrl+D</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1247"/>
+        <source>PasteInPlace</source>
+        <translation>粘贴到位置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1250"/>
+        <source>Paste In place</source>
+        <translation>粘贴到位置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1253"/>
+        <source>Alt+V</source>
+        <translation>Alt+V</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1258"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1261"/>
+        <source>Update Outline</source>
+        <translation>更新拓扑结构</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1266"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1269"/>
+        <source>Laser Position</source>
+        <translation>激光位置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1278"/>
+        <source>MirrorAcrossLine</source>
+        <translation>根据直线镜像</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1281"/>
+        <source>Backspace</source>
+        <translation>Ｂａｃｋｓｐａｃｅ</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="929"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="878"/>
         <source>Device Settings</source>
-        <translation>设备选项</translation>
+        <translation type="vanished">设备选项</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="883"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="886"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="934"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="937"/>
         <source>Edit Spline Tool</source>
         <translation>编辑样条线工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="903"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="954"/>
         <source>Analysis Document</source>
         <translation>文档分析</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="915"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="966"/>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>锁定</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="918"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="969"/>
         <source>lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="930"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="933"/>
-        <source>Unlock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="941"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="944"/>
-        <source>mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="949"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="952"/>
-        <source>Show Main Card Info</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="957"/>
-        <source>Temporary License</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="960"/>
-        <source>Apply for temporary license</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="965"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="968"/>
-        <source>About</source>
-        <translation type="unfinished">关于</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="973"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="976"/>
-        <source>Update Overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>锁定</translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="981"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="984"/>
-        <source>Trace</source>
-        <translation type="unfinished"></translation>
+        <source>Unlock</source>
+        <translation>解锁</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="989"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="992"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="995"/>
+        <source>mm</source>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1000"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1003"/>
+        <source>Show Main Card Info</source>
+        <translation>显示主板信息</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1008"/>
+        <source>Temporary License</source>
+        <translation>临时许可证</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1011"/>
+        <source>Apply for temporary license</source>
+        <translation>申请临时许可证</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1016"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1019"/>
+        <source>About</source>
+        <translation>关于关于</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1024"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1027"/>
+        <source>Update Overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1032"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1035"/>
+        <source>Trace</source>
+        <translation>图像寻边</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1040"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1043"/>
         <source>Save Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>保存设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1001"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1004"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1052"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1055"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1009"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1012"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1060"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1063"/>
         <source>Read Origins</source>
-        <translation type="unfinished"></translation>
+        <translation>读取原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1017"/>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="1020"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1068"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="1071"/>
         <source>Write Origins</source>
-        <translation type="unfinished"></translation>
+        <translation>保存原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="112"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="145"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="174"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="191"/>
         <source>Tips</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="181"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="198"/>
         <source>Unregistered</source>
-        <translation type="unfinished"></translation>
+        <translation>未注册</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="188"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="205"/>
         <source>Inactivated</source>
-        <translation type="unfinished"></translation>
+        <translation>未激活</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="195"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="212"/>
         <source>Welcome!</source>
         <translation>欢迎！</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="202"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="225"/>
         <source>0,0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="209"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="232"/>
         <source>Top Left</source>
         <translation>左上</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="216"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="239"/>
         <source>Page Size(mm): 210x320</source>
         <translation>页面尺寸(mm): 210x320</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="658"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="693"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="839"/>
         <source>Operate failure</source>
         <translation>操作失败</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="658"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="839"/>
         <source>Laser device is not connected!</source>
         <translation>激光设置未连接！</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="693"/>
         <source>Getting register value failure!</source>
-        <translation>读取寄存器失败！</translation>
+        <translation type="vanished">读取寄存器失败！</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="831"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1297"/>
         <source>work space</source>
-        <translation type="unfinished"></translation>
+        <translation>工作区</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="877"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1343"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1400"/>
         <source>Cameras</source>
         <translation>相机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="880"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1345"/>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="894"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1359"/>
         <source>Fade</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="895"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1360"/>
         <source>Width</source>
-        <translation type="unfinished">宽度</translation>
+        <translation>宽度</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="899"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1364"/>
         <source>Height</source>
-        <translation type="unfinished">长度</translation>
+        <translation>长度</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="904"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1369"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>显示</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="905"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1370"/>
         <source>X Shift</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="909"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1374"/>
         <source>Y Shift</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="936"/>
         <source>Camera</source>
-        <translation>相机</translation>
+        <translation type="vanished">相机</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1010"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1475"/>
         <source>Devices</source>
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1190"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1191"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1192"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1693"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1694"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="1695"/>
         <source>Origin 1</source>
         <translation>机械原点1</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1280"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2813"/>
         <source>Open SVG File</source>
-        <translation>打开SVG文件</translation>
+        <translation type="vanished">打开SVG文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1365"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2167"/>
+        <source>SVG (*.svg);;CAD (*.dxf)</source>
+        <translation>SVG (*.svg);;CAD (*.dxf)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2168"/>
+        <source>Open Supported File</source>
+        <translation>打开支持的文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2293"/>
         <source>You can not remove default layer. (Note: The first two layers are default layers, one for cutting and another for engraving.)</source>
         <translation>无法删除默认图层。（注意：图层列表中前两个图层为默认图层，一个为默认切割图层，另一个为默认雕刻图层。）</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1371"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2299"/>
         <source>You are about deleting selected layer. Do you want to delete all primitives belonged to this layer or move them to default layer?</source>
         <translation>您当前正要删除图层。是否要删除该图层中的所有图元？或是将它们移动到默认图层？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1372"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2300"/>
         <source>If you click &apos;Delete&apos;, all primitives in this layer will be deleted. 
 If you click &apos;Move&apos;, they will be moved to the default layer. 
 If you click &apos;Cancel&apos;, do nothing.</source>
@@ -3032,94 +3970,97 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 如果点击“取消”按钮，则放弃当前操作。</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1374"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2302"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1376"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2304"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1444"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2372"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1486"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2421"/>
         <source>Alert</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1486"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2421"/>
         <source>No active document. Please open or import a document to mechining</source>
         <translation>没有活动文档。请打开或导入一个文档用于加工</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1583"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2489"/>
+        <source>Path Optimization</source>
+        <translation>路径优化</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2522"/>
         <source>Do you want to unload motor?</source>
         <translation>是否确认卸载电机？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1656"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2600"/>
         <source>Open Image</source>
         <translation>打开图片</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1656"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2600"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation>图片(*.png *.bmp *.jpg)</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1685"/>
         <source>Delete primitives?</source>
-        <translation>删除图元？</translation>
+        <translation type="vanished">删除图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1685"/>
         <source>Do you want to delete primitives selected?</source>
-        <translation>是否删除选中的图元？</translation>
+        <translation type="vanished">是否删除选中的图元？</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1849"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2878"/>
         <source>Request successful</source>
-        <translation type="unfinished"></translation>
+        <translation>请求成功</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1849"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2878"/>
         <source>Your application for temporary license is successful. Please restart your program.</source>
-        <translation type="unfinished"></translation>
+        <translation>临时许可证申请成功。请重新运行当前应用程序。</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1853"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2882"/>
         <source>Request failure</source>
-        <translation type="unfinished"></translation>
+        <translation>请求失败</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1853"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2882"/>
         <source>Your application for temporary license is failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>申请临时许可证失败。</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1892"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2973"/>
         <source>Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>已连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1897"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2978"/>
         <source>Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>未连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1902"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2983"/>
         <source>Registered</source>
-        <translation type="unfinished"></translation>
+        <translation>已注册</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="1907"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2988"/>
         <source>Activated</source>
-        <translation type="unfinished"></translation>
+        <translation>已激活</translation>
     </message>
     <message>
         <source>Close document?</source>
@@ -3149,266 +4090,298 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDevice</name>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="452"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="901"/>
         <source>Laser device fatal error</source>
-        <translation type="unfinished">设备致命错误</translation>
+        <translation>设备致命错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="458"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="908"/>
         <source>Failed to initialize laser device</source>
-        <translation type="unfinished">无法初始化设备</translation>
+        <translation>无法初始化设备</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="461"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="911"/>
         <source>Failed to uninitialize laser device normally</source>
-        <translation type="unfinished">无法正常卸载设备</translation>
+        <translation>无法正常卸载设备</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="464"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="914"/>
         <source>Com port not available</source>
-        <translation type="unfinished">无法正常卸载设备</translation>
+        <translation>无法正常卸载设备</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="467"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="917"/>
         <source>Failed to get COM port list</source>
-        <translation type="unfinished">获取COM端口列表失败</translation>
+        <translation>获取COM端口列表失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="470"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="920"/>
         <source>Dongle does not exist</source>
-        <translation type="unfinished">未找到加密狗</translation>
+        <translation>未找到加密狗</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="473"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="923"/>
         <source>Dongle activation is disabled</source>
-        <translation type="unfinished">加密狗激活功能已禁用</translation>
+        <translation>加密狗激活功能已禁用</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="476"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="926"/>
         <source>Failed to register main card</source>
-        <translation type="unfinished">板卡注册失败</translation>
+        <translation>板卡注册失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="479"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="929"/>
         <source>Main card inactivated</source>
-        <translation type="unfinished">板卡未激活</translation>
+        <translation>板卡未激活</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="482"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="932"/>
         <source>Invalid main card ID</source>
-        <translation type="unfinished">无效的板卡ID</translation>
+        <translation>无效的板卡ID</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="485"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="935"/>
         <source>Invalid dongle ID</source>
-        <translation type="unfinished">无效的加密狗ID</translation>
+        <translation>无效的加密狗ID</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="488"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="938"/>
         <source>Failed to bind card with dongle</source>
-        <translation type="unfinished">板卡绑定加密狗失败</translation>
+        <translation>板卡绑定加密狗失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="491"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="941"/>
         <source>The card is repeatedly bound to the dongle</source>
-        <translation type="unfinished">板卡与加密狗重复绑定</translation>
+        <translation>板卡与加密狗重复绑定</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="494"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="944"/>
         <source>The number of times the card is bound to the dongle exceeds the allowable range</source>
-        <translation type="unfinished">板卡绑定加密狗次数超限</translation>
+        <translation>板卡绑定加密狗次数超限</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="497"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="947"/>
         <source>The card is illegally bound to the dongle</source>
-        <translation type="unfinished">板卡非法绑定加密狗</translation>
+        <translation>板卡非法绑定加密狗</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="500"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="950"/>
         <source>Failed to clear duration of laser tube</source>
-        <translation type="unfinished">激光管累计运行时间清零失败</translation>
+        <translation>激光管累计运行时间清零失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="503"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="953"/>
         <source>Incorrect factory password</source>
-        <translation type="unfinished">厂家密码错误</translation>
+        <translation>厂家密码错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="507"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="955"/>
+        <source>Invalid password</source>
+        <translation>无效密码</translation>
+    </message>
+    <message>
+        <location filename="../src/laser/LaserDevice.cpp" line="955"/>
+        <source>Invalid Manufacture password</source>
+        <translation>厂商密码错误</translation>
+    </message>
+    <message>
+        <location filename="../src/laser/LaserDevice.cpp" line="958"/>
         <source>Invalid length of factory password</source>
-        <translation type="unfinished">厂家密码长度无效</translation>
+        <translation>厂家密码长度无效</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="510"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="961"/>
         <source>Factory password expired</source>
-        <translation type="unfinished">厂家密码已过期</translation>
+        <translation>厂家密码已过期</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="513"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="964"/>
         <source>Input incorrect factory password too many times</source>
-        <translation type="unfinished">厂家密码错误输入次数过多</translation>
+        <translation>厂家密码错误输入次数过多</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="516"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="967"/>
         <source>Failed to change factory password</source>
-        <translation type="unfinished">修改厂家密码错误</translation>
+        <translation>修改厂家密码错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="519"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="525"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="970"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="976"/>
         <source>Failed to read parameters from device</source>
-        <translation type="unfinished">读取设备参数错误</translation>
+        <translation>读取设备参数错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="522"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="528"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="973"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="979"/>
         <source>Failed to write parameters to device</source>
-        <translation type="unfinished">写入设备参数错误</translation>
+        <translation>写入设备参数错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="531"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="982"/>
         <source>Failed to save parameters to server</source>
-        <translation type="unfinished">向服务器保存参数错误</translation>
+        <translation>向服务器保存参数错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="534"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="985"/>
         <source>Failed to load parameters from server</source>
-        <translation type="unfinished">从服务器读取参数错误</translation>
+        <translation>从服务器读取参数错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="537"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="988"/>
         <source>File does not exist</source>
-        <translation type="unfinished">文件不存在</translation>
+        <translation>文件不存在</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="540"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="991"/>
         <source>Invalid data format</source>
-        <translation type="unfinished">数据格式错误</translation>
+        <translation>数据格式错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="543"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="994"/>
         <source>Failed to decrypt data</source>
-        <translation type="unfinished">数据解码错误</translation>
+        <translation>数据解码错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="546"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="997"/>
         <source>Invalid image data</source>
-        <translation type="unfinished">无效的图片数据</translation>
+        <translation>无效的图片数据</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="549"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1000"/>
         <source>Min size of image is too small</source>
-        <translation type="unfinished">图片尺寸过小</translation>
+        <translation>图片尺寸过小</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="552"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1003"/>
         <source>Max size of image is too large</source>
-        <translation type="unfinished">图片尺寸过大</translation>
+        <translation>图片尺寸过大</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="555"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1006"/>
         <source>No data transfered</source>
-        <translation type="unfinished">没有数据传输</translation>
+        <translation>没有数据传输</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="558"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1009"/>
         <source>Transfering data timeout</source>
-        <translation type="unfinished">传输数据超时</translation>
+        <translation>传输数据超时</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="561"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1012"/>
         <source>Retransfer data after timeout</source>
-        <translation type="unfinished">超时重发数据</translation>
+        <translation>超时重发数据</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="564"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1015"/>
         <source>Retransfer data too many times</source>
-        <translation type="unfinished">重发次数过多</translation>
+        <translation>重发次数过多</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="567"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1018"/>
         <source>Failed to transfer data</source>
-        <translation type="unfinished">数据发送失败</translation>
+        <translation>数据发送失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="570"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1021"/>
         <source>Receive invalid data too many times</source>
-        <translation type="unfinished">连续接收错误数据次数过多</translation>
+        <translation>连续接收错误数据次数过多</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="573"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1024"/>
         <source>Failed to transfer data with breakpoint</source>
-        <translation type="unfinished">断点续传失败</translation>
+        <translation>断点续传失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="576"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1027"/>
         <source>This operation is not supported during machining</source>
-        <translation type="unfinished">加工期间不支持此操作</translation>
+        <translation>加工期间不支持此操作</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="579"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1030"/>
         <source>Failed to connect to server</source>
-        <translation type="unfinished">连接服务器错误</translation>
+        <translation>连接服务器错误</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="582"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1033"/>
         <source>Failed to log in to server</source>
-        <translation type="unfinished">登陆服务器失败</translation>
+        <translation>登陆服务器失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="585"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1036"/>
         <source>Login too frequently</source>
-        <translation type="unfinished">登陆过于频繁</translation>
+        <translation>登陆过于频繁</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="588"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1039"/>
         <source>Failed to submit data</source>
-        <translation type="unfinished">提交数据失败</translation>
+        <translation>提交数据失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="591"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1042"/>
         <source>Updating info file does not exist</source>
-        <translation type="unfinished">升级用的信息文件不存在</translation>
+        <translation>升级用的信息文件不存在</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="594"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1045"/>
         <source>Updating file dose not exist</source>
-        <translation type="unfinished">升级文件不存在</translation>
+        <translation>升级文件不存在</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="597"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1048"/>
         <source>Failed to update</source>
-        <translation type="unfinished">升级失败</translation>
+        <translation>升级失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="600"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1051"/>
         <source>Failed to download firmware</source>
-        <translation type="unfinished">下载固件失败</translation>
+        <translation>下载固件失败</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="603"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1054"/>
         <source>Update firmware timeout</source>
-        <translation type="unfinished">升级固件超时</translation>
+        <translation>升级固件超时</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="659"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="664"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1110"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1115"/>
         <source>Main card info incomplete.</source>
-        <translation type="unfinished"></translation>
+        <translation>主板信息不完整。</translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="695"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="708"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1146"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1155"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1164"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1173"/>
         <source>Registers data incomplete.</source>
-        <translation type="unfinished"></translation>
+        <translation>寄存信息不完整。</translation>
     </message>
 </context>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="172"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="193"/>
         <source>Layer</source>
-        <translation>图层层</translation>
+        <translation>图层</translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserDocument.cpp" line="350"/>
+        <source>Primitve %1 finished.</source>
+        <translation>图元%1完毕。</translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserDocument.cpp" line="373"/>
+        <source>File saved.</source>
+        <translation>文档已保存。</translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserDocument.cpp" line="377"/>
+        <source>Done</source>
+        <translation>完成</translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserDocument.cpp" line="972"/>
+        <source>Untitled</source>
+        <translation>未命名</translation>
     </message>
 </context>
 <context>
@@ -3757,16 +4730,11 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <source>Update firmware timeout</source>
         <translation type="vanished">升级固件超时</translation>
     </message>
-    <message>
-        <location filename="../src/laser/LaserDriver.cpp" line="34"/>
-        <source>Device driver initialize failure.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>LaserLayer</name>
     <message>
-        <location filename="../src/scene/LaserLayer.cpp" line="143"/>
+        <location filename="../src/scene/LaserLayer.cpp" line="135"/>
         <source>undefined</source>
         <translation>未定义</translation>
     </message>
@@ -3813,8 +4781,23 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="121"/>
         <location filename="../src/ui/LaserLayerDialog.ui" line="187"/>
+        <source>Run Speed(mm/s)</source>
+        <translation>运行速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="161"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="177"/>
+        <source>Min Speed(mm/s)</source>
+        <translation>起跳速度(mm/s)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="261"/>
+        <source>Row Interval(μm)</source>
+        <translation>行间距(µm)</translation>
+    </message>
+    <message>
         <source>Run Speed</source>
-        <translation>运行速度</translation>
+        <translation type="vanished">运行速度</translation>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="131"/>
@@ -3835,10 +4818,8 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>运行速比</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="161"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="177"/>
         <source>Min Speed</source>
-        <translation>起跳速度</translation>
+        <translation type="vanished">起跳速度</translation>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="227"/>
@@ -3859,67 +4840,67 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserLayerTableWidget</name>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="18"/>
-        <source>#</source>
-        <translation type="unfinished">#</translation>
-    </message>
-    <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="19"/>
-        <source>Layer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="20"/>
-        <source>Mode</source>
-        <translation type="unfinished">模式</translation>
+        <source>#</source>
+        <translation>#</translation>
     </message>
     <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="21"/>
-        <source>Count</source>
-        <translation type="unfinished">图元数</translation>
+        <source>Layer</source>
+        <translation>图层</translation>
     </message>
     <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="22"/>
-        <source>Speed/Power</source>
-        <translation type="unfinished">速度/功率</translation>
+        <source>Mode</source>
+        <translation>模式</translation>
     </message>
     <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="23"/>
-        <source>Output</source>
-        <translation type="unfinished">输出</translation>
+        <source>Count</source>
+        <translation>图元数</translation>
     </message>
     <message>
         <location filename="../src/widget/LaserLayerTableWidget.cpp" line="24"/>
-        <source>Visible</source>
-        <translation type="unfinished">显示</translation>
+        <source>Speed/Power</source>
+        <translation>速度/功率</translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="83"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="25"/>
+        <source>Output</source>
+        <translation>输出</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="26"/>
+        <source>Visible</source>
+        <translation>显示</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="105"/>
         <source>C</source>
         <translation>C</translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="84"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="106"/>
         <source>Cutting</source>
         <translation>切割</translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="88"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="110"/>
         <source>E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="89"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="111"/>
         <source>Engraving</source>
         <translation>雕刻</translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="93"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="115"/>
         <source>C+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="94"/>
+        <location filename="../src/widget/LaserLayerTableWidget.cpp" line="116"/>
         <source>Both</source>
         <translation>切割+雕刻</translation>
     </message>
@@ -3927,50 +4908,62 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="396"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="526"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="397"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="527"/>
         <source>Circle</source>
         <translation>圆</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="398"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="528"/>
         <source>Ellipse</source>
         <translation>椭圆</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="399"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="529"/>
         <source>Line</source>
         <translation>直线</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="400"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="530"/>
         <source>Path</source>
         <translation>路径</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="401"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="531"/>
         <source>Polygon</source>
         <translation>多边形</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="402"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="532"/>
         <source>Polyline</source>
         <translation>多边线</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="403"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="533"/>
         <source>Rect</source>
         <translation>矩形</translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="534"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="552"/>
+        <source>Text</source>
+        <translation>文本</translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="535"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="553"/>
+        <source>Nurbs</source>
+        <translation>样条线</translation>
     </message>
 </context>
 <context>
     <name>LaserText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="399"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="513"/>
         <source>Text</source>
         <translation>文本</translation>
     </message>
@@ -3980,77 +4973,77 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="14"/>
         <source>Main Card Info</source>
-        <translation type="unfinished"></translation>
+        <translation>主板信息</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="22"/>
         <source>Main card</source>
-        <translation type="unfinished"></translation>
+        <translation>主板</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="42"/>
         <source>Main card registered date</source>
-        <translation type="unfinished"></translation>
+        <translation>主板注册日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="62"/>
         <source>Main card activated date</source>
-        <translation type="unfinished"></translation>
+        <translation>主板激活日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="82"/>
         <source>Bound Dongle</source>
-        <translation type="unfinished"></translation>
+        <translation>绑定的加密狗</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="102"/>
         <source>Bound dongle registered date</source>
-        <translation type="unfinished"></translation>
+        <translation>绑定加密狗的注册日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="122"/>
         <source>Bound dongle activated date</source>
-        <translation type="unfinished"></translation>
+        <translation>绑定加密狗的激活日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="142"/>
         <source>Bound dongle binding times</source>
-        <translation type="unfinished"></translation>
+        <translation>绑定加密狗的次数</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="162"/>
         <source>Current Dongle</source>
-        <translation type="unfinished"></translation>
+        <translation>当前加密狗</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="182"/>
         <source>Current dongle registered date</source>
-        <translation type="unfinished"></translation>
+        <translation>当前加密狗的注册日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="202"/>
         <source>Current dongle activated date</source>
-        <translation type="unfinished"></translation>
+        <translation>当前加密狗的激活日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="222"/>
         <source>Current dongle binding times</source>
-        <translation type="unfinished"></translation>
+        <translation>当前加密狗的绑定次数</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="242"/>
         <source>Hardware registered date</source>
-        <translation type="unfinished"></translation>
+        <translation>硬件注册日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="262"/>
         <source>Hardware activated date</source>
-        <translation type="unfinished"></translation>
+        <translation>硬件激活日期</translation>
     </message>
     <message>
         <location filename="../src/ui/MainCardInfoDialog.ui" line="282"/>
         <source>Hardware maintaining times</source>
-        <translation type="unfinished"></translation>
+        <translation>硬件重置次数</translation>
     </message>
 </context>
 <context>
@@ -4113,75 +5106,110 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>PathOptimizer</name>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="658"/>
+        <location filename="../src/algorithm/PathOptimizer.cpp" line="65"/>
         <source>Initializing optimizer...</source>
         <translation>初始化路径优化工具...</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="663"/>
+        <location filename="../src/algorithm/PathOptimizer.cpp" line="84"/>
+        <source>Arranged machining points of node %1.</source>
+        <translation>重新排列%1的加工点。</translation>
+    </message>
+    <message>
+        <location filename="../src/algorithm/PathOptimizer.cpp" line="123"/>
+        <source>Generating machining points of node %1</source>
+        <translation>为%1生成加工点</translation>
+    </message>
+    <message>
+        <location filename="../src/algorithm/PathOptimizer.cpp" line="131"/>
+        <source>Generating machining points of node %1. Done.</source>
+        <translation>为%1生成加工点。完毕。</translation>
+    </message>
+    <message>
+        <location filename="../src/algorithm/PathOptimizer.cpp" line="201"/>
+        <source>Arrived node %1</source>
+        <translation>访问结点%1</translation>
+    </message>
+    <message>
         <source>Begin optimizing...</source>
-        <translation>开始优化...</translation>
+        <translation type="vanished">开始优化...</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="668"/>
         <source>The init pheromones is %1</source>
-        <translation>初始信息素浓度为%1</translation>
+        <translation type="vanished">初始信息素浓度为%1</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="688"/>
         <source>Count of ants is %1, count of iterations is %2</source>
-        <translation>蚂蚁数量为%1，迭代数为%2</translation>
+        <translation type="vanished">蚂蚁数量为%1，迭代数为%2</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="719"/>
         <source>[%1/%2] Iteration %1 beginning...</source>
-        <translation>[%1/%2]迭代%1开始执行...</translation>
+        <translation type="vanished">[%1/%2]迭代%1开始执行...</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="780"/>
         <source>The optimized path has been already generated, quit calculating.</source>
-        <translation>已经生成了最优路径，退出计算。</translation>
+        <translation type="vanished">已经生成了最优路径，退出计算。</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="793"/>
+        <location filename="../src/algorithm/PathOptimizer.cpp" line="78"/>
         <source>Optimizing ended.</source>
         <translation>优化完毕。</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="795"/>
         <source>Outputing canvas.</source>
-        <translation>输出画布。</translation>
+        <translation type="vanished">输出画布。</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="806"/>
         <source>Generated path canvas at tmp/path.png.</source>
-        <translation>画布已经生成在tmp/path.png路径下。</translation>
+        <translation type="vanished">画布已经生成在tmp/path.png路径下。</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="808"/>
         <source>Done.</source>
-        <translation>完成。</translation>
+        <translation type="vanished">完成。</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="871"/>
         <source>[%1/%2] Node %3 created.</source>
-        <translation>[%1/%2]节点&quot;%3&quot;已创建.</translation>
+        <translation type="vanished">[%1/%2]节点&quot;%3&quot;已创建.</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="906"/>
         <source>[%1/%2] Generating edges for node %3.</source>
-        <translation>[%1/%2]为节点&quot;%3&quot;创建边.</translation>
+        <translation type="vanished">[%1/%2]为节点&quot;%3&quot;创建边.</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="919"/>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="934"/>
         <source>[%1/%2] Created edge from node %3 to node %4 with length is %5.</source>
-        <translation>[%1/%2]边从&quot;%3&quot;到&quot;%4&quot;已创建，长度为%5.</translation>
+        <translation type="vanished">[%1/%2]边从&quot;%3&quot;到&quot;%4&quot;已创建，长度为%5.</translation>
     </message>
     <message>
-        <location filename="../src/algorithm/PathOptimizer.cpp" line="960"/>
         <source>average edge length is %1</source>
-        <translation>边的平均长度为%1</translation>
+        <translation type="vanished">边的平均长度为%1</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewWindow</name>
+    <message>
+        <location filename="../src/ui/PreviewWindow.cpp" line="41"/>
+        <source>Zoom In</source>
+        <translation>放大</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/PreviewWindow.cpp" line="44"/>
+        <source>Zoom Out</source>
+        <translation>缩小</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/PreviewWindow.cpp" line="47"/>
+        <source>Next</source>
+        <translation>下一步</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/PreviewWindow.cpp" line="70"/>
+        <source>Canvas</source>
+        <translation>显示区</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/PreviewWindow.cpp" line="76"/>
+        <source>Log</source>
+        <translation>日志</translation>
     </message>
 </context>
 <context>
@@ -4437,63 +5465,59 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">相邻两个点间的最大间隔距离 。</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="57"/>
         <source>Open Failure</source>
-        <translation>打开失败</translation>
+        <translation type="vanished">打开失败</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="57"/>
         <source>An error occured when opening configuration file!</source>
-        <translation>打开配置文件时发生错误！</translation>
+        <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="84"/>
+        <location filename="../src/common/Config.cpp" line="104"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="84"/>
+        <location filename="../src/common/Config.cpp" line="104"/>
         <source>An error occured when saving configuration file!</source>
         <translation>保存配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/LaserApplication.cpp" line="47"/>
         <source>LaserController</source>
-        <translation>激光控制器</translation>
+        <translation type="vanished">激光控制器</translation>
     </message>
     <message>
-        <location filename="../src/LaserApplication.cpp" line="48"/>
         <source>Laser Controller</source>
-        <translation>激光控制器</translation>
+        <translation type="vanished">激光控制器</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1468"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2208"/>
         <source>Relays: </source>
         <translation>限位器： </translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1484"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1499"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2224"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2239"/>
         <source>None</source>
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1487"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2227"/>
         <source>Release</source>
         <translation>释放</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1490"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2230"/>
         <source>Machining 1</source>
         <translation>加工原点1</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1493"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2233"/>
         <source>Machining 2</source>
         <translation>加工原点2</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1496"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2236"/>
         <source>Machining 3</source>
         <translation>加工原点3</translation>
     </message>
@@ -4531,103 +5555,127 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/demo/MainWindow.cpp" line="424"/>
+        <location filename="../src/widget/ADS/demo/MainWindow.cpp" line="440"/>
         <source>Create Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="158"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="159"/>
         <source>List All Tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="168"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="169"/>
         <source>Detach Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="181"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="182"/>
         <source>Close Active Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="185"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="186"/>
         <source>Close Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="238"/>
+        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="250"/>
         <source>Close Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/LaserApplication.cpp" line="50"/>
+        <source>CNE Laser</source>
+        <translation type="unfinished">CNE Laser</translation>
+    </message>
+    <message>
+        <location filename="../src/LaserApplication.cpp" line="51"/>
+        <source>CNE Laser %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserDocumentItem.cpp" line="8"/>
+        <source>no name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>RegistersDialog</name>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="14"/>
         <source>Registers Dialog</source>
-        <translation>寄存器对话框</translation>
+        <translation type="vanished">寄存器对话框</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="22"/>
-        <location filename="../src/ui/RegistersDialog.ui" line="119"/>
         <source>Reload</source>
-        <translation>重新加载</translation>
+        <translation type="vanished">重新加载</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="29"/>
-        <location filename="../src/ui/RegistersDialog.ui" line="124"/>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="39"/>
-        <location filename="../src/ui/RegistersDialog.ui" line="129"/>
         <source>Discard</source>
-        <translation>放弃</translation>
+        <translation type="vanished">放弃</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="49"/>
-        <location filename="../src/ui/RegistersDialog.ui" line="134"/>
         <source>Backup</source>
-        <translation>备份</translation>
+        <translation type="vanished">备份</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="59"/>
-        <location filename="../src/ui/RegistersDialog.ui" line="139"/>
         <source>Restore</source>
-        <translation>恢复</translation>
+        <translation type="vanished">恢复</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="91"/>
         <source>Addr</source>
-        <translation>地址</translation>
+        <translation type="vanished">地址</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="96"/>
         <source>Value</source>
-        <translation>值</translation>
+        <translation type="vanished">值</translation>
     </message>
     <message>
-        <location filename="../src/ui/RegistersDialog.ui" line="101"/>
         <source>Comment</source>
-        <translation>注释</translation>
+        <translation type="vanished">注释</translation>
+    </message>
+</context>
+<context>
+    <name>SmallDiagonalLimitationWidget</name>
+    <message>
+        <location filename="../src/widget/SmallDiagonalLimitationWidget.cpp" line="33"/>
+        <source>Add limitation item</source>
+        <translation>添加限制项</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/SmallDiagonalLimitationWidget.cpp" line="56"/>
+        <source>Diagonal</source>
+        <translation>限速直径</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/SmallDiagonalLimitationWidget.cpp" line="70"/>
+        <source>Power</source>
+        <translation>功率激光功率</translation>
+    </message>
+    <message>
+        <location filename="../src/widget/SmallDiagonalLimitationWidget.cpp" line="84"/>
+        <source>Speed</source>
+        <translation>速度</translation>
     </message>
 </context>
 <context>
     <name>ads::CDockAreaTitleBar</name>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="582"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="584"/>
         <source>Detach Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="585"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="587"/>
         <source>Close Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="587"/>
+        <location filename="../src/widget/ADS/src/DockAreaTitleBar.cpp" line="589"/>
         <source>Close Other Groups</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4643,17 +5691,17 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>ads::CDockWidgetTab</name>
     <message>
-        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="490"/>
+        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="509"/>
         <source>Detach</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="493"/>
+        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="512"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="495"/>
+        <location filename="../src/widget/ADS/src/DockWidgetTab.cpp" line="514"/>
         <source>Close Others</source>
         <translation type="unfinished"></translation>
     </message>

@@ -27,8 +27,8 @@ public:
     void addConfigItem(ConfigItem* item);
 
     ConfigItem* addConfigItem(const QString& name
-        , const QString& title
-        , const QString& description
+        //, const QString& title
+        //, const QString& description
         , const QVariant& value
         , DataType dataType = DT_INT
         , bool advanced = false
@@ -45,6 +45,8 @@ public:
     bool isModified() const;
 
     void confirm();
+
+    void updateTitleAndDesc(const QString& title, const QString& desc);
 
 protected:
 

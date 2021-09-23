@@ -752,7 +752,7 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
 {
 	
-	qreal delta = Config::Ui::clickSelectiontTolerance();
+	qreal delta = Config::Ui::clickSelectionTolerance();
 	if (delta <= 0) {
 		return false;
 	}

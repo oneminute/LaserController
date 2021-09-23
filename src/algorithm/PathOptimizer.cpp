@@ -193,14 +193,14 @@ void PathOptimizer::optimizeLayer(OptimizeNode* root)
     while (true)
     {
         // 访问该节点，添加到访问列表中
-        travelled.insert(d->currentNode);
-        qLogD << "arrived node " << d->currentNode->nodeName();
+            travelled.insert(d->currentNode);
+            qLogD << "arrived node " << d->currentNode->nodeName();
 
-        if (d->currentNode->nodeType() == LNT_PRIMITIVE)
-        {
-            LaserApplication::previewWindow->addProgress(this, 0.9 * 0.1 / d->totalNodes, tr("Arrived node %1").arg(d->currentNode->nodeName()));
-            d->optimizedPath.append(d->currentNode);
-        }
+            if (d->currentNode->nodeType() == LNT_PRIMITIVE && !d->optimizedPath.contains(d->currentNode))
+            {
+                LaserApplication::previewWindow->addProgress(this, 0.9 * 0.1 / d->totalNodes, tr("Arrived node %1").arg(d->currentNode->nodeName()));
+                d->optimizedPath.append(d->currentNode);
+            }
 
         // 生成输出边的kdtree
         LaserPointList siblingPoints;

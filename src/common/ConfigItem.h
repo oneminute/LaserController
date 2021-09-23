@@ -27,8 +27,8 @@ public:
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
-        , const QString& title
-        , const QString& description
+        //, const QString& title
+        //, const QString& description
         , const QVariant& value
         , DataType dataType = DT_INT
         , bool advanced = false
@@ -42,7 +42,10 @@ public:
     ConfigItemGroup* group() const;
     QString groupName() const;
     QString title() const;
+    void setTitle(const QString& title);
     QString description() const;
+    void setDescription(const QString& description);
+    void setTitleAndDesc(const QString& title, const QString& desc);
 
     bool isAdvanced() const;
     void setAdvanced(bool advanced);
@@ -92,6 +95,10 @@ public:
     QMap<QString, QVariant>& inputWidgetProperties();
     void setInputWidgetProperty(const QString& key, const QVariant& value);
 
+    QVariantMap& extraProperties();
+    void setExtraProperty(const QString& key, const QVariant& value);
+    QVariant& extraProperty(const QString& key);
+
     WidgetInitializeHook widgetInitializeHook();
     void setWidgetInitializeHook(WidgetInitializeHook fn);
     void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
@@ -136,17 +143,13 @@ public:
 
     ModifiedBy modifiedBy() const;
 
-    void setValue(const QVariant& value, ModifiedBy modifiedBy);
+    void setValue(const QVariant& value, ModifiedBy modifiedBy = MB_Manual);
 
 public slots:
     void reset();
     void restore();
     void restoreSystem();
     void confirm();
-
-protected:
-    void setName(const QString& name);
-    void setDescription(const QString& description);
 
 protected slots:
     void onRegisterLoaded(const QVariant& value);
