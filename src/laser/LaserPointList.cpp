@@ -35,7 +35,7 @@ void LaserPointList::buildKdtree()
         delete m_kdtree;
     }
 
-    // re-calculate weights, making w1/w2 equale to layout(width or height)/gridSize
+    // re-calculate weights, making w1/w2 equale to layout(m_width or m_height)/gridSize
     qreal w1 = Config::PathOptimization::searchingXYWeight() / 2;
     qreal w2 = 1 - w1 * 2;
     qreal n = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?

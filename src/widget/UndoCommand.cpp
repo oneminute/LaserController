@@ -36,11 +36,26 @@ void SelectionUndoCommand::redo()
 {
 	//qDebug() << m_groupUndoTransform;
 	//qDebug() << m_groupRedoTransform;
-	if(!m_viewer || !m_viewer->group()|| m_viewer->group()->childItems() == m_redoSelectedList.keys()){
+    //m_viewer->scene()->selectedPrimitives()
+    QList<LaserPrimitive*> lPList= m_viewer->scene()->selectedPrimitives();
+    QSet<QGraphicsItem*> list;
+    QSet<QGraphicsItem*> redoList;
+    
+    for (QList<LaserPrimitive*>::Iterator i = lPList.end() - 1; i != lPList.begin() - 1; i--) {
+        list.insert(*i);
+    }
+
+    for (QGraphicsItem* primitive : m_redoSelectedList.keys()) {
+        redoList.insert(primitive);
+    }
+
+    qDebug() << list;
+    qDebug() << redoList;
+	if(!m_viewer || !m_viewer->group()|| list == redoList){
 		return;
 	}
-	//qDebug() << m_viewer->group()->childItems();
-	//qDebug() << m_redoSelectedList.keys();
+	qDebug() << m_viewer->group()->childItems();
+	qDebug() << m_redoSelectedList.keys();
 	handle(m_redoSelectedList);
 }
 
@@ -237,7 +252,9 @@ void AddDelUndoCommand::undo()
 		}
 		
 	}
+    
 	m_viewer->viewport()->repaint();
+    emit m_viewer->selectedChange();
 }
 
 void AddDelUndoCommand::redo()
@@ -267,7 +284,9 @@ void AddDelUndoCommand::redo()
 			emit m_viewer->idleToSelected();
 		}
 	}
+    
 	m_viewer->viewport()->repaint();
+    emit m_viewer->selectedChange();
 }
 
 void AddDelUndoCommand::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)
@@ -564,7 +583,8 @@ void MirrorACommand::redo()
     QTransform t1(1, 0, 0, -1, 0, 0);
     QTransform t2 = t.inverted();
     group->setTransform(group->transform() * t * t1 * t2);
-   
+    //更新选中数据
+   m_viewer->selectedChange();
    
     m_viewer->viewport()->repaint();
 }

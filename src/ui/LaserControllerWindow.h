@@ -52,7 +52,6 @@ public:
     void createUpdateDockPanel(int winId);
 
     LaserDocument* currentDocument() const;
-
 public slots:
     void handleSecurityException(int code, const QString& message);
     void onFontComboBoxHighLighted(int index);
@@ -67,6 +66,7 @@ public slots:
     void onFontUpperStateChanged();
     void onFontSpaceXEnterOrLostFocus();
     void onFontSpaceYEnterOrLostFocus();
+    void onLaserPrimitiveGroupItemChanged();
 	
 protected:
     void createCentralDockPanel();
@@ -232,6 +232,7 @@ protected slots:
 
 	//selection
 	void onLaserSceneSelectedChanged();
+    
     void onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 	void selectedChange();//items
 	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
@@ -429,42 +430,56 @@ private:
     LaserDoubleSpinBox* m_fontSpaceY;
     int m_fontComboxLightedIndex;
     //dock panel/ shape properties panel
-    LaserDoubleSpinBox* cutOrderPriority;
-    QLabel* cutOrderPriorityLabel;
-    LaserDoubleSpinBox* powerScale;
-    QLabel* powerScaleLabel;
-    LaserDoubleSpinBox* width;
-    QLabel* widthLabel;
-    LaserDoubleSpinBox* height;
-    QLabel* heightLabel;
-    LaserDoubleSpinBox* maxWidth;
-    QLabel* maxWidthLabel;
-    LaserDoubleSpinBox* cornerRadius;
-    QLabel* cornerRadiusLabel;
-    QCheckBox* locked;
-    QLabel* lockedLabel;
-    QGridLayout* rectPropertyLayout;
-    QGridLayout* linePropertyLayout;
-    QGridLayout* ellipsePropertyLayout;
-    QGridLayout* polygonPropertyLayout;
-    QGridLayout* polylinePropertyLayout;
-    QGridLayout* bitmapPropertyLayout;
-    QGridLayout* textPropertyLayout;
-    QGridLayout* nurbsPropertyLayout;
-    QGridLayout* mixturePropertyLayout;
-    QGridLayout* nullPropertyLayout;
-    QWidget* propertyPanelWidget;
-    QWidget* rectPropertyWidget;
-    QWidget* linePropertyWidget;
-    QWidget* ellipsePropertyWidget;
-    QWidget* polygonPropertyWidget;
-    QWidget* polylinePropertyWidget;
-    QWidget* bitmapPropertyWidget;
-    QWidget* textPropertyWidget;
-    QWidget* nurbsPropertyWidget;
-    QWidget* mixturePropertyWidget;
-    QWidget* nullPropertyWidget;
-    ads::CDockWidget* propertyDockWidget;
+    LaserDoubleSpinBox* m_cutOrderPriority;
+    QLabel* m_cutOrderPriorityLabel;
+    LaserDoubleSpinBox* m_powerScale;
+    QLabel* m_powerScaleLabel;
+    LaserDoubleSpinBox* m_width;
+    QLabel* m_widthLabel;
+    LaserDoubleSpinBox* m_height;
+    QLabel* m_heightLabel;
+    LaserDoubleSpinBox* m_maxWidth;
+    QLabel* m_maxWidthLabel;
+    LaserDoubleSpinBox* m_cornerRadius;
+    QLabel* m_cornerRadiusLabel;
+    QCheckBox* m_locked;
+    QLabel* m_lockedLabel;
+    LaserDoubleSpinBox* m_gamma;
+    QLabel* m_gammaLabel;
+    LaserDoubleSpinBox* m_garmma;
+    QLabel* m_garmmaLabel;
+    LaserDoubleSpinBox* m_brightness;
+    QLabel* m_brightnessLabel;
+    LaserDoubleSpinBox* m_contrast;
+    QLabel* m_contrastLabel;
+    LaserDoubleSpinBox* m_enhanceRadius;
+    QLabel* m_enhanceRadiusLabel;
+    LaserDoubleSpinBox* m_enhanceAmout;
+    QLabel* m_enhanceAmoutLabel;
+    LaserDoubleSpinBox* m_enhanceDenoise;
+    QLabel* m_enhanceDenoiseLabel;
+    QGridLayout* m_rectPropertyLayout;
+    QGridLayout* m_linePropertyLayout;
+    QGridLayout* m_ellipsePropertyLayout;
+    QGridLayout* m_polygonPropertyLayout;
+    QGridLayout* m_polylinePropertyLayout;
+    QGridLayout* m_bitmapPropertyLayout;
+    QGridLayout* m_textPropertyLayout;
+    QGridLayout* m_nurbsPropertyLayout;
+    QGridLayout* m_mixturePropertyLayout;
+    QGridLayout* m_nullPropertyLayout;
+    QWidget* m_propertyPanelWidget;
+    QWidget* m_rectPropertyWidget;
+    QWidget* m_linePropertyWidget;
+    QWidget* m_ellipsePropertyWidget;
+    QWidget* m_polygonPropertyWidget;
+    QWidget* m_polylinePropertyWidget;
+    QWidget* m_bitmapPropertyWidget;
+    QWidget* m_textPropertyWidget;
+    QWidget* m_nurbsPropertyWidget;
+    QWidget* m_mixturePropertyWidget;
+    QWidget* m_nullPropertyWidget;
+    ads::CDockWidget* m_propertyDockWidget;
 
     friend class LaserApplication;
 };

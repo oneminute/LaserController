@@ -154,7 +154,7 @@ void LayerButton::paintEvent(QPaintEvent * event)
 	}
     
     QTransform t;
-    //t.translate(width() / 2, height() / 2);
+    //t.translate(m_width() / 2, m_height() / 2);
 	t.translate(5, 5);
     painter.setTransform(t);
 
@@ -197,6 +197,6 @@ void LayerButton::paintEvent(QPaintEvent * event)
     painter.setTransform(t);
     painter.setPen(Qt::black);
 	
-    //painter.drawText(QRect(0, 20, width(), height() - 20), Qt::AlignCenter, text());
+    //painter.drawText(QRect(0, 20, m_width(), m_height() - 20), Qt::AlignCenter, text());
 }
 

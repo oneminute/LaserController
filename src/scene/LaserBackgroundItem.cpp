@@ -178,14 +178,14 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	painter.setPen(pen2);
 	for (int i1 = 0; i1 < m_gridSecondNodeYList.size(); i1++) {
 		//QPointF p1SecondH = mapFromScene(mapToScene(QPointF(0, m_gridSecondNodeYList[i1])));
-		//QPointF p2SecondH = mapFromScene(mapToScene(QPointF(width, m_gridSecondNodeYList[i1])));
+		//QPointF p2SecondH = mapFromScene(mapToScene(QPointF(m_width, m_gridSecondNodeYList[i1])));
 		QPointF p1SecondH = QPointF(0, m_gridSecondNodeYList[i1]);
 		QPointF p2SecondH = QPointF(width, m_gridSecondNodeYList[i1]);
 		painter.drawLine(p1SecondH, p2SecondH);
 	}
 	for (int j1 = 0; j1 < m_gridSecondNodeXList.size(); j1++) {
 		//QPointF p1SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], 0)));
-		//QPointF p2SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], height)));
+		//QPointF p2SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], m_height)));
 		QPointF p1SecondV = QPointF(m_gridSecondNodeXList[j1], 0);
 		QPointF p2SecondV = QPointF(m_gridSecondNodeXList[j1], height);
 		painter.drawLine(p1SecondV, p2SecondV);
@@ -194,14 +194,14 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	painter.setPen(pen1);
 	for (int i = 1; i < m_gridNodeYList.size()-1; i++) {
 		//QPointF p1H = mapFromScene(mapToScene(QPointF(0, m_gridNodeYList[i])));
-		//QPointF p2H = mapFromScene(mapToScene(QPointF(width, m_gridNodeYList[i])));
+		//QPointF p2H = mapFromScene(mapToScene(QPointF(m_width, m_gridNodeYList[i])));
 		QPointF p1H = QPointF(0, m_gridNodeYList[i]);
 		QPointF p2H = QPointF(width, m_gridNodeYList[i]);
 		painter.drawLine(p1H, p2H);
 	}
 	for (int j = 1; j < m_gridNodeXList.size()-1; j++) {
 		//QPointF p1V = mapFromScene(mapToScene(QPointF(m_gridNodeXList[j], 0)));
-		//QPointF p2V = mapFromScene(mapToScene(QPointF(m_gridNodeXList[j], height)));
+		//QPointF p2V = mapFromScene(mapToScene(QPointF(m_gridNodeXList[j], m_height)));
 		QPointF p1V = QPointF(m_gridNodeXList[j], 0);
 		QPointF p2V = QPointF(m_gridNodeXList[j], height);
 		painter.drawLine(p1V, p2V);
