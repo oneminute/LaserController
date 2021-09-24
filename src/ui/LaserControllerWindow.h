@@ -480,6 +480,7 @@ private:
     QWidget* m_mixturePropertyWidget;
     QWidget* m_nullPropertyWidget;
     ads::CDockWidget* m_propertyDockWidget;
+    Qt::CheckState m_lastLockedState;
 
     friend class LaserApplication;
 };

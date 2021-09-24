@@ -6,6 +6,7 @@
 #include "scene/LaserDocument.h"
 #include  "util/Utils.h"
 
+
 SelectionUndoCommand::SelectionUndoCommand(
 	LaserViewer * viewer, 
 	QMap<QGraphicsItem*, QTransform> undoList,
@@ -14,8 +15,6 @@ SelectionUndoCommand::SelectionUndoCommand(
 	m_viewer = viewer;
 	m_undoSelectedList = undoList;
 	m_redoSelectedList = redoList;
-	//m_groupUndoTransform = groupUndoTransform;
-	//m_groupRedoTransform = groupRedoTransform;
 }
 
 SelectionUndoCommand::~SelectionUndoCommand()
@@ -143,18 +142,6 @@ void TranformUndoCommand::sceneTransformToItemTransform(QTransform sceneTransfor
 void TranformUndoCommand::undo()
 {
 	handle(m_undoList);
-	/*if (m_item) {
-		//m_item->setTransform(m_undoTransform);
-		sceneTransformToItemTransform(m_undoTransform, m_item);
-	}
-	else {
-		for each(QGraphicsItem* item in m_viewer->group()->childItems()) {
-			item->setTransform(QTransform());
-		}
-		//m_viewer->group()->setTransform(m_undoTransform);
-		sceneTransformToItemTransform(m_undoTransform, m_viewer->group());
-	}
-	m_viewer->viewport()->repaint();*/
 }
 
 void TranformUndoCommand::redo()
@@ -584,7 +571,118 @@ void MirrorACommand::redo()
     QTransform t2 = t.inverted();
     group->setTransform(group->transform() * t * t1 * t2);
     //更新选中数据
-   m_viewer->selectedChange();
-   
+    m_viewer->selectedChange();  
     m_viewer->viewport()->repaint();
 }
+
+LockedCommand::LockedCommand(LaserViewer* v, QCheckBox* locked, Qt::CheckState lastState, QList<LaserPrimitive*> lockedList)
+{
+    m_viewer = v;
+    m_scene = m_viewer->scene();
+    m_locked = locked;
+    m_lastCheckState = lastState;
+    m_curCheckState = m_locked->checkState();
+    m_lastLockedList = lockedList;
+}
+
+LockedCommand::~LockedCommand()
+{
+}
+
+void LockedCommand::undo()
+{
+    LaserPrimitiveGroup* group = m_viewer->group();
+
+    switch (m_lastCheckState)
+    {
+    case Qt::Checked: {
+        for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            primitive->setLocked(true);
+            group->removeFromGroup(primitive);
+
+        }
+        //m_locked->setCheckState(m_lastCheckState);
+        break;
+    }
+    case Qt::Unchecked: {
+        for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            primitive->setLocked(false);
+            group->addToGroup(primitive);
+        }
+        
+        break;
+
+    }
+    case Qt::PartiallyChecked: {
+
+        for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            bool isLocked = false;
+            for (LaserPrimitive* lockedP : m_lastLockedList) {
+                if (primitive == lockedP) {
+                    primitive->setLocked(true);
+                    group->removeFromGroup(primitive);
+                    isLocked = true;
+                    break;
+                }
+            }
+            if (!isLocked) {
+                primitive->setLocked(false);
+                group->addToGroup(primitive);
+            } 
+
+        }
+        //m_locked->setCheckState(Qt::Checked);
+        break;
+    }
+    default:
+        break;
+    }
+    m_locked->setCheckState(m_lastCheckState);
+    m_viewer->viewport()->repaint();
+    
+}
+
+void LockedCommand::redo()
+{
+    LaserPrimitiveGroup* group = m_viewer->group();
+
+    switch (m_curCheckState)
+    {
+    case Qt::Checked: {
+        for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            primitive->setLocked(true);
+            group->removeFromGroup(primitive);
+
+        }
+        m_locked->setCheckState(m_curCheckState);
+        break;
+    }
+    case Qt::Unchecked: {
+        for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            primitive->setLocked(false);
+            group->addToGroup(primitive);
+        }
+        m_locked->setCheckState(m_curCheckState);
+        break;
+
+    }
+    case Qt::PartiallyChecked: {
+        for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            primitive->setLocked(true);
+            group->removeFromGroup(primitive);
+
+        }
+        m_locked->setCheckState(Qt::Checked);
+        break;
+    }
+    default:
+        break;
+    }
+    m_viewer->viewport()->repaint();
+}
+
+void LockedCommand::handle(Qt::CheckState state)
+{
+    
+}
+

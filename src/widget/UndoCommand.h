@@ -4,7 +4,7 @@
 #include <QGraphicsItem>
 #include "LaserViewer.h"
 #include "scene/LaserPrimitive.h"
-
+#include <QCheckBox>
 class SelectionUndoCommand :public QUndoCommand {
 public :
 	SelectionUndoCommand(LaserViewer * viewer,
@@ -124,5 +124,21 @@ public:
 private:
     LaserViewer * m_viewer;
     LaserLine* m_line;
+};
+//Lock
+class LockedCommand : public QUndoCommand {
+public:
+    LockedCommand(LaserViewer* v, QCheckBox* locked, Qt::CheckState lastState, QList<LaserPrimitive*> lockedList);
+    ~LockedCommand();
+    virtual void undo() override;
+    virtual void redo() override;
+    virtual void handle(Qt::CheckState state);
+private:
+    LaserViewer * m_viewer;
+    LaserScene* m_scene;
+    QCheckBox* m_locked;
+    QList<LaserPrimitive*> m_lastLockedList;
+    Qt::CheckState m_lastCheckState;
+    Qt::CheckState m_curCheckState;
 };
 #endif // UNDOCOMMAND_H
