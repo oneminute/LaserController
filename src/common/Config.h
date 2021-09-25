@@ -164,6 +164,8 @@ public:
         CONFIG_ITEM(engravingLayer, maxPower, qreal, toReal)
         CONFIG_ITEM(engravingLayer, rowInterval, int, toInt)
         CONFIG_ITEM(engravingLayer, useHalftone, bool, toBool)
+        CONFIG_ITEM(engravingLayer, halftoneAngles, qreal, toReal)
+        CONFIG_ITEM(engravingLayer, halftoneGridSize, int, toInt)
         CONFIG_ITEM(engravingLayer, LPI, int, toInt)
         CONFIG_ITEM(engravingLayer, DPI, int, toInt)
 

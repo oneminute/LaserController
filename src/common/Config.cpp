@@ -496,6 +496,23 @@ void Config::loadEngravingLayerItems()
         DT_BOOL
     );
 
+    ConfigItem* halftoneAngles = group->addConfigItem(
+        "halftoneAngles",
+        45,
+        DT_REAL
+    );
+    halftoneAngles->setInputWidgetType(IWT_DoubleSpinBox);
+    halftoneAngles->setInputWidgetProperty("minimum", 0);
+    halftoneAngles->setInputWidgetProperty("maximum", 90);
+
+    ConfigItem* halftoneGridSize = group->addConfigItem(
+        "halftoneGridSize",
+        12,
+        DT_INT
+    );
+    halftoneGridSize->setInputWidgetType(IWT_EditSlider);
+    halftoneGridSize->setInputWidgetProperty("minimum", 4);
+    halftoneGridSize->setInputWidgetProperty("maximum", 100);
     ConfigItem* lpi = group->addConfigItem(
         "LPI",
         100,
@@ -2625,6 +2642,14 @@ void Config::updateTitlesAndDescriptions()
     EngravingLayer::useHalftoneItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Use Halftone", nullptr), 
         QCoreApplication::translate("Config", "Use halftone algorithm when generating bitmap datas", nullptr));
+
+    EngravingLayer::halftoneAnglesItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Halftone Angles", nullptr), 
+        QCoreApplication::translate("Config", "Angles of rotating grid for halftone", nullptr));
+
+    EngravingLayer::halftoneGridSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Halftone Grid Size", nullptr), 
+        QCoreApplication::translate("Config", "Grid size of halftone", nullptr));
 
     EngravingLayer::useHalftoneItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Use Halftone", nullptr), 

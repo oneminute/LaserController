@@ -428,94 +428,42 @@ cv::Mat imageUtils::halftone5(cv::Mat src, float degrees, int gridSize)
                 cv::Mat dstRoi = dst(rect);
 
                 generateGroupingDitcher(srcRoi, dstRoi);
+            }
+        }
+    }
+    else if (orient == Qt::Horizontal)
+    {
+        QVector<int> offsets;
 
-                /*for (int j = 0; j < srcRoi.rows; j++)
-                {
-                    int rowSum1 = 0;
-                    int rowSum2 = 0;
-                    for (int i = 0; i < srcRoi.cols / 2; i++)
-                    {
-                        rowSum1 += 255 - srcRoi.ptr<quint8>(j)[i];
-                    }
-                    for (int i = srcRoi.cols / 2; i < srcRoi.cols; i++)
-                    {
-                        rowSum2 += 255 - srcRoi.ptr<quint8>(j)[i];
-                    }
-                    for (int i = srcRoi.cols / 2 - 1; i >= 0 && rowSum1 >= 0; i--)
-                    {
-                        dstRoi.ptr<quint8>(j)[i] = rowSum1 > 255 ? 255 : rowSum1;
-                        rowSum1 -= 255;
-                    }
-                    for (int i = srcRoi.cols / 2; i < srcRoi.cols && rowSum2 >= 0; i++)
-                    {
-                        dstRoi.ptr<quint8>(j)[i] = rowSum2 > 255 ? 255 : rowSum2;
-                        rowSum2 -= 255;
-                    }
-                }
+        qreal cosValue = qCos(radians);
+        for (int r = -halfRows; r <= halfRows; r++)
+        {
+            int offset = qRound(r * gridSize * cosValue);
+            qLogD << r << ", " << offset << ", " << (offset % gridSize);
+            offset = offset % gridSize;
+            if (offset < 0)
+                offset += gridSize;
+            offsets.append(offset);
+            for (int c = -halfCols; c <= halfCols; c++)
+            {
+                qreal x = c * gridSize + center.x() + offset;
+                qreal y = r * gridSize + center.y();
 
-                for (int i = 0; i < dstRoi.cols; i++)
-                {
-                    int colSum1 = 0;
-                    int colSum2 = 0;
-                    for (int j = 0; j < dstRoi.rows / 2; j++)
-                    {
-                        colSum1 += dstRoi.ptr<quint8>(j)[i];
-                        dstRoi.ptr<quint8>(j)[i] = 0;
-                    }
-                    for (int j = dstRoi.rows / 2; j < dstRoi.rows; j++)
-                    {
-                        colSum2 += dstRoi.ptr<quint8>(j)[i];
-                        dstRoi.ptr<quint8>(j)[i] = 0;
-                    }
-                    for (int j = dstRoi.rows / 2 - 1; j >= 0 && colSum1 >= 0; j--)
-                    {
-                        dstRoi.ptr<quint8>(j)[i] = colSum1 > 255 ? 255 : colSum1;
-                        colSum1 -= 255;
-                    }
-                    for (int j = dstRoi.rows / 2; j < dstRoi.rows && colSum2 >= 0; j++)
-                    {
-                        dstRoi.ptr<quint8>(j)[i] = colSum2 > 255 ? 255 : colSum2;
-                        colSum2 -= 255;
-                    }
-                }*/
+                QRect qRect(qRound(x - halfGridSize), qRound(y - halfGridSize), gridSize, gridSize);
+                qRect.setLeft(qMax(0, qRect.left()));
+                qRect.setTop(qMax(0, qRect.top()));
+                qRect.setRight(qMin(src.cols - 1, qRect.right()));
+                qRect.setBottom(qMin(src.rows - 1, qRect.bottom()));
 
-                /*QVector2D roiCenter(srcRoi.cols * 1.0 / 2, srcRoi.rows * 1.0 / 2);
-                for (int i = 0; i < srcRoi.cols; i++)
-                {
-                    for (int j = 0; j < srcRoi.rows; j++)
-                    {
-                        QVector2D v = QVector2D(i, j) - roiCenter;
-                        QVector2D nv = v.normalized();
-                        qreal factor = v.length();
-                        qreal gaussian = qExp(-factor * factor / (2 * sumFactor * sumFactor));
-                        quint8 graySrc = 255 - srcRoi.ptr<quint8>(j)[i];
-                        graySrc = qRound(graySrc * gaussian);
-                        int remains = 0;
-                        int vLength = qCeil(v.length());
-                        for (int n = 0; n < vLength; n++)
-                        {
-                            QVector2D dstPos = roiCenter + nv * n;
-                            int dstPosX = qFloor(dstPos.x());
-                            int dstPosY = qFloor(dstPos.y());
+                if (!qRect.isValid() || qRect.right() < 0 || qRect.left() >= src.cols || qRect.bottom() < 0 || qRect.top() >= src.rows)
+                    continue;
 
-                            if (dstPosX < 0 || dstPosY < 0 || dstPosX >= dstRoi.cols || dstPosY >= dstRoi.rows)
-                                continue;
+                cv::Rect rect(qRect.x(), qRect.y(), qRect.width(), qRect.height());
 
-                            int grayDst = dstRoi.ptr<quint8>(dstPosY)[dstPosX];
-                            grayDst += graySrc + remains;
-                            if (grayDst > 255)
-                            {
-                                remains = grayDst - 255;
-                                grayDst = 255;
-                                dstRoi.ptr<quint8>(dstPosY)[dstPosX] = static_cast<quint8>(grayDst);
-                                continue;
-                            }
-                            remains = 0;
-                            dstRoi.ptr<quint8>(dstPosY)[dstPosX] = static_cast<quint8>(grayDst);
-                            break;
-                        }
-                    }
-                }*/
+                cv::Mat srcRoi = src(rect);
+                cv::Mat dstRoi = dst(rect);
+
+                generateGroupingDitcher(srcRoi, dstRoi);
             }
         }
     }

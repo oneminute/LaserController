@@ -20,7 +20,6 @@ public:
         , engravingForward(true)
         , engravingStyle(0)
         , rowInterval(70)
-        , columnSpacing(0)
         , startX(25)
         , startY(0)
         , errorX(0)
@@ -42,6 +41,8 @@ public:
         , visible(true)
         , row(-1)
         , useHalftone(true)
+        , halftoneAngles(Config::EngravingLayer::halftoneAngles())
+        , halftoneGridSize(Config::EngravingLayer::halftoneGridSize())
         , isDefault(false)  
     {}
 
@@ -64,7 +65,6 @@ public:
     bool engravingForward;
     int engravingStyle;
     int rowInterval;
-    int columnSpacing;
     int startX;
     int startY;
     int errorX;
@@ -74,6 +74,8 @@ public:
     int dpi;
     int row;
     bool useHalftone;
+    qreal halftoneAngles;
+    int halftoneGridSize;
 
     LaserDocument* doc;
     LayerButton* button;
@@ -478,7 +480,31 @@ void LaserLayer::setUseHalftone(bool value)
     d->useHalftone = value; 
 }
 
-bool LaserLayer::isDefault() const 
+qreal LaserLayer::halftoneAngles() const
+{
+    Q_D(const LaserLayer);
+    return d->halftoneAngles;
+}
+
+void LaserLayer::setHalftoneAngles(qreal angles)
+{
+    Q_D(LaserLayer);
+    d->halftoneAngles = angles;
+}
+
+int LaserLayer::halftoneGridSize() const
+{
+    Q_D(const LaserLayer);
+    return d->halftoneGridSize;
+}
+
+void LaserLayer::setHalftoneGridSize(int gridSize)
+{
+    Q_D(LaserLayer);
+    d->halftoneGridSize = gridSize;
+}
+
+bool LaserLayer::isDefault() const
 { 
     Q_D(const LaserLayer);
     return d->isDefault; 
@@ -510,6 +536,13 @@ QJsonObject LaserLayer::toJson(QWidget* window)
     object.insert("engravingLaserPower", this->engravingLaserPower());
     object.insert("engravingMinSpeedPower", this->engravingMinSpeedPower());
     object.insert("engravingRunSpeedPower", this->engravingRunSpeedPower());
+    object.insert("rowInterval", this->rowInterval());
+    object.insert("errorX", this->errorX());
+    object.insert("useHalftone", this->useHalftone());
+    object.insert("lpi", this->lpi());
+    object.insert("dpi", this->dpi());
+    object.insert("halftoneAngles", this->halftoneAngles());
+    object.insert("halftoneGridSize", this->halftoneGridSize());
 	
 	for (int i = 0; i < primitives.size(); i++) {
 		LaserPrimitive* primitive = primitives[i];

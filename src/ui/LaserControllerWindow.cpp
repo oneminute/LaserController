@@ -13,6 +13,7 @@
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <QErrorMessage>
 #include <QFileDialog>
 #include <QFormLayout>
@@ -2716,24 +2717,11 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
         QImage image(filename);
         image = image.convertToFormat(QImage::Format_Grayscale8);
         cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
-        float mmWidth = 1000.f * image.width() / image.dotsPerMeterX();
-        float mmHeight = 1000.f * image.height() / image.dotsPerMeterY();
-
-        HalftoneDialog dialog(this);
-        if (dialog.exec() == QDialog::Accepted)
-        {
-            float pixelInterval = dialog.pixelInterval() * dialog.yPulseLength();
-
-            int outWidth = mmWidth * MM_TO_INCH * dialog.dpi();
-            int outHeight = std::round(mmHeight / pixelInterval);
-            qDebug() << " out width:" << outWidth;
-            qDebug() << "out height:" << outHeight;
-
-            cv::Mat resized;
-            cv::resize(src, resized, cv::Size(outWidth, outHeight));
-            
-            imageUtils::halftone4(resized, dialog.degrees(), 12);
-        }
+        
+        imageUtils::halftone5(src, Config::EngravingLayer::halftoneAngles(), Config::EngravingLayer::halftoneGridSize());
+        QFileInfo tmpFile("tmp/dst.bmp");
+        QUrl url = QUrl::fromLocalFile(tmpFile.absolutePath());
+        QDesktopServices::openUrl(url);
     }
 }
 

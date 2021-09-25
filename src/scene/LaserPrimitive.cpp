@@ -2026,7 +2026,7 @@ QByteArray LaserBitmap::engravingImage()
     {
         //outMat = imageUtils::halftone3(resized, layer()->lpi(), layer()->dpi(), 45);
         //outMat = imageUtils::halftone4(resized, 30, 12);
-        outMat = imageUtils::halftone5(resized, 45, 12);
+        outMat = imageUtils::halftone5(resized, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
     }
 
     ba = imageUtils::image2EngravingData(outMat, boundingLeft, boundingTop, pixelInterval, boundingWidth);

@@ -114,6 +114,12 @@ public:
     bool useHalftone() const;
     void setUseHalftone(bool value);
 
+    qreal halftoneAngles() const;
+    void setHalftoneAngles(qreal angles);
+
+    int halftoneGridSize() const;
+    void setHalftoneGridSize(int gridSize);
+
     bool isDefault() const;
 
     virtual bool isAvailable() const;

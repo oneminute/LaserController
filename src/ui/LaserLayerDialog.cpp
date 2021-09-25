@@ -105,6 +105,8 @@ void LaserLayerDialog::resetParameters()
     m_ui->editSliderEngravingRunSpeedPower->setValue(m_layer->engravingRunSpeedPower());
     m_ui->editSliderEngravingRowInterval->setValue(m_layer->rowInterval());
     m_ui->checkBoxUseHalftone->setChecked(m_layer->useHalftone());
+    m_ui->doubleSpinBoxHalftoneAngles->setValue(m_layer->halftoneAngles());
+    m_ui->editSliderHalftoneGridSize->setValue(m_layer->halftoneGridSize());
     m_ui->editSliderDPI->setValue(m_layer->dpi());
     m_ui->editSliderLPI->setValue(m_layer->lpi());
 }
@@ -123,6 +125,8 @@ void LaserLayerDialog::restoreParameters()
     m_ui->editSliderEngravingMinSpeedPower->setValue(Config::EngravingLayer::minPower());
     m_ui->editSliderEngravingRunSpeedPower->setValue(Config::EngravingLayer::maxPower());
     m_ui->checkBoxUseHalftone->setChecked(Config::EngravingLayer::useHalftone());
+    m_ui->doubleSpinBoxHalftoneAngles->setValue(Config::EngravingLayer::halftoneAngles());
+    m_ui->editSliderHalftoneGridSize->setValue(Config::EngravingLayer::halftoneGridSize());
     m_ui->editSliderDPI->setValue(Config::EngravingLayer::DPI());
     m_ui->editSliderLPI->setValue(Config::EngravingLayer::LPI());
 }
@@ -182,6 +186,8 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::EngravingLayer::minPowerItem()->setValue(m_ui->editSliderEngravingMinSpeedPower->value());
 		Config::EngravingLayer::maxPowerItem()->setValue(m_ui->editSliderEngravingRunSpeedPower->value());
         Config::EngravingLayer::rowIntervalItem()->setValue(m_ui->editSliderEngravingRowInterval->value());
+        Config::EngravingLayer::halftoneAnglesItem()->setValue(m_ui->doubleSpinBoxHalftoneAngles->value());
+        Config::EngravingLayer::halftoneGridSizeItem()->setValue(m_ui->editSliderHalftoneGridSize->value());
 		Config::EngravingLayer::LPIItem()->setValue(m_ui->editSliderLPI->value());
 		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value());
 		Config::EngravingLayer::useHalftoneItem()->setValue(m_ui->checkBoxUseHalftone->isChecked());
@@ -211,6 +217,8 @@ void LaserLayerDialog::accept()
 		m_layer->setEngravingMinSpeedPower(m_ui->editSliderEngravingMinSpeedPower->value());
 		m_layer->setEngravingRunSpeedPower(m_ui->editSliderEngravingRunSpeedPower->value());
         m_layer->setRowInterval(m_ui->editSliderEngravingRowInterval->value());
+        m_layer->setHalftoneAngles(m_ui->doubleSpinBoxHalftoneAngles->value());
+        m_layer->setHalftoneGridSize(m_ui->editSliderHalftoneGridSize->value());
 		m_layer->setLpi(m_ui->editSliderLPI->value());
 		m_layer->setDpi(m_ui->editSliderDPI->value());
 		m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
