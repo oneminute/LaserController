@@ -1,4 +1,4 @@
-#include "ImageUtils.h"
+﻿#include "ImageUtils.h"
 
 #include <iostream>
 
@@ -9,6 +9,7 @@
 #include <QPainterPath>
 
 #include "common/common.h"
+#include "common/Config.h"
 #include "laser/LaserDriver.h"
 #include "UnitUtils.h"
 
@@ -328,6 +329,378 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     cv::imwrite("temp/halfton3_final.bmp", outMat);*/
 
     return outMat;
+}
+
+cv::Mat imageUtils::halftone4(cv::Mat src, float degrees, int gridSize)
+{
+    // 根据角度计算v1和v2两个相互正交的向量，向量长度是网格长度
+    QTransform t1, t2;
+    t1.rotate(degrees);
+    t2.rotate(degrees - 90);
+    QPointF p1(gridSize, 0);
+    QPointF p2(gridSize, 0);
+    QVector2D v1(t1.map(p1));
+    QVector2D v2(t2.map(p2));
+    // 让v1表示偏x轴的向量，v2表示偏y轴的向量
+    if (qAbs(v1.x()) < qAbs(v1.y()))
+        qSwap(v1, v2);
+
+    QRectF grid(QPointF(0, 0), QPointF(gridSize, gridSize));
+    grid = t1.mapRect(grid);
+
+    int dx = qCeil(grid.width());
+    int dy = qCeil(grid.height());
+    //int dx = qRound(qAbs(QVector2D::dotProduct(v1, QVector2D(1, 0))));
+    //int dy = qRound(qAbs(QVector2D::dotProduct(v2, QVector2D(0, 1))));
+    //int halfXCount = qCeil(src.cols / (dx * 2));
+    //int halfYCount = qCeil(src.rows / (dy * 2));
+
+    QVector2D center(src.cols * 1.0 / 2, src.rows * 1.0 / 2);
+    int halfXCount = qCeil(qAbs((QVector2D::dotProduct(center, v1.normalized()) / gridSize)));
+    int halfYCount = qCeil(qAbs((QVector2D::dotProduct(center, v2.normalized()) / gridSize)));
+
+    int margin = qMax(halfXCount, halfYCount);
+
+    // 生成网格
+    cv::Mat dst(src.size(), CV_8UC1, cv::Scalar(255));
+    for (int c = -margin; c <= margin; c++)
+    {
+        for (int r = -margin; r <= margin; r++)
+        {
+            QVector2D v = v1 * c + v2 * r + center;
+            int x = qRound(v.x());
+            int y = qRound(v.y());
+            if (x < 0 || y < 0 || x >= src.cols || y >= src.rows)
+                continue;
+            cv::rectangle(dst, cv::Rect(x - dx / 2, y - dy / 2, dx, dy), cv::Scalar(0));
+        }
+    }
+    cv::imwrite("tmp/dst.bmp", dst);
+
+    // [TODO:] 根据生成策略决定是否给原图片描边
+
+    // 迭代网格
+
+    // 在每个网格内通过径向向量，进行像素吸附
+    return cv::Mat();
+}
+
+cv::Mat imageUtils::halftone5(cv::Mat src, float degrees, int gridSize)
+{
+    Qt::Orientation orient = degrees <= 45 ? Qt::Vertical : Qt::Horizontal;
+    qreal radians = qDegreesToRadians(degrees);
+    QVector2D center(src.cols * 1.0 / 2, src.rows * 1.0 / 2);
+    int halfCols = qCeil(src.cols * 1.0 / gridSize / 2);
+    int halfRows = qCeil(src.rows * 1.0 / gridSize / 2);
+    qreal halfGridSize = gridSize / 2;
+    cv::Mat dst(src.size(), CV_8UC1, cv::Scalar(0));
+
+    if (orient == Qt::Vertical)
+    {
+        QVector<int> offsets;
+
+        qreal sinValue = qSin(radians);
+        for (int c = -halfCols; c <= halfCols; c++)
+        {
+            int offset = qRound(c * gridSize * sinValue);
+            qLogD << c << ", " << offset << ", " << (offset % gridSize);
+            offset = offset % gridSize;
+            if (offset < 0)
+                offset += gridSize;
+            offsets.append(offset);
+            for (int r = -halfRows; r <= halfRows; r++)
+            {
+                qreal x = c * gridSize + center.x();
+                qreal y = r * gridSize + center.y() + offset;
+
+                QRect qRect(qRound(x - halfGridSize), qRound(y - halfGridSize), gridSize, gridSize);
+                qRect.setLeft(qMax(0, qRect.left()));
+                qRect.setTop(qMax(0, qRect.top()));
+                qRect.setRight(qMin(src.cols - 1, qRect.right()));
+                qRect.setBottom(qMin(src.rows - 1, qRect.bottom()));
+
+                if (!qRect.isValid() || qRect.right() < 0 || qRect.left() >= src.cols || qRect.bottom() < 0 || qRect.top() >= src.rows)
+                    continue;
+
+                cv::Rect rect(qRect.x(), qRect.y(), qRect.width(), qRect.height());
+
+                cv::Mat srcRoi = src(rect);
+                cv::Mat dstRoi = dst(rect);
+
+                generateGroupingDitcher(srcRoi, dstRoi);
+
+                /*for (int j = 0; j < srcRoi.rows; j++)
+                {
+                    int rowSum1 = 0;
+                    int rowSum2 = 0;
+                    for (int i = 0; i < srcRoi.cols / 2; i++)
+                    {
+                        rowSum1 += 255 - srcRoi.ptr<quint8>(j)[i];
+                    }
+                    for (int i = srcRoi.cols / 2; i < srcRoi.cols; i++)
+                    {
+                        rowSum2 += 255 - srcRoi.ptr<quint8>(j)[i];
+                    }
+                    for (int i = srcRoi.cols / 2 - 1; i >= 0 && rowSum1 >= 0; i--)
+                    {
+                        dstRoi.ptr<quint8>(j)[i] = rowSum1 > 255 ? 255 : rowSum1;
+                        rowSum1 -= 255;
+                    }
+                    for (int i = srcRoi.cols / 2; i < srcRoi.cols && rowSum2 >= 0; i++)
+                    {
+                        dstRoi.ptr<quint8>(j)[i] = rowSum2 > 255 ? 255 : rowSum2;
+                        rowSum2 -= 255;
+                    }
+                }
+
+                for (int i = 0; i < dstRoi.cols; i++)
+                {
+                    int colSum1 = 0;
+                    int colSum2 = 0;
+                    for (int j = 0; j < dstRoi.rows / 2; j++)
+                    {
+                        colSum1 += dstRoi.ptr<quint8>(j)[i];
+                        dstRoi.ptr<quint8>(j)[i] = 0;
+                    }
+                    for (int j = dstRoi.rows / 2; j < dstRoi.rows; j++)
+                    {
+                        colSum2 += dstRoi.ptr<quint8>(j)[i];
+                        dstRoi.ptr<quint8>(j)[i] = 0;
+                    }
+                    for (int j = dstRoi.rows / 2 - 1; j >= 0 && colSum1 >= 0; j--)
+                    {
+                        dstRoi.ptr<quint8>(j)[i] = colSum1 > 255 ? 255 : colSum1;
+                        colSum1 -= 255;
+                    }
+                    for (int j = dstRoi.rows / 2; j < dstRoi.rows && colSum2 >= 0; j++)
+                    {
+                        dstRoi.ptr<quint8>(j)[i] = colSum2 > 255 ? 255 : colSum2;
+                        colSum2 -= 255;
+                    }
+                }*/
+
+                /*QVector2D roiCenter(srcRoi.cols * 1.0 / 2, srcRoi.rows * 1.0 / 2);
+                for (int i = 0; i < srcRoi.cols; i++)
+                {
+                    for (int j = 0; j < srcRoi.rows; j++)
+                    {
+                        QVector2D v = QVector2D(i, j) - roiCenter;
+                        QVector2D nv = v.normalized();
+                        qreal factor = v.length();
+                        qreal gaussian = qExp(-factor * factor / (2 * sumFactor * sumFactor));
+                        quint8 graySrc = 255 - srcRoi.ptr<quint8>(j)[i];
+                        graySrc = qRound(graySrc * gaussian);
+                        int remains = 0;
+                        int vLength = qCeil(v.length());
+                        for (int n = 0; n < vLength; n++)
+                        {
+                            QVector2D dstPos = roiCenter + nv * n;
+                            int dstPosX = qFloor(dstPos.x());
+                            int dstPosY = qFloor(dstPos.y());
+
+                            if (dstPosX < 0 || dstPosY < 0 || dstPosX >= dstRoi.cols || dstPosY >= dstRoi.rows)
+                                continue;
+
+                            int grayDst = dstRoi.ptr<quint8>(dstPosY)[dstPosX];
+                            grayDst += graySrc + remains;
+                            if (grayDst > 255)
+                            {
+                                remains = grayDst - 255;
+                                grayDst = 255;
+                                dstRoi.ptr<quint8>(dstPosY)[dstPosX] = static_cast<quint8>(grayDst);
+                                continue;
+                            }
+                            remains = 0;
+                            dstRoi.ptr<quint8>(dstPosY)[dstPosX] = static_cast<quint8>(grayDst);
+                            break;
+                        }
+                    }
+                }*/
+            }
+        }
+    }
+    dst = 255 - dst;
+    cv::imwrite("tmp/dst.bmp", dst);
+
+    return dst;
+}
+
+void imageUtils::generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi)
+{
+    qreal base = srcRoi.cols * srcRoi.rows * 255;
+    qreal sum = base - cv::sum(srcRoi)[0];
+    qreal sumRatio = qMin(1., sum / base);
+    qreal sumFactor = sumRatio * qMax(srcRoi.cols, srcRoi.rows) * qSqrt(2) / 2;
+    qreal sigma = 1 - sumRatio;
+
+    //if (qFuzzyCompare(sumFactor, 1))
+    //{
+    //dstRoi.setTo(cv::Scalar(255));
+    //continue;
+    //}
+    qreal dx = 1;
+    qreal dy = srcRoi.cols * 1.0 / srcRoi.rows;
+
+    int sum1 = 0;
+    int sum2 = 0;
+    int sum3 = 0;
+    int sum4 = 0;
+    for (int j = 0; j < srcRoi.rows / 2; j++)
+    {
+        for (int i = 0; i < srcRoi.cols / 2; i++)
+        {
+            if (Config::Export::imageUseGaussian())
+            {
+                qreal length = QVector2D(j, i).length();
+                qreal gaussian = qExp(-length * length / (2 * sumFactor * sumFactor));
+                sum1 += qRound((255 - srcRoi.ptr<quint8>(j)[i]) * gaussian);
+            }
+            else
+                sum1 += 255 - srcRoi.ptr<quint8>(j)[i];
+        }
+    }
+    for (int j = srcRoi.rows / 2; j < srcRoi.rows; j++)
+    {
+        for (int i = 0; i < srcRoi.cols / 2; i++)
+        {
+            if (Config::Export::imageUseGaussian())
+            {
+                qreal length = QVector2D(j, i).length();
+                qreal gaussian = qExp(-length * length / (2 * sumFactor * sumFactor));
+                sum2 += qRound((255 - srcRoi.ptr<quint8>(j)[i]) * gaussian);
+            }
+            else
+                sum2 += 255 - srcRoi.ptr<quint8>(j)[i];
+        }
+    }
+    for (int j = 0; j < srcRoi.rows / 2; j++)
+    {
+        for (int i = srcRoi.cols / 2; i < srcRoi.cols; i++)
+        {
+            if (Config::Export::imageUseGaussian())
+            {
+                qreal length = QVector2D(j, i).length();
+                qreal gaussian = qExp(-length * length / (2 * sumFactor * sumFactor));
+                sum3 += qRound((255 - srcRoi.ptr<quint8>(j)[i]) * gaussian);
+            }
+            else
+                sum3 += 255 - srcRoi.ptr<quint8>(j)[i];
+        }
+    }
+    for (int j = srcRoi.rows / 2; j < srcRoi.rows; j++)
+    {
+        for (int i = srcRoi.cols / 2; i < srcRoi.cols; i++)
+        {
+            if (Config::Export::imageUseGaussian())
+            {
+                qreal length = QVector2D(j, i).length();
+                qreal gaussian = qExp(-length * length / (2 * sumFactor * sumFactor));
+                sum4 += qRound((255 - srcRoi.ptr<quint8>(j)[i]) * gaussian);
+            }
+            else
+                sum4 += 255 - srcRoi.ptr<quint8>(j)[i];
+        }
+    }
+
+    QPoint pt(srcRoi.cols / 2 - 1, srcRoi.rows / 2 - 1);
+    for (int j = pt.y(); j >= 0 && sum1 > 0; j--)
+    {
+        for (int i = srcRoi.cols / 2 - 1; i >= pt.x() && sum1 > 0; i--)
+        {
+            int gray = dstRoi.ptr<quint8>(pt.y())[i];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(pt.y())[i] = sum1 > 255 ? 255 : sum1;
+                sum1 -= 255;
+            }
+        }
+        for (int j = srcRoi.rows / 2 - 1; j >= pt.y() && sum1 > 0; j--)
+        {
+            int gray = dstRoi.ptr<quint8>(j)[pt.x()];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(j)[pt.x()] = sum1 > 255 ? 255 : sum1;
+                sum1 -= 255;
+            }
+        }
+        pt.setX(qMax(0, qRound(pt.x() - dx)));
+        pt.setY(qMax(0, qRound(pt.y() - dy)));
+    }
+
+    pt = QPoint(srcRoi.cols / 2 - 1, srcRoi.rows / 2);
+    for (int j = pt.y(); j >= 0 && sum2 > 0; j--)
+    {
+        for (int i = srcRoi.cols / 2 - 1; i >= pt.x() && sum2 > 0; i--)
+        {
+            int gray = dstRoi.ptr<quint8>(pt.y())[i];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(pt.y())[i] = sum2 > 255 ? 255 : sum2;
+                sum2 -= 255;
+            }
+        }
+        for (int j = srcRoi.rows / 2; j <= pt.y() && sum2 > 0; j++)
+        {
+            int gray = dstRoi.ptr<quint8>(j)[pt.x()];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(j)[pt.x()] = sum2 > 255 ? 255 : sum2;
+                sum2 -= 255;
+            }
+        }
+        pt.setX(qMax(0, qRound(pt.x() - dx)));
+        pt.setY(qMin(dstRoi.rows - 1, qRound(pt.y() + dy)));
+    }
+
+    pt = QPoint(srcRoi.cols / 2, srcRoi.rows / 2 - 1);
+    for (int j = pt.y(); j >= 0 && sum3 > 0; j--)
+    {
+        for (int i = srcRoi.cols / 2; i <= pt.x() && sum3 > 0; i++)
+        {
+            int gray = dstRoi.ptr<quint8>(pt.y())[i];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(pt.y())[i] = sum3 > 255 ? 255 : sum3;
+                sum3 -= 255;
+            }
+        }
+        for (int j = srcRoi.rows / 2 - 1; j >= pt.y() && sum3 > 0; j--)
+        {
+            int gray = dstRoi.ptr<quint8>(j)[pt.x()];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(j)[pt.x()] = sum3 > 255 ? 255 : sum3;
+                sum3 -= 255;
+            }
+        }
+        pt.setX(qMin(dstRoi.cols - 1, qRound(pt.x() + dx)));
+        pt.setY(qMax(0, qRound(pt.y() - dy)));
+    }
+
+    pt = QPoint(srcRoi.cols / 2, srcRoi.rows / 2);
+    for (int j = pt.y(); j >= 0 && sum4 > 0; j--)
+    {
+        for (int i = srcRoi.cols / 2; i <= pt.x() && sum4 > 0; i++)
+        {
+            int gray = dstRoi.ptr<quint8>(pt.y())[i];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(pt.y())[i] = sum4 > 255 ? 255 : sum4;
+                sum4 -= 255;
+            }
+        }
+        for (int j = srcRoi.rows / 2; j <= pt.y() && sum4 > 0; j++)
+        {
+            int gray = dstRoi.ptr<quint8>(j)[pt.x()];
+            if (gray == 0)
+            {
+                dstRoi.ptr<quint8>(j)[pt.x()] = sum4 > 255 ? 255 : sum4;
+                sum4 -= 255;
+            }
+        }
+        pt.setX(qMin(dstRoi.cols - 1, qRound(pt.x() + dx)));
+        pt.setY(qMin(dstRoi.rows - 1, qRound(pt.y() + dy)));
+    }
 }
 
 cv::Mat imageUtils::floydSteinberg(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi)
@@ -949,8 +1322,8 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
             {
                 stream << rowBytes.at(i);
             }
+            forward = !forward;
         }
-        forward = !forward;
     }
 
     /*forward = true;

@@ -17,9 +17,6 @@ public:
     LaserLayerPrivate(LaserLayer* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_LAYER)
         , removable(true)
-        , minSpeed(60)
-        , runSpeed(300)
-        , laserPower(115)
         , engravingForward(true)
         , engravingStyle(0)
         , rowInterval(70)
@@ -27,8 +24,16 @@ public:
         , startX(25)
         , startY(0)
         , errorX(0)
-        , minSpeedPower(60)
-        , runSpeedPower(60)
+        , cuttingMinSpeed(Config::CuttingLayer::minSpeed())
+        , cuttingRunSpeed(Config::CuttingLayer::runSpeed())
+        , cuttingLaserPower(Config::CuttingLayer::laserPower())
+        , cuttingMinSpeedPower(Config::CuttingLayer::minPower())
+        , cuttingRunSpeedPower(Config::CuttingLayer::maxPower())
+        , engravingMinSpeed(Config::EngravingLayer::minSpeed())
+        , engravingRunSpeed(Config::EngravingLayer::runSpeed())
+        , engravingLaserPower(Config::EngravingLayer::laserPower())
+        , engravingMinSpeedPower(Config::EngravingLayer::minPower())
+        , engravingRunSpeedPower(Config::EngravingLayer::maxPower())
         , doc(nullptr)
         , lpi(60)
         , dpi(600)
@@ -44,11 +49,16 @@ public:
     LaserLayerType type;
 
     // normal fields
-    int minSpeed;
-    int runSpeed;
-    int laserPower;
-    int minSpeedPower;
-    int runSpeedPower;
+    int cuttingMinSpeed;
+    int cuttingRunSpeed;
+    qreal cuttingLaserPower;
+    qreal cuttingMinSpeedPower;
+    qreal cuttingRunSpeedPower;
+    int engravingMinSpeed;
+    int engravingRunSpeed;
+    qreal engravingLaserPower;
+    qreal engravingMinSpeedPower;
+    qreal engravingRunSpeedPower;
 
     // engraving fields
     bool engravingForward;
@@ -86,22 +96,6 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     d->name = document->newLayerName();
     setParent(document);
 
-    if (type == LLT_ENGRAVING)
-    {
-        d->minSpeed = Config::EngravingLayer::minSpeed();
-        d->runSpeed = Config::EngravingLayer::runSpeed();
-        d->laserPower = Config::EngravingLayer::laserPower();
-        d->minSpeedPower = Config::EngravingLayer::minPower();
-        d->runSpeedPower = Config::EngravingLayer::maxPower();       
-    }
-    else if (type == LLT_CUTTING)
-    {
-        d->minSpeed = Config::CuttingLayer::minSpeed();
-        d->runSpeed = Config::CuttingLayer::runSpeed();
-        d->laserPower = Config::CuttingLayer::laserPower();
-        d->minSpeedPower = Config::CuttingLayer::minPower();
-        d->runSpeedPower = Config::CuttingLayer::maxPower();        
-    }
 	d->useHalftone = Config::EngravingLayer::useHalftone();
 	d->lpi = Config::EngravingLayer::LPI();
 	d->dpi = Config::EngravingLayer::DPI();
@@ -148,43 +142,127 @@ void LaserLayer::setType(LaserLayerType type)
     d->type = type;
 }
 
-int LaserLayer::minSpeed() const 
+int LaserLayer::cuttingMinSpeed() const
 {
     Q_D(const LaserLayer);
-    return d->minSpeed; 
+    return d->cuttingMinSpeed;
 }
 
-void LaserLayer::setMinSpeed(int minSpeed) 
+void LaserLayer::setCuttingMinSpeed(int minSpeed)
 {
     Q_D(LaserLayer);
-    d->minSpeed = minSpeed; 
+    d->cuttingMinSpeed = minSpeed;
 }
 
-int LaserLayer::runSpeed() const 
+int LaserLayer::cuttingRunSpeed() const
 {
     Q_D(const LaserLayer);
-    return d->runSpeed; 
+    return d->cuttingRunSpeed;
 }
 
-void LaserLayer::setRunSpeed(int runSpeed) 
+void LaserLayer::setCuttingRunSpeed(int runSpeed)
 {
     Q_D(LaserLayer);
-    d->runSpeed = runSpeed; 
+    d->cuttingRunSpeed = runSpeed;
 }
 
-int LaserLayer::laserPower() const 
+qreal LaserLayer::cuttingLaserPower() const
 {
     Q_D(const LaserLayer);
-    return d->laserPower; 
+    return d->cuttingLaserPower;
 }
 
-void LaserLayer::setLaserPower(int laserPower) 
+void LaserLayer::setCuttingLaserPower(qreal laserPower)
 {
     Q_D(LaserLayer);
-    d->laserPower = laserPower; 
+    d->cuttingLaserPower = laserPower;
 }
 
-bool LaserLayer::engravingForward() const 
+qreal LaserLayer::cuttingMinSpeedPower() const
+{
+    Q_D(const LaserLayer);
+    return d->cuttingMinSpeedPower;
+}
+
+void LaserLayer::setCuttingMinSpeedPower(qreal minSpeedPower)
+{
+    Q_D(LaserLayer);
+    d->cuttingMinSpeedPower = minSpeedPower;
+}
+
+qreal LaserLayer::cuttingRunSpeedPower() const
+{
+    Q_D(const LaserLayer);
+    return d->cuttingRunSpeedPower;
+}
+
+void LaserLayer::setCuttingRunSpeedPower(qreal runSpeedPower)
+{
+    Q_D(LaserLayer);
+    d->cuttingRunSpeedPower = runSpeedPower;
+}
+
+int LaserLayer::engravingMinSpeed() const
+{
+    Q_D(const LaserLayer);
+    return d->engravingMinSpeed;
+}
+
+void LaserLayer::setEngravingMinSpeed(int minSpeed)
+{
+    Q_D(LaserLayer);
+    d->engravingMinSpeed = minSpeed;
+}
+
+int LaserLayer::engravingRunSpeed() const
+{
+    Q_D(const LaserLayer);
+    return d->engravingRunSpeed;
+}
+
+void LaserLayer::setEngravingRunSpeed(int runSpeed)
+{
+    Q_D(LaserLayer);
+    d->engravingRunSpeed = runSpeed;
+}
+
+qreal LaserLayer::engravingLaserPower() const
+{
+    Q_D(const LaserLayer);
+    return d->engravingLaserPower;
+}
+
+void LaserLayer::setEngravingLaserPower(qreal laserPower)
+{
+    Q_D(LaserLayer);
+    d->engravingLaserPower = laserPower;
+}
+
+qreal LaserLayer::engravingMinSpeedPower() const
+{
+    Q_D(const LaserLayer);
+    return d->engravingMinSpeedPower;
+}
+
+void LaserLayer::setEngravingMinSpeedPower(qreal minSpeedPower)
+{
+    Q_D(LaserLayer);
+    d->engravingMinSpeedPower = minSpeedPower;
+}
+
+qreal LaserLayer::engravingRunSpeedPower() const
+{
+    Q_D(const LaserLayer);
+    return d->engravingRunSpeedPower;
+}
+
+void LaserLayer::setEngravingRunSpeedPower(qreal runSpeedPower)
+{
+    Q_D(LaserLayer);
+    d->engravingRunSpeedPower = runSpeedPower;
+}
+
+bool LaserLayer::engravingForward() const
 {
     Q_D(const LaserLayer);
     return d->engravingForward; 
@@ -267,30 +345,6 @@ void LaserLayer::setErrorX(int errorX)
 { 
     Q_D(LaserLayer);
     d->errorX = errorX; 
-}
-
-int LaserLayer::minSpeedPower() const 
-{ 
-    Q_D(const LaserLayer);
-    return d->minSpeedPower; 
-}
-
-void LaserLayer::setMinSpeedPower(int minSpeedPower) 
-{ 
-    Q_D(LaserLayer);
-    d->minSpeedPower = minSpeedPower; 
-}
-
-int LaserLayer::runSpeedPower() const 
-{ 
-    Q_D(const LaserLayer);
-    return d->runSpeedPower; 
-}
-
-void LaserLayer::setRunSpeedPower(int runSpeedPower) 
-{ 
-    Q_D(LaserLayer);
-    d->runSpeedPower = runSpeedPower; 
 }
 
 void LaserLayer::addPrimitive(LaserPrimitive * item)
@@ -446,6 +500,16 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 	QJsonArray array;
 	object.insert("name", this->name());
 	object.insert("type", this->type());
+    object.insert("cuttingMinSpeed", this->cuttingMinSpeed());
+    object.insert("cuttingRunSpeed", this->cuttingRunSpeed());
+    object.insert("cuttingLaserPower", this->cuttingLaserPower());
+    object.insert("cuttingMinSpeedPower", this->cuttingMinSpeedPower());
+    object.insert("cuttingRunSpeedPower", this->cuttingRunSpeedPower());
+    object.insert("engravingMinSpeed", this->engravingMinSpeed());
+    object.insert("engravingRunSpeed", this->engravingRunSpeed());
+    object.insert("engravingLaserPower", this->engravingLaserPower());
+    object.insert("engravingMinSpeedPower", this->engravingMinSpeedPower());
+    object.insert("engravingRunSpeedPower", this->engravingRunSpeedPower());
 	
 	for (int i = 0; i < primitives.size(); i++) {
 		LaserPrimitive* primitive = primitives[i];

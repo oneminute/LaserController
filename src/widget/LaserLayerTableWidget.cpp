@@ -136,7 +136,14 @@ void LaserLayerTableWidget::updateItems()
             itemCount->setTextAlignment(Qt::AlignCenter);
 
             QTableWidgetItem* itemSpeedPower = new QTableWidgetItem();
-            itemSpeedPower->setText(QString("%1/%2").arg(layer->minSpeed()).arg(layer->laserPower()));
+            if (layer->type() == LLT_CUTTING)
+            {
+                itemSpeedPower->setText(QString("%1/%2").arg(layer->cuttingMinSpeed()).arg(layer->cuttingLaserPower()));
+            }
+            else if (layer->type() == LLT_ENGRAVING)
+            {
+                itemSpeedPower->setText(QString("%1/%2").arg(layer->engravingMinSpeed()).arg(layer->engravingLaserPower()));
+            }
             itemSpeedPower->setTextAlignment(Qt::AlignCenter);
 
             QCheckBox* exportable = new QCheckBox();

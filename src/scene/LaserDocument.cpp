@@ -287,27 +287,25 @@ void LaserDocument::exportJSON(const QString& filename)
                 {
                     //engravingParamObj["LayerId"] = layerList.count();
                     engravingParamObj["Type"] = layer->type();
-                    engravingParamObj["MinSpeed"] = layer->minSpeed() * 1000;
-                    engravingParamObj["RunSpeed"] = layer->runSpeed() * 1000;
-                    engravingParamObj["LaserPower"] = layer->laserPower();
-                    engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
-                    engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+                    engravingParamObj["MinSpeed"] = layer->engravingMinSpeed() * 1000;
+                    engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
+                    engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
+                    engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower() * 10;
+                    engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower() * 10;
                     engravingParamObj["CarveForward"] = layer->engravingForward();
                     engravingParamObj["CarveStyle"] = layer->engravingStyle();
                     engravingParamObj["RowInterval"] = layer->rowInterval();
                     engravingParamObj["ErrorX"] = layer->errorX();
-                    engravingParamObj["MinSpeedPower"] = layer->minSpeedPower();
-                    engravingParamObj["RunSpeedPower"] = layer->runSpeedPower();
                 }
                 else if (layer->type() == LLT_CUTTING)
                 {
                     //cuttingParamObj["LayerId"] = layerList.count();
                     cuttingParamObj["Type"] = layer->type();
-                    cuttingParamObj["MinSpeed"] = layer->minSpeed() * 1000;
-                    cuttingParamObj["RunSpeed"] = layer->runSpeed() * 1000;
-                    cuttingParamObj["LaserPower"] = layer->laserPower();
-                    cuttingParamObj["MinSpeedPower"] = layer->minSpeedPower();
-                    cuttingParamObj["RunSpeedPower"] = layer->runSpeedPower();
+                    cuttingParamObj["MinSpeed"] = layer->cuttingMinSpeed() * 1000;
+                    cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
+                    cuttingParamObj["LaserPower"] = layer->cuttingLaserPower() * 10;
+                    cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
+                    cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
                 }
                 paramObj["EngravingParams"] = engravingParamObj;
                 paramObj["CuttingParams"] = cuttingParamObj;
@@ -804,6 +802,48 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 			qLogD << "your layer index have changed";
 			return;
 		}
+
+        if (layer.contains("cuttingMinSpeed"))
+        {
+            laserLayers[index]->setCuttingMinSpeed(layer.value("cuttingMinSpeed").toInt());
+        }
+        if (layer.contains("cuttingRunSpeed"))
+        {
+            laserLayers[index]->setCuttingRunSpeed(layer.value("cuttingRunSpeed").toInt());
+        }
+        if (layer.contains("cuttingLaserPower"))
+        {
+            laserLayers[index]->setCuttingLaserPower(layer.value("cuttingLaserPower").toDouble());
+        }
+        if (layer.contains("cuttingMinSpeedPower"))
+        {
+            laserLayers[index]->setCuttingMinSpeedPower(layer.value("cuttingMinSpeedPower").toDouble());
+        }
+        if (layer.contains("cuttingRunSpeedPower"))
+        {
+            laserLayers[index]->setCuttingRunSpeedPower(layer.value("cuttingRunSpeedPower").toDouble());
+        }
+        if (layer.contains("engravingMinSpeed"))
+        {
+            laserLayers[index]->setEngravingMinSpeed(layer.value("engravingMinSpeed").toInt());
+        }
+        if (layer.contains("engravingRunSpeed"))
+        {
+            laserLayers[index]->setEngravingRunSpeed(layer.value("engravingRunSpeed").toInt());
+        }
+        if (layer.contains("engravingLaserPower"))
+        {
+            laserLayers[index]->setEngravingLaserPower(layer.value("engravingLaserPower").toDouble());
+        }
+        if (layer.contains("engravingMinSpeedPower"))
+        {
+            laserLayers[index]->setEngravingMinSpeedPower(layer.value("engravingMinSpeedPower").toDouble());
+        }
+        if (layer.contains("engravingRunSpeedPower"))
+        {
+            laserLayers[index]->setEngravingRunSpeedPower(layer.value("engravingRunSpeedPower").toDouble());
+        }
+
 		//primitive
 		for (int j = 0; j < array.size(); j++) {
 			QJsonObject primitiveJson = array[j].toObject();

@@ -2750,7 +2750,7 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
             cv::Mat resized;
             cv::resize(src, resized, cv::Size(outWidth, outHeight));
             
-            imageUtils::halftone3(resized, dialog.lpi(), dialog.dpi(), dialog.degrees());
+            imageUtils::halftone4(resized, dialog.degrees(), 12);
         }
     }
 }

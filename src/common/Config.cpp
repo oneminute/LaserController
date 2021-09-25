@@ -454,7 +454,8 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
-        8
+        8,
+        DT_REAL
     );
     laserPower->setInputWidgetType(IWT_FloatEditSlider);
     laserPower->setInputWidgetProperty("minimum", 0);
@@ -653,6 +654,12 @@ void Config::loadExportItems()
         DT_BOOL
     );
     enableRelativeCoordinates->setStoreStrategy(SS_DIRECTLY);
+
+    ConfigItem* imageUseGaussian = group->addConfigItem(
+        "imageUseGaussian",
+        false,
+        DT_BOOL
+    );
 }
 
 void Config::loadDeviceItems()
@@ -2678,6 +2685,10 @@ void Config::updateTitlesAndDescriptions()
     Export::enableRelativeCoordinatesItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Relative Coordinates", nullptr), 
         QCoreApplication::translate("Config", "Enable relative coordinates for exporting machining points", nullptr));
+
+    Export::imageUseGaussianItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Image Use Gaussian", nullptr), 
+        QCoreApplication::translate("Config", "Use gaussian when generating images", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 

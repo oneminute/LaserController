@@ -31,14 +31,35 @@ public:
     LaserLayerType type() const;
     void setType(LaserLayerType type);
 
-    int minSpeed() const;
-    void setMinSpeed(int minSpeed);
+    int cuttingMinSpeed() const;
+    void setCuttingMinSpeed(int minSpeed);
 
-    int runSpeed() const;
-    void setRunSpeed(int runSpeed);
+    int cuttingRunSpeed() const;
+    void setCuttingRunSpeed(int runSpeed);
 
-    int laserPower() const;
-    void setLaserPower(int laserPower);
+    qreal cuttingLaserPower() const;
+    void setCuttingLaserPower(qreal laserPower);
+
+    qreal cuttingMinSpeedPower() const;
+    void setCuttingMinSpeedPower(qreal minSpeedPower);
+
+    qreal cuttingRunSpeedPower() const;
+    void setCuttingRunSpeedPower(qreal runSpeedPower);
+
+    int engravingMinSpeed() const;
+    void setEngravingMinSpeed(int minSpeed);
+
+    int engravingRunSpeed() const;
+    void setEngravingRunSpeed(int runSpeed);
+
+    qreal engravingLaserPower() const;
+    void setEngravingLaserPower(qreal laserPower);
+
+    qreal engravingMinSpeedPower() const;
+    void setEngravingMinSpeedPower(qreal minSpeedPower);
+
+    qreal engravingRunSpeedPower() const;
+    void setEngravingRunSpeedPower(qreal runSpeedPower);
 
     bool engravingForward() const;
     void setEngravingForward(bool engravingForward);
@@ -60,12 +81,6 @@ public:
 
     int errorX() const;
     void setErrorX(int errorX);
-
-    int minSpeedPower() const;
-    void setMinSpeedPower(int minSpeedPower);
-
-    int runSpeedPower() const;
-    void setRunSpeedPower(int runSpeedPower);
 
     void addPrimitive(LaserPrimitive* item);
     QList<LaserPrimitive*>& primitives();

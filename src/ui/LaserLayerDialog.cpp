@@ -92,17 +92,17 @@ void LaserLayerDialog::initUi()
 
 void LaserLayerDialog::resetParameters()
 {
-	m_ui->editSliderCuttingMinSpeed->setValue(m_layer->minSpeed());
-    m_ui->editSliderCuttingRunSpeed->setValue(m_layer->runSpeed());
-    m_ui->editSliderCuttingLaserPower->setValue(m_layer->laserPower());
-    m_ui->editSliderCuttingMinSpeedPower->setValue(m_layer->minSpeedPower());
-    m_ui->editSliderCuttingRunSpeedPower->setValue(m_layer->runSpeedPower());
+	m_ui->editSliderCuttingMinSpeed->setValue(m_layer->cuttingMinSpeed());
+    m_ui->editSliderCuttingRunSpeed->setValue(m_layer->cuttingRunSpeed());
+    m_ui->editSliderCuttingLaserPower->setValue(m_layer->cuttingLaserPower());
+    m_ui->editSliderCuttingMinSpeedPower->setValue(m_layer->cuttingMinSpeedPower());
+    m_ui->editSliderCuttingRunSpeedPower->setValue(m_layer->cuttingRunSpeedPower());
 
-    m_ui->editSliderEngravingMinSpeed->setValue(m_layer->minSpeed());
-    m_ui->editSliderEngravingRunSpeed->setValue(m_layer->runSpeed());
-    m_ui->editSliderEngravingLaserPower->setValue(m_layer->laserPower());
-    m_ui->editSliderEngravingMinSpeedPower->setValue(m_layer->minSpeedPower());
-    m_ui->editSliderEngravingRunSpeedPower->setValue(m_layer->runSpeedPower());
+    m_ui->editSliderEngravingMinSpeed->setValue(m_layer->engravingMinSpeed());
+    m_ui->editSliderEngravingRunSpeed->setValue(m_layer->engravingRunSpeed());
+    m_ui->editSliderEngravingLaserPower->setValue(m_layer->engravingLaserPower());
+    m_ui->editSliderEngravingMinSpeedPower->setValue(m_layer->engravingMinSpeedPower());
+    m_ui->editSliderEngravingRunSpeedPower->setValue(m_layer->engravingRunSpeedPower());
     m_ui->editSliderEngravingRowInterval->setValue(m_layer->rowInterval());
     m_ui->checkBoxUseHalftone->setChecked(m_layer->useHalftone());
     m_ui->editSliderDPI->setValue(m_layer->dpi());
@@ -197,19 +197,19 @@ void LaserLayerDialog::accept()
 {
 	if (m_type == LLT_CUTTING)
 	{
-		m_layer->setMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
-		m_layer->setRunSpeed(m_ui->editSliderCuttingRunSpeed->value());
-		m_layer->setLaserPower(m_ui->editSliderCuttingLaserPower->value());
-		m_layer->setMinSpeedPower(m_ui->editSliderCuttingMinSpeedPower->value());
-		m_layer->setRunSpeedPower(m_ui->editSliderCuttingRunSpeedPower->value());
+		m_layer->setCuttingMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
+		m_layer->setCuttingRunSpeed(m_ui->editSliderCuttingRunSpeed->value());
+		m_layer->setCuttingLaserPower(m_ui->editSliderCuttingLaserPower->value());
+		m_layer->setCuttingMinSpeedPower(m_ui->editSliderCuttingMinSpeedPower->value());
+		m_layer->setCuttingRunSpeedPower(m_ui->editSliderCuttingRunSpeedPower->value());
 	}
 	else if (m_type == LLT_ENGRAVING)
 	{
-		m_layer->setMinSpeed(m_ui->editSliderEngravingMinSpeed->value());
-		m_layer->setRunSpeed(m_ui->editSliderEngravingRunSpeed->value());
-		m_layer->setLaserPower(m_ui->editSliderEngravingLaserPower->value());
-		m_layer->setMinSpeedPower(m_ui->editSliderEngravingMinSpeedPower->value());
-		m_layer->setRunSpeedPower(m_ui->editSliderEngravingRunSpeedPower->value());
+		m_layer->setEngravingMinSpeed(m_ui->editSliderEngravingMinSpeed->value());
+		m_layer->setEngravingRunSpeed(m_ui->editSliderEngravingRunSpeed->value());
+		m_layer->setEngravingLaserPower(m_ui->editSliderEngravingLaserPower->value());
+		m_layer->setEngravingMinSpeedPower(m_ui->editSliderEngravingMinSpeedPower->value());
+		m_layer->setEngravingRunSpeedPower(m_ui->editSliderEngravingRunSpeedPower->value());
         m_layer->setRowInterval(m_ui->editSliderEngravingRowInterval->value());
 		m_layer->setLpi(m_ui->editSliderLPI->value());
 		m_layer->setDpi(m_ui->editSliderDPI->value());

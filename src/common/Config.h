@@ -140,9 +140,9 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(cuttingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(cuttingLayer, runSpeed, int, toInt)
-        CONFIG_ITEM(cuttingLayer, laserPower, int, toInt)
-        CONFIG_ITEM(cuttingLayer, minPower, int, toInt)
-        CONFIG_ITEM(cuttingLayer, maxPower, int, toInt)
+        CONFIG_ITEM(cuttingLayer, laserPower, qreal, toReal)
+        CONFIG_ITEM(cuttingLayer, minPower, qreal, toReal)
+        CONFIG_ITEM(cuttingLayer, maxPower, qreal, toReal)
 
     private:
         friend class Config;
@@ -159,9 +159,9 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(engravingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, runSpeed, int, toInt)
-        CONFIG_ITEM(engravingLayer, laserPower, int, toInt)
-        CONFIG_ITEM(engravingLayer, minPower, int, toInt)
-        CONFIG_ITEM(engravingLayer, maxPower, int, toInt)
+        CONFIG_ITEM(engravingLayer, laserPower, qreal, toReal)
+        CONFIG_ITEM(engravingLayer, minPower, qreal, toReal)
+        CONFIG_ITEM(engravingLayer, maxPower, qreal, toReal)
         CONFIG_ITEM(engravingLayer, rowInterval, int, toInt)
         CONFIG_ITEM(engravingLayer, useHalftone, bool, toBool)
         CONFIG_ITEM(engravingLayer, LPI, int, toInt)
@@ -204,6 +204,7 @@ public:
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
         CONFIG_ITEM(export, enableRelativeCoordinates, bool, toBool)
+        CONFIG_ITEM(export, imageUseGaussian, bool, toBool)
 
     private:
         friend class Config;
