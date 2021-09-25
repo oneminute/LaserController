@@ -35,6 +35,7 @@
 #include <QWindow>
 #include <QFontComboBox>
 #include <QSize>
+#include <QUndoStack>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -77,6 +78,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	, m_selectionOriginalState(SelectionOriginalCenter)
     , m_textFontWidget(nullptr)
     , m_propertyWidget(nullptr)
+    , m_lastLockedState(Qt::Unchecked)
 {
     m_ui->setupUi(this);
 
@@ -1799,39 +1801,18 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     
     m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
         qDebug() << "state:" << m_locked->checkState();
-        LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
-        LaserPrimitiveGroup* group = view->group();
-        switch (m_locked->checkState())
-        {
-        case Qt::Checked:{
-            for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
-                primitive->setLocked(true);
-                group->removeFromGroup(primitive);
-                
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        QList<LaserPrimitive*>lockedList;
+        for (LaserPrimitive* p : list) {
+            if (p->isLocked()) {
+                lockedList.append(p);
             }
-            break;
+            
         }
-        case Qt::Unchecked: {
-            for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
-                primitive->setLocked(false);
-                group->addToGroup(primitive);
-            }
-            break;
-
-        }
-        case Qt::PartiallyChecked: {
-            for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
-                primitive->setLocked(true);
-                group->removeFromGroup(primitive);
-
-            }
-            m_locked->setCheckState(Qt::Checked);
-            break;
-        }
-        default:
-            break;
-        }
-        view->viewport()->repaint();
+        LockedCommand* cmd = new LockedCommand(view, m_locked, m_lastLockedState, lockedList);
+        view->undoStack()->push(cmd);
+        m_lastLockedState = m_locked->checkState();
 
     });
     m_locked->connect(m_locked, &QCheckBox::toggled, this, [=] {
@@ -1876,6 +1857,7 @@ void LaserControllerWindow::showShapePropertyPanel()
         }
 
     }
+    m_lastLockedState = m_locked->checkState();
     switch(type) {
         case LPT_UNKNOWN: {
             m_mixturePropertyLayout->setMargin(10);
