@@ -802,7 +802,12 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 			qLogD << "your layer index have changed";
 			return;
 		}
-
+        if (layer.contains("name")) {
+            laserLayers[index]->setName(layer.value("name").toString());
+        }
+        if (layer.contains("type")) {
+            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
+        }
         if (layer.contains("cuttingMinSpeed"))
         {
             laserLayers[index]->setCuttingMinSpeed(layer.value("cuttingMinSpeed").toInt());
@@ -842,6 +847,34 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("engravingRunSpeedPower"))
         {
             laserLayers[index]->setEngravingRunSpeedPower(layer.value("engravingRunSpeedPower").toDouble());
+        }
+        if (layer.contains("rowInterval")) 
+        {
+            laserLayers[index]->setRowInterval(layer.value("rowInterval").toInt());
+        }
+        if (layer.contains("errorX"))
+        {
+            laserLayers[index]->setErrorX(layer.value("errorX").toInt());
+        }
+        if (layer.contains("useHalftone"))
+        {
+            laserLayers[index]->setUseHalftone(layer.value("useHalftone").toBool());
+        }
+        if (layer.contains("lpi"))
+        {
+            laserLayers[index]->setLpi(layer.value("lpi").toInt());
+        }
+        if (layer.contains("dpi"))
+        {
+            laserLayers[index]->setDpi(layer.value("dpi").toInt());
+        }
+        if (layer.contains("halftoneAngles"))
+        {
+            laserLayers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
+        }
+        if (layer.contains("halftoneGridSize"))
+        {
+            laserLayers[index]->setHalftoneGridSize(layer.value("halftoneGridSize").toInt());
         }
 
 		//primitive
