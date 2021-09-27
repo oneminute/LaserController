@@ -198,9 +198,9 @@ QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
     return bounding;
 }
 
-LaserLineList utils::interLines(const QPainterPath& path, qreal rowInterval)
+LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
 {
-    LaserLineList lines;
+    LaserLineListList lineList;
     QRectF boundingRect = path.boundingRect();
 
     qreal y = boundingRect.top();
@@ -223,9 +223,10 @@ LaserLineList utils::interLines(const QPainterPath& path, qreal rowInterval)
         }
         qreal last;
         int i = 0;
+        LaserLineList lines;
         for (qreal curr : linePoints)
         {
-            qDebug() << curr;
+            //qDebug() << curr;
             if (i++ == 0)
             {
                 last = curr;
@@ -236,11 +237,16 @@ LaserLineList utils::interLines(const QPainterPath& path, qreal rowInterval)
             QPointF pt(mean, y);
             if (path.contains(pt))
             {
-                lines.append(QLineF(QPointF(last, y), QPointF(curr, y)));
+                qreal x1 = last;
+                qreal x2 = curr;
+                if (x1 > x2) qSwap(x1, x2);
+                lines.append(QLineF(QPointF(x1, y), QPointF(x2, y)));
             }
             last = curr;
         }
+        if (!lines.empty())
+            lineList.append(lines);
     }
 
-    return lines;
+    return lineList;
 }

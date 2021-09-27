@@ -354,7 +354,8 @@ void LaserDocument::exportJSON(const QString& filename)
                     else if (layer->type() == LLT_BOTH)
                     {
                         itemObj["Type"] = primitive->typeLatinName();
-                        itemObj["Data"] = QString(primitive->generateFillData(lastPoint));
+                        LaserLineListList lineList = primitive->generateFillData(lastPoint);
+                        itemObj["Data"] = QString(machiningUtils::lineList2Plt(lineList, lastPoint));
                     }
                     items.append(itemObj);
 

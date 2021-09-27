@@ -20,4 +20,11 @@ private:
     QVector<qreal> m_matrix;
 };
 
+class LaserLineListList : public QList<LaserLineList>
+{
+public:
+    explicit LaserLineListList();
+    ~LaserLineListList();
+};
+
 #endif // LASERLINELIST_H

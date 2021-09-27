@@ -267,6 +267,62 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
     return buffer;
 }
 
+QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPointF& lastPoint)
+{
+    QByteArray buffer;
+    // 建立所有线点的kdtree
+    //lines.buildKdtree();
+    // 从起刀点位置开始依次寻找最优点
+    //QPointF point = path.boundingRect().topLeft();
+    //QLineF lastLine = lines.first();
+    bool forward = true;
+    for (int i = 0; i < lineList.count(); i++)
+    {
+        //QLineF line = lines.nearestSearch(point);
+        LaserLineList lines = lineList.at(i);
+        
+        int step = 1;
+        int j = 0;
+        int end = lines.length();
+        if (!forward)
+        {
+            step = -1;
+            j = lines.length() - 1;
+            end = -1;
+        }
+
+        for (; j != end; j += step)
+        {
+            QLineF line = lines.at(j);
+
+            QPointF pt1 = line.p1();
+            QPointF pt2 = line.p2();
+            if (!forward)
+            {
+                pt1 = line.p2();
+                pt2 = line.p1();
+            }
+
+            QPointF diff1 = pt1 - lastPoint;
+            QPointF diff2 = pt2 - pt1;
+            if (Config::Export::enableRelativeCoordinates())
+            {
+                buffer.append(QString("PU%1 %2;").arg(qRound(diff1.x())).arg(qRound(diff1.y())));
+                buffer.append(QString("PD%1 %2;").arg(qRound(diff2.x())).arg(qRound(diff2.y())));
+            }
+            else
+            {
+                buffer.append(QString("PU%1 %2;").arg(qRound(pt1.x())).arg(qRound(pt1.y())));
+                buffer.append(QString("PD%1 %2;").arg(qRound(pt2.x())).arg(qRound(pt2.y())));
+            }
+            //point = line.p2();
+            lastPoint = pt2;
+        }
+        forward = !forward;
+    }
+    return buffer;
+}
+
 QByteArray machiningUtils::image2Plt(const QImage & image)
 {
     return QByteArray();

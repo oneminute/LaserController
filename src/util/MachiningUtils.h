@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "laser/LaserPointList.h"
+#include "laser/LaserLineList.h"
 
 namespace machiningUtils
 {
@@ -49,6 +50,8 @@ namespace machiningUtils
     QByteArray pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint);
 
     QByteArray pointList2Plt(const LaserPointList& points, QPointF& lastPoint);
+
+    QByteArray lineList2Plt(const LaserLineListList& lineList, QPointF& lastPoint);
 
     QByteArray image2Plt(const QImage& image);
 

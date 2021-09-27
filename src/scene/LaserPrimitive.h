@@ -15,6 +15,7 @@
 #include <QTextEdit>
 #include "LaserDocumentItem.h"
 #include "laser/LaserPointList.h"
+#include "laser/LaserLineList.h"
 
 class LaserDocument;
 class LaserLayer;
@@ -128,7 +129,7 @@ public:
     LaserPointListList machiningPoints() const;
     virtual LaserPointListList arrangeMachiningPoints(LaserPoint& fromPoint, int startingIndex);
     LaserPointListList arrangedPoints() const;
-    virtual QString generateFillData(QPointF& lastPoint) const;
+    virtual LaserLineListList generateFillData(QPointF& lastPoint);
     LaserPoint arrangedStartingPoint() const;
     LaserPoint arrangedEndingPoint() const;
     QList<int> startingIndices() const;
@@ -519,6 +520,7 @@ public:
     virtual QPointF position() const;
     virtual QPainterPath toMachiningPath() const;
     virtual LaserPointListList updateMachiningPoints(quint32 progressCode, qreal progressQuota);
+    virtual LaserLineListList generateFillData(QPointF& lastPoint);
 
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)

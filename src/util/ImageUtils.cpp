@@ -575,22 +575,6 @@ void imageUtils::generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi)
         pt.setY(qMax(0, qRound(pt.y() - dy)));
     }
 
-    //// 修形
-    //for (int j = srcRoi.cols / 2 - 1; j >= 0; j--)
-    //{
-    //    for (int i = srcRoi.rows / 2 - 1; i >= 0; i--)
-    //    {
-    //        int gray = dstRoi.ptr<quint8>(pt.y())[i];
-    //        if (gray == 0)
-    //        {
-    //            int leftX = qMin(j, j - 1);
-    //            int topY = qMin(i, i - 1);
-    //            int topPx = dstRoi.ptr<quint8>(topY)[leftX];
-    //            int leftPx = dstRoi.ptr<quint8>(topY)[leftX];
-    //        }
-    //    }
-    //}
-
     pt = QPoint(srcRoi.cols / 2 - 1, srcRoi.rows / 2);
     for (int j = pt.y(); j >= 0 && sum2 > 0; j--)
     {

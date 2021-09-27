@@ -46,7 +46,7 @@ namespace utils
 
     QRectF boundingRect(const QList<LaserPrimitive*>& primitives);
 
-    LaserLineList interLines(const QPainterPath& path, qreal rowInterval = 1);
+    LaserLineListList interLines(const QPainterPath& path, qreal rowInterval = 1);
 }
 
 #endif // UTILS_H

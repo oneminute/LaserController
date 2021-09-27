@@ -79,3 +79,12 @@ QLineF LaserLineList::nearestSearch(const QPointF& point, bool remove)
     }
     return line;
 }
+
+LaserLineListList::LaserLineListList()
+    : QList<LaserLineList>()
+{
+}
+
+LaserLineListList::~LaserLineListList()
+{
+}

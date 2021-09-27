@@ -357,37 +357,13 @@ LaserPointListList LaserPrimitive::arrangedPoints() const
     return d->arrangedPointsList;
 }
 
-QString LaserPrimitive::generateFillData(QPointF& lastPoint) const 
+LaserLineListList LaserPrimitive::generateFillData(QPointF& lastPoint) 
 {
     // 获取所有的加工线
     QPainterPath path = toMachiningPath();
-    LaserLineList lines = utils::interLines(path, 70);
+    LaserLineListList lineList = utils::interLines(path, layer()->rowInterval());
 
-    // 建立所有线点的kdtree
-    lines.buildKdtree();
-    
-    QByteArray buffer;
-    // 从起刀点位置开始依次寻找最优点
-    QPointF point = path.boundingRect().topLeft();
-    for (int i = 0; i < lines.count(); i++)
-    {
-        QLineF line = lines.nearestSearch(point);
-        QPointF diff1 = line.p1() - point;
-        QPointF diff2 = line.p2() - line.p1();
-        if (Config::Export::enableRelativeCoordinates())
-        {
-            buffer.append(QString("PU%1 %2;").arg(qRound(diff1.x())).arg(qRound(diff1.y())));
-            buffer.append(QString("PD%1 %2;").arg(qRound(diff2.x())).arg(qRound(diff2.y())));
-        }
-        else
-        {
-            buffer.append(QString("PU%1 %2;").arg(qRound(line.p1().x())).arg(qRound(line.p1().y())));
-            buffer.append(QString("PD%1 %2;").arg(qRound(line.p2().x())).arg(qRound(line.p2().y())));
-        }
-        point = line.p2();
-        lastPoint = point;
-    }
-    return buffer; 
+    return lineList;
 }
 
 LaserPoint LaserPrimitive::arrangedStartingPoint() const
@@ -2838,5 +2814,23 @@ LaserPointListList LaserText::updateMachiningPoints(quint32 progressCode, qreal 
     d->machiningCenter = transform.mapRect(sceneBoundingRect()).center();
     
     return d->machiningPointsList;
+}
+
+LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
+{
+    Q_D(LaserText);
+    QTransform transform = sceneTransform() * Global::matrixToMachining();
+    LaserLineListList lineList;
+    for (int i = 0; i < d->pathList.size(); i++) {
+        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
+        for (QPainterPath rowPath : rowPathList) {
+            QPainterPath path = transform.map(rowPath);
+            LaserLineListList lines = utils::interLines(path, layer()->rowInterval());
+            if (lines.empty())
+                continue;
+            lineList.append(lines);
+        }
+    }
+    return lineList;
 }
 
