@@ -28,6 +28,7 @@
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserPrimitiveGroup.h"
+#include "laser/LaserLineList.h"
 
 class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
@@ -294,7 +295,7 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
             pointIndex = 0;
             ignore = true;
         }
-        bool isClosed = qFuzzyCompare(machiningPoints.first().toPointF(), machiningPoints.last().toPointF());
+        bool isClosed = utils::fuzzyCompare(machiningPoints.first().toPointF(), machiningPoints.last().toPointF());
         LaserPointList points;
         // check closour
         if (isClosed)
@@ -319,7 +320,7 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
             {
                 cursor = (cursor + step + machiningPoints.length()) % machiningPoints.length();
                 LaserPoint& currentPoint = machiningPoints[cursor];
-                if (!qFuzzyCompare(lastPoint.toPointF(), currentPoint.toPointF()))
+                if (!utils::fuzzyCompare(lastPoint.toPointF(), currentPoint.toPointF()))
                     points.push_back(currentPoint);
                 lastPoint = currentPoint;
             }
@@ -354,6 +355,39 @@ LaserPointListList LaserPrimitive::arrangedPoints() const
 {
     Q_D(const LaserPrimitive);
     return d->arrangedPointsList;
+}
+
+QString LaserPrimitive::generateFillData(QPointF& lastPoint) const 
+{
+    // 获取所有的加工线
+    QPainterPath path = toMachiningPath();
+    LaserLineList lines = utils::interLines(path, 70);
+
+    // 建立所有线点的kdtree
+    lines.buildKdtree();
+    
+    QByteArray buffer;
+    // 从起刀点位置开始依次寻找最优点
+    QPointF point = path.boundingRect().topLeft();
+    for (int i = 0; i < lines.count(); i++)
+    {
+        QLineF line = lines.nearestSearch(point);
+        QPointF diff1 = line.p1() - point;
+        QPointF diff2 = line.p2() - line.p1();
+        if (Config::Export::enableRelativeCoordinates())
+        {
+            buffer.append(QString("PU%1 %2;").arg(qRound(diff1.x())).arg(qRound(diff1.y())));
+            buffer.append(QString("PD%1 %2;").arg(qRound(diff2.x())).arg(qRound(diff2.y())));
+        }
+        else
+        {
+            buffer.append(QString("PU%1 %2;").arg(qRound(line.p1().x())).arg(qRound(line.p1().y())));
+            buffer.append(QString("PD%1 %2;").arg(qRound(line.p2().x())).arg(qRound(line.p2().y())));
+        }
+        point = line.p2();
+        lastPoint = point;
+    }
+    return buffer; 
 }
 
 LaserPoint LaserPrimitive::arrangedStartingPoint() const
@@ -742,9 +776,8 @@ void LaserEllipse::draw(QPainter* painter)
 QPainterPath LaserEllipse::toMachiningPath() const
 {
     Q_D(const LaserEllipse);
-    QPainterPath path;
     QTransform t = sceneTransform() * Global::matrixToMachining();
-    path = t.map(d->path);
+    QPainterPath path = t.map(d->path);
     return path;
 }
 
@@ -912,7 +945,7 @@ QPainterPath LaserRect::toMachiningPath() const
 {
     Q_D(const LaserRect);
     QPainterPath path;
-    QPolygonF rect = transform().map(d->rect);
+    QPolygonF rect = sceneTransform().map(d->rect);
     path.addPolygon(rect);
 
     path = Global::matrixToMachining().map(path);

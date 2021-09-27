@@ -193,12 +193,6 @@ inline const LaserPoint operator/(const LaserPoint& l1, const LaserPoint& l2)
 //        qFuzzyCompare(l1.m_angle2, l2.m_angle2);
 //}
 
-inline const bool qFuzzyCompare(const QPointF& p1, const QPointF& p2)
-{
-    return qFuzzyCompare(p1.x(), p2.x()) &&
-        qFuzzyCompare(p1.y(), p2.y());
-}
-
 inline QPointF LaserPoint::toPointF() const
 {
     return QPointF(m_x, m_y);

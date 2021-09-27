@@ -157,6 +157,9 @@ void LaserLayerDialog::onBothToggled(bool checked)
 {
     if (checked)
     {
+		m_ui->groupBoxCutting->setVisible(true);
+		m_ui->groupBoxEngraving->setVisible(false);
+		adjustSize();
         m_type = LLT_BOTH;
     }
 }
@@ -201,7 +204,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 
 void LaserLayerDialog::accept()
 {
-	if (m_type == LLT_CUTTING)
+	if (m_type == LLT_CUTTING || m_type == LLT_BOTH)
 	{
 		m_layer->setCuttingMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
 		m_layer->setCuttingRunSpeed(m_ui->editSliderCuttingRunSpeed->value());

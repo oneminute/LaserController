@@ -283,10 +283,10 @@ void LaserDocument::exportJSON(const QString& filename)
                 QJsonArray items;
                 QJsonObject engravingParamObj;
                 QJsonObject cuttingParamObj;
+                layerObj["Type"] = layer->type();
                 if (layer->type() == LLT_ENGRAVING)
                 {
                     //engravingParamObj["LayerId"] = layerList.count();
-                    engravingParamObj["Type"] = layer->type();
                     engravingParamObj["MinSpeed"] = layer->engravingMinSpeed() * 1000;
                     engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
                     engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
@@ -300,7 +300,15 @@ void LaserDocument::exportJSON(const QString& filename)
                 else if (layer->type() == LLT_CUTTING)
                 {
                     //cuttingParamObj["LayerId"] = layerList.count();
-                    cuttingParamObj["Type"] = layer->type();
+                    cuttingParamObj["MinSpeed"] = layer->cuttingMinSpeed() * 1000;
+                    cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
+                    cuttingParamObj["LaserPower"] = layer->cuttingLaserPower() * 10;
+                    cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
+                    cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
+                }
+                else if (layer->type() == LLT_BOTH)
+                {
+                    layerObj["Type"] = 2;
                     cuttingParamObj["MinSpeed"] = layer->cuttingMinSpeed() * 1000;
                     cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
                     cuttingParamObj["LaserPower"] = layer->cuttingLaserPower() * 10;
@@ -342,6 +350,11 @@ void LaserDocument::exportJSON(const QString& filename)
                             itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
                             //items.append(itemObj);
                         }
+                    }
+                    else if (layer->type() == LLT_BOTH)
+                    {
+                        itemObj["Type"] = primitive->typeLatinName();
+                        itemObj["Data"] = QString(primitive->generateFillData(lastPoint));
                     }
                     items.append(itemObj);
 
