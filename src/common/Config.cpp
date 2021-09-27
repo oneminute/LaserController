@@ -677,6 +677,7 @@ void Config::loadExportItems()
         false,
         DT_BOOL
     );
+    imageUseGaussian->setVisible(false);
 }
 
 void Config::loadDeviceItems()

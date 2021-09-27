@@ -215,7 +215,7 @@ LaserLineList utils::interLines(const QPainterPath& path, qreal rowInterval)
         for (int i = 0; i < intersected.elementCount(); i++)
         {
             QPainterPath::Element e = intersected.elementAt(i);
-            qDebug() << i << e.x << e.y << e.type;
+            //qDebug() << i << e.x << e.y << e.type;
             if (utils::fuzzyEquals(e.y, y))
             {
                 linePoints.insert(e.x, e.x);
