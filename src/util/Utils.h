@@ -9,8 +9,10 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QGraphicsItem>
+#include <QPointF>
 
 #include "laser/LaserPointList.h"
+#include "laser/LaserLineList.h"
 
 class LaserPrimitive;
 
@@ -30,6 +32,10 @@ namespace utils
 
     bool fuzzyEquals(const QPointF& pt1, const QPointF& pt2);
 
+    bool fuzzyEquals(qreal a, qreal b);
+
+    bool fuzzyCompare(const QPointF& p1, const QPointF& p2);
+
 	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);
 	
     quint32 factorial(quint32 n);
@@ -39,6 +45,8 @@ namespace utils
     LaserPoint center(const LaserPointList& points);
 
     QRectF boundingRect(const QList<LaserPrimitive*>& primitives);
+
+    LaserLineList interLines(const QPainterPath& path, qreal rowInterval = 1);
 }
 
 #endif // UTILS_H

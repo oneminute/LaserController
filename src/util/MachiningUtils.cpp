@@ -202,7 +202,7 @@ void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& po
 {
     points.clear();
     startingIndices.clear();
-    bool isClosed = qFuzzyCompare(polygon.first(), polygon.last());
+    bool isClosed = utils::fuzzyCompare(polygon.first(), polygon.last());
     center = QPointF(0, 0);
     for (int i = 0; i < polygon.size(); i++)
     {

@@ -123,6 +123,17 @@ bool utils::fuzzyEquals(const QPointF& pt1, const QPointF& pt2)
     return qFuzzyIsNull(length);
 }
 
+bool utils::fuzzyEquals(qreal a, qreal b)
+{
+    return qAbs(a - b) < 0.001;
+}
+
+bool utils::fuzzyCompare(const QPointF& p1, const QPointF& p2)
+{
+    return qFuzzyCompare(p1.x(), p2.x()) &&
+        qFuzzyCompare(p1.y(), p2.y());
+}
+
 void utils::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)
 {
 	item->setTransform(sceneTransform);
@@ -185,4 +196,51 @@ QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
             bounding.setBottom(rect.bottom());
     }
     return bounding;
+}
+
+LaserLineList utils::interLines(const QPainterPath& path, qreal rowInterval)
+{
+    LaserLineList lines;
+    QRectF boundingRect = path.boundingRect();
+
+    qreal y = boundingRect.top();
+    for (; y <= boundingRect.bottom(); y += rowInterval)
+    {
+        QRectF intersectRect(boundingRect.left(), y, boundingRect.width(), 1);
+        QPainterPath intersectPath;
+        intersectPath.addRect(intersectRect);
+
+        QPainterPath intersected = intersectPath.intersected(path);
+        QMap<qreal, qreal> linePoints;
+        for (int i = 0; i < intersected.elementCount(); i++)
+        {
+            QPainterPath::Element e = intersected.elementAt(i);
+            qDebug() << i << e.x << e.y << e.type;
+            if (utils::fuzzyEquals(e.y, y))
+            {
+                linePoints.insert(e.x, e.x);
+            }
+        }
+        qreal last;
+        int i = 0;
+        for (qreal curr : linePoints)
+        {
+            qDebug() << curr;
+            if (i++ == 0)
+            {
+                last = curr;
+                continue;
+            }
+            qreal mean = (last + curr) / 2;
+
+            QPointF pt(mean, y);
+            if (path.contains(pt))
+            {
+                lines.append(QLineF(QPointF(last, y), QPointF(curr, y)));
+            }
+            last = curr;
+        }
+    }
+
+    return lines;
 }

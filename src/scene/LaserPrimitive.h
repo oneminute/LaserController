@@ -128,6 +128,7 @@ public:
     LaserPointListList machiningPoints() const;
     virtual LaserPointListList arrangeMachiningPoints(LaserPoint& fromPoint, int startingIndex);
     LaserPointListList arrangedPoints() const;
+    virtual QString generateFillData(QPointF& lastPoint) const;
     LaserPoint arrangedStartingPoint() const;
     LaserPoint arrangedEndingPoint() const;
     QList<int> startingIndices() const;
