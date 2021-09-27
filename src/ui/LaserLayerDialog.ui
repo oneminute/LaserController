@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>698</width>
-    <height>594</height>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,12 +50,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButtonBoth">
+         <widget class="QRadioButton" name="radioButtonFilling">
           <property name="enabled">
            <bool>true</bool>
           </property>
           <property name="text">
-           <string>Both</string>
+           <string>Filling</string>
           </property>
          </widget>
         </item>
@@ -256,9 +256,9 @@
        <widget class="EditSlider" name="editSliderDPI" native="true"/>
       </item>
       <item row="9" column="0">
-       <widget class="QLabel" name="labelRowInterval">
+       <widget class="QLabel" name="labelEngravingRowInterval">
         <property name="text">
-         <string>Row Interval(μm)</string>
+         <string>Row Interval(um)</string>
         </property>
        </widget>
       </item>
@@ -284,6 +284,75 @@
       </item>
       <item row="12" column="1">
        <widget class="EditSlider" name="editSliderHalftoneGridSize" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxFilling">
+     <property name="title">
+      <string>Filling</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_4">
+      <item row="0" column="1">
+       <widget class="EditSlider" name="editSliderFillingMinSpeed" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Run Speed(mm/s)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="EditSlider" name="editSliderFillingRunSpeed" native="true"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Laser Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="FloatEditSlider" name="editSliderFillingLaserPower" native="true"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Min Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="FloatEditSlider" name="editSliderFillingMinSpeedPower" native="true"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Run Speed Power</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="FloatEditSlider" name="editSliderFillingRunSpeedPower" native="true"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="labelFillingRowInterval">
+        <property name="text">
+         <string>Row Interval(um)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="EditSlider" name="editSliderFillingRowInterval" native="true"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Min Speed(mm/s)</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

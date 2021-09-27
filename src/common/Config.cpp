@@ -26,6 +26,7 @@ ConfigItemGroup* Config::Layers::group(nullptr);
 ConfigItemGroup* Config::Ui::group(nullptr);
 ConfigItemGroup* Config::CuttingLayer::group(nullptr);
 ConfigItemGroup* Config::EngravingLayer::group(nullptr);
+ConfigItemGroup* Config::FillingLayer::group(nullptr);
 ConfigItemGroup* Config::PathOptimization::group(nullptr);
 ConfigItemGroup* Config::Export::group(nullptr);
 ConfigItemGroup* Config::Device::group(nullptr);
@@ -53,6 +54,7 @@ void Config::init()
     loadUiItems();
     loadCuttingLayerItems();
     loadEngravingLayerItems();
+    loadFillingLayerItems();
     loadPathOptimizationItems();
     loadExportItems();
     loadDeviceItems();
@@ -528,6 +530,68 @@ void Config::loadEngravingLayerItems()
     );
     dpi->setInputWidgetProperty("minimum", 1);
     dpi->setInputWidgetProperty("maximum", 1200);
+}
+
+void Config::loadFillingLayerItems()
+{
+    ConfigItemGroup* group = new Config::FillingLayer;
+    Config::FillingLayer::group = group;
+
+    ConfigItem* minSpeed = group->addConfigItem(
+        "minSpeed",
+        15
+    );
+    minSpeed->setInputWidgetProperty("minimum", 1);
+    minSpeed->setInputWidgetProperty("maximum", 1000);
+    minSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    minSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+
+    ConfigItem* runSpeed = group->addConfigItem(
+        "runSpeed",
+        30
+    );
+    runSpeed->setInputWidgetProperty("minimum", 1);
+    runSpeed->setInputWidgetProperty("maximum", 1000);
+    runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+
+    ConfigItem* laserPower = group->addConfigItem(
+        "laserPower",
+        8,
+        DT_REAL
+    );
+    laserPower->setInputWidgetType(IWT_FloatEditSlider);
+    laserPower->setInputWidgetProperty("minimum", 0);
+    laserPower->setInputWidgetProperty("maximum", 100);
+    laserPower->setInputWidgetProperty("textTemplate", "%1%");
+
+    ConfigItem* minPower= group->addConfigItem(
+        "minPower",
+        4,
+        DT_REAL
+    );
+    minPower->setInputWidgetType(IWT_FloatEditSlider);
+    minPower->setInputWidgetProperty("minimum", 0);
+    minPower->setInputWidgetProperty("maximum", 100);
+    minPower->setInputWidgetProperty("textTemplate", "%1%");
+
+    ConfigItem* maxPower= group->addConfigItem(
+        "maxPower",
+        12,
+        DT_REAL
+    );
+    maxPower->setInputWidgetProperty("minimum", 0);
+    maxPower->setInputWidgetProperty("maximum", 100);
+    maxPower->setInputWidgetProperty("textTemplate", "%1%");
+
+    ConfigItem* rowInterval = group->addConfigItem(
+        "rowInterval",
+        70,
+        DT_INT
+    );
+    rowInterval->setInputWidgetProperty("minimum", 0);
+    rowInterval->setInputWidgetProperty("maximum", 1000);
+    rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
 }
 
 void Config::loadPathOptimizationItems()
@@ -2664,6 +2728,30 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "DPI", nullptr), 
         QCoreApplication::translate("Config", "Dots per inch", nullptr));
 
+    FillingLayer::minSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "The min speed for filling layers", nullptr));
+
+    FillingLayer::runSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Run Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "The run speed for filling layers", nullptr));
+
+    FillingLayer::laserPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The laser power for filling layers", nullptr));
+
+    FillingLayer::minPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The min power percentage for filling layers", nullptr));
+
+    FillingLayer::maxPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "The max power percentage for filling layers", nullptr));
+
+    FillingLayer::rowIntervalItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Row Interval(μm)", nullptr), 
+        QCoreApplication::translate("Config", "The row interval between lines of bitmap for filling layers", nullptr));
+
     PathOptimization::maxStartingPointsItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Starting Points", nullptr), 
         QCoreApplication::translate("Config", "Max starting points count of each primitive node", nullptr));
@@ -3142,6 +3230,10 @@ void Config::updateTitlesAndDescriptions()
     groupsMap["engravingLayer"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "Engraving Layer", nullptr),
         QCoreApplication::translate("Config", "Engraving Layer", nullptr));
+
+    groupsMap["fillingLayer"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Filling Layer", nullptr),
+        QCoreApplication::translate("Config", "Filling Layer", nullptr));
 
     groupsMap["pathOptimization"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "Path Optimization", nullptr),

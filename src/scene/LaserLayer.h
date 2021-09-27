@@ -67,8 +67,26 @@ public:
     int engravingStyle() const;
     void setEngravingStyle(int engravingStyle);
 
-    int rowInterval() const;
-    void setRowInterval(int rowInterval);
+    int engravingRowInterval() const;
+    void setEngravingRowInterval(int rowInterval);
+
+    int fillingMinSpeed() const;
+    void setFillingMinSpeed(int minSpeed);
+
+    int fillingRunSpeed() const;
+    void setFillingRunSpeed(int runSpeed);
+
+    qreal fillingLaserPower() const;
+    void setFillingLaserPower(qreal laserPower);
+
+    qreal fillingMinSpeedPower() const;
+    void setFillingMinSpeedPower(qreal minSpeedPower);
+
+    qreal fillingRunSpeedPower() const;
+    void setFillingRunSpeedPower(qreal runSpeedPower);
+
+    int fillingRowInterval() const;
+    void setFillingRowInterval(int rowInterval);
 
     QPoint startPos() const;
     void setStartPos(const QPoint& startPos);

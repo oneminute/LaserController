@@ -31,26 +31,26 @@ void LaserLayerDialog::initUi()
 
     connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
     connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
-    connect(m_ui->radioButtonBoth, &QRadioButton::toggled, this, &LaserLayerDialog::onBothToggled);
+    connect(m_ui->radioButtonFilling, &QRadioButton::toggled, this, &LaserLayerDialog::onBothToggled);
     connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &LaserLayerDialog::onButtonClicked);
 
     if (m_type == LLT_ENGRAVING)
     {
         m_ui->radioButtonCutting->setChecked(false);
         m_ui->radioButtonEngraving->setChecked(true);
-        m_ui->radioButtonBoth->setChecked(false);
+        m_ui->radioButtonFilling->setChecked(false);
     }
     else if (m_type == LLT_CUTTING)
     {
         m_ui->radioButtonCutting->setChecked(true);
         m_ui->radioButtonEngraving->setChecked(false);
-        m_ui->radioButtonBoth->setChecked(false);
+        m_ui->radioButtonFilling->setChecked(false);
     }
-    else if (m_type == LLT_BOTH)
+    else if (m_type == LLT_FILLING)
     {
-        m_ui->radioButtonCutting->setChecked(false);
+        m_ui->radioButtonCutting->setChecked(true);
         m_ui->radioButtonEngraving->setChecked(false);
-        m_ui->radioButtonBoth->setChecked(true);
+        m_ui->radioButtonFilling->setChecked(true);
     }
 
     m_ui->editSliderCuttingMinSpeed->setMaximum(2000);
@@ -78,12 +78,28 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderEngravingRunSpeedPower->setMaximum(100);
     m_ui->editSliderEngravingRunSpeedPower->setTextTemplate("%1%");
     m_ui->editSliderEngravingRunSpeedPower->setStep(0.1);
-
+    m_ui->editSliderEngravingRowInterval->setMinimum(1);
     m_ui->editSliderEngravingRowInterval->setMaximum(1000);
+
     m_ui->editSliderDPI->setMinimum(0);
     m_ui->editSliderDPI->setMaximum(1200);
     m_ui->editSliderLPI->setMinimum(1);
     m_ui->editSliderLPI->setMaximum(100);
+
+    m_ui->editSliderFillingMinSpeed->setMaximum(2000);
+    m_ui->editSliderFillingRunSpeed->setMaximum(2000);
+
+    m_ui->editSliderFillingLaserPower->setMaximum(100);
+    m_ui->editSliderFillingLaserPower->setTextTemplate("%1%");
+    m_ui->editSliderFillingLaserPower->setStep(0.1);
+    m_ui->editSliderFillingMinSpeedPower->setMaximum(100);
+    m_ui->editSliderFillingMinSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderFillingMinSpeedPower->setStep(0.1);
+    m_ui->editSliderFillingRunSpeedPower->setMaximum(100);
+    m_ui->editSliderFillingRunSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderFillingRunSpeedPower->setStep(0.1);
+    m_ui->editSliderFillingRowInterval->setMinimum(1);
+    m_ui->editSliderFillingRowInterval->setMaximum(1000);
 
     m_ui->lineEditLayerName->setText(m_layer->name());
 
@@ -103,12 +119,19 @@ void LaserLayerDialog::resetParameters()
     m_ui->editSliderEngravingLaserPower->setValue(m_layer->engravingLaserPower());
     m_ui->editSliderEngravingMinSpeedPower->setValue(m_layer->engravingMinSpeedPower());
     m_ui->editSliderEngravingRunSpeedPower->setValue(m_layer->engravingRunSpeedPower());
-    m_ui->editSliderEngravingRowInterval->setValue(m_layer->rowInterval());
+    m_ui->editSliderEngravingRowInterval->setValue(m_layer->engravingRowInterval());
     m_ui->checkBoxUseHalftone->setChecked(m_layer->useHalftone());
     m_ui->doubleSpinBoxHalftoneAngles->setValue(m_layer->halftoneAngles());
     m_ui->editSliderHalftoneGridSize->setValue(m_layer->halftoneGridSize());
     m_ui->editSliderDPI->setValue(m_layer->dpi());
     m_ui->editSliderLPI->setValue(m_layer->lpi());
+
+    m_ui->editSliderFillingMinSpeed->setValue(m_layer->fillingMinSpeed());
+    m_ui->editSliderFillingRunSpeed->setValue(m_layer->fillingRunSpeed());
+    m_ui->editSliderFillingLaserPower->setValue(m_layer->fillingLaserPower());
+    m_ui->editSliderFillingMinSpeedPower->setValue(m_layer->fillingMinSpeedPower());
+    m_ui->editSliderFillingRunSpeedPower->setValue(m_layer->fillingRunSpeedPower());
+    m_ui->editSliderFillingRowInterval->setValue(m_layer->fillingRowInterval());
 }
 
 void LaserLayerDialog::restoreParameters()
@@ -124,11 +147,19 @@ void LaserLayerDialog::restoreParameters()
     m_ui->editSliderEngravingLaserPower->setValue(Config::EngravingLayer::laserPower());
     m_ui->editSliderEngravingMinSpeedPower->setValue(Config::EngravingLayer::minPower());
     m_ui->editSliderEngravingRunSpeedPower->setValue(Config::EngravingLayer::maxPower());
+    m_ui->editSliderEngravingRowInterval->setValue(Config::EngravingLayer::rowInterval());
     m_ui->checkBoxUseHalftone->setChecked(Config::EngravingLayer::useHalftone());
     m_ui->doubleSpinBoxHalftoneAngles->setValue(Config::EngravingLayer::halftoneAngles());
     m_ui->editSliderHalftoneGridSize->setValue(Config::EngravingLayer::halftoneGridSize());
     m_ui->editSliderDPI->setValue(Config::EngravingLayer::DPI());
     m_ui->editSliderLPI->setValue(Config::EngravingLayer::LPI());
+
+    m_ui->editSliderFillingMinSpeed->setValue(Config::FillingLayer::minSpeed());
+    m_ui->editSliderFillingRunSpeed->setValue(Config::FillingLayer::runSpeed());
+    m_ui->editSliderFillingLaserPower->setValue(Config::FillingLayer::laserPower());
+    m_ui->editSliderFillingMinSpeedPower->setValue(Config::FillingLayer::minPower());
+    m_ui->editSliderFillingRunSpeedPower->setValue(Config::FillingLayer::maxPower());
+    m_ui->editSliderFillingRowInterval->setValue(Config::FillingLayer::rowInterval());
 }
 
 void LaserLayerDialog::onCuttingToggled(bool checked)
@@ -137,6 +168,7 @@ void LaserLayerDialog::onCuttingToggled(bool checked)
     {
 		m_ui->groupBoxCutting->setVisible(true);
 		m_ui->groupBoxEngraving->setVisible(false);
+        m_ui->groupBoxFilling->setVisible(false);
 		adjustSize();
         m_type = LLT_CUTTING;
     }
@@ -148,6 +180,7 @@ void LaserLayerDialog::onEngravingToggled(bool checked)
     {
 		m_ui->groupBoxCutting->setVisible(false);
 		m_ui->groupBoxEngraving->setVisible(true);
+        m_ui->groupBoxFilling->setVisible(false);
 		adjustSize();
         m_type = LLT_ENGRAVING;
     }
@@ -159,8 +192,9 @@ void LaserLayerDialog::onBothToggled(bool checked)
     {
 		m_ui->groupBoxCutting->setVisible(true);
 		m_ui->groupBoxEngraving->setVisible(false);
+        m_ui->groupBoxFilling->setVisible(true);
 		adjustSize();
-        m_type = LLT_BOTH;
+        m_type = LLT_FILLING;
     }
 }
 
@@ -195,6 +229,13 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value());
 		Config::EngravingLayer::useHalftoneItem()->setValue(m_ui->checkBoxUseHalftone->isChecked());
 
+		Config::FillingLayer::minSpeedItem()->setValue(m_ui->editSliderFillingMinSpeed->value());
+		Config::FillingLayer::runSpeedItem()->setValue(m_ui->editSliderFillingRunSpeed->value());
+		Config::FillingLayer::laserPowerItem()->setValue(m_ui->editSliderFillingLaserPower->value());
+		Config::FillingLayer::minPowerItem()->setValue(m_ui->editSliderFillingMinSpeedPower->value());
+		Config::FillingLayer::maxPowerItem()->setValue(m_ui->editSliderFillingRunSpeedPower->value());
+        Config::FillingLayer::rowIntervalItem()->setValue(m_ui->editSliderFillingRowInterval->value());
+
 		if (Config::isModified())
 		{
 			Config::save();
@@ -204,29 +245,37 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 
 void LaserLayerDialog::accept()
 {
-	if (m_type == LLT_CUTTING || m_type == LLT_BOTH)
-	{
-		m_layer->setCuttingMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
-		m_layer->setCuttingRunSpeed(m_ui->editSliderCuttingRunSpeed->value());
-		m_layer->setCuttingLaserPower(m_ui->editSliderCuttingLaserPower->value());
-		m_layer->setCuttingMinSpeedPower(m_ui->editSliderCuttingMinSpeedPower->value());
-		m_layer->setCuttingRunSpeedPower(m_ui->editSliderCuttingRunSpeedPower->value());
-	}
-	else if (m_type == LLT_ENGRAVING)
-	{
-		m_layer->setEngravingMinSpeed(m_ui->editSliderEngravingMinSpeed->value());
-		m_layer->setEngravingRunSpeed(m_ui->editSliderEngravingRunSpeed->value());
-		m_layer->setEngravingLaserPower(m_ui->editSliderEngravingLaserPower->value());
-		m_layer->setEngravingMinSpeedPower(m_ui->editSliderEngravingMinSpeedPower->value());
-		m_layer->setEngravingRunSpeedPower(m_ui->editSliderEngravingRunSpeedPower->value());
-        m_layer->setRowInterval(m_ui->editSliderEngravingRowInterval->value());
-        m_layer->setHalftoneAngles(m_ui->doubleSpinBoxHalftoneAngles->value());
-        m_layer->setHalftoneGridSize(m_ui->editSliderHalftoneGridSize->value());
-		m_layer->setLpi(m_ui->editSliderLPI->value());
-		m_layer->setDpi(m_ui->editSliderDPI->value());
-		m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
-	}
-	m_layer->setType(m_type);
+    //if (m_type == LLT_CUTTING || m_type == LLT_FILLING)
+    //{
+    m_layer->setCuttingMinSpeed(m_ui->editSliderCuttingMinSpeed->value());
+    m_layer->setCuttingRunSpeed(m_ui->editSliderCuttingRunSpeed->value());
+    m_layer->setCuttingLaserPower(m_ui->editSliderCuttingLaserPower->value());
+    m_layer->setCuttingMinSpeedPower(m_ui->editSliderCuttingMinSpeedPower->value());
+    m_layer->setCuttingRunSpeedPower(m_ui->editSliderCuttingRunSpeedPower->value());
+    //}
+    //else if (m_type == LLT_ENGRAVING)
+    //{
+    m_layer->setEngravingMinSpeed(m_ui->editSliderEngravingMinSpeed->value());
+    m_layer->setEngravingRunSpeed(m_ui->editSliderEngravingRunSpeed->value());
+    m_layer->setEngravingLaserPower(m_ui->editSliderEngravingLaserPower->value());
+    m_layer->setEngravingMinSpeedPower(m_ui->editSliderEngravingMinSpeedPower->value());
+    m_layer->setEngravingRunSpeedPower(m_ui->editSliderEngravingRunSpeedPower->value());
+    m_layer->setEngravingRowInterval(m_ui->editSliderEngravingRowInterval->value());
+    m_layer->setHalftoneAngles(m_ui->doubleSpinBoxHalftoneAngles->value());
+    m_layer->setHalftoneGridSize(m_ui->editSliderHalftoneGridSize->value());
+    m_layer->setLpi(m_ui->editSliderLPI->value());
+    m_layer->setDpi(m_ui->editSliderDPI->value());
+    m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
+    //}
+
+    m_layer->setFillingMinSpeed(m_ui->editSliderFillingMinSpeed->value());
+    m_layer->setFillingRunSpeed(m_ui->editSliderFillingRunSpeed->value());
+    m_layer->setFillingLaserPower(m_ui->editSliderFillingLaserPower->value());
+    m_layer->setFillingMinSpeedPower(m_ui->editSliderFillingMinSpeedPower->value());
+    m_layer->setFillingRunSpeedPower(m_ui->editSliderFillingRunSpeedPower->value());
+    m_layer->setFillingRowInterval(m_ui->editSliderFillingRowInterval->value());
+
+    m_layer->setType(m_type);
 
     QDialog::accept();
 }

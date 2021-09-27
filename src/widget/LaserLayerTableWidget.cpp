@@ -110,7 +110,7 @@ void LaserLayerTableWidget::updateItems()
                 type = tr("E");
                 fullType = tr("Engraving");
             }
-            else if (layer->type() == LLT_BOTH)
+            else if (layer->type() == LLT_FILLING)
             {
                 type = tr("C+E");
                 fullType = tr("Both");

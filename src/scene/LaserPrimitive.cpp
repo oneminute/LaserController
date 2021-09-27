@@ -361,7 +361,7 @@ LaserLineListList LaserPrimitive::generateFillData(QPointF& lastPoint)
 {
     // 获取所有的加工线
     QPainterPath path = toMachiningPath();
-    LaserLineListList lineList = utils::interLines(path, layer()->rowInterval());
+    LaserLineListList lineList = utils::interLines(path, layer()->fillingRowInterval());
 
     return lineList;
 }
@@ -2825,7 +2825,7 @@ LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
         QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
         for (QPainterPath rowPath : rowPathList) {
             QPainterPath path = transform.map(rowPath);
-            LaserLineListList lines = utils::interLines(path, layer()->rowInterval());
+            LaserLineListList lines = utils::interLines(path, layer()->fillingRowInterval());
             if (lines.empty())
                 continue;
             lineList.append(lines);

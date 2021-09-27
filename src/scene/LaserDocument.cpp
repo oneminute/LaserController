@@ -283,6 +283,7 @@ void LaserDocument::exportJSON(const QString& filename)
                 QJsonArray items;
                 QJsonObject engravingParamObj;
                 QJsonObject cuttingParamObj;
+                QJsonObject fillingParamObj;
                 layerObj["Type"] = layer->type();
                 if (layer->type() == LLT_ENGRAVING)
                 {
@@ -292,9 +293,9 @@ void LaserDocument::exportJSON(const QString& filename)
                     engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
                     engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower() * 10;
                     engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower() * 10;
+                    engravingParamObj["RowInterval"] = layer->engravingRowInterval();
                     engravingParamObj["CarveForward"] = layer->engravingForward();
                     engravingParamObj["CarveStyle"] = layer->engravingStyle();
-                    engravingParamObj["RowInterval"] = layer->rowInterval();
                     engravingParamObj["ErrorX"] = layer->errorX();
                 }
                 else if (layer->type() == LLT_CUTTING)
@@ -306,7 +307,7 @@ void LaserDocument::exportJSON(const QString& filename)
                     cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
                     cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
                 }
-                else if (layer->type() == LLT_BOTH)
+                else if (layer->type() == LLT_FILLING)
                 {
                     layerObj["Type"] = 2;
                     cuttingParamObj["MinSpeed"] = layer->cuttingMinSpeed() * 1000;
@@ -314,9 +315,16 @@ void LaserDocument::exportJSON(const QString& filename)
                     cuttingParamObj["LaserPower"] = layer->cuttingLaserPower() * 10;
                     cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
                     cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
+                    fillingParamObj["MinSpeed"] = layer->fillingMinSpeed() * 1000;
+                    fillingParamObj["RunSpeed"] = layer->fillingRunSpeed() * 1000;
+                    fillingParamObj["LaserPower"] = layer->fillingLaserPower() * 10;
+                    fillingParamObj["MinSpeedPower"] = layer->fillingMinSpeedPower() * 10;
+                    fillingParamObj["RunSpeedPower"] = layer->fillingRunSpeedPower() * 10;
+                    fillingParamObj["RowInterval"] = layer->fillingRowInterval();
                 }
                 paramObj["EngravingParams"] = engravingParamObj;
                 paramObj["CuttingParams"] = cuttingParamObj;
+                paramObj["FillingParams"] = fillingParamObj;
                 layerObj["Params"] = paramObj;
                 //(*layerObj)["Index"] = layerId;
                 for (OptimizeNode* pathNode : layersMap[layer])
@@ -337,7 +345,7 @@ void LaserDocument::exportJSON(const QString& filename)
                             itemObj["Type"] = primitive->typeLatinName();
                             itemObj["ImageType"] = "PNG";
                             itemObj["Data"] = QString(data.toBase64());
-                            //items.append(itemObj);
+                            items.append(itemObj);
                         }
                     }
                     else if (layer->type() == LLT_CUTTING)
@@ -348,16 +356,25 @@ void LaserDocument::exportJSON(const QString& filename)
                         {
                             itemObj["Type"] = primitive->typeLatinName();
                             itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
-                            //items.append(itemObj);
+                            items.append(itemObj);
                         }
                     }
-                    else if (layer->type() == LLT_BOTH)
+                    else if (layer->type() == LLT_FILLING)
                     {
                         itemObj["Type"] = primitive->typeLatinName();
                         LaserLineListList lineList = primitive->generateFillData(lastPoint);
                         itemObj["Data"] = QString(machiningUtils::lineList2Plt(lineList, lastPoint));
+                        items.append(itemObj);
+
+                        QJsonObject itemObjCutting;
+                        itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
+                        itemObjCutting["Type"] = primitive->typeLatinName();
+                        pathNode->nearestPoint(LaserPoint(lastPoint));
+                        LaserPointListList points = primitive->arrangedPoints();
+                        itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
+                        itemObjCutting["Cutting"] = true;
+                        items.append(itemObjCutting);
                     }
-                    items.append(itemObj);
 
                     LaserApplication::previewWindow->addProgress(this, 1.0 * 0.9 / path.length(), tr("Primitve %1 finished.").arg(pathNode->nodeName()));
                 }
@@ -862,9 +879,33 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         {
             laserLayers[index]->setEngravingRunSpeedPower(layer.value("engravingRunSpeedPower").toDouble());
         }
-        if (layer.contains("rowInterval")) 
+        if (layer.contains("engravingRowInterval")) 
         {
-            laserLayers[index]->setRowInterval(layer.value("rowInterval").toInt());
+            laserLayers[index]->setEngravingRowInterval(layer.value("engravingRowInterval").toInt());
+        }
+        if (layer.contains("fillingMinSpeed"))
+        {
+            laserLayers[index]->setFillingMinSpeed(layer.value("fillingMinSpeed").toInt());
+        }
+        if (layer.contains("fillingRunSpeed"))
+        {
+            laserLayers[index]->setFillingRunSpeed(layer.value("fillingRunSpeed").toInt());
+        }
+        if (layer.contains("fillingLaserPower"))
+        {
+            laserLayers[index]->setFillingLaserPower(layer.value("fillingLaserPower").toDouble());
+        }
+        if (layer.contains("fillingMinSpeedPower"))
+        {
+            laserLayers[index]->setFillingMinSpeedPower(layer.value("fillingMinSpeedPower").toDouble());
+        }
+        if (layer.contains("fillingRunSpeedPower"))
+        {
+            laserLayers[index]->setFillingRunSpeedPower(layer.value("fillingRunSpeedPower").toDouble());
+        }
+        if (layer.contains("fillingRowInterval")) 
+        {
+            laserLayers[index]->setFillingRowInterval(layer.value("fillingRowInterval").toInt());
         }
         if (layer.contains("errorX"))
         {

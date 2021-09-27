@@ -60,6 +60,7 @@ protected:
     static void loadUiItems();
     static void loadCuttingLayerItems();
     static void loadEngravingLayerItems();
+    static void loadFillingLayerItems();
     static void loadPathOptimizationItems();
     static void loadExportItems();
     static void loadDeviceItems();
@@ -168,6 +169,26 @@ public:
         CONFIG_ITEM(engravingLayer, halftoneGridSize, int, toInt)
         CONFIG_ITEM(engravingLayer, LPI, int, toInt)
         CONFIG_ITEM(engravingLayer, DPI, int, toInt)
+
+    private:
+        friend class Config;
+    };
+
+    class FillingLayer : public ConfigItemGroup
+    {
+    protected:
+        FillingLayer(QObject* parent = nullptr)
+            : ConfigItemGroup("fillingLayer", tr("Filling Layer"), tr("Filling Layer"), parent)
+        {}
+        
+    public:
+        static ConfigItemGroup* group;
+        CONFIG_ITEM(fillingLayer, minSpeed, int, toInt)
+        CONFIG_ITEM(fillingLayer, runSpeed, int, toInt)
+        CONFIG_ITEM(fillingLayer, laserPower, qreal, toReal)
+        CONFIG_ITEM(fillingLayer, minPower, qreal, toReal)
+        CONFIG_ITEM(fillingLayer, maxPower, qreal, toReal)
+        CONFIG_ITEM(fillingLayer, rowInterval, int, toInt)
 
     private:
         friend class Config;
