@@ -831,9 +831,11 @@ LaserControllerWindow::~LaserControllerWindow()
 {
 	m_propertyWidget = nullptr;
     m_textFontWidget = nullptr;
+    
 	if (m_viewer->undoStack()) {
 		delete m_viewer->undoStack();
 	}
+    m_viewer = nullptr;
 }
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
@@ -3144,11 +3146,11 @@ void LaserControllerWindow::onActionMoveLayerDown(bool checked)
 void LaserControllerWindow::onLaserSceneSelectedChanged()
 {
     QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
+    if (!m_viewer) {
+        return;
+    }
 	if (items.length() == 0) {
-		/*if (m_propertyWidget) {
-			m_propertyWidget->setEnabled(false);
-		}*/
-		
+        QAction* mirrorH = m_ui->actionMirrorHorizontal;		
 		m_ui->actionMirrorHorizontal->setEnabled(false);
 		m_ui->actionMirrorVertical->setEnabled(false);
         m_ui->actionMirrorAcrossLine->setEnabled(false);
@@ -3162,11 +3164,6 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
         m_viewer->setMirrorLine(nullptr);
 	}
 	else if (items.length() > 0) {
-		/*if (m_propertyWidget && m_viewer->group()) {
-            if (m_viewer->group()->childItems().size() > 0) {
-                m_propertyWidget->setEnabled(true);
-            }
-		}*/
 		m_ui->actionMirrorHorizontal->setEnabled(true);
 		m_ui->actionMirrorVertical->setEnabled(true);
         m_ui->actionMirrorAcrossLine->setEnabled(false);
@@ -3204,7 +3201,7 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
         return;
     }
     LaserPrimitiveGroup* group = m_viewer->group();
-    if (!group) {
+    if (!group || !m_propertyWidget) {
         return;
     }
     int i = group->childItems().size();
@@ -3216,6 +3213,8 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
         m_propertyWidget->setEnabled(true);
         emit selectedChange();
     }
+    
+    
 }
 
 void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
