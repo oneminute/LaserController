@@ -13,6 +13,7 @@
 #include "scene/LaserScene.h"
 #include "widget/LaserViewer.h"
 #include "widget/UndoCommand.h"
+#include "LaserApplication.h"
 
 LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
     : QTableWidget(parent)
@@ -106,17 +107,17 @@ void LaserLayerTableWidget::updateItems()
             if (layer->type() == LLT_CUTTING)
             {
                 type = tr("C");
-                fullType = tr("Cutting");
+                fullType = ltr("Cutting");
             }
             else if (layer->type() == LLT_ENGRAVING)
             {
                 type = tr("E");
-                fullType = tr("Engraving");
+                fullType = ltr("Engraving");
             }
             else if (layer->type() == LLT_FILLING)
             {
                 type = tr("C+E");
-                fullType = tr("Both");
+                fullType = ltr("Filling");
             }
 
             QTableWidgetItem* itemColor = new QTableWidgetItem();

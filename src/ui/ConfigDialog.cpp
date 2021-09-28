@@ -26,7 +26,7 @@
 ConfigDialog::ConfigDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::ConfigDialog)
-    , m_windowTitle(tr("Config Dialog"))
+    , m_windowTitle(ltr("Config Dialog"))
     , m_systemRegisterPage(nullptr)
 {
     m_ui->setupUi(this);

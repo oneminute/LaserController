@@ -77,6 +77,7 @@ public:
 
     void showAboutWindow(int interval = 0, bool modal = true);
     void closeAboutWindow();
+    int showUpdateDialog();
 
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;
@@ -101,7 +102,7 @@ public:
     QVector3D getCurrentLaserPos();
 
 public slots:
-    bool load();
+    void load();
     void unload();
     void connectDevice(const QString& portName);
     void disconnectDevice();

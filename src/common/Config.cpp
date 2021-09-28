@@ -11,6 +11,7 @@
 #include <QTimer>
 
 #include "ConfigItem.h"
+#include "LaserApplication.h"
 #include "exception/LaserException.h"
 #include "laser/LaserRegister.h"
 #include "util/WidgetUtils.h"
@@ -183,8 +184,8 @@ void Config::loadGeneralItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem("English", static_cast<int>(QLocale::English));
-            comboBox->addItem("Chinese", static_cast<int>(QLocale::Chinese));
+            comboBox->addItem(ltr("English"), static_cast<int>(QLocale::English));
+            comboBox->addItem(ltr("Chinese"), static_cast<int>(QLocale::Chinese));
 
             QTimer::singleShot(0, 
                 [=]() {
@@ -311,10 +312,10 @@ void Config::loadUiItems()
             //comboBox->addItem(QCoreApplication::translate("Config", ("Medium Contrast"), nullptr), 2);
             //comboBox->addItem(QCoreApplication::translate("Config", ("High Contrast"), nullptr), 3);
 
-            comboBox->addItem(item->extraProperty("Off").toString(), 0);
-            comboBox->addItem(item->extraProperty("Low Contrast").toString(), 1);
-            comboBox->addItem(item->extraProperty("Medium Contrast").toString(), 2);
-            comboBox->addItem(item->extraProperty("High Contrast").toString(), 3);
+            comboBox->addItem(ltr("Off"), 0);
+            comboBox->addItem(ltr("Low Contrast"), 1);
+            comboBox->addItem(ltr("Medium Contrast"), 2);
+            comboBox->addItem(ltr("High Contrast"), 3);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -626,8 +627,8 @@ void Config::loadPathOptimizationItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("Horizontal"), 1);
-            comboBox->addItem(tr("Vertical"), 2);
+            comboBox->addItem(ltr("Horizontal"), 1);
+            comboBox->addItem(ltr("Vertical"), 2);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -772,9 +773,9 @@ void Config::loadDeviceItems()
             //comboBox->addItem(tr("Current Position"), SFT_CurrentPosition);
             //comboBox->addItem(tr("User Origin"), SFT_UserOrigin);
             //comboBox->addItem(tr("Absolute Coords"), SFT_AbsoluteCoords);
-            comboBox->addItem(item->extraProperty("Current Position").toString(), SFT_CurrentPosition);
-            comboBox->addItem(item->extraProperty("User Origin").toString(), SFT_UserOrigin);
-            comboBox->addItem(item->extraProperty("Absolute Coords").toString(), SFT_AbsoluteCoords);
+            comboBox->addItem(ltr("Current Position"), SFT_CurrentPosition);
+            comboBox->addItem(ltr("User Origin"), SFT_UserOrigin);
+            comboBox->addItem(ltr("Absolute Coords"), SFT_AbsoluteCoords);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -1693,11 +1694,12 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
+    xStepLength->setInputWidgetType(IWT_FloatEditSlider);
     xStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStepLength->setInputWidgetProperty("step", 0.000001);
     xStepLength->setInputWidgetProperty("page", 0.001);
     xStepLength->setInputWidgetProperty("minimum", 0.000001);
-    xStepLength->setInputWidgetProperty("maximum", 100);
+    xStepLength->setInputWidgetProperty("maximum", 10000000);
     xStepLength->setInputWidgetProperty("decimals", 6);
 
     ConfigItem* xLimitNum = group->addConfigItem(
@@ -1974,6 +1976,7 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
+    yStepLength->setInputWidgetType(IWT_FloatEditSlider);
     yStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     yStepLength->setInputWidgetProperty("step", 0.000001);
     yStepLength->setInputWidgetProperty("page", 0.001);
@@ -2258,6 +2261,7 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
+    zStepLength->setInputWidgetType(IWT_FloatEditSlider);
     zStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     zStepLength->setInputWidgetProperty("step", 0.000001);
     zStepLength->setInputWidgetProperty("page", 0.001);
@@ -2589,8 +2593,8 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Language for both UI and Business.", nullptr));
 
     General::unitItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Language", nullptr), 
-        QCoreApplication::translate("Config", "Language for both UI and Business.", nullptr));
+        QCoreApplication::translate("Config", "Unit", nullptr), 
+        QCoreApplication::translate("Config", "Unit for user interface.", nullptr));
 
     General::machiningUnitItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Machining Unit", nullptr), 
@@ -2631,10 +2635,6 @@ void Config::updateTitlesAndDescriptions()
     Ui::gridContrastItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Grid Contrast", nullptr), 
         QCoreApplication::translate("Config", "Contrast of grid lines", nullptr));
-    Ui::gridContrastItem()->setExtraProperty("Off", QCoreApplication::translate("Config", "Off", nullptr));
-    Ui::gridContrastItem()->setExtraProperty("Low Contrast", QCoreApplication::translate("Config", "Low Contrast", nullptr));
-    Ui::gridContrastItem()->setExtraProperty("Medium Contrast", QCoreApplication::translate("Config", "Medium Contrast", nullptr));
-    Ui::gridContrastItem()->setExtraProperty("High Contrast", QCoreApplication::translate("Config", "High Contrast", nullptr));
 
     Ui::gridShapeDistanceItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Grid Shape Distance(px)", nullptr), 
@@ -2811,9 +2811,6 @@ void Config::updateTitlesAndDescriptions()
     Device::startFromItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Start from", nullptr), 
         QCoreApplication::translate("Config", "Choose the start point type of machining", nullptr));
-    Device::startFromItem()->setExtraProperty("Current Position", QCoreApplication::translate("Config", "Current Position", nullptr));
-    Device::startFromItem()->setExtraProperty("User Origin", QCoreApplication::translate("Config", "User Origin", nullptr));
-    Device::startFromItem()->setExtraProperty("Absolute Coords", QCoreApplication::translate("Config", "Absolute Coords", nullptr));
 
     Device::jobOriginItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Job Origin", nullptr), 

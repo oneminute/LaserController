@@ -55,6 +55,7 @@
 #include "ui/LaserLayerDialog.h"
 #include "ui/MainCardInfoDialog.h"
 #include "ui/PreviewWindow.h"
+#include "ui/UpdateDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -3040,7 +3041,9 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 
 void LaserControllerWindow::onActionUpdate(bool checked)
 {
-    LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
+    //LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
+    UpdateDialog dlg;
+    dlg.exec();
 }
 
 void LaserControllerWindow::onActionLaserPosition(bool checked)

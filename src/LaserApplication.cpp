@@ -26,6 +26,7 @@ LaserControllerWindow* LaserApplication::mainWindow(nullptr);
 PreviewWindow* LaserApplication::previewWindow(nullptr);
 LaserDevice* LaserApplication::device(nullptr);
 LaserDriver* LaserApplication::driver(nullptr);
+QMap<QString, QString> LaserApplication::stringMap;
 
 LaserApplication::LaserApplication(int argc, char** argv)
     : QApplication(argc, argv)
@@ -78,7 +79,6 @@ bool LaserApplication::initialize()
 
     QTranslator translator;
     QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
-    //QLocale locale(QLocale::Chinese);
     qLogD << "language code: " << Config::General::language() << ", " << QLocale::Chinese;
     qLogD << "language name: " << QLocale::languageToString(locale.language());
     if (translator.load(locale, appShortName, QLatin1String("_"), QLatin1String("translations")))
@@ -96,7 +96,7 @@ bool LaserApplication::initialize()
 
     QLocale::setDefault(locale);
     //Config::load();
-    Config::updateTitlesAndDescriptions();
+    retranslate();
 
     QFile file("theme/Dark.qss");
     if (file.open(QFile::ReadOnly | QFile::Text))
@@ -109,13 +109,18 @@ bool LaserApplication::initialize()
     device = new LaserDevice(driver);
 
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
+    connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
 
     StateController::start();
     previewWindow = new PreviewWindow(mainWindow);
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
 
-    device->load();
+    //connect(StateController::instance().deviceState(), &QState::entered, device, &LaserDevice::load);
+    //connect(mainWindow, &LaserControllerWindow::windowCreated, device, &LaserDevice::load);
+
+    //device->load();
+
 
     g_deviceThread.start();
 
@@ -199,6 +204,32 @@ bool LaserApplication::checkEnvironment()
 //    return done;
 //}
 
+void LaserApplication::retranslate()
+{
+    stringMap["Absolute Coords"] = translate("LaserApplication", "Absolute Coords", nullptr);
+    stringMap["Config Dialog"] = translate("LaserApplication", "Config Dialog", nullptr);
+    stringMap["Current Position"] = translate("LaserApplication", "Current Position", nullptr);
+    stringMap["Cutting"] = translate("LaserApplication", "Cutting", nullptr);
+    stringMap["Chinese"] = translate("LaserApplication", "Chinese", nullptr);
+    stringMap["English"] = translate("LaserApplication", "English", nullptr);
+    stringMap["Engraving"] = translate("LaserApplication", "Engraving", nullptr);
+    stringMap["Filling"] = translate("LaserApplication", "Filling", nullptr);
+    stringMap["High Contrast"] = translate("LaserApplication", ("High Contrast"), nullptr);
+    stringMap["Horizontal"] = translate("LaserApplication", "Horizontal", nullptr);
+    stringMap["Low Contrast"] = translate("LaserApplication", ("Low Contrast"), nullptr);
+    stringMap["Medium Contrast"] = translate("LaserApplication", ("Medium Contrast"), nullptr);
+    stringMap["Off"] = translate("LaserApplication", ("Off"), nullptr);
+    stringMap["User Origin"] = translate("LaserApplication", "User Origin", nullptr);
+    stringMap["Vertical"] = translate("LaserApplication", "Vertical", nullptr);
+
+    Config::updateTitlesAndDescriptions();
+}
+
+QString LaserApplication::str(const QString& key)
+{
+    return stringMap[key];
+}
+
 void LaserApplication::initLog()
 {
     google::InitGoogleLogging(this->arguments()[0].toStdString().c_str());
@@ -273,6 +304,14 @@ void LaserApplication::handleLogOutput(QtMsgType type, const QMessageLogContext&
         LOG(FATAL) << "[" << fileInfo.fileName().toStdString() << ":" << context.line << /*" " << function <<*/ "] " << localMsg.constData();
         break;
     }
+}
+
+void LaserApplication::onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy)
+{
+    QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
+    QLocale::setDefault(locale);
+    //Config::load();
+    retranslate();
 }
 
 void LaserApplication::onEnterDeviceUnconnectedState()

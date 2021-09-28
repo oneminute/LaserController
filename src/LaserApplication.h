@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QThread>
+#include "common/common.h"
 
 class LaserControllerWindow;
 class PreviewWindow;
@@ -11,6 +12,7 @@ class LaserDriver;
 
 class LaserApplication : public QApplication
 {
+    Q_OBJECT
 public:
     LaserApplication(int argc, char** argv);
     ~LaserApplication();
@@ -22,6 +24,9 @@ public:
 
     //bool notify(QObject* receiver, QEvent* event) override;
 
+    static void retranslate();
+    static QString str(const QString& key);
+
 protected:
     void initLog();
     void clearCrash();
@@ -30,6 +35,7 @@ protected:
 
 protected slots:
     void onEnterDeviceUnconnectedState();
+    void onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy);
 
 public:
     static LaserApplication* app;
@@ -41,8 +47,12 @@ public:
     static void closeProgressWindow();
     static void showProgressWindow();
 
+    static QMap<QString, QString> stringMap;
+
 private:
     QThread g_deviceThread;
 };
+
+#define ltr(key) LaserApplication::str(key)
 
 #endif // LASERAPPLICATION_H
