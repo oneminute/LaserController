@@ -77,6 +77,7 @@ public:
 
     void showAboutWindow(int interval = 0, bool modal = true);
     void closeAboutWindow();
+    int showUpdateDialog();
 
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;
