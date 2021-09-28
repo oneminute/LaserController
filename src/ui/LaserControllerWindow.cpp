@@ -2473,6 +2473,12 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     LaserLayer* layer = m_scene->document()->layers()[index];
     m_scene->blockSignals(true);
     //m_scene->clearSelection();
+    //清理之前的选区
+    LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
+    if (!view) {
+        return;
+    }
+    view->clearGroupSelection();
     for (LaserPrimitive* primitive : layer->primitives())
     {
         primitive->setSelected(true);
