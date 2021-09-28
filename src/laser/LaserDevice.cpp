@@ -543,7 +543,7 @@ void LaserDevice::showLibraryVersion()
     qLogD << "laser library info: " << laserLibraryInfo;
     QString mainCardId = d->driver->getMainCardID();
     qLogD << "main card id: " << mainCardId;
-    //d->driver->showAboutWindow();
+    d->driver->showAboutWindow();
 }
 
 void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile)
