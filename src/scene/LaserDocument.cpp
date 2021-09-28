@@ -33,6 +33,7 @@
 #include "svg/qsvgtinydocument.h"
 #include "LaserScene.h"
 #include "laser/LaserPointList.h"
+#include "ui/LaserControllerWindow.h"
 
 class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 {
@@ -836,9 +837,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("name")) {
             laserLayers[index]->setName(layer.value("name").toString());
         }
-        if (layer.contains("type")) {
-            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
-        }
+        
         if (layer.contains("cuttingMinSpeed"))
         {
             laserLayers[index]->setCuttingMinSpeed(layer.value("cuttingMinSpeed").toInt());
@@ -1072,6 +1071,14 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             }
             
 		}
+        if (layer.contains("type")) {
+            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
+        }
+        if (layer.contains("visible")) {
+            bool bl = layer.value("visible").toBool();
+            laserLayers[index]->setVisible(bl);
+            //LaserControllerWindow* window = LaserApplication::mainWindow;
+        }
 	}
     outline();
 }

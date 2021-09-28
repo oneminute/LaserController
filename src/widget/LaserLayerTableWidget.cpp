@@ -10,6 +10,9 @@
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
 #include "LaserHeaderView.h"
+#include "scene/LaserScene.h"
+#include "widget/LaserViewer.h"
+#include "widget/UndoCommand.h"
 
 LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
     : QTableWidget(parent)
@@ -60,7 +63,7 @@ LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
         
     }
     setColumnWidth(2, 78);
-    setColumnWidth(4, 48);
+    setColumnWidth(4, 68);
     
 }
 
@@ -169,9 +172,13 @@ void LaserLayerTableWidget::updateItems()
             visibleLayout->setContentsMargins(0, 0, 0, 0);
             visiblePanel->setLayout(visibleLayout);
             visible->setChecked(layer->visible());
-            connect(visible, &QCheckBox::toggled, [=](bool checked)
+            layer->setCheckBox(visible);
+            connect(visible, &QCheckBox::clicked, [=](bool checked)
                 {
-                    layer->setVisible(checked);
+                    //layer->setVisible(checked);
+                    LaserViewer* view = qobject_cast<LaserViewer*>(m_doc->scene()->views()[0]);
+                    LayerVisibleCommand* cmd = new LayerVisibleCommand(view, layer, checked);
+                    view->undoStack()->push(cmd);
                 }
             );
             setCellWidget(row, 6, visiblePanel);

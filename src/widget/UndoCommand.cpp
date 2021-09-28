@@ -5,6 +5,7 @@
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
 #include  "util/Utils.h"
+#include "scene/LaserLayer.h"
 
 
 SelectionUndoCommand::SelectionUndoCommand(
@@ -681,8 +682,65 @@ void LockedCommand::redo()
     m_viewer->viewport()->repaint();
 }
 
-void LockedCommand::handle(Qt::CheckState state)
+LayerVisibleCommand::LayerVisibleCommand(LaserViewer * v, LaserLayer* layer, bool checked)
 {
-    
+    m_viewer = v;
+    m_group = m_viewer->group();
+    m_layer = layer;
+    m_checked = checked;
+    m_lastIsInGroup = false;
+    m_lastSelected = false;
 }
 
+void LayerVisibleCommand::undo()
+{
+    bool undoChecked = !m_checked;
+    
+    for (LaserPrimitive* primitive : m_layer->primitives()) {
+        if (m_lastIsInGroup) {
+            m_group->addToGroup(primitive);
+        }
+        else {
+            if (m_group) {
+                m_group->removeFromGroup(primitive);
+            }
+            
+        }
+        primitive->setSelected(m_lastSelected);
+        //primitive->setVisible(undoChecked);
+    }
+    m_layer->setVisible(undoChecked);
+    m_viewer->viewport()->repaint();
+}
+
+void LayerVisibleCommand::redo()
+{
+    for (LaserPrimitive* primitive : m_layer->primitives()) {      
+        m_lastSelected = false;
+        m_lastIsInGroup = false;
+        if (!m_checked) {
+            if (m_group) {
+                QList<QGraphicsItem*>list = m_group->childItems();
+                if (list.contains(primitive)) {
+                    m_group->removeFromGroup(primitive);
+                    m_lastIsInGroup = true;
+                }
+                else {
+                    m_lastIsInGroup = false;
+                }
+
+            }
+            if (primitive->isSelected()) {
+                primitive->setSelected(false);
+                m_lastSelected = true;
+            }
+            else {
+                m_lastSelected = false;
+            }
+            
+        }
+        
+    }
+    m_layer->setVisible(m_checked);
+    m_viewer->viewport()->repaint();
+}

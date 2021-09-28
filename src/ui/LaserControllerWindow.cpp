@@ -1273,7 +1273,7 @@ void LaserControllerWindow::createCentralDockPanel()
 	m_hRuler->refresh();
 	connect(m_viewer, &LaserViewer::zoomChanged, m_hRuler, &RulerWidget::viewZoomChanged);
 	connect(StateControllerInst.documentWorkingState(), &QState::initialStateChanged, m_hRuler, [=] {
-		qDebug() << "ruler_h";
+		//qDebug() << "ruler_h";
 	});
 
     m_vRuler = new RulerWidget;
@@ -1283,7 +1283,7 @@ void LaserControllerWindow::createCentralDockPanel()
 	m_vRuler->refresh();
 	connect(m_viewer, &LaserViewer::zoomChanged, m_vRuler, &RulerWidget::viewZoomChanged);
 	connect(StateControllerInst.documentState(), &QState::initialStateChanged, m_vRuler, [=] {
-		qDebug() << "ruler_v";
+		//qDebug() << "ruler_v";
 	});
 
 	// 初始化整个工作区。这是一个网格布局的9宫格。
@@ -1314,19 +1314,26 @@ void LaserControllerWindow::createLayersDockPanel()
 
     m_buttonMoveLayerUp = new QToolButton;
     m_buttonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
+    m_buttonMoveLayerUp->setAutoRepeat(true);
+    m_buttonMoveLayerUp->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_buttonMoveLayerDown = new QToolButton;
     m_buttonMoveLayerDown->setDefaultAction(m_ui->actionMoveLayerDown);
+    m_buttonMoveLayerDown->setAutoRepeat(true);
+    m_buttonMoveLayerDown->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_buttonRemoveLayer = new QToolButton;
     m_buttonRemoveLayer->setDefaultAction(m_ui->actionRemoveLayer);
+    m_buttonRemoveLayer->setAutoRepeat(true);
+    m_buttonRemoveLayer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
     buttonsLayout->setMargin(0);
     buttonsLayout->addStretch(0);
-    buttonsLayout->addWidget(m_buttonMoveLayerUp);
-    buttonsLayout->addWidget(m_buttonMoveLayerDown);
-    buttonsLayout->addWidget(m_buttonRemoveLayer);
+    buttonsLayout->addWidget(m_buttonMoveLayerUp, Qt::AlignCenter);
+    buttonsLayout->addWidget(m_buttonMoveLayerDown, Qt::AlignCenter);
+    buttonsLayout->addWidget(m_buttonRemoveLayer, Qt::AlignCenter);
+    buttonsLayout->setAlignment(Qt::AlignHCenter);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(3);
@@ -2469,8 +2476,15 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     int row = items[0]->row();
     QTableWidgetItem* item = m_tableWidgetLayers->item(row, 0);
     int index = item->data(Qt::UserRole).toInt();
-
-    LaserLayer* layer = m_scene->document()->layers()[index];
+    LaserDocument* doc = m_scene->document();
+    if (!doc) {
+        return;
+    }
+    QList<LaserLayer*>list = doc->layers();
+    if (list.isEmpty()) {
+        return;
+    }
+    LaserLayer* layer = list[index];
     m_scene->blockSignals(true);
     //m_scene->clearSelection();
     //清理之前的选区

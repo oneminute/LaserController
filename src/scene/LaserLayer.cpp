@@ -2,6 +2,7 @@
 
 #include <QMessageBox>
 #include <QJsonArray>
+#include<QList>
 
 #include "util/Utils.h"
 #include "LaserDocument.h"
@@ -9,6 +10,7 @@
 #include "LaserScene.h"
 #include "widget/LayerButton.h"
 #include "common/Config.h"
+#include "scene/LaserPrimitiveGroup.h"
 
 class LaserLayerPrivate: public ILaserDocumentItemPrivate
 {
@@ -99,7 +101,7 @@ public:
     QList<LaserPrimitive*> primitives;   
 };
 
-LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault)
+LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault, QCheckBox* box)
     : ILaserDocumentItem(LNT_LAYER, new LaserLayerPrivate(this))
 {
     Q_D(LaserLayer);
@@ -113,6 +115,7 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
 	d->useHalftone = Config::EngravingLayer::useHalftone();
 	d->lpi = Config::EngravingLayer::LPI();
 	d->dpi = Config::EngravingLayer::DPI();
+    m_checkBox = box;
 }
 
 LaserLayer::~LaserLayer()
@@ -538,6 +541,15 @@ void LaserLayer::setVisible(bool visible)
 { 
     Q_D(LaserLayer);
     d->visible = visible; 
+    for (LaserPrimitive* primitive : primitives()) {
+        primitive->setVisible(visible);
+    }
+    
+
+    if (m_checkBox && m_checkBox->isChecked() != visible) {
+        m_checkBox->setChecked(visible);
+    }
+
 }
 
 int LaserLayer::row() const 
@@ -610,6 +622,7 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 	QJsonArray array;
 	object.insert("name", this->name());
 	object.insert("type", this->type());
+    object.insert("visible", this->visible());
     object.insert("cuttingMinSpeed", this->cuttingMinSpeed());
     object.insert("cuttingRunSpeed", this->cuttingRunSpeed());
     object.insert("cuttingLaserPower", this->cuttingLaserPower());
@@ -709,6 +722,16 @@ QPointF LaserLayer::positionMM() const
 QPointF LaserLayer::positionMachining() const
 {
     return Global::matrixToMachining().map(position());
+}
+
+QCheckBox * LaserLayer::checkBox()
+{
+    return m_checkBox;
+}
+
+void LaserLayer::setCheckBox(QCheckBox * box)
+{
+    m_checkBox = box;
 }
 
 void LaserLayer::onClicked()

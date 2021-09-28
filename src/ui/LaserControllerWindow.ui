@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -381,6 +381,10 @@
   <action name="actionRemoveLayer">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/delete.png</normaloff>:/ui/icons/images/delete.png</iconset>
    </property>
    <property name="text">
     <string>Remove Layer</string>
@@ -756,6 +760,10 @@
    </property>
   </action>
   <action name="actionMoveLayerUp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_up.png</normaloff>:/ui/icons/images/move_up.png</iconset>
+   </property>
    <property name="text">
     <string>Move Up</string>
    </property>
@@ -763,6 +771,10 @@
   <action name="actionMoveLayerDown">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/move_down.png</normaloff>:/ui/icons/images/move_down.png</iconset>
    </property>
    <property name="text">
     <string>Move Down</string>

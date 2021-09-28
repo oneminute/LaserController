@@ -132,7 +132,6 @@ public:
     ~LockedCommand();
     virtual void undo() override;
     virtual void redo() override;
-    virtual void handle(Qt::CheckState state);
 private:
     LaserViewer * m_viewer;
     LaserScene* m_scene;
@@ -140,5 +139,20 @@ private:
     QList<LaserPrimitive*> m_lastLockedList;
     Qt::CheckState m_lastCheckState;
     Qt::CheckState m_curCheckState;
+};
+//layer visible
+class LayerVisibleCommand : public QUndoCommand {
+public :
+    LayerVisibleCommand(LaserViewer* v, LaserLayer* layer, bool checked);
+    ~LayerVisibleCommand() {};
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserViewer * m_viewer;
+    LaserPrimitiveGroup* m_group;
+    LaserLayer* m_layer;
+    bool m_checked;
+    bool m_lastIsInGroup;
+    bool m_lastSelected;
 };
 #endif // UNDOCOMMAND_H

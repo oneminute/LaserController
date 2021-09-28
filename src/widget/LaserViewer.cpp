@@ -3076,7 +3076,6 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 				p_item->setSelected(false);
 			}
 		}
-
 	}
     //清空选取区域
     for (QGraphicsItem *item : m_scene->selectedPrimitives()) {

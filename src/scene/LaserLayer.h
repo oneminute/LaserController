@@ -9,6 +9,7 @@
 #include <QSharedDataPointer>
 #include <QExplicitlySharedDataPointer>
 #include <QJsonObject>
+#include <QCheckBox>
 #include "scene/LaserDocumentItem.h"
 
 class LaserPrimitive;
@@ -21,7 +22,7 @@ class LaserLayer : public QObject, public ILaserDocumentItem
 {
     Q_OBJECT
 public:
-    explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault = false);
+    explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault = false, QCheckBox* box = nullptr);
     virtual ~LaserLayer();
 
     bool removable() const;
@@ -154,6 +155,10 @@ public:
     virtual QPointF positionMM() const;
     virtual QPointF positionMachining() const;
 
+    QCheckBox* checkBox();
+
+    void setCheckBox(QCheckBox* box);
+
 protected:
     void onClicked();
 
@@ -163,6 +168,7 @@ protected:
     Q_DISABLE_COPY(LaserLayer)
 private:
 	int m_index;
+    QCheckBox* m_checkBox;
 };
 
 #endif // LASERLAYER_H
