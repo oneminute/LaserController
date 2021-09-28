@@ -3066,6 +3066,7 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 		//reshapeUndoStackPushBefore();
 
 		//selectedList.insert( m_group->childItems(), m_group->sceneTransform());
+        //清空group
 		for (QGraphicsItem *item : m_group->childItems()) {
             selectedList.insert(item, item->sceneTransform());
 			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
@@ -3077,6 +3078,7 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 		}
 
 	}
+    //清空选取区域
     for (QGraphicsItem *item : m_scene->selectedPrimitives()) {
 
         item->setSelected(false);
