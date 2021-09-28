@@ -244,7 +244,7 @@ QString LaserDevice::portName() const
     return d->portName;
 }
 
-bool LaserDevice::load()
+void LaserDevice::load()
 {
     Q_D(LaserDevice);
 
@@ -252,12 +252,13 @@ bool LaserDevice::load()
     connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage, Qt::ConnectionType::QueuedConnection);
     connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
-    if (d->driver->load())
+    d->driver->load();
+    /*if (d->driver->load())
     {
         return true;
     }
 
-    return false;
+    return false;*/
 }
 
 qreal LaserDevice::layoutWidth() const
@@ -626,9 +627,6 @@ void LaserDevice::closeAboutWindow()
 int LaserDevice::showUpdateDialog()
 {
     Q_D(LaserDevice);
-    d->driver->setupCallbacks();
-    d->isInit = true;
-    d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
     QString systemDate(__DATE__);
     qLogD << "system date: " << systemDate;
     QDate compileDate = QLocale("en_US").toDate(systemDate.simplified(), "MMM d yyyy");
@@ -1435,7 +1433,9 @@ void LaserDevice::onLibraryInitialized()
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryInitialized";
     //showAboutWindow(5);
-    
+    d->driver->setupCallbacks();
+    d->isInit = true;
+    d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
     d->driver->getPortList();
 }
 

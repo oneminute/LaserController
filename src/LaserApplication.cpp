@@ -115,7 +115,10 @@ bool LaserApplication::initialize()
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
 
-    device->load();
+    //connect(StateController::instance().deviceState(), &QState::entered, device, &LaserDevice::load);
+    //connect(mainWindow, &LaserControllerWindow::windowCreated, device, &LaserDevice::load);
+
+    //device->load();
 
     g_deviceThread.start();
 

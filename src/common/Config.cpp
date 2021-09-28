@@ -1693,11 +1693,12 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
+    xStepLength->setInputWidgetType(IWT_FloatEditSlider);
     xStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStepLength->setInputWidgetProperty("step", 0.000001);
     xStepLength->setInputWidgetProperty("page", 0.001);
     xStepLength->setInputWidgetProperty("minimum", 0.000001);
-    xStepLength->setInputWidgetProperty("maximum", 100);
+    xStepLength->setInputWidgetProperty("maximum", 10000000);
     xStepLength->setInputWidgetProperty("decimals", 6);
 
     ConfigItem* xLimitNum = group->addConfigItem(
@@ -1974,6 +1975,7 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
+    yStepLength->setInputWidgetType(IWT_FloatEditSlider);
     yStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     yStepLength->setInputWidgetProperty("step", 0.000001);
     yStepLength->setInputWidgetProperty("page", 0.001);
@@ -2258,6 +2260,7 @@ void Config::loadSystemRegisters()
             return QVariant(value.toInt() / 1000000.0);
         }
     );
+    zStepLength->setInputWidgetType(IWT_FloatEditSlider);
     zStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     zStepLength->setInputWidgetProperty("step", 0.000001);
     zStepLength->setInputWidgetProperty("page", 0.001);
@@ -2589,8 +2592,8 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Language for both UI and Business.", nullptr));
 
     General::unitItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Language", nullptr), 
-        QCoreApplication::translate("Config", "Language for both UI and Business.", nullptr));
+        QCoreApplication::translate("Config", "Unit", nullptr), 
+        QCoreApplication::translate("Config", "Unit for user interface.", nullptr));
 
     General::machiningUnitItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Machining Unit", nullptr), 

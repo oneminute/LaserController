@@ -102,7 +102,7 @@ public:
     QVector3D getCurrentLaserPos();
 
 public slots:
-    bool load();
+    void load();
     void unload();
     void connectDevice(const QString& portName);
     void disconnectDevice();
