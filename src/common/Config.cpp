@@ -737,12 +737,42 @@ void Config::loadExportItems()
     );
     enableRelativeCoordinates->setStoreStrategy(SS_DIRECTLY);
 
+    ConfigItem* halfToneStyle = group->addConfigItem(
+        "halfToneStyle",
+        0,
+        DT_INT
+    );
+    halfToneStyle->setInputWidgetType(IWT_ComboBox);
+    halfToneStyle->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("Style 1"), 0);
+            comboBox->addItem(ltr("Style 2"), 1);
+            comboBox->addItem(ltr("Style 3"), 2);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
     ConfigItem* imageUseGaussian = group->addConfigItem(
         "imageUseGaussian",
         false,
         DT_BOOL
     );
-    imageUseGaussian->setVisible(false);
+    imageUseGaussian->setVisible(true);
+
+    ConfigItem* gaussianFactor = group->addConfigItem(
+        "gaussianFactor",
+        1.5,
+        DT_REAL
+    );
+    maxAnglesDiff->setInputWidgetProperty("minimum", 0);
+    maxAnglesDiff->setInputWidgetProperty("maximum", 5);
 }
 
 void Config::loadDeviceItems()
@@ -1141,28 +1171,15 @@ void Config::loadUserReigsters()
     scanRowSpeed->setInputWidgetProperty("minimum", 1);
     scanRowSpeed->setInputWidgetProperty("maximum", 10000);
 
-    ConfigItem* scanRowInterval = group->addConfigItem(
-        "scanRowInterval",
-        0.007,
-        DT_REAL
+    ConfigItem* scanLaserFrequency = group->addConfigItem(
+        "scanLaserFrequency",
+        4000,
+        DT_INT
     );
-    scanRowInterval->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 1000.0);
-        }
-    );
-    scanRowInterval->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanRowInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
-    scanRowInterval->setInputWidgetProperty("step", 0.001);
-    scanRowInterval->setInputWidgetProperty("page", 0.01);
-    scanRowInterval->setInputWidgetProperty("minimum", 0);
-    scanRowInterval->setInputWidgetProperty("maximum", 1);
+    scanLaserFrequency->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanLaserFrequency->setInputWidgetProperty("page", 100);
+    scanLaserFrequency->setInputWidgetProperty("minimum", 1000);
+    scanLaserFrequency->setInputWidgetProperty("maximum", 10000);
 
     ConfigItem* scanReturnError = group->addConfigItem(
         "scanReturnError",
@@ -2800,9 +2817,17 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Enable Relative Coordinates", nullptr), 
         QCoreApplication::translate("Config", "Enable relative coordinates for exporting machining points", nullptr));
 
+    Export::halfToneStyleItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Half Tone Style", nullptr), 
+        QCoreApplication::translate("Config", "Half Tone Style", nullptr));
+
     Export::imageUseGaussianItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Image Use Gaussian", nullptr), 
         QCoreApplication::translate("Config", "Use gaussian when generating images", nullptr));
+
+    Export::gaussianFactorItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Gaussian Factor", nullptr), 
+        QCoreApplication::translate("Config", "Factor of gaussian", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 
@@ -2888,9 +2913,9 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "[14] Scan Row Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Scan row speed", nullptr));
 
-    UserRegister::scanRowIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[15] Scan Row Interval(mm)", nullptr), 
-        QCoreApplication::translate("Config", "Scan row interval", nullptr));
+    UserRegister::scanLaserFrequencyItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "[15] Laser Frequency", nullptr), 
+        QCoreApplication::translate("Config", "Laser Frequency", nullptr));
 
     UserRegister::scanReturnErrorItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "[16] Scan Return Error(mm)", nullptr), 

@@ -227,7 +227,10 @@ void LaserApplication::retranslate()
 
 QString LaserApplication::str(const QString& key)
 {
-    return stringMap[key];
+    if (stringMap.contains(key))
+        return stringMap[key];
+    else
+        return key;
 }
 
 void LaserApplication::initLog()

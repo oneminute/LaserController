@@ -227,7 +227,9 @@ public:
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
         CONFIG_ITEM(export, enableRelativeCoordinates, bool, toBool)
+        CONFIG_ITEM(export, halfToneStyle, int, toInt)
         CONFIG_ITEM(export, imageUseGaussian, bool, toBool)
+        CONFIG_ITEM(export, gaussianFactor, qreal, toReal)
 
     private:
         friend class Config;
@@ -279,7 +281,7 @@ public:
         CONFIG_ITEM(userRegister, scanXAcc, int, toInt)
         CONFIG_ITEM(userRegister, scanYAcc, int, toInt)
         CONFIG_ITEM(userRegister, scanRowSpeed, int, toInt)
-        CONFIG_ITEM(userRegister, scanRowInterval, qreal, toReal)
+        CONFIG_ITEM(userRegister, scanLaserFrequency, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnError, int, toInt)
         CONFIG_ITEM(userRegister, scanLaserPower, qreal, toReal)
         CONFIG_ITEM(userRegister, scanXResetEnabled, bool, toBool)

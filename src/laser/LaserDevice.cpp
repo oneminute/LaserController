@@ -121,7 +121,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(12, new LaserRegister(12, Config::UserRegister::scanXAccItem(), false));
     d->userRegisters.insert(13, new LaserRegister(13, Config::UserRegister::scanYAccItem(), false));
     d->userRegisters.insert(14, new LaserRegister(14, Config::UserRegister::scanRowSpeedItem(), false));
-    d->userRegisters.insert(15, new LaserRegister(15, Config::UserRegister::scanRowIntervalItem(), false));
+    d->userRegisters.insert(15, new LaserRegister(15, Config::UserRegister::scanLaserFrequencyItem(), false));
     d->userRegisters.insert(16, new LaserRegister(16, Config::UserRegister::scanReturnErrorItem(), false));
     d->userRegisters.insert(17, new LaserRegister(17, Config::UserRegister::scanLaserPowerItem(), false));
     d->userRegisters.insert(18, new LaserRegister(18, Config::UserRegister::scanXResetEnabledItem(), false));
@@ -1469,6 +1469,9 @@ void LaserDevice::onConnected()
         //qLogD << "laser library info: " << laserLibraryInfo;
         //QString mainCardId = d->driver->getMainCardID();
         //qLogD << "main card id: " << mainCardId;
+
+        readSystemRegisters();
+        readUserRegisters();
     }
 }
 
