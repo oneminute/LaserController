@@ -1451,12 +1451,12 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
 
         quint8 binCheck = 0;
         QList<quint8> rowBytes;
-        QString rowString;
+        //QString rowString;
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
             quint8 bin = pixel == 255 ? 0 : 1;
-            rowString.append(QString::number(bin));
+            //rowString.append(QString::number(bin));
             binCheck |= bin;
             byte = byte << 1;
             byte |= bin;
@@ -1469,7 +1469,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
                 byte = 0;
             }
         }
-        rowString.append("\n\r");
+        //rowString.append("\n\r");
         if (mat.cols % 8 != 0)
             rowBytes.append(byte);
             //stream << byte;

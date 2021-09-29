@@ -230,6 +230,7 @@ public:
         CONFIG_ITEM(export, halfToneStyle, int, toInt)
         CONFIG_ITEM(export, imageUseGaussian, bool, toBool)
         CONFIG_ITEM(export, gaussianFactor, qreal, toReal)
+        CONFIG_ITEM(export, curveFlatteningThreshold, qreal, toReal)
 
     private:
         friend class Config;

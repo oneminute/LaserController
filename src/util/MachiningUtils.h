@@ -42,6 +42,8 @@ namespace machiningUtils
         QPointF& center = QPointF(),
         const QTransform& transform = QTransform());
 
+    QList<QPolygonF> path2SubpathPolygons(const QPainterPath& path, const QTransform& matrix, qreal bezier_flattening_threshold = 0.5);
+
     void polygon2Points(const QPolygonF& polygon,
         LaserPointList& points,
         QList<int>& startingIndices,

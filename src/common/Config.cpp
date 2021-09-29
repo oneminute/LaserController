@@ -764,15 +764,24 @@ void Config::loadExportItems()
         false,
         DT_BOOL
     );
-    imageUseGaussian->setVisible(true);
+    imageUseGaussian->setVisible(false);
 
     ConfigItem* gaussianFactor = group->addConfigItem(
         "gaussianFactor",
         1.5,
         DT_REAL
     );
-    maxAnglesDiff->setInputWidgetProperty("minimum", 0);
-    maxAnglesDiff->setInputWidgetProperty("maximum", 5);
+    gaussianFactor->setInputWidgetProperty("minimum", 0);
+    gaussianFactor->setInputWidgetProperty("maximum", 5);
+    gaussianFactor->setVisible(false);
+
+    ConfigItem* curveFlatteningThreshold = group->addConfigItem(
+        "curveFlatteningThreshold",
+        20,
+        DT_REAL
+    );
+    curveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
+    curveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadDeviceItems()
@@ -2828,6 +2837,10 @@ void Config::updateTitlesAndDescriptions()
     Export::gaussianFactorItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Gaussian Factor", nullptr), 
         QCoreApplication::translate("Config", "Factor of gaussian", nullptr));
+
+    Export::curveFlatteningThresholdItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr), 
+        QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 
