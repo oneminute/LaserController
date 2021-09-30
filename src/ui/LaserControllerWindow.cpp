@@ -240,7 +240,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addPermanentWidget(m_statusBarLocation);
 
     m_statusBarPageInfo = new QLabel;
-    m_statusBarPageInfo->setText(tr("Page Size(mm): 210x320"));
+    m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
+        .arg(LaserApplication::device->layoutWidth())
+        .arg(LaserApplication::device->layoutHeight()));
     m_statusBarPageInfo->setMinimumWidth(150);
     m_statusBarPageInfo->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addPermanentWidget(utils::createSeparator());
@@ -574,6 +576,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::mainCardRegistered, this, &LaserControllerWindow::onMainCardRegistered);
     connect(LaserApplication::device, &LaserDevice::mainCardActivated, this, &LaserControllerWindow::onMainCardActivated);
     connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
+    connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &LaserControllerWindow::onLayoutChanged);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
@@ -3300,6 +3303,13 @@ void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
     m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f'));
     m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f'));
     m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f'));
+}
+
+void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
+{
+    m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
+        .arg(LaserApplication::device->layoutWidth())
+        .arg(LaserApplication::device->layoutHeight()));
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)

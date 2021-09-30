@@ -80,6 +80,8 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderEngravingRunSpeedPower->setStep(0.1);
     m_ui->editSliderEngravingRowInterval->setMinimum(1);
     m_ui->editSliderEngravingRowInterval->setMaximum(1000);
+    m_ui->editSliderHalftoneGridSize->setMinimum(1);
+    m_ui->editSliderHalftoneGridSize->setMinimum(200);
 
     m_ui->editSliderDPI->setMinimum(0);
     m_ui->editSliderDPI->setMaximum(1200);

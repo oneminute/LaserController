@@ -1495,8 +1495,8 @@ void Config::loadUserReigsters()
         DT_INT
     );
     maxScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
-    maxScanGrayRatio->setInputWidgetProperty("minimum", 1);
-    maxScanGrayRatio->setInputWidgetProperty("maximum", 2000);
+    maxScanGrayRatio->setInputWidgetProperty("minimum", 0);
+    maxScanGrayRatio->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* minScanGrayRatio = group->addConfigItem(
         "minScanGrayRatio",
@@ -1504,8 +1504,8 @@ void Config::loadUserReigsters()
         DT_INT
     );
     minScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
-    minScanGrayRatio->setInputWidgetProperty("minimum", 1);
-    minScanGrayRatio->setInputWidgetProperty("maximum", 2000);
+    minScanGrayRatio->setInputWidgetProperty("minimum", 0);
+    minScanGrayRatio->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadSystemRegisters()

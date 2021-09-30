@@ -198,6 +198,8 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->systemRegisters.insert(56, new LaserRegister(56, Config::SystemRegister::zPhaseEnabledItem(), true));
     d->systemRegisters.insert(57, new LaserRegister(57, Config::SystemRegister::deviceOriginItem(), true));
 
+    connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
+    connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
     connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
     connect(this, &LaserDevice::mainCardRegistered, this, &LaserDevice::onMainCardRegistered);
@@ -1501,5 +1503,15 @@ void LaserDevice::onConfigJobOriginChanged(const QVariant& value, ModifiedBy mod
 {
     Q_D(LaserDevice);
     d->updateDeviceOriginAndTransform();
+}
+
+void LaserDevice::onLayerWidthChanged(const QVariant& value)
+{
+    emit layoutChanged(QSizeF(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength()));
+}
+
+void LaserDevice::onLayerHeightChanged(const QVariant& value)
+{
+    emit layoutChanged(QSizeF(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength()));
 }
 

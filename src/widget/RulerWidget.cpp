@@ -90,7 +90,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	}
 	
 	m_scale = m_viewer->zoomValue();
-    qDebug() << m_scale;
+    //qDebug() << m_scale;
 	//Ruller
 	QRectF rect = this->rect();
 	painter.setPen(QPen(QColor(200, 200, 200), 1, Qt::SolidLine));

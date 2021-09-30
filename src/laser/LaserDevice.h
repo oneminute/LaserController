@@ -137,6 +137,9 @@ protected slots:
     void onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy);
     void onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
 
+    void onLayerWidthChanged(const QVariant& value);
+    void onLayerHeightChanged(const QVariant& value);
+
 signals:
     void comPortsFetched(const QStringList& ports);
     void comPortConnected(const QString& portName);
@@ -147,6 +150,7 @@ signals:
     void mainCardInfoFetched();
     void manufacturePasswordVerified(bool pass);
     void workStateUpdated(LaserState state);
+    void layoutChanged(const QSizeF& size);
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

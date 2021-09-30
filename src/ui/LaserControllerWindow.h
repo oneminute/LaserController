@@ -208,6 +208,7 @@ protected slots:
     void onComboBoxSxaleTextChanged(const QString& text);
 
     void onLaserReturnWorkState(LaserState state);
+    void onLayoutChanged(const QSizeF& size);
     void onFloatEditSliderLaserPower(qreal value);
     void onFloatDualEditSliderLowerValueChanged(qreal value);
     void onFloatDualEditSliderHigherValueChanged(qreal value);
