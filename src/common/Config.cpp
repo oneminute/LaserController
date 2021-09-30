@@ -1192,7 +1192,7 @@ void Config::loadUserReigsters()
 
     ConfigItem* scanReturnError = group->addConfigItem(
         "scanReturnError",
-        1000,
+        0,
         DT_INT
     );
     scanReturnError->setValueToWidgetHook(
@@ -1209,9 +1209,9 @@ void Config::loadUserReigsters()
     );
     scanReturnError->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanReturnError->setInputWidgetProperty("step", 0.001);
-    scanReturnError->setInputWidgetProperty("page", 10);
-    scanReturnError->setInputWidgetProperty("minimum", 1);
-    scanReturnError->setInputWidgetProperty("maximum", 100);
+    scanReturnError->setInputWidgetProperty("page", 1);
+    scanReturnError->setInputWidgetProperty("minimum", -20);
+    scanReturnError->setInputWidgetProperty("maximum", 20);
 
     ConfigItem* scanLaserPower = group->addConfigItem(
         "scanLaserPower",
