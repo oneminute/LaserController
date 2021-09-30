@@ -1615,7 +1615,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xMaxLength = group->addConfigItem(
         "xMaxLength",
         320000,
-        DT_INT
+        DT_REAL
     );
     xMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1630,7 +1630,6 @@ void Config::loadSystemRegisters()
         }
     );
     xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
-    xMaxLength->setInputWidgetProperty("textTemplate", "%1mm");
     xMaxLength->setInputWidgetProperty("step", 0.001);
     xMaxLength->setInputWidgetProperty("page", 10);
     xMaxLength->setInputWidgetProperty("minimum", 1);
@@ -1681,7 +1680,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xZeroDev = group->addConfigItem(
         "xZeroDev",
         2000,
-        DT_INT
+        DT_REAL
     );
     xZeroDev->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1696,7 +1695,6 @@ void Config::loadSystemRegisters()
         }
     );
     xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
-    xZeroDev->setInputWidgetProperty("textTemplate", "%1mm");
     xZeroDev->setInputWidgetProperty("step", 0.001);
     xZeroDev->setInputWidgetProperty("page", 1);
     xZeroDev->setInputWidgetProperty("minimum", 0);
@@ -1706,7 +1704,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xStepLength = group->addConfigItem(
         "xStepLength",
         3164557,
-        DT_INT
+        DT_REAL
     );
     xStepLength->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1804,7 +1802,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xStartSpeed = group->addConfigItem(
         "xStartSpeed",
         15000,
-        DT_INT
+        DT_REAL
     );
     xStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1828,7 +1826,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xMaxSpeed = group->addConfigItem(
         "xMaxSpeed",
         4500,
-        DT_INT
+        DT_REAL
     );
     xMaxSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1852,7 +1850,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xMaxAcceleration = group->addConfigItem(
         "xMaxAcceleration",
         45,
-        DT_INT
+        DT_REAL
     );
     xMaxAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1876,7 +1874,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xUrgentAcceleration = group->addConfigItem(
         "xUrgentAcceleration",
         45,
-        DT_INT
+        DT_REAL
     );
     xUrgentAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1900,7 +1898,7 @@ void Config::loadSystemRegisters()
     ConfigItem* yMaxLength = group->addConfigItem(
         "yMaxLength",
         200000,
-        DT_INT
+        DT_REAL
     );
     yMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -1964,7 +1962,7 @@ void Config::loadSystemRegisters()
     ConfigItem* yZeroDev = group->addConfigItem(
         "yZeroDev",
         2000,
-        DT_INT
+        DT_REAL
     );
     yZeroDev->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2087,7 +2085,7 @@ void Config::loadSystemRegisters()
     ConfigItem* yStartSpeed = group->addConfigItem(
         "yStartSpeed",
         15,
-        DT_INT
+        DT_REAL
     );
     yStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2105,7 +2103,7 @@ void Config::loadSystemRegisters()
     yStartSpeed->setInputWidgetProperty("step", 0.001);
     yStartSpeed->setInputWidgetProperty("page", 10);
     yStartSpeed->setInputWidgetProperty("minimum", 1);
-    yStartSpeed->setInputWidgetProperty("maximum", 100);
+    yStartSpeed->setInputWidgetProperty("maximum", 1000);
     yStartSpeed->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yMaxSpeed = group->addConfigItem(
@@ -2183,7 +2181,7 @@ void Config::loadSystemRegisters()
     ConfigItem* zMaxLength = group->addConfigItem(
         "zMaxLength",
         200000,
-        DT_INT
+        DT_REAL
     );
     zMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2249,7 +2247,7 @@ void Config::loadSystemRegisters()
     ConfigItem* zZeroDev = group->addConfigItem(
         "zZeroDev",
         2000,
-        DT_INT
+        DT_REAL
     );
     zZeroDev->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2372,7 +2370,7 @@ void Config::loadSystemRegisters()
     ConfigItem* zStartSpeed = group->addConfigItem(
         "zStartSpeed",
         15000,
-        DT_INT
+        DT_REAL
     );
     zStartSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2396,7 +2394,7 @@ void Config::loadSystemRegisters()
     ConfigItem* zMaxSpeed = group->addConfigItem(
         "zMaxSpeed",
         10000,
-        DT_INT
+        DT_REAL
     );
     zMaxSpeed->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2420,7 +2418,7 @@ void Config::loadSystemRegisters()
     ConfigItem* zMaxAcceleration = group->addConfigItem(
         "zMaxAcceleration",
         30000,
-        DT_INT
+        DT_REAL
     );
     zMaxAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2444,7 +2442,7 @@ void Config::loadSystemRegisters()
     ConfigItem* zUrgentAcceleration = group->addConfigItem(
         "zUrgentAcceleration",
         30000,
-        DT_INT
+        DT_REAL
     );
     zUrgentAcceleration->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2867,363 +2865,363 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Enabled z axis movement", nullptr));
 
     UserRegister::headItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[00] Head Data", nullptr), 
+        QCoreApplication::translate("Config", "Head Data", nullptr), 
         QCoreApplication::translate("Config", "Read-only data used to test the quality of data transmission", nullptr));
 
     UserRegister::accModeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[01] Acceleration Mode", nullptr), 
+        QCoreApplication::translate("Config", "Acceleration Mode", nullptr), 
         QCoreApplication::translate("Config", "Acceleration mode", nullptr));
 
     UserRegister::cuttingMoveSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[02] Cutting Move Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Move Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Acceleration mode", nullptr));
 
     UserRegister::cuttingMoveAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[03] Cutting Move Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Move Acceleration(mm/s<sub>2</sub>)", nullptr), 
         QCoreApplication::translate("Config", "Move acceleration for cutting movement", nullptr));
 
     UserRegister::cuttingTurnSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[04] Cutting Turn Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Turn Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Turn speed for cutting movement", nullptr));
 
     UserRegister::cuttingTurnAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[05] Cutting Turn Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Turn Acceleration(mm/s<sub>2</sub>)", nullptr), 
         QCoreApplication::translate("Config", "Turn acceleration for cutting movement", nullptr));
 
     UserRegister::cuttingWorkAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[06] Cutting Work Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Work Acceleration(mm/s<sub>2</sub>)", nullptr), 
         QCoreApplication::translate("Config", "Work acceleration for cutting movement", nullptr));
 
     UserRegister::cuttingMoveSpeedFactorItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[07] Move Speed Factor", nullptr), 
+        QCoreApplication::translate("Config", "Move Speed Factor", nullptr), 
         QCoreApplication::translate("Config", "Move speed factor for cutting movement", nullptr));
 
     UserRegister::cuttingWorkSpeedFactorItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[08] Work Speed Factor", nullptr), 
+        QCoreApplication::translate("Config", "Work Speed Factor", nullptr), 
         QCoreApplication::translate("Config", "Work speed factor for cutting movement", nullptr));
 
     UserRegister::cuttingSpotSizeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[09] Cutting Spot Size", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Spot Size", nullptr), 
         QCoreApplication::translate("Config", "Spot size for cutting movement", nullptr));
 
     UserRegister::scanXStartSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[10] Scan X Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Scan X Start Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Scan x start speed", nullptr));
 
     UserRegister::scanYStartSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[11] Scan Y Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Scan Y Start Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Scan y start speed", nullptr));
 
     UserRegister::scanXAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[12] Scan X Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Scan X Acceleration(mm/s<sub>2</sub>)", nullptr), 
         QCoreApplication::translate("Config", "Scan x acceleration", nullptr));
 
     UserRegister::scanYAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[13] Scan Y Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Scan Y Acceleration(mm/s<sub>2</sub>)", nullptr), 
         QCoreApplication::translate("Config", "Scan y acceleration", nullptr));
 
     UserRegister::scanRowSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[14] Scan Row Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Scan Row Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Scan row speed", nullptr));
 
     UserRegister::scanLaserFrequencyItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[15] Laser Frequency", nullptr), 
+        QCoreApplication::translate("Config", "Laser Frequency", nullptr), 
         QCoreApplication::translate("Config", "Laser Frequency", nullptr));
 
     UserRegister::scanReturnErrorItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[16] Scan Return Error(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Scan Return Error(mm)", nullptr), 
         QCoreApplication::translate("Config", "Scan return error", nullptr));
 
     UserRegister::scanLaserPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[17] Scan Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Scan Laser Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The percentage of scan laser power", nullptr));
 
     UserRegister::scanXResetEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[18] Scan X Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Scan X Reset Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enabled Scan X reset", nullptr));
 
     UserRegister::scanYResetEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[19] Scan Y Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Scan Y Reset Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enabled Scan Y reset", nullptr));
 
     UserRegister::scanZResetEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[20] Scan Z Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Scan Z Reset Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enabled Scan Z reset", nullptr));
 
     UserRegister::resetSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[21] Reset Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Reset Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Reset speed", nullptr));
 
     UserRegister::scanReturnPosItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[22] Scan Return Pos", nullptr), 
+        QCoreApplication::translate("Config", "Scan Return Pos", nullptr), 
         QCoreApplication::translate("Config", "Scan return pos", nullptr));
 
     UserRegister::backlashXIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[23] Backlash X Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash X Interval(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Backlash X interval", nullptr));
 
     UserRegister::backlashYIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[24] Backlash Y Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash Y Interval(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Backlash Y interval", nullptr));
 
     UserRegister::backlashZIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[25] Backlash Z Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash Z Interval(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Backlash Z interval", nullptr));
 
     UserRegister::defaultRunSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[26] Default Run Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Default Run Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Default run speed", nullptr));
 
     UserRegister::defaultMaxCuttingPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[27] Default Max Cutting Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Default Max Cutting Power(%)", nullptr), 
         QCoreApplication::translate("Config", "Default max cutting power", nullptr));
 
     UserRegister::defaultMinCuttingPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[28] Default Min Cutting Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Default Min Cutting Power(%)", nullptr), 
         QCoreApplication::translate("Config", "Default min cutting power", nullptr));
 
     UserRegister::defaultScanSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[29] Default Scan Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Default Scan Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Default scan speed", nullptr));
 
     UserRegister::maxScanGrayRatioItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[30] Max Scan Gray Ratio", nullptr), 
+        QCoreApplication::translate("Config", "Max Scan Gray Ratio", nullptr), 
         QCoreApplication::translate("Config", "Max scan gray ratio", nullptr));
 
     UserRegister::minScanGrayRatioItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[31] Min Scan Gray Ratio", nullptr), 
+        QCoreApplication::translate("Config", "Min Scan Gray Ratio", nullptr), 
         QCoreApplication::translate("Config", "Min scan gray ratio", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[00] Head Data", nullptr), 
+        QCoreApplication::translate("Config", "Head Data", nullptr), 
         QCoreApplication::translate("Config", "Read-only data used to test the quality of data transmission", nullptr));
 
     SystemRegister::passwordItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[01] Password", nullptr), 
+        QCoreApplication::translate("Config", "Password", nullptr), 
         QCoreApplication::translate("Config", "Manufacture password to modify system registers", nullptr));
 
     SystemRegister::storedPasswordItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[02] Stored Password", nullptr), 
+        QCoreApplication::translate("Config", "Stored Password", nullptr), 
         QCoreApplication::translate("Config", "Stored manufacture password", nullptr));
 
     SystemRegister::hardwareID1Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[03] Hardware ID1", nullptr), 
+        QCoreApplication::translate("Config", "Hardware ID1", nullptr), 
         QCoreApplication::translate("Config", "Hardware ID1", nullptr));
 
     SystemRegister::hardwareID2Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[04] Hardware ID2", nullptr), 
+        QCoreApplication::translate("Config", "Hardware ID2", nullptr), 
         QCoreApplication::translate("Config", "Hardware ID2", nullptr));
 
     SystemRegister::hardwareID3Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[05] Hardware ID3", nullptr), 
+        QCoreApplication::translate("Config", "Hardware ID3", nullptr), 
         QCoreApplication::translate("Config", "Hardware ID3", nullptr));
 
     SystemRegister::cdKey1Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[06] CDKey1", nullptr), 
+        QCoreApplication::translate("Config", "CDKey1", nullptr), 
         QCoreApplication::translate("Config", "CDKey1", nullptr));
 
     SystemRegister::cdKey2Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[07] CDKey2", nullptr), 
+        QCoreApplication::translate("Config", "CDKey2", nullptr), 
         QCoreApplication::translate("Config", "CDKey2", nullptr));
 
     SystemRegister::cdKey3Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[08] CDKey3", nullptr), 
+        QCoreApplication::translate("Config", "CDKey3", nullptr), 
         QCoreApplication::translate("Config", "CDKey3", nullptr));
 
     SystemRegister::sysRunTimeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[09] System Run Time", nullptr), 
+        QCoreApplication::translate("Config", "System Run Time", nullptr), 
         QCoreApplication::translate("Config", "System run time", nullptr));
 
     SystemRegister::laserRunTimeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[10] Laser Run Time", nullptr), 
+        QCoreApplication::translate("Config", "Laser Run Time", nullptr), 
         QCoreApplication::translate("Config", "Laser run time", nullptr));
 
     SystemRegister::sysRunNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[11] System Run Times", nullptr), 
+        QCoreApplication::translate("Config", "System Run Times", nullptr), 
         QCoreApplication::translate("Config", "System run times", nullptr));
 
     SystemRegister::xMaxLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[12] X Max Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "X Max Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "X max length", nullptr));
 
     SystemRegister::xDirPhaseItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[13] X Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "X Dir Phase", nullptr), 
         QCoreApplication::translate("Config", "X dir phase", nullptr));
 
     SystemRegister::xLimitPhaseItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[14] X Limit Phase", nullptr), 
+        QCoreApplication::translate("Config", "X Limit Phase", nullptr), 
         QCoreApplication::translate("Config", "X limit phase", nullptr));
 
     SystemRegister::xZeroDevItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[15] X Zero Dev(mm)", nullptr), 
+        QCoreApplication::translate("Config", "X Zero Dev(mm)", nullptr), 
         QCoreApplication::translate("Config", "X Zero Dev", nullptr));
 
     SystemRegister::xStepLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[16] X Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "X Step Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "X Zero Dev", nullptr));
 
     SystemRegister::xLimitNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[17] X Limit Num", nullptr), 
+        QCoreApplication::translate("Config", "X Limit Num", nullptr), 
         QCoreApplication::translate("Config", "X limit num", nullptr));
 
     SystemRegister::xResetEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[18] X Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "X Reset Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enable x reset", nullptr));
 
     SystemRegister::xMotorNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[19] X Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "X Motor Num", nullptr), 
         QCoreApplication::translate("Config", "X motor num", nullptr));
 
     SystemRegister::xMotorCurrentItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[20] X Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "X Motor current(%)", nullptr), 
         QCoreApplication::translate("Config", "X motor current", nullptr));
 
     SystemRegister::xStartSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[21] X Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "X Start Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "X Start Speed", nullptr));
 
     SystemRegister::xMaxSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[22] X Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "X Max Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "X Max Speed", nullptr));
 
     SystemRegister::xMaxAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[23] X Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "X Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "X max acceleration", nullptr));
 
     SystemRegister::xUrgentAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[24] X Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "X Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "X urgent acceleration", nullptr));
 
     SystemRegister::yMaxLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[25] Y Max Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y Max Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "Y max length", nullptr));
 
     SystemRegister::yDirPhaseItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[26] Y Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "Y Dir Phase", nullptr), 
         QCoreApplication::translate("Config", "Y dir phase", nullptr));
 
     SystemRegister::yLimitPhaseItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[27] Y Limit Phase", nullptr), 
+        QCoreApplication::translate("Config", "Y Limit Phase", nullptr), 
         QCoreApplication::translate("Config", "Y limit phase", nullptr));
 
     SystemRegister::yZeroDevItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[28] Y Zero Dev(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y Zero Dev(mm)", nullptr), 
         QCoreApplication::translate("Config", "Y Zero Dev", nullptr));
 
     SystemRegister::yStepLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[29] Y Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Y Step Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "Y Zero Dev", nullptr));
 
     SystemRegister::yLimitNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[30] Y Limit Num", nullptr), 
+        QCoreApplication::translate("Config", "Y Limit Num", nullptr), 
         QCoreApplication::translate("Config", "Y limit num", nullptr));
 
     SystemRegister::yResetEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[31] Y Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Y Reset Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enable y reset", nullptr));
 
     SystemRegister::yMotorNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[32] Y Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "Y Motor Num", nullptr), 
         QCoreApplication::translate("Config", "Y motor num", nullptr));
 
     SystemRegister::yMotorCurrentItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[33] Y Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "Y Motor current(%)", nullptr), 
         QCoreApplication::translate("Config", "Y motor current", nullptr));
 
     SystemRegister::yStartSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[34] Y Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Y Start Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Y Start Speed", nullptr));
 
     SystemRegister::yMaxSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[35] Y Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Y Max Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Y Max Speed", nullptr));
 
     SystemRegister::yMaxAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[36] Y Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Y Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Y max acceleration", nullptr));
 
     SystemRegister::yUrgentAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[37] Y Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Y Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Y urgent acceleration", nullptr));
 
     SystemRegister::zMaxLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[38] Z Max Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Z Max Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "Y max length", nullptr));
 
     SystemRegister::zDirPhaseItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[39] Z Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "Z Dir Phase", nullptr), 
         QCoreApplication::translate("Config", "Z dir phase", nullptr));
 
     SystemRegister::zLimitPhaseItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[40] Z Limit Phase", nullptr), 
+        QCoreApplication::translate("Config", "Z Limit Phase", nullptr), 
         QCoreApplication::translate("Config", "Z limit phase", nullptr));
 
     SystemRegister::zZeroDevItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[41] Z Zero Dev(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Z Zero Dev(mm)", nullptr), 
         QCoreApplication::translate("Config", "Z Zero Dev", nullptr));
 
     SystemRegister::zStepLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[42] Z Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Z Step Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "Z Zero Dev", nullptr));
 
     SystemRegister::zLimitNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[43] Z Limit Num", nullptr), 
+        QCoreApplication::translate("Config", "Z Limit Num", nullptr), 
         QCoreApplication::translate("Config", "Z limit num", nullptr));
 
     SystemRegister::zResetEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[44] Z Reset Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Z Reset Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enable z reset", nullptr));
 
     SystemRegister::zMotorNumItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[45] Z Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "Z Motor Num", nullptr), 
         QCoreApplication::translate("Config", "Z motor num", nullptr));
 
     SystemRegister::zMotorCurrentItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[46] Z Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "Z Motor current(%)", nullptr), 
         QCoreApplication::translate("Config", "Z motor current", nullptr));
 
     SystemRegister::zStartSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[47] Z Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Z Start Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Z Start Speed", nullptr));
 
     SystemRegister::zMaxSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[48] Z Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Z Max Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Z Max Speed", nullptr));
 
     SystemRegister::zMaxAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[49] Z Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Z Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Z max acceleration", nullptr));
 
     SystemRegister::zUrgentAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[50] Z Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "Z Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Z urgent acceleration", nullptr));
 
     SystemRegister::laserMaxPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[51] Laser Max Power(%)", nullptr),
+        QCoreApplication::translate("Config", "Laser Max Power(%)", nullptr),
         QCoreApplication::translate("Config", "Laser Max Power", nullptr));
 
     SystemRegister::laserMinPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[52] Laser Min Power(%)", nullptr),
+        QCoreApplication::translate("Config", "Laser Min Power(%)", nullptr),
         QCoreApplication::translate("Config", "Laser Min Power", nullptr));
 
     SystemRegister::laserPowerFreqItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[53] Laser Power Frequence", nullptr),
+        QCoreApplication::translate("Config", "Laser Power Frequence", nullptr),
         QCoreApplication::translate("Config", "Laser Power Frequence", nullptr));
 
     SystemRegister::xPhaseEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[54] X Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "X Phase Enabled", nullptr),
         QCoreApplication::translate("Config", "Enabled X phase", nullptr));
 
     SystemRegister::yPhaseEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[55] Y Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "Y Phase Enabled", nullptr),
         QCoreApplication::translate("Config", "Enabled Y phase", nullptr));
 
     SystemRegister::zPhaseEnabledItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[56] Z Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "Z Phase Enabled", nullptr),
         QCoreApplication::translate("Config", "Enabled Z phase", nullptr));
 
     SystemRegister::deviceOriginItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "[57] Device Origin", nullptr),
+        QCoreApplication::translate("Config", "Device Origin", nullptr),
         QCoreApplication::translate("Config", "Device Origin", nullptr));
 
     Debug::showPrimitiveNameItem()->setTitleAndDesc(
@@ -3287,12 +3285,12 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Debug", nullptr));
 
     groupsMap["userRegister"]->updateTitleAndDesc(
-        QCoreApplication::translate("Config", "User Registers", nullptr),
-        QCoreApplication::translate("Config", "User Registers", nullptr));
+        QCoreApplication::translate("Config", "User", nullptr),
+        QCoreApplication::translate("Config", "User", nullptr));
 
     groupsMap["systemRegister"]->updateTitleAndDesc(
-        QCoreApplication::translate("Config", "System Registers", nullptr),
-        QCoreApplication::translate("Config", "System Registers", nullptr));
+        QCoreApplication::translate("Config", "System", nullptr),
+        QCoreApplication::translate("Config", "System", nullptr));
 }
 
 void Config::destroy()

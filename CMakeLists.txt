@@ -111,6 +111,7 @@ FILE(GLOB ALGORITHM_SOURCES src/algorithm/*.cpp)
 
 FILE(GLOB MOCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_autogen/*.cpp)
 FILE(GLOB DOCS docs/*.*)
+FILE(GLOB TRANSLATIONS translations/*.ts)
 LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 
 set(OTHER_FILES
@@ -129,6 +130,7 @@ set(OTHER_FILES
 source_group("ui" FILES ${UIS})
 source_group("others" FILES ${OTHER_FILES})
 source_group("docs" FILES ${DOCS})
+source_group("translations" FILES ${TRANSLATIONS})
 
 set(HEADER_FILES
     ${HEADER_FILES}
