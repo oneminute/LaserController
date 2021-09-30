@@ -55,7 +55,8 @@ public:
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
     QRectF AllItemsSceneBoundingRect();
-	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, int _state, int _transformType);//change selection property by tool bar
+	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, 
+        int _state, int _transformType, int _pp, bool _unitIsMM);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);//draw
 	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);//selection

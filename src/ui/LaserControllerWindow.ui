@@ -758,6 +758,9 @@
    <property name="text">
     <string>Delete Primitive</string>
    </property>
+   <property name="shortcut">
+    <string>Backspace</string>
+   </property>
   </action>
   <action name="actionMoveLayerUp">
    <property name="icon">

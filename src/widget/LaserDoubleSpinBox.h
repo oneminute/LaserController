@@ -14,6 +14,7 @@ public:
 protected:
 
 	virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
 	virtual void focusOutEvent(QFocusEvent *event);
 signals:
 	void enterOrLostFocus();
