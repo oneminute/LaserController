@@ -2012,6 +2012,23 @@ QByteArray LaserBitmap::engravingImage()
     outImage.save("tmp\\outImage.png");
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
 
+    cv::Mat halfToneMat = src;
+    if (layer()->useHalftone())
+    {
+        switch (Config::Export::halfToneStyle())
+        {
+        case 0:
+            halfToneMat = imageUtils::halftone4(src, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+            break;
+        case 1:
+            halfToneMat = imageUtils::halftone5(src, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+            break;
+        case 2:
+            halfToneMat = imageUtils::halftone6(src, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+            break;
+        }
+    }
+
     qreal pixelInterval = 0.07;
 
 	qreal boundingWidth = Global::convertToMM(SU_PX, boundingRect.width());
@@ -2028,17 +2045,17 @@ QByteArray LaserBitmap::engravingImage()
     qDebug() << "out top:" << boundingTop;
 
     cv::Mat resized;
-    cv::resize(src, resized, cv::Size(outWidth, outHeight));
+    cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight));
     
-    cv::Mat outMat = resized;
-    if (layer()->useHalftone())
-    {
+    //cv::Mat outMat = resized;
+    //if (layer()->useHalftone())
+    //{
         //outMat = imageUtils::halftone3(resized, layer()->lpi(), layer()->dpi(), 45);
         //outMat = imageUtils::halftone4(resized, 30, 12);
-        outMat = imageUtils::halftone5(resized, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
-    }
+        //outMat = imageUtils::halftone5(resized, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+    //}
 
-    ba = imageUtils::image2EngravingData(outMat, boundingLeft, boundingTop, pixelInterval, boundingWidth);
+    ba = imageUtils::image2EngravingData(resized, boundingLeft, boundingTop, pixelInterval, boundingWidth);
 
     return ba; 
 }

@@ -12,6 +12,7 @@
 #include "ui/PreviewWindow.h"
 #include "TypeUtils.h"
 #include "Utils.h"
+#include "algorithm/QBezier.h"
 
 int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
 {
@@ -180,7 +181,7 @@ void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& p
 {
     pointsList.clear();
     startingIndices.clear();
-    QList<QPolygonF> polygons = path.toSubpathPolygons(transform);
+    QList<QPolygonF> polygons = path2SubpathPolygons(path, transform, Config::Export::curveFlatteningThreshold());
     LaserPointList allPoints;
     for (QPolygonF& polygon : polygons)
     {
@@ -196,6 +197,49 @@ void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& p
         pointsList.append(points);
     }
     center = utils::center(allPoints).toPointF();
+}
+
+QList<QPolygonF> machiningUtils::path2SubpathPolygons(const QPainterPath& path, const QTransform& matrix, qreal bezier_flattening_threshold)
+{
+    QList<QPolygonF> flatCurves;
+    if (path.isEmpty())
+        return flatCurves;
+
+    QPolygonF current;
+    for (int i = 0; i < path.elementCount(); ++i) {
+        const QPainterPath::Element& e = path.elementAt(i);
+        switch (e.type) {
+        case QPainterPath::MoveToElement:
+            if (current.size() > 1)
+                flatCurves += current;
+            current.clear();
+            current.reserve(16);
+            current += QPointF(e.x, e.y) * matrix;
+            break;
+        case QPainterPath::LineToElement:
+            current += QPointF(e.x, e.y) * matrix;
+            break;
+        case QPainterPath::CurveToElement: {
+            Q_ASSERT(path.elementAt(i + 1).type == QPainterPath::CurveToDataElement);
+            Q_ASSERT(path.elementAt(i + 2).type == QPainterPath::CurveToDataElement);
+            QBezier bezier = QBezier::fromPoints(QPointF(path.elementAt(i - 1).x, path.elementAt(i - 1).y) * matrix,
+                QPointF(e.x, e.y) * matrix,
+                QPointF(path.elementAt(i + 1).x, path.elementAt(i + 1).y) * matrix,
+                QPointF(path.elementAt(i + 2).x, path.elementAt(i + 2).y) * matrix);
+            bezier.addToPolygon(&current, bezier_flattening_threshold);
+            i += 2;
+            break;
+        }
+        case QPainterPath::CurveToDataElement:
+            Q_ASSERT(!"QPainterPath::toSubpathPolygons(), bad element type");
+            break;
+        }
+    }
+
+    if (current.size() > 1)
+        flatCurves += current;
+
+    return flatCurves;
 }
 
 void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& points, QList<int>& startingIndices, QPointF& center)

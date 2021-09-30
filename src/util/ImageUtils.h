@@ -16,6 +16,7 @@ namespace imageUtils
     cv::Mat halftone3(cv::Mat src, float lpi = 100, float dpi = 600, float degrees = 45.0);
     cv::Mat halftone4(cv::Mat src,float degrees = 45.0, int gridSize = 12);
     cv::Mat halftone5(cv::Mat src,float degrees = 45.0, int gridSize = 12);
+    cv::Mat halftone6(cv::Mat src,float degrees = 45.0, int gridSize = 12);
 
     void generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi);
 
