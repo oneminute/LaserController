@@ -389,7 +389,8 @@ QRectF LaserViewer::AllItemsSceneBoundingRect()
     }
     return QRectF(QPointF(left, top), QPointF(right, bottom));
 }
-void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, int _state, int _transformType)
+void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
+    int _state, int _transformType, int _pp, bool _unitIsMM)
 {
 	if (m_group && !m_group->isEmpty()) {
 		QRectF bounds = selectedItemsSceneBoundingRect();
@@ -397,6 +398,8 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 		qreal width = _sceneRect.width();
 		qreal height = _sceneRect.height();
 		QTransform t = m_group->transform();
+        LaserControllerWindow* window = LaserApplication::mainWindow;
+        bool isLockRatio = window->lockEqualRatio();
 		switch (_transformType) {
 			case Transform_MOVE: {
 				QPointF diff;
@@ -446,7 +449,14 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 			}
 			case Transform_SCALE: {
 				QTransform t1;
-				t1.scale(_xscale, _yscale);
+                qreal scaleX = _xscale;
+                qreal scaleY = _yscale;
+                if (_pp == PrimitiveProperty::PP_ScaleX && isLockRatio) {
+                    scaleY = scaleX;
+                }else if (_pp == PrimitiveProperty::PP_ScaleY && isLockRatio) {
+                    scaleX = scaleY;
+                }
+				t1.scale(scaleX, scaleY);
 				t = t * t1;
 				QPointF origi;
 				
@@ -502,6 +512,20 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 			case Transform_RESIZE: {
 				qreal rateX = width / bounds.width();
 				qreal rateY = height / bounds.height();
+                if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
+                    rateX = rateY;
+                    if (_unitIsMM) {
+                        window->widthBox()->setValue(Global::pixelsF2mmX(width * rateX));
+                    }
+                    
+                }
+                if (_pp == PrimitiveProperty::PP_Width && isLockRatio) {
+                    rateY = rateX;
+                    if (_unitIsMM) {
+                        window->heightBox()->setValue(Global::pixelsF2mmY(height * rateY));
+                    }
+                }
+
 				QTransform t1;
 				t1.scale(rateX, rateY);
 				t = t * t1;

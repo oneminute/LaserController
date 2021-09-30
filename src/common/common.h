@@ -254,6 +254,17 @@ enum ModifiedBy
     MB_RegisterConfirmed
 };
 
+enum PrimitiveProperty
+{
+    PP_Width,
+    PP_Height,
+    PP_PosX,
+    PP_PosY,
+    PP_ScaleX,
+    PP_ScaleY,
+    PP_Other
+};
+
 class Global
 {
 public:

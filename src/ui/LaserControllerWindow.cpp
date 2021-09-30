@@ -81,6 +81,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_textFontWidget(nullptr)
     , m_propertyWidget(nullptr)
     , m_lastLockedState(Qt::Unchecked)
+    , m_lockEqualRatio(false)
 {
     m_ui->setupUi(this);
 
@@ -282,7 +283,20 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_posYUnit = new QLabel("mm");
 	m_lockOrUnlock = new QToolButton();
 	m_lockOrUnlock->setDefaultAction(m_ui->actionLock);
-	m_lockOrUnlock->setEnabled(false);
+    m_lockEqualRatio = false;
+	m_lockOrUnlock->setChecked(false);
+    m_ui->actionLock->setIcon(QIcon(":/ui/icons/images/unlock.png"));
+    connect(m_ui->actionLock, &QAction::triggered, this, [=] {
+        if (m_lockOrUnlock->isChecked()) {
+            m_lockEqualRatio = true;
+            m_ui->actionLock->setIcon(QIcon(":/ui/icons/images/lock.png"));
+        }
+        else {
+            m_lockEqualRatio = false;
+            m_ui->actionLock->setIcon(QIcon(":/ui/icons/images/unlock.png"));
+        }
+        
+    });
 
 	m_propertyLayout->addWidget(m_posXLabel, 0, 0);
 	m_propertyLayout->addWidget(m_posYLabel, 1, 0);
@@ -603,7 +617,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_posXBox->value() < -9000) {
 			m_posXBox->setValue(-9000);
 		}
-		selectionPropertyBoxChange();
+		selectionPropertyBoxChange(PrimitiveProperty::PP_PosX);
 	});
 	connect(m_posYBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_MOVE;
@@ -613,7 +627,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_posYBox->value() < -9000) {
 			m_posYBox->setValue(-9000);
 		}
-		selectionPropertyBoxChange();
+		selectionPropertyBoxChange(PrimitiveProperty::PP_PosY);
 	});
 	connect(m_widthBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         if (m_viewer->group()->boundingRect().height() == 0) {
@@ -627,7 +641,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_widthBox->value() <= 0) {
 			m_widthBox->setValue(0.001);
 		}
-		selectionPropertyBoxChange();
+        qreal width = m_widthBox->value();
+        qreal height = m_heightBox->value();
+        
+		selectionPropertyBoxChange(PrimitiveProperty::PP_Width);
 	});
 	connect(m_heightBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         if (m_viewer->group()->boundingRect().height() == 0) {
@@ -638,33 +655,30 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_heightBox->value() > 20000) {
 			m_heightBox->setValue(20000);
 		}
-		/*if (m_heightBox->value() < -20000) {
-			m_heightBox->setValue(-20000);
-		}*/
 		if (m_heightBox->value() <= 0) {
 			m_heightBox->setValue(0.001);
 		}
         
-		selectionPropertyBoxChange();
+		selectionPropertyBoxChange(PrimitiveProperty::PP_Height);
 	});
 	connect(m_xRateBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_SCALE;
 		if (m_xRateBox->value() <= 0) {
 			m_xRateBox->setValue(0.001);
 		}
-		selectionPropertyBoxChange();
+		selectionPropertyBoxChange(PP_ScaleX);
 	});
 	connect(m_yRateBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_SCALE;
 		if (m_yRateBox->value() <= 0) {
 			m_yRateBox->setValue(0.001);
 		}
-		selectionPropertyBoxChange();
+		selectionPropertyBoxChange(PrimitiveProperty::PP_ScaleY);
 	});
 	//rotate
 	connect(m_rotateBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_ROTATE;
-		selectionPropertyBoxChange();
+		selectionPropertyBoxChange(PP_Other);
 	});
 	//selection original raido button
 	connect(m_topLeftBtn, &QRadioButton::toggled, this, [=] {
@@ -2167,6 +2181,21 @@ LaserDocument* LaserControllerWindow::currentDocument() const
     return m_viewer->scene()->document();
 }
 
+bool LaserControllerWindow::lockEqualRatio()
+{
+    return m_lockEqualRatio;
+}
+
+LaserDoubleSpinBox * LaserControllerWindow::widthBox()
+{
+    return m_widthBox;
+}
+
+LaserDoubleSpinBox * LaserControllerWindow::heightBox()
+{
+    return m_heightBox;
+}
+
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
 {
 	
@@ -3644,7 +3673,7 @@ void LaserControllerWindow::selectedChange()
 		
 	}
 }
-void LaserControllerWindow::selectionPropertyBoxChange()
+void LaserControllerWindow::selectionPropertyBoxChange(int state)
 {
 	qreal x = m_posXBox->value();
 	qreal y = m_posYBox->value();
@@ -3656,15 +3685,49 @@ void LaserControllerWindow::selectionPropertyBoxChange()
 
 	qreal rotate = m_rotateBox->value() / 180 * M_PI;
 
-	if (m_unitIsMM) {
-		x = Global::mm2PixelsXF(x);
-		y = Global::mm2PixelsYF(y);
-		width = Global::mm2PixelsXF(width);
-		height = Global::mm2PixelsYF(height);
-	}
+    if (m_unitIsMM) {
+        x = Global::mm2PixelsXF(x);
+        y = Global::mm2PixelsYF(y);
+        width = Global::mm2PixelsXF(width);
+        height = Global::mm2PixelsYF(height);
+    }
+
+    /*if (m_lockEqualRatio) {
+        QRectF bounds = m_viewer->selectedItemsSceneBoundingRect();
+        qreal widthRatio = 1;
+        qreal heightRatio = 1;
+        if (bounds.width() != 0) {
+            widthRatio = width / bounds.width();
+        }
+        if (bounds.height() != 0) {
+            heightRatio = height / bounds.height();
+        }
+        switch (state)
+        {
+        case PrimitiveProperty::PP_Height: {
+            width *= widthRatio;
+            break;
+        }
+        case PrimitiveProperty::PP_Width: {
+            height *= heightRatio;
+            break;
+        }
+        case PrimitiveProperty::PP_ScaleX: {
+            break;
+        }
+        case PrimitiveProperty::PP_ScaleY: {
+            break;
+        }
+            default:
+                break;
+        }
+    }*/
+    
+	
 	
 	//repaint 
-	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, m_selectionTranformState);
+	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
+        m_selectionTranformState, state, m_unitIsMM);
 	m_xRateBox->setValue(100);
 	m_yRateBox->setValue(100);
 	m_rotateBox->setValue(0);

@@ -52,6 +52,11 @@ public:
     void createUpdateDockPanel(int winId);
 
     LaserDocument* currentDocument() const;
+
+    bool lockEqualRatio();
+    LaserDoubleSpinBox* widthBox();
+    LaserDoubleSpinBox* heightBox();
+    
 public slots:
     void handleSecurityException(int code, const QString& message);
     void onFontComboBoxHighLighted(int index);
@@ -235,7 +240,7 @@ protected slots:
     
     void onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 	void selectedChange();//items
-	void selectionPropertyBoxChange();//doubleSpinBox's enter or mouse lost focus
+	void selectionPropertyBoxChange(int state);//doubleSpinBox's enter or mouse lost focus
 	void onSelectionOriginalClicked(bool clicked);
 	//undo
 	void onUndoStackCleanChanged(bool clean);
@@ -409,6 +414,7 @@ private:
 	LaserDoubleSpinBox* m_rotateBox;
 	QToolButton* m_mmOrIn;
 	bool m_unitIsMM;
+    bool m_lockEqualRatio;
 	//selection tool bar
 	int m_selectionOriginalState;
 	int m_selectionTranformState;
