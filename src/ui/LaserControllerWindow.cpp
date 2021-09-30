@@ -2221,6 +2221,11 @@ void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
 			}
 			break;
 		}
+        case Qt::Key_Delete: {
+            if (!StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+                onActionDeletePrimitive();
+            }
+        }
 	
 	}
 	

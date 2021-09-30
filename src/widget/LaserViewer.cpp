@@ -3006,15 +3006,21 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
         //text
                               
         case Qt::Key_Return: {
-            addTextByKeyInput("\n");
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+                addTextByKeyInput("\n");
+            }
             break;
         }
         case Qt::Key_Enter: {
-            addTextByKeyInput("\n");
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
+                addTextByKeyInput("\n");
+            }
             break;
         }
         case Qt::Key_Delete: {
-            removeBackText();
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+                removeBackText();
+            }
             break;
         }
         case Qt::Key_Backspace: {
