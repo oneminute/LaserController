@@ -2005,12 +2005,26 @@ QByteArray LaserBitmap::engravingImage()
     QByteArray ba;
 
     QImage srcImage = d->image.copy();
-    srcImage.invertPixels();
+    //srcImage.invertPixels();
     QImage outImage = srcImage.transformed(sceneTransform()).convertToFormat(QImage::Format_Grayscale8);
-    outImage.invertPixels();
+    //outImage.invertPixels();
     QRectF boundingRect = sceneBoundingRect();
     outImage.save("tmp\\outImage.png");
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
+
+	qreal boundingWidth = Global::convertToMM(SU_PX, boundingRect.width());
+	qreal boundingHeight = Global::convertToMM(SU_PX, boundingRect.height(), Qt::Vertical);
+    qreal boundingLeft = Global::convertToMM(SU_PX, boundingRect.left());
+    qreal boundingTop = Global::convertToMM(SU_PX, boundingRect.top());
+
+    int dpi = d->layer->dpi();
+    int pixelWidth = qRound(boundingWidth * MM_TO_INCH * dpi);
+    int pixelHeight = qRound(boundingHeight * MM_TO_INCH * dpi);
+
+    cv::Mat pixelScaled;
+    cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight));
+
+    int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
 
     cv::Mat halfToneMat = src;
     if (layer()->useHalftone())
@@ -2018,26 +2032,21 @@ QByteArray LaserBitmap::engravingImage()
         switch (Config::Export::halfToneStyle())
         {
         case 0:
-            halfToneMat = imageUtils::halftone4(src, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+            halfToneMat = imageUtils::halftone4(pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         case 1:
-            halfToneMat = imageUtils::halftone5(src, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+            halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         case 2:
-            halfToneMat = imageUtils::halftone6(src, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
+            halfToneMat = imageUtils::halftone6(pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         }
     }
 
-    qreal pixelInterval = 0.07;
+    qreal pixelInterval = layer()->engravingRowInterval();
 
-	qreal boundingWidth = Global::convertToMM(SU_PX, boundingRect.width());
-	qreal boundingHeight = Global::convertToMM(SU_PX, boundingRect.height(), Qt::Vertical);
-    qreal boundingLeft = Global::convertToMM(SU_PX, boundingRect.left());
-    qreal boundingTop = Global::convertToMM(SU_PX, boundingRect.top());
-    int dpi = d->layer->dpi();
-    int outWidth = boundingWidth * MM_TO_INCH * dpi;
-    int outHeight = std::round(boundingHeight / pixelInterval);
+    int outWidth = pixelWidth;
+    int outHeight = std::round(boundingHeight * Config::General::machiningUnit() / pixelInterval);
     qLogD << "bounding rect: " << boundingRect;
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
@@ -2055,7 +2064,7 @@ QByteArray LaserBitmap::engravingImage()
         //outMat = imageUtils::halftone5(resized, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
     //}
 
-    ba = imageUtils::image2EngravingData(resized, boundingLeft, boundingTop, pixelInterval, boundingWidth);
+    ba = imageUtils::image2EngravingData(resized, boundingLeft, boundingTop, pixelInterval / 1000, boundingWidth);
 
     return ba; 
 }

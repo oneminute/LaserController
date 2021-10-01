@@ -3,6 +3,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QToolButton>
+#include "LaserApplication.h"
 
 SmallDiagonalLimitationWidget::SmallDiagonalLimitationWidget(QWidget* parent)
     : QWidget(parent)
@@ -24,7 +25,7 @@ void SmallDiagonalLimitationWidget::init()
 
     m_layout = new QVBoxLayout;
     m_layout->setMargin(0);
-    m_layout->setSpacing(0);
+    m_layout->setSpacing(2);
 
     m_gridLayout = new QGridLayout;
     updateLimitations();
@@ -53,7 +54,7 @@ void SmallDiagonalLimitationWidget::updateLimitations()
 
 void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem* item)
 {
-    QLabel* labelDiagonal = new QLabel(tr("Diagonal"));
+    QLabel* labelDiagonal = new QLabel(ltr("Size"));
     QDoubleSpinBox* dsbDiagonal = new QDoubleSpinBox;
     dsbDiagonal->setMinimum(0);
     dsbDiagonal->setMaximum(1000000);
@@ -65,9 +66,10 @@ void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem*
             emitValueChanged();
         });
     m_gridLayout->addWidget(labelDiagonal, row, 0);
+    m_gridLayout->setAlignment(labelDiagonal, Qt::AlignmentFlag::AlignRight);
     m_gridLayout->addWidget(dsbDiagonal, row, 1);
 
-    QLabel* labelPower = new QLabel(tr("Power"));
+    QLabel* labelPower = new QLabel(ltr("Power"));
     QDoubleSpinBox* dsbPower = new QDoubleSpinBox;
     dsbPower->setMinimum(0);
     dsbPower->setMaximum(100);
@@ -79,9 +81,10 @@ void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem*
             emitValueChanged();
         });
     m_gridLayout->addWidget(labelPower, row, 2);
+    m_gridLayout->setAlignment(labelPower, Qt::AlignmentFlag::AlignRight);
     m_gridLayout->addWidget(dsbPower, row, 3);
 
-    QLabel* labelSpeed = new QLabel(tr("Speed"));
+    QLabel* labelSpeed = new QLabel(ltr("Speed"));
     QDoubleSpinBox* dsbSpeed = new QDoubleSpinBox;
     dsbSpeed->setMinimum(0);
     dsbSpeed->setMaximum(1000);
@@ -93,6 +96,7 @@ void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem*
             emitValueChanged();
         });
     m_gridLayout->addWidget(labelSpeed, row, 4);
+    m_gridLayout->setAlignment(labelSpeed, Qt::AlignmentFlag::AlignRight);
     m_gridLayout->addWidget(dsbSpeed, row, 5);
 
     QToolButton* removeButton = new QToolButton;
@@ -108,6 +112,14 @@ void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem*
             emitValueChanged();
         });
     m_gridLayout->addWidget(removeButton, row, 6);
+
+    m_gridLayout->setColumnStretch(0, 1);
+    m_gridLayout->setColumnStretch(1, 2);
+    m_gridLayout->setColumnStretch(2, 1);
+    m_gridLayout->setColumnStretch(3, 2);
+    m_gridLayout->setColumnStretch(4, 1);
+    m_gridLayout->setColumnStretch(5, 2);
+    m_gridLayout->setColumnStretch(6, 0);
 }
 
 void SmallDiagonalLimitationWidget::removeRow(int row)

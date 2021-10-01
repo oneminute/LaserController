@@ -136,8 +136,8 @@ public:
     qreal halftoneAngles() const;
     void setHalftoneAngles(qreal angles);
 
-    int halftoneGridSize() const;
-    void setHalftoneGridSize(int gridSize);
+    //int halftoneGridSize() const;
+    //void setHalftoneGridSize(int gridSize);
 
     bool isDefault() const;
 

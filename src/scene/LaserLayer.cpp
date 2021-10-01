@@ -50,7 +50,7 @@ public:
         , row(-1)
         , useHalftone(true)
         , halftoneAngles(Config::EngravingLayer::halftoneAngles())
-        , halftoneGridSize(Config::EngravingLayer::halftoneGridSize())
+        //, halftoneGridSize(Config::EngravingLayer::halftoneGridSize())
         , isDefault(false)  
     {}
 
@@ -89,7 +89,7 @@ public:
     int row;
     bool useHalftone;
     qreal halftoneAngles;
-    int halftoneGridSize;
+    //int halftoneGridSize;
 
     LaserDocument* doc;
     LayerButton* button;
@@ -588,17 +588,17 @@ void LaserLayer::setHalftoneAngles(qreal angles)
     d->halftoneAngles = angles;
 }
 
-int LaserLayer::halftoneGridSize() const
-{
-    Q_D(const LaserLayer);
-    return d->halftoneGridSize;
-}
-
-void LaserLayer::setHalftoneGridSize(int gridSize)
-{
-    Q_D(LaserLayer);
-    d->halftoneGridSize = gridSize;
-}
+//int LaserLayer::halftoneGridSize() const
+//{
+//    Q_D(const LaserLayer);
+//    return d->halftoneGridSize;
+//}
+//
+//void LaserLayer::setHalftoneGridSize(int gridSize)
+//{
+//    Q_D(LaserLayer);
+//    d->halftoneGridSize = gridSize;
+//}
 
 bool LaserLayer::isDefault() const
 { 
@@ -645,7 +645,7 @@ QJsonObject LaserLayer::toJson(QWidget* window)
     object.insert("lpi", this->lpi());
     object.insert("dpi", this->dpi());
     object.insert("halftoneAngles", this->halftoneAngles());
-    object.insert("halftoneGridSize", this->halftoneGridSize());
+    //object.insert("halftoneGridSize", this->halftoneGridSize());
 	
 	for (int i = 0; i < primitives.size(); i++) {
 		LaserPrimitive* primitive = primitives[i];

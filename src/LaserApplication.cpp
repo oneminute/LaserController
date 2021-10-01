@@ -219,6 +219,9 @@ void LaserApplication::retranslate()
     stringMap["Low Contrast"] = translate("LaserApplication", ("Low Contrast"), nullptr);
     stringMap["Medium Contrast"] = translate("LaserApplication", ("Medium Contrast"), nullptr);
     stringMap["Off"] = translate("LaserApplication", ("Off"), nullptr);
+    stringMap["Power"] = translate("LaserApplication", ("Power"), nullptr);
+    stringMap["Size"] = translate("LaserApplication", ("Size"), nullptr);
+    stringMap["Speed"] = translate("LaserApplication", ("Speed"), nullptr);
     stringMap["User Origin"] = translate("LaserApplication", "User Origin", nullptr);
     stringMap["Vertical"] = translate("LaserApplication", "Vertical", nullptr);
 

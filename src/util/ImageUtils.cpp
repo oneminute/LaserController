@@ -518,7 +518,7 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
     int gridRows = qCeil(rotated.rows * 1.0 / gridSize);
     for (int c = 0; c < gridCols; c++)
     {
-        qLogD << "col: " << c;
+        qLogD << "col: " << c << "/" << gridCols;
         for (int r = 0; r <= gridRows; r++)
         {
             int x = c * gridSize;
@@ -1489,42 +1489,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         }
     }
 
-    /*forward = true;
-    QDataStream restoreStream(&bytes, QIODevice::ReadWrite);
-    restoreStream.setByteOrder(QDataStream::LittleEndian);
-    cv::Mat res1(mat.size(), CV_8UC1, cv::Scalar(255));
-    cv::Mat res2(mat.size(), CV_8UC1, cv::Scalar(255));
-    int row = 0;
-    while (!restoreStream.atEnd())
-    {
-        int yStart;
-        restoreStream >> yStart >> xEnd >> xStart >> fspc.code;
-        int length = fspc.count();
-        int byteCount = length % 8 == 0 ? length / 8 : length / 8 + 1;
-        for (int c = 0; c < byteCount; c++)
-        {
-            uchar byte;
-            restoreStream >> byte;
-            for (int i = 0; i < qMin(length, 8); i++)
-            {
-                uchar bit = (1 << i) & byte;
-                uchar pixel = bit ? 255 : 0;
-                if (forward)
-                {
-                    res1.ptr<uchar>(row)[c * 8 + i] = pixel;
-                }
-                else
-                {
-                    res2.ptr<uchar>(row)[fspc.count() - c * 8 - i - 1] = pixel;
-                }
-            }
-            length -= 8;
-        }
-        row++;
-        forward = !forward;
-    }
-    cv::imwrite("tmp/res1.bmp", res1);
-    cv::imwrite("tmp/res2.bmp", res2);*/
+    
     
     return bytes;
 }

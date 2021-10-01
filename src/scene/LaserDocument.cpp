@@ -926,10 +926,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         {
             laserLayers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
         }
-        if (layer.contains("halftoneGridSize"))
+        /*if (layer.contains("halftoneGridSize"))
         {
             laserLayers[index]->setHalftoneGridSize(layer.value("halftoneGridSize").toInt());
-        }
+        }*/
 
 		//primitive
 		for (int j = 0; j < array.size(); j++) {

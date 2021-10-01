@@ -221,6 +221,16 @@
       <item row="8" column="1">
        <widget class="FloatEditSlider" name="editSliderEngravingRunSpeedPower" native="true"/>
       </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="labelEngravingRowInterval">
+        <property name="text">
+         <string>Row Interval(um)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="EditSlider" name="editSliderEngravingRowInterval" native="true"/>
+      </item>
       <item row="10" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
@@ -235,36 +245,6 @@
         </property>
        </widget>
       </item>
-      <item row="13" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>LPI</string>
-        </property>
-       </widget>
-      </item>
-      <item row="13" column="1">
-       <widget class="EditSlider" name="editSliderLPI" native="true"/>
-      </item>
-      <item row="15" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>DPI</string>
-        </property>
-       </widget>
-      </item>
-      <item row="15" column="1">
-       <widget class="EditSlider" name="editSliderDPI" native="true"/>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="labelEngravingRowInterval">
-        <property name="text">
-         <string>Row Interval(um)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="EditSlider" name="editSliderEngravingRowInterval" native="true"/>
-      </item>
       <item row="11" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
@@ -272,18 +252,28 @@
         </property>
        </widget>
       </item>
-      <item row="12" column="0">
-       <widget class="QLabel" name="label_12">
-        <property name="text">
-         <string>Grid Size(px)</string>
-        </property>
-       </widget>
-      </item>
       <item row="11" column="1">
        <widget class="QDoubleSpinBox" name="doubleSpinBoxHalftoneAngles"/>
       </item>
+      <item row="12" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>LPI</string>
+        </property>
+       </widget>
+      </item>
       <item row="12" column="1">
-       <widget class="EditSlider" name="editSliderHalftoneGridSize" native="true"/>
+       <widget class="EditSlider" name="editSliderLPI" native="true"/>
+      </item>
+      <item row="14" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>DPI</string>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="1">
+       <widget class="EditSlider" name="editSliderDPI" native="true"/>
       </item>
      </layout>
     </widget>
