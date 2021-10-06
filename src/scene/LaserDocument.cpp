@@ -258,7 +258,8 @@ void LaserDocument::exportJSON(const QString& filename)
             laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
             QRectF docBoundingRect = docBoundingRectMachining();
             laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
-            laserDocumentInfo["IsRelative"] = Config::Export::enableRelativeCoordinates();
+            //laserDocumentInfo["IsRelative"] = Config::Export::enableRelativeCoordinates();
+            laserDocumentInfo["Absolute"] = !Config::Export::enableRelativeCoordinates();
             jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
             QList<LaserLayer*> layerList;
@@ -334,6 +335,7 @@ void LaserDocument::exportJSON(const QString& filename)
 
                     QJsonObject itemObj;
                     itemObj["Name"] = pathNode->nodeName();
+                    itemObj["Absolute"] = !Config::Export::enableRelativeCoordinates();
                     if (layer->type() == LLT_ENGRAVING)
                     {
                         //itemObj["Layer"] = layerId;
@@ -967,7 +969,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					rect = new LaserEllipse(bounds, this, saveTransform, layerIndex);
 				}
 				else if (className == "LaserRect") {
-					rect = new LaserRect(bounds, this, saveTransform, layerIndex);
+                    qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
+					rect = new LaserRect(bounds, cornerRadius, this, saveTransform, layerIndex);
 				}
 				else if (className == "LaserBitmap") {
 					//bounds

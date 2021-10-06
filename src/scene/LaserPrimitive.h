@@ -243,11 +243,16 @@ class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserRect(const QRectF rect, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
+    LaserRect(const QRectF rect, qreal cornerRadius, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserRect() {}
 
     QRectF rect() const;
     void setRect(const QRectF& rect);
+
+    qreal cornerRadius() const;
+    void setCornerRadius(qreal cornerRadius);
+
+    bool isRoundedRect() const;
 
     virtual void draw(QPainter* painter);
     virtual LaserPointListList updateMachiningPoints(quint32 progressCode, qreal progressQuota);

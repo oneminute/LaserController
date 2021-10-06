@@ -13,59 +13,59 @@ qreal Global::highPen2(220);
 SizeUnit Global::unit(SU_MM);
 //QWidget* Global::mainWindow(nullptr);
 
-int Global::mm2PixelsX(float mm)
+int Global::mm2PixelsX(qreal mm)
 {
 	return mm / 25.4f * dpiX;
 }
 
-qreal Global::mm2PixelsXF(float mm)
+qreal Global::mm2PixelsXF(qreal mm)
 {
 	return mm / 25.4f * dpiX;
 }
 
-int Global::mm2PixelsY(float mm)
+int Global::mm2PixelsY(qreal mm)
 {
 	return mm / 25.4f * dpiY;
 }
-qreal Global::mm2PixelsYF(float mm)
+qreal Global::mm2PixelsYF(qreal mm)
 {
 	return mm / 25.4f * dpiY;
 }
 
-float Global::pixels2mmX(int pixels)
+qreal Global::pixels2mmX(int pixels)
 {
 	return pixels * 25.4f / dpiX;
 }
 
-float Global::pixels2mmY(int pixels)
+qreal Global::pixels2mmY(int pixels)
 {
 	return pixels * 25.4f / dpiY;
 }
-float Global::pixelsF2mmX(float pixels)
+qreal Global::pixelsF2mmX(qreal pixels)
 {
 	return pixels * 25.4f / dpiX;
 }
 
-float Global::pixelsF2mmY(float pixels)
+qreal Global::pixelsF2mmY(qreal pixels)
 {
 	return pixels * 25.4f / dpiY;
 }
 
-float Global::convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation)
+qreal Global::convertUnit(SizeUnit from, SizeUnit to, qreal num, Qt::Orientation orientation)
 {
 	if (from == to)
 		return num;
 
-	float output = convertToMM(from, num, orientation);
+	qreal output = convertToMM(from, num, orientation);
 	output = convertFromMM(to, num, orientation);
 
 	return output;
 }
 
-float Global::convertToMM(SizeUnit from, float num, Qt::Orientation orientation)
+qreal Global::convertToMM(SizeUnit from, qreal num, Qt::Orientation orientation)
 {
-	float factor = 1.0f;
-	float dpi = orientation == Qt::Horizontal ? dpiX : dpiY;
+	qreal factor = 1.0f;
+	qreal dpi = orientation == Qt::Horizontal ? dpiX : dpiY;
 	switch (from)
 	{
 	case SU_PX:
@@ -90,10 +90,10 @@ float Global::convertToMM(SizeUnit from, float num, Qt::Orientation orientation)
 	return num * factor;
 }
 
-float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
+qreal Global::convertFromMM(SizeUnit to, qreal num, Qt::Orientation orientation)
 {
-	float factor = 1.0f;
-	float dpi = orientation == Qt::Horizontal ? dpiX : dpiY;
+	qreal factor = 1.0f;
+	qreal dpi = orientation == Qt::Horizontal ? dpiX : dpiY;
 	switch (to)
 	{
 	case SU_PX:
@@ -118,18 +118,18 @@ float Global::convertFromMM(SizeUnit to, float num, Qt::Orientation orientation)
 	return num * factor;
 }
 
-float Global::convertToMachining(SizeUnit from, Qt::Orientation orientation)
+qreal Global::convertToMachining(SizeUnit from, Qt::Orientation orientation)
 {
 	return convertToMM(from, Config::General::machiningUnit(), orientation);
 }
 
-QTransform Global::matrixToMM(SizeUnit from, float hScale, float vScale)
+QTransform Global::matrixToMM(SizeUnit from, qreal hScale, qreal vScale)
 {
 	return QTransform::fromScale(Global::convertToMM(from, 1) * hScale, 
 		Global::convertToMM(from, 1, Qt::Vertical) * vScale);
 }
 
-QTransform Global::matrix(SizeUnit from, SizeUnit to, float hScale, float vScale)
+QTransform Global::matrix(SizeUnit from, SizeUnit to, qreal hScale, qreal vScale)
 {
 	return QTransform::fromScale(Global::convertUnit(from, to, 1) * hScale, 
 		Global::convertUnit(from, to, 1, Qt::Vertical) * vScale);

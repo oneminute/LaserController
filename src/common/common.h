@@ -282,21 +282,21 @@ public:
 	static qreal highPen1;
 	static qreal highPen2;
 
-    static int mm2PixelsX(float mm);
-	static qreal Global::mm2PixelsXF(float mm);
-    static int mm2PixelsY(float mm);
-	static qreal mm2PixelsYF(float mm);
-    static float pixels2mmX(int pixels);
-    static float pixels2mmY(int pixels);
-	static float pixelsF2mmX(float pixels);
-	static float pixelsF2mmY(float pixels);
+    static int mm2PixelsX(qreal mm);
+	static qreal Global::mm2PixelsXF(qreal mm);
+    static int mm2PixelsY(qreal mm);
+	static qreal mm2PixelsYF(qreal mm);
+    static qreal pixels2mmX(int pixels);
+    static qreal pixels2mmY(int pixels);
+	static qreal pixelsF2mmX(qreal pixels);
+	static qreal pixelsF2mmY(qreal pixels);
 
-	static float convertUnit(SizeUnit from, SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
-	static float convertToMM(SizeUnit from, float num, Qt::Orientation orientation = Qt::Horizontal);
-	static float convertToMachining(SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
-	static float convertFromMM(SizeUnit to, float num, Qt::Orientation orientation = Qt::Horizontal);
-	static QTransform matrixToMM(SizeUnit from, float hScale = 1.f, float vScale = 1.f);
-	static QTransform matrix(SizeUnit from, SizeUnit to, float hScale = 1.0f, float vScale = 1.0f);
+	static qreal convertUnit(SizeUnit from, SizeUnit to, qreal num, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertToMM(SizeUnit from, qreal num, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertToMachining(SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertFromMM(SizeUnit to, qreal num, Qt::Orientation orientation = Qt::Horizontal);
+	static QTransform matrixToMM(SizeUnit from, qreal hScale = 1.f, qreal vScale = 1.f);
+	static QTransform matrix(SizeUnit from, SizeUnit to, qreal hScale = 1.0f, qreal vScale = 1.0f);
     static QTransform matrixToMachining(SizeUnit from = SU_PX);
 
     int pxToMachiningH(qreal x);

@@ -2028,7 +2028,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
 			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));
 		//QRectF rect(0, 0, 500, 300);
-        LaserRect* rectItem = new LaserRect(rect, m_scene->document(),QTransform(), m_curLayerIndex);
+        LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(),QTransform(), m_curLayerIndex);
 		//undo 创建完后会执行redo
 		QList<QGraphicsItem*> list;
 		list.append(rectItem);

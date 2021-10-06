@@ -829,19 +829,31 @@ class LaserRectPrivate : public LaserShapePrivate
 public:
     LaserRectPrivate(LaserRect* ptr)
         : LaserShapePrivate(ptr)
+        , cornerRadius(0)
     {}
 
     QRectF rect;
+    qreal cornerRadius;
 	//QPainterPath path;
 };
 
-LaserRect::LaserRect(const QRectF rect, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+LaserRect::LaserRect(const QRectF rect, qreal cornerRadius, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserRectPrivate(this), doc, LPT_RECT, layerIndex, saveTransform)
 {
     Q_D(LaserRect);
     d->rect = rect;
 	d->originalBoundingRect = rect;
-	d->path.addRect(rect);
+    d->cornerRadius = cornerRadius;
+
+    if (cornerRadius == 0)
+    {
+	    d->path.addRect(rect);
+    }
+    else
+    {
+        d->path.addRoundedRect(rect, cornerRadius, cornerRadius);
+    }
+
 	sceneTransformToItemTransform(saveTransform);
 	//d->path = saveTransform.map(d->path);
     d->boundingRect = d->path.boundingRect();
@@ -863,6 +875,24 @@ void LaserRect::setRect(const QRectF& rect)
 	d->path = path;
 }
 
+qreal LaserRect::cornerRadius() const
+{
+    Q_D(const LaserRect);
+    return d->cornerRadius;
+}
+
+void LaserRect::setCornerRadius(qreal cornerRadius)
+{
+    Q_D(LaserRect);
+    d->cornerRadius = cornerRadius;
+}
+
+bool LaserRect::isRoundedRect() const
+{
+    Q_D(const LaserRect);
+    return !utils::fuzzyEquals(d->cornerRadius, 0, 0.0001);
+}
+
 void LaserRect::draw(QPainter* painter)
 {
     Q_D(LaserRect);
@@ -875,44 +905,51 @@ LaserPointListList LaserRect::updateMachiningPoints(quint32 progressCode, qreal 
     d->machiningPointsList.clear();
     d->startingIndices.clear();
 	QTransform t = sceneTransform() * Global::matrixToMachining();
-    QPolygonF poly = d->path.toFillPolygon(t);
-    QPointF pt1 = poly.at(0);
-    QPointF pt2 = poly.at(1);
-    QPointF pt3 = poly.at(2);
-    QPointF pt4 = poly.at(3);
+    if (isRoundedRect())
+    {
+        machiningUtils::path2Points(t.map(d->path), d->machiningPointsList, d->startingIndices, d->machiningCenter);
+    }
+    else
+    {
+        QPolygonF poly = d->path.toFillPolygon(t);
+        QPointF pt1 = poly.at(0);
+        QPointF pt2 = poly.at(1);
+        QPointF pt3 = poly.at(2);
+        QPointF pt4 = poly.at(3);
 
-    QLineF line11(pt1, pt2);
-    QLineF line12(pt1, pt4);
-    qreal angle11 = line11.angle();
-    qreal angle12 = line12.angle();
+        QLineF line11(pt1, pt2);
+        QLineF line12(pt1, pt4);
+        qreal angle11 = line11.angle();
+        qreal angle12 = line12.angle();
 
-    QLineF line21(pt2, pt3);
-    QLineF line22(pt2, pt1);
-    qreal angle21 = line21.angle();
-    qreal angle22 = line22.angle();
+        QLineF line21(pt2, pt3);
+        QLineF line22(pt2, pt1);
+        qreal angle21 = line21.angle();
+        qreal angle22 = line22.angle();
 
-    QLineF line31(pt3, pt4);
-    QLineF line32(pt3, pt2);
-    qreal angle31 = line31.angle();
-    qreal angle32 = line32.angle();
+        QLineF line31(pt3, pt4);
+        QLineF line32(pt3, pt2);
+        qreal angle31 = line31.angle();
+        qreal angle32 = line32.angle();
 
-    QLineF line41(pt4, pt1);
-    QLineF line42(pt4, pt3);
-    qreal angle41 = line41.angle();
-    qreal angle42 = line42.angle();
+        QLineF line41(pt4, pt1);
+        QLineF line42(pt4, pt3);
+        qreal angle41 = line41.angle();
+        qreal angle42 = line42.angle();
 
-    LaserPointList points;
-    points.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
-    points.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
-    points.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
-    points.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
-    d->machiningCenter = utils::center(points).toPointF();
-    points.push_back(points.first());
-    d->startingIndices.append(0);
-    d->startingIndices.append(1);
-    d->startingIndices.append(2);
-    d->startingIndices.append(3);
-    d->machiningPointsList.append(points);
+        LaserPointList points;
+        points.push_back(LaserPoint(pt1.x(), pt1.y(), angle11, angle12));
+        points.push_back(LaserPoint(pt2.x(), pt2.y(), angle21, angle22));
+        points.push_back(LaserPoint(pt3.x(), pt3.y(), angle31, angle32));
+        points.push_back(LaserPoint(pt4.x(), pt4.y(), angle41, angle42));
+        d->machiningCenter = utils::center(points).toPointF();
+        points.push_back(points.first());
+        d->startingIndices.append(0);
+        d->startingIndices.append(1);
+        d->startingIndices.append(2);
+        d->startingIndices.append(3);
+        d->machiningPointsList.append(points);
+    }
 
     return d->machiningPointsList;
 }
@@ -958,6 +995,7 @@ QJsonObject LaserRect::toJson()
 	QTransform parentTransform = sceneTransform();
 	QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
 	object.insert("parentMatrix", parentMatrix);
+    object.insert("cornerRadius", d->cornerRadius);
 	//rect
 	QJsonArray bounds = { d->rect.x(), d->rect.y(),d->rect.width(), d->rect.height() };
 	//QJsonArray();
@@ -979,7 +1017,7 @@ QVector<QLineF> LaserRect::edges()
 LaserPrimitive * LaserRect::clone(QTransform t)
 {
 	Q_D(const LaserRect);
-	LaserRect* cloneRect = new LaserRect(this->rect(), this->document(), t, d->layerIndex);
+	LaserRect* cloneRect = new LaserRect(this->rect(), this->cornerRadius(), this->document(), t, d->layerIndex);
 	return cloneRect;
 }
 
@@ -2025,7 +2063,6 @@ QByteArray LaserBitmap::engravingImage()
 
     cv::Mat pixelScaled;
     cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight), 0.0, 0.0, cv::INTER_NEAREST);
-
 
     cv::Mat halfToneMat = src;
     if (layer()->useHalftone())

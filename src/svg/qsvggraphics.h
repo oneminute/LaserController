@@ -177,6 +177,8 @@ public:
     void draw(QPainter *p, QSvgExtraStates &states) override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
     QRectF rect() { return m_rect; }
+    int rx() { return m_rx; }
+    int ry() { return m_ry; }
 private:
     QRectF m_rect;
     int m_rx, m_ry;
