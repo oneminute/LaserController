@@ -24,6 +24,7 @@ public:
     typedef std::function<void(ConfigItem*)> ResetHook;
     typedef std::function<void(ConfigItem*)> RestoreHook;
     typedef std::function<void(QWidget* widget, const QVariant& value)> UpdateWidgetValueHook;
+    typedef std::function<void(QWidget*, ConfigItem*)> RetranslateHook;
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
@@ -138,6 +139,10 @@ public:
     UpdateWidgetValueHook updateWidgetValueHook();
     void setUpdateWidgetValueHook(UpdateWidgetValueHook fn);
     bool doUpdateWidgetValueHook(QWidget* widget, const QVariant& value);
+
+    RetranslateHook retranslateHook();
+    void setRetranslateHook(RetranslateHook fn);
+    void doRetranslateHook(QWidget* widget);
 
     const QList<QWidget*>& boundedWidgets() const;
 

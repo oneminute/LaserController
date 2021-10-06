@@ -26,7 +26,10 @@ LaserControllerWindow* LaserApplication::mainWindow(nullptr);
 PreviewWindow* LaserApplication::previewWindow(nullptr);
 LaserDevice* LaserApplication::device(nullptr);
 LaserDriver* LaserApplication::driver(nullptr);
+QString LaserApplication::appShortName("CNELaser");
 QMap<QString, QString> LaserApplication::stringMap;
+QMap<QString, QTranslator*> LaserApplication::translators;
+QTranslator* LaserApplication::currentTranslator(nullptr);
 
 LaserApplication::LaserApplication(int argc, char** argv)
     : QApplication(argc, argv)
@@ -45,7 +48,6 @@ LaserApplication::~LaserApplication()
 
 bool LaserApplication::initialize()
 {
-    QString appShortName("CNELaser");
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
     LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
@@ -67,8 +69,8 @@ bool LaserApplication::initialize()
     QLocale displayLocale = QLocale(currentDisplayLanguages.first());
     qLogD << "Display languages: " << displayLocale << ", code: " << displayLocale.language();
 
+    loadLanguages();
     checkEnvironment();
-
     checkCrash();
     initLog();
     qInstallMessageHandler(LaserApplication::handleLogOutput);
@@ -77,25 +79,6 @@ bool LaserApplication::initialize()
     Config::load();
 	Global::unit = static_cast<SizeUnit>(Config::General::unit());
 
-    QTranslator translator;
-    QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
-    qLogD << "language code: " << Config::General::language() << ", " << QLocale::Chinese;
-    qLogD << "language name: " << QLocale::languageToString(locale.language());
-    if (translator.load(locale, appShortName, QLatin1String("_"), QLatin1String("translations")))
-    {
-        qDebug() << "load translation file." << applicationName() << locale.name();
-        installTranslator(&translator);
-    }
-
-    QTranslator qtTranslator;
-    if (qtTranslator.load(locale, QLatin1String("qt"), QLatin1String("_"), QLatin1String("translations")))
-    {
-        qDebug() << "load translation file." << "qt" << locale.name();
-        installTranslator(&qtTranslator);
-    }
-
-    QLocale::setDefault(locale);
-    //Config::load();
     retranslate();
 
     QFile file("theme/Dark.qss");
@@ -152,6 +135,8 @@ void LaserApplication::destroy()
     g_deviceThread.wait();
 
     Config::destroy();
+
+    qDeleteAll(translators);
 }
 
 bool LaserApplication::checkEnvironment()
@@ -204,8 +189,65 @@ bool LaserApplication::checkEnvironment()
 //    return done;
 //}
 
+void LaserApplication::loadLanguages()
+{
+    qDeleteAll(translators);
+    translators.clear();
+    QDir translationDir("translations");
+    QStringList nameFilters;
+    nameFilters << "*.qm";
+    QFileInfoList entries = translationDir.entryInfoList(nameFilters);
+    for (QFileInfo& fileInfo : entries)
+    {
+        QTranslator* translator = new QTranslator;
+        translator->load(fileInfo.absoluteFilePath());
+        translators.insert(fileInfo.baseName(), translator);
+    }
+}
+
+void LaserApplication::changeLanguage()
+{
+    QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
+    qLogD << "language code: " << Config::General::language() << ", " << locale;
+    qLogD << "language name: " << QLocale::languageToString(locale.language());
+    qLogD << "language bcp47Name: " << locale.bcp47Name();
+    QStringList languages = locale.uiLanguages();
+    for (QString localeName : qAsConst(languages)) {
+        localeName.replace(QLatin1Char('-'), QLatin1Char('_'));
+        QString realName = appShortName + "_" + localeName;
+
+        if (translators.contains(realName))
+        {
+            qDebug() << "load translation file." << applicationName() << locale.name();
+            if (currentTranslator)
+                removeTranslator(currentTranslator);
+            currentTranslator = translators[realName];
+            installTranslator(currentTranslator);
+        }
+    }
+    
+
+    /*translator = new QTranslator;
+    if (translator->load(locale, QLatin1String("qt"), QLatin1String("_"), QLatin1String("translations")))
+    {
+        qDebug() << "load translation file." << "qt" << locale.name();
+        installTranslator(translator);
+        translators.append(translator);
+    }
+    else
+    {
+        delete translator;
+    }*/
+
+    QLocale::setDefault(locale);
+}
+
 void LaserApplication::retranslate()
 {
+    changeLanguage();
+    QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
+    QLocale::setDefault(locale);
+
     stringMap["Absolute Coords"] = translate("LaserApplication", "Absolute Coords", nullptr);
     stringMap["Config Dialog"] = translate("LaserApplication", "Config Dialog", nullptr);
     stringMap["Current Position"] = translate("LaserApplication", "Current Position", nullptr);
@@ -226,6 +268,8 @@ void LaserApplication::retranslate()
     stringMap["Vertical"] = translate("LaserApplication", "Vertical", nullptr);
 
     Config::updateTitlesAndDescriptions();
+
+    emit app->languageChanged();
 }
 
 QString LaserApplication::str(const QString& key)
@@ -314,9 +358,6 @@ void LaserApplication::handleLogOutput(QtMsgType type, const QMessageLogContext&
 
 void LaserApplication::onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
-    QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
-    QLocale::setDefault(locale);
-    //Config::load();
     retranslate();
 }
 

@@ -52,7 +52,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     for (ConfigItemGroup* group : groups)
     {
         QWidget* page = new QWidget(this);
-        page->setWindowTitle(group->name());
+        page->setWindowTitle(group->title());
         m_ui->stackedWidgetPanels->addWidget(page);
 
         QVBoxLayout* pageLayout = new QVBoxLayout(page);
@@ -66,7 +66,12 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         QTreeWidgetItem* treeItem = new QTreeWidgetItem;
         treeItem->setText(0, group->title());
-        treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
+        m_pages.insert(treeItem, page);
+        m_groups.insert(treeItem, group);
+        m_groupBoxes.insert(treeItem, groupBox);
+        //treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
+        //treeItem->setData(0, Qt::UserRole + 1, QVariant::fromValue<ConfigItemGroup*>(group));
+        //treeItem->setData(0, Qt::UserRole + 2, QVariant::fromValue<QGroupBox*>(groupBox));
         m_ui->treeWidgetCatalogue->addTopLevelItem(treeItem);
 
         for (ConfigItem* item : group->items())
@@ -84,30 +89,30 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     // 生成系统寄存器面板
     {
-        QTabWidget* page = new QTabWidget(this);
-        m_systemRegisterPage = page;
-        page->setWindowTitle(Config::SystemRegister::group->name());
-        m_ui->stackedWidgetPanels->addWidget(page);
+        m_systemPage = new QTabWidget(this);
+        m_systemRegisterPage = m_systemPage;
+        m_systemPage->setWindowTitle(Config::SystemRegister::group->name());
+        m_ui->stackedWidgetPanels->addWidget(m_systemPage);
 
-        QWidget* generalPanel = new QWidget(page);
+        QWidget* generalPanel = new QWidget(m_systemPage);
         QFormLayout* generalLayout = new QFormLayout(generalPanel);
         generalPanel->setLayout(generalLayout);
-        page->addTab(generalPanel, tr("General"));
+        m_systemPage->addTab(generalPanel, tr("General"));
 
-        QWidget* xPanel = new QWidget(page);
+        QWidget* xPanel = new QWidget(m_systemPage);
         QFormLayout* xLayout = new QFormLayout(xPanel);
         xPanel->setLayout(xLayout);
-        page->addTab(xPanel, tr("X"));
+        m_systemPage->addTab(xPanel, tr("X"));
 
-        QWidget* yPanel = new QWidget(page);
+        QWidget* yPanel = new QWidget(m_systemPage);
         QFormLayout* yLayout = new QFormLayout(yPanel);
         yPanel->setLayout(yLayout);
-        page->addTab(yPanel, tr("Y"));
+        m_systemPage->addTab(yPanel, tr("Y"));
 
-        QWidget* zPanel = new QWidget(page);
+        QWidget* zPanel = new QWidget(m_systemPage);
         QFormLayout* zLayout = new QFormLayout(zPanel);
         zPanel->setLayout(zLayout);
-        page->addTab(zPanel, tr("Z"));
+        m_systemPage->addTab(zPanel, tr("Z"));
 
         for (ConfigItem* item : Config::SystemRegister::group->items())
         {
@@ -126,7 +131,10 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         QTreeWidgetItem* treeItem = new QTreeWidgetItem;
         treeItem->setText(0, Config::SystemRegister::group->title());
-        treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
+        //treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
+        m_pages.insert(treeItem, m_systemPage);
+        m_groups.insert(treeItem, Config::SystemRegister::group);
+        m_groupBoxes.insert(treeItem, nullptr);
         m_ui->treeWidgetCatalogue->addTopLevelItem(treeItem);
     }
 
@@ -136,6 +144,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     connect(m_ui->treeWidgetCatalogue, &QTreeWidget::currentItemChanged, this, &ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged);
     connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &ConfigDialog::onButtonClicked);
     connect(LaserApplication::device, &LaserDevice::manufacturePasswordVerified, this, &ConfigDialog::onManufacturePasswordVerified);
+    connect(LaserApplication::app, &LaserApplication::languageChanged, this, &ConfigDialog::retranslate);
 
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
@@ -162,7 +171,7 @@ bool ConfigDialog::isModified()
 
 void ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
-    setCurrentPanel(current->data(0, Qt::UserRole).value<QWidget*>());
+    setCurrentPanel(m_pages[current]);
 }
 
 void ConfigDialog::onButtonClicked(QAbstractButton * button)
@@ -232,8 +241,6 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
 
     widget->setParent(parent);
     QLabel* labelName = new QLabel(parent);
-    labelName->setText(item->title());
-    labelName->setToolTip(item->description());
 
     layout->addRow(labelName, widget);
 
@@ -261,6 +268,36 @@ void ConfigDialog::onManufacturePasswordVerified(bool pass)
     {
         QMessageBox::warning(this, tr("Invalid Manufacture Password"), tr("Invalid manufacture password!"));
     }
+}
+
+void ConfigDialog::retranslate()
+{
+    for (InputWidgetWrapper* wrapper : m_wrappers)
+    {
+        wrapper->retranslate();
+    }
+    m_ui->retranslateUi(this);
+    for (int i = 0; i < m_ui->treeWidgetCatalogue->topLevelItemCount(); i++)
+    {
+        QTreeWidgetItem* item = m_ui->treeWidgetCatalogue->topLevelItem(i);
+        QWidget* page = m_pages[item];
+        ConfigItemGroup* group = m_groups[item];
+        QGroupBox* groupBox = m_groupBoxes[item];
+        item->setText(0, group->title());
+        page->setWindowTitle(group->title());
+        if (groupBox)
+            groupBox->setTitle(group->title());
+    }
+
+    m_systemPage->setTabText(0, tr("General"));
+    m_systemPage->setTabText(1, tr("X"));
+    m_systemPage->setTabText(2, tr("Y"));
+    m_systemPage->setTabText(3, tr("Z"));
+    /*for (int i = 0; i < m_ui->stackedWidgetPanels->count(); i++)
+    {
+        QWidget* widget = m_ui->stackedWidgetPanels->widget(i);
+        widget->setWindowTitle()
+    }*/
 }
 
 void ConfigDialog::onValueChanged(const QVariant& value)

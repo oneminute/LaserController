@@ -10,6 +10,8 @@
 
 class QTreeWidgetItem;
 class QAbstractButton;
+class QGroupBox;
+class QTabWidget;
 
 namespace Ui
 {
@@ -41,12 +43,18 @@ protected slots:
     void onValueChanged(const QVariant& value);
     void onManufacturePasswordVerified(bool pass);
 
+    void retranslate();
+
 private:
     QScopedPointer<Ui::ConfigDialog> m_ui;
     QMap<QString, QWidget*> m_panels;
     QList<InputWidgetWrapper*> m_wrappers;
     QString m_windowTitle;
     QWidget* m_systemRegisterPage;
+    QMap<QTreeWidgetItem*, QWidget*> m_pages;
+    QMap<QTreeWidgetItem*, ConfigItemGroup*> m_groups;
+    QMap<QTreeWidgetItem*, QGroupBox*> m_groupBoxes;
+    QTabWidget* m_systemPage;
 };
 
 #endif // CONFIG_DIALOG

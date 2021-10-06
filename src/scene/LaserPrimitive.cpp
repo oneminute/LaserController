@@ -2021,10 +2021,11 @@ QByteArray LaserBitmap::engravingImage()
     int pixelWidth = qRound(boundingWidth * MM_TO_INCH * dpi);
     int pixelHeight = qRound(boundingHeight * MM_TO_INCH * dpi);
 
-    cv::Mat pixelScaled;
-    cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight));
-
     int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
+
+    cv::Mat pixelScaled;
+    cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight), 0.0, 0.0, cv::INTER_NEAREST);
+
 
     cv::Mat halfToneMat = src;
     if (layer()->useHalftone())

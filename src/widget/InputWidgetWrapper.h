@@ -34,6 +34,8 @@ public:
     bool isModified();
     QVariant value() const;
 
+    void retranslate();
+
     static QWidget* createWidget(ConfigItem* item, Qt::Orientation orientation);
 
 public slots:

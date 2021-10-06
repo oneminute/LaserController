@@ -346,6 +346,8 @@ cv::Mat imageUtils::halftone4(cv::Mat src, float degrees, int gridSize)
     if (qAbs(v1.x()) < qAbs(v1.y()))
         qSwap(v1, v2);
 
+    src = 255 - src;
+
     QRectF grid(QPointF(0, 0), QPointF(gridSize, gridSize));
     grid = t1.mapRect(grid);
 
@@ -398,12 +400,24 @@ cv::Mat imageUtils::halftone4(cv::Mat src, float degrees, int gridSize)
             cv::Mat srcRoi = src(rectSrc);
             cv::Mat dstRoi = dst(rectDst);
 
-            qLogD << r << c << "src:" << srcRoi.rows << srcRoi.cols << ", dst:" << dstRoi.rows << dstRoi.cols;
-            generateGroupingDitcher(srcRoi, dstRoi);
+            //qLogD << r << c << "src:" << srcRoi.rows << srcRoi.cols << ", dst:" << dstRoi.rows << dstRoi.cols;
+            //generateGroupingDitcher(srcRoi, dstRoi);
+
+            //int sum = cv::sum(srcRoi)[0];
+            QPoint center;
+            int sum = sumMat(srcRoi, center);
+            int initAngle = QRandomGenerator::global()->bounded(4) * 90;
+            int rotationAngle = 90 + 45 * QRandomGenerator::global()->bounded(2);
+            int stepAngle = -45;
+            if (QRandomGenerator::global()->bounded(2))
+            {
+                rotationAngle = -rotationAngle;
+                stepAngle = -stepAngle;
+            }
+            generatePattern(dstRoi, sum, center);
         }
     }
-    dst = 255 - dst;
-    cv::imwrite("tmp/dst.bmp", dst);
+    cv::imwrite("tmp/dst.bmp", 255 - dst);
 
     return dst;
 }
@@ -450,7 +464,19 @@ cv::Mat imageUtils::halftone5(cv::Mat src, float degrees, int gridSize)
                 cv::Mat srcRoi = src(rect);
                 cv::Mat dstRoi = dst(rect);
 
-                generateGroupingDitcher(srcRoi, dstRoi);
+                //generateGroupingDitcher(srcRoi, dstRoi);
+                //int sum = cv::sum(srcRoi)[0];
+                QPoint center;
+                int sum = sumMat(srcRoi, center);
+                int initAngle = QRandomGenerator::global()->bounded(4) * 90;
+                int rotationAngle = 90 + 45 * QRandomGenerator::global()->bounded(2);
+                int stepAngle = -45;
+                if (QRandomGenerator::global()->bounded(2))
+                {
+                    rotationAngle = -rotationAngle;
+                    stepAngle = -stepAngle;
+                }
+                generatePattern(dstRoi, sum, center);
             }
         }
     }
@@ -486,19 +512,31 @@ cv::Mat imageUtils::halftone5(cv::Mat src, float degrees, int gridSize)
                 cv::Mat srcRoi = src(rect);
                 cv::Mat dstRoi = dst(rect);
 
-                generateGroupingDitcher(srcRoi, dstRoi);
+                //generateGroupingDitcher(srcRoi, dstRoi);
+                //int sum = cv::sum(srcRoi)[0];
+                QPoint center;
+                int sum = sumMat(srcRoi, center);
+                int initAngle = QRandomGenerator::global()->bounded(4) * 90;
+                int rotationAngle = 90 + 45 * QRandomGenerator::global()->bounded(2);
+                int stepAngle = -45;
+                if (QRandomGenerator::global()->bounded(2))
+                {
+                    rotationAngle = -rotationAngle;
+                    stepAngle = -stepAngle;
+                }
+                generatePattern(dstRoi, sum, center);
             }
         }
     }
-    dst = 255 - dst;
     cv::imwrite("tmp/dst.bmp", dst);
+    dst = 255 - dst;
 
     return dst;
 }
 
 cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
 {
-    //qreal cos = qCos(qDegreesToRadians(degrees));
+    src = 255 - src;
     cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
     cv::Mat rot = cv::getRotationMatrix2D(center, degrees, 1.);
     cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), src.size(), degrees).boundingRect2f();
@@ -508,14 +546,23 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
     rot.at<double>(0, 2) += rotatedWidth / 2.0 - src.cols / 2.0;
     rot.at<double>(1, 2) += rotatedHeight / 2.0 - src.rows / 2.0;
 
-    cv::imwrite("tmp/src.bmp", src);
+    cv::imwrite("tmp/h6_src.bmp", src);
     cv::Mat rotated;
-    cv::warpAffine(src, rotated, rot, cv::Size(rotatedWidth, rotatedHeight), cv::INTER_AREA, 0, cv::Scalar(255));
-    cv::imwrite("tmp/halfton6_rot.bmp", rotated);
+    cv::warpAffine(src, rotated, rot, cv::Size(rotatedWidth, rotatedHeight), cv::INTER_NEAREST, 0, cv::Scalar(255));
+    cv::imwrite("tmp/h6_rotated.bmp", rotated);
+
+    //cv::Mat bilateraled;
+    //cv::bilateralFilter(rotated, bilateraled, gridSize, Config::Export::a(), Config::Export::b(), cv::BORDER_ISOLATED);
+    //cv::imwrite("tmp/h6_bilateral.bmp", bilateraled);
+    //rotated = bilateraled;
+
+    cv::Mat canvas;
+    cv::cvtColor(rotated, canvas, cv::COLOR_GRAY2BGR);
+    cv::imwrite("tmp/h6_canvas1.bmp", canvas);
 
     cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
-    int gridCols = qCeil(rotated.cols * 1.0 / gridSize);
-    int gridRows = qCeil(rotated.rows * 1.0 / gridSize);
+    int gridCols = qCeil(dst.cols * 1.0 / gridSize);
+    int gridRows = qCeil(dst.rows * 1.0 / gridSize);
     for (int c = 0; c < gridCols; c++)
     {
         qLogD << "col: " << c << "/" << gridCols;
@@ -546,30 +593,59 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
             cv::Rect rectSrc(qRectSrc.x(), qRectSrc.y(), qRectSrc.width(), qRectSrc.height());
             cv::Rect rectDst(qRectDst.x(), qRectDst.y(), qRectDst.width(), qRectDst.height());
 
+            cv::rectangle(canvas, rectSrc, cv::Scalar(255, 0, 0));
+
             cv::Mat srcRoi = rotated(rectSrc);
             cv::Mat dstRoi = dst(rectDst);
 
             //qLogD << r << ", " << c << " src:" << srcRoi.rows << ", " << srcRoi.cols << ", dst:" << dstRoi.rows << ", " << dstRoi.cols;
-            generateGroupingDitcher(srcRoi, dstRoi);
+            //generateGroupingDitcher(srcRoi, dstRoi);
+            qreal full = srcRoi.cols * srcRoi.rows * 255.0;
+            QPoint center;
+            int sum = sumMat(srcRoi, center);
+
+            QPoint drawCenter = center + QPoint(x, y);
+            //cv::circle(canvas, cv::Point(drawCenter.x(), drawCenter.y()), 1, cv::Scalar(0, 0, 255));
+            canvas.ptr<cv::Vec3b>(drawCenter.y())[drawCenter.x()] = cv::Vec3b(0, 0, 255);
+            //qreal def = sum * 1.0 / full * 2;
+            //qreal val = 1 / (1 + qPow(M_E, -3 * (def - 1)));
+            //qreal def = sum * 1.0 / full;
+            //qreal val = 0.5 * qCos(M_PI * def - M_PI) + 0.5;
+            //qreal def = sum * 1.0 / full;
+            //qreal val = 1.4 * qAsin(2 * def - 1) / M_PI + 0.5;
+            //sum = qRound(val * full);
+
+            int initAngle = QRandomGenerator::global()->bounded(4) * 90;
+            int rotationAngle = 90/* + 45 * QRandomGenerator::global()->bounded(2)*/;
+            int stepAngle = -45;
+            if (QRandomGenerator::global()->bounded(2))
+            {
+                rotationAngle = -rotationAngle;
+                stepAngle = -stepAngle;
+            }
+            sum = qBound(0, sum, static_cast<int>(full));
+            generatePattern(dstRoi, sum, center, initAngle, rotationAngle, stepAngle);
         }
     }
+    cv::imwrite("tmp/h6_canvas2.bmp", canvas);
 
     std::vector<int>param; 
-    param.push_back(cv::IMWRITE_PNG_BILEVEL);
-    param.push_back(1);
-    param.push_back(cv::IMWRITE_PNG_COMPRESSION);
-    param.push_back(0);
-    cv::imwrite("tmp/dst.bmp", dst, param);
+    //param.push_back(cv::IMWRITE_PNG_BILEVEL);
+    //param.push_back(1);
+    //param.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    //param.push_back(0);
+    cv::imwrite("tmp/h6_dst.bmp", dst);
 
-    cv::Mat outMat(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
+    cv::Mat outMat(dst.rows, dst.cols, CV_8UC1, cv::Scalar(0));
     center = cv::Point2f((dst.cols - 1) / 2, (dst.rows - 1) / 2);
     rot = cv::getRotationMatrix2D(center, -degrees, 1.);
     bbox = cv::RotatedRect(cv::Point2f(), dst.size(), 0).boundingRect2f();
-    cv::warpAffine(dst, rotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
-    //cv::imwrite("tmp/halfton6_rot_inv.png", dst, param);
+    cv::Mat antiRotated;
+    cv::warpAffine(dst, antiRotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
+    cv::imwrite("tmp/h6_antiRotated.bmp", dst);
 
-	int roix = (rotated.cols - src.cols - 1) / 2;
-	int roiy = (rotated.rows - src.rows - 1) / 2;
+	int roix = (antiRotated.cols - src.cols - 1) / 2;
+	int roiy = (antiRotated.rows - src.rows - 1) / 2;
 	int roiCols = src.cols;
 	int roiRows = src.rows;
 	if (roix < 0)
@@ -578,11 +654,12 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
 
 	}
     cv::Rect roi(roix, roiy, roiCols, roiRows);
-    outMat = 255 - rotated(roi);
-    cv::imwrite("tmp/outMat.png", outMat, param);
+    outMat = antiRotated(roi);
+    //outMat = 255 - outMat;
+    cv::imwrite("tmp/h6_outMat.bmp", 255 - outMat);
 
 #ifdef _DEBUG
-    cv::imshow("halftone6_processed", outMat);
+    //cv::imshow("halftone6_processed", outMat);
 #endif
 
     return outMat;
@@ -593,6 +670,57 @@ inline bool operator<(const QPoint& p1, const QPoint& p2)
     if (p1.x() != p2.x())
         return p1.x() < p2.x();
     return p1.y() < p2.y();
+}
+
+int imageUtils::sumMat(const cv::Mat& mat, QPoint& point)
+{
+    int sum = 0;
+    int sum2 = 0;
+    QPointF center = QPointF(0, 0);
+    int meanX = mat.cols / 2;
+    int meanY = mat.rows / 2;
+    qreal sigma = Config::Export::a();
+    qreal factor = Config::Export::b();
+    qreal fullLength = mat.rows / 2 + mat.rows / 2;
+    qreal fullLength2 = fullLength * fullLength;
+    qreal gaussianReciprocal = sigma * qSqrt(2 * M_PI);
+    qreal gaussianFactor = 1.0 / gaussianReciprocal;
+    qreal sigma2 = sigma * sigma;
+    //qreal maxLength = qMax(mat.cols, mat.rows);
+    for (int i = 0; i < mat.cols; i++)
+    {
+        for (int j = 0; j < mat.rows; j++)
+        {
+            int grayScale = mat.ptr<quint8>(j)[i];
+            sum += grayScale;
+            qreal length = j - meanX + i - meanY;
+            qreal gaussian = factor * qExp(-length * length / (2 * fullLength2));
+            sum2 += qRound(grayScale * gaussian);
+        }
+    }
+    for (int i = 0; i < mat.cols; i++)
+    {
+        for (int j = 0; j < mat.rows; j++)
+        {
+            int grayScale = mat.ptr<quint8>(j)[i];
+            if (grayScale)
+            {
+                center += (static_cast<qreal>(grayScale) / sum) * QPointF(i - meanX, j - meanY);
+            }
+        }
+    }
+    point.setX(qRound(center.x() + meanX));
+    point.setY(qRound(center.y() + meanY));
+    /*if (sum == 0)
+    {
+        point.setX(mat.cols % 2 == 0 ? mat.cols / 2 - 1 : mat.cols / 2);
+        point.setY(mat.rows % 2 == 0 ? mat.rows / 2 - 1 : mat.rows / 2);
+    }*/
+    point.setX(qBound(0, point.x(), mat.cols - 1));
+    point.setY(qBound(0, point.y(), mat.rows - 1));
+    //qLogD << sum << ", " << point;
+    sum2 = qBound(0, sum2, mat.cols * mat.rows * 255);
+    return sum2;
 }
 
 void imageUtils::generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi)
@@ -859,6 +987,73 @@ void imageUtils::generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi)
                 count--;
             }
             total2 += i.value();
+        }
+    }
+}
+
+void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int initAngle, int rotationAngle, int stepAngle)
+{
+    /*int x = dstRoi.cols / 2;
+    int y = dstRoi.rows / 2;
+    if (dstRoi.cols > 2)
+        x -= QRandomGenerator::global()->bounded(2);
+    if (dstRoi.rows > 2)
+        y -= QRandomGenerator::global()->bounded(2);*/
+
+    dstRoi.setTo(cv::Scalar(0));
+
+    QTransform initTrans;
+    initTrans.rotate(initAngle);
+
+    QPoint pt = center;
+    QPoint vec(1, 0);
+    vec = initTrans.map(vec);
+
+    int count = 0;
+    while (sum > 0)
+    {
+        // 填充颜色并递减总颜色值
+        int grayScale = sum >= 255 ? 255 : 255 - sum;
+        //int grayScale = sum >= 255 ? 0 : sum;
+        dstRoi.ptr<quint8>(pt.y())[pt.x()] = grayScale;
+        //qLogD << ++count << ": " << pt;
+        sum -= 255;
+
+        if (sum <= 0)
+            break;
+
+        bool isAvailable = false;
+        while (!isAvailable)
+        {
+            int angle = rotationAngle;
+            // 当旋转角度还没有变号时循环
+            int factor = angle * rotationAngle;
+            while (/*!utils::fuzzyEquals(angle, 0, 0.1) && */factor >= 0)
+            {
+                QTransform t;
+                t.rotate(angle);
+                QPoint candidateVec = t.map(vec);
+                QPoint candidate = pt + candidateVec;
+                if (candidate.x() < 0 || candidate.y() < 0 || candidate.x() >= dstRoi.cols || candidate.y() >= dstRoi.rows)
+                {
+                    // 如果超出范围
+                    pt = candidate;
+                    vec = candidateVec;
+                    break;
+                }
+                else if (!dstRoi.ptr<quint8>(candidate.y())[candidate.x()])
+                {
+                    // 如果该位置有效
+                    isAvailable = true;
+                    pt = candidate;
+                    vec = candidateVec;
+                    break;
+                }
+
+                // 该位置已经被占据
+                angle += stepAngle;
+                factor = angle * rotationAngle;
+            }
         }
     }
 }
@@ -1455,7 +1650,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
-            quint8 bin = pixel == 255 ? 0 : 1;
+            quint8 bin = pixel >= 255 ? 0 : 1;
             //rowString.append(QString::number(bin));
             binCheck |= bin;
             byte = byte << 1;
@@ -1488,8 +1683,6 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
             forward = !forward;
         }
     }
-
-    
     
     return bytes;
 }

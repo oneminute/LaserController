@@ -184,8 +184,8 @@ void Config::loadGeneralItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(ltr("English"), static_cast<int>(QLocale::English));
-            comboBox->addItem(ltr("Chinese"), static_cast<int>(QLocale::Chinese));
+            comboBox->addItem(tr("English"), static_cast<int>(QLocale::English));
+            comboBox->addItem(tr("Chinese"), static_cast<int>(QLocale::Chinese));
 
             QTimer::singleShot(0, 
                 [=]() {
@@ -195,6 +195,17 @@ void Config::loadGeneralItems()
             );
         }
     );
+    language->setRetranslateHook(
+        [](QWidget* widget, ConfigItem* item)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+            comboBox->setItemText(0, tr("English"));
+            comboBox->setItemText(1, tr("Chinese"));
+        }
+    );
+    language->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* unit = group->addConfigItem(
         "unit"
@@ -224,6 +235,7 @@ void Config::loadGeneralItems()
     machiningUnit->setInputWidgetType(IWT_DoubleSpinBox);
     machiningUnit->setInputWidgetProperty("minimum", 1);
     machiningUnit->setInputWidgetProperty("maximum", 1000);
+    machiningUnit->setVisible(false);
 }
 
 void Config::loadLayersItems()
@@ -782,6 +794,33 @@ void Config::loadExportItems()
     );
     curveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
     curveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* a = group->addConfigItem(
+        "a",
+        20,
+        DT_REAL
+    );
+    a->setInputWidgetProperty("minimum", 0);
+    a->setInputWidgetProperty("maximum", 1000);
+    a->setInputWidgetProperty("decimals", 3);
+
+    ConfigItem* b = group->addConfigItem(
+        "b",
+        20,
+        DT_REAL
+    );
+    b->setInputWidgetProperty("minimum", 0);
+    b->setInputWidgetProperty("maximum", 1000);
+    b->setInputWidgetProperty("decimals", 3);
+
+    ConfigItem* c = group->addConfigItem(
+        "c",
+        20,
+        DT_REAL
+    );
+    c->setInputWidgetProperty("minimum", 0);
+    c->setInputWidgetProperty("maximum", 1000);
+    c->setInputWidgetProperty("decimals", 3);
 }
 
 void Config::loadDeviceItems()
@@ -2609,7 +2648,6 @@ QList<ConfigItemGroup*> Config::getGroups()
     groupName::itemName##Item()->setTitle(QCoreApplication::translate("Config", title, nullptr)); \
     groupName::itemName##Item()->setDescription(QCoreApplication::translate("Config", desc, nullptr));
     
-
 void Config::updateTitlesAndDescriptions()
 {
     General::languageItem()->setTitleAndDesc(
@@ -2839,6 +2877,18 @@ void Config::updateTitlesAndDescriptions()
     Export::curveFlatteningThresholdItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr), 
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr));
+
+    Export::aItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "a", nullptr), 
+        QCoreApplication::translate("Config", "a", nullptr));
+
+    Export::bItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "b", nullptr), 
+        QCoreApplication::translate("Config", "b", nullptr));
+
+    Export::cItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "c", nullptr), 
+        QCoreApplication::translate("Config", "c", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 

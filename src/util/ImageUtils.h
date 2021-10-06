@@ -18,10 +18,12 @@ namespace imageUtils
     cv::Mat halftone5(cv::Mat src,float degrees = 45.0, int gridSize = 12);
     cv::Mat halftone6(cv::Mat src,float degrees = 45.0, int gridSize = 12);
 
+    int sumMat(const cv::Mat& mat, QPoint& point);
     void generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi);
+    void generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int initAngle = 90, int rotationAngle = -90, int stepAngle = 45);
 
     // Floyd-Steinberg
-    cv::Mat floydSteinberg(cv::Mat src, float mmWidth, float mmHeight, float lpi = 100, float dpi = 600);
+    cv::Mat floydSteinberg(cv::Mat src, float mmWidth, float mmHeight, float lpi = 50, float dpi = 600);
 
     cv::Mat generateSpiralPattern(int gridSize, int& grades, float degrees = 45);
     cv::Mat generateSpiralDitchMatRec(int circleNum);

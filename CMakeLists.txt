@@ -125,12 +125,13 @@ set(OTHER_FILES
     src/res/icons.qrc
     src/res/laser.rc
     .gitignore
+    ${TRANSLATIONS}
 )
 
 source_group("ui" FILES ${UIS})
 source_group("others" FILES ${OTHER_FILES})
 source_group("docs" FILES ${DOCS})
-source_group("translations" FILES ${TRANSLATIONS})
+#source_group("translations" FILES ${TRANSLATIONS})
 
 set(HEADER_FILES
     ${HEADER_FILES}
@@ -262,7 +263,7 @@ set(QM_FILES
 #qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${TS_FILES})
 
 add_custom_target (GenerateTranslations 
-    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts
+    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en.ts
 )
 
 include(cmake_install_Debug.txt)

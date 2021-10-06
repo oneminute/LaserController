@@ -32,7 +32,7 @@ namespace utils
 
     bool fuzzyEquals(const QPointF& pt1, const QPointF& pt2);
 
-    bool fuzzyEquals(qreal a, qreal b);
+    bool fuzzyEquals(qreal a, qreal b, qreal limit = 0.001);
 
     bool fuzzyCompare(const QPointF& p1, const QPointF& p2);
 

@@ -123,9 +123,9 @@ bool utils::fuzzyEquals(const QPointF& pt1, const QPointF& pt2)
     return qFuzzyIsNull(length);
 }
 
-bool utils::fuzzyEquals(qreal a, qreal b)
+bool utils::fuzzyEquals(qreal a, qreal b, qreal limit)
 {
-    return qAbs(a - b) < 0.001;
+    return qAbs(a - b) < limit;
 }
 
 bool utils::fuzzyCompare(const QPointF& p1, const QPointF& p2)

@@ -148,6 +148,7 @@ void InputWidgetWrapper::setNameLabel(QLabel* label)
 {
     Q_D(InputWidgetWrapper);
     d->labelName = label;
+    retranslate();
 }
 
 void InputWidgetWrapper::setDescriptionLabel(QLabel* label)
@@ -296,6 +297,13 @@ QVariant InputWidgetWrapper::value() const
 {
     Q_D(const InputWidgetWrapper);
     return d->configItem->value();
+}
+
+void InputWidgetWrapper::retranslate()
+{
+    Q_D(InputWidgetWrapper);
+    d->labelName->setText(d->configItem->title());
+    d->labelName->setToolTip(d->configItem->description());
 }
 
 QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orientation)

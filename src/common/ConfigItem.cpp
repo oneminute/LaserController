@@ -30,6 +30,7 @@ public:
         , resetHook(nullptr)
         , restoreHook(nullptr)
         , updateWidgetValueHook(nullptr)
+        , retranslateHook(nullptr)
     {
         
     }
@@ -152,6 +153,7 @@ public:
     ConfigItem::ResetHook resetHook;
     ConfigItem::RestoreHook restoreHook;
     ConfigItem::UpdateWidgetValueHook updateWidgetValueHook;
+    ConfigItem::RetranslateHook retranslateHook;
 };
 
 ConfigItem::ConfigItem(
@@ -760,6 +762,27 @@ bool ConfigItem::doUpdateWidgetValueHook(QWidget* widget, const QVariant& value)
         return true;
     }
     return false;
+}
+
+ConfigItem::RetranslateHook ConfigItem::retranslateHook()
+{
+    Q_D(ConfigItem);
+    return d->retranslateHook;
+}
+
+void ConfigItem::setRetranslateHook(RetranslateHook fn)
+{
+    Q_D(ConfigItem);
+    d->retranslateHook = fn;
+}
+
+void ConfigItem::doRetranslateHook(QWidget* widget)
+{
+    Q_D(ConfigItem);
+    if (d->retranslateHook)
+    {
+        d->retranslateHook(widget, this);
+    }
 }
 
 const QList<QWidget*>& ConfigItem::boundedWidgets() const

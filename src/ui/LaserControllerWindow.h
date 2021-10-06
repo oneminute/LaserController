@@ -72,6 +72,8 @@ public slots:
     void onFontSpaceXEnterOrLostFocus();
     void onFontSpaceYEnterOrLostFocus();
     void onLaserPrimitiveGroupItemChanged();
+
+    void retranslate();
 	
 protected:
     void createCentralDockPanel();
@@ -251,8 +253,6 @@ protected slots:
     // config items
     void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
     //void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
-
-    
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");

@@ -24,6 +24,8 @@ public:
 
     //bool notify(QObject* receiver, QEvent* event) override;
 
+    static void loadLanguages();
+    static void changeLanguage();
     static void retranslate();
     static QString str(const QString& key);
 
@@ -37,17 +39,24 @@ protected slots:
     void onEnterDeviceUnconnectedState();
     void onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy);
 
+signals:
+    void languageChanged();
+
 public:
     static LaserApplication* app;
     static LaserControllerWindow* mainWindow;
     static PreviewWindow* previewWindow;
     static LaserDevice* device;
     static LaserDriver* driver;
+    static QString appShortName;
+    static QTranslator* currentTranslator;
 
     static void closeProgressWindow();
     static void showProgressWindow();
 
     static QMap<QString, QString> stringMap;
+
+    static QMap<QString, QTranslator*> translators;
 
 private:
     QThread g_deviceThread;

@@ -744,6 +744,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
 
     connect(LaserApplication::previewWindow, &PreviewWindow::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
+    connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
     connect(m_statusBarProgress, &ProgressBar::clicked, LaserApplication::previewWindow, &QMainWindow::show);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
@@ -3287,7 +3288,11 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
         emit selectedChange();
     }
     
-    
+}
+
+void LaserControllerWindow::retranslate()
+{
+    m_ui->retranslateUi(this);
 }
 
 void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
