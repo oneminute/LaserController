@@ -285,9 +285,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_posYUnit = new QLabel("mm");
 	m_lockOrUnlock = new QToolButton();
 	m_lockOrUnlock->setDefaultAction(m_ui->actionLock);
-    m_lockEqualRatio = false;
-	m_lockOrUnlock->setChecked(false);
-    m_ui->actionLock->setIcon(QIcon(":/ui/icons/images/unlock.png"));
+    m_lockEqualRatio = true;
+    m_ui->actionLock->setChecked(true);
+    m_ui->actionLock->setIcon(QIcon(":/ui/icons/images/lock.png"));
     connect(m_ui->actionLock, &QAction::triggered, this, [=] {
         if (m_lockOrUnlock->isChecked()) {
             m_lockEqualRatio = true;
@@ -3071,7 +3071,7 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
-	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png)");
+	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png*.svg*.ico)");
 	//qDebug() <<"name: "<< name;
 	if (name == "") {
 		return;
