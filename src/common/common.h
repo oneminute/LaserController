@@ -102,9 +102,9 @@ enum LaserPrimitiveType
 
 enum LaserLayerType
 {
-    LLT_ENGRAVING,
-    LLT_CUTTING,
-    LLT_FILLING
+    LLT_ENGRAVING = 0,
+    LLT_CUTTING = 1,
+    LLT_FILLING = 2
 };
 
 enum RelayAction

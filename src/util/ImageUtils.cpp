@@ -655,8 +655,8 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
 	}
     cv::Rect roi(roix, roiy, roiCols, roiRows);
     outMat = antiRotated(roi);
-    //outMat = 255 - outMat;
-    cv::imwrite("tmp/h6_outMat.bmp", 255 - outMat);
+    outMat = 255 - outMat;
+    cv::imwrite("tmp/h6_outMat.bmp", outMat);
 
 #ifdef _DEBUG
     //cv::imshow("halftone6_processed", outMat);
@@ -711,11 +711,7 @@ int imageUtils::sumMat(const cv::Mat& mat, QPoint& point)
     }
     point.setX(qRound(center.x() + meanX));
     point.setY(qRound(center.y() + meanY));
-    /*if (sum == 0)
-    {
-        point.setX(mat.cols % 2 == 0 ? mat.cols / 2 - 1 : mat.cols / 2);
-        point.setY(mat.rows % 2 == 0 ? mat.rows / 2 - 1 : mat.rows / 2);
-    }*/
+
     point.setX(qBound(0, point.x(), mat.cols - 1));
     point.setY(qBound(0, point.y(), mat.rows - 1));
     //qLogD << sum << ", " << point;

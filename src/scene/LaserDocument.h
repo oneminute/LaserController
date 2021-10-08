@@ -70,6 +70,8 @@ public:
     QRectF docBoundingRect() const;
     QRectF docBoundingRectMM() const;
     QRectF docBoundingRectMachining() const;
+    QRectF imagesBoundingRect() const;
+    QRectF imagesBoundingRectMachining() const;
 
     /// <summary>
     /// 返回相对于当前确定的原点的坐标。

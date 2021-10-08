@@ -293,7 +293,7 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
     QPointF pt = points.first().toPointF();
     QPointF diff = pt - lastPoint;
     lastPoint = pt;
-    if (Config::Export::enableRelativeCoordinates())
+    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
         buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
     else
         buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
@@ -302,7 +302,7 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
         LaserPoint lPt = points.at(i);
         QPointF pt = lPt.toPointF();
         QPointF diff = pt - lastPoint;
-        if (Config::Export::enableRelativeCoordinates())
+        if (Config::Device::startFrom() != SFT_AbsoluteCoords)
             buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
         else
             buffer.append(QString("PD%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
@@ -349,7 +349,7 @@ QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPoin
 
             QPointF diff1 = pt1 - lastPoint;
             QPointF diff2 = pt2 - pt1;
-            if (Config::Export::enableRelativeCoordinates())
+            if (Config::Device::startFrom() != SFT_AbsoluteCoords)
             {
                 buffer.append(QString("PU%1 %2;").arg(qRound(diff1.x())).arg(qRound(diff1.y())));
                 buffer.append(QString("PD%1 %2;").arg(qRound(diff2.x())).arg(qRound(diff2.y())));

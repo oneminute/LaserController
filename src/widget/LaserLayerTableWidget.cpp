@@ -116,7 +116,7 @@ void LaserLayerTableWidget::updateItems()
             }
             else if (layer->type() == LLT_FILLING)
             {
-                type = tr("C+E");
+                type = tr("F");
                 fullType = ltr("Filling");
             }
 
@@ -147,6 +147,10 @@ void LaserLayerTableWidget::updateItems()
             else if (layer->type() == LLT_ENGRAVING)
             {
                 itemSpeedPower->setText(QString("%1/%2").arg(layer->engravingMinSpeed()).arg(layer->engravingLaserPower()));
+            }
+            else if (layer->type() == LLT_FILLING)
+            {
+                itemSpeedPower->setText(QString("%1/%2").arg(layer->fillingMinSpeed()).arg(layer->fillingLaserPower()));
             }
             itemSpeedPower->setTextAlignment(Qt::AlignCenter);
 

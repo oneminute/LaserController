@@ -742,12 +742,12 @@ void Config::loadExportItems()
         }
     );
 
-    ConfigItem* enableRelativeCoordinates = group->addConfigItem(
+    /*ConfigItem* enableRelativeCoordinates = group->addConfigItem(
         "enableRelativeCoordinates",
         false,
         DT_BOOL
     );
-    enableRelativeCoordinates->setStoreStrategy(SS_DIRECTLY);
+    enableRelativeCoordinates->setStoreStrategy(SS_DIRECTLY);*/
 
     ConfigItem* halfToneStyle = group->addConfigItem(
         "halfToneStyle",
@@ -2858,9 +2858,9 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Small Diagonal Limitation", nullptr), 
         QCoreApplication::translate("Config", "Details of small diagonal limitation", nullptr));
 
-    Export::enableRelativeCoordinatesItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Enable Relative Coordinates", nullptr), 
-        QCoreApplication::translate("Config", "Enable relative coordinates for exporting machining points", nullptr));
+    //Export::enableRelativeCoordinatesItem()->setTitleAndDesc(
+        //QCoreApplication::translate("Config", "Enable Relative Coordinates", nullptr), 
+        //QCoreApplication::translate("Config", "Enable relative coordinates for exporting machining points", nullptr));
 
     Export::halfToneStyleItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Half Tone Style", nullptr), 
