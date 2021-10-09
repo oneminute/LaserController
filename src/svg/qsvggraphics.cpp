@@ -484,6 +484,26 @@ void QSvgText::addText(const QString &text)
     m_tspans.back()->addText(text);
 }
 
+QPointF QSvgText::coord() const
+{
+    return m_coord;
+}
+
+QSizeF QSvgText::size() const
+{
+    return m_size;
+}
+
+QString QSvgText::text() const
+{
+    QString chars;
+    for (QSvgTspan* tspan : m_tspans)
+    {
+        chars.append(tspan->text());
+    }
+    return chars;
+}
+
 QSvgUse::QSvgUse(const QPointF &start, QSvgNode *parent, QSvgNode *node)
     : QSvgNode(parent), m_link(node), m_start(start), m_recursing(false)
 {

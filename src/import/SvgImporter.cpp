@@ -155,6 +155,27 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             break;
         }
         case QSvgNode::TEXT:
+        {
+            QSvgText* svgTextNode = reinterpret_cast<QSvgText*>(node);
+            QSvgStyleProperty* styleProperty = svgTextNode->styleProperty(QSvgStyleProperty::Type::FONT);
+            QSvgFontStyle* fontStyle = reinterpret_cast<QSvgFontStyle*>(styleProperty);
+            QFont font("Times New Roman");
+            if (fontStyle)
+            {
+                font = fontStyle->qfont();
+                qLogD << font;
+                //qreal scale = 100.0 / font.pointSizeF();
+                //qLogD << font.pixelSize() << ", " << font.pointSize() << ", " << font.pointSizeF();
+                //font.setPixelSize(Global::mm2PixelsXF(font.pointSizeF() * scale * docScaleWidth));
+                font.setPointSizeF(Global::mm2PixelsXF(font.pointSizeF() * docScaleWidth));
+            }
+            QPointF pos = matrix.map(svgTextNode->coord());
+            LaserText* laserText = new LaserText(laserDoc, pos, font, Qt::AlignHCenter, Qt::AlignVCenter);
+            laserText->setContent(svgTextNode->text());
+            laserText->modifyPathList();
+            item = laserText;
+            break;
+        }
         case QSvgNode::TEXTAREA:
             break;
         case QSvgNode::IMAGE:

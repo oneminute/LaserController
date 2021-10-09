@@ -325,6 +325,7 @@ void LaserDocument::exportJSON(const QString& filename)
 
                     QJsonObject itemObj;
                     itemObj["Name"] = pathNode->nodeName();
+                    itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                     if (layer->type() == LLT_ENGRAVING)
                     {
                         //itemObj["Layer"] = layerId;
@@ -363,6 +364,7 @@ void LaserDocument::exportJSON(const QString& filename)
 
                         QJsonObject itemObjCutting;
                         itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
+                        itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                         itemObjCutting["Type"] = primitive->typeLatinName();
                         itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                         pathNode->nearestPoint(LaserPoint(lastPoint));
