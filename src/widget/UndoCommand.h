@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include "LaserViewer.h"
 #include "scene/LaserPrimitive.h"
+#include "widget/LaserDoubleSpinBox.h"
 #include <QCheckBox>
 class SelectionUndoCommand :public QUndoCommand {
 public :
@@ -139,6 +140,21 @@ private:
     QList<LaserPrimitive*> m_lastLockedList;
     Qt::CheckState m_lastCheckState;
     Qt::CheckState m_curCheckState;
+};
+//corner radius
+class CornerRadiusCommand :public QUndoCommand {
+public:
+    CornerRadiusCommand(LaserViewer*  view, LaserRect* rect, LaserDoubleSpinBox* cornerRadius, qreal curVal);
+    ~CornerRadiusCommand();
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserViewer * m_view;
+    LaserRect* m_rect;
+    LaserDoubleSpinBox* m_cornerRadius;
+    qreal m_lastRadius;
+    qreal m_curRadius;
+    LaserControllerWindow* m_window;
 };
 //layer visible
 class LayerVisibleCommand : public QUndoCommand {

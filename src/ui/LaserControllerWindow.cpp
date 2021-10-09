@@ -1824,9 +1824,26 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_maxWidth = new LaserDoubleSpinBox();
     m_maxWidthLabel = new QLabel("Max Width");
     m_cornerRadius = new LaserDoubleSpinBox();
+    m_cornerRadius->setMinimum(0);
+    m_cornerRadius->setMaximum(DBL_MAX);
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
     m_lockedLabel = new QLabel("Locked");
+
+    m_cornerRadius->connect(m_cornerRadius, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        if (list.count() != 1) {
+            return;
+        }
+        LaserRect* rect = nullptr;
+        rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+
+        if (rect) {
+            CornerRadiusCommand* cmd = new CornerRadiusCommand(m_viewer, rect, m_cornerRadius, m_cornerRadius->value());
+            view->undoStack()->push(cmd);            
+        }        
+    });
     
     m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
         qDebug() << "state:" << m_locked->checkState();
@@ -1845,9 +1862,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
 
     });
     m_locked->connect(m_locked, &QCheckBox::toggled, this, [=] {
-        qDebug() << "state:" << m_locked->checkState();
+        //qDebug() << "state:" << m_locked->checkState();
     });
-    //m_locked->setCheckState(Qt::PartiallyChecked);
+
     m_propertyPanelWidget = new QWidget();
     m_propertyDockWidget = new CDockWidget(tr("Movement"));
     
@@ -1948,15 +1965,16 @@ void LaserControllerWindow::showShapePropertyPanel()
 
             m_rectPropertyWidget->setLayout(m_rectPropertyLayout);
             m_propertyDockWidget->setWidget(m_rectPropertyWidget);
-
-            //m_lockedLabel->setText("rect");
+            LaserRect* rect = nullptr;
+            rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+            m_cornerRadius->setValue(rect->cornerRadius());
+            m_lastCornerRadiusValue = rect->cornerRadius();
             break;
         }
         case LPT_ELLIPSE: {
             m_ellipsePropertyLayout->setMargin(0);
             m_ellipsePropertyLayout->setSpacing(10);
             m_ellipsePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
             m_ellipsePropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
             m_ellipsePropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
             m_ellipsePropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
@@ -2198,6 +2216,16 @@ LaserDoubleSpinBox * LaserControllerWindow::widthBox()
 LaserDoubleSpinBox * LaserControllerWindow::heightBox()
 {
     return m_heightBox;
+}
+
+void LaserControllerWindow::setLastCornerRadiusValue(qreal val)
+{
+    m_lastCornerRadiusValue = val;
+}
+
+qreal LaserControllerWindow::lastCornerRadiusValue()
+{
+    return m_lastCornerRadiusValue;
 }
 
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
@@ -3242,7 +3270,6 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionMirrorVertical->setEnabled(true);
         m_ui->actionMirrorAcrossLine->setEnabled(false);
 		m_ui->actionCopy->setEnabled(true);
-		//m_ui->actionPaste->setEnabled(true);
 		m_ui->actionCut->setEnabled(true);
 		m_ui->actionDuplication->setEnabled(true);
 		m_ui->actionDeletePrimitive->setEnabled(true);
@@ -3281,13 +3308,11 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
     int i = group->childItems().size();
     if (i == 0) {
         m_propertyWidget->setEnabled(false);
-        //emit selectedChange();
     }
     else if (i > 0) {
         m_propertyWidget->setEnabled(true);
         emit selectedChange();
     }
-    
 }
 
 void LaserControllerWindow::retranslate()

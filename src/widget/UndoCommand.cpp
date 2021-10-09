@@ -6,7 +6,8 @@
 #include "scene/LaserDocument.h"
 #include  "util/Utils.h"
 #include "scene/LaserLayer.h"
-
+#include "LaserApplication.h"
+#include "ui/LaserControllerWindow.h"
 
 SelectionUndoCommand::SelectionUndoCommand(
 	LaserViewer * viewer, 
@@ -743,4 +744,45 @@ void LayerVisibleCommand::redo()
     }
     m_layer->setVisible(m_checked);
     m_viewer->viewport()->repaint();
+}
+
+CornerRadiusCommand::CornerRadiusCommand(LaserViewer * view, LaserRect * rect, LaserDoubleSpinBox* cornerRadius, qreal curVal)
+{
+    m_view = view;
+    m_rect = rect;
+    m_cornerRadius = cornerRadius;
+    m_window = LaserApplication::mainWindow;
+    m_lastRadius = m_window->lastCornerRadiusValue();
+    m_curRadius = curVal;
+}
+
+CornerRadiusCommand::~CornerRadiusCommand()
+{
+}
+
+void CornerRadiusCommand::undo()
+{
+    m_cornerRadius->setValue(m_lastRadius);
+    m_rect->setCornerRadius(m_lastRadius);
+    m_view->viewport()->repaint();
+}
+
+void CornerRadiusCommand::redo()
+{
+    QRectF bounding = m_rect->boundingRect();
+    qreal w = bounding.width();
+    qreal h = bounding.height();
+    qreal shorter = h;
+    if (w < h) {
+        shorter = w;
+    }
+    //qreal val = m_curRadius;
+    if (m_curRadius > shorter) {
+        m_curRadius = shorter;
+        
+    }
+    m_cornerRadius->setValue(m_curRadius);
+    m_rect->setCornerRadius(m_curRadius);
+    m_window->setLastCornerRadiusValue(m_curRadius);
+    m_view->viewport()->repaint();
 }

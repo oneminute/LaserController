@@ -885,6 +885,16 @@ void LaserRect::setCornerRadius(qreal cornerRadius)
 {
     Q_D(LaserRect);
     d->cornerRadius = cornerRadius;
+    QPainterPath path;
+    if (cornerRadius == 0)
+    {
+        path.addRect(d->rect);
+    }
+    else
+    {
+        path.addRoundedRect(d->rect, cornerRadius, cornerRadius);
+    }
+    d->path = path;
 }
 
 bool LaserRect::isRoundedRect() const
