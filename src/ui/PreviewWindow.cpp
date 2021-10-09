@@ -40,6 +40,7 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     // actions
     m_actionZoomIn = new QAction(tr("Zoom In"));
     toolBarProcedure->addAction(m_actionZoomIn);
+   
 
     m_actionZoomOut = new QAction(tr("Zoom Out"));
     toolBarProcedure->addAction(m_actionZoomOut);
@@ -77,6 +78,12 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     m_logDockWidget->setWidget(m_textEditLog);
     CDockAreaWidget* bottomDockArea = m_dockManager->addDockWidget(BottomDockWidgetArea, m_logDockWidget);
 
+    m_actionZoomIn->connect(m_actionZoomIn, &QAction::triggered, this, [=] {
+        m_viewer->zoomIn();
+    });
+    m_actionZoomOut->connect(m_actionZoomOut, &QAction::triggered, this, [=] {
+        m_viewer->zoomOut();
+    });
     connect(this, &PreviewWindow::addPathSignal, this, &PreviewWindow::onAddPath);
     connect(this, &PreviewWindow::addLineSignal, this, &PreviewWindow::onAddLine);
     connect(this, &PreviewWindow::setTitleSignal, this, &PreviewWindow::onSetTitle);
@@ -136,6 +143,7 @@ void PreviewWindow::updatePreviewArea()
     qreal scaleY = viewSize.height() / sceneSize.height();
     qreal scale = qMax(scaleX, scaleY);
     m_viewer->setTransform(QTransform::fromScale(scale, scale));
+    
 }
 
 void PreviewWindow::reset()
@@ -144,8 +152,10 @@ void PreviewWindow::reset()
     m_progressBar->setValue(0);
     m_viewer->scene()->clear();
     m_viewer->scene()->addRect(LaserApplication::device->boundRectMachining());
+    
     resetProgress();
     updatePreviewArea();
+    m_viewer->reset();
 }
 
 void PreviewWindow::resetProgress()

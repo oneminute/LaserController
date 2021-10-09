@@ -3600,8 +3600,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
             //m_viewer->centerOn(rect.center());
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
-            m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点
-                                                                            //创建网格
+            m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点进行变换
             LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
             if (backgroundItem) {
                 backgroundItem->onChangeGrids();
