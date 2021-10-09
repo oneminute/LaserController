@@ -1824,9 +1824,25 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_maxWidth = new LaserDoubleSpinBox();
     m_maxWidthLabel = new QLabel("Max Width");
     m_cornerRadius = new LaserDoubleSpinBox();
+    m_cornerRadius->setMinimum(0);
+    
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
     m_lockedLabel = new QLabel("Locked");
+
+    m_cornerRadius->connect(m_cornerRadius, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        if (list.count() != 1) {
+            return;
+        }
+        LaserRect* rect = nullptr;
+        rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+        if (rect) {
+            rect->setCornerRadius(m_cornerRadius->value());
+        }
+        view->viewport()->repaint();
+    });
     
     m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
         qDebug() << "state:" << m_locked->checkState();
@@ -1845,9 +1861,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
 
     });
     m_locked->connect(m_locked, &QCheckBox::toggled, this, [=] {
-        qDebug() << "state:" << m_locked->checkState();
+        //qDebug() << "state:" << m_locked->checkState();
     });
-    //m_locked->setCheckState(Qt::PartiallyChecked);
+
     m_propertyPanelWidget = new QWidget();
     m_propertyDockWidget = new CDockWidget(tr("Movement"));
     
@@ -1948,8 +1964,9 @@ void LaserControllerWindow::showShapePropertyPanel()
 
             m_rectPropertyWidget->setLayout(m_rectPropertyLayout);
             m_propertyDockWidget->setWidget(m_rectPropertyWidget);
-
-            //m_lockedLabel->setText("rect");
+            LaserRect* rect = nullptr;
+            rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+            m_cornerRadius->setValue(rect->cornerRadius());
             break;
         }
         case LPT_ELLIPSE: {
@@ -3242,7 +3259,6 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionMirrorVertical->setEnabled(true);
         m_ui->actionMirrorAcrossLine->setEnabled(false);
 		m_ui->actionCopy->setEnabled(true);
-		//m_ui->actionPaste->setEnabled(true);
 		m_ui->actionCut->setEnabled(true);
 		m_ui->actionDuplication->setEnabled(true);
 		m_ui->actionDeletePrimitive->setEnabled(true);
@@ -3281,13 +3297,11 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
     int i = group->childItems().size();
     if (i == 0) {
         m_propertyWidget->setEnabled(false);
-        //emit selectedChange();
     }
     else if (i > 0) {
         m_propertyWidget->setEnabled(true);
         emit selectedChange();
     }
-    
 }
 
 void LaserControllerWindow::retranslate()
