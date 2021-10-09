@@ -206,7 +206,7 @@ LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
     qreal y = boundingRect.top();
     for (; y <= boundingRect.bottom(); y += rowInterval)
     {
-        QRectF intersectRect(boundingRect.left(), y, boundingRect.width(), 1);
+        QRectF intersectRect(boundingRect.left() - 10, y, boundingRect.width() + 10, 1);
         QPainterPath intersectPath;
         intersectPath.addRect(intersectRect);
 
@@ -216,7 +216,7 @@ LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
         {
             QPainterPath::Element e = intersected.elementAt(i);
             //qDebug() << i << e.x << e.y << e.type;
-            if (utils::fuzzyEquals(e.y, y))
+            if (utils::fuzzyEquals(e.y, y, 1))
             {
                 linePoints.insert(e.x, e.x);
             }
@@ -247,6 +247,8 @@ LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
         if (!lines.empty())
             lineList.append(lines);
     }
+    qLogD << lineList.count() << " lines generated";
+    qLogD << boundingRect.height() / rowInterval << " lines expected";
 
     return lineList;
 }
