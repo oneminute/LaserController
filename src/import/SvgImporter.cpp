@@ -162,12 +162,13 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             QFont font("Times New Roman");
             if (fontStyle)
             {
-                font = fontStyle->qfont();
-                qLogD << font;
+                QFont svgFont = fontStyle->qfont();
+                qLogD << svgFont;
+                font = QFont(svgFont.family());
                 //qreal scale = 100.0 / font.pointSizeF();
-                //qLogD << font.pixelSize() << ", " << font.pointSize() << ", " << font.pointSizeF();
                 //font.setPixelSize(Global::mm2PixelsXF(font.pointSizeF() * scale * docScaleWidth));
-                font.setPointSizeF(Global::mm2PixelsXF(font.pointSizeF() * docScaleWidth));
+                font.setPointSizeF(Global::mm2PixelsXF(svgFont.pointSizeF() * docScaleWidth) * 0.8);
+                qLogD << font.pixelSize() << ", " << font.pointSize() << ", " << font.pointSizeF();
             }
             QPointF pos = matrix.map(svgTextNode->coord());
             LaserText* laserText = new LaserText(laserDoc, pos, font, Qt::AlignHCenter, Qt::AlignVCenter);
