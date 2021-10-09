@@ -56,6 +56,8 @@ public:
     bool lockEqualRatio();
     LaserDoubleSpinBox* widthBox();
     LaserDoubleSpinBox* heightBox();
+    void setLastCornerRadiusValue(qreal val);
+    qreal lastCornerRadiusValue();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -448,6 +450,7 @@ private:
     LaserDoubleSpinBox* m_maxWidth;
     QLabel* m_maxWidthLabel;
     LaserDoubleSpinBox* m_cornerRadius;
+    qreal m_lastCornerRadiusValue;
     QLabel* m_cornerRadiusLabel;
     QCheckBox* m_locked;
     QLabel* m_lockedLabel;

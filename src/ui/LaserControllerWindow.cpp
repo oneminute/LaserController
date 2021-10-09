@@ -1825,7 +1825,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_maxWidthLabel = new QLabel("Max Width");
     m_cornerRadius = new LaserDoubleSpinBox();
     m_cornerRadius->setMinimum(0);
-    
+    m_cornerRadius->setMaximum(DBL_MAX);
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
     m_lockedLabel = new QLabel("Locked");
@@ -1838,10 +1838,11 @@ void LaserControllerWindow::createShapePropertyDockPanel()
         }
         LaserRect* rect = nullptr;
         rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+
         if (rect) {
-            rect->setCornerRadius(m_cornerRadius->value());
-        }
-        view->viewport()->repaint();
+            CornerRadiusCommand* cmd = new CornerRadiusCommand(m_viewer, rect, m_cornerRadius, m_cornerRadius->value());
+            view->undoStack()->push(cmd);            
+        }        
     });
     
     m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
@@ -1967,13 +1968,13 @@ void LaserControllerWindow::showShapePropertyPanel()
             LaserRect* rect = nullptr;
             rect = qgraphicsitem_cast<LaserRect*>(list[0]);
             m_cornerRadius->setValue(rect->cornerRadius());
+            m_lastCornerRadiusValue = rect->cornerRadius();
             break;
         }
         case LPT_ELLIPSE: {
             m_ellipsePropertyLayout->setMargin(0);
             m_ellipsePropertyLayout->setSpacing(10);
             m_ellipsePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
             m_ellipsePropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
             m_ellipsePropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
             m_ellipsePropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
@@ -2215,6 +2216,16 @@ LaserDoubleSpinBox * LaserControllerWindow::widthBox()
 LaserDoubleSpinBox * LaserControllerWindow::heightBox()
 {
     return m_heightBox;
+}
+
+void LaserControllerWindow::setLastCornerRadiusValue(qreal val)
+{
+    m_lastCornerRadiusValue = val;
+}
+
+qreal LaserControllerWindow::lastCornerRadiusValue()
+{
+    return m_lastCornerRadiusValue;
 }
 
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)

@@ -228,17 +228,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>PushButton</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -285,7 +274,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/open_document.png</normaloff>:/ui/icons/images/open_document.png</iconset>
    </property>
    <property name="text">
@@ -300,7 +289,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/import.png</normaloff>:/ui/icons/images/import.png</iconset>
    </property>
    <property name="text">
@@ -315,7 +304,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/export_json.png</normaloff>:/ui/icons/images/export_json.png</iconset>
    </property>
    <property name="text">
@@ -327,7 +316,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/save_document.png</normaloff>:/ui/icons/images/save_document.png</iconset>
    </property>
    <property name="text">
@@ -342,7 +331,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/save_as.png</normaloff>:/ui/icons/images/save_as.png</iconset>
    </property>
    <property name="text">
@@ -360,7 +349,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/new_document.png</normaloff>:/ui/icons/images/new_document.png</iconset>
    </property>
    <property name="text">
@@ -394,7 +383,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/delete.png</normaloff>:/ui/icons/images/delete.png</iconset>
    </property>
    <property name="text">
@@ -422,7 +411,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Selection.png</normaloff>:/ui/icons/images/Selection.png</iconset>
    </property>
    <property name="text">
@@ -437,7 +426,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Rectangle.png</normaloff>:/ui/icons/images/Rectangle.png</iconset>
    </property>
    <property name="text">
@@ -449,7 +438,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Ellipse.png</normaloff>:/ui/icons/images/Ellipse.png</iconset>
    </property>
    <property name="text">
@@ -461,7 +450,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Polygon.png</normaloff>:/ui/icons/images/Polygon.png</iconset>
    </property>
    <property name="text">
@@ -473,7 +462,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Text.png</normaloff>:/ui/icons/images/Text.png</iconset>
    </property>
    <property name="text">
@@ -485,7 +474,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Line.png</normaloff>:/ui/icons/images/Line.png</iconset>
    </property>
    <property name="text">
@@ -497,7 +486,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Image.png</normaloff>:/ui/icons/images/Image.png</iconset>
    </property>
    <property name="text">
@@ -509,7 +498,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Spline.png</normaloff>:/ui/icons/images/Spline.png</iconset>
    </property>
    <property name="text">
@@ -521,7 +510,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/import_cdr.png</normaloff>:/ui/icons/images/import_cdr.png</iconset>
    </property>
    <property name="text">
@@ -536,7 +525,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/start.png</normaloff>:/ui/icons/images/start.png</iconset>
    </property>
    <property name="text">
@@ -551,7 +540,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/pause.png</normaloff>:/ui/icons/images/pause.png</iconset>
    </property>
    <property name="text">
@@ -563,7 +552,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/stop.png</normaloff>:/ui/icons/images/stop.png</iconset>
    </property>
    <property name="text">
@@ -575,7 +564,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/connect.png</normaloff>:/ui/icons/images/connect.png</iconset>
    </property>
    <property name="text">
@@ -587,7 +576,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/disconnect.png</normaloff>:/ui/icons/images/disconnect.png</iconset>
    </property>
    <property name="text">
@@ -618,7 +607,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/close_document.png</normaloff>:/ui/icons/images/close_document.png</iconset>
    </property>
    <property name="text">
@@ -650,7 +639,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/cut.png</normaloff>:/ui/icons/images/cut.png</iconset>
    </property>
    <property name="text">
@@ -662,7 +651,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/copy.png</normaloff>:/ui/icons/images/copy.png</iconset>
    </property>
    <property name="text">
@@ -674,7 +663,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/paste.png</normaloff>:/ui/icons/images/paste.png</iconset>
    </property>
    <property name="text">
@@ -686,7 +675,7 @@
   </action>
   <action name="actionPathOptimization">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/path_opt.png</normaloff>:/ui/icons/images/path_opt.png</iconset>
    </property>
    <property name="text">
@@ -763,7 +752,7 @@
   </action>
   <action name="actionDeletePrimitive">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/delete.png</normaloff>:/ui/icons/images/delete.png</iconset>
    </property>
    <property name="text">
@@ -775,7 +764,7 @@
   </action>
   <action name="actionMoveLayerUp">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_up.png</normaloff>:/ui/icons/images/move_up.png</iconset>
    </property>
    <property name="text">
@@ -787,7 +776,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_down.png</normaloff>:/ui/icons/images/move_down.png</iconset>
    </property>
    <property name="text">
@@ -796,7 +785,7 @@
   </action>
   <action name="actionLaserSpotShot">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/machining.png</normaloff>:/ui/icons/images/machining.png</iconset>
    </property>
    <property name="text">
@@ -805,7 +794,7 @@
   </action>
   <action name="actionBounding">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/cut_edge.png</normaloff>:/ui/icons/images/cut_edge.png</iconset>
    </property>
    <property name="text">
@@ -825,7 +814,7 @@
   </action>
   <action name="actionMoveToOrigin">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_origin.png</normaloff>:/ui/icons/images/move_origin.png</iconset>
    </property>
    <property name="text">
@@ -834,7 +823,7 @@
   </action>
   <action name="actionMoveLeft">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_left.png</normaloff>:/ui/icons/images/move_left.png</iconset>
    </property>
    <property name="text">
@@ -846,7 +835,7 @@
   </action>
   <action name="actionMoveRight">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_right.png</normaloff>:/ui/icons/images/move_right.png</iconset>
    </property>
    <property name="text">
@@ -858,7 +847,7 @@
   </action>
   <action name="actionMoveTop">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_top.png</normaloff>:/ui/icons/images/move_top.png</iconset>
    </property>
    <property name="text">
@@ -870,7 +859,7 @@
   </action>
   <action name="actionMoveBottom">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_bottom.png</normaloff>:/ui/icons/images/move_bottom.png</iconset>
    </property>
    <property name="text">
@@ -882,7 +871,7 @@
   </action>
   <action name="actionMoveTopLeft">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_top_left.png</normaloff>:/ui/icons/images/move_top_left.png</iconset>
    </property>
    <property name="text">
@@ -894,7 +883,7 @@
   </action>
   <action name="actionMoveTopRight">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_top_right.png</normaloff>:/ui/icons/images/move_top_right.png</iconset>
    </property>
    <property name="text">
@@ -906,7 +895,7 @@
   </action>
   <action name="actionMoveBottomLeft">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_bottom_left.png</normaloff>:/ui/icons/images/move_bottom_left.png</iconset>
    </property>
    <property name="text">
@@ -918,7 +907,7 @@
   </action>
   <action name="actionMoveBottomRight">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_bottom_right.png</normaloff>:/ui/icons/images/move_bottom_right.png</iconset>
    </property>
    <property name="text">
@@ -930,7 +919,7 @@
   </action>
   <action name="actionMoveUp">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_up.png</normaloff>:/ui/icons/images/move_up.png</iconset>
    </property>
    <property name="text">
@@ -939,7 +928,7 @@
   </action>
   <action name="actionMoveDown">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/move_down.png</normaloff>:/ui/icons/images/move_down.png</iconset>
    </property>
    <property name="text">
@@ -948,7 +937,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/Settings.png</normaloff>:/ui/icons/images/Settings.png</iconset>
    </property>
    <property name="text">
@@ -965,7 +954,7 @@
   </action>
   <action name="actionReset">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/reset.png</normaloff>:/ui/icons/images/reset.png</iconset>
    </property>
    <property name="text">
@@ -985,7 +974,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/lock.png</normaloff>:/ui/icons/images/lock.png</iconset>
    </property>
    <property name="text">
@@ -1000,7 +989,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/unlock.png</normaloff>:/ui/icons/images/unlock.png</iconset>
    </property>
    <property name="text">
@@ -1071,7 +1060,7 @@
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/reset.png</normaloff>:/ui/icons/images/reset.png</iconset>
    </property>
    <property name="text">
@@ -1099,7 +1088,7 @@
   </action>
   <action name="actionDragView">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/drag.png</normaloff>:/ui/icons/images/drag.png</iconset>
    </property>
    <property name="text">
@@ -1111,7 +1100,7 @@
   </action>
   <action name="actionZoomIn">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/add.png</normaloff>:/ui/icons/images/add.png</iconset>
    </property>
    <property name="text">
@@ -1126,7 +1115,7 @@
   </action>
   <action name="actionZoomOut">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/subtract.png</normaloff>:/ui/icons/images/subtract.png</iconset>
    </property>
    <property name="text">
@@ -1141,7 +1130,7 @@
   </action>
   <action name="actionZoomToPage">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/zommToPage.png</normaloff>:/ui/icons/images/zommToPage.png</iconset>
    </property>
    <property name="text">
@@ -1156,7 +1145,7 @@
   </action>
   <action name="actionZoomToSelection">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/zoomToSelection.png</normaloff>:/ui/icons/images/zoomToSelection.png</iconset>
    </property>
    <property name="text">
@@ -1171,7 +1160,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/undo.png</normaloff>:/ui/icons/images/undo.png</iconset>
    </property>
    <property name="text">
@@ -1183,7 +1172,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/redo.png</normaloff>:/ui/icons/images/redo.png</iconset>
    </property>
    <property name="text">
@@ -1195,7 +1184,7 @@
   </action>
   <action name="actionMirrorHorizontal">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/mirrorH.png</normaloff>:/ui/icons/images/mirrorH.png</iconset>
    </property>
    <property name="text">
@@ -1210,7 +1199,7 @@
   </action>
   <action name="actionMirrorVertical">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/mirrorV.png</normaloff>:/ui/icons/images/mirrorV.png</iconset>
    </property>
    <property name="text">
@@ -1225,7 +1214,7 @@
   </action>
   <action name="actionGroup">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/group.png</normaloff>:/ui/icons/images/group.png</iconset>
    </property>
    <property name="text">
@@ -1240,7 +1229,7 @@
   </action>
   <action name="actionUngroup">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/ungroup.png</normaloff>:/ui/icons/images/ungroup.png</iconset>
    </property>
    <property name="text">
@@ -1255,7 +1244,7 @@
   </action>
   <action name="actionDuplication">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/copy.png</normaloff>:/ui/icons/images/copy.png</iconset>
    </property>
    <property name="text">
@@ -1297,7 +1286,7 @@
   </action>
   <action name="actionMirrorAcrossLine">
    <property name="icon">
-    <iconset resource="../res/icons.qrc">
+    <iconset>
      <normaloff>:/ui/icons/images/mirrorA.png</normaloff>:/ui/icons/images/mirrorA.png</iconset>
    </property>
    <property name="text">
