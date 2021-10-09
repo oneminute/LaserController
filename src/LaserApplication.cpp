@@ -189,6 +189,11 @@ bool LaserApplication::checkEnvironment()
 //    return done;
 //}
 
+QString LaserApplication::softwareVersion()
+{
+    return LC_VERSION_STR;
+}
+
 void LaserApplication::loadLanguages()
 {
     qDeleteAll(translators);

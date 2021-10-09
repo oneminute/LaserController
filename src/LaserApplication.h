@@ -24,6 +24,7 @@ public:
 
     //bool notify(QObject* receiver, QEvent* event) override;
 
+    static QString softwareVersion();
     static void loadLanguages();
     static void changeLanguage();
     static void retranslate();

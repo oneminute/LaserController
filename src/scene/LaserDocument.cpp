@@ -213,18 +213,6 @@ QString LaserDocument::newLayerName() const
     return name;
 }
 
-//qreal LaserDocument::scale() const
-//{
-//    Q_D(const LaserDocument);
-//    return d->scale;
-//}
-//
-//void LaserDocument::setScale(qreal scale)
-//{
-//    Q_D(LaserDocument);
-//    d->scale = scale;
-//}
-
 void LaserDocument::exportJSON(const QString& filename)
 {
     Q_D(LaserDocument);
@@ -256,10 +244,12 @@ void LaserDocument::exportJSON(const QString& filename)
             //docOrigin = LaserApplication::device->deviceTransformMachining().map(docOrigin);
             QPointF docOrigin(0, 0);
             laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
+            laserDocumentInfo["UserOrigin"] = typeUtils::point2Json(docOrigin);
             QRectF docBoundingRect = docBoundingRectMachining();
             laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
-            //laserDocumentInfo["IsRelative"] = Config::Export::enableRelativeCoordinates();
-            laserDocumentInfo["Absolute"] = !Config::Export::enableRelativeCoordinates();
+            laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectMachining());
+            laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
+
             jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
             QList<LaserLayer*> layerList;
@@ -335,12 +325,12 @@ void LaserDocument::exportJSON(const QString& filename)
 
                     QJsonObject itemObj;
                     itemObj["Name"] = pathNode->nodeName();
-                    itemObj["Absolute"] = !Config::Export::enableRelativeCoordinates();
                     if (layer->type() == LLT_ENGRAVING)
                     {
                         //itemObj["Layer"] = layerId;
                         itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
                         itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+                        itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
 
                         QByteArray data = primitive->engravingImage();
                         if (!data.isEmpty())
@@ -358,6 +348,7 @@ void LaserDocument::exportJSON(const QString& filename)
                         if (!points.empty())
                         {
                             itemObj["Type"] = primitive->typeLatinName();
+                            itemObj["Style"] = LaserLayerType::LLT_CUTTING;
                             itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
                             items.append(itemObj);
                         }
@@ -367,15 +358,16 @@ void LaserDocument::exportJSON(const QString& filename)
                         itemObj["Type"] = primitive->typeLatinName();
                         LaserLineListList lineList = primitive->generateFillData(lastPoint);
                         itemObj["Data"] = QString(machiningUtils::lineList2Plt(lineList, lastPoint));
+                        itemObj["Style"] = LaserLayerType::LLT_FILLING;
                         items.append(itemObj);
 
                         QJsonObject itemObjCutting;
                         itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
                         itemObjCutting["Type"] = primitive->typeLatinName();
+                        itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                         pathNode->nearestPoint(LaserPoint(lastPoint));
                         LaserPointListList points = primitive->arrangedPoints();
                         itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint));
-                        itemObjCutting["Cutting"] = true;
                         items.append(itemObjCutting);
                     }
 
@@ -679,6 +671,76 @@ QRectF LaserDocument::docBoundingRectMM() const
 QRectF LaserDocument::docBoundingRectMachining() const
 {
     return Global::matrixToMachining().map(docBoundingRect()).boundingRect();
+}
+
+QRectF LaserDocument::imagesBoundingRect() const
+{
+    Q_D(const LaserDocument);
+    QRectF bounding(0, 0, 0, 0);
+    int count = 0;
+    for (QMap<QString, LaserPrimitive*>::ConstIterator i = d->primitives.constBegin();
+        i != d->primitives.constEnd(); i++)
+    {
+        if (i.value()->primitiveType() == LPT_BITMAP)
+        {
+            QRectF rect = i.value()->sceneBoundingRect();
+            qreal minSpeed = Config::UserRegister::scanXStartSpeed() / 1000;
+            qreal acc = Config::UserRegister::scanXAcc() / 1000;
+            qreal maxSpeed = i.value()->layer()->engravingRunSpeed();
+            qreal span = (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
+            rect.setLeft(rect.left() - span);
+            rect.setRight(rect.right() + span);
+            if (count++ == 0)
+            {
+                bounding = rect;
+                continue;
+            }
+            if (rect.left() < bounding.left())
+                bounding.setLeft(rect.left());
+            if (rect.top() < bounding.top())
+                bounding.setTop(rect.top());
+            if (rect.right() > bounding.right())
+                bounding.setRight(rect.right());
+            if (rect.bottom() > bounding.bottom())
+                bounding.setBottom(rect.bottom());
+        }
+    }
+    return bounding;
+}
+
+QRectF LaserDocument::imagesBoundingRectMachining() const
+{
+    Q_D(const LaserDocument);
+    QRectF bounding(0, 0, 0, 0);
+    int count = 0;
+    for (QMap<QString, LaserPrimitive*>::ConstIterator i = d->primitives.constBegin();
+        i != d->primitives.constEnd(); i++)
+    {
+        if (i.value()->primitiveType() == LPT_BITMAP)
+        {
+            QRectF rect = Global::matrixToMachining().map(i.value()->sceneBoundingRect()).boundingRect();
+            qreal minSpeed = Config::UserRegister::scanXStartSpeed();
+            qreal acc = Config::UserRegister::scanXAcc();
+            qreal maxSpeed = i.value()->layer()->engravingRunSpeed() * 1000;
+            qreal span = (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
+            rect.setLeft(rect.left() - span);
+            rect.setRight(rect.right() + span);
+            if (count++ == 0)
+            {
+                bounding = rect;
+                continue;
+            }
+            if (rect.left() < bounding.left())
+                bounding.setLeft(rect.left());
+            if (rect.top() < bounding.top())
+                bounding.setTop(rect.top());
+            if (rect.right() > bounding.right())
+                bounding.setRight(rect.right());
+            if (rect.bottom() > bounding.bottom())
+                bounding.setBottom(rect.bottom());
+        }
+    }
+    return bounding;
 }
 
 void LaserDocument::updateLayersStructure()

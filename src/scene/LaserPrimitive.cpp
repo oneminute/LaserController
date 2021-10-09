@@ -1574,6 +1574,7 @@ LaserPointListList LaserPolygon::updateMachiningPoints(quint32 progressCode, qre
     d->machiningPointsList.clear();
     QTransform t = sceneTransform() * Global::matrixToMachining();
     QPolygonF polygon = t.map(d->poly);
+    polygon.append(polygon.first());
     LaserPointList points;
     machiningUtils::polygon2Points(polygon, points, d->startingIndices, d->machiningCenter);
     d->machiningPointsList.append(points);

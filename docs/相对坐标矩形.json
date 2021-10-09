@@ -1,0 +1,60 @@
+{
+    "LaserDocumentInfo": {
+        "APIVersion": "21100415", 
+       
+        "BoundingRect": {//外接矩形 必须绝对坐标
+            "x1": 15000.000593155391,
+            "x2": 75000.00296577696,
+            "y1": 15000.000593155391,
+            "y2": 70000.00276805849
+        },
+        "ImageBoundingRect": {//雕刻图形  必须绝对坐标
+            "x1": 15000.000593155391,
+            "x2": 75000.00296577696,
+            "y1": 15000.000593155391,
+            "y2": 70000.00276805849
+        },
+        "CreateDate": "2021-10-06 18:25:13",      
+        "FinishRun": 0,//
+        "DeviceOrigin": 0, //设备原点
+        "JobOrigin": 2,//作业原点，按九宫格
+        "Origin": { //文档原点坐标
+            "x": 0,
+            "y": 0
+        },
+        "PrinterDrawUnit": 1016,
+      
+        "Absolute": false, //此参数取消
+        "StartFrom": 1, //开始加工的方式，0-当前位置  必须相对坐标，1-用户原点  必须相对坐标，2 机械原点  必须绝对坐标
+        "UserOrigin": { //用户原点坐标  必须绝对坐标
+            "x": 150,
+            "y": 450
+        }
+    },
+    "Layers": [
+        {
+            "Items": [
+                {
+                    "Absolute": false,
+                    "Data": "PU15000 15000;PD0 55000;PD60000 0;PD0 -55000;PD-60000 0;",
+                    "Name": "矩形_0",
+                    "Type": "Rect"
+                }
+            ],
+            "Params": {
+                "CuttingParams": {
+                    "LaserPower": 700,
+                    "MinSpeed": 15000,
+                    "MinSpeedPower": 500,
+                    "RunSpeed": 40000,
+                    "RunSpeedPower": 750
+                },
+                "EngravingParams": {
+                },
+                "FillingParams": {
+                }
+            },
+            "Type": 1
+        }
+    ]
+}

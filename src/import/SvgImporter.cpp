@@ -147,7 +147,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 				if (area > 0)
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
-                    qreal cornerRaius = Global::mm2PixelsXF(svgRectNode->rx());
+                    qreal cornerRaius = Global::mm2PixelsXF(svgRectNode->rx()) * docScaleWidth;
 					item = new LaserRect(rect, cornerRaius, laserDoc);
 					qDebug() << "rect:" << rect;
 				}

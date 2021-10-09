@@ -226,7 +226,7 @@ public:
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
-        CONFIG_ITEM(export, enableRelativeCoordinates, bool, toBool)
+        //CONFIG_ITEM(export, enableRelativeCoordinates, bool, toBool)
         CONFIG_ITEM(export, halfToneStyle, int, toInt)
         CONFIG_ITEM(export, imageUseGaussian, bool, toBool)
         CONFIG_ITEM(export, gaussianFactor, qreal, toReal)
