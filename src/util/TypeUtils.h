@@ -40,6 +40,10 @@ namespace typeUtils
 
     QJsonObject point2Json(const QPointF& point);
 
+    QPointF json2Point(const QJsonObject& json);
+
+    QPointF json2Point(const QJsonValue& json);
+
     QJsonObject rect2Json(const QRectF& rect);
 }
 

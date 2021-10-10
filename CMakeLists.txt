@@ -263,7 +263,7 @@ set(QM_FILES
 #qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${TS_FILES})
 
 add_custom_target (GenerateTranslations 
-    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en.ts
+    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts
 )
 
 include(cmake_install_Debug.txt)

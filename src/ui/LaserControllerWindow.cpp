@@ -66,7 +66,9 @@
 #include "widget/PropertiesHelperManager.h"
 #include "widget/RulerWidget.h"
 #include "widget/ProgressBar.h"
+#include "widget/Vector2DWidget.h"
 #include "widget/PressedToolButton.h"
+#include "widget/RadioButtonGroup.h"
 #include "scene/LaserPrimitive.h"
 
 using namespace ads;
@@ -574,6 +576,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveToOrigin, &QAction::triggered, this, &LaserControllerWindow::laserBackToMachiningOriginalPoint);
 
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
+    connect(m_ui->actionFetchToUserOrigin, &QAction::triggered, this, &LaserControllerWindow::onActionFetchToUserOrigin);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -894,15 +897,15 @@ FinishRun LaserControllerWindow::finishRun()
     }
     else
     {
-        if (m_radioButtonMachiningOrigin1->isChecked())
+        if (m_radioButtonUserOrigin1->isChecked())
         {
             value.setAction(3);
         }
-        else if (m_radioButtonMachiningOrigin2->isChecked())
+        else if (m_radioButtonUserOrigin2->isChecked())
         {
             value.setAction(4);
         }
-        else if (m_radioButtonMachiningOrigin3->isChecked())
+        else if (m_radioButtonUserOrigin3->isChecked())
         {
             value.setAction(5);
         }
@@ -1474,35 +1477,35 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationOptimize->setDefaultAction(m_ui->actionPathOptimization);
     m_buttonOperationOptimize->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    //QLabel* labelStartPosition = new QLabel(tr("Start Position"));
-    m_comboBoxStartPosition = new QComboBox;
-    m_comboBoxStartPosition->addItem(tr("Current Position"));
-    m_comboBoxStartPosition->addItem(tr("Custom Origin"));
-    m_comboBoxStartPosition->addItem(tr("Mechnical Origin"));
+    m_comboBoxStartPosition = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::startFromItem());
+    Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition);
 
-    //QLabel* labelLaserPower = new QLabel(tr("Laser Power"));
-    m_floatEditSliderLaserPower = new FloatEditSlider;
-    m_floatEditSliderLaserPower->setMinimum(0);
-    m_floatEditSliderLaserPower->setMaximum(100);
-    m_floatEditSliderLaserPower->setStep(0.1);
-    m_floatEditSliderLaserPower->setPage(10);
-    m_floatEditSliderLaserPower->setTextTemplate("%1%");
-    m_floatEditSliderLaserPower->setMaximumLineEditWidth(40);
-    connect(m_floatEditSliderLaserPower, &FloatEditSlider::valueChanged, this, &LaserControllerWindow::onFloatEditSliderLaserPower);
+    m_radioButtonGroupJobOrigin = InputWidgetWrapper::createWidget<RadioButtonGroup*>(Config::Device::jobOriginItem());
+    Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin);
 
-    //QLabel* labelLaserRange = new QLabel(tr("Laser Range"));
-    m_floatEditDualSliderLaserRange = new FloatEditDualSlider;
-    m_floatEditDualSliderLaserRange->setMinimum(0);
-    m_floatEditDualSliderLaserRange->setMaximum(100);
-    m_floatEditDualSliderLaserRange->setStep(0.1);
-    m_floatEditDualSliderLaserRange->setTextTemplate("%1%");
-    m_floatEditDualSliderLaserRange->setEditMaxWidth(40);
-    m_floatEditDualSliderLaserRange->setLowerValue(Config::SystemRegister::laserMinPower());
-    m_floatEditDualSliderLaserRange->setHigherValue(Config::SystemRegister::laserMaxPower());
-    connect(m_floatEditDualSliderLaserRange, &FloatEditDualSlider::lowerValueChanged, this, &LaserControllerWindow::onFloatDualEditSliderLowerValueChanged);
-    connect(m_floatEditDualSliderLaserRange, &FloatEditDualSlider::higherValueChanged, this, &LaserControllerWindow::onFloatDualEditSliderHigherValueChanged);
-    connect(Config::SystemRegister::laserMinPowerItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::onLaserMinPowerChanged);
-    connect(Config::SystemRegister::laserMaxPowerItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::onLaserMaxPowerChanged);
+    m_floatEditSliderScanLaserPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::scanLaserPowerItem());
+    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower);
+
+    m_editSliderScanMaxGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::maxScanGrayRatioItem());
+    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray);
+
+    m_editSliderScanMinGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::minScanGrayRatioItem());
+    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray);
+
+    m_floatEditSliderCuttingMaxPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMaxCuttingPowerItem());
+    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower);
+
+    m_floatEditSliderCuttingMinPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMinCuttingPowerItem());
+    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower);
+
+    m_floatEditSliderCuttingTurnOnDelay = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::cuttingTurnOnDelayItem());
+    Config::UserRegister::cuttingTurnOnDelayItem()->bindWidget(m_floatEditSliderCuttingTurnOnDelay);
+
+    m_floatEditSliderCuttingTurnOffDelay = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::cuttingTurnOffDelayItem());
+    Config::UserRegister::cuttingTurnOffDelayItem()->bindWidget(m_floatEditSliderCuttingTurnOffDelay);
+
+    m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
+    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower);
 
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
@@ -1528,29 +1531,42 @@ void LaserControllerWindow::createOperationsDockPanel()
     secondRow->addWidget(m_buttonOperationOrigin);
     secondRow->addWidget(m_buttonOperationOptimize);
 
-    QFormLayout* thirdRow = new QFormLayout;
-    thirdRow->setMargin(0);
-    thirdRow->addRow(tr("Start Position"), m_comboBoxStartPosition);
-    thirdRow->addRow(tr("Laser Power"), m_floatEditSliderLaserPower);
-    thirdRow->addRow(tr("Laser Range"), m_floatEditDualSliderLaserRange);
+    m_comboBoxPostEvent = new QComboBox;
+    m_comboBoxPostEvent->addItem(tr("Stop at current position"));
+    m_comboBoxPostEvent->addItem(tr("Unload motor"));
+    m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
 
-    QHBoxLayout* fourthRow = new QHBoxLayout;
-    fourthRow->setMargin(0);
-    fourthRow->addWidget(labelDevices);
-    fourthRow->addWidget(m_comboBoxDevices);
-    fourthRow->addWidget(m_buttonConnect);
-    fourthRow->addWidget(m_buttonRefresh);
-    fourthRow->setStretch(0, 0);
-    fourthRow->setStretch(1, 1);
-    fourthRow->setStretch(2, 0);
-    fourthRow->setStretch(3, 0);
+    QFormLayout* fifthRow = new QFormLayout;
+    fifthRow->setMargin(0);
+    fifthRow->addRow(Config::Device::startFromItem()->title(), m_comboBoxStartPosition);
+    fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
+    fifthRow->addRow(tr("Post Event"), m_comboBoxPostEvent);
+    fifthRow->addRow(Config::UserRegister::scanLaserPowerItem()->title(), m_floatEditSliderScanLaserPower);
+    fifthRow->addRow(Config::UserRegister::maxScanGrayRatioItem()->title(), m_editSliderScanMaxGray);
+    fifthRow->addRow(Config::UserRegister::minScanGrayRatioItem()->title(), m_editSliderScanMinGray);
+    fifthRow->addRow(Config::UserRegister::defaultMaxCuttingPowerItem()->title(), m_floatEditSliderCuttingMaxPower);
+    fifthRow->addRow(Config::UserRegister::defaultMinCuttingPowerItem()->title(), m_floatEditSliderCuttingMinPower);
+    fifthRow->addRow(Config::UserRegister::cuttingTurnOnDelayItem()->title(), m_floatEditSliderCuttingTurnOnDelay);
+    fifthRow->addRow(Config::UserRegister::cuttingTurnOffDelayItem()->title(), m_floatEditSliderCuttingTurnOffDelay);
+    fifthRow->addRow(Config::UserRegister::spotShotPowerItem()->title(), m_floatEditSliderSpotShotPower);
+
+    QHBoxLayout* sixthRow = new QHBoxLayout;
+    sixthRow->setMargin(0);
+    sixthRow->addWidget(labelDevices);
+    sixthRow->addWidget(m_comboBoxDevices);
+    sixthRow->addWidget(m_buttonConnect);
+    sixthRow->addWidget(m_buttonRefresh);
+    sixthRow->setStretch(0, 0);
+    sixthRow->setStretch(1, 1);
+    sixthRow->setStretch(2, 0);
+    sixthRow->setStretch(3, 0);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(3);
     layout->addLayout(firstRow);
     layout->addLayout(secondRow);
-    layout->addLayout(thirdRow);
-    layout->addLayout(fourthRow);
+    layout->addLayout(fifthRow);
+    layout->addLayout(sixthRow);
     layout->addStretch(1);
 
     QWidget* panelWidget = new QWidget;
@@ -1716,80 +1732,42 @@ void LaserControllerWindow::createMovementDockPanel()
     secondRow->addWidget(m_buttonMoveDown, 2, 3);
     secondRow->addWidget(m_buttonLaserPosition, 3, 0, 1, 4);
 
-    m_comboBoxPostEvent = new QComboBox;
-    m_comboBoxPostEvent->addItem(tr("Stop at current position"));
-    m_comboBoxPostEvent->addItem(tr("Unload motor"));
-    m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
-    m_comboBoxPostEvent->addItem(tr("Back to machining origin"));
+    m_radioButtonUserOrigin1 = new QRadioButton(tr("User Origin 1"));
+    m_radioButtonUserOrigin2 = new QRadioButton(tr("User Origin 2"));
+    m_radioButtonUserOrigin3 = new QRadioButton(tr("User Origin 3"));
+    m_radioButtonUserOrigin1->setProperty("origin", 0);
+    m_radioButtonUserOrigin2->setProperty("origin", 1);
+    m_radioButtonUserOrigin3->setProperty("origin", 2);
+    connect(m_radioButtonUserOrigin1, &QRadioButton::toggled, this, &LaserControllerWindow::onUserOriginRadioButtonChanged);
+    connect(m_radioButtonUserOrigin2, &QRadioButton::toggled, this, &LaserControllerWindow::onUserOriginRadioButtonChanged);
+    connect(m_radioButtonUserOrigin3, &QRadioButton::toggled, this, &LaserControllerWindow::onUserOriginRadioButtonChanged);
 
-    m_radioButtonMachiningOrigin1 = new QRadioButton(tr("Origin 1"));
-    m_radioButtonMachiningOrigin2 = new QRadioButton(tr("Origin 1"));
-    m_radioButtonMachiningOrigin3 = new QRadioButton(tr("Origin 1"));
-    m_radioButtonMachiningOrigin1->setChecked(true);
+    updateUserOriginSelection(Config::Device::userOriginSelected());
 
-    m_doubleSpinBoxOrigin1X = new QDoubleSpinBox;
-    m_doubleSpinBoxOrigin1X->setDecimals(2);
-    m_doubleSpinBoxOrigin1X->setValue(0.00);
+    m_userOrigin1 = new Vector2DWidget;
+    m_userOrigin2 = new Vector2DWidget;
+    m_userOrigin3 = new Vector2DWidget;
 
-    m_doubleSpinBoxOrigin1Y = new QDoubleSpinBox;
-    m_doubleSpinBoxOrigin1Y->setDecimals(2);
-    m_doubleSpinBoxOrigin1Y->setValue(0.00);
-
-    m_doubleSpinBoxOrigin2X = new QDoubleSpinBox;
-    m_doubleSpinBoxOrigin2X->setDecimals(2);
-    m_doubleSpinBoxOrigin2X->setValue(0.00);
-
-    m_doubleSpinBoxOrigin2Y = new QDoubleSpinBox;
-    m_doubleSpinBoxOrigin2Y->setDecimals(2);
-    m_doubleSpinBoxOrigin2Y->setValue(0.00);
-
-    m_doubleSpinBoxOrigin3X = new QDoubleSpinBox;
-    m_doubleSpinBoxOrigin3X->setDecimals(2);
-    m_doubleSpinBoxOrigin3X->setValue(0.00);
-
-    m_doubleSpinBoxOrigin3Y = new QDoubleSpinBox;
-    m_doubleSpinBoxOrigin3Y->setDecimals(2);
-    m_doubleSpinBoxOrigin3Y->setValue(0.00);
+    Config::Device::userOrigin1Item()->bindWidget(m_userOrigin1);
+    Config::Device::userOrigin2Item()->bindWidget(m_userOrigin2);
+    Config::Device::userOrigin3Item()->bindWidget(m_userOrigin3);
 
     QGridLayout* thirdRow = new QGridLayout;
     thirdRow->setMargin(0);
-    thirdRow->addWidget(new QLabel(tr("Post Event")), 0, 0);
-    thirdRow->addWidget(m_comboBoxPostEvent, 0, 1, 1, 4);
-    thirdRow->addWidget(m_radioButtonMachiningOrigin1, 1, 0);
-    thirdRow->addWidget(new QLabel(tr("X")), 1, 1);
-    thirdRow->addWidget(m_doubleSpinBoxOrigin1X, 1, 2);
-    thirdRow->addWidget(new QLabel(tr("Y")), 1, 3);
-    thirdRow->addWidget(m_doubleSpinBoxOrigin1Y, 1, 4);
-    thirdRow->addWidget(m_radioButtonMachiningOrigin2, 2, 0);
-    thirdRow->addWidget(new QLabel(tr("X")), 2, 1);
-    thirdRow->addWidget(m_doubleSpinBoxOrigin2X, 2, 2);
-    thirdRow->addWidget(new QLabel(tr("Y")), 2, 3);
-    thirdRow->addWidget(m_doubleSpinBoxOrigin2Y, 2, 4);
-    thirdRow->addWidget(m_radioButtonMachiningOrigin3, 3, 0);
-    thirdRow->addWidget(new QLabel(tr("X")), 3, 1);
-    thirdRow->addWidget(m_doubleSpinBoxOrigin3X, 3, 2);
-    thirdRow->addWidget(new QLabel(tr("Y")), 3, 3);
-    thirdRow->addWidget(m_doubleSpinBoxOrigin3Y, 3, 4);
-    thirdRow->setColumnStretch(0, 1);
-    thirdRow->setColumnStretch(1, 0);
+    thirdRow->addWidget(m_radioButtonUserOrigin1, 0, 0);
+    thirdRow->addWidget(m_radioButtonUserOrigin2, 1, 0);
+    thirdRow->addWidget(m_radioButtonUserOrigin3, 2, 0);
+    thirdRow->addWidget(m_userOrigin1, 0, 1);
+    thirdRow->addWidget(m_userOrigin2, 1, 1);
+    thirdRow->addWidget(m_userOrigin3, 2, 1);
+    thirdRow->setColumnStretch(0, 0);
     thirdRow->setColumnStretch(2, 1);
-    thirdRow->setColumnStretch(3, 0);
-    thirdRow->setColumnStretch(4, 1);
 
-    m_buttonReadOrigins = new QToolButton;
-    m_buttonReadOrigins->setDefaultAction(m_ui->actionReadOrigins);
-    m_buttonReadOrigins->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    connect(m_buttonReadOrigins, &QToolButton::clicked, this, &LaserControllerWindow::readMachiningOrigins);
-
-    m_buttonWriteOrigins = new QToolButton;
-    m_buttonWriteOrigins->setDefaultAction(m_ui->actionWriteOrigins);
-    m_buttonWriteOrigins->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    connect(m_buttonWriteOrigins, &QToolButton::clicked, this, &LaserControllerWindow::writeMachiningOrigins);
-
+    m_buttonFetchToUserOrigin = new QToolButton;
+    m_buttonFetchToUserOrigin->setDefaultAction(m_ui->actionFetchToUserOrigin);
     QHBoxLayout* fourthRow = new QHBoxLayout;
     fourthRow->setMargin(3);
-    fourthRow->addWidget(m_buttonReadOrigins);
-    fourthRow->addWidget(m_buttonWriteOrigins);
+    fourthRow->addWidget(m_buttonFetchToUserOrigin);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -1812,7 +1790,6 @@ void LaserControllerWindow::createMovementDockPanel()
 
 void LaserControllerWindow::createShapePropertyDockPanel()
 {
-    
     m_cutOrderPriority = new LaserDoubleSpinBox();
     m_cutOrderPriorityLabel = new QLabel("Cut Order Priority");
     m_powerScale = new LaserDoubleSpinBox();
@@ -3097,6 +3074,23 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
     updateOutlineTree();
 }
 
+void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
+{
+    QPointF laserPos = LaserApplication::device->getCurrentLaserPos().toPointF();
+    switch (Config::Device::userOriginSelected())
+    {
+    case 0:
+        Config::Device::userOrigin1Item()->setValue(laserPos);
+        break;
+    case 1:
+        Config::Device::userOrigin2Item()->setValue(laserPos);
+        break;
+    case 2:
+        Config::Device::userOrigin3Item()->setValue(laserPos);
+        break;
+    }
+}
+
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png*.svg*.ico)");
@@ -3393,26 +3387,17 @@ void LaserControllerWindow::onFloatDualEditSliderHigherValueChanged(qreal value)
     Config::SystemRegister::laserMaxPowerItem()->setValue(value, MB_Widget);
 }
 
-void LaserControllerWindow::onLaserMinPowerChanged(const QVariant& value, ModifiedBy modifiedBy)
+void LaserControllerWindow::onUserOriginRadioButtonChanged(bool checked)
 {
-    bool ok;
-    qreal lower = value.toReal(&ok);
-    if (!ok)
+    if (!checked)
         return;
-    m_floatEditDualSliderLaserRange->blockSignals(true);
-    m_floatEditDualSliderLaserRange->setLowerValue(lower);
-    m_floatEditDualSliderLaserRange->blockSignals(false);
-}
 
-void LaserControllerWindow::onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy)
-{
-    bool ok;
-    qreal higher = value.toReal(&ok);
-    if (!ok)
-        return;
-    m_floatEditDualSliderLaserRange->blockSignals(true);
-    m_floatEditDualSliderLaserRange->setHigherValue(higher);
-    m_floatEditDualSliderLaserRange->blockSignals(false);
+    QRadioButton* rb = qobject_cast<QRadioButton*>(sender());
+    if (rb)
+    {
+        int originIndex = rb->property("origin").toInt();
+        Config::Device::userOriginSelectedItem()->setValue(originIndex, MB_Widget);
+    }
 }
 
 void LaserControllerWindow::onCreatSpline()
@@ -3440,6 +3425,35 @@ void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
     m_statusBarProgress->setValue(qRound(progress * 100));
 }
 
+void LaserControllerWindow::onUserOriginConfigValueChanged(const QVariant& index, ModifiedBy modifiedBy)
+{
+    updateUserOriginSelection(index);
+}
+
+void LaserControllerWindow::updateUserOriginSelection(const QVariant& index)
+{
+    int originIndex = index.toInt();
+    QRadioButton* dest = nullptr;
+    switch (originIndex)
+    {
+    case 0:
+        dest = m_radioButtonUserOrigin1;
+        break;
+    case 1:
+        dest = m_radioButtonUserOrigin2;
+        break;
+    case 2:
+        dest = m_radioButtonUserOrigin3;
+        break;
+    }
+    if (dest && !dest->isChecked())
+    {
+        dest->blockSignals(true);
+        dest->setChecked(true);
+        dest->blockSignals(false);
+    }
+}
+
 void LaserControllerWindow::lightOnLaser()
 {
     LaserApplication::driver->testLaserLight(true);
@@ -3450,74 +3464,50 @@ void LaserControllerWindow::lightOffLaser()
     LaserApplication::driver->testLaserLight(false);
 }
 
-void LaserControllerWindow::readMachiningOrigins(bool checked)
-{
-    /*LaserDriver::instance().readSysParamFromCard(QList<int>() 
-        << LaserDriver::RT_CUSTOM_1_X
-        << LaserDriver::RT_CUSTOM_1_Y
-        << LaserDriver::RT_CUSTOM_2_X
-        << LaserDriver::RT_CUSTOM_2_Y
-        << LaserDriver::RT_CUSTOM_3_X
-        << LaserDriver::RT_CUSTOM_3_Y
-    );*/
-}
-
-void LaserControllerWindow::writeMachiningOrigins(bool checked)
-{
-    /*LaserDriver::RegistersMap values;
-    values[LaserDriver::RT_CUSTOM_1_X] = m_ui->doubleSpinBoxOrigin1X->value();
-    values[LaserDriver::RT_CUSTOM_1_Y] = m_ui->doubleSpinBoxOrigin1Y->value();
-    values[LaserDriver::RT_CUSTOM_2_X] = m_ui->doubleSpinBoxOrigin2X->value();
-    values[LaserDriver::RT_CUSTOM_2_Y] = m_ui->doubleSpinBoxOrigin2Y->value();
-    values[LaserDriver::RT_CUSTOM_3_X] = m_ui->doubleSpinBoxOrigin3X->value();
-    values[LaserDriver::RT_CUSTOM_3_Y] = m_ui->doubleSpinBoxOrigin3Y->value();
-    LaserDriver::instance().writeSysParamToCard(values);*/
-}
-
 void LaserControllerWindow::updatePostEventWidgets(int index)
 {
     if (index == 3)
     {
-        m_radioButtonMachiningOrigin1->setEnabled(true);
-        m_radioButtonMachiningOrigin2->setEnabled(true);
-        m_radioButtonMachiningOrigin3->setEnabled(true);
+        m_radioButtonUserOrigin1->setEnabled(true);
+        m_radioButtonUserOrigin2->setEnabled(true);
+        m_radioButtonUserOrigin3->setEnabled(true);
 
-        m_doubleSpinBoxOrigin1X->setEnabled(true);
+        /*m_doubleSpinBoxOrigin1X->setEnabled(true);
         m_doubleSpinBoxOrigin1Y->setEnabled(true);
         m_doubleSpinBoxOrigin2X->setEnabled(true);
         m_doubleSpinBoxOrigin2Y->setEnabled(true);
         m_doubleSpinBoxOrigin3X->setEnabled(true);
-        m_doubleSpinBoxOrigin3Y->setEnabled(true);
+        m_doubleSpinBoxOrigin3Y->setEnabled(true);*/
     }
     else
     {
-        m_radioButtonMachiningOrigin1->setEnabled(false);
-        m_radioButtonMachiningOrigin2->setEnabled(false);
-        m_radioButtonMachiningOrigin3->setEnabled(false);
+        m_radioButtonUserOrigin1->setEnabled(false);
+        m_radioButtonUserOrigin2->setEnabled(false);
+        m_radioButtonUserOrigin3->setEnabled(false);
 
-        m_doubleSpinBoxOrigin1X->setEnabled(false);
+        /*m_doubleSpinBoxOrigin1X->setEnabled(false);
         m_doubleSpinBoxOrigin1Y->setEnabled(false);
         m_doubleSpinBoxOrigin2X->setEnabled(false);
         m_doubleSpinBoxOrigin2Y->setEnabled(false);
         m_doubleSpinBoxOrigin3X->setEnabled(false);
-        m_doubleSpinBoxOrigin3Y->setEnabled(false);
+        m_doubleSpinBoxOrigin3Y->setEnabled(false);*/
     }
 }
 
 void LaserControllerWindow::laserBackToMachiningOriginalPoint(bool checked)
 {
     QVector3D dest;
-    if (m_radioButtonMachiningOrigin1->isChecked())
+    if (m_radioButtonUserOrigin1->isChecked())
     {
-        dest = QVector3D(m_doubleSpinBoxOrigin1X->value(), m_doubleSpinBoxOrigin1Y->value(), 0.f);
+        //dest = QVector3D(m_doubleSpinBoxOrigin1X->value(), m_doubleSpinBoxOrigin1Y->value(), 0.f);
     }
-    else if (m_radioButtonMachiningOrigin2->isChecked())
+    else if (m_radioButtonUserOrigin2->isChecked())
     {
-        dest = QVector3D(m_doubleSpinBoxOrigin2X->value(), m_doubleSpinBoxOrigin2Y->value(), 0.f);
+        //dest = QVector3D(m_doubleSpinBoxOrigin2X->value(), m_doubleSpinBoxOrigin2Y->value(), 0.f);
     }
-    else if (m_radioButtonMachiningOrigin3->isChecked())
+    else if (m_radioButtonUserOrigin3->isChecked())
     {
-        dest = QVector3D(m_doubleSpinBoxOrigin3X->value(), m_doubleSpinBoxOrigin3Y->value(), 0.f);
+        //dest = QVector3D(m_doubleSpinBoxOrigin3X->value(), m_doubleSpinBoxOrigin3Y->value(), 0.f);
     }
     moveLaser(QVector3D(), false, dest);
 }
@@ -4167,21 +4157,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, devicePausedState);
     // end actionMoveToOrigin
 
-    // toolButtonReadOrigins
-    BIND_PROP_TO_STATE(m_buttonReadOrigins, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_buttonReadOrigins, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_buttonReadOrigins, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_buttonReadOrigins, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_buttonReadOrigins, "enabled", false, devicePausedState);
-    // end toolButtonReadOrigins
-
-    // toolButtonWriteOrigins
-    BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_buttonWriteOrigins, "enabled", false, devicePausedState);
-    // end toolButtonWriteOriginse
+    // actionFetchToUserOrigin
+    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, devicePausedState);
+    // end actionFetchToUserOrigin
 
     // actionSelectionTool
 	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);

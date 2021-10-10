@@ -159,19 +159,28 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             QSvgText* svgTextNode = reinterpret_cast<QSvgText*>(node);
             QSvgStyleProperty* styleProperty = svgTextNode->styleProperty(QSvgStyleProperty::Type::FONT);
             QSvgFontStyle* fontStyle = reinterpret_cast<QSvgFontStyle*>(styleProperty);
-            QFont font("Times New Roman");
+            //QFont font("Microsoft YaHei", 24);
+            QFont font;
             if (fontStyle)
             {
                 QFont svgFont = fontStyle->qfont();
-                qLogD << svgFont;
-                font = QFont(svgFont.family());
+                font = QFont(svgFont);
+                qreal fontSize = 100 / svgFont.pointSizeF() * docScaleWidth;
+                qLogD << fontSize;
+                //font.setPointSize(24);
+                //font.setPixelSize(fontPixel);
+                font.setPixelSize(Global::mm2PixelsX(fontSize) * 3);
                 //qreal scale = 100.0 / font.pointSizeF();
                 //font.setPixelSize(Global::mm2PixelsXF(font.pointSizeF() * scale * docScaleWidth));
-                font.setPointSizeF(Global::mm2PixelsXF(svgFont.pointSizeF() * docScaleWidth) * 0.8);
-                qLogD << font.pixelSize() << ", " << font.pointSize() << ", " << font.pointSizeF();
+                //font.setPointSizeF(svgFont.pointSizeF() * docScaleWidth);
+                //font.setPointSize(24);
+                QFontMetricsF fm(svgFont);
+                //font.setPixelSize(fm.height());
+                //qLogD << font.family() << ", " << font.pixelSize() << ", " << font.pointSize() << ", " << font.pointSizeF();
             }
+            qLogD << font;
             QPointF pos = matrix.map(svgTextNode->coord());
-            LaserText* laserText = new LaserText(laserDoc, pos, font, Qt::AlignHCenter, Qt::AlignVCenter);
+            LaserText* laserText = new LaserText(laserDoc, pos, font, Qt::AlignLeft, Qt::AlignVCenter);
             laserText->setContent(svgTextNode->text());
             laserText->modifyPathList();
             item = laserText;

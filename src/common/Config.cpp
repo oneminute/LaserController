@@ -15,6 +15,7 @@
 #include "exception/LaserException.h"
 #include "laser/LaserRegister.h"
 #include "util/WidgetUtils.h"
+#include "util/TypeUtils.h"
 #include "widget/InputWidgetWrapper.h"
 #include "widget/RadioButtonGroup.h"
 #include "widget/SmallDiagonalLimitationWidget.h"
@@ -848,9 +849,6 @@ void Config::loadDeviceItems()
             if (!comboBox)
                 return;
 
-            //comboBox->addItem(tr("Current Position"), SFT_CurrentPosition);
-            //comboBox->addItem(tr("User Origin"), SFT_UserOrigin);
-            //comboBox->addItem(tr("Absolute Coords"), SFT_AbsoluteCoords);
             comboBox->addItem(ltr("Current Position"), SFT_CurrentPosition);
             comboBox->addItem(ltr("User Origin"), SFT_UserOrigin);
             comboBox->addItem(ltr("Absolute Coords"), SFT_AbsoluteCoords);
@@ -924,6 +922,167 @@ void Config::loadDeviceItems()
         DT_BOOL
     );
     zEnabled->setStoreStrategy(SS_DIRECTLY);
+
+    ConfigItem* userOrigin1 = group->addConfigItem(
+        "userOrigin1",
+        QPointF(0, 0),
+        DT_POINT
+    );
+    userOrigin1->setStoreStrategy(SS_DIRECTLY);
+    userOrigin1->setInputWidgetProperty("minimum", -1000000);
+    userOrigin1->setInputWidgetProperty("maximum", 1000000);
+    userOrigin1->setInputWidgetProperty("decimals", 3);
+    userOrigin1->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            QPointF pt = value.toPointF();
+            return QVariant(pt * 1000);
+        }
+    );
+    userOrigin1->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            QPointF pt = value.toPointF();
+            return QVariant(pt / 1000.0);
+        }
+    );
+    userOrigin1->setToJsonHook(
+        [=](const ConfigItem* item) {
+            QPointF pt = item->value().toPointF();
+            QPointF defPt = item->defaultValue().toPointF();
+            QJsonObject jsonObj;
+            jsonObj["value"] = typeUtils::point2Json(pt);
+            jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
+            return jsonObj;
+        }
+    );
+    userOrigin1->setFromJsonHook(
+        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
+            if (json.contains("value"))
+            {
+                value = typeUtils::json2Point(json["value"]);
+            }
+            if (json.contains("defaultValue"))
+            {
+                defaultValue = typeUtils::json2Point(json["defaultValue"]);
+            }
+        }
+    );
+
+    ConfigItem* userOrigin2 = group->addConfigItem(
+        "userOrigin2",
+        QPointF(0, 0),
+        DT_POINT
+    );
+    userOrigin2->setStoreStrategy(SS_DIRECTLY);
+    userOrigin2->setInputWidgetProperty("minimum", -1000000);
+    userOrigin2->setInputWidgetProperty("maximum", 1000000);
+    userOrigin2->setInputWidgetProperty("decimals", 3);
+    userOrigin2->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            QPointF pt = value.toPointF();
+            return QVariant(pt * 1000);
+        }
+    );
+    userOrigin2->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            QPointF pt = value.toPointF();
+            return QVariant(pt / 1000.0);
+        }
+    );
+    userOrigin2->setToJsonHook(
+        [=](const ConfigItem* item) {
+            QPointF pt = item->value().toPointF();
+            QPointF defPt = item->defaultValue().toPointF();
+            QJsonObject jsonObj;
+            jsonObj["value"] = typeUtils::point2Json(pt);
+            jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
+            return jsonObj;
+        }
+    );
+    userOrigin2->setFromJsonHook(
+        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
+            if (json.contains("value"))
+            {
+                value = typeUtils::json2Point(json["value"]);
+            }
+            if (json.contains("defaultValue"))
+            {
+                defaultValue = typeUtils::json2Point(json["defaultValue"]);
+            }
+        }
+    );
+
+    ConfigItem* userOrigin3 = group->addConfigItem(
+        "userOrigin3",
+        QPointF(0, 0),
+        DT_POINT
+    );
+    userOrigin3->setStoreStrategy(SS_DIRECTLY);
+    userOrigin3->setInputWidgetProperty("minimum", -1000000);
+    userOrigin3->setInputWidgetProperty("maximum", 1000000);
+    userOrigin3->setInputWidgetProperty("decimals", 3);
+    userOrigin3->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            QPointF pt = value.toPointF();
+            return QVariant(pt * 1000);
+        }
+    );
+    userOrigin3->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            QPointF pt = value.toPointF();
+            return QVariant(pt / 1000.0);
+        }
+    );
+    userOrigin3->setToJsonHook(
+        [=](const ConfigItem* item) {
+            QPointF pt = item->value().toPointF();
+            QPointF defPt = item->defaultValue().toPointF();
+            QJsonObject jsonObj;
+            jsonObj["value"] = typeUtils::point2Json(pt);
+            jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
+            return jsonObj;
+        }
+    );
+    userOrigin3->setFromJsonHook(
+        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
+            if (json.contains("value"))
+            {
+                value = typeUtils::json2Point(json["value"]);
+            }
+            if (json.contains("defaultValue"))
+            {
+                defaultValue = typeUtils::json2Point(json["defaultValue"]);
+            }
+        }
+    );
+
+    ConfigItem* userOriginSelected = group->addConfigItem(
+        "userOriginSelected",
+        0,
+        DT_INT
+    );
+    userOriginSelected->setInputWidgetType(IWT_ComboBox);
+    userOriginSelected->setStoreStrategy(SS_DIRECTLY);
+    userOriginSelected->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("User Origin 1"), 0);
+            comboBox->addItem(ltr("User Origin 2"), 1);
+            comboBox->addItem(ltr("User Origin 3"), 2);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
 }
 
 void Config::loadUserReigsters()
@@ -1255,8 +1414,10 @@ void Config::loadUserReigsters()
     ConfigItem* scanLaserPower = group->addConfigItem(
         "scanLaserPower",
         120,
-        DT_INT
+        DT_REAL
     );
+    scanLaserPower->setInputWidgetType(IWT_FloatEditSlider);
+    scanLaserPower->setStoreStrategy(SS_DIRECTLY);
     scanLaserPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
@@ -1459,8 +1620,10 @@ void Config::loadUserReigsters()
     ConfigItem* defaultMaxCuttingPower = group->addConfigItem(
         "defaultMaxCuttingPower",
         1000,
-        DT_INT
+        DT_REAL
     );
+    defaultMaxCuttingPower->setInputWidgetType(IWT_FloatEditSlider);
+    defaultMaxCuttingPower->setStoreStrategy(SS_DIRECTLY);
     defaultMaxCuttingPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
@@ -1483,8 +1646,10 @@ void Config::loadUserReigsters()
     ConfigItem* defaultMinCuttingPower = group->addConfigItem(
         "defaultMinCuttingPower",
         100,
-        DT_INT
+        DT_REAL
     );
+    defaultMinCuttingPower->setInputWidgetType(IWT_FloatEditSlider);
+    defaultMinCuttingPower->setStoreStrategy(SS_DIRECTLY);
     defaultMinCuttingPower->setValueToWidgetHook(
         [](const QVariant& value)
         {
@@ -1533,6 +1698,7 @@ void Config::loadUserReigsters()
         800,
         DT_INT
     );
+    maxScanGrayRatio->setStoreStrategy(SS_DIRECTLY);
     maxScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxScanGrayRatio->setInputWidgetProperty("minimum", 0);
     maxScanGrayRatio->setInputWidgetProperty("maximum", 1000);
@@ -1542,9 +1708,56 @@ void Config::loadUserReigsters()
         50,
         DT_INT
     );
+    minScanGrayRatio->setStoreStrategy(SS_DIRECTLY);
     minScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     minScanGrayRatio->setInputWidgetProperty("minimum", 0);
     minScanGrayRatio->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* cuttingTurnOnDelay = group->addConfigItem(
+        "cuttingTurnOnDelay",
+        0.01,
+        DT_REAL
+    );
+    cuttingTurnOnDelay->setStoreStrategy(SS_DIRECTLY);
+    cuttingTurnOnDelay->setInputWidgetProperty("minimum", 0.001);
+    cuttingTurnOnDelay->setInputWidgetProperty("maximum", 1);
+    cuttingTurnOnDelay->setInputWidgetProperty("decimals", 3);
+
+    ConfigItem* cuttingTurnOffDelay = group->addConfigItem(
+        "cuttingTurnOffDelay",
+        0.01,
+        DT_REAL
+    );
+    cuttingTurnOffDelay->setStoreStrategy(SS_DIRECTLY);
+    cuttingTurnOffDelay->setInputWidgetProperty("minimum", 0.001);
+    cuttingTurnOffDelay->setInputWidgetProperty("maximum", 1);
+    cuttingTurnOffDelay->setInputWidgetProperty("decimals", 3);
+
+    ConfigItem* spotShotPower = group->addConfigItem(
+        "spotShotPower",
+        100,
+        DT_REAL
+    );
+    spotShotPower->setInputWidgetType(IWT_FloatEditSlider);
+    spotShotPower->setStoreStrategy(SS_DIRECTLY);
+    spotShotPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    spotShotPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    spotShotPower->setInputWidgetProperty("textTemplate", "%1%");
+    spotShotPower->setInputWidgetProperty("maximumLineEditWidth", 75);
+    spotShotPower->setInputWidgetProperty("step", 0.1);
+    spotShotPower->setInputWidgetProperty("page", 10);
+    spotShotPower->setInputWidgetProperty("minimum", 1);
+    spotShotPower->setInputWidgetProperty("maximum", 100);
 }
 
 void Config::loadSystemRegisters()
@@ -2914,6 +3127,22 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Z Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enabled z axis movement", nullptr));
 
+    Device::userOrigin1Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "User Origin 1", nullptr), 
+        QCoreApplication::translate("Config", "User Origin 1", nullptr));
+
+    Device::userOrigin2Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "User Origin 2", nullptr), 
+        QCoreApplication::translate("Config", "User Origin 2", nullptr));
+
+    Device::userOrigin3Item()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "User Origin 3", nullptr), 
+        QCoreApplication::translate("Config", "User Origin 3", nullptr));
+
+    Device::userOriginSelectedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "User Origin", nullptr), 
+        QCoreApplication::translate("Config", "Selected user origin", nullptr));
+
     UserRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 
         QCoreApplication::translate("Config", "Read-only data used to test the quality of data transmission", nullptr));
@@ -3041,6 +3270,18 @@ void Config::updateTitlesAndDescriptions()
     UserRegister::minScanGrayRatioItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Min Scan Gray Ratio", nullptr), 
         QCoreApplication::translate("Config", "Min scan gray ratio", nullptr));
+
+    UserRegister::cuttingTurnOnDelayItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Cutting Turn On Delay(us)", nullptr), 
+        QCoreApplication::translate("Config", "Delay of turning on laser for cutting", nullptr));
+
+    UserRegister::cuttingTurnOffDelayItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Cutting Turn Off Delay(us)", nullptr), 
+        QCoreApplication::translate("Config", "Delay of turning off laser for cutting", nullptr));
+
+    UserRegister::spotShotPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Spot Shot Power", nullptr), 
+        QCoreApplication::translate("Config", "Spot shot power", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

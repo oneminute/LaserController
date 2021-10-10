@@ -203,6 +203,9 @@ ConfigItem::ConfigItem(
     case DT_DATETIME:
         d->inputWidgetType = IWT_DateTimeEdit;
         break;
+    case DT_POINT:
+        d->inputWidgetType = IWT_Vector2DWidget;
+        break;
     default:
         d->inputWidgetType = IWT_Custom;
     }
@@ -454,6 +457,10 @@ QJsonObject ConfigItem::toJson() const
     else
     {
         QJsonObject item;
+        if (this == Config::Device::userOrigin1Item())
+        {
+            qLogD << "break point: " << value().toString();
+        }
         item["value"] = QJsonValue::fromVariant(value());
         item["defaultValue"] = QJsonValue::fromVariant(defaultValue());
         return item;
