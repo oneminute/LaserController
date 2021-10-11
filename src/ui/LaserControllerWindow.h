@@ -19,6 +19,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
 QT_END_NAMESPACE
 
+class EditSlider;
 class FloatEditDualSlider;
 class FloatEditSlider;
 class LaserLayerTableWidget;
@@ -38,6 +39,8 @@ class QWidget;
 class RulerWidget;
 class ProgressBar;
 class PressedToolButton;
+class Vector2DWidget;
+class RadioButtonGroup;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -150,17 +153,6 @@ protected slots:
     void onActionMoveUp();
     void onActionMoveDown();
 
-    /*void onButtonMoveTopLeft();
-    void onButtonMoveTop();
-    void onButtonMoveTopRight();
-    void onButtonMoveBottomLeft();
-    void onButtonMoveBottom();
-    void onButtonMoveBottomRight();
-    void onButtonMoveLeft();
-    void onButtonMoveRight();
-    void onButtonMoveUp();
-    void onButtonMoveDown();*/
-
     void onMovementButtonReleased();
 
     void onActionHalfTone(bool checked = false);
@@ -196,6 +188,7 @@ protected slots:
     void onActionAbout(bool checked = false);
 
     void onActionUpdateOutline(bool checked = false);
+    void onActionFetchToUserOrigin(bool checked = false);
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -221,18 +214,18 @@ protected slots:
     void onFloatEditSliderLaserPower(qreal value);
     void onFloatDualEditSliderLowerValueChanged(qreal value);
     void onFloatDualEditSliderHigherValueChanged(qreal value);
-    void onLaserMinPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
-    void onLaserMaxPowerChanged(const QVariant& value, ModifiedBy modifiedBy);
+
+    void onUserOriginRadioButtonChanged(bool checked);
 
 	void onCreatSpline();
     void onDocumentExportFinished(const QString& filename);
 
     void onPreviewWindowProgressUpdated(qreal progress);
+    void onUserOriginConfigValueChanged(const QVariant& index, ModifiedBy modifiedBy);
+    void updateUserOriginSelection(const QVariant& index);
 
     void lightOnLaser();
     void lightOffLaser();
-    void readMachiningOrigins(bool checked = false);
-    void writeMachiningOrigins(bool checked = false);
     void updatePostEventWidgets(int index);
     void laserBackToMachiningOriginalPoint(bool checked = false);
     void laserResetToOriginalPoint(bool checked = false);
@@ -318,8 +311,17 @@ private:
     QToolButton* m_buttonOperationOrigin;
     QToolButton* m_buttonOperationOptimize;
     QComboBox* m_comboBoxStartPosition;
-    FloatEditSlider* m_floatEditSliderLaserPower;
-    FloatEditDualSlider* m_floatEditDualSliderLaserRange;
+    RadioButtonGroup* m_radioButtonGroupJobOrigin;
+    FloatEditSlider* m_floatEditSliderScanLaserPower;
+    EditSlider* m_editSliderScanMaxGray;
+    EditSlider* m_editSliderScanMinGray;
+    FloatEditSlider* m_floatEditSliderCuttingMaxPower;
+    FloatEditSlider* m_floatEditSliderCuttingMinPower;
+    FloatEditSlider* m_floatEditSliderCuttingTurnOnDelay;
+    FloatEditSlider* m_floatEditSliderCuttingTurnOffDelay;
+    FloatEditSlider* m_floatEditSliderSpotShotPower;
+    //FloatEditSlider* m_floatEditSliderLaserPower;
+    //FloatEditDualSlider* m_floatEditDualSliderLaserRange;
     QComboBox* m_comboBoxDevices;
     QToolButton* m_buttonConnect;
     QToolButton* m_buttonRefresh;
@@ -355,17 +357,13 @@ private:
 
     QToolButton* m_buttonLaserPosition;
     QComboBox* m_comboBoxPostEvent;
-    QRadioButton* m_radioButtonMachiningOrigin1;
-    QRadioButton* m_radioButtonMachiningOrigin2;
-    QRadioButton* m_radioButtonMachiningOrigin3;
-    QDoubleSpinBox* m_doubleSpinBoxOrigin1X;
-    QDoubleSpinBox* m_doubleSpinBoxOrigin1Y;
-    QDoubleSpinBox* m_doubleSpinBoxOrigin2X;
-    QDoubleSpinBox* m_doubleSpinBoxOrigin2Y;
-    QDoubleSpinBox* m_doubleSpinBoxOrigin3X;
-    QDoubleSpinBox* m_doubleSpinBoxOrigin3Y;
-    QToolButton* m_buttonReadOrigins;
-    QToolButton* m_buttonWriteOrigins;
+    QRadioButton* m_radioButtonUserOrigin1;
+    QRadioButton* m_radioButtonUserOrigin2;
+    QRadioButton* m_radioButtonUserOrigin3;
+    Vector2DWidget* m_userOrigin1;
+    Vector2DWidget* m_userOrigin2;
+    Vector2DWidget* m_userOrigin3;
+    QToolButton* m_buttonFetchToUserOrigin;
     ads::CDockAreaWidget* m_dockAreaMovement;
 
     // Update Panel widgets

@@ -22,14 +22,14 @@
         return itemName##Item()->value().convertionMethod(); \
     }
 
-#define CONFIG_ITEM_T(groupName, itemName, returnType, T) \
+#define CONFIG_ITEM_T(groupName, itemName, T) \
     static ConfigItem* itemName##Item() \
     { \
         return Config::groupsMap[#groupName]->configItem(#itemName); \
     } \
-    static returnType itemName() \
+    static T itemName() \
     { \
-        return itemName##Item()->value<T>(); \
+        return itemName##Item()->value().value<T>(); \
     }
 
 class ConfigItem;
@@ -226,7 +226,6 @@ public:
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
-        //CONFIG_ITEM(export, enableRelativeCoordinates, bool, toBool)
         CONFIG_ITEM(export, halfToneStyle, int, toInt)
         CONFIG_ITEM(export, imageUseGaussian, bool, toBool)
         CONFIG_ITEM(export, gaussianFactor, qreal, toReal)
@@ -249,13 +248,16 @@ public:
     public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(device, autoConnectFirstCOM, bool, toBool)
-
         CONFIG_ITEM(device, startFrom, int, toInt)
         CONFIG_ITEM(device, jobOrigin, int, toInt)
-
         CONFIG_ITEM(device, xEnabled, bool, toBool)
         CONFIG_ITEM(device, yEnabled, bool, toBool)
         CONFIG_ITEM(device, zEnabled, bool, toBool)
+        CONFIG_ITEM(device, userOrigin1, QPointF, toPointF)
+        CONFIG_ITEM(device, userOrigin2, QPointF, toPointF)
+        CONFIG_ITEM(device, userOrigin3, QPointF, toPointF)
+        CONFIG_ITEM(device, userOriginSelected, int, toInt)
+        //CONFIG_ITEM_T(device, userOrigins, QList<QPointF>, QList<QPointF>)
 
     private:
         friend class Config;
@@ -303,6 +305,9 @@ public:
         CONFIG_ITEM(userRegister, defaultScanSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, maxScanGrayRatio, qreal, toReal)
         CONFIG_ITEM(userRegister, minScanGrayRatio, qreal, toReal)
+        CONFIG_ITEM(userRegister, cuttingTurnOnDelay, qreal, toReal)
+        CONFIG_ITEM(userRegister, cuttingTurnOffDelay, qreal, toReal)
+        CONFIG_ITEM(userRegister, spotShotPower, qreal, toReal)
 
     private:
         friend class Config;

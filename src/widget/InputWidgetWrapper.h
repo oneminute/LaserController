@@ -5,6 +5,23 @@
 #include <QVariant>
 #include <QWidget>
 #include "common/Config.h"
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDateEdit>
+#include <QDateTimeEdit>
+#include <QDial>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPlainTextEdit>
+#include <QSpinBox>
+#include <QTextEdit>
+#include <QTimeEdit>
+#include "util/TypeUtils.h"
+#include "widget/EditSlider.h"
+#include "widget/FloatEditSlider.h"
+#include "widget/SmallDiagonalLimitationWidget.h"
+#include "widget/Vector2DWidget.h"
 
 class QComboBox;
 class QLineEdit;
@@ -36,7 +53,60 @@ public:
 
     void retranslate();
 
-    static QWidget* createWidget(ConfigItem* item, Qt::Orientation orientation);
+    template<typename T = QWidget*>
+    static T createWidget(ConfigItem* item, Qt::Orientation orientation = Qt::Horizontal)
+    {
+        QWidget* widget = nullptr;
+        switch (item->inputWidgetType())
+        {
+        case IWT_CheckBox:
+            widget = new QCheckBox;
+            break;
+        case IWT_ComboBox:
+            widget = new QComboBox;
+            break;
+        case IWT_LineEdit:
+            widget = new QLineEdit;
+            break;
+        case IWT_TextEdit:
+            widget = new QTextEdit;
+            break;
+        case IWT_PlainTextEdit:
+            widget = new QPlainTextEdit;
+            break;
+        case IWT_SpinBox:
+            widget = new QSpinBox;
+            break;
+        case IWT_DoubleSpinBox:
+            widget = new QDoubleSpinBox;
+            break;
+        case IWT_TimeEdit:
+            widget = new QTimeEdit;
+            break;
+        case IWT_DateEdit:
+            widget = new QDateEdit;
+            break;
+        case IWT_DateTimeEdit:
+            widget = new QDateTimeEdit;
+            break;
+        case IWT_Dial:
+            widget = new QDial;
+            break;
+        case IWT_EditSlider:
+            widget = new EditSlider(orientation);
+            break;
+        case IWT_FloatEditSlider:
+            widget = new FloatEditSlider(orientation);
+            break;
+        case IWT_Vector2DWidget:
+            widget = new Vector2DWidget;
+            break;
+        default:
+            widget = item->doCreateWidgetHook();
+            break;
+        }
+        return qobject_cast<T>(widget);
+    }
 
 public slots:
     void setEnabled(bool enabled);
@@ -52,6 +122,7 @@ public slots:
     void onTimeChanged(const QTime& time);
     void onDateChanged(const QDate& date);
     void onDateTimeChanged(const QDateTime& dateTime);
+    void onVector2DChanged(qreal x, qreal y);
 
     void onConfigItemModifiedChanged(bool modified);
     void onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy);

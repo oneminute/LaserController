@@ -212,6 +212,7 @@ enum InputWidgetType
     IWT_Dial,
     IWT_EditSlider,
     IWT_FloatEditSlider,
+    IWT_Vector2DWidget,
     //IWT_LimitationWidget
 };
 

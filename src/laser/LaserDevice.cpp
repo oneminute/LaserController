@@ -138,6 +138,9 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(29, new LaserRegister(29, Config::UserRegister::defaultScanSpeedItem(), false));
     d->userRegisters.insert(30, new LaserRegister(30, Config::UserRegister::maxScanGrayRatioItem(), false));
     d->userRegisters.insert(31, new LaserRegister(31, Config::UserRegister::minScanGrayRatioItem(), false));
+    d->userRegisters.insert(32, new LaserRegister(32, Config::UserRegister::cuttingTurnOnDelayItem(), false));
+    d->userRegisters.insert(33, new LaserRegister(33, Config::UserRegister::cuttingTurnOffDelayItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(34, Config::UserRegister::spotShotPowerItem(), false));
 
     d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
     d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));
@@ -845,11 +848,7 @@ LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified)
 QVector3D LaserDevice::getCurrentLaserPos()
 {
     Q_D(LaserDevice);
-    if (isAvailable())
-    {
-        return d->driver->getCurrentLaserPos();
-    }
-    return QVector3D(0, 0, 0);
+    return d->lastState.pos;
 }
 
 void LaserDevice::unload()

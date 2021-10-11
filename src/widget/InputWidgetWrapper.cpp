@@ -1,22 +1,5 @@
 #include "InputWidgetWrapper.h"
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QDateEdit>
-#include <QDateTimeEdit>
-#include <QDial>
-#include <QDoubleSpinBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPlainTextEdit>
-#include <QSpinBox>
-#include <QTextEdit>
-#include <QTimeEdit>
-#include "util/TypeUtils.h"
-#include "widget/EditSlider.h"
-#include "widget/FloatEditSlider.h"
-#include "widget/SmallDiagonalLimitationWidget.h"
-
 class InputWidgetWrapperPrivate
 {
     Q_DECLARE_PUBLIC(InputWidgetWrapper)
@@ -129,6 +112,10 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         connect(floatEditSlider, &FloatEditSlider::valueChanged, this, QOverload<qreal>::of(&InputWidgetWrapper::onValueChanged));
         break;
     }
+    case IWT_Vector2DWidget:
+        Vector2DWidget* vector2DWidget = qobject_cast<Vector2DWidget*>(widget);
+        connect(vector2DWidget, &Vector2DWidget::valueChanged, this, QOverload<qreal, qreal>::of(&InputWidgetWrapper::onVector2DChanged));
+        break;
     }
     configItem->blockSignals(true);
     //if (d->configItem->name() == "searchingXYWeight")
@@ -273,6 +260,12 @@ void InputWidgetWrapper::updateValue(const QVariant& newValue)
             editSlider->setValue(value.toReal());
             break;
         }
+        case IWT_Vector2DWidget:
+        {
+            Vector2DWidget* vector2DWidget = qobject_cast<Vector2DWidget*>(widget);
+            vector2DWidget->setValue(value.toPointF());
+            break;
+        }
         }
     }
     widget->blockSignals(false);
@@ -304,57 +297,6 @@ void InputWidgetWrapper::retranslate()
     Q_D(InputWidgetWrapper);
     d->labelName->setText(d->configItem->title());
     d->labelName->setToolTip(d->configItem->description());
-}
-
-QWidget* InputWidgetWrapper::createWidget(ConfigItem* item, Qt::Orientation orientation)
-{
-    QWidget* widget = nullptr;
-    switch (item->inputWidgetType())
-    {
-    case IWT_CheckBox:
-        widget = new QCheckBox;
-        break;
-    case IWT_ComboBox:
-        widget = new QComboBox;
-        break;
-    case IWT_LineEdit:
-        widget = new QLineEdit;
-        break;
-    case IWT_TextEdit:
-        widget = new QTextEdit;
-        break;
-    case IWT_PlainTextEdit:
-        widget = new QPlainTextEdit;
-        break;
-    case IWT_SpinBox:
-        widget = new QSpinBox;
-        break;
-    case IWT_DoubleSpinBox:
-        widget = new QDoubleSpinBox;
-        break;
-    case IWT_TimeEdit:
-        widget = new QTimeEdit;
-        break;
-    case IWT_DateEdit:
-        widget = new QDateEdit;
-        break;
-    case IWT_DateTimeEdit:
-        widget = new QDateTimeEdit;
-        break;
-    case IWT_Dial:
-        widget = new QDial;
-        break;
-    case IWT_EditSlider:
-        widget = new EditSlider(orientation);
-        break;
-    case IWT_FloatEditSlider:
-        widget = new FloatEditSlider(orientation);
-        break;
-    default:
-        widget = item->doCreateWidgetHook();
-        break;
-    }
-    return widget;
 }
 
 void InputWidgetWrapper::setEnabled(bool enabled)
@@ -435,6 +377,11 @@ void InputWidgetWrapper::onDateChanged(const QDate & date)
 void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
 {
     changeValue(dateTime);
+}
+
+void InputWidgetWrapper::onVector2DChanged(qreal x, qreal y)
+{
+    changeValue(QPointF(x, y));
 }
 
 void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
