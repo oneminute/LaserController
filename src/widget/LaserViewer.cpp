@@ -389,16 +389,30 @@ QRectF LaserViewer::AllItemsSceneBoundingRect()
     }
     return QRectF(QPointF(left, top), QPointF(right, bottom));
 }
-void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
+void LaserViewer::resetSelectedItemsGroupRect(qreal width, qreal height, QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
     int _state, int _transformType, int _pp, bool _unitIsMM)
 {
 	if (m_group && !m_group->isEmpty()) {
 		QRectF bounds = selectedItemsSceneBoundingRect();
 		QPointF point = _sceneRect.topLeft();
-		qreal width = _sceneRect.width();
-		qreal height = _sceneRect.height();
-		QTransform t = m_group->transform();
+		qreal widthReal = _sceneRect.width();
+		qreal heightReal = _sceneRect.height();
         LaserControllerWindow* window = LaserApplication::mainWindow;
+        /*if (width <= 0) {
+            if (_unitIsMM) {
+                width = Global::mm2PixelsXF(0.001);
+            }
+            //window->widthBox()->setValue(0.001);
+        }
+        if (height <= 0) {
+            if (_unitIsMM) {
+                height = Global::mm2PixelsYF(0.001);
+            }
+            
+            //window->heightBox()->setValue(0.001);
+        }*/
+		QTransform t = m_group->transform();
+        
         bool isLockRatio = window->lockEqualRatio();
 		switch (_transformType) {
 			case Transform_MOVE: {
@@ -510,19 +524,22 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				break;
 			}
 			case Transform_RESIZE: {
-				qreal rateX = width / bounds.width();
-				qreal rateY = height / bounds.height();
+                qDebug() << bounds.width();
+				qreal rateX = widthReal / bounds.width();
+				qreal rateY = heightReal / bounds.height();
                 if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
                     rateX = rateY;
                     if (_unitIsMM) {
-                        window->widthBox()->setValue(Global::pixelsF2mmX(width * rateX));
+                        qreal v = Global::pixelsF2mmY(bounds.width() * rateY);
+                        window->widthBox()->setValue(v);
                     }
                     
                 }
                 if (_pp == PrimitiveProperty::PP_Width && isLockRatio) {
                     rateY = rateX;
                     if (_unitIsMM) {
-                        window->heightBox()->setValue(Global::pixelsF2mmY(height * rateY));
+                        qreal v = Global::pixelsF2mmY(bounds.height() * rateY);
+                        window->heightBox()->setValue(v);
                     }
                 }
 
@@ -1633,13 +1650,16 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 	if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
 		
 		m_detectedPrimitive = nullptr;
-		if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
-			QPixmap cMap(":/ui/icons/images/arrow.png");
-			this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
-		}
-		else {
-			setCursor(Qt::ArrowCursor);
-		}
+        if (event->button() == Qt::NoButton) {
+            if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
+                QPixmap cMap(":/ui/icons/images/arrow.png");
+                this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+            }
+            else {
+                setCursor(Qt::ArrowCursor);
+            }
+        }
+		
 
 	}else if(StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
@@ -1726,7 +1746,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     break;
                 }
             }
-        }else if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
+        }else if (detectItemByMouse(m_detectedPrimitive, event->pos()) && event->button() == Qt::NoButton) {
 			//when mousepress, detect again
 			m_curSelectedHandleIndex = -1;
 			QPixmap cMap(":/ui/icons/images/arrow.png");

@@ -314,11 +314,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_widthBox = new LaserDoubleSpinBox();
 	m_widthBox->setMinimum(DBL_MIN);
 	m_widthBox->setMaximum(DBL_MAX);
+    m_widthBox->setDecimals(3);
 	m_heightBox = new LaserDoubleSpinBox();
 	m_heightBox->setMinimum(DBL_MIN);
 	m_heightBox->setMaximum(DBL_MAX);
+	//m_heightBox->setDecimals(3);
 	m_heightBox->setDecimals(3);
-	//m_heightBox->setDecimals(DBL_MAX_10_EXP);
 	m_widthUnit = new QLabel("mm");
 	m_heightUnit = new QLabel("mm");
 
@@ -3783,7 +3784,7 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
 	
 	
 	//repaint 
-	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
+	m_viewer->resetSelectedItemsGroupRect(width, height, QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
         m_selectionTranformState, state, m_unitIsMM);
 	m_xRateBox->setValue(100);
 	m_yRateBox->setValue(100);
