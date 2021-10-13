@@ -3774,7 +3774,7 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
 	
 	
 	//repaint 
-	m_viewer->resetSelectedItemsGroupRect(width, height, QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
+	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
         m_selectionTranformState, state, m_unitIsMM);
 	m_xRateBox->setValue(100);
 	m_yRateBox->setValue(100);

@@ -389,7 +389,7 @@ QRectF LaserViewer::AllItemsSceneBoundingRect()
     }
     return QRectF(QPointF(left, top), QPointF(right, bottom));
 }
-void LaserViewer::resetSelectedItemsGroupRect(qreal width, qreal height, QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
+void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
     int _state, int _transformType, int _pp, bool _unitIsMM)
 {
 	if (m_group && !m_group->isEmpty()) {
@@ -398,19 +398,7 @@ void LaserViewer::resetSelectedItemsGroupRect(qreal width, qreal height, QRectF 
 		qreal widthReal = _sceneRect.width();
 		qreal heightReal = _sceneRect.height();
         LaserControllerWindow* window = LaserApplication::mainWindow;
-        /*if (width <= 0) {
-            if (_unitIsMM) {
-                width = Global::mm2PixelsXF(0.001);
-            }
-            //window->widthBox()->setValue(0.001);
-        }
-        if (height <= 0) {
-            if (_unitIsMM) {
-                height = Global::mm2PixelsYF(0.001);
-            }
-            
-            //window->heightBox()->setValue(0.001);
-        }*/
+       
 		QTransform t = m_group->transform();
         
         bool isLockRatio = window->lockEqualRatio();

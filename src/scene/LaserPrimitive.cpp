@@ -256,8 +256,21 @@ QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
 	QRectF bounds = d->boundingRect;
+    qDebug() << d->boundingRect;
     return bounds;
 }
+
+/*QPainterPath LaserPrimitive::shape() const
+{
+    Q_D(const LaserPrimitive);
+    QPainterPath path;
+    QPainterPath shape;
+    shape.addPath(sceneTransform().map(d->path));
+    path.addPolygon(sceneTransform().inverted().map(shape.boundingRect()));
+    QPainterPath path1;
+    path1.addRect(QRect(0, 0, 10, 10));
+    return path1;
+}*/
 
 QRectF LaserPrimitive::sceneBoundingRect() const
 {
@@ -745,8 +758,10 @@ void LaserEllipse::draw(QPainter* painter)
     Q_D(LaserEllipse);
 	//painter->drawRect(boundingRect());
 	painter->drawPath(d->path);
-	//painter->setPen(QPen(Qt::black, 1));
+	painter->setPen(QPen(Qt::black, 1));
 	//painter->drawLine(edges()[0]);
+    painter->drawPath(shape());
+    painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserEllipse::toMachiningPath() const
@@ -855,7 +870,7 @@ LaserRect::LaserRect(const QRectF rect, qreal cornerRadius, LaserDocument * doc,
     }
 
 	sceneTransformToItemTransform(saveTransform);
-	//d->path = saveTransform.map(d->path);
+	//d->path = saveTransform.map(d->path);q
     d->boundingRect = d->path.boundingRect();
     d->outline.addRect(rect);
 }

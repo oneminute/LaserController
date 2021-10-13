@@ -287,7 +287,7 @@ void LaserScene::findSelectedByLine(QRectF selection)
 void LaserScene::findSelectedByBoundingRect(QRectF rect)
 {
 	//items
-	QList<LaserPrimitive*> list = this->document()->primitives().values();
+	/*QList<LaserPrimitive*> list = this->document()->primitives().values();
 	
 	for(LaserPrimitive* item : list) {
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
@@ -300,7 +300,14 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 		if (rect.contains(item->sceneBoundingRect())) {
 			item->setSelected(true);
 		}
-	}
+	}*/
+    QPainterPath path;
+    path.addRect(rect);
+    setSelectionArea(path, Qt::ItemSelectionMode::ContainsItemShape);
+    QList<LaserPrimitive*>list = selectedPrimitives();
+    
+    
+    //bspTreeDepth();
 }
 
 
