@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGraphicsScene>
 #include "scene/LaserBackgroundItem.h"
+#include "algorithm/QuadTreeNode.h"
 
 class QPaintEvent;
 class QPushButton;
@@ -48,6 +49,7 @@ private:
 	bool m_mousePressBlock = false;
 	bool m_mouseMoveBlock = false;
 	LaserBitmap* m_detectedBitmap = nullptr;
+    QuadTreeNode* m_quadTree;
 };
 
 #endif // LASERSCENE_H

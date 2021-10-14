@@ -112,6 +112,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
             painter.setPen(QPen(Qt::red));
             qreal maxSize = Global::mm2PixelsYF(3000);
             qreal regionSize = maxSize * zoomValue();
+
+
             m_maxRegion = QRectF(backItemLeftTop.x() - (regionSize - w)*0.5, backItemLeftTop.y() - (regionSize - h)*0.5, regionSize, regionSize);
             //QRectF region(backItemLeftTop.x(), backItemLeftTop.y(), regionSize, regionSize);
             painter.drawRect(m_maxRegion);

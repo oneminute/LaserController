@@ -15,6 +15,7 @@ LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
     , m_doc(nullptr)
 	, m_background(nullptr)
+    , m_quadTree(nullptr)
 {
 }
 
@@ -36,6 +37,11 @@ void LaserScene::updateDocument(LaserDocument * doc)
     m_doc = doc;
 
     m_doc->setParent(this);
+    //创建树
+    if (!m_quadTree) {
+
+        //m_quadTree = new QuadTreeNode(m_maxRegion)
+    }
 
     qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
     m_background = new LaserBackgroundItem(m_doc->pageBounds());
@@ -287,7 +293,7 @@ void LaserScene::findSelectedByLine(QRectF selection)
 void LaserScene::findSelectedByBoundingRect(QRectF rect)
 {
 	//items
-	/*QList<LaserPrimitive*> list = this->document()->primitives().values();
+	QList<LaserPrimitive*> list = this->document()->primitives().values();
 	
 	for(LaserPrimitive* item : list) {
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
@@ -300,12 +306,12 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 		if (rect.contains(item->sceneBoundingRect())) {
 			item->setSelected(true);
 		}
-	}*/
-    QPainterPath path;
+	}
+    /*QPainterPath path;
     path.addRect(rect);
     setSelectionArea(path, Qt::ItemSelectionMode::ContainsItemShape);
-    QList<LaserPrimitive*>list = selectedPrimitives();
-    
+    QList<LaserPrimitive*>list = selectedPrimitives();*/
+
     
     //bspTreeDepth();
 }
