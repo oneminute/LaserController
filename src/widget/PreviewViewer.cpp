@@ -59,7 +59,7 @@ void PreviewViewer::setZoomValue(qreal zoomScale)
 bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
 {
     const qreal currentZoom = zoomValue();
-    if ((factor < 1 && currentZoom < 0.0000001) || (factor > 1 && currentZoom > 58))
+    if ((factor < 1 && currentZoom < 0.00001) || (factor > 1 && currentZoom > 58))
         return false;
     
     QTransform t = transform();
@@ -88,7 +88,7 @@ bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCent
 
 void PreviewViewer::reset()
 {
-    setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+    setSceneRect(QRectF(QPointF(-50000000000000, -50000000000000), QPointF(50000000000000, 50000000000000)));
     QRectF rect1 = rect();
     setTransformationAnchor(QGraphicsView::NoAnchor);
     m_anchorPoint =  mapFromScene(QPointF(0, 0)); //NoAnchor以scene的(0, 0)点为坐标原点进行变换
@@ -104,9 +104,9 @@ void PreviewViewer::wheelEvent(QWheelEvent * event)
     if (!m_scene) {
         return;
     }
-    qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
+    setTransformationAnchor(QGraphicsView::NoAnchor);
     
-
+    qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
     QPointF mousePos = mapFromGlobal(QCursor::pos());
     zoomBy(wheelZoomValue, mousePos);
     this->viewport()->repaint();
@@ -137,4 +137,14 @@ void PreviewViewer::mouseReleaseEvent(QMouseEvent * event)
     QGraphicsView::mouseReleaseEvent(event);
     QPixmap cMap(":/ui/icons/images/drag_hand.png");
     this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
+}
+
+void PreviewViewer::paintEvent(QPaintEvent * event)
+{
+    QGraphicsView::paintEvent(event);
+    QPainter painter(viewport());
+    painter.setPen(QPen(Qt::black));
+    QRectF rect(0, 0, 100, 100);
+
+    painter.drawRect(sceneRect());
 }

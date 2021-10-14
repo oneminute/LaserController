@@ -61,7 +61,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 {
     setScene(m_scene.data());
     init();
-    
+    //m_maxRegion = QRectF(0, 0, maxSize, maxSize);
 
     Global::dpiX = logicalDpiX();
     Global::dpiY = logicalDpiY();
@@ -89,6 +89,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	QPainter painter(viewport());
     
 	painter.setRenderHint(QPainter::Antialiasing);
+    
 
 	if (scene()->document())
 	{
@@ -96,9 +97,28 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		if (rect.isValid())
 		{
 			painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
-			painter.drawPolygon(mapFromScene(rect));
+            QPolygonF gridBounds = mapFromScene(rect);
+			painter.drawPolygon(gridBounds);
+
+            
 		}
+        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+        if (backgroundItem) {
+            QPointF backItemLeftTop = mapFromScene(backgroundItem->rect().topLeft());
+            qreal w = backgroundItem->rect().width() * zoomValue();
+            qreal h = backgroundItem->rect().height() * zoomValue();
+            QColor red;
+            red.setRed(126);
+            painter.setPen(QPen(Qt::red));
+            qreal maxSize = Global::mm2PixelsYF(3000);
+            qreal regionSize = maxSize * zoomValue();
+            m_maxRegion = QRectF(backItemLeftTop.x() - (regionSize - w)*0.5, backItemLeftTop.y() - (regionSize - h)*0.5, regionSize, regionSize);
+            //QRectF region(backItemLeftTop.x(), backItemLeftTop.y(), regionSize, regionSize);
+            painter.drawRect(m_maxRegion);
+        }
+        
 	}
+    
 
 	{
 		//painter.setBrush(Qt::BrushStyle::SolidPattern);

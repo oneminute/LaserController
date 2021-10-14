@@ -22,6 +22,7 @@ private:
 	QList<qreal> m_gridSecondNodeXList;
 	QList<qreal> m_gridSecondNodeYList;
 	QGraphicsRectItem* m_rectItem;
+    QRectF m_maxRegion;
 
 };
 #endif // LASERBACKGROUNDITEM_H
