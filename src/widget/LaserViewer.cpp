@@ -91,6 +91,11 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     
 	painter.setRenderHint(QPainter::Antialiasing);
     
+    LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+    if (backgroundItem) {
+        QRectF sceneMaxRegion = m_scene->maxRegion();
+        painter.drawPolygon(mapFromScene(sceneMaxRegion));
+    }
 
 	if (Config::Ui::showDocumentBoundingRect() && scene()->document())
 	{
@@ -99,38 +104,14 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		{
 			painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
             QPolygonF gridBounds = mapFromScene(rect);
-			painter.drawPolygon(gridBounds);
-
-            
+			painter.drawPolygon(gridBounds);            
 		}
-        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-        if (backgroundItem) {
-            /*QPointF backItemLeftTop = mapFromScene(backgroundItem->rect().topLeft());
-            qreal w = backgroundItem->rect().width() * zoomValue();
-            qreal h = backgroundItem->rect().height() * zoomValue();
-            QColor red;
-            red.setRed(126);
-            painter.setPen(QPen(Qt::red));
-            qreal maxSize = Global::mm2PixelsYF(3000);
-            qreal regionSize = maxSize * zoomValue();
-
-
-            m_maxRegion = QRectF(backItemLeftTop.x() - (regionSize - w)*0.5, backItemLeftTop.y() - (regionSize - h)*0.5, regionSize, regionSize);
-            //QRectF region(backItemLeftTop.x(), backItemLeftTop.y(), regionSize, regionSize);
-            painter.drawRect(m_maxRegion);
-        }
         
-    
-
         painter.setPen(QPen(Qt::darkGreen));
         QPointF origin = mapFromScene(scene()->document()->docOrigin());
         QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
         painter.drawRect(originRect);
 
-=======
-	{
-		//painter.setBrush(Qt::BrushStyle::SolidPattern);
->>>>>>> Stashed changes
 		painter.setPen(QPen(Qt::red, 2));
 		QPointF deviceOrigin = mapFromScene(LaserApplication::device->deviceOrigin());
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
