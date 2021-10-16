@@ -25,6 +25,13 @@ LaserBackgroundItem::LaserBackgroundItem(const QRectF & rect, QGraphicsItem * pa
 	m_rectItem->setPen(pen);
 	addToGroup(m_rectItem);
 	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
+
+    QPen pen1(Qt::black, 1.0f, Qt::SolidLine);
+    pen1.setCosmetic(true);
+    qreal maxSize = Global::mm2PixelsYF(3000);
+
+    QRectF m_maxRegion = QRectF(rect.left(), rect.top(), maxSize, maxSize);
+    
 }
 LaserBackgroundItem::~LaserBackgroundItem()
 {
@@ -33,9 +40,15 @@ LaserBackgroundItem::~LaserBackgroundItem()
 void LaserBackgroundItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
 	//QGraphicsItemGroup::paint(painter, option, widget);
+    
+
 	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
 	//this->setBrush(QBrush(Qt::white));
 	pen.setCosmetic(true);
+    QColor red;
+    red.setRed(177);
+    painter->setPen(QPen(Qt::red));
+    painter->drawRect(m_maxRegion);
 	painter->setPen(pen);
 	//painter->drawRect(this->rect());
 	//QGraphicsItemGroup::setSelected(true);

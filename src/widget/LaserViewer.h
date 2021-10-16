@@ -55,7 +55,7 @@ public:
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
     QRectF AllItemsSceneBoundingRect();
-	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate, 
+	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate,
         int _state, int _transformType, int _pp, bool _unitIsMM);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);//draw
@@ -320,6 +320,7 @@ private:
     int m_textAlighV;
     //mirror
     LaserPrimitive* m_mirrorLine;
+    QRectF m_maxRegion;
 	
 	friend class LaserScene;
 };

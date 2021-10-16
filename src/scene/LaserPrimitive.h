@@ -120,6 +120,7 @@ public:
 	QRectF originalBoundingRect(qreal extendPixel = 0) const;
 	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
+    //virtual QPainterPath shape() const override;
     virtual QRectF sceneBoundingRect() const;
 	void sceneTransformToItemTransform(QTransform sceneTransform);
 

@@ -62,7 +62,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 {
     setScene(m_scene.data());
     init();
-    
+    //m_maxRegion = QRectF(0, 0, maxSize, maxSize);
 
     Global::dpiX = logicalDpiX();
     Global::dpiY = logicalDpiY();
@@ -90,6 +90,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	QPainter painter(viewport());
     
 	painter.setRenderHint(QPainter::Antialiasing);
+    
 
 	if (Config::Ui::showDocumentBoundingRect() && scene()->document())
 	{
@@ -97,8 +98,30 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		if (rect.isValid())
 		{
 			painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
-			painter.drawPolygon(mapFromScene(rect));
+            QPolygonF gridBounds = mapFromScene(rect);
+			painter.drawPolygon(gridBounds);
+
+            
 		}
+        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+        if (backgroundItem) {
+            QPointF backItemLeftTop = mapFromScene(backgroundItem->rect().topLeft());
+            qreal w = backgroundItem->rect().width() * zoomValue();
+            qreal h = backgroundItem->rect().height() * zoomValue();
+            QColor red;
+            red.setRed(126);
+            painter.setPen(QPen(Qt::red));
+            qreal maxSize = Global::mm2PixelsYF(3000);
+            qreal regionSize = maxSize * zoomValue();
+
+
+            m_maxRegion = QRectF(backItemLeftTop.x() - (regionSize - w)*0.5, backItemLeftTop.y() - (regionSize - h)*0.5, regionSize, regionSize);
+            //QRectF region(backItemLeftTop.x(), backItemLeftTop.y(), regionSize, regionSize);
+            painter.drawRect(m_maxRegion);
+        }
+        
+	}
+    
 
         painter.setPen(QPen(Qt::darkGreen));
         QPointF origin = mapFromScene(scene()->document()->docOrigin());
@@ -402,10 +425,12 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 	if (m_group && !m_group->isEmpty()) {
 		QRectF bounds = selectedItemsSceneBoundingRect();
 		QPointF point = _sceneRect.topLeft();
-		qreal width = _sceneRect.width();
-		qreal height = _sceneRect.height();
-		QTransform t = m_group->transform();
+		qreal widthReal = _sceneRect.width();
+		qreal heightReal = _sceneRect.height();
         LaserControllerWindow* window = LaserApplication::mainWindow;
+       
+		QTransform t = m_group->transform();
+        
         bool isLockRatio = window->lockEqualRatio();
 		switch (_transformType) {
 			case Transform_MOVE: {
@@ -517,19 +542,22 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				break;
 			}
 			case Transform_RESIZE: {
-				qreal rateX = width / bounds.width();
-				qreal rateY = height / bounds.height();
+                qDebug() << bounds.width();
+				qreal rateX = widthReal / bounds.width();
+				qreal rateY = heightReal / bounds.height();
                 if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
                     rateX = rateY;
                     if (_unitIsMM) {
-                        window->widthBox()->setValue(Global::pixelsF2mmX(width * rateX));
+                        qreal v = Global::pixelsF2mmY(bounds.width() * rateY);
+                        window->widthBox()->setValue(v);
                     }
                     
                 }
                 if (_pp == PrimitiveProperty::PP_Width && isLockRatio) {
                     rateY = rateX;
                     if (_unitIsMM) {
-                        window->heightBox()->setValue(Global::pixelsF2mmY(height * rateY));
+                        qreal v = Global::pixelsF2mmY(bounds.height() * rateY);
+                        window->heightBox()->setValue(v);
                     }
                 }
 
@@ -1643,13 +1671,16 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 	if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
 		
 		m_detectedPrimitive = nullptr;
-		if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
-			QPixmap cMap(":/ui/icons/images/arrow.png");
-			this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
-		}
-		else {
-			setCursor(Qt::ArrowCursor);
-		}
+        if (event->button() == Qt::NoButton) {
+            if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
+                QPixmap cMap(":/ui/icons/images/arrow.png");
+                this->setCursor(cMap.scaled(25, 25, Qt::KeepAspectRatio));
+            }
+            else {
+                setCursor(Qt::ArrowCursor);
+            }
+        }
+		
 
 	}else if(StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
@@ -1736,7 +1767,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     break;
                 }
             }
-        }else if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
+        }else if (detectItemByMouse(m_detectedPrimitive, event->pos()) && event->button() == Qt::NoButton) {
 			//when mousepress, detect again
 			m_curSelectedHandleIndex = -1;
 			QPixmap cMap(":/ui/icons/images/arrow.png");

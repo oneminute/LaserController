@@ -327,11 +327,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_widthBox = new LaserDoubleSpinBox();
 	m_widthBox->setMinimum(DBL_MIN);
 	m_widthBox->setMaximum(DBL_MAX);
+    m_widthBox->setDecimals(3);
 	m_heightBox = new LaserDoubleSpinBox();
 	m_heightBox->setMinimum(DBL_MIN);
 	m_heightBox->setMaximum(DBL_MAX);
+	//m_heightBox->setDecimals(3);
 	m_heightBox->setDecimals(3);
-	//m_heightBox->setDecimals(DBL_MAX_10_EXP);
 	m_widthUnit = new QLabel("mm");
 	m_heightUnit = new QLabel("mm");
 
