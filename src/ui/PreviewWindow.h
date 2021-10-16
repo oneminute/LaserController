@@ -7,6 +7,7 @@
 #include <QPlainTextEdit>
 #include <QProgressBar>
 #include <DockManager.h>
+#include <QTimer>
 
 class LaserPrimitive;
 class PreviewViewer;
@@ -20,6 +21,7 @@ public:
     ~PreviewWindow();
 
     qreal progress() const;
+    void intendUpdate();
 
 public slots:
     void updatePreviewArea();
@@ -81,6 +83,7 @@ private:
     QMap<quint32, qreal> m_progressQuotas;
     qreal m_sumQuotas;
 
+    QTimer m_updateTimer;
 };
 
 #endif // PREVIEWWINDOW_H

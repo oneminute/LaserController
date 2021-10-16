@@ -108,7 +108,7 @@ bool LaserPrimitiveGroup::isEmpty() const
 
 void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
-	//»æÖÆgroup
+	//ï¿½ï¿½ï¿½ï¿½group
 	//QGraphicsItemGroup::paint(painter, option, widget);
 }
 
@@ -116,7 +116,7 @@ QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange chang
 {
     
     int size = this->childItems().size();
-    qDebug() << size;
+    //qDebug() << size;
     LaserScene* s = qobject_cast<LaserScene*>(scene());
     if (!s) {
         return QGraphicsItemGroup::itemChange(change, value);

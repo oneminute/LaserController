@@ -73,6 +73,14 @@ public:
     QRectF imagesBoundingRect() const;
     QRectF imagesBoundingRectMachining() const;
 
+    bool enablePrintAndCut() const;
+    void setEnablePrintAndCut(bool value);
+    QTransform printAndCutTransform() const;
+    void setPrintAndCutTransform(const QTransform& t);
+    //QList<QPointF> printAndCutCanvasPoints() const;
+    PointPairList printAndCutPointPairs() const;
+    void setPrintAndCutPointPairs(const PointPairList& pairs);
+
     /// <summary>
     /// 返回相对于当前确定的原点的坐标。
     /// </summary>
@@ -95,7 +103,6 @@ public slots:
 
 protected:
 	void init();
-    RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
     void outlineByLayers(OptimizeNode* node);
     void outlineByGroups(OptimizeNode* node);
     void clearTree(OptimizeNode* node);

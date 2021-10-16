@@ -131,6 +131,80 @@ QPoint Vector2DWidget::toPoint() const
     return QPoint(qRound(d->x), qRound(d->y));
 }
 
+qreal Vector2DWidget::minimum() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxX->minimum();
+}
+
+qreal Vector2DWidget::maximum() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxX->maximum();
+}
+
+qreal Vector2DWidget::xMinimum() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxX->minimum();
+}
+
+qreal Vector2DWidget::yMinimum() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxY->minimum();
+}
+
+qreal Vector2DWidget::xMaximum() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxX->maximum();
+}
+
+qreal Vector2DWidget::yMaximum() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxY->maximum();
+}
+
+void Vector2DWidget::setMinimum(qreal value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxX->setMinimum(value);
+    d->spinBoxY->setMinimum(value);
+}
+
+void Vector2DWidget::setMaximum(qreal value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxX->setMaximum(value);
+    d->spinBoxY->setMaximum(value);
+}
+
+void Vector2DWidget::setXMinimum(qreal value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxX->setMinimum(value);
+}
+
+void Vector2DWidget::setYMinimum(qreal value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxY->setMinimum(value);
+}
+
+void Vector2DWidget::setXMaximum(qreal value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxX->setMaximum(value);
+}
+
+void Vector2DWidget::setYMaximum(qreal value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxY->setMaximum(value);
+}
+
 void Vector2DWidget::init()
 {
     Q_D(Vector2DWidget);

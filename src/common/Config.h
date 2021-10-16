@@ -125,6 +125,7 @@ public:
         CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
         CONFIG_ITEM(ui, autoRepeatDelay, int, toInt)
         //CONFIG_ITEM(ui, autoRepeatInterval, int, toInt)
+        CONFIG_ITEM(ui, showDocumentBoundingRect, bool, toBool)
 
     private:
         friend class Config;
@@ -139,9 +140,7 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(cuttingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(cuttingLayer, runSpeed, int, toInt)
-        CONFIG_ITEM(cuttingLayer, laserPower, qreal, toReal)
         CONFIG_ITEM(cuttingLayer, minPower, qreal, toReal)
         CONFIG_ITEM(cuttingLayer, maxPower, qreal, toReal)
 
@@ -158,7 +157,6 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(engravingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, runSpeed, int, toInt)
         CONFIG_ITEM(engravingLayer, laserPower, qreal, toReal)
         CONFIG_ITEM(engravingLayer, minPower, qreal, toReal)
@@ -169,6 +167,7 @@ public:
         CONFIG_ITEM(engravingLayer, halftoneGridSize, int, toInt)
         CONFIG_ITEM(engravingLayer, LPI, int, toInt)
         CONFIG_ITEM(engravingLayer, DPI, int, toInt)
+        CONFIG_ITEM(engravingLayer, enableCutting, bool, toBool)
 
     private:
         friend class Config;
@@ -183,12 +182,11 @@ public:
         
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(fillingLayer, minSpeed, int, toInt)
         CONFIG_ITEM(fillingLayer, runSpeed, int, toInt)
-        CONFIG_ITEM(fillingLayer, laserPower, qreal, toReal)
         CONFIG_ITEM(fillingLayer, minPower, qreal, toReal)
         CONFIG_ITEM(fillingLayer, maxPower, qreal, toReal)
         CONFIG_ITEM(fillingLayer, rowInterval, int, toInt)
+        CONFIG_ITEM(fillingLayer, enableCutting, bool, toBool)
 
     private:
         friend class Config;

@@ -50,8 +50,8 @@ void SelectionUndoCommand::redo()
         redoList.insert(primitive);
     }
 
-    qDebug() << list;
-    qDebug() << redoList;
+    //qDebug() << list;
+    //qDebug() << redoList;
 	if(!m_viewer || !m_viewer->group()|| list == redoList){
 		return;
 	}
@@ -228,7 +228,7 @@ void AddDelUndoCommand::undo()
 			sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
 			m_scene->removeLaserPrimitive(primitive);
 		}
-		//»Ö¸´Ö®Ç°µÄgroup
+		//ï¿½Ö¸ï¿½Ö®Ç°ï¿½ï¿½group
 		for (QMap<QGraphicsItem*, QTransform>::Iterator i = m_selectedBeforeAdd.begin();
 			i != m_selectedBeforeAdd.end(); i++) {
 			sceneTransformToItemTransform(i.value(), i.key());
@@ -262,7 +262,7 @@ void AddDelUndoCommand::redo()
 	else {
 
 		m_selectedBeforeAdd = m_viewer->clearGroupSelection();
-		//ÏÈÌí¼Óµ½scene
+		//ï¿½ï¿½ï¿½ï¿½Óµï¿½scene
 		for each(QGraphicsItem* item in m_list) {
 			LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
 			m_scene->addLaserPrimitive(primitive);
@@ -445,7 +445,7 @@ void PasteCommand::undo()
 		m_scene->removeLaserPrimitive(primitive);
 	}
 	m_viewer->clearGroupSelection();
-	//»Ö¸´Ö®Ç°µÄgroup
+	//ï¿½Ö¸ï¿½Ö®Ç°ï¿½ï¿½group
 	for (QMap<QGraphicsItem*, QTransform>::Iterator i = m_pastedBeforeAdd.begin(); i != m_pastedBeforeAdd.end(); i++) {
 		
 		utils::sceneTransformToItemTransform(i.value(), i.key());
@@ -457,7 +457,7 @@ void PasteCommand::undo()
 
 void PasteCommand::redo()
 {
-	//µÚÒ»´Î½øÈëÊÇ´´½¨Item
+	//ï¿½ï¿½Ò»ï¿½Î½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ï¿½ï¿½Item
 	if (m_pasteList.isEmpty()) {
 		if (!m_isDuplication) {
 			for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_viewer->copyedList().begin(); 
@@ -479,7 +479,7 @@ void PasteCommand::redo()
 			
 			redoImp();
 			if (!m_isPasteInline) {
-				//ÉèÖÃÎ»ÖÃ
+				//ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 				QPointF mousePos = m_viewer->mapFromGlobal(QCursor::pos());
 				if (mousePos.x() < 0 || mousePos.y() < 0) {
 					mousePos = m_viewer->rect().center();
@@ -572,7 +572,7 @@ void MirrorACommand::redo()
     QTransform t1(1, 0, 0, -1, 0, 0);
     QTransform t2 = t.inverted();
     group->setTransform(group->transform() * t * t1 * t2);
-    //¸üÐÂÑ¡ÖÐÊý¾Ý
+    //ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     m_viewer->selectedChange();  
     m_viewer->viewport()->repaint();
 }

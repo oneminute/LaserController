@@ -176,8 +176,8 @@ int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode,
     return points.size();
 }
 
-void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& pointsList, 
-    QList<int>& startingIndices, QPointF& center, const QTransform& transform)
+void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& pointsList, quint32 progressCode, 
+    qreal progressQuota, QList<int>& startingIndices, QPointF& center, const QTransform& transform)
 {
     pointsList.clear();
     startingIndices.clear();
@@ -274,23 +274,23 @@ void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& po
     center /= points.size();
 }
 
-QByteArray machiningUtils::pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint)
+QByteArray machiningUtils::pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t)
 {
     QByteArray buffer;
     for (const LaserPointList& points : pointList)
     {
-        buffer.append(pointList2Plt(points, lastPoint));
+        buffer.append(pointList2Plt(points, lastPoint, t));
     }
     return buffer;
 }
 
-QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& lastPoint)
+QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& lastPoint, const QTransform& t)
 {
     QByteArray buffer;
     if (points.empty())
         return buffer;
 
-    QPointF pt = points.first().toPointF();
+    QPointF pt = t.map(points.first().toPointF());
     QPointF diff = pt - lastPoint;
     lastPoint = pt;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
@@ -300,12 +300,14 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
     for (size_t i = 1; i < points.size(); i++)
     {
         LaserPoint lPt = points.at(i);
-        QPointF pt = lPt.toPointF();
+        QPointF pt = t.map(lPt.toPointF());
         QPointF diff = pt - lastPoint;
+        //QString command = i == points.size() - 1 ? "CE%1 %2;" : "CM%1 %2;";
+        QString command = "PD%1 %2;";
         if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-            buffer.append(QString("PD%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
+            buffer.append(command.arg(qRound(diff.x())).arg(qRound(diff.y())));
         else
-            buffer.append(QString("PD%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
+            buffer.append(command.arg(qRound(pt.x())).arg(qRound(pt.y())));
         lastPoint = pt;
     }
     return buffer;

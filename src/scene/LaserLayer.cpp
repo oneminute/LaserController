@@ -24,23 +24,20 @@ public:
         , startX(25)
         , startY(0)
         , errorX(0)
-        , cuttingMinSpeed(Config::CuttingLayer::minSpeed())
         , cuttingRunSpeed(Config::CuttingLayer::runSpeed())
-        , cuttingLaserPower(Config::CuttingLayer::laserPower())
         , cuttingMinSpeedPower(Config::CuttingLayer::minPower())
         , cuttingRunSpeedPower(Config::CuttingLayer::maxPower())
-        , engravingMinSpeed(Config::EngravingLayer::minSpeed())
         , engravingRunSpeed(Config::EngravingLayer::runSpeed())
         , engravingLaserPower(Config::EngravingLayer::laserPower())
         , engravingMinSpeedPower(Config::EngravingLayer::minPower())
         , engravingRunSpeedPower(Config::EngravingLayer::maxPower())
         , engravingRowInterval(Config::EngravingLayer::rowInterval())
-        , fillingMinSpeed(Config::FillingLayer::minSpeed())
+        , engravingEnableCutting(Config::EngravingLayer::enableCutting())
         , fillingRunSpeed(Config::FillingLayer::runSpeed())
-        , fillingLaserPower(Config::FillingLayer::laserPower())
         , fillingMinSpeedPower(Config::FillingLayer::minPower())
         , fillingRunSpeedPower(Config::FillingLayer::maxPower())
         , fillingRowInterval(Config::FillingLayer::rowInterval())
+        , fillingEnableCutting(Config::FillingLayer::enableCutting())
         , doc(nullptr)
         , lpi(60)
         , dpi(600)
@@ -58,23 +55,20 @@ public:
     LaserLayerType type;
 
     // normal fields
-    int cuttingMinSpeed;
     int cuttingRunSpeed;
-    qreal cuttingLaserPower;
     qreal cuttingMinSpeedPower;
     qreal cuttingRunSpeedPower;
-    int engravingMinSpeed;
     int engravingRunSpeed;
     qreal engravingLaserPower;
     qreal engravingMinSpeedPower;
     qreal engravingRunSpeedPower;
     int engravingRowInterval;
-    int fillingMinSpeed;
+    bool engravingEnableCutting;
     int fillingRunSpeed;
-    qreal fillingLaserPower;
     qreal fillingMinSpeedPower;
     qreal fillingRunSpeedPower;
     int fillingRowInterval;
+    bool fillingEnableCutting;
 
     // engraving fields
     bool engravingForward;
@@ -159,18 +153,6 @@ void LaserLayer::setType(LaserLayerType type)
     d->type = type;
 }
 
-int LaserLayer::cuttingMinSpeed() const
-{
-    Q_D(const LaserLayer);
-    return d->cuttingMinSpeed;
-}
-
-void LaserLayer::setCuttingMinSpeed(int minSpeed)
-{
-    Q_D(LaserLayer);
-    d->cuttingMinSpeed = minSpeed;
-}
-
 int LaserLayer::cuttingRunSpeed() const
 {
     Q_D(const LaserLayer);
@@ -181,18 +163,6 @@ void LaserLayer::setCuttingRunSpeed(int runSpeed)
 {
     Q_D(LaserLayer);
     d->cuttingRunSpeed = runSpeed;
-}
-
-qreal LaserLayer::cuttingLaserPower() const
-{
-    Q_D(const LaserLayer);
-    return d->cuttingLaserPower;
-}
-
-void LaserLayer::setCuttingLaserPower(qreal laserPower)
-{
-    Q_D(LaserLayer);
-    d->cuttingLaserPower = laserPower;
 }
 
 qreal LaserLayer::cuttingMinSpeedPower() const
@@ -217,18 +187,6 @@ void LaserLayer::setCuttingRunSpeedPower(qreal runSpeedPower)
 {
     Q_D(LaserLayer);
     d->cuttingRunSpeedPower = runSpeedPower;
-}
-
-int LaserLayer::engravingMinSpeed() const
-{
-    Q_D(const LaserLayer);
-    return d->engravingMinSpeed;
-}
-
-void LaserLayer::setEngravingMinSpeed(int minSpeed)
-{
-    Q_D(LaserLayer);
-    d->engravingMinSpeed = minSpeed;
 }
 
 int LaserLayer::engravingRunSpeed() const
@@ -291,16 +249,16 @@ void LaserLayer::setEngravingRowInterval(int rowInterval)
     d->engravingRowInterval = rowInterval; 
 }
 
-int LaserLayer::fillingMinSpeed() const
+bool LaserLayer::engravingEnableCutting() const
 {
     Q_D(const LaserLayer);
-    return d->fillingMinSpeed;
+    return d->engravingEnableCutting;
 }
 
-void LaserLayer::setFillingMinSpeed(int minSpeed)
+void LaserLayer::setEngravingEnableCutting(bool cutting)
 {
     Q_D(LaserLayer);
-    d->fillingMinSpeed = minSpeed;
+    d->engravingEnableCutting = cutting;
 }
 
 int LaserLayer::fillingRunSpeed() const
@@ -313,18 +271,6 @@ void LaserLayer::setFillingRunSpeed(int runSpeed)
 {
     Q_D(LaserLayer);
     d->fillingRunSpeed = runSpeed;
-}
-
-qreal LaserLayer::fillingLaserPower() const
-{
-    Q_D(const LaserLayer);
-    return d->fillingLaserPower;
-}
-
-void LaserLayer::setFillingLaserPower(qreal laserPower)
-{
-    Q_D(LaserLayer);
-    d->fillingLaserPower = laserPower;
 }
 
 qreal LaserLayer::fillingMinSpeedPower() const
@@ -387,7 +333,19 @@ void LaserLayer::setEngravingStyle(int engravingStyle)
     d->engravingStyle = engravingStyle; 
 }
 
-QPoint LaserLayer::startPos() const 
+bool LaserLayer::fillingEnableCutting() const
+{
+    Q_D(const LaserLayer);
+    return d->fillingEnableCutting;
+}
+
+void LaserLayer::setFillingEnableCutting(bool cutting)
+{
+    Q_D(LaserLayer);
+    d->fillingEnableCutting = cutting;
+}
+
+QPoint LaserLayer::startPos() const
 { 
     Q_D(const LaserLayer);
     return QPoint(d->startX, d->startY); 
@@ -623,20 +581,16 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 	object.insert("name", this->name());
 	object.insert("type", this->type());
     object.insert("visible", this->visible());
-    object.insert("cuttingMinSpeed", this->cuttingMinSpeed());
     object.insert("cuttingRunSpeed", this->cuttingRunSpeed());
-    object.insert("cuttingLaserPower", this->cuttingLaserPower());
     object.insert("cuttingMinSpeedPower", this->cuttingMinSpeedPower());
     object.insert("cuttingRunSpeedPower", this->cuttingRunSpeedPower());
-    object.insert("engravingMinSpeed", this->engravingMinSpeed());
     object.insert("engravingRunSpeed", this->engravingRunSpeed());
     object.insert("engravingLaserPower", this->engravingLaserPower());
     object.insert("engravingMinSpeedPower", this->engravingMinSpeedPower());
     object.insert("engravingRunSpeedPower", this->engravingRunSpeedPower());
     object.insert("engravingRowInterval", this->engravingRowInterval());
-    object.insert("fillingMinSpeed", this->fillingMinSpeed());
+    object.insert("engravingEnableCutting", this->engravingEnableCutting());
     object.insert("fillingRunSpeed", this->fillingRunSpeed());
-    object.insert("fillingLaserPower", this->fillingLaserPower());
     object.insert("fillingMinSpeedPower", this->fillingMinSpeedPower());
     object.insert("fillingRunSpeedPower", this->fillingRunSpeedPower());
     object.insert("fillingRowInterval", this->fillingRowInterval());

@@ -13,6 +13,7 @@
 
 #include "laser/LaserPointList.h"
 #include "laser/LaserLineList.h"
+#include "common/common.h"
 
 class LaserPrimitive;
 
@@ -47,6 +48,12 @@ namespace utils
     QRectF boundingRect(const QList<LaserPrimitive*>& primitives);
 
     LaserLineListList interLines(const QPainterPath& path, qreal rowInterval = 1);
+
+    RELATION determineRelationship(const QPainterPath& a, const QPainterPath& b);
+
+    RELATION determineRelationship(const QRectF& a, const QRectF& b);
+
+    QTransform fromPointPairs(const PointPairList& pointPairs);
 }
 
 #endif // UTILS_H

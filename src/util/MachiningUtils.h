@@ -37,8 +37,8 @@ namespace machiningUtils
         int diagonalThreshold = 2 * 40);
 
     void path2Points(const QPainterPath& path,
-        LaserPointListList& pointsList,
-        QList<int>& startingIndices,
+        LaserPointListList& pointsList, quint32 progressCode, 
+        qreal progressQuota, QList<int>& startingIndices,
         QPointF& center = QPointF(),
         const QTransform& transform = QTransform());
 
@@ -49,9 +49,9 @@ namespace machiningUtils
         QList<int>& startingIndices,
         QPointF& center);
 
-    QByteArray pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint);
+    QByteArray pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t = QTransform());
 
-    QByteArray pointList2Plt(const LaserPointList& points, QPointF& lastPoint);
+    QByteArray pointList2Plt(const LaserPointList& points, QPointF& lastPoint, const QTransform& t = QTransform());
 
     QByteArray lineList2Plt(const LaserLineListList& lineList, QPointF& lastPoint);
 

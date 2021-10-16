@@ -14,6 +14,7 @@
 #include <QVector3D>
 #include <QMouseEvent>
 #include <QUndoStack>
+#include <QGLWidget>
 
 #include <LaserApplication.h>
 #include "laser/LaserDevice.h"
@@ -90,7 +91,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	if (scene()->document())
+	if (Config::Ui::showDocumentBoundingRect() && scene()->document())
 	{
 		QRectF rect = scene()->document()->docBoundingRect();
 		if (rect.isValid())
@@ -98,24 +99,30 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 			painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
 			painter.drawPolygon(mapFromScene(rect));
 		}
-	}
 
-	{
-		//painter.setBrush(Qt::BrushStyle::SolidPattern);
+        painter.setPen(QPen(Qt::darkGreen));
+        QPointF origin = mapFromScene(scene()->document()->docOrigin());
+        QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
+        painter.drawRect(originRect);
+
 		painter.setPen(QPen(Qt::red, 2));
 		QPointF deviceOrigin = mapFromScene(LaserApplication::device->deviceOrigin());
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
 		painter.drawRect(deviceOriginRect);
-        if (scene()->document())
-        {
-			painter.setPen(QPen(Qt::darkGreen));
-            QPointF origin = mapFromScene(scene()->document()->docOrigin());
-            QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
-            painter.drawRect(originRect);
 
-        }
+		if (scene()->document()->enablePrintAndCut())
+		{
+			for (const PointPair& pair : scene()->document()->printAndCutPointPairs())
+			{
+				QPointF canvasPoint(Global::mm2PixelsXF(pair.second.x()), Global::mm2PixelsYF(pair.second.y()));
+                painter.setPen(QPen(Qt::red, 2));
+                canvasPoint = mapFromScene(canvasPoint);
+                QRectF canvasPointRect(canvasPoint - QPointF(2, 2), canvasPoint + QPointF(2, 2));
+                painter.drawRect(canvasPointRect);
+			}
+		}
 	}
-	
+
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
 	//painter.drawPolygon (testRect);
 	//painter.drawPolygon(testBoundinRect);
@@ -1202,6 +1209,7 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 	//m_scene->setSelectionArea(mapToScene(selectionPath));
 	qDebug() << "_startPoint: " << _startPoint;
 	qDebug() << "_endPoint: " << _endPoint;
+	m_scene->blockSignals(true);
 	//right select
 	if (_endPoint.x() < _startPoint.x()) {
 		//m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
@@ -1214,7 +1222,9 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 		//m_scene->setSelectionArea(selectionPath, Qt::ItemSelectionMode::ContainsItemBoundingRect);
 		m_scene->findSelectedByBoundingRect(rect);
 	}
+	m_scene->blockSignals(false);
 	viewport()->repaint();
+	emit m_scene->selectionChanged();
 	return m_scene->document()->selectedPrimitives().size();
 }
 
@@ -3085,6 +3095,7 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 {
 	QMap<QGraphicsItem*, QTransform> selectedList;
     
+	m_scene->blockSignals(true);
 	if (!m_group) {
 		return selectedList;
 	}
@@ -3103,20 +3114,23 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 
 			m_group->removeFromGroup(p_item);
 			if (p_item->isSelected()) {
+				p_item->blockSignals(true);
 				p_item->setSelected(false);
+				p_item->blockSignals(false);
 			}
 		}
 	}
     //清空选取区域
     for (QGraphicsItem *item : m_scene->selectedPrimitives()) {
-
         item->setSelected(false);
         selectedList.insert(item, item->sceneTransform());
     }
 	m_group->setTransform(QTransform());
     
 	m_scene->clearSelection();
+	m_scene->blockSignals(false);
     viewport()->repaint();
+	emit m_scene->selectionChanged();
 	return selectedList;
 }
 
@@ -3574,7 +3588,7 @@ qreal LaserViewer::adapterViewScale()
 
 void LaserViewer::init()
 {
-    
+	//setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 	setMouseTracking(true);
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);	

@@ -14,7 +14,6 @@
 #include "svg/qsvggraphics.h"
 #include "svg/qsvgrenderer.h"
 #include "svg/qsvgtinydocument.h"
-#include "ui/ImportSVGDialog.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/UnitUtils.h"
 

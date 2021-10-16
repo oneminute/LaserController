@@ -96,7 +96,8 @@ void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
 {
     QList<LaserPrimitive*> primitives;
-    for (QGraphicsItem* item : selectedItems())
+	QList<QGraphicsItem*> items = selectedItems();
+    for (QGraphicsItem* item : items)
     {
         LaserPrimitive* primitive = dynamic_cast<LaserPrimitive*>(item);
         if (primitive)
@@ -248,6 +249,7 @@ void LaserScene::findSelectedByLine(QRectF selection)
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
 			continue;
 		}
+		item->blockSignals(true);
 		//如果已经被选中则设为false
 		if (item->isSelected()) {
 			item->setSelected(false);
@@ -281,6 +283,7 @@ void LaserScene::findSelectedByLine(QRectF selection)
 			LaserRect* rect = qgraphicsitem_cast<LaserRect*>(item);
 			
 		}*/
+		item->blockSignals(false);
 	}
 }
 
@@ -293,6 +296,7 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
 			continue;
 		}
+		item->blockSignals(true);
 		//如果已经被选中则设为false
 		if (item->isSelected()) {
 			item->setSelected(false);
@@ -300,7 +304,9 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 		if (rect.contains(item->sceneBoundingRect())) {
 			item->setSelected(true);
 		}
+		item->blockSignals(false);
 	}
+
 }
 
 

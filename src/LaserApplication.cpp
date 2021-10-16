@@ -253,7 +253,7 @@ void LaserApplication::retranslate()
     QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
     QLocale::setDefault(locale);
 
-    stringMap["Absolute Coords"] = translate("LaserApplication", "Absolute Coords", nullptr);
+    /*stringMap["Absolute Coords"] = translate("LaserApplication", "Absolute Coords", nullptr);
     stringMap["Config Dialog"] = translate("LaserApplication", "Config Dialog", nullptr);
     stringMap["Current Position"] = translate("LaserApplication", "Current Position", nullptr);
     stringMap["Cutting"] = translate("LaserApplication", "Cutting", nullptr);
@@ -270,7 +270,52 @@ void LaserApplication::retranslate()
     stringMap["Size"] = translate("LaserApplication", ("Size"), nullptr);
     stringMap["Speed"] = translate("LaserApplication", ("Speed"), nullptr);
     stringMap["User Origin"] = translate("LaserApplication", "User Origin", nullptr);
-    stringMap["Vertical"] = translate("LaserApplication", "Vertical", nullptr);
+    stringMap["Vertical"] = translate("LaserApplication", "Vertical", nullptr);*/
+
+    stringMap["Absolute Coords"] = tr("Absolute Coords");
+    stringMap["Align X"] = tr("Align X");
+    stringMap["Align Y"] = tr("Align Y");
+    stringMap["Bold"] = tr("Bold");
+    stringMap["Bottom"] = tr("Bottom");
+    stringMap["Config Dialog"] = tr("Config Dialog");
+    stringMap["Current Position"] = tr("Current Position");
+    stringMap["Cutting"] = tr("Cutting");
+    stringMap["Chinese"] = tr("Chinese");
+    stringMap["English"] = tr("English");
+    stringMap["Engraving"] = tr("Engraving");
+    stringMap["Filling"] = tr("Filling");
+    stringMap["Font"] = tr("Font");
+    stringMap["Height"] = tr("Height");
+    stringMap["High Contrast"] = tr("High Contrast");
+    stringMap["Horizontal"] = tr("Horizontal");
+    stringMap["Inactivated"] = tr("Inactivated");
+    stringMap["Italic"] = tr("Italic");
+    stringMap["Laser Power"] = tr("Laser Power");
+    stringMap["Left"] = tr("Left");
+    stringMap["Low Contrast"] = tr("Low Contrast");
+    stringMap["Medium Contrast"] = tr("Medium Contrast");
+    stringMap["Middle"] = tr("Middle");
+    stringMap["Movement"] = tr("Movement");
+    stringMap["Off"] = tr("Off");
+    stringMap["PageSize"] = tr("Page Size(mm): %1x%2");
+    stringMap["Power"] = tr("Power");
+    stringMap["Right"] = tr("Right");
+    stringMap["Rotate"] = tr("Rotate");
+    stringMap["Size"] = tr("Size");
+    stringMap["Spacing X"] = tr("Spacing X");
+    stringMap["Spacing Y"] = tr("Spacing Y");
+    stringMap["Speed"] = tr("Speed");
+    stringMap["Tips"] = tr("Tips");
+    stringMap["Top"] = tr("Top");
+    stringMap["Top Left"] = tr("Top Left");
+    stringMap["User Origin"] = tr("User Origin");
+    stringMap["Unregistered"] = tr("Unregistered");
+    stringMap["Upper Case"] = tr("Upper Case");
+    stringMap["Vertical"] = tr("Vertical");
+    stringMap["Welcome!"] = tr("Welcome!");
+    stringMap["Width"] = tr("Width");
+    stringMap["X Pos"] = tr("X Pos");
+    stringMap["Y Pos"] = tr("Y Pos");
 
     Config::updateTitlesAndDescriptions();
 

@@ -16,6 +16,7 @@
 #include <QScrollBar>
 #include <QTableWidget>
 #include <QTreeWidgetItem>
+#include <QPushButton>
 #include <widget/EditSlider.h>
 
 #include "LaserApplication.h"
@@ -149,6 +150,8 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
     LaserApplication::device->readSystemRegisters();
+
+    retranslate();
 }
 
 ConfigDialog::~ConfigDialog()
@@ -293,11 +296,11 @@ void ConfigDialog::retranslate()
     m_systemPage->setTabText(1, tr("X"));
     m_systemPage->setTabText(2, tr("Y"));
     m_systemPage->setTabText(3, tr("Z"));
-    /*for (int i = 0; i < m_ui->stackedWidgetPanels->count(); i++)
-    {
-        QWidget* widget = m_ui->stackedWidgetPanels->widget(i);
-        widget->setWindowTitle()
-    }*/
+
+    m_ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Save"));
+    m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
+    m_ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(tr("Restore Defaults"));
+    m_ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Reset"));
 }
 
 void ConfigDialog::onValueChanged(const QVariant& value)

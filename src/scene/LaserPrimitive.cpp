@@ -722,7 +722,7 @@ LaserPointListList LaserEllipse::updateMachiningPoints(quint32 progressCode, qre
     QPainterPath path = toMachiningPath();
 
     QList<int> indices;
-    machiningUtils::path2Points(path, d->machiningPointsList, indices, d->machiningCenter);
+    machiningUtils::path2Points(path, d->machiningPointsList, progressCode, progressQuota, indices, d->machiningCenter);
 
     if (indices.length() <= Config::PathOptimization::maxStartingPoints())
     {
@@ -917,7 +917,7 @@ LaserPointListList LaserRect::updateMachiningPoints(quint32 progressCode, qreal 
 	QTransform t = sceneTransform() * Global::matrixToMachining();
     if (isRoundedRect())
     {
-        machiningUtils::path2Points(t.map(d->path), d->machiningPointsList, d->startingIndices, d->machiningCenter);
+        machiningUtils::path2Points(t.map(d->path), d->machiningPointsList, progressCode, progressQuota, d->startingIndices, d->machiningCenter);
     }
     else
     {
@@ -1237,7 +1237,7 @@ LaserPointListList LaserPath::updateMachiningPoints(quint32 progressCode, qreal 
     Q_D(LaserPath);
     QPainterPath path = toMachiningPath();
 
-    machiningUtils::path2Points(path, d->machiningPointsList, d->startingIndices, d->machiningCenter);
+    machiningUtils::path2Points(path, d->machiningPointsList, progressCode, progressQuota, d->startingIndices, d->machiningCenter);
 
     /*d->machiningPointsList.clear();
     LaserPointList points;
@@ -2860,7 +2860,7 @@ LaserPointListList LaserText::updateMachiningPoints(quint32 progressCode, qreal 
 
             QList<int> indices;
             LaserPointListList pointsList;
-            machiningUtils::path2Points(rowPath, pointsList, indices, QPointF(), transform);
+            machiningUtils::path2Points(rowPath, pointsList, progressCode, progressQuota, indices, QPointF(), transform);
 
             if (indices.length() <= Config::PathOptimization::maxStartingPoints())
             {

@@ -40,7 +40,7 @@ void PreviewViewer::resetZoom()
     if (!qFuzzyCompare(zoomValue(), qreal(1))) {
         //resetTransform();
         setTransform(QTransform());
-        setZoomValue(1);//zoomBy()ÖÐ¸üÐÂÍø¸ñºÍ±ê³ß
+        setZoomValue(1);//zoomBy()ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í±ï¿½ï¿½
                         //emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
     }
 }
@@ -68,7 +68,7 @@ bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCent
     QTransform t2;
     QPointF diff;
 
-    QPointF newZoomAnchor = zoomAnchor - m_anchorPoint;//Ó³Éäµ½ÒÔm_anchorPointÎª£¨0£¬ 0£©µãµÄ×ø±êÏµ
+    QPointF newZoomAnchor = zoomAnchor - m_anchorPoint;//Ó³ï¿½äµ½ï¿½ï¿½m_anchorPointÎªï¿½ï¿½0ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµ
     QPointF scaled = t1.map(newZoomAnchor);
     QPointF newPoint = newZoomAnchor;
     if (zoomAnchorCenter) {
@@ -79,7 +79,7 @@ bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCent
     diff = newPoint - scaled;
     t2.translate(diff.x(), diff.y());
     setTransform(t*t1*t2);
-    //¸üÐÂÍø¸ñ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     //backgroundItem->onChangeGrids();
     //emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
     //emit scaleChanged(zoomValue());
@@ -91,7 +91,7 @@ void PreviewViewer::reset()
     setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
     QRectF rect1 = rect();
     setTransformationAnchor(QGraphicsView::NoAnchor);
-    m_anchorPoint =  mapFromScene(QPointF(0, 0)); //NoAnchorÒÔsceneµÄ(0, 0)µãÎª×ø±êÔ­µã½øÐÐ±ä»»
+    m_anchorPoint =  mapFromScene(QPointF(0, 0)); //NoAnchorï¿½ï¿½sceneï¿½ï¿½(0, 0)ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Ð±ä»»
     setTransform(QTransform());
     QPixmap cMap(":/ui/icons/images/drag_hand.png");
     this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));

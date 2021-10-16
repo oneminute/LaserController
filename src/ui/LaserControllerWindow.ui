@@ -1285,6 +1285,41 @@
     <string>Fetch To User Origin</string>
    </property>
   </action>
+  <action name="actionPrintAndCutNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutFetchLaser">
+   <property name="text">
+    <string>Fetch Laser</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutFetchCanvas">
+   <property name="text">
+    <string>Fetch Canvas</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutAlign">
+   <property name="text">
+    <string>Align</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutRestore">
+   <property name="text">
+    <string>Restore</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutRemove">
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

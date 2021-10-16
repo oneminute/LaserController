@@ -107,17 +107,17 @@ void LaserLayerTableWidget::updateItems()
             if (layer->type() == LLT_CUTTING)
             {
                 type = tr("C");
-                fullType = ltr("Cutting");
+                fullType = tr("Cutting");
             }
             else if (layer->type() == LLT_ENGRAVING)
             {
                 type = tr("E");
-                fullType = ltr("Engraving");
+                fullType = tr("Engraving");
             }
             else if (layer->type() == LLT_FILLING)
             {
-                type = tr("F");
-                fullType = ltr("Filling");
+                type = tr("C+F");
+                fullType = tr("Filling");
             }
 
             QTableWidgetItem* itemColor = new QTableWidgetItem();
@@ -142,15 +142,15 @@ void LaserLayerTableWidget::updateItems()
             QTableWidgetItem* itemSpeedPower = new QTableWidgetItem();
             if (layer->type() == LLT_CUTTING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(layer->cuttingMinSpeed()).arg(layer->cuttingLaserPower()));
+                itemSpeedPower->setText(QString("%1/%2").arg(layer->cuttingRunSpeed()).arg(layer->cuttingRunSpeedPower()));
             }
             else if (layer->type() == LLT_ENGRAVING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(layer->engravingMinSpeed()).arg(layer->engravingLaserPower()));
+                itemSpeedPower->setText(QString("%1/%2").arg(layer->engravingRunSpeed()).arg(layer->engravingLaserPower()));
             }
             else if (layer->type() == LLT_FILLING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(layer->fillingMinSpeed()).arg(layer->fillingLaserPower()));
+                itemSpeedPower->setText(QString("%1/%2").arg(layer->fillingRunSpeed()).arg(layer->fillingRunSpeedPower()));
             }
             itemSpeedPower->setTextAlignment(Qt::AlignCenter);
 

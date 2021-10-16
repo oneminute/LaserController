@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QImage>
 #include <QLabel>
 #include <QMessageBox>
@@ -37,6 +38,7 @@
 #include <QFontComboBox>
 #include <QSize>
 #include <QUndoStack>
+#include <QPainter>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -69,7 +71,11 @@
 #include "widget/Vector2DWidget.h"
 #include "widget/PressedToolButton.h"
 #include "widget/RadioButtonGroup.h"
+#include "widget/PointPairTableWidget.h"
 #include "scene/LaserPrimitive.h"
+
+#include "opencv2/features2d.hpp"
+#include "opencv2/xfeatures2d.hpp"
 
 using namespace ads;
 
@@ -100,8 +106,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     createOutlineDockPanel();
     createMovementDockPanel();
     createShapePropertyDockPanel();
+    createLaserPowerDockPanel();
+    createPrintAndCutPanel();
 
     m_dockAreaLayers->setCurrentIndex(0);
+    m_dockAreaOperations->setCurrentIndex(0);
     // 更改分割条的粗细
     internal::findParent<QSplitter*>(m_centralDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaLayers)->setHandleWidth(Config::Ui::splitterHandleWidth());
@@ -109,6 +118,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     internal::findParent<QSplitter*>(m_dockAreaOperations)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaOutline)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaMovement)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(m_dockAreaProperty)->setHandleWidth(Config::Ui::splitterHandleWidth());
     for (CDockContainerWidget* container : m_dockManager->dockContainers())
     {
         connect(container, &CDockContainerWidget::dockAreasAdded,
@@ -195,67 +205,68 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     // init status bar
     m_statusBarStatus = new QLabel;
-    m_statusBarStatus->setText(tr("Tips"));
+    m_statusBarStatus->setText(ltr("Tips"));
     m_statusBarStatus->setMinimumWidth(60);
     m_statusBarStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarStatus);
-    m_ui->statusbar->addWidget(utils::createSeparator());
+    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarRegister = new QLabel;
-    m_statusBarRegister->setText(tr("Unregistered"));
+    m_statusBarRegister->setText(ltr("Unregistered"));
     m_statusBarRegister->setMinimumWidth(60);
     m_statusBarRegister->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarRegister);
-    m_ui->statusbar->addWidget(utils::createSeparator());
+    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarActivation = new QLabel;
-    m_statusBarActivation->setText(tr("Inactivated"));
+    m_statusBarActivation->setText(ltr("Inactivated"));
     m_statusBarActivation->setMinimumWidth(60);
     m_statusBarActivation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarActivation);
-    m_ui->statusbar->addWidget(utils::createSeparator());
+    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarTips = new QLabel;
-    m_statusBarTips->setText(tr("Welcome!"));
+    m_statusBarTips->setText(ltr("Welcome!"));
     m_statusBarTips->setMinimumWidth(120);
     m_statusBarTips->setAlignment(Qt::AlignHCenter);
     //m_ui->statusbar->addWidget(m_statusBarTips);
     //m_ui->statusbar->addWidget(utils::createSeparator());
-
-    m_statusBarProgress = new ProgressBar;
-    m_statusBarProgress->setMinimum(0);
-    m_statusBarProgress->setMaximum(100);
-    m_ui->statusbar->addWidget(m_statusBarProgress);
-    m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarCoordinate = new QLabel;
     m_statusBarCoordinate->setText(tr("0,0"));
     m_statusBarCoordinate->setMinimumWidth(45);
     m_statusBarCoordinate->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarCoordinate);
-    m_ui->statusbar->addWidget(utils::createSeparator());
+    //m_ui->statusbar->addWidget(utils::createSeparator());
     
     m_statusBarLocation = new QLabel;
-    m_statusBarLocation->setText(tr("Top Left"));
-    m_statusBarLocation->setMinimumWidth(100);
+    m_statusBarLocation->setText(ltr("Top Left"));
+    m_statusBarLocation->setMinimumWidth(300);
     m_statusBarLocation->setAlignment(Qt::AlignHCenter);
-    m_ui->statusbar->addPermanentWidget(utils::createSeparator());
-    m_ui->statusbar->addPermanentWidget(m_statusBarLocation);
+    //m_ui->statusbar->addWidget(utils::createSeparator());
+    m_ui->statusbar->addWidget(m_statusBarLocation);
 
     m_statusBarPageInfo = new QLabel;
-    m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
+    m_statusBarPageInfo->setText(ltr("Page Size(mm): %1x%2")
         .arg(LaserApplication::device->layoutWidth())
         .arg(LaserApplication::device->layoutHeight()));
     m_statusBarPageInfo->setMinimumWidth(150);
     m_statusBarPageInfo->setAlignment(Qt::AlignHCenter);
-    m_ui->statusbar->addPermanentWidget(utils::createSeparator());
-    m_ui->statusbar->addPermanentWidget(m_statusBarPageInfo);
+    //m_ui->statusbar->addWidget(utils::createSeparator());
+    m_ui->statusbar->addWidget(m_statusBarPageInfo);
+
+    m_statusBarProgress = new ProgressBar;
+    m_statusBarProgress->setMinimum(0);
+    m_statusBarProgress->setMaximum(100);
+    m_ui->statusbar->addPermanentWidget(m_statusBarProgress);
+    //m_ui->statusbar->addPermanentWidget(utils::createSeparator());
+
 
     m_statusBarCopyright = new QLabel;
-    m_statusBarCopyright->setText(tr(u8"Copyright \u00a9 2020 Super Laser Technologies, Inc. All Rights Reserved."));
-    m_statusBarCopyright->setMinimumWidth(200);
+    m_statusBarCopyright->setText(LaserApplication::applicationName());
+    m_statusBarCopyright->setMinimumWidth(80);
     m_statusBarCopyright->setAlignment(Qt::AlignHCenter);
-    m_ui->statusbar->addPermanentWidget(utils::createSeparator());
+    //m_ui->statusbar->addPermanentWidget(utils::createSeparator());
     m_ui->statusbar->addPermanentWidget(m_statusBarCopyright);
 
 	//设置为可选择
@@ -273,8 +284,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_propertyLayout->setMargin(0);
 	m_propertyLayout->setSpacing(3);
 	//posx, posy, lock, unlcok
-	m_posXLabel = new QLabel("XPos");
-	m_posYLabel = new QLabel("YPos");
+	m_posXLabel = new QLabel(tr("X Pos"));
+	m_posYLabel = new QLabel(tr("Y Pos"));
 	m_posXBox = new LaserDoubleSpinBox();
 	m_posXBox->setMinimum(-DBL_MAX);
 	m_posXBox->setMaximum(DBL_MAX);
@@ -311,8 +322,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_propertyLayout->addWidget(m_lockOrUnlock, 0, 3, 2, 1);
 
 	//m_width, m_height
-	QLabel* widthLabel = new QLabel("Width");
-	QLabel* heightLabel = new QLabel("Height");
+	m_propertyWidthLabel = new QLabel(tr("Width"));
+	m_propertyHeightLabel = new QLabel(tr("Height"));
 	m_widthBox = new LaserDoubleSpinBox();
 	m_widthBox->setMinimum(DBL_MIN);
 	m_widthBox->setMaximum(DBL_MAX);
@@ -324,8 +335,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_widthUnit = new QLabel("mm");
 	m_heightUnit = new QLabel("mm");
 
-	m_propertyLayout->addWidget(widthLabel, 0, 4);
-	m_propertyLayout->addWidget(heightLabel, 1, 4);
+	m_propertyLayout->addWidget(m_propertyWidthLabel, 0, 4);
+	m_propertyLayout->addWidget(m_propertyHeightLabel, 1, 4);
 	m_propertyLayout->addWidget(m_widthBox, 0, 5);
 	m_propertyLayout->addWidget(m_heightBox, 1, 5);
 	m_propertyLayout->addWidget(m_widthUnit, 0, 6);
@@ -380,7 +391,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	rotateWidget->setLayout(rotateLayout);
 	m_propertyLayout->addWidget(rotateWidget,0, 9, 2, 2);
 	//rotate
-	QLabel* rotateLabel = new QLabel("Rotate");
+	m_rotateLabel = new QLabel(tr("Rotate"));
 	m_rotateBox = new LaserDoubleSpinBox();
 	m_rotateBox->setMinimum(-360.0);
 	m_rotateBox->setMaximum(360.0);
@@ -390,7 +401,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_mmOrIn->setDefaultAction(m_ui->actionUnitChange);
 	m_mmOrIn->setEnabled(false);
 
-	m_propertyLayout->addWidget(rotateLabel, 0, 11, 2, 1);
+	m_propertyLayout->addWidget(m_rotateLabel, 0, 11, 2, 1);
 	m_propertyLayout->addWidget(m_rotateBox, 0, 12, 2, 1);
 	m_propertyLayout->addWidget(m_mmOrIn, 0, 13, 2, 1);
 
@@ -418,13 +429,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //align
     m_fontAlignX = new QComboBox(this);
     m_fontAlignY = new QComboBox(this);
-    m_fontAlignX->addItem("Left");
-    m_fontAlignX->addItem("Middle");
-    m_fontAlignX->addItem("Right");
+    m_fontAlignX->addItem(tr("Left"));
+    m_fontAlignX->addItem(tr("Middle"));
+    m_fontAlignX->addItem(tr("Right"));
     m_fontAlignX->setCurrentIndex(0);
-    m_fontAlignY->addItem("Top");
-    m_fontAlignY->addItem("Middle");
-    m_fontAlignY->addItem("Bottom");
+    m_fontAlignY->addItem(tr("Top"));
+    m_fontAlignY->addItem(tr("Middle"));
+    m_fontAlignY->addItem(tr("Bottom"));
     m_fontAlignY->setCurrentIndex(1);
     //bold Italic upper
     m_fontBold = new QCheckBox(this);
@@ -434,23 +445,23 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_fontSpaceX = new LaserDoubleSpinBox(this);
     m_fontSpaceY = new LaserDoubleSpinBox(this);
     //layot
-    m_textLayout->addWidget(new QLabel("Font"), 0, 0);
+    m_textLayout->addWidget(new QLabel(tr("Font")), 0, 0);
     m_textLayout->addWidget(m_fontFamily, 0, 1);
-    m_textLayout->addWidget(new QLabel("Height"), 1, 0);
+    m_textLayout->addWidget(new QLabel(tr("Height")), 1, 0);
     m_textLayout->addWidget(m_fontHeight, 1, 1);
-    m_textLayout->addWidget(new QLabel("AlignX"), 0, 2);
+    m_textLayout->addWidget(new QLabel(tr("Align X")), 0, 2);
     m_textLayout->addWidget(m_fontAlignX, 0, 3);
-    m_textLayout->addWidget(new QLabel("AlignY"), 1, 2);
+    m_textLayout->addWidget(new QLabel(tr("Align Y")), 1, 2);
     m_textLayout->addWidget(m_fontAlignY, 1, 3);
-    m_textLayout->addWidget(new QLabel("SpacingX"), 0, 4);
+    m_textLayout->addWidget(new QLabel(tr("Spacing X")), 0, 4);
     m_textLayout->addWidget(m_fontSpaceX, 0, 5);
-    m_textLayout->addWidget(new QLabel("SpacingY"), 1, 4);
+    m_textLayout->addWidget(new QLabel(tr("Spacing Y")), 1, 4);
     m_textLayout->addWidget(m_fontSpaceY, 1, 5);
-    m_textLayout->addWidget(new QLabel("Bold"), 0, 6);
+    m_textLayout->addWidget(new QLabel(tr("Bold")), 0, 6);
     m_textLayout->addWidget(m_fontBold, 0, 7);
-    m_textLayout->addWidget(new QLabel("Italic"), 0, 8);
+    m_textLayout->addWidget(new QLabel(tr("Italic")), 0, 8);
     m_textLayout->addWidget(m_fontItalic, 0, 9);
-    m_textLayout->addWidget(new QLabel("Upper Case"), 1, 6, 1, 2);
+    m_textLayout->addWidget(new QLabel(tr("Upper Case")), 1, 6, 1, 2);
     m_textLayout->addWidget(m_fontUpper, 1, 8);
     //text family
     connect(m_fontFamily, QOverload<int>::of(&QComboBox::highlighted), this, &LaserControllerWindow::onFontComboBoxHighLighted);
@@ -577,6 +588,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
     connect(m_ui->actionFetchToUserOrigin, &QAction::triggered, this, &LaserControllerWindow::onActionFetchToUserOrigin);
+
+    connect(m_ui->actionPrintAndCutNew, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutNew);
+    connect(m_ui->actionPrintAndCutFetchLaser, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutFetchLaser);
+    connect(m_ui->actionPrintAndCutFetchCanvas, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutFetchCanvas);
+    connect(m_ui->actionPrintAndCutRemove, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutRemove);
+    connect(m_ui->actionPrintAndCutClear, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutClear);
+    connect(m_ui->actionPrintAndCutAlign, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutAlign);
+    connect(m_ui->actionPrintAndCutRestore, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutRestore);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -1369,6 +1388,7 @@ void LaserControllerWindow::createLayersDockPanel()
     dockWidget->setWidget(panelWidget);
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
+    m_dockLayers = dockWidget;
     m_dockAreaLayers = m_dockManager->addDockWidget(RightDockWidgetArea, dockWidget);
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/layer.png"), "Layers");
 }
@@ -1435,6 +1455,7 @@ void LaserControllerWindow::createCameraDockPanel()
     CDockWidget* dockWidget = new CDockWidget(tr("Cameras"));
     dockWidget->setWidget(panelWidget);
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
+    m_dockCameras = dockWidget;
     m_dockAreaCameras = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
     //只显示tab中icon
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/camera.png"), "Cameras");
@@ -1483,30 +1504,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_radioButtonGroupJobOrigin = InputWidgetWrapper::createWidget<RadioButtonGroup*>(Config::Device::jobOriginItem());
     Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin);
 
-    m_floatEditSliderScanLaserPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::scanLaserPowerItem());
-    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower);
-
-    m_editSliderScanMaxGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::maxScanGrayRatioItem());
-    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray);
-
-    m_editSliderScanMinGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::minScanGrayRatioItem());
-    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray);
-
-    m_floatEditSliderCuttingMaxPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMaxCuttingPowerItem());
-    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower);
-
-    m_floatEditSliderCuttingMinPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMinCuttingPowerItem());
-    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower);
-
-    m_floatEditSliderCuttingTurnOnDelay = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::cuttingTurnOnDelayItem());
-    Config::UserRegister::cuttingTurnOnDelayItem()->bindWidget(m_floatEditSliderCuttingTurnOnDelay);
-
-    m_floatEditSliderCuttingTurnOffDelay = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::cuttingTurnOffDelayItem());
-    Config::UserRegister::cuttingTurnOffDelayItem()->bindWidget(m_floatEditSliderCuttingTurnOffDelay);
-
-    m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
-    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower);
-
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
     m_comboBoxDevices->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -1541,14 +1538,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow(Config::Device::startFromItem()->title(), m_comboBoxStartPosition);
     fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
     fifthRow->addRow(tr("Post Event"), m_comboBoxPostEvent);
-    fifthRow->addRow(Config::UserRegister::scanLaserPowerItem()->title(), m_floatEditSliderScanLaserPower);
-    fifthRow->addRow(Config::UserRegister::maxScanGrayRatioItem()->title(), m_editSliderScanMaxGray);
-    fifthRow->addRow(Config::UserRegister::minScanGrayRatioItem()->title(), m_editSliderScanMinGray);
-    fifthRow->addRow(Config::UserRegister::defaultMaxCuttingPowerItem()->title(), m_floatEditSliderCuttingMaxPower);
-    fifthRow->addRow(Config::UserRegister::defaultMinCuttingPowerItem()->title(), m_floatEditSliderCuttingMinPower);
-    fifthRow->addRow(Config::UserRegister::cuttingTurnOnDelayItem()->title(), m_floatEditSliderCuttingTurnOnDelay);
-    fifthRow->addRow(Config::UserRegister::cuttingTurnOffDelayItem()->title(), m_floatEditSliderCuttingTurnOffDelay);
-    fifthRow->addRow(Config::UserRegister::spotShotPowerItem()->title(), m_floatEditSliderSpotShotPower);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -1576,6 +1565,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     dockWidget->setWidget(panelWidget);
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
+    m_dockOperations = dockWidget;
     m_dockAreaOperations = m_dockManager->addDockWidget(BottomDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
 
@@ -1607,6 +1597,7 @@ void LaserControllerWindow::createOutlineDockPanel()
     dockWidget->setWidget(panelWidget);
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
+    m_dockOutline = dockWidget;
     m_dockAreaOutline = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/outline.png"), "Outline");
 }
@@ -1640,14 +1631,20 @@ void LaserControllerWindow::createMovementDockPanel()
     m_doubleSpinBoxDistanceX = new QDoubleSpinBox;
     m_doubleSpinBoxDistanceX->setDecimals(1);
     m_doubleSpinBoxDistanceX->setValue(10.0);
+    m_doubleSpinBoxDistanceX->setMinimum(0);
+    m_doubleSpinBoxDistanceX->setMaximum(1000);
 
     m_doubleSpinBoxDistanceY = new QDoubleSpinBox;
     m_doubleSpinBoxDistanceY->setDecimals(1);
     m_doubleSpinBoxDistanceY->setValue(10.0);
+    m_doubleSpinBoxDistanceY->setMinimum(0);
+    m_doubleSpinBoxDistanceY->setMaximum(1000);
 
     m_doubleSpinBoxDistanceZ = new QDoubleSpinBox;
     m_doubleSpinBoxDistanceZ->setDecimals(1);
     m_doubleSpinBoxDistanceZ->setValue(10.0);
+    m_doubleSpinBoxDistanceZ->setMinimum(0);
+    m_doubleSpinBoxDistanceZ->setMaximum(1000);
 
     QGridLayout* firstRow = new QGridLayout;
     firstRow->setMargin(0);
@@ -1744,9 +1741,9 @@ void LaserControllerWindow::createMovementDockPanel()
 
     updateUserOriginSelection(Config::Device::userOriginSelected());
 
-    m_userOrigin1 = new Vector2DWidget;
-    m_userOrigin2 = new Vector2DWidget;
-    m_userOrigin3 = new Vector2DWidget;
+    m_userOrigin1 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin1Item());
+    m_userOrigin2 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin2Item());
+    m_userOrigin3 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin3Item());
 
     Config::Device::userOrigin1Item()->bindWidget(m_userOrigin1);
     Config::Device::userOrigin2Item()->bindWidget(m_userOrigin2);
@@ -1784,8 +1781,119 @@ void LaserControllerWindow::createMovementDockPanel()
     dockWidget->setWidget(panelWidget);
     m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
 
+    m_dockMovement = dockWidget;
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/movement.png"), "Movement");
+}
+
+void LaserControllerWindow::createLaserPowerDockPanel()
+{
+    m_floatEditSliderScanLaserPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::scanLaserPowerItem());
+    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower);
+
+    m_editSliderScanMaxGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::maxScanGrayRatioItem());
+    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray);
+
+    m_editSliderScanMinGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::minScanGrayRatioItem());
+    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray);
+
+    m_floatEditSliderCuttingMaxPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMaxCuttingPowerItem());
+    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower);
+
+    m_floatEditSliderCuttingMinPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMinCuttingPowerItem());
+    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower);
+
+    m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
+    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower);
+    QFormLayout* layout = new QFormLayout;
+    layout->addRow(Config::UserRegister::scanLaserPowerItem()->title(), m_floatEditSliderScanLaserPower);
+    layout->addRow(Config::UserRegister::maxScanGrayRatioItem()->title(), m_editSliderScanMaxGray);
+    layout->addRow(Config::UserRegister::minScanGrayRatioItem()->title(), m_editSliderScanMinGray);
+    layout->addRow(Config::UserRegister::defaultMaxCuttingPowerItem()->title(), m_floatEditSliderCuttingMaxPower);
+    layout->addRow(Config::UserRegister::defaultMinCuttingPowerItem()->title(), m_floatEditSliderCuttingMinPower);
+    layout->addRow(Config::UserRegister::spotShotPowerItem()->title(), m_floatEditSliderSpotShotPower);
+    m_formLayoutLaserPower = layout;
+
+    QWidget* panelWidget = new QWidget;
+    panelWidget->setLayout(layout);
+
+    CDockWidget* dockWidget = new CDockWidget(tr("Laser Power"));
+    dockWidget->setWidget(panelWidget);
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
+
+    m_dockLaserPower = dockWidget;
+    m_dockAreaLaserPower = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaOperations);
+    //dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/laser_power.png"), "Movement");
+}
+
+void LaserControllerWindow::createPrintAndCutPanel()
+{
+    m_groupBoxPrintAndCutPoints = new QGroupBox;
+    m_groupBoxPrintAndCutPoints->setTitle(tr("Points"));
+    QVBoxLayout* pointsLayout = new QVBoxLayout;
+    pointsLayout->setMargin(2);
+    m_tablePrintAndCutPoints = new PointPairTableWidget;
+    pointsLayout->addWidget(m_tablePrintAndCutPoints);
+
+    QHBoxLayout* buttonsLayout = new QHBoxLayout;
+    QToolButton* buttonNewLine = new QToolButton;
+    buttonNewLine->setDefaultAction(m_ui->actionPrintAndCutNew);
+    buttonsLayout->addWidget(buttonNewLine);
+    QToolButton* buttonFetchLaser = new QToolButton;
+    buttonFetchLaser->setDefaultAction(m_ui->actionPrintAndCutFetchLaser);
+    buttonsLayout->addWidget(buttonFetchLaser);
+    QToolButton* buttonFetchCanvas = new QToolButton;
+    buttonFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutFetchCanvas);
+    buttonsLayout->addWidget(buttonFetchCanvas);
+    QToolButton* buttonRemove = new QToolButton;
+    buttonRemove->setDefaultAction(m_ui->actionPrintAndCutRemove);
+    buttonsLayout->addWidget(buttonRemove);
+    QToolButton* buttonClear = new QToolButton;
+    buttonClear->setDefaultAction(m_ui->actionPrintAndCutClear);
+    buttonsLayout->addWidget(buttonClear);
+    pointsLayout->addLayout(buttonsLayout);
+    m_groupBoxPrintAndCutPoints->setLayout(pointsLayout);
+
+    m_groupBoxPrintAndCutResult = new QGroupBox;
+    m_groupBoxPrintAndCutResult->setTitle(tr("Result"));
+    QVBoxLayout* resultLayout = new QVBoxLayout;
+    resultLayout->setMargin(2);
+    m_labelPrintAndCutTranslationResult = new QLabel(tr("Translation"));
+    m_labelPrintAndCutRotationResult = new QLabel(tr("Rotation"));
+    m_labelPrintAndCutTranslation= new QLabel(tr("0.000, 0.000"));
+    m_labelPrintAndCutRotation= new QLabel(tr("0.00 degrees"));
+    QFormLayout* resultFormLayout = new QFormLayout;
+    resultFormLayout->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
+    resultFormLayout->addRow(m_labelPrintAndCutTranslationResult, m_labelPrintAndCutTranslation);
+    resultFormLayout->addRow(m_labelPrintAndCutRotationResult, m_labelPrintAndCutRotation);
+    resultLayout->addLayout(resultFormLayout);
+
+    buttonsLayout = new QHBoxLayout;
+    QToolButton* buttonAlign = new QToolButton;
+    buttonAlign->setDefaultAction(m_ui->actionPrintAndCutAlign);
+    buttonsLayout->addWidget(buttonAlign);
+    QToolButton* buttonRestore = new QToolButton;
+    buttonRestore->setDefaultAction(m_ui->actionPrintAndCutRestore);
+    buttonsLayout->addWidget(buttonRestore);
+    resultLayout->addLayout(buttonsLayout);
+
+    m_groupBoxPrintAndCutResult->setLayout(resultLayout);
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(m_groupBoxPrintAndCutPoints);
+    layout->addWidget(m_groupBoxPrintAndCutResult);
+
+    QWidget* panelWidget = new QWidget;
+    panelWidget->setLayout(layout);
+
+    CDockWidget* dockWidget = new CDockWidget(tr("Print and Cut"));
+    dockWidget->setWidget(panelWidget);
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
+
+    m_dockPrintAndCut = dockWidget;
+    m_dockAreaPrintAndCut = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaOperations);
+    //m_dockPrintAndCut->setFloating();
+    //m_dockAreaPrintAndCut->setBaseSize(QSize(300, 500));
 }
 
 void LaserControllerWindow::createShapePropertyDockPanel()
@@ -1847,7 +1955,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     
     m_ui->menuWindow->addAction(m_propertyDockWidget->toggleViewAction());
 
-    m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, m_propertyDockWidget, m_dockAreaLayers);
+    m_dockAreaProperty = m_dockManager->addDockWidget(CenterDockWidgetArea, m_propertyDockWidget, m_dockAreaLayers);
     dockPanelOnlyShowIcon(m_propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
     createPrimitivePropertiesPanel();
 }
@@ -2096,7 +2204,6 @@ void LaserControllerWindow::createPrimitivePropertiesPanel()
 
 void LaserControllerWindow::createPrimitiveLinePropertyPanel()
 {
-
     QGridLayout* layout = new QGridLayout();
     
     layout->setMargin(0);
@@ -2152,27 +2259,6 @@ void LaserControllerWindow::dockPanelOnlyShowIcon(CDockWidget* dockWidget, QPixm
     connect(tab, &CDockWidgetTab::activeTabChanged, this, [=] {
         tab->closeButton()->setVisible(false);
     });
-}
-
-void LaserControllerWindow::createUpdateDockPanel(int winId)
-{
-    QWindow* externalWindow = QWindow::fromWinId(winId);
-    //externalWindow->showMaximized();
-    QWidget* externalWidget = createWindowContainer(externalWindow);
-
-    QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->addWidget(externalWidget);
-    //layout->addStretch(1);
-
-    QWidget* panelWidget = new QWidget;
-    panelWidget->setLayout(layout);
-
-    CDockWidget* dockWidget = new CDockWidget(tr("Update"));
-    dockWidget->setWidget(panelWidget);
-    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
-
-    m_dockAreaUpdate = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
 }
 
 LaserDocument* LaserControllerWindow::currentDocument() const
@@ -3122,9 +3208,6 @@ void LaserControllerWindow::onActionUpdate(bool checked)
 void LaserControllerWindow::onActionLaserPosition(bool checked)
 {
     LaserApplication::device->getCurrentLaserPos();
-    //m_lineEditCoordinatesX->setText(QString::number(pos.x(), 'f'));
-    //m_lineEditCoordinatesY->setText(QString::number(pos.y(), 'f'));
-    //m_lineEditCoordinatesZ->setText(QString::number(pos.z(), 'f'));
 }
 
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
@@ -3152,6 +3235,199 @@ void LaserControllerWindow::onActionMirrorACrossLine(bool checked)
     }
     MirrorACommand* cmd = new MirrorACommand(m_viewer);
     m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionPrintAndCutNew(bool checked)
+{
+    m_tablePrintAndCutPoints->addNewLine();
+}
+
+void LaserControllerWindow::onActionPrintAndCutFetchLaser(bool checked)
+{
+    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->getCurrentLaserPos().toPointF());
+}
+
+void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
+{
+    if (m_scene->selectedPrimitives().count() != 1)
+        return;
+
+    LaserPrimitive* primitive = m_scene->selectedPrimitives().first();
+    LaserRect* laserRect = dynamic_cast<LaserRect*>(primitive);
+    if (!laserRect)
+        return;
+
+    QRectF bounding = laserRect->sceneBoundingRect();
+    QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
+
+    //Config::Ui::visualGridSpacing();
+    int gridContrast = Config::Ui::gridContrast();
+    bool showDocBounding = Config::Ui::showDocumentBoundingRect();
+
+    Config::Ui::gridContrastItem()->setValue(0);
+    m_scene->removeLaserPrimitive(primitive);
+    m_viewer->update();
+    QPixmap pixmap = m_viewer->grab(boundingViewer.toRect());
+    pixmap.save("tmp/printAndCut.bmp");
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_Grayscale8);
+    cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+    std::vector<cv::Point2f> corners;
+    cv::goodFeaturesToTrack(src, corners, 5, 0.01, 10, cv::Mat());
+    cv::Mat featuresImg;
+    cv::cvtColor(src, featuresImg, cv::COLOR_GRAY2BGR);
+    cv::Rect2f validRect(cv::Point2f(qRound(src.cols * 0.05), qRound(src.rows * 0.05)), 
+        cv::Size2f(qRound(src.cols * 0.9), qRound(src.rows * 0.9)));
+    QList<cv::Point2f> features;
+    for (int i = 0; i < corners.size(); i++)
+    {
+        cv::Point2f pt = corners[i];
+        if (validRect.contains(pt))
+        {
+            cv::circle(featuresImg, pt, 2, cv::Scalar(0, 255, 0), 2);
+            features.append(pt);
+        }
+    }
+    cv::imwrite("tmp/features.bmp", featuresImg);
+    
+    if (features.size() == 0)
+    {
+        QMessageBox::warning(this, tr("No Feature points found"), tr("There's no features point found. Please move or scale your selection rect primitive."));
+    }
+    else if (features.size() > 1)
+    {
+        QMessageBox::warning(this, tr("Too many feature points"), tr("Too many reature points found. Please move or scale your selection rect primitive to confirm that only one feature point to be found."));
+    }
+    else if (features.size() == 1)
+    {
+        cv::Point2f cvPt = features[0];
+        QPointF candidatePt(cvPt.x * bounding.width() / src.cols, cvPt.y * bounding.height() / src.rows);
+        candidatePt += bounding.topLeft();
+        qLogD << "candidate point: " << candidatePt;
+        QPointF canvasPoint(Global::pixels2mmX(candidatePt.x()), Global::pixels2mmY(candidatePt.y()));
+        qLogD << "canvas point: " << canvasPoint;
+        m_tablePrintAndCutPoints->setCanvasPoint(canvasPoint);
+    }
+
+    Config::Ui::gridContrastItem()->setValue(gridContrast);
+    Config::Ui::showDocumentBoundingRectItem()->setValue(showDocBounding);
+    m_viewer->update();
+}
+
+void LaserControllerWindow::onActionPrintAndCutRemove(bool checked)
+{
+    m_tablePrintAndCutPoints->removeSelected();
+}
+
+void LaserControllerWindow::onActionPrintAndCutClear(bool checked)
+{
+    m_tablePrintAndCutPoints->clearContents();
+}
+
+void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
+{
+    if (!m_scene->document())
+        return;
+    PointPairList pointPairs = m_tablePrintAndCutPoints->pointPairs();
+    qLogD << "Point pairs count: " << pointPairs.length();
+
+    //PointPairList pointPairs;
+    //pointPairs << PointPair(QPointF(56.88, 8.93), QPointF(31.22, 20.11))
+        //<< PointPair(QPointF(223.01, 154.01), QPointF(234.95, 103.98))
+        //<< PointPair(QPointF(70.01, 80.54), QPointF(65.88, 83.87));
+
+    if (pointPairs.length() >= 2)
+    {
+        QPointF srcPt1(pointPairs.at(0).first.x(), pointPairs.at(0).first.y());
+        QPointF dstPt1(pointPairs.at(0).second.x(), pointPairs.at(0).second.y());
+        QPointF srcPt2(pointPairs.at(1).first.x(), pointPairs.at(1).first.y());
+        QPointF dstPt2(pointPairs.at(1).second.x(), pointPairs.at(1).second.y());
+
+        QPixmap bitmap(300, 300);
+        QPainter painter(&bitmap);
+
+        QLineF l1(srcPt1, srcPt2);
+        QLineF l2(dstPt1, dstPt2);
+        painter.setPen(QPen(Qt::blue, 3));
+        painter.drawLine(l1);
+        painter.setPen(QPen(Qt::red, 3));
+        painter.drawLine(l2);
+        qreal angle = l1.angleTo(l2);
+        QTransform t;
+        t.rotate(angle);
+        QLineF l22 = t.map(l2);
+        QPointF diff1 = l1.p1() - l22.p1();
+        QPointF diff2 = l1.p2() - l22.p2();
+        qLogD << "l1: " << l1;
+        qLogD << "l2: " << l22;
+        qLogD << "diff1: " << diff1 << ", diff2: " << diff2;
+        QPointF diff = (diff1 + diff2) * 1000 / 2;
+        t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), diff.x(), diff.y());
+        l2 = t.map(l2);
+
+        qLogD << t;
+
+        m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
+        m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x() / 1000).arg(diff.y() / 1000));
+
+        m_scene->document()->setEnablePrintAndCut(true);
+        m_scene->document()->setPrintAndCutTransform(t);
+        m_scene->document()->setPrintAndCutPointPairs(pointPairs);
+    }
+    /*else if (pointPairs.length() > 2)
+    {
+        QTransform ti;
+        QTransform tf;
+        PointPairList pointPairs2(pointPairs);
+        for (int i = 0; i < 2; i++)
+        {
+            ti = utils::fromPointPairs(pointPairs2);
+            tf = tf * ti;
+            qLogD << "tf: " << tf;
+
+            for (PointPair& pair : pointPairs2)
+            {
+                pair.second = ti.map(pair.second);
+            }
+        }
+        qLogD << "tf angle: " << tf.map(QLineF(0, 0, 1, 0)).angle();
+
+        std::vector<cv::Point2f> srcPts;
+        std::vector<cv::Point2f> dstPts;
+        int row = 0;
+        for (const PointPair& pair : pointPairs)
+        {
+            srcPts.push_back(cv::Point2f(pair.first.x(), pair.first.y()));
+            dstPts.push_back(cv::Point2f(pair.second.x(), pair.second.y()));
+        }
+
+        cv::Mat cvT = cv::findHomography(dstPts, srcPts);
+        std::cout << cvT << std::endl;
+
+        QTransform t(
+            cvT.at<qreal>(0, 0), cvT.at<qreal>(1, 0), cvT.at<qreal>(2, 0),
+            cvT.at<qreal>(0, 1), cvT.at<qreal>(1, 1), cvT.at<qreal>(2, 1),
+            cvT.at<qreal>(0, 2) * 1000, cvT.at<qreal>(1, 2) * 1000, 1
+            );
+
+        qLogD << t;
+        qLogD << t.isScaling();
+
+        qreal angle = t.map(QLineF(0, 0, 1, 0)).angle();
+        QPointF diff(t.dx(), t.dy());
+        m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
+        m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x() / 1000).arg(diff.y() / 1000));
+
+        m_scene->document()->setEnablePrintAndCut(true);
+        m_scene->document()->setPrintAndCutTransform(t);
+        m_scene->document()->setPrintAndCutPointPairs(pointPairs);
+    }*/
+}
+
+void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
+{
+    m_scene->document()->setEnablePrintAndCut(false);
+    m_scene->document()->setPrintAndCutTransform(QTransform());
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -3291,7 +3567,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 
 void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
 {
-    qDebug() << "onLaserPrimitiveGroupItemChanged";
+    //qDebug() << "onLaserPrimitiveGroupItemChanged";
     if (!m_viewer) {
         return;
     }
@@ -3312,6 +3588,38 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
 void LaserControllerWindow::retranslate()
 {
     m_ui->retranslateUi(this);
+
+    m_dockOperations->setWindowTitle(tr("Operations"));
+    m_dockLaserPower->setWindowTitle(tr("Laser Power"));
+
+
+    qobject_cast<QLabel*>(m_formLayoutLaserPower->itemAt(0, QFormLayout::LabelRole)->widget())->setText(Config::UserRegister::scanLaserPowerItem()->title());
+    qobject_cast<QLabel*>(m_formLayoutLaserPower->itemAt(1, QFormLayout::LabelRole)->widget())->setText(Config::UserRegister::maxScanGrayRatioItem()->title());
+    qobject_cast<QLabel*>(m_formLayoutLaserPower->itemAt(2, QFormLayout::LabelRole)->widget())->setText(Config::UserRegister::minScanGrayRatioItem()->title());
+    qobject_cast<QLabel*>(m_formLayoutLaserPower->itemAt(3, QFormLayout::LabelRole)->widget())->setText(Config::UserRegister::defaultMaxCuttingPowerItem()->title());
+    qobject_cast<QLabel*>(m_formLayoutLaserPower->itemAt(4, QFormLayout::LabelRole)->widget())->setText(Config::UserRegister::defaultMinCuttingPowerItem()->title());
+    qobject_cast<QLabel*>(m_formLayoutLaserPower->itemAt(5, QFormLayout::LabelRole)->widget())->setText(Config::UserRegister::spotShotPowerItem()->title());
+
+    m_posXLabel->setText(tr("Pos X"));
+    m_posXLabel->setText(tr("Pos Y"));
+    m_propertyWidthLabel->setText(tr("Width"));
+    m_propertyHeightLabel->setText(tr("Height"));
+    m_rotateLabel->setText(tr("Rotate"));
+    m_fontAlignX->setItemText(0, tr("Left"));
+    m_fontAlignX->setItemText(1, tr("Middle"));
+    m_fontAlignX->setItemText(2, tr("Right"));
+    m_fontAlignY->setItemText(0, tr("Top"));
+    m_fontAlignY->setItemText(1, tr("Middle"));
+    m_fontAlignY->setItemText(2, tr("Bottom"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 0)->widget())->setText(tr("Font"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 0)->widget())->setText(tr("Height"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 2)->widget())->setText(tr("Align X"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 2)->widget())->setText(tr("Align Y"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 4)->widget())->setText(tr("Spacing X"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 4)->widget())->setText(tr("Spacing Y"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 6)->widget())->setText(tr("Bold"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 8)->widget())->setText(tr("Italic"));
+    qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 6)->widget())->setText(tr("Upper Case"));
 }
 
 void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
@@ -3326,7 +3634,7 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
     QPointF posMM = QPointF(x, y);
     posMM = LaserApplication::device->transform().map(posMM);
     QString posStr = QString("%1mm,%2mm | %3px,%4px")
-        .arg(posMM.x(), 5, 'f', 3).arg(posMM.y(), 5, 'f', 3)
+        .arg(posMM.x(), 8, 'f', 3).arg(posMM.y(), 8, 'f', 3)
         .arg(qFloor(pos.x()), 5).arg(qFloor(pos.y()), 5);
     m_statusBarLocation->setText(posStr);
 }
@@ -3360,9 +3668,9 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     //m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
-    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f'));
-    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f'));
-    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f'));
+    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f', 1));
+    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f', 1));
+    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f', 1));
 }
 
 void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
@@ -3572,7 +3880,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         doc->bindLayerButtons(m_layerButtons);
 		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
         m_scene->updateDocument(doc);
-        doc->outline();
+        //doc->outline();
         m_tableWidgetLayers->setDocument(doc);
         m_tableWidgetLayers->updateItems();
         setWindowTitle(doc->name());
@@ -3638,7 +3946,7 @@ void LaserControllerWindow::selectedChange()
 			return;
 		}
 		QRectF rectReal = QRectF(backgroudItem->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
-		qDebug() << rectReal.top();
+		//qDebug() << rectReal.top();
 		qreal x = 0, y = 0, width = 0, height = 0; 
 		if (m_unitIsMM) {
 			width = Global::pixelsF2mmX(rectReal.width());

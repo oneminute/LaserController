@@ -392,21 +392,19 @@ void Config::loadUiItems()
     autoRepeatInterval->setInputWidgetProperty("textTemplate", "%1ms");
     autoRepeatInterval->setInputWidgetProperty("minimum", 0);
     autoRepeatInterval->setInputWidgetProperty("maximum", 2000);*/
+
+    ConfigItem* showDocumentBoundingRect = group->addConfigItem(
+        "showDocumentBoundingRect",
+        false,
+        DT_BOOL
+    );
+    showDocumentBoundingRect->setInputWidgetType(IWT_CheckBox);
 }
 
 void Config::loadCuttingLayerItems()
 {
     ConfigItemGroup* group = new Config::CuttingLayer;
     Config::CuttingLayer::group = group;
-
-    ConfigItem* minSpeed = group->addConfigItem(
-        "minSpeed",
-        15
-    );
-    minSpeed->setInputWidgetProperty("minimum", 1);
-    minSpeed->setInputWidgetProperty("maximum", 1000);
-    minSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
-    minSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
@@ -417,20 +415,24 @@ void Config::loadCuttingLayerItems()
     runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
-    ConfigItem* laserPower = group->addConfigItem(
-        "laserPower",
-        8,
-        DT_REAL
-    );
-    laserPower->setInputWidgetProperty("minimum", 0);
-    laserPower->setInputWidgetProperty("maximum", 100);
-    laserPower->setInputWidgetProperty("textTemplate", "%1%");
-
     ConfigItem* minPower = group->addConfigItem(
         "minPower",
         70,
         DT_REAL
     );
+    minPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    minPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
@@ -440,6 +442,19 @@ void Config::loadCuttingLayerItems()
         100,
         DT_REAL
     );
+    maxPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    maxPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
@@ -450,15 +465,6 @@ void Config::loadEngravingLayerItems()
     ConfigItemGroup* group = new Config::EngravingLayer;
     Config::EngravingLayer::group = group;
 
-    ConfigItem* minSpeed = group->addConfigItem(
-        "minSpeed",
-        15
-    );
-    minSpeed->setInputWidgetProperty("minimum", 1);
-    minSpeed->setInputWidgetProperty("maximum", 1000);
-    minSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
-    minSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
-
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
         60
@@ -470,10 +476,22 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
-        8,
+        70,
         DT_REAL
     );
-    laserPower->setInputWidgetType(IWT_FloatEditSlider);
+    laserPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    laserPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    laserPower->setInputWidgetProperty("decimals", 1);
     laserPower->setInputWidgetProperty("minimum", 0);
     laserPower->setInputWidgetProperty("maximum", 100);
     laserPower->setInputWidgetProperty("textTemplate", "%1%");
@@ -483,6 +501,19 @@ void Config::loadEngravingLayerItems()
         70,
         DT_REAL
     );
+    minPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    minPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetType(IWT_FloatEditSlider);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
@@ -493,6 +524,19 @@ void Config::loadEngravingLayerItems()
         100,
         DT_REAL
     );
+    maxPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    maxPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
@@ -544,21 +588,18 @@ void Config::loadEngravingLayerItems()
     );
     dpi->setInputWidgetProperty("minimum", 1);
     dpi->setInputWidgetProperty("maximum", 1200);
+
+    ConfigItem* enableCutting = group->addConfigItem(
+        "enableCutting",
+        true,
+        DT_BOOL
+    );
 }
 
 void Config::loadFillingLayerItems()
 {
     ConfigItemGroup* group = new Config::FillingLayer;
     Config::FillingLayer::group = group;
-
-    ConfigItem* minSpeed = group->addConfigItem(
-        "minSpeed",
-        15
-    );
-    minSpeed->setInputWidgetProperty("minimum", 1);
-    minSpeed->setInputWidgetProperty("maximum", 1000);
-    minSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
-    minSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
@@ -569,21 +610,24 @@ void Config::loadFillingLayerItems()
     runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
-    ConfigItem* laserPower = group->addConfigItem(
-        "laserPower",
-        8,
-        DT_REAL
-    );
-    laserPower->setInputWidgetType(IWT_FloatEditSlider);
-    laserPower->setInputWidgetProperty("minimum", 0);
-    laserPower->setInputWidgetProperty("maximum", 100);
-    laserPower->setInputWidgetProperty("textTemplate", "%1%");
-
     ConfigItem* minPower= group->addConfigItem(
         "minPower",
         4,
         DT_REAL
     );
+    minPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    minPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetType(IWT_FloatEditSlider);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
@@ -594,6 +638,19 @@ void Config::loadFillingLayerItems()
         12,
         DT_REAL
     );
+    maxPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    maxPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
@@ -606,6 +663,12 @@ void Config::loadFillingLayerItems()
     rowInterval->setInputWidgetProperty("minimum", 0);
     rowInterval->setInputWidgetProperty("maximum", 1000);
     rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
+
+    ConfigItem* enableCutting = group->addConfigItem(
+        "enableCutting",
+        true,
+        DT_BOOL
+    );
 }
 
 void Config::loadPathOptimizationItems()
@@ -2935,44 +2998,36 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Auto repeat delay(ms)", nullptr), 
         QCoreApplication::translate("Config", "The delay duration of auto repeat button", nullptr));
 
-    CuttingLayer::minSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Speed(mm)", nullptr), 
-        QCoreApplication::translate("Config", "Min speed for cutting layers", nullptr));
+    Ui::showDocumentBoundingRectItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Show Document Bounding Rect", nullptr), 
+        QCoreApplication::translate("Config", "Show document bounding rect", nullptr));
 
     CuttingLayer::runSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Run Speed(mm)", nullptr), 
-        QCoreApplication::translate("Config", "Run speed for cutting layers", nullptr));
-
-    CuttingLayer::laserPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Laser Power(%)", nullptr), 
-        QCoreApplication::translate("Config", "The power percentage for cutting layers", nullptr));
+        QCoreApplication::translate("Config", "Cutting Speed(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting speed for cutting layers", nullptr));
 
     CuttingLayer::minPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Min Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The min power percentage for cutting layers", nullptr));
 
     CuttingLayer::maxPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Max Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The max power percentage for cutting layers", nullptr));
 
-    EngravingLayer::minSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Speed(mm/s)", nullptr), 
-        QCoreApplication::translate("Config", "The min speed for engraving layers", nullptr));
-
     EngravingLayer::runSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Run Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Engraving Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "The run speed for engraving layers", nullptr));
 
     EngravingLayer::laserPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Laser Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Engraving Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The laser power for engraving layers", nullptr));
 
     EngravingLayer::minPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Engraving Min Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The min power percentage for engraving layers", nullptr));
 
     EngravingLayer::maxPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Engraving Max Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The max power percentage for engraving layers", nullptr));
 
     EngravingLayer::rowIntervalItem()->setTitleAndDesc(
@@ -3003,29 +3058,29 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "DPI", nullptr), 
         QCoreApplication::translate("Config", "Dots per inch", nullptr));
 
-    FillingLayer::minSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Speed(mm/s)", nullptr), 
-        QCoreApplication::translate("Config", "The min speed for filling layers", nullptr));
+    EngravingLayer::enableCuttingItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Cutting Item", nullptr), 
+        QCoreApplication::translate("Config", "Enable Cutting Item", nullptr));
 
     FillingLayer::runSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Run Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Filling Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "The run speed for filling layers", nullptr));
 
-    FillingLayer::laserPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Laser Power(%)", nullptr), 
-        QCoreApplication::translate("Config", "The laser power for filling layers", nullptr));
-
     FillingLayer::minPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Filling Min Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The min power percentage for filling layers", nullptr));
 
     FillingLayer::maxPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Power(%)", nullptr), 
+        QCoreApplication::translate("Config", "Filling Max Power(%)", nullptr), 
         QCoreApplication::translate("Config", "The max power percentage for filling layers", nullptr));
 
     FillingLayer::rowIntervalItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Row Interval(μm)", nullptr), 
         QCoreApplication::translate("Config", "The row interval between lines of bitmap for filling layers", nullptr));
+
+    FillingLayer::enableCuttingItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Cutting Item", nullptr), 
+        QCoreApplication::translate("Config", "Enable Cutting Item", nullptr));
 
     PathOptimization::maxStartingPointsItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Starting Points", nullptr), 

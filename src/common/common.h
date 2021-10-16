@@ -402,6 +402,9 @@ public:
     QString toString();
 };
 
+typedef QPair<QPointF, QPointF> PointPair;
+typedef QList<PointPair> PointPairList;
+
 Q_DECLARE_METATYPE(FinishRun);
 
 #endif // COMMON_H

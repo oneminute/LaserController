@@ -95,10 +95,11 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     connect(this, &PreviewWindow::addMessageSignal, this, &PreviewWindow::onAddMessage);
     connect(this, &PreviewWindow::addPointsSignal, this, &PreviewWindow::onAddPoints);
     connect(this, &PreviewWindow::addPointSignal, this, &PreviewWindow::onAddPoint);
+    connect(&m_updateTimer, &QTimer::timeout, this, &PreviewWindow::updatePreviewArea);
 
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
-    updatePreviewArea();
+    intendUpdate();
 }
 
 PreviewWindow::~PreviewWindow()
@@ -108,6 +109,14 @@ PreviewWindow::~PreviewWindow()
 qreal PreviewWindow::progress() const
 {
     return m_progress;
+}
+
+void PreviewWindow::intendUpdate()
+{
+    if (!m_updateTimer.isActive())
+    {
+        m_updateTimer.start(1500);
+    }
 }
 
 void PreviewWindow::setTitle(const QString& msg)
@@ -137,13 +146,14 @@ void PreviewWindow::addPoint(const QPointF& point, QPen pen, int style)
 
 void PreviewWindow::updatePreviewArea()
 {
+    m_updateTimer.stop();
+    qLogD << "update preview area";
     QSizeF viewSize = m_viewer->viewport()->size();
     QSizeF sceneSize = m_viewer->scene()->sceneRect().size();
     qreal scaleX = viewSize.width() / sceneSize.width();
     qreal scaleY = viewSize.height() / sceneSize.height();
     qreal scale = qMax(scaleX, scaleY);
     m_viewer->setTransform(QTransform::fromScale(scale, scale));
-    
 }
 
 void PreviewWindow::reset()
@@ -154,7 +164,7 @@ void PreviewWindow::reset()
     m_viewer->scene()->addRect(LaserApplication::device->boundRectMachining());
     
     resetProgress();
-    updatePreviewArea();
+    intendUpdate();
     m_viewer->reset();
 }
 
@@ -213,25 +223,25 @@ void PreviewWindow::addMessage(const QString& message)
 void PreviewWindow::onAddPath(const QPainterPath& path, QPen pen, const QString& label)
 {
     m_scene->addPath(path, pen, label);
-    updatePreviewArea();
+    intendUpdate();
 }
 
 void PreviewWindow::onAddLine(const QLineF& line, QPen pen, const QString& label)
 {
     m_scene->addLine(line, pen, label);
-    updatePreviewArea();
+    intendUpdate();
 }
 
 void PreviewWindow::onAddPoints(const QList<QPointF>& points, QPen pen, int style)
 {
     m_scene->addPoints(points, pen, style);
-    updatePreviewArea();
+    intendUpdate();
 }
 
 void PreviewWindow::onAddPoint(const QPointF& point, QPen pen, int style)
 {
     m_scene->addPoint(point, pen, style);
-    updatePreviewArea();
+    intendUpdate();
 }
 
 void PreviewWindow::onSetTitle(const QString& msg)
@@ -276,6 +286,6 @@ void PreviewWindow::onSetProgress(quint32 code, qreal progress)
 
 void PreviewWindow::onAddMessage(const QString& message)
 {
-    qLogD << message;
+    //qLogD << message;
     m_textEditLog->appendPlainText(message);
 }

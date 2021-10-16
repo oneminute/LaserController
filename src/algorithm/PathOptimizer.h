@@ -6,7 +6,6 @@
 #include <QVector>
 #include <QVector2D>
 #include "scene/LaserPrimitive.h"
-#include "ui/ProgressDialog.h"
 #include "ui/PreviewWindow.h"
 
 class PathOptimizer;
@@ -37,7 +36,6 @@ signals:
     /**/
 
 protected:
-    void optimizeLayer(OptimizeNode* root);
     void optimizeFrom(OptimizeNode* root);
 
     void optimizeNodes(QSet<OptimizeNode*>& siblingLeaves, QSet<OptimizeNode*>& travelled);

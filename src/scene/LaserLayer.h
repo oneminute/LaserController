@@ -32,23 +32,14 @@ public:
     LaserLayerType type() const;
     void setType(LaserLayerType type);
 
-    int cuttingMinSpeed() const;
-    void setCuttingMinSpeed(int minSpeed);
-
     int cuttingRunSpeed() const;
     void setCuttingRunSpeed(int runSpeed);
-
-    qreal cuttingLaserPower() const;
-    void setCuttingLaserPower(qreal laserPower);
 
     qreal cuttingMinSpeedPower() const;
     void setCuttingMinSpeedPower(qreal minSpeedPower);
 
     qreal cuttingRunSpeedPower() const;
     void setCuttingRunSpeedPower(qreal runSpeedPower);
-
-    int engravingMinSpeed() const;
-    void setEngravingMinSpeed(int minSpeed);
 
     int engravingRunSpeed() const;
     void setEngravingRunSpeed(int runSpeed);
@@ -71,14 +62,11 @@ public:
     int engravingRowInterval() const;
     void setEngravingRowInterval(int rowInterval);
 
-    int fillingMinSpeed() const;
-    void setFillingMinSpeed(int minSpeed);
+    bool engravingEnableCutting() const;
+    void setEngravingEnableCutting(bool cutting);
 
     int fillingRunSpeed() const;
     void setFillingRunSpeed(int runSpeed);
-
-    qreal fillingLaserPower() const;
-    void setFillingLaserPower(qreal laserPower);
 
     qreal fillingMinSpeedPower() const;
     void setFillingMinSpeedPower(qreal minSpeedPower);
@@ -88,6 +76,9 @@ public:
 
     int fillingRowInterval() const;
     void setFillingRowInterval(int rowInterval);
+
+    bool fillingEnableCutting() const;
+    void setFillingEnableCutting(bool cutting);
 
     QPoint startPos() const;
     void setStartPos(const QPoint& startPos);

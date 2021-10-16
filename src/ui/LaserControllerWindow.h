@@ -22,16 +22,19 @@ QT_END_NAMESPACE
 class EditSlider;
 class FloatEditDualSlider;
 class FloatEditSlider;
+class QFormLayout;
 class LaserLayerTableWidget;
 class LaserViewer;
 class LaserScene;
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
+class QGroupBox;
 class QLabel;
 class QPushButton;
 class QGridLayout;
 class QRadioButton;
+class QTableWidget;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -41,6 +44,7 @@ class ProgressBar;
 class PressedToolButton;
 class Vector2DWidget;
 class RadioButtonGroup;
+class PointPairTableWidget;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -51,8 +55,6 @@ public:
 
     void moveLaser(const QVector3D& delta, bool relative = true, const QVector3D& abstractDest = QVector3D());
     FinishRun finishRun();
-
-    void createUpdateDockPanel(int winId);
 
     LaserDocument* currentDocument() const;
 
@@ -87,6 +89,8 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+    void createLaserPowerDockPanel();
+    void createPrintAndCutPanel();
     //shape properties panel / dock panel
     void createShapePropertyDockPanel();
     //show shape properties
@@ -190,6 +194,14 @@ protected slots:
     void onActionUpdateOutline(bool checked = false);
     void onActionFetchToUserOrigin(bool checked = false);
 
+    void onActionPrintAndCutNew(bool checked = false);
+    void onActionPrintAndCutFetchLaser(bool checked = false);
+    void onActionPrintAndCutFetchCanvas(bool checked = false);
+    void onActionPrintAndCutRemove(bool checked = false);
+    void onActionPrintAndCutClear(bool checked = false);
+    void onActionPrintAndCutAlign(bool checked = false);
+    void onActionPrintAndCutRestore(bool checked = false);
+
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
     void onDeviceDisconnected();
@@ -286,6 +298,7 @@ private:
     QToolButton* m_buttonMoveLayerUp;
     QToolButton* m_buttonMoveLayerDown;
     QToolButton* m_buttonRemoveLayer;
+    ads::CDockWidget* m_dockLayers;
     ads::CDockAreaWidget* m_dockAreaLayers;
 
     // Camera Panel widgets
@@ -299,6 +312,7 @@ private:
     QCheckBox* m_checkBoxCameraShow;
     QDoubleSpinBox* m_doubleSpinBoxCameraXShift;
     QDoubleSpinBox* m_doubleSpinBoxCameraYShift;
+    ads::CDockWidget* m_dockCameras;
     ads::CDockAreaWidget* m_dockAreaCameras;
 
     // Operations Panel widgets
@@ -312,23 +326,17 @@ private:
     QToolButton* m_buttonOperationOptimize;
     QComboBox* m_comboBoxStartPosition;
     RadioButtonGroup* m_radioButtonGroupJobOrigin;
-    FloatEditSlider* m_floatEditSliderScanLaserPower;
-    EditSlider* m_editSliderScanMaxGray;
-    EditSlider* m_editSliderScanMinGray;
-    FloatEditSlider* m_floatEditSliderCuttingMaxPower;
-    FloatEditSlider* m_floatEditSliderCuttingMinPower;
-    FloatEditSlider* m_floatEditSliderCuttingTurnOnDelay;
-    FloatEditSlider* m_floatEditSliderCuttingTurnOffDelay;
-    FloatEditSlider* m_floatEditSliderSpotShotPower;
     //FloatEditSlider* m_floatEditSliderLaserPower;
     //FloatEditDualSlider* m_floatEditDualSliderLaserRange;
     QComboBox* m_comboBoxDevices;
     QToolButton* m_buttonConnect;
     QToolButton* m_buttonRefresh;
+    ads::CDockWidget* m_dockOperations;
     ads::CDockAreaWidget* m_dockAreaOperations;
 
     // Outline Panel widgets
     QTreeWidget* m_treeWidgetOutline;
+    ads::CDockWidget* m_dockOutline;
     ads::CDockAreaWidget* m_dockAreaOutline;
 
     // Movement Panel widgets
@@ -364,79 +372,10 @@ private:
     Vector2DWidget* m_userOrigin2;
     Vector2DWidget* m_userOrigin3;
     QToolButton* m_buttonFetchToUserOrigin;
+    ads::CDockWidget* m_dockMovement;
     ads::CDockAreaWidget* m_dockAreaMovement;
 
-    // Update Panel widgets
-    ads::CDockAreaWidget* m_dockAreaUpdate;
-
-    bool m_created;
-    QDir m_tmpDir;
-    QString m_currentJson;
-    bool m_useLoadedJson;
-    bool m_prepareMachining;
-
-    // widgets on status bar
-    QLabel* m_statusBarStatus;
-    QLabel* m_statusBarRegister;
-    QLabel* m_statusBarActivation;
-    QLabel* m_statusBarTips;
-    ProgressBar* m_statusBarProgress;
-    QLabel* m_statusBarCoordinate;
-    QLabel* m_statusBarLocation;
-    QLabel* m_statusBarPageInfo;
-    QLabel* m_statusBarCopyright;
-
-    QList<LayerButton*> m_layerButtons;
-	//selected items properties
-	QGridLayout* m_propertyLayout;
-	QWidget* m_propertyWidget;
-	QLabel* m_posXLabel;
-	QLabel* m_posYLabel;
-	LaserDoubleSpinBox* m_posXBox;
-	LaserDoubleSpinBox* m_posYBox;
-	QToolButton* m_lockOrUnlock;
-	QLabel* m_posXUnit;
-	QLabel* m_posYUnit;
-	LaserDoubleSpinBox* m_widthBox;
-	LaserDoubleSpinBox* m_heightBox;
-	QLabel* m_widthUnit;
-	QLabel* m_heightUnit;
-	LaserDoubleSpinBox* m_xRateBox;
-	LaserDoubleSpinBox* m_yRateBox;
-	QRadioButton* m_topLeftBtn;
-	QRadioButton* m_topCenterBtn;
-	QRadioButton* m_topRightBtn;
-	QRadioButton* m_bottomLeftBtn;
-	QRadioButton* m_bottomCenterBtn;
-	QRadioButton* m_bottomRightBtn;
-	QRadioButton* m_leftCenterBtn;
-	QRadioButton* m_centerBtn;
-	QRadioButton* m_rightCenterBtn;
-	LaserDoubleSpinBox* m_rotateBox;
-	QToolButton* m_mmOrIn;
-	bool m_unitIsMM;
-    bool m_lockEqualRatio;
-	//selection tool bar
-	int m_selectionOriginalState;
-	int m_selectionTranformState;
-
-	QString m_fileDirection;
-	QString m_fileName;
-	//QString m_windowTitle;
-	//Text 
-    QGridLayout* m_textLayout;
-    QWidget * m_textFontWidget;
-    LaserFontComboBox* m_fontFamily;
-    LaserDoubleSpinBox* m_fontHeight;
-    QComboBox* m_fontAlignX;
-    QComboBox* m_fontAlignY;
-    QCheckBox* m_fontBold;
-    QCheckBox* m_fontItalic;
-    QCheckBox* m_fontUpper;
-    LaserDoubleSpinBox* m_fontSpaceX;
-    LaserDoubleSpinBox* m_fontSpaceY;
-    int m_fontComboxLightedIndex;
-    //dock panel/ shape properties panel
+    // Property panel
     LaserDoubleSpinBox* m_cutOrderPriority;
     QLabel* m_cutOrderPriorityLabel;
     LaserDoubleSpinBox* m_powerScale;
@@ -487,8 +426,104 @@ private:
     QWidget* m_nurbsPropertyWidget;
     QWidget* m_mixturePropertyWidget;
     QWidget* m_nullPropertyWidget;
-    ads::CDockWidget* m_propertyDockWidget;
     Qt::CheckState m_lastLockedState;
+    ads::CDockWidget* m_propertyDockWidget;
+    ads::CDockAreaWidget* m_dockAreaProperty;
+
+    // Laser Power Panel
+    FloatEditSlider* m_floatEditSliderScanLaserPower;
+    EditSlider* m_editSliderScanMaxGray;
+    EditSlider* m_editSliderScanMinGray;
+    FloatEditSlider* m_floatEditSliderCuttingMaxPower;
+    FloatEditSlider* m_floatEditSliderCuttingMinPower;
+    FloatEditSlider* m_floatEditSliderSpotShotPower;
+    QFormLayout* m_formLayoutLaserPower;
+    ads::CDockWidget* m_dockLaserPower;
+    ads::CDockAreaWidget* m_dockAreaLaserPower;
+
+    // Print and Cut Panel
+    QGroupBox* m_groupBoxPrintAndCutPoints;
+    PointPairTableWidget* m_tablePrintAndCutPoints;
+    QGroupBox* m_groupBoxPrintAndCutResult;
+    QLabel* m_labelPrintAndCutTranslationResult;
+    QLabel* m_labelPrintAndCutRotationResult;
+    QLabel* m_labelPrintAndCutTranslation;
+    QLabel* m_labelPrintAndCutRotation;
+    ads::CDockWidget* m_dockPrintAndCut;
+    ads::CDockAreaWidget* m_dockAreaPrintAndCut;
+
+    bool m_created;
+    QDir m_tmpDir;
+    QString m_currentJson;
+    bool m_useLoadedJson;
+    bool m_prepareMachining;
+
+    // widgets on status bar
+    QLabel* m_statusBarStatus;
+    QLabel* m_statusBarRegister;
+    QLabel* m_statusBarActivation;
+    QLabel* m_statusBarTips;
+    ProgressBar* m_statusBarProgress;
+    QLabel* m_statusBarCoordinate;
+    QLabel* m_statusBarLocation;
+    QLabel* m_statusBarPageInfo;
+    QLabel* m_statusBarCopyright;
+
+    QList<LayerButton*> m_layerButtons;
+	//selected items properties
+	QGridLayout* m_propertyLayout;
+	QWidget* m_propertyWidget;
+	QLabel* m_posXLabel;
+	QLabel* m_posYLabel;
+	LaserDoubleSpinBox* m_posXBox;
+	LaserDoubleSpinBox* m_posYBox;
+	QToolButton* m_lockOrUnlock;
+	QLabel* m_posXUnit;
+	QLabel* m_posYUnit;
+    QLabel* m_propertyWidthLabel;
+    QLabel* m_propertyHeightLabel;
+	LaserDoubleSpinBox* m_widthBox;
+	LaserDoubleSpinBox* m_heightBox;
+	QLabel* m_widthUnit;
+	QLabel* m_heightUnit;
+	LaserDoubleSpinBox* m_xRateBox;
+	LaserDoubleSpinBox* m_yRateBox;
+	QRadioButton* m_topLeftBtn;
+	QRadioButton* m_topCenterBtn;
+	QRadioButton* m_topRightBtn;
+	QRadioButton* m_bottomLeftBtn;
+	QRadioButton* m_bottomCenterBtn;
+	QRadioButton* m_bottomRightBtn;
+	QRadioButton* m_leftCenterBtn;
+	QRadioButton* m_centerBtn;
+	QRadioButton* m_rightCenterBtn;
+    QLabel* m_rotateLabel;
+	LaserDoubleSpinBox* m_rotateBox;
+	QToolButton* m_mmOrIn;
+	bool m_unitIsMM;
+    bool m_lockEqualRatio;
+	//selection tool bar
+	int m_selectionOriginalState;
+	int m_selectionTranformState;
+
+	QString m_fileDirection;
+	QString m_fileName;
+	//QString m_windowTitle;
+	//Text 
+    QGridLayout* m_textLayout;
+    QWidget * m_textFontWidget;
+    LaserFontComboBox* m_fontFamily;
+    LaserDoubleSpinBox* m_fontHeight;
+    QComboBox* m_fontAlignX;
+    QComboBox* m_fontAlignY;
+    QCheckBox* m_fontBold;
+    QCheckBox* m_fontItalic;
+    QCheckBox* m_fontUpper;
+    LaserDoubleSpinBox* m_fontSpaceX;
+    LaserDoubleSpinBox* m_fontSpaceY;
+    int m_fontComboxLightedIndex;
+    //dock panel/ shape properties panel
+    
 
     friend class LaserApplication;
 };

@@ -1,6 +1,11 @@
 #include "Utils.h"
 #include <QUuid>
+#include <QtMath>
 #include "scene/LaserPrimitive.h"
+#include "Eigen/Core"
+#include "Eigen/Dense"
+#include "opencv2/features2d.hpp"
+#include "opencv2/xfeatures2d.hpp"
 
 QString utils::createUUID(const QString& prefix)
 {
@@ -216,7 +221,7 @@ LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
         {
             QPainterPath::Element e = intersected.elementAt(i);
             //qDebug() << i << e.x << e.y << e.type;
-            if (utils::fuzzyEquals(e.y, y, 1))
+            if (utils::fuzzyEquals(e.y, y, 0.1))
             {
                 linePoints.insert(e.x, e.x);
             }
@@ -252,3 +257,185 @@ LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
 
     return lineList;
 }
+
+RELATION utils::determineRelationship(const QPainterPath& a, const QPainterPath& b)
+{
+    RELATION rel = determineRelationship(a.boundingRect(), b.boundingRect());
+    if (rel == RELATION::A_CONTAINS_B)
+    {
+        if (a.contains(b))
+            return rel;
+        else
+            rel = RELATION::NONE;
+    }
+    else if (rel == RELATION::B_CONTAINS_A)
+    {
+        if (b.contains(a))
+            return rel;
+        else
+            rel = RELATION::NONE;
+    }
+    else
+    {
+        rel = RELATION::NONE;
+    }
+    //if (a.contains(b))
+    //{
+    //    // candidate primitive contains tree node primitive
+    //    rel = A_CONTAINS_B;
+    //}
+    //else if (b.contains(a))
+    //{
+    //    // tree node primitive contains candidate primitive
+    //    rel = B_CONTAINS_A;
+    //}
+    //else if (a.intersects(b))
+    //{
+    //    // a intersects with b
+    //    rel = INTERSECTION;
+    //}
+    //else
+    //{
+    //    // no relationship between candidate primitive and tree node primitive
+    //    rel = RELATION::NONE;
+    //}
+    return rel;
+}
+
+RELATION utils::determineRelationship(const QRectF& a, const QRectF& b)
+{
+    RELATION hRel = RELATION::NONE;
+    RELATION vRel = RELATION::NONE;
+    qreal left = qMin(a.left(), b.left());
+    qreal right = qMax(a.right(), b.right());
+    qreal top = qMin(a.top(), b.top());
+    qreal bottom = qMax(a.bottom(), b.bottom());
+    qreal interWidth = right - left;
+    qreal interHeight = bottom - top;
+    qreal hSum = a.width() + b.width();
+    qreal vSum = a.height() + b.height();
+
+    if (interWidth < hSum)
+    {
+        hRel = RELATION::INTERSECTION;
+        if (interWidth == a.width())
+        {
+            hRel = RELATION::A_CONTAINS_B;
+        }
+        else if (interWidth == b.width())
+        {
+            hRel = RELATION::B_CONTAINS_A;
+        }
+    }
+
+    if (interHeight < vSum)
+    {
+        vRel = RELATION::INTERSECTION;
+        if (interHeight == a.height())
+        {
+            vRel = RELATION::A_CONTAINS_B;
+        }
+        else if (interHeight == b.height())
+        {
+            vRel = RELATION::B_CONTAINS_A;
+        }
+    }
+
+    RELATION rel = RELATION::NONE;
+    if (vRel == RELATION::INTERSECTION && hRel == RELATION::INTERSECTION)
+    {
+        rel = RELATION::INTERSECTION;
+    }
+    if (vRel == A_CONTAINS_B && hRel == A_CONTAINS_B)
+    {
+        rel = A_CONTAINS_B;
+    }
+    if (vRel == B_CONTAINS_A && hRel == B_CONTAINS_A)
+    {
+        rel = B_CONTAINS_A;
+    }
+
+    return rel;
+}
+
+QTransform utils::fromPointPairs(const PointPairList& pointPairs)
+{
+    // solve Ax=b
+    // 
+    // A = | sigma(x1^2 + y1^2)         0          sigma(x1) sigma(y1) |
+    //     |         0          sigma(x1^2 - y1^2) sigma(y1) sigma(x1) |
+    //     |     sigma(x1)          sigma(y1)          1         0     |
+    //     |     sigma(y1)          sigma(x1)          0         1     |
+    // 
+    // b = | sigma(x1 * x2 + y1 * y2) |
+    //     | sigma(x1 * y2 - x2 * y1) |
+    //     |         sigma(x2)        |
+    //     |         sigma(y2)        |
+    //
+    // x = | a |
+    //     | b |
+    //     | c |
+    //     | d |
+    //
+    // a = cos(angle), b = sin(angle), c = dx, d = dy
+
+    qreal sumX1 = 0;
+    qreal sumX2 = 0;
+    qreal sumY1 = 0;
+    qreal sumY2 = 0;
+    qreal sumX12AY12 = 0;
+    qreal sumX12SY12 = 0;
+    qreal sumX1X2AY1Y2 = 0;
+    qreal sumX1Y2SX2Y1 = 0;
+
+    int i = 0;
+    for (const PointPair& pair : pointPairs)
+    {
+        qreal x1 = pair.second.x();
+        qreal y1 = pair.second.y();
+        qreal x2 = pair.first.x();
+        qreal y2 = pair.first.y();
+
+        qreal x12 = x1 * x1;
+        qreal y12 = y1 * y1;
+        qreal x1x2 = x1 * x2;
+        qreal y1y2 = y1 * y2;
+        qreal x1y2 = x1 * y2;
+        qreal x2y1 = x2 * y1;
+
+        sumX1 += x1;
+        sumX2 += x2;
+        sumY1 += y1;
+        sumY2 += y2;
+        sumX12AY12 += x12 + y12;
+        sumX12SY12 += x12 - y12;
+        sumX1X2AY1Y2 += x1x2 + y1y2;
+        sumX1Y2SX2Y1 += x1y2 - x2y1;
+
+        i++;
+    }
+
+    Eigen::MatrixXd A(4, 4);
+    A << sumX12AY12,          0, sumX1, sumY1,
+                  0, sumX12SY12, sumY1, sumX1,
+              sumX1,      sumY1,     1,     0,
+              sumY1,      sumX1,     0,     1;
+    Eigen::Vector4d b;
+    b << sumX1X2AY1Y2, sumX1Y2SX2Y1, sumX2, sumY2;
+    std::cout << A << std::endl << std::endl;
+    std::cout << b << std::endl << std::endl;
+
+    Eigen::MatrixXd x = A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+    std::cout << x << std::endl << std::endl;
+
+    qreal angle1 = qRadiansToDegrees(qAcos(x(0)));
+    qreal angle2 = qRadiansToDegrees(qAsin(x(1)));
+    qLogD << "angle1: " << angle1;
+    qLogD << "angle2: " << angle2;
+
+    QTransform transform(x(0), x(1), -x(1), x(0), x(2), x(3));
+    qLogD << transform;
+    return transform;
+}
+
+

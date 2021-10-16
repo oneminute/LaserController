@@ -40,6 +40,8 @@ protected slots:
     void onCuttingToggled(bool checked);
     void onEngravingToggled(bool checked);
     void onBothToggled(bool checked);
+    void onEngravingEnableCuttingToggled(bool checked);
+    void onFillingEnableCuttingToggled(bool checked);
 
 	void onButtonClicked(QAbstractButton *button);
 

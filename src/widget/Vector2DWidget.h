@@ -10,6 +10,12 @@ class Vector2DWidgetPrivate;
 class Vector2DWidget : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(qreal minimum READ minimum WRITE setMinimum DESIGNABLE true)
+    Q_PROPERTY(qreal maximum READ maximum WRITE setMaximum DESIGNABLE true)
+    Q_PROPERTY(qreal xMinimum READ xMinimum WRITE setXMinimum DESIGNABLE true)
+    Q_PROPERTY(qreal xMaximum READ xMaximum WRITE setXMaximum DESIGNABLE true)
+    Q_PROPERTY(qreal yMinimum READ yMinimum WRITE setYMinimum DESIGNABLE true)
+    Q_PROPERTY(qreal yMaximum READ yMaximum WRITE setYMaximum DESIGNABLE true)
 public:
     explicit Vector2DWidget(QWidget* parent = nullptr);
     explicit Vector2DWidget(qreal x, qreal y, QWidget* parent = nullptr);
@@ -32,6 +38,19 @@ public:
     QVector2D toVector2D() const;
     QPointF toPointF() const;
     QPoint toPoint() const;
+
+    qreal minimum() const;
+    qreal maximum() const;
+    qreal xMinimum() const;
+    qreal yMinimum() const;
+    qreal xMaximum() const;
+    qreal yMaximum() const;
+    void setMinimum(qreal value);
+    void setMaximum(qreal value);
+    void setXMinimum(qreal value);
+    void setYMinimum(qreal value);
+    void setXMaximum(qreal value);
+    void setYMaximum(qreal value);
 
 protected:
     void init();
