@@ -362,15 +362,15 @@ QTransform utils::fromPointPairs(const PointPairList& pointPairs)
 {
     // solve Ax=b
     // 
-    // A = | sigma(x1^2 + y1^2)         0          sigma(x1) sigma(y1) |
-    //     |         0          sigma(x1^2 - y1^2) sigma(y1) sigma(x1) |
-    //     |     sigma(x1)          sigma(y1)          1         0     |
-    //     |     sigma(y1)          sigma(x1)          0         1     |
+    // A = | sigma(x1^2 + y1^2)                   0  sigma(x1)  sigma(y1) |
+    //     |                  0  sigma(x1^2 - y1^2) -sigma(y1)  sigma(x1) |
+    //     |          sigma(x1)          -sigma(y1)          1          0 |
+    //     |          sigma(y1)           sigma(x1)          0          1 |
     // 
     // b = | sigma(x1 * x2 + y1 * y2) |
     //     | sigma(x1 * y2 - x2 * y1) |
-    //     |         sigma(x2)        |
-    //     |         sigma(y2)        |
+    //     |                sigma(x2) |
+    //     |                sigma(y2) |
     //
     // x = | a |
     //     | b |
@@ -388,7 +388,6 @@ QTransform utils::fromPointPairs(const PointPairList& pointPairs)
     qreal sumX1X2AY1Y2 = 0;
     qreal sumX1Y2SX2Y1 = 0;
 
-    int i = 0;
     for (const PointPair& pair : pointPairs)
     {
         qreal x1 = pair.second.x();
@@ -411,17 +410,18 @@ QTransform utils::fromPointPairs(const PointPairList& pointPairs)
         sumX12SY12 += x12 - y12;
         sumX1X2AY1Y2 += x1x2 + y1y2;
         sumX1Y2SX2Y1 += x1y2 - x2y1;
-
-        i++;
     }
 
     Eigen::MatrixXd A(4, 4);
-    A << sumX12AY12,          0, sumX1, sumY1,
-                  0, sumX12SY12, sumY1, sumX1,
-              sumX1,      sumY1,     1,     0,
-              sumY1,      sumX1,     0,     1;
+    A << sumX12AY12,          0,  sumX1, sumY1,
+                  0, sumX12SY12, -sumY1, sumX1,
+              sumX1,      -sumY1,    1,      0,
+              sumY1,       sumX1,    0,      1;
     Eigen::Vector4d b;
-    b << sumX1X2AY1Y2, sumX1Y2SX2Y1, sumX2, sumY2;
+    b << sumX1X2AY1Y2, 
+         sumX1Y2SX2Y1, 
+                sumX2, 
+                sumY2;
     std::cout << A << std::endl << std::endl;
     std::cout << b << std::endl << std::endl;
 

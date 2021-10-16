@@ -3329,15 +3329,15 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 {
     if (!m_scene->document())
         return;
-    PointPairList pointPairs = m_tablePrintAndCutPoints->pointPairs();
-    qLogD << "Point pairs count: " << pointPairs.length();
+    //PointPairList pointPairs = m_tablePrintAndCutPoints->pointPairs();
+    //qLogD << "Point pairs count: " << pointPairs.length();
 
-    //PointPairList pointPairs;
-    //pointPairs << PointPair(QPointF(56.88, 8.93), QPointF(31.22, 20.11))
-        //<< PointPair(QPointF(223.01, 154.01), QPointF(234.95, 103.98))
-        //<< PointPair(QPointF(70.01, 80.54), QPointF(65.88, 83.87));
+    PointPairList pointPairs;
+    pointPairs << PointPair(QPointF(56.88, 8.93), QPointF(31.22, 20.11))
+        << PointPair(QPointF(223.01, 154.01), QPointF(234.95, 103.98))
+        << PointPair(QPointF(70.01, 80.54), QPointF(65.88, 83.87));
 
-    if (pointPairs.length() >= 2)
+    if (pointPairs.length() == 2)
     {
         QPointF srcPt1(pointPairs.at(0).first.x(), pointPairs.at(0).first.y());
         QPointF dstPt1(pointPairs.at(0).second.x(), pointPairs.at(0).second.y());
@@ -3375,7 +3375,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
         m_scene->document()->setPrintAndCutTransform(t);
         m_scene->document()->setPrintAndCutPointPairs(pointPairs);
     }
-    /*else if (pointPairs.length() > 2)
+    else if (pointPairs.length() > 2)
     {
         QTransform ti;
         QTransform tf;
@@ -3422,7 +3422,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
         m_scene->document()->setEnablePrintAndCut(true);
         m_scene->document()->setPrintAndCutTransform(t);
         m_scene->document()->setPrintAndCutPointPairs(pointPairs);
-    }*/
+    }
 }
 
 void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)

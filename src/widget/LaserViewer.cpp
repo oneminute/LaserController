@@ -120,7 +120,6 @@ void LaserViewer::paintEvent(QPaintEvent* event)
             painter.drawRect(m_maxRegion);
         }
         
-	}
     
 
         painter.setPen(QPen(Qt::darkGreen));
