@@ -105,7 +105,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		}
         LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
         if (backgroundItem) {
-            QPointF backItemLeftTop = mapFromScene(backgroundItem->rect().topLeft());
+            /*QPointF backItemLeftTop = mapFromScene(backgroundItem->rect().topLeft());
             qreal w = backgroundItem->rect().width() * zoomValue();
             qreal h = backgroundItem->rect().height() * zoomValue();
             QColor red;
@@ -127,6 +127,10 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
         painter.drawRect(originRect);
 
+=======
+	{
+		//painter.setBrush(Qt::BrushStyle::SolidPattern);
+>>>>>>> Stashed changes
 		painter.setPen(QPen(Qt::red, 2));
 		QPointF deviceOrigin = mapFromScene(LaserApplication::device->deviceOrigin());
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
@@ -854,22 +858,27 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
         }
         LaserText* text = qgraphicsitem_cast<LaserText*>(primitive);
         QRectF rect = text->originalBoundingRect(extend);
-        qDebug() << text->sceneTransform().map(rect);
-        qDebug() << mousePoint;
+        //如果只有一个空格
+        //if (rowSize == 1 && text->subPathList()[0].subRowPathlist()[0].isEmpty()) {
+        qDebug() << text->content();
+        qDebug() << text->content().length();
+        laserText = text;
+        if (text->content().trimmed().isEmpty()) {
+            m_scene->removeLaserPrimitive(laserText);
+            laserText = nullptr;
+            m_insertIndex = -1;
+            return false;
+        }
+        
         isInAllPathBound = (text->sceneTransform().map(rect)).containsPoint(mousePoint, Qt::OddEvenFill);
         if (!isInAllPathBound) {
             continue;
         }
-        laserText = text;
+        
         QPainterPath lastPath;
         int rowSize = text->subPathList().size();
 
-        //如果只有一个空格
-        if (rowSize == 1 && text->subPathList()[0].subRowPathlist()[0].isEmpty()) {
-            m_scene->removeLaserPrimitive(laserText);
-            laserText = nullptr;
-            return false;
-        }
+        
         //再遍历每一行的外包框
         for (int i = 0; i < rowSize; i++) {
             LaserTextRowPath rowPathStruct = text->subPathList()[i];
@@ -877,7 +886,7 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
             QList<QPainterPath> subRowPathlist = rowPathStruct.subRowPathlist();
             QList<QRectF> subRowBoundList = rowPathStruct.subRowBoundList();
             int subPathSize = subRowPathlist.size();
-            qreal worldSpacing = m_textFont.wordSpacing();
+            //qreal worldSpacing = m_textFont.wordSpacing();
             QRectF rowPathBoundingRect = rowPathStruct.path().boundingRect();
             qreal halfWTopSpacing = 0;
             qreal halfWBottomSpacing = 0;

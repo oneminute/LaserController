@@ -320,8 +320,6 @@ private:
     int m_textAlighV;
     //mirror
     LaserPrimitive* m_mirrorLine;
-    QRectF m_maxRegion;
-	
 	friend class LaserScene;
 };
 

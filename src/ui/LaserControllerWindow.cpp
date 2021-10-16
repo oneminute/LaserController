@@ -1253,11 +1253,15 @@ void LaserControllerWindow::onFontSpaceXEnterOrLostFocus()
 
 void LaserControllerWindow::onFontSpaceYEnterOrLostFocus()
 {
-    QFont font = m_viewer->editingText()->font();
-    font.setWordSpacing(m_fontSpaceY->value());
-    m_viewer->editingText()->setFont(QFont(font));
-    qreal q = m_fontSpaceY->value();
-    m_viewer->textFont()->setWordSpacing(m_fontSpaceY->value());
+    if (!m_viewer->editingText()) {
+        return;
+    }
+    //QFont font = m_viewer->editingText()->font();
+    //font.setWordSpacing(m_fontSpaceY->value());
+    qreal space = m_fontSpaceY->value();
+    m_viewer->editingText()->setSpacceY(space);
+    m_viewer->editingText()->modifyPathList();
+    //m_viewer->textFont()->setWordSpacing(m_fontSpaceY->value());
 
     m_viewer->setFocus();
     m_viewer->modifyTextCursor();
@@ -2290,6 +2294,11 @@ void LaserControllerWindow::setLastCornerRadiusValue(qreal val)
 qreal LaserControllerWindow::lastCornerRadiusValue()
 {
     return m_lastCornerRadiusValue;
+}
+
+LaserDoubleSpinBox * LaserControllerWindow::fontSpaceYDoubleSpinBox()
+{
+    return m_fontSpaceY;
 }
 
 void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
