@@ -93,6 +93,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     
     LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
     if (backgroundItem) {
+        painter.setPen(QPen(Qt::red, 1, Qt::DashDotDotLine));
         QRectF sceneMaxRegion = m_scene->maxRegion();
         painter.drawPolygon(mapFromScene(sceneMaxRegion));
     }
