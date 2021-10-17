@@ -294,7 +294,7 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
     QPointF diff = pt - lastPoint;
     lastPoint = pt;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-        buffer.append(QString("PU%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
+        buffer.append(QString("pu%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
     else
         buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
     for (size_t i = 1; i < points.size(); i++)
@@ -302,12 +302,34 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
         LaserPoint lPt = points.at(i);
         QPointF pt = t.map(lPt.toPointF());
         QPointF diff = pt - lastPoint;
-        //QString command = i == points.size() - 1 ? "CE%1 %2;" : "CM%1 %2;";
         QString command = "PD%1 %2;";
-        if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-            buffer.append(command.arg(qRound(diff.x())).arg(qRound(diff.y())));
+
+        if (points.size() == 2)
+        {
+            command = "CO%1 %2;";
+        }
+        else if (i == 1)
+        {
+            command = "CS%1 %2;";
+        }
+        else if (i == points.length() - 1)
+        {
+            command = "CE%1 %2;";
+        }
         else
+        {
+            command = "CM%1 %2;";
+        }
+
+        if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+        {
+            command = command.toLower();
+            buffer.append(command.arg(qRound(diff.x())).arg(qRound(diff.y())));
+        }
+        else
+        {
             buffer.append(command.arg(qRound(pt.x())).arg(qRound(pt.y())));
+        }
         lastPoint = pt;
     }
     return buffer;
@@ -337,6 +359,7 @@ QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPoin
             end = -1;
         }
 
+        int count = 0;
         for (; j != end; j += step)
         {
             QLineF line = lines.at(j);
@@ -351,15 +374,28 @@ QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPoin
 
             QPointF diff1 = pt1 - lastPoint;
             QPointF diff2 = pt2 - pt1;
+            QString command1 = "PU%1 %2;";
+            QString command2 = "CM%1 %2;";
+            //QString command1 = "PU%1 %2;";
+            //QString command2 = "PD%1 %2;";
+            if (count++ > 0)
+            {
+                command1 = "CU%1 %2;";
+                command2 = "CM%1 %2;";
+                //command1 = "PU%1 %2;";
+                //command2 = "PD%1 %2;";
+            }
             if (Config::Device::startFrom() != SFT_AbsoluteCoords)
             {
-                buffer.append(QString("PU%1 %2;").arg(qRound(diff1.x())).arg(qRound(diff1.y())));
-                buffer.append(QString("PD%1 %2;").arg(qRound(diff2.x())).arg(qRound(diff2.y())));
+                command1 = command1.toLower();
+                command2 = command2.toLower();
+                buffer.append(command1.arg(qRound(diff1.x())).arg(qRound(diff1.y())));
+                buffer.append(command2.arg(qRound(diff2.x())).arg(qRound(diff2.y())));
             }
             else
             {
-                buffer.append(QString("PU%1 %2;").arg(qRound(pt1.x())).arg(qRound(pt1.y())));
-                buffer.append(QString("PD%1 %2;").arg(qRound(pt2.x())).arg(qRound(pt2.y())));
+                buffer.append(command1.arg(qRound(pt1.x())).arg(qRound(pt1.y())));
+                buffer.append(command2.arg(qRound(pt2.x())).arg(qRound(pt2.y())));
             }
             //point = line.p2();
             lastPoint = pt2;

@@ -43,6 +43,7 @@ public:
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
         , blockSignals(false)
         , isOpened(false)
+        , enablePrintAndCut(false)
         //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
@@ -321,7 +322,7 @@ void LaserDocument::exportJSON(const QString& filename)
 
                     QJsonObject itemObj;
                     itemObj["Name"] = pathNode->nodeName();
-                    itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
+                    //itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                     if (layer->type() == LLT_ENGRAVING)
                     {
                         if (!enablePrintAndCut())

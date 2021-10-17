@@ -2388,7 +2388,9 @@ class LaserTextPrivate : public LaserPrimitivePrivate
 public:
     LaserTextPrivate(LaserText* ptr)
         : LaserPrimitivePrivate(ptr)
-    {}
+    {
+        spaceY = LaserApplication::mainWindow->fontSpaceYDoubleSpinBox()->value();
+    }
 	QRect rect;
     QString content;
     QString lastContent;
@@ -2403,8 +2405,7 @@ public:
     int alignVType;
     int lastAlignVType;
     QGraphicsView* view;
-    LaserControllerWindow* window = LaserApplication::mainWindow;
-    qreal spaceY = window->fontSpaceYDoubleSpinBox()->value();
+    qreal spaceY;
 };
 
 LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
@@ -2925,8 +2926,9 @@ LaserPointListList LaserText::updateMachiningPoints(quint32 progressCode, qreal 
 LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
 {
     Q_D(LaserText);
-    QTransform transform = sceneTransform() * Global::matrixToMachining();
-    LaserLineListList lineList;
+    QPainterPath path = toMachiningPath();
+    LaserLineListList lineList = utils::interLines(path, layer()->fillingRowInterval());
+    /*QTransform transform = sceneTransform() * Global::matrixToMachining();
     for (int i = 0; i < d->pathList.size(); i++) {
         QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
         for (QPainterPath rowPath : rowPathList) {
@@ -2936,7 +2938,7 @@ LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
                 continue;
             lineList.append(lines);
         }
-    }
+    }*/
     return lineList;
 }
 
