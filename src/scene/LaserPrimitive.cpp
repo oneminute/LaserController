@@ -256,7 +256,7 @@ QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
 	QRectF bounds = d->boundingRect;
-    qDebug() << d->boundingRect;
+    //qDebug() << d->boundingRect;
     return bounds;
 }
 

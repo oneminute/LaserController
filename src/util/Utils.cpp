@@ -358,12 +358,12 @@ RELATION utils::determineRelationship(const QRectF& a, const QRectF& b)
     return rel;
 }
 
-QTransform utils::fromPointPairs(const PointPairList& pointPairs)
+QTransform utils::leastSquare4d(const PointPairList& pointPairs)
 {
     // solve Ax=b
     // 
     // A = | sigma(x1^2 + y1^2)                   0  sigma(x1)  sigma(y1) |
-    //     |                  0  sigma(x1^2 - y1^2) -sigma(y1)  sigma(x1) |
+    //     |                  0  sigma(x1^2 + y1^2) -sigma(y1)  sigma(x1) |
     //     |          sigma(x1)          -sigma(y1)          1          0 |
     //     |          sigma(y1)           sigma(x1)          0          1 |
     // 
@@ -384,9 +384,9 @@ QTransform utils::fromPointPairs(const PointPairList& pointPairs)
     qreal sumY1 = 0;
     qreal sumY2 = 0;
     qreal sumX12AY12 = 0;
-    qreal sumX12SY12 = 0;
     qreal sumX1X2AY1Y2 = 0;
     qreal sumX1Y2SX2Y1 = 0;
+    qreal i = pointPairs.size();
 
     for (const PointPair& pair : pointPairs)
     {
@@ -407,16 +407,15 @@ QTransform utils::fromPointPairs(const PointPairList& pointPairs)
         sumY1 += y1;
         sumY2 += y2;
         sumX12AY12 += x12 + y12;
-        sumX12SY12 += x12 - y12;
         sumX1X2AY1Y2 += x1x2 + y1y2;
         sumX1Y2SX2Y1 += x1y2 - x2y1;
     }
 
     Eigen::MatrixXd A(4, 4);
     A << sumX12AY12,          0,  sumX1, sumY1,
-                  0, sumX12SY12, -sumY1, sumX1,
-              sumX1,      -sumY1,    1,      0,
-              sumY1,       sumX1,    0,      1;
+                  0, sumX12AY12, -sumY1, sumX1,
+              sumX1,      -sumY1,    i,      0,
+              sumY1,       sumX1,    0,      i;
     Eigen::Vector4d b;
     b << sumX1X2AY1Y2, 
          sumX1Y2SX2Y1, 
@@ -433,9 +432,164 @@ QTransform utils::fromPointPairs(const PointPairList& pointPairs)
     qLogD << "angle1: " << angle1;
     qLogD << "angle2: " << angle2;
 
-    QTransform transform(x(0), x(1), -x(1), x(0), x(2), x(3));
-    qLogD << transform;
-    return transform;
+    QTransform t(x(0), x(1), -x(1), x(0), x(2), x(3));
+    qLogD << t;
+    QLineF vl1(0, 0, 1, 0);
+    QLineF vl2 = t.map(vl1);
+    qreal sx = vl2.length() / vl1.length();
+    QLineF hl1(0, 0, 0, 1);
+    QLineF hl2 = t.map(hl1);
+    qreal sy = hl2.length() / hl1.length();
+    qLogD << "sx: " << sx << ", sy: " << sy;
+
+    QTransform invScaleT = QTransform::fromScale(1 / sx, 1 / sy);
+    t = t * invScaleT;
+    qLogD << t;
+
+    return t;
+}
+
+QTransform utils::leastSquare6d(const PointPairList& pointPairs)
+{
+    // solve Ax=b
+    // 
+    // A = | sigma(x^2) sigma(x*y)          0          0    sigma(x)        0 |
+    //     | sigma(x*y) sigma(y^2)          0          0    sigma(y)        0 |
+    //     |          0          0 sigma(x^2) sigma(x*y)           0 sigma(x) |
+    //     |          0          0 sigma(x*y) sigma(y^2)           0 sigma(y) |
+    //     |   sigma(x)   sigma(y)          0          0           i        0 |
+    //     |          0          0   sigma(x)   sigma(y)           0        i |
+    // 
+    // b = | sigma(x*m) |
+    //     | sigma(y*m) |
+    //     | sigma(x*n) |
+    //     | sigma(y*n) |
+    //     |   sigma(m) |
+    //     |   sigma(n) |
+    //
+    // x = | a |
+    //     | b |
+    //     | c |
+    //     | d |
+    //     | e |
+    //     | f |
+    //
+    // a = cos(angle), b = sin(angle), c = dx, d = dy
+
+    qreal sumX = 0;
+    qreal sumY = 0;
+    qreal sumX2 = 0;
+    qreal sumY2 = 0;
+    qreal sumXY = 0;
+    qreal sumXM = 0;
+    qreal sumYM = 0;
+    qreal sumXN = 0;
+    qreal sumYN = 0;
+    qreal sumM = 0;
+    qreal sumN = 0;
+    qreal i = pointPairs.size();
+
+    for (const PointPair& pair : pointPairs)
+    {
+        qreal x = pair.second.x();
+        qreal y = pair.second.y();
+        qreal m = pair.first.x();
+        qreal n = pair.first.y();
+
+        sumX += x;
+        sumY += y;
+        sumX2 += x * x;
+        sumY2 += y * y;
+        sumXY += x * y;
+        sumXM += x * m;
+        sumYM += y * m;
+        sumXN += x * n;
+        sumYN += y * n;
+        sumM += m;
+        sumN += n;
+    }
+
+    Eigen::MatrixXd A(6, 6);
+    A << sumX2, sumXY,     0,     0, sumX,    0,
+         sumXY, sumY2,     0,     0, sumY,    0,
+             0,     0, sumX2, sumXY,    0, sumX,
+             0,     0, sumXY, sumY2,    0, sumY,
+          sumX,  sumY,     0,     0,    i,    0,
+             0,     0,  sumX,  sumY,    0,    i;
+
+    Eigen::VectorXd b(6);
+    b << sumXM,
+         sumYM,
+         sumXN,
+         sumYN,
+          sumM,
+          sumN;
+
+    std::cout << A << std::endl << std::endl;
+    std::cout << b << std::endl << std::endl;
+
+    Eigen::MatrixXd x = A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+    std::cout << x << std::endl << std::endl;
+
+    qreal angle1 = qRadiansToDegrees(qAcos(x(0)));
+    qreal angle2 = qRadiansToDegrees(qAsin(x(1)));
+    qLogD << "angle1: " << angle1;
+    qLogD << "angle2: " << angle2;
+
+    QTransform t(
+        x(0), x(2), 0,
+        x(1), x(3), 0,
+        x(4), x(5), 1
+    );
+    qLogD << t;
+    QLineF vl1(0, 0, 1, 0);
+    QLineF vl2 = t.map(vl1);
+    qreal sx = vl2.length() / vl1.length();
+    QLineF hl1(0, 0, 0, 1);
+    QLineF hl2 = t.map(hl1);
+    qreal sy = hl2.length() / hl1.length();
+    qLogD << "sx: " << sx << ", sy: " << sy;
+
+    QTransform invScaleT = QTransform::fromScale(1 / sx, 1 / sy);
+    t = t * invScaleT;
+    qLogD << t;
+    QLineF l1(0, 0, 1, 0);
+    QLineF l2 = t.map(l1);
+
+    angle1 = qRadiansToDegrees(qAcos(t.m11()));
+    angle2 = qRadiansToDegrees(qAsin(t.m12()));
+    qLogD << "angle1: " << angle1;
+    qLogD << "angle2: " << angle2;
+
+    qreal angle = l2.angleTo(l1);
+    qLogD << "angle: " << angle;
+
+    return t;
+}
+
+QTransform utils::transformFrom2Points(const PointPairList& pointPairs)
+{
+    QPointF srcPt1(pointPairs.at(0).first.x(), pointPairs.at(0).first.y());
+    QPointF dstPt1(pointPairs.at(0).second.x(), pointPairs.at(0).second.y());
+    QPointF srcPt2(pointPairs.at(1).first.x(), pointPairs.at(1).first.y());
+    QPointF dstPt2(pointPairs.at(1).second.x(), pointPairs.at(1).second.y());
+
+    QLineF l1(srcPt1, srcPt2);
+    QLineF l2(dstPt1, dstPt2);
+    qreal angle = l1.angleTo(l2);
+    QTransform t;
+    t.rotate(angle);
+    QLineF l22 = t.map(l2);
+    QPointF diff1 = l1.p1() - l22.p1();
+    QPointF diff2 = l1.p2() - l22.p2();
+    qLogD << "l1: " << l1;
+    qLogD << "l2: " << l22;
+    qLogD << "diff1: " << diff1 << ", diff2: " << diff2;
+    QPointF diff = (diff1 + diff2) / 2;
+    t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), diff.x(), diff.y());
+    qLogD << t;
+
+    return t;
 }
 
 
