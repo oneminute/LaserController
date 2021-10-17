@@ -509,6 +509,9 @@ public:
     void addPath(QString content, int insertIndex);
     void delPath(int index);
 
+    qreal spaceY();
+    void setSpacceY(qreal space);
+
     //void modifyLinePathList();
     void modifyPathList();
     QList<LaserTextRowPath> subPathList();

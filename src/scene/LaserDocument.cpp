@@ -1090,8 +1090,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					rect = new LaserBitmap(img, bounds, this, saveTransform, layerIndex);
 				}
 				laserLayers[index]->addPrimitive(rect);
-				this->addPrimitive(rect);
-				this->scene()->addItem(rect);
+				//this->addPrimitive(rect);
+				this->scene()->addLaserPrimitive(rect);
 			}
 			else if (className == "LaserLine") {
 				
@@ -1102,8 +1102,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 
 				LaserLine* line = new LaserLine(QLineF(p1, p2), this, saveTransform, layerIndex);
 				laserLayers[index]->addPrimitive(line);
-				this->addPrimitive(line);
-				this->scene()->addItem(line);
+				//this->addPrimitive(line);
+				//this->scene()->addItem(line);
+                this->scene()->addLaserPrimitive(line);
 			}
 			else if (className == "LaserPolyline" || className == "LaserPolygon") {
 				QJsonArray polyArray = primitiveJson["poly"].toArray();
@@ -1121,8 +1122,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				}
 				
 				laserLayers[index]->addPrimitive(poly);
-				this->addPrimitive(poly);
-				this->scene()->addItem(poly);
+				//this->addPrimitive(poly);
+				//this->scene()->addItem(poly);
+                this->scene()->addLaserPrimitive(poly);
             }
             else if (className == "LaserText") {
                 QString content = primitiveJson["content"].toString();
@@ -1139,9 +1141,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                     font, fontObj["alignH"].toInt(), fontObj["alignV"].toInt(), saveTransform, layerIndex);
                 text->setContent(content);
                 text->modifyPathList();   
-                //text->sceneTransformToItemTransform(saveTransform);
-                this->addPrimitive(text);
-                this->scene()->addItem(text);
+                //this->addPrimitive(text);
+                //this->scene()->addItem(text);
+                this->scene()->addLaserPrimitive(text);
             }
             else if (className == "LaserPath") {
                 QByteArray buffer = QByteArray::fromBase64(primitiveJson["path"].toString().toLatin1());
@@ -1149,30 +1151,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QDataStream stream(buffer);
                 stream >> path;
                 LaserPath * laserPath = new LaserPath(path, this, saveTransform, layerIndex);
-                this->addPrimitive(laserPath);
-                this->scene()->addItem(laserPath);
-                /*for each(QJsonValue obj in pathArray) {
-                    QJsonObject element = obj.toObject();
-                    double x = element["x"].toDouble();
-                    double y = element["y"].toDouble();
-                    switch (element["type"].toInt()) {
-                        case QPainterPath::ElementType::MoveToElement: {
-                            path.moveTo(x, y);
-                            break;
-                        }
-                        case QPainterPath::ElementType::LineToElement: {
-                            path.lineTo(x, y);
-                            break;
-                        }
-                        case QPainterPath::ElementType::CurveToElement: {
-                            //path.cubicTo()
-                            break;
-                        }
-                        case QPainterPath::ElementType::CurveToDataElement: {
-                            break;
-                        }
-                    }
-                }*/
+                //this->addPrimitive(laserPath);
+                //this->scene()->addItem(laserPath);
+                this->scene()->addLaserPrimitive(laserPath);
                 
             }
             

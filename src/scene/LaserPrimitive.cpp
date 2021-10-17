@@ -16,6 +16,7 @@
 #include <QImageReader>
 #include <QStack>
 
+#include "LaserApplication.h"
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
 #include "common/Config.h"
@@ -29,6 +30,8 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserPrimitiveGroup.h"
 #include "laser/LaserLineList.h"
+#include "ui/LaserControllerWindow.h"
+#include "widget/LaserDoubleSpinBox.h"
 
 class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
@@ -2400,6 +2403,8 @@ public:
     int alignVType;
     int lastAlignVType;
     QGraphicsView* view;
+    LaserControllerWindow* window = LaserApplication::mainWindow;
+    qreal spaceY = window->fontSpaceYDoubleSpinBox()->value();
 };
 
 LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
@@ -2563,6 +2568,18 @@ void LaserText::delPath(int index)
     d->view->viewport()->repaint();
 }
 
+qreal LaserText::spaceY()
+{
+    Q_D(LaserText);
+    return d->spaceY;
+}
+
+void LaserText::setSpacceY(qreal space)
+{
+    Q_D(LaserText);
+    d->spaceY = space;
+}
+
 void LaserText::modifyPathList()
 {
     Q_D(LaserText);
@@ -2579,7 +2596,7 @@ void LaserText::modifyPathList()
 
     qreal fontSize = d->font.pixelSize();
     qreal letterSpacing = d->font.letterSpacing();
-    qreal wordSpacing = d->font.wordSpacing();
+    //qreal wordSpacing = d->font.wordSpacing();
     
     bool isNewLine = true;
     QRectF lastBound;
@@ -2591,14 +2608,14 @@ void LaserText::modifyPathList()
     
     for (int i = 0; i < d->content.size(); i++) {
         QChar c = d->content[i];
-        qreal rowY = (subRowPathList.size() + 1) * fontSize + subRowPathList.size()* wordSpacing + d->startPos.y();
+        qreal rowY = (subRowPathList.size() + 1) * fontSize + subRowPathList.size()* spaceY() + d->startPos.y();
         QPointF startP(d->startPos.x(), rowY);
         if (c == "\n") {
             subRowPathList.append(*listPtr);
             rowPathList.append(*rowPathPtr);
             subBoundList.append(*boundListPtr);
             startPosList.append(startP);
-            rowY = (subRowPathList.size() + 1) * fontSize + subRowPathList.size()* wordSpacing + d->startPos.y();
+            rowY = (subRowPathList.size() + 1) * fontSize + subRowPathList.size()* spaceY() + d->startPos.y();
             startP .setY(rowY);
             //换行
             isNewLine = true;
@@ -2644,8 +2661,7 @@ void LaserText::modifyPathList()
         
         
     }
-    
-    qreal allHeight = fontSize * subRowPathList.size() + (fontSize * subRowPathList.size()-1)* wordSpacing;
+    qreal allHeight = fontSize * subRowPathList.size() + (subRowPathList.size()-1)* spaceY();
     d->pathList.clear();
     d->allPath = QPainterPath();
     for (int j = 0; j < subRowPathList.size(); j++) {

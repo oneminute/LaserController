@@ -37,11 +37,7 @@ void LaserScene::updateDocument(LaserDocument * doc)
     m_doc = doc;
 
     m_doc->setParent(this);
-    //创建树
-    if (!m_quadTree) {
-
-        //m_quadTree = new QuadTreeNode(m_maxRegion)
-    }
+    
 
     qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
     m_background = new LaserBackgroundItem(m_doc->pageBounds());
@@ -54,14 +50,19 @@ void LaserScene::updateDocument(LaserDocument * doc)
 	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
 	views()[0]->setTransform(QTransform());
 	views()[0]->centerOn(rect.center());
-    
-	
+    //创建树
+    if (!m_quadTree) {
+        qreal maxSize = Global::mm2PixelsYF(3000);
+        qreal top = -(maxSize - rect.height()) * 0.5;
+        qreal left = -(maxSize - rect.width()) * 0.5;
+        m_maxRegion = QRectF(left, top, maxSize, maxSize);
+        m_quadTree = new QuadTreeNode(m_maxRegion);
+    }
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
     {
         this->addItem(i.value());
     }
-	
 }
 
 void LaserScene::clearDocument(bool delDoc)
@@ -91,6 +92,7 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
     m_doc->addPrimitive(primitive);
 	addItem(primitive);
+
 }
 
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
@@ -319,6 +321,11 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 
     
     //bspTreeDepth();
+}
+
+QRectF LaserScene::maxRegion()
+{
+    return m_maxRegion;
 }
 
 

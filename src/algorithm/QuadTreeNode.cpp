@@ -36,79 +36,82 @@ void QuadTreeNode::createTreeNodes()
         return;
     }
     for (LaserPrimitive* primitive : m_primitiveList) {
-        QRectF bound = primitive->sceneBoundingRect();
-        
-        //图元包含节点区域
-        if (bound.contains(m_topLeftRegion)) {
-            createNode(Qt::TopLeftCorner, true);
-            m_nodeTopLeft->addPrimitive(primitive);
-           
-        }else if (bound.contains(m_topRightRegion)) {
-            createNode(Qt::TopRightCorner, true);
-            m_nodeTopRight->addPrimitive(primitive);
-        }
-        else if (bound.contains(m_bottomRightRegion)) {
-            createNode(Qt::BottomRightCorner, true);
-            m_nodeBottomRight->addPrimitive(primitive);
-        }
-        else if (bound.contains(m_bottomLeftRegion)) {
-            createNode(Qt::BottomLeftCorner, true);
-            m_nodeBottomLeft->addPrimitive(primitive);
-        }
-        //区域包含图元
-        if (m_topLeftRegion.contains(bound)) {
+        setPrimitiveTreeNode(primitive);
+    }
+}
+void QuadTreeNode::setPrimitiveTreeNode(LaserPrimitive* primitive)
+{
+    QRectF bound = primitive->sceneBoundingRect();
+    //图元包含节点区域
+    if (bound.contains(m_topLeftRegion)) {
+        createNode(Qt::TopLeftCorner, true);
+        m_nodeTopLeft->addPrimitive(primitive);
+
+    }
+    else if (bound.contains(m_topRightRegion)) {
+        createNode(Qt::TopRightCorner, true);
+        m_nodeTopRight->addPrimitive(primitive);
+    }
+    else if (bound.contains(m_bottomRightRegion)) {
+        createNode(Qt::BottomRightCorner, true);
+        m_nodeBottomRight->addPrimitive(primitive);
+    }
+    else if (bound.contains(m_bottomLeftRegion)) {
+        createNode(Qt::BottomLeftCorner, true);
+        m_nodeBottomLeft->addPrimitive(primitive);
+    }
+    //区域包含图元
+    if (m_topLeftRegion.contains(bound)) {
+        createNode(Qt::TopLeftCorner, false);
+        m_nodeTopLeft->addPrimitive(primitive);
+        m_nodeTopLeft->createTreeNodes();
+    }
+    else if (m_topRightRegion.contains(bound)) {
+        createNode(Qt::TopRightCorner, false);
+        m_nodeTopRight->addPrimitive(primitive);
+        m_nodeTopRight->createTreeNodes();
+    }
+    else if (m_bottomRightRegion.contains(bound)) {
+        createNode(Qt::BottomRightCorner, false);
+        m_nodeBottomRight->addPrimitive(primitive);
+        m_nodeBottomRight->createTreeNodes();
+    }
+    else if (m_bottomLeftRegion.contains(bound)) {
+        createNode(Qt::BottomLeftCorner, false);
+        m_nodeBottomLeft->addPrimitive(primitive);
+        m_nodeBottomLeft->createTreeNodes();
+    }
+    else {
+        bool isInterset = false;
+        //区域与图元相交
+        if (m_topLeftRegion.intersects(bound)) {
             createNode(Qt::TopLeftCorner, false);
             m_nodeTopLeft->addPrimitive(primitive);
             m_nodeTopLeft->createTreeNodes();
+            isInterset = true;
         }
-        else if (m_topRightRegion.contains(bound)) {
+        if (m_topRightRegion.intersects(bound)) {
             createNode(Qt::TopRightCorner, false);
             m_nodeTopRight->addPrimitive(primitive);
             m_nodeTopRight->createTreeNodes();
+            isInterset = true;
         }
-        else if (m_bottomRightRegion.contains(bound)) {
+        if (m_bottomRightRegion.intersects(bound)) {
             createNode(Qt::BottomRightCorner, false);
             m_nodeBottomRight->addPrimitive(primitive);
             m_nodeBottomRight->createTreeNodes();
+            isInterset = true;
         }
-        else if (m_bottomLeftRegion.contains(bound)) {
+        if (m_bottomLeftRegion.intersects(bound)) {
             createNode(Qt::BottomLeftCorner, false);
             m_nodeBottomLeft->addPrimitive(primitive);
             m_nodeBottomLeft->createTreeNodes();
+            isInterset = true;
         }
-        else{
-            bool isInterset = false;
-            //区域与图元相交
-            if (m_topLeftRegion.intersects(bound)) {
-                createNode(Qt::TopLeftCorner, false);
-                m_nodeTopLeft->addPrimitive(primitive);
-                m_nodeTopLeft->createTreeNodes();
-                isInterset = true;
-            }
-            if (m_topRightRegion.intersects(bound)) {
-                createNode(Qt::TopRightCorner, false);
-                m_nodeTopRight->addPrimitive(primitive);
-                m_nodeTopRight->createTreeNodes();
-                isInterset = true;
-            }
-            if (m_bottomRightRegion.intersects(bound)) {
-                createNode(Qt::BottomRightCorner, false);
-                m_nodeBottomRight->addPrimitive(primitive);
-                m_nodeBottomRight->createTreeNodes();
-                isInterset = true;
-            }
-            if (m_bottomLeftRegion.intersects(bound)) {
-                createNode(Qt::BottomLeftCorner, false);
-                m_nodeBottomLeft->addPrimitive(primitive);
-                m_nodeBottomLeft->createTreeNodes();
-                isInterset = true;
-            }
-            //区域与图元没有任何关系
-            if (!isInterset) {
-                m_isLeaf = true;
-            }
+        //区域与图元没有任何关系
+        if (!isInterset) {
+            m_isLeaf = true;
         }
-        
     }
 }
 void QuadTreeNode::createNode(int type, bool isLeaf)

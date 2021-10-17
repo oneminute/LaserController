@@ -23,6 +23,7 @@ public:
     QuadTreeNode(QRectF region, int depth = 0, bool isLeaf = false);
     ~QuadTreeNode();
     void createTreeNodes();
+    void setPrimitiveTreeNode(LaserPrimitive* primitive);
     void createNode(int type, bool isLeaf = false);
     QList<QuadTreeNode*>* search(QRectF selection);
     bool isLeaf();

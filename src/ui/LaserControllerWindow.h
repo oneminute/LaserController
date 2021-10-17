@@ -63,6 +63,7 @@ public:
     LaserDoubleSpinBox* heightBox();
     void setLastCornerRadiusValue(qreal val);
     qreal lastCornerRadiusValue();
+    LaserDoubleSpinBox* fontSpaceYDoubleSpinBox();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
