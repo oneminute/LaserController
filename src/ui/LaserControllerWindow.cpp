@@ -58,6 +58,7 @@
 #include "ui/MainCardInfoDialog.h"
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
+#include "ui/RegisteDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -577,6 +578,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
+    connect(m_ui->actionRegiste, &QAction::triggered, this, &LaserControllerWindow::onActionRegiste);
     connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
     connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
 
@@ -3206,6 +3208,12 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 	//m_scene->addLaserPrimitive(bitmap);
 	m_viewer->onReplaceGroup(bitmap);
     
+}
+
+void LaserControllerWindow::onActionRegiste(bool checked)
+{
+    RegisteDialog dlg;
+    dlg.exec();
 }
 
 void LaserControllerWindow::onActionUpdate(bool checked)

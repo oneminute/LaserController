@@ -53,7 +53,7 @@ bool LaserApplication::initialize()
     LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
     LaserApplication::setApplicationDisplayName(QObject::tr("CNE Laser %1").arg(LC_VERSION_STR));
     LaserApplication::setOrganizationName(tr(""));
-    LaserApplication::setApplicationVersion(QString("version: %1").arg(LC_VERSION_STR));
+    LaserApplication::setApplicationVersion(QString("%1").arg(LC_VERSION_STR));
     //LaserApplication::setStyle(QStyleFactory::create("Fusion"));
     
     qLogD << "product name:" << LaserApplication::applicationName() << ", version:" << LaserApplication::applicationVersion();

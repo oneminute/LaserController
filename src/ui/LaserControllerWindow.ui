@@ -111,6 +111,7 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="actionOnlineHelp"/>
+    <addaction name="actionRegiste"/>
     <addaction name="actionUpdate"/>
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionContactUs"/>
@@ -1318,6 +1319,11 @@
   <action name="actionPrintAndCutRemove">
    <property name="text">
     <string>Remove</string>
+   </property>
+  </action>
+  <action name="actionRegiste">
+   <property name="text">
+    <string>Registe</string>
    </property>
   </action>
  </widget>

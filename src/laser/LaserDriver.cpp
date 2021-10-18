@@ -268,6 +268,9 @@ bool LaserDriver::load()
     m_fnGetUpdatePanelHandle = (FN_INT_INT_INT)m_library.resolve("GetUpdatePanelHandle");
     CHECK_FN(m_fnGetUpdatePanelHandle)
 
+    m_fnRegisteMainCard = (FN_WCHART_WCHART)m_library.resolve("RegisterMainCard");
+    CHECK_FN(m_fnRegisteMainCard);
+
     Q_ASSERT(m_fnLoadDataFromFile);
 
     m_isLoaded = true;
@@ -776,5 +779,14 @@ void LaserDriver::checkVersionUpdate(bool hardware, const QString& flag, int cur
 int LaserDriver::getUpdatePanelHandle(int version, int wndId)
 {
     return m_fnGetUpdatePanelHandle(version, wndId);
+}
+
+QString LaserDriver::registeMainCard(const QString& registeCode)
+{
+    wchar_t* registeCodeBuf = typeUtils::qStringToWCharPtr(registeCode);
+    wchar_t* returnBuf = m_fnRegisteMainCard(registeCodeBuf);
+    delete[] registeCodeBuf;
+    QString returnRegisteCode = QString::fromWCharArray(returnBuf);
+    return returnRegisteCode;
 }
 

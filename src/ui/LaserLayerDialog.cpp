@@ -142,6 +142,7 @@ void LaserLayerDialog::resetParameters()
     m_ui->editSliderDPI->setValue(m_layer->dpi());
     m_ui->editSliderLPI->setValue(m_layer->lpi());
 
+    m_ui->checkBoxFillingEnableCutting->setChecked(m_layer->fillingEnableCutting());
     m_ui->editSliderFillingRunSpeed->setValue(m_layer->fillingRunSpeed());
     m_ui->editSliderFillingMinSpeedPower->setValue(m_layer->fillingMinSpeedPower());
     m_ui->editSliderFillingRunSpeedPower->setValue(m_layer->fillingRunSpeedPower());
@@ -165,6 +166,7 @@ void LaserLayerDialog::restoreParameters()
     m_ui->editSliderDPI->setValue(Config::EngravingLayer::DPI());
     m_ui->editSliderLPI->setValue(Config::EngravingLayer::LPI());
 
+    m_ui->checkBoxFillingEnableCutting->setChecked(Config::FillingLayer::enableCutting());
     m_ui->editSliderFillingRunSpeed->setValue(Config::FillingLayer::runSpeed());
     m_ui->editSliderFillingMinSpeedPower->setValue(Config::FillingLayer::minPower());
     m_ui->editSliderFillingRunSpeedPower->setValue(Config::FillingLayer::maxPower());
@@ -247,6 +249,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value());
 		Config::EngravingLayer::useHalftoneItem()->setValue(m_ui->checkBoxUseHalftone->isChecked());
 
+        Config::FillingLayer::enableCuttingItem()->setValue(m_ui->checkBoxFillingEnableCutting->isChecked());
 		Config::FillingLayer::runSpeedItem()->setValue(m_ui->editSliderFillingRunSpeed->value());
 		Config::FillingLayer::minPowerItem()->setValue(m_ui->editSliderFillingMinSpeedPower->value());
 		Config::FillingLayer::maxPowerItem()->setValue(m_ui->editSliderFillingRunSpeedPower->value());
@@ -275,6 +278,7 @@ void LaserLayerDialog::accept()
     m_layer->setDpi(m_ui->editSliderDPI->value());
     m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
 
+    m_layer->setFillingEnableCutting(m_ui->checkBoxFillingEnableCutting->isChecked());
     m_layer->setFillingRunSpeed(m_ui->editSliderFillingRunSpeed->value());
     m_layer->setFillingMinSpeedPower(m_ui->editSliderFillingMinSpeedPower->value());
     m_layer->setFillingRunSpeedPower(m_ui->editSliderFillingRunSpeedPower->value());

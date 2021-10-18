@@ -230,6 +230,8 @@ private:
     typedef void(__stdcall* FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
     typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
 
+    typedef wchar_t* (__stdcall* FN_WCHART_WCHART)(wchar_t*);
+
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -325,6 +327,8 @@ public:
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
     int getUpdatePanelHandle(int version, int wndId);
+
+    QString registeMainCard(const QString& registeCode);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
@@ -436,6 +440,8 @@ private:
 
     FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
     FN_INT_INT_INT m_fnGetUpdatePanelHandle;
+
+    FN_WCHART_WCHART m_fnRegisteMainCard;
 
     wchar_t m_wcharBuffer[2048];
 
