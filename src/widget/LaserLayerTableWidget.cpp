@@ -104,17 +104,18 @@ void LaserLayerTableWidget::updateItems()
 
             QString type;
             QString fullType;
-            if (layer->type() == LLT_CUTTING)
+            LaserLayerType laserType = layer->type();
+            if (laserType == LLT_CUTTING)
             {
                 type = tr("C");
                 fullType = tr("Cutting");
             }
-            else if (layer->type() == LLT_ENGRAVING)
+            else if (laserType == LLT_ENGRAVING)
             {
                 type = tr("E");
                 fullType = tr("Engraving");
             }
-            else if (layer->type() == LLT_FILLING)
+            else if (laserType == LLT_FILLING)
             {
                 type = tr("C+F");
                 fullType = tr("Filling");

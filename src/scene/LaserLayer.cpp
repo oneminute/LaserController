@@ -699,7 +699,7 @@ void LaserLayer::onClicked()
             scene->document()->addPrimitive(primitive, this);
         }
 
-        QList<LaserPrimitiveType> types;
+       /* QList<LaserPrimitiveType> types;
         for (LaserPrimitive* primitive : d->primitives)
         {
             if (primitive->isShape())
@@ -739,7 +739,7 @@ void LaserLayer::onClicked()
         else if (types[0] == LPT_TEXT)
         {
             setType(LLT_CUTTING);
-        }
+        }*/
         scene->document()->updateLayersStructure();
     }
 }

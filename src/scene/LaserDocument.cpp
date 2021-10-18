@@ -1032,6 +1032,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         {
             laserLayers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
         }
+        if (layer.contains("type")) {
+            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
+        }
         /*if (layer.contains("halftoneGridSize"))
         {
             laserLayers[index]->setHalftoneGridSize(layer.value("halftoneGridSize").toInt());
@@ -1159,9 +1162,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             }
             
 		}
-        if (layer.contains("type")) {
-            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
-        }
         if (layer.contains("visible")) {
             bool bl = layer.value("visible").toBool();
             laserLayers[index]->setVisible(bl);
