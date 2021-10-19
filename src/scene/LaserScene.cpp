@@ -98,13 +98,14 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
     m_doc->addPrimitive(primitive);
 	addItem(primitive);
-    m_quadTree->setPrimitiveTreeNode(primitive);
+    m_quadTree->createPrimitiveTreeNode(primitive);
 
 }
 
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
 	m_doc->removePrimitive(primitive);
+    primitive->removeAllTreeNode();
 	removeItem(primitive);
 }
 
@@ -321,23 +322,20 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
     path.addRect(rect);
     setSelectionArea(path, Qt::ItemSelectionMode::ContainsItemShape);
     QList<LaserPrimitive*>list = selectedPrimitives();*/
+    //已经被选中的恢复正常状态
+    for (LaserPrimitive* primitive : selectedPrimitives()) {
+        primitive->setSelected(false);
+    }
     //tree 查找
     QList<QuadTreeNode*> nodes = m_quadTree->search(rect);
-    bool exits = false;
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (rect.contains(primitive->sceneBoundingRect()) && (primitive->flags() & QGraphicsItem::ItemIsSelectable)) {
                 primitive->setSelected(true);
-                exits = true;
             }
         } 
     }
-    //选区中没有图元
-    if (!exits) {
-        for (LaserPrimitive* primitive : selectedPrimitives()) {
-            primitive->setSelected(false);
-        }
-    }
+    
 }
 
 QRectF LaserScene::maxRegion()

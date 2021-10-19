@@ -4274,7 +4274,6 @@ bool LaserViewer::resetGroup()
 		LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 
 		m_group->removeFromGroup(p_item);
-		//p_item->reShape();
 		
 	}
 	m_group->setTransform(QTransform());

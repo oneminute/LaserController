@@ -22,6 +22,7 @@ class LaserLayer;
 class LaserScene;
 class QPaintEvent;
 class LaserViewer;
+class QuadTreeNode;
 
 struct Slice
 {
@@ -176,6 +177,9 @@ public:
 
     void setLocked(bool isLocked);
     bool isLocked();
+    void addTreeNode(QuadTreeNode* node);
+    void removeAllTreeNode();
+    void removeOneTreeNode(QuadTreeNode* node);
 
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;

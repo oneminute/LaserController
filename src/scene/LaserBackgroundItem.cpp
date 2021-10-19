@@ -262,7 +262,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 		}
 	}
 
-	for (int i2 = 0; i2 < m_gridSecondNodeXList.size(); i2++) {
+	/*for (int i2 = 0; i2 < m_gridSecondNodeXList.size(); i2++) {
 		for (int j = 0; j < m_gridNodeYList.size(); j++) {
 			QPointF node = QPointF(m_gridSecondNodeXList[i2], m_gridNodeYList[j]);
 			qreal absX = qAbs(node.x() - documentPoint.x());
@@ -283,7 +283,7 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 				return true;
 			}
 		}
-	}
+	}*/
 
 	return false;
 }
