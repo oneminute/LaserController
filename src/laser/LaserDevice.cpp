@@ -327,7 +327,21 @@ QString LaserDevice::requestMainCardId() const
     Q_D(const LaserDevice);
     if (d->driver)
     {
-        return d->driver->getMainCardID();
+        QStringList segs = d->driver->getMainCardID().split(";");
+        return segs[0];
+    }
+    return "";
+}
+
+QString LaserDevice::requestRegisteId() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        QStringList segs = d->driver->getMainCardID().split(";");
+        if (segs.length() > 1)
+            return segs[1];
+        return "";
     }
     return "";
 }
@@ -461,11 +475,40 @@ QString LaserDevice::hardwareMaintainingTimes() const
     return d->hardwareMaintainingTimes;
 }
 
+QString LaserDevice::apiLibVersion() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+        return d->driver->getVersion();
+    return "";
+}
+
+QString LaserDevice::apiLibCompileInfo() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+        return d->driver->getCompileInfo();
+    return "";
+}
+
 bool LaserDevice::verifyManufacturePassword(const QString& password)
 {
     Q_D(LaserDevice);
     //return d->driver->checkFactoryPassword(password);
     return true;
+}
+
+bool LaserDevice::registeMainCard(const QString& registeCode, QWidget* parentWidget)
+{
+    Q_D(LaserDevice);
+    QString retCode = d->driver->registeMainCard(registeCode);
+    if (retCode == registeCode)
+    {
+        QMessageBox::information(parentWidget, tr("Registration success"), tr("Registration success!"), QMessageBox::StandardButton::Ok);
+        return true;
+    }
+    QMessageBox::warning(parentWidget, tr("Registration failure"), tr("Registration failure!"), QMessageBox::StandardButton::Ok);
+    return false;
 }
 
 bool LaserDevice::writeUserRegisters()
@@ -1463,13 +1506,13 @@ void LaserDevice::onConnected()
     {
         d->driver->setFactoryType("LaserController");
         //d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
-        //d->driver->getMainCardRegisterState();
-        //QString compileInfo = d->driver->getCompileInfo();
-        //qLogD << "compile info: " << compileInfo;
-        //QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
-        //qLogD << "laser library info: " << laserLibraryInfo;
-        //QString mainCardId = d->driver->getMainCardID();
-        //qLogD << "main card id: " << mainCardId;
+        d->driver->getMainCardRegisterState();
+        QString compileInfo = d->driver->getCompileInfo();
+        qLogD << "compile info: " << compileInfo;
+        QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
+        qLogD << "laser library info: " << laserLibraryInfo;
+        QString mainCardId = d->driver->getMainCardID();
+        qLogD << "main card id: " << mainCardId;
 
         readSystemRegisters();
         readUserRegisters();

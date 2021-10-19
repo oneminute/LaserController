@@ -36,6 +36,7 @@ public:
 
     QString requestHardwareId() const;
     QString requestMainCardId() const;
+    QString requestRegisteId() const;
     QString requestDongleId() const;
 
     void requestMainCardInfo();
@@ -54,7 +55,12 @@ public:
     QString hardwareActivatedDate() const;
     QString hardwareMaintainingTimes() const;
 
+    QString apiLibVersion() const;
+    QString apiLibCompileInfo() const;
+
     bool verifyManufacturePassword(const QString& password);
+
+    bool registeMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 
     bool writeUserRegisters();
     bool writeSystemRegisters();

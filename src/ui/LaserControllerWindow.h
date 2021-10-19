@@ -181,6 +181,7 @@ protected slots:
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
+    void onActionRegiste(bool checked = false);
     void onActionUpdate(bool checked = false);
     void onActionLaserPosition(bool checked = false);
 

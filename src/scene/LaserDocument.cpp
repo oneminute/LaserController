@@ -43,6 +43,7 @@ public:
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
         , blockSignals(false)
         , isOpened(false)
+        , enablePrintAndCut(false)
         //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
@@ -321,7 +322,7 @@ void LaserDocument::exportJSON(const QString& filename)
 
                     QJsonObject itemObj;
                     itemObj["Name"] = pathNode->nodeName();
-                    itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
+                    //itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                     if (layer->type() == LLT_ENGRAVING)
                     {
                         if (!enablePrintAndCut())
@@ -1031,6 +1032,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         {
             laserLayers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
         }
+        if (layer.contains("type")) {
+            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
+        }
         /*if (layer.contains("halftoneGridSize"))
         {
             laserLayers[index]->setHalftoneGridSize(layer.value("halftoneGridSize").toInt());
@@ -1158,9 +1162,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             }
             
 		}
-        if (layer.contains("type")) {
-            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
-        }
         if (layer.contains("visible")) {
             bool bl = layer.value("visible").toBool();
             laserLayers[index]->setVisible(bl);

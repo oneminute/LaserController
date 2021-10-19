@@ -53,7 +53,11 @@ namespace utils
 
     RELATION determineRelationship(const QRectF& a, const QRectF& b);
 
-    QTransform fromPointPairs(const PointPairList& pointPairs);
+    QTransform leastSquare4d(const PointPairList& pointPairs);
+
+    QTransform leastSquare6d(const PointPairList& pointPairs);
+
+    QTransform transformFrom2Points(const PointPairList& pointPairs);
 }
 
 #endif // UTILS_H

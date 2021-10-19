@@ -58,6 +58,7 @@
 #include "ui/MainCardInfoDialog.h"
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
+#include "ui/RegisteDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -577,6 +578,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
+    connect(m_ui->actionRegiste, &QAction::triggered, this, &LaserControllerWindow::onActionRegiste);
     connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
     connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
 
@@ -3208,6 +3210,12 @@ void LaserControllerWindow::onActionBitmap(bool checked)
     
 }
 
+void LaserControllerWindow::onActionRegiste(bool checked)
+{
+    RegisteDialog dlg;
+    dlg.exec();
+}
+
 void LaserControllerWindow::onActionUpdate(bool checked)
 {
     //LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
@@ -3338,100 +3346,32 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 {
     if (!m_scene->document())
         return;
-    //PointPairList pointPairs = m_tablePrintAndCutPoints->pointPairs();
-    //qLogD << "Point pairs count: " << pointPairs.length();
+    PointPairList pointPairs = m_tablePrintAndCutPoints->pointPairs();
+    qLogD << "Point pairs count: " << pointPairs.length();
 
-    PointPairList pointPairs;
-    pointPairs << PointPair(QPointF(56.88, 8.93), QPointF(31.22, 20.11))
-        << PointPair(QPointF(223.01, 154.01), QPointF(234.95, 103.98))
-        << PointPair(QPointF(70.01, 80.54), QPointF(65.88, 83.87));
+    //PointPairList pointPairs;
+    //pointPairs << PointPair(QPointF(56.88, 8.93), QPointF(31.22, 20.11))
+        //<< PointPair(QPointF(223.01, 154.01), QPointF(234.95, 103.98));
+    //<< PointPair(QPointF(70.01, 80.54), QPointF(65.88, 83.87));
 
-    if (pointPairs.length() == 2)
-    {
-        QPointF srcPt1(pointPairs.at(0).first.x(), pointPairs.at(0).first.y());
-        QPointF dstPt1(pointPairs.at(0).second.x(), pointPairs.at(0).second.y());
-        QPointF srcPt2(pointPairs.at(1).first.x(), pointPairs.at(1).first.y());
-        QPointF dstPt2(pointPairs.at(1).second.x(), pointPairs.at(1).second.y());
+    if (pointPairs.length() < 2)
+        return;
 
-        QPixmap bitmap(300, 300);
-        QPainter painter(&bitmap);
+    QTransform t = utils::leastSquare4d(pointPairs);
 
-        QLineF l1(srcPt1, srcPt2);
-        QLineF l2(dstPt1, dstPt2);
-        painter.setPen(QPen(Qt::blue, 3));
-        painter.drawLine(l1);
-        painter.setPen(QPen(Qt::red, 3));
-        painter.drawLine(l2);
-        qreal angle = l1.angleTo(l2);
-        QTransform t;
-        t.rotate(angle);
-        QLineF l22 = t.map(l2);
-        QPointF diff1 = l1.p1() - l22.p1();
-        QPointF diff2 = l1.p2() - l22.p2();
-        qLogD << "l1: " << l1;
-        qLogD << "l2: " << l22;
-        qLogD << "diff1: " << diff1 << ", diff2: " << diff2;
-        QPointF diff = (diff1 + diff2) * 1000 / 2;
-        t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), diff.x(), diff.y());
-        l2 = t.map(l2);
+    QLineF l1(0, 0, 1, 0);
+    QLineF l2 = t.map(l1);
+    qreal angle = l2.angleTo(l1);
+    qLogD << "angle: " << angle;
+    QPointF diff(t.dx(), t.dy());
 
-        qLogD << t;
+    t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx() * 1000, t.dy() * 1000);
+    m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
+    m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x()).arg(diff.y()));
 
-        m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
-        m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x() / 1000).arg(diff.y() / 1000));
-
-        m_scene->document()->setEnablePrintAndCut(true);
-        m_scene->document()->setPrintAndCutTransform(t);
-        m_scene->document()->setPrintAndCutPointPairs(pointPairs);
-    }
-    else if (pointPairs.length() > 2)
-    {
-        QTransform ti;
-        QTransform tf;
-        PointPairList pointPairs2(pointPairs);
-        for (int i = 0; i < 2; i++)
-        {
-            ti = utils::fromPointPairs(pointPairs2);
-            tf = tf * ti;
-            qLogD << "tf: " << tf;
-
-            for (PointPair& pair : pointPairs2)
-            {
-                pair.second = ti.map(pair.second);
-            }
-        }
-        qLogD << "tf angle: " << tf.map(QLineF(0, 0, 1, 0)).angle();
-
-        std::vector<cv::Point2f> srcPts;
-        std::vector<cv::Point2f> dstPts;
-        int row = 0;
-        for (const PointPair& pair : pointPairs)
-        {
-            srcPts.push_back(cv::Point2f(pair.first.x(), pair.first.y()));
-            dstPts.push_back(cv::Point2f(pair.second.x(), pair.second.y()));
-        }
-
-        cv::Mat cvT = cv::findHomography(dstPts, srcPts);
-        std::cout << cvT << std::endl;
-
-        QTransform t(
-            cvT.at<qreal>(0, 0), cvT.at<qreal>(1, 0), cvT.at<qreal>(2, 0),
-            cvT.at<qreal>(0, 1), cvT.at<qreal>(1, 1), cvT.at<qreal>(2, 1),
-            cvT.at<qreal>(0, 2) * 1000, cvT.at<qreal>(1, 2) * 1000, 1
-            );
-
-        qLogD << t;
-        qLogD << t.isScaling();
-
-        qreal angle = t.map(QLineF(0, 0, 1, 0)).angle();
-        QPointF diff(t.dx(), t.dy());
-        m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
-        m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x() / 1000).arg(diff.y() / 1000));
-
-        m_scene->document()->setEnablePrintAndCut(true);
-        m_scene->document()->setPrintAndCutTransform(t);
-        m_scene->document()->setPrintAndCutPointPairs(pointPairs);
-    }
+    m_scene->document()->setEnablePrintAndCut(true);
+    m_scene->document()->setPrintAndCutTransform(t);
+    m_scene->document()->setPrintAndCutPointPairs(pointPairs);
 }
 
 void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
