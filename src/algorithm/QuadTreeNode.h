@@ -12,7 +12,6 @@ private:
     QRectF m_topRightRegion;
     QRectF m_bottomLeftRegion;
     QRectF m_bottomRightRegion;
-    bool m_isLeaf;
     QList<QuadTreeNode*> m_targetNodes;
     QList<QuadTreeNode*> m_candidateNodes;
     int m_depth;//为0说明为子节点
@@ -25,10 +24,10 @@ public:
     void createTreeNodes();
     void setPrimitiveTreeNode(LaserPrimitive* primitive);
     void createNode(int type, bool isLeaf = false);
-    QList<QuadTreeNode*>* search(QRectF selection);
-    bool isLeaf();
-    void setLeaf(bool isLeaf);
+    QList<QuadTreeNode*>& search(QRectF selection);
+    bool isLeaf();//是否是叶子节点
     void setPrimitiveList(QList<LaserPrimitive*> list);
+    QList<LaserPrimitive*>& primitiveList();
     void addPrimitive(LaserPrimitive* primitive);
     QRectF region();
     QRectF topLeftRegion();

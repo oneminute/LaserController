@@ -763,8 +763,8 @@ void LaserEllipse::draw(QPainter* painter)
 	painter->drawPath(d->path);
 	painter->setPen(QPen(Qt::black, 1));
 	//painter->drawLine(edges()[0]);
-    painter->drawPath(shape());
-    painter->drawRect(boundingRect());
+    //painter->drawPath(shape());
+    //painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserEllipse::toMachiningPath() const

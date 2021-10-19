@@ -192,8 +192,10 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 			}
 			m_creatingRectEndPoint = point;
 		}
-		
-        painter.drawRect(QRectF(mapFromScene(m_creatingRectStartPoint), mapFromScene(m_creatingRectEndPoint)));
+        QRectF rect = QRectF(mapFromScene(m_creatingRectStartPoint), mapFromScene(m_creatingRectEndPoint));
+        if (rect.width() != 0 && rect.height() != 0) {
+            painter.drawRect(rect);
+        }       
     }
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
@@ -2059,15 +2061,17 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
 			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));
 		//QRectF rect(0, 0, 500, 300);
-        LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(),QTransform(), m_curLayerIndex);
-		//undo 创建完后会执行redo
-		QList<QGraphicsItem*> list;
-		list.append(rectItem);
-		AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
-		m_undoStack->push(addCmd);
-        //m_scene->addLaserPrimitive(rectItem);
-		onReplaceGroup(rectItem);
-		viewport()->repaint();
+        if (rect.width() != 0 && rect.height() != 0) {
+            LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(), QTransform(), m_curLayerIndex);
+            //undo 创建完后会执行redo
+            QList<QGraphicsItem*> list;
+            list.append(rectItem);
+            AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+            m_undoStack->push(addCmd);
+            //m_scene->addLaserPrimitive(rectItem);
+            onReplaceGroup(rectItem);
+        }
+        viewport()->repaint();
         emit readyRectangle();
     }
     //Ellipse
