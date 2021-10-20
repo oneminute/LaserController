@@ -358,7 +358,7 @@ RELATION utils::determineRelationship(const QRectF& a, const QRectF& b)
     return rel;
 }
 
-QTransform utils::leastSquare4d(const PointPairList& pointPairs)
+QTransform utils::leastSquare4d(const PointPairList& pointPairs, const QPointF& offset)
 {
     // solve Ax=b
     // 
@@ -392,8 +392,8 @@ QTransform utils::leastSquare4d(const PointPairList& pointPairs)
     {
         qreal x1 = pair.second.x();
         qreal y1 = pair.second.y();
-        qreal x2 = pair.first.x();
-        qreal y2 = pair.first.y();
+        qreal x2 = pair.first.x() + offset.x();
+        qreal y2 = pair.first.y() + offset.y();
 
         qreal x12 = x1 * x1;
         qreal y12 = y1 * y1;
@@ -449,7 +449,7 @@ QTransform utils::leastSquare4d(const PointPairList& pointPairs)
     return t;
 }
 
-QTransform utils::leastSquare6d(const PointPairList& pointPairs)
+QTransform utils::leastSquare6d(const PointPairList& pointPairs, const QPointF& offset)
 {
     // solve Ax=b
     // 
@@ -493,8 +493,8 @@ QTransform utils::leastSquare6d(const PointPairList& pointPairs)
     {
         qreal x = pair.second.x();
         qreal y = pair.second.y();
-        qreal m = pair.first.x();
-        qreal n = pair.first.y();
+        qreal m = pair.first.x() + offset.x();
+        qreal n = pair.first.y() + offset.y();
 
         sumX += x;
         sumY += y;

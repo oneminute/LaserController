@@ -24,3 +24,9 @@ UpdateDialog::UpdateDialog(QWidget* parent)
 UpdateDialog::~UpdateDialog()
 {
 }
+
+void UpdateDialog::closeEvent(QCloseEvent* ev)
+{
+    ev->ignore();
+    this->hide();
+}

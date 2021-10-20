@@ -58,6 +58,7 @@
 #include "ui/MainCardInfoDialog.h"
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
+#include "ui/ActivationDialog.h"
 #include "ui/RegisteDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
@@ -73,6 +74,7 @@
 #include "widget/PressedToolButton.h"
 #include "widget/RadioButtonGroup.h"
 #include "widget/PointPairTableWidget.h"
+#include "widget/Label.h"
 #include "scene/LaserPrimitive.h"
 
 #include "opencv2/features2d.hpp"
@@ -91,6 +93,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_propertyWidget(nullptr)
     , m_lastLockedState(Qt::Unchecked)
     , m_lockEqualRatio(false)
+    , m_updateDialog(nullptr)
 {
     m_ui->setupUi(this);
 
@@ -212,18 +215,20 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addWidget(m_statusBarStatus);
     //m_ui->statusbar->addWidget(utils::createSeparator());
 
-    m_statusBarRegister = new QLabel;
+    m_statusBarRegister = new Label;
     m_statusBarRegister->setText(ltr("Unregistered"));
     m_statusBarRegister->setMinimumWidth(60);
     m_statusBarRegister->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarRegister);
+    connect(m_statusBarRegister, &Label::clicked, this, &LaserControllerWindow::onStatusBarRegisterClicked);
     //m_ui->statusbar->addWidget(utils::createSeparator());
 
-    m_statusBarActivation = new QLabel;
+    m_statusBarActivation = new Label;
     m_statusBarActivation->setText(ltr("Inactivated"));
     m_statusBarActivation->setMinimumWidth(60);
     m_statusBarActivation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarActivation);
+    connect(m_statusBarActivation, &Label::clicked, this, &LaserControllerWindow::onStatusBarActivationClicked);
     //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarTips = new QLabel;
@@ -578,6 +583,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionEditSplineTool, &QAction::triggered, this, &LaserControllerWindow::onActionSplineEdit);
 	connect(m_ui->actionTextTool, &QAction::triggered, this, &LaserControllerWindow::onActionText);
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
+    connect(m_ui->actionActivate, &QAction::triggered, this, &LaserControllerWindow::onActionActivate);
     connect(m_ui->actionRegiste, &QAction::triggered, this, &LaserControllerWindow::onActionRegiste);
     connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
     connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
@@ -612,8 +618,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::comPortsFetched, this, &LaserControllerWindow::onDeviceComPortsFetched);
     connect(LaserApplication::device, &LaserDevice::connected, this, &LaserControllerWindow::onDeviceConnected);
     connect(LaserApplication::device, &LaserDevice::disconnected, this, &LaserControllerWindow::onDeviceDisconnected);
-    connect(LaserApplication::device, &LaserDevice::mainCardRegistered, this, &LaserControllerWindow::onMainCardRegistered);
-    connect(LaserApplication::device, &LaserDevice::mainCardActivated, this, &LaserControllerWindow::onMainCardActivated);
+    connect(LaserApplication::device, &LaserDevice::mainCardRegistrationChanged, this, &LaserControllerWindow::onMainCardRegistrationChanged);
+    connect(LaserApplication::device, &LaserDevice::mainCardActivationChanged, this, &LaserControllerWindow::onMainCardActivationChanged);
     connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
     connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &LaserControllerWindow::onLayoutChanged);
 
@@ -880,6 +886,8 @@ LaserControllerWindow::~LaserControllerWindow()
 		delete m_viewer->undoStack();
 	}
     m_viewer = nullptr;
+
+    SAFE_DELETE(m_updateDialog)
 }
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
@@ -945,18 +953,6 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
     {
     case E_MainCardInactivated:
     {
-        LaserApplication::device->activateMainCard(
-            "name",
-            "address",
-            "18688886666",
-            "12341234",
-            "wx_66886688",
-            "happy@ever.net",
-            "China",
-            "Unknown",
-            "Unknown",
-            "Default"
-        );
         break;
     }
     }
@@ -1841,6 +1837,28 @@ void LaserControllerWindow::createPrintAndCutPanel()
     pointsLayout->setMargin(2);
     m_tablePrintAndCutPoints = new PointPairTableWidget;
     pointsLayout->addWidget(m_tablePrintAndCutPoints);
+
+    QHBoxLayout* offsetLayout = new QHBoxLayout;
+    m_labelPrintAndCutOffset = new QLabel(tr("Laser Offset: "));
+    m_doubleSpinBoxPrintAndCutOffsetX = new QDoubleSpinBox;
+    m_doubleSpinBoxPrintAndCutOffsetX->setMinimum(-100);
+    m_doubleSpinBoxPrintAndCutOffsetX->setMaximum(100);
+    m_doubleSpinBoxPrintAndCutOffsetX->setDecimals(1);
+    m_doubleSpinBoxPrintAndCutOffsetY = new QDoubleSpinBox;
+    m_doubleSpinBoxPrintAndCutOffsetY->setMinimum(-100);
+    m_doubleSpinBoxPrintAndCutOffsetY->setMaximum(100);
+    m_doubleSpinBoxPrintAndCutOffsetY->setDecimals(1);
+    offsetLayout->addWidget(m_labelPrintAndCutOffset);
+    offsetLayout->addWidget(new QLabel(" X"));
+    offsetLayout->addWidget(m_doubleSpinBoxPrintAndCutOffsetX);
+    offsetLayout->addWidget(new QLabel(" Y"));
+    offsetLayout->addWidget(m_doubleSpinBoxPrintAndCutOffsetY);
+    pointsLayout->addLayout(offsetLayout);
+    offsetLayout->setStretch(0, 0);
+    offsetLayout->setStretch(1, 0.1);
+    offsetLayout->setStretch(2, 1);
+    offsetLayout->setStretch(3, 0.1);
+    offsetLayout->setStretch(4, 1);
 
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
     QToolButton* buttonNewLine = new QToolButton;
@@ -3216,11 +3234,32 @@ void LaserControllerWindow::onActionRegiste(bool checked)
     dlg.exec();
 }
 
+void LaserControllerWindow::onStatusBarRegisterClicked(bool checked)
+{
+    RegisteDialog dlg;
+    dlg.exec();
+}
+
+void LaserControllerWindow::onActionActivate(bool checked)
+{
+    ActivationDialog dlg;
+    dlg.exec();
+}
+
+void LaserControllerWindow::onStatusBarActivationClicked(bool checked)
+{
+    ActivationDialog dlg;
+    dlg.exec();
+}
+
 void LaserControllerWindow::onActionUpdate(bool checked)
 {
-    //LaserApplication::device->checkVersionUpdate(false, "{4A5F9C85-8735-414D-BCA7-E9DD111B23A8}", 0, "update_info.json");
-    UpdateDialog dlg;
-    dlg.exec();
+    if (!m_updateDialog)
+    {
+        m_updateDialog = new UpdateDialog;
+    }
+    m_updateDialog->setModal(true);
+    m_updateDialog->show();
 }
 
 void LaserControllerWindow::onActionLaserPosition(bool checked)
@@ -3357,7 +3396,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     if (pointPairs.length() < 2)
         return;
 
-    QTransform t = utils::leastSquare4d(pointPairs);
+    QTransform t = utils::leastSquare4d(pointPairs, QPointF(m_doubleSpinBoxPrintAndCutOffsetX->value(), m_doubleSpinBoxPrintAndCutOffsetY->value()));
 
     QLineF l1(0, 0, 1, 0);
     QLineF l2 = t.map(l1);
@@ -3403,14 +3442,20 @@ void LaserControllerWindow::onDeviceDisconnected()
     m_statusBarStatus->setText(tr("Disconnected"));
 }
 
-void LaserControllerWindow::onMainCardRegistered()
+void LaserControllerWindow::onMainCardRegistrationChanged(bool registered)
 {
-    m_statusBarRegister->setText(tr("Registered"));
+    if (registered)
+        m_statusBarRegister->setText(tr("Registered"));
+    else
+        m_statusBarRegister->setText(tr("Unregistered"));
 }
 
-void LaserControllerWindow::onMainCardActivated()
+void LaserControllerWindow::onMainCardActivationChanged(bool activated)
 {
-    m_statusBarActivation->setText(tr("Activated"));
+    if (activated)
+        m_statusBarActivation->setText(tr("Activated"));
+    else
+        m_statusBarActivation->setText(tr("Inactivated"));
 }
 
 void LaserControllerWindow::onWindowCreated()

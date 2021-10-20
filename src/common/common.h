@@ -405,6 +405,13 @@ public:
 typedef QPair<QPointF, QPointF> PointPair;
 typedef QList<PointPair> PointPairList;
 
+#define SAFE_DELETE(ptr) \
+    if (ptr) \
+    { \
+        delete ptr; \
+        ptr = nullptr; \
+    }
+
 Q_DECLARE_METATYPE(FinishRun);
 
 #endif // COMMON_H

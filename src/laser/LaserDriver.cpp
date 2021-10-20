@@ -268,8 +268,14 @@ bool LaserDriver::load()
     m_fnGetUpdatePanelHandle = (FN_INT_INT_INT)m_library.resolve("GetUpdatePanelHandle");
     CHECK_FN(m_fnGetUpdatePanelHandle)
 
+    m_fnActivationMainCardEx = (FN_INT_WCHART)m_library.resolve("ActivationMainCardEx");
+    CHECK_FN(m_fnActivationMainCardEx);
+
     m_fnRegisteMainCard = (FN_WCHART_WCHART)m_library.resolve("RegisterMainCard");
-    CHECK_FN(m_fnRegisteMainCard);
+    CHECK_FN(m_fnRegisteMainCard)
+
+    m_fnSendAuthenticationEmail = (FN_INT_WCHART_WCHART_INT)m_library.resolve("SendAuthenticationEmail");
+    CHECK_FN(m_fnSendAuthenticationEmail)
 
     Q_ASSERT(m_fnLoadDataFromFile);
 
@@ -639,32 +645,58 @@ QString LaserDriver::getMainCardID()
     return id;
 }
 
-QString LaserDriver::activateMainCard(const QString& name, const QString& address,
-    const QString& phone, const QString& qq, const QString& wx, const QString& email,
-    const QString& country, const QString& distributor, const QString& trademark,
-    const QString& model, const QString& cardId)
+bool LaserDriver::autoActiveMainCard()
 {
+    return m_fnActivationMainCardEx(L"{3567D29E-394B-4814-80C4-510331CD39CD}") == 0;
+}
+
+bool LaserDriver::sendAuthenticationEmail(const QString& email)
+{
+    wchar_t* emailBuf = typeUtils::qStringToWCharPtr(email);
+    return m_fnSendAuthenticationEmail(
+        L"{464D4EDA-2645-4427-AA92-80D53231089F}",
+        emailBuf, -1);
+}
+
+QString LaserDriver::activateMainCard(
+    const QString& email,
+    const QString& code,
+    const QString& name,
+    const QString& phone,
+    const QString& address,
+    const QString& qq,
+    const QString& wx,
+    const QString& country,
+    const QString& distributor,
+    const QString& brand,
+    const QString& model,
+    const QString& machineId
+)
+{
+    wchar_t* emailBuf = typeUtils::qStringToWCharPtr(email);
+    wchar_t* codeBuf = typeUtils::qStringToWCharPtr(code);
     wchar_t* nameBuf = typeUtils::qStringToWCharPtr(name);
-    wchar_t* addressBuf = typeUtils::qStringToWCharPtr(address);
     wchar_t* phoneBuf = typeUtils::qStringToWCharPtr(phone);
+    wchar_t* addressBuf = typeUtils::qStringToWCharPtr(address);
     wchar_t* qqBuf = typeUtils::qStringToWCharPtr(qq);
     wchar_t* wxBuf = typeUtils::qStringToWCharPtr(wx);
-    wchar_t* emailBuf = typeUtils::qStringToWCharPtr(email);
     wchar_t* countryBuf = typeUtils::qStringToWCharPtr(country);
     wchar_t* distributorBuf = typeUtils::qStringToWCharPtr(distributor);
-    wchar_t* trademarkBuf = typeUtils::qStringToWCharPtr(trademark);
+    wchar_t* trademarkBuf = typeUtils::qStringToWCharPtr(brand);
     wchar_t* modelBuf = typeUtils::qStringToWCharPtr(model);
-    wchar_t* cardIdBuf = typeUtils::qStringToWCharPtr(cardId);
+    wchar_t* cardIdBuf = typeUtils::qStringToWCharPtr(machineId);
 
-    wchar_t* resultBuf = m_fnActiveMainCard(nameBuf, addressBuf, phoneBuf, qqBuf, wxBuf,
-        emailBuf, countryBuf, distributorBuf, trademarkBuf, modelBuf, cardIdBuf);
+    wchar_t* resultBuf = m_fnActiveMainCard(
+        emailBuf, codeBuf, nameBuf, phoneBuf, addressBuf, qqBuf, wxBuf,
+        countryBuf, distributorBuf, trademarkBuf, modelBuf, cardIdBuf);
     QString result = QString::fromWCharArray(resultBuf);
+    delete[] emailBuf;
+    delete[] codeBuf;
     delete[] nameBuf;
-    delete[] addressBuf;
     delete[] phoneBuf;
+    delete[] addressBuf;
     delete[] qqBuf;
     delete[] wxBuf;
-    delete[] emailBuf;
     delete[] countryBuf;
     delete[] distributorBuf;
     delete[] trademarkBuf;
