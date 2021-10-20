@@ -302,6 +302,8 @@ private:
 	QUndoStack* m_undoStack;
 	QMap<QGraphicsItem*, QTransform> m_undoSelectionList;
 	QMap<QGraphicsItem*, QTransform> m_undoTransformList;
+    QTransform m_groupLastTransform;
+    QTransform m_singleLastTransform;
 	//arrange
 	QMap<LaserPrimitive*, QTransform> m_copyedList;
 	QMap<QString, QList<LaserPrimitive*>> m_groupedMap;

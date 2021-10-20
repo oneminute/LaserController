@@ -33,6 +33,12 @@ void LaserScene::updateDocument(LaserDocument * doc)
     else
     {
         clearDocument(true);
+        //删除树
+        if (m_quadTree) {
+            delete m_quadTree;
+            m_quadTree = nullptr;
+        }
+        
     }
     m_doc = doc;
 
@@ -92,12 +98,14 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
 {
     m_doc->addPrimitive(primitive);
 	addItem(primitive);
+    m_quadTree->createPrimitiveTreeNode(primitive);
 
 }
 
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
 	m_doc->removePrimitive(primitive);
+    primitive->removeAllTreeNode();
 	removeItem(primitive);
 }
 
@@ -286,19 +294,14 @@ void LaserScene::findSelectedByLine(QRectF selection)
 			if (breakdown)
 				break;
 		}
-		/*QString name = item->metaObject()->className();
-		if (name == "LaserRect") {
-			LaserRect* rect = qgraphicsitem_cast<LaserRect*>(item);
-			
-		}*/
 		item->blockSignals(false);
 	}
 }
 
 void LaserScene::findSelectedByBoundingRect(QRectF rect)
 {
-	//items
-	QList<LaserPrimitive*> list = this->document()->primitives().values();
+	//items遍历查找
+    /*QList<LaserPrimitive*> list = this->document()->primitives().values();
 	
 	for(LaserPrimitive* item : list) {
 		if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
@@ -313,14 +316,26 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 			item->setSelected(true);
 		}
 		item->blockSignals(false);
-	}
+	}*/
+    //QT自带
     /*QPainterPath path;
     path.addRect(rect);
     setSelectionArea(path, Qt::ItemSelectionMode::ContainsItemShape);
     QList<LaserPrimitive*>list = selectedPrimitives();*/
-
+    //已经被选中的恢复正常状态
+    for (LaserPrimitive* primitive : selectedPrimitives()) {
+        primitive->setSelected(false);
+    }
+    //tree 查找
+    QList<QuadTreeNode*> nodes = m_quadTree->search(rect);
+    for (QuadTreeNode* node : nodes) {
+        for (LaserPrimitive* primitive : node->primitiveList()) {
+            if (rect.contains(primitive->sceneBoundingRect()) && (primitive->flags() & QGraphicsItem::ItemIsSelectable)) {
+                primitive->setSelected(true);
+            }
+        } 
+    }
     
-    //bspTreeDepth();
 }
 
 QRectF LaserScene::maxRegion()

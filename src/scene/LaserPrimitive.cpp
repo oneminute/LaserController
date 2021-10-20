@@ -32,6 +32,7 @@
 #include "laser/LaserLineList.h"
 #include "ui/LaserControllerWindow.h"
 #include "widget/LaserDoubleSpinBox.h"
+#include "algorithm/QuadTreeNode.h"
 
 class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
@@ -62,6 +63,7 @@ public:
 	QRectF originalBoundingRect;
 	QPainterPath path;
     bool isLocked;
+    QList<QuadTreeNode*> treeNodes;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
@@ -631,6 +633,34 @@ bool LaserPrimitive::isLocked()
     return d->isLocked;
 }
 
+void LaserPrimitive::addTreeNode(QuadTreeNode* node)
+{
+    Q_D(LaserPrimitive);
+    if (node) {
+        d->treeNodes.append(node);
+    }
+}
+
+void LaserPrimitive::removeAllTreeNode()
+{
+    Q_D(LaserPrimitive);
+    for (QuadTreeNode * node : d->treeNodes) {
+        removeOneTreeNode(node);
+    }
+}
+
+void LaserPrimitive::removeOneTreeNode(QuadTreeNode * node)
+{
+    Q_D(LaserPrimitive);
+    if (node) {
+        node->removePrimitive(this);
+        if (!d->treeNodes.removeOne(node)) {
+            qLogW << "the remove node not exit in the TreeNode";
+        }
+    }
+}
+
+
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     Q_D(LaserPrimitive);
@@ -763,8 +793,8 @@ void LaserEllipse::draw(QPainter* painter)
 	painter->drawPath(d->path);
 	painter->setPen(QPen(Qt::black, 1));
 	//painter->drawLine(edges()[0]);
-    painter->drawPath(shape());
-    painter->drawRect(boundingRect());
+    //painter->drawPath(shape());
+    //painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserEllipse::toMachiningPath() const

@@ -120,78 +120,6 @@ void SelectionUndoCommand::handle(QMap<QGraphicsItem*, QTransform> list)
 	m_viewer->viewport()->repaint();
 }
 
-TranformUndoCommand::TranformUndoCommand(
-	LaserViewer* viewer, 
-	QMap<QGraphicsItem*, QTransform> undoList, 
-	QMap<QGraphicsItem*, QTransform> redoList)
-{
-	m_viewer = viewer;
-	m_undoList = undoList;//sceneTransform
-	m_redoList = redoList;
-	//m_item = item;
-}
-
-TranformUndoCommand::~TranformUndoCommand()
-{
-}
-
-void TranformUndoCommand::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item)
-{
-	item->setTransform(sceneTransform);
-	item->setPos(0, 0);
-}
-
-void TranformUndoCommand::undo()
-{
-	handle(m_undoList);
-}
-
-void TranformUndoCommand::redo()
-{
-	handle(m_redoList);
-	qDebug() << "TranformUndoCommand::redo()";
-	/*if (m_item) {
-		if (m_item->sceneTransform() == m_redoTransform) {
-			return;
-		}
-		//m_item->setTransform(m_redoTransform);
-		sceneTransformToItemTransform(m_redoTransform, m_item);
-	}
-	else {
-		if (m_viewer->group()->sceneTransform() == m_redoTransform) {
-			return;
-		}
-		for each(QGraphicsItem* item in m_viewer->group()->childItems()) {
-			item->setTransform(QTransform());
-		}
-		//m_viewer->group()->setTransform(m_redoTransform);
-		sceneTransformToItemTransform(m_redoTransform, m_viewer->group());
-	}
-	m_viewer->viewport()->repaint();*/
-}
-
-void TranformUndoCommand::handle(QMap<QGraphicsItem*, QTransform> list)
-{
-	bool isInGroup = true;
-	for (QMap<QGraphicsItem*, QTransform>::Iterator i = list.begin(); i != list.end(); i++) {
-		if (m_viewer->group()->isAncestorOf(i.key())) {
-			if (!isInGroup) {
-				qLogW << "in group or not in? confused.";
-				return;
-			}
-			m_viewer->resetGroup();
-			sceneTransformToItemTransform(i.value(), i.key());
-			m_viewer->onSelectedFillGroup();
-		}
-		else {
-			isInGroup = false;
-			sceneTransformToItemTransform(i.value(), i.key());
-		}
-		
-	}
-	m_viewer->viewport()->repaint();
-}
-
 AddDelUndoCommand::AddDelUndoCommand(LaserScene * scene, QList<QGraphicsItem*> list, bool isDel)
 {
 	m_scene = scene;
@@ -785,4 +713,67 @@ void CornerRadiusCommand::redo()
     m_rect->setCornerRadius(m_curRadius);
     m_window->setLastCornerRadiusValue(m_curRadius);
     m_view->viewport()->repaint();
+}
+
+GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, QTransform lastTransform, QTransform curTransform)
+    :m_scene(scene), m_lastTransform(lastTransform), m_curTransform(curTransform)
+{
+    m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+    m_group = m_viewer->group();
+
+    isRedo = false;
+}
+
+GroupTransformUndoCommand::~GroupTransformUndoCommand()
+{
+
+}
+
+void GroupTransformUndoCommand::undo()
+{
+    qDebug() << QTransform();
+    qDebug() << m_lastTransform;
+    m_group->setTransform(m_lastTransform);
+    m_viewer->viewport()->repaint();
+    isRedo = true;
+}
+
+void GroupTransformUndoCommand::redo()
+{
+    if (!isRedo) {
+        return;
+    }
+    m_group->setTransform(m_curTransform);
+    m_viewer->viewport()->repaint();
+}
+
+SingleTransformUndoCommand::SingleTransformUndoCommand(LaserScene * scene, QTransform lastTransform, QTransform curTransform, 
+    LaserPrimitive* primitive)
+{
+    m_scene = scene;
+    m_lastTransform = lastTransform;
+    m_curTransform = curTransform;
+    m_primitive = primitive;
+    m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+    isRedo = false;
+}
+
+SingleTransformUndoCommand::~SingleTransformUndoCommand()
+{
+}
+
+void SingleTransformUndoCommand::undo()
+{
+    isRedo = true;
+    //m_primitive->setTransform(m_lastTransform);
+    utils::sceneTransformToItemTransform(m_lastTransform, m_primitive);
+}
+
+void SingleTransformUndoCommand::redo()
+{
+    if (!isRedo) {
+        return;
+    }
+    utils::sceneTransformToItemTransform(m_curTransform, m_primitive);
+    //m_primitive->setTransform(m_curTransform);
 }

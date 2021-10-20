@@ -192,8 +192,10 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 			}
 			m_creatingRectEndPoint = point;
 		}
-		
-        painter.drawRect(QRectF(mapFromScene(m_creatingRectStartPoint), mapFromScene(m_creatingRectEndPoint)));
+        QRectF rect = QRectF(mapFromScene(m_creatingRectStartPoint), mapFromScene(m_creatingRectEndPoint));
+        if (rect.width() != 0 && rect.height() != 0) {
+            painter.drawRect(rect);
+        }       
     }
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
@@ -2059,15 +2061,17 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
 			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));
 		//QRectF rect(0, 0, 500, 300);
-        LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(),QTransform(), m_curLayerIndex);
-		//undo 创建完后会执行redo
-		QList<QGraphicsItem*> list;
-		list.append(rectItem);
-		AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
-		m_undoStack->push(addCmd);
-        //m_scene->addLaserPrimitive(rectItem);
-		onReplaceGroup(rectItem);
-		viewport()->repaint();
+        if (rect.width() != 0 && rect.height() != 0) {
+            LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(), QTransform(), m_curLayerIndex);
+            //undo 创建完后会执行redo
+            QList<QGraphicsItem*> list;
+            list.append(rectItem);
+            AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+            m_undoStack->push(addCmd);
+            //m_scene->addLaserPrimitive(rectItem);
+            onReplaceGroup(rectItem);
+        }
+        viewport()->repaint();
         emit readyRectangle();
     }
     //Ellipse
@@ -3450,8 +3454,6 @@ void LaserViewer::selectionUndoStackPushBefore()
 		for each(QGraphicsItem* item in m_scene->selectedPrimitives()) {
 			m_undoSelectionList.insert(item, item->sceneTransform());
 		}
-		//m_undoSelectionList = m_group->childItems();
-		//m_undoSelectionTransform = m_group->sceneTransform();
 	}
 }
 
@@ -3474,87 +3476,30 @@ void LaserViewer::selectionUndoStackPush()
 	m_undoStack->push(selection);
 }
 
-/*void LaserViewer::reshapeUndoStackPushBefore()
-{
-	m_undoReshapMap.clear();
-	//transform group
-	for each(QGraphicsItem* item_g in m_group->childItems()) {
-		LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item_g);
-		qDebug() << primitive->pos();
-		qDebug() << m_group->transform();
-
-		ReshapeUndoPrimitive undoPrimitive(
-			primitive->getPath(), 
-			primitive->getAllTransform(), 
-			primitive->transform(), 
-			primitive->boundingRect(),
-			m_group->transform());
-		m_undoReshapMap.insert(primitive, undoPrimitive);
-	}
-}
-
-ReshapeUndoCommand* LaserViewer::reshapeUndoStackPush()
-{
-	if (m_undoReshapMap.isEmpty()) {
-		return nullptr;
-	}
-	QMap<LaserPrimitive*, ReshapeUndoPrimitive> map;
-	//QTransform g_transform = m_group->transform();
-	//已经被移除出group
-	for each(LaserPrimitive* primitive in m_undoReshapMap.keys()) {
-		qDebug() << primitive->pos();
-		ReshapeUndoPrimitive undoPrimitive(
-			primitive->getPath(),
-			primitive->getAllTransform(),
-			primitive->transform(),
-			primitive->boundingRect(),
-			m_group->transform());
-		map.insert(primitive, undoPrimitive);
-	}
-	return new ReshapeUndoCommand(this, m_undoReshapMap, map);
-}*/
-
 void LaserViewer::transformUndoStackPushBefore(LaserPrimitive* item)
 {
-	m_undoTransformList.clear();
-	if (item) {
-		//qDebug() << "undosceneTransform(): " << item->sceneTransform();
-		//qDebug() << "undotransform(): " << item->transform();
-		//qDebug() << "pos(): " << item->pos();
-		m_undoTransformList.insert(item, item->sceneTransform());
-		//m_undoTransform = item->sceneTransform();
-	}
-	else {
-		//m_undoTransform = m_group->sceneTransform();
-		for each(QGraphicsItem* gitem in m_group->childItems()) {
-			m_undoTransformList.insert(gitem, gitem->sceneTransform());
-		}
-	}
+	
+    if (item) {
+        m_singleLastTransform = item->sceneTransform();
+    }
+    else {
+        m_groupLastTransform = m_group->transform();
+    }
+    
 }
 
 void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
 {
 
-	QMap<QGraphicsItem*, QTransform> redoTransformList;
-	if (item != nullptr) {
-		//qDebug() << "redosceneTransform(): " << item->sceneTransform();
-		//qDebug() << "redotransform(): " << item->transform();
-		//redoTransform = item->sceneTransform();
-		redoTransformList.insert(item, item->sceneTransform());
-	}
-	else {
-		//redoTransform = m_group->sceneTransform();
-		for each(QGraphicsItem* gitem in m_group->childItems()) {
-			redoTransformList.insert(gitem, gitem->sceneTransform());
-		}
-	}
-	if (redoTransformList == m_undoTransformList) {
-		return;
-	}
-	//qDebug() << "m_undoTransform: " << m_undoTransform;
-
-	TranformUndoCommand* transformCmd = new TranformUndoCommand(this, m_undoTransformList, redoTransformList);
-	m_undoStack->push(transformCmd);
+    if (item) {
+        SingleTransformUndoCommand* cmd = new SingleTransformUndoCommand(m_scene.data(), m_singleLastTransform, item->sceneTransform(), item);
+        m_undoStack->push(cmd);
+    }
+    else {
+        GroupTransformUndoCommand* cmd = new GroupTransformUndoCommand(m_scene.data(), m_groupLastTransform, m_group->transform());
+        m_undoStack->push(cmd);
+    }
+    
 }
 
 int LaserViewer::textAlignH()
@@ -4006,6 +3951,7 @@ void LaserViewer::selectedHandleScale()
 			QTransform t1;
 			t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
 			m_group->setTransform(t * t1);
+            
 			break;
 		}
 		case 13://点选
@@ -4098,10 +4044,10 @@ void LaserViewer::selectedHandleScale()
 			if (std::isnan(radians)) {
 				radians = 0;
 			}
-			qDebug() << "radians: " << radians;
+			//qDebug() << "radians: " << radians;
 
 			m_radians += radians;
-			qDebug() << "m_radians: " << m_radians;
+			//qDebug() << "m_radians: " << m_radians;
 			t = m_group->transform();
 			QTransform t1;
 			t1.setMatrix(qCos(radians), qSin(radians), t1.m13(), -qSin(radians), qCos(radians), t.m23(), t1.m31(), t1.m32(), t1.m33());
@@ -4270,7 +4216,6 @@ bool LaserViewer::resetGroup()
 		LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 
 		m_group->removeFromGroup(p_item);
-		//p_item->reShape();
 		
 	}
 	m_group->setTransform(QTransform());
