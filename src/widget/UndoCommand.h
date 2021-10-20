@@ -25,23 +25,33 @@ private:
 	QTransform m_groupRedoTransform;
 	//ReshapeUndoCommand* m_reshapeCmd;
 };
-class TranformUndoCommand :public QUndoCommand {
+class GroupTransformUndoCommand : public QUndoCommand {
 public:
-	TranformUndoCommand(LaserViewer* viewer,
-		QMap<QGraphicsItem*, QTransform> undoList,
-		QMap<QGraphicsItem*, QTransform> redoList);
-	~TranformUndoCommand();
-	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);//根据sceneTransfrom转化为Item的transform和position
-	virtual void undo() override;
-	virtual void redo() override;
-	void handle(QMap<QGraphicsItem*, QTransform> list);
+    GroupTransformUndoCommand(LaserScene* scene,  QTransform lastTransform , QTransform curTransform);
+    ~GroupTransformUndoCommand();
+    virtual void undo() override;
+    virtual void redo() override;
 private:
-	LaserViewer * m_viewer;
-	//LaserPrimitive* m_item;
-	QMap<QGraphicsItem*, QTransform> m_undoList;
-	QMap<QGraphicsItem*, QTransform> m_redoList;
-	//QTransform m_undoTransform;
-	//QTransform m_redoTransform;
+    LaserScene * m_scene;
+    LaserViewer* m_viewer;
+    LaserPrimitiveGroup* m_group;
+    QTransform m_lastTransform;
+    QTransform m_curTransform;
+    bool isRedo;
+};
+class SingleTransformUndoCommand : public QUndoCommand {
+public:
+    SingleTransformUndoCommand(LaserScene* scene, QTransform lastTransform, QTransform curTransform, LaserPrimitive* primitive);
+    ~SingleTransformUndoCommand();
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserScene * m_scene;
+    LaserViewer* m_viewer;
+    LaserPrimitive* m_primitive;
+    QTransform m_lastTransform;
+    QTransform m_curTransform;
+    bool isRedo;
 };
 class AddDelUndoCommand : public QUndoCommand {
 public :
