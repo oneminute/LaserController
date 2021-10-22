@@ -514,14 +514,14 @@ bool LaserDevice::verifyManufacturePassword(const QString& password)
     return true;
 }
 
-bool LaserDevice::autoActivateMainCard()
+MainCardActivateResult LaserDevice::autoActivateMainCard()
 {
     Q_D(LaserDevice);
     if (d->driver)
     {
         return d->driver->autoActiveMainCard();
     }
-    return false;
+    return MAR_Other;
 }
 
 bool LaserDevice::sendAuthenticationEmail(const QString& email)

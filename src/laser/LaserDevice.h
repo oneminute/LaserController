@@ -62,7 +62,7 @@ public:
 
     bool verifyManufacturePassword(const QString& password);
 
-    bool autoActivateMainCard();
+    MainCardActivateResult autoActivateMainCard();
     bool sendAuthenticationEmail(const QString& email);
     bool registeMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 

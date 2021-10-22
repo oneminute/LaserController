@@ -16,7 +16,6 @@ public:
     ~RegisteDialog();
 
 protected slots:
-    void onButtonCopyCardIdClicked(bool checked = false);
     void onButtonCopyDongleIdClicked(bool checked = false);
     void onButtonCopyRegisteIdClicked(bool checked = false);
     void onButtonRegiste(bool checked = false);

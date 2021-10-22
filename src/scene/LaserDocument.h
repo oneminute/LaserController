@@ -115,6 +115,8 @@ protected:
     //void clearOutline(OptimizeNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node);
 
+    QString newPrimitiveName(LaserPrimitive* primitive);
+
 signals:
     void layersStructureChanged();
     void opened();
@@ -128,6 +130,7 @@ protected:
 
     friend class OptimizeNode;
     friend class OptimizeNodePrivate;
+    friend class LaserPrimitive;
 };
 
 #endif // LASERDOCUMENT_H

@@ -171,7 +171,6 @@ public:
 
     static QString typeName(LaserPrimitiveType typeId);
     static QString typeLatinName(LaserPrimitiveType typeId);
-    QString newPrimitiveName(LaserPrimitiveType type) const;
 
     virtual QPainterPath toMachiningPath() const = 0;
 
