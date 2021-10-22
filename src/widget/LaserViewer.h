@@ -86,6 +86,8 @@ public:
     int textAlignV();
     void setTextAlignH(int align);
     void setTextAlignV(int align);
+    //tree
+    void updateGroupTreeNode();
 	
 private:
     void init();
@@ -113,6 +115,7 @@ private:
 	void setGroupNull();
 	void pointSelectWhenSelectedState(int handleIndex, LaserPrimitive* primitive);
 	void selectingReleaseInBlank();//释放鼠标时，点选和框选的区域为空白（没有图元）
+    
 	//undo
 	void selectionUndoStackPushBefore();
 	void selectionUndoStackPush();

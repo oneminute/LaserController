@@ -756,7 +756,7 @@ void LaserEllipse::draw(QPainter* painter)
 	painter->setPen(QPen(Qt::black, 1));
 	//painter->drawLine(edges()[0]);
     //painter->drawPath(shape());
-    //painter->drawRect(boundingRect());
+    painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserEllipse::toMachiningPath() const
@@ -917,6 +917,7 @@ void LaserRect::draw(QPainter* painter)
 {
     Q_D(LaserRect);
     painter->drawPath(d->path);
+    painter->drawRect(d->boundingRect);
 }
 
 LaserPointListList LaserRect::updateMachiningPoints(quint32 progressCode, qreal progressQuota)
@@ -1115,7 +1116,7 @@ void LaserLine::draw(QPainter * painter)
 {
     Q_D(LaserLine);
     painter->drawLine(d->line);
-	//painter->drawRect(d->boundingRect);
+	painter->drawRect(d->boundingRect);
 }
 
 QPainterPath LaserLine::toMachiningPath() const
@@ -1262,6 +1263,7 @@ void LaserPath::draw(QPainter * painter)
 {
     Q_D(LaserPath);
     painter->drawPath(d->path);
+    painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserPath::toMachiningPath() const
@@ -1464,6 +1466,7 @@ void LaserPolyline::draw(QPainter * painter)
 {
     Q_D(LaserPolyline);
 	painter->drawPath(d->path);
+    painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserPolyline::toMachiningPath() const
@@ -1605,6 +1608,7 @@ void LaserPolygon::draw(QPainter * painter)
 {
     Q_D(LaserPolygon);
     painter->drawPolygon(d->poly);
+    painter->drawRect(d->boundingRect);
 }
 
 QPainterPath LaserPolygon::toMachiningPath() const
@@ -1961,6 +1965,7 @@ void LaserNurbs::draw(QPainter* painter)
     
     painter->setPen(QPen(Qt::gray, 1, Qt::DashLine));
     painter->drawPolyline(polygon);
+    painter->drawRect(d->boundingRect);
 }
 
 QPainterPath LaserNurbs::toMachiningPath() const
@@ -2134,6 +2139,7 @@ void LaserBitmap::draw(QPainter * painter)
 	
 	//QImage image = d->image.transformed(d->allTransform, Qt::TransformationMode::SmoothTransformation);
 	painter->drawImage(d->boundingRect, d->image);
+    painter->drawRect(d->boundingRect);
 }
 
 QPainterPath LaserBitmap::toMachiningPath() const
@@ -2797,6 +2803,7 @@ void LaserText::draw(QPainter * painter)
 
         }
     }*/
+    painter->drawRect(d->boundingRect);
 }
 
 LaserPrimitive * LaserText::clone(QTransform t)

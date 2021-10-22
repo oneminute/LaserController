@@ -37,6 +37,7 @@ private:
     LaserPrimitiveGroup* m_group;
     QTransform m_lastTransform;
     QTransform m_curTransform;
+    QuadTreeNode* m_tree;
     bool isRedo;
 };
 class SingleTransformUndoCommand : public QUndoCommand {
@@ -51,6 +52,7 @@ private:
     LaserPrimitive* m_primitive;
     QTransform m_lastTransform;
     QTransform m_curTransform;
+    QuadTreeNode* m_tree;
     bool isRedo;
 };
 class AddDelUndoCommand : public QUndoCommand {
