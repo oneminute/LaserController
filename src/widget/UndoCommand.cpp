@@ -98,6 +98,7 @@ void SelectionUndoCommand::handle(QMap<QGraphicsItem*, QTransform> list)
 		sceneTransformToItemTransform(i.value(), i.key());
 	}
 	m_viewer->onSelectedFillGroup();
+    
 	/*for each(LaserPrimitive* primitive in list) {
 
 		primitive->setSelected(true);
@@ -720,7 +721,9 @@ GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, QTransf
 {
     m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
     m_group = m_viewer->group();
-
+    m_tree = m_scene->quadTreeNode();
+    m_lastTransform = lastTransform;
+    m_curTransform = curTransform;
     isRedo = false;
 }
 
@@ -731,19 +734,30 @@ GroupTransformUndoCommand::~GroupTransformUndoCommand()
 
 void GroupTransformUndoCommand::undo()
 {
-    qDebug() << QTransform();
-    qDebug() << m_lastTransform;
-    m_group->setTransform(m_lastTransform);
+    /*if (m_group->transform() == QTransform()) {
+        
+        m_group->setTransform(m_group->transform()*(m_lastTransform.inverted() * m_curTransform).inverted());       
+    }
+    else {
+        m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
+    }*/
+    m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
+    //updata tree
+    m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();
     isRedo = true;
 }
 
 void GroupTransformUndoCommand::redo()
 {
-    if (!isRedo) {
+    if (!isRedo) {   
+        //updata tree
+        m_viewer->updateGroupTreeNode();
         return;
     }
     m_group->setTransform(m_curTransform);
+    //updata tree
+    m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();
 }
 
@@ -755,6 +769,7 @@ SingleTransformUndoCommand::SingleTransformUndoCommand(LaserScene * scene, QTran
     m_curTransform = curTransform;
     m_primitive = primitive;
     m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+    
     isRedo = false;
 }
 
@@ -767,13 +782,17 @@ void SingleTransformUndoCommand::undo()
     isRedo = true;
     //m_primitive->setTransform(m_lastTransform);
     utils::sceneTransformToItemTransform(m_lastTransform, m_primitive);
+    m_tree->upDatePrimitive(m_primitive);
+    m_viewer->repaint();
 }
 
 void SingleTransformUndoCommand::redo()
 {
     if (!isRedo) {
+        m_tree->upDatePrimitive(m_primitive);
         return;
     }
     utils::sceneTransformToItemTransform(m_curTransform, m_primitive);
-    //m_primitive->setTransform(m_curTransform);
+    m_tree->upDatePrimitive(m_primitive);
+    m_viewer->repaint();
 }

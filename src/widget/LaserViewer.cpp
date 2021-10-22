@@ -1953,6 +1953,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		QList<LaserPrimitive*> newSelectedList = m_scene->document()->selectedPrimitives();
 		//框选区域，分情况处理selectionUndo
 		if (m_isKeyCtrlPress) {
+            //update tree
+
 			for each(LaserPrimitive* item in selectedList) {
 				item->setSelected(true);
 			}
@@ -3431,6 +3433,7 @@ void LaserViewer::selectingReleaseInBlank()
 		else {
 			//m_scene->clearSelection();
 			if (!m_scene->selectedItems().isEmpty()) {
+                
 				//undo
 				selectionUndoStackPushBefore();
 				//清理group及所有被选中item
@@ -3439,6 +3442,7 @@ void LaserViewer::selectingReleaseInBlank()
 				//m_isKeyShiftPressed = false;
 				//undo redo
 				selectionUndoStackPush();
+                
 			}
             
 		}
@@ -3520,6 +3524,16 @@ void LaserViewer::setTextAlignH(int align)
 void LaserViewer::setTextAlignV(int align)
 {
     m_textAlighV = align;
+}
+
+void LaserViewer::updateGroupTreeNode()
+{
+    if (m_group && !m_group->isEmpty()) {
+        for (QGraphicsItem* item : m_group->childItems()) {
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+            m_scene->quadTreeNode()->upDatePrimitive(primitive);
+        }
+    }
 }
 
 qreal LaserViewer::zoomValue() const

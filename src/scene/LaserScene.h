@@ -44,6 +44,7 @@ public:
 	void findSelectedByLine(QRectF rect);
 	void findSelectedByBoundingRect(QRectF rect);
     QRectF maxRegion();
+    QuadTreeNode* quadTreeNode();
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;

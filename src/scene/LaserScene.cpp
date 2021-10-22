@@ -328,11 +328,40 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
     }
     //tree 查找
     QList<QuadTreeNode*> nodes = m_quadTree->search(rect);
+
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
-            if (rect.contains(primitive->sceneBoundingRect()) && (primitive->flags() & QGraphicsItem::ItemIsSelectable)) {
-                primitive->setSelected(true);
+            if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
+                QRectF bounds = primitive->sceneBoundingRect();
+                if (rect.contains(bounds)) {
+                    if (!primitive->isSelected()) {
+                        primitive->setSelected(true);
+                    }
+
+                }
+                //point
+                else if(bounds.width() == 0 && bounds.height() == 0){
+                    QPointF p = bounds.topLeft();
+                    if (rect.contains(p)) {
+                        if (!primitive->isSelected()) {
+                            primitive->setSelected(true);
+                        }
+
+                    }
+                }
+                // line
+                else if (bounds.width() == 0 || bounds.height() == 0) {
+                    QPointF p1 = bounds.topLeft();
+                    QPointF p2 = bounds.bottomRight();
+                    if (rect.contains(p1) && rect.contains(p2)) {
+                        if (!primitive->isSelected()) {
+                            primitive->setSelected(true);
+                        }
+
+                    }
+                }
             }
+            
         } 
     }
     
@@ -341,6 +370,11 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 QRectF LaserScene::maxRegion()
 {
     return m_maxRegion;
+}
+
+QuadTreeNode * LaserScene::quadTreeNode()
+{
+    return m_quadTree;
 }
 
 
