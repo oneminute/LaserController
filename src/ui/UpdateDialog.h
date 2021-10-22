@@ -15,6 +15,9 @@ public:
     explicit UpdateDialog(QWidget* parent = nullptr);
     ~UpdateDialog();
 
+protected:
+    virtual void closeEvent(QCloseEvent* ev) override;
+
 private:
     QScopedPointer<Ui::UpdateDialog> m_ui;
 

@@ -931,11 +931,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 	}
 	QJsonArray layers = doc.object()["layers"].toArray();
 	QList<LaserLayer*> laserLayers = this->layers();
-	/*for (int i = 0; i < layers.size(); i++) {
-		LaserLayer* layer = layers[i];
-		if()
-	}*/
 	
+    this->blockSignals(true);
 	for (int i = 0; i < layers.size(); i++) {
 		QJsonObject layer = layers[i].toObject();
 		QJsonArray array = layer["primitives"].toArray();
@@ -1168,7 +1165,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             //LaserControllerWindow* window = LaserApplication::mainWindow;
         }
 	}
-    outline();
+    this->blockSignals(false);
+    emit updateLayersStructure();
+    //outline();
 }
 
 int LaserDocument::totalNodes()

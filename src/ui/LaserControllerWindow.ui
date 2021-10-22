@@ -111,6 +111,7 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="actionOnlineHelp"/>
+    <addaction name="actionActivate"/>
     <addaction name="actionRegiste"/>
     <addaction name="actionUpdate"/>
     <addaction name="actionOfficialWebsite"/>
@@ -1324,6 +1325,11 @@
   <action name="actionRegiste">
    <property name="text">
     <string>Registe</string>
+   </property>
+  </action>
+  <action name="actionActivate">
+   <property name="text">
+    <string>Activate</string>
    </property>
   </action>
  </widget>

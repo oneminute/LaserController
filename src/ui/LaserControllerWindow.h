@@ -26,6 +26,7 @@ class QFormLayout;
 class LaserLayerTableWidget;
 class LaserViewer;
 class LaserScene;
+class Label;
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
@@ -45,6 +46,7 @@ class PressedToolButton;
 class Vector2DWidget;
 class RadioButtonGroup;
 class PointPairTableWidget;
+class UpdateDialog;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -182,6 +184,9 @@ protected slots:
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
     void onActionRegiste(bool checked = false);
+    void onStatusBarRegisterClicked(bool checked = false);
+    void onActionActivate(bool checked = false);
+    void onStatusBarActivationClicked(bool checked = false);
     void onActionUpdate(bool checked = false);
     void onActionLaserPosition(bool checked = false);
 
@@ -207,8 +212,8 @@ protected slots:
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
     void onDeviceDisconnected();
-    void onMainCardRegistered();
-    void onMainCardActivated();
+    void onMainCardRegistrationChanged(bool registered);
+    void onMainCardActivationChanged(bool activated);
 
     void onWindowCreated();
     virtual void closeEvent(QCloseEvent* event) override;
@@ -446,6 +451,9 @@ private:
     // Print and Cut Panel
     QGroupBox* m_groupBoxPrintAndCutPoints;
     PointPairTableWidget* m_tablePrintAndCutPoints;
+    QLabel* m_labelPrintAndCutOffset;
+    QDoubleSpinBox* m_doubleSpinBoxPrintAndCutOffsetX;
+    QDoubleSpinBox* m_doubleSpinBoxPrintAndCutOffsetY;
     QGroupBox* m_groupBoxPrintAndCutResult;
     QLabel* m_labelPrintAndCutTranslationResult;
     QLabel* m_labelPrintAndCutRotationResult;
@@ -462,8 +470,8 @@ private:
 
     // widgets on status bar
     QLabel* m_statusBarStatus;
-    QLabel* m_statusBarRegister;
-    QLabel* m_statusBarActivation;
+    Label* m_statusBarRegister;
+    Label* m_statusBarActivation;
     QLabel* m_statusBarTips;
     ProgressBar* m_statusBarProgress;
     QLabel* m_statusBarCoordinate;
@@ -526,6 +534,7 @@ private:
     int m_fontComboxLightedIndex;
     //dock panel/ shape properties panel
     
+    UpdateDialog* m_updateDialog;
 
     friend class LaserApplication;
 };

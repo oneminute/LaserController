@@ -219,9 +219,10 @@ private:
 
     typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double millimeter, bool xaxis);
 
-    typedef wchar_t* (__stdcall *FNActivationMainCard)(wchar_t* name, wchar_t* address, wchar_t* phone, wchar_t* qq,
-        wchar_t* wx, wchar_t* email, wchar_t* country, wchar_t* distributor, wchar_t* trademark, wchar_t* model,
-        wchar_t* cardId);
+    typedef wchar_t* (__stdcall *FNActivationMainCard)(
+        wchar_t*, wchar_t*, wchar_t*, wchar_t*,
+        wchar_t*, wchar_t*, wchar_t*, wchar_t*, 
+        wchar_t*, wchar_t*, wchar_t*, wchar_t*);
 
     typedef wchar_t* (__stdcall* FN_WCHART_BOOL)(bool reload);
 
@@ -231,6 +232,7 @@ private:
     typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
 
     typedef wchar_t* (__stdcall* FN_WCHART_WCHART)(wchar_t*);
+    typedef int(__stdcall* FN_INT_WCHART_WCHART_INT)(wchar_t*, wchar_t*, int);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
@@ -298,17 +300,21 @@ public:
     void controlHDAction(int action);
 
     QString getMainCardID();
-    QString activateMainCard(const QString& name,
-        const QString& address,
+    bool autoActiveMainCard();
+    bool sendAuthenticationEmail(const QString& email);
+    QString activateMainCard(
+        const QString& email,
+        const QString& code,
+        const QString& name,
         const QString& phone,
+        const QString& address,
         const QString& qq,
         const QString& wx,
-        const QString& email,
         const QString& country,
         const QString& distributor,
-        const QString& trademark,
+        const QString& brand,
         const QString& model,
-        const QString& cardId
+        const QString& machineId
     );
     QString getDeviceId(bool reload = true);
     QString getDongleId();
@@ -441,7 +447,9 @@ private:
     FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
     FN_INT_INT_INT m_fnGetUpdatePanelHandle;
 
+    FN_INT_WCHART m_fnActivationMainCardEx;
     FN_WCHART_WCHART m_fnRegisteMainCard;
+    FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
 
     wchar_t m_wcharBuffer[2048];
 

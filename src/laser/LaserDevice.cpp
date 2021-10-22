@@ -29,6 +29,8 @@ public:
         , deviceOriginMM(0, 0)
         , transform()
         , origin(0, 0)
+        , mainCardActivated(false)
+        , mainCardRegistered(false)
     {}
 
     void updateDeviceOriginAndTransform();
@@ -65,6 +67,8 @@ public:
     QMap<int, LaserRegister*> userRegisters;
     QMap<int, LaserRegister*> systemRegisters;
 
+    bool mainCardActivated;
+    bool mainCardRegistered;
     LaserState lastState;
 };
 
@@ -205,8 +209,8 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
     connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
-    connect(this, &LaserDevice::mainCardRegistered, this, &LaserDevice::onMainCardRegistered);
-    connect(this, &LaserDevice::mainCardActivated, this, &LaserDevice::onMainCardActivated);
+    connect(this, &LaserDevice::mainCardRegistrationChanged, this, &LaserDevice::onMainCardRegistrationChanged);
+    connect(this, &LaserDevice::mainCardActivationChanged, this, &LaserDevice::onMainCardActivationChanged);
     connect(Config::SystemRegister::deviceOriginItem(),
         &ConfigItem::valueChanged, this,
         &LaserDevice::onConfigStartFromChanged);
@@ -475,6 +479,18 @@ QString LaserDevice::hardwareMaintainingTimes() const
     return d->hardwareMaintainingTimes;
 }
 
+bool LaserDevice::isMainCardActivated() const
+{
+    Q_D(const LaserDevice);
+    return d->mainCardActivated;
+}
+
+bool LaserDevice::isMainCardRegistered() const
+{
+    Q_D(const LaserDevice);
+    return d->mainCardRegistered;
+}
+
 QString LaserDevice::apiLibVersion() const
 {
     Q_D(const LaserDevice);
@@ -496,6 +512,26 @@ bool LaserDevice::verifyManufacturePassword(const QString& password)
     Q_D(LaserDevice);
     //return d->driver->checkFactoryPassword(password);
     return true;
+}
+
+bool LaserDevice::autoActivateMainCard()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->autoActiveMainCard();
+    }
+    return false;
+}
+
+bool LaserDevice::sendAuthenticationEmail(const QString& email)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->sendAuthenticationEmail(email);
+    }
+    return false;
 }
 
 bool LaserDevice::registeMainCard(const QString& registeCode, QWidget* parentWidget)
@@ -916,12 +952,26 @@ void LaserDevice::disconnectDevice()
     }
 }
 
-QString LaserDevice::activateMainCard(const QString& name, const QString& address, const QString& phone, const QString& qq, const QString& wx, const QString& email, const QString& country, const QString& distributor, const QString& trademark, const QString& model)
+QString LaserDevice::activateMainCard(
+    const QString& email,
+    const QString& code,
+    const QString& name,
+    const QString& phone,
+    const QString& address,
+    const QString& qq,
+    const QString& wx,
+    const QString& country,
+    const QString& distributor,
+    const QString& brand,
+    const QString& model
+)
 {
     Q_D(LaserDevice);
     QString cardId = requestMainCardId();
     qLogD << "cardId: " << cardId;
-    QString result = d->driver->activateMainCard(name, address, phone, qq, wx, email, country, distributor, trademark, model, cardId);
+    QString result = d->driver->activateMainCard(
+        email, code, name, phone, address, qq, wx, country, distributor, brand, model, mainCardId()
+    );
     qLogD << "activation result: " << result;
     return result;
 }
@@ -982,10 +1032,12 @@ void LaserDevice::handleError(int code, const QString& message)
         throw new LaserDeviceSecurityException(code, tr("Dongle activation is disabled"));
         break;
     case E_MainCardRegisterError:
-        throw new LaserDeviceSecurityException(code, tr("Failed to register main card"));
+        //throw new LaserDeviceSecurityException(code, tr("Failed to register main card"));
+        emit mainCardRegistrationChanged(false);
         break;
     case E_MainCardInactivated:
-        throw new LaserDeviceSecurityException(code, tr("Main card inactivated"));
+        //throw new LaserDeviceSecurityException(code, tr("Main card inactivated"));
+        emit mainCardActivationChanged(false);
         break;
     case E_InvalidMainCardId:
         throw new LaserDeviceSecurityException(code, tr("Invalid main card ID"));
@@ -1149,17 +1201,17 @@ void LaserDevice::handleMessage(int code, const QString& message)
         break;
     case M_MainCardRegisterOK:
     {
-        emit mainCardRegistered();
+        emit mainCardRegistrationChanged(true);
         break;
     }
     case M_MainCardIsGenuine:
     {
-        emit mainCardActivated(false);
+        emit mainCardActivationChanged(true);
         break;
     }
     case M_MainCardIsGenuineEx:
     {
-        emit mainCardActivated(true);
+        emit mainCardActivationChanged(true);
         break;
     }
     case M_MainCardMachineMoreInfo:
@@ -1505,8 +1557,8 @@ void LaserDevice::onConnected()
     if (d->driver)
     {
         d->driver->setFactoryType("LaserController");
-        //d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
-        d->driver->getMainCardRegisterState();
+        d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
+        //d->driver->getMainCardRegisterState();
         QString compileInfo = d->driver->getCompileInfo();
         qLogD << "compile info: " << compileInfo;
         QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
@@ -1519,20 +1571,18 @@ void LaserDevice::onConnected()
     }
 }
 
-void LaserDevice::onMainCardRegistered()
+void LaserDevice::onMainCardRegistrationChanged(bool registered)
 {
     Q_D(LaserDevice);
-    d->mainCard = requestMainCardId();
-    qLogD << "Hardware id: " << d->mainCard;
-    qLogD << "Main card id: " << requestMainCardId();
-    qLogD << "Dongle id: " << requestDongleId();
-    requestMainCardInfo();
+    d->mainCardRegistered = registered;
+    qLogD << "main card registration changed: " << registered;
 }
 
-void LaserDevice::onMainCardActivated(bool temp)
+void LaserDevice::onMainCardActivationChanged(bool activated)
 {
     Q_D(LaserDevice);
-    qLogD << "main card activated. temp? " << temp;
+    d->mainCardActivated = activated;
+    qLogD << "main card activation changed: " << activated;
 }
 
 void LaserDevice::onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy)

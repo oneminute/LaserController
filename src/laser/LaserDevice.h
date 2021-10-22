@@ -54,12 +54,16 @@ public:
     QString hardwareRegisteredDate() const;
     QString hardwareActivatedDate() const;
     QString hardwareMaintainingTimes() const;
+    bool isMainCardActivated() const;
+    bool isMainCardRegistered() const;
 
     QString apiLibVersion() const;
     QString apiLibCompileInfo() const;
 
     bool verifyManufacturePassword(const QString& password);
 
+    bool autoActivateMainCard();
+    bool sendAuthenticationEmail(const QString& email);
     bool registeMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 
     bool writeUserRegisters();
@@ -112,15 +116,17 @@ public slots:
     void unload();
     void connectDevice(const QString& portName);
     void disconnectDevice();
-    QString activateMainCard(const QString& name,
-        const QString& address,
+    QString activateMainCard(
+        const QString& email,
+        const QString& code,
+        const QString& name,
         const QString& phone,
+        const QString& address,
         const QString& qq,
         const QString& wx,
-        const QString& email,
         const QString& country,
         const QString& distributor,
-        const QString& trademark,
+        const QString& brand,
         const QString& model
     );
     bool requestTemporaryLicense();
@@ -137,8 +143,8 @@ protected slots:
     void onLibraryInitialized();
     void onComPortsFetched(const QStringList& portNames);
     void onConnected();
-    void onMainCardRegistered();
-    void onMainCardActivated(bool temp);
+    void onMainCardRegistrationChanged(bool registered);
+    void onMainCardActivationChanged(bool activated);
 
     void onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy);
     void onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
@@ -151,8 +157,8 @@ signals:
     void comPortConnected(const QString& portName);
     void connected();
     void disconnected();
-    void mainCardRegistered();
-    void mainCardActivated(bool temp);
+    void mainCardRegistrationChanged(bool registered);
+    void mainCardActivationChanged(bool activated);
     void mainCardInfoFetched();
     void manufacturePasswordVerified(bool pass);
     void workStateUpdated(LaserState state);

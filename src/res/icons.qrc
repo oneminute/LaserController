@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/ui/icons">
+        <file>images/Image-dialog-error.ico</file>
+        <file>images/Image-dialog-info.ico</file>
+        <file>images/Image-dialog-question.ico</file>
+        <file>images/Image-dialog-warning.ico</file>
         <file>images/Ellipse.png</file>
         <file>images/Image.png</file>
         <file>images/Line.png</file>
@@ -80,5 +84,6 @@
         <file>images/visible.png</file>
         <file>images/shape.png</file>
         <file>images/laser_power.png</file>
+        <file>images/loading_anim.gif</file>
     </qresource>
 </RCC>

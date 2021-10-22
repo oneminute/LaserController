@@ -53,9 +53,9 @@ namespace utils
 
     RELATION determineRelationship(const QRectF& a, const QRectF& b);
 
-    QTransform leastSquare4d(const PointPairList& pointPairs);
+    QTransform leastSquare4d(const PointPairList& pointPairs, const QPointF& offset = QPointF());
 
-    QTransform leastSquare6d(const PointPairList& pointPairs);
+    QTransform leastSquare6d(const PointPairList& pointPairs, const QPointF& offset = QPointF());
 
     QTransform transformFrom2Points(const PointPairList& pointPairs);
 }

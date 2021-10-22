@@ -376,14 +376,27 @@ QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPoin
             QPointF diff2 = pt2 - pt1;
             QString command1 = "PU%1 %2;";
             QString command2 = "CM%1 %2;";
-            //QString command1 = "PU%1 %2;";
-            //QString command2 = "PD%1 %2;";
-            if (count++ > 0)
+
+            if (lines.length() == 1)
             {
-                command1 = "CU%1 %2;";
-                command2 = "CM%1 %2;";
-                //command1 = "PU%1 %2;";
-                //command2 = "PD%1 %2;";
+                command2 = "CO%1 %2;";
+            }
+            else
+            {
+                if (count == 0)
+                {
+                    command2 = "CS%1 %2;";
+                }
+                else if (count == lines.length() - 1)
+                {
+                    command1 = "CU%1 %2;";
+                    command2 = "CE%1 %2;";
+                }
+                else
+                {
+                    command1 = "CU%1 %2;";
+                }
+                count++;
             }
             if (Config::Device::startFrom() != SFT_AbsoluteCoords)
             {
