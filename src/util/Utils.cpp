@@ -592,4 +592,13 @@ QTransform utils::transformFrom2Points(const PointPairList& pointPairs)
     return t;
 }
 
+void utils::rectEdges(QRectF rect, QList<QLineF>& edges)
+{
+    //selection lines
+    edges.append(QLineF(rect.topLeft(), rect.topRight()));
+    edges.append(QLineF(rect.topRight(), rect.bottomRight()));
+    edges.append(QLineF(rect.bottomLeft(), rect.bottomRight()));
+    edges.append(QLineF(rect.topLeft(), rect.bottomLeft()));
+}
+
 

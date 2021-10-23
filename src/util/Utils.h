@@ -58,6 +58,8 @@ namespace utils
     QTransform leastSquare6d(const PointPairList& pointPairs, const QPointF& offset = QPointF());
 
     QTransform transformFrom2Points(const PointPairList& pointPairs);
+
+    void rectEdges(QRectF rect, QList<QLineF>& edges);
 }
 
 #endif // UTILS_H

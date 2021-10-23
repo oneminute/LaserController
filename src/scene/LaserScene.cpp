@@ -10,6 +10,7 @@
 #include<QGraphicsSceneWheelEvent>
 #include <QScrollBar>
 #include <qmath.h>
+#include "util/Utils.h"
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
@@ -250,14 +251,56 @@ void LaserScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 
 void LaserScene::findSelectedByLine(QRectF selection)
 {
-	//selection lines
-	QVector<QLineF> selectionEdges;
-	selectionEdges.append(QLineF(selection.topLeft(), selection.topRight()));
-	selectionEdges.append(QLineF(selection.topRight(), selection.bottomRight()));
-	selectionEdges.append(QLineF(selection.bottomLeft(), selection.bottomRight()));
-	selectionEdges.append(QLineF(selection.topLeft(), selection.bottomLeft()));
+    //已经被选中的恢复正常状态
+    for (LaserPrimitive* primitive : selectedPrimitives()) {
+        primitive->setSelected(false);
+    }
+    QList<QLineF> selectionEdges;
+    utils::rectEdges(selection, selectionEdges);
+    //tree 查找
+    QList<QuadTreeNode*> nodes = m_quadTree->search(selection);
+    for (QuadTreeNode* node : nodes) {
+        for (LaserPrimitive* primitive : node->primitiveList()) {
+            
+            if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
+                QRectF bounds = primitive->sceneBoundingRect();
+                //图元外包框整个被selection包裹
+                selectedByBounds(bounds, selection, primitive);
+                //图元的边与selection的边交叉
+                bool isIntersected = false;
+                QVector<QLineF> edges = primitive->edges();
+                for (QLineF selectionEdge : selectionEdges) {
+                    for (QLineF edge : edges) {
+                        QPointF p;
+                        if (selectionEdge.intersect(edge, &p) == QLineF::BoundedIntersection) {
+                            isIntersected = true;
+                            if (!primitive->isSelected()) {
+                                primitive->setSelected(true);
+                            }
+                            break;
+                        }
+                        
+                    }
+                    if (isIntersected) {
+                        isIntersected = false;
+                        break;
+                    }
+                }
+                
+            }
+
+        }
+    }
+
 	//items
-	QMap<QString, LaserPrimitive*> list = this->document()->primitives();
+	/*
+    //selection lines
+    QVector<QLineF> selectionEdges;
+    selectionEdges.append(QLineF(selection.topLeft(), selection.topRight()));
+    selectionEdges.append(QLineF(selection.topRight(), selection.bottomRight()));
+    selectionEdges.append(QLineF(selection.bottomLeft(), selection.bottomRight()));
+    selectionEdges.append(QLineF(selection.topLeft(), selection.bottomLeft()));
+    QMap<QString, LaserPrimitive*> list = this->document()->primitives();
 	
 	for (int i = 0; i < list.size(); i++) {
 		bool breakdown = false;
@@ -295,10 +338,10 @@ void LaserScene::findSelectedByLine(QRectF selection)
 				break;
 		}
 		item->blockSignals(false);
-	}
+	}*/
 }
 
-void LaserScene::findSelectedByBoundingRect(QRectF rect)
+void LaserScene::findSelectedByBoundingRect(QRectF selection)
 {
 	//items遍历查找
     /*QList<LaserPrimitive*> list = this->document()->primitives().values();
@@ -312,14 +355,14 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
 		if (item->isSelected()) {
 			item->setSelected(false);
 		}
-		if (rect.contains(item->sceneBoundingRect())) {
+		if (selection.contains(item->sceneBoundingRect())) {
 			item->setSelected(true);
 		}
 		item->blockSignals(false);
 	}*/
     //QT自带
     /*QPainterPath path;
-    path.addRect(rect);
+    path.addRect(selection);
     setSelectionArea(path, Qt::ItemSelectionMode::ContainsItemShape);
     QList<LaserPrimitive*>list = selectedPrimitives();*/
     //已经被选中的恢复正常状态
@@ -327,44 +370,45 @@ void LaserScene::findSelectedByBoundingRect(QRectF rect)
         primitive->setSelected(false);
     }
     //tree 查找
-    QList<QuadTreeNode*> nodes = m_quadTree->search(rect);
-
+    QList<QuadTreeNode*> nodes = m_quadTree->search(selection);
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
                 QRectF bounds = primitive->sceneBoundingRect();
-                if (rect.contains(bounds)) {
-                    if (!primitive->isSelected()) {
-                        primitive->setSelected(true);
-                    }
-
-                }
-                //point
-                else if(bounds.width() == 0 && bounds.height() == 0){
-                    QPointF p = bounds.topLeft();
-                    if (rect.contains(p)) {
-                        if (!primitive->isSelected()) {
-                            primitive->setSelected(true);
-                        }
-
-                    }
-                }
-                // line
-                else if (bounds.width() == 0 || bounds.height() == 0) {
-                    QPointF p1 = bounds.topLeft();
-                    QPointF p2 = bounds.bottomRight();
-                    if (rect.contains(p1) && rect.contains(p2)) {
-                        if (!primitive->isSelected()) {
-                            primitive->setSelected(true);
-                        }
-
-                    }
-                }
-            }
-            
+                selectedByBounds(bounds, selection, primitive);
+            }           
         } 
     }
     
+}
+
+void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive)
+{  
+    if (selection.contains(bounds)) {
+        if (!primitive->isSelected()) {
+            primitive->setSelected(true);
+        }
+
+    }
+    //point
+    else if (bounds.width() == 0 && bounds.height() == 0) {
+        QPointF p = bounds.topLeft();
+        if (selection.contains(p)) {
+            if (!primitive->isSelected()) {
+                primitive->setSelected(true);
+            }
+        }
+    }
+    // line
+    else if (bounds.width() == 0 || bounds.height() == 0) {
+        QPointF p1 = bounds.topLeft();
+        QPointF p2 = bounds.bottomRight();
+        if (selection.contains(p1) && selection.contains(p2)) {
+            if (!primitive->isSelected()) {
+                primitive->setSelected(true);
+            }
+        }
+    }
 }
 
 QRectF LaserScene::maxRegion()

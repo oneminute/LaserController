@@ -2,6 +2,7 @@
 #include <QList>
 #include <QRectF>
 #include <QStack>
+#include "util/utils.h"
 
 QuadTreeNode::QuadTreeNode(QRectF region, int depth)
     :m_nodeTopLeft(nullptr)
@@ -75,25 +76,67 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
         QPointF p2 = bound.bottomRight();
         QLineF line(p1, p2);
         //ÇøÓò°üº¬Í¼Ôª
-        if (m_topLeftRegion.contains(p1) || m_topLeftRegion.contains(p2)) {
+        if (m_topLeftRegion.contains(p1) && m_topLeftRegion.contains(p2)) {
             createNode(Qt::TopLeftCorner);
             //m_nodeTopLeft->addPrimitive(primitive);
             m_nodeTopLeft->createChildrenNodes(primitive);
         }
-        else if (m_topRightRegion.contains(p1) || m_topRightRegion.contains(p2)) {
+        else if (m_topRightRegion.contains(p1) && m_topRightRegion.contains(p2)) {
             createNode(Qt::TopRightCorner);
             //m_nodeTopRight->addPrimitive(primitive);
             m_nodeTopRight->createChildrenNodes(primitive);
         }
-        else if (m_bottomRightRegion.contains(p1) || m_bottomRightRegion.contains(p2)) {
+        else if (m_bottomRightRegion.contains(p1) && m_bottomRightRegion.contains(p2)) {
             createNode(Qt::BottomRightCorner);
             //m_nodeBottomRight->addPrimitive(primitive);
             m_nodeBottomRight->createChildrenNodes(primitive);
         }
-        else if (m_bottomLeftRegion.contains(p1) || m_bottomLeftRegion.contains(p2)) {
+        else if (m_bottomLeftRegion.contains(p1) && m_bottomLeftRegion.contains(p2)) {
             createNode(Qt::BottomLeftCorner);
             //m_nodeBottomLeft->addPrimitive(primitive);
             m_nodeBottomLeft->createChildrenNodes(primitive);
+        }
+        else {
+            QList<QLineF> topLeftRegionEdges;
+            QList<QLineF> topRightRegionEdges;
+            QList<QLineF> bottomLeftRegionEdges;
+            QList<QLineF> bottomRightRegionEdges;
+            utils::rectEdges(m_topLeftRegion, topLeftRegionEdges);
+            utils::rectEdges(m_topRightRegion, topRightRegionEdges);
+            utils::rectEdges(m_bottomLeftRegion, bottomLeftRegionEdges);
+            utils::rectEdges(m_bottomRightRegion, bottomRightRegionEdges);
+            for (QLineF lineTL : topLeftRegionEdges) {
+                QPointF p;
+                if (lineTL.intersect(line, &p)) {
+                    createNode(Qt::TopLeftCorner);
+                    m_nodeTopLeft->createChildrenNodes(primitive);
+                    break;
+                }
+            }
+            for (QLineF lineTR : topRightRegionEdges) {
+                QPointF p;
+                if (lineTR.intersect(line, &p)) {
+                    createNode(Qt::TopRightCorner);
+                    m_nodeTopRight->createChildrenNodes(primitive);
+                    break;
+                }
+            }
+            for (QLineF lineBL : bottomLeftRegionEdges) {
+                QPointF p;
+                if (lineBL.intersect(line, &p)) {
+                    createNode(Qt::BottomLeftCorner);
+                    m_nodeBottomLeft->createChildrenNodes(primitive);
+                    break;
+                }
+            }
+            for (QLineF lineBL : bottomRightRegionEdges) {
+                QPointF p;
+                if (lineBL.intersect(line, &p)) {
+                    createNode(Qt::BottomRightCorner);
+                    m_nodeBottomRight->createChildrenNodes(primitive);
+                    break;
+                }
+            }
         }
     }
     //rect
