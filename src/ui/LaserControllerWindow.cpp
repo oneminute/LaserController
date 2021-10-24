@@ -660,8 +660,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		selectionPropertyBoxChange(PrimitiveProperty::PP_PosY);
 	});
 	connect(m_widthBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
-        if (m_viewer->group()->boundingRect().height() == 0) {
-            m_heightBox->setValue(0);
+        if (m_viewer->selectedItemsSceneBoundingRect().width() == 0) {
+            m_widthBox->setValue(0);
             return;
         }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
@@ -671,13 +671,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		if (m_widthBox->value() <= 0) {
 			m_widthBox->setValue(0.001);
 		}
-        qreal width = m_widthBox->value();
-        qreal height = m_heightBox->value();
         
 		selectionPropertyBoxChange(PrimitiveProperty::PP_Width);
 	});
 	connect(m_heightBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
-        if (m_viewer->group()->boundingRect().height() == 0) {
+        if (m_viewer->selectedItemsSceneBoundingRect().height() == 0) {
             m_heightBox->setValue(0);
             return;
         }
@@ -3613,7 +3611,7 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
     }
     else if (i > 0) {
         m_propertyWidget->setEnabled(true);
-        emit selectedChange();
+        selectedChange();
     }
 }
 

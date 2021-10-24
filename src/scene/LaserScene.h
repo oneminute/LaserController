@@ -43,6 +43,7 @@ public:
 
 	void findSelectedByLine(QRectF rect);
 	void findSelectedByBoundingRect(QRectF rect);
+    void selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive);
     QRectF maxRegion();
     QuadTreeNode* quadTreeNode();
 private:

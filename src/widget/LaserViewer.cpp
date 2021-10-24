@@ -525,7 +525,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				t2.translate(diff.x(), diff.y());
 				t = t * t2;
 				m_group->setTransform(t);
-				emit selectedChange();
+				//emit selectedChange();
 				break;
 			}
 			case Transform_RESIZE: {
@@ -1374,6 +1374,8 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				transformUndoStackPushBefore();
 				//undo redo
 				selectionUndoStackPush();
+                //选取区域的属性面板
+                LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
 				return;
 			}
 			else {
@@ -1394,6 +1396,8 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					transformUndoStackPushBefore();
 					//undo redo
 					selectionUndoStackPush();
+                    //选取区域的属性面板
+                    LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
 					return;
 				}
 				// 获取选框起点
@@ -1934,10 +1938,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
 		QGraphicsView::mouseReleaseEvent(event);
+        
         if (utils::checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
 			//点中空白且press与release同一个点
 			selectingReleaseInBlank();
+            //选取区域的属性面板
+            LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
 			return;
         }
 		//undo before
@@ -1983,6 +1990,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				
 			}
 		}
+        //选取区域的属性面板
+        LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -2019,6 +2028,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		else {
 			transformUndoStackPush();
 		}
+        //选取区域的属性面板
+        LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
 		this->viewport()->repaint();
 		return;
     }
