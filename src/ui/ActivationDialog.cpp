@@ -88,8 +88,9 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
 {
     if (m_ui->stackedWidget->currentIndex() == 0)
     {
-        if (LaserApplication::device->autoActivateMainCard())
-        //if (false)
+        switch (LaserApplication::device->autoActivateMainCard())
+        {
+        case MAR_Activated:
         {
             m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-info.ico"));
             m_ui->labelStatus->setText(tr("Activated"));
@@ -97,8 +98,9 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
             m_ui->pushButtonActivate->hide();
             QMessageBox::information(this, tr("Activated"), tr("Activated"));
             this->close();
+            break;
         }
-        else
+        case MAR_Inactivated:
         {
             m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-warning.ico"));
             m_ui->labelStatus->setText(tr("Inactivated"));
@@ -109,6 +111,16 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
 
             m_ui->pushButtonSend->setEnabled(false);
             m_ui->pushButtonActivate->setEnabled(false);
+            break;
+        }
+        case MAR_Error:
+        case MAR_Other:
+        {
+            m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-warning.ico"));
+            m_ui->labelStatus->setText(tr("Error"));
+            m_ui->labelDescription->setText(tr("An error occurred. Please communicate your administartor."));
+            break;
+        }
         }
     }
     else if (m_ui->stackedWidget->currentIndex() == 1)
@@ -129,12 +141,16 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
         m_ui->pushButtonActivate->setEnabled(false);
         if (!result.isEmpty())
         {
+            m_ui->labelTips->setStyleSheet("color: rgb(0, 255, 0);font: 12pt;");
             m_ui->labelTips->setText(tr("Activation successful!"));
+            emit LaserApplication::device->mainCardActivationChanged(true);
         }
         else
         {
+            m_ui->labelTips->setStyleSheet("color: rgb(255, 0, 0);font: 12pt;");
             m_ui->labelTips->setText(tr("Activation failure!"));
             m_ui->pushButtonActivate->setEnabled(true);
+            emit LaserApplication::device->mainCardActivationChanged(false);
         }
     }
 }

@@ -208,6 +208,14 @@ enum LaserWorkMode
     LWM_PAUSE
 };
 
+enum MainCardActivateResult
+{
+    MAR_Activated = 0,
+    MAR_Inactivated = 1,
+    MAR_Error,
+    MAR_Other
+};
+
 struct LaserState
 {
 public:
@@ -240,5 +248,6 @@ public:
     }
 };
 Q_DECLARE_METATYPE(LaserState)
+
 
 #endif // LASERDEFINES_H

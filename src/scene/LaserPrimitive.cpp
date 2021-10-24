@@ -79,7 +79,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     this->setFlag(ItemIsSelectable, true);
     //this->setFlag(ItemIsFocusable, true);
     //this->setAcceptHoverEvents(true);
-    d->name = newPrimitiveName(type);
+    d->name = doc->newPrimitiveName(this);
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
 }
@@ -87,7 +87,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
 LaserPrimitive::~LaserPrimitive()
 {
     Q_D(LaserPrimitive);
-    qDebug() << d->name;
+    //qDebug() << d->name;
 }
 
 LaserDocument* LaserPrimitive::document() const 
@@ -581,44 +581,6 @@ QString LaserPrimitive::typeLatinName(LaserPrimitiveType typeId)
         { LPT_NURBS, tr("Nurbs") },
     };
     return TypeLatinNamesMap[typeId];
-}
-
-QString LaserPrimitive::newPrimitiveName(LaserPrimitiveType type) const
-{
-    Q_D(const LaserPrimitive);
-    QMap<LaserPrimitiveType, int> typeCount;
-    for (LaserPrimitive* primitive : d->doc->primitives().values())
-    {
-        if (!typeCount.contains(primitive->primitiveType()))
-        {
-            typeCount[primitive->primitiveType()] = 0;
-        }
-        typeCount[primitive->primitiveType()]++;
-    }
-
-    if (typeCount.contains(type))
-    {
-        bool used = true;
-        int count = typeCount[type];
-        while (true)
-        {
-            used = false;
-            QString name = QString("%1_%2").arg(typeName(type)).arg(count);
-            for (LaserPrimitive* primitive : d->doc->primitives().values())
-            {
-                if (name == primitive->name())
-                {
-                    used = true;
-                    break;
-                }
-            }
-            if (!used)
-                break;
-            count++;
-        }
-        return QString("%1_%2").arg(typeName(type)).arg(count);
-    }
-    return QString("%1_0").arg(typeName(type));
 }
 
 void LaserPrimitive::setLocked(bool isLocked)

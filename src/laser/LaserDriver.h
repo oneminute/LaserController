@@ -300,7 +300,7 @@ public:
     void controlHDAction(int action);
 
     QString getMainCardID();
-    bool autoActiveMainCard();
+    MainCardActivateResult autoActiveMainCard();
     bool sendAuthenticationEmail(const QString& email);
     QString activateMainCard(
         const QString& email,

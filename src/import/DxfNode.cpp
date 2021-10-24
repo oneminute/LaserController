@@ -266,7 +266,7 @@ bool DxfDocumentNode::parse(DxfStream* stream)
         }
     }
 
-    // post process
+    // post progress
     QStack<DxfNode*> stack;
     stack.push(this);
     while (!stack.isEmpty())

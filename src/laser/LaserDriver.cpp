@@ -645,9 +645,22 @@ QString LaserDriver::getMainCardID()
     return id;
 }
 
-bool LaserDriver::autoActiveMainCard()
+MainCardActivateResult LaserDriver::autoActiveMainCard()
 {
-    return m_fnActivationMainCardEx(L"{3567D29E-394B-4814-80C4-510331CD39CD}") == 0;
+    int result = m_fnActivationMainCardEx(L"{3567D29E-394B-4814-80C4-510331CD39CD}");
+    if (result == 0)
+        return MAR_Activated;
+    else if (result < 0)
+    {
+        qLogW << "auto activae main card error: " << result;
+        return MAR_Error;
+    }
+    else if (result == 1)
+    {
+        qLogW << "auto activae main card failure: inactivated";
+        return MAR_Inactivated;
+    }
+    return MAR_Other;
 }
 
 bool LaserDriver::sendAuthenticationEmail(const QString& email)

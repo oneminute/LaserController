@@ -61,6 +61,8 @@ public:
 
     //QRectF boundingRect;
     QElapsedTimer boundingRectTimer;
+
+    QMap<LaserPrimitiveType, int> typeMax;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -91,8 +93,6 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
     {
         d->layers[0]->addPrimitive(item);
     }*/
-
-    updateLayersStructure();
 }
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
@@ -1412,6 +1412,25 @@ void LaserDocument::addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeN
         }
     }
     node->addChildNode(primitive->optimizeNode());
+}
+
+QString LaserDocument::newPrimitiveName(LaserPrimitive* primitive)
+{
+    Q_D(LaserDocument);
+
+    LaserPrimitiveType type = primitive->primitiveType();
+    QString typeName = primitive->typeName();
+
+    int maxCount = 0;
+    if (d->typeMax.contains(type))
+    {
+        maxCount = d->typeMax[type];
+        
+    }
+    maxCount++;
+    QString name = QString("%1_%2").arg(typeName).arg(maxCount);
+    d->typeMax[type] = maxCount;
+    return name;
 }
 
 
