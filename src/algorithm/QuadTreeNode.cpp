@@ -34,6 +34,7 @@ bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
 {
     if (m_depth > m_maxDepth) {
         addPrimitive(primitive);
+        primitive->blockSignals(true);
         return false;
     }
     createPrimitiveTreeNode(primitive);

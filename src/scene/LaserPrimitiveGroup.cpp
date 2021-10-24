@@ -112,7 +112,7 @@ void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsIt
 	//QGraphicsItemGroup::paint(painter, option, widget);
 }
 
-QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
+/*QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
 {
     
     int size = this->childItems().size();
@@ -129,7 +129,7 @@ QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange chang
     
 
     return QGraphicsItemGroup::itemChange(change, value);
-}
+}*/
 
 //QRectF LaserPrimitiveGroup::updateBoundingRect()
 //{

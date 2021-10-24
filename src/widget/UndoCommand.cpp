@@ -769,7 +769,7 @@ SingleTransformUndoCommand::SingleTransformUndoCommand(LaserScene * scene, QTran
     m_curTransform = curTransform;
     m_primitive = primitive;
     m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
-    
+    m_tree = m_scene->quadTreeNode();
     isRedo = false;
 }
 

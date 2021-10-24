@@ -276,6 +276,7 @@ void LaserScene::findSelectedByLine(QRectF selection)
                             isIntersected = true;
                             if (!primitive->isSelected()) {
                                 primitive->setSelected(true);
+                                primitive->blockSignals(true);
                             }
                             break;
                         }
@@ -368,6 +369,7 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
     //已经被选中的恢复正常状态
     for (LaserPrimitive* primitive : selectedPrimitives()) {
         primitive->setSelected(false);
+        primitive->blockSignals(true);
     }
     //tree 查找
     QList<QuadTreeNode*> nodes = m_quadTree->search(selection);

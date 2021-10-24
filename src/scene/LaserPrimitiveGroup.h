@@ -22,10 +22,10 @@ public:
 
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-protected:
+//protected:
 
-    virtual QVariant
-        itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
+    //virtual QVariant
+        //itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 private:
 	QScopedPointer<LaserPrimitiveGroupPrivate> m_ptr;
 
