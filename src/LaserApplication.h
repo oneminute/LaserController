@@ -7,6 +7,7 @@
 
 class LaserControllerWindow;
 class PreviewWindow;
+class ProgressModel;
 class LaserDevice;
 class LaserDriver;
 
@@ -47,6 +48,7 @@ public:
     static LaserApplication* app;
     static LaserControllerWindow* mainWindow;
     static PreviewWindow* previewWindow;
+    static ProgressModel* progressModel;
     static LaserDevice* device;
     static LaserDriver* driver;
     static QString appShortName;

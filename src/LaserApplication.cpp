@@ -14,6 +14,7 @@
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"
 #include "ui/PreviewWindow.h"
+#include "task/ProgressModel.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -24,6 +25,7 @@
 LaserApplication* LaserApplication::app(nullptr);
 LaserControllerWindow* LaserApplication::mainWindow(nullptr);
 PreviewWindow* LaserApplication::previewWindow(nullptr);
+ProgressModel* LaserApplication::progressModel(nullptr);
 LaserDevice* LaserApplication::device(nullptr);
 LaserDriver* LaserApplication::driver(nullptr);
 QString LaserApplication::appShortName("CNELaser");
@@ -95,6 +97,7 @@ bool LaserApplication::initialize()
     connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
 
     StateController::start();
+    progressModel = new ProgressModel;
     previewWindow = new PreviewWindow(mainWindow);
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
@@ -127,10 +130,8 @@ void LaserApplication::destroy()
         delete device;
     }
     
-    if (previewWindow)
-    {
-        delete previewWindow;
-    }
+    SAFE_DELETE(previewWindow)
+    SAFE_DELETE(progressModel)
     g_deviceThread.exit();
     g_deviceThread.wait();
 

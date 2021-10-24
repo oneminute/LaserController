@@ -422,7 +422,6 @@ void LaserDocument::exportJSON(const QString& filename)
             emit exportFinished(filename);
         }
     );
-    
 }
 
 void LaserDocument::blockSignals(bool block)

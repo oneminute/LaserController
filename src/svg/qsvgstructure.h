@@ -63,11 +63,12 @@ class QSvgTinyDocument;
 class QSvgNode;
 class QPainter;
 class QSvgDefs;
+class QSvgHandler;
 
 class  QSvgStructureNode : public QSvgNode
 {
 public:
-    QSvgStructureNode(QSvgNode *parent);
+    QSvgStructureNode(QSvgHandler* handler, QSvgNode *parent);
     ~QSvgStructureNode();
     QSvgNode *scopeNode(const QString &id) const;
     void addChild(QSvgNode *child, const QString &id);
@@ -83,7 +84,7 @@ protected:
 class  QSvgG : public QSvgStructureNode
 {
 public:
-    QSvgG(QSvgNode *parent);
+    QSvgG(QSvgHandler* handler, QSvgNode *parent);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
 };
@@ -91,7 +92,7 @@ public:
 class  QSvgDefs : public QSvgStructureNode
 {
 public:
-    QSvgDefs(QSvgNode *parent);
+    QSvgDefs(QSvgHandler* handler, QSvgNode *parent);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
 };
@@ -99,7 +100,7 @@ public:
 class  QSvgSwitch : public QSvgStructureNode
 {
 public:
-    QSvgSwitch(QSvgNode *parent);
+    QSvgSwitch(QSvgHandler* handler, QSvgNode *parent);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
 private:

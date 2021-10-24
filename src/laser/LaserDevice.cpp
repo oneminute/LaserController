@@ -395,6 +395,16 @@ void LaserDevice::requestMainCardInfo()
     }
 }
 
+QString LaserDevice::firmwareVersion() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->firmwareVersion();
+    }
+    return "";
+}
+
 QString LaserDevice::mainCardId() const
 {
     Q_D(const LaserDevice);
@@ -1221,10 +1231,6 @@ void LaserDevice::handleMessage(int code, const QString& message)
             throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
         }
         QStringList items = message.split(";");
-        if (items.length() != 13)
-        {
-            throw new LaserDeviceDataException(E_TransferDataError, tr("Main card info incomplete."));
-        }
         d->mainCard = items[0];
         d->mainCardRegisteredDate = items[1];
         d->mainCardActivatedDate = items[2];
@@ -1528,7 +1534,6 @@ void LaserDevice::onLibraryInitialized()
 {
     Q_D(LaserDevice);
     qLogD << "LaserDevice::onLibraryInitialized";
-    //showAboutWindow(5);
     d->driver->setupCallbacks();
     d->isInit = true;
     d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
@@ -1559,15 +1564,15 @@ void LaserDevice::onConnected()
         d->driver->setFactoryType("LaserController");
         d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
         //d->driver->getMainCardRegisterState();
-        QString compileInfo = d->driver->getCompileInfo();
-        qLogD << "compile info: " << compileInfo;
-        QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
-        qLogD << "laser library info: " << laserLibraryInfo;
-        QString mainCardId = d->driver->getMainCardID();
-        qLogD << "main card id: " << mainCardId;
+        //QString compileInfo = d->driver->getCompileInfo();
+        //qLogD << "compile info: " << compileInfo;
+        //QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
+        //qLogD << "laser library info: " << laserLibraryInfo;
+        //QString mainCardId = d->driver->getMainCardID();
+        //qLogD << "main card id: " << mainCardId;
 
-        readSystemRegisters();
-        readUserRegisters();
+        //readSystemRegisters();
+        //readUserRegisters();
     }
 }
 

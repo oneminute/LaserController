@@ -3,6 +3,7 @@
 
 #include <DockManager.h>
 //#include <DockWidgetTab.h>
+#include <QtConcurrent>
 #include <QObject>
 #include <QMainWindow>
 #include <QScopedPointer>
@@ -189,13 +190,15 @@ protected slots:
     void onStatusBarActivationClicked(bool checked = false);
     void onActionUpdate(bool checked = false);
     void onActionLaserPosition(bool checked = false);
+    void onProgressBarClicked();
 
 	void onActionMirrorHorizontal(bool checked = false);
 	void onActionMirrorVertical(bool checked = false);
     void onActionMirrorACrossLine(bool checked = false);
 
-    void onActionShowMainCardInfo(bool checked = false);
+    void onActionMainCardInfo(bool checked = false);
     void onActionTemporaryLicense(bool checked = false);
+    void onActionUserInfo(bool checked = false);
     void onActionAbout(bool checked = false);
 
     void onActionUpdateOutline(bool checked = false);
@@ -535,6 +538,8 @@ private:
     //dock panel/ shape properties panel
     
     UpdateDialog* m_updateDialog;
+
+    QFutureWatcher<LaserDocument*> m_watcher;
 
     friend class LaserApplication;
 };

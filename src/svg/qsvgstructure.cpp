@@ -49,8 +49,8 @@
 
 QT_BEGIN_NAMESPACE
 
-QSvgG::QSvgG(QSvgNode *parent)
-    : QSvgStructureNode(parent)
+QSvgG::QSvgG(QSvgHandler* handler, QSvgNode *parent)
+    : QSvgStructureNode(handler, parent)
 {
 
 }
@@ -79,8 +79,8 @@ QSvgNode::Type QSvgG::type() const
     return G;
 }
 
-QSvgStructureNode::QSvgStructureNode(QSvgNode *parent)
-    :QSvgNode(parent)
+QSvgStructureNode::QSvgStructureNode(QSvgHandler* handler, QSvgNode *parent)
+    :QSvgNode(handler, parent)
 {
 
 }
@@ -103,8 +103,8 @@ void QSvgStructureNode::addChild(QSvgNode *child, const QString &id)
         doc->addNamedNode(id, child);
 }
 
-QSvgDefs::QSvgDefs(QSvgNode *parent)
-    : QSvgStructureNode(parent)
+QSvgDefs::QSvgDefs(QSvgHandler* handler, QSvgNode *parent)
+    : QSvgStructureNode(handler, parent)
 {
 }
 
@@ -270,8 +270,8 @@ static inline bool isSupportedSvgExtension(const QString &)
 }
 
 
-QSvgSwitch::QSvgSwitch(QSvgNode *parent)
-    : QSvgStructureNode(parent)
+QSvgSwitch::QSvgSwitch(QSvgHandler* handler, QSvgNode *parent)
+    : QSvgStructureNode(handler, parent)
 {
     init();
 }

@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QElapsedTimer>
 #include <QObject>
+#include <QList>
 #include <QSet>
 #include <QMap>
 
@@ -24,12 +25,23 @@ public:
         PT_Complex
     };
 
-    explicit ProgressItem(ProgressType processType, const QString& title, QObject* parent = nullptr);
+protected:
+    explicit ProgressItem(const QString& title, ProgressType progressType = PT_Simple, QObject* parent = nullptr);
     ~ProgressItem();
+
+public:
+    ProgressType progressType() const { return m_type; }
+
+    qreal minimum() const { return m_minimum; }
+    void setMinimum(qreal value) { m_minimum = value; }
+
+    qreal maximum() const { return m_maximum; }
+    void setMaximum(qreal value) { m_maximum = value; }
 
     qreal progress() const;
     void setProgress(qreal process);
-    void addProgress(qreal delta);
+    void increaseProgress(qreal delta = 1.0);
+    void finish();
 
     QString title() const { return m_title; }
     void setTitle(const QString& title) { m_title = title; }
@@ -44,7 +56,10 @@ public:
     qint64 durationNSecs() const;
 
     void addChildItem(ProgressItem* item);
-    QSet<ProgressItem*> childItems() const;
+    QList<ProgressItem*> childItems() const;
+    ProgressItem* child(int index) const;
+    int childCount() const;
+    bool hasChildren() const { return !m_childItems.empty(); }
 
     void setWeight(ProgressItem* item, qreal weight);
 
@@ -63,22 +78,27 @@ protected:
     void notify();
 
 signals:
-    void processUpdated(qreal progress);
+    void progressUpdated(qreal progress);
+    void finished();
 
 private:
     ProgressState m_state;
     ProgressType m_type;
+    qreal m_minimum;
+    qreal m_maximum;
     qreal m_progress;
     QString m_title;
     QString m_message;
     QElapsedTimer m_timer;
 
     qint64 m_durationNSecs;
-    QSet<ProgressItem*> m_childItems;
+    QList<ProgressItem*> m_childItems;
     QMap<ProgressItem*, qreal> m_weights;
     qreal m_sumWeights;
 
     Q_DISABLE_COPY(ProgressItem)
+
+    friend class ProgressModel;
 };
 
 #endif // PROGRESSITEM_H

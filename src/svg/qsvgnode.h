@@ -60,6 +60,7 @@ QT_BEGIN_NAMESPACE
 
 class QPainter;
 class QSvgTinyDocument;
+class QSvgHandler;
 
 class  QSvgNode
 {
@@ -107,7 +108,7 @@ public:
         InheritMode
     };
 public:
-    QSvgNode(QSvgNode *parent=0);
+    QSvgNode(QSvgHandler* handler, QSvgNode *parent=0);
     virtual ~QSvgNode();
     virtual void draw(QPainter *p, QSvgExtraStates &states) =0;
 
@@ -168,6 +169,8 @@ public:
         m_cachedBounds = bounds;
     }
 
+    QSvgHandler* handler() const { return m_handler; }
+
 protected:
     mutable QSvgStyle m_style;
 
@@ -187,6 +190,8 @@ private:
     QString m_class;
     qreal m_x;
     qreal m_y;
+
+    QSvgHandler* m_handler;
 
     DisplayMode m_displayMode;
     mutable QRectF m_cachedBounds;

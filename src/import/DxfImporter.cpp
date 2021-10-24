@@ -5,6 +5,8 @@
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
 #include "scene/LaserDocument.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
 #include <QFile>
 #include <QList>
 #include <QRegularExpression>
@@ -41,7 +43,7 @@ DxfImporter::~DxfImporter()
 {
 }
 
-LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, const QVariantMap& params)
+LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
     Q_D(DxfImporter);
     qLogD << "import from dxf";
@@ -50,7 +52,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
     if (!file.open(QFile::ReadOnly))
         return nullptr;
 
-    DxfStream stream(&file);
+    DxfStream stream(&file, parentProgress);
 
     d->documentNode = new DxfDocumentNode;
     if (!d->documentNode->parse(&stream))
@@ -64,6 +66,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
     //d->documentNode->debugPrint();
 #endif
 
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import Dxf", parentProgress);
     LaserDocument* laserDoc = new LaserDocument(scene);
     PageInformation page;
     page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
@@ -76,13 +79,16 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
 
     QTransform t(scaleX, 0, 0, -scaleY, 0, page.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
 
-    for (DxfEntityNode* node : d->documentNode->entities())
+    const DxfEntitiesNode& entities = d->documentNode->entities();
+    progress->setMaximum(entities.length());
+    for (DxfEntityNode* node : entities)
     {
         LaserPrimitive* primitive = node->convertTo(laserDoc, t);
         if (primitive)
         {
             laserDoc->addPrimitive(primitive);
         }
+        progress->increaseProgress();
     }
 
     QFileInfo fileInfo(filename);
@@ -99,6 +105,6 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, c
 
     delete d->documentNode;
     d->documentNode = nullptr;
-
+    progress->finish();
     return laserDoc;
 }

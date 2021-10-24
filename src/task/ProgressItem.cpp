@@ -4,15 +4,22 @@
 
 #include "common/common.h"
 
-ProgressItem::ProgressItem(ProgressType processType, const QString& title, QObject* parent)
+ProgressItem::ProgressItem(const QString& title, ProgressType progressType, QObject* parent)
     : QObject(parent)
     , m_state(PS_Idle)
-    , m_type(processType)
+    , m_type(progressType)
+    , m_minimum(0.0)
+    , m_maximum(100.0)
     , m_progress(0.0)
-    , m_title("")
+    , m_title(title)
     , m_message("")
 {
-
+    ProgressItem* parentItem = qobject_cast<ProgressItem*>(parent);
+    if (parentItem && parentItem->progressType() == PT_Complex)
+    {
+        parentItem->addChildItem(this);
+    }
+    startTimer();
 }
 
 ProgressItem::~ProgressItem()
@@ -25,7 +32,7 @@ qreal ProgressItem::progress() const
     {
     case PT_Simple:
     {
-        return m_progress; 
+        return qBound(0.0, (m_progress - m_minimum) / (m_maximum - m_minimum), 1.0); 
     }
     case PT_Complex:
     {
@@ -43,13 +50,24 @@ qreal ProgressItem::progress() const
 void ProgressItem::setProgress(qreal process)
 {
     if (m_type == PT_Simple)
-        m_progress = qBound(0.0, process, 1.0); 
+        m_progress = qBound(m_minimum, process, m_maximum); 
+    qreal progressValue = progress();
+    emit progressUpdated(progressValue);
+    if (progressValue >= 1.0)
+        emit finished();
 }
 
-void ProgressItem::addProgress(qreal delta)
+void ProgressItem::increaseProgress(qreal delta)
 {
     if (m_type == PT_Simple)
-        m_progress = qBound(0.0, m_progress + delta, 1.0);
+        setProgress(m_progress + delta);
+}
+
+void ProgressItem::finish()
+{
+    if (m_type == PT_Simple)
+        setProgress(m_maximum);
+    stopTimer();
 }
 
 bool ProgressItem::isFinished() const
@@ -81,12 +99,25 @@ qint64 ProgressItem::durationNSecs() const
 
 void ProgressItem::addChildItem(ProgressItem* item)
 {
-    m_childItems.insert(item);
+    item->setParent(this);
+    m_childItems.append(item);
 }
 
-QSet<ProgressItem*> ProgressItem::childItems() const
+QList<ProgressItem*> ProgressItem::childItems() const
 {
     return m_childItems;
+}
+
+ProgressItem* ProgressItem::child(int index) const
+{
+    if (index < m_childItems.length())
+        return m_childItems.at(index);
+    return nullptr;
+}
+
+int ProgressItem::childCount() const
+{
+    return m_childItems.count();
 }
 
 void ProgressItem::setWeight(ProgressItem* item, qreal weight)
@@ -155,5 +186,5 @@ void ProgressItem::notify()
     {
         parent->notify();
     }
-    emit processUpdated(progress());
+    emit progressUpdated(progress());
 }

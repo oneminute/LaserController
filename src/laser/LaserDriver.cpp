@@ -211,6 +211,9 @@ bool LaserDriver::load()
     m_fnControlHDAction = (FN_VOID_INT)m_library.resolve("ControlHDAction");
     CHECK_FN(m_fnControlHDAction)
 
+    m_fnGetMainHardVersion = (FN_WCHART_VOID)m_library.resolve("GetMainHardVersion");
+    CHECK_FN(m_fnGetMainHardVersion);
+
     m_fnGetMainCardID = (FN_WCHART_VOID)m_library.resolve("GetMainCardID");
     CHECK_FN(m_fnGetMainCardID)
 
@@ -636,6 +639,13 @@ void LaserDriver::startMoveLaserMotors()
 void LaserDriver::controlHDAction(int action)
 {
     m_fnControlHDAction(action);
+}
+
+QString LaserDriver::firmwareVersion()
+{
+    wchar_t* strId = m_fnGetMainHardVersion();
+    QString id = QString::fromWCharArray(strId);
+    return id;
 }
 
 QString LaserDriver::getMainCardID()

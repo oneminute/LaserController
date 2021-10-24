@@ -44,11 +44,11 @@ ActivationDialog::ActivationDialog(QWidget* parent)
     //LaserApplication::device->autoActivateMainCard();
 
     if (LaserApplication::device->isMainCardActivated())
-    //if (false)
     {
         m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-info.ico"));
         m_ui->labelStatus->setText(tr("Activated"));
-        m_ui->labelDescription->setText(tr("Your main board is already activated"));
+        m_ui->labelDescription->setText(tr("Your main board is already activated at %1")
+            .arg(LaserApplication::device->hardwareActivatedDate()));
         m_ui->pushButtonActivate->hide();
     }
     else

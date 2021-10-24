@@ -2,6 +2,7 @@
 #include "SvgImporter.h"
 #include "DxfImporter.h"
 #include "CorelDrawImporter.h"
+#include "task/ProgressItem.h"
 
 Importer::Importer(QObject* parent)
     : QObject(parent)

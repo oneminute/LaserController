@@ -56,8 +56,8 @@
 
 QT_BEGIN_NAMESPACE
 
-QSvgTinyDocument::QSvgTinyDocument()
-    : QSvgStructureNode(0)
+QSvgTinyDocument::QSvgTinyDocument(QSvgHandler* handler)
+    : QSvgStructureNode(handler, nullptr)
     , m_widthPercent(false)
     , m_heightPercent(false)
     , m_animated(false)

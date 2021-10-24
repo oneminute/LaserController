@@ -1,8 +1,11 @@
 ﻿#include "DxfNode.h"
 
+#include "LaserApplication.h"
 #include "common/common.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -18,11 +21,13 @@ public:
 
 };
 
-DxfStream::DxfStream(QIODevice* device)
+DxfStream::DxfStream(QIODevice* device, ProgressItem* parentProgress)
     : QTextStream(device)
     , m_lineNumber(0)
     , m_cached(false)
+    , m_progress(LaserApplication::progressModel->createSimpleItem(QObject::tr("Parse Dxf file"), parentProgress))
 {
+    m_progress->setMaximum(device->bytesAvailable());
 }
 
 bool DxfStream::readGroup(DxfGroup& pair)
@@ -34,6 +39,7 @@ bool DxfStream::readGroup(DxfGroup& pair)
     else
     {
         m_line = readLine().trimmed();
+        m_progress->setProgress(pos());
         m_lineNumber++;
         bool ok;
         m_cachedGroupCode = m_line.toInt(&ok);
@@ -48,6 +54,7 @@ bool DxfStream::readGroup(DxfGroup& pair)
     pair.groupCode = m_cachedGroupCode;
     pair.variable = m_cachedVariable;
 
+    m_progress->finish();
     return true;
 }
 

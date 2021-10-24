@@ -12,6 +12,7 @@
 class LaserDocument;
 class LaserPrimitive;
 class DxfDocumentNode;
+class ProgressItem;
 
 enum DxfNodeType
 {
@@ -111,7 +112,7 @@ public:
 class DxfStream : public QTextStream
 {
 public:
-    explicit DxfStream(QIODevice* device);
+    explicit DxfStream(QIODevice* device, ProgressItem* parentProgress);
     ~DxfStream()
     {
     }
@@ -128,6 +129,8 @@ private:
     bool m_cached;
     int m_cachedGroupCode;
     QString m_cachedVariable;
+
+    ProgressItem* m_progress;
 
     Q_DISABLE_COPY(DxfStream)
 };

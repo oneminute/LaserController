@@ -22,6 +22,7 @@ RegisteDialog::RegisteDialog(QWidget* parent)
     m_ui->lineEditRegisteId->setText(registeId);
     m_ui->lineEditDongleId->setText(dongleId);
 
+    m_ui->labelFirmwareVersion->setText(LaserApplication::device->firmwareVersion());
     m_ui->labelAPIVersion->setText(LaserApplication::device->apiLibVersion());
     m_ui->labelEXEVersion->setText(LaserApplication::applicationVersion());
 

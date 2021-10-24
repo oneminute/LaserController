@@ -2544,7 +2544,7 @@ static bool parseAudioNode(QSvgNode *parent,
 
 static QSvgNode *createCircleNode(QSvgNode *parent,
                                   const QXmlStreamAttributes &attributes,
-                                  QSvgHandler *)
+                                  QSvgHandler * handler)
 {
     const QStringRef cx      = attributes.value(QLatin1String("cx"));
     const QStringRef cy      = attributes.value(QLatin1String("cy"));
@@ -2554,22 +2554,22 @@ static QSvgNode *createCircleNode(QSvgNode *parent,
     qreal nr  = toDouble(r);
 
     QRectF rect(ncx-nr, ncy-nr, nr*2, nr*2);
-    QSvgNode *circle = new QSvgCircle(parent, rect);
+    QSvgNode *circle = new QSvgCircle(handler, parent, rect);
     return circle;
 }
 
 static QSvgNode *createDefsNode(QSvgNode *parent,
                                 const QXmlStreamAttributes &attributes,
-                                QSvgHandler *)
+                                QSvgHandler *handler)
 {
     Q_UNUSED(attributes);
-    QSvgDefs *defs = new QSvgDefs(parent);
+    QSvgDefs *defs = new QSvgDefs(handler, parent);
     return defs;
 }
 
 static bool parseDescNode(QSvgNode *parent,
                           const QXmlStreamAttributes &attributes,
-                          QSvgHandler *)
+                          QSvgHandler *handler)
 {
     Q_UNUSED(parent); Q_UNUSED(attributes);
     return true;
@@ -2577,7 +2577,7 @@ static bool parseDescNode(QSvgNode *parent,
 
 static bool parseDiscardNode(QSvgNode *parent,
                              const QXmlStreamAttributes &attributes,
-                             QSvgHandler *)
+                             QSvgHandler *handler)
 {
     Q_UNUSED(parent); Q_UNUSED(attributes);
     return true;
@@ -2585,7 +2585,7 @@ static bool parseDiscardNode(QSvgNode *parent,
 
 static QSvgNode *createEllipseNode(QSvgNode *parent,
                                    const QXmlStreamAttributes &attributes,
-                                   QSvgHandler *)
+                                   QSvgHandler *handler)
 {
     const QStringRef cx      = attributes.value(QLatin1String("cx"));
     const QStringRef cy      = attributes.value(QLatin1String("cy"));
@@ -2597,13 +2597,13 @@ static QSvgNode *createEllipseNode(QSvgNode *parent,
     qreal nry = toDouble(ry);
 
     QRectF rect(ncx-nrx, ncy-nry, nrx*2, nry*2);
-    QSvgNode *ellipse = new QSvgEllipse(parent, rect);
+    QSvgNode *ellipse = new QSvgEllipse(handler, parent, rect);
     return ellipse;
 }
 
 static QSvgStyleProperty *createFontNode(QSvgNode *parent,
                                          const QXmlStreamAttributes &attributes,
-                                         QSvgHandler *)
+                                         QSvgHandler *handler)
 {
     const QStringRef hax = attributes.value(QLatin1String("horiz-adv-x"));
     QString myId     = someId(attributes);
@@ -2703,10 +2703,10 @@ static bool parseForeignObjectNode(QSvgNode *parent,
 
 static QSvgNode *createGNode(QSvgNode *parent,
                              const QXmlStreamAttributes &attributes,
-                             QSvgHandler *)
+                             QSvgHandler * handler)
 {
     Q_UNUSED(attributes);
-    QSvgG *node = new QSvgG(parent);
+    QSvgG *node = new QSvgG(handler, parent);
     return node;
 }
 
@@ -2799,7 +2799,7 @@ static QSvgNode *createImageNode(QSvgNode *parent,
     if (image.format() == QImage::Format_ARGB32)
         image = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    QSvgNode *img = new QSvgImage(parent,
+    QSvgNode *img = new QSvgImage(handler, parent,
                                   image,
                                   QRectF(nx,
                                          ny,
@@ -2810,7 +2810,7 @@ static QSvgNode *createImageNode(QSvgNode *parent,
 
 static QSvgNode *createLineNode(QSvgNode *parent,
                                 const QXmlStreamAttributes &attributes,
-                                QSvgHandler *)
+                                QSvgHandler *handler)
 {
     const QStringRef x1 = attributes.value(QLatin1String("x1"));
     const QStringRef y1 = attributes.value(QLatin1String("y1"));
@@ -2822,7 +2822,7 @@ static QSvgNode *createLineNode(QSvgNode *parent,
     qreal ny2 = toDouble(y2);
 
     QLineF lineBounds(nx1, ny1, nx2, ny2);
-    QSvgNode *line = new QSvgLine(parent, lineBounds);
+    QSvgNode *line = new QSvgLine(handler, parent, lineBounds);
     return line;
 }
 
@@ -2948,7 +2948,7 @@ static bool parseMissingGlyphNode(QSvgStyleProperty *parent,
 
 static bool parseMpathNode(QSvgNode *parent,
                            const QXmlStreamAttributes &attributes,
-                           QSvgHandler *)
+                           QSvgHandler *handler)
 {
     Q_UNUSED(parent); Q_UNUSED(attributes);
     return true;
@@ -2956,7 +2956,7 @@ static bool parseMpathNode(QSvgNode *parent,
 
 static QSvgNode *createPathNode(QSvgNode *parent,
                                 const QXmlStreamAttributes &attributes,
-                                QSvgHandler *)
+                                QSvgHandler *handler)
 {
     QStringRef data      = attributes.value(QLatin1String("d"));
 
@@ -2965,13 +2965,13 @@ static QSvgNode *createPathNode(QSvgNode *parent,
     //XXX do error handling
     parsePathDataFast(data, qpath);
 
-    QSvgNode *path = new QSvgPath(parent, qpath);
+    QSvgNode *path = new QSvgPath(handler, parent, qpath);
     return path;
 }
 
 static QSvgNode *createPolygonNode(QSvgNode *parent,
                                    const QXmlStreamAttributes &attributes,
-                                   QSvgHandler *)
+                                   QSvgHandler *handler)
 {
     QString pointsStr  = attributes.value(QLatin1String("points")).toString();
 
@@ -2981,13 +2981,13 @@ static QSvgNode *createPolygonNode(QSvgNode *parent,
     QPolygonF poly(points.count()/2);
     for (int i = 0; i < poly.size(); ++i)
         poly[i] = QPointF(points.at(2 * i), points.at(2 * i + 1));
-    QSvgNode *polygon = new QSvgPolygon(parent, poly);
+    QSvgNode *polygon = new QSvgPolygon(handler, parent, poly);
     return polygon;
 }
 
 static QSvgNode *createPolylineNode(QSvgNode *parent,
                                     const QXmlStreamAttributes &attributes,
-                                    QSvgHandler *)
+                                    QSvgHandler *handler)
 {
     QString pointsStr  = attributes.value(QLatin1String("points")).toString();
 
@@ -2998,13 +2998,13 @@ static QSvgNode *createPolylineNode(QSvgNode *parent,
     for (int i = 0; i < poly.size(); ++i)
         poly[i] = QPointF(points.at(2 * i), points.at(2 * i + 1));
 
-    QSvgNode *line = new QSvgPolyline(parent, poly);
+    QSvgNode *line = new QSvgPolyline(handler, parent, poly);
     return line;
 }
 
 static bool parsePrefetchNode(QSvgNode *parent,
                               const QXmlStreamAttributes &attributes,
-                              QSvgHandler *)
+                              QSvgHandler *handler)
 {
     Q_UNUSED(parent); Q_UNUSED(attributes);
     return true;
@@ -3088,7 +3088,7 @@ static QSvgNode *createRectNode(QSvgNode *parent,
     //nrx *= (100/(bounds.width()/2));
     //nry *= (100/(bounds.height()/2));
 
-    QSvgNode *rect = new QSvgRect(parent, bounds,
+    QSvgNode *rect = new QSvgRect(handler, parent, bounds,
                                   int(nrx),
                                   int(nry));
     return rect;
@@ -3141,7 +3141,7 @@ static bool parseStopNode(QSvgStyleProperty *parent,
     //    we force a dummy node with the same id and class into a rendering
     //    tree to figure out whether the selector has a style for it
     //    QSvgStyleSelector should be coded in a way that could avoid it
-    QSvgAnimation anim;
+    QSvgAnimation anim(handler);
     anim.setNodeId(nodeIdStr);
     anim.setXmlClass(xmlClassStr);
 
@@ -3236,7 +3236,7 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
 {
     Q_UNUSED(parent); Q_UNUSED(attributes);
 
-    QSvgTinyDocument *node = new QSvgTinyDocument();
+    QSvgTinyDocument *node = new QSvgTinyDocument(handler);
     const QStringRef widthStr  = attributes.value(QLatin1String("width"));
     const QStringRef heightStr = attributes.value(QLatin1String("height"));
     QString viewBoxStr = attributes.value(QLatin1String("viewBox")).toString();
@@ -3294,10 +3294,10 @@ static QSvgNode *createSvgNode(QSvgNode *parent,
 
 static QSvgNode *createSwitchNode(QSvgNode *parent,
                                   const QXmlStreamAttributes &attributes,
-                                  QSvgHandler *)
+                                  QSvgHandler * handler)
 {
     Q_UNUSED(attributes);
-    QSvgSwitch *node = new QSvgSwitch(parent);
+    QSvgSwitch *node = new QSvgSwitch(handler, parent);
     return node;
 }
 
@@ -3322,7 +3322,7 @@ static QSvgNode *createTextNode(QSvgNode *parent,
     qreal nx = parseLength(x, type, handler);
     qreal ny = parseLength(y, type, handler);
 
-    QSvgNode *text = new QSvgText(parent, QPointF(nx, ny));
+    QSvgNode *text = new QSvgText(handler, parent, QPointF(nx, ny));
     return text;
 }
 
@@ -3342,9 +3342,9 @@ static QSvgNode *createTextAreaNode(QSvgNode *parent,
 
 static QSvgNode *createTspanNode(QSvgNode *parent,
                                     const QXmlStreamAttributes &,
-                                    QSvgHandler *)
+                                    QSvgHandler *handler)
 {
-    return new QSvgTspan(parent);
+    return new QSvgTspan(handler, parent);
 }
 
 static bool parseTitleNode(QSvgNode *parent,
@@ -3394,11 +3394,11 @@ static QSvgNode *createUseNode(QSvgNode *parent,
             if (parent->isDescendantOf(link))
                 qCWarning(lcSvgHandler, "link #%s is recursive!", qPrintable(linkId));
 
-            return new QSvgUse(pt, parent, link);
+            return new QSvgUse(pt, handler, parent, link);
         }
 
         //delay link resolving, link might have not been created yet
-        return new QSvgUse(pt, parent, linkId);
+        return new QSvgUse(pt, handler, parent, linkId);
     }
 
     qCWarning(lcSvgHandler, "<use> element %s in wrong context!", qPrintable(linkId));
@@ -3616,6 +3616,7 @@ QSvgHandler::QSvgHandler(QXmlStreamReader *const reader) : xml(reader)
 
 void QSvgHandler::init()
 {
+    m_nodeCount = 0;
     m_doc = 0;
     m_style = 0;
     m_animEnd = 0;
@@ -3668,6 +3669,21 @@ void QSvgHandler::parse()
     }
     resolveGradients(m_doc);
     resolveNodes();
+}
+
+void QSvgHandler::increaseNodeCount()
+{
+    m_nodeCount++;
+}
+
+void QSvgHandler::clearNodeCount()
+{
+    m_nodeCount = 0;
+}
+
+int QSvgHandler::nodeCount() const
+{
+    return m_nodeCount;
 }
 
 bool QSvgHandler::startElement(const QString &localName,

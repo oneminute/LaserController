@@ -39,6 +39,7 @@
 #include <QSize>
 #include <QUndoStack>
 #include <QPainter>
+#include <QtConcurrent>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -51,7 +52,9 @@
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserScene.h"
+#include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
+#include "task/ProgressModel.h"
 #include "ui/ConfigDialog.h"
 #include "ui/HalftoneDialog.h"
 #include "ui/LaserLayerDialog.h"
@@ -60,6 +63,7 @@
 #include "ui/UpdateDialog.h"
 #include "ui/ActivationDialog.h"
 #include "ui/RegisteDialog.h"
+#include "ui/UserInfoDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -75,7 +79,6 @@
 #include "widget/RadioButtonGroup.h"
 #include "widget/PointPairTableWidget.h"
 #include "widget/Label.h"
-#include "scene/LaserPrimitive.h"
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
@@ -205,7 +208,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonLineTool);
     m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
-	//m_ui->toolBarTools->addWidget(toolButtonViewDragTool);
 
     // init status bar
     m_statusBarStatus = new QLabel;
@@ -213,7 +215,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarStatus->setMinimumWidth(60);
     m_statusBarStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarStatus);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarRegister = new Label;
     m_statusBarRegister->setText(ltr("Unregistered"));
@@ -221,7 +222,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarRegister->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarRegister);
     connect(m_statusBarRegister, &Label::clicked, this, &LaserControllerWindow::onStatusBarRegisterClicked);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarActivation = new Label;
     m_statusBarActivation->setText(ltr("Inactivated"));
@@ -229,27 +229,22 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarActivation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarActivation);
     connect(m_statusBarActivation, &Label::clicked, this, &LaserControllerWindow::onStatusBarActivationClicked);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarTips = new QLabel;
     m_statusBarTips->setText(ltr("Welcome!"));
     m_statusBarTips->setMinimumWidth(120);
     m_statusBarTips->setAlignment(Qt::AlignHCenter);
-    //m_ui->statusbar->addWidget(m_statusBarTips);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
 
     m_statusBarCoordinate = new QLabel;
     m_statusBarCoordinate->setText(tr("0,0"));
     m_statusBarCoordinate->setMinimumWidth(45);
     m_statusBarCoordinate->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarCoordinate);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
     
     m_statusBarLocation = new QLabel;
     m_statusBarLocation->setText(ltr("Top Left"));
     m_statusBarLocation->setMinimumWidth(300);
     m_statusBarLocation->setAlignment(Qt::AlignHCenter);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
     m_ui->statusbar->addWidget(m_statusBarLocation);
 
     m_statusBarPageInfo = new QLabel;
@@ -258,21 +253,18 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         .arg(LaserApplication::device->layoutHeight()));
     m_statusBarPageInfo->setMinimumWidth(150);
     m_statusBarPageInfo->setAlignment(Qt::AlignHCenter);
-    //m_ui->statusbar->addWidget(utils::createSeparator());
     m_ui->statusbar->addWidget(m_statusBarPageInfo);
 
     m_statusBarProgress = new ProgressBar;
     m_statusBarProgress->setMinimum(0);
     m_statusBarProgress->setMaximum(100);
     m_ui->statusbar->addPermanentWidget(m_statusBarProgress);
-    //m_ui->statusbar->addPermanentWidget(utils::createSeparator());
-
+    connect(m_statusBarProgress, &ProgressBar::clicked, this, &LaserControllerWindow::onProgressBarClicked);
 
     m_statusBarCopyright = new QLabel;
     m_statusBarCopyright->setText(LaserApplication::applicationName());
     m_statusBarCopyright->setMinimumWidth(80);
     m_statusBarCopyright->setAlignment(Qt::AlignHCenter);
-    //m_ui->statusbar->addPermanentWidget(utils::createSeparator());
     m_ui->statusbar->addPermanentWidget(m_statusBarCopyright);
 
 	//设置为可选择
@@ -588,9 +580,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
     connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
 
-	connect(m_ui->actionShowMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionShowMainCardInfo);
+	connect(m_ui->actionMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
+	connect(m_ui->actionUserInfo, &QAction::triggered, this, &LaserControllerWindow::onActionUserInfo);
 	connect(m_ui->actionAbout, &QAction::triggered, this, &LaserControllerWindow::onActionAbout);
+	connect(m_ui->actionOfficialWebsite, &QAction::triggered, this, &LaserControllerWindow::onActionAbout);
+	connect(m_ui->actionOnlineHelp, &QAction::triggered, this, &LaserControllerWindow::onActionAbout);
+	connect(m_ui->actionContactUs, &QAction::triggered, this, &LaserControllerWindow::onActionAbout);
 
     connect(m_ui->actionReset, &QAction::triggered, this, &LaserControllerWindow::laserResetToOriginalPoint);
     connect(m_ui->actionMoveToOrigin, &QAction::triggered, this, &LaserControllerWindow::laserBackToMachiningOriginalPoint);
@@ -776,7 +772,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(LaserApplication::previewWindow, &PreviewWindow::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
-    connect(m_statusBarProgress, &ProgressBar::clicked, LaserApplication::previewWindow, &QMainWindow::show);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -1506,6 +1501,18 @@ void LaserControllerWindow::createOperationsDockPanel()
 
     m_radioButtonGroupJobOrigin = InputWidgetWrapper::createWidget<RadioButtonGroup*>(Config::Device::jobOriginItem());
     Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin);
+    int index = Config::Device::startFrom();
+    switch (index)
+    {
+    case SFT_CurrentPosition:
+    case SFT_UserOrigin:
+        m_radioButtonGroupJobOrigin->setEnabled(true);
+        m_radioButtonGroupJobOrigin->setRowsCols(3, 3);
+        break;
+    case SFT_AbsoluteCoords:
+        m_radioButtonGroupJobOrigin->setEnabled(false);
+        break;
+    }
 
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
@@ -2457,8 +2464,26 @@ void LaserControllerWindow::onActionImport(bool checked)
     QSharedPointer<Importer> importer = Importer::getImporter(this, file.suffix());
     if (!importer.isNull())
     {
-        LaserDocument* doc = importer->import(filename, m_scene);
+        LaserApplication::showProgressWindow();
+        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+        LaserDocument* doc = importer->import(filename, m_scene, progress);
         initDocument(doc);
+        //QFuture<LaserDocument*> future = QtConcurrent::run(
+        //    [=]() {
+        //        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+        //        LaserDocument* doc = importer->import(filename, m_scene, progress);
+        //        //initDocument(doc);
+        //        return doc;
+        //    }
+        //);
+
+        //m_watcher.setFuture(future);
+        //connect(&m_watcher, &QFutureWatcher<LaserDocument*>::finished,
+        //    [=]()
+        //    {
+        //        initDocument(m_watcher.result());
+        //    }
+        //);
     }
 }
 
@@ -2555,7 +2580,8 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     QVariantMap params;
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
-    LaserDocument* doc = importer->import("", m_scene, params);
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+    LaserDocument* doc = importer->import("", m_scene, progress, params);
     initDocument(doc);
 }
 
@@ -3161,7 +3187,7 @@ void LaserControllerWindow::onActionText(bool checked)
 	}
 }
 
-void LaserControllerWindow::onActionShowMainCardInfo(bool checked)
+void LaserControllerWindow::onActionMainCardInfo(bool checked)
 {
     MainCardInfoDialog dialog;
     dialog.exec();
@@ -3177,6 +3203,12 @@ void LaserControllerWindow::onActionTemporaryLicense(bool checked)
     {
         QMessageBox::information(this, tr("Request failure"), tr("Your application for temporary license is failure."));
     }
+}
+
+void LaserControllerWindow::onActionUserInfo(bool checked)
+{
+    UserInfoDialog dlg;
+    dlg.exec();
 }
 
 void LaserControllerWindow::onActionAbout(bool checked)
@@ -3265,6 +3297,11 @@ void LaserControllerWindow::onActionUpdate(bool checked)
 void LaserControllerWindow::onActionLaserPosition(bool checked)
 {
     LaserApplication::device->getCurrentLaserPos();
+}
+
+void LaserControllerWindow::onProgressBarClicked()
+{
+    LaserApplication::showProgressWindow();
 }
 
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
@@ -3881,17 +3918,11 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         setWindowTitle(doc->name());
         //undo
         m_viewer->undoStack()->clear();
-        //m_ui->actionUndo->setEnabled(false);
-        //m_ui->actionRedo->setEnabled(false);
         LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         if (m_viewer) {
-            //m_viewer->setZoomValue(1.0);
-            //m_viewer->centerOn(0, 0);
             QRectF rect = m_scene->document()->pageBounds();
 
-            //m_scene->setSceneRect(rect);
             m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
-            //m_viewer->centerOn(rect.center());
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
             m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点进行变换
             LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();

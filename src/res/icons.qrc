@@ -85,5 +85,13 @@
         <file>images/shape.png</file>
         <file>images/laser_power.png</file>
         <file>images/loading_anim.gif</file>
+        <file>images/app_icon.ico</file>
+        <file>images/app_icon.png</file>
+        <file>images/app_icon_16.png</file>
+        <file>images/app_icon_32.png</file>
+        <file>images/app_icon_48.png</file>
+        <file>images/app_icon_64.png</file>
+        <file>images/app_icon_128.png</file>
+        <file>images/app_icon_256.png</file>
     </qresource>
 </RCC>

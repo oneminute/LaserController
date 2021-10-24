@@ -123,6 +123,12 @@ public:
     inline QPen defaultPen() const
     { return m_defaultPen; }
 
+    void increaseNodeCount();
+
+    void clearNodeCount();
+
+    int nodeCount() const;
+
 public:
     bool startElement(const QString &localName, const QXmlStreamAttributes &attributes);
     bool endElement(const QStringRef &localName);
@@ -176,6 +182,8 @@ private:
      * we need to delete it.
      */
     const bool m_ownsReader;
+
+    int m_nodeCount;
 };
 
 Q_DECLARE_LOGGING_CATEGORY(lcSvgHandler)

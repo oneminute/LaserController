@@ -299,6 +299,7 @@ public:
     void startMoveLaserMotors();
     void controlHDAction(int action);
 
+    QString firmwareVersion();
     QString getMainCardID();
     MainCardActivateResult autoActiveMainCard();
     bool sendAuthenticationEmail(const QString& email);
@@ -422,6 +423,7 @@ private:
     FN_VOID_VOID m_fnStartMoveLaserMotors;
     FN_VOID_INT m_fnControlHDAction;
 
+    FN_WCHART_VOID m_fnGetMainHardVersion;
     FN_WCHART_VOID m_fnGetMainCardID;
     FNActivationMainCard m_fnActiveMainCard;
     FN_WCHART_BOOL m_fnGetDeviceId;

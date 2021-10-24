@@ -167,7 +167,7 @@ void LayerButton::paintEvent(QPaintEvent * event)
     painter.setPen(QPen(color));
     QRect rect(0, 0, width() - 10, height() - 10);
 	painter.drawRect(rect);
-    //»æÖÆlayer index
+    //ï¿½ï¿½ï¿½ï¿½layer index
     if (this->isEnabled()) {
         QFont f;
         f.setPixelSize(height() - 16);

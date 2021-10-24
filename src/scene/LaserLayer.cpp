@@ -472,7 +472,7 @@ void LaserLayer::bindButton(LayerButton * button, int index)
     Q_D(LaserLayer);
     d->button = button;
 	d->button->setLayerIndex(index);
-	d->button->setEnabled(true);
+	//d->button->setEnabled(true);
     connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
 	//m_index = index;
 }

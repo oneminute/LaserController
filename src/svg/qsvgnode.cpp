@@ -42,16 +42,19 @@
 
 #include "qdebug.h"
 #include "qstack.h"
+#include "qsvghandler.h"
 
 QT_BEGIN_NAMESPACE
 
-QSvgNode::QSvgNode(QSvgNode *parent)
+QSvgNode::QSvgNode(QSvgHandler* handler, QSvgNode* parent)
     : m_parent(parent)
     , m_visible(true)
     , m_x(0)
     , m_y(0)
     , m_displayMode(BlockMode)
+    , m_handler(handler)
 {
+    m_handler->increaseNodeCount();
 }
 
 QSvgNode::~QSvgNode()

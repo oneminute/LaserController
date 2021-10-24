@@ -8,6 +8,7 @@
 
 class LaserDocument;
 class LaserScene;
+class ProgressItem;
 
 class Importer : public QObject
 {
@@ -21,7 +22,7 @@ public:
 
     Importer(QObject* parent = nullptr);
 
-    virtual LaserDocument* import(const QString& filename, LaserScene* scene, const QVariantMap& params = QVariantMap()) = 0;
+    virtual LaserDocument* import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap()) = 0;
     
     static QSharedPointer<Importer> getImporter(QWidget* parentWnd, Types type);
 

@@ -83,8 +83,8 @@ static inline QRectF boundsOnStroke(QPainter *p, const QPainterPath &path, qreal
     return p->transform().map(stroke).boundingRect();
 }
 
-QSvgEllipse::QSvgEllipse(QSvgNode *parent, const QRectF &rect)
-    : QSvgNode(parent), m_bounds(rect)
+QSvgEllipse::QSvgEllipse(QSvgHandler* handler, QSvgNode *parent, const QRectF &rect)
+    : QSvgNode(handler, parent), m_bounds(rect)
 {
     setX(rect.x());
     setY(rect.y());
@@ -117,8 +117,8 @@ void QSvgEllipse::draw(QPainter *p, QSvgExtraStates &states)
     revertStyle(p, states);
 }
 
-QSvgArc::QSvgArc(QSvgNode *parent, const QPainterPath &path)
-    : QSvgNode(parent), m_path(path)
+QSvgArc::QSvgArc(QSvgHandler* handler, QSvgNode *parent, const QPainterPath &path)
+    : QSvgNode(handler, parent), m_path(path)
 {
 }
 
@@ -134,9 +134,9 @@ void QSvgArc::draw(QPainter *p, QSvgExtraStates &states)
     revertStyle(p, states);
 }
 
-QSvgImage::QSvgImage(QSvgNode *parent, const QImage &image,
+QSvgImage::QSvgImage(QSvgHandler* handler, QSvgNode *parent, const QImage &image,
                      const QRectF &bounds)
-    : QSvgNode(parent), m_image(image),
+    : QSvgNode(handler, parent), m_image(image),
       m_bounds(bounds)
 {
     if (m_bounds.width() == 0.0)
@@ -160,8 +160,8 @@ void QSvgImage::draw(QPainter *p, QSvgExtraStates &states)
 }
 
 
-QSvgLine::QSvgLine(QSvgNode *parent, const QLineF &line)
-    : QSvgNode(parent), m_line(line)
+QSvgLine::QSvgLine(QSvgHandler* handler, QSvgNode *parent, const QLineF &line)
+    : QSvgNode(handler, parent), m_line(line)
 {
 }
 
@@ -178,8 +178,8 @@ void QSvgLine::draw(QPainter *p, QSvgExtraStates &states)
     revertStyle(p, states);
 }
 
-QSvgPath::QSvgPath(QSvgNode *parent, const QPainterPath &qpath)
-    : QSvgNode(parent), m_path(qpath)
+QSvgPath::QSvgPath(QSvgHandler* handler, QSvgNode *parent, const QPainterPath &qpath)
+    : QSvgNode(handler, parent), m_path(qpath)
 {
 }
 
@@ -198,8 +198,8 @@ QRectF QSvgPath::bounds(QPainter *p, QSvgExtraStates &) const
         : boundsOnStroke(p, m_path, sw);
 }
 
-QSvgPolygon::QSvgPolygon(QSvgNode *parent, const QPolygonF &poly)
-    : QSvgNode(parent), m_poly(poly)
+QSvgPolygon::QSvgPolygon(QSvgHandler* handler, QSvgNode *parent, const QPolygonF &poly)
+    : QSvgNode(handler, parent), m_poly(poly)
 {
 }
 
@@ -223,8 +223,8 @@ void QSvgPolygon::draw(QPainter *p, QSvgExtraStates &states)
 }
 
 
-QSvgPolyline::QSvgPolyline(QSvgNode *parent, const QPolygonF &poly)
-    : QSvgNode(parent), m_poly(poly)
+QSvgPolyline::QSvgPolyline(QSvgHandler* handler, QSvgNode *parent, const QPolygonF &poly)
+    : QSvgNode(handler, parent), m_poly(poly)
 {
 
 }
@@ -248,8 +248,8 @@ void QSvgPolyline::draw(QPainter *p, QSvgExtraStates &states)
     revertStyle(p, states);
 }
 
-QSvgRect::QSvgRect(QSvgNode *node, const QRectF &rect, int rx, int ry)
-    : QSvgNode(node),
+QSvgRect::QSvgRect(QSvgHandler* handler, QSvgNode *node, const QRectF &rect, int rx, int ry)
+    : QSvgNode(handler, node),
       m_rect(rect), m_rx(rx), m_ry(ry)
 {
     setX(m_rect.x());
@@ -285,8 +285,8 @@ void QSvgRect::draw(QPainter *p, QSvgExtraStates &states)
 
 QSvgTspan * const QSvgText::LINEBREAK = 0;
 
-QSvgText::QSvgText(QSvgNode *parent, const QPointF &coord)
-    : QSvgNode(parent)
+QSvgText::QSvgText(QSvgHandler* handler, QSvgNode *parent, const QPointF &coord)
+    : QSvgNode(handler, parent)
     , m_coord(coord)
     , m_type(TEXT)
     , m_size(0, 0)
@@ -479,7 +479,7 @@ void QSvgText::draw(QPainter *p, QSvgExtraStates &states)
 
 void QSvgText::addText(const QString &text)
 {
-    m_tspans.append(new QSvgTspan(this, false));
+    m_tspans.append(new QSvgTspan(handler(), this, false));
     m_tspans.back()->setWhitespaceMode(m_mode);
     m_tspans.back()->addText(text);
 }
@@ -504,8 +504,8 @@ QString QSvgText::text() const
     return chars;
 }
 
-QSvgUse::QSvgUse(const QPointF &start, QSvgNode *parent, QSvgNode *node)
-    : QSvgNode(parent), m_link(node), m_start(start), m_recursing(false)
+QSvgUse::QSvgUse(const QPointF &start, QSvgHandler* handler, QSvgNode *parent, QSvgNode *node)
+    : QSvgNode(handler, parent), m_link(node), m_start(start), m_recursing(false)
 {
 
 }
@@ -658,4 +658,13 @@ QRectF QSvgLine::bounds(QPainter *p, QSvgExtraStates &) const
     }
 }
 
+// tspans are also used to store normal text, so the 'isProperTspan' is used to separate text from tspan.
+
+QSvgTspan::QSvgTspan(QSvgHandler* handler, QSvgNode* parent, bool isProperTspan)
+    : QSvgNode(handler, parent), m_mode(QSvgText::Default), m_isTspan(isProperTspan)
+{
+}
+
 QT_END_NAMESPACE
+
+

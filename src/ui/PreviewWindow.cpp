@@ -10,7 +10,10 @@
 #include <QMenuBar>
 #include <QPen>
 #include <QPointer>
+#include <QPlainTextEdit>
+#include <QProgressBar>
 #include <QToolBar>
+#include <QTreeView>
 #include <QtMath>
 #include <QStatusBar>
 #include <DockAreaTabBar.h>
@@ -18,6 +21,8 @@
 #include <DockAreaWidget.h>
 #include <DockComponentsFactory.h>
 #include "widget/PreviewViewer.h"
+#include "widget/ProgressBarDelegate.h"
+#include "task/ProgressModel.h"
 
 using namespace ads;
 
@@ -25,6 +30,8 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_progress(0.0)
 {
+    this->setWindowModality(Qt::WindowModality::WindowModal);
+
     // menu bar
     QMenuBar* menuBar = new QMenuBar;
     setMenuBar(menuBar);
@@ -62,21 +69,33 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     m_progressBar->setMaximum(100);
     statusBar->addWidget(m_progressBar);
 
+    // progress tree widget
+    m_treeViewProgress = new QTreeView;
+    m_treeViewProgress->setModel(LaserApplication::progressModel);
+    ProgressBarDelegate* progressBarDelegate = new ProgressBarDelegate(m_treeViewProgress);
+    m_treeViewProgress->setItemDelegateForColumn(1, progressBarDelegate);
+
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
     CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
     CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
     m_dockManager = new CDockManager(this);
 
-    CDockWidget* centralDockWidget = new CDockWidget(tr("Canvas"));
-    centralDockWidget->setWidget(m_viewer);
-    CDockAreaWidget* centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
-    centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
+    m_canvasDockWidget = new CDockWidget(tr("Canvas"));
+    m_canvasDockWidget->setWidget(m_viewer);
+    //CDockAreaWidget* centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
+    CDockAreaWidget* canvasDockArea = m_dockManager->addDockWidget(RightDockWidgetArea, m_canvasDockWidget);
+    //centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
+
+    // create progress tree view dock panel
+    m_progressDockWidget = new CDockWidget(tr("Progress"));
+    m_progressDockWidget->setWidget(m_treeViewProgress);
+    CDockAreaWidget* progressDockArea = m_dockManager->addDockWidget(LeftDockWidgetArea, m_progressDockWidget);
 
     // create log dock panel
     m_logDockWidget = new CDockWidget(tr("Log"));
     m_logDockWidget->setWidget(m_textEditLog);
-    CDockAreaWidget* bottomDockArea = m_dockManager->addDockWidget(BottomDockWidgetArea, m_logDockWidget);
+    CDockAreaWidget* logDockArea = m_dockManager->addDockWidget(BottomDockWidgetArea, m_logDockWidget, progressDockArea);
 
     m_actionZoomIn->connect(m_actionZoomIn, &QAction::triggered, this, [=] {
         m_viewer->zoomIn();

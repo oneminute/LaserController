@@ -90,9 +90,10 @@
     <property name="title">
      <string>&amp;Mainboard</string>
     </property>
-    <addaction name="actionMainboardInformation"/>
-    <addaction name="actionUpdateFirmware"/>
-    <addaction name="actionShowMainCardInfo"/>
+    <addaction name="actionActivate"/>
+    <addaction name="separator"/>
+    <addaction name="actionUserInfo"/>
+    <addaction name="actionMainCardInfo"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -111,12 +112,9 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="actionOnlineHelp"/>
-    <addaction name="actionActivate"/>
-    <addaction name="actionRegiste"/>
     <addaction name="actionUpdate"/>
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionContactUs"/>
-    <addaction name="actionTemporaryLicense"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -733,6 +731,9 @@
    </property>
   </action>
   <action name="actionOnlineHelp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Online Help</string>
    </property>
@@ -1012,12 +1013,12 @@
     <string>mm</string>
    </property>
   </action>
-  <action name="actionShowMainCardInfo">
+  <action name="actionMainCardInfo">
    <property name="text">
-    <string>Show Main Card Info</string>
+    <string>Main Card Info</string>
    </property>
    <property name="toolTip">
-    <string>Show Main Card Info</string>
+    <string>Main Card Info</string>
    </property>
   </action>
   <action name="actionTemporaryLicense">
@@ -1330,6 +1331,11 @@
   <action name="actionActivate">
    <property name="text">
     <string>Activate</string>
+   </property>
+  </action>
+  <action name="actionUserInfo">
+   <property name="text">
+    <string>User Info</string>
    </property>
   </action>
  </widget>

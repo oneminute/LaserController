@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>578</width>
-    <height>325</height>
+    <width>580</width>
+    <height>300</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>580</width>
+    <height>300</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Registe</string>
@@ -24,6 +36,11 @@
      </property>
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEditDongleId">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -31,6 +48,11 @@
      </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEditRegisterCode">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="inputMask">
         <string notr="true"/>
        </property>
@@ -41,6 +63,11 @@
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_softdog">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -61,6 +88,11 @@
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_registerCode">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -74,6 +106,11 @@
      </item>
      <item row="3" column="1">
       <widget class="QLabel" name="labelStatus">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -98,6 +135,11 @@
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEditRegisteId">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -112,6 +154,11 @@
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_registerId">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -131,6 +178,12 @@
       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1">
        <item row="1" column="1">
         <widget class="QLabel" name="labelAPIVersion">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -138,6 +191,11 @@
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_fixedVersion">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Firmware Version:</string>
          </property>
@@ -148,6 +206,12 @@
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="labelFirmwareVersion">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -155,6 +219,11 @@
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_APIVersion">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Card API Version:</string>
          </property>
@@ -165,6 +234,12 @@
        </item>
        <item row="2" column="1">
         <widget class="QLabel" name="labelEXEVersion">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -172,6 +247,11 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_EXEVersion">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Card EXE Version:</string>
          </property>

@@ -4,14 +4,16 @@
 #include <QAction>
 #include <QDialog>
 #include <QMainWindow>
-#include <QPlainTextEdit>
-#include <QProgressBar>
 #include <DockManager.h>
 #include <QTimer>
+#include <QPen>
 
 class LaserPrimitive;
 class PreviewViewer;
 class PreviewScene;
+class QTreeView;
+class QProgressBar;
+class QPlainTextEdit;
 
 class PreviewWindow : public QMainWindow
 {
@@ -68,11 +70,14 @@ signals:
 
 private:
     ads::CDockManager* m_dockManager;
+    ads::CDockWidget* m_canvasDockWidget;
     ads::CDockWidget* m_logDockWidget;
+    ads::CDockWidget* m_progressDockWidget;
     PreviewViewer* m_viewer;
     PreviewScene* m_scene;
     QPlainTextEdit* m_textEditLog;
     QProgressBar* m_progressBar;
+    QTreeView* m_treeViewProgress;
 
     // actions
     QAction* m_actionZoomIn;

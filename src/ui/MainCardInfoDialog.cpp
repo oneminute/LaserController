@@ -4,6 +4,7 @@
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
 #include "common/common.h"
+#include "common/Config.h"
 
 MainCardInfoDialog::MainCardInfoDialog(QWidget* parent)
     : QDialog(parent)
@@ -18,20 +19,13 @@ MainCardInfoDialog::MainCardInfoDialog(QWidget* parent)
 
 void MainCardInfoDialog::onGetMainCardInfo()
 {
-    m_ui->labelMainCard->setText(LaserApplication::device->mainCardId());;
-    m_ui->labelMainCardRegisteredDate->setText(LaserApplication::device->mainCardRegisteredDate());;
-    m_ui->labelMainCardActivatedDate->setText(LaserApplication::device->mainCardActivatedDate());;
-    m_ui->labelBoundDongle->setText(LaserApplication::device->boundDongleId());;
-    m_ui->labelBoundDongleRegisteredDate->setText(LaserApplication::device->boundDongleRegisteredDate());;
-    m_ui->labelBoundDongleActivatedDate->setText(LaserApplication::device->boundDongleActivatedDate());;
-    m_ui->labelBoundDongleBindingTimes->setText(LaserApplication::device->boundDongleBindingTimes());;
-    m_ui->labelCurrentDongle->setText(LaserApplication::device->dongleId());;
-    m_ui->labelCurrentDongleRegisteredDate->setText(LaserApplication::device->dongleRegisteredDate());;
-    m_ui->labelCurrentDongleActivatedDate->setText(LaserApplication::device->dongleActivatedDate());;
-    m_ui->labelCurrentDongleBindingTimes->setText(LaserApplication::device->dongleBindingTimes());;
-    m_ui->labelHardwareRegisteredDate->setText(LaserApplication::device->hardwareRegisteredDate());;
-    m_ui->labelHardwareActivatedDate->setText(LaserApplication::device->hardwareActivatedDate());;
-    m_ui->labelHardwareMaintainingTimes->setText(LaserApplication::device->hardwareMaintainingTimes());;
+    m_ui->lineEditFirmwareVersion->setText(LaserApplication::device->firmwareVersion());
+    m_ui->lineEditSoftwareVersion->setText(LaserApplication::applicationVersion());
+    m_ui->lineEditTotalRunningTime->setText(QString::number(Config::SystemRegister::sysRunTime()));
+    m_ui->lineEditLaserTubeRunningTime->setText(QString::number(Config::SystemRegister::laserRunTime()));
+    m_ui->lineEditMachiningTimes->setText(QString::number(Config::SystemRegister::sysRunNum()));
+    m_ui->lineEditDongleId->setText(LaserApplication::device->dongleId());
+    m_ui->lineEditMainCardId->setText(LaserApplication::device->mainCardId());
 }
 
 MainCardInfoDialog::~MainCardInfoDialog()

@@ -63,10 +63,16 @@
 QT_BEGIN_NAMESPACE
 
 class QTextCharFormat;
+class QSvgHandler;
 
 class  QSvgAnimation : public QSvgNode
 {
 public:
+    QSvgAnimation(QSvgHandler* handler, QSvgNode* parent = nullptr)
+        : QSvgNode(handler, parent)
+    {}
+
+    ~QSvgAnimation() {}
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
 };
@@ -74,7 +80,7 @@ public:
 class  QSvgArc : public QSvgNode
 {
 public:
-    QSvgArc(QSvgNode *parent, const QPainterPath &path);
+    QSvgArc(QSvgHandler* handler, QSvgNode *parent, const QPainterPath &path);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -85,7 +91,7 @@ private:
 class  QSvgEllipse : public QSvgNode
 {
 public:
-    QSvgEllipse(QSvgNode *parent, const QRectF &rect);
+    QSvgEllipse(QSvgHandler* handler, QSvgNode *parent, const QRectF &rect);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -97,14 +103,14 @@ private:
 class  QSvgCircle : public QSvgEllipse
 {
 public:
-    QSvgCircle(QSvgNode *parent, const QRectF &rect) : QSvgEllipse(parent, rect) { }
+    QSvgCircle(QSvgHandler* handler, QSvgNode *parent, const QRectF &rect) : QSvgEllipse(handler, parent, rect) { }
     Type type() const override;
 };
 
 class  QSvgImage : public QSvgNode
 {
 public:
-    QSvgImage(QSvgNode *parent, const QImage &image,
+    QSvgImage(QSvgHandler* handler, QSvgNode *parent, const QImage &image,
               const QRectF &bounds);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
@@ -121,7 +127,7 @@ private:
 class  QSvgLine : public QSvgNode
 {
 public:
-    QSvgLine(QSvgNode *parent, const QLineF &line);
+    QSvgLine(QSvgHandler* handler, QSvgNode *parent, const QLineF &line);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -133,7 +139,7 @@ private:
 class  QSvgPath : public QSvgNode
 {
 public:
-    QSvgPath(QSvgNode *parent, const QPainterPath &qpath);
+    QSvgPath(QSvgHandler* handler, QSvgNode *parent, const QPainterPath &qpath);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -148,7 +154,7 @@ private:
 class  QSvgPolygon : public QSvgNode
 {
 public:
-    QSvgPolygon(QSvgNode *parent, const QPolygonF &poly);
+    QSvgPolygon(QSvgHandler* handler, QSvgNode *parent, const QPolygonF &poly);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -160,7 +166,7 @@ private:
 class  QSvgPolyline : public QSvgNode
 {
 public:
-    QSvgPolyline(QSvgNode *parent, const QPolygonF &poly);
+    QSvgPolyline(QSvgHandler* handler, QSvgNode *parent, const QPolygonF &poly);
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -172,7 +178,7 @@ private:
 class  QSvgRect : public QSvgNode
 {
 public:
-    QSvgRect(QSvgNode *paren, const QRectF &rect, int rx=0, int ry=0);
+    QSvgRect(QSvgHandler* handler, QSvgNode *paren, const QRectF &rect, int rx=0, int ry=0);
     Type type() const override;
     void draw(QPainter *p, QSvgExtraStates &states) override;
     QRectF bounds(QPainter *p, QSvgExtraStates &states) const override;
@@ -195,7 +201,7 @@ public:
         Preserve
     };
 
-    QSvgText(QSvgNode *parent, const QPointF &coord);
+    QSvgText(QSvgHandler* handler, QSvgNode *parent, const QPointF &coord);
     ~QSvgText();
     void setTextArea(const QSizeF &size);
 
@@ -231,10 +237,7 @@ class  QSvgTspan : public QSvgNode
 {
 public:
     // tspans are also used to store normal text, so the 'isProperTspan' is used to separate text from tspan.
-    QSvgTspan(QSvgNode *parent, bool isProperTspan = true)
-        : QSvgNode(parent), m_mode(QSvgText::Default), m_isTspan(isProperTspan)
-    {
-    }
+    QSvgTspan(QSvgHandler* handler, QSvgNode* parent, bool isProperTspan = true);
     ~QSvgTspan() { };
     Type type() const override { return TSPAN; }
     void draw(QPainter *, QSvgExtraStates &) override { Q_ASSERT(!"Tspans should be drawn through QSvgText::draw()."); }
@@ -252,9 +255,9 @@ private:
 class QSvgUse : public QSvgNode
 {
 public:
-    QSvgUse(const QPointF &start, QSvgNode *parent, QSvgNode *link);
-    QSvgUse(const QPointF &start, QSvgNode *parent, const QString &linkId)
-        : QSvgUse(start, parent, nullptr)
+    QSvgUse(const QPointF &start, QSvgHandler* handler, QSvgNode *parent, QSvgNode *link);
+    QSvgUse(const QPointF &start, QSvgHandler* handler, QSvgNode *parent, const QString &linkId)
+        : QSvgUse(start, handler, parent, nullptr)
     { m_linkId = linkId; }
     void draw(QPainter *p, QSvgExtraStates &states) override;
     Type type() const override;

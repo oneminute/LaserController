@@ -76,7 +76,7 @@ public:
     static QSvgTinyDocument * load(const QByteArray &contents);
     static QSvgTinyDocument * load(QXmlStreamReader *contents);
 public:
-    QSvgTinyDocument();
+    QSvgTinyDocument(QSvgHandler* handler);
     ~QSvgTinyDocument();
     Type type() const override;
 

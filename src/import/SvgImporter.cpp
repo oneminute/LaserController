@@ -14,6 +14,8 @@
 #include "svg/qsvggraphics.h"
 #include "svg/qsvgrenderer.h"
 #include "svg/qsvgtinydocument.h"
+#include "svg/qsvghandler.h"
+#include "task/ProgressModel.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/UnitUtils.h"
 
@@ -27,12 +29,15 @@ SvgImporter::~SvgImporter()
 {
 }
 
-LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, const QVariantMap& params)
+LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
 	LaserApplication::mainWindow->activateWindow();
 
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
+    int nodeCount = svgDoc->handler()->nodeCount();
+    ProgressItem* progress= LaserApplication::progressModel->createSimpleItem("import svg", parentProgress);
+    progress->setMaximum(nodeCount);
     LaserDocument* laserDoc = new LaserDocument(scene);
 	if (svgDoc == nullptr)
 	{
@@ -66,7 +71,6 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 
     QList<QSvgNode*> nodes = svgDoc->renderers();
     QStack<QSvgNode*> stack;
-    QList<QSvgRenderer*> renderers;
     for (int i = 0; i < nodes.length(); i++)
     {
         stack.push(nodes[i]);
@@ -224,6 +228,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 
             laserDoc->addPrimitive(item);
         }
+        progress->increaseProgress();
     }
     QFileInfo fileInfo(filename);
     QString docName = fileInfo.baseName();
@@ -235,8 +240,8 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     }
     laserDoc->setName(docName);
     laserDoc->blockSignals(false);
-    
     emit imported();
     laserDoc->open();
+    progress->finish();
     return laserDoc;
 }
