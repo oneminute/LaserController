@@ -9,6 +9,7 @@
 #include<QGraphicsSceneMouseEvent>
 #include<QGraphicsSceneWheelEvent>
 #include <QScrollBar>
+#include <QInputMethodEvent>
 #include <qmath.h>
 #include "util/Utils.h"
 
@@ -212,7 +213,7 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 		}
     }
     else if (event->type() == QEvent::InputMethod) {
-        QInputMethodEvent* e = static_cast<QInputMethodEvent*>(event);
+        QInputMethodEvent* e = reinterpret_cast<QInputMethodEvent*>(event);
         if (!e->commitString().isEmpty()) {
             qDebug() << e->commitString();
         }

@@ -168,7 +168,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         button->setColor(colors[i]);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
-		button->setEnabled(false);
+		//button->setEnabled(false);
         m_ui->layoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
 
@@ -2468,7 +2468,6 @@ void LaserControllerWindow::onActionImport(bool checked)
         initDocument(doc);
         //QFuture<LaserDocument*> future = QtConcurrent::run(
         //    [=]() {
-        //        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
         //        LaserDocument* doc = importer->import(filename, m_scene, progress);
         //        //initDocument(doc);
         //        return doc;
@@ -4738,7 +4737,7 @@ void LaserControllerWindow::documentClose()
 	this->m_fileName = "";
 	//layer color buttons not enabled
 	for each(LayerButton* button in m_layerButtons) {
-		button->setEnabled(false);
+		//button->setEnabled(false);
 		button->setChecked(false);
 	}
     updateOutlineTree();

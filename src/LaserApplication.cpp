@@ -331,6 +331,19 @@ QString LaserApplication::str(const QString& key)
         return key;
 }
 
+int LaserApplication::exec()
+{
+    try {
+        int result = QApplication::exec();
+        return result;
+    }
+    catch (...)
+    {
+        qLogW << "error: ";
+        return -1;
+    }
+}
+
 void LaserApplication::initLog()
 {
     google::InitGoogleLogging(this->arguments()[0].toStdString().c_str());

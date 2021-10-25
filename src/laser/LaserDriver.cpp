@@ -31,7 +31,6 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_parentWidget(nullptr)
     , m_isDownloading(false)
     , m_packagesCount(0)
-    , m_device(nullptr)
     , m_isClosed(false)
 {
     ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
@@ -40,26 +39,6 @@ LaserDriver::LaserDriver(QObject* parent)
     ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
-
-    /*QFile deviceCache("dev_cache.bin");
-    if (!deviceCache.open(QIODevice::ReadOnly))
-    {
-        qWarning() << "Can not read cache file!";
-        return;
-    }
-
-    qDebug() << "available bytes:" << deviceCache.bytesAvailable();
-    QDataStream stream(&deviceCache);
-    QMap<int, QVariant> registers;
-    stream >> registers;
-    qDebug() << "load cached registers:" << registers;
-    m_registers.clear();
-    for (QMap<int, QVariant>::ConstIterator i = registers.constBegin(); i != registers.constEnd(); i++)
-    {
-        m_registers.insert(static_cast<RegisterType>(i.key()), i.value());
-    }
-
-    deviceCache.close();*/
 }
 
 LaserDriver::~LaserDriver()
@@ -90,13 +69,13 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
     if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
     {
-        //emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
-        LaserApplication::device->handleError(sysMsgCode, eventData);
+        emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
+        //LaserApplication::device->handleError(sysMsgCode, eventData);
     }
     else if (sysMsgCode >= M_Base)
     {
-        //emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
-        LaserApplication::device->handleMessage(sysMsgCode, eventData);
+        emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
+        //LaserApplication::device->handleMessage(sysMsgCode, eventData);
     }
 }
 
@@ -177,6 +156,12 @@ bool LaserDriver::load()
 
     m_fnReadUserParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadUserParamFromCard");
     CHECK_FN(m_fnReadUserParamFromCard)
+
+    m_fnWriteComputerParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteComputerParamToCard");
+    CHECK_FN(m_fnWriteComputerParamToCard)
+
+    m_fnReadComputerParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadComputerParamFromCard");
+    CHECK_FN(m_fnReadComputerParamFromCard)
 
     m_fnShowAboutWindow = (FN_INT_INT_BOOL)m_library.resolve("ShowAboutWindow");
     CHECK_FN(m_fnShowAboutWindow)
@@ -294,16 +279,6 @@ void LaserDriver::unload()
     m_isLoaded = false;
     m_isClosed = true;
     emit libraryUnloaded();
-}
-
-void LaserDriver::setDevice(LaserDevice* device)
-{
-    m_device = device;
-}
-
-LaserDevice* LaserDriver::device() const
-{
-    return m_device;
 }
 
 QString LaserDriver::getVersion()
@@ -544,11 +519,71 @@ bool LaserDriver::readUserParamFromCard(QList<int> addresses)
 bool LaserDriver::readAllUserParamFromCard()
 {
     QList<int> params;
-    for (int i = 0; i <= 31; i++)
+    for (int i = 0; i <= 40; i++)
     {
         params << i;
     }
     return readUserParamFromCard(params);
+
+}
+
+bool LaserDriver::writeHostParamToCard(const LaserRegister::RegistersMap& values)
+{
+    if (values.count() == 0)
+        return false;
+
+    QString addrBuf, valuesBuf;
+    QStringList addrList;
+    QStringList valuesList;
+    for (LaserRegister::RegistersMap::ConstIterator i = values.constBegin(); i != values.constEnd(); i++)
+    {
+        addrList.append(QString("%1").arg(i.key()));
+        QString value = i.value().toString();
+        if (i.value().type() == QVariant::Bool)
+            value = i.value().toBool() ? "1" : "0";
+        valuesList.append(value);
+    }
+    addrBuf = addrList.join(",");
+    valuesBuf = valuesList.join(",");
+
+    wchar_t* wcAddrs = typeUtils::qStringToWCharPtr(addrBuf);
+    wchar_t* wcValues = typeUtils::qStringToWCharPtr(valuesBuf);
+
+    qDebug() << "writing address list: " << addrBuf;
+    qDebug() << "writing values list: " << valuesBuf;
+
+    bool success = m_fnWriteComputerParamToCard(wcAddrs, wcValues) != -1;
+    delete[] wcAddrs;
+    delete[] wcValues;
+    return success;
+}
+
+bool LaserDriver::readHostParamFromCard(QList<int> addresses)
+{
+    if (addresses.length() == 0)
+        return false;
+
+    QStringList addrList;
+    for (int i = 0; i < addresses.length(); i++)
+    {
+        addrList.append(QString("%1").arg(addresses[i]));
+    }
+    QString addrStr = addrList.join(",");
+    wchar_t* addrBuf = typeUtils::qStringToWCharPtr(addrStr);
+
+    bool success = m_fnReadComputerParamFromCard(addrBuf) != -1;
+    delete[] addrBuf;
+    return success;
+}
+
+bool LaserDriver::readAllHostParamFromCard()
+{
+    QList<int> params;
+    for (int i = 0; i <= 49; i++)
+    {
+        params << i;
+    }
+    return readHostParamFromCard(params);
 
 }
 

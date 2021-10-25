@@ -72,7 +72,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, P
     page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
     page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
     laserDoc->setPageInformation(page);
-    laserDoc->blockSignals();
+    laserDoc->blockSignals(true);
 
     qreal scaleX = Global::convertFromMM(SizeUnit::SU_PX, 1);
     qreal scaleY = Global::convertFromMM(SizeUnit::SU_PX, 1, Qt::Vertical);

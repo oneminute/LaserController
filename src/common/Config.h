@@ -307,6 +307,13 @@ public:
         CONFIG_ITEM(userRegister, cuttingTurnOffDelay, qreal, toReal)
         CONFIG_ITEM(userRegister, spotShotPower, qreal, toReal)
 
+        CONFIG_ITEM(userRegister, fillingSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, fillingStartSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, fillingAcceleration, qreal, toReal)
+        CONFIG_ITEM(userRegister, maxFillingPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, minFillingPower, qreal, toReal)
+        CONFIG_ITEM(userRegister, fillingAccRatio, qreal, toReal)
+
     private:
         friend class Config;
     };

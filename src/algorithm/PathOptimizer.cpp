@@ -70,7 +70,9 @@ void PathOptimizer::arriveNode(OptimizeNode* node, QSet<OptimizeNode*>& travelle
         node->parentNode()->removeChildNode(node);
     d->currentNode = node;
     travelled.insert(node);
+#ifdef _DEBUG
     qLogD << "arrived " << node->nodeName();
+#endif
 }
 
 void PathOptimizer::optimize()

@@ -60,7 +60,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
     page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
     laserDoc->setPageInformation(page);
-    laserDoc->blockSignals();
+    laserDoc->blockSignals(true);
 
     qDebug() << "shapeUnit:" << laserDoc->unit();
     qDebug() << "svg size:" << svgSize;
@@ -82,7 +82,6 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     while (!stack.empty())
     {
         QSvgNode* node = stack.pop();
-		//qDebug() << "node shape:" << node->type() << ", display mode:" << node->displayMode();
         QSvgRenderer* renderer = nullptr;
         LaserPrimitive* item = nullptr;
         switch (node->type())

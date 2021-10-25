@@ -5922,7 +5922,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location line="+27"/>
         <source>Main Card SN</source>
-        <translation>主析ID</translation>
+        <translation>主板SN</translation>
     </message>
     <message>
         <source>Main card</source>

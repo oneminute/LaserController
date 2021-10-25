@@ -1750,7 +1750,7 @@ void Config::loadUserReigsters()
         }
     );
     defaultScanSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
-    defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1%");
+    defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     defaultScanSpeed->setInputWidgetProperty("step", 0.001);
     defaultScanSpeed->setInputWidgetProperty("page", 10);
     defaultScanSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1821,6 +1821,140 @@ void Config::loadUserReigsters()
     spotShotPower->setInputWidgetProperty("page", 10);
     spotShotPower->setInputWidgetProperty("minimum", 1);
     spotShotPower->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* fillingSpeed = group->addConfigItem(
+        "fillingSpeed",
+        100000,
+        DT_REAL
+    );
+    fillingSpeed->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    fillingSpeed->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    fillingSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    fillingSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    fillingSpeed->setInputWidgetProperty("step", 0.001);
+    fillingSpeed->setInputWidgetProperty("page", 10);
+    fillingSpeed->setInputWidgetProperty("minimum", 0.001);
+    fillingSpeed->setInputWidgetProperty("maximum", 10000);
+
+    ConfigItem* fillingStartSpeed = group->addConfigItem(
+        "fillingStartSpeed",
+        50000,
+        DT_REAL
+    );
+    fillingStartSpeed->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    fillingStartSpeed->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    fillingStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    fillingStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    fillingStartSpeed->setInputWidgetProperty("step", 0.001);
+    fillingStartSpeed->setInputWidgetProperty("page", 10);
+    fillingStartSpeed->setInputWidgetProperty("minimum", 0.001);
+    fillingStartSpeed->setInputWidgetProperty("maximum", 10000);
+
+    ConfigItem* fillingAcceleration = group->addConfigItem(
+        "fillingAcceleration",
+        100000,
+        DT_REAL
+    );
+    fillingAcceleration->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 1000.0);
+        }
+    );
+    fillingAcceleration->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    fillingAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    fillingAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s");
+    fillingAcceleration->setInputWidgetProperty("step", 0.001);
+    fillingAcceleration->setInputWidgetProperty("page", 10);
+    fillingAcceleration->setInputWidgetProperty("minimum", 0.001);
+    fillingAcceleration->setInputWidgetProperty("maximum", 10000);
+
+    ConfigItem* maxFillingPower = group->addConfigItem(
+        "maxFillingPower",
+        1000,
+        DT_REAL
+    );
+    maxFillingPower->setInputWidgetType(IWT_FloatEditSlider);
+    maxFillingPower->setStoreStrategy(SS_DIRECTLY);
+    maxFillingPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    maxFillingPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    maxFillingPower->setInputWidgetProperty("textTemplate", "%1%");
+    maxFillingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
+    maxFillingPower->setInputWidgetProperty("step", 0.1);
+    maxFillingPower->setInputWidgetProperty("page", 10);
+    maxFillingPower->setInputWidgetProperty("minimum", 0);
+    maxFillingPower->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* minFillingPower = group->addConfigItem(
+        "minFillingPower",
+        100,
+        DT_REAL
+    );
+    minFillingPower->setInputWidgetType(IWT_FloatEditSlider);
+    minFillingPower->setStoreStrategy(SS_DIRECTLY);
+    minFillingPower->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() / 10.0);
+        }
+    );
+    minFillingPower->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 10));
+        }
+    );
+    minFillingPower->setInputWidgetProperty("textTemplate", "%1%");
+    minFillingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
+    minFillingPower->setInputWidgetProperty("step", 0.1);
+    minFillingPower->setInputWidgetProperty("page", 10);
+    minFillingPower->setInputWidgetProperty("minimum", 0);
+    minFillingPower->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* fillingAccRatio = group->addConfigItem(
+        "fillingAccRatio",
+        800,
+        DT_INT
+    );
+    fillingAccRatio->setStoreStrategy(SS_DIRECTLY);
+    fillingAccRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
+    fillingAccRatio->setInputWidgetProperty("minimum", 0);
+    fillingAccRatio->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadSystemRegisters()
@@ -3337,6 +3471,30 @@ void Config::updateTitlesAndDescriptions()
     UserRegister::spotShotPowerItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Spot Shot Power", nullptr), 
         QCoreApplication::translate("Config", "Spot shot power", nullptr));
+
+    UserRegister::fillingSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Filling Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Filling speed", nullptr));
+
+    UserRegister::fillingStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Filling Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Filling start speed", nullptr));
+
+    UserRegister::fillingAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Filling Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Filling acceleration", nullptr));
+
+    UserRegister::maxFillingPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Max Filling Power", nullptr), 
+        QCoreApplication::translate("Config", "Max filling power", nullptr));
+
+    UserRegister::minFillingPowerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min Filling Power", nullptr), 
+        QCoreApplication::translate("Config", "Min filling power", nullptr));
+
+    UserRegister::fillingAccRatioItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Filling Acceleration Ratio", nullptr), 
+        QCoreApplication::translate("Config", "SFilling acceleration ratiopot shot power", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

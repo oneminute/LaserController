@@ -28,6 +28,7 @@
 #include "laser/LaserDriver.h"
 #include "util/MachiningUtils.h"
 #include "util/TypeUtils.h"
+#include "util/Utils.h"
 #include "LaserLayer.h"
 #include "state/StateController.h"
 #include "svg/qsvgtinydocument.h"
@@ -41,7 +42,6 @@ class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 public:
     LaserDocumentPrivate(LaserDocument* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
-        , blockSignals(false)
         , isOpened(false)
         , enablePrintAndCut(false)
         //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
@@ -49,7 +49,6 @@ public:
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
     PageInformation pageInfo;
-    bool blockSignals;
     bool isOpened;
     LaserScene* scene;
     FinishRun finishRun;
@@ -84,15 +83,6 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
 	d->layers[item->layerIndex()]->addPrimitive(item);
-
-    /*if (item->isShape())
-    {
-        d->layers[1]->addPrimitive(item);
-    }
-    else if (item->isBitmap())
-    {
-        d->layers[0]->addPrimitive(item);
-    }*/
 }
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
@@ -422,12 +412,6 @@ void LaserDocument::exportJSON(const QString& filename)
             emit exportFinished(filename);
         }
     );
-}
-
-void LaserDocument::blockSignals(bool block)
-{
-    Q_D(LaserDocument);
-    d->blockSignals = block;
 }
 
 bool LaserDocument::isOpened() const
@@ -799,8 +783,7 @@ void LaserDocument::setPrintAndCutPointPairs(const PointPairList& pairs)
 void LaserDocument::updateLayersStructure()
 {
     Q_D(LaserDocument);
-    if (!d->blockSignals)
-        emit layersStructureChanged();
+    emit layersStructureChanged();
 }
 
 void LaserDocument::destroy()
@@ -878,7 +861,9 @@ void LaserDocument::printOutline(OptimizeNode* node, int level)
     {
         space.append("  ");
     }
+#ifdef _DEBUG
     qLogD << space << node->nodeName();
+#endif
 
     for (OptimizeNode* item : node->childNodes())
     {

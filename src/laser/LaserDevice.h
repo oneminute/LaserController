@@ -71,6 +71,7 @@ public:
     bool writeSystemRegisters();
     bool readUserRegisters();
     bool readSystemRegisters();
+    bool readHostRegisters();
 
     bool readUserRegister(int address);
     bool writeUserReigister(int address, const QVariant& value);

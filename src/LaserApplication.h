@@ -30,6 +30,7 @@ public:
     static void changeLanguage();
     static void retranslate();
     static QString str(const QString& key);
+    static int exec();
 
 protected:
     void initLog();
