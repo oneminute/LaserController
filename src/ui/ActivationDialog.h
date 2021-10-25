@@ -3,7 +3,7 @@
 
 #include <QDateTime>
 #include <QDialog>
-#include <QRegularExpressionValidator>
+#include <QRegularExpression>
 #include <QTimer>
 
 namespace Ui
@@ -30,9 +30,7 @@ protected:
     bool validateUserName();
 
 protected slots:
-    void onLineEditEmailEditingFinished();
-    void onLineEditCodeEditingFinished();
-    void onLineEditUserNameEditingFinished();
+    void onFieldTextEdited(const QString& text);
 
     void onSendTimerTimeout();
     void onUpdateTimerTimeout();
@@ -42,9 +40,9 @@ private:
 
     QTimer m_sendTimer;
     QTimer m_updateTimer;
-    QRegularExpressionValidator m_validatorEmail;
-    QRegularExpressionValidator m_validatorCode;
-    QRegularExpressionValidator m_validatorUserName;
+    QRegularExpression m_reEmail;
+    QRegularExpression m_reCode;
+    QRegularExpression m_reUserName;
 };
 
 #endif // ACTIVATIONDIALOG_H

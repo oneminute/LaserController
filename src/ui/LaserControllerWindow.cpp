@@ -1626,15 +1626,15 @@ void LaserControllerWindow::createMovementDockPanel()
 
     m_lineEditCoordinatesX = new QLineEdit;
     m_lineEditCoordinatesX->setReadOnly(true);
-    m_lineEditCoordinatesX->setText(QString::number(0.0));
+    m_lineEditCoordinatesX->setText(QString::number(0.0, 'f', 2));
 
     m_lineEditCoordinatesY = new QLineEdit;
     m_lineEditCoordinatesY->setReadOnly(true);
-    m_lineEditCoordinatesY->setText(QString::number(0.0));
+    m_lineEditCoordinatesY->setText(QString::number(0.0, 'f', 2));
 
     m_lineEditCoordinatesZ = new QLineEdit;
     m_lineEditCoordinatesZ->setReadOnly(true);
-    m_lineEditCoordinatesZ->setText(QString::number(0.0));
+    m_lineEditCoordinatesZ->setText(QString::number(0.0, 'f', 2));
 
     m_doubleSpinBoxDistanceX = new QDoubleSpinBox;
     m_doubleSpinBoxDistanceX->setDecimals(1);
@@ -3697,9 +3697,9 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     //m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
-    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f', 1));
-    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f', 1));
-    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f', 1));
+    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f', 2));
+    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f', 2));
+    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f', 2));
 }
 
 void LaserControllerWindow::onLayoutChanged(const QSizeF& size)

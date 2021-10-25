@@ -3485,16 +3485,16 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Filling acceleration", nullptr));
 
     UserRegister::maxFillingPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Filling Power", nullptr), 
+        QCoreApplication::translate("Config", "Max Filling Power(%)", nullptr), 
         QCoreApplication::translate("Config", "Max filling power", nullptr));
 
     UserRegister::minFillingPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Min Filling Power", nullptr), 
+        QCoreApplication::translate("Config", "Min Filling Power(%)", nullptr), 
         QCoreApplication::translate("Config", "Min filling power", nullptr));
 
     UserRegister::fillingAccRatioItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Filling Acceleration Ratio", nullptr), 
-        QCoreApplication::translate("Config", "SFilling acceleration ratiopot shot power", nullptr));
+        QCoreApplication::translate("Config", "Filling acceleration ratio", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

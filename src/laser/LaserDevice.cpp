@@ -406,6 +406,16 @@ QString LaserDevice::firmwareVersion() const
     return "";
 }
 
+QString LaserDevice::hardwareIdentID() const
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->getHardwareIdentID();
+    }
+    return "";
+}
+
 QString LaserDevice::mainCardId() const
 {
     Q_D(const LaserDevice);
@@ -1571,7 +1581,7 @@ void LaserDevice::onConnected()
     Q_D(LaserDevice);
     if (d->driver)
     {
-        d->driver->setFactoryType("LaserController");
+        d->driver->setFactoryType("EFSLaserController");
         d->driver->stopMachining();
         d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
         d->driver->getDeviceWorkState();

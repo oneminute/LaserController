@@ -154,6 +154,7 @@ public:
 
     QString firmwareVersion();
     QString getMainCardID();
+    QString getHardwareIdentID();
     MainCardActivateResult autoActiveMainCard();
     bool sendAuthenticationEmail(const QString& email);
     QString activateMainCard(
@@ -279,6 +280,7 @@ private:
     FN_VOID_INT m_fnControlHDAction;
 
     FN_WCHART_VOID m_fnGetMainHardVersion;
+    FN_WCHART_VOID m_fnGetHardwareIdentID;
     FN_WCHART_VOID m_fnGetMainCardID;
     FNActivationMainCard m_fnActiveMainCard;
     FN_WCHART_BOOL m_fnGetDeviceId;

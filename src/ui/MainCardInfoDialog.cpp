@@ -25,7 +25,7 @@ void MainCardInfoDialog::onGetMainCardInfo()
     m_ui->lineEditLaserTubeRunningTime->setText(QString::number(Config::SystemRegister::laserRunTime()));
     m_ui->lineEditMachiningTimes->setText(QString::number(Config::SystemRegister::sysRunNum()));
     m_ui->lineEditDongleId->setText(LaserApplication::device->dongleId());
-    m_ui->lineEditMainCardId->setText(LaserApplication::device->mainCardId());
+    m_ui->lineEditMainCardId->setText(LaserApplication::device->hardwareIdentID());
 }
 
 MainCardInfoDialog::~MainCardInfoDialog()

@@ -41,6 +41,7 @@ public:
 
     void requestMainCardInfo();
     QString firmwareVersion() const;
+    QString hardwareIdentID() const;
     QString mainCardId() const;
     QString mainCardRegisteredDate() const;
     QString mainCardActivatedDate() const;

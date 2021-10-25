@@ -14,27 +14,18 @@
 ActivationDialog::ActivationDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::ActivationDialog)
+    , m_reEmail("([a-z0-9]+(?:[._-][a-z0-9]+)*)@([a-z0-9]+(?:[.-][a-z0-9]+)*\.[a-z]{2,})")
+    , m_reCode("^[0-9]{6}$")
+    , m_reUserName("[a-zA-Z0-9!@#$%-_\\w]{6,12}", QRegularExpression::UseUnicodePropertiesOption)
 {
     m_ui->setupUi(this);
-
-    QRegularExpression regexpEmail;
-    regexpEmail.setPattern("([a-z0-9]+(?:[._-][a-z0-9]+)*)@([a-z0-9]+(?:[.-][a-z0-9]+)*\.[a-z]{2,})");
-    m_validatorEmail.setRegularExpression(regexpEmail);
-
-    QRegularExpression regexpCode;
-    regexpCode.setPattern("[0-9]{6}");
-    m_validatorCode.setRegularExpression(regexpCode);
-
-    QRegularExpression regexpUserName;
-    regexpUserName.setPattern("[a-zA-Z0-9!@#$%-_]{6,}");
-    m_validatorUserName.setRegularExpression(regexpUserName);
 
     connect(m_ui->pushButtonSend, &QPushButton::clicked, this, &ActivationDialog::onPushButtonSendClicked);
     connect(m_ui->pushButtonActivate, &QPushButton::clicked, this, &ActivationDialog::onPushButtonActivateClicked);
     connect(m_ui->pushButtonClose, &QPushButton::clicked, this, &ActivationDialog::onPushButtonCloseClicked);
-    connect(m_ui->lineEditMail, &QLineEdit::editingFinished, this, &ActivationDialog::onLineEditEmailEditingFinished);
-    connect(m_ui->lineEditCode, &QLineEdit::editingFinished, this, &ActivationDialog::onLineEditCodeEditingFinished);
-    connect(m_ui->lineEditUserName, &QLineEdit::editingFinished, this, &ActivationDialog::onLineEditUserNameEditingFinished);
+    connect(m_ui->lineEditMail, &QLineEdit::textEdited, this, &ActivationDialog::onFieldTextEdited);
+    connect(m_ui->lineEditCode, &QLineEdit::textEdited, this, &ActivationDialog::onFieldTextEdited);
+    connect(m_ui->lineEditUserName, &QLineEdit::textEdited, this, &ActivationDialog::onFieldTextEdited);
 
     connect(&m_sendTimer, &QTimer::timeout, this, &ActivationDialog::onSendTimerTimeout);
     connect(&m_updateTimer, &QTimer::timeout, this, &ActivationDialog::onUpdateTimerTimeout);
@@ -108,7 +99,7 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
             m_ui->pushButtonActivate->show();
             QMessageBox::warning(this, tr("Activate failure"), tr("You should use the email to fetch activation code and activate your main card online."));
             m_ui->stackedWidget->setCurrentIndex(1);
-
+            onFieldTextEdited("");
             m_ui->pushButtonSend->setEnabled(false);
             m_ui->pushButtonActivate->setEnabled(false);
             break;
@@ -166,76 +157,55 @@ void ActivationDialog::onActivationResponse(bool activated)
 
 bool ActivationDialog::validateMail()
 {
-    int pos;
-    QValidator::State state = m_validatorEmail.validate(m_ui->lineEditMail->text(), pos);
-    qLogD << "validate mail state: " << state << ", pos: " << pos;
-    if (state != QValidator::State::Invalid && !m_sendTimer.isActive())
-    {
-        m_ui->pushButtonSend->setEnabled(true);
-        m_ui->labelTips->setText("");
-        return true;
-    }
-    else
-    {
-        m_ui->labelTips->setText(tr("Invalid email!"));
-        return false;
-    }
+    QString email = m_ui->lineEditMail->text();
+    QRegularExpressionMatch match = m_reEmail.match(email);
+    qLogD << "validate mail state: " << match;
+    return match.hasMatch();
 }
 
 bool ActivationDialog::validateCode()
 {
-    int pos;
-    QValidator::State state = m_validatorCode.validate(m_ui->lineEditCode->text(), pos);
-    qLogD << "vaildate code state: " << state << ", pos: " << pos;
-    if (state != QValidator::State::Invalid)
-    {
-        m_ui->labelTips->setText("");
-        return true;
-    }
-    else
-    {
-        m_ui->labelTips->setText(tr("Invalid Activation Code!"));
-        return false;
-    }
+    QRegularExpressionMatch match = m_reCode.match(m_ui->lineEditCode->text());
+    qLogD << "vaildate code state: " << match;
+    return match.hasMatch();
 }
 
 bool ActivationDialog::validateUserName()
 {
-    int pos;
-    QValidator::State state = m_validatorUserName.validate(m_ui->lineEditUserName->text(), pos);
-    qLogD << "vaildate username state: " << state << ", pos: " << pos;
-    if (state != QValidator::State::Invalid)
+    QRegularExpressionMatch match = m_reUserName.match(m_ui->lineEditUserName->text());
+    qLogD << "vaildate username state: " << match;
+    return match.hasMatch();
+}
+
+void ActivationDialog::onFieldTextEdited(const QString& text)
+{
+    bool mailValid = validateMail();
+    bool codeValid = validateCode();
+    bool userNameValid = validateUserName();
+
+    QString errorMsg;
+    if (mailValid && !m_sendTimer.isActive())
     {
-        m_ui->labelTips->setText("");
-        return true;
+        m_ui->pushButtonSend->setEnabled(true);
     }
     else
     {
-        m_ui->labelTips->setText(tr("Invalid User Name!"));
-        return false;
+        errorMsg.append(tr("Invalid email!\n"));
     }
-}
 
-void ActivationDialog::onLineEditEmailEditingFinished()
-{
-    validateMail();
-}
-
-void ActivationDialog::onLineEditCodeEditingFinished()
-{
-    if (validateMail() && validateCode() && validateUserName())
+    if (!codeValid)
     {
-        m_ui->pushButtonActivate->setEnabled(true);
+        errorMsg.append(tr("Invalid Activation Code!\n"));
     }
-    else
-    {
-        m_ui->pushButtonActivate->setEnabled(false);
-    }
-}
 
-void ActivationDialog::onLineEditUserNameEditingFinished()
-{
-    if (validateMail() && validateCode() && validateUserName())
+    if (!userNameValid)
+    {
+        errorMsg.append(tr("Invalid User Name!"));
+    }
+
+    m_ui->labelTips->setText(errorMsg);
+
+    if (mailValid && codeValid && userNameValid)
     {
         m_ui->pushButtonActivate->setEnabled(true);
     }
@@ -260,3 +230,4 @@ void ActivationDialog::onUpdateTimerTimeout()
         m_ui->pushButtonSend->setText(tr("Send(%1)").arg(m_sendTimer.remainingTime() / 1000));
     }
 }
+

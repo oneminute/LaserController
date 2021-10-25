@@ -199,6 +199,9 @@ bool LaserDriver::load()
     m_fnGetMainHardVersion = (FN_WCHART_VOID)m_library.resolve("GetMainHardVersion");
     CHECK_FN(m_fnGetMainHardVersion);
 
+    m_fnGetHardwareIdentID = (FN_WCHART_VOID)m_library.resolve("GetHardwareIdentID");
+    CHECK_FN(m_fnGetHardwareIdentID);
+
     m_fnGetMainCardID = (FN_WCHART_VOID)m_library.resolve("GetMainCardID");
     CHECK_FN(m_fnGetMainCardID)
 
@@ -686,6 +689,13 @@ QString LaserDriver::firmwareVersion()
 QString LaserDriver::getMainCardID()
 {
     wchar_t* strId = m_fnGetMainCardID();
+    QString id = QString::fromWCharArray(strId);
+    return id;
+}
+
+QString LaserDriver::getHardwareIdentID()
+{
+    wchar_t* strId = m_fnGetHardwareIdentID();
     QString id = QString::fromWCharArray(strId);
     return id;
 }
