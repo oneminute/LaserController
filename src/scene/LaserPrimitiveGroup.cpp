@@ -73,7 +73,7 @@ QRectF LaserPrimitiveGroup::boundingRect() const
 {
 	Q_D(const LaserPrimitiveGroup);
 	QRectF bounding = QRectF(0, 0, 0, 0);
-	for (QGraphicsItem* item : childItems())
+	for (QGraphicsItem* item : QGraphicsItemGroup::childItems())
 	{
 		LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
 		if (!primitive)
@@ -98,12 +98,12 @@ QRectF LaserPrimitiveGroup::boundingRect() const
 
 QRectF LaserPrimitiveGroup::sceneBoundingRect() const
 {
-	return this->mapRectToScene(boundingRect());
+	return this->QGraphicsItemGroup::mapRectToScene(boundingRect());
 }
 
 bool LaserPrimitiveGroup::isEmpty() const
 {
-	return childItems().isEmpty();
+	return QGraphicsItemGroup::childItems().isEmpty();
 }
 
 void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -112,24 +112,12 @@ void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsIt
 	//QGraphicsItemGroup::paint(painter, option, widget);
 }
 
-/*QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
+QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
 {
-    
-    int size = this->childItems().size();
-    //qDebug() << size;
-    LaserScene* s = qobject_cast<LaserScene*>(scene());
-    if (!s) {
-        return QGraphicsItemGroup::itemChange(change, value);
-    }
-    LaserViewer* view = qobject_cast<LaserViewer*>(s->views()[0]);
-    LaserControllerWindow* window = LaserApplication::mainWindow;   
-    if (window) {
-        window->onLaserPrimitiveGroupItemChanged();
-    }
-    
 
-    return QGraphicsItemGroup::itemChange(change, value);
-}*/
+    //return QGraphicsItemGroup::itemChange(change, value);
+    return value;
+}
 
 //QRectF LaserPrimitiveGroup::updateBoundingRect()
 //{

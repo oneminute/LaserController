@@ -366,7 +366,7 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	qreal top = 0;
 	qreal bottom = 0;
 
-	QList<QGraphicsItem*> group_items = m_group->childItems();
+	QList<QGraphicsItem*> group_items = m_group->QGraphicsItemGroup::childItems();
 	if (group_items.size() == 0) {
 		return rect;
 	}
@@ -416,7 +416,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 		qreal heightReal = _sceneRect.height();
         LaserControllerWindow* window = LaserApplication::mainWindow;
        
-		QTransform t = m_group->transform();
+		QTransform t = m_group->QGraphicsItemGroup::transform();
         
         bool isLockRatio = window->lockEqualRatio();
 		switch (_transformType) {
@@ -463,7 +463,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 					}
 				}
 				t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-				m_group->setTransform(t);
+				m_group->QGraphicsItemGroup::setTransform(t);
 				break;
 			}
 			case Transform_SCALE: {
@@ -524,7 +524,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				QTransform t2;
 				t2.translate(diff.x(), diff.y());
 				t = t * t2;
-				m_group->setTransform(t);
+				m_group->QGraphicsItemGroup::setTransform(t);
 				//emit selectedChange();
 				break;
 			}
@@ -596,7 +596,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				QPointF newOriginal = t1.map(original);
 				diff = original - newOriginal;
 				t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
-				m_group->setTransform(t);
+				m_group->QGraphicsItemGroup::setTransform(t);
 				break;
 			}
 			case Transform_ROTATE: {
@@ -648,7 +648,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				QPointF diff = original - newOriginal;
 				t2.translate(diff.x(), diff.y());
 				t = t * t1 * t2;
-				m_group->setTransform(t);
+				m_group->QGraphicsItemGroup::setTransform(t);
 				break;
 			}
 		}
@@ -1420,7 +1420,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             if (isOnControllHandlers(event->pos(), handlerIndex))
             {
 				m_selectedRect = selectedItemsSceneBoundingRect();
-				m_oldTransform = m_group->transform();
+				m_oldTransform = m_group->QGraphicsItemGroup::transform();
 				m_rate = 1;
 				m_isItemScaleChangeX = true;
 				m_isItemScaleChangeY = true;
@@ -1473,7 +1473,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					case 8:
 					case 11: {
 						m_origin = boundRect.center();
-						m_newOrigin = m_group->mapFromScene(m_origin);
+						m_newOrigin = m_group->QGraphicsItemGroup::mapFromScene(m_origin);
 						break;
 					}
 
@@ -1490,7 +1490,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 				//undo redo
 				selectionUndoStackPush();
 				//undo before
-				if (m_group->isAncestorOf(m_detectedPrimitive)) {
+				if (m_group->QGraphicsItemGroup::isAncestorOf(m_detectedPrimitive)) {
 					transformUndoStackPushBefore();
 				}
 				else {
@@ -1511,7 +1511,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 					//undo redo
 					selectionUndoStackPush();
 					//undo before
-					if (m_group->isAncestorOf(m_detectedBitmap)) {
+					if (m_group->QGraphicsItemGroup::isAncestorOf(m_detectedBitmap)) {
 						transformUndoStackPushBefore();
 					}
 					else {
@@ -1966,12 +1966,16 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				item->setSelected(true);
 			}
 			for each(LaserPrimitive* newItem in newSelectedList) {
-				
-				if (selectedList.contains(newItem)) {
-					newItem->setSelected(false);
+                LaserPrimitive* p_newItem = qgraphicsitem_cast<LaserPrimitive*>(newItem);
+				if (selectedList.contains(p_newItem)) {
+                    p_newItem->blockSignals(true);
+                    p_newItem->setSelected(false);
+                    p_newItem->blockSignals(false);
 				}
 				else {
-					newItem->setSelected(true);
+                    p_newItem->blockSignals(true);
+                    p_newItem->setSelected(true);
+                    p_newItem->blockSignals(false);
 				}
 			}
 			onEndSelectionFillGroup();
@@ -2010,7 +2014,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		//undo
 		//如果是图元点选
 		if (m_detectedPrimitive != nullptr) {
-			if (m_group->isAncestorOf(m_detectedPrimitive)) {
+			if (m_group->QGraphicsItemGroup::isAncestorOf(m_detectedPrimitive)) {
 				transformUndoStackPush();
 			}
 			else {
@@ -2018,7 +2022,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			}
 		}
 		else if (m_detectedBitmap != nullptr) {
-			if (m_group->isAncestorOf(m_detectedBitmap)) {
+			if (m_group->QGraphicsItemGroup::isAncestorOf(m_detectedBitmap)) {
 				transformUndoStackPush();
 			}
 			else {
@@ -3139,31 +3143,29 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
 	}
 	if (!m_group->isEmpty())
 	{
-		/*if (m_group->isSelected()) {
-		m_group->setSelected(false);
-		}*/
-		//reshapeUndoStackPushBefore();
-
-		//selectedList.insert( m_group->childItems(), m_group->sceneTransform());
+		
         //清空group
-		for (QGraphicsItem *item : m_group->childItems()) {
+		for (QGraphicsItem *item : m_group->QGraphicsItemGroup::childItems()) {
             selectedList.insert(item, item->sceneTransform());
 			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
-
 			m_group->removeFromGroup(p_item);
-			if (p_item->isSelected()) {
-				p_item->blockSignals(true);
-				p_item->setSelected(false);
-				p_item->blockSignals(false);
-			}
+			p_item->blockSignals(true);
+			p_item->setSelected(false);
+			p_item->blockSignals(false);
+            
 		}
+        //m_scene->destroyItemGroup(m_group);
+        //m_group = nullptr;
 	}
     //清空选取区域
-    for (QGraphicsItem *item : m_scene->selectedPrimitives()) {
-        item->setSelected(false);
-        selectedList.insert(item, item->sceneTransform());
+    for (QGraphicsItem *item : m_scene->document()->selectedPrimitives()) {
+        LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
+        p_item->blockSignals(true);
+        p_item->setSelected(false);
+        p_item->blockSignals(false);
+        selectedList.insert(p_item, p_item->sceneTransform());
     }
-	m_group->setTransform(QTransform());
+	m_group->QGraphicsItemGroup::setTransform(QTransform());
     
 	m_scene->clearSelection();
 	m_scene->blockSignals(false);
@@ -3330,7 +3332,7 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 	QString className = primitive->metaObject()->className();
 	if (className == "LaserBitmap") {
 		LaserBitmap* bitmap = qobject_cast<LaserBitmap*> (primitive);
-		if (!m_group->isAncestorOf(bitmap)) {
+		if (!m_group->QGraphicsItemGroup::isAncestorOf(bitmap)) {
 			if (bitmap) {
 				if (m_isKeyCtrlPress) {
 						resetGroup();
@@ -3450,7 +3452,6 @@ void LaserViewer::selectingReleaseInBlank()
 				//清理group及所有被选中item
 				clearGroupSelection();
 				emit selectionToIdle();
-				//m_isKeyShiftPressed = false;
 				//undo redo
 				selectionUndoStackPush();
                 
@@ -3498,7 +3499,7 @@ void LaserViewer::transformUndoStackPushBefore(LaserPrimitive* item)
         m_singleLastTransform = item->sceneTransform();
     }
     else {
-        m_groupLastTransform = m_group->transform();
+        m_groupLastTransform = m_group->QGraphicsItemGroup::transform();
     }
     
 }
@@ -3511,7 +3512,7 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
         m_undoStack->push(cmd);
     }
     else {
-        GroupTransformUndoCommand* cmd = new GroupTransformUndoCommand(m_scene.data(), m_groupLastTransform, m_group->transform());
+        GroupTransformUndoCommand* cmd = new GroupTransformUndoCommand(m_scene.data(), m_groupLastTransform, m_group->QGraphicsItemGroup::transform());
         m_undoStack->push(cmd);
     }
     
@@ -3540,7 +3541,7 @@ void LaserViewer::setTextAlignV(int align)
 void LaserViewer::updateGroupTreeNode()
 {
     if (m_group && !m_group->isEmpty()) {
-        for (QGraphicsItem* item : m_group->childItems()) {
+        for (QGraphicsItem* item : m_group->QGraphicsItemGroup::childItems()) {
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
             m_scene->quadTreeNode()->upDatePrimitive(primitive);
         }
@@ -3758,9 +3759,10 @@ void LaserViewer::onEndSelectionFillGroup()
 	}
 	else {
 		emit endSelecting();
+        
 	}
-
-	viewport()->repaint();
+    viewport()->repaint();
+	
 }
 bool LaserViewer::onSelectedFillGroup()
 {
@@ -3774,12 +3776,11 @@ bool LaserViewer::onSelectedFillGroup()
 		
 		for (LaserPrimitive* item : m_scene->document()->selectedPrimitives())
 		{
-			if (m_group->childItems().contains(item) || item->isLocked())
+			if (m_group->QGraphicsItemGroup::childItems().contains(item) || item->isLocked())
 				continue;
 			m_group->addToGroup(item);
 		}
-		//m_group->setZValue(1);
-		m_group->setSelected(true);
+		m_group->QGraphicsItemGroup::setSelected(true);
 	}
 	else
 	{
@@ -3787,11 +3788,10 @@ bool LaserViewer::onSelectedFillGroup()
 		if (list.isEmpty()) {
 			return false;
 		}
-		//m_group->stackBefore(list[list.size() - 1]);
 		m_group = m_scene->createItemGroup(list);
-		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-		m_group->setSelected(true);
-		m_group->setZValue(1);
+		m_group->QGraphicsItemGroup::setFlag(QGraphicsItem::ItemIsSelectable, true);
+		m_group->QGraphicsItemGroup::setSelected(true);
+		m_group->QGraphicsItemGroup::setZValue(1);
 	}
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
@@ -3807,8 +3807,6 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* ite
 	QMap<QGraphicsItem*, QTransform> selectedListBeforeReplace = onCancelSelected();
 	item->setSelected(true);
 	onEndSelectionFillGroup();
-	//undo
-	//selectionUndoStackPush();
 	return selectedListBeforeReplace;
 }
 
@@ -3972,21 +3970,21 @@ void LaserViewer::selectedHandleScale()
 		{
 			//QPointF diff = m_group->mapFromScene(this->mapToScene(QPointF(m_mousePoint - m_origin).toPoint()));
 			QPointF diff = (m_mousePoint - m_lastPos) ;
-			t = m_group->transform();
+			t = m_group->QGraphicsItemGroup::transform();
 			QTransform t1;
 			t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-			m_group->setTransform(t * t1);
+			m_group->QGraphicsItemGroup::setTransform(t * t1);
             
 			break;
 		}
 		case 13://点选
 		{
 			QPointF diff = (m_mousePoint - m_lastPos);
-			if (m_group->isAncestorOf(m_detectedPrimitive)) {
-				t = m_group->transform();
+			if (m_group->QGraphicsItemGroup::isAncestorOf(m_detectedPrimitive)) {
+				t = m_group->QGraphicsItemGroup::transform();
 				QTransform t1;
 				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-				m_group->setTransform(t * t1);
+				m_group->QGraphicsItemGroup::setTransform(t * t1);
 			}
 			else {
                 if (!m_detectedPrimitive->isLocked()) {
@@ -4004,11 +4002,11 @@ void LaserViewer::selectedHandleScale()
 		case 14://点选图片
 		{
 			QPointF diff = (m_mousePoint - m_lastPos);
-			if (m_group->isAncestorOf(m_detectedBitmap)) {
-				t = m_group->transform();
+			if (m_group->QGraphicsItemGroup::isAncestorOf(m_detectedBitmap)) {
+				t = m_group->QGraphicsItemGroup::transform();
 				QTransform t1;
 				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-				m_group->setTransform(t * t1);
+				m_group->QGraphicsItemGroup::setTransform(t * t1);
 			}
 			else {
                 if (!m_detectedBitmap->isLocked()) {
@@ -4038,10 +4036,10 @@ void LaserViewer::selectedHandleScale()
 			t1.scale(xRate, yRate);
 			m_newOrigin = t1.map(m_origin);
 			QPointF diff = m_origin - m_newOrigin;
-			t = m_group->transform();
+			t = m_group->QGraphicsItemGroup::transform();
 			QTransform t2;
 			t2.translate(diff.x(), diff.y());
-			m_group->setTransform(t * t1*t2);
+			m_group->QGraphicsItemGroup::setTransform(t * t1*t2);
 			break;
 		}
 		case 2:
@@ -4073,14 +4071,14 @@ void LaserViewer::selectedHandleScale()
 
 			m_radians += radians;
 			//qDebug() << "m_radians: " << m_radians;
-			t = m_group->transform();
+			t = m_group->QGraphicsItemGroup::transform();
 			QTransform t1;
 			t1.setMatrix(qCos(radians), qSin(radians), t1.m13(), -qSin(radians), qCos(radians), t.m23(), t1.m31(), t1.m32(), t1.m33());
 			m_newOrigin = m_origin * t1;
 			QTransform t2;
 			QPointF diff = m_origin - m_newOrigin;
 			t2.setMatrix(t2.m11(), t2.m12(), t2.m13(), t2.m21(), t2.m22(), t2.m23(), diff.x(), diff.y(), t2.m33());
-			m_group->setTransform(t * t1 * t2);
+			m_group->QGraphicsItemGroup::setTransform(t * t1 * t2);
 			m_origin = m_origin * t1 * t2;
 			break;
 		}
@@ -4203,8 +4201,8 @@ void LaserViewer::zoomToSelection()
 
 void LaserViewer::onDocumentIdle()
 {
-	if (m_group && m_group->isSelected()) {
-		QList<QGraphicsItem*> items = m_group->childItems();
+	if (m_group && m_group->QGraphicsItemGroup::isSelected()) {
+		QList<QGraphicsItem*> items = m_group->QGraphicsItemGroup::childItems();
 		int size = items.size();
 		if (items.size() > 0) {
 			emit endSelecting();
@@ -4232,18 +4230,16 @@ bool LaserViewer::resetGroup()
 	}
 	if (m_group->isEmpty())
 	{
-		m_group->setTransform(QTransform());
+		m_group->QGraphicsItemGroup::setTransform(QTransform());
 		return false;
 	}
-	//reshapeUndoStackPushBefore();
-	const auto items = m_group->childItems();
+	const auto items = m_group->QGraphicsItemGroup::childItems();
 	for (QGraphicsItem *item : items) {
 		LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 
 		m_group->removeFromGroup(p_item);
 		
 	}
-	m_group->setTransform(QTransform());
-	//reshapeUndoStackPush();
+	m_group->QGraphicsItemGroup::setTransform(QTransform());
 	return true;
 }

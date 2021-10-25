@@ -741,6 +741,7 @@ void GroupTransformUndoCommand::undo()
     else {
         m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
     }*/
+    m_group = m_viewer->group();
     m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
     //updata tree
     m_viewer->updateGroupTreeNode();
@@ -755,6 +756,7 @@ void GroupTransformUndoCommand::redo()
         m_viewer->updateGroupTreeNode();
         return;
     }
+    m_group = m_viewer->group();
     m_group->setTransform(m_curTransform);
     //updata tree
     m_viewer->updateGroupTreeNode();

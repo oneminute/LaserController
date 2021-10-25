@@ -5,8 +5,9 @@
 
 class LaserPrimitive;
 class LaserPrimitiveGroupPrivate;
-class LaserPrimitiveGroup : public QGraphicsItemGroup
+class LaserPrimitiveGroup : public QObject, public QGraphicsItemGroup
 {
+    Q_OBJECT
 public:
 	LaserPrimitiveGroup(QGraphicsItem* parent = nullptr);
 	virtual ~LaserPrimitiveGroup();
@@ -22,10 +23,10 @@ public:
 
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-//protected:
+protected:
 
-    //virtual QVariant
-        //itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
+    virtual QVariant
+        itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 private:
 	QScopedPointer<LaserPrimitiveGroupPrivate> m_ptr;
 
