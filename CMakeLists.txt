@@ -247,6 +247,8 @@ add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
 target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
 add_executable(TestQPainterPath test/TestQPainterPath.cpp)
 target_link_libraries(TestQPainterPath PRIVATE ${LINK_LIBRARIES})
+add_executable(TestDriver test/TestDriver.cpp)
+target_link_libraries(TestDriver PRIVATE ${LINK_LIBRARIES})
 add_executable(TestException test/TestException.cpp src/exception/LaserException.h src/exception/LaserException.cpp)
 target_link_libraries(TestException PRIVATE ${LINK_LIBRARIES})
 

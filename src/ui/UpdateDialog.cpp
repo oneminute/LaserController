@@ -5,6 +5,7 @@
 #include <common/Config.h>
 #include <LaserApplication.h>
 #include <laser/LaserDevice.h>
+#include <QCloseEvent>
 
 #include <QWindow>
 

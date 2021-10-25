@@ -46,8 +46,6 @@ public:
 
     QString newLayerName() const;
 
-    void blockSignals(bool block = true);
-
 	bool isOpened() const;
 
 	LaserScene* scene() const;

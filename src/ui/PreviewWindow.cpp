@@ -1,6 +1,7 @@
 #include "PreviewWindow.h"
 
 #include "common/common.h"
+#include "common/Config.h"
 #include "scene/LaserPrimitive.h"
 #include <LaserApplication.h>
 #include <laser/LaserDevice.h>
@@ -20,6 +21,9 @@
 #include <DockAreaTitleBar.h>
 #include <DockAreaWidget.h>
 #include <DockComponentsFactory.h>
+#include <DockContainerWidget.h>
+#include <DockSplitter.h>
+#include <DockWidgetTab.h>
 #include "widget/PreviewViewer.h"
 #include "widget/ProgressBarDelegate.h"
 #include "task/ProgressModel.h"
@@ -96,6 +100,30 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     m_logDockWidget = new CDockWidget(tr("Log"));
     m_logDockWidget->setWidget(m_textEditLog);
     CDockAreaWidget* logDockArea = m_dockManager->addDockWidget(BottomDockWidgetArea, m_logDockWidget, progressDockArea);
+
+    //canvasDockArea->resize(QSize(600, 600));
+    //progressDockArea->resize(QSize(600, 300));
+    //logDockArea->resize(QSize(600, 300));
+    m_canvasDockWidget->resize(QSize(600, 600));
+    m_progressDockWidget->resize(QSize(600, 300));
+    m_logDockWidget->resize(QSize(600, 300));
+    m_progressDockWidget->setMinimumWidth(500);
+
+    internal::findParent<QSplitter*>(canvasDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(progressDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    internal::findParent<QSplitter*>(logDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    /*for (CDockContainerWidget* container : m_dockManager->dockContainers())
+    {
+        connect(container, &CDockContainerWidget::dockAreasAdded,
+            [=]() {
+                qLogD << container;
+                for (int i = 0; i < container->dockAreaCount(); i++)
+                {
+                    internal::findParent<QSplitter*>(container->dockArea(i))->setHandleWidth(Config::Ui::splitterHandleWidth());
+                }
+            }
+        );
+    }*/
 
     m_actionZoomIn->connect(m_actionZoomIn, &QAction::triggered, this, [=] {
         m_viewer->zoomIn();

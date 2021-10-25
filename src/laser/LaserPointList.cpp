@@ -164,7 +164,9 @@ int LaserPointList::nearestSearch(const LaserPoint& point)
         }
     }
 
+#ifdef _DEBUG
     qLogD << "nearest point: " << m_matrix[index * 3] << ", " << m_matrix[index * 3 + 1] << ", " << m_matrix[index * 3 + 2];
+#endif
 
     /*for (int i = 0; i < m_matrix.length() / 3; i++)
     {

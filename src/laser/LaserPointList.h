@@ -4,6 +4,7 @@
 #include <QList>
 #include <QPainterPath>
 #include <QVector>
+#include <QMap>
 #include "LaserPoint.h"
 #include <flann/flann.hpp>
 

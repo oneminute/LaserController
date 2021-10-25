@@ -12,6 +12,7 @@
 #include "exception/LaserException.h"
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"
+#include "util/Utils.h"
 
 class LaserDevicePrivate
 {
@@ -145,6 +146,12 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(32, new LaserRegister(32, Config::UserRegister::cuttingTurnOnDelayItem(), false));
     d->userRegisters.insert(33, new LaserRegister(33, Config::UserRegister::cuttingTurnOffDelayItem(), false));
     d->userRegisters.insert(34, new LaserRegister(34, Config::UserRegister::spotShotPowerItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(35, Config::UserRegister::fillingSpeedItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(36, Config::UserRegister::fillingStartSpeedItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(37, Config::UserRegister::fillingAccelerationItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(38, Config::UserRegister::maxFillingPowerItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(39, Config::UserRegister::minFillingPowerItem(), false));
+    d->userRegisters.insert(34, new LaserRegister(40, Config::UserRegister::fillingAccRatioItem(), false));
 
     d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
     d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));
@@ -262,12 +269,6 @@ void LaserDevice::load()
     connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
     d->driver->load();
-    /*if (d->driver->load())
-    {
-        return true;
-    }
-
-    return false;*/
 }
 
 qreal LaserDevice::layoutWidth() const
@@ -589,6 +590,14 @@ bool LaserDevice::readSystemRegisters()
     return d->driver->readAllSysParamFromCard();
 }
 
+bool LaserDevice::readHostRegisters()
+{
+    Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
+    return d->driver->readAllHostParamFromCard();
+}
+
 bool LaserDevice::readUserRegister(int address)
 {
     Q_D(LaserDevice);
@@ -777,6 +786,7 @@ QPointF LaserDevice::origin() const
     }
         break;
     }
+    return QPointF(0, 0);
 }
 
 QPointF LaserDevice::deviceOrigin() const
@@ -1130,7 +1140,7 @@ void LaserDevice::handleError(int code, const QString& message)
         throw new LaserDeviceIOException(code, tr("Transfering data timeout"));
         break;
     case E_RetransferAfterTimeout:
-        throw new LaserDeviceIOException(code, tr("Retransfer data after timeout"));
+        //throw new LaserDeviceIOException(code, tr("Retransfer data after timeout"));
         break;
     case E_RetransferTooManyTimes:
         throw new LaserDeviceIOException(code, tr("Retransfer data too many times"));
@@ -1543,7 +1553,7 @@ void LaserDevice::onLibraryInitialized()
 void LaserDevice::onComPortsFetched(const QStringList& portNames)
 {
     Q_D(LaserDevice);
-    if (portNames.length() == 1)
+    /*if (portNames.length() == 1)
     {
         connectDevice(portNames[0]);
     }
@@ -1553,7 +1563,7 @@ void LaserDevice::onComPortsFetched(const QStringList& portNames)
         {
             connectDevice(portNames[0]);
         }
-    }
+    }*/
 }
 
 void LaserDevice::onConnected()
@@ -1562,7 +1572,9 @@ void LaserDevice::onConnected()
     if (d->driver)
     {
         d->driver->setFactoryType("LaserController");
+        d->driver->stopMachining();
         d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
+        d->driver->getDeviceWorkState();
         //d->driver->getMainCardRegisterState();
         //QString compileInfo = d->driver->getCompileInfo();
         //qLogD << "compile info: " << compileInfo;
@@ -1573,6 +1585,7 @@ void LaserDevice::onConnected()
 
         //readSystemRegisters();
         //readUserRegisters();
+        //readHostRegisters();
     }
 }
 

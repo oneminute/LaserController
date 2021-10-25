@@ -397,8 +397,6 @@ void LaserLayer::setErrorX(int errorX)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
-    //if (d->primitives.contains(item))
-        //return;
     int i = this->index();
     item->setLayer(this);
     d->primitives.append(item);

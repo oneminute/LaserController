@@ -13,6 +13,7 @@ LayerButton::LayerButton(LaserViewer* viewer, QWidget* parent)
 	//, m_clicked(false)
 	, m_checked(false)
     , m_layer(nullptr)
+	, m_layerIndex(-1)
 {
 	m_viewer = viewer;
 	installEventFilter(this);
@@ -51,9 +52,12 @@ void LayerButton::setLayerIndex(int index)
 void LayerButton::setCheckedTrue()
 {
 	m_checked = true;
-	m_viewer->setCurLayerIndex(m_layerIndex);
-	this->repaint();
-	m_viewer->viewport()->repaint();
+	if (m_layerIndex >= 0)
+	{
+		m_viewer->setCurLayerIndex(m_layerIndex);
+		this->repaint();
+		m_viewer->viewport()->repaint();
+	}
 }
 
 void LayerButton::contextMenuEvent(QContextMenuEvent * event)
@@ -186,12 +190,12 @@ void LayerButton::paintEvent(QPaintEvent * event)
         painter.setPen(textColor);
         QTextOption option;
         option.setAlignment(Qt::AlignCenter);
-        QString index = QString::number(m_layerIndex);
+        /*QString index = QString::number(m_layerIndex);
         if (index.length() == 1) {
             index.insert(0, "0");
-        }
+        }*/
 
-        painter.drawText(rect, index, option);
+        painter.drawText(rect, text(), option);
     }
     t = QTransform::fromTranslate(0, 0);
     painter.setTransform(t);
