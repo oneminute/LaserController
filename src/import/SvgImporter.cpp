@@ -11,6 +11,7 @@
 #include "laser/LaserDriver.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
+#include "scene/LaserScene.h"
 #include "svg/qsvggraphics.h"
 #include "svg/qsvgrenderer.h"
 #include "svg/qsvgtinydocument.h"
@@ -225,7 +226,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setName(node->nodeId());
 
-            laserDoc->addPrimitive(item);
+            scene->addLaserPrimitive(item);
         }
         progress->increaseProgress();
     }
