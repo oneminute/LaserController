@@ -164,16 +164,18 @@ LaserPrimitiveGroup * LaserScene::createItemGroup(const QList<LaserPrimitive*>& 
 	LaserPrimitiveGroup *group = new LaserPrimitiveGroup(commonAncestor);
 	if (!commonAncestor)
 		addItem(group);
-	for (QGraphicsItem *item : items)
+	for (LaserPrimitive *item : items)
 	{
-		group->addToGroup(qgraphicsitem_cast<LaserPrimitive*>(item));
+        if (item->isLocked())
+            continue;
+		group->addToGroup(item);
 	}
 	return group;
 }
 
 void LaserScene::destroyItemGroup(LaserPrimitiveGroup * group)
 {
-	const auto items = group->QGraphicsItemGroup::childItems();
+	const auto items = group->childItems();
 	for (QGraphicsItem *item : items)
 		group->removeFromGroup(qgraphicsitem_cast<LaserPrimitive*>(item));
 	removeItem(group);

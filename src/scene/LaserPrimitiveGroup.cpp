@@ -6,10 +6,10 @@
 #include "scene/LaserScene.h"
 #include"LaserApplication.h"
 #include <QGraphicsScene>
-
+#include <QGraphicsItem>
 
 //class QGraphicsItem;
-class LaserPrimitiveGroupPrivate
+/*class LaserPrimitiveGroupPrivate
 {
 	Q_DECLARE_PUBLIC(LaserPrimitiveGroup)
 public:
@@ -32,29 +32,6 @@ LaserPrimitiveGroup::LaserPrimitiveGroup(QGraphicsItem * parent)
 LaserPrimitiveGroup::~LaserPrimitiveGroup()
 {
 }
-
-//void LaserPrimitiveGroup::addPrimitives(const QList<LaserPrimitive*>& primitives)
-//{
-//	for (LaserPrimitive* primitive : primitives)
-//	{
-//		addToGroup(primitive);
-//	}
-//}
-//
-//void LaserPrimitiveGroup::clearPrimitives()
-//{
-//	Q_D(LaserPrimitiveGroup);
-//	
-//	const auto items = childItems();
-//	for (QGraphicsItem *item : items)
-//	{
-//		LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-//		if (primitive)
-//			removeFromGroup(primitive);
-//	}
-//		
-//	d->boundingRect = QRectF(0, 0, 0, 0);
-//}
 
 void LaserPrimitiveGroup::addToGroup(LaserPrimitive * primitive)
 {
@@ -80,10 +57,6 @@ QRectF LaserPrimitiveGroup::boundingRect() const
 			continue;
 		QTransform t = primitive->sceneTransform();
 		QRectF boundingRect = primitive->boundingRect();
-		/*if (!t.isIdentity())
-		{
-			boundingRect = t.mapRect(boundingRect);
-		}*/
 		if (bounding.isEmpty())
 		{
 			bounding = boundingRect;
@@ -117,23 +90,60 @@ QVariant LaserPrimitiveGroup::itemChange(QGraphicsItem::GraphicsItemChange chang
 
     //return QGraphicsItemGroup::itemChange(change, value);
     return value;
+}*/
+
+LaserPrimitiveGroup::LaserPrimitiveGroup(QGraphicsItem * parent)
+    :QGraphicsItem(parent)
+{
 }
 
-//QRectF LaserPrimitiveGroup::updateBoundingRect()
-//{
-//	Q_D(LaserPrimitiveGroup);
-//	d->boundingRect = QRectF(0, 0, 0, 0);
-//	for (LaserPrimitive* primitive : d->primitives)
-//	{
-//		if (d->boundingRect.isEmpty())
-//		{
-//			d->boundingRect = primitive->sceneBoundingRect();
-//		}
-//		else
-//		{
-//			d->boundingRect = d->boundingRect.united(primitive->sceneBoundingRect());
-//		}
-//	}
-//	return d->boundingRect;
-//}
+LaserPrimitiveGroup::~LaserPrimitiveGroup()
+{
+}
 
+void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+{
+}
+
+void LaserPrimitiveGroup::addToGroup(LaserPrimitive * primitive)
+{
+    primitive->setParentItem(this);
+}
+
+void LaserPrimitiveGroup::removeFromGroup(LaserPrimitive * primitive)
+{
+    QTransform transform = primitive->sceneTransform();
+    primitive->setParentItem(0);
+    primitive->setTransform(transform);
+}
+
+QRectF LaserPrimitiveGroup::boundingRect() const
+{
+    QRectF bounding = QRectF(0, 0, 0, 0);
+    for (QGraphicsItem* item : childItems())
+    {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        if (!primitive)
+            continue;
+        QTransform t = primitive->sceneTransform();
+        QRectF boundingRect = primitive->boundingRect();
+        if (bounding.isEmpty())
+        {
+            bounding = boundingRect;
+        }
+        else
+        {
+            bounding = bounding.united(boundingRect);
+        }
+    }
+    return bounding;
+}
+
+bool LaserPrimitiveGroup::isEmpty() const
+{
+    return childItems().isEmpty();
+}
+QRectF LaserPrimitiveGroup::sceneBoundingRect() const
+{
+    return this->mapRectToScene(boundingRect());
+}
