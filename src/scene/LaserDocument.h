@@ -30,9 +30,9 @@ public:
     void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
     void removePrimitive(LaserPrimitive* item);
 
-    PageInformation pageInformation() const;
-    void setPageInformation(const PageInformation& page);
-    QRectF pageBounds() const;
+    //PageInformation pageInformation() const;
+    //void setPageInformation(const PageInformation& page);
+    //QRectF pageBounds() const;
 
     QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;

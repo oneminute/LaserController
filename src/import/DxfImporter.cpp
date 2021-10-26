@@ -68,16 +68,17 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, P
 
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import Dxf", parentProgress);
     LaserDocument* laserDoc = new LaserDocument(scene);
-    PageInformation page;
-    page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
-    page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
-    laserDoc->setPageInformation(page);
+    //PageInformation page;
+    //page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
+    //page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
+    //laserDoc->setPageInformation(page);
     laserDoc->blockSignals(true);
 
+    QRectF deviceRect = LaserApplication::device->boundingRect();
     qreal scaleX = Global::convertFromMM(SizeUnit::SU_PX, 1);
     qreal scaleY = Global::convertFromMM(SizeUnit::SU_PX, 1, Qt::Vertical);
 
-    QTransform t(scaleX, 0, 0, -scaleY, 0, page.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
+    QTransform t(scaleX, 0, 0, -scaleY, 0, deviceRect.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
 
     const DxfEntitiesNode& entities = d->documentNode->entities();
     progress->setMaximum(entities.length());

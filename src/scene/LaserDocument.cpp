@@ -48,7 +48,7 @@ public:
     {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
-    PageInformation pageInfo;
+    //PageInformation pageInfo;
     bool isOpened;
     LaserScene* scene;
     FinishRun finishRun;
@@ -102,23 +102,23 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
 
 }
 
-PageInformation LaserDocument::pageInformation() const
-{
-    Q_D(const LaserDocument);
-    return d->pageInfo;
-}
-
-void LaserDocument::setPageInformation(const PageInformation& page)
-{
-    Q_D(LaserDocument);
-    d->pageInfo = page;
-}
-
-QRectF LaserDocument::pageBounds() const
-{
-    Q_D(const LaserDocument);
-    return QRectF(0, 0, d->pageInfo.width(), d->pageInfo.height());
-}
+//PageInformation LaserDocument::pageInformation() const
+//{
+//    Q_D(const LaserDocument);
+//    return d->pageInfo;
+//}
+//
+//void LaserDocument::setPageInformation(const PageInformation& page)
+//{
+//    Q_D(LaserDocument);
+//    d->pageInfo = page;
+//}
+//
+//QRectF LaserDocument::pageBounds() const
+//{
+//    Q_D(const LaserDocument);
+//    return QRectF(0, 0, d->pageInfo.width(), d->pageInfo.height());
+//}
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
 {

@@ -2452,6 +2452,22 @@ void LaserControllerWindow::onActionRedo(bool checked) {
 void LaserControllerWindow::onActionImport(bool checked)
 {
     qLogD << "onActionImport";
+
+ //   LaserDocument* doc = m_scene->document();
+	//if (doc) {
+ //       // 询问关闭还是合并
+ //       QMessageBox msgDlg;
+ //       msgDlg.setText(tr("A document is opened."));
+ //       msgDlg.setInformativeText(tr("Do you want to merge or create a new one?"));
+ //       msgDlg.addButton(tr("Merge"), QMessageBox::ButtonRole::YesRole);
+ //       msgDlg.addButton(tr("New"), QMessageBox::ButtonRole::NoRole);
+	//	if (!onActionCloseDocument()) {
+	//		return;
+	//	}
+	//}
+	//this->setWindowTitle("Untitled - ");
+	//createNewDocument();
+
     QString filters = tr("SVG (*.svg);;CAD (*.dxf)");
     QString filename = getFilename(tr("Open Supported File"), filters);
     qLogD << "importing filename is " << filename;
@@ -3917,7 +3933,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         m_viewer->undoStack()->clear();
         LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         if (m_viewer) {
-            QRectF rect = m_scene->document()->pageBounds();
+            QRectF rect = LaserApplication::device->boundingRect();
 
             m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -4708,14 +4724,8 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
 void LaserControllerWindow::createNewDocument()
 {
 	LaserDocument* doc = new LaserDocument(m_scene);
-	PageInformation page;
-	page.setWidth(Global::mm2PixelsXF(LaserApplication::device->layoutWidth()));
-	page.setHeight(Global::mm2PixelsYF(LaserApplication::device->layoutHeight()));
-	doc->setPageInformation(page);
 	initDocument(doc);
-	
 	doc->open();
-	
 }
 
 QString LaserControllerWindow::getCurrentFileName()
