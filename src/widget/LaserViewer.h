@@ -286,6 +286,7 @@ private:
 
 	qreal m_selectedEditCount = 0;
 	LaserPrimitiveGroup* m_group;
+    QGraphicsRectItem* m_group2;
 	bool m_isLeftSelecting = true;//����߿�ʼѡ�����ұ߿�ʼѡ��
 
 	bool m_isFirstPaint = true;
