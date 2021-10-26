@@ -3908,7 +3908,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
 
         doc->bindLayerButtons(m_layerButtons);
 		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
-        m_scene->updateDocument(doc);
+        //m_scene->setDocument(doc);
         //doc->outline();
         m_tableWidgetLayers->setDocument(doc);
         m_tableWidgetLayers->updateItems();

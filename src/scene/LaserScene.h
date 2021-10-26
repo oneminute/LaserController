@@ -22,7 +22,7 @@ public:
     explicit LaserScene(QObject* parent = nullptr);
     ~LaserScene();
 
-    void updateDocument(LaserDocument* doc);
+    void setDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
     void addLaserPrimitive(LaserPrimitive* primitive);
 	void removeLaserPrimitive(LaserPrimitive* primitive);

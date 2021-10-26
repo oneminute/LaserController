@@ -26,7 +26,7 @@ LaserScene::~LaserScene()
     clearSelection();
 }
 
-void LaserScene::updateDocument(LaserDocument * doc)
+void LaserScene::setDocument(LaserDocument * doc)
 {
     if (m_doc == doc)
     {
@@ -101,7 +101,6 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
     m_doc->addPrimitive(primitive);
 	addItem(primitive);
     m_quadTree->createPrimitiveTreeNode(primitive);
-
 }
 
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)

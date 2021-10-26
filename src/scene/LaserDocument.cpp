@@ -70,6 +70,7 @@ LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
 {
     Q_D(LaserDocument);
     d->scene = scene;
+    d->scene->setDocument(this);
 	init();
 }
 
@@ -83,7 +84,6 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
 	d->layers[item->layerIndex()]->addPrimitive(item);
-    scene()->addLaserPrimitive(item);
 }
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
