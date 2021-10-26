@@ -2,24 +2,22 @@
 #define LASERPRIMITIVEGROUP_H
 
 #include <QGraphicsItemGroup>
+#include <QGraphicsItem>
 
 class LaserPrimitive;
 class LaserPrimitiveGroupPrivate;
-class LaserPrimitiveGroup : public QObject, public QGraphicsItemGroup
+//class LaserPrimitiveGroup : public QObject, public QGraphicsItemGroup
+class LaserPrimitiveGroup : public QGraphicsItem
 {
-    Q_OBJECT
+    /*Q_OBJECT
 public:
 	LaserPrimitiveGroup(QGraphicsItem* parent = nullptr);
 	virtual ~LaserPrimitiveGroup();
-
-	//void addPrimitives(const QList<LaserPrimitive*>& primitives);
-	//void clearPrimitives();
 	void addToGroup(LaserPrimitive* primitive);
 	void removeFromGroup(LaserPrimitive* primitive, bool updateBounding = false);
 	virtual QRectF boundingRect() const override;
 	QRectF sceneBoundingRect() const;
 	bool isEmpty() const;
-	//QRectF updateBoundingRect();
 
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
@@ -31,9 +29,19 @@ private:
 	QScopedPointer<LaserPrimitiveGroupPrivate> m_ptr;
 
 	Q_DECLARE_PRIVATE_D(m_ptr, LaserPrimitiveGroup)
-	Q_DISABLE_COPY(LaserPrimitiveGroup)
-
-        
+	Q_DISABLE_COPY(LaserPrimitiveGroup)*/
+public:
+    LaserPrimitiveGroup(QGraphicsItem *parent = nullptr);
+    ~LaserPrimitiveGroup();
+protected:
+    virtual void
+        paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+public:
+    void addToGroup(LaserPrimitive* primitive);
+    void removeFromGroup(LaserPrimitive* primitive);
+    virtual QRectF boundingRect() const override;
+    QRectF sceneBoundingRect() const;
+    bool isEmpty() const;
 };
 
 #endif // LASERPRIMITIVEGROUP_H

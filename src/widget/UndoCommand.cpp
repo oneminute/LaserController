@@ -196,6 +196,10 @@ void AddDelUndoCommand::redo()
 			LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
 			m_scene->addLaserPrimitive(primitive);
 			primitive->setSelected(true);
+            //QGraphicsRectItem *m_group2 = new QGraphicsRectItem();
+            //m_scene->addItem(m_group2);
+            //primitive->setParentItem(m_group2);
+            //m_group2->setScale(3);
 		}
 		m_viewer->onSelectedFillGroup();
 		if (StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
