@@ -1,23 +1,25 @@
 #include "ProgressItem.h"
 
 #include <QtMath>
+#include <QMutexLocker>
 
 #include "common/common.h"
+#include "LaserApplication.h"
+#include "task/ProgressModel.h"
 
-ProgressItem::ProgressItem(const QString& title, ProgressType progressType, QObject* parent)
-    : QObject(parent)
-    , m_state(PS_Idle)
+ProgressItem::ProgressItem(const QString& title, ProgressType progressType, ProgressItem* parent)
+    : m_state(PS_Idle)
     , m_type(progressType)
     , m_minimum(0.0)
     , m_maximum(100.0)
     , m_progress(0.0)
     , m_title(title)
     , m_message("")
+    , m_parent(parent)
 {
-    ProgressItem* parentItem = qobject_cast<ProgressItem*>(parent);
-    if (parentItem && parentItem->progressType() == PT_Complex)
+    if (parent && parent->progressType() == PT_Complex)
     {
-        parentItem->addChildItem(this);
+        parent->addChildItem(this);
     }
     startTimer();
 }
@@ -28,6 +30,7 @@ ProgressItem::~ProgressItem()
 
 qreal ProgressItem::progress() const 
 {
+    //QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
     switch (m_type)
     {
     case PT_Simple:
@@ -49,12 +52,10 @@ qreal ProgressItem::progress() const
 
 void ProgressItem::setProgress(qreal process)
 {
+    //QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
     if (m_type == PT_Simple)
         m_progress = qBound(m_minimum, process, m_maximum); 
-    qreal progressValue = progress();
-    emit progressUpdated(progressValue);
-    if (progressValue >= 1.0)
-        emit finished();
+    notify();
 }
 
 void ProgressItem::increaseProgress(qreal delta)
@@ -100,7 +101,9 @@ qint64 ProgressItem::durationNSecs() const
 void ProgressItem::addChildItem(ProgressItem* item)
 {
     item->setParent(this);
-    m_childItems.append(item);
+    if (!m_childItems.contains(item))
+        m_childItems.append(item);
+    setWeight(item, 1.0);
 }
 
 QList<ProgressItem*> ProgressItem::childItems() const
@@ -160,6 +163,16 @@ QString ProgressItem::toString() const
     return QString();
 }
 
+ProgressItem* ProgressItem::parent() const
+{
+    return m_parent;
+}
+
+void ProgressItem::setParent(ProgressItem* parent)
+{
+    m_parent = parent;
+}
+
 void ProgressItem::updateWeights()
 {
     m_sumWeights = 0;
@@ -181,10 +194,9 @@ void ProgressItem::updateWeights()
 
 void ProgressItem::notify()
 {
-    ProgressItem* parent = qobject_cast<ProgressItem*>(this->parent());
-    if (parent)
+    if (m_parent)
     {
-        parent->notify();
+        m_parent->notify();
     }
-    emit progressUpdated(progress());
+    LaserApplication::progressModel->updateItem(this);
 }

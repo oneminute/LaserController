@@ -5,6 +5,7 @@
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
 #include "scene/LaserDocument.h"
+#include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
 #include <QFile>
@@ -43,14 +44,14 @@ DxfImporter::~DxfImporter()
 {
 }
 
-LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void DxfImporter::import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
     Q_D(DxfImporter);
     qLogD << "import from dxf";
 
     QFile file(filename);
     if (!file.open(QFile::ReadOnly))
-        return nullptr;
+        return;
 
     DxfStream stream(&file, parentProgress);
 
@@ -59,7 +60,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, P
     {
         delete d->documentNode;
         d->documentNode = nullptr;
-        return nullptr;
+        return;
     }
 
 #ifdef _DEBUG
@@ -67,11 +68,7 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, P
 #endif
 
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import Dxf", parentProgress);
-    LaserDocument* laserDoc = new LaserDocument(scene);
-    //PageInformation page;
-    //page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
-    //page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
-    //laserDoc->setPageInformation(page);
+    LaserDocument* laserDoc = scene->document();
     laserDoc->blockSignals(true);
 
     QRectF deviceRect = LaserApplication::device->boundingRect();
@@ -92,20 +89,10 @@ LaserDocument* DxfImporter::import(const QString& filename, LaserScene* scene, P
         progress->increaseProgress();
     }
 
-    QFileInfo fileInfo(filename);
-    QString docName = fileInfo.baseName();
-    QRegularExpression re("^\\{.{8}-.{4}-.{4}-.{4}-.{12}\\}$");
-    QRegularExpressionMatch match = re.match(docName);
-    if (match.hasMatch())
-    {
-        docName = "root";
-    }
-    laserDoc->setName(docName);   
     laserDoc->blockSignals(false);
     emit imported();
 
     delete d->documentNode;
     d->documentNode = nullptr;
     progress->finish();
-    return laserDoc;
 }

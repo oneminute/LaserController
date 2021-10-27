@@ -32,6 +32,8 @@ QString LaserApplication::appShortName("CNELaser");
 QMap<QString, QString> LaserApplication::stringMap;
 QMap<QString, QTranslator*> LaserApplication::translators;
 QTranslator* LaserApplication::currentTranslator(nullptr);
+QThread* LaserApplication::mainThread(nullptr);
+QThread* LaserApplication::progressThread(nullptr);
 
 LaserApplication::LaserApplication(int argc, char** argv)
     : QApplication(argc, argv)
@@ -50,6 +52,7 @@ LaserApplication::~LaserApplication()
 
 bool LaserApplication::initialize()
 {
+    mainThread = QThread::currentThread();
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
     LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
@@ -96,12 +99,17 @@ bool LaserApplication::initialize()
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
     connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
 
+    progressThread = new QThread;
+
     StateController::start();
     progressModel = new ProgressModel;
     previewWindow = new PreviewWindow(mainWindow);
+    //progressModel->moveToThread(progressThread);
+    //previewWindow->moveToThread(progressThread);
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
 
+    connect(previewWindow, &QDialog::close, progressThread, &QObject::deleteLater);
     //connect(StateController::instance().deviceState(), &QState::entered, device, &LaserDevice::load);
     //connect(mainWindow, &LaserControllerWindow::windowCreated, device, &LaserDevice::load);
 
@@ -130,6 +138,7 @@ void LaserApplication::destroy()
         delete device;
     }
     
+    previewWindow->moveToThread(mainThread);
     SAFE_DELETE(previewWindow)
     SAFE_DELETE(progressModel)
     g_deviceThread.exit();
@@ -159,36 +168,36 @@ bool LaserApplication::checkEnvironment()
     return true;
 }
 
-//bool LaserApplication::notify(QObject * receiver, QEvent * event)
-//{
-//    bool done = true;
-//    try {
-//        done = QApplication::notify(receiver, event);
-//    }
-//    catch (LaserDeviceSecurityException* e)
-//    {
-//        qLogW << "laser security exception: " << e->toString();
-//        //mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
-//    }
-//    catch (LaserException* e)
-//    {
-//        qLogD << "laser exception: " << e->toString();
-//    }
-//    catch (QException* e)
-//    {
-//        qLogD << "QException: " << e;
-//    }
-//    catch (std::exception* e)
-//    {
-//        qLogD << "std::exception";
-//    }
-//    catch (...)
-//    {
-//        qLogD << "some exception else";
-//
-//    }
-//    return done;
-//}
+bool LaserApplication::notify(QObject * receiver, QEvent * event)
+{
+    bool done = true;
+    try {
+        done = QApplication::notify(receiver, event);
+    }
+    catch (LaserDeviceSecurityException* e)
+    {
+        qLogW << "laser security exception: " << e->toString();
+        //mainWindow->handleSecurityException(e->errorCode(), e->errorMessage());
+    }
+    catch (LaserException* e)
+    {
+        qLogD << "laser exception: " << e->toString();
+    }
+    catch (QException* e)
+    {
+        qLogD << "QException: " << e;
+    }
+    catch (std::exception* e)
+    {
+        qLogD << "std::exception";
+    }
+    catch (...)
+    {
+        qLogD << "some exception else";
+
+    }
+    return done;
+}
 
 QString LaserApplication::softwareVersion()
 {
@@ -337,9 +346,9 @@ int LaserApplication::exec()
         int result = QApplication::exec();
         return result;
     }
-    catch (...)
+    catch (std::exception e)
     {
-        qLogW << "error: ";
+        std::cout << "error: " << e.what() << std::endl;
         return -1;
     }
 }
@@ -441,6 +450,5 @@ void LaserApplication::closeProgressWindow()
 
 void LaserApplication::showProgressWindow()
 {
-    previewWindow->setWindowModality(Qt::ApplicationModal);
     previewWindow->show();
 }

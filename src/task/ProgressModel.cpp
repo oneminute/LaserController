@@ -1,6 +1,7 @@
 #include "ProgressModel.h"
 
 #include <QStack>
+#include "LaserApplication.h"
 
 ProgressModel::ProgressModel(QObject* parent)
     : QAbstractItemModel(parent)
@@ -18,6 +19,7 @@ ProgressItem* ProgressModel::createItem(const QString& title, ProgressItem::Prog
     ProgressItem* item = new ProgressItem(title, type, parent);
     if (!parent)
         m_items.append(item);
+    updateItem(item);
     return item;
 }
 
@@ -31,21 +33,65 @@ ProgressItem* ProgressModel::createComplexItem(const QString& title, ProgressIte
     return createItem(title, ProgressItem::PT_Complex, parent);
 }
 
+void ProgressModel::updateItem(ProgressItem* item)
+{
+    ProgressItem* parent = item->parent();
+    int row = 0;
+    if (parent)
+    {
+        row = parent->childItems().indexOf(item);
+    }
+    else
+    {
+        row = m_items.indexOf(item);
+    }
+
+    emit dataChanged(createIndex(row, 0), createIndex(row, 1));
+    emit progressUpdated(progress());
+}
+
+qreal ProgressModel::progress() const
+{
+    qreal value = 0;
+    for (ProgressItem* child : m_items)
+    {
+        value += child->progress();
+    }
+    return value;
+}
+
 void ProgressModel::clear()
 {
+    QStack<ProgressItem*> stack;
     for (ProgressItem* item : m_items)
     {
-        item->deleteLater();
+        stack.push(item);
+    }
+    while (!stack.isEmpty())
+    {
+        ProgressItem* item = stack.pop();
+
+        if (item->hasChildren())
+        {
+            for (ProgressItem* child : item->childItems())
+            {
+                stack.push(child);
+            }
+        }
+        delete item;
     }
     m_items.clear();
+    emit dataChanged(QModelIndex(), QModelIndex());
 }
 
 QModelIndex ProgressModel::index(int row, int column, const QModelIndex& parent) const
 {
+    //qLogD << "index: " << row << ", " << column;
     if (parent.isValid())
     {
         ProgressItem* parentItem = getItem(parent);
         ProgressItem* childItem = parentItem->child(row);
+        //qLogD << "parent: " << parentItem->title() << ", child: " << childItem->title();
         if (childItem)
             return createIndex(row, column, childItem);
         else
@@ -56,6 +102,7 @@ QModelIndex ProgressModel::index(int row, int column, const QModelIndex& parent)
         if (row < m_items.count())
         {
             ProgressItem* item = m_items.at(row);
+            //qLogD << "top item: " << item->title();
             if (item)
                 return createIndex(row, column, item);
             else
@@ -71,7 +118,10 @@ QModelIndex ProgressModel::parent(const QModelIndex& child) const
         return QModelIndex();
 
     ProgressItem* childItem = getItem(child);
-    ProgressItem* parentItem = qobject_cast<ProgressItem*>(childItem->parent());
+    if (!childItem)
+        return QModelIndex();
+
+    ProgressItem* parentItem = childItem->parent();
 
     if (parentItem)
         return createIndex(parentItem->childCount(), 0, parentItem);

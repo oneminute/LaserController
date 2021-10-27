@@ -16,6 +16,9 @@ public:
     ProgressItem* createItem(const QString& title, ProgressItem::ProgressType type, ProgressItem* parent = nullptr);
     ProgressItem* createSimpleItem(const QString& title, ProgressItem* parent);
     ProgressItem* createComplexItem(const QString& title, ProgressItem* parent);
+    void updateItem(ProgressItem* item);
+
+    qreal progress() const;
 
     void clear();
 
@@ -32,6 +35,7 @@ protected:
 protected slots:
 
 signals:
+    void progressUpdated(qreal value);
 
 private:
     QList<ProgressItem*> m_items;

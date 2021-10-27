@@ -17,6 +17,7 @@ class LaserPrimitive;
 class LaserLayer;
 class LaserScene;
 class LayerButton;
+class ProgressItem;
 
 class LaserDocumentPrivate;
 class LaserDocument : public QObject, public ILaserDocumentItem
@@ -91,8 +92,7 @@ public slots:
     void destroy();
     void open();
     void close();
-	void analysis();
-    void outline();
+    void outline(ProgressItem* item);
     //void clearOutline(bool clearLayers = false);
     void printOutline(OptimizeNode* node, int level);
     void save(const QString& filename, QWidget* window);

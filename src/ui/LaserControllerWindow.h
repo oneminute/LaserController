@@ -271,6 +271,8 @@ protected slots:
     void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
     //void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
 
+    void askMergeOrNew();
+
 private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
