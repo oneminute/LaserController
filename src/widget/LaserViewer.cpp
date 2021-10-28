@@ -15,6 +15,7 @@
 #include <QMouseEvent>
 #include <QUndoStack>
 #include <QGLWidget>
+#include <QMessageBox>
 
 #include <LaserApplication.h>
 #include "laser/LaserDevice.h"
@@ -30,6 +31,7 @@
 #include "common/Config.h"
 #include "widget/UndoCommand.h";
 #include "util/utils.h"
+#include "widget/OverstepMessageBoxWarn.h"
 
 LaserViewer::LaserViewer(QWidget* parent)
 	: QGraphicsView(parent)
@@ -58,6 +60,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_insertIndex(-1)
     , m_textAlighH(Qt::AlignLeft)
     , m_textAlighV(Qt::AlignBottom)
+    , m_isTextMessageBoxShow(false)
 	
 {
     setScene(m_scene.data());
@@ -2080,13 +2083,21 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		//QRectF rect(0, 0, 500, 300);
         if (rect.width() != 0 && rect.height() != 0) {
             LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(), QTransform(), m_curLayerIndex);
-            //undo 创建完后会执行redo
-            QList<QGraphicsItem*> list;
-            list.append(rectItem);
-            AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
-            m_undoStack->push(addCmd);
-            //m_scene->addLaserPrimitive(rectItem);
-            onReplaceGroup(rectItem);
+            //判断是否在4叉树的有效区域内
+            if (m_scene->maxRegion().contains(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint))) {
+                //undo 创建完后会执行redo
+                QList<QGraphicsItem*> list;
+                list.append(rectItem);
+                AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+                m_undoStack->push(addCmd);
+                //m_scene->addLaserPrimitive(rectItem);
+                onReplaceGroup(rectItem);
+            }
+            else {
+                QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                
+            }
+            
         }
         viewport()->repaint();
         emit readyRectangle();
@@ -2100,12 +2111,18 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
         LaserEllipse* ellipseItem = new LaserEllipse(rect, m_scene->document(), QTransform(), m_curLayerIndex);
         //m_scene->addLaserPrimitive(ellipseItem);
-		//undo 创建完后会执行redo
-		QList<QGraphicsItem*> list;
-		list.append(ellipseItem);
-		AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
-		m_undoStack->push(addCmd);
-		onReplaceGroup(ellipseItem);
+        //判断是否在4叉树的有效区域内
+        if (m_scene->maxRegion().contains(rect)) {
+            //undo 创建完后会执行redo
+            QList<QGraphicsItem*> list;
+            list.append(ellipseItem);
+            AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+            m_undoStack->push(addCmd);
+            onReplaceGroup(ellipseItem);
+        }
+        else {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        }
         emit readyEllipse();
     }
 	
@@ -2132,13 +2149,20 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
 				LaserLine* lineItem = new LaserLine(line, m_scene->document(), QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(lineItem);
-				//undo 创建完后会执行redo
-				QList<QGraphicsItem*> list;
-				list.append(lineItem);
-				AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
-				m_undoStack->push(addCmd);
-				onReplaceGroup(lineItem);
-				emit readyLine();
+                //判断是否在4叉树的有效区域内
+                if (m_scene->maxRegion().contains(m_creatingLineStartPoint) && m_scene->maxRegion().contains(m_creatingLineEndPoint)) {
+                    //undo 创建完后会执行redo
+                    QList<QGraphicsItem*> list;
+                    list.append(lineItem);
+                    AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+                    m_undoStack->push(addCmd);
+                    onReplaceGroup(lineItem);
+                    
+                }
+                else {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                }
+                emit readyLine();
 			}
 			else if (event->button() == Qt::RightButton) {
 				emit readyLine();
@@ -2199,11 +2223,18 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 					setCursor(Qt::ArrowCursor);
 					emit readyPolygon();				
 					primitive = polygon;
-				}			
-				//undo
-				PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, primitive);
-				m_undoStack->push(polyCmd);
-				m_lastPolygon = primitive;
+				}	
+                //判断是否在4叉树的有效区域内
+                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint)) {
+                    //undo
+                    PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, primitive);
+                    m_undoStack->push(polyCmd);
+                    m_lastPolygon = primitive;
+                }
+                else {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                    m_creatingPolygonPoints.removeLast();
+                }
 				
 			}
 		}
@@ -3065,7 +3096,8 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
         }
         case Qt::Key_Enter: {
             if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
-                addTextByKeyInput("\n");
+                    addTextByKeyInput("\n");
+                    //event->accept();
             }
             break;
         }
@@ -3669,6 +3701,7 @@ void LaserViewer::initSpline()
 
 void LaserViewer::addText(QString str)
 {
+    
     if (!m_editingText) {
         m_insertIndex = 0;
         m_editingText = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
@@ -3684,9 +3717,16 @@ void LaserViewer::addText(QString str)
         m_editingText->addPath(str, m_insertIndex);
         m_insertIndex += str.size();
     }
-    modifyTextCursor();
+    QLineF cursorLine = modifyTextCursor();
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(cursorLine.p1()) || !m_scene->maxRegion().contains(cursorLine.p2())) {
+        //QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        OverstepMessageBoxWarn msgBox;
+        msgBox.exec();
+        removeFrontText();
+    }
     viewport()->repaint();
-    //delete m_textEdit;
+    
 }
 
 void LaserViewer::removeBackText()

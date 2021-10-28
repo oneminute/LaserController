@@ -253,11 +253,7 @@ private:
 	qreal m_splineNodeEditWidth;
 	qreal m_splineHandlerWidth;
 	//Text
-	//QPoint m_textInputPoint;
-	//QTime m_time;
-	//int m_curTime;
-	//int m_lastTime;
-	//QTextEdit *m_textEdit;
+    bool m_isTextMessageBoxShow;
 
 	bool m_isKeyShiftPressed;
 	bool m_isKeyCtrlPress;

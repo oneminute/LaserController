@@ -2539,7 +2539,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 		}
 	}
 	//create title
-	QString name = QFileDialog::getOpenFileName(nullptr, "open file", ".", "File(*lc)");
+	QString name = QFileDialog::getOpenFileName(nullptr, tr("open file"), ".", "File(*lc)");
 	m_fileDirection = name;
 	if (name == "") {
 		return;

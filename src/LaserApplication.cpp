@@ -313,6 +313,8 @@ void LaserApplication::retranslate()
     stringMap["Unregistered"] = tr("Unregistered");
     stringMap["Upper Case"] = tr("Upper Case");
     stringMap["Vertical"] = tr("Vertical");
+    stringMap["WargingOverstepTitle"] = tr("Out max valid region.");
+    stringMap["WargingOverstepText"] = tr("You had oversteped the valid region, Please don't operate out the red line.");
     stringMap["Welcome!"] = tr("Welcome!");
     stringMap["Width"] = tr("Width");
     stringMap["X Pos"] = tr("X Pos");
