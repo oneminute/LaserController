@@ -7,6 +7,7 @@
 #include "util/Utils.h"
 #include "util/TypeUtils.h"
 #include "scene/LaserDocument.h"
+#include "scene/LaserScene.h"
 #include <VGCoreAuto.tlh>
 #include <ObjIdl.h>
 
@@ -33,7 +34,7 @@ CorelDrawImporter::~CorelDrawImporter()
 {
 }
 
-LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void CorelDrawImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import from Corel Draw", parentProgress);
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -42,7 +43,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
         QMessageBox::warning(LaserApplication::mainWindow, tr("Import failure"), tr("Cannot initialize COM."));
 		CoUninitialize();
         progress->finish();
-        return nullptr;
+        return;
     }
     progress->increaseProgress(10);
 
@@ -62,7 +63,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
 			QMessageBox::warning(LaserApplication::mainWindow, tr("Import failure"), tr("Cannot load cdr x8's dll."));
 			CoUninitialize();
             progress->finish();
-			return nullptr;
+            return;
 		}
 
 		IUnknown* pUnk = NULL;
@@ -84,7 +85,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
             QMessageBox::warning(LaserApplication::mainWindow, tr("Import CDR"), tr("No active document in CorelDRAW!"));
 			CoUninitialize();
             progress->finish();
-            return nullptr;
+            return;
         }
 		qDebug() << "CDR Window active object:" << window;
 		qDebug() << "CDR window handle:" << hex << showbase << window->GetHandle();
@@ -112,7 +113,7 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
             QMessageBox::warning(LaserApplication::mainWindow, tr("Import CDR"), tr("No active document in CorelDRAW!"));
 			CoUninitialize();
             progress->finish();
-            return nullptr;
+            return;
         }
 
         qDebug() << "selection count:" << doc->Selection()->Shapes->Count;
@@ -171,23 +172,16 @@ LaserDocument * CorelDrawImporter::import(const QString & filename, LaserScene* 
     }
 	//ShowWindow(hWnd, SW_RESTORE);
 
-    LaserDocument* doc = nullptr;
     if (success)
     {
         QSharedPointer<Importer> importer = Importer::getImporter(LaserApplication::mainWindow, Importer::SVG);
-        doc = importer->import(tmpSvgFilename, scene, parentProgress, params);
+        importer->import(tmpSvgFilename, scene, parentProgress, params);
 
-        if (doc)
+        if (tmpDir.exists(tmpSvgFilename))
         {
-            if (tmpDir.exists(tmpSvgFilename))
-            {
-                //tmpDir.remove(tmpSvgFilename);
-            }
-
-            doc->open();
+            //tmpDir.remove(tmpSvgFilename);
         }
     }
     CoUninitialize();
-    return doc;
 }
 

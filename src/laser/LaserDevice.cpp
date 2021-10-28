@@ -264,8 +264,8 @@ void LaserDevice::load()
 {
     Q_D(LaserDevice);
 
-    connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError, Qt::ConnectionType::QueuedConnection);
-    connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage, Qt::ConnectionType::QueuedConnection);
+    connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError/*, Qt::ConnectionType::QueuedConnection*/);
+    connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
     d->driver->load();
@@ -461,7 +461,11 @@ QString LaserDevice::boundDongleBindingTimes() const
 QString LaserDevice::dongleId() const
 {
     Q_D(const LaserDevice);
-    return d->dongle;
+    if (d->driver)
+    {
+        return d->driver->getDongleId();
+    }
+    return "";
 }
 
 QString LaserDevice::dongleRegisteredDate() const
@@ -1165,7 +1169,7 @@ void LaserDevice::handleError(int code, const QString& message)
         throw new LaserDeviceIOException(code, tr("Failed to transfer data with breakpoint"));
         break;
     case E_CanNotDoOnWorking:
-        throw new LaserDeviceMachiningException(code, tr("This operation is not supported during machining"));
+        //throw new LaserDeviceMachiningException(code, tr("This operation is not supported during machining"));
         break;
     case E_PingServerFail:
         throw new LaserNetworkException(code, tr("Failed to connect to server"));
@@ -1582,7 +1586,7 @@ void LaserDevice::onConnected()
     if (d->driver)
     {
         d->driver->setFactoryType("EFSLaserController");
-        d->driver->stopMachining();
+        //d->driver->stopMachining();
         d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
         d->driver->getDeviceWorkState();
         //d->driver->getMainCardRegisterState();

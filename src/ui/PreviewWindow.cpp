@@ -35,6 +35,7 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     , m_progress(0.0)
 {
     this->setWindowModality(Qt::WindowModality::WindowModal);
+    this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
     // menu bar
     QMenuBar* menuBar = new QMenuBar;
@@ -112,18 +113,6 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     internal::findParent<QSplitter*>(canvasDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(progressDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(logDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
-    /*for (CDockContainerWidget* container : m_dockManager->dockContainers())
-    {
-        connect(container, &CDockContainerWidget::dockAreasAdded,
-            [=]() {
-                qLogD << container;
-                for (int i = 0; i < container->dockAreaCount(); i++)
-                {
-                    internal::findParent<QSplitter*>(container->dockArea(i))->setHandleWidth(Config::Ui::splitterHandleWidth());
-                }
-            }
-        );
-    }*/
 
     m_actionZoomIn->connect(m_actionZoomIn, &QAction::triggered, this, [=] {
         m_viewer->zoomIn();
@@ -143,6 +132,7 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     connect(this, &PreviewWindow::addPointsSignal, this, &PreviewWindow::onAddPoints);
     connect(this, &PreviewWindow::addPointSignal, this, &PreviewWindow::onAddPoint);
     connect(&m_updateTimer, &QTimer::timeout, this, &PreviewWindow::updatePreviewArea);
+    connect(this, &PreviewWindow::showAsyncSignal, this, &PreviewWindow::onShowAsync, Qt::ConnectionType::QueuedConnection);
 
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
@@ -267,6 +257,11 @@ void PreviewWindow::addMessage(const QString& message)
     emit addMessageSignal(message);
 }
 
+void PreviewWindow::showAsync()
+{
+    emit showAsyncSignal();
+}
+
 void PreviewWindow::onAddPath(const QPainterPath& path, QPen pen, const QString& label)
 {
     m_scene->addPath(path, pen, label);
@@ -335,4 +330,9 @@ void PreviewWindow::onAddMessage(const QString& message)
 {
     //qLogD << message;
     m_textEditLog->appendPlainText(message);
+}
+
+void PreviewWindow::onShowAsync()
+{
+    this->show();
 }

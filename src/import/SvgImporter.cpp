@@ -30,45 +30,35 @@ SvgImporter::~SvgImporter()
 {
 }
 
-LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
 	LaserApplication::mainWindow->activateWindow();
+    LaserDocument* doc = scene->document();
 
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
     int nodeCount = svgDoc->handler()->nodeCount();
     ProgressItem* progress= LaserApplication::progressModel->createSimpleItem("import svg", parentProgress);
     progress->setMaximum(nodeCount);
-    LaserDocument* laserDoc = new LaserDocument(scene);
+    //LaserDocument* laserDoc = new LaserDocument(scene);
 	if (svgDoc == nullptr)
 	{
 		qWarning() << "Load SVG document failure!";
-		laserDoc->deleteLater();
-		return nullptr;
+		return;
 	}
 
     QRectF viewBox = svgDoc->viewBox();
     
-	laserDoc->setUnit(svgDoc->sizeUnit());
-
     QSize svgSize = svgDoc->size();
     qreal docScaleWidth = svgSize.width() * 1.0 / viewBox.width();
     qreal docScaleHeight = svgSize.height() * 1.0 / viewBox.height();
 
-	//float layoutWidth, layoutHeight;
-	//LaserDriver::instance().getLayout(layoutWidth, layoutHeight);
-    PageInformation page;
-    page.setWidth(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutWidth()));
-    page.setHeight(Global::convertUnit(laserDoc->unit(), SU_PX, LaserApplication::device->layoutHeight(), Qt::Vertical));
-    laserDoc->setPageInformation(page);
-    laserDoc->blockSignals(true);
+    doc->blockSignals(true);
 
-    qDebug() << "shapeUnit:" << laserDoc->unit();
     qDebug() << "svg size:" << svgSize;
     qDebug() << "svg viewBox size:" << viewBox;
     qDebug() << "svg scale width:" << docScaleWidth;
     qDebug() << "svg scale height:" << docScaleHeight;
-	qDebug() << "page size:" << page.width() << page.height();
 
     QList<QSvgNode*> nodes = svgDoc->renderers();
     QStack<QSvgNode*> stack;
@@ -78,7 +68,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     }
 
 	QMatrix matrix;
-	matrix.scale(docScaleWidth * Global::convertUnit(laserDoc->unit(), SU_PX, 1.0f), docScaleHeight * Global::convertUnit(laserDoc->unit(), SU_PX, 1.0f, Qt::Vertical));
+	matrix.scale(Global::mm2PixelsXF(docScaleWidth), Global::mm2PixelsYF(docScaleHeight));
 
     while (!stack.empty())
     {
@@ -108,14 +98,14 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
 			QRectF bounds = matrix.mapRect(svgEllipseNode->bounds());
-            item = new LaserEllipse(bounds, laserDoc);
+            item = new LaserEllipse(bounds, doc);
         }
             break;
         case QSvgNode::LINE:
         {
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
 			QLineF line = matrix.map(svgLineNode->line());
-            item = new LaserLine(line, laserDoc);
+            item = new LaserLine(line, doc);
         }
             break;
         case QSvgNode::ARC:
@@ -123,7 +113,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
-            item = new LaserPath(path, laserDoc);
+            item = new LaserPath(path, doc);
             int i = item->layerIndex();
         }
             break;
@@ -131,14 +121,14 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgPolygon* svgPolygonNode = reinterpret_cast<QSvgPolygon*>(node);
 			QPolygonF polygon = matrix.map(svgPolygonNode->polygon());
-            item = new LaserPolygon(polygon, laserDoc);
+            item = new LaserPolygon(polygon, doc);
         }
             break;
         case QSvgNode::POLYLINE:
         {
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
 			QPolygonF polyline = matrix.map(svgPolylineNode->polyline());
-            item = new LaserPolyline(polyline, laserDoc);
+            item = new LaserPolyline(polyline, doc);
         }
             break;
         case QSvgNode::RECT:
@@ -151,7 +141,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
                     qreal cornerRaius = Global::mm2PixelsXF(svgRectNode->rx()) * docScaleWidth;
-					item = new LaserRect(rect, cornerRaius, laserDoc);
+					item = new LaserRect(rect, cornerRaius, doc);
 					qDebug() << "rect:" << rect;
 				}
             }
@@ -183,7 +173,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             }
             qLogD << font;
             QPointF pos = matrix.map(svgTextNode->coord());
-            LaserText* laserText = new LaserText(laserDoc, pos, font, Qt::AlignLeft, Qt::AlignVCenter);
+            LaserText* laserText = new LaserText(doc, pos, font, Qt::AlignLeft, Qt::AlignVCenter);
             laserText->setContent(svgTextNode->text());
             laserText->modifyPathList();
             item = laserText;
@@ -195,7 +185,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
         {
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
 			QRectF bounds = matrix.mapRect(svgImageNode->imageBounds());
-            item = new LaserBitmap(svgImageNode->image(), bounds, laserDoc);
+            item = new LaserBitmap(svgImageNode->image(), bounds, doc);
         }
             break;
         default:
@@ -226,6 +216,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setName(node->nodeId());
 
+            //item->moveToThread(LaserApplication::mainThread);
             scene->addLaserPrimitive(item);
         }
         progress->increaseProgress();
@@ -238,10 +229,7 @@ LaserDocument* SvgImporter::import(const QString & filename, LaserScene* scene, 
     {
         docName = "root";
     }
-    laserDoc->setName(docName);
-    laserDoc->blockSignals(false);
+    doc->blockSignals(false);
     emit imported();
-    laserDoc->open();
     progress->finish();
-    return laserDoc;
 }

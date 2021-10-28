@@ -48,7 +48,7 @@ public:
     {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
-    PageInformation pageInfo;
+    //PageInformation pageInfo;
     bool isOpened;
     LaserScene* scene;
     FinishRun finishRun;
@@ -102,23 +102,23 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
 
 }
 
-PageInformation LaserDocument::pageInformation() const
-{
-    Q_D(const LaserDocument);
-    return d->pageInfo;
-}
-
-void LaserDocument::setPageInformation(const PageInformation& page)
-{
-    Q_D(LaserDocument);
-    d->pageInfo = page;
-}
-
-QRectF LaserDocument::pageBounds() const
-{
-    Q_D(const LaserDocument);
-    return QRectF(0, 0, d->pageInfo.width(), d->pageInfo.height());
-}
+//PageInformation LaserDocument::pageInformation() const
+//{
+//    Q_D(const LaserDocument);
+//    return d->pageInfo;
+//}
+//
+//void LaserDocument::setPageInformation(const PageInformation& page)
+//{
+//    Q_D(LaserDocument);
+//    d->pageInfo = page;
+//}
+//
+//QRectF LaserDocument::pageBounds() const
+//{
+//    Q_D(const LaserDocument);
+//    return QRectF(0, 0, d->pageInfo.width(), d->pageInfo.height());
+//}
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
 {
@@ -811,37 +811,13 @@ void LaserDocument::close()
     }
 }
 
-void LaserDocument::analysis()
-{
-    Q_D(LaserDocument);
-    qLogD << "begin analysising";
-
-    /*for (LaserPrimitive* primitive : d->primitives)
-    {
-        if (primitive->primitiveType() == LPT_PATH)
-        {
-            LaserPath* laserPath = qobject_cast<LaserPath*>(primitive);
-            QList<QPainterPath> subBoundings = laserPath->subBoundings();
-            for (int i = 0; i < subBoundings.size(); i++)
-            {
-                qLogD << "sub path " << i << ":" << subBoundings[i];
-            }
-        }
-    }*/
-
-    outline();
-}
-
-void LaserDocument::outline()
+void LaserDocument::outline(ProgressItem* item)
 {
     Q_D(LaserDocument);
     qLogD << "Before outline:";
-    //clearOutline(true);
     clearTree(d->optimizeNode);
     printOutline(d->optimizeNode, 0);
     outlineByLayers(d->optimizeNode);
-    //outlineByGroups(d->optimizeNode);
-    //optimizeGroups(d->optimizeNode);
     qLogD << "After outline:";
     printOutline(d->optimizeNode, 0);
 

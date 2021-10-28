@@ -22,7 +22,7 @@ public:
 
     Importer(QObject* parent = nullptr);
 
-    virtual LaserDocument* import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap()) = 0;
+    virtual void import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap()) = 0;
     
     static QSharedPointer<Importer> getImporter(QWidget* parentWnd, Types type);
 

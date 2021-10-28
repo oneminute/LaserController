@@ -59,7 +59,6 @@
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
     <addaction name="actionRemoteAssistance"/>
-    <addaction name="actionAnalysisDocument"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -202,7 +201,7 @@
     </size>
    </property>
    <property name="windowIcon">
-    <iconset>
+    <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/app_icon.ico</normaloff>:/ui/icons/images/app_icon.ico</iconset>
    </property>
    <property name="features">

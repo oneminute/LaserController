@@ -17,6 +17,7 @@ class LaserPrimitive;
 class LaserLayer;
 class LaserScene;
 class LayerButton;
+class ProgressItem;
 
 class LaserDocumentPrivate;
 class LaserDocument : public QObject, public ILaserDocumentItem
@@ -30,9 +31,9 @@ public:
     void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
     void removePrimitive(LaserPrimitive* item);
 
-    PageInformation pageInformation() const;
-    void setPageInformation(const PageInformation& page);
-    QRectF pageBounds() const;
+    //PageInformation pageInformation() const;
+    //void setPageInformation(const PageInformation& page);
+    //QRectF pageBounds() const;
 
     QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
@@ -91,8 +92,7 @@ public slots:
     void destroy();
     void open();
     void close();
-	void analysis();
-    void outline();
+    void outline(ProgressItem* item);
     //void clearOutline(bool clearLayers = false);
     void printOutline(OptimizeNode* node, int level);
     void save(const QString& filename, QWidget* window);

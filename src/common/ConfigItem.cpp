@@ -807,7 +807,7 @@ ModifiedBy ConfigItem::modifiedBy() const
 void ConfigItem::setValue(const QVariant& value, ModifiedBy modifiedBy)
 {
     Q_D(ConfigItem);
-    if (!value.isValid() || value.isNull())
+    if (!value.isValid())
         return;
 
     d->modifiedBy = modifiedBy;

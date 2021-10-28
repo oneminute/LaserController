@@ -5,6 +5,8 @@
 #include "LaserLayer.h"
 #include "LaserPrimitiveGroup.h"
 #include "widget/LaserViewer.h"
+#include "laser/LaserDevice.h"
+#include "LaserApplication.h"
 
 #include<QGraphicsSceneMouseEvent>
 #include<QGraphicsSceneWheelEvent>
@@ -46,14 +48,13 @@ void LaserScene::setDocument(LaserDocument * doc)
 
     m_doc->setParent(this);
     
-
-    qDebug() << "page bounds in pixel:" << m_doc->pageBounds();
-    m_background = new LaserBackgroundItem(m_doc->pageBounds());
+	QRectF rect = LaserApplication::device->boundingRect();
+    qDebug() << "deivce bounds in pixel:" << rect;
+    m_background = new LaserBackgroundItem(rect);
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
 	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));
 	setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
-	QRectF rect = m_doc->pageBounds();
 	//views()[0]->horizontalScrollBar()->setSliderPosition(rect.center().x());
 	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
 	views()[0]->setTransform(QTransform());

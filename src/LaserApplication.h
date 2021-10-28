@@ -23,7 +23,7 @@ public:
 
     bool checkEnvironment();
 
-    //bool notify(QObject* receiver, QEvent* event) override;
+    bool notify(QObject* receiver, QEvent* event) override;
 
     static QString softwareVersion();
     static void loadLanguages();
@@ -59,8 +59,10 @@ public:
     static void showProgressWindow();
 
     static QMap<QString, QString> stringMap;
-
     static QMap<QString, QTranslator*> translators;
+
+    static QThread* mainThread;
+    static QThread* progressThread;
 
 private:
     QThread g_deviceThread;

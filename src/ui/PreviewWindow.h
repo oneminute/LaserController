@@ -44,6 +44,8 @@ public slots:
     void setProgress(void* code, qreal progress);
     void addMessage(const QString& message);
 
+    void showAsync();
+
 protected slots:
     void onAddPath(const QPainterPath& path, QPen pen = QPen(Qt::blue, 1, Qt::SolidLine), const QString& label = QString());
     void onAddLine(const QLineF& line, QPen pen = QPen(Qt::black, 1, Qt::SolidLine), const QString& label = QString());
@@ -54,6 +56,8 @@ protected slots:
     void onSetProgress(qreal progress);
     void onSetProgress(quint32 code, qreal progress);
     void onAddMessage(const QString& message);
+
+    void onShowAsync();
 
 signals:
     void addPathSignal(const QPainterPath& path, QPen pen = QPen(Qt::blue, 1, Qt::SolidLine), const QString& label = QString());
@@ -67,6 +71,8 @@ signals:
     void addMessageSignal(const QString& message);
 
     void progressUpdated(qreal progress);
+
+    void showAsyncSignal();
 
 private:
     ads::CDockManager* m_dockManager;

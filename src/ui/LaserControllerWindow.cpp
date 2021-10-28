@@ -766,9 +766,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
     // config items
     connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
-    //connect(Config::Ui::autoRepeatIntervalItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatIntervalChanged);
 
-    connect(LaserApplication::previewWindow, &PreviewWindow::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
+    connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
@@ -885,7 +884,7 @@ LaserControllerWindow::~LaserControllerWindow()
 
 void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
 {
-    if (!LaserApplication::driver->isConnected())
+    if (!LaserApplication::driver)
     {
         QMessageBox::warning(this, tr("Operate failure"), tr("Laser device is not connected!"));
         return;
@@ -2414,6 +2413,7 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 	}
 	
 }
+
 void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 {
 	if (StateControllerInst.isInState(StateControllerInst.documentIdleState()) ||
@@ -2438,6 +2438,7 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 		Context.exec(QCursor::pos());
 	}
 }
+
 void LaserControllerWindow::onActionUndo(bool checked) {
 	int index = m_viewer->undoStack()->index();
 	if (index <= 0) {
@@ -2445,13 +2446,18 @@ void LaserControllerWindow::onActionUndo(bool checked) {
 	}
 	m_viewer->undoStack()->setIndex(index - 1);
 }
+
 void LaserControllerWindow::onActionRedo(bool checked) {
 	int index = m_viewer->undoStack()->index();	
 	m_viewer->undoStack()->setIndex(index + 1);
 }
+
 void LaserControllerWindow::onActionImport(bool checked)
 {
     qLogD << "onActionImport";
+
+    askMergeOrNew();
+
     QString filters = tr("SVG (*.svg);;CAD (*.dxf)");
     QString filename = getFilename(tr("Open Supported File"), filters);
     qLogD << "importing filename is " << filename;
@@ -2462,26 +2468,25 @@ void LaserControllerWindow::onActionImport(bool checked)
     QSharedPointer<Importer> importer = Importer::getImporter(this, file.suffix());
     if (!importer.isNull())
     {
+        LaserApplication::progressModel->clear();
         LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
-        LaserDocument* doc = importer->import(filename, m_scene, progress);
-        initDocument(doc);
-        //QFuture<LaserDocument*> future = QtConcurrent::run(
-        //    [=]() {
-        //        LaserDocument* doc = importer->import(filename, m_scene, progress);
-        //        //initDocument(doc);
-        //        return doc;
-        //    }
-        //);
-
-        //m_watcher.setFuture(future);
-        //connect(&m_watcher, &QFutureWatcher<LaserDocument*>::finished,
-        //    [=]()
-        //    {
-        //        initDocument(m_watcher.result());
-        //    }
-        //);
+        importer->import(filename, m_scene, progress);
     }
+}
+
+void LaserControllerWindow::onActionImportCorelDraw(bool checked)
+{
+    askMergeOrNew();
+
+    QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::CORELDRAW);
+    QVariantMap params;
+    params["parent_winid"] = winId();
+    params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
+    LaserApplication::progressModel->clear();
+    LaserApplication::showProgressWindow();
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+    importer->import("", m_scene, progress, params);
 }
 
 void LaserControllerWindow::onActionNew(bool checked)
@@ -2493,7 +2498,7 @@ void LaserControllerWindow::onActionNew(bool checked)
 			return;
 		}
 	}
-	this->setWindowTitle("Untitled - ");
+	this->setWindowTitle(tr("Untitled - "));
 	createNewDocument();
 }
 
@@ -2568,18 +2573,6 @@ void LaserControllerWindow::onActionZoomToPage(bool checked)
 void LaserControllerWindow::onActionZoomToSelection(bool checked)
 {
 	m_viewer->zoomToSelection();
-}
-
-
-void LaserControllerWindow::onActionImportCorelDraw(bool checked)
-{
-    QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::CORELDRAW);
-    QVariantMap params;
-    params["parent_winid"] = winId();
-    params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
-    LaserDocument* doc = importer->import("", m_scene, progress, params);
-    initDocument(doc);
 }
 
 void LaserControllerWindow::onActionRemoveLayer(bool checked)
@@ -2695,7 +2688,9 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
         {
-            m_scene->document()->outline();
+            LaserApplication::progressModel->clear();
+            ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("outline", nullptr);
+            m_scene->document()->outline(progress);
             m_scene->document()->setFinishRun(finishRun());
             LaserApplication::previewWindow->reset();
             LaserApplication::showProgressWindow();
@@ -2746,7 +2741,10 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //{
             //QString filename = file.fileName();
 
-        m_scene->document()->outline();
+        LaserApplication::progressModel->clear();
+        LaserApplication::showProgressWindow();
+        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+        m_scene->document()->outline(progress);
         m_scene->document()->setFinishRun(finishRun());
         qDebug() << "exporting to temporary json file:" << filename;
         m_prepareMachining = true;
@@ -3042,15 +3040,8 @@ void LaserControllerWindow::onActionUngroup(bool checked)
 
 bool LaserControllerWindow::onActionCloseDocument(bool checked)
 {
-	//documentClose();
-	/*QMessageBox msgBox;
-	msgBox.setText(tr("Close document?"));
-	msgBox.setInformativeText(tr("Do you want to save current document?"));
-	msgBox.setStandardButtons(QMessageBox::Save
-		| QMessageBox::Close
-		| QMessageBox::Cancel);*/
 	QMessageBox msgBox(QMessageBox::NoIcon,
-		"Close document?", "Do you want to save current document?",
+		tr("Close document?"), tr("Do you want to save current document?"),
 		QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
 	int result = msgBox.exec();
 	switch (result) {
@@ -3215,7 +3206,10 @@ void LaserControllerWindow::onActionAbout(bool checked)
 
 void LaserControllerWindow::onActionUpdateOutline(bool checked)
 {
-    m_scene->document()->outline();
+    LaserApplication::progressModel->clear();
+    LaserApplication::showProgressWindow();
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+    m_scene->document()->outline(progress);
     updateOutlineTree();
 }
 
@@ -3902,14 +3896,11 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
 {
     if (doc)
     {
-        connect(m_ui->actionAnalysisDocument, &QAction::triggered, doc, &LaserDocument::analysis);
         connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
         connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
 
         doc->bindLayerButtons(m_layerButtons);
 		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
-        //m_scene->setDocument(doc);
-        //doc->outline();
         m_tableWidgetLayers->setDocument(doc);
         m_tableWidgetLayers->updateItems();
         setWindowTitle(doc->name());
@@ -3917,7 +3908,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         m_viewer->undoStack()->clear();
         LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         if (m_viewer) {
-            QRectF rect = m_scene->document()->pageBounds();
+            QRectF rect = LaserApplication::device->boundingRect();
 
             m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -4173,7 +4164,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // actionImport
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentWorkingState);
     // end actionImportSVG
 
 	// actionNew
@@ -4185,7 +4176,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // actionImportCorelDraw
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentWorkingState);
     // end actionImportCorelDraw
 
     // actionExportJSON
@@ -4708,14 +4699,8 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
 void LaserControllerWindow::createNewDocument()
 {
 	LaserDocument* doc = new LaserDocument(m_scene);
-	PageInformation page;
-	page.setWidth(Global::mm2PixelsXF(LaserApplication::device->layoutWidth()));
-	page.setHeight(Global::mm2PixelsYF(LaserApplication::device->layoutHeight()));
-	doc->setPageInformation(page);
 	initDocument(doc);
-	
 	doc->open();
-	
 }
 
 QString LaserControllerWindow::getCurrentFileName()
@@ -4755,6 +4740,31 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, 
     m_buttonMoveBottomRight->setAutoRepeatDelay(value.toInt());
     m_buttonMoveUp->setAutoRepeatDelay(value.toInt());
     m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
+}
+
+void LaserControllerWindow::askMergeOrNew()
+{
+    if (m_scene->document()) {
+        // 询问关闭还是合并
+        QMessageBox msgDlg;
+        msgDlg.setText(tr("A document is opened."));
+        msgDlg.setInformativeText(tr("Do you want to merge or create a new one?"));
+        msgDlg.addButton(tr("Merge"), QMessageBox::ButtonRole::YesRole);
+        msgDlg.addButton(tr("New"), QMessageBox::ButtonRole::NoRole);
+        msgDlg.setDefaultButton(QMessageBox::Yes);
+        int ret = msgDlg.exec();
+
+        if (ret == 1)
+        {
+            if (onActionCloseDocument()) {
+                createNewDocument();
+            }
+        }
+	}
+    else
+    {
+        createNewDocument();
+    }
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)

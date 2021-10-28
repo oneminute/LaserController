@@ -7,10 +7,10 @@
 #include <QList>
 #include <QSet>
 #include <QMap>
+#include <QMutex>
 
-class ProgressItem : public QObject
+class ProgressItem
 {
-    Q_OBJECT
 public:
     enum ProgressState
     {
@@ -26,7 +26,7 @@ public:
     };
 
 protected:
-    explicit ProgressItem(const QString& title, ProgressType progressType = PT_Simple, QObject* parent = nullptr);
+    explicit ProgressItem(const QString& title, ProgressType progressType = PT_Simple, ProgressItem* parent = nullptr);
     ~ProgressItem();
 
 public:
@@ -73,13 +73,12 @@ public:
     void debugPrint();
     QString toString() const;
 
+    ProgressItem* parent() const;
+    void setParent(ProgressItem* parent);
+
 protected:
     void updateWeights();
     void notify();
-
-signals:
-    void progressUpdated(qreal progress);
-    void finished();
 
 private:
     ProgressState m_state;
@@ -96,7 +95,9 @@ private:
     QMap<ProgressItem*, qreal> m_weights;
     qreal m_sumWeights;
 
-    Q_DISABLE_COPY(ProgressItem)
+    ProgressItem* m_parent;
+
+    QMutex m_mutex;
 
     friend class ProgressModel;
 };
