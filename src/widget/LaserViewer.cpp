@@ -3538,12 +3538,51 @@ void LaserViewer::transformUndoStackPushBefore(LaserPrimitive* item)
 
 void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
 {
-
+    //判断是否在4叉树的有效区域内
+    QRectF bounds;
     if (item) {
+        bounds = item->sceneBoundingRect();
+    }
+    //group
+    else {
+        bounds = selectedItemsSceneBoundingRect();
+    }
+    //垂直或水平线，点的情况
+    if (bounds.width() == 0 || bounds.height() == 0) {
+        if (!m_scene->maxRegion().contains(bounds.topLeft()) || !m_scene->maxRegion().contains(bounds.bottomRight())) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            if (item) {
+                item->setTransform(m_singleLastTransform);
+            }
+            //group
+            else {
+                m_group->setTransform(m_groupLastTransform);
+            }
+            return;
+        }
+    }
+    else {
+        if (!m_scene->maxRegion().contains(bounds)) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            if (item) {
+                item->setTransform(m_singleLastTransform);
+            }
+            //group
+            else {
+                m_group->setTransform(m_groupLastTransform);
+            }
+            return;
+        }
+    }
+    //TransformUndoCommand
+    if (item) {
+        
         SingleTransformUndoCommand* cmd = new SingleTransformUndoCommand(m_scene.data(), m_singleLastTransform, item->sceneTransform(), item);
         m_undoStack->push(cmd);
     }
+    //group
     else {
+
         GroupTransformUndoCommand* cmd = new GroupTransformUndoCommand(m_scene.data(), m_groupLastTransform, m_group->transform());
         m_undoStack->push(cmd);
     }
@@ -3720,9 +3759,9 @@ void LaserViewer::addText(QString str)
     QLineF cursorLine = modifyTextCursor();
     //判断是否在4叉树的有效区域内
     if (!m_scene->maxRegion().contains(cursorLine.p1()) || !m_scene->maxRegion().contains(cursorLine.p2())) {
-        //QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-        OverstepMessageBoxWarn msgBox;
-        msgBox.exec();
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        //OverstepMessageBoxWarn msgBox;
+        //msgBox.exec();
         removeFrontText();
     }
     viewport()->repaint();

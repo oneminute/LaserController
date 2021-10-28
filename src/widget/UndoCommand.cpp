@@ -738,13 +738,6 @@ GroupTransformUndoCommand::~GroupTransformUndoCommand()
 
 void GroupTransformUndoCommand::undo()
 {
-    /*if (m_group->transform() == QTransform()) {
-        
-        m_group->setTransform(m_group->transform()*(m_lastTransform.inverted() * m_curTransform).inverted());       
-    }
-    else {
-        m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
-    }*/
     m_group = m_viewer->group();
     m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
     //updata tree
