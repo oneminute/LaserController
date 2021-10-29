@@ -21,6 +21,10 @@ ProgressItem::ProgressItem(const QString& title, ProgressType progressType, Prog
     {
         parent->addChildItem(this);
     }
+    if (progressType == PT_Complex)
+    {
+        m_maximum = 1.0;
+    }
     startTimer();
 }
 
@@ -28,7 +32,16 @@ ProgressItem::~ProgressItem()
 {
 }
 
-qreal ProgressItem::progress() const 
+void ProgressItem::setMaximum(qreal value) 
+{
+    m_maximum = value; 
+    if (this->progressType() == PT_Complex)
+    {
+        updateWeights();
+    }
+}
+
+qreal ProgressItem::progress() const
 {
     //QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
     switch (m_type)
@@ -40,10 +53,11 @@ qreal ProgressItem::progress() const
     case PT_Complex:
     {
         qreal finalProcess = 0.0;
+        
         for (ProgressItem* item : m_childItems)
         {
             qreal weight = m_weights[item];
-            finalProcess += weight * item->progress();
+            finalProcess += weight * item->progress() / m_sumWeights;
         }
         return finalProcess;
     }
@@ -104,6 +118,7 @@ void ProgressItem::addChildItem(ProgressItem* item)
     if (!m_childItems.contains(item))
         m_childItems.append(item);
     setWeight(item, 1.0);
+    updateWeights();
 }
 
 QList<ProgressItem*> ProgressItem::childItems() const
@@ -189,6 +204,11 @@ void ProgressItem::updateWeights()
         }
 
         m_sumWeights += weight;
+    }
+
+    if (m_childItems.length() < m_maximum)
+    {
+        m_sumWeights += (m_maximum - m_childItems.length());
     }
 }
 

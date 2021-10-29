@@ -62,7 +62,6 @@ public:
     static QMap<QString, QTranslator*> translators;
 
     static QThread* mainThread;
-    static QThread* progressThread;
 
 private:
     QThread g_deviceThread;

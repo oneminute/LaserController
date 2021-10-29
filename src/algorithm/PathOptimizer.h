@@ -11,6 +11,7 @@
 class PathOptimizer;
 class OptimizeNode;
 class OptimizeEdge;
+class ProgressItem;
 
 class PathOptimizerPrivate;
 class PathOptimizer : public QObject
@@ -29,14 +30,14 @@ public:
     Path optimizedPath() const;
 
 public slots:
-    void optimize();
+    void optimize(ProgressItem* parentProgress);
 
 signals:
     void finished();
     /**/
 
 protected:
-    void optimizeFrom(OptimizeNode* root);
+    void optimizeFrom(OptimizeNode* root, ProgressItem* progressParent);
 
     void optimizeNodes(QSet<OptimizeNode*>& siblingLeaves, QSet<OptimizeNode*>& travelled);
 
@@ -49,31 +50,31 @@ private:
     Q_DISABLE_COPY(PathOptimizer)
 };
 
-class OptimizerController : public QObject
-{
-    Q_OBJECT
-public:
-    typedef std::function<void(OptimizerController*)> FinishedCallback;
-    OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent = nullptr);
-    ~OptimizerController();
-
-    void optimize();
-
-    PathOptimizer::Path path();
-
-    void setFinishedCallback(FinishedCallback callback);
-
-public slots:
-    void finished();
-
-signals:
-    void start();
-
-private:
-    QThread m_thread;
-    FinishedCallback m_finishedCallback;
-    QScopedPointer<PathOptimizer> m_optimizer;
-};
+//class OptimizerController : public QObject
+//{
+//    Q_OBJECT
+//public:
+//    typedef std::function<void(OptimizerController*)> FinishedCallback;
+//    OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent = nullptr);
+//    ~OptimizerController();
+//
+//    void optimize(ProgressItem* parentProgress);
+//
+//    PathOptimizer::Path path();
+//
+//    void setFinishedCallback(FinishedCallback callback);
+//
+//public slots:
+//    void onFinished();
+//
+//signals:
+//    void start();
+//
+//private:
+//    QThread m_thread;
+//    FinishedCallback m_finishedCallback;
+//    QScopedPointer<PathOptimizer> m_optimizer;
+//};
 
 class Lane : public QSet<OptimizeNode*>
 {

@@ -62,6 +62,9 @@ qreal ProgressModel::progress() const
 
 void ProgressModel::clear()
 {
+    //this->removeRows(0, m_items.count());
+
+    this->beginResetModel();
     QStack<ProgressItem*> stack;
     for (ProgressItem* item : m_items)
     {
@@ -81,7 +84,8 @@ void ProgressModel::clear()
         delete item;
     }
     m_items.clear();
-    emit dataChanged(QModelIndex(), QModelIndex());
+    this->endResetModel();
+    emit dataChanged(createIndex(0, 0), createIndex(0, 1));
 }
 
 QModelIndex ProgressModel::index(int row, int column, const QModelIndex& parent) const

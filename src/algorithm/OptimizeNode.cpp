@@ -27,7 +27,7 @@ public:
 
     ~OptimizeNodePrivate();
 
-    void update(quint32 progressCode, qreal progressQuota);
+    void update(ProgressItem* parentProgress);
 
     //bool isVirtual() const;
 
@@ -59,7 +59,7 @@ OptimizeNodePrivate::~OptimizeNodePrivate()
     qLogD << "Node " << name << " destroyed.";
 }
 
-void OptimizeNodePrivate::update(quint32 progressCode, qreal progressQuota)
+void OptimizeNodePrivate::update(ProgressItem* parentProgress)
 {
     Q_Q(OptimizeNode);
 
@@ -67,7 +67,7 @@ void OptimizeNodePrivate::update(quint32 progressCode, qreal progressQuota)
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(documentItem);
         name = primitive->name();
-        primitive->updateMachiningPoints(progressCode, progressQuota);
+        primitive->updateMachiningPoints(parentProgress);
         startingPoints = primitive->startingPoints();
         if (startingPoints.isEmpty())
             return;
@@ -416,10 +416,10 @@ QPointF OptimizeNode::machiningPosition() const
     return QPointF(0, 0);
 }
 
-void OptimizeNode::update(quint32 progressCode, qreal progressQuota)
+void OptimizeNode::update(ProgressItem* parentProgress)
 {
     Q_D(OptimizeNode);
-    d->update(progressCode, progressQuota);
+    d->update(parentProgress);
 }
 
 ILaserDocumentItem* OptimizeNode::documentItem() const

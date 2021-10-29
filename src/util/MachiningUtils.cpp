@@ -13,6 +13,8 @@
 #include "TypeUtils.h"
 #include "Utils.h"
 #include "algorithm/QBezier.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
 
 int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::vector<cv::Point2f>& points, qreal factor, const Eigen::Matrix3d& transform)
 {
@@ -48,8 +50,9 @@ int machiningUtils::linePoints(double x1, double y1, double x2, double y2, std::
     return count;
 }
 
-int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode, 
-    qreal progressQuota, LaserPointList& points, 
+int machiningUtils::path2Points(
+    ProgressItem* parentProgress,
+    const QPainterPath & path, LaserPointList& points, 
     QList<int>& startingIndices, QPointF& center, int closed, int startingIndiciesCount, 
     int diagonalThreshold)
 {
@@ -155,12 +158,8 @@ int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode,
             anchor = point;
             anchorRadians = radians;
         }
-        if (i % 100 == 0)
-        {
-            LaserApplication::previewWindow->addProgress(progressCode, 100.0 * progressQuota / length);
-        }
+        
     }
-    LaserApplication::previewWindow->addProgress(progressCode, (qFloor(length) % 100) * progressQuota / length);
 
     angle = path.angleAtPercent(1);
     point4d.setAll(lastPoint, angle);
@@ -176,18 +175,22 @@ int machiningUtils::path2Points(const QPainterPath & path, quint32 progressCode,
     return points.size();
 }
 
-void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& pointsList, quint32 progressCode, 
-    qreal progressQuota, QList<int>& startingIndices, QPointF& center, const QTransform& transform)
+void machiningUtils::path2Points(
+    ProgressItem* parentProgress,
+    const QPainterPath& path, LaserPointListList& pointsList, 
+    QList<int>& startingIndices, QPointF& center, const QTransform& transform)
 {
     pointsList.clear();
     startingIndices.clear();
-    QList<QPolygonF> polygons = path2SubpathPolygons(path, transform, Config::Export::curveFlatteningThreshold());
+    QList<QPolygonF> polygons = path2SubpathPolygons(parentProgress, path, transform, Config::Export::curveFlatteningThreshold());
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Polygon to points"), parentProgress);
+    progress->setMaximum(path.elementCount());
     LaserPointList allPoints;
     for (QPolygonF& polygon : polygons)
     {
         LaserPointList points;
         QList<int> indices;
-        polygon2Points(polygon, points, indices, QPointF());
+        polygon2Points(nullptr, polygon, points, indices, QPointF());
 
         for (int index : indices)
         {
@@ -195,16 +198,23 @@ void machiningUtils::path2Points(const QPainterPath& path, LaserPointListList& p
         }
         allPoints.append(points);
         pointsList.append(points);
+        progress->increaseProgress();
     }
     center = utils::center(allPoints).toPointF();
+    progress->finish();
 }
 
-QList<QPolygonF> machiningUtils::path2SubpathPolygons(const QPainterPath& path, const QTransform& matrix, qreal bezier_flattening_threshold)
+QList<QPolygonF> machiningUtils::path2SubpathPolygons(
+    ProgressItem* parentProgress,
+    const QPainterPath& path, const QTransform& matrix, 
+    qreal bezier_flattening_threshold)
 {
     QList<QPolygonF> flatCurves;
     if (path.isEmpty())
         return flatCurves;
 
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("bazier to polygons"), parentProgress);
+    progress->setMaximum(path.elementCount());
     QPolygonF current;
     for (int i = 0; i < path.elementCount(); ++i) {
         const QPainterPath::Element& e = path.elementAt(i);
@@ -234,16 +244,25 @@ QList<QPolygonF> machiningUtils::path2SubpathPolygons(const QPainterPath& path, 
             Q_ASSERT(!"QPainterPath::toSubpathPolygons(), bad element type");
             break;
         }
+        progress->increaseProgress();
     }
-
     if (current.size() > 1)
         flatCurves += current;
-
+    progress->finish();
     return flatCurves;
 }
 
-void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& points, QList<int>& startingIndices, QPointF& center)
+void machiningUtils::polygon2Points(
+    ProgressItem* parentProgress,
+    const QPolygonF& polygon, LaserPointList& points, 
+    QList<int>& startingIndices, QPointF& center)
 {
+    ProgressItem* progress = nullptr;
+    if (parentProgress)
+    {
+        progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Polygon to Points"), parentProgress);
+        progress->setMaximum(polygon.size());
+    }
     points.clear();
     startingIndices.clear();
     bool isClosed = utils::fuzzyCompare(polygon.first(), polygon.last());
@@ -264,6 +283,8 @@ void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& po
         {
             startingIndices.append(i);
         }
+        if (progress)
+            progress->increaseProgress();
     }
     if (!isClosed)
     {
@@ -272,6 +293,8 @@ void machiningUtils::polygon2Points(const QPolygonF& polygon, LaserPointList& po
     }
         
     center /= points.size();
+    if (progress)
+        progress->finish();
 }
 
 QByteArray machiningUtils::pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t)

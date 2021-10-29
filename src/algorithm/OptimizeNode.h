@@ -14,6 +14,7 @@ class ILaserDocumentItem;
 class OptimizeNode;
 class OptimizeEdge;
 class LaserPrimitive;
+class ProgressItem;
 
 class OptimizeNodePrivate;
 class OptimizeNode
@@ -54,7 +55,7 @@ public:
     QPointF position() const;
     QPointF machiningPosition() const;
 
-    void update(quint32 progressCode = 0, qreal progressQuota = 0);
+    void update(ProgressItem* parentProgress);
 
     ILaserDocumentItem* documentItem() const;
 

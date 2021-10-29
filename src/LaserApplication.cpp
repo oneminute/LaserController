@@ -33,7 +33,6 @@ QMap<QString, QString> LaserApplication::stringMap;
 QMap<QString, QTranslator*> LaserApplication::translators;
 QTranslator* LaserApplication::currentTranslator(nullptr);
 QThread* LaserApplication::mainThread(nullptr);
-QThread* LaserApplication::progressThread(nullptr);
 
 LaserApplication::LaserApplication(int argc, char** argv)
     : QApplication(argc, argv)
@@ -99,22 +98,12 @@ bool LaserApplication::initialize()
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
     connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
 
-    progressThread = new QThread;
+    progressModel = new ProgressModel;
+    previewWindow = new PreviewWindow;
 
     StateController::start();
-    progressModel = new ProgressModel;
-    previewWindow = new PreviewWindow(mainWindow);
-    //progressModel->moveToThread(progressThread);
-    //previewWindow->moveToThread(progressThread);
     mainWindow = new LaserControllerWindow;
     mainWindow->showMaximized();
-
-    connect(previewWindow, &QDialog::close, progressThread, &QObject::deleteLater);
-    //connect(StateController::instance().deviceState(), &QState::entered, device, &LaserDevice::load);
-    //connect(mainWindow, &LaserControllerWindow::windowCreated, device, &LaserDevice::load);
-
-    //device->load();
-
 
     g_deviceThread.start();
 
@@ -138,9 +127,10 @@ void LaserApplication::destroy()
         delete device;
     }
     
-    previewWindow->moveToThread(mainThread);
+    previewWindow->close();
     SAFE_DELETE(previewWindow)
     SAFE_DELETE(progressModel)
+
     g_deviceThread.exit();
     g_deviceThread.wait();
 
@@ -452,5 +442,14 @@ void LaserApplication::closeProgressWindow()
 
 void LaserApplication::showProgressWindow()
 {
-    previewWindow->show();
+    if (previewWindow->isVisible())
+    {
+        previewWindow->hide();
+    }
+    else
+    {
+        previewWindow->show();
+        previewWindow->raise();
+        previewWindow->activateWindow();
+    }
 }

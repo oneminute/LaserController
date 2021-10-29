@@ -35,6 +35,7 @@
 #include "LaserScene.h"
 #include "laser/LaserPointList.h"
 #include "ui/LaserControllerWindow.h"
+#include "task/ProgressModel.h"
 
 class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 {
@@ -209,210 +210,194 @@ QString LaserDocument::newLayerName() const
     return name;
 }
 
-void LaserDocument::exportJSON(const QString& filename)
+void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProgress)
 {
     Q_D(LaserDocument);
 
-    LaserApplication::previewWindow->registerProgressCode(this, 0.1);
+    PathOptimizer optimizer(d->optimizeNode, primitives().count());
+    optimizer.optimize(parentProgress);
+    PathOptimizer::Path path = optimizer.optimizedPath();
 
-    QElapsedTimer timer;
-    timer.start();
-    OptimizerController* optimizer = new OptimizerController(d->optimizeNode, primitives().count());
-    optimizer->optimize();
-    optimizer->setFinishedCallback(
-        [=](OptimizerController* controller)
+    QFile saveFile(filename);
+    QJsonObject jsonObj;
+
+    QTransform t = enablePrintAndCut() ? printAndCutTransform() : QTransform();
+
+    QJsonObject laserDocumentInfo;
+    laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
+    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    laserDocumentInfo["PrinterDrawUnit"] = 1016;
+    laserDocumentInfo["FinishRun"] = d->finishRun.code;
+    laserDocumentInfo["StartFrom"] = Config::Device::startFrom();
+    laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
+    laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
+    //QPointF docOrigin = docOriginMachining();
+    //docOrigin = LaserApplication::device->deviceTransformMachining().map(docOrigin);
+    QPointF docOrigin(0, 0);
+    laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
+    laserDocumentInfo["UserOrigin"] = typeUtils::point2Json(docOrigin);
+    QRectF docBoundingRect = docBoundingRectMachining();
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
+    laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectMachining());
+    laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
+
+    jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
+
+    QList<LaserLayer*> layerList;
+    QMap<LaserLayer*, QList<OptimizeNode*>> layersMap;
+    for (OptimizeNode* pathNode : path)
+    {
+        LaserPrimitive* primitive = pathNode->primitive();
+        LaserLayer* layer = primitive->layer();
+        layersMap[layer].append(pathNode);
+        if (!layerList.contains(layer))
         {
-            PathOptimizer::Path path = controller->path();
-            qLogD << "optimized duration: " << timer.elapsed() / 1000.0;
-
-            QFile saveFile(filename);
-            QJsonObject jsonObj;
-
-            QTransform t = enablePrintAndCut() ? printAndCutTransform() : QTransform();
-
-            QJsonObject laserDocumentInfo;
-            laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
-            laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-            laserDocumentInfo["PrinterDrawUnit"] = 1016;
-            laserDocumentInfo["FinishRun"] = d->finishRun.code;
-            laserDocumentInfo["StartFrom"] = Config::Device::startFrom();
-            laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
-            laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
-            //QPointF docOrigin = docOriginMachining();
-            //docOrigin = LaserApplication::device->deviceTransformMachining().map(docOrigin);
-            QPointF docOrigin(0, 0);
-            laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
-            laserDocumentInfo["UserOrigin"] = typeUtils::point2Json(docOrigin);
-            QRectF docBoundingRect = docBoundingRectMachining();
-            laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
-            laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectMachining());
-            laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
-
-            jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
-
-            QList<LaserLayer*> layerList;
-            QMap<LaserLayer*, QList<OptimizeNode*>> layersMap;
-            for (OptimizeNode* pathNode : path)
-            {
-                LaserPrimitive* primitive = pathNode->primitive();
-                LaserLayer* layer = primitive->layer();
-                layersMap[layer].append(pathNode);
-                if (!layerList.contains(layer))
-                {
-                    layerList.append(layer);
-                }
-            }
-
-            QJsonArray layers;
-            //QPointF lastPoint = docOriginMachining();
-            QPointF lastPoint = docOrigin;
-            for (LaserLayer* layer : layerList)
-            {
-                QJsonObject layerObj;
-                QJsonObject paramObj;
-                QJsonArray items;
-                QJsonObject engravingParamObj;
-                QJsonObject cuttingParamObj;
-                QJsonObject fillingParamObj;
-                layerObj["Type"] = layer->type();
-                if (layer->type() == LLT_ENGRAVING)
-                {
-                    engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
-                    engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
-                    engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower() * 10;
-                    engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower() * 10;
-                    engravingParamObj["RowInterval"] = layer->engravingRowInterval();
-                    engravingParamObj["CarveForward"] = layer->engravingForward();
-                    engravingParamObj["CarveStyle"] = layer->engravingStyle();
-                    engravingParamObj["ErrorX"] = layer->errorX();
-                }
-                else if (layer->type() == LLT_CUTTING)
-                {
-                    cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
-                    cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
-                    cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
-                }
-                else if (layer->type() == LLT_FILLING)
-                {
-                    layerObj["Type"] = 2;
-                    cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
-                    cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
-                    cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
-                    fillingParamObj["RunSpeed"] = layer->fillingRunSpeed() * 1000;
-                    fillingParamObj["MinSpeedPower"] = layer->fillingMinSpeedPower() * 10;
-                    fillingParamObj["RunSpeedPower"] = layer->fillingRunSpeedPower() * 10;
-                    fillingParamObj["RowInterval"] = layer->fillingRowInterval();
-                }
-                paramObj["EngravingParams"] = engravingParamObj;
-                paramObj["CuttingParams"] = cuttingParamObj;
-                paramObj["FillingParams"] = fillingParamObj;
-                layerObj["Params"] = paramObj;
-                for (OptimizeNode* pathNode : layersMap[layer])
-                {
-                    LaserPrimitive* primitive = pathNode->primitive();
-
-                    QJsonObject itemObj;
-                    itemObj["Name"] = pathNode->nodeName();
-                    //itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
-                    if (layer->type() == LLT_ENGRAVING)
-                    {
-                        if (!enablePrintAndCut())
-                        {
-                            itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
-                            itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
-                            itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
-
-                            QByteArray data = primitive->engravingImage();
-                            if (!data.isEmpty())
-                            {
-                                itemObj["Type"] = primitive->typeLatinName();
-                                itemObj["ImageType"] = "PNG";
-                                itemObj["Data"] = QString(data.toBase64());
-                                items.append(itemObj);
-                            }
-                        }
-
-                        if (layer->engravingEnableCutting())
-                        {
-                            QJsonObject itemObjCutting;
-                            itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
-                            itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
-                            itemObjCutting["Type"] = primitive->typeLatinName();
-                            itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
-                            pathNode->nearestPoint(LaserPoint(lastPoint));
-                            LaserPointListList points = primitive->arrangedPoints();
-                            itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
-                            items.append(itemObjCutting);
-                        }
-                    }
-                    else if (layer->type() == LLT_CUTTING)
-                    {
-                        LaserPointListList points = primitive->arrangedPoints();
-                        if (!points.empty())
-                        {
-                            itemObj["Type"] = primitive->typeLatinName();
-                            itemObj["Style"] = LaserLayerType::LLT_CUTTING;
-                            itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
-                            items.append(itemObj);
-                        }
-                    }
-                    else if (layer->type() == LLT_FILLING)
-                    {
-                        if (!enablePrintAndCut())
-                        {
-                            itemObj["Type"] = primitive->typeLatinName();
-                            LaserLineListList lineList = primitive->generateFillData(lastPoint);
-                            itemObj["Data"] = QString(machiningUtils::lineList2Plt(lineList, lastPoint));
-                            itemObj["Style"] = LaserLayerType::LLT_FILLING;
-                            items.append(itemObj);
-                        }
-
-                        if (layer->fillingEnableCutting())
-                        {
-                            QJsonObject itemObjCutting;
-                            itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
-                            itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
-                            itemObjCutting["Type"] = primitive->typeLatinName();
-                            itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
-                            pathNode->nearestPoint(LaserPoint(lastPoint));
-                            LaserPointListList points = primitive->arrangedPoints();
-                            itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
-                            items.append(itemObjCutting);
-                        }
-                    }
-
-                    LaserApplication::previewWindow->addProgress(this, 1.0 * 0.9 / path.length(), tr("Primitve %1 finished.").arg(pathNode->nodeName()));
-                }
-                layerObj["Items"] = items;
-                layers.append(layerObj);
-            }
-
-            QJsonObject actionObj;
-
-            jsonObj["Layers"] = layers;
-
-            QJsonDocument jsonDoc(jsonObj);
-
-            if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
-            {
-                qWarning("Couldn't open save file.");
-                return;
-            }
-
-            //QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
-            QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
-            //qLogD << rawJson;
-            qint64 writtenBytes = saveFile.write(rawJson);
-            LaserApplication::previewWindow->addProgress(this, 0.1 / path.length(), tr("File saved."));
-            qDebug() << "written bytes:" << writtenBytes;
-
-            qLogD << "exported json duration: " << timer.elapsed() / 1000.0;
-            LaserApplication::previewWindow->addMessage(tr("Done"));
-            LaserApplication::previewWindow->setProgress(1);
-            saveFile.close();
-            emit exportFinished(filename);
+            layerList.append(layer);
         }
-    );
+    }
+
+    QJsonArray layers;
+    //QPointF lastPoint = docOriginMachining();
+    QPointF lastPoint = docOrigin;
+    for (LaserLayer* layer : layerList)
+    {
+        QJsonObject layerObj;
+        QJsonObject paramObj;
+        QJsonArray items;
+        QJsonObject engravingParamObj;
+        QJsonObject cuttingParamObj;
+        QJsonObject fillingParamObj;
+        layerObj["Type"] = layer->type();
+        if (layer->type() == LLT_ENGRAVING)
+        {
+            engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
+            engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
+            engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower() * 10;
+            engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower() * 10;
+            engravingParamObj["RowInterval"] = layer->engravingRowInterval();
+            engravingParamObj["CarveForward"] = layer->engravingForward();
+            engravingParamObj["CarveStyle"] = layer->engravingStyle();
+            engravingParamObj["ErrorX"] = layer->errorX();
+        }
+        else if (layer->type() == LLT_CUTTING)
+        {
+            cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
+            cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
+            cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
+        }
+        else if (layer->type() == LLT_FILLING)
+        {
+            layerObj["Type"] = 2;
+            cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
+            cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
+            cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
+            fillingParamObj["RunSpeed"] = layer->fillingRunSpeed() * 1000;
+            fillingParamObj["MinSpeedPower"] = layer->fillingMinSpeedPower() * 10;
+            fillingParamObj["RunSpeedPower"] = layer->fillingRunSpeedPower() * 10;
+            fillingParamObj["RowInterval"] = layer->fillingRowInterval();
+        }
+        paramObj["EngravingParams"] = engravingParamObj;
+        paramObj["CuttingParams"] = cuttingParamObj;
+        paramObj["FillingParams"] = fillingParamObj;
+        layerObj["Params"] = paramObj;
+        for (OptimizeNode* pathNode : layersMap[layer])
+        {
+            LaserPrimitive* primitive = pathNode->primitive();
+
+            QJsonObject itemObj;
+            itemObj["Name"] = pathNode->nodeName();
+            //itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
+            if (layer->type() == LLT_ENGRAVING)
+            {
+                if (!enablePrintAndCut())
+                {
+                    itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
+                    itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+                    itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
+
+                    QByteArray data = primitive->engravingImage();
+                    if (!data.isEmpty())
+                    {
+                        itemObj["Type"] = primitive->typeLatinName();
+                        itemObj["ImageType"] = "PNG";
+                        itemObj["Data"] = QString(data.toBase64());
+                        items.append(itemObj);
+                    }
+                }
+
+                if (layer->engravingEnableCutting())
+                {
+                    QJsonObject itemObjCutting;
+                    itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
+                    itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
+                    itemObjCutting["Type"] = primitive->typeLatinName();
+                    itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
+                    pathNode->nearestPoint(LaserPoint(lastPoint));
+                    LaserPointListList points = primitive->arrangedPoints();
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
+                    items.append(itemObjCutting);
+                }
+            }
+            else if (layer->type() == LLT_CUTTING)
+            {
+                LaserPointListList points = primitive->arrangedPoints();
+                if (!points.empty())
+                {
+                    itemObj["Type"] = primitive->typeLatinName();
+                    itemObj["Style"] = LaserLayerType::LLT_CUTTING;
+                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
+                    items.append(itemObj);
+                }
+            }
+            else if (layer->type() == LLT_FILLING)
+            {
+                if (!enablePrintAndCut())
+                {
+                    itemObj["Type"] = primitive->typeLatinName();
+                    LaserLineListList lineList = primitive->generateFillData(lastPoint);
+                    itemObj["Data"] = QString(machiningUtils::lineList2Plt(lineList, lastPoint));
+                    itemObj["Style"] = LaserLayerType::LLT_FILLING;
+                    items.append(itemObj);
+                }
+
+                if (layer->fillingEnableCutting())
+                {
+                    QJsonObject itemObjCutting;
+                    itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
+                    itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
+                    itemObjCutting["Type"] = primitive->typeLatinName();
+                    itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
+                    pathNode->nearestPoint(LaserPoint(lastPoint));
+                    LaserPointListList points = primitive->arrangedPoints();
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
+                    items.append(itemObjCutting);
+                }
+            }
+
+        }
+        layerObj["Items"] = items;
+        layers.append(layerObj);
+    }
+
+    QJsonObject actionObj;
+
+    jsonObj["Layers"] = layers;
+
+    QJsonDocument jsonDoc(jsonObj);
+
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    {
+        qWarning("Couldn't open save file.");
+        return;
+    }
+
+    QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
+    qint64 writtenBytes = saveFile.write(rawJson);
+    qDebug() << "written bytes:" << writtenBytes;
+
+    LaserApplication::previewWindow->addMessage(tr("Done"));
+    saveFile.close();
+    emit exportFinished(filename);
 }
 
 bool LaserDocument::isOpened() const
@@ -811,13 +796,17 @@ void LaserDocument::close()
     }
 }
 
-void LaserDocument::outline(ProgressItem* item)
+void LaserDocument::outline(ProgressItem* parentProgress)
 {
     Q_D(LaserDocument);
     qLogD << "Before outline:";
-    clearTree(d->optimizeNode);
-    printOutline(d->optimizeNode, 0);
-    outlineByLayers(d->optimizeNode);
+    ProgressItem* clearProgress = LaserApplication::progressModel->createSimpleItem("Clear tree", parentProgress);
+    ProgressItem* outlineProgress = LaserApplication::progressModel->createSimpleItem("Outline by layers", parentProgress);
+    clearTree(d->optimizeNode, clearProgress);
+#ifdef _DEBUG
+    //printOutline(d->optimizeNode, 0);
+#endif
+    outlineByLayers(d->optimizeNode, outlineProgress);
     qLogD << "After outline:";
     printOutline(d->optimizeNode, 0);
 
@@ -1177,9 +1166,10 @@ void LaserDocument::init()
     d->boundingRectTimer.start();
 }
 
-void LaserDocument::outlineByLayers(OptimizeNode* node)
+void LaserDocument::outlineByLayers(OptimizeNode* node, ProgressItem* progress)
 {
     Q_D(LaserDocument);
+    progress->setMaximum(d->primitives.count());
     for (LaserLayer* layer : d->layers)
     {
         if (layer->isEmpty())
@@ -1188,9 +1178,11 @@ void LaserDocument::outlineByLayers(OptimizeNode* node)
         for (LaserPrimitive* primitive : layer->primitives())
         {
             addPrimitiveToNodesTree(primitive, layer->optimizeNode());
+            progress->increaseProgress();
         }
         //optimizeGroups(layer->optimizeNode());
     }
+    progress->finish();
 }
 
 void LaserDocument::outlineByGroups(OptimizeNode* node)
@@ -1204,14 +1196,17 @@ void LaserDocument::outlineByGroups(OptimizeNode* node)
     }
 }
 
-void LaserDocument::clearTree(OptimizeNode* node)
+void LaserDocument::clearTree(OptimizeNode* node, ProgressItem* progress)
 {
+    Q_D(LaserDocument);
     QStack<OptimizeNode*> stack;
     stack.push(node);
     QList<OptimizeNode*> deletingNodes;
+    progress->setMaximum(d->primitives.count());
     while (!stack.isEmpty())
     {
         OptimizeNode* topNode = stack.pop();
+        progress->increaseProgress();
         for (OptimizeNode* childNode : topNode->childNodes())
         {
             stack.push(childNode);
@@ -1222,6 +1217,7 @@ void LaserDocument::clearTree(OptimizeNode* node)
     }
     if (!deletingNodes.isEmpty())
         qDeleteAll(deletingNodes);
+    progress->finish();
 }
 
 void LaserDocument::optimizeGroups(OptimizeNode* node, int level, bool sorted)

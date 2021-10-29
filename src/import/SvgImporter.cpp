@@ -38,7 +38,7 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
     int nodeCount = svgDoc->handler()->nodeCount();
-    ProgressItem* progress= LaserApplication::progressModel->createSimpleItem("import svg", parentProgress);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("import svg", parentProgress);
     progress->setMaximum(nodeCount);
     //LaserDocument* laserDoc = new LaserDocument(scene);
 	if (svgDoc == nullptr)

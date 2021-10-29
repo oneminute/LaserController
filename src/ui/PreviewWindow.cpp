@@ -32,10 +32,9 @@ using namespace ads;
 
 PreviewWindow::PreviewWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_progress(0.0)
 {
     this->setWindowModality(Qt::WindowModality::WindowModal);
-    this->setWindowFlags(Qt::WindowStaysOnTopHint);
+    //this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
     // menu bar
     QMenuBar* menuBar = new QMenuBar;
@@ -123,16 +122,10 @@ PreviewWindow::PreviewWindow(QWidget* parent)
     connect(this, &PreviewWindow::addPathSignal, this, &PreviewWindow::onAddPath);
     connect(this, &PreviewWindow::addLineSignal, this, &PreviewWindow::onAddLine);
     connect(this, &PreviewWindow::setTitleSignal, this, &PreviewWindow::onSetTitle);
-    connect(this, &PreviewWindow::addProgressSignal, this, &PreviewWindow::onAddProgress);
-    connect(this, QOverload<qreal>::of(&PreviewWindow::setProgressSignal), 
-        this, QOverload<qreal>::of(&PreviewWindow::onSetProgress));
-    connect(this, QOverload<quint32, qreal>::of(&PreviewWindow::setProgressSignal), 
-        this, QOverload<quint32, qreal>::of(&PreviewWindow::onSetProgress));
-    connect(this, &PreviewWindow::addMessageSignal, this, &PreviewWindow::onAddMessage);
     connect(this, &PreviewWindow::addPointsSignal, this, &PreviewWindow::onAddPoints);
     connect(this, &PreviewWindow::addPointSignal, this, &PreviewWindow::onAddPoint);
+    connect(this, &PreviewWindow::addMessageSignal, this, &PreviewWindow::onAddMessage);
     connect(&m_updateTimer, &QTimer::timeout, this, &PreviewWindow::updatePreviewArea);
-    connect(this, &PreviewWindow::showAsyncSignal, this, &PreviewWindow::onShowAsync, Qt::ConnectionType::QueuedConnection);
 
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
@@ -141,11 +134,6 @@ PreviewWindow::PreviewWindow(QWidget* parent)
 
 PreviewWindow::~PreviewWindow()
 {
-}
-
-qreal PreviewWindow::progress() const
-{
-    return m_progress;
 }
 
 void PreviewWindow::intendUpdate()
@@ -159,6 +147,11 @@ void PreviewWindow::intendUpdate()
 void PreviewWindow::setTitle(const QString& msg)
 {
     emit setTitleSignal(msg);
+}
+
+void PreviewWindow::addMessage(const QString& message)
+{
+    emit addMessageSignal(message);
 }
 
 void PreviewWindow::addPath(const QPainterPath& path, QPen pen, const QString& label)
@@ -200,66 +193,8 @@ void PreviewWindow::reset()
     m_viewer->scene()->clear();
     m_viewer->scene()->addRect(LaserApplication::device->boundRectMachining());
     
-    resetProgress();
     intendUpdate();
     m_viewer->reset();
-}
-
-void PreviewWindow::resetProgress()
-{
-    m_progress = 0.0;
-    m_progressQuotas.clear();
-    m_sumQuotas = 0;
-}
-
-void PreviewWindow::registerProgressCode(quint32 code, qreal quota)
-{
-    m_progressQuotas[code] = quota;
-    m_sumQuotas = 0;
-    for (QMap<quint32, qreal>::ConstIterator i = m_progressQuotas.constBegin(); i != m_progressQuotas.constEnd(); i++)
-    {
-        m_sumQuotas += i.value();
-    }
-}
-
-void PreviewWindow::registerProgressCode(void* ptr, qreal quota)
-{
-    registerProgressCode((quint32)ptr, quota);
-}
-
-void PreviewWindow::addProgress(quint32 code, qreal deltaProgress, const QString& msg, bool ignoreQuota)
-{
-    emit addProgressSignal(code, deltaProgress, msg, ignoreQuota);
-}
-
-void PreviewWindow::addProgress(void* code, qreal deltaProgress, const QString& msg, bool ignoreQuota)
-{
-    addProgress((quint32)code, deltaProgress, msg, ignoreQuota);
-}
-
-void PreviewWindow::setProgress(qreal progress)
-{
-    emit setProgressSignal(progress);
-}
-
-void PreviewWindow::setProgress(quint32 code, qreal progress)
-{
-    emit setProgressSignal(code, progress);
-}
-
-void PreviewWindow::setProgress(void* ptr, qreal progress)
-{
-    setProgress((quint32)ptr, progress);
-}
-
-void PreviewWindow::addMessage(const QString& message)
-{
-    emit addMessageSignal(message);
-}
-
-void PreviewWindow::showAsync()
-{
-    emit showAsyncSignal();
 }
 
 void PreviewWindow::onAddPath(const QPainterPath& path, QPen pen, const QString& label)
@@ -292,47 +227,9 @@ void PreviewWindow::onSetTitle(const QString& msg)
     m_textEditLog->appendPlainText(msg);
 }
 
-void PreviewWindow::onAddProgress(quint32 code, qreal deltaProgress, const QString& msg, bool ignoreQuota)
-{
-    if (!m_progressQuotas.contains(code))
-        return;
-
-    if (!ignoreQuota)
-    {
-        qreal quota = m_progressQuotas[code];
-        deltaProgress = deltaProgress * quota;
-    }
-    onSetProgress(qMin(m_progress + deltaProgress, 1.0));
-
-    if (!msg.isEmpty())
-    {
-        onAddMessage(msg);
-    }
-}
-
-void PreviewWindow::onSetProgress(qreal progress)
-{
-    m_progress = progress;
-    m_progressBar->setValue(qRound(progress * 100));
-    emit progressUpdated(m_progress);
-}
-
-void PreviewWindow::onSetProgress(quint32 code, qreal progress)
-{
-    if (!m_progressQuotas.contains(code))
-        return;
-
-    qreal quota = m_progressQuotas[code];
-    onSetProgress(qMin(progress * quota, 1.0));
-}
-
 void PreviewWindow::onAddMessage(const QString& message)
 {
     //qLogD << message;
     m_textEditLog->appendPlainText(message);
 }
 
-void PreviewWindow::onShowAsync()
-{
-    this->show();
-}

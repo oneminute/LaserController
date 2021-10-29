@@ -10,6 +10,8 @@
 #include "laser/LaserPoint.h"
 #include "laser/LaserPointList.h"
 #include "laser/LaserDevice.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
 #include "util/TypeUtils.h"
 #include "util/Utils.h"
 
@@ -75,7 +77,7 @@ void PathOptimizer::arriveNode(OptimizeNode* node, QSet<OptimizeNode*>& travelle
 #endif
 }
 
-void PathOptimizer::optimize()
+void PathOptimizer::optimize(ProgressItem* parentProgress)
 {
     Q_D(PathOptimizer);
 
@@ -84,16 +86,19 @@ void PathOptimizer::optimize()
     d->arrivedNodes = 0;
     d->currentNode = d->root;
     d->currentNode->clearEdges();
-    d->currentNode->update();
+    d->currentNode->update(parentProgress);
     d->optimizedPath.clear();
 
+    ProgressItem* optimizeProgress = LaserApplication::progressModel->createComplexItem(tr("Optimize by layers"), parentProgress);
+    ProgressItem* arrangeProgress = LaserApplication::progressModel->createComplexItem(tr("Arrange points"), parentProgress);
+    optimizeProgress->setMaximum(d->root->childNodes().count() * 2);
     for (OptimizeNode* layerNode : d->root->childNodes())
     {
-        //optimizeLayer(layerNode);
-        optimizeFrom(layerNode);
+        optimizeFrom(layerNode, optimizeProgress);
     }
 
     LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
+    arrangeProgress->setMaximum(d->optimizedPath.length());
     OptimizeNode* last = d->root;
     for (OptimizeNode* node : d->optimizedPath)
     {
@@ -111,7 +116,9 @@ void PathOptimizer::optimize()
                 QPen(Qt::blue, 2));
         }
         last = node;
+        arrangeProgress->increaseProgress();
     }
+    arrangeProgress->finish();
 
     emit finished();
 }
@@ -122,9 +129,12 @@ PathOptimizer::Path PathOptimizer::optimizedPath() const
     return d->optimizedPath;
 }
 
-void PathOptimizer::optimizeFrom(OptimizeNode* root)
+void PathOptimizer::optimizeFrom(OptimizeNode* root, ProgressItem* parentProgress)
 {
     Q_D(PathOptimizer);
+    ProgressItem* buildProgress = LaserApplication::progressModel->createComplexItem(tr("Update nodes"), parentProgress);
+    ProgressItem* optimizeProgress = LaserApplication::progressModel->createSimpleItem(tr("Optimze nodes"), parentProgress);
+
     // 计算泳道宽
     int laneInterval = qRound(Config::PathOptimization::groupingGridInterval() * 1000);
     Qt::Orientation orient = static_cast<Qt::Orientation>(Config::PathOptimization::groupingOrientation());
@@ -135,37 +145,40 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root)
     QStack<OptimizeNode*> stack;
     stack.push(root);
     QSet<OptimizeNode*> leaves;
+    QList<OptimizeNode*> allNodes;
     while (!stack.empty())
     {
         OptimizeNode* node = stack.pop();
-        node->clearEdges();
-        node->update((quint32)this, 1.0 * 0.9 / d->totalNodes);
-
-        if (node->isLeaf())
-        {
-            laneMap.addNode(node);
-            leaves.insert(node);
-        }
+        allNodes.append(node);
 
         for (OptimizeNode* childNode : node->childNodes())
         {
             stack.push(childNode);
         }
     }
+    buildProgress->setMaximum(allNodes.length());
+    optimizeProgress->setMaximum(allNodes.length());
+    for (OptimizeNode* node : allNodes)
+    {
+        node->clearEdges();
+        node->update(parentProgress);
+
+        if (node->isLeaf())
+        {
+            laneMap.addNode(node);
+            leaves.insert(node);
+        }
+        buildProgress->increaseProgress();
+    }
     laneMap.buildKdtree();
+    buildProgress->finish();
 
     QSet<OptimizeNode*> travelled;
     // 找到第一个最优节点
     OptimizeNode* firstNode = laneMap.nearestSearch(d->currentNode, true, leaves);
     arriveNode(firstNode, travelled);
-    //while (travelled.count() != leaves.count())
     while (d->currentNode != root)
     {
-        /*if (d->currentNode->nodeType() == LNT_PRIMITIVE)
-        {
-            travelled.insert(d->currentNode);
-        }*/
-
         // 搜索所有的兄弟节点
         QSet<OptimizeNode*> siblingLeaves;
         QSet<OptimizeNode*> siblingBranches;
@@ -210,7 +223,9 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root)
             OptimizeNode* firstNode = laneMap.nearestSearch(d->currentNode, true, leaves);
             arriveNode(firstNode, travelled);
         }
+        optimizeProgress->increaseProgress();
     }
+    optimizeProgress->finish();
 }
 
 void PathOptimizer::optimizeNodes(QSet<OptimizeNode*>& siblingLeaves, QSet<OptimizeNode*>& travelled)
@@ -252,50 +267,49 @@ void PathOptimizer::printNodeAndEdges()
     }
 }
 
-OptimizerController::OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent)
-    : QObject(parent)
-    , m_optimizer(new PathOptimizer(
-        root,
-        totalNodes))
-{
-    qLogD << "OptimizerController";
-    LaserApplication::previewWindow->registerProgressCode(m_optimizer.data(), 0.9);
-    m_optimizer->moveToThread(&m_thread);
-    connect(this, &OptimizerController::start, m_optimizer.data(), &PathOptimizer::optimize);
-    connect(m_optimizer.data(), &PathOptimizer::finished, this, &OptimizerController::finished);
-
-    m_thread.start();
-}
-
-OptimizerController::~OptimizerController()
-{
-}
-
-void OptimizerController::optimize()
-{
-    emit start();
-}
-
-PathOptimizer::Path OptimizerController::path()
-{
-    return m_optimizer->optimizedPath();
-}
-
-void OptimizerController::setFinishedCallback(FinishedCallback callback)
-{
-    m_finishedCallback = callback;
-}
-
-void OptimizerController::finished()
-{
-    LaserApplication::previewWindow->setProgress(this, 1);
-    if (m_finishedCallback)
-    {
-        m_finishedCallback(this);
-    }
-    m_thread.quit();
-    this->deleteLater();
-}
+//OptimizerController::OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent)
+//    : QObject(parent)
+//    , m_optimizer(new PathOptimizer(
+//        root,
+//        totalNodes))
+//{
+//    qLogD << "OptimizerController";
+//    LaserApplication::previewWindow->registerProgressCode(m_optimizer.data(), 0.9);
+//    m_optimizer->moveToThread(&m_thread);
+//    connect(this, &OptimizerController::start, m_optimizer.data(), &PathOptimizer::optimize);
+//    connect(m_optimizer.data(), &PathOptimizer::finished, this, &OptimizerController::onFinished);
+//
+//    m_thread.start();
+//}
+//
+//OptimizerController::~OptimizerController()
+//{
+//}
+//
+//void OptimizerController::optimize()
+//{
+//    emit start();
+//}
+//
+//PathOptimizer::Path OptimizerController::path()
+//{
+//    return m_optimizer->optimizedPath();
+//}
+//
+//void OptimizerController::setFinishedCallback(FinishedCallback callback)
+//{
+//    m_finishedCallback = callback;
+//}
+//
+//void OptimizerController::onFinished()
+//{
+//    if (m_finishedCallback)
+//    {
+//        m_finishedCallback(this);
+//    }
+//    m_thread.quit();
+//    this->deleteLater();
+//}
 
 Lane::Lane()
 {

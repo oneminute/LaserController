@@ -2545,7 +2545,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 		}
 	}
 	//create title
-	QString name = QFileDialog::getOpenFileName(nullptr, tr("open file"), ".", "File(*lc)");
+	QString name = QFileDialog::getOpenFileName(nullptr, tr("Open File"), ".", "File(*.lc)");
 	m_fileDirection = name;
 	if (name == "") {
 		return;
@@ -2690,13 +2690,16 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         if (!filename.isEmpty() && !filename.isNull())
         {
             LaserApplication::progressModel->clear();
-            ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("outline", nullptr);
-            m_scene->document()->outline(progress);
-            m_scene->document()->setFinishRun(finishRun());
-            LaserApplication::previewWindow->reset();
             LaserApplication::showProgressWindow();
-            m_prepareMachining = false;
-            m_scene->document()->exportJSON(filename);
+            ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+            QtConcurrent::run([=]()
+                {
+                    m_scene->document()->outline(progress);
+                    m_scene->document()->setFinishRun(finishRun());
+                    m_prepareMachining = false;
+                    m_scene->document()->exportJSON(filename, progress);
+                }
+            );
         }
     }
 }
@@ -2722,7 +2725,7 @@ void LaserControllerWindow::onActionLoadJson(bool checked)
 void LaserControllerWindow::onActionMachining(bool checked)
 {
     LaserApplication::previewWindow->reset();
-    LaserApplication::showProgressWindow();
+    //LaserApplication::showProgressWindow();
 
     if (m_useLoadedJson)
     {
@@ -2744,13 +2747,17 @@ void LaserControllerWindow::onActionMachining(bool checked)
 
         LaserApplication::progressModel->clear();
         LaserApplication::showProgressWindow();
-        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
-        m_scene->document()->outline(progress);
-        m_scene->document()->setFinishRun(finishRun());
-        qDebug() << "exporting to temporary json file:" << filename;
-        m_prepareMachining = true;
-        qDebug() << "export temp json file for machining" << filename;
-        m_scene->document()->exportJSON(filename);
+        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+        QtConcurrent::run([=]()
+            {
+                m_scene->document()->outline(progress);
+                m_scene->document()->setFinishRun(finishRun());
+                qDebug() << "exporting to temporary json file:" << filename;
+                m_prepareMachining = true;
+                qDebug() << "export temp json file for machining" << filename;
+                m_scene->document()->exportJSON(filename, progress);
+            }
+        );
         //}
     }
     m_useLoadedJson = false;
@@ -2822,11 +2829,9 @@ void LaserControllerWindow::onActionDisconnect(bool checked)
 
 void LaserControllerWindow::onActionDownload(bool checked)
 {
-    QString filename = "export.json";
+	QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open File"), ".", "JSON (*.json)");
     filename = m_tmpDir.absoluteFilePath(filename);
     m_prepareMachining = false;
-    m_scene->document()->exportJSON(filename);
-    qDebug() << "export temp json file for machining" << filename;
     LaserApplication::driver->loadDataFromFile(filename);
 }
 
@@ -3209,9 +3214,12 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 {
     LaserApplication::progressModel->clear();
     LaserApplication::showProgressWindow();
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
-    m_scene->document()->outline(progress);
-    updateOutlineTree();
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Outlining", nullptr);
+    QtConcurrent::run(
+        [=]() {
+            m_scene->document()->outline(progress);
+        }
+    );
 }
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)

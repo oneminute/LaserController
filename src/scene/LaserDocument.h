@@ -87,7 +87,7 @@ public:
     virtual QPointF position() const { return QPoint(0, 0); }
 
 public slots:
-    void exportJSON(const QString& filename);
+    void exportJSON(const QString& filename, ProgressItem* parentProgress);
     void updateLayersStructure();
     void destroy();
     void open();
@@ -101,9 +101,9 @@ public slots:
 
 protected:
 	void init();
-    void outlineByLayers(OptimizeNode* node);
+    void outlineByLayers(OptimizeNode* node, ProgressItem* parentProgress);
     void outlineByGroups(OptimizeNode* node);
-    void clearTree(OptimizeNode* node);
+    void clearTree(OptimizeNode* node, ProgressItem* parentProgress);
     /// <summary>
     /// 对当前的节点树进行整理，使每个分组树中的叶结点不要超过最大数量。
     /// </summary>

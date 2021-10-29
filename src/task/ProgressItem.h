@@ -36,7 +36,7 @@ public:
     void setMinimum(qreal value) { m_minimum = value; }
 
     qreal maximum() const { return m_maximum; }
-    void setMaximum(qreal value) { m_maximum = value; }
+    void setMaximum(qreal value);
 
     qreal progress() const;
     void setProgress(qreal process);
