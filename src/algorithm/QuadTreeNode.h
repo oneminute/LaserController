@@ -34,8 +34,13 @@ public:
     QRectF topRightRegion();
     QRectF bottomLeftRegion();
     QRectF bottomRightRegion();
+    QuadTreeNode* nodeTopLeft();
+    QuadTreeNode* nodeTopRight();
+    QuadTreeNode* nodeBottomLeft();
+    QuadTreeNode* nodeBottomRight();
     QList<QuadTreeNode*> children();
     QList<QRectF> targetRegions();
     void upDatePrimitive(LaserPrimitive* primitive);
+    void clearAllNodes();
 };
 #endif // QUADTREENODE_H

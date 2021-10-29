@@ -367,6 +367,16 @@ void Config::loadUiItems()
 	visualGridSpacing->setInputWidgetProperty("minimum", 0);
 	visualGridSpacing->setInputWidgetProperty("maximum", 10);
 
+   
+    ConfigItem* validMaxRegion = group->addConfigItem(
+        "validMaxRegion",
+        3000,
+        DT_REAL
+    );
+    validMaxRegion->setInputWidgetProperty("textTemplate", "%1mm");
+    validMaxRegion->setInputWidgetProperty("minimum", 0);
+    validMaxRegion->setInputWidgetProperty("maximum", 10000);
+
     ConfigItem* splitterHandleWidth = group->addConfigItem(
         "splitterHandleWidth",
         1
@@ -3123,6 +3133,10 @@ void Config::updateTitlesAndDescriptions()
     Ui::visualGridSpacingItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Visual Grid Spacing(mm)", nullptr), 
         QCoreApplication::translate("Config", "The visual grid spacing in mm", nullptr));
+
+    Ui::validMaxRegionItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Valid Max Region(m)", nullptr),
+        QCoreApplication::translate("Config", "The Valid Max Region Width Or Height in m", nullptr));
 
     Ui::splitterHandleWidthItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Splitter Handle Width(px)", nullptr), 

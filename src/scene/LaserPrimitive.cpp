@@ -595,6 +595,12 @@ bool LaserPrimitive::isLocked()
     return d->isLocked;
 }
 
+QList<QuadTreeNode*>& LaserPrimitive::treeNodesList()
+{
+    Q_D(LaserPrimitive);
+    return d->treeNodes;
+}
+
 void LaserPrimitive::addTreeNode(QuadTreeNode* node)
 {
     Q_D(LaserPrimitive);

@@ -40,6 +40,7 @@
 #include <QUndoStack>
 #include <QPainter>
 #include <QtConcurrent>
+#include <QDialogButtonBox>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -3927,17 +3928,34 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
 {
+    qreal lastValidMaxRegion = Config::Ui::validMaxRegion();
     ConfigDialog dialog;
     if (!title.isEmpty() && !title.isNull())
         dialog.setCurrentPanel(title);
-    dialog.exec();
+    int result = dialog.exec();   
+    qreal validMaxRegion = Config::Ui::validMaxRegion();
 	//关闭窗口
-	if (m_scene) {
-		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
-		if (backgroudItem) {
-			backgroudItem->onChangeGrids();
-		}
-	}
+    if (result == QDialog::Accepted) {
+        if (m_scene) {
+            //改变网格
+            LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
+            if (backgroudItem) {
+                backgroudItem->onChangeGrids();
+            }
+            //更新树
+            if (lastValidMaxRegion != validMaxRegion) {
+                m_scene->updateTree();
+            }
+        }
+    }
+    else if (result == QDialog::Rejected) {
+        if (lastValidMaxRegion != validMaxRegion) {
+            Config::Ui::validMaxRegionItem()->setValue(lastValidMaxRegion);
+            //updata region
+            m_scene->updateValidMaxRegionRect();
+        }
+    }
+	
 }
 //selected items change,被选中的物体，发生移动，缩放，旋转,以线镜像变换时
 void LaserControllerWindow::selectedChange()

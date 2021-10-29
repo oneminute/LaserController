@@ -176,6 +176,7 @@ public:
 
     void setLocked(bool isLocked);
     bool isLocked();
+    QList<QuadTreeNode*>& treeNodesList();
     void addTreeNode(QuadTreeNode* node);
     void removeAllTreeNode();
     void removeOneTreeNode(QuadTreeNode* node);

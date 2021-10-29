@@ -29,6 +29,10 @@ QuadTreeNode::QuadTreeNode(QRectF region, int depth)
 
 QuadTreeNode::~QuadTreeNode()
 {
+    m_nodeTopLeft = nullptr;
+    m_nodeTopRight = nullptr;
+    m_nodeBottomLeft = nullptr;
+    m_nodeBottomRight = nullptr;
 }
 bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
 {
@@ -394,6 +398,26 @@ QRectF QuadTreeNode::bottomRightRegion()
     return m_bottomRightRegion;
 }
 
+QuadTreeNode * QuadTreeNode::nodeTopLeft()
+{
+    return m_nodeTopLeft;
+}
+
+QuadTreeNode * QuadTreeNode::nodeTopRight()
+{
+    return m_nodeTopRight;
+}
+
+QuadTreeNode * QuadTreeNode::nodeBottomLeft()
+{
+    return m_nodeBottomLeft;
+}
+
+QuadTreeNode * QuadTreeNode::nodeBottomRight()
+{
+    return m_nodeBottomRight;
+}
+
 QList<QuadTreeNode*> QuadTreeNode::children()
 {
     QList<QuadTreeNode*> list;
@@ -427,6 +451,42 @@ void QuadTreeNode::upDatePrimitive(LaserPrimitive * primitive)
 {
     primitive->removeAllTreeNode();
     createPrimitiveTreeNode(primitive);
+}
+
+void QuadTreeNode::clearAllNodes()
+{
+    //clear all nodes
+    QStack<QuadTreeNode*> stack;
+    while(this)
+    stack.push(this);
+    while (!stack.isEmpty()) {
+        QuadTreeNode* node = stack.pop();
+        if (!node) {
+            continue;
+        }
+        if (node->isLeaf()) {
+            //clear primitive
+            for (LaserPrimitive* primitive : node->primitiveList()) {
+                primitive->removeOneTreeNode(node);
+            }
+        }
+        else {
+            stack.push(node);
+            if (node->m_nodeTopLeft) {
+                stack.push(node->nodeTopLeft());
+            }
+            if (node->m_nodeBottomLeft) {
+                stack.push(node->nodeBottomLeft());
+            }
+            if (node->m_nodeTopRight) {
+                stack.push(node->nodeTopRight());
+            }
+            if (node->m_nodeTopRight) {
+                stack.push(node->nodeTopRight());
+            }
+        }
+    }
+
 }
 
 

@@ -13,7 +13,9 @@
 #include <QScrollBar>
 #include <QInputMethodEvent>
 #include <qmath.h>
+#include <QMessageBox>
 #include "util/Utils.h"
+#include "common/Config.h"
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
@@ -61,11 +63,16 @@ void LaserScene::setDocument(LaserDocument * doc)
 	views()[0]->centerOn(rect.center());
     //创建树
     if (!m_quadTree) {
-        qreal maxSize = Global::mm2PixelsYF(3000);
+        qreal maxSize = Global::mm2PixelsYF(Config::Ui::validMaxRegion());
         qreal top = -(maxSize - rect.height()) * 0.5;
         qreal left = -(maxSize - rect.width()) * 0.5;
         m_maxRegion = QRectF(left, top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
+        connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
+            //updata region
+            updataValidMaxRegion();
+        
+        });
     }
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
@@ -424,6 +431,73 @@ QRectF LaserScene::maxRegion()
 QuadTreeNode * LaserScene::quadTreeNode()
 {
     return m_quadTree;
+}
+
+void LaserScene::updateValidMaxRegionRect()
+{
+    QRectF rect = LaserApplication::device->boundingRect();
+    qreal maxSize = Global::mm2PixelsYF(Config::Ui::validMaxRegion());
+    qreal top = -(maxSize - rect.height()) * 0.5;
+    qreal left = -(maxSize - rect.width()) * 0.5;
+    m_maxRegion = QRectF(left, top, maxSize, maxSize);
+    views()[0]->viewport()->repaint();
+}
+
+void LaserScene::updataValidMaxRegion()
+{
+    LaserViewer* view = qobject_cast<LaserViewer*>( views()[0]);
+    QRectF rect = LaserApplication::device->boundingRect();
+    qreal maxSize = Global::mm2PixelsYF(Config::Ui::validMaxRegion());
+    qreal top = -(maxSize - rect.height()) * 0.5;
+    qreal left = -(maxSize - rect.width()) * 0.5;
+    qreal lastMaxSize = m_maxRegion.width();
+    m_maxRegion = QRectF(left, top, maxSize, maxSize);
+    view->viewport()->repaint();
+    //所有图元bounds
+    qreal bLeft = 0;
+    qreal bRight = 0;
+    qreal bTop = 0;
+    qreal bBottom = 0;
+    int i = 0;
+    for (LaserPrimitive* primitive : document()->primitives()) {
+        view->detectRect(*primitive, i, bLeft, bRight, bTop, bBottom);
+        i++;
+    }
+    QRectF bounds = QRectF(bLeft, bTop, bRight - bLeft, bBottom - bTop);
+    //垂直或水平线，点的情况
+    if (bounds.width() == 0 || bounds.height() == 0) {
+        if (!maxRegion().contains(bounds.topLeft()) || !maxRegion().contains(bounds.bottomRight())) {
+            QMessageBox::warning(view, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            
+        }
+    }
+    else {
+        if (!maxRegion().contains(bounds)) {
+            QMessageBox::warning(view, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            
+        }
+    }
+
+    
+}
+
+void LaserScene::updateTree()
+{
+    if (document()) {
+        //updata region
+        updataValidMaxRegion();
+        //clear tree
+        delete m_quadTree;
+        //rebuild tree
+        m_quadTree = new QuadTreeNode(m_maxRegion);
+        int s = document()->primitives().size();
+        for (LaserPrimitive* p : document()->primitives()) {
+            //clear primitive nodelist
+            p->treeNodesList().clear();
+            //create
+            m_quadTree->createPrimitiveTreeNode(p);
+        }
+    }
 }
 
 

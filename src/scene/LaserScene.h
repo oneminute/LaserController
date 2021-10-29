@@ -46,6 +46,9 @@ public:
     void selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive);
     QRectF maxRegion();
     QuadTreeNode* quadTreeNode();
+    void updateValidMaxRegionRect();
+    void updataValidMaxRegion();
+    void updateTree();
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;
