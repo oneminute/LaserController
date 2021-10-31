@@ -22,8 +22,8 @@ public:
 public slots:
     void addPath(const QPainterPath& path, QPen pen = QPen(Qt::blue, 1, Qt::SolidLine), const QString& label = QString());
     void addLine(const QLineF& line, QPen pen = QPen(Qt::black, 1, Qt::SolidLine), const QString& label = QString());
-    void addPoints(const QList<QPointF>& points, QPen pen = QPen(Qt::gray, 0.5, Qt::SolidLine), int style = 0);
-    void addPoint(const QPointF& point, QPen pen = QPen(Qt::gray, 0.5, Qt::SolidLine), int style = 0);
+
+    void drawAllItems();
 
 private:
     QScopedPointer<PreviewScenePrivate> d_ptr;

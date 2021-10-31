@@ -73,7 +73,7 @@ void PathOptimizer::arriveNode(OptimizeNode* node, QSet<OptimizeNode*>& travelle
     d->currentNode = node;
     travelled.insert(node);
 #ifdef _DEBUG
-    qLogD << "arrived " << node->nodeName();
+    //qLogD << "arrived " << node->nodeName();
 #endif
 }
 
@@ -89,13 +89,15 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
     d->currentNode->update(parentProgress);
     d->optimizedPath.clear();
 
+    parentProgress->setMaximum(2);
     ProgressItem* optimizeProgress = LaserApplication::progressModel->createComplexItem(tr("Optimize by layers"), parentProgress);
-    ProgressItem* arrangeProgress = LaserApplication::progressModel->createComplexItem(tr("Arrange points"), parentProgress);
+    ProgressItem* arrangeProgress = LaserApplication::progressModel->createSimpleItem(tr("Arrange points"), parentProgress);
     optimizeProgress->setMaximum(d->root->childNodes().count() * 2);
     for (OptimizeNode* layerNode : d->root->childNodes())
     {
         optimizeFrom(layerNode, optimizeProgress);
     }
+    optimizeProgress->finish();
 
     LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
     arrangeProgress->setMaximum(d->optimizedPath.length());
@@ -132,8 +134,8 @@ PathOptimizer::Path PathOptimizer::optimizedPath() const
 void PathOptimizer::optimizeFrom(OptimizeNode* root, ProgressItem* parentProgress)
 {
     Q_D(PathOptimizer);
-    ProgressItem* buildProgress = LaserApplication::progressModel->createComplexItem(tr("Update nodes"), parentProgress);
-    ProgressItem* optimizeProgress = LaserApplication::progressModel->createSimpleItem(tr("Optimze nodes"), parentProgress);
+    ProgressItem* buildProgress = LaserApplication::progressModel->createSimpleItem(tr("Update nodes"), parentProgress);
+    ProgressItem* optimizeProgress = LaserApplication::progressModel->createSimpleItem(tr("Optimize nodes"), parentProgress);
 
     // 计算泳道宽
     int laneInterval = qRound(Config::PathOptimization::groupingGridInterval() * 1000);

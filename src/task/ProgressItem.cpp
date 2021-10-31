@@ -11,11 +11,13 @@ ProgressItem::ProgressItem(const QString& title, ProgressType progressType, Prog
     : m_state(PS_Idle)
     , m_type(progressType)
     , m_minimum(0.0)
-    , m_maximum(100.0)
+    , m_maximum(1.0)
     , m_progress(0.0)
     , m_title(title)
     , m_message("")
     , m_parent(parent)
+    , m_durationNSecs(0)
+    , m_isFinished(false)
 {
     if (parent && parent->progressType() == PT_Complex)
     {
@@ -35,15 +37,26 @@ ProgressItem::~ProgressItem()
 void ProgressItem::setMaximum(qreal value) 
 {
     m_maximum = value; 
-    if (this->progressType() == PT_Complex)
+    /*if (this->progressType() == PT_Complex)
     {
         updateWeights();
-    }
+    }*/
+}
+
+int ProgressItem::indexOfParent()
+{
+    QMutexLocker locker(&m_childMutex);
+    if (parent())
+        return parent()->childItems().indexOf(this);
+    else
+        return LaserApplication::progressModel->m_items.indexOf(this);
 }
 
 qreal ProgressItem::progress() const
 {
-    //QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
+    if (m_isFinished)
+        return 1.0;
+
     switch (m_type)
     {
     case PT_Simple:
@@ -52,14 +65,15 @@ qreal ProgressItem::progress() const
     }
     case PT_Complex:
     {
-        qreal finalProcess = 0.0;
+        //QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
+        qreal finalProgress = 0.0;
         
         for (ProgressItem* item : m_childItems)
         {
-            qreal weight = m_weights[item];
-            finalProcess += weight * item->progress() / m_sumWeights;
+            //qreal weight = m_weights[item];
+            finalProgress += /*weight * */item->progress() / (m_maximum - m_minimum);
         }
-        return finalProcess;
+        return qBound(0.0, (finalProgress - m_minimum) / (m_maximum - m_minimum), 1.0); 
     }
     }
 }
@@ -82,7 +96,9 @@ void ProgressItem::finish()
 {
     if (m_type == PT_Simple)
         setProgress(m_maximum);
+    m_durationNSecs = m_timer.nsecsElapsed();
     stopTimer();
+    m_isFinished = true;
 }
 
 bool ProgressItem::isFinished() const
@@ -97,7 +113,7 @@ qreal ProgressItem::durationSecs() const
 
 qreal ProgressItem::durationMSecs() const
 {
-    return durationNSecs() / 1000.0;
+    return durationNSecs() / 1000000.0;
 }
 
 qint64 ProgressItem::durationNSecs() const
@@ -114,34 +130,37 @@ qint64 ProgressItem::durationNSecs() const
 
 void ProgressItem::addChildItem(ProgressItem* item)
 {
+    QMutexLocker locker(&m_childMutex);
     item->setParent(this);
-    if (!m_childItems.contains(item))
-        m_childItems.append(item);
-    setWeight(item, 1.0);
-    updateWeights();
+    m_childItems.append(item);
+    //setWeight(item, 1.0);
+    //updateWeights();
 }
 
 QList<ProgressItem*> ProgressItem::childItems() const
 {
+    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return m_childItems;
 }
 
 ProgressItem* ProgressItem::child(int index) const
 {
-    if (index < m_childItems.length())
+    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
+    if (index < m_childItems.length() && index >= 0)
         return m_childItems.at(index);
     return nullptr;
 }
 
 int ProgressItem::childCount() const
 {
+    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return m_childItems.count();
 }
 
-void ProgressItem::setWeight(ProgressItem* item, qreal weight)
-{
-    m_weights[item] = weight;
-}
+//void ProgressItem::setWeight(ProgressItem* item, qreal weight)
+//{
+//    m_weights[item] = weight;
+//}
 
 void ProgressItem::startTimer()
 {
@@ -188,29 +207,29 @@ void ProgressItem::setParent(ProgressItem* parent)
     m_parent = parent;
 }
 
-void ProgressItem::updateWeights()
-{
-    m_sumWeights = 0;
-    for (ProgressItem* item : m_childItems)
-    {
-        qreal weight = 1.0;
-        if (m_weights.contains(item))
-        {
-            weight = m_weights[item];
-        }
-        else
-        {
-            m_weights.insert(item, 1.0);
-        }
-
-        m_sumWeights += weight;
-    }
-
-    if (m_childItems.length() < m_maximum)
-    {
-        m_sumWeights += (m_maximum - m_childItems.length());
-    }
-}
+//void ProgressItem::updateWeights()
+//{
+//    m_sumWeights = 0;
+//    for (ProgressItem* item : m_childItems)
+//    {
+//        qreal weight = 1.0;
+//        if (m_weights.contains(item))
+//        {
+//            weight = m_weights[item];
+//        }
+//        else
+//        {
+//            m_weights.insert(item, 1.0);
+//        }
+//
+//        m_sumWeights += weight;
+//    }
+//
+//    if (m_childItems.length() < m_maximum)
+//    {
+//        m_sumWeights += (m_maximum - m_childItems.length());
+//    }
+//}
 
 void ProgressItem::notify()
 {

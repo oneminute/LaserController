@@ -738,7 +738,8 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
     QPainterPath path = toMachiningPath();
 
     QList<int> indices;
-    machiningUtils::path2Points(parentProgress, path, d->machiningPointsList, indices, d->machiningCenter);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
+    machiningUtils::path2Points(progress, path, d->machiningPointsList, indices, d->machiningCenter);
 
     if (indices.length() <= Config::PathOptimization::maxStartingPoints())
     {
@@ -931,12 +932,13 @@ void LaserRect::draw(QPainter* painter)
 LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserRect);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
     d->machiningPointsList.clear();
     d->startingIndices.clear();
 	QTransform t = sceneTransform() * Global::matrixToMachining();
     if (isRoundedRect())
     {
-        machiningUtils::path2Points(parentProgress, t.map(d->path), d->machiningPointsList, d->startingIndices, d->machiningCenter);
+        machiningUtils::path2Points(progress, t.map(d->path), d->machiningPointsList, d->startingIndices, d->machiningCenter);
     }
     else
     {
@@ -978,6 +980,7 @@ LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress
         d->startingIndices.append(2);
         d->startingIndices.append(3);
         d->machiningPointsList.append(points);
+        progress->finish();
     }
 
     return d->machiningPointsList;
@@ -1103,7 +1106,7 @@ LaserPointListList LaserLine::updateMachiningPoints(ProgressItem* parentProgress
     d->machiningPointsList.clear();
     d->startingIndices.clear();
 
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("Polygon to points"), parentProgress);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
 	QTransform t = sceneTransform() * Global::matrixToMachining();
     QPointF pt1 = t.map(d->line.p1());
     QPointF pt2 = t.map(d->line.p2());
@@ -1256,9 +1259,10 @@ void LaserPath::setPath(const QPainterPath& path)
 LaserPointListList LaserPath::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserPath);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
     QPainterPath path = toMachiningPath();
 
-    machiningUtils::path2Points(parentProgress, path, d->machiningPointsList, d->startingIndices, d->machiningCenter);
+    machiningUtils::path2Points(progress, path, d->machiningPointsList, d->startingIndices, d->machiningCenter);
 
     /*d->machiningPointsList.clear();
     LaserPointList points;
@@ -1437,7 +1441,7 @@ QRectF LaserPolyline::sceneBoundingRect() const
 LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserPolyline);
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("Polygon to points"), parentProgress);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
     progress->setMaximum(d->poly.size());
     d->machiningPointsList.clear();
     d->startingIndices.clear();
@@ -1613,7 +1617,8 @@ LaserPointListList LaserPolygon::updateMachiningPoints(ProgressItem* parentProgr
     QPolygonF polygon = t.map(d->poly);
     polygon.append(polygon.first());
     LaserPointList points;
-    machiningUtils::polygon2Points(parentProgress, polygon, points, d->startingIndices, d->machiningCenter);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
+    machiningUtils::polygon2Points(progress, polygon, points, d->startingIndices, d->machiningCenter);
     d->machiningPointsList.append(points);
     return d->machiningPointsList;
 }
@@ -2208,7 +2213,7 @@ QJsonObject LaserBitmap::toJson()
 LaserPointListList LaserBitmap::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserBitmap);
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("Polygon to points"), parentProgress);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
     d->machiningPointsList.clear();
     d->startingIndices.clear();
 
@@ -2894,7 +2899,7 @@ QPainterPath LaserText::toMachiningPath() const
 LaserPointListList LaserText::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserText);
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("Polygon to points"), parentProgress);
+    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
     int total = 0;
     for (int i = 0; i < d->pathList.size(); i++) {
         QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();

@@ -28,9 +28,11 @@ public:
     virtual Q_INVOKABLE int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual Q_INVOKABLE int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual Q_INVOKABLE QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual Q_INVOKABLE QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 protected:
     ProgressItem* getItem(const QModelIndex& index) const;
+    QModelIndex getQModelIndex(ProgressItem* item, int column = 0);
 
 protected slots:
 
@@ -41,6 +43,8 @@ private:
     QList<ProgressItem*> m_items;
 
     Q_DISABLE_COPY(ProgressModel)
+
+    friend class ProgressItem;
 
 };
 

@@ -2469,10 +2469,11 @@ void LaserControllerWindow::onActionImport(bool checked)
     QSharedPointer<Importer> importer = Importer::getImporter(this, file.suffix());
     if (!importer.isNull())
     {
-        LaserApplication::progressModel->clear();
+        LaserApplication::resetProgressWindow();
         LaserApplication::showProgressWindow();
-        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+        ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Importing"), nullptr);
         importer->import(filename, m_scene, progress);
+        progress->finish();
     }
 }
 
@@ -2484,10 +2485,11 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     QVariantMap params;
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
-    LaserApplication::progressModel->clear();
+    LaserApplication::resetProgressWindow();
     LaserApplication::showProgressWindow();
     ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
     importer->import("", m_scene, progress, params);
+    progress->finish();
 }
 
 void LaserControllerWindow::onActionNew(bool checked)
@@ -2689,15 +2691,17 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
         {
-            LaserApplication::progressModel->clear();
+            LaserApplication::resetProgressWindow();
             LaserApplication::showProgressWindow();
             ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+            progress->setMaximum(4);
             QtConcurrent::run([=]()
                 {
                     m_scene->document()->outline(progress);
                     m_scene->document()->setFinishRun(finishRun());
                     m_prepareMachining = false;
                     m_scene->document()->exportJSON(filename, progress);
+                    progress->finish();
                 }
             );
         }
@@ -2724,9 +2728,6 @@ void LaserControllerWindow::onActionLoadJson(bool checked)
 
 void LaserControllerWindow::onActionMachining(bool checked)
 {
-    LaserApplication::previewWindow->reset();
-    //LaserApplication::showProgressWindow();
-
     if (m_useLoadedJson)
     {
         qDebug() << "export temp json file for machining" << m_currentJson;
@@ -2745,9 +2746,10 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //{
             //QString filename = file.fileName();
 
-        LaserApplication::progressModel->clear();
+        LaserApplication::resetProgressWindow();
         LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+        progress->setMaximum(4);
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
@@ -2756,6 +2758,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
                 m_prepareMachining = true;
                 qDebug() << "export temp json file for machining" << filename;
                 m_scene->document()->exportJSON(filename, progress);
+                progress->finish();
             }
         );
         //}
@@ -3212,12 +3215,13 @@ void LaserControllerWindow::onActionAbout(bool checked)
 
 void LaserControllerWindow::onActionUpdateOutline(bool checked)
 {
-    LaserApplication::progressModel->clear();
+    LaserApplication::resetProgressWindow();
     LaserApplication::showProgressWindow();
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Outlining", nullptr);
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Outlining"), nullptr);
     QtConcurrent::run(
         [=]() {
             m_scene->document()->outline(progress);
+            progress->finish();
         }
     );
 }

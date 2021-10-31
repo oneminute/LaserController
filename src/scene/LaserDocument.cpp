@@ -800,24 +800,21 @@ void LaserDocument::outline(ProgressItem* parentProgress)
 {
     Q_D(LaserDocument);
     qLogD << "Before outline:";
-    ProgressItem* clearProgress = LaserApplication::progressModel->createSimpleItem("Clear tree", parentProgress);
-    ProgressItem* outlineProgress = LaserApplication::progressModel->createSimpleItem("Outline by layers", parentProgress);
+    parentProgress->setMaximum(2);
+    ProgressItem* clearProgress = LaserApplication::progressModel->createSimpleItem(tr("Clear tree"), parentProgress);
+    ProgressItem* outlineProgress = LaserApplication::progressModel->createSimpleItem(tr("Outline by layers"), parentProgress);
     clearTree(d->optimizeNode, clearProgress);
 #ifdef _DEBUG
     //printOutline(d->optimizeNode, 0);
 #endif
     outlineByLayers(d->optimizeNode, outlineProgress);
     qLogD << "After outline:";
-    printOutline(d->optimizeNode, 0);
+#ifdef _DEBUG
+    //printOutline(d->optimizeNode, 0);
+#endif
 
     emit outlineUpdated();
 }
-
-//void LaserDocument::clearOutline(bool clearLayers)
-//{
-//    Q_D(LaserDocument);
-//    clearOutline(d->optimizeNode, clearLayers);
-//}
 
 void LaserDocument::printOutline(OptimizeNode* node, int level)
 {

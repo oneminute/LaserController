@@ -57,6 +57,7 @@ public:
 
     static void closeProgressWindow();
     static void showProgressWindow();
+    static void resetProgressWindow();
 
     static QMap<QString, QString> stringMap;
     static QMap<QString, QTranslator*> translators;

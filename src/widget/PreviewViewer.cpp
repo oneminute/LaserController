@@ -3,22 +3,24 @@
 #include <QScrollBar>
 #include <qdebug.h>
 #include <QMouseEvent>
+#include "common/common.h"
+#include "PreviewScene.h"
 
-PreviewViewer::PreviewViewer(QWidget* parent)
+PreviewViewer::PreviewViewer(PreviewScene* scene, QWidget* parent)
     : QGraphicsView(parent)
-    ,m_scene(new QGraphicsScene())
 {
-    setScene(m_scene);
+    setScene(scene);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     verticalScrollBar()->setEnabled(false);
     horizontalScrollBar()->setEnabled(false);
+
     reset();
 }
 
 PreviewViewer::~PreviewViewer()
 {
-    m_scene = nullptr;
+    //m_scene = nullptr;
 }
 
 void PreviewViewer::zoomIn()
@@ -47,7 +49,7 @@ void PreviewViewer::resetZoom()
 
 qreal PreviewViewer::zoomValue() const
 {
-    qDebug()<<transform();
+    //qDebug()<<transform();
     return transform().m11();
 }
 
@@ -64,6 +66,7 @@ bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCent
     
     QTransform t = transform();
     QTransform t1;
+    qLogD << "scale factor: " << factor;
     t1.scale(factor, factor);
     QTransform t2;
     QPointF diff;
@@ -88,22 +91,19 @@ bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCent
 
 void PreviewViewer::reset()
 {
-    setSceneRect(QRectF(QPointF(-50000000000000, -50000000000000), QPointF(50000000000000, 50000000000000)));
-    QRectF rect1 = rect();
+    setSceneRect(scene()->sceneRect());
+
     setTransformationAnchor(QGraphicsView::NoAnchor);
     m_anchorPoint =  mapFromScene(QPointF(0, 0)); //NoAnchor��scene��(0, 0)��Ϊ����ԭ����б任
     setTransform(QTransform());
+
     QPixmap cMap(":/ui/icons/images/drag_hand.png");
-    this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
-    //centerOn(rect().center());
+    this->setCursor(cMap.scaled(10, 10, Qt::KeepAspectRatio));
 }
 
 void PreviewViewer::wheelEvent(QWheelEvent * event)
 {
     QGraphicsView::wheelEvent(event);
-    if (!m_scene) {
-        return;
-    }
     setTransformationAnchor(QGraphicsView::NoAnchor);
     
     qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
@@ -142,9 +142,5 @@ void PreviewViewer::mouseReleaseEvent(QMouseEvent * event)
 void PreviewViewer::paintEvent(QPaintEvent * event)
 {
     QGraphicsView::paintEvent(event);
-    QPainter painter(viewport());
-    painter.setPen(QPen(Qt::black));
-    QRectF rect(0, 0, 100, 100);
-
-    painter.drawRect(sceneRect());
+    //painter.drawRect(sceneRect());
 }

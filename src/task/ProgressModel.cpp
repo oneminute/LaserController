@@ -6,7 +6,7 @@
 ProgressModel::ProgressModel(QObject* parent)
     : QAbstractItemModel(parent)
 {
-
+    qRegisterMetaType<QVector<int>>("QVector<int>");
 }
 
 ProgressModel::~ProgressModel()
@@ -17,9 +17,21 @@ ProgressModel::~ProgressModel()
 ProgressItem* ProgressModel::createItem(const QString& title, ProgressItem::ProgressType type, ProgressItem* parent)
 {
     ProgressItem* item = new ProgressItem(title, type, parent);
-    if (!parent)
+    QModelIndex parentIndex;
+    int row = 0;
+    if (parent)
+    {
+        parentIndex = getQModelIndex(parent);
+        row = parent->childCount();
+    }
+    else
+    {
         m_items.append(item);
-    updateItem(item);
+        row = m_items.count();
+    }
+    beginInsertRows(parentIndex, row, row);
+    endInsertRows();
+    //updateItem(item);
     return item;
 }
 
@@ -35,19 +47,38 @@ ProgressItem* ProgressModel::createComplexItem(const QString& title, ProgressIte
 
 void ProgressModel::updateItem(ProgressItem* item)
 {
-    ProgressItem* parent = item->parent();
+    QVector<int> roles;
+    roles << Qt::DisplayRole;
+    QModelIndex index1 = getQModelIndex(item);
+    QModelIndex index2 = getQModelIndex(item, 2);
+    emit dataChanged(index1, index2, roles);
+
+    /*ProgressItem* parent = item->parent();
     int row = 0;
     if (parent)
     {
         row = parent->childItems().indexOf(item);
+        if (parent->parent())
+        {
+            int parentRow = parent->parent()->childItems().indexOf(parent);
+            emit dataChanged(createIndex(parentRow, 0), createIndex(parentRow, 2), roles);
+        }
+        else
+        {
+            int parentRow = m_items.indexOf(parent);
+            emit dataChanged(createIndex(parentRow, 0), createIndex(parentRow, 2), roles);
+        }
     }
     else
     {
         row = m_items.indexOf(item);
-    }
+        emit dataChanged(createIndex(row, 0), createIndex(row, 2));
+    }*/
+    qreal progressValue = progress();
 
-    emit dataChanged(createIndex(row, 0), createIndex(row, 1));
-    emit progressUpdated(progress());
+    //emit dataChanged(createIndex(row, 0), createIndex(row, 1));
+    //emit layoutChanged();
+    emit progressUpdated(progressValue);
 }
 
 qreal ProgressModel::progress() const
@@ -85,7 +116,7 @@ void ProgressModel::clear()
     }
     m_items.clear();
     this->endResetModel();
-    emit dataChanged(createIndex(0, 0), createIndex(0, 1));
+    emit dataChanged(createIndex(0, 0), createIndex(0, 2));
 }
 
 QModelIndex ProgressModel::index(int row, int column, const QModelIndex& parent) const
@@ -148,7 +179,7 @@ int ProgressModel::rowCount(const QModelIndex& parent) const
 
 int ProgressModel::columnCount(const QModelIndex& parent) const
 {
-    return 2;
+    return 3;
 }
 
 QVariant ProgressModel::data(const QModelIndex& index, int role) const
@@ -165,6 +196,22 @@ QVariant ProgressModel::data(const QModelIndex& index, int role) const
         return item->title();
     else if (index.column() == 1)
         return item->progress();
+    else if (index.column() == 2)
+        return tr("%1 ms").arg(item->durationMSecs(), 0, 'f', 3);
+}
+
+Q_INVOKABLE QVariant ProgressModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+        if (section == 0)
+            return tr("Task");
+        else if (section == 1)
+            return tr("Progress");
+        else if (section == 2)
+            return tr("Duration");
+    }
+    return Q_INVOKABLE QVariant();
 }
 
 ProgressItem* ProgressModel::getItem(const QModelIndex& index) const
@@ -176,4 +223,25 @@ ProgressItem* ProgressModel::getItem(const QModelIndex& index) const
             return item;
     }
     return nullptr;
+}
+
+QModelIndex ProgressModel::getQModelIndex(ProgressItem* item, int column)
+{
+    if (!item)
+        return QModelIndex();
+
+    ProgressItem* parent = item->parent();
+    QModelIndex parentIndex;
+    if (parent)
+    {
+        parentIndex = getQModelIndex(parent);
+    }
+    /*else
+    {
+        int row = m_items.indexOf(item);
+        parentIndex = createIndex(row, 0, item);
+    }*/
+    int row = item->indexOfParent();
+    QModelIndex curIndex = index(row, column, parentIndex);
+    return curIndex;
 }

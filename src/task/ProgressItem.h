@@ -38,6 +38,8 @@ public:
     qreal maximum() const { return m_maximum; }
     void setMaximum(qreal value);
 
+    int indexOfParent();
+
     qreal progress() const;
     void setProgress(qreal process);
     void increaseProgress(qreal delta = 1.0);
@@ -61,7 +63,7 @@ public:
     int childCount() const;
     bool hasChildren() const { return !m_childItems.empty(); }
 
-    void setWeight(ProgressItem* item, qreal weight);
+    //void setWeight(ProgressItem* item, qreal weight);
 
     virtual void startTimer();
     virtual void stopTimer();
@@ -77,7 +79,7 @@ public:
     void setParent(ProgressItem* parent);
 
 protected:
-    void updateWeights();
+    //void updateWeights();
     void notify();
 
 private:
@@ -92,12 +94,14 @@ private:
 
     qint64 m_durationNSecs;
     QList<ProgressItem*> m_childItems;
-    QMap<ProgressItem*, qreal> m_weights;
-    qreal m_sumWeights;
+    //QMap<ProgressItem*, qreal> m_weights;
+    //qreal m_sumWeights;
 
     ProgressItem* m_parent;
+    bool m_isFinished;
 
-    QMutex m_mutex;
+    QMutex m_childMutex;
+    QMutex m_progressMutex;
 
     friend class ProgressModel;
 };

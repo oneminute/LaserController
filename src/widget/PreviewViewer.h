@@ -3,7 +3,6 @@
 
 #include <QGraphicsView>
 #include <QGraphicsPathItem>
-#include <scene/LaserScene.h>
 
 class PreviewPathItemPrivate;
 class PreviewPathItem : public QGraphicsPathItem
@@ -11,12 +10,14 @@ class PreviewPathItem : public QGraphicsPathItem
 
 };
 
+class PreviewScene;
+
 class PreviewViewerPrivate;
 class PreviewViewer : public QGraphicsView
 {
     Q_OBJECT
 public:
-    explicit PreviewViewer(QWidget* parent = nullptr);
+    explicit PreviewViewer(PreviewScene* scene, QWidget* parent = nullptr);
     ~PreviewViewer();
     void zoomIn();
     void zoomOut();
@@ -27,7 +28,7 @@ public:
     void reset();
 private:
     QPointF m_anchorPoint;
-    QGraphicsScene* m_scene;
+    //QGraphicsScene* m_scene;
     QPointF m_lastViewDragPoint;
 protected:
     virtual void wheelEvent(QWheelEvent *event) override;

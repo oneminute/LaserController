@@ -40,7 +40,7 @@ void ProgressBarDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
     bar.maximum = 100;
     bar.textVisible = true;;
     bar.text = QString("%1%").arg(progress, 5, 'f', 2, QLatin1Char(' '));
-    bar.textAlignment = Qt::AlignRight;
+    bar.textAlignment = Qt::AlignCenter;
 
     QProgressBar pbar;
     LaserApplication::style()->drawControl(QStyle::CE_ProgressBar, &bar, painter, &pbar);

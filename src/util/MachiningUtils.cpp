@@ -182,9 +182,20 @@ void machiningUtils::path2Points(
 {
     pointsList.clear();
     startingIndices.clear();
+    ProgressItem* progress = nullptr;
+    if (parentProgress)
+    {
+        if (parentProgress->progressType() == ProgressItem::PT_Simple)
+        {
+            progress = parentProgress;
+        }
+        else if (parentProgress->progressType() == ProgressItem::PT_Complex)
+        {
+            progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Path to points"), parentProgress);
+            progress->setMaximum(path.elementCount());
+        }
+    }
     QList<QPolygonF> polygons = path2SubpathPolygons(parentProgress, path, transform, Config::Export::curveFlatteningThreshold());
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Polygon to points"), parentProgress);
-    progress->setMaximum(path.elementCount());
     LaserPointList allPoints;
     for (QPolygonF& polygon : polygons)
     {
@@ -198,10 +209,12 @@ void machiningUtils::path2Points(
         }
         allPoints.append(points);
         pointsList.append(points);
-        progress->increaseProgress();
+        if (progress)
+            progress->increaseProgress();
     }
     center = utils::center(allPoints).toPointF();
-    progress->finish();
+    if (progress)
+        progress->finish();
 }
 
 QList<QPolygonF> machiningUtils::path2SubpathPolygons(
@@ -213,8 +226,20 @@ QList<QPolygonF> machiningUtils::path2SubpathPolygons(
     if (path.isEmpty())
         return flatCurves;
 
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("bazier to polygons"), parentProgress);
-    progress->setMaximum(path.elementCount());
+    ProgressItem* progress = nullptr;
+    if (parentProgress)
+    {
+        if (parentProgress->progressType() == ProgressItem::PT_Simple)
+        {
+            progress = parentProgress;
+            progress->setMaximum(path.elementCount());
+        }
+        else if (parentProgress->progressType() == ProgressItem::PT_Complex)
+        {
+            progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Bazier to polygons"), parentProgress);
+            progress->setMaximum(path.elementCount());
+        }
+    }
     QPolygonF current;
     for (int i = 0; i < path.elementCount(); ++i) {
         const QPainterPath::Element& e = path.elementAt(i);
@@ -244,11 +269,13 @@ QList<QPolygonF> machiningUtils::path2SubpathPolygons(
             Q_ASSERT(!"QPainterPath::toSubpathPolygons(), bad element type");
             break;
         }
-        progress->increaseProgress();
+        if (progress)
+            progress->increaseProgress();
     }
     if (current.size() > 1)
         flatCurves += current;
-    progress->finish();
+    if (progress)
+        progress->finish();
     return flatCurves;
 }
 
@@ -260,8 +287,15 @@ void machiningUtils::polygon2Points(
     ProgressItem* progress = nullptr;
     if (parentProgress)
     {
-        progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Polygon to Points"), parentProgress);
-        progress->setMaximum(polygon.size());
+        if (parentProgress->progressType() == ProgressItem::PT_Simple)
+        {
+            progress = parentProgress;
+        }
+        else if (parentProgress->progressType() == ProgressItem::PT_Complex)
+        {
+            progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Polygon to Points"), parentProgress);
+            progress->setMaximum(polygon.size());
+        }
     }
     points.clear();
     startingIndices.clear();

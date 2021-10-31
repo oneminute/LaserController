@@ -121,12 +121,22 @@ void pathTest()
     }
 }
 
+void paintTest()
+{
+    QPixmap canvas(200, 200);
+    QPen pen;
+    QPainter painter(&canvas);
+    painter.setPen(pen);
+    painter.drawLine(QPointF(1, 0), QPointF(0, 1));
+}
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
     //PathTest();
-    interactionTest();
+    //interactionTest();
+    paintTest();
 
     return app.exec();
 }

@@ -5,6 +5,16 @@
 
 #include <QGraphicsItem>
 #include <QVector2D>
+#include <QPainter>
+#include <QPolygon>
+#include <QQueue>
+#include <QTimer>
+
+struct DrawingItem
+{
+    QPen pen;
+    QPainterPath path;
+};
 
 class PreviewScenePrivate
 {
@@ -16,10 +26,23 @@ public:
 
     }
 
+    ~PreviewScenePrivate()
+    {
+    }
+
     PreviewScene* q_ptr;
+
+    QPixmap canvas;
+    QTransform canvasTransform;
+    QGraphicsPixmapItem* canvasItem;
+
+    QMutex canvasMutex;
 
     QPen labelPen;
     QFont labelFont;
+    QTimer timer;
+
+    QQueue<DrawingItem> drawingItems;
 };
 
 PreviewScene::PreviewScene(QObject* parent)
@@ -59,14 +82,38 @@ void PreviewScene::setLabelFont(QFont& font)
 
 void PreviewScene::reset()
 {
+    Q_D(PreviewScene);
     clear();
-    addRect(LaserApplication::device->boundRectMachining());
+    QRectF boundingRect = LaserApplication::device->boundRectMachining();
+
+    int width = 2000;
+    int height = qRound(boundingRect.height() / boundingRect.width() * width);
+    d->canvasTransform = QTransform::fromScale(width / boundingRect.width(), height / boundingRect.height());
+    setSceneRect(QRect(QPoint(0, 0), QPoint(width, height)));
+
+    d->canvas = QPixmap(width, height);
+    d->canvas.fill();
+
+    d->canvasItem = addPixmap(d->canvas);
+    setBackgroundBrush(Qt::lightGray);
+
+    connect(&d->timer, &QTimer::timeout, this, &PreviewScene::drawAllItems);
+    d->timer.setInterval(200);
+    d->timer.start();
 }
 
 void PreviewScene::addPath(const QPainterPath& path, QPen pen, const QString& label)
 {
     Q_D(PreviewScene);
-    QGraphicsPathItem* item = QGraphicsScene::addPath(path);
+    QMutexLocker locker(&d->canvasMutex);
+    DrawingItem item;
+    item.pen = pen;
+    item.path = d->canvasTransform.map(path);
+    d->drawingItems.enqueue(item);
+
+    //d->canvasItem->update();
+
+    /*QGraphicsPathItem* item = QGraphicsScene::addPath(path);
     pen.setCosmetic(true);
     item->setPen(pen);
     
@@ -76,13 +123,46 @@ void PreviewScene::addPath(const QPainterPath& path, QPen pen, const QString& la
         QGraphicsTextItem* textItem = QGraphicsScene::addText(label);
         textItem->setDefaultTextColor(d->labelPen.color());
         textItem->setPos(pos);
-    }
+    }*/
 }
 
 void PreviewScene::addLine(const QLineF& line, QPen pen, const QString& label)
 {
     Q_D(PreviewScene);
-    QGraphicsLineItem* item = QGraphicsScene::addLine(line);
+    QMutexLocker locker(&d->canvasMutex);
+
+    QLineF mappedLine = d->canvasTransform.map(line);
+
+    QPainterPath path;
+    path.addEllipse(mappedLine.p1().x() - 3, mappedLine.p1().y() - 3, 6, 6);
+    path.moveTo(mappedLine.p1());
+    path.lineTo(mappedLine.p2());
+    QVector2D dir(mappedLine.p1() - mappedLine.p2());
+    dir.normalize();
+    QTransform t1, t2;
+    t1.rotate(15);
+    t2.rotate(-15);
+    QLineF arrowLine(QPointF(0, 0), (dir * 18).toPointF());
+    QLineF arrowLine1 = t1.map(arrowLine);
+    QLineF arrowLine2 = t2.map(arrowLine);
+    arrowLine1.translate(mappedLine.p2());
+    arrowLine2.translate(mappedLine.p2());
+    QLineF arrowLine3(arrowLine1.p2(), arrowLine2.p2());
+    path.moveTo(arrowLine1.p1());
+    path.lineTo(arrowLine1.p2());
+    path.moveTo(arrowLine2.p1());
+    path.lineTo(arrowLine2.p2());
+    path.moveTo(arrowLine3.p1());
+    path.lineTo(arrowLine3.p2());
+
+    DrawingItem item;
+    item.pen = pen;
+    item.path = path;
+    d->drawingItems.append(item);
+
+    //d->canvasItem->update();
+
+    /*QGraphicsLineItem* item = QGraphicsScene::addLine(line);
     pen.setCosmetic(true);
     item->setPen(pen);
 
@@ -116,34 +196,21 @@ void PreviewScene::addLine(const QLineF& line, QPen pen, const QString& label)
         textItem->setDefaultTextColor(pen.color());
         textItem->setPos(pos);
         textItem->setFont(d->labelFont);
-    }
+    }*/
 }
 
-void PreviewScene::addPoints(const QList<QPointF>& points, QPen pen, int style)
+void PreviewScene::drawAllItems()
 {
     Q_D(PreviewScene);
-    pen.setCosmetic(true);
-    for (const QPointF& point : points)
+    QMutexLocker locker(&d->canvasMutex);
+    QPainter painter(&d->canvas);
+    while (!d->drawingItems.empty())
     {
-        addPoint(point, pen, style);
+        DrawingItem item = d->drawingItems.dequeue();
+        item.pen.setCosmetic(true);
+        painter.setPen(item.pen);
+        painter.drawPath(item.path);
     }
+    d->canvasItem->setPixmap(d->canvas);
 }
 
-void PreviewScene::addPoint(const QPointF& point, QPen pen, int style)
-{
-    switch (style)
-    {
-    case 0:
-    {
-        QPointF offset1(1000, 1000);
-        QPointF offset2(1000, -1000);
-        QLineF line1(point - offset1, point + offset1);
-        QLineF line2(point - offset2, point + offset2);
-        QGraphicsLineItem* i1 = QGraphicsScene::addLine(line1);
-        QGraphicsLineItem* i2 = QGraphicsScene::addLine(line2);
-        i1->setPen(pen);
-        i2->setPen(pen);
-    }
-    break;
-    }
-}

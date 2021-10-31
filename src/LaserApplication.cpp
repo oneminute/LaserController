@@ -98,11 +98,11 @@ bool LaserApplication::initialize()
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
     connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
 
-    progressModel = new ProgressModel;
-    previewWindow = new PreviewWindow;
-
     StateController::start();
+
+    progressModel = new ProgressModel;
     mainWindow = new LaserControllerWindow;
+    previewWindow = new PreviewWindow(mainWindow);
     mainWindow->showMaximized();
 
     g_deviceThread.start();
@@ -112,7 +112,7 @@ bool LaserApplication::initialize()
 
 void LaserApplication::destroy()
 {
-    delete mainWindow;
+    SAFE_DELETE(mainWindow);
     StateController::stop();
 
     if (driver)
@@ -127,8 +127,6 @@ void LaserApplication::destroy()
         delete device;
     }
     
-    previewWindow->close();
-    SAFE_DELETE(previewWindow)
     SAFE_DELETE(progressModel)
 
     g_deviceThread.exit();
@@ -452,4 +450,10 @@ void LaserApplication::showProgressWindow()
         previewWindow->raise();
         previewWindow->activateWindow();
     }
+}
+
+void LaserApplication::resetProgressWindow()
+{
+    previewWindow->reset();
+    progressModel->clear();
 }
