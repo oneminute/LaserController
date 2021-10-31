@@ -2467,6 +2467,7 @@ void LaserControllerWindow::onActionImport(bool checked)
 
     QFileInfo file(filename);
     QSharedPointer<Importer> importer = Importer::getImporter(this, file.suffix());
+    connect(importer.data(), &Importer::imported, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     if (!importer.isNull())
     {
         LaserApplication::resetProgressWindow();
@@ -2482,6 +2483,8 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     askMergeOrNew();
 
     QSharedPointer<Importer> importer = Importer::getImporter(this, Importer::CORELDRAW);
+    connect(importer.data(), &Importer::imported, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
+
     QVariantMap params;
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);

@@ -75,6 +75,8 @@ LaserLayerTableWidget::~LaserLayerTableWidget()
 
 void LaserLayerTableWidget::setDocument(LaserDocument * doc) 
 { 
+    if (!doc)
+        return;
     m_doc = doc; 
     connect(m_doc, &LaserDocument::layersStructureChanged, this, &LaserLayerTableWidget::updateItems);
     connect(m_doc, &LaserDocument::closed, this, &LaserLayerTableWidget::laserDocumentClosed);
