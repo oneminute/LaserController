@@ -544,18 +544,6 @@ void LaserLayer::setHalftoneAngles(qreal angles)
     d->halftoneAngles = angles;
 }
 
-//int LaserLayer::halftoneGridSize() const
-//{
-//    Q_D(const LaserLayer);
-//    return d->halftoneGridSize;
-//}
-//
-//void LaserLayer::setHalftoneGridSize(int gridSize)
-//{
-//    Q_D(LaserLayer);
-//    d->halftoneGridSize = gridSize;
-//}
-
 bool LaserLayer::isDefault() const
 { 
     Q_D(const LaserLayer);
@@ -684,6 +672,31 @@ QCheckBox * LaserLayer::checkBox()
 void LaserLayer::setCheckBox(QCheckBox * box)
 {
     m_checkBox = box;
+}
+
+qreal LaserLayer::accelerationLength(LaserLayerType layerType) const
+{
+    Q_D(const LaserLayer);
+    qreal minSpeed = Config::UserRegister::scanXStartSpeed();
+    qreal acc = Config::UserRegister::scanXAcc();
+    //qreal maxSpeed = i.value()->layer()->engravingRunSpeed() * 1000;
+    //qreal span = (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
+    switch (layerType)
+    {
+    case LLT_CUTTING:
+        //minSpeed = d->min
+        break;
+    case LLT_ENGRAVING:
+        break;
+    case LLT_FILLING:
+        break;
+    }
+    return 0;
+}
+
+qreal LaserLayer::accelerationSegmentLength(LaserLayerType layerType) const
+{
+    return qreal();
 }
 
 void LaserLayer::onClicked()

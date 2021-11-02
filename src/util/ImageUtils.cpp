@@ -13,6 +13,9 @@
 #include "common/Config.h"
 #include "laser/LaserDriver.h"
 #include "UnitUtils.h"
+#include "LaserApplication.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
 
 cv::Mat imageUtils::halftone(cv::Mat src, float mmWidth, float mmHeight, float lpi, float dpi, float degrees)
 {
@@ -534,7 +537,7 @@ cv::Mat imageUtils::halftone5(cv::Mat src, float degrees, int gridSize)
     return dst;
 }
 
-cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
+cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees, int gridSize)
 {
     src = 255 - src;
     cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
@@ -563,6 +566,7 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
     cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
     int gridCols = qCeil(dst.cols * 1.0 / gridSize);
     int gridRows = qCeil(dst.rows * 1.0 / gridSize);
+    progress->setMaximum(gridCols * gridRows);
     for (int c = 0; c < gridCols; c++)
     {
         qLogD << "col: " << c << "/" << gridCols;
@@ -571,7 +575,10 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
             int x = c * gridSize;
             int y = r * gridSize;
             if (x < 0 || y < 0 || x >= rotated.cols || y >= rotated.rows)
+            {
+                progress->increaseProgress();
                 continue;
+            }
             //cv::rectangle(dst, cv::Rect(x - dx / 2, y - dy / 2, dx, dy), cv::Scalar(0));
 
             QRect qRectSrc(x, y, gridSize, gridSize);
@@ -580,7 +587,10 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
             qRectSrc.setRight(qMin(rotated.cols - 1, qRectSrc.right()));
             qRectSrc.setBottom(qMin(rotated.rows - 1, qRectSrc.bottom()));
             if (!qRectSrc.isValid() || qRectSrc.right() < 0 || qRectSrc.left() >= rotated.cols || qRectSrc.bottom() < 0 || qRectSrc.top() >= rotated.rows)
+            {
+                progress->increaseProgress();
                 continue;
+            }
 
             QRect qRectDst(x, y, gridSize, gridSize);
             qRectDst.setLeft(qMax(0, qRectDst.left()));
@@ -588,7 +598,10 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
             qRectDst.setRight(qMin(dst.cols - 1, qRectDst.right()));
             qRectDst.setBottom(qMin(dst.rows - 1, qRectDst.bottom()));
             if (!qRectDst.isValid() || qRectDst.right() < 0 || qRectDst.left() >= dst.cols || qRectDst.bottom() < 0 || qRectSrc.top() >= dst.rows)
+            {
+                progress->increaseProgress();
                 continue;
+            }
 
             cv::Rect rectSrc(qRectSrc.x(), qRectSrc.y(), qRectSrc.width(), qRectSrc.height());
             cv::Rect rectDst(qRectDst.x(), qRectDst.y(), qRectDst.width(), qRectDst.height());
@@ -625,6 +638,7 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
             }
             sum = qBound(0, sum, static_cast<int>(full));
             generatePattern(dstRoi, sum, center, initAngle, rotationAngle, stepAngle);
+            progress->increaseProgress();
         }
     }
     cv::imwrite("tmp/h6_canvas2.bmp", canvas);
@@ -662,6 +676,7 @@ cv::Mat imageUtils::halftone6(cv::Mat src, float degrees, int gridSize)
     //cv::imshow("halftone6_processed", outMat);
 #endif
 
+    progress->finish();
     return outMat;
 }
 
@@ -1623,7 +1638,7 @@ cv::Mat imageUtils::rotateMat(cv::Mat src, float degrees)
     return cv::Mat();
 }
 
-QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width)
+QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width)
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
@@ -1634,6 +1649,7 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
     fspc.setCount(mat.cols);
     fspc.setSame(false);
     bool forward = true;
+    progress->setMaximum(mat.rows);
     for (int r = 0; r < mat.rows; r++)
     {
         int yStart = unitUtils::mm2MicroMM(y + r * rowInterval);
@@ -1678,8 +1694,10 @@ QByteArray imageUtils::image2EngravingData(cv::Mat mat, qreal x, qreal y, qreal 
             }
             forward = !forward;
         }
+
+        progress->increaseProgress();
     }
-    
+    progress->finish();
     return bytes;
 }
 

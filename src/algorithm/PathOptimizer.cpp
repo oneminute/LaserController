@@ -89,7 +89,6 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
     d->currentNode->update(parentProgress);
     d->optimizedPath.clear();
 
-    parentProgress->setMaximum(2);
     ProgressItem* optimizeProgress = LaserApplication::progressModel->createComplexItem(tr("Optimize by layers"), parentProgress);
     ProgressItem* arrangeProgress = LaserApplication::progressModel->createSimpleItem(tr("Arrange points"), parentProgress);
     optimizeProgress->setMaximum(d->root->childNodes().count() * 2);

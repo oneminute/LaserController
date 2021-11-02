@@ -68,12 +68,13 @@ qreal ProgressItem::progress() const
         //QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
         qreal finalProgress = 0.0;
         
+        qreal maximum = qMax(m_maximum, static_cast<qreal>(m_childItems.count()));
         for (ProgressItem* item : m_childItems)
         {
             //qreal weight = m_weights[item];
-            finalProgress += /*weight * */item->progress() / (m_maximum - m_minimum);
+            finalProgress += /*weight * */item->progress() / (maximum - m_minimum);
         }
-        return qBound(0.0, (finalProgress - m_minimum) / (m_maximum - m_minimum), 1.0); 
+        return qBound(0.0, finalProgress, 1.0); 
     }
     }
 }

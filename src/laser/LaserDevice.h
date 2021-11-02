@@ -40,6 +40,7 @@ public:
     QString requestDongleId() const;
 
     void requestMainCardInfo();
+    void requestMainCardRegInfo();
     QString firmwareVersion() const;
     QString hardwareIdentID() const;
     QString mainCardId() const;

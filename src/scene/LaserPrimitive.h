@@ -140,7 +140,7 @@ public:
     LaserPoint firstStartingPoint() const;
     LaserPoint lastStartingPoint() const;
     QPointF centerMachiningPoint() const;
-    virtual QByteArray engravingImage() { return QByteArray(); }
+    virtual QByteArray engravingImage(ProgressItem* parentProgress) { return QByteArray(); }
     virtual bool isClosed() const = 0;
 
     LaserPrimitiveType primitiveType() const;
@@ -208,7 +208,7 @@ class LaserShape : public LaserPrimitive
 public:
     LaserShape(LaserShapePrivate* data, LaserDocument* doc,   LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
-    virtual QByteArray engravingImage() override;
+    virtual QByteArray engravingImage(ProgressItem* progress) override;
 	int layerIndex();
 private:
     Q_DISABLE_COPY(LaserShape);
@@ -441,7 +441,7 @@ public:
 
     QRectF bounds() const;
 
-    virtual QByteArray engravingImage();
+    virtual QByteArray engravingImage(ProgressItem* parentProgress);
     virtual void draw(QPainter* painter);
     virtual QPainterPath toMachiningPath() const;
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }

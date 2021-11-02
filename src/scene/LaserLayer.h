@@ -150,6 +150,9 @@ public:
 
     void setCheckBox(QCheckBox* box);
 
+    qreal accelerationLength(LaserLayerType layerType) const;
+    qreal accelerationSegmentLength(LaserLayerType layerType) const;
+
 protected:
     void onClicked();
 

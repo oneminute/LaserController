@@ -29,6 +29,7 @@ RegisteDialog::RegisteDialog(QWidget* parent)
     connect(m_ui->pushButtonCopyDongleId, &QPushButton::clicked, this, &RegisteDialog::onButtonCopyDongleIdClicked);
     connect(m_ui->pushButtonCopyRegisteId, &QPushButton::clicked, this, &RegisteDialog::onButtonCopyRegisteIdClicked);
     connect(m_ui->pushButtonRegisteCode, &QPushButton::clicked, this, &RegisteDialog::onButtonRegiste);
+    connect(m_ui->pushButtonStatus, &QPushButton::clicked, this, &RegisteDialog::onButtonStatusClicked);
 } 
  
 RegisteDialog::~RegisteDialog() 
@@ -55,5 +56,10 @@ void RegisteDialog::onButtonRegiste(bool checked)
     }
 
     LaserApplication::device->registeMainCard(code, this);
+}
+
+void RegisteDialog::onButtonStatusClicked(bool checked)
+{
+    LaserApplication::device->requestMainCardRegInfo();
 }
 

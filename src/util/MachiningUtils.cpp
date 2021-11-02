@@ -331,17 +331,26 @@ void machiningUtils::polygon2Points(
         progress->finish();
 }
 
-QByteArray machiningUtils::pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t)
+QByteArray machiningUtils::pointListList2Plt(ProgressItem* progress, const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t)
 {
     QByteArray buffer;
+    int total = 0;
     for (const LaserPointList& points : pointList)
     {
-        buffer.append(pointList2Plt(points, lastPoint, t));
+        total += points.length();
     }
+    if (progress)
+        progress->setMaximum(total);
+    for (const LaserPointList& points : pointList)
+    {
+        buffer.append(pointList2Plt(progress, points, lastPoint, t));
+    }
+    if (progress)
+        progress->finish();
     return buffer;
 }
 
-QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& lastPoint, const QTransform& t)
+QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPointList& points, QPointF& lastPoint, const QTransform& t)
 {
     QByteArray buffer;
     if (points.empty())
@@ -388,11 +397,13 @@ QByteArray machiningUtils::pointList2Plt(const LaserPointList& points, QPointF& 
             buffer.append(command.arg(qRound(pt.x())).arg(qRound(pt.y())));
         }
         lastPoint = pt;
+        if (progress)
+            progress->increaseProgress();
     }
     return buffer;
 }
 
-QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPointF& lastPoint)
+QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineListList& lineList, QPointF& lastPoint)
 {
     QByteArray buffer;
     // 建立所有线点的kdtree
@@ -400,6 +411,7 @@ QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPoin
     // 从起刀点位置开始依次寻找最优点
     //QPointF point = path.boundingRect().topLeft();
     //QLineF lastLine = lines.first();
+    progress->setMaximum(lineList.count());
     bool forward = true;
     for (int i = 0; i < lineList.count(); i++)
     {
@@ -471,7 +483,9 @@ QByteArray machiningUtils::lineList2Plt(const LaserLineListList& lineList, QPoin
             lastPoint = pt2;
         }
         forward = !forward;
+        progress->increaseProgress();
     }
+    progress->finish();
     return buffer;
 }
 

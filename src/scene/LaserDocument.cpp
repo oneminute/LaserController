@@ -223,6 +223,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QTransform t = enablePrintAndCut() ? printAndCutTransform() : QTransform();
 
+    ProgressItem* exportProgress = LaserApplication::progressModel->createComplexItem(tr("Export Json"), parentProgress);
     QJsonObject laserDocumentInfo;
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
@@ -245,6 +246,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QList<LaserLayer*> layerList;
     QMap<LaserLayer*, QList<OptimizeNode*>> layersMap;
+    exportProgress->setMaximum(path.count());
     for (OptimizeNode* pathNode : path)
     {
         LaserPrimitive* primitive = pathNode->primitive();
@@ -315,7 +317,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
 
-                    QByteArray data = primitive->engravingImage();
+                    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Engraving").arg(primitive->name()), exportProgress);
+                    QByteArray data = primitive->engravingImage(progress);
                     if (!data.isEmpty())
                     {
                         itemObj["Type"] = primitive->typeLatinName();
@@ -334,7 +337,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, t));
                     items.append(itemObjCutting);
                 }
             }
@@ -345,7 +348,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 {
                     itemObj["Type"] = primitive->typeLatinName();
                     itemObj["Style"] = LaserLayerType::LLT_CUTTING;
-                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
+                    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Points to Plt").arg(primitive->name()), exportProgress);
+                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, t));
                     items.append(itemObj);
                 }
             }
@@ -355,7 +359,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 {
                     itemObj["Type"] = primitive->typeLatinName();
                     LaserLineListList lineList = primitive->generateFillData(lastPoint);
-                    itemObj["Data"] = QString(machiningUtils::lineList2Plt(lineList, lastPoint));
+                    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), exportProgress);
+                    itemObj["Data"] = QString(machiningUtils::lineList2Plt(progress, lineList, lastPoint));
                     itemObj["Style"] = LaserLayerType::LLT_FILLING;
                     items.append(itemObj);
                 }
@@ -369,7 +374,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(points, lastPoint, t));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, t));
                     items.append(itemObjCutting);
                 }
             }
@@ -397,6 +402,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     LaserApplication::previewWindow->addMessage(tr("Done"));
     saveFile.close();
+    exportProgress->finish();
     emit exportFinished(filename);
 }
 
@@ -800,7 +806,6 @@ void LaserDocument::outline(ProgressItem* parentProgress)
 {
     Q_D(LaserDocument);
     qLogD << "Before outline:";
-    parentProgress->setMaximum(2);
     ProgressItem* clearProgress = LaserApplication::progressModel->createSimpleItem(tr("Clear tree"), parentProgress);
     ProgressItem* outlineProgress = LaserApplication::progressModel->createSimpleItem(tr("Outline by layers"), parentProgress);
     clearTree(d->optimizeNode, clearProgress);

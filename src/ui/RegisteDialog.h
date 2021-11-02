@@ -19,6 +19,7 @@ protected slots:
     void onButtonCopyDongleIdClicked(bool checked = false);
     void onButtonCopyRegisteIdClicked(bool checked = false);
     void onButtonRegiste(bool checked = false);
+    void onButtonStatusClicked(bool checked = false);
 
 private:
     QScopedPointer<Ui::RegisteDialog> m_ui;

@@ -57,11 +57,11 @@ namespace machiningUtils
         QList<int>& startingIndices,
         QPointF& center);
 
-    QByteArray pointListList2Plt(const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t = QTransform());
+    QByteArray pointListList2Plt(ProgressItem* progress, const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t = QTransform());
 
-    QByteArray pointList2Plt(const LaserPointList& points, QPointF& lastPoint, const QTransform& t = QTransform());
+    QByteArray pointList2Plt(ProgressItem* progress, const LaserPointList& points, QPointF& lastPoint, const QTransform& t = QTransform());
 
-    QByteArray lineList2Plt(const LaserLineListList& lineList, QPointF& lastPoint);
+    QByteArray lineList2Plt(ProgressItem* progress, const LaserLineListList& lineList, QPointF& lastPoint);
 
     QByteArray image2Plt(const QImage& image);
 

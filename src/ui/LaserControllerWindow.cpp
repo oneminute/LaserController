@@ -2697,7 +2697,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
             LaserApplication::resetProgressWindow();
             LaserApplication::showProgressWindow();
             ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
-            progress->setMaximum(4);
+            progress->setMaximum(5);
             QtConcurrent::run([=]()
                 {
                     m_scene->document()->outline(progress);
@@ -2752,7 +2752,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
         LaserApplication::resetProgressWindow();
         LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
-        progress->setMaximum(4);
+        progress->setMaximum(5);
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
@@ -2927,6 +2927,9 @@ void LaserControllerWindow::onMovementButtonReleased()
 void LaserControllerWindow::onActionHalfTone(bool checked)
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Images (*.png *.bmp *.jpg)"));
+    LaserApplication::resetProgressWindow();
+    LaserApplication::showProgressWindow();
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
     if (!filename.isEmpty() && !filename.isNull())
     {
         QImage image(filename);
@@ -2944,12 +2947,13 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
             imageUtils::halftone5(src, Config::EngravingLayer::halftoneAngles(), gridSize);
             break;
         case 2:
-            imageUtils::halftone6(src, Config::EngravingLayer::halftoneAngles(), gridSize);
+            imageUtils::halftone6(progress, src, Config::EngravingLayer::halftoneAngles(), gridSize);
             break;
         }
         QFileInfo tmpFile("tmp/dst.bmp");
         QUrl url = QUrl::fromLocalFile(tmpFile.absolutePath());
         QDesktopServices::openUrl(url);
+        progress->finish();
     }
 }
 

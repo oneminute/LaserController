@@ -396,6 +396,15 @@ void LaserDevice::requestMainCardInfo()
     }
 }
 
+void LaserDevice::requestMainCardRegInfo()
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        d->driver->getMainCardRegisterState();
+    }
+}
+
 QString LaserDevice::firmwareVersion() const
 {
     Q_D(const LaserDevice);

@@ -2082,11 +2082,12 @@ QRectF LaserBitmap::bounds() const
     return d->boundingRect; 
 }
 
-QByteArray LaserBitmap::engravingImage()
+QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
 { 
     Q_D(LaserBitmap);
     QByteArray ba;
 
+    parentProgress->setMaximum(2);
     QImage srcImage = d->image.copy();
     //srcImage.invertPixels();
     QImage outImage = srcImage.transformed(sceneTransform()).convertToFormat(QImage::Format_Grayscale8);
@@ -2121,7 +2122,7 @@ QByteArray LaserBitmap::engravingImage()
             halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         case 2:
-            halfToneMat = imageUtils::halftone6(pixelScaled, this->layer()->halftoneAngles(), gridSize);
+            halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         }
     }
@@ -2147,8 +2148,9 @@ QByteArray LaserBitmap::engravingImage()
         //outMat = imageUtils::halftone5(resized, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
     //}
 
-    ba = imageUtils::image2EngravingData(resized, boundingLeft, boundingTop, pixelInterval / 1000, boundingWidth);
+    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingLeft, boundingTop, pixelInterval / 1000, boundingWidth);
 
+    parentProgress->finish();
     return ba; 
 }
 
@@ -2367,31 +2369,51 @@ QString FinishRun::toString()
     return text;
 }
 
-QByteArray LaserShape::engravingImage()
+QByteArray LaserShape::engravingImage(ProgressItem* progress)
 {
+    Q_D(LaserShape);
     QByteArray bytes;
     QPainterPath path = toMachiningPath();
     QRectF boundRect = path.boundingRect();
 
-    int scanInterval = 7;
-    double yPulseLength = 0.006329114;
-    
-    qreal pixelInterval = scanInterval * yPulseLength;
+    int dpi = d->layer->dpi();
+    int pixelWidth = qRound(boundRect.width() * MM_TO_INCH * dpi);
+    int pixelHeight = qRound(boundRect.height() * MM_TO_INCH * dpi);
 
-    QList<SliceGroup> groups;
+    int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
 
-    for (qreal y = boundRect.top(); y <= boundRect.bottom(); y += pixelInterval)
+    cv::Mat pixelScaled(pixelHeight, pixelWidth, CV_8UC1, cv::Scalar(0));
+
+    cv::Mat halfToneMat = pixelScaled;
+    if (layer()->useHalftone())
     {
-        QLineF hLine(boundRect.left() - 0.01f, y, boundRect.right() + 0.01f, y + 1);
-        QRectF hRect(hLine.p1(), hLine.p2());
-        QPainterPath linePath;
-        linePath.addRect(hRect);
-        QPainterPath intersection = path.intersected(linePath);
-        for (int i = 0; i < intersection.elementCount(); i++)
+        switch (Config::Export::halfToneStyle())
         {
-            qDebug() << i << intersection.elementAt(i);
+        case 0:
+            halfToneMat = imageUtils::halftone4(pixelScaled, this->layer()->halftoneAngles(), gridSize);
+            break;
+        case 1:
+            halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);
+            break;
+        case 2:
+            halfToneMat = imageUtils::halftone6(progress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
+            break;
         }
     }
+
+    qreal pixelInterval = layer()->engravingRowInterval();
+
+    int outWidth = pixelWidth;
+    int outHeight = std::round(boundRect.height() * Config::General::machiningUnit() / pixelInterval);
+    qLogD << "bounding rect: " << boundRect;
+    qDebug() << "out width:" << outWidth;
+    qDebug() << "out height:" << outHeight;
+
+    cv::Mat resized;
+    cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight));
+    
+    bytes = imageUtils::image2EngravingData(progress, resized, boundRect.left(), boundRect.top(), pixelInterval / 1000, boundRect.width());
+
     return bytes;
 }
 
