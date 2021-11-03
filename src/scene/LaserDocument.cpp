@@ -232,13 +232,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["StartFrom"] = Config::Device::startFrom();
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
-    //QPointF docOrigin = docOriginMachining();
-    //docOrigin = LaserApplication::device->deviceTransformMachining().map(docOrigin);
-    QPointF docOrigin(0, 0);
+    QPointF docOrigin = LaserApplication::device->originMachining();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
-    laserDocumentInfo["UserOrigin"] = typeUtils::point2Json(docOrigin);
-    QRectF docBoundingRect = docBoundingRectMachining();
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBoundingRect);
+    QRectF boundingRect = docBoundingRect();
+    QRectF boundingRectMachining = Global::matrixToMachining().map(boundingRect).boundingRect();
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(boundingRectMachining);
     laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectMachining());
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
@@ -261,6 +259,12 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QJsonArray layers;
     //QPointF lastPoint = docOriginMachining();
     QPointF lastPoint = docOrigin;
+    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    {
+        QPointF jobOrigin = LaserApplication::device->jobOrigin(boundingRect);
+        jobOrigin = Global::matrixToMachining().map(jobOrigin);
+        lastPoint = boundingRectMachining.topLeft() - jobOrigin;
+    }
     for (LaserLayer* layer : layerList)
     {
         QJsonObject layerObj;
@@ -519,7 +523,7 @@ QPointF LaserDocument::docOrigin() const
         break;
     case SFT_CurrentPosition:
     {
-        QVector3D laserPos = LaserApplication::device->getCurrentLaserPos();
+        QPointF laserPos = LaserApplication::device->getCurrentLaserPosition();
         dx = laserPos.x();
         dy = laserPos.y();
     }
@@ -596,7 +600,7 @@ QTransform LaserDocument::docTransform() const
         break;
     case SFT_CurrentPosition:
     {
-        QVector3D laserPos = LaserApplication::device->getCurrentLaserPos();
+        QPointF laserPos = LaserApplication::device->getCurrentLaserPosition();
         switch (Config::Device::jobOrigin())
         {
         case 0:
@@ -770,6 +774,16 @@ void LaserDocument::setPrintAndCutPointPairs(const PointPairList& pairs)
 {
     Q_D(LaserDocument);
     d->pointPairs = pairs;
+}
+
+void LaserDocument::transform(const QTransform& trans)
+{
+    Q_D(LaserDocument);
+    for (LaserPrimitive* primitive : d->primitives)
+    {
+        QTransform t = primitive->transform() * trans;
+        primitive->setTransform(t);
+    }
 }
 
 void LaserDocument::updateLayersStructure()

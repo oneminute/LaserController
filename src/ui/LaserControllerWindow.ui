@@ -1337,6 +1337,14 @@
     <string>User Info</string>
    </property>
   </action>
+  <action name="actionApplyJobOriginToDocument">
+   <property name="text">
+    <string>Apply Job Origin To Document</string>
+   </property>
+   <property name="toolTip">
+    <string>Apply Job Origin To Document</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

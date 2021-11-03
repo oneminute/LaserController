@@ -937,6 +937,7 @@ void Config::loadDeviceItems()
         DT_INT
     );
     jobOrigin->setInputWidgetType(IWT_Custom);
+    jobOrigin->setStoreStrategy(SS_DIRECTLY);
     jobOrigin->setCreateWidgetHook(
         [=](ConfigItem* item) {
             return qobject_cast<QWidget*>(new RadioButtonGroup());

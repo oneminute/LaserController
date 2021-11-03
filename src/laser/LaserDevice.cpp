@@ -786,28 +786,106 @@ LaserRegister* LaserDevice::systemRegister(int addr) const
         return nullptr;
 }
 
+QPointF LaserDevice::jobOrigin(const QRectF& docBounding) const
+{
+    qreal dx, dy;
+    switch (Config::Device::jobOrigin())
+    {
+    case 0:
+        dx = 0;
+        dy = 0;
+        break;
+    case 1:
+        dx = -docBounding.width() / 2;
+        dy = 0;
+        break;
+    case 2:
+        dx = -docBounding.width();
+        dy = 0;
+        break;
+    case 3:
+        dx = 0;
+        dy = -docBounding.height() / 2;
+        break;
+    case 4:
+        dx = -docBounding.width() / 2;
+        dy = -docBounding.height() / 2;
+        break;
+    case 5:
+        dx = -docBounding.width();
+        dy = -docBounding.height() / 2;
+        break;
+    case 6:
+        dx = 0;
+        dy = -docBounding.height();
+        break;
+    case 7:
+        dx = -docBounding.width() / 2;
+        dy = -docBounding.height();
+        break;
+    case 8:
+        dx = -docBounding.width();
+        dy = -docBounding.height();
+        break;
+    }
+    return QPointF(dx, dy);
+}
+
 QPointF LaserDevice::origin() const
 {
     Q_D(const LaserDevice);
     switch (Config::Device::startFrom())
     {
     case SFT_AbsoluteCoords:
-        return deviceOriginMM();
+        return deviceOrigin();
         break;
     case SFT_UserOrigin:
+    {
+        return userOrigin();
+    }
     case SFT_CurrentPosition:
     {
-        LaserDocument* document = LaserApplication::mainWindow->currentDocument();
-        if (document)
-        {
-            return document->docOrigin();
-        }
-        else
-        {
-            return deviceOriginMM();
-        }
-    }
+        return getCurrentLaserPosition();
         break;
+    }
+    }
+    return QPointF(0, 0);
+}
+
+QPointF LaserDevice::originMM() const
+{
+    Q_D(const LaserDevice);
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        return deviceOriginMM();
+    case SFT_UserOrigin:
+    {
+        return userOriginMM();
+    }
+    case SFT_CurrentPosition:
+    {
+        return getCurrentLaserPositionMM();
+    }
+    }
+    return QPointF(0, 0);
+}
+
+QPointF LaserDevice::originMachining() const
+{
+    Q_D(const LaserDevice);
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        return deviceOriginMachining();
+    case SFT_UserOrigin:
+    {
+        return userOriginMachining();
+    }
+    case SFT_CurrentPosition:
+    {
+        return getCurrentLaserPositionMachining();
+    }
     }
     return QPointF(0, 0);
 }
@@ -826,6 +904,29 @@ QPointF LaserDevice::deviceOriginMM() const
 QPointF LaserDevice::deviceOriginMachining() const
 {
     return deviceOriginMM() * Config::General::machiningUnit();
+}
+
+QPointF LaserDevice::userOrigin() const
+{
+    return Global::matrix(SU_MM, SU_PX).map(userOriginMM());
+}
+
+QPointF LaserDevice::userOriginMM() const
+{
+    return userOriginMachining() / Config::General::machiningUnit();
+}
+
+QPointF LaserDevice::userOriginMachining() const
+{
+    switch (Config::Device::userOriginSelected())
+    {
+    case 0:
+        return Config::Device::userOrigin1();
+    case 1:
+        return Config::Device::userOrigin2();
+    case 2:
+        return Config::Device::userOrigin3();
+    }
 }
 
 QRectF LaserDevice::boundingRect() const
@@ -967,10 +1068,23 @@ LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified)
     return map;
 }
 
-QVector3D LaserDevice::getCurrentLaserPos()
+QPointF LaserDevice::getCurrentLaserPositionMachining() const
 {
-    Q_D(LaserDevice);
-    return d->lastState.pos;
+    Q_D(const LaserDevice);
+    return d->lastState.pos.toPointF();
+}
+
+QPointF LaserDevice::getCurrentLaserPositionMM() const
+{
+    Q_D(const LaserDevice);
+    return d->lastState.pos.toPointF() / Config::General::machiningUnit();
+}
+
+QPointF LaserDevice::getCurrentLaserPosition() const
+{
+    Q_D(const LaserDevice);
+    QPointF pos = d->lastState.pos.toPointF();
+    return Global::matrix(SU_MM, SU_PX, 0.001, 0.001).map(pos);
 }
 
 void LaserDevice::unload()

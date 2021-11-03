@@ -188,7 +188,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     QToolButton* toolButtonSplineTool = new QToolButton;
     QToolButton* toolButtonBitmapTool = new QToolButton;
 	//QToolButton* toolButtonViewDragTool = new QToolButton;
-
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -591,6 +590,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionReset, &QAction::triggered, this, &LaserControllerWindow::laserResetToOriginalPoint);
     connect(m_ui->actionMoveToOrigin, &QAction::triggered, this, &LaserControllerWindow::laserBackToMachiningOriginalPoint);
+    connect(m_ui->actionApplyJobOriginToDocument, &QAction::triggered, this, &LaserControllerWindow::applyJobOriginToDocument);
 
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
     connect(m_ui->actionFetchToUserOrigin, &QAction::triggered, this, &LaserControllerWindow::onActionFetchToUserOrigin);
@@ -767,6 +767,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
     // config items
     connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
+    /*connect(Config::Device::userOrigin1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
+    connect(Config::Device::userOrigin2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
+    connect(Config::Device::userOrigin3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
+    connect(Config::Device::userOriginSelectedItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
+    connect(Config::Device::startFromItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
+    connect(Config::Device::jobOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);*/
 
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
@@ -914,7 +920,7 @@ void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, con
 FinishRun LaserControllerWindow::finishRun()
 {
     FinishRun value;
-    if (m_comboBoxPostEvent->currentIndex() < 3)
+    /*if (m_comboBoxPostEvent->currentIndex() < 3)
     {
         value.setAction(m_comboBoxPostEvent->currentIndex());
     }
@@ -932,7 +938,7 @@ FinishRun LaserControllerWindow::finishRun()
         {
             value.setAction(5);
         }
-    }
+    }*/
     //value.setRelay(0, m_ui->checkBoxRelay1->isChecked());
     //value.setRelay(1, m_ui->checkBoxRelay2->isChecked());
     //value.setRelay(2, m_ui->checkBoxRelay3->isChecked());
@@ -1536,16 +1542,19 @@ void LaserControllerWindow::createOperationsDockPanel()
     secondRow->addWidget(m_buttonOperationOrigin);
     secondRow->addWidget(m_buttonOperationOptimize);
 
-    m_comboBoxPostEvent = new QComboBox;
-    m_comboBoxPostEvent->addItem(tr("Stop at current position"));
-    m_comboBoxPostEvent->addItem(tr("Unload motor"));
-    m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
+    //m_comboBoxPostEvent = new QComboBox;
+    //m_comboBoxPostEvent->addItem(tr("Stop at current position"));
+    //m_comboBoxPostEvent->addItem(tr("Unload motor"));
+    //m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
+    QToolButton* buttonApplyToDoc = new QToolButton;
+    buttonApplyToDoc->setDefaultAction(m_ui->actionApplyJobOriginToDocument);
 
     QFormLayout* fifthRow = new QFormLayout;
     fifthRow->setMargin(0);
     fifthRow->addRow(Config::Device::startFromItem()->title(), m_comboBoxStartPosition);
     fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
-    fifthRow->addRow(tr("Post Event"), m_comboBoxPostEvent);
+    fifthRow->addRow("", buttonApplyToDoc);
+    //fifthRow->addRow(tr("Post Event"), m_comboBoxPostEvent);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -3235,7 +3244,7 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 {
-    QPointF laserPos = LaserApplication::device->getCurrentLaserPos().toPointF();
+    QPointF laserPos = LaserApplication::device->getCurrentLaserPositionMachining();
     switch (Config::Device::userOriginSelected())
     {
     case 0:
@@ -3307,7 +3316,7 @@ void LaserControllerWindow::onActionUpdate(bool checked)
 
 void LaserControllerWindow::onActionLaserPosition(bool checked)
 {
-    LaserApplication::device->getCurrentLaserPos();
+    LaserApplication::device->getCurrentLaserPositionMM();
 }
 
 void LaserControllerWindow::onProgressBarClicked()
@@ -3349,7 +3358,7 @@ void LaserControllerWindow::onActionPrintAndCutNew(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutFetchLaser(bool checked)
 {
-    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->getCurrentLaserPos().toPointF());
+    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->getCurrentLaserPositionMachining());
 }
 
 void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
@@ -4802,6 +4811,47 @@ void LaserControllerWindow::askMergeOrNew()
     {
         createNewDocument();
     }
+}
+
+void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
+{
+    if (!m_scene->document())
+    {
+        m_viewer->update();
+        return;
+    }
+
+    // 判断是否需要更新
+    bool needUpdate = false;
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
+    {
+        needUpdate = false;
+    }
+    else
+    {
+        needUpdate = true;
+    }
+
+    if (!needUpdate)
+    {
+        m_viewer->update();
+        return;
+    }
+
+    // 计算文档外包框
+    QRectF docBounding = m_scene->document()->docBoundingRect();
+
+    // 获取当前原点
+    QPointF origin = LaserApplication::device->origin();
+
+    QPointF jobOrigin = LaserApplication::device->jobOrigin(docBounding);
+
+    QPointF topLeft = origin + jobOrigin;
+    
+    QPointF offset = topLeft - docBounding.topLeft();
+    QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
+    m_scene->document()->transform(t);
+    m_viewer->viewport()->update();
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)

@@ -103,16 +103,19 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 
 	if (Config::Ui::showDocumentBoundingRect() && scene()->document())
 	{
-		QRectF rect = scene()->document()->docBoundingRect();
-		if (rect.isValid())
-		{
-			painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
-            QPolygonF gridBounds = mapFromScene(rect);
-			painter.drawPolygon(gridBounds);            
-		}
+        if (scene()->document())
+        {
+            QRectF rect = scene()->document()->docBoundingRect();
+            if (rect.isValid())
+            {
+                painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
+                QPolygonF gridBounds = mapFromScene(rect);
+                painter.drawPolygon(gridBounds);
+            }
+        }
         
         painter.setPen(QPen(Qt::darkGreen));
-        QPointF origin = mapFromScene(scene()->document()->docOrigin());
+        QPointF origin = mapFromScene(LaserApplication::device->userOrigin());
         QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
         painter.drawRect(originRect);
 
@@ -121,7 +124,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
 		painter.drawRect(deviceOriginRect);
 
-		if (scene()->document()->enablePrintAndCut())
+		if (scene()->document() && scene()->document()->enablePrintAndCut())
 		{
 			for (const PointPair& pair : scene()->document()->printAndCutPointPairs())
 			{

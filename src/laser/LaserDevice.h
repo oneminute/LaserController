@@ -96,10 +96,17 @@ public:
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;
 
+    QPointF jobOrigin(const QRectF& docBounding) const;
+
     QPointF origin() const;
+    QPointF originMM() const;
+    QPointF originMachining() const;
     QPointF deviceOrigin() const;
     QPointF deviceOriginMM() const;
     QPointF deviceOriginMachining() const;
+    QPointF userOrigin() const;
+    QPointF userOriginMM() const;
+    QPointF userOriginMachining() const;
     QRectF boundingRect() const;
     QRectF boundingRectMM() const;
     QRectF boundRectMachining() const;
@@ -113,7 +120,9 @@ public:
     LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
     LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
 
-    QVector3D getCurrentLaserPos();
+    QPointF getCurrentLaserPositionMachining() const;
+    QPointF getCurrentLaserPositionMM() const;
+    QPointF getCurrentLaserPosition() const;
 
 public slots:
     void load();

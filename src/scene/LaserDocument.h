@@ -86,6 +86,8 @@ public:
     /// <returns></returns>
     virtual QPointF position() const { return QPoint(0, 0); }
 
+    void transform(const QTransform& trans);
+
 public slots:
     void exportJSON(const QString& filename, ProgressItem* parentProgress);
     void updateLayersStructure();

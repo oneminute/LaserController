@@ -273,6 +273,8 @@ protected slots:
 
     void askMergeOrNew();
 
+    void applyJobOriginToDocument(const QVariant& value);
+
 private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
