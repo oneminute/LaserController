@@ -181,6 +181,7 @@ void CorelDrawImporter::import(const QString & filename, LaserScene* scene, Prog
         {
             //tmpDir.remove(tmpSvgFilename);
         }
+        emit imported();
     }
     CoUninitialize();
 }
