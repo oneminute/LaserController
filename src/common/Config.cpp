@@ -825,7 +825,7 @@ void Config::loadExportItems()
 
     ConfigItem* halfToneStyle = group->addConfigItem(
         "halfToneStyle",
-        0,
+        2,
         DT_INT
     );
     halfToneStyle->setInputWidgetType(IWT_ComboBox);
@@ -844,6 +844,7 @@ void Config::loadExportItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+    halfToneStyle->setVisible(false);
 
     ConfigItem* imageUseGaussian = group->addConfigItem(
         "imageUseGaussian",

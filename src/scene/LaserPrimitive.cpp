@@ -2116,7 +2116,7 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
         switch (Config::Export::halfToneStyle())
         {
         case 0:
-            halfToneMat = imageUtils::halftone4(pixelScaled, this->layer()->halftoneAngles(), gridSize);
+            halfToneMat = imageUtils::halftone4(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         case 1:
             halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);
@@ -2390,7 +2390,7 @@ QByteArray LaserShape::engravingImage(ProgressItem* progress)
         switch (Config::Export::halfToneStyle())
         {
         case 0:
-            halfToneMat = imageUtils::halftone4(pixelScaled, this->layer()->halftoneAngles(), gridSize);
+            halfToneMat = imageUtils::halftone4(progress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         case 1:
             halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);

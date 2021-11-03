@@ -2950,7 +2950,7 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
         switch (Config::Export::halfToneStyle())
         {
         case 0:
-            imageUtils::halftone4(src, Config::EngravingLayer::halftoneAngles(), gridSize);
+            imageUtils::halftone4(progress, src, Config::EngravingLayer::halftoneAngles(), gridSize);
             break;
         case 1:
             imageUtils::halftone5(src, Config::EngravingLayer::halftoneAngles(), gridSize);

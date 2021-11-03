@@ -16,7 +16,7 @@ namespace imageUtils
     cv::Mat halftone(cv::Mat src, float mmWidth, float mmHeight, float lpi = 100, float dpi = 600, float degrees = 45.0);
     cv::Mat halftone2(cv::Mat src, float lpi = 100, float dpi = 600, float degrees = 45.0, float nonlinearCoefficient = 1.5f);
     cv::Mat halftone3(cv::Mat src, float lpi = 100, float dpi = 600, float degrees = 45.0);
-    cv::Mat halftone4(cv::Mat src,float degrees = 45.0, int gridSize = 12);
+    cv::Mat halftone4(ProgressItem* progress, cv::Mat src,float degrees = 45.0, int gridSize = 12);
     cv::Mat halftone5(cv::Mat src,float degrees = 45.0, int gridSize = 12);
     cv::Mat halftone6(ProgressItem* progress, cv::Mat src,float degrees = 45.0, int gridSize = 12);
 

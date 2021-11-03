@@ -335,7 +335,7 @@ cv::Mat imageUtils::halftone3(cv::Mat src, float lpi, float dpi, float degrees)
     return outMat;
 }
 
-cv::Mat imageUtils::halftone4(cv::Mat src, float degrees, int gridSize)
+cv::Mat imageUtils::halftone4(ProgressItem* progress, cv::Mat src, float degrees, int gridSize)
 {
     // 根据角度计算v1和v2两个相互正交的向量，向量长度是网格长度
     QTransform t1, t2;
@@ -368,6 +368,7 @@ cv::Mat imageUtils::halftone4(cv::Mat src, float degrees, int gridSize)
     int margin = qMax(halfXCount, halfYCount);
     qreal halfGridSize = gridSize / 2;
 
+    progress->setMaximum(margin * 2);
     // 生成网格
     cv::Mat dst(src.size(), CV_8UC1, cv::Scalar(0));
     for (int c = -margin; c <= margin; c++)
@@ -419,8 +420,11 @@ cv::Mat imageUtils::halftone4(cv::Mat src, float degrees, int gridSize)
             }
             generatePattern(dstRoi, sum, center);
         }
+        progress->increaseProgress();
     }
-    cv::imwrite("tmp/dst.bmp", 255 - dst);
+    dst = 255 - dst;
+    cv::imwrite("tmp/dst.bmp", dst);
+    progress->finish();
 
     return dst;
 }
