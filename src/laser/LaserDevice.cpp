@@ -949,7 +949,7 @@ QRectF LaserDevice::boundRectMachining() const
 QTransform LaserDevice::transform() const
 {
     Q_D(const LaserDevice);
-    QTransform transform;
+    /*QTransform transform;
     if (!Config::Device::startFromItem())
         return QTransform();
     switch (Config::Device::startFrom())
@@ -972,7 +972,8 @@ QTransform LaserDevice::transform() const
     }
         break;
     }
-    return transform;
+    return transform;*/
+    return d->deviceTransformMM;
 }
 
 QTransform LaserDevice::deviceTransform() const
