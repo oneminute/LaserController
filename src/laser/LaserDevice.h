@@ -92,6 +92,8 @@ public:
     void showAboutWindow(int interval = 0, bool modal = true);
     void closeAboutWindow();
     int showUpdateDialog();
+    void showSoftwareUpdateWizard();
+    void showFirmwareUpdateWizard();
 
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;

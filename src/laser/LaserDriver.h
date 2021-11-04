@@ -188,6 +188,8 @@ public:
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
     int getUpdatePanelHandle(int version, int wndId);
+    void startSoftUpdateWizard();
+    void startFirmwareUpdateWizard();
 
     QString registeMainCard(const QString& registeCode);
 
@@ -288,6 +290,8 @@ private:
     FN_VOID_VOID m_fnGetMainCardRegState;
     FN_WCHART_VOID m_fnGetMainCardInfo;
     FN_BOOL_WCHART m_fnCreateLicenseFile;
+    FN_VOID_VOID m_fnStartSoftUpdateWizard;
+    FN_VOID_VOID m_fnStartFirmwareUpdateWizard;
 
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FNSmallScaleMovement m_fnSmallScaleMovement;

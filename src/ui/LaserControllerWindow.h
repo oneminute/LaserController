@@ -188,7 +188,8 @@ protected slots:
     void onStatusBarRegisterClicked(bool checked = false);
     void onActionActivate(bool checked = false);
     void onStatusBarActivationClicked(bool checked = false);
-    void onActionUpdate(bool checked = false);
+    void onActionUpdateSoftware(bool checked = false);
+    void onActionUpdateFirmware(bool checked = false);
     void onActionLaserPosition(bool checked = false);
     void onProgressBarClicked();
 

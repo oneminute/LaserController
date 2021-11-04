@@ -764,6 +764,20 @@ int LaserDevice::showUpdateDialog()
     //LaserApplication::mainWindow->createUpdateDockPanel(winId);
 }
 
+void LaserDevice::showSoftwareUpdateWizard()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        d->driver->startSoftUpdateWizard();
+}
+
+void LaserDevice::showFirmwareUpdateWizard()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        d->driver->startFirmwareUpdateWizard();
+}
+
 LaserRegister* LaserDevice::userRegister(int addr) const
 {
     Q_D(const LaserDevice);

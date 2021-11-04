@@ -110,8 +110,15 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <widget class="QMenu" name="menuUpdate">
+     <property name="title">
+      <string>Update</string>
+     </property>
+     <addaction name="actionUpdateSoftware"/>
+     <addaction name="actionUpdateFirmware"/>
+    </widget>
     <addaction name="actionOnlineHelp"/>
-    <addaction name="actionUpdate"/>
+    <addaction name="menuUpdate"/>
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionContactUs"/>
     <addaction name="separator"/>
@@ -737,11 +744,6 @@
     <string>Online Help</string>
    </property>
   </action>
-  <action name="actionUpdate">
-   <property name="text">
-    <string>Update</string>
-   </property>
-  </action>
   <action name="actionOfficialWebsite">
    <property name="text">
     <string>Official Website</string>
@@ -1343,6 +1345,11 @@
    </property>
    <property name="toolTip">
     <string>Apply Job Origin To Document</string>
+   </property>
+  </action>
+  <action name="actionUpdateSoftware">
+   <property name="text">
+    <string>Update Software</string>
    </property>
   </action>
  </widget>

@@ -577,7 +577,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionBitmapTool, &QAction::triggered, this, &LaserControllerWindow::onActionBitmap);
     connect(m_ui->actionActivate, &QAction::triggered, this, &LaserControllerWindow::onActionActivate);
     connect(m_ui->actionRegiste, &QAction::triggered, this, &LaserControllerWindow::onActionRegiste);
-    connect(m_ui->actionUpdate, &QAction::triggered, this, &LaserControllerWindow::onActionUpdate);
+    connect(m_ui->actionUpdateSoftware, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateSoftware);
+    connect(m_ui->actionUpdateFirmware, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateFirmware);
     connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
 
 	connect(m_ui->actionMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionMainCardInfo);
@@ -3304,14 +3305,14 @@ void LaserControllerWindow::onStatusBarActivationClicked(bool checked)
     dlg.exec();
 }
 
-void LaserControllerWindow::onActionUpdate(bool checked)
+void LaserControllerWindow::onActionUpdateSoftware(bool checked)
 {
-    if (!m_updateDialog)
-    {
-        m_updateDialog = new UpdateDialog;
-    }
-    m_updateDialog->setModal(true);
-    m_updateDialog->show();
+    LaserApplication::device->showSoftwareUpdateWizard();
+}
+
+void LaserControllerWindow::onActionUpdateFirmware(bool checked)
+{
+    LaserApplication::device->showFirmwareUpdateWizard();
 }
 
 void LaserControllerWindow::onActionLaserPosition(bool checked)

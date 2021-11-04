@@ -259,6 +259,12 @@ bool LaserDriver::load()
     m_fnGetUpdatePanelHandle = (FN_INT_INT_INT)m_library.resolve("GetUpdatePanelHandle");
     CHECK_FN(m_fnGetUpdatePanelHandle)
 
+    m_fnStartSoftUpdateWizard = (FN_VOID_VOID)m_library.resolve("StartSoftUpdateWizard");
+    CHECK_FN(m_fnStartSoftUpdateWizard)
+
+    m_fnStartFirmwareUpdateWizard = (FN_VOID_VOID)m_library.resolve("StartFirmwareUpdateWizard");
+    CHECK_FN(m_fnStartFirmwareUpdateWizard)
+
     m_fnActivationMainCardEx = (FN_INT_WCHART)m_library.resolve("ActivationMainCardEx");
     CHECK_FN(m_fnActivationMainCardEx);
 
@@ -879,6 +885,16 @@ void LaserDriver::checkVersionUpdate(bool hardware, const QString& flag, int cur
 int LaserDriver::getUpdatePanelHandle(int version, int wndId)
 {
     return m_fnGetUpdatePanelHandle(version, wndId);
+}
+
+void LaserDriver::startSoftUpdateWizard()
+{
+    m_fnStartSoftUpdateWizard();
+}
+
+void LaserDriver::startFirmwareUpdateWizard()
+{
+    m_fnStartFirmwareUpdateWizard();
 }
 
 QString LaserDriver::registeMainCard(const QString& registeCode)
