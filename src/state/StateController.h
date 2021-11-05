@@ -146,6 +146,7 @@ public:
 	DECL_STATE(documentViewDrag)
 	DECL_STATE(documentViewDragReady)
 	DECL_STATE(documentViewDraging)
+    DECL_STATE(documentPrintAndCut)
     DECL_STATE(documentPrimitive)
 	DECL_STATE(documentPrimitiveRect)
 	DECL_STATE(documentPrimitiveRectReady)

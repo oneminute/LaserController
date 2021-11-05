@@ -1158,6 +1158,13 @@ void Config::loadDeviceItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+
+    ConfigItem* redLightOffset = group->addConfigItem(
+        "redLightOffset",
+        QPointF(0, 0),
+        DT_POINT
+    );
+    redLightOffset->setReadOnly(true);
 }
 
 void Config::loadUserReigsters()

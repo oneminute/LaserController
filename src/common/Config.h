@@ -256,6 +256,7 @@ public:
         CONFIG_ITEM(device, userOrigin2, QPointF, toPointF)
         CONFIG_ITEM(device, userOrigin3, QPointF, toPointF)
         CONFIG_ITEM(device, userOriginSelected, int, toInt)
+        CONFIG_ITEM(device, redLightOffset, QPointF, toPointF)
         //CONFIG_ITEM_T(device, userOrigins, QList<QPointF>, QList<QPointF>)
 
     private:

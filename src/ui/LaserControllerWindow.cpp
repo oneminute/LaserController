@@ -603,6 +603,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionPrintAndCutClear, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutClear);
     connect(m_ui->actionPrintAndCutAlign, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutAlign);
     connect(m_ui->actionPrintAndCutRestore, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutRestore);
+    connect(m_ui->actionStartRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentStart);
+    connect(m_ui->actionPrintAndCutSelectPoint, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutSelectPoint);
+    connect(m_ui->actionPrintAndCutEndSelect, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutEndSelect);
+    connect(m_ui->actionFinishRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentFinish);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -779,6 +783,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
+
+    ADD_TRANSITION(documentIdleState, documentPrintAndCutState, this, SIGNAL(startPrintAndCut()));
+    ADD_TRANSITION(documentPrintAndCutState, documentIdleState, this, SIGNAL(finishPrintAndCut()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
@@ -1853,28 +1860,6 @@ void LaserControllerWindow::createPrintAndCutPanel()
     m_tablePrintAndCutPoints = new PointPairTableWidget;
     pointsLayout->addWidget(m_tablePrintAndCutPoints);
 
-    QHBoxLayout* offsetLayout = new QHBoxLayout;
-    m_labelPrintAndCutOffset = new QLabel(tr("Laser Offset: "));
-    m_doubleSpinBoxPrintAndCutOffsetX = new QDoubleSpinBox;
-    m_doubleSpinBoxPrintAndCutOffsetX->setMinimum(-100);
-    m_doubleSpinBoxPrintAndCutOffsetX->setMaximum(100);
-    m_doubleSpinBoxPrintAndCutOffsetX->setDecimals(1);
-    m_doubleSpinBoxPrintAndCutOffsetY = new QDoubleSpinBox;
-    m_doubleSpinBoxPrintAndCutOffsetY->setMinimum(-100);
-    m_doubleSpinBoxPrintAndCutOffsetY->setMaximum(100);
-    m_doubleSpinBoxPrintAndCutOffsetY->setDecimals(1);
-    offsetLayout->addWidget(m_labelPrintAndCutOffset);
-    offsetLayout->addWidget(new QLabel(" X"));
-    offsetLayout->addWidget(m_doubleSpinBoxPrintAndCutOffsetX);
-    offsetLayout->addWidget(new QLabel(" Y"));
-    offsetLayout->addWidget(m_doubleSpinBoxPrintAndCutOffsetY);
-    pointsLayout->addLayout(offsetLayout);
-    offsetLayout->setStretch(0, 0);
-    offsetLayout->setStretch(1, 0.1);
-    offsetLayout->setStretch(2, 1);
-    offsetLayout->setStretch(3, 0.1);
-    offsetLayout->setStretch(4, 1);
-
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
     QToolButton* buttonNewLine = new QToolButton;
     buttonNewLine->setDefaultAction(m_ui->actionPrintAndCutNew);
@@ -1893,6 +1878,30 @@ void LaserControllerWindow::createPrintAndCutPanel()
     buttonsLayout->addWidget(buttonClear);
     pointsLayout->addLayout(buttonsLayout);
     m_groupBoxPrintAndCutPoints->setLayout(pointsLayout);
+
+    m_groupBoxRedLightAlignment = new QGroupBox;
+    m_groupBoxRedLightAlignment->setTitle(tr("Red Light Alignment"));
+    QVBoxLayout* redLightAlignmentLayout = new QVBoxLayout;
+    redLightAlignmentLayout->setMargin(2);
+    m_groupBoxRedLightAlignment->setLayout(redLightAlignmentLayout);
+    QFormLayout* redLightAlignmentInfoLayout = new QFormLayout;
+    m_labelRedLightAlignmentFirst = new QLabel;
+    m_labelRedLightAlignmentSecond = new QLabel;
+    m_labelPrintAndCutOffset = new QLabel;
+    redLightAlignmentInfoLayout->addRow(tr("1st Point"), m_labelRedLightAlignmentFirst);
+    redLightAlignmentInfoLayout->addRow(tr("2nd Point"), m_labelRedLightAlignmentSecond);
+    redLightAlignmentInfoLayout->addRow(tr("Offset"), m_labelPrintAndCutOffset);
+    QHBoxLayout* redLightOperationsLayout = new QHBoxLayout;
+    m_buttonRedLightAlignmentStart = new QToolButton;
+    m_buttonRedLightAlignmentFinish = new QToolButton;
+    m_buttonRedLightAlignmentStart->setDefaultAction(m_ui->actionStartRedLightAlight);
+    m_buttonRedLightAlignmentFinish->setDefaultAction(m_ui->actionFinishRedLightAlight);
+    m_ui->actionStartRedLightAlight->setEnabled(true);
+    m_ui->actionFinishRedLightAlight->setEnabled(false);
+    redLightOperationsLayout->addWidget(m_buttonRedLightAlignmentStart);
+    redLightOperationsLayout->addWidget(m_buttonRedLightAlignmentFinish);
+    redLightAlignmentLayout->addLayout(redLightAlignmentInfoLayout);
+    redLightAlignmentLayout->addLayout(redLightOperationsLayout);
 
     m_groupBoxPrintAndCutResult = new QGroupBox;
     m_groupBoxPrintAndCutResult->setTitle(tr("Result"));
@@ -1921,6 +1930,7 @@ void LaserControllerWindow::createPrintAndCutPanel()
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(m_groupBoxPrintAndCutPoints);
+    layout->addWidget(m_groupBoxRedLightAlignment);
     layout->addWidget(m_groupBoxPrintAndCutResult);
 
     QWidget* panelWidget = new QWidget;
@@ -2299,6 +2309,11 @@ void LaserControllerWindow::dockPanelOnlyShowIcon(CDockWidget* dockWidget, QPixm
     connect(tab, &CDockWidgetTab::activeTabChanged, this, [=] {
         tab->closeButton()->setVisible(false);
     });
+}
+
+PointPairList LaserControllerWindow::printAndCutPoints() const
+{
+    return m_tablePrintAndCutPoints->pointPairs();
 }
 
 LaserDocument* LaserControllerWindow::currentDocument() const
@@ -3364,19 +3379,56 @@ void LaserControllerWindow::onActionPrintAndCutFetchLaser(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
 {
+    //emit startPrintAndCut();
     if (m_scene->selectedPrimitives().count() != 1)
         return;
 
-    LaserPrimitive* primitive = m_scene->selectedPrimitives().first();
-    LaserRect* laserRect = dynamic_cast<LaserRect*>(primitive);
+    LaserPrimitive* rectPrimitive = m_scene->selectedPrimitives().first();
+    LaserRect* laserRect = dynamic_cast<LaserRect*>(rectPrimitive);
     if (!laserRect)
         return;
 
     QRectF bounding = laserRect->sceneBoundingRect();
-    QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
+    QRectF littleBounding(
+        bounding.topLeft() + QPointF(bounding.width() * 0.05, bounding.height() * 0.05),
+        QSizeF(bounding.width() * 0.9, bounding.height() * 0.9));
+    //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
+
+    QPainterPath rectPath;
+    rectPath.addRect(bounding);
+
+    QSet<LaserPrimitive*> primitives = m_scene->findPrimitivesByRect(bounding);
+    for (LaserPrimitive* primitive : primitives)
+    {
+        if (primitive == rectPrimitive)
+            continue;
+
+        qLogD << primitive->name();
+        QPainterPath path = primitive->getScenePath();
+        QPainterPath inter = rectPath.intersected(path);
+        if (inter.isEmpty())
+            continue;
+
+        for (int i = 0; i < inter.elementCount(); i++)
+        {
+            QPainterPath::Element e = inter.elementAt(i);
+            if (e.type == QPainterPath::MoveToElement || e.type == QPainterPath::LineToElement)
+            {
+                QPointF pt(e.x, e.y);
+                if (!littleBounding.contains(pt))
+                    continue;
+                QPointF ptCandidate(
+                    Global::convertToMM(SU_PX, pt.x()),
+                    Global::convertToMM(SU_PX, pt.y())
+                );
+                qLogD << "canvas point: " << pt << ", " << ptCandidate;
+                m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
+            }
+        }
+    }
 
     //Config::Ui::visualGridSpacing();
-    int gridContrast = Config::Ui::gridContrast();
+    /*int gridContrast = Config::Ui::gridContrast();
     bool showDocBounding = Config::Ui::showDocumentBoundingRect();
 
     Config::Ui::gridContrastItem()->setValue(0);
@@ -3425,8 +3477,8 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     }
 
     Config::Ui::gridContrastItem()->setValue(gridContrast);
-    Config::Ui::showDocumentBoundingRectItem()->setValue(showDocBounding);
-    m_viewer->update();
+    Config::Ui::showDocumentBoundingRectItem()->setValue(showDocBounding);*/
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutRemove(bool checked)
@@ -3454,7 +3506,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     if (pointPairs.length() < 2)
         return;
 
-    QTransform t = utils::leastSquare4d(pointPairs, QPointF(m_doubleSpinBoxPrintAndCutOffsetX->value(), m_doubleSpinBoxPrintAndCutOffsetY->value()));
+    QTransform t = utils::leastSquare4d(pointPairs, Config::Device::redLightOffset());
 
     QLineF l1(0, 0, 1, 0);
     QLineF l2 = t.map(l1);
@@ -3475,6 +3527,55 @@ void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 {
     m_scene->document()->setEnablePrintAndCut(false);
     m_scene->document()->setPrintAndCutTransform(QTransform());
+}
+
+void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
+{
+}
+
+void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
+{
+}
+
+void LaserControllerWindow::onActionRedLightAlignmentStart(bool checked)
+{
+    if (m_ui->actionStartRedLightAlight->isEnabled())
+    {
+        m_ui->actionStartRedLightAlight->setEnabled(false);
+        m_ui->actionFinishRedLightAlight->setEnabled(true);
+        m_redLightAlignment1stPt = LaserApplication::device->getCurrentLaserPositionMachining();
+        qreal x = m_redLightAlignment1stPt.x() / Config::General::machiningUnit();
+        qreal y = m_redLightAlignment1stPt.y() / Config::General::machiningUnit();
+        m_labelRedLightAlignmentFirst->setText(tr("x: %1, y: %2")
+            .arg(x, 8, 'f', 2, QLatin1Char(' '))
+            .arg(y, 8, 'f', 2, QLatin1Char(' ')));
+    }
+}
+
+void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
+{
+    if (m_ui->actionFinishRedLightAlight->isEnabled())
+    {
+        m_ui->actionStartRedLightAlight->setEnabled(true);
+        m_ui->actionFinishRedLightAlight->setEnabled(false);
+        m_redLightAlignment2ndPt = LaserApplication::device->getCurrentLaserPositionMachining();
+
+        qreal x = m_redLightAlignment2ndPt.x() / Config::General::machiningUnit();
+        qreal y = m_redLightAlignment2ndPt.y() / Config::General::machiningUnit();
+        m_labelRedLightAlignmentSecond->setText(tr("x: %1, y: %2")
+            .arg(x, 8, 'f', 2, QLatin1Char(' '))
+            .arg(y, 8, 'f', 2, QLatin1Char(' ')));
+
+        Config::Device::redLightOffsetItem()->setValue(
+            m_redLightAlignment2ndPt - m_redLightAlignment1stPt
+        );
+
+        x = Config::Device::redLightOffset().x() / Config::General::machiningUnit();
+        y = Config::Device::redLightOffset().y() / Config::General::machiningUnit();
+        m_labelPrintAndCutOffset->setText(tr("x: %1, y: %2")
+            .arg(x, 8, 'f', 2, QLatin1Char(' '))
+            .arg(y, 8, 'f', 2, QLatin1Char(' ')));
+    }
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -4725,6 +4826,14 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentEmptyState);
 	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", true, documentIdleState);
     // end actionAnalysisDocument
+
+    // actionPrintAndCutFetchCanvas
+	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, initState);
+	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentEmptyState);
+	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentIdleState);
+	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, documentIdleState);
+	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentPrintAndCutState);
+    // end actionPrintAndCutFetchCanvas
 
     // actionPathOptimization
     //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);

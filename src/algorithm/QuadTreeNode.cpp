@@ -12,7 +12,7 @@ QuadTreeNode::QuadTreeNode(QRectF region, int depth)
 {
     m_region = region;
     m_depth = depth;
-    //×Ó½ÚµãÇøÓò
+    //ï¿½Ó½Úµï¿½ï¿½ï¿½ï¿½ï¿½
     qreal widthHalf = region.width() * 0.5;
     qreal heightHalf = region.height() * 0.5;
     qreal left = region.left();
@@ -53,7 +53,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
     //point
     if (bound.width() == 0 && bound.height() == 0) {
         QPointF p = bound.topLeft();
-        //ÇøÓò°üº¬Í¼Ôª
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôª
         if (m_topLeftRegion.contains(p)) {
             createNode(Qt::TopLeftCorner);
             //m_nodeTopLeft->addPrimitive(primitive);
@@ -80,7 +80,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
         QPointF p1 = bound.topLeft();
         QPointF p2 = bound.bottomRight();
         QLineF line(p1, p2);
-        //ÇøÓò°üº¬Í¼Ôª
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôª
         if (m_topLeftRegion.contains(p1) && m_topLeftRegion.contains(p2)) {
             createNode(Qt::TopLeftCorner);
             //m_nodeTopLeft->addPrimitive(primitive);
@@ -146,7 +146,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
     }
     //rect
     else {
-        //ÇøÓò°üº¬Í¼Ôª
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôª
         if (m_topLeftRegion.contains(bound)) {
             createNode(Qt::TopLeftCorner);
             //m_nodeTopLeft->addPrimitive(primitive);
@@ -178,48 +178,48 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
         }
         else {
             if (bound.contains(m_topLeftRegion)) {
-                //Í¼Ôª°üº¬½ÚµãÇøÓò
+                //Í¼Ôªï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
                 createNode(Qt::TopLeftCorner);
                 m_nodeTopLeft->addPrimitive(primitive);
             }
             else if (m_topLeftRegion.intersects(bound)) {
-                //ÇøÓòÓëÍ¼ÔªÏà½»
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôªï¿½à½»
                 createNode(Qt::TopLeftCorner);
                 //m_nodeTopLeft->addPrimitive(primitive);
                 m_nodeTopLeft->createChildrenNodes(primitive);
             }
 
             if (bound.contains(m_topRightRegion)) {
-                //Í¼Ôª°üº¬½ÚµãÇøÓò
+                //Í¼Ôªï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
                 createNode(Qt::TopRightCorner);
                 m_nodeTopRight->addPrimitive(primitive);
             }
             else if (m_topRightRegion.intersects(bound)) {
-                //ÇøÓòÓëÍ¼ÔªÏà½»
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôªï¿½à½»
                 createNode(Qt::TopRightCorner);
                 //m_nodeTopRight->addPrimitive(primitive);
                 m_nodeTopRight->createChildrenNodes(primitive);
             }
 
             if (bound.contains(m_bottomRightRegion)) {
-                //Í¼Ôª°üº¬½ÚµãÇøÓò
+                //Í¼Ôªï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
                 createNode(Qt::BottomRightCorner);
                 m_nodeBottomRight->addPrimitive(primitive);
             }
             else if (m_bottomRightRegion.intersects(bound)) {
-                //ÇøÓòÓëÍ¼ÔªÏà½»
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôªï¿½à½»
                 createNode(Qt::BottomRightCorner);
                 //m_nodeBottomRight->addPrimitive(primitive);
                 m_nodeBottomRight->createChildrenNodes(primitive);
             }
 
             if (bound.contains(m_bottomLeftRegion)) {
-                //Í¼Ôª°üº¬½ÚµãÇøÓò
+                //Í¼Ôªï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
                 createNode(Qt::BottomLeftCorner);
                 m_nodeBottomLeft->addPrimitive(primitive);
             }
             else if (m_bottomLeftRegion.intersects(bound)) {
-                //ÇøÓòÓëÍ¼ÔªÏà½»
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ôªï¿½à½»
                 createNode(Qt::BottomLeftCorner);
                 //m_nodeBottomLeft->addPrimitive(primitive);
                 m_nodeBottomLeft->createChildrenNodes(primitive);
@@ -270,7 +270,7 @@ QList<QuadTreeNode*>& QuadTreeNode::search(QRectF selection)
             if (!node->primitiveList().isEmpty()) {
                 m_targetNodes.append(node);
             }
-            //²éÕÒ×Ó½Úµã
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½
             if (node->m_nodeTopLeft) {
                 stack.push(node->m_nodeTopLeft);
             }
@@ -289,7 +289,7 @@ QList<QuadTreeNode*>& QuadTreeNode::search(QRectF selection)
                 m_targetNodes.append(node);
             }
             else {
-                //²éÕÒ×Ó½Úµã
+                //ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½
                 if (node->m_nodeTopLeft) {
                     stack.push(node->m_nodeTopLeft);
                 }
@@ -310,7 +310,7 @@ QList<QuadTreeNode*>& QuadTreeNode::search(QRectF selection)
                 m_targetNodes.append(node);
 
             }
-            //²éÕÒ×Ó½Úµã
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½
             if (node->m_nodeTopLeft) {
                 stack.push(node->m_nodeTopLeft);
             }

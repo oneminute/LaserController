@@ -124,17 +124,15 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
 		painter.drawRect(deviceOriginRect);
 
-		if (scene()->document() && scene()->document()->enablePrintAndCut())
-		{
-			for (const PointPair& pair : scene()->document()->printAndCutPointPairs())
-			{
-				QPointF canvasPoint(Global::mm2PixelsXF(pair.second.x()), Global::mm2PixelsYF(pair.second.y()));
-                painter.setPen(QPen(Qt::red, 2));
-                canvasPoint = mapFromScene(canvasPoint);
-                QRectF canvasPointRect(canvasPoint - QPointF(2, 2), canvasPoint + QPointF(2, 2));
-                painter.drawRect(canvasPointRect);
-			}
-		}
+        PointPairList pairs = LaserApplication::mainWindow->printAndCutPoints();
+        for (const PointPair& pair : pairs)
+        {
+            QPointF canvasPoint(Global::mm2PixelsXF(pair.second.x()), Global::mm2PixelsYF(pair.second.y()));
+            painter.setPen(QPen(Qt::red, 2));
+            canvasPoint = mapFromScene(canvasPoint);
+            QRectF canvasPointRect(canvasPoint - QPointF(2, 2), canvasPoint + QPointF(2, 2));
+            painter.drawRect(canvasPointRect);
+        }
 	}
 
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
@@ -1314,16 +1312,16 @@ bool LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter
 void LaserViewer::resizeEvent(QResizeEvent * event)
 {
     if (!m_scene->document()) {
+return;
+    }
+    LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+    if (!backgroundItem) {
         return;
     }
-	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-	if (!backgroundItem) {
-		return;
-	}
-	//QPointF fitInRectTopLeft = mapFromScene(backgroundItem->pos());
-	QGraphicsView::resizeEvent(event);
+    //QPointF fitInRectTopLeft = mapFromScene(backgroundItem->pos());
+    QGraphicsView::resizeEvent(event);
     qreal scale = adapterViewScale();
-    zoomBy(scale/zoomValue(), mapTo(this,mapFromScene(backgroundItem->rect().center().toPoint())), true);
+    zoomBy(scale / zoomValue(), mapTo(this, mapFromScene(backgroundItem->rect().center().toPoint())), true);
     viewport()->repaint();
 }
 
@@ -1345,232 +1343,238 @@ void LaserViewer::enterEvent(QEvent* event)
 
 void LaserViewer::mousePressEvent(QMouseEvent* event)
 {
-// 处理鼠标左键
+    // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
-		m_mousePressState = nullptr;
-		//qDebug() << mapFromGlobal(QCursor::pos());
-		//qDebug() << mapToScene(mapFromGlobal(QCursor::pos()));
-		//附近的图元交点
-		/*if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
-			bool isEdgeSpecailPoint = false;
-			if (detectIntersectionByMouse(intersePoint, point, isEdgeSpecailPoint)) {
-				point = intersePoint;
-			}
-		}*/
-			
+        m_mousePressState = nullptr;
+        //qDebug() << mapFromGlobal(QCursor::pos());
+        //qDebug() << mapToScene(mapFromGlobal(QCursor::pos()));
+        //附近的图元交点
+        /*if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
+            bool isEdgeSpecailPoint = false;
+            if (detectIntersectionByMouse(intersePoint, point, isEdgeSpecailPoint)) {
+                point = intersePoint;
+            }
+        }*/
+
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
-			m_mousePressState = StateControllerInst.documentIdleState();
-			m_detectedPrimitive = nullptr;
-			m_detectedBitmap = nullptr;
-			//点击选中图元
-			if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
-				//undo
-				//qDebug()<<m_group->childItems();
-				selectionUndoStackPushBefore();
-				
-				//clearGroupSelection();
-				m_detectedPrimitive->setSelected(true);
-				if (onSelectedFillGroup()) {
-					m_curSelectedHandleIndex = 13;
-					emit beginIdelEditing();
-				}
-				//undo before
-				transformUndoStackPushBefore();
-				//undo redo
-				selectionUndoStackPush();
+            m_mousePressState = StateControllerInst.documentIdleState();
+            m_detectedPrimitive = nullptr;
+            m_detectedBitmap = nullptr;
+            //点击选中图元
+            if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
+                //undo
+                //qDebug()<<m_group->childItems();
+                selectionUndoStackPushBefore();
+
+                //clearGroupSelection();
+                m_detectedPrimitive->setSelected(true);
+                if (onSelectedFillGroup()) {
+                    m_curSelectedHandleIndex = 13;
+                    emit beginIdelEditing();
+                }
+                //undo before
+                transformUndoStackPushBefore();
+                //undo redo
+                selectionUndoStackPush();
                 //选取区域的属性面板
                 LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
-				return;
-			}
-			else {
-				//detectBitmapByMouse(m_detectedBitmap, event->pos());
-				//QGraphicsView::mousePressEvent(event);
-				//点击选中图片
-				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
-					//clearGroupSelection();
-					//undo
-					selectionUndoStackPushBefore();
-					//transformUndoStackPushBefore();
-					m_detectedBitmap->setSelected(true);
-					if (onSelectedFillGroup()) {
-						m_curSelectedHandleIndex = 14;
-						emit beginIdelEditing();
-					}
-					//undo before
-					transformUndoStackPushBefore();
-					//undo redo
-					selectionUndoStackPush();
+                return;
+            }
+            else {
+                //detectBitmapByMouse(m_detectedBitmap, event->pos());
+                //QGraphicsView::mousePressEvent(event);
+                //点击选中图片
+                if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+                    //clearGroupSelection();
+                    //undo
+                    selectionUndoStackPushBefore();
+                    //transformUndoStackPushBefore();
+                    m_detectedBitmap->setSelected(true);
+                    if (onSelectedFillGroup()) {
+                        m_curSelectedHandleIndex = 14;
+                        emit beginIdelEditing();
+                    }
+                    //undo before
+                    transformUndoStackPushBefore();
+                    //undo redo
+                    selectionUndoStackPush();
                     //选取区域的属性面板
                     LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
-					return;
-				}
-				// 获取选框起点
-				m_selectionStartPoint = event->pos();
-				m_selectionEndPoint = m_selectionStartPoint;
-				qDebug() << "begin to select";
-				emit beginSelecting();
-			}
-            
+                    return;
+                }
+                // 获取选框起点
+                m_selectionStartPoint = event->pos();
+                m_selectionEndPoint = m_selectionStartPoint;
+                qDebug() << "begin to select";
+                emit beginSelecting();
+            }
+        }
+        else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+        {
+            // 获取选框起点
+            m_selectionStartPoint = event->pos();
+            m_selectionEndPoint = m_selectionStartPoint;
+            emit beginSelecting();
         }
         // 若在DocumentSelected状态下
         else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-			m_mousePressState = StateControllerInst.documentSelectedState();
-			
-			//
-			m_detectedPrimitive = nullptr;
-			m_detectedBitmap = nullptr;
+            m_mousePressState = StateControllerInst.documentSelectedState();
+
+            //
+            m_detectedPrimitive = nullptr;
+            m_detectedBitmap = nullptr;
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
             {
-				m_selectedRect = selectedItemsSceneBoundingRect();
-				m_oldTransform = m_group->transform();
-				m_rate = 1;
-				m_isItemScaleChangeX = true;
-				m_isItemScaleChangeY = true;
-				QRectF boundRect = selectedItemsSceneBoundingRect();
-				qLogD << "group bounding rect: " << boundRect;
-				switch (m_curSelectedHandleIndex)
-				{
-					case 0: {
-						m_origin = m_mousePoint;
-					}
-					//scale
-					case 1: {
-						m_origin = boundRect.bottomRight();
-						break;
-					}
-					
-					case 4: {
-						m_origin = boundRect.bottomLeft();
-						break;
-					}
-					case 7: {
-						m_origin = boundRect.topLeft();
-						break;
-					}
-					case 10: {
-						m_origin = boundRect.topRight();
-						break;
-						
-					}
-					//stecth
-					case 3: {//top
-						m_origin = boundRect.bottomLeft();
-						break;
-					}
-					case 6: {//right
-						m_origin = boundRect.topLeft();
-						break;
-					}
-					case 9: {//bottom
-						m_origin = boundRect.topLeft();
-						break;
-					}
-					case 12: {//left
-						m_origin = boundRect.topRight();
-						break;
-					}
-					//rotate
-					case 2:
-					case 5:
-					case 8:
-					case 11: {
-						m_origin = boundRect.center();
-						m_newOrigin = m_group->mapFromScene(m_origin);
-						break;
-					}
+                m_selectedRect = selectedItemsSceneBoundingRect();
+                m_oldTransform = m_group->transform();
+                m_rate = 1;
+                m_isItemScaleChangeX = true;
+                m_isItemScaleChangeY = true;
+                QRectF boundRect = selectedItemsSceneBoundingRect();
+                qLogD << "group bounding rect: " << boundRect;
+                switch (m_curSelectedHandleIndex)
+                {
+                case 0: {
+                    m_origin = m_mousePoint;
+                }
+                      //scale
+                case 1: {
+                    m_origin = boundRect.bottomRight();
+                    break;
+                }
 
-				}
-				//undo
-				//m_undoTransform = m_group->sceneTransform();
-				transformUndoStackPushBefore();
+                case 4: {
+                    m_origin = boundRect.bottomLeft();
+                    break;
+                }
+                case 7: {
+                    m_origin = boundRect.topLeft();
+                    break;
+                }
+                case 10: {
+                    m_origin = boundRect.topRight();
+                    break;
+
+                }
+                       //stecth
+                case 3: {//top
+                    m_origin = boundRect.bottomLeft();
+                    break;
+                }
+                case 6: {//right
+                    m_origin = boundRect.topLeft();
+                    break;
+                }
+                case 9: {//bottom
+                    m_origin = boundRect.topLeft();
+                    break;
+                }
+                case 12: {//left
+                    m_origin = boundRect.topRight();
+                    break;
+                }
+                       //rotate
+                case 2:
+                case 5:
+                case 8:
+                case 11: {
+                    m_origin = boundRect.center();
+                    m_newOrigin = m_group->mapFromScene(m_origin);
+                    break;
+                }
+
+                }
+                //undo
+                //m_undoTransform = m_group->sceneTransform();
+                transformUndoStackPushBefore();
                 emit beginSelectedEditing();
-			}
-			else if(detectItemByMouse(m_detectedPrimitive, event->pos())){
-				//undo before
-				selectionUndoStackPushBefore();
-				pointSelectWhenSelectedState(13, m_detectedPrimitive);
-				//undo redo
-				selectionUndoStackPush();
-				//undo before
-				if (m_group->isAncestorOf(m_detectedPrimitive)) {
-					transformUndoStackPushBefore();
-				}
-				else {
-					transformUndoStackPushBefore(m_detectedPrimitive);
-				}
-			}
-			
+            }
+            else if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
+                //undo before
+                selectionUndoStackPushBefore();
+                pointSelectWhenSelectedState(13, m_detectedPrimitive);
+                //undo redo
+                selectionUndoStackPush();
+                //undo before
+                if (m_group->isAncestorOf(m_detectedPrimitive)) {
+                    transformUndoStackPushBefore();
+                }
+                else {
+                    transformUndoStackPushBefore(m_detectedPrimitive);
+                }
+            }
+
             else
             {
-				m_detectedBitmap = nullptr;
-				
-				//QGraphicsView::mousePressEvent(event);
-				//事件被Item截断 图片点选
-				if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
-					//undo before
-					selectionUndoStackPushBefore();
-					pointSelectWhenSelectedState(14, m_detectedBitmap);
-					//undo redo
-					selectionUndoStackPush();
-					//undo before
-					if (m_group->isAncestorOf(m_detectedBitmap)) {
-						transformUndoStackPushBefore();
-					}
-					else {
-						transformUndoStackPushBefore(m_detectedBitmap);
-					}
-					return;
-				}
-				m_selectionStartPoint = event->pos();
-				m_selectionEndPoint = m_selectionStartPoint;
-				emit beginSelecting();
+                m_detectedBitmap = nullptr;
+
+                //QGraphicsView::mousePressEvent(event);
+                //事件被Item截断 图片点选
+                if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+                    //undo before
+                    selectionUndoStackPushBefore();
+                    pointSelectWhenSelectedState(14, m_detectedBitmap);
+                    //undo redo
+                    selectionUndoStackPush();
+                    //undo before
+                    if (m_group->isAncestorOf(m_detectedBitmap)) {
+                        transformUndoStackPushBefore();
+                    }
+                    else {
+                        transformUndoStackPushBefore(m_detectedBitmap);
+                    }
+                    return;
+                }
+                m_selectionStartPoint = event->pos();
+                m_selectionEndPoint = m_selectionStartPoint;
+                emit beginSelecting();
             }
         }
-		//View Drag Ready
-		else if (StateControllerInst.isInState(StateControllerInst.documentViewDragReadyState())) {
-			m_mousePressState = StateControllerInst.documentViewDragReadyState();
-			QPixmap cMap(":/ui/icons/images/dragging_hand.png");
-			this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
-			m_lastViewDragPoint = event->pos();
-			
-			emit beginViewDraging();
-		}
+        //View Drag Ready
+        else if (StateControllerInst.isInState(StateControllerInst.documentViewDragReadyState())) {
+            m_mousePressState = StateControllerInst.documentViewDragReadyState();
+            QPixmap cMap(":/ui/icons/images/dragging_hand.png");
+            this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
+            m_lastViewDragPoint = event->pos();
+
+            emit beginViewDraging();
+        }
         //Rect
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectReadyState()))
         {
-			m_mousePressState = StateControllerInst.documentPrimitiveRectReadyState();
-			QPointF point = mapToScene(event->pos());
+            m_mousePressState = StateControllerInst.documentPrimitiveRectReadyState();
+            QPointF point = mapToScene(event->pos());
             m_creatingRectStartPoint = point;
-			//
-			if (m_isPrimitiveInteractPoint) {
-				m_creatingRectStartPoint = m_primitiveInteractPoint;
-			}
-			//是否网格点
-			if (m_isGridNode) {
-				m_creatingRectStartPoint = m_gridNode;
-			}
+            //
+            if (m_isPrimitiveInteractPoint) {
+                m_creatingRectStartPoint = m_primitiveInteractPoint;
+            }
+            //是否网格点
+            if (m_isGridNode) {
+                m_creatingRectStartPoint = m_gridNode;
+            }
             m_creatingRectEndPoint = m_creatingRectStartPoint;
             emit creatingRectangle();
         }
         //Ellipse
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseReadyState()))
         {
-			m_mousePressState = StateControllerInst.documentPrimitiveEllipseReadyState();
+            m_mousePressState = StateControllerInst.documentPrimitiveEllipseReadyState();
             m_creatingEllipseStartPoint = mapToScene(event->pos());
-			if (m_isPrimitiveInteractPoint) {
-				m_creatingEllipseStartPoint = m_primitiveInteractPoint;
-			}
-			//是否网格点
-			if (m_isGridNode) {
-				m_creatingEllipseStartPoint = m_gridNode;
-			}
+            if (m_isPrimitiveInteractPoint) {
+                m_creatingEllipseStartPoint = m_primitiveInteractPoint;
+            }
+            //是否网格点
+            if (m_isGridNode) {
+                m_creatingEllipseStartPoint = m_gridNode;
+            }
             m_creatingEllipseStartInitPoint = m_creatingEllipseStartPoint;
             m_creatingEllipseEndPoint = m_creatingEllipseStartPoint;
-			m_EllipseEndPoint = m_creatingEllipseEndPoint;
+            m_EllipseEndPoint = m_creatingEllipseEndPoint;
             emit creatingEllipse();
         }
         //Line
@@ -1578,40 +1582,40 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         {
             m_creatingLineStartPoint = mapToScene(event->pos());
             m_creatingLineEndPoint = m_creatingLineStartPoint;
-            
+
         }*/
         //Polygon Ready
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
-			m_mousePressState = StateControllerInst.documentPrimitivePolygonReadyState();
-			m_lastPolygon = nullptr;
-			m_creatingPolygonPoints.clear();
+            m_mousePressState = StateControllerInst.documentPrimitivePolygonReadyState();
+            m_lastPolygon = nullptr;
+            m_creatingPolygonPoints.clear();
             //clear
             //m_creatingPolygonPoints.clear();
-			//m_creatingPolygonLines.clear();
+            //m_creatingPolygonLines.clear();
 
             //emit creatingPolygonStartRect();
         }
         //Spline
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineReadyState())) {
-			m_mousePressState = StateControllerInst.documentPrimitiveSplineReadyState();
+            m_mousePressState = StateControllerInst.documentPrimitiveSplineReadyState();
             initSpline();
             emit creatingSpline();
         }
         //Text
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {
-			m_mousePressState = StateControllerInst.documentPrimitiveTextReadyState();
+            m_mousePressState = StateControllerInst.documentPrimitiveTextReadyState();
             //addText();
             //emit creatingText();
             //m_textInputPoint = mapToScene(event->pos()).toPoint();
-			/*if (m_isPrimitiveInteractPoint) {
-				m_textInputPoint = m_primitiveInteractPoint.toPoint();
-			}
-			//是否网格点
-			if (m_isGridNode) {
-				m_textInputPoint = m_gridNode.toPoint();
-			}*/
+            /*if (m_isPrimitiveInteractPoint) {
+                m_textInputPoint = m_primitiveInteractPoint.toPoint();
+            }
+            //是否网格点
+            if (m_isGridNode) {
+                m_textInputPoint = m_gridNode.toPoint();
+            }*/
             //creatTextEdit();
-            
+
         }
         //Text
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextCreatingState())) {
@@ -1619,11 +1623,11 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             emit readyText();
             viewport()->repaint();
         }
-		else {
-			m_mousePressState = nullptr;
-			//QGraphicsView::mousePressEvent(event); 会使画线时出现Bug
-			//setInteractive(false);
-		}
+        else {
+            m_mousePressState = nullptr;
+            //QGraphicsView::mousePressEvent(event); 会使画线时出现Bug
+            //setInteractive(false);
+        }
     }
     else if (event->button() == Qt::RightButton) {
         m_mirrorLine = nullptr;
@@ -1682,9 +1686,14 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                 setCursor(Qt::ArrowCursor);
             }
         }
-		
-
-	}else if(StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
+	}
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+    {
+        m_selectionEndPoint = m_mousePoint;
+        m_isLeftSelecting = false;
+        viewport()->repaint();
+    }
+    else if(StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
 		//事件被Item截断
 		/*if (m_scene->mouseMoveBlock()) {
@@ -1940,8 +1949,29 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		
 		return;
 	}
+
+    
+    if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+    {
+        QGraphicsView::mouseReleaseEvent(event);
+        if (utils::checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
+        {
+            //点中空白且press与release同一个点
+            selectingReleaseInBlank();
+            //选取区域的属性面板
+            LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
+            return;
+        }
+
+        QRectF areaRect(m_selectionStartPoint, m_selectionEndPoint);
+        QSet<LaserPrimitive*> primitives = m_scene->findPrimitivesByRect(areaRect);
+        for (LaserPrimitive* primitive : primitives)
+        {
+            qLogD << primitive->name();
+        }
+    }
     //select
-    if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
+    else if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
 		QGraphicsView::mouseReleaseEvent(event);
         

@@ -26,6 +26,7 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_STATE(documentSelection, documentSelectedEditing);
     DEFINE_CHILD_STATE(documentWorking, documentTransforming);
     DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
+	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCut);
 
 	DEFINE_CHILD_INIT_STATE(documentViewDrag, documentViewDragReady);
 	DEFINE_CHILD_STATE(documentViewDrag, documentViewDraging);

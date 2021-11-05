@@ -389,7 +389,7 @@
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+2934"/>
+        <location line="+2941"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -399,7 +399,7 @@
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
     <message>
-        <location line="-2889"/>
+        <location line="-2896"/>
         <location line="+17"/>
         <source>English</source>
         <translation>英文</translation>
@@ -411,7 +411,7 @@
         <translation>中文</translation>
     </message>
     <message>
-        <location line="+2874"/>
+        <location line="+2881"/>
         <source>Unit</source>
         <translation>单位</translation>
     </message>
@@ -420,12 +420,12 @@
         <translation type="vanished">全局单位</translation>
     </message>
     <message>
-        <location line="-2856"/>
+        <location line="-2863"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location line="+2860"/>
+        <location line="+2867"/>
         <source>Machining Unit</source>
         <translation>加工单位</translation>
     </message>
@@ -2563,7 +2563,7 @@
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.h" line="+25"/>
+        <location filename="../src/common/Config.h" line="+26"/>
         <source>User Registers</source>
         <translation>用户寄存器</translation>
     </message>
@@ -3473,7 +3473,7 @@ Would you like to overwrite it?</source>
         <translation>工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1390"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1397"/>
         <source>Layers</source>
         <translation>图层</translation>
     </message>
@@ -3527,7 +3527,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="+192"/>
-        <location line="+2063"/>
+        <location line="+2157"/>
         <source>Operations</source>
         <translation>操作</translation>
     </message>
@@ -3569,8 +3569,8 @@ Would you like to overwrite it?</source>
         <translation type="vanished">优化</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1807"/>
-        <location line="+1808"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1901"/>
+        <location line="+1902"/>
         <source>Laser Power</source>
         <translation>激光功率</translation>
     </message>
@@ -3620,13 +3620,13 @@ Would you like to overwrite it?</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1848"/>
-        <location line="+196"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1942"/>
+        <location line="+199"/>
         <source>Movement</source>
         <translation>运动控制</translation>
     </message>
     <message>
-        <location line="-322"/>
+        <location line="-325"/>
         <source>Coordinates</source>
         <translatorcomment>坐标</translatorcomment>
         <translation>坐标</translation>
@@ -3712,7 +3712,7 @@ Would you like to overwrite it?</source>
         <translation>选点</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+50"/>
         <source>Result</source>
         <translation>结果</translation>
     </message>
@@ -3732,17 +3732,17 @@ Would you like to overwrite it?</source>
         <translation>0.00 度</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+26"/>
         <source>Print and Cut</source>
         <translation>选点切割</translation>
     </message>
     <message>
-        <location line="+1141"/>
+        <location line="+1146"/>
         <source>Do you want to save current document?</source>
         <translation>是否保存当前文档？</translation>
     </message>
     <message>
-        <location line="+586"/>
+        <location line="+672"/>
         <source>Pos X</source>
         <translation>水平坐标</translation>
     </message>
@@ -3757,7 +3757,7 @@ Would you like to overwrite it?</source>
         <translation>页面尺寸(mm)： %1x%2</translation>
     </message>
     <message>
-        <location line="-3446"/>
+        <location line="-3547"/>
         <source>X Pos</source>
         <translation>水平坐标</translation>
     </message>
@@ -3768,80 +3768,80 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+107"/>
-        <location line="+3267"/>
+        <location line="+3368"/>
         <source>Rotate</source>
         <translation>旋转</translation>
     </message>
     <message>
-        <location line="-3228"/>
+        <location line="-3329"/>
         <location line="+4"/>
-        <location line="+3226"/>
+        <location line="+3327"/>
         <location line="+3"/>
         <source>Middle</source>
         <translation>中间对齐</translation>
     </message>
     <message>
-        <location line="-3230"/>
-        <location line="+3229"/>
+        <location line="-3331"/>
+        <location line="+3330"/>
         <source>Top</source>
         <translation>顶部对齐</translation>
     </message>
     <message>
-        <location line="-3227"/>
-        <location line="+3229"/>
+        <location line="-3328"/>
+        <location line="+3330"/>
         <source>Bottom</source>
         <translation>底部对齐</translation>
     </message>
     <message>
-        <location line="-3219"/>
-        <location line="+3220"/>
+        <location line="-3320"/>
+        <location line="+3321"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location line="-3216"/>
-        <location line="+3218"/>
+        <location line="-3317"/>
+        <location line="+3319"/>
         <source>Align X</source>
         <translation>水平对齐</translation>
     </message>
     <message>
-        <location line="-3216"/>
-        <location line="+3217"/>
+        <location line="-3317"/>
+        <location line="+3318"/>
         <source>Align Y</source>
         <translation>垂直对齐</translation>
     </message>
     <message>
-        <location line="-3215"/>
-        <location line="+3216"/>
+        <location line="-3316"/>
+        <location line="+3317"/>
         <source>Spacing X</source>
         <translation>水平间隔</translation>
     </message>
     <message>
-        <location line="-3214"/>
-        <location line="+3215"/>
+        <location line="-3315"/>
+        <location line="+3316"/>
         <source>Spacing Y</source>
         <translation>垂直间隔</translation>
     </message>
     <message>
-        <location line="-3213"/>
-        <location line="+3214"/>
+        <location line="-3314"/>
+        <location line="+3315"/>
         <source>Bold</source>
         <translation>粗体</translation>
     </message>
     <message>
-        <location line="-3212"/>
-        <location line="+3213"/>
+        <location line="-3313"/>
+        <location line="+3314"/>
         <source>Italic</source>
         <translation>斜体</translation>
     </message>
     <message>
-        <location line="-3211"/>
-        <location line="+3212"/>
+        <location line="-3312"/>
+        <location line="+3313"/>
         <source>Upper Case</source>
         <translation>大写</translation>
     </message>
     <message>
-        <location line="-1925"/>
+        <location line="-2019"/>
         <source>User Origin 1</source>
         <translation>用户原点1</translation>
     </message>
@@ -3856,17 +3856,36 @@ Would you like to overwrite it?</source>
         <translation>用户原点3</translation>
     </message>
     <message>
-        <location line="+105"/>
         <source>Laser Offset: </source>
-        <translation>激光偏移:</translation>
+        <translation type="vanished">激光偏移:</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+124"/>
+        <source>Red Light Alignment</source>
+        <translation>红光校准</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>1st Point</source>
+        <translation>激光位置</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>2nd Point</source>
+        <translation>校准位置</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Offset</source>
+        <translation>红光补偿</translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>0.000, 0.000</source>
         <translation>0.000, 0.000</translation>
     </message>
     <message>
-        <location line="+582"/>
+        <location line="+588"/>
         <source>Importing</source>
         <translation>导入</translation>
     </message>
@@ -3882,7 +3901,14 @@ Would you like to overwrite it?</source>
         <translation>建立拓扑结构</translation>
     </message>
     <message>
-        <location line="+1560"/>
+        <location line="+297"/>
+        <location line="+16"/>
+        <location line="+10"/>
+        <source>x: %1, y: %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1331"/>
         <source>A document is opened.</source>
         <translation>当前已经有一个打开中的文档。</translation>
     </message>
@@ -3897,7 +3923,7 @@ Would you like to overwrite it?</source>
         <translation>合并</translation>
     </message>
     <message>
-        <location line="-3173"/>
+        <location line="-3275"/>
         <source>X Enabled</source>
         <translation>X轴使能</translation>
     </message>
@@ -3912,7 +3938,7 @@ Would you like to overwrite it?</source>
         <translation>Z轴使能</translation>
     </message>
     <message>
-        <location line="+1227"/>
+        <location line="+1235"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
@@ -3953,7 +3979,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">继电器3</translation>
     </message>
     <message>
-        <location line="-1247"/>
+        <location line="-1255"/>
         <source>Outline</source>
         <translation>大纲</translation>
     </message>
@@ -4020,7 +4046,7 @@ Would you like to overwrite it?</source>
         <location line="+15"/>
         <location line="+3"/>
         <location line="+929"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+3186"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+3288"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
@@ -4037,7 +4063,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2192"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2286"/>
         <location line="+5"/>
         <source>Remove Layer</source>
         <translation>删除图层</translation>
@@ -4292,8 +4318,8 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2187"/>
-        <location line="+3230"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2202"/>
+        <location line="+3331"/>
         <source>Left</source>
         <translation>左</translation>
     </message>
@@ -4304,8 +4330,8 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3228"/>
-        <location line="+3230"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3329"/>
+        <location line="+3331"/>
         <source>Right</source>
         <translation>右</translation>
     </message>
@@ -4630,7 +4656,27 @@ Would you like to overwrite it?</source>
         <translation>更新软件</translation>
     </message>
     <message>
-        <location line="-586"/>
+        <location line="+5"/>
+        <source>Start Red Light Alight</source>
+        <translation>开始红光校准</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Finish Red Light Alight</source>
+        <translation>结束红光校准</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Select Point</source>
+        <translation>开始选点</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>End Select</source>
+        <translation>结束选点</translation>
+    </message>
+    <message>
+        <location line="-606"/>
         <location line="+518"/>
         <source>Backspace</source>
         <translation>Ｂａｃｋｓｐａｃｅ</translation>
@@ -4730,7 +4776,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">保存原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3493"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3594"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
@@ -4739,7 +4785,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">提示</translation>
     </message>
     <message>
-        <location line="+3338"/>
+        <location line="+3439"/>
         <source>Unregistered</source>
         <translation>未注册</translation>
     </message>
@@ -4753,7 +4799,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">欢迎！</translation>
     </message>
     <message>
-        <location line="-3277"/>
+        <location line="-3378"/>
         <source>0,0</source>
         <translation></translation>
     </message>
@@ -4766,7 +4812,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">页面尺寸(mm): 210x320</translation>
     </message>
     <message>
-        <location line="+658"/>
+        <location line="+665"/>
         <source>Operate failure</source>
         <translation>操作失败</translation>
     </message>
@@ -4801,23 +4847,23 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-1094"/>
-        <location line="+1095"/>
-        <location line="+2240"/>
+        <location line="-1101"/>
+        <location line="+1102"/>
+        <location line="+2334"/>
         <source>Width</source>
         <translation>宽度</translation>
     </message>
     <message>
-        <location line="-3334"/>
+        <location line="-3435"/>
         <location line="+125"/>
-        <location line="+973"/>
-        <location line="+2237"/>
+        <location line="+980"/>
+        <location line="+2331"/>
         <location line="+9"/>
         <source>Height</source>
         <translation>长度</translation>
     </message>
     <message>
-        <location line="-2241"/>
+        <location line="-2335"/>
         <source>Show</source>
         <translation>显示</translation>
     </message>
@@ -4849,7 +4895,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">打开SVG文件</translation>
     </message>
     <message>
-        <location line="+950"/>
+        <location line="+958"/>
         <source>SVG (*.svg);;CAD (*.dxf)</source>
         <translation>SVG (*.svg);;CAD (*.dxf)</translation>
     </message>
@@ -4956,27 +5002,23 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>申请临时许可证失败。</translation>
     </message>
     <message>
-        <location line="+192"/>
         <source>No Feature points found</source>
-        <translation>没有找到特征点</translation>
+        <translation type="vanished">没有找到特征点</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>There&apos;s no features point found. Please move or scale your selection rect primitive.</source>
-        <translation>没有找到特征点。请移动或缩放您的矩形框。</translation>
+        <translation type="vanished">没有找到特征点。请移动或缩放您的矩形框。</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Too many feature points</source>
-        <translation>找到的特征点过多</translation>
+        <translation type="vanished">找到的特征点过多</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Too many reature points found. Please move or scale your selection rect primitive to confirm that only one feature point to be found.</source>
-        <translation>找到的特征点过多。请移动或缩放您的矩形框，确保只有一个特征点在选框内。</translation>
+        <translation type="vanished">找到的特征点过多。请移动或缩放您的矩形框，确保只有一个特征点在选框内。</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+285"/>
         <source>%1 degrees</source>
         <translation>%1 度</translation>
     </message>
@@ -4986,7 +5028,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+77"/>
         <source>Connected</source>
         <translation>已连接</translation>
     </message>
@@ -5006,7 +5048,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>已激活</translation>
     </message>
     <message>
-        <location line="-444"/>
+        <location line="-530"/>
         <source>Close document?</source>
         <translation>关闭文档？</translation>
     </message>
@@ -9410,7 +9452,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3697"/>
+        <location filename="../src/common/Config.cpp" line="-3704"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>

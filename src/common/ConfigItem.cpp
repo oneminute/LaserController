@@ -285,6 +285,8 @@ void ConfigItem::setAdvanced(bool advanced)
 bool ConfigItem::isVisible() const
 {
     Q_D(const ConfigItem);
+    if (readOnly())
+        return false;
     return d->visible;
 }
 

@@ -1352,6 +1352,26 @@
     <string>Update Software</string>
    </property>
   </action>
+  <action name="actionStartRedLightAlight">
+   <property name="text">
+    <string>Start Red Light Alight</string>
+   </property>
+  </action>
+  <action name="actionFinishRedLightAlight">
+   <property name="text">
+    <string>Finish Red Light Alight</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutSelectPoint">
+   <property name="text">
+    <string>Select Point</string>
+   </property>
+  </action>
+  <action name="actionPrintAndCutEndSelect">
+   <property name="text">
+    <string>End Select</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

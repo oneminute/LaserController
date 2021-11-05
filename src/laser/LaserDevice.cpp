@@ -1725,7 +1725,7 @@ void LaserDevice::onConnected()
     {
         d->driver->setFactoryType("EFSLaserController");
         //d->driver->stopMachining();
-        d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
+        //d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
         d->driver->getDeviceWorkState();
         //d->driver->getMainCardRegisterState();
         //QString compileInfo = d->driver->getCompileInfo();

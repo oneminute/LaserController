@@ -67,6 +67,8 @@ public:
     void setLastCornerRadiusValue(qreal val);
     qreal lastCornerRadiusValue();
     LaserDoubleSpinBox* fontSpaceYDoubleSpinBox();
+
+    PointPairList printAndCutPoints() const;
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -212,6 +214,10 @@ protected slots:
     void onActionPrintAndCutClear(bool checked = false);
     void onActionPrintAndCutAlign(bool checked = false);
     void onActionPrintAndCutRestore(bool checked = false);
+    void onActionPrintAndCutSelectPoint(bool checked = false);
+    void onActionPrintAndCutEndSelect(bool checked = false);
+    void onActionRedLightAlignmentStart(bool checked = false);
+    void onActionRedLightAlignmentFinish(bool checked = false);
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -295,6 +301,8 @@ signals:
 	void readySplineEdit();
 	void readyText();
 	void readyViewDrag();
+    void startPrintAndCut();
+    void finishPrintAndCut();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
@@ -459,9 +467,12 @@ private:
     // Print and Cut Panel
     QGroupBox* m_groupBoxPrintAndCutPoints;
     PointPairTableWidget* m_tablePrintAndCutPoints;
+    QGroupBox* m_groupBoxRedLightAlignment;
+    QLabel* m_labelRedLightAlignmentFirst;
+    QLabel* m_labelRedLightAlignmentSecond;
     QLabel* m_labelPrintAndCutOffset;
-    QDoubleSpinBox* m_doubleSpinBoxPrintAndCutOffsetX;
-    QDoubleSpinBox* m_doubleSpinBoxPrintAndCutOffsetY;
+    QToolButton* m_buttonRedLightAlignmentStart;
+    QToolButton* m_buttonRedLightAlignmentFinish;
     QGroupBox* m_groupBoxPrintAndCutResult;
     QLabel* m_labelPrintAndCutTranslationResult;
     QLabel* m_labelPrintAndCutRotationResult;
@@ -545,6 +556,9 @@ private:
     UpdateDialog* m_updateDialog;
 
     QFutureWatcher<LaserDocument*> m_watcher;
+
+    QPointF m_redLightAlignment1stPt;
+    QPointF m_redLightAlignment2ndPt;
 
     friend class LaserApplication;
 };

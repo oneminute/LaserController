@@ -41,6 +41,7 @@ public:
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
+    QSet<LaserPrimitive*> findPrimitivesByRect(const QRectF& rect);
 	void findSelectedByLine(QRectF rect);
 	void findSelectedByBoundingRect(QRectF rect);
     void selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive);

@@ -2,13 +2,13 @@
 #include "LaserApplication.h"
 #include "laser/LaserDriver.h"
 
-#ifdef _MSC_VER
-#    ifdef NDEBUG
-#        pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-#    else
-#        pragma comment(linker, "/SUBSYSTEM:CONSOLE")
-#    endif
-#endif
+//#ifdef _MSC_VER
+//#    ifdef NDEBUG
+//#        pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+//#    else
+//#        pragma comment(linker, "/SUBSYSTEM:CONSOLE")
+//#    endif
+//#endif
 
 int main(int argc, char *argv[])
 {
