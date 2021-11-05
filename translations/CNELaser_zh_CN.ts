@@ -3412,7 +3412,7 @@ Would you like to overwrite it?</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+2218"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+2219"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -5378,7 +5378,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>导出JSON文件</translation>
     </message>
     <message>
-        <location line="+181"/>
+        <location line="+182"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
@@ -5748,7 +5748,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserEllipse</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="-1477"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="-1478"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -5780,57 +5780,72 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+9"/>
-        <location line="+248"/>
+        <location line="+282"/>
         <source>Cutting</source>
         <translation>切割</translation>
     </message>
     <message>
-        <location line="-241"/>
+        <location line="-275"/>
         <location line="+61"/>
         <source>Engraving</source>
         <translation>雕刻</translation>
     </message>
     <message>
         <location line="-51"/>
-        <location line="+168"/>
+        <location line="+175"/>
         <source>Filling</source>
         <translation>矢量填充</translation>
     </message>
     <message>
-        <location line="-97"/>
-        <location line="+103"/>
-        <location line="+63"/>
+        <location line="-104"/>
+        <location line="+110"/>
+        <location line="+90"/>
         <source>Speed(mm/s)</source>
         <translation>切割速度（mm/s)</translation>
     </message>
     <message>
-        <location line="-146"/>
-        <location line="+93"/>
-        <location line="+63"/>
+        <location line="-180"/>
+        <location line="+100"/>
+        <location line="+90"/>
         <source>Min Power(%)</source>
         <translation>最小功率(%)</translation>
     </message>
     <message>
-        <location line="-146"/>
-        <location line="+93"/>
-        <location line="+63"/>
+        <location line="-180"/>
+        <location line="+100"/>
+        <location line="+90"/>
         <source>Max Power(%)</source>
         <translation>最大功率(%)</translation>
     </message>
     <message>
-        <location line="-200"/>
-        <location line="+157"/>
+        <location line="-53"/>
+        <source>Filling Type</source>
+        <translation>填充类型</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Line</source>
+        <translation>线段填充</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Pixel</source>
+        <translation>像素填充</translation>
+    </message>
+    <message>
+        <location line="-197"/>
+        <location line="+164"/>
         <source>Enable Cutting</source>
         <translation>切割外轮廓</translation>
     </message>
     <message>
-        <location line="-133"/>
+        <location line="-140"/>
         <source>Power</source>
         <translation>雕刻功率(%)</translation>
     </message>
     <message>
         <location line="+30"/>
-        <location line="+93"/>
+        <location line="+100"/>
         <source>Row Interval(um)</source>
         <translation>行间距</translation>
     </message>
@@ -5839,7 +5854,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">切割+雕刻</translation>
     </message>
     <message>
-        <location line="-176"/>
+        <location line="-183"/>
         <source>Layer Name</source>
         <translation>图层名称</translation>
     </message>
@@ -5890,7 +5905,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>半色调网屏？</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+31"/>
         <source>LPI</source>
         <translation>每英寸线数</translation>
     </message>
@@ -6104,7 +6119,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+1989"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+1988"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -9470,7 +9485,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">激光控制器</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="-591"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="-589"/>
         <source>Relays: </source>
         <translation>限位器： </translation>
     </message>
@@ -9639,7 +9654,7 @@ Do you want to delete it anyway?</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-836"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-837"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>

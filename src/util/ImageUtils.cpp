@@ -558,15 +558,6 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
     cv::warpAffine(src, rotated, rot, cv::Size(rotatedWidth, rotatedHeight), cv::INTER_NEAREST, 0, cv::Scalar(255));
     cv::imwrite("tmp/h6_rotated.bmp", rotated);
 
-    //cv::Mat bilateraled;
-    //cv::bilateralFilter(rotated, bilateraled, gridSize, Config::Export::a(), Config::Export::b(), cv::BORDER_ISOLATED);
-    //cv::imwrite("tmp/h6_bilateral.bmp", bilateraled);
-    //rotated = bilateraled;
-
-    cv::Mat canvas;
-    cv::cvtColor(rotated, canvas, cv::COLOR_GRAY2BGR);
-    cv::imwrite("tmp/h6_canvas1.bmp", canvas);
-
     cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
     int gridCols = qCeil(dst.cols * 1.0 / gridSize);
     int gridRows = qCeil(dst.rows * 1.0 / gridSize);
@@ -583,7 +574,6 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
                 progress->increaseProgress();
                 continue;
             }
-            //cv::rectangle(dst, cv::Rect(x - dx / 2, y - dy / 2, dx, dy), cv::Scalar(0));
 
             QRect qRectSrc(x, y, gridSize, gridSize);
             qRectSrc.setLeft(qMax(0, qRectSrc.left()));
@@ -610,8 +600,6 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
             cv::Rect rectSrc(qRectSrc.x(), qRectSrc.y(), qRectSrc.width(), qRectSrc.height());
             cv::Rect rectDst(qRectDst.x(), qRectDst.y(), qRectDst.width(), qRectDst.height());
 
-            cv::rectangle(canvas, rectSrc, cv::Scalar(255, 0, 0));
-
             cv::Mat srcRoi = rotated(rectSrc);
             cv::Mat dstRoi = dst(rectDst);
 
@@ -623,14 +611,6 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
 
             QPoint drawCenter = center + QPoint(x, y);
             //cv::circle(canvas, cv::Point(drawCenter.x(), drawCenter.y()), 1, cv::Scalar(0, 0, 255));
-            canvas.ptr<cv::Vec3b>(drawCenter.y())[drawCenter.x()] = cv::Vec3b(0, 0, 255);
-            //qreal def = sum * 1.0 / full * 2;
-            //qreal val = 1 / (1 + qPow(M_E, -3 * (def - 1)));
-            //qreal def = sum * 1.0 / full;
-            //qreal val = 0.5 * qCos(M_PI * def - M_PI) + 0.5;
-            //qreal def = sum * 1.0 / full;
-            //qreal val = 1.4 * qAsin(2 * def - 1) / M_PI + 0.5;
-            //sum = qRound(val * full);
 
             int initAngle = QRandomGenerator::global()->bounded(4) * 90;
             int rotationAngle = 90/* + 45 * QRandomGenerator::global()->bounded(2)*/;
@@ -645,13 +625,8 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
             progress->increaseProgress();
         }
     }
-    cv::imwrite("tmp/h6_canvas2.bmp", canvas);
 
     std::vector<int>param; 
-    //param.push_back(cv::IMWRITE_PNG_BILEVEL);
-    //param.push_back(1);
-    //param.push_back(cv::IMWRITE_PNG_COMPRESSION);
-    //param.push_back(0);
     cv::imwrite("tmp/h6_dst.bmp", dst);
 
     cv::Mat outMat(dst.rows, dst.cols, CV_8UC1, cv::Scalar(0));
@@ -1008,13 +983,6 @@ void imageUtils::generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi)
 
 void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int initAngle, int rotationAngle, int stepAngle)
 {
-    /*int x = dstRoi.cols / 2;
-    int y = dstRoi.rows / 2;
-    if (dstRoi.cols > 2)
-        x -= QRandomGenerator::global()->bounded(2);
-    if (dstRoi.rows > 2)
-        y -= QRandomGenerator::global()->bounded(2);*/
-
     dstRoi.setTo(cv::Scalar(0));
 
     QTransform initTrans;

@@ -2111,7 +2111,8 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
     cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight), 0.0, 0.0, cv::INTER_NEAREST);
 
     cv::Mat halfToneMat = src;
-    if (layer()->useHalftone())
+    halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
+    /*if (layer()->useHalftone())
     {
         switch (Config::Export::halfToneStyle())
         {
@@ -2125,7 +2126,7 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
             halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
             break;
         }
-    }
+    }*/
 
     qreal pixelInterval = layer()->engravingRowInterval();
 
@@ -2374,32 +2375,31 @@ QByteArray LaserShape::engravingImage(ProgressItem* progress)
     Q_D(LaserShape);
     QByteArray bytes;
     QPainterPath path = toMachiningPath();
-    QRectF boundRect = path.boundingRect();
+    QTransform t = QTransform::fromScale(
+        1.0 / Config::General::machiningUnit(),
+        1.0 / Config::General::machiningUnit()
+    );
 
-    int dpi = d->layer->dpi();
+    path = t.map(path);
+    QRectF boundRect = path.boundingRect();
+    t = QTransform::fromTranslate(-boundRect.x(), -boundRect.y());
+    path = t.map(path);
+    QPixmap canvas(boundRect.size().toSize());
+    QPainter painter(&canvas);
+    painter.setBrush(Qt::black);
+    //QPen pen(Qt::black, 1);
+    //painter.setPen(pen);
+    painter.drawPath(path);
+
+    canvas.save("tmp/" + name() + ".png");
+
+    /*int dpi = d->layer->dpi();
     int pixelWidth = qRound(boundRect.width() * MM_TO_INCH * dpi);
     int pixelHeight = qRound(boundRect.height() * MM_TO_INCH * dpi);
 
     int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
 
     cv::Mat pixelScaled(pixelHeight, pixelWidth, CV_8UC1, cv::Scalar(0));
-
-    cv::Mat halfToneMat = pixelScaled;
-    if (layer()->useHalftone())
-    {
-        switch (Config::Export::halfToneStyle())
-        {
-        case 0:
-            halfToneMat = imageUtils::halftone4(progress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
-            break;
-        case 1:
-            halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);
-            break;
-        case 2:
-            halfToneMat = imageUtils::halftone6(progress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
-            break;
-        }
-    }
 
     qreal pixelInterval = layer()->engravingRowInterval();
 
@@ -2410,9 +2410,8 @@ QByteArray LaserShape::engravingImage(ProgressItem* progress)
     qDebug() << "out height:" << outHeight;
 
     cv::Mat resized;
-    cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight));
     
-    bytes = imageUtils::image2EngravingData(progress, resized, boundRect.left(), boundRect.top(), pixelInterval / 1000, boundRect.width());
+    bytes = imageUtils::image2EngravingData(progress, resized, boundRect.left(), boundRect.top(), pixelInterval / 1000, boundRect.width());*/
 
     return bytes;
 }

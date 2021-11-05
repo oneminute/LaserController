@@ -134,8 +134,6 @@ void ProgressItem::addChildItem(ProgressItem* item)
     QMutexLocker locker(&m_childMutex);
     item->setParent(this);
     m_childItems.append(item);
-    //setWeight(item, 1.0);
-    //updateWeights();
 }
 
 QList<ProgressItem*> ProgressItem::childItems() const
@@ -157,11 +155,6 @@ int ProgressItem::childCount() const
     QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return m_childItems.count();
 }
-
-//void ProgressItem::setWeight(ProgressItem* item, qreal weight)
-//{
-//    m_weights[item] = weight;
-//}
 
 void ProgressItem::startTimer()
 {

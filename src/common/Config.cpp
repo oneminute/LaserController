@@ -872,7 +872,7 @@ void Config::loadExportItems()
 
     ConfigItem* a = group->addConfigItem(
         "a",
-        20,
+        12,
         DT_REAL
     );
     a->setInputWidgetProperty("minimum", 0);
@@ -881,7 +881,7 @@ void Config::loadExportItems()
 
     ConfigItem* b = group->addConfigItem(
         "b",
-        20,
+        1.25,
         DT_REAL
     );
     b->setInputWidgetProperty("minimum", 0);

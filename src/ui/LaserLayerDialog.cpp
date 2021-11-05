@@ -268,6 +268,7 @@ void LaserLayerDialog::accept()
     m_layer->setCuttingMinSpeedPower(m_ui->editSliderCuttingMinSpeedPower->value());
     m_layer->setCuttingRunSpeedPower(m_ui->editSliderCuttingRunSpeedPower->value());
 
+    m_layer->setEngravingEnableCutting(m_ui->checkBoxEngravingEnableCutting->isChecked());
     m_layer->setEngravingRunSpeed(m_ui->editSliderEngravingRunSpeed->value());
     m_layer->setEngravingLaserPower(m_ui->editSliderEngravingLaserPower->value());
     m_layer->setEngravingMinSpeedPower(m_ui->editSliderEngravingMinSpeedPower->value());

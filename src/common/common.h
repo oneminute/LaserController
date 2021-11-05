@@ -266,6 +266,12 @@ enum PrimitiveProperty
     PP_Other
 };
 
+enum FillingType
+{
+    FT_Line,
+    FT_Pixel
+};
+
 class Global
 {
 public:

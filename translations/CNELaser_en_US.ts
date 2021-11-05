@@ -2621,7 +2621,7 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2218"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2219"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -4272,22 +4272,22 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="407"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="408"/>
         <source>Done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="823"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="824"/>
         <source>Clear tree</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="824"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="825"/>
         <source>Outline by layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1160"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1161"/>
         <source>Untitled</source>
         <translation></translation>
     </message>
@@ -4327,7 +4327,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="41"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="289"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="323"/>
         <source>Cutting</source>
         <translation></translation>
     </message>
@@ -4339,7 +4339,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="58"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="226"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="233"/>
         <source>Filling</source>
         <translation></translation>
     </message>
@@ -4350,28 +4350,43 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="129"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="232"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="295"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="239"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="329"/>
         <source>Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="149"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="242"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="305"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="249"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="339"/>
         <source>Min Power(%)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="159"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="252"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="315"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="259"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="349"/>
         <source>Max Power(%)</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="296"/>
+        <source>Filling Type</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="307"/>
+        <source>Line</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="312"/>
+        <source>Pixel</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="115"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="272"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="279"/>
         <source>Enable Cutting</source>
         <translation></translation>
     </message>
@@ -4382,7 +4397,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location filename="../src/ui/LaserLayerDialog.ui" line="169"/>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="262"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="269"/>
         <source>Row Interval(um)</source>
         <translation></translation>
     </message>
@@ -4397,12 +4412,12 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="203"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="210"/>
         <source>LPI</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.ui" line="213"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="220"/>
         <source>DPI</source>
         <translation></translation>
     </message>
@@ -4603,7 +4618,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2924"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2923"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -4843,33 +4858,33 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2333"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2334"/>
         <source>Relays: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2349"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2364"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2350"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2365"/>
         <source>None</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2352"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2353"/>
         <source>Release</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2355"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2356"/>
         <source>Machining 1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2358"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2359"/>
         <source>Machining 2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2361"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2362"/>
         <source>Machining 3</source>
         <translation></translation>
     </message>

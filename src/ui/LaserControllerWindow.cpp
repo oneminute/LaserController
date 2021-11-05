@@ -2514,7 +2514,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
     LaserApplication::resetProgressWindow();
-    LaserApplication::showProgressWindow();
+    //LaserApplication::showProgressWindow();
     ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
     importer->import("", m_scene, progress, params);
     progress->finish();
@@ -2720,7 +2720,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         if (!filename.isEmpty() && !filename.isNull())
         {
             LaserApplication::resetProgressWindow();
-            LaserApplication::showProgressWindow();
+            //LaserApplication::showProgressWindow();
             ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
             progress->setMaximum(5);
             QtConcurrent::run([=]()
@@ -2775,7 +2775,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
             //QString filename = file.fileName();
 
         LaserApplication::resetProgressWindow();
-        LaserApplication::showProgressWindow();
+        //LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
         progress->setMaximum(5);
         QtConcurrent::run([=]()

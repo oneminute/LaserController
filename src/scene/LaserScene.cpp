@@ -289,9 +289,7 @@ QSet<LaserPrimitive*> LaserScene::findPrimitivesByRect(const QRectF& rect)
                         break;
                     }
                 }
-                
             }
-
         }
     }
     return primitives;
@@ -309,7 +307,6 @@ void LaserScene::findSelectedByLine(QRectF selection)
     QList<QuadTreeNode*> nodes = m_quadTree->search(selection);
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
-            
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
                 QRectF bounds = primitive->sceneBoundingRect();
                 //图元外包框整个被selection包裹
