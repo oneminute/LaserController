@@ -26,7 +26,7 @@ void LaserDoubleSpinBox::keyReleaseEvent(QKeyEvent * event)
     {
         event->accept();
         emit enterOrLostFocus();
-        qDebug() << "keyReleaseEvent";
+        //qDebug() << "keyReleaseEvent";
         break;
     }
     }
@@ -35,7 +35,7 @@ void LaserDoubleSpinBox::keyReleaseEvent(QKeyEvent * event)
 void LaserDoubleSpinBox::focusOutEvent(QFocusEvent * event)
 {
 	QDoubleSpinBox::focusOutEvent(event);
-	//emit enterOrLostFocus();
+	emit enterOrLostFocus();
 	//qDebug() << "lost focus";
 }
 
