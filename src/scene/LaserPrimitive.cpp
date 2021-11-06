@@ -2370,7 +2370,7 @@ QString FinishRun::toString()
     return text;
 }
 
-QByteArray LaserShape::engravingImage(ProgressItem* progress)
+QByteArray LaserShape::filling(ProgressItem* progress)
 {
     Q_D(LaserShape);
     QByteArray bytes;

@@ -580,6 +580,7 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 	QJsonArray array;
 	object.insert("name", this->name());
 	object.insert("type", this->type());
+    object.insert("exportable", this->exportable());
     object.insert("visible", this->visible());
     object.insert("cuttingRunSpeed", this->cuttingRunSpeed());
     object.insert("cuttingMinSpeedPower", this->cuttingMinSpeedPower());

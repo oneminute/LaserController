@@ -1629,7 +1629,7 @@ void LaserControllerWindow::createOutlineDockPanel()
 
 void LaserControllerWindow::createMovementDockPanel()
 {
-    m_checkBoxXEnabled = new QCheckBox;
+    /*m_checkBoxXEnabled = new QCheckBox;
     m_checkBoxXEnabled->setText(tr("X Enabled"));
     Config::Device::xEnabledItem()->bindWidget(m_checkBoxXEnabled);
 
@@ -1639,7 +1639,7 @@ void LaserControllerWindow::createMovementDockPanel()
 
     m_checkBoxZEnabled = new QCheckBox;
     m_checkBoxZEnabled->setText(tr("Z Enabled"));
-    Config::Device::zEnabledItem()->bindWidget(m_checkBoxZEnabled);
+    Config::Device::zEnabledItem()->bindWidget(m_checkBoxZEnabled);*/
 
     m_lineEditCoordinatesX = new QLineEdit;
     m_lineEditCoordinatesX->setReadOnly(true);
@@ -1673,23 +1673,23 @@ void LaserControllerWindow::createMovementDockPanel()
 
     QGridLayout* firstRow = new QGridLayout;
     firstRow->setMargin(0);
-    firstRow->addWidget(m_checkBoxXEnabled, 0, 1, 1, 2);
-    firstRow->addWidget(m_checkBoxYEnabled, 0, 3, 1, 2);
-    firstRow->addWidget(m_checkBoxZEnabled, 0, 5, 1, 2);
-    firstRow->addWidget(new QLabel(tr("Coordinates")), 1, 0);
+    //firstRow->addWidget(m_checkBoxXEnabled, 0, 1, 1, 2);
+    //firstRow->addWidget(m_checkBoxYEnabled, 0, 3, 1, 2);
+    //firstRow->addWidget(m_checkBoxZEnabled, 0, 5, 1, 2);
+    firstRow->addWidget(new QLabel(tr("Coordinates")), 0, 0);
+    firstRow->addWidget(new QLabel(tr("X")), 0, 1);
+    firstRow->addWidget(m_lineEditCoordinatesX, 0, 2);
+    firstRow->addWidget(new QLabel(tr("Y")), 0, 3);
+    firstRow->addWidget(m_lineEditCoordinatesY, 0, 4);
+    firstRow->addWidget(new QLabel(tr("Z")), 0, 5);
+    firstRow->addWidget(m_lineEditCoordinatesZ, 0, 6);
+    firstRow->addWidget(new QLabel(tr("Distance(mm)")), 1, 0);
     firstRow->addWidget(new QLabel(tr("X")), 1, 1);
-    firstRow->addWidget(m_lineEditCoordinatesX, 1, 2);
+    firstRow->addWidget(m_doubleSpinBoxDistanceX, 1, 2);
     firstRow->addWidget(new QLabel(tr("Y")), 1, 3);
-    firstRow->addWidget(m_lineEditCoordinatesY, 1, 4);
+    firstRow->addWidget(m_doubleSpinBoxDistanceY, 1, 4);
     firstRow->addWidget(new QLabel(tr("Z")), 1, 5);
-    firstRow->addWidget(m_lineEditCoordinatesZ, 1, 6);
-    firstRow->addWidget(new QLabel(tr("Distance(mm)")), 2, 0);
-    firstRow->addWidget(new QLabel(tr("X")), 2, 1);
-    firstRow->addWidget(m_doubleSpinBoxDistanceX, 2, 2);
-    firstRow->addWidget(new QLabel(tr("Y")), 2, 3);
-    firstRow->addWidget(m_doubleSpinBoxDistanceY, 2, 4);
-    firstRow->addWidget(new QLabel(tr("Z")), 2, 5);
-    firstRow->addWidget(m_doubleSpinBoxDistanceZ, 2, 6);
+    firstRow->addWidget(m_doubleSpinBoxDistanceZ, 1, 6);
     firstRow->setColumnStretch(0, 1);
     firstRow->setColumnStretch(1, 0);
     firstRow->setColumnStretch(2, 1);
@@ -1792,7 +1792,7 @@ void LaserControllerWindow::createMovementDockPanel()
     fourthRow->addWidget(m_buttonFetchToUserOrigin);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->setMargin(0);
+    layout->setMargin(3);
     layout->addLayout(firstRow);
     layout->addLayout(secondRow);
     layout->addLayout(thirdRow);
@@ -1831,6 +1831,7 @@ void LaserControllerWindow::createLaserPowerDockPanel()
     m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
     Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower);
     QFormLayout* layout = new QFormLayout;
+    layout->setMargin(3);
     layout->addRow(Config::UserRegister::scanLaserPowerItem()->title(), m_floatEditSliderScanLaserPower);
     layout->addRow(Config::UserRegister::maxScanGrayRatioItem()->title(), m_editSliderScanMaxGray);
     layout->addRow(Config::UserRegister::minScanGrayRatioItem()->title(), m_editSliderScanMinGray);
@@ -1929,6 +1930,7 @@ void LaserControllerWindow::createPrintAndCutPanel()
     m_groupBoxPrintAndCutResult->setLayout(resultLayout);
 
     QVBoxLayout* layout = new QVBoxLayout;
+    layout->setMargin(3);
     layout->addWidget(m_groupBoxPrintAndCutPoints);
     layout->addWidget(m_groupBoxRedLightAlignment);
     layout->addWidget(m_groupBoxPrintAndCutResult);
@@ -2658,6 +2660,8 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 		}
 	}
 	m_tableWidgetLayers->updateItems();
+    m_viewer->update();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int column)
@@ -3393,6 +3397,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
         bounding.topLeft() + QPointF(bounding.width() * 0.05, bounding.height() * 0.05),
         QSizeF(bounding.width() * 0.9, bounding.height() * 0.9));
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
+    m_scene->removeLaserPrimitive(rectPrimitive);
 
     QPainterPath rectPath;
     rectPath.addRect(bounding);
@@ -3479,6 +3484,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     Config::Ui::gridContrastItem()->setValue(gridContrast);
     Config::Ui::showDocumentBoundingRectItem()->setValue(showDocBounding);*/
     m_viewer->viewport()->update();
+    m_viewer->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutRemove(bool checked)

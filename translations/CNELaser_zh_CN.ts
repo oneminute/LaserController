@@ -3559,7 +3559,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+99"/>
         <source>Cut</source>
-        <translation>切边</translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <source>Spot Shot</source>
@@ -4211,7 +4211,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+9"/>
         <source>Paste</source>
-        <translation>剪切</translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4319,13 +4319,13 @@ Would you like to overwrite it?</source>
         <location line="+9"/>
         <location line="+3"/>
         <source>Bounding</source>
-        <translation>走边框</translation>
+        <translation>切边框</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="-111"/>
         <source>Move</source>
-        <translation>走边</translation>
+        <translation>移动</translation>
     </message>
     <message>
         <location line="+18"/>
