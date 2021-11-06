@@ -3,11 +3,13 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QStandardPaths>
 #include <QTimer>
 
 #include "ConfigItem.h"
@@ -149,7 +151,15 @@ void Config::restore()
 
 QString Config::configFilePath()
 {
-    return "config.json";
+    //QString configPath = QStandardPaths::locate(QStandardPaths::ConfigLocation, "CNELaser");
+    QDir dataPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+    if (!dataPath.exists("CNELaser"))
+    {
+        dataPath.mkdir("CNELaser");
+    }
+    dataPath.cd("CNELaser");
+    qLogD << "configPath: " << dataPath.absolutePath();
+    return dataPath.absoluteFilePath("config.json");
 }
 
 bool Config::isModified()
