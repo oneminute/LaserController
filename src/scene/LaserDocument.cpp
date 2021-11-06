@@ -274,6 +274,9 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         QJsonObject cuttingParamObj;
         QJsonObject fillingParamObj;
         layerObj["Type"] = layer->type();
+        if (layer->type() == LLT_FILLING)
+            layerObj["Type"] = LLT_ENGRAVING;
+
         //if (layer->type() == LLT_ENGRAVING)
         //{
         engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
@@ -362,12 +365,21 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 if (!enablePrintAndCut())
                 {
                     itemObj["Type"] = primitive->typeLatinName();
-                    LaserLineListList lineList = primitive->generateFillData(lastPoint);
+                    //LaserLineListList lineList = primitive->generateFillData(lastPoint);
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), exportProgress);
-                    itemObj["Data"] = QString(machiningUtils::lineList2Plt(progress, lineList, lastPoint));
-                    //QByteArray data = primitive->engravingImage(progress);
-                    itemObj["Style"] = LaserLayerType::LLT_FILLING;
-                    items.append(itemObj);
+                    //itemObj["Data"] = QString(machiningUtils::lineList2Plt(progress, lineList, lastPoint));
+                    QByteArray data = primitive->engravingImage(progress);
+                    if (!data.isEmpty())
+                    {
+                        itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
+                        itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+                        itemObj["Type"] = "Bitmap";
+                        itemObj["ImageType"] = "PNG";
+                        itemObj["Data"] = QString(data.toBase64());
+                        itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
+                        items.append(itemObj);
+                    }
+                    //items.append(itemObj);
                 }
 
                 if (layer->fillingEnableCutting())
@@ -975,6 +987,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("fillingEnableCutting")) 
         {
             laserLayers[index]->setFillingEnableCutting(layer.value("fillingEnableCutting").toBool());
+        }
+        if (layer.contains("fillingType"))
+        {
+            laserLayers[index]->setFillingType(layer.value("fillingType").toInt());
         }
         if (layer.contains("errorX"))
         {

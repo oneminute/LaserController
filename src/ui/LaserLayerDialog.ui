@@ -6,104 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
-    <height>644</height>
+    <width>654</width>
+    <height>446</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Laser Layer Options</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QGroupBox" name="groupBoxGeneral">
-     <property name="title">
-      <string>General</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="5" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="labelAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-      <property name="formAlignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>Layer Type</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QRadioButton" name="radioButtonCutting">
-          <property name="text">
-           <string>Cutting</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonEngraving">
-          <property name="text">
-           <string>Engraving</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonFilling">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>Filling</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="minimumSize">
-         <size>
-          <width>102</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Layer Name</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEditLayerName">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::Reset|QDialogButtonBox::RestoreDefaults|QDialogButtonBox::Save</set>
+     </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0" rowspan="3">
     <widget class="QGroupBox" name="groupBoxEngraving">
      <property name="title">
       <string>Engraving</string>
@@ -227,97 +148,96 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="groupBoxFilling">
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBoxGeneral">
      <property name="title">
-      <string>Filling</string>
+      <string>General</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_4">
-      <item row="2" column="0">
-       <widget class="QLabel" name="labelFillingSpeed">
-        <property name="text">
-         <string>Speed(mm/s)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="EditSlider" name="editSliderFillingRunSpeed" native="true"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="labelFillingMinPower">
-        <property name="text">
-         <string>Min Power(%)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="FloatEditSlider" name="editSliderFillingMinSpeedPower" native="true"/>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="labelFillingMaxPower">
-        <property name="text">
-         <string>Max Power(%)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="FloatEditSlider" name="editSliderFillingRunSpeedPower" native="true"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="labelFillingRowInterval">
-        <property name="text">
-         <string>Row Interval(um)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="EditSlider" name="editSliderFillingRowInterval" native="true"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="labelFillingEnableCutting">
-        <property name="text">
-         <string>Enable Cutting</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="checkBoxFillingEnableCutting">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="labelAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="formAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="labelFillingType">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
+       <widget class="QLabel" name="label_17">
         <property name="text">
-         <string>Filling Type</string>
+         <string>Layer Type</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="comboBoxFillingType">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="radioButtonEngraving">
+          <property name="text">
+           <string>Engraving</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonCutting">
+          <property name="text">
+           <string>Cutting</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonFilling">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Filling</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>102</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Layer Name</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEditLayerName">
         <property name="enabled">
          <bool>false</bool>
         </property>
-        <item>
-         <property name="text">
-          <string>Line</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Pixel</string>
-         </property>
-        </item>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="1">
     <widget class="QGroupBox" name="groupBoxCutting">
      <property name="title">
       <string>Cutting</string>
@@ -356,14 +276,93 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="groupBoxFilling">
+     <property name="title">
+      <string>Filling</string>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::Reset|QDialogButtonBox::RestoreDefaults|QDialogButtonBox::Save</set>
+     <layout class="QFormLayout" name="formLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelFillingType">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Filling Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboBoxFillingType">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelFillingEnableCutting">
+        <property name="text">
+         <string>Enable Cutting</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="checkBoxFillingEnableCutting">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="groupBoxFillingLines">
+     <property name="title">
+      <string>Line Filling</string>
      </property>
+     <layout class="QFormLayout" name="formLayout_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelFillingSpeed">
+        <property name="text">
+         <string>Speed(mm/s)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="EditSlider" name="editSliderFillingRunSpeed" native="true"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelFillingMinPower">
+        <property name="text">
+         <string>Min Power(%)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="FloatEditSlider" name="editSliderFillingMinSpeedPower" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelFillingMaxPower">
+        <property name="text">
+         <string>Max Power(%)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="FloatEditSlider" name="editSliderFillingRunSpeedPower" native="true"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="labelFillingRowInterval">
+        <property name="text">
+         <string>Row Interval(um)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="EditSlider" name="editSliderFillingRowInterval" native="true"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

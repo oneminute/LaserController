@@ -679,6 +679,27 @@ void Config::loadFillingLayerItems()
         true,
         DT_BOOL
     );
+
+    ConfigItem* fillingType = group->addConfigItem(
+        "fillingType",
+        1,
+        DT_INT
+    );
+    fillingType->setInputWidgetType(IWT_ComboBox);
+    fillingType->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("Line"), 0);
+            comboBox->addItem(tr("Pixel"), 1);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
 }
 
 void Config::loadPathOptimizationItems()
@@ -3238,6 +3259,10 @@ void Config::updateTitlesAndDescriptions()
     FillingLayer::enableCuttingItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Cutting Item", nullptr), 
         QCoreApplication::translate("Config", "Enable Cutting Item", nullptr));
+
+    FillingLayer::fillingTypeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Filling Type", nullptr), 
+        QCoreApplication::translate("Config", "Filling Type", nullptr));
 
     PathOptimization::maxStartingPointsItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Starting Points", nullptr), 

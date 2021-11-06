@@ -39,11 +39,14 @@ protected slots:
 
     void onCuttingToggled(bool checked);
     void onEngravingToggled(bool checked);
-    void onBothToggled(bool checked);
+    void onFillingToggled(bool checked);
     void onEngravingEnableCuttingToggled(bool checked);
     void onFillingEnableCuttingToggled(bool checked);
+    void onFillingTypeChanged(int index);
 
 	void onButtonClicked(QAbstractButton *button);
+
+    void updateControls();
 
 private:
     QScopedPointer<Ui::LaserLayerDialog> m_ui;

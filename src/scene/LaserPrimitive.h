@@ -206,7 +206,7 @@ class LaserShape : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserShape(LaserShapePrivate* data, LaserDocument* doc,   LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
+    LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
     virtual QByteArray engravingImage(ProgressItem* progress) override;
 	int layerIndex();
@@ -485,7 +485,7 @@ public:
     void setSubRowBoundlist(QList<QRectF> l) { m_boundList = l; };
 };
 class LaserTextPrivate;
-class LaserText : public LaserPrimitive
+class LaserText : public LaserShape
 {
 	Q_OBJECT
 public:
