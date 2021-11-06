@@ -274,7 +274,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         QJsonObject cuttingParamObj;
         QJsonObject fillingParamObj;
         layerObj["Type"] = layer->type();
-        if (layer->type() == LLT_FILLING)
+        if (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel)
             layerObj["Type"] = LLT_ENGRAVING;
 
         //if (layer->type() == LLT_ENGRAVING)
@@ -365,28 +365,40 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 if (!enablePrintAndCut())
                 {
                     itemObj["Type"] = primitive->typeLatinName();
-                    //LaserLineListList lineList = primitive->generateFillData(lastPoint);
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), exportProgress);
-                    //itemObj["Data"] = QString(machiningUtils::lineList2Plt(progress, lineList, lastPoint));
-                    QByteArray data = primitive->engravingImage(progress);
-                    if (!data.isEmpty())
+                    if (layer->fillingType() == FT_Line)
                     {
-                        itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
-                        itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
-                        itemObj["Type"] = "Bitmap";
-                        itemObj["ImageType"] = "PNG";
-                        itemObj["Data"] = QString(data.toBase64());
-                        itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
-                        items.append(itemObj);
+                        LaserLineListList lineList = primitive->generateFillData(lastPoint);
+                        QByteArray data = machiningUtils::lineList2Plt(progress, lineList, lastPoint);
+                        if (!data.isEmpty())
+                        {
+                            itemObj["Type"] = primitive->typeLatinName();
+                            itemObj["Style"] = LaserLayerType::LLT_FILLING;
+                            itemObj["Data"] = QString(data);
+                            items.append(itemObj);
+                        }
                     }
-                    //items.append(itemObj);
+                    else if (layer->fillingType() == FT_Pixel)
+                    {
+                        QByteArray data = primitive->engravingImage(progress);
+                        if (!data.isEmpty())
+                        {
+                            itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
+                            itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+                            itemObj["Type"] = "Bitmap";
+                            itemObj["ImageType"] = "PNG";
+                            itemObj["Data"] = QString(data.toBase64());
+                            itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
+                            items.append(itemObj);
+                        }
+                    }
                 }
 
                 if (layer->fillingEnableCutting())
                 {
                     QJsonObject itemObjCutting;
                     itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
-                    itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
+                    //itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                     itemObjCutting["Type"] = primitive->typeLatinName();
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
