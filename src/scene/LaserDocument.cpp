@@ -257,7 +257,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     }
 
     QJsonArray layers;
-    //QPointF lastPoint = docOriginMachining();
     QPointF lastPoint = docOrigin;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
     {
@@ -280,34 +279,22 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         if (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel)
             layerObj["Type"] = LLT_ENGRAVING;
 
-        //if (layer->type() == LLT_ENGRAVING)
-        //{
         engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
         engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
         engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower() * 10;
         engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower() * 10;
-        //engravingParamObj["RowInterval"] = layer->engravingRowInterval();
         engravingParamObj["CarveForward"] = layer->engravingForward();
         engravingParamObj["CarveStyle"] = layer->engravingStyle();
-        //engravingParamObj["ErrorX"] = layer->errorX();
-        //}
-        //else if (layer->type() == LLT_CUTTING)
-        //{
+
         cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
         cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
         cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
-        //}
-        //else if (layer->type() == LLT_FILLING)
-        //{
-        //layerObj["Type"] = 2;
-        //cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
-        //cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
-        //cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
+
         fillingParamObj["RunSpeed"] = layer->fillingRunSpeed() * 1000;
         fillingParamObj["MinSpeedPower"] = layer->fillingMinSpeedPower() * 10;
         fillingParamObj["RunSpeedPower"] = layer->fillingRunSpeedPower() * 10;
         fillingParamObj["RowInterval"] = layer->fillingRowInterval();
-        //}
+
         paramObj["EngravingParams"] = engravingParamObj;
         paramObj["CuttingParams"] = cuttingParamObj;
         paramObj["FillingParams"] = fillingParamObj;
@@ -318,7 +305,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
             QJsonObject itemObj;
             itemObj["Name"] = pathNode->nodeName();
-            //itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
             if (layer->type() == LLT_ENGRAVING)
             {
                 if (!enablePrintAndCut())
@@ -342,7 +328,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 {
                     QJsonObject itemObjCutting;
                     itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
-                    itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                     itemObjCutting["Type"] = primitive->typeLatinName();
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
@@ -401,7 +386,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 {
                     QJsonObject itemObjCutting;
                     itemObjCutting["Name"] = pathNode->nodeName() + "_cutting";
-                    //itemObjCutting["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                     itemObjCutting["Type"] = primitive->typeLatinName();
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));

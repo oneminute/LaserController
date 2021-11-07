@@ -151,7 +151,6 @@ void Config::restore()
 
 QString Config::configFilePath()
 {
-    //QString configPath = QStandardPaths::locate(QStandardPaths::ConfigLocation, "CNELaser");
     QDir dataPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     if (!dataPath.exists("CNELaser"))
     {
@@ -1622,7 +1621,7 @@ void Config::loadUserReigsters()
         }
     );
     resetSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
-    resetSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    resetSpeed->setInputWidgetProperty("textTemplate", "%1");
     resetSpeed->setInputWidgetProperty("step", 0.001);
     resetSpeed->setInputWidgetProperty("page", 10);
     resetSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1724,7 +1723,7 @@ void Config::loadUserReigsters()
         }
     );
     defaultRunSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
-    defaultRunSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    defaultRunSpeed->setInputWidgetProperty("textTemplate", "%1");
     defaultRunSpeed->setInputWidgetProperty("step", 0.001);
     defaultRunSpeed->setInputWidgetProperty("page", 10);
     defaultRunSpeed->setInputWidgetProperty("minimum", 1);
@@ -1800,7 +1799,7 @@ void Config::loadUserReigsters()
         }
     );
     defaultScanSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
-    defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1");
     defaultScanSpeed->setInputWidgetProperty("step", 0.001);
     defaultScanSpeed->setInputWidgetProperty("page", 10);
     defaultScanSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1890,7 +1889,7 @@ void Config::loadUserReigsters()
         }
     );
     fillingSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
-    fillingSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    fillingSpeed->setInputWidgetProperty("textTemplate", "%1");
     fillingSpeed->setInputWidgetProperty("step", 0.001);
     fillingSpeed->setInputWidgetProperty("page", 10);
     fillingSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1914,7 +1913,7 @@ void Config::loadUserReigsters()
         }
     );
     fillingStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
-    fillingStartSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
+    fillingStartSpeed->setInputWidgetProperty("textTemplate", "%1");
     fillingStartSpeed->setInputWidgetProperty("step", 0.001);
     fillingStartSpeed->setInputWidgetProperty("page", 10);
     fillingStartSpeed->setInputWidgetProperty("minimum", 0.001);
@@ -1938,7 +1937,7 @@ void Config::loadUserReigsters()
         }
     );
     fillingAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
-    fillingAcceleration->setInputWidgetProperty("textTemplate", "%1mm/s");
+    fillingAcceleration->setInputWidgetProperty("textTemplate", "%1");
     fillingAcceleration->setInputWidgetProperty("step", 0.001);
     fillingAcceleration->setInputWidgetProperty("page", 10);
     fillingAcceleration->setInputWidgetProperty("minimum", 0.001);
@@ -3403,7 +3402,7 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Acceleration mode", nullptr));
 
     UserRegister::cuttingMoveAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Cutting Move Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Move Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Move acceleration for cutting movement", nullptr));
 
     UserRegister::cuttingTurnSpeedItem()->setTitleAndDesc(
@@ -3411,11 +3410,11 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Turn speed for cutting movement", nullptr));
 
     UserRegister::cuttingTurnAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Cutting Turn Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Turn Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Turn acceleration for cutting movement", nullptr));
 
     UserRegister::cuttingWorkAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Cutting Work Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Work Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Work acceleration for cutting movement", nullptr));
 
     UserRegister::cuttingMoveSpeedFactorItem()->setTitleAndDesc(
@@ -3439,11 +3438,11 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Scan y start speed", nullptr));
 
     UserRegister::scanXAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Scan X Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Scan X Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Scan x acceleration", nullptr));
 
     UserRegister::scanYAccItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Scan Y Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Scan Y Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Scan y acceleration", nullptr));
 
     UserRegister::scanRowSpeedItem()->setTitleAndDesc(
@@ -3539,7 +3538,7 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Filling start speed", nullptr));
 
     UserRegister::fillingAccelerationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Filling Acceleration(mm/s<sub>2</sub>)", nullptr), 
+        QCoreApplication::translate("Config", "Filling Acceleration(mm/s<sup>2</sup>)", nullptr), 
         QCoreApplication::translate("Config", "Filling acceleration", nullptr));
 
     UserRegister::maxFillingPowerItem()->setTitleAndDesc(

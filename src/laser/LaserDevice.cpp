@@ -146,12 +146,12 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(32, new LaserRegister(32, Config::UserRegister::cuttingTurnOnDelayItem(), false));
     d->userRegisters.insert(33, new LaserRegister(33, Config::UserRegister::cuttingTurnOffDelayItem(), false));
     d->userRegisters.insert(34, new LaserRegister(34, Config::UserRegister::spotShotPowerItem(), false));
-    d->userRegisters.insert(34, new LaserRegister(35, Config::UserRegister::fillingSpeedItem(), false));
-    d->userRegisters.insert(34, new LaserRegister(36, Config::UserRegister::fillingStartSpeedItem(), false));
-    d->userRegisters.insert(34, new LaserRegister(37, Config::UserRegister::fillingAccelerationItem(), false));
-    d->userRegisters.insert(34, new LaserRegister(38, Config::UserRegister::maxFillingPowerItem(), false));
-    d->userRegisters.insert(34, new LaserRegister(39, Config::UserRegister::minFillingPowerItem(), false));
-    d->userRegisters.insert(34, new LaserRegister(40, Config::UserRegister::fillingAccRatioItem(), false));
+    d->userRegisters.insert(35, new LaserRegister(35, Config::UserRegister::fillingSpeedItem(), false));
+    d->userRegisters.insert(36, new LaserRegister(36, Config::UserRegister::fillingStartSpeedItem(), false));
+    d->userRegisters.insert(37, new LaserRegister(37, Config::UserRegister::fillingAccelerationItem(), false));
+    d->userRegisters.insert(38, new LaserRegister(38, Config::UserRegister::maxFillingPowerItem(), false));
+    d->userRegisters.insert(39, new LaserRegister(39, Config::UserRegister::minFillingPowerItem(), false));
+    d->userRegisters.insert(40, new LaserRegister(40, Config::UserRegister::fillingAccRatioItem(), false));
 
     d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
     d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));

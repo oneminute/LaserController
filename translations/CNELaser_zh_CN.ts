@@ -384,12 +384,12 @@
 <context>
     <name>Config</name>
     <message>
-        <location filename="../src/common/Config.cpp" line="+142"/>
+        <location filename="../src/common/Config.cpp" line="+144"/>
         <source>Save config file error.</source>
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+2962"/>
+        <location line="+2969"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -1266,21 +1266,19 @@
         <translation>空移速度(mm/s)</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Cutting Turn Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
-        <translation>切割拐弯加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation type="vanished">切割拐弯加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+32"/>
         <source>Scan Y Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
-        <translation>扫描Y轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+        <translation type="vanished">扫描Y轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
         <source>Scan Row Interval(mm)</source>
         <translation type="vanished">行间距(mm)</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+56"/>
         <source>Scan Return Error(mm)</source>
         <translation>扫描回差(mm)</translation>
     </message>
@@ -1521,21 +1519,24 @@
         <translation>启用生成加工路径的图片</translation>
     </message>
     <message>
+        <location line="-397"/>
         <source>Cutting Move Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="vanished">空移加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation>空移加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="+4"/>
         <source>Cutting Turn Speed(mm/s)</source>
         <translation>拐弯速度(mm/s)</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Cutting Turn Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="vanished">拐弯加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation>拐弯加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Cutting Work Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation type="vanished">切割加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation>切割加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
         <source>Cutting Move Speed Factor</source>
@@ -1546,7 +1547,7 @@
         <translation type="vanished">切割加速倍率</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+12"/>
         <source>Cutting Spot Size</source>
         <translation>光斑尺寸</translation>
     </message>
@@ -1558,7 +1559,7 @@
     <message>
         <location line="+4"/>
         <source>Scan Y Start Speed(mm/s)</source>
-        <translation>扫描X轴起跳速度(mm/s)</translation>
+        <translation>扫描Y轴起跳速度(mm/s)</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -1641,12 +1642,11 @@
         <translation>填充起跳速度</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Filling Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
-        <translation>填充加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+        <translation type="vanished">填充加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Filling acceleration</source>
         <translation>填充加速度</translation>
     </message>
@@ -1967,17 +1967,15 @@
         <translation>所选用户原点</translation>
     </message>
     <message>
-        <location line="+15"/>
         <source>Cutting Move Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
-        <translation>空移加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation type="vanished">空移加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Cutting Work Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
-        <translation>切割加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation type="vanished">切割加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+31"/>
         <source>Move Speed Factor</source>
         <translation>空移加速倍率</translation>
     </message>
@@ -1997,12 +1995,11 @@
         <translation>扫描Y轴起跳速度</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Scan X Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
-        <translation>扫描X轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+        <translation type="vanished">扫描X轴加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Scan x acceleration</source>
         <translation>扫描X轴加速度</translation>
     </message>
@@ -2412,13 +2409,28 @@
         <translation>曲线平滑阈值</translation>
     </message>
     <message>
-        <location line="+115"/>
+        <location line="+103"/>
+        <source>Scan X Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>扫描X轴加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Scan Y Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>扫描Y轴加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <location line="+1"/>
         <source>Laser Frequency</source>
         <translation>激光频率</translation>
     </message>
     <message>
-        <location line="+91"/>
+        <location line="+87"/>
+        <source>Filling Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
+        <translation>填充加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Max Filling Power(%)</source>
         <translation>最大填充功率(%)</translation>
     </message>
@@ -2438,9 +2450,17 @@
         <translation>X轴最大速度(mm/s)</translation>
     </message>
     <message>
+        <source>X Max Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation type="vanished">X轴最大加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+    </message>
+    <message>
         <location line="+5"/>
         <source>X max acceleration</source>
         <translation>X轴最大加速度</translation>
+    </message>
+    <message>
+        <source>X Urgent Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation type="vanished">X轴急停加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2467,6 +2487,22 @@
         <location line="+7"/>
         <source>Y Step Length(mm)</source>
         <translation>Y轴电机步距(mm)</translation>
+    </message>
+    <message>
+        <source>Y Max Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation type="vanished">Y轴最大加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+    </message>
+    <message>
+        <source>Y Urgent Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation type="vanished">Y轴急停加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+    </message>
+    <message>
+        <source>Z Max Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation type="vanished">Z轴最大加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
+    </message>
+    <message>
+        <source>Z Urgent Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
+        <translation type="vanished">Z轴急停加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
         <location line="+176"/>
@@ -3423,7 +3459,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="+448"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="+449"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>
@@ -3543,7 +3579,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="+192"/>
-        <location line="+2157"/>
+        <location line="+2163"/>
         <source>Operations</source>
         <translation>操作</translation>
     </message>
@@ -3585,8 +3621,8 @@ Would you like to overwrite it?</source>
         <translation type="vanished">优化</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1901"/>
-        <location line="+1902"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1906"/>
+        <location line="+1907"/>
         <source>Laser Power</source>
         <translation>激光功率</translation>
     </message>
@@ -3636,13 +3672,13 @@ Would you like to overwrite it?</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1942"/>
-        <location line="+199"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1948"/>
+        <location line="+201"/>
         <source>Movement</source>
         <translation>运动控制</translation>
     </message>
     <message>
-        <location line="-325"/>
+        <location line="-327"/>
         <source>Coordinates</source>
         <translatorcomment>坐标</translatorcomment>
         <translation>坐标</translation>
@@ -3723,7 +3759,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">激光头停在当前位置</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+167"/>
         <source>Points</source>
         <translation>选点</translation>
     </message>
@@ -3748,17 +3784,17 @@ Would you like to overwrite it?</source>
         <translation>0.00 度</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+27"/>
         <source>Print and Cut</source>
         <translation>选点切割</translation>
     </message>
     <message>
-        <location line="+1146"/>
+        <location line="+1148"/>
         <source>Do you want to save current document?</source>
         <translation>是否保存当前文档？</translation>
     </message>
     <message>
-        <location line="+672"/>
+        <location line="+674"/>
         <source>Pos X</source>
         <translation>水平坐标</translation>
     </message>
@@ -3773,7 +3809,7 @@ Would you like to overwrite it?</source>
         <translation>页面尺寸(mm)： %1x%2</translation>
     </message>
     <message>
-        <location line="-3547"/>
+        <location line="-3553"/>
         <source>X Pos</source>
         <translation>水平坐标</translation>
     </message>
@@ -3784,80 +3820,80 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+107"/>
-        <location line="+3368"/>
+        <location line="+3374"/>
         <source>Rotate</source>
         <translation>旋转</translation>
     </message>
     <message>
-        <location line="-3329"/>
+        <location line="-3335"/>
         <location line="+4"/>
-        <location line="+3327"/>
+        <location line="+3333"/>
         <location line="+3"/>
         <source>Middle</source>
         <translation>中间对齐</translation>
     </message>
     <message>
-        <location line="-3331"/>
-        <location line="+3330"/>
+        <location line="-3337"/>
+        <location line="+3336"/>
         <source>Top</source>
         <translation>顶部对齐</translation>
     </message>
     <message>
-        <location line="-3328"/>
-        <location line="+3330"/>
+        <location line="-3334"/>
+        <location line="+3336"/>
         <source>Bottom</source>
         <translation>底部对齐</translation>
     </message>
     <message>
-        <location line="-3320"/>
-        <location line="+3321"/>
+        <location line="-3326"/>
+        <location line="+3327"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location line="-3317"/>
-        <location line="+3319"/>
+        <location line="-3323"/>
+        <location line="+3325"/>
         <source>Align X</source>
         <translation>水平对齐</translation>
     </message>
     <message>
-        <location line="-3317"/>
-        <location line="+3318"/>
+        <location line="-3323"/>
+        <location line="+3324"/>
         <source>Align Y</source>
         <translation>垂直对齐</translation>
     </message>
     <message>
-        <location line="-3316"/>
-        <location line="+3317"/>
+        <location line="-3322"/>
+        <location line="+3323"/>
         <source>Spacing X</source>
         <translation>水平间隔</translation>
     </message>
     <message>
-        <location line="-3315"/>
-        <location line="+3316"/>
+        <location line="-3321"/>
+        <location line="+3322"/>
         <source>Spacing Y</source>
         <translation>垂直间隔</translation>
     </message>
     <message>
-        <location line="-3314"/>
-        <location line="+3315"/>
+        <location line="-3320"/>
+        <location line="+3321"/>
         <source>Bold</source>
         <translation>粗体</translation>
     </message>
     <message>
-        <location line="-3313"/>
-        <location line="+3314"/>
+        <location line="-3319"/>
+        <location line="+3320"/>
         <source>Italic</source>
         <translation>斜体</translation>
     </message>
     <message>
-        <location line="-3312"/>
-        <location line="+3313"/>
+        <location line="-3318"/>
+        <location line="+3319"/>
         <source>Upper Case</source>
         <translation>大写</translation>
     </message>
     <message>
-        <location line="-2019"/>
+        <location line="-2025"/>
         <source>User Origin 1</source>
         <translation>用户原点1</translation>
     </message>
@@ -3876,7 +3912,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">激光偏移:</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+125"/>
         <source>Red Light Alignment</source>
         <translation>红光校准</translation>
     </message>
@@ -3901,13 +3937,13 @@ Would you like to overwrite it?</source>
         <translation>0.000, 0.000</translation>
     </message>
     <message>
-        <location line="+588"/>
+        <location line="+589"/>
         <source>Importing</source>
         <translation>导入</translation>
     </message>
     <message>
         <location line="+78"/>
-        <location line="+285"/>
+        <location line="+287"/>
         <source>Open File</source>
         <translation>打开</translation>
     </message>
@@ -3917,7 +3953,7 @@ Would you like to overwrite it?</source>
         <translation>建立拓扑结构</translation>
     </message>
     <message>
-        <location line="+297"/>
+        <location line="+299"/>
         <location line="+16"/>
         <location line="+10"/>
         <source>x: %1, y: %2</source>
@@ -3939,22 +3975,19 @@ Would you like to overwrite it?</source>
         <translation>合并</translation>
     </message>
     <message>
-        <location line="-3275"/>
         <source>X Enabled</source>
-        <translation>X轴使能</translation>
+        <translation type="vanished">X轴使能</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Y Enabled</source>
-        <translation>Y轴使能</translation>
+        <translation type="vanished">Y轴使能</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Z Enabled</source>
-        <translation>Z轴使能</translation>
+        <translation type="vanished">Z轴使能</translation>
     </message>
     <message>
-        <location line="+1235"/>
+        <location line="-2034"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
@@ -3995,7 +4028,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">继电器3</translation>
     </message>
     <message>
-        <location line="-1255"/>
+        <location line="-1259"/>
         <source>Outline</source>
         <translation>大纲</translation>
     </message>
@@ -4062,7 +4095,7 @@ Would you like to overwrite it?</source>
         <location line="+15"/>
         <location line="+3"/>
         <location line="+929"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+3288"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+3294"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
@@ -4079,7 +4112,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2286"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2290"/>
         <location line="+5"/>
         <source>Remove Layer</source>
         <translation>删除图层</translation>
@@ -4184,7 +4217,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+116"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+118"/>
         <source>Load Json</source>
         <translation>加载Json文件</translation>
     </message>
@@ -4323,7 +4356,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+8"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-111"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-113"/>
         <source>Move</source>
         <translation>移动</translation>
     </message>
@@ -4334,8 +4367,8 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2202"/>
-        <location line="+3331"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2204"/>
+        <location line="+3337"/>
         <source>Left</source>
         <translation>左</translation>
     </message>
@@ -4346,8 +4379,8 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3329"/>
-        <location line="+3331"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3335"/>
+        <location line="+3337"/>
         <source>Right</source>
         <translation>右</translation>
     </message>
@@ -4792,7 +4825,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">保存原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3594"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-3600"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
@@ -4801,7 +4834,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">提示</translation>
     </message>
     <message>
-        <location line="+3439"/>
+        <location line="+3445"/>
         <source>Unregistered</source>
         <translation>未注册</translation>
     </message>
@@ -4815,7 +4848,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">欢迎！</translation>
     </message>
     <message>
-        <location line="-3378"/>
+        <location line="-3384"/>
         <source>0,0</source>
         <translation></translation>
     </message>
@@ -4865,21 +4898,21 @@ Would you like to overwrite it?</source>
     <message>
         <location line="-1101"/>
         <location line="+1102"/>
-        <location line="+2334"/>
+        <location line="+2340"/>
         <source>Width</source>
         <translation>宽度</translation>
     </message>
     <message>
-        <location line="-3435"/>
+        <location line="-3441"/>
         <location line="+125"/>
         <location line="+980"/>
-        <location line="+2331"/>
+        <location line="+2337"/>
         <location line="+9"/>
         <source>Height</source>
         <translation>长度</translation>
     </message>
     <message>
-        <location line="-2335"/>
+        <location line="-2341"/>
         <source>Show</source>
         <translation>显示</translation>
     </message>
@@ -4911,7 +4944,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">打开SVG文件</translation>
     </message>
     <message>
-        <location line="+958"/>
+        <location line="+960"/>
         <source>SVG (*.svg);;CAD (*.dxf)</source>
         <translation>SVG (*.svg);;CAD (*.dxf)</translation>
     </message>
@@ -4955,7 +4988,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+83"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
@@ -5034,7 +5067,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">找到的特征点过多。请移动或缩放您的矩形框，确保只有一个特征点在选框内。</translation>
     </message>
     <message>
-        <location line="+285"/>
+        <location line="+287"/>
         <source>%1 degrees</source>
         <translation>%1 度</translation>
     </message>
@@ -5064,7 +5097,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>已激活</translation>
     </message>
     <message>
-        <location line="-530"/>
+        <location line="-532"/>
         <source>Close document?</source>
         <translation>关闭文档？</translation>
     </message>
@@ -5394,7 +5427,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>导出JSON文件</translation>
     </message>
     <message>
-        <location line="+194"/>
+        <location line="+193"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
@@ -5409,7 +5442,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>按层建立拓扑</translation>
     </message>
     <message>
-        <location line="+340"/>
+        <location line="+371"/>
         <source>Untitled</source>
         <translation>未命名</translation>
     </message>
@@ -9488,7 +9521,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3729"/>
+        <location filename="../src/common/Config.cpp" line="-3736"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
@@ -9675,17 +9708,17 @@ Do you want to delete it anyway?</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-850"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-891"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+30"/>
         <source>%1 Points to Plt</source>
         <translation>%1生成Plt点</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+10"/>
         <source>%1 Lines to Plt</source>
         <translation>%1生成Plt线</translation>
     </message>

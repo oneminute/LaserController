@@ -97,6 +97,13 @@ void ProgressItem::finish()
 {
     if (m_type == PT_Simple)
         setProgress(m_maximum);
+    else if (m_type == PT_Complex)
+    {
+        for (ProgressItem* item : childItems())
+        {
+            item->finish();
+        }
+    }
     m_durationNSecs = m_timer.nsecsElapsed();
     stopTimer();
     m_isFinished = true;
