@@ -58,6 +58,7 @@ private:
 class AddDelUndoCommand : public QUndoCommand {
 public :
 	AddDelUndoCommand(LaserScene* scene, QList<QGraphicsItem*> list, bool isDel = false);
+    AddDelUndoCommand(LaserScene* scene, QList<LaserPrimitive*> list, bool isDel = false);
 	~AddDelUndoCommand();
 	virtual void undo() override;
 	virtual void redo() override;
@@ -66,6 +67,7 @@ private:
 	LaserScene * m_scene;
 	LaserViewer* m_viewer;
 	QList<QGraphicsItem*> m_list;
+    QList<LaserPrimitive*> m_primitiveList;
 	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
 	//QTransform m_addRedoTransform;
 	//QTransform m_delRedoTransform;

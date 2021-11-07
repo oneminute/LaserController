@@ -128,7 +128,7 @@ void LaserScene::addGroupItemsToTreeNode()
 
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
-	m_doc->removePrimitive(primitive);
+	//m_doc->removePrimitive(primitive);
     primitive->removeAllTreeNode();
 	removeItem(primitive);
 }

@@ -2637,10 +2637,12 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 	msgBox.exec();
 	if (msgBox.clickedButton() == deleteButton)
 	{
-        for (LaserPrimitive* primitive : layer->primitives())
+        /*for (LaserPrimitive* primitive : layer->primitives())
         {
             m_scene->document()->removePrimitive(primitive);
-        }
+        }*/
+        AddDelUndoCommand* cmd = new AddDelUndoCommand(m_scene, layer->primitives(), true);
+        m_viewer->undoStack()->push(cmd);
 	}
 	else if (msgBox.clickedButton() == moveButton)
 	{
