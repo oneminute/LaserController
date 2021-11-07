@@ -382,9 +382,9 @@ private:
     PressedToolButton* m_buttonMoveUp;
     PressedToolButton* m_buttonMoveDown;
 
-    QCheckBox* m_checkBoxXEnabled;
-    QCheckBox* m_checkBoxYEnabled;
-    QCheckBox* m_checkBoxZEnabled;
+    //QCheckBox* m_checkBoxXEnabled;
+    //QCheckBox* m_checkBoxYEnabled;
+    //QCheckBox* m_checkBoxZEnabled;
 
     QToolButton* m_buttonLaserPosition;
     QComboBox* m_comboBoxPostEvent;

@@ -2370,48 +2370,59 @@ QString FinishRun::toString()
     return text;
 }
 
-QByteArray LaserShape::engravingImage(ProgressItem* progress)
+QByteArray LaserShape::filling(ProgressItem* progress)
 {
     Q_D(LaserShape);
     QByteArray bytes;
     QPainterPath path = toMachiningPath();
+    QRectF boundingRectMachining = path.boundingRect();
+    qreal ratio = boundingRectMachining.width() / boundingRectMachining.height();
+    int canvasWidth = qMin(boundingRectMachining.width(), 1000.0);
+    int canvasHeight = qRound(canvasWidth / ratio);
+
     QTransform t = QTransform::fromScale(
-        1.0 / Config::General::machiningUnit(),
-        1.0 / Config::General::machiningUnit()
+        canvasWidth / boundingRectMachining.width(),
+        canvasHeight / boundingRectMachining.height()
     );
 
     path = t.map(path);
     QRectF boundRect = path.boundingRect();
     t = QTransform::fromTranslate(-boundRect.x(), -boundRect.y());
     path = t.map(path);
-    QPixmap canvas(boundRect.size().toSize());
+    QImage canvas(boundRect.width(), boundRect.height(), QImage::Format_Grayscale8);
+    canvas.fill(Qt::white);
     QPainter painter(&canvas);
     painter.setBrush(Qt::black);
     //QPen pen(Qt::black, 1);
     //painter.setPen(pen);
     painter.drawPath(path);
 
-    canvas.save("tmp/" + name() + ".png");
+    t = QTransform::fromScale(
+        1 / Config::General::machiningUnit(),
+        1 / Config::General::machiningUnit()
+    );
+    QRectF boundingRectMM = t.mapRect(boundingRectMachining);
 
-    /*int dpi = d->layer->dpi();
-    int pixelWidth = qRound(boundRect.width() * MM_TO_INCH * dpi);
-    int pixelHeight = qRound(boundRect.height() * MM_TO_INCH * dpi);
+    cv::Mat src(canvas.height(), canvas.width(), CV_8UC1, (void*)canvas.constBits(), canvas.bytesPerLine());
 
-    int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
-
-    cv::Mat pixelScaled(pixelHeight, pixelWidth, CV_8UC1, cv::Scalar(0));
+    int dpi = d->layer->dpi();
+    int pixelWidth = qRound(boundingRectMM.width() * MM_TO_INCH * dpi);
+    int pixelHeight = qRound(boundingRectMM.height() * MM_TO_INCH * dpi);
 
     qreal pixelInterval = layer()->engravingRowInterval();
-
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundRect.height() * Config::General::machiningUnit() / pixelInterval);
+    int outHeight = std::round(boundingRectMM.height() * Config::General::machiningUnit() / pixelInterval);
+    cv::Mat resized;
+    cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_NEAREST);
+    //resized = 255 - resized;
+
+    cv::imwrite("tmp/" + name().toStdString() + ".png", resized);
+
     qLogD << "bounding rect: " << boundRect;
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
-
-    cv::Mat resized;
     
-    bytes = imageUtils::image2EngravingData(progress, resized, boundRect.left(), boundRect.top(), pixelInterval / 1000, boundRect.width());*/
+    bytes = imageUtils::image2EngravingData(progress, resized, boundingRectMM.left(), boundingRectMM.top(), pixelInterval / 1000, boundingRectMM.width());
 
     return bytes;
 }
@@ -2422,12 +2433,12 @@ int LaserShape::layerIndex()
 	return d->layerIndex;
 }
 
-class LaserTextPrivate : public LaserPrimitivePrivate
+class LaserTextPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserText)
 public:
     LaserTextPrivate(LaserText* ptr)
-        : LaserPrimitivePrivate(ptr)
+        : LaserShapePrivate(ptr)
     {
         spaceY = LaserApplication::mainWindow->fontSpaceYDoubleSpinBox()->value();
     }
@@ -2449,7 +2460,7 @@ public:
 };
 
 LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
-	: LaserPrimitive(new LaserTextPrivate(this),  doc,  LPT_TEXT, saveTransform, layerIndex)
+	: LaserShape(new LaserTextPrivate(this),  doc,  LPT_TEXT, layerIndex, saveTransform)
 {
     Q_D(LaserText);
     //d->boundingRect = d->path.boundingRect();

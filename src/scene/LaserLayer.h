@@ -80,6 +80,9 @@ public:
     bool fillingEnableCutting() const;
     void setFillingEnableCutting(bool cutting);
 
+    int fillingType() const;
+    void setFillingType(int type);
+
     QPoint startPos() const;
     void setStartPos(const QPoint& startPos);
 

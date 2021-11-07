@@ -188,6 +188,7 @@ public:
         CONFIG_ITEM(fillingLayer, maxPower, qreal, toReal)
         CONFIG_ITEM(fillingLayer, rowInterval, int, toInt)
         CONFIG_ITEM(fillingLayer, enableCutting, bool, toBool)
+        CONFIG_ITEM(fillingLayer, fillingType, int, toInt)
 
     private:
         friend class Config;

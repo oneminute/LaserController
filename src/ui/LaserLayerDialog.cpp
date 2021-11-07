@@ -31,31 +31,15 @@ void LaserLayerDialog::initUi()
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
-    connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
-    connect(m_ui->radioButtonFilling, &QRadioButton::toggled, this, &LaserLayerDialog::onBothToggled);
-    connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &LaserLayerDialog::onButtonClicked);
-    connect(m_ui->checkBoxEngravingEnableCutting, &QCheckBox::toggled, this, &LaserLayerDialog::onEngravingEnableCuttingToggled);
-    connect(m_ui->checkBoxFillingEnableCutting, &QCheckBox::toggled, this, &LaserLayerDialog::onFillingEnableCuttingToggled);
-
-    if (m_type == LLT_ENGRAVING)
-    {
-        m_ui->radioButtonCutting->setChecked(false);
+    if (m_layer->type() == LLT_ENGRAVING)
         m_ui->radioButtonEngraving->setChecked(true);
-        m_ui->radioButtonFilling->setChecked(false);
-    }
-    else if (m_type == LLT_CUTTING)
-    {
+    else if (m_layer->type() == LLT_CUTTING)
         m_ui->radioButtonCutting->setChecked(true);
-        m_ui->radioButtonEngraving->setChecked(false);
-        m_ui->radioButtonFilling->setChecked(false);
-    }
-    else if (m_type == LLT_FILLING)
-    {
-        m_ui->radioButtonCutting->setChecked(true);
-        m_ui->radioButtonEngraving->setChecked(false);
+    else if (m_layer->type() == LLT_FILLING)
         m_ui->radioButtonFilling->setChecked(true);
-    }
+
+    m_ui->comboBoxFillingType->addItem(tr("Line"), 0);
+    m_ui->comboBoxFillingType->addItem(tr("Pixel"), 1);
 
     m_ui->editSliderCuttingRunSpeed->setMaximum(2000);
     m_ui->editSliderCuttingMinSpeedPower->setMaximum(100);
@@ -122,6 +106,14 @@ void LaserLayerDialog::initUi()
     m_ui->labelFillingMaxPower->setText(Config::FillingLayer::maxPowerItem()->title());
     m_ui->labelFillingRowInterval->setText(Config::FillingLayer::rowIntervalItem()->title());
 
+    connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
+    connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
+    connect(m_ui->radioButtonFilling, &QRadioButton::toggled, this, &LaserLayerDialog::onFillingToggled);
+    connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &LaserLayerDialog::onButtonClicked);
+    connect(m_ui->checkBoxEngravingEnableCutting, &QCheckBox::toggled, this, &LaserLayerDialog::onEngravingEnableCuttingToggled);
+    connect(m_ui->checkBoxFillingEnableCutting, &QCheckBox::toggled, this, &LaserLayerDialog::onFillingEnableCuttingToggled);
+    connect(m_ui->comboBoxFillingType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserLayerDialog::onFillingTypeChanged);
+
 	resetParameters();
 }
 
@@ -142,11 +134,14 @@ void LaserLayerDialog::resetParameters()
     m_ui->editSliderDPI->setValue(m_layer->dpi());
     m_ui->editSliderLPI->setValue(m_layer->lpi());
 
+    m_ui->comboBoxFillingType->setCurrentIndex(m_layer->fillingType());
     m_ui->checkBoxFillingEnableCutting->setChecked(m_layer->fillingEnableCutting());
     m_ui->editSliderFillingRunSpeed->setValue(m_layer->fillingRunSpeed());
     m_ui->editSliderFillingMinSpeedPower->setValue(m_layer->fillingMinSpeedPower());
     m_ui->editSliderFillingRunSpeedPower->setValue(m_layer->fillingRunSpeedPower());
     m_ui->editSliderFillingRowInterval->setValue(m_layer->fillingRowInterval());
+
+    updateControls();
 }
 
 void LaserLayerDialog::restoreParameters()
@@ -166,6 +161,7 @@ void LaserLayerDialog::restoreParameters()
     m_ui->editSliderDPI->setValue(Config::EngravingLayer::DPI());
     m_ui->editSliderLPI->setValue(Config::EngravingLayer::LPI());
 
+    m_ui->comboBoxFillingType->setCurrentIndex(Config::FillingLayer::fillingType());
     m_ui->checkBoxFillingEnableCutting->setChecked(Config::FillingLayer::enableCutting());
     m_ui->editSliderFillingRunSpeed->setValue(Config::FillingLayer::runSpeed());
     m_ui->editSliderFillingMinSpeedPower->setValue(Config::FillingLayer::minPower());
@@ -177,11 +173,8 @@ void LaserLayerDialog::onCuttingToggled(bool checked)
 {
     if (checked)
     {
-		m_ui->groupBoxCutting->setVisible(true);
-		m_ui->groupBoxEngraving->setVisible(false);
-        m_ui->groupBoxFilling->setVisible(false);
-		adjustSize();
         m_type = LLT_CUTTING;
+        updateControls();
     }
 }
 
@@ -189,36 +182,33 @@ void LaserLayerDialog::onEngravingToggled(bool checked)
 {
     if (checked)
     {
-		m_ui->groupBoxCutting->setVisible(m_ui->checkBoxEngravingEnableCutting->isChecked());
-		m_ui->groupBoxEngraving->setVisible(true);
-        m_ui->groupBoxFilling->setVisible(false);
-		adjustSize();
         m_type = LLT_ENGRAVING;
+        updateControls();
     }
 }
 
-void LaserLayerDialog::onBothToggled(bool checked)
+void LaserLayerDialog::onFillingToggled(bool checked)
 {
     if (checked)
     {
-		m_ui->groupBoxCutting->setVisible(m_ui->checkBoxFillingEnableCutting->isChecked());
-		m_ui->groupBoxEngraving->setVisible(false);
-        m_ui->groupBoxFilling->setVisible(true);
-		adjustSize();
         m_type = LLT_FILLING;
+        updateControls();
     }
 }
 
 void LaserLayerDialog::onEngravingEnableCuttingToggled(bool checked)
 {
-    m_ui->groupBoxCutting->setVisible(checked);
-	adjustSize();
+    updateControls();
 }
 
 void LaserLayerDialog::onFillingEnableCuttingToggled(bool checked)
 {
-    m_ui->groupBoxCutting->setVisible(checked);
-	adjustSize();
+    updateControls();
+}
+
+void LaserLayerDialog::onFillingTypeChanged(int index)
+{
+    updateControls();
 }
 
 void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
@@ -250,6 +240,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::EngravingLayer::useHalftoneItem()->setValue(m_ui->checkBoxUseHalftone->isChecked());
 
         Config::FillingLayer::enableCuttingItem()->setValue(m_ui->checkBoxFillingEnableCutting->isChecked());
+        Config::FillingLayer::fillingTypeItem()->setValue(m_ui->comboBoxFillingType->currentData().toInt());
 		Config::FillingLayer::runSpeedItem()->setValue(m_ui->editSliderFillingRunSpeed->value());
 		Config::FillingLayer::minPowerItem()->setValue(m_ui->editSliderFillingMinSpeedPower->value());
 		Config::FillingLayer::maxPowerItem()->setValue(m_ui->editSliderFillingRunSpeedPower->value());
@@ -260,6 +251,60 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 			Config::save();
 		}
 	}
+}
+
+void LaserLayerDialog::updateControls()
+{
+    switch (m_type)
+    {
+    case LLT_ENGRAVING:
+    {
+        m_ui->groupBoxEngraving->setEnabled(true);
+        m_ui->groupBoxCutting->setEnabled(false);
+        m_ui->groupBoxFilling->setEnabled(false);
+        m_ui->groupBoxFillingLines->setEnabled(false);
+        m_ui->checkBoxEngravingEnableCutting->setEnabled(true);
+
+        if (m_ui->checkBoxEngravingEnableCutting->isChecked())
+        {
+            m_ui->groupBoxCutting->setEnabled(true);
+        }
+    }
+    break;
+    case LLT_CUTTING:
+    {
+        m_ui->groupBoxEngraving->setEnabled(false);
+        m_ui->groupBoxCutting->setEnabled(true);
+        m_ui->groupBoxFilling->setEnabled(false);
+        m_ui->groupBoxFillingLines->setEnabled(false);
+    }
+    break;
+    case LLT_FILLING:
+    {
+        m_ui->groupBoxEngraving->setEnabled(false);
+        m_ui->groupBoxCutting->setEnabled(false);
+        m_ui->groupBoxFilling->setEnabled(true);
+        m_ui->groupBoxFillingLines->setEnabled(true);
+        m_ui->checkBoxEngravingEnableCutting->setEnabled(false);
+
+        if (m_ui->checkBoxFillingEnableCutting->isChecked())
+        {
+            m_ui->groupBoxCutting->setEnabled(true);
+        }
+
+        if (m_ui->comboBoxFillingType->currentData().toInt() == FT_Pixel)
+        {
+            m_ui->groupBoxEngraving->setEnabled(true);
+            m_ui->groupBoxFillingLines->setEnabled(false);
+        }
+        else if (m_ui->comboBoxFillingType->currentData().toInt() == FT_Line)
+        {
+            m_ui->groupBoxEngraving->setEnabled(false);
+            m_ui->groupBoxFillingLines->setEnabled(true);
+        }
+    }
+    break;
+    }
 }
 
 void LaserLayerDialog::accept()
@@ -280,6 +325,7 @@ void LaserLayerDialog::accept()
     m_layer->setUseHalftone(m_ui->checkBoxUseHalftone->isChecked());
 
     m_layer->setFillingEnableCutting(m_ui->checkBoxFillingEnableCutting->isChecked());
+    m_layer->setFillingType(m_ui->comboBoxFillingType->currentData().toInt());
     m_layer->setFillingRunSpeed(m_ui->editSliderFillingRunSpeed->value());
     m_layer->setFillingMinSpeedPower(m_ui->editSliderFillingMinSpeedPower->value());
     m_layer->setFillingRunSpeedPower(m_ui->editSliderFillingRunSpeedPower->value());

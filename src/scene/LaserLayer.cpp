@@ -38,6 +38,7 @@ public:
         , fillingRunSpeedPower(Config::FillingLayer::maxPower())
         , fillingRowInterval(Config::FillingLayer::rowInterval())
         , fillingEnableCutting(Config::FillingLayer::enableCutting())
+        , fillingType(Config::FillingLayer::fillingType())
         , doc(nullptr)
         , lpi(60)
         , dpi(600)
@@ -69,6 +70,7 @@ public:
     qreal fillingRunSpeedPower;
     int fillingRowInterval;
     bool fillingEnableCutting;
+    int fillingType;
 
     // engraving fields
     bool engravingForward;
@@ -345,6 +347,18 @@ void LaserLayer::setFillingEnableCutting(bool cutting)
     d->fillingEnableCutting = cutting;
 }
 
+int LaserLayer::fillingType() const
+{
+    Q_D(const LaserLayer);
+    return d->fillingType;
+}
+
+void LaserLayer::setFillingType(int type)
+{
+    Q_D(LaserLayer);
+    d->fillingType = type;
+}
+
 QPoint LaserLayer::startPos() const
 { 
     Q_D(const LaserLayer);
@@ -566,6 +580,7 @@ QJsonObject LaserLayer::toJson(QWidget* window)
 	QJsonArray array;
 	object.insert("name", this->name());
 	object.insert("type", this->type());
+    object.insert("exportable", this->exportable());
     object.insert("visible", this->visible());
     object.insert("cuttingRunSpeed", this->cuttingRunSpeed());
     object.insert("cuttingMinSpeedPower", this->cuttingMinSpeedPower());
@@ -580,6 +595,8 @@ QJsonObject LaserLayer::toJson(QWidget* window)
     object.insert("fillingMinSpeedPower", this->fillingMinSpeedPower());
     object.insert("fillingRunSpeedPower", this->fillingRunSpeedPower());
     object.insert("fillingRowInterval", this->fillingRowInterval());
+    object.insert("fillingEnableCutting", this->fillingEnableCutting());
+    object.insert("fillingType", this->fillingType());
     object.insert("errorX", this->errorX());
     object.insert("useHalftone", this->useHalftone());
     object.insert("lpi", this->lpi());

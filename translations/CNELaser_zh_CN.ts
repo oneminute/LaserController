@@ -389,7 +389,7 @@
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+2941"/>
+        <location line="+2962"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -399,7 +399,7 @@
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
     <message>
-        <location line="-2896"/>
+        <location line="-2917"/>
         <location line="+17"/>
         <source>English</source>
         <translation>英文</translation>
@@ -411,7 +411,7 @@
         <translation>中文</translation>
     </message>
     <message>
-        <location line="+2881"/>
+        <location line="+2902"/>
         <source>Unit</source>
         <translation>单位</translation>
     </message>
@@ -420,12 +420,12 @@
         <translation type="vanished">全局单位</translation>
     </message>
     <message>
-        <location line="-2863"/>
+        <location line="-2884"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location line="+2867"/>
+        <location line="+2888"/>
         <source>Machining Unit</source>
         <translation>加工单位</translation>
     </message>
@@ -666,7 +666,7 @@
         <translation type="vanished">是否在路径优化中使用贪婪算法。</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+32"/>
         <source>Max Starting Points</source>
         <translation>最大起刀点数</translation>
     </message>
@@ -782,7 +782,7 @@
         <translation type="vanished">绝对坐标</translation>
     </message>
     <message>
-        <location line="-263"/>
+        <location line="-267"/>
         <source>Unit for machining</source>
         <translation>加工时用到的坐标</translation>
     </message>
@@ -1025,7 +1025,7 @@
         <translation>矢量填充图层中位图两行间的间距</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+12"/>
         <source>Max starting points count of each primitive node</source>
         <translation>每一个图元的最大起刀点数</translation>
     </message>
@@ -1116,7 +1116,7 @@
         <translation>在生成挂网图像时应用高斯函数</translation>
     </message>
     <message>
-        <location line="-97"/>
+        <location line="-101"/>
         <source>Halftone Angles</source>
         <translation>半调网屏角度</translation>
     </message>
@@ -1148,7 +1148,7 @@
         <translation>切割外轮廓</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+71"/>
         <location line="+1"/>
         <source>a</source>
         <translation></translation>
@@ -1905,7 +1905,7 @@
         <translation>启用优化交互</translation>
     </message>
     <message>
-        <location line="-629"/>
+        <location line="-633"/>
         <source>Visual Grid Spacing(mm)</source>
         <translation>可视网格间距(mm)</translation>
     </message>
@@ -1914,13 +1914,13 @@
         <translation type="obsolete">分割条手柄宽度</translation>
     </message>
     <message>
-        <location line="+221"/>
+        <location line="+225"/>
         <location line="+4"/>
         <source>Acceleration mode</source>
         <translation>加速模式</translation>
     </message>
     <message>
-        <location line="-2172"/>
+        <location line="-2176"/>
         <source>T</source>
         <translation>T</translation>
     </message>
@@ -1962,7 +1962,7 @@
         <translation type="vanished">最大激光功率(%)</translation>
     </message>
     <message>
-        <location line="+2155"/>
+        <location line="+2159"/>
         <source>Selected user origin</source>
         <translation>所选用户原点</translation>
     </message>
@@ -2056,7 +2056,7 @@
         <translation>X轴方向极性</translation>
     </message>
     <message>
-        <location line="-1456"/>
+        <location line="-1460"/>
         <location line="+20"/>
         <location line="+69"/>
         <location line="+28"/>
@@ -2108,7 +2108,7 @@
         <translation>切割图层的最大功率百分比</translation>
     </message>
     <message>
-        <location line="+200"/>
+        <location line="+204"/>
         <source>Move acceleration for cutting movement</source>
         <translation>切割空移加速度</translation>
     </message>
@@ -2279,7 +2279,7 @@
         <translation>X轴限位极性</translation>
     </message>
     <message>
-        <location line="-1369"/>
+        <location line="-1373"/>
         <location line="+28"/>
         <location line="+255"/>
         <location line="+28"/>
@@ -2289,7 +2289,17 @@
         <translation>2</translation>
     </message>
     <message>
-        <location line="-595"/>
+        <location line="-2132"/>
+        <source>Line</source>
+        <translation>直线填充</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Pixel</source>
+        <translation>像素填充</translation>
+    </message>
+    <message>
+        <location line="+1536"/>
         <location line="+28"/>
         <location line="+255"/>
         <location line="+28"/>
@@ -2365,12 +2375,12 @@
     </message>
     <message>
         <location line="+36"/>
-        <location line="+276"/>
+        <location line="+280"/>
         <source>Filling Speed(mm/s)</source>
         <translation>填充速度(mm/s)</translation>
     </message>
     <message>
-        <location line="-272"/>
+        <location line="-276"/>
         <source>Filling Min Power(%)</source>
         <translation>最小填充功率(%)</translation>
     </message>
@@ -2380,7 +2390,13 @@
         <translation>最大填充功率(%)</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+12"/>
+        <location line="+1"/>
+        <source>Filling Type</source>
+        <translation>填充类型</translation>
+    </message>
+    <message>
+        <location line="+59"/>
         <source>Gaussian Factor</source>
         <translation>高斯系数</translation>
     </message>
@@ -2544,7 +2560,7 @@
     <message>
         <location line="+3"/>
         <location line="+1"/>
-        <location filename="../src/common/Config.h" line="+19"/>
+        <location filename="../src/common/Config.h" line="+20"/>
         <source>Path Optimization</source>
         <translation>路径优化</translation>
     </message>
@@ -3543,7 +3559,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+99"/>
         <source>Cut</source>
-        <translation>切边</translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <source>Spot Shot</source>
@@ -4195,7 +4211,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+9"/>
         <source>Paste</source>
-        <translation>剪切</translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4303,13 +4319,13 @@ Would you like to overwrite it?</source>
         <location line="+9"/>
         <location line="+3"/>
         <source>Bounding</source>
-        <translation>走边框</translation>
+        <translation>切边框</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="-111"/>
         <source>Move</source>
-        <translation>走边</translation>
+        <translation>移动</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -4555,7 +4571,7 @@ Would you like to overwrite it?</source>
         <location line="+9"/>
         <location line="+3"/>
         <source>Duplication</source>
-        <translation>复制</translation>
+        <translation>克隆当前对象</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -5378,7 +5394,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>导出JSON文件</translation>
     </message>
     <message>
-        <location line="+182"/>
+        <location line="+194"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
@@ -5393,7 +5409,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>按层建立拓扑</translation>
     </message>
     <message>
-        <location line="+336"/>
+        <location line="+340"/>
         <source>Untitled</source>
         <translation>未命名</translation>
     </message>
@@ -5756,7 +5772,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserLayer</name>
     <message>
-        <location filename="../src/scene/LaserLayer.cpp" line="+140"/>
+        <location filename="../src/scene/LaserLayer.cpp" line="+142"/>
         <source>undefined</source>
         <translation>未定义</translation>
     </message>
@@ -5769,7 +5785,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>图层参数</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+140"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
@@ -5779,73 +5795,78 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>图层类型</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <location line="+282"/>
+        <location line="+16"/>
+        <location line="+61"/>
         <source>Cutting</source>
         <translation>切割</translation>
     </message>
     <message>
-        <location line="-275"/>
-        <location line="+61"/>
+        <location line="+79"/>
+        <source>Line Filling</source>
+        <translation>线填充</translation>
+    </message>
+    <message>
+        <location line="-292"/>
+        <location line="+145"/>
         <source>Engraving</source>
         <translation>雕刻</translation>
     </message>
     <message>
-        <location line="-51"/>
-        <location line="+175"/>
+        <location line="+17"/>
+        <location line="+90"/>
         <source>Filling</source>
         <translation>矢量填充</translation>
     </message>
     <message>
-        <location line="-104"/>
-        <location line="+110"/>
-        <location line="+90"/>
+        <location line="-232"/>
+        <location line="+199"/>
+        <location line="+79"/>
         <source>Speed(mm/s)</source>
         <translation>切割速度（mm/s)</translation>
     </message>
     <message>
-        <location line="-180"/>
-        <location line="+100"/>
-        <location line="+90"/>
+        <location line="-258"/>
+        <location line="+189"/>
+        <location line="+79"/>
         <source>Min Power(%)</source>
         <translation>最小功率(%)</translation>
     </message>
     <message>
-        <location line="-180"/>
-        <location line="+100"/>
-        <location line="+90"/>
+        <location line="-258"/>
+        <location line="+189"/>
+        <location line="+79"/>
         <source>Max Power(%)</source>
         <translation>最大功率(%)</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-57"/>
         <source>Filling Type</source>
         <translation>填充类型</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location filename="../src/ui/LaserLayerDialog.cpp" line="+41"/>
         <source>Line</source>
         <translation>线段填充</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+1"/>
         <source>Pixel</source>
         <translation>像素填充</translation>
     </message>
     <message>
-        <location line="-197"/>
-        <location line="+164"/>
+        <location filename="../src/ui/LaserLayerDialog.ui" line="-255"/>
+        <location line="+269"/>
         <source>Enable Cutting</source>
         <translation>切割外轮廓</translation>
     </message>
     <message>
-        <location line="-140"/>
+        <location line="-245"/>
         <source>Power</source>
         <translation>雕刻功率(%)</translation>
     </message>
     <message>
         <location line="+30"/>
-        <location line="+100"/>
+        <location line="+268"/>
         <source>Row Interval(um)</source>
         <translation>行间距</translation>
     </message>
@@ -5854,7 +5875,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">切割+雕刻</translation>
     </message>
     <message>
-        <location line="-183"/>
+        <location line="-138"/>
         <source>Layer Name</source>
         <translation>图层名称</translation>
     </message>
@@ -5871,7 +5892,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">行间距(µm)</translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="-106"/>
         <source>Angles</source>
         <translation>角度</translation>
     </message>
@@ -5915,7 +5936,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>每英寸点数</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserLayerDialog.cpp" line="+98"/>
+        <location filename="../src/ui/LaserLayerDialog.cpp" line="+40"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
@@ -6119,7 +6140,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+1988"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+1999"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -9467,7 +9488,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3704"/>
+        <location filename="../src/common/Config.cpp" line="-3729"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
@@ -9485,7 +9506,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">激光控制器</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="-589"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="-600"/>
         <source>Relays: </source>
         <translation>限位器： </translation>
     </message>
@@ -9654,7 +9675,7 @@ Do you want to delete it anyway?</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-837"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-850"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>
