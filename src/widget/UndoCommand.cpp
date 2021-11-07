@@ -361,6 +361,7 @@ PasteCommand::PasteCommand(LaserViewer * v, bool isPasteInline, bool isDuplicati
 	m_scene = m_viewer->scene();
 	m_isDuplication = isDuplication;
 	m_isPasteInline = isPasteInline;
+    m_quadTree = v->scene()->quadTreeNode();
 }
 
 PasteCommand::~PasteCommand()
@@ -391,65 +392,35 @@ void PasteCommand::undo()
 void PasteCommand::redo()
 {
 	//��һ�ν����Ǵ���Item
-	if (m_pasteList.isEmpty()) {
-		if (!m_isDuplication) {
-			for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_viewer->copyedList().begin(); 
-				i != m_viewer->copyedList().end(); i++) {
-				LaserPrimitive* copyP = i.key()->clone(i.value());
-				m_pasteList.append(copyP);
-			}
-		}
-		else {
-			for each(QGraphicsItem* item in m_group->childItems()){
-				LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-				LaserPrimitive* copyP = primitive->clone(primitive->sceneTransform());
-				m_pasteList.append(copyP);
-			}
-		}
-		
-		//copy
-		if (!m_isDuplication) {
-			
-			redoImp();
-			if (!m_isPasteInline) {
-				//����λ��
-				QPointF mousePos = m_viewer->mapFromGlobal(QCursor::pos());
-				if (mousePos.x() < 0 || mousePos.y() < 0) {
-					mousePos = m_viewer->rect().center();
-				}
-				QPointF initPos = m_viewer->selectedItemsSceneBoundingRect().center();
-				QPointF diff = m_viewer->mapToScene(mousePos.toPoint()) - initPos;
-				QTransform t = m_group->transform();
-				QTransform t1;
-				t1.translate(diff.x(), diff.y());
-				m_group->setTransform(t * t1);
-			}
-			
-		}
-		//duplication
-		else {
-			redoImp();
-		}
-		
-	}
-	else {
-		redoImp();
-		//copy
-		/*if (!m_isDuplication) {
-			redoImp();
-		}
-		//duplication
-		else {
-			duplicationRedo();
-		}*/
-	}
+    if (m_pasteList.isEmpty()) {
+        if (!m_isDuplication) {
+            for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_viewer->copyedList().begin();
+                i != m_viewer->copyedList().end(); i++) {
+                LaserPrimitive* copyP = i.key()->clone(i.value());
+                m_pasteList.append(copyP);
+            }
+        }
+        else {
+            for each(QGraphicsItem* item in m_group->childItems()) {
+                LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+                LaserPrimitive* copyP = primitive->clone(primitive->sceneTransform());
+                m_pasteList.append(copyP);
+            }
+        }
+        redoImp(false);
+    }
+    else {
+        redoImp(true);
+    }
+
+    
 	if (!m_viewer->group()->isEmpty() && StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
 		emit m_viewer->idleToSelected();
 	}
 	m_viewer->viewport()->repaint();
 }
 
-void PasteCommand::redoImp()
+void PasteCommand::addImp(bool isAddToTreeNode)
 {
 	m_pastedBeforeAdd.clear();
 	for each(QGraphicsItem* item in m_group->childItems()) {
@@ -457,20 +428,61 @@ void PasteCommand::redoImp()
 	}
 	m_viewer->clearGroupSelection();
 	for each(LaserPrimitive* primitive in m_pasteList) {
-		//LaserPrimitive* copyP = new LaserPrimitive(primitive->, primitive->document());
-
-		primitive->setSelected(true);
-		m_scene->addLaserPrimitive(primitive);
+        if (isAddToTreeNode) {
+            m_scene->addLaserPrimitive(primitive);
+        }
+        else {
+            m_scene->addLaserPrimitiveWithoutTreeNode(primitive);
+        }
+        primitive->setSelected(true);
 	}
 	m_viewer->onSelectedFillGroup();
 }
 
-void PasteCommand::duplicationRedo()
+void PasteCommand::redoImp(bool isRedo)
 {
-	
+    //copy
+    if (!m_isDuplication) {
+
+        if (!m_isPasteInline) {
+            addImp();
+            QPointF mousePos;
+            QPointF initPos = m_viewer->selectedItemsSceneBoundingRect().center();
+            if (isRedo) {
+                mousePos = m_mouseRedoPos;
+            }
+            else {
+                mousePos = m_viewer->mapFromGlobal(QCursor::pos());
+                if (mousePos.x() < 0 || mousePos.y() < 0) {
+                    mousePos = m_viewer->rect().center();
+                }
+                mousePos = m_viewer->mapToScene(mousePos.toPoint());
+                m_mouseRedoPos = mousePos;
+            }
+            QPointF diff = mousePos - initPos;
+            QTransform t = m_group->transform();
+            QTransform t1;
+            t1.translate(diff.x(), diff.y());
+            QTransform lastTransform = m_group->sceneTransform();
+            m_group->setTransform(t * t1);
+            if (!m_viewer->detectBoundsInMaxRegion(m_group->sceneBoundingRect())) {
+
+                m_group->setTransform(lastTransform);
+            }
+            m_scene->addGroupItemsToTreeNode();
+        }
+        else {
+            addImp(true);
+        }
+
+    }
+    //duplication
+    else {
+        addImp(true);
+    }
 }
 
-MirrorACommand::MirrorACommand(LaserViewer * v)
+/*MirrorACommand::MirrorACommand(LaserViewer * v)
 {
     m_viewer = v;
     m_line = qgraphicsitem_cast<LaserLine*>(m_viewer->mirrorLine());
@@ -508,7 +520,7 @@ void MirrorACommand::redo()
     //����ѡ������
     m_viewer->selectedChange();  
     m_viewer->viewport()->repaint();
-}
+}*/
 
 LockedCommand::LockedCommand(LaserViewer* v, QCheckBox* locked, Qt::CheckState lastState, QList<LaserPrimitive*> lockedList)
 {

@@ -114,8 +114,8 @@ public:
 	~PasteCommand();
 	virtual void undo() override;
 	virtual void redo() override;
-	void redoImp();
-	void duplicationRedo();
+	void addImp(bool isAddToTreeNode = false);
+    void redoImp(bool isRedo);
 private :
 	LaserViewer *  m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_pastedBeforeAdd;
@@ -124,11 +124,13 @@ private :
 	LaserScene* m_scene;
 	bool m_isDuplication;
 	bool m_isPasteInline;
+    QuadTreeNode* m_quadTree;
+    QPointF m_mouseRedoPos;
 	//QPointF m_position;
 
 };
 //½»²æÏß¾µÏñ
-class MirrorACommand : public QUndoCommand {
+/*class MirrorACommand : public QUndoCommand {
 public:
     MirrorACommand(LaserViewer* v);
     ~MirrorACommand();
@@ -137,7 +139,7 @@ public:
 private:
     LaserViewer * m_viewer;
     LaserLine* m_line;
-};
+};*/
 //Lock
 class LockedCommand : public QUndoCommand {
 public:

@@ -25,6 +25,8 @@ public:
     void setDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
     void addLaserPrimitive(LaserPrimitive* primitive);
+    void addLaserPrimitiveWithoutTreeNode(LaserPrimitive* primitive);
+    void addGroupItemsToTreeNode();
 	void removeLaserPrimitive(LaserPrimitive* primitive);
 	LaserBackgroundItem* backgroundItem() { return m_background; }
 

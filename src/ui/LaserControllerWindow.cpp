@@ -3363,8 +3363,10 @@ void LaserControllerWindow::onActionMirrorACrossLine(bool checked)
     if (!m_viewer || !m_viewer->group()) {
         return;
     }
-    MirrorACommand* cmd = new MirrorACommand(m_viewer);
-    m_viewer->undoStack()->push(cmd);
+    //MirrorACommand* cmd = new MirrorACommand(m_viewer);
+    //m_viewer->undoStack()->push(cmd);
+    m_viewer->AcrossLineMirror();
+    
 }
 
 void LaserControllerWindow::onActionPrintAndCutNew(bool checked)

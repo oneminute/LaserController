@@ -88,6 +88,10 @@ public:
     void setTextAlignV(int align);
     //tree
     void updateGroupTreeNode();
+    //mirror
+    void AcrossLineMirror();
+    //detect bounds is in max region
+    bool detectBoundsInMaxRegion(QRectF bounds);
 	
 private:
     void init();
@@ -123,6 +127,7 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
+
     
 public slots:
     void zoomIn();

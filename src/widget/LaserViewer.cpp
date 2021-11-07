@@ -3580,32 +3580,15 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
     else {
         bounds = selectedItemsSceneBoundingRect();
     }
-    //垂直或水平线，点的情况
-    if (bounds.width() == 0 || bounds.height() == 0) {
-        if (!m_scene->maxRegion().contains(bounds.topLeft()) || !m_scene->maxRegion().contains(bounds.bottomRight())) {
-            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-            if (item) {
-                item->setTransform(m_singleLastTransform);
-            }
-            //group
-            else {
-                m_group->setTransform(m_groupLastTransform);
-            }
-            return;
+    if (!detectBoundsInMaxRegion(bounds)) {
+        if (item) {
+            item->setTransform(m_singleLastTransform);
         }
-    }
-    else {
-        if (!m_scene->maxRegion().contains(bounds)) {
-            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-            if (item) {
-                item->setTransform(m_singleLastTransform);
-            }
-            //group
-            else {
-                m_group->setTransform(m_groupLastTransform);
-            }
-            return;
+        //group
+        else {
+            m_group->setTransform(m_groupLastTransform);
         }
+        return;
     }
     //TransformUndoCommand
     if (item) {
@@ -3650,6 +3633,49 @@ void LaserViewer::updateGroupTreeNode()
             m_scene->quadTreeNode()->upDatePrimitive(primitive);
         }
     }
+}
+
+void LaserViewer::AcrossLineMirror()
+{
+    LaserPrimitiveGroup* group = this->group();
+
+    LaserLine* line = qgraphicsitem_cast<LaserLine*>(m_mirrorLine);
+    QPointF p1 = line->line().p1();
+    QPointF p2 = line->line().p2();
+    QVector2D v1(p2 - p1);
+    //QVector2D v1(1, 0);
+    v1.normalize();
+    QVector2D v2(v1.y(), -v1.x());
+    QPointF pos = line->transform().map(line->pos());
+    QMatrix mat(v1.x(), v1.y(), v2.x(), v2.y(), p1.x(), p1.y());
+    QPointF p = mat.inverted().map(QPointF(1, 0));
+
+    QTransform t(mat.inverted());
+    QTransform t1(1, 0, 0, -1, 0, 0);
+    QTransform t2 = t.inverted();
+    m_groupLastTransform = group->sceneTransform();
+    group->setTransform(group->transform() * t * t1 * t2);
+    //undo
+    transformUndoStackPush();
+    viewport()->repaint();
+}
+//判断是否在4叉树的有效区域内
+bool LaserViewer::detectBoundsInMaxRegion(QRectF bounds)
+{
+    //垂直或水平线，点的情况
+    if (bounds.width() == 0 || bounds.height() == 0) {
+        if (!m_scene->maxRegion().contains(bounds.topLeft()) || !m_scene->maxRegion().contains(bounds.bottomRight())) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            return false;
+        }
+    }
+    else {
+        if (!m_scene->maxRegion().contains(bounds)) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            return false;
+        }
+    }
+    return true;
 }
 
 qreal LaserViewer::zoomValue() const
