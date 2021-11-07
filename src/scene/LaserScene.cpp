@@ -111,9 +111,24 @@ void LaserScene::addLaserPrimitive(LaserPrimitive * primitive)
     m_quadTree->createPrimitiveTreeNode(primitive);
 }
 
+void LaserScene::addLaserPrimitiveWithoutTreeNode(LaserPrimitive * primitive)
+{
+    m_doc->addPrimitive(primitive);
+    addItem(primitive);
+}
+
+void LaserScene::addGroupItemsToTreeNode()
+{
+    LaserViewer* v = qobject_cast<LaserViewer*>( views()[0]);
+    for each(QGraphicsItem* item in v->group()->childItems()) {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_quadTree->createPrimitiveTreeNode(primitive);
+    }
+}
+
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
-	m_doc->removePrimitive(primitive);
+	//m_doc->removePrimitive(primitive);
     primitive->removeAllTreeNode();
 	removeItem(primitive);
 }

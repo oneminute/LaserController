@@ -58,6 +58,7 @@ private:
 class AddDelUndoCommand : public QUndoCommand {
 public :
 	AddDelUndoCommand(LaserScene* scene, QList<QGraphicsItem*> list, bool isDel = false);
+    AddDelUndoCommand(LaserScene* scene, QList<LaserPrimitive*> list, bool isDel = false);
 	~AddDelUndoCommand();
 	virtual void undo() override;
 	virtual void redo() override;
@@ -66,6 +67,7 @@ private:
 	LaserScene * m_scene;
 	LaserViewer* m_viewer;
 	QList<QGraphicsItem*> m_list;
+    QList<LaserPrimitive*> m_primitiveList;
 	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
 	//QTransform m_addRedoTransform;
 	//QTransform m_delRedoTransform;
@@ -114,8 +116,8 @@ public:
 	~PasteCommand();
 	virtual void undo() override;
 	virtual void redo() override;
-	void redoImp();
-	void duplicationRedo();
+	void addImp(bool isAddToTreeNode = false);
+    void redoImp(bool isRedo);
 private :
 	LaserViewer *  m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_pastedBeforeAdd;
@@ -124,11 +126,13 @@ private :
 	LaserScene* m_scene;
 	bool m_isDuplication;
 	bool m_isPasteInline;
+    QuadTreeNode* m_quadTree;
+    QPointF m_mouseRedoPos;
 	//QPointF m_position;
 
 };
 //½»²æÏß¾µÏñ
-class MirrorACommand : public QUndoCommand {
+/*class MirrorACommand : public QUndoCommand {
 public:
     MirrorACommand(LaserViewer* v);
     ~MirrorACommand();
@@ -137,7 +141,7 @@ public:
 private:
     LaserViewer * m_viewer;
     LaserLine* m_line;
-};
+};*/
 //Lock
 class LockedCommand : public QUndoCommand {
 public:
