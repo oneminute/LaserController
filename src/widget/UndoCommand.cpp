@@ -191,8 +191,7 @@ void AddDelUndoCommand::undo()
 			emit m_viewer->selectionToIdle();
 		}
 		
-	}
-    
+	}   
 	m_viewer->viewport()->repaint();
     emit m_viewer->selectedChange();
 }
