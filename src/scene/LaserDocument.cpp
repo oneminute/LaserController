@@ -52,7 +52,7 @@ public:
     //PageInformation pageInfo;
     bool isOpened;
     LaserScene* scene;
-    FinishRun finishRun;
+    FinishRunType finishRun;
     SizeUnit unit;
 
     bool enablePrintAndCut;
@@ -99,9 +99,7 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
     Q_D(LaserDocument);
     item->layer()->removePrimitive(item);
     scene()->removeLaserPrimitive(item);
-    //d->primitives.remove(item->id());
-    //item->QObject::deleteLater();
-
+    d->primitives.remove(item->id());
 }
 
 //PageInformation LaserDocument::pageInformation() const
@@ -229,16 +227,21 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
-    laserDocumentInfo["FinishRun"] = d->finishRun.code;
+    laserDocumentInfo["FinishRun"] = d->finishRun;
     laserDocumentInfo["StartFrom"] = Config::Device::startFrom();
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
+
     QPointF docOrigin = LaserApplication::device->originMachining();
-    laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
+    // 这里的原点要进行平移操作
+    QTransform deviceTMachining = LaserApplication::device->deviceTransformMachining();
+    laserDocumentInfo["Origin"] = typeUtils::point2Json(deviceTMachining.map(docOrigin));
+    // 这里计算出的外包框也要进行平移操作
     QRectF boundingRect = docBoundingRect();
     QRectF boundingRectMachining = Global::matrixToMachining().map(boundingRect).boundingRect();
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(boundingRectMachining);
-    laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectMachining());
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(deviceTMachining.mapRect(boundingRectMachining));
+    laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(deviceTMachining.mapRect(imagesBoundingRectMachining()));
+
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -310,12 +313,12 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
             {
                 if (!enablePrintAndCut())
                 {
-                    itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
-                    itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+                    itemObj["Width"] = Global::convertToMmH(primitive->boundingRect().width());
+                    itemObj["Height"] = Global::convertToMmV(primitive->boundingRect().height());
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
 
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Engraving").arg(primitive->name()), exportProgress);
-                    QByteArray data = primitive->engravingImage(progress);
+                    QByteArray data = primitive->engravingImage(progress, lastPoint);
                     if (!data.isEmpty())
                     {
                         itemObj["Type"] = primitive->typeLatinName();
@@ -369,11 +372,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     }
                     else if (layer->fillingType() == FT_Pixel)
                     {
-                        QByteArray data = primitive->filling(progress);
+                        QByteArray data = primitive->filling(progress, lastPoint);
                         if (!data.isEmpty())
                         {
-                            itemObj["Width"] = Global::convertToMM(SU_PX, primitive->boundingRect().width());
-                            itemObj["Height"] = Global::convertToMM(SU_PX, primitive->boundingRect().height(), Qt::Vertical);
+                            itemObj["Width"] = Global::convertToMmH(primitive->boundingRect().width());
+                            itemObj["Height"] = Global::convertToMmV(primitive->boundingRect().height());
                             itemObj["Type"] = "Bitmap";
                             itemObj["ImageType"] = "PNG";
                             itemObj["Data"] = QString(data.toBase64());
@@ -423,6 +426,162 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     emit exportFinished(filename);
 }
 
+void LaserDocument::exportBoundingJSON()
+{
+    Q_D(LaserDocument);
+
+    PathOptimizer optimizer(d->optimizeNode, primitives().count());
+
+    QFile saveFile("tmp/bounding.json");
+    QJsonObject jsonObj;
+
+    QTransform t = enablePrintAndCut() ? printAndCutTransform() : QTransform();
+
+    QJsonObject laserDocumentInfo;
+    laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
+    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    laserDocumentInfo["PrinterDrawUnit"] = 1016;
+    laserDocumentInfo["FinishRun"] = d->finishRun;
+    laserDocumentInfo["StartFrom"] = Config::Device::startFrom();
+    laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
+    laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
+
+    QPointF docOrigin = LaserApplication::device->originMachining();
+    // 这里的原点要进行平移操作
+    QTransform deviceTMachining = LaserApplication::device->deviceTransformMachining();
+    laserDocumentInfo["Origin"] = typeUtils::point2Json(deviceTMachining.map(docOrigin));
+    // 这里计算出的外包框也要进行平移操作
+    QRectF boundingRect = docBoundingRect();
+    QRectF boundingRectMachining = Global::matrixToMachining().map(boundingRect).boundingRect();
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(deviceTMachining.mapRect(boundingRectMachining));
+    laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(deviceTMachining.mapRect(imagesBoundingRectMachining()));
+
+    laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
+
+    jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
+
+    QJsonArray layers;
+    QPointF lastPoint = docOrigin;
+    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    {
+        QPointF jobOrigin = LaserApplication::device->jobOrigin(boundingRect);
+        jobOrigin = Global::matrixToMachining().map(jobOrigin);
+        lastPoint = boundingRectMachining.topLeft() - jobOrigin;
+    }
+
+    QJsonObject layerObj;
+    QJsonObject paramObj;
+    QJsonArray items;
+    QJsonObject engravingParamObj;
+    QJsonObject cuttingParamObj;
+    QJsonObject fillingParamObj;
+    layerObj["Type"] = LLT_CUTTING;
+    cuttingParamObj["RunSpeed"] = Config::UserRegister::cuttingMoveSpeed();
+    cuttingParamObj["MinSpeedPower"] = 0;
+    cuttingParamObj["RunSpeedPower"] = 0;
+    paramObj["EngravingParams"] = engravingParamObj;
+    paramObj["CuttingParams"] = cuttingParamObj;
+    paramObj["FillingParams"] = fillingParamObj;
+    layerObj["Params"] = paramObj;
+
+    QJsonObject itemObj;
+    itemObj["Name"] = "BoundingRect";
+    LaserPointList points;
+    points.append(LaserPoint(boundingRectMachining.topLeft()));
+    points.append(LaserPoint(boundingRectMachining.topRight()));
+    points.append(LaserPoint(boundingRectMachining.bottomRight()));
+    points.append(LaserPoint(boundingRectMachining.bottomLeft()));
+    int index = 0;
+    bool isMiddle = false;
+    switch (Config::Device::jobOrigin())
+    {
+    case 0:
+        index = 1;
+        break;
+    case 1:
+        index = 1;
+        isMiddle = true;
+        break;
+    case 2:
+        index = 2;
+        break;
+    case 3:
+        index = 0;
+        isMiddle = true;
+        break;
+    case 4:
+        index = 0;
+        isMiddle = true;
+        break;
+    case 5:
+        index = 2;
+        isMiddle = true;
+        break;
+    case 6:
+        index = 0;
+        break;
+    case 7:
+        index = 3;
+        isMiddle = true;
+        break;
+    case 8:
+        index = 3;
+        break;
+    }
+    qLogD << "bounding rect point index: " << index;
+    LaserPointList points2;
+    for (int i = 0; i < 4; i++)
+    {
+        index = (index + 4) % 4;
+        points2.append(points.at(index));
+        index++;
+    }
+
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
+    {
+        points2.append(points2.first());
+    }
+    else
+    {
+        if (Config::Device::jobOrigin() == 4)
+        {
+            points2.append(points2.first());
+        }
+        if (isMiddle)
+        {
+            points2.insert(0, LaserPoint(lastPoint));
+            points2.append(points2.first());
+        }
+    }
+    
+    itemObj["Type"] = "Rect";
+    itemObj["Style"] = LaserLayerType::LLT_CUTTING;
+    itemObj["Data"] = QString(machiningUtils::pointList2Plt(nullptr, points2, lastPoint, t));
+    items.append(itemObj);
+
+    layerObj["Items"] = items;
+    layers.append(layerObj);
+
+    QJsonObject actionObj;
+
+    jsonObj["Layers"] = layers;
+
+    QJsonDocument jsonDoc(jsonObj);
+
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    {
+        qWarning("Couldn't open save file.");
+        return;
+    }
+
+    QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
+    qint64 writtenBytes = saveFile.write(rawJson);
+    qDebug() << "written bytes:" << writtenBytes;
+
+    saveFile.close();
+    //emit exportFinished(filename);
+}
+
 bool LaserDocument::isOpened() const
 {
     Q_D(const LaserDocument);
@@ -455,13 +614,13 @@ void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
     updateLayersStructure();
 }
 
-FinishRun& LaserDocument::finishRun()
+FinishRunType& LaserDocument::finishRun()
 {
     Q_D(LaserDocument);
     return d->finishRun;
 }
 
-void LaserDocument::setFinishRun(const FinishRun& value)
+void LaserDocument::setFinishRun(const FinishRunType& value)
 {
     Q_D(LaserDocument);
     d->finishRun = value;
@@ -662,8 +821,8 @@ QTransform LaserDocument::docTransform() const
 QTransform LaserDocument::docTransformMM() const
 {
     QTransform t = docTransform();
-    qreal dx = Global::convertToMM(SU_PX, t.dx());
-    qreal dy = Global::convertToMM(SU_PX, t.dy());
+    qreal dx = Global::convertToMmH(t.dx());
+    qreal dy = Global::convertToMmV(t.dy());
     return QTransform::fromTranslate(dx, dy);
 }
 
@@ -694,8 +853,8 @@ QRectF LaserDocument::imagesBoundingRect() const
         if (i.value()->primitiveType() == LPT_BITMAP)
         {
             QRectF rect = i.value()->sceneBoundingRect();
-            qreal minSpeed = Config::UserRegister::scanXStartSpeed() / 1000;
-            qreal acc = Config::UserRegister::scanXAcc() / 1000;
+            qreal minSpeed = Config::UserRegister::scanXStartSpeed() * 0.001;
+            qreal acc = Config::UserRegister::scanXAcc() * 0.001;
             qreal maxSpeed = i.value()->layer()->engravingRunSpeed();
             qreal span = (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
             rect.setLeft(rect.left() - span);
@@ -729,10 +888,7 @@ QRectF LaserDocument::imagesBoundingRectMachining() const
         if (i.value()->primitiveType() == LPT_BITMAP)
         {
             QRectF rect = Global::matrixToMachining().map(i.value()->sceneBoundingRect()).boundingRect();
-            qreal minSpeed = Config::UserRegister::scanXStartSpeed();
-            qreal acc = Config::UserRegister::scanXAcc();
-            qreal maxSpeed = i.value()->layer()->engravingRunSpeed() * 1000;
-            qreal span = (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
+            qreal span = LaserApplication::device->engravingAccLength(i.value()->layer()->engravingRunSpeed() * 1000);
             rect.setLeft(rect.left() - span);
             rect.setRight(rect.right() + span);
             if (count++ == 0)
@@ -1302,11 +1458,11 @@ void LaserDocument::optimizeGroups(OptimizeNode* node, int level, bool sorted)
             int groupIndex = 0;
             if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
             {
-                groupIndex = Global::convertToMM(SU_PX, node->position().y()) / Config::PathOptimization::groupingGridInterval();
+                groupIndex = Global::convertToMmH(node->position().y()) / Config::PathOptimization::groupingGridInterval();
             }
             else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
             {
-                groupIndex = Global::convertFromMM(SU_PX, node->position().x()) / Config::PathOptimization::groupingGridInterval();
+                groupIndex = Global::convertFromMmV(node->position().x()) / Config::PathOptimization::groupingGridInterval();
             }
             childrenMap[groupIndex].append(node);
         }

@@ -227,7 +227,7 @@ void ActivationDialog::onUpdateTimerTimeout()
 {
     if (m_sendTimer.isActive())
     {
-        m_ui->pushButtonSend->setText(tr("Send(%1)").arg(m_sendTimer.remainingTime() / 1000));
+        m_ui->pushButtonSend->setText(tr("Send(%1)").arg(m_sendTimer.remainingTime() * 0.001));
     }
 }
 

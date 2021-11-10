@@ -13,6 +13,7 @@
 #include "TypeUtils.h"
 #include "Utils.h"
 #include "algorithm/QBezier.h"
+#include "laser/LaserDevice.h"
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
 
@@ -362,7 +363,11 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
         buffer.append(QString("pu%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
     else
-        buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
+    {
+        int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
+        int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
+        buffer.append(QString("PU%1 %2;").arg(x).arg(y));
+    }
     for (size_t i = 1; i < points.size(); i++)
     {
         LaserPoint lPt = points.at(i);
@@ -394,7 +399,9 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
         }
         else
         {
-            buffer.append(command.arg(qRound(pt.x())).arg(qRound(pt.y())));
+            int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
+            int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
+            buffer.append(command.arg(x).arg(y));
         }
         lastPoint = pt;
         if (progress)
@@ -476,8 +483,12 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineL
             }
             else
             {
-                buffer.append(command1.arg(qRound(pt1.x())).arg(qRound(pt1.y())));
-                buffer.append(command2.arg(qRound(pt2.x())).arg(qRound(pt2.y())));
+                int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt1.x()));
+                int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt1.y()));
+                buffer.append(command1.arg(x).arg(y));
+                x = LaserApplication::device->deviceTranslateXMachining(qRound(pt2.x()));
+                y = LaserApplication::device->deviceTranslateYMachining(qRound(pt2.y()));
+                buffer.append(command2.arg(x).arg(y));
             }
             //point = line.p2();
             lastPoint = pt2;

@@ -40,7 +40,6 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
     int nodeCount = svgDoc->handler()->nodeCount();
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("import svg", parentProgress);
     progress->setMaximum(nodeCount);
-    //LaserDocument* laserDoc = new LaserDocument(scene);
 	if (svgDoc == nullptr)
 	{
 		qWarning() << "Load SVG document failure!";
@@ -196,16 +195,13 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
         {
             QTransform t;
             t = node->getCascadeTransform();
-	        //qDebug() << t;
 
 			if (!qFuzzyCompare(t.dx(), 0) || !qFuzzyCompare(t.dy(), 0))
 			{
                 QTransform t1 = QTransform(
 					t.m11(), t.m12(), t.m13(),
 					t.m21(), t.m22(), t.m23(),
-					//0, 0, t.m33()
-					//t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
-					Global::convertFromMM(SU_PX, t.m31() * docScaleWidth), Global::convertFromMM(SU_PX, t.m32() * docScaleHeight, Qt::Vertical), t.m33()
+					Global::convertFromMmH(t.m31() * docScaleWidth), Global::convertFromMmV(t.m32() * docScaleHeight), t.m33()
 				);
 				
                 t = t1;
@@ -216,7 +212,6 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setName(node->nodeId());
 
-            //item->moveToThread(LaserApplication::mainThread);
             scene->addLaserPrimitive(item);
         }
         progress->increaseProgress();

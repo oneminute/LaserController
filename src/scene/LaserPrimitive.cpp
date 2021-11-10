@@ -19,6 +19,7 @@
 #include "LaserApplication.h"
 #include "LaserScene.h"
 #include "laser/LaserDriver.h"
+#include "laser/LaserDevice.h"
 #include "common/Config.h"
 #include "util/ImageUtils.h"
 #include "util/MachiningUtils.h"
@@ -48,6 +49,8 @@ public:
         , primitiveType(LPT_UNKNOWN)
         , machiningCenter(0, 0)
         , isLocked(false)
+        , exportable(true)
+        , visible(true)
     {}
 
     LaserDocument* doc;
@@ -66,6 +69,8 @@ public:
 	QPainterPath path;
     bool isLocked;
     QList<QuadTreeNode*> treeNodes;
+    bool exportable;
+    bool visible;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
@@ -138,6 +143,9 @@ void setSelectedInGroup(bool selected) {
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
+    if (!visible())
+        return;
+
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
     //qLogD << "primitive " << d->nodeName << " painter transform : " << painter->transform();
 
@@ -152,6 +160,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     if (d->layer)
     {
         color = d->layer->color();
+        if (!exportable())
+        {
+            color = Qt::lightGray;
+        }
     }
 
 	if (isSelected())
@@ -493,7 +505,43 @@ bool LaserPrimitive::isText() const
     return d->primitiveType == LPT_TEXT;
 }
 
-LaserLayer* LaserPrimitive::layer() const 
+bool LaserPrimitive::exportable() const
+{
+    Q_D(const LaserPrimitive);
+    if (layer()->exportable())
+    {
+        return d->exportable;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void LaserPrimitive::setExportable(bool value)
+{
+    Q_D(LaserPrimitive);
+    d->exportable = value;
+}
+
+bool LaserPrimitive::visible() const
+{
+    Q_D(const LaserPrimitive);
+    if (layer()->visible())
+    {
+        return d->visible;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void LaserPrimitive::setVisible(bool value)
+{
+}
+
+LaserLayer* LaserPrimitive::layer() const
 {
     Q_D(const LaserPrimitive);
     return d->layer; 
@@ -2082,24 +2130,22 @@ QRectF LaserBitmap::bounds() const
     return d->boundingRect; 
 }
 
-QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
+QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& lastPoint)
 { 
     Q_D(LaserBitmap);
     QByteArray ba;
 
     parentProgress->setMaximum(2);
     QImage srcImage = d->image.copy();
-    //srcImage.invertPixels();
     QImage outImage = srcImage.transformed(sceneTransform()).convertToFormat(QImage::Format_Grayscale8);
-    //outImage.invertPixels();
     QRectF boundingRect = sceneBoundingRect();
     outImage.save("tmp\\outImage.png");
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
 
-	qreal boundingWidth = Global::convertToMM(SU_PX, boundingRect.width());
-	qreal boundingHeight = Global::convertToMM(SU_PX, boundingRect.height(), Qt::Vertical);
-    qreal boundingLeft = Global::convertToMM(SU_PX, boundingRect.left());
-    qreal boundingTop = Global::convertToMM(SU_PX, boundingRect.top());
+	qreal boundingWidth = Global::convertToMmH(boundingRect.width());
+	qreal boundingHeight = Global::convertToMmV(boundingRect.height());
+    qreal boundingLeft = Global::convertToMmH(boundingRect.left());
+    qreal boundingTop = Global::convertToMmV(boundingRect.top());
 
     int dpi = d->layer->dpi();
     int pixelWidth = qRound(boundingWidth * MM_TO_INCH * dpi);
@@ -2111,27 +2157,13 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
     cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight), 0.0, 0.0, cv::INTER_NEAREST);
 
     cv::Mat halfToneMat = src;
-    halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
-    /*if (layer()->useHalftone())
-    {
-        switch (Config::Export::halfToneStyle())
-        {
-        case 0:
-            halfToneMat = imageUtils::halftone4(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
-            break;
-        case 1:
-            halfToneMat = imageUtils::halftone5(pixelScaled, this->layer()->halftoneAngles(), gridSize);
-            break;
-        case 2:
-            halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
-            break;
-        }
-    }*/
+    if (layer()->useHalftone())
+        halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
 
     qreal pixelInterval = layer()->engravingRowInterval();
 
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundingHeight * Config::General::machiningUnit() / pixelInterval);
+    int outHeight = std::round(boundingHeight * 1000.0 / pixelInterval);
     qLogD << "bounding rect: " << boundingRect;
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
@@ -2141,15 +2173,8 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress)
     cv::Mat resized;
     cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight));
     
-    //cv::Mat outMat = resized;
-    //if (layer()->useHalftone())
-    //{
-        //outMat = imageUtils::halftone3(resized, layer()->lpi(), layer()->dpi(), 45);
-        //outMat = imageUtils::halftone4(resized, 30, 12);
-        //outMat = imageUtils::halftone5(resized, this->layer()->halftoneAngles(), this->layer()->halftoneGridSize());
-    //}
-
-    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingLeft, boundingTop, pixelInterval / 1000, boundingWidth);
+    qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
+    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingLeft, boundingTop, pixelInterval * 0.001, boundingWidth, lastPoint, accLength);
 
     parentProgress->finish();
     return ba; 
@@ -2329,48 +2354,7 @@ QDebug operator<<(QDebug debug, const LaserPrimitive & item)
     return debug;
 }
 
-QString FinishRun::toString()
-{
-    QString text = QObject::tr("Relays: ");
-    QStringList nos;
-    for (int i = 0; i < 8; i++)
-    {
-        if (isEnabled(i))
-        {
-            nos.append(QString::number(i + 1));
-        }
-    }
-    text.append(nos.join(","));
-    text.append(" Action: ");
-
-    QString actionStr;
-    switch (action)
-    {
-    case RA_NONE:
-        actionStr = QObject::tr("None");
-        break;
-    case RA_RELEASE:
-        actionStr = QObject::tr("Release");
-        break;
-    case RA_ORIGIN:
-        actionStr = QObject::tr("Machining 1");
-        break;
-    case RA_MACHINING_1:
-        actionStr = QObject::tr("Machining 2");
-        break;
-    case RA_MACHINING_2:
-        actionStr = QObject::tr("Machining 3");
-        break;
-    case RA_MACHINING_3:
-        actionStr = QObject::tr("None");
-        break;
-    }
-
-    text.append(actionStr);
-    return text;
-}
-
-QByteArray LaserShape::filling(ProgressItem* progress)
+QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint)
 {
     Q_D(LaserShape);
     QByteArray bytes;
@@ -2398,8 +2382,8 @@ QByteArray LaserShape::filling(ProgressItem* progress)
     painter.drawPath(path);
 
     t = QTransform::fromScale(
-        1 / Config::General::machiningUnit(),
-        1 / Config::General::machiningUnit()
+        0.001,
+        0.001
     );
     QRectF boundingRectMM = t.mapRect(boundingRectMachining);
 
@@ -2411,7 +2395,7 @@ QByteArray LaserShape::filling(ProgressItem* progress)
 
     qreal pixelInterval = layer()->engravingRowInterval();
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundingRectMM.height() * Config::General::machiningUnit() / pixelInterval);
+    int outHeight = std::round(boundingRectMM.height() * 1000.0 / pixelInterval);
     cv::Mat resized;
     cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_NEAREST);
     //resized = 255 - resized;
@@ -2422,7 +2406,10 @@ QByteArray LaserShape::filling(ProgressItem* progress)
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
     
-    bytes = imageUtils::image2EngravingData(progress, resized, boundingRectMM.left(), boundingRectMM.top(), pixelInterval / 1000, boundingRectMM.width());
+    qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
+    bytes = imageUtils::image2EngravingData(progress, resized, boundingRectMM.left(), 
+        boundingRectMM.top(), pixelInterval * 0.001, boundingRectMM.width(), lastPoint, 
+        accLength);
 
     return bytes;
 }

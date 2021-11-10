@@ -14,6 +14,7 @@
 #include "laser/LaserDriver.h"
 #include "UnitUtils.h"
 #include "LaserApplication.h"
+#include "laser/LaserDevice.h"
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
 
@@ -1610,13 +1611,14 @@ cv::Mat imageUtils::rotateMat(cv::Mat src, float degrees)
     return cv::Mat();
 }
 
-QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width)
+QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width, QPointF& lastPoint, qreal accLength)
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
     stream.setByteOrder(QDataStream::LittleEndian);
     int xStart = unitUtils::mm2MicroMM(x);
     int xEnd = unitUtils::mm2MicroMM(x + width);
+    int yStart = unitUtils::mm2MicroMM(y);
     FillStyleAndPixelsCount fspc;
     fspc.setCount(mat.cols);
     fspc.setSame(false);
@@ -1624,7 +1626,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
     progress->setMaximum(mat.rows);
     for (int r = 0; r < mat.rows; r++)
     {
-        int yStart = unitUtils::mm2MicroMM(y + r * rowInterval);
+        yStart = unitUtils::mm2MicroMM(y + r * rowInterval);
         int bitCount = 0;
         quint8 byte = 0;
 
@@ -1655,10 +1657,13 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
 
         if (binCheck)
         {
+            int outXStart = LaserApplication::device->deviceTranslateXMachining(xStart);
+            int outXEnd = LaserApplication::device->deviceTranslateXMachining(xEnd);
+            int outYStart = LaserApplication::device->deviceTranslateYMachining(yStart);
             if (forward)
-                stream << yStart << xStart << xEnd << fspc.code;
+                stream << outYStart << outXStart << outXEnd << fspc.code;
             else
-                stream << yStart << xEnd << xStart << fspc.code;
+                stream << outYStart << outXEnd << outXStart << fspc.code;
 
             for (int i = 0; i < rowBytes.length(); i++)
             {
@@ -1669,6 +1674,19 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
 
         progress->increaseProgress();
     }
+
+    qreal outX;
+    qreal outY = yStart;
+    // 这里要反着计算
+    if (!forward)
+    {
+        outX = xEnd + accLength;
+    }
+    else
+    {
+        outX = xStart - accLength;
+    }
+    lastPoint = QPointF(outX, outY);
     progress->finish();
     return bytes;
 }

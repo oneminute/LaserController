@@ -94,7 +94,8 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
     optimizeProgress->setMaximum(d->root->childNodes().count() * 2);
     for (OptimizeNode* layerNode : d->root->childNodes())
     {
-        optimizeFrom(layerNode, optimizeProgress);
+        if (layerNode->exportable())
+            optimizeFrom(layerNode, optimizeProgress);
     }
     optimizeProgress->finish();
 
@@ -154,7 +155,8 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root, ProgressItem* parentProgres
 
         for (OptimizeNode* childNode : node->childNodes())
         {
-            stack.push(childNode);
+            if (childNode->exportable())
+                stack.push(childNode);
         }
     }
     buildProgress->setMaximum(allNodes.length());

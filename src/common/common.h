@@ -272,42 +272,12 @@ enum FillingType
     FT_Pixel
 };
 
-class Global
+enum FinishRunType
 {
-public:
-	static int dpiX;
-	static int dpiY;
-	static SizeUnit unit;
-	//static QWidget* mainWindow;
-	//grid pen
-	static qreal lowPen1;
-	static qreal lowPen2;
-
-	static qreal mediumPen1;
-	static qreal mediumPen2;
-
-	static qreal highPen1;
-	static qreal highPen2;
-
-    static int mm2PixelsX(qreal mm);
-	static qreal Global::mm2PixelsXF(qreal mm);
-    static int mm2PixelsY(qreal mm);
-	static qreal mm2PixelsYF(qreal mm);
-    static qreal pixels2mmX(int pixels);
-    static qreal pixels2mmY(int pixels);
-	static qreal pixelsF2mmX(qreal pixels);
-	static qreal pixelsF2mmY(qreal pixels);
-
-	static qreal convertUnit(SizeUnit from, SizeUnit to, qreal num, Qt::Orientation orientation = Qt::Horizontal);
-	static qreal convertToMM(SizeUnit from, qreal num, Qt::Orientation orientation = Qt::Horizontal);
-	static qreal convertToMachining(SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
-	static qreal convertFromMM(SizeUnit to, qreal num, Qt::Orientation orientation = Qt::Horizontal);
-	static QTransform matrixToMM(SizeUnit from, qreal hScale = 1.f, qreal vScale = 1.f);
-	static QTransform matrix(SizeUnit from, SizeUnit to, qreal hScale = 1.0f, qreal vScale = 1.0f);
-    static QTransform matrixToMachining(SizeUnit from = SU_PX);
-
-    int pxToMachiningH(qreal x);
-    int pxToMachiningV(qreal y);
+    FT_CurrentPos,
+    FT_Unload,
+    FT_BackToOrigin,
+    FT_BackToUserOrigin
 };
 
 struct FillStyleAndPixelsCount
@@ -350,62 +320,47 @@ struct FillStyleAndPixelsCount
 
 Q_DECLARE_METATYPE(FillStyleAndPixelsCount);
 
-struct FinishRun
+class Global
 {
 public:
-    FinishRun()
-        : code(0)
-    {}
+	static int dpiX;
+	static int dpiY;
+	static SizeUnit unit;
+	//static QWidget* mainWindow;
+	//grid pen
+	static qreal lowPen1;
+	static qreal lowPen2;
 
-    union
-    {
-        quint16 code;
-        struct
-        {
-            quint8 action;
-            quint8 relays;
-        };
-    };
+	static qreal mediumPen1;
+	static qreal mediumPen2;
 
-    void setRelays(const QList<int>& relays, bool enabled = true)
-    {
-        for (int no : relays)
-        {
-            setRelay(no, enabled);
-        }
-    }
+	static qreal highPen1;
+	static qreal highPen2;
 
-    void setRelay(int no, bool enabled = true)
-    {
-        int relayNo = no;
-        if (relayNo < 0 || relayNo > 7)
-            return;
+    static int mm2PixelsX(qreal mm);
+	static qreal Global::mm2PixelsXF(qreal mm);
+    static int mm2PixelsY(qreal mm);
+	static qreal mm2PixelsYF(qreal mm);
+    static qreal pixels2mmX(int pixels);
+    static qreal pixels2mmY(int pixels);
+	static qreal pixelsF2mmX(qreal pixels);
+	static qreal pixelsF2mmY(qreal pixels);
 
-        int relayBit = 1 << relayNo;
+	static qreal convertUnit(qreal num, SizeUnit from, SizeUnit to, Qt::Orientation orientation = Qt::Horizontal);
 
-        if (enabled)
-        {
-            relays |= relayBit;
-        }
-        else
-        {
-            relays &= ~relayBit;
-        }
-    }
+	static qreal convertToMM(qreal num, SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertToMmH(qreal num, SizeUnit from = SU_PX);
+	static qreal convertToMmV(qreal num, SizeUnit from = SU_PX);
 
-    void setAction(int action)
-    {
-        this->action = action;
-    }
+	static qreal convertToMachining(qreal num, SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
 
-    bool isEnabled(int no)
-    {
-        int relayNo = no;
-        int relayBit = 1 << relayNo;
-        return relayBit & relays;
-    }
+	static qreal convertFromMM(qreal num, SizeUnit to = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertFromMmH(qreal num, SizeUnit to = SU_PX);
+	static qreal convertFromMmV(qreal num, SizeUnit to = SU_PX);
 
-    QString toString();
+	static QTransform matrixToMM(SizeUnit from = SU_PX, qreal hScale = 1.f, qreal vScale = 1.f);
+	static QTransform matrix(SizeUnit from, SizeUnit to, qreal hScale = 1.0f, qreal vScale = 1.0f);
+    static QTransform matrixToMachining(SizeUnit from = SU_PX);
 };
 
 typedef QPair<QPointF, QPointF> PointPair;
@@ -417,7 +372,5 @@ typedef QList<PointPair> PointPairList;
         delete ptr; \
         ptr = nullptr; \
     }
-
-Q_DECLARE_METATYPE(FinishRun);
 
 #endif // COMMON_H

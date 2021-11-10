@@ -116,12 +116,12 @@ bool ProgressItem::isFinished() const
 
 qreal ProgressItem::durationSecs() const
 {
-    return durationNSecs() / 1000000.0;
+    return durationNSecs() * 0.000001;
 }
 
 qreal ProgressItem::durationMSecs() const
 {
-    return durationNSecs() / 1000000.0;
+    return durationNSecs() * 0.000001;
 }
 
 qint64 ProgressItem::durationNSecs() const

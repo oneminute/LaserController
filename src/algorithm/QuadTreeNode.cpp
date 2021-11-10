@@ -47,7 +47,7 @@ bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
 void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
 {
     QRectF bound = primitive->sceneBoundingRect();
-    qDebug() << bound;
+    //qDebug() << bound;
     QLineF line1(QPointF(100, 0), QPointF(200, 10));
     QPointF p;
     int i = line1.intersect(line1, &p);

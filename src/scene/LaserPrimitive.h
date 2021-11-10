@@ -25,84 +25,6 @@ class LaserViewer;
 class QuadTreeNode;
 class ProgressItem;
 
-struct Slice
-{
-    qreal y;
-    qreal xStart;
-    qreal xEnd;
-    FillStyleAndPixelsCount fspc;
-    QVector<quint8> pixels;
-
-    void reverse()
-    {
-        qSwap(xStart, xEnd);
-        std::reverse(pixels.begin(), pixels.end());
-    }
-
-    qreal left() const
-    {
-        if (xStart < xEnd)
-            return xEnd;
-        else
-            return xStart;
-    }
-
-    qreal right() const
-    {
-        if (xStart > xEnd)
-            return xStart;
-        else
-            return xEnd;
-    }
-
-    qreal length() const
-    {
-        return right() - left();
-    }
-};
-
-struct SliceGroup
-{
-    QVector<Slice> slices;
-
-    Slice& first() { return slices.first(); }
-    Slice& last() { return slices.last(); }
-
-    void append(Slice& slice)
-    {
-        qreal startDiff = qAbs(slice.xStart - last().xEnd);
-        qreal endDiff = qAbs(slice.xEnd - last().xEnd);
-
-        if (startDiff > endDiff)
-        {
-            slice.reverse();
-        }
-
-        slices.append(slice);
-    }
-
-    bool adjacent(const Slice& slice, qreal vInterval, qreal hInterval = 0.1f)
-    {
-        if (isEmpty())
-            return false;
-
-        // determine vertical interval
-        if (slice.y - last().y > vInterval)
-            return false;
-
-        // determine horizontal interval
-        qreal left = qMin(slice.left(), last().left());
-        qreal right = qMin(slice.right(), last().right());
-
-        if (right - left - (slice.length() + last().length()) > hInterval)
-            return false;
-
-        return true;
-    }
-
-    bool isEmpty() const { return slices.isEmpty(); }
-};
-
 class LaserPrimitivePrivate;
 class LaserPrimitive : public QGraphicsObject, public ILaserDocumentItem
 {
@@ -140,8 +62,8 @@ public:
     LaserPoint firstStartingPoint() const;
     LaserPoint lastStartingPoint() const;
     QPointF centerMachiningPoint() const;
-    virtual QByteArray engravingImage(ProgressItem* parentProgress) { return QByteArray(); }
-    virtual QByteArray filling(ProgressItem* parentProgress) { return QByteArray(); }
+    virtual QByteArray engravingImage(ProgressItem* parentProgress, QPointF& lastPoint) { return QByteArray(); }
+    virtual QByteArray filling(ProgressItem* parentProgress, QPointF& lastPoint) { return QByteArray(); }
     virtual bool isClosed() const = 0;
 
     LaserPrimitiveType primitiveType() const;
@@ -150,6 +72,11 @@ public:
     bool isShape() const;
     bool isBitmap() const;
     bool isText() const;
+
+    bool exportable() const;
+    void setExportable(bool value);
+    bool visible() const;
+    void setVisible(bool value);
 
     LaserLayer* layer() const;
     void setLayer(LaserLayer* layer);
@@ -209,7 +136,7 @@ class LaserShape : public LaserPrimitive
 public:
     LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
-    virtual QByteArray filling(ProgressItem* progress) override;
+    virtual QByteArray filling(ProgressItem* progress, QPointF& lastPoint) override;
 	int layerIndex();
 private:
     Q_DISABLE_COPY(LaserShape);
@@ -442,7 +369,7 @@ public:
 
     QRectF bounds() const;
 
-    virtual QByteArray engravingImage(ProgressItem* parentProgress);
+    virtual QByteArray engravingImage(ProgressItem* parentProgress, QPointF& lastPoint);
     virtual void draw(QPainter* painter);
     virtual QPainterPath toMachiningPath() const;
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }

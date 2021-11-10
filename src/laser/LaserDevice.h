@@ -70,7 +70,7 @@ public:
     bool registeMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 
     bool writeUserRegisters();
-    bool writeSystemRegisters();
+    bool writeSystemRegisters(const QString& password);
     bool readUserRegisters();
     bool readSystemRegisters();
     bool readHostRegisters();
@@ -84,7 +84,7 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
-    void moveTo(const QVector3D& pos, QUADRANT quad, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
+    void moveToMachining(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
     void moveBy(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
 
     bool isAvailable() const;
@@ -116,6 +116,8 @@ public:
     QTransform deviceTransform() const;
     QTransform deviceTransformMM() const;
     QTransform deviceTransformMachining() const;
+    int deviceTranslateXMachining(int x) const;
+    int deviceTranslateYMachining(int y) const;
 
     void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
 
@@ -125,6 +127,8 @@ public:
     QPointF getCurrentLaserPositionMachining() const;
     QPointF getCurrentLaserPositionMM() const;
     QPointF getCurrentLaserPosition() const;
+
+    qreal engravingAccLength(qreal engravingRunSpeed) const;
 
 public slots:
     void load();

@@ -56,8 +56,7 @@ public:
     LaserControllerWindow(QWidget* parent = nullptr);
     ~LaserControllerWindow();
 
-    void moveLaser(const QVector3D& delta, bool relative = true, const QVector3D& abstractDest = QVector3D());
-    FinishRun finishRun();
+    FinishRunType finishRun();
 
     LaserDocument* currentDocument() const;
 
@@ -133,8 +132,8 @@ protected slots:
     void onActionMachining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
+    void onActionBounding(bool checked = false);
     void onActionLaserSpotShot(bool checked = false);
-    void onActionLaserCut(bool checked = false);
     void onActionLaserMove(bool checked = false);
     void onActionPathOptimization(bool checked = false);
     void onActionConnect(bool checked = false);
@@ -206,6 +205,7 @@ protected slots:
 
     void onActionUpdateOutline(bool checked = false);
     void onActionFetchToUserOrigin(bool checked = false);
+    void onActionMoveToUserOrigin(bool checked = false);
 
     void onActionPrintAndCutNew(bool checked = false);
     void onActionPrintAndCutFetchLaser(bool checked = false);
@@ -346,11 +346,8 @@ private:
     QToolButton* m_buttonOperationSpotShot;
     QToolButton* m_buttonOperationReset;
     QToolButton* m_buttonOperationOrigin;
-    QToolButton* m_buttonOperationOptimize;
     QComboBox* m_comboBoxStartPosition;
     RadioButtonGroup* m_radioButtonGroupJobOrigin;
-    //FloatEditSlider* m_floatEditSliderLaserPower;
-    //FloatEditDualSlider* m_floatEditDualSliderLaserRange;
     QComboBox* m_comboBoxDevices;
     QToolButton* m_buttonConnect;
     QToolButton* m_buttonRefresh;
@@ -395,6 +392,7 @@ private:
     Vector2DWidget* m_userOrigin2;
     Vector2DWidget* m_userOrigin3;
     QToolButton* m_buttonFetchToUserOrigin;
+    QToolButton* m_buttonMoveToUserOrigin;
     ads::CDockWidget* m_dockMovement;
     ads::CDockAreaWidget* m_dockAreaMovement;
 
