@@ -100,6 +100,8 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
     item->layer()->removePrimitive(item);
     scene()->removeLaserPrimitive(item);
     d->primitives.remove(item->id());
+    //item->QObject::deleteLater();
+
 }
 
 //PageInformation LaserDocument::pageInformation() const
