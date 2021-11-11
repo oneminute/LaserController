@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1212</width>
-    <height>998</height>
+    <height>1008</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -70,6 +70,7 @@
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionDuplication"/>
+    <addaction name="actionMultiDuplication"/>
     <addaction name="actionPaste"/>
     <addaction name="actionPasteInPlace"/>
    </widget>
@@ -1370,6 +1371,21 @@
   <action name="actionPrintAndCutEndSelect">
    <property name="text">
     <string>End Select</string>
+   </property>
+  </action>
+  <action name="actionMultiDuplication">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/multi_duplication.png</normaloff>:/ui/icons/images/multi_duplication.png</iconset>
+   </property>
+   <property name="text">
+    <string>MultiDuplication</string>
+   </property>
+   <property name="toolTip">
+    <string>MultiDuplication</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+D</string>
    </property>
   </action>
  </widget>

@@ -328,6 +328,7 @@ private:
     //mirror
     LaserPrimitive* m_mirrorLine;
 	friend class LaserScene;
+    
 };
 
 #endif // LASERVIEWER_H

@@ -182,8 +182,10 @@ void AddDelUndoCommand::undo()
 		//�ָ�֮ǰ��group
 		for (QMap<QGraphicsItem*, QTransform>::Iterator i = m_selectedBeforeAdd.begin();
 			i != m_selectedBeforeAdd.end(); i++) {
-			sceneTransformToItemTransform(i.value(), i.key());
-			i.key()->setSelected(true);
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(i.key());
+			sceneTransformToItemTransform(i.value(), p);
+			p->setSelected(true);
+            //m_viewer->group()->addToGroup(p);
 		}
 		m_viewer->onSelectedFillGroup();
 		
