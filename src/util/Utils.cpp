@@ -77,31 +77,31 @@ QVector3D utils::putToQuadrant(const QVector3D & pos, QUADRANT quadrant)
     return QVector3D(x, y, z);
 }
 
-QVector3D utils::limitToLayout(const QVector3D & pos, QUADRANT quadrant, float width, float height)
+QVector3D utils::limitToLayout(const QVector3D & pos, int quadrant, float width, float height)
 {
     float x = pos.x();
     float y = pos.y();
     switch (quadrant)
     {
-    case QUADRANT_1:
+    case 0:
     {
         x = qBound(0.f, x, width);
-        y = qBound(0.f, y, width);
+        y = qBound(0.f, y, height);
     }
         break;
-    case QUADRANT_2:
+    case 1:
     {
         x = qBound(-width, x, 0.f);
-        y = qBound(0.f, y, width);
+        y = qBound(0.f, y, height);
     }
         break;
-    case QUADRANT_3:
+    case 2:
     {
         x = qBound(-width, x, 0.f);
         y = qBound(-height, y, 0.f);
     }
         break;
-    case QUADRANT_4:
+    case 3:
     {
         x = qBound(0.f, x, width);
         y = qBound(-height, y, 0.f);
@@ -185,6 +185,9 @@ QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
     int count = 0;
     for (LaserPrimitive* primitive: primitives)
     {
+        if (!primitive->exportable())
+            continue;
+
         QRectF rect = primitive->sceneBoundingRect();
         if (count++ == 0)
         {

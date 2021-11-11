@@ -73,7 +73,6 @@
 #include "widget/LaserLayerTableWidget.h"
 #include "widget/LaserViewer.h"
 #include "widget/LayerButton.h"
-#include "widget/PropertiesHelperManager.h"
 #include "widget/RulerWidget.h"
 #include "widget/ProgressBar.h"
 #include "widget/Vector2DWidget.h"
@@ -514,8 +513,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
+    connect(m_ui->actionBounding, &QAction::triggered, this, &LaserControllerWindow::onActionBounding);
     connect(m_ui->actionLaserSpotShot, &QAction::triggered, this, &LaserControllerWindow::onActionLaserSpotShot);
-    connect(m_ui->actionBounding, &QAction::triggered, this, &LaserControllerWindow::onActionLaserCut);
     connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
 	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::onActionNew);
 	connect(m_ui->actionSave, &QAction::triggered, this, &LaserControllerWindow::onActionSave);
@@ -604,6 +603,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
     connect(m_ui->actionFetchToUserOrigin, &QAction::triggered, this, &LaserControllerWindow::onActionFetchToUserOrigin);
+    connect(m_ui->actionMoveToUserOrigin, &QAction::triggered, this, &LaserControllerWindow::onActionMoveToUserOrigin);
 
     connect(m_ui->actionPrintAndCutNew, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutNew);
     connect(m_ui->actionPrintAndCutFetchLaser, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutFetchLaser);
@@ -906,37 +906,9 @@ LaserControllerWindow::~LaserControllerWindow()
     SAFE_DELETE(m_updateDialog)
 }
 
-void LaserControllerWindow::moveLaser(const QVector3D& delta, bool relative, const QVector3D& abstractDest)
+FinishRunType LaserControllerWindow::finishRun()
 {
-    if (!LaserApplication::driver)
-    {
-        QMessageBox::warning(this, tr("Operate failure"), tr("Laser device is not connected!"));
-        return;
-    }
-
-    QVariant value(0);
-
-    QUADRANT quad = static_cast<QUADRANT>(value.toInt());
-
-    qLogD << "move by: " << delta;
-
-    if (relative)
-    {
-        LaserApplication::device->moveBy(delta, Config::Device::xEnabled(), Config::Device::yEnabled(), Config::Device::zEnabled());
-    }
-    else
-    {
-        // Get current pos;
-        QVector3D dest = utils::putToQuadrant(abstractDest, quad);
-        QVector3D pos = utils::putToQuadrant(LaserApplication::driver->getCurrentLaserPos(), quad);
-        dest = pos + delta;
-        LaserApplication::device->moveTo(dest, quad, Config::Device::xEnabled(), Config::Device::yEnabled(), Config::Device::zEnabled());
-    }
-}
-
-FinishRun LaserControllerWindow::finishRun()
-{
-    FinishRun value;
+    FinishRunType value = FinishRunType::FT_CurrentPos;
     /*if (m_comboBoxPostEvent->currentIndex() < 3)
     {
         value.setAction(m_comboBoxPostEvent->currentIndex());
@@ -959,7 +931,7 @@ FinishRun LaserControllerWindow::finishRun()
     //value.setRelay(0, m_ui->checkBoxRelay1->isChecked());
     //value.setRelay(1, m_ui->checkBoxRelay2->isChecked());
     //value.setRelay(2, m_ui->checkBoxRelay3->isChecked());
-    qDebug() << value.toString();
+    qDebug() << value;
     return value;
 }
 
@@ -1410,6 +1382,7 @@ void LaserControllerWindow::createLayersDockPanel()
     m_dockLayers = dockWidget;
     m_dockAreaLayers = m_dockManager->addDockWidget(RightDockWidgetArea, dockWidget);
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/layer.png"), "Layers");
+    m_dockAreaLayers->setMinimumWidth(350);
 }
 
 void LaserControllerWindow::createCameraDockPanel()
@@ -1513,10 +1486,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
     m_buttonOperationOrigin->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    m_buttonOperationOptimize = new QToolButton;
-    m_buttonOperationOptimize->setDefaultAction(m_ui->actionPathOptimization);
-    m_buttonOperationOptimize->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
     m_comboBoxStartPosition = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::startFromItem());
     Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition);
 
@@ -1557,7 +1526,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     secondRow->addWidget(m_buttonOperationSpotShot);
     secondRow->addWidget(m_buttonOperationReset);
     secondRow->addWidget(m_buttonOperationOrigin);
-    secondRow->addWidget(m_buttonOperationOptimize);
 
     //m_comboBoxPostEvent = new QComboBox;
     //m_comboBoxPostEvent->addItem(tr("Stop at current position"));
@@ -1663,19 +1631,19 @@ void LaserControllerWindow::createMovementDockPanel()
     m_lineEditCoordinatesZ->setText(QString::number(0.0, 'f', 2));
 
     m_doubleSpinBoxDistanceX = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceX->setDecimals(1);
+    m_doubleSpinBoxDistanceX->setDecimals(2);
     m_doubleSpinBoxDistanceX->setValue(10.0);
     m_doubleSpinBoxDistanceX->setMinimum(0);
     m_doubleSpinBoxDistanceX->setMaximum(1000);
 
     m_doubleSpinBoxDistanceY = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceY->setDecimals(1);
+    m_doubleSpinBoxDistanceY->setDecimals(2);
     m_doubleSpinBoxDistanceY->setValue(10.0);
     m_doubleSpinBoxDistanceY->setMinimum(0);
     m_doubleSpinBoxDistanceY->setMaximum(1000);
 
     m_doubleSpinBoxDistanceZ = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceZ->setDecimals(1);
+    m_doubleSpinBoxDistanceZ->setDecimals(2);
     m_doubleSpinBoxDistanceZ->setValue(10.0);
     m_doubleSpinBoxDistanceZ->setMinimum(0);
     m_doubleSpinBoxDistanceZ->setMaximum(1000);
@@ -1796,9 +1764,12 @@ void LaserControllerWindow::createMovementDockPanel()
 
     m_buttonFetchToUserOrigin = new QToolButton;
     m_buttonFetchToUserOrigin->setDefaultAction(m_ui->actionFetchToUserOrigin);
+    m_buttonMoveToUserOrigin = new QToolButton;
+    m_buttonMoveToUserOrigin->setDefaultAction(m_ui->actionMoveToUserOrigin);
     QHBoxLayout* fourthRow = new QHBoxLayout;
     fourthRow->setMargin(3);
     fourthRow->addWidget(m_buttonFetchToUserOrigin);
+    fourthRow->addWidget(m_buttonMoveToUserOrigin);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(3);
@@ -2833,6 +2804,19 @@ void LaserControllerWindow::onActionStopMechining(bool checked)
     m_ui->actionPause->setChecked(false);
 }
 
+void LaserControllerWindow::onActionBounding(bool checked)
+{
+    if (m_scene->document())
+    m_scene->document()->exportBoundingJSON();
+    QFileInfo fileInfo("tmp/bounding.json");
+    QString filePath = fileInfo.absoluteFilePath();
+#ifdef Q_OS_WIN
+    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
+    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
+#endif
+    LaserApplication::driver->loadDataFromFile(filePath);
+}
+
 void LaserControllerWindow::onActionLaserSpotShot(bool checked)
 {
     int result = LaserApplication::driver->testLaserLight(checked);
@@ -2846,10 +2830,6 @@ void LaserControllerWindow::onActionLaserSpotShot(bool checked)
         qDebug() << "Light off.";
         m_ui->actionLaserSpotShot->setChecked(false);
     }
-}
-
-void LaserControllerWindow::onActionLaserCut(bool checked)
-{
 }
 
 void LaserControllerWindow::onActionLaserMove(bool checked)
@@ -2903,61 +2883,61 @@ void LaserControllerWindow::onActionWorkState(bool checked)
 void LaserControllerWindow::onActionMoveTop()
 {
     QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottom()
 {
     QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveLeft()
 {
     QVector3D delta(-m_doubleSpinBoxDistanceX->value(), 0, 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveRight()
 {
     QVector3D delta(m_doubleSpinBoxDistanceX->value(), 0, 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopLeft()
 {
     QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopRight()
 {
     QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomLeft()
 {
     QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomRight()
 {
     QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveUp()
 {
     QVector3D delta(0, 0, m_doubleSpinBoxDistanceZ->value());
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveDown()
 {
     QVector3D delta(0, 0, -m_doubleSpinBoxDistanceZ->value());
-    moveLaser(delta);
+    LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onMovementButtonReleased()
@@ -3311,6 +3291,13 @@ void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
     }
 }
 
+void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
+{
+    QPointF userOrigin = LaserApplication::device->userOriginMachining();
+    qLogD << "user origin: " << userOrigin;
+    LaserApplication::device->moveToMachining(QVector3D(userOrigin));
+}
+
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png*.svg*.ico)");
@@ -3431,7 +3418,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
         bounding.topLeft() + QPointF(bounding.width() * 0.05, bounding.height() * 0.05),
         QSizeF(bounding.width() * 0.9, bounding.height() * 0.9));
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
-    m_scene->removeLaserPrimitive(rectPrimitive);
+    m_scene->document()->removePrimitive(rectPrimitive);
 
     QPainterPath rectPath;
     rectPath.addRect(bounding);
@@ -3457,8 +3444,8 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
                 if (!littleBounding.contains(pt))
                     continue;
                 QPointF ptCandidate(
-                    Global::convertToMM(SU_PX, pt.x()),
-                    Global::convertToMM(SU_PX, pt.y())
+                    Global::convertToMmH(pt.x()),
+                    Global::convertToMmV(pt.y())
                 );
                 qLogD << "canvas point: " << pt << ", " << ptCandidate;
                 m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
@@ -3584,8 +3571,8 @@ void LaserControllerWindow::onActionRedLightAlignmentStart(bool checked)
         m_ui->actionStartRedLightAlight->setEnabled(false);
         m_ui->actionFinishRedLightAlight->setEnabled(true);
         m_redLightAlignment1stPt = LaserApplication::device->getCurrentLaserPositionMachining();
-        qreal x = m_redLightAlignment1stPt.x() / Config::General::machiningUnit();
-        qreal y = m_redLightAlignment1stPt.y() / Config::General::machiningUnit();
+        qreal x = m_redLightAlignment1stPt.x() * 0.001;
+        qreal y = m_redLightAlignment1stPt.y() * 0.001;
         m_labelRedLightAlignmentFirst->setText(tr("x: %1, y: %2")
             .arg(x, 8, 'f', 2, QLatin1Char(' '))
             .arg(y, 8, 'f', 2, QLatin1Char(' ')));
@@ -3600,8 +3587,8 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
         m_ui->actionFinishRedLightAlight->setEnabled(false);
         m_redLightAlignment2ndPt = LaserApplication::device->getCurrentLaserPositionMachining();
 
-        qreal x = m_redLightAlignment2ndPt.x() / Config::General::machiningUnit();
-        qreal y = m_redLightAlignment2ndPt.y() / Config::General::machiningUnit();
+        qreal x = m_redLightAlignment2ndPt.x() * 0.001;
+        qreal y = m_redLightAlignment2ndPt.y() * 0.001;
         m_labelRedLightAlignmentSecond->setText(tr("x: %1, y: %2")
             .arg(x, 8, 'f', 2, QLatin1Char(' '))
             .arg(y, 8, 'f', 2, QLatin1Char(' ')));
@@ -3610,8 +3597,8 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
             m_redLightAlignment2ndPt - m_redLightAlignment1stPt
         );
 
-        x = Config::Device::redLightOffset().x() / Config::General::machiningUnit();
-        y = Config::Device::redLightOffset().y() / Config::General::machiningUnit();
+        x = Config::Device::redLightOffset().x() * 0.001;
+        y = Config::Device::redLightOffset().y() * 0.001;
         m_labelPrintAndCutOffset->setText(tr("x: %1, y: %2")
             .arg(x, 8, 'f', 2, QLatin1Char(' '))
             .arg(y, 8, 'f', 2, QLatin1Char(' ')));
@@ -3825,8 +3812,8 @@ void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraph
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
-    qreal x = Global::convertToMM(SU_PX, pos.x());
-    qreal y = Global::convertToMM(SU_PX, pos.y());
+    qreal x = Global::convertToMmH(pos.x());
+    qreal y = Global::convertToMmV(pos.y());
     QPointF posMM = QPointF(x, y);
     posMM = LaserApplication::device->transform().map(posMM);
     QString posStr = QString("%1mm,%2mm | %3px,%4px")
@@ -3864,9 +3851,9 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
 {
     //m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
-    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() / 1000, 'f', 2));
-    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() / 1000, 'f', 2));
-    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() / 1000, 'f', 2));
+    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() * 0.001, 'f', 2));
+    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() * 0.001, 'f', 2));
+    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() * 0.001, 'f', 2));
 }
 
 void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
@@ -4000,32 +3987,12 @@ void LaserControllerWindow::updatePostEventWidgets(int index)
 
 void LaserControllerWindow::laserBackToMachiningOriginalPoint(bool checked)
 {
-    QVector3D dest;
-    if (m_radioButtonUserOrigin1->isChecked())
-    {
-        //dest = QVector3D(m_doubleSpinBoxOrigin1X->value(), m_doubleSpinBoxOrigin1Y->value(), 0.f);
-    }
-    else if (m_radioButtonUserOrigin2->isChecked())
-    {
-        //dest = QVector3D(m_doubleSpinBoxOrigin2X->value(), m_doubleSpinBoxOrigin2Y->value(), 0.f);
-    }
-    else if (m_radioButtonUserOrigin3->isChecked())
-    {
-        //dest = QVector3D(m_doubleSpinBoxOrigin3X->value(), m_doubleSpinBoxOrigin3Y->value(), 0.f);
-    }
-    moveLaser(QVector3D(), false, dest);
+    LaserApplication::device->moveToMachining(QVector3D(0, 0, 0));
 }
 
 void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 {
     LaserApplication::device->moveToOrigin();
-    /*QVariant value;
-    if (!LaserDriver::instance().getRegister(LaserDriver::RT_MOVE_TO_ORI_SPEED,value))
-    {
-        QMessageBox::warning(this, tr("Read registers failure"), tr("Cannot read registers value!"));
-        return;
-    }
-    LaserDriver::instance().lPenMoveToOriginalPoint(value.toDouble());*/
 }
 
 void LaserControllerWindow::updateOutlineTree()

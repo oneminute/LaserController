@@ -44,7 +44,7 @@ namespace imageUtils
 
     cv::Mat rotateMat(cv::Mat src, float degrees);
 
-    QByteArray image2EngravingData(ProgressItem* parentProgress, cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width);
+    QByteArray image2EngravingData(ProgressItem* parentProgress, cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width, QPointF& lastPoint, qreal accLength);
 
     QPointF closestPointTo(const QPointF &target, const QPainterPath &sourcePath);
     bool hit(const QLineF& ray, const QPainterPath& target, QPointF& hitPos);

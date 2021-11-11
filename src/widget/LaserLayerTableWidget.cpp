@@ -9,6 +9,7 @@
 
 #include "scene/LaserDocument.h"
 #include "scene/LaserPrimitive.h"
+#include "LaserApplication.h"
 #include "LaserHeaderView.h"
 #include "scene/LaserScene.h"
 #include "widget/LaserViewer.h"
@@ -168,6 +169,8 @@ void LaserLayerTableWidget::updateItems()
             connect(exportable, &QCheckBox::toggled, [=](bool checked) 
                 {
                     layer->setExportable(checked);
+                    LaserViewer* view = qobject_cast<LaserViewer*>(m_doc->scene()->views()[0]);
+                    view->viewport()->update();
                 }
             );
             setCellWidget(row, 5, exportablePanel);
@@ -187,6 +190,7 @@ void LaserLayerTableWidget::updateItems()
                     LaserViewer* view = qobject_cast<LaserViewer*>(m_doc->scene()->views()[0]);
                     LayerVisibleCommand* cmd = new LayerVisibleCommand(view, layer, checked);
                     view->undoStack()->push(cmd);
+                    view->viewport()->update();
                 }
             );
             setCellWidget(row, 6, visiblePanel);

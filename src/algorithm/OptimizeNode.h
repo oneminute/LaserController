@@ -15,6 +15,7 @@ class OptimizeNode;
 class OptimizeEdge;
 class LaserPrimitive;
 class ProgressItem;
+class LaserLayer;
 
 class OptimizeNodePrivate;
 class OptimizeNode
@@ -42,6 +43,8 @@ public:
     bool isDocument() const;
     bool isLayer() const;
     bool isPrimitive() const;
+
+    bool exportable() const;
 
     OptimizeNode* parentNode() const;
     void setParentNode(OptimizeNode* parent);
@@ -84,6 +87,7 @@ public:
     bool isVirtual() const;
 
     LaserPrimitive* primitive() const;
+    LaserLayer* layer() const;
     LaserPointListList arrangeMachiningPoints();
     LaserPointListList arrangedPoints() const;
     LaserPoint arrangedStartingPoint() const;

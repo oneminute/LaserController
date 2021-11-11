@@ -31,10 +31,6 @@ public:
     void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
     void removePrimitive(LaserPrimitive* item);
 
-    //PageInformation pageInformation() const;
-    //void setPageInformation(const PageInformation& page);
-    //QRectF pageBounds() const;
-
     QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
 	QList<LaserPrimitive*> selectedPrimitives() const;
@@ -55,8 +51,8 @@ public:
 
     void bindLayerButtons(const QList<LayerButton*>& layerButtons);
 
-	FinishRun& finishRun();
-	void setFinishRun(const FinishRun& value);
+	FinishRunType& finishRun();
+	void setFinishRun(const FinishRunType& value);
 
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
@@ -90,6 +86,7 @@ public:
 
 public slots:
     void exportJSON(const QString& filename, ProgressItem* parentProgress);
+    void exportBoundingJSON();
     void updateLayersStructure();
     void destroy();
     void open();

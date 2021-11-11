@@ -72,8 +72,8 @@ void DxfImporter::import(const QString& filename, LaserScene* scene, ProgressIte
     laserDoc->blockSignals(true);
 
     QRectF deviceRect = LaserApplication::device->boundingRect();
-    qreal scaleX = Global::convertFromMM(SizeUnit::SU_PX, 1);
-    qreal scaleY = Global::convertFromMM(SizeUnit::SU_PX, 1, Qt::Vertical);
+    qreal scaleX = Global::convertFromMmH(1);
+    qreal scaleY = Global::convertFromMmV(1);
 
     QTransform t(scaleX, 0, 0, -scaleY, 0, deviceRect.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
 

@@ -112,6 +112,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
                 QPolygonF gridBounds = mapFromScene(rect);
                 painter.drawPolygon(gridBounds);
             }
+
+            //scene()->document()->docOrigin
         }
         
         painter.setPen(QPen(Qt::darkGreen));

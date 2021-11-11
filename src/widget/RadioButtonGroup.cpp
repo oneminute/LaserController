@@ -183,13 +183,65 @@ void RadioButtonGroup::updateLayout()
 {
     Q_D(RadioButtonGroup);
     int index = 0;
+    int total = d->rows * d->cols;
     for (int r = 0; r < d->rows; r++)
     {
         for (int c = 0; c < d->cols; c++)
         {
             QRadioButton* button = new QRadioButton(this);
             button->setText("");
-            QString hint = QString("%1").arg(index);
+            QString hint;
+            if (total == 4)
+            {
+                switch (index)
+                {
+                case 0:
+                    hint = tr("Top Left");
+                    break;
+                case 1:
+                    hint = tr("Top Right");
+                    break;
+                case 2:
+                    hint = tr("Bottom Left");
+                    break;
+                case 3:
+                    hint = tr("Bottom Right");
+                    break;
+                }
+            }
+            else if (total == 9)
+            {
+                switch (index)
+                {
+                case 0:
+                    hint = tr("Top Left");
+                    break;
+                case 1:
+                    hint = tr("Top Middle");
+                    break;
+                case 2:
+                    hint = tr("Top Right");
+                    break;
+                case 3:
+                    hint = tr("Middle Left");
+                    break;
+                case 4:
+                    hint = tr("Center");
+                    break;
+                case 5:
+                    hint = tr("Middle Right");
+                    break;
+                case 6:
+                    hint = tr("Bottom Left");
+                    break;
+                case 7:
+                    hint = tr("Bottom Middle");
+                    break;
+                case 8:
+                    hint = tr("Bottom Right");
+                    break;
+                }
+            }
             button->setToolTip(hint);
             d->values.append(index);
             d->buttons.append(button);

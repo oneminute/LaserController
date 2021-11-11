@@ -97,6 +97,7 @@ third/bin/translations/
 
 third/bin/Demo1920x1080.ini
 
+*.diagsession
 
 *.Lan
 

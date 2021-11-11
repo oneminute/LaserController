@@ -33,6 +33,7 @@ void LaserPointList::buildKdtree()
     if (m_kdtree)
     {
         delete m_kdtree;
+        m_kdtree = nullptr;
     }
 
     // re-calculate weights, making w1/w2 equale to layout(m_width or m_height)/gridSize

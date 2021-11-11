@@ -1388,6 +1388,11 @@
     <string>Ctrl+Shift+D</string>
    </property>
   </action>
+  <action name="actionMoveToUserOrigin">
+   <property name="text">
+    <string>Move To User Origin</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

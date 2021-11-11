@@ -213,8 +213,8 @@ void ConfigDialog::onButtonClicked(QAbstractButton * button)
                 tr("Password"),
                 QLineEdit::Normal
             );
-            Config::SystemRegister::passwordItem()->setValue(password, MB_Manual);
-            LaserApplication::device->writeSystemRegisters();
+            //Config::SystemRegister::passwordItem()->setValue(password, MB_Manual);
+            LaserApplication::device->writeSystemRegisters(password);
         }
         Config::save(LaserApplication::device->mainCardId());
         onValueChanged(QVariant());

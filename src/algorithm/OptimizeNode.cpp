@@ -249,6 +249,16 @@ bool OptimizeNode::isPrimitive() const
     return d->nodeType == LaserNodeType::LNT_PRIMITIVE;
 }
 
+bool OptimizeNode::exportable() const
+{
+    if (isDocument())
+        return true;
+    else if (isLayer())
+        return layer()->exportable();
+    else if (isPrimitive())
+        return primitive()->exportable();
+}
+
 OptimizeNode* OptimizeNode::parentNode() const
 {
     Q_D(const OptimizeNode);
@@ -557,6 +567,14 @@ LaserPrimitive* OptimizeNode::primitive() const
     Q_D(const OptimizeNode);
     if (d->nodeType == LNT_PRIMITIVE)
         return static_cast<LaserPrimitive*>(d->documentItem);
+    return nullptr;
+}
+
+LaserLayer* OptimizeNode::layer() const
+{
+    Q_D(const OptimizeNode);
+    if (d->nodeType == LNT_LAYER)
+        return static_cast<LaserLayer*>(d->documentItem);
     return nullptr;
 }
 

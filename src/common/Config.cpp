@@ -237,7 +237,7 @@ void Config::loadGeneralItems()
         }
     );
 
-    ConfigItem* machiningUnit = group->addConfigItem(
+    /*ConfigItem* machiningUnit = group->addConfigItem(
         "machiningUnit",
         1000,
         DT_REAL
@@ -245,7 +245,7 @@ void Config::loadGeneralItems()
     machiningUnit->setInputWidgetType(IWT_DoubleSpinBox);
     machiningUnit->setInputWidgetProperty("minimum", 1);
     machiningUnit->setInputWidgetProperty("maximum", 1000);
-    machiningUnit->setVisible(false);
+    machiningUnit->setVisible(false);*/
 }
 
 void Config::loadLayersItems()
@@ -1048,7 +1048,7 @@ void Config::loadDeviceItems()
         [](const QVariant& value)
         {
             QPointF pt = value.toPointF();
-            return QVariant(pt / 1000.0);
+            return QVariant(pt * 0.001);
         }
     );
     userOrigin1->setToJsonHook(
@@ -1094,7 +1094,7 @@ void Config::loadDeviceItems()
         [](const QVariant& value)
         {
             QPointF pt = value.toPointF();
-            return QVariant(pt / 1000.0);
+            return QVariant(pt * 0.001);
         }
     );
     userOrigin2->setToJsonHook(
@@ -1140,7 +1140,7 @@ void Config::loadDeviceItems()
         [](const QVariant& value)
         {
             QPointF pt = value.toPointF();
-            return QVariant(pt / 1000.0);
+            return QVariant(pt * 0.001);
         }
     );
     userOrigin3->setToJsonHook(
@@ -1243,7 +1243,7 @@ void Config::loadUserReigsters()
     cuttingMoveSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     cuttingMoveSpeed->setValueFromWidgetHook(
@@ -1266,7 +1266,7 @@ void Config::loadUserReigsters()
     cuttingMoveAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     cuttingMoveAcc->setValueFromWidgetHook(
@@ -1289,7 +1289,7 @@ void Config::loadUserReigsters()
     cuttingTurnSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     cuttingTurnSpeed->setValueFromWidgetHook(
@@ -1312,7 +1312,7 @@ void Config::loadUserReigsters()
     cuttingTurnAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     cuttingTurnAcc->setValueFromWidgetHook(
@@ -1335,7 +1335,7 @@ void Config::loadUserReigsters()
     cuttingWorkAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     cuttingWorkAcc->setValueFromWidgetHook(
@@ -1383,7 +1383,7 @@ void Config::loadUserReigsters()
     scanXStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     scanXStartSpeed->setValueFromWidgetHook(
@@ -1406,7 +1406,7 @@ void Config::loadUserReigsters()
     scanYStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     scanYStartSpeed->setValueFromWidgetHook(
@@ -1429,7 +1429,7 @@ void Config::loadUserReigsters()
     scanXAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     scanXAcc->setValueFromWidgetHook(
@@ -1452,7 +1452,7 @@ void Config::loadUserReigsters()
     scanYAcc->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     scanYAcc->setValueFromWidgetHook(
@@ -1475,7 +1475,7 @@ void Config::loadUserReigsters()
     scanRowSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     scanRowSpeed->setValueFromWidgetHook(
@@ -1508,7 +1508,7 @@ void Config::loadUserReigsters()
     scanReturnError->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     scanReturnError->setValueFromWidgetHook(
@@ -1611,7 +1611,7 @@ void Config::loadUserReigsters()
     resetSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     resetSpeed->setValueFromWidgetHook(
@@ -1644,7 +1644,7 @@ void Config::loadUserReigsters()
     backlashXInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     backlashXInterval->setValueFromWidgetHook(
@@ -1667,7 +1667,7 @@ void Config::loadUserReigsters()
     backlashYInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     backlashYInterval->setValueFromWidgetHook(
@@ -1690,7 +1690,7 @@ void Config::loadUserReigsters()
     backlashZInterval->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     backlashZInterval->setValueFromWidgetHook(
@@ -1713,7 +1713,7 @@ void Config::loadUserReigsters()
     defaultRunSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     defaultRunSpeed->setValueFromWidgetHook(
@@ -1789,7 +1789,7 @@ void Config::loadUserReigsters()
     defaultScanSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     defaultScanSpeed->setValueFromWidgetHook(
@@ -1879,7 +1879,7 @@ void Config::loadUserReigsters()
     fillingSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     fillingSpeed->setValueFromWidgetHook(
@@ -1903,7 +1903,7 @@ void Config::loadUserReigsters()
     fillingStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     fillingStartSpeed->setValueFromWidgetHook(
@@ -1927,7 +1927,7 @@ void Config::loadUserReigsters()
     fillingAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     fillingAcceleration->setValueFromWidgetHook(
@@ -2019,6 +2019,7 @@ void Config::loadSystemRegisters()
     head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
+    head->setVisible(false);
 
     ConfigItem* password = group->addConfigItem(
         "password",
@@ -2046,6 +2047,7 @@ void Config::loadSystemRegisters()
     hardwareID1->setReadOnly();
     hardwareID1->setInputWidgetType(IWT_LineEdit);
     hardwareID1->setInputWidgetProperty("readOnly", true);
+    hardwareID1->setVisible(false);
 
     ConfigItem* hardwareID2 = group->addConfigItem(
         "hardwareID2",
@@ -2055,6 +2057,7 @@ void Config::loadSystemRegisters()
     hardwareID2->setReadOnly();
     hardwareID2->setInputWidgetType(IWT_LineEdit);
     hardwareID2->setInputWidgetProperty("readOnly", true);
+    hardwareID2->setVisible(false);
 
     ConfigItem* hardwareID3 = group->addConfigItem(
         "hardwareID3",
@@ -2064,6 +2067,7 @@ void Config::loadSystemRegisters()
     hardwareID3->setReadOnly();
     hardwareID3->setInputWidgetType(IWT_LineEdit);
     hardwareID3->setInputWidgetProperty("readOnly", true);
+    hardwareID3->setVisible(false);
 
     ConfigItem* cdKey1 = group->addConfigItem(
         "cdKey1",
@@ -2071,6 +2075,7 @@ void Config::loadSystemRegisters()
         DT_STRING
     );
     cdKey1->setInputWidgetType(IWT_LineEdit);
+    cdKey1->setVisible(false);
 
     ConfigItem* cdKey2 = group->addConfigItem(
         "cdKey2",
@@ -2078,6 +2083,7 @@ void Config::loadSystemRegisters()
         DT_STRING
     );
     cdKey2->setInputWidgetType(IWT_LineEdit);
+    cdKey2->setVisible(false);
 
     ConfigItem* cdKey3 = group->addConfigItem(
         "cdKey3",
@@ -2085,6 +2091,7 @@ void Config::loadSystemRegisters()
         DT_STRING
     );
     cdKey3->setInputWidgetType(IWT_LineEdit);
+    cdKey3->setVisible(false);
 
     ConfigItem* sysRunTime = group->addConfigItem(
         "sysRunTime",
@@ -2124,7 +2131,7 @@ void Config::loadSystemRegisters()
     xMaxLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2189,7 +2196,7 @@ void Config::loadSystemRegisters()
     xZeroDev->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2213,7 +2220,7 @@ void Config::loadSystemRegisters()
     xStepLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000000.0);
+            return QVariant(value.toInt() * 0.000001);
         }
     );
     xStepLength->setInputWidgetType(IWT_FloatEditSlider);
@@ -2311,7 +2318,7 @@ void Config::loadSystemRegisters()
     xStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     xStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2335,7 +2342,7 @@ void Config::loadSystemRegisters()
     xMaxSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     xMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2359,7 +2366,7 @@ void Config::loadSystemRegisters()
     xMaxAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     xMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2383,7 +2390,7 @@ void Config::loadSystemRegisters()
     xUrgentAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     xUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2407,7 +2414,7 @@ void Config::loadSystemRegisters()
     yMaxLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     yMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2471,7 +2478,7 @@ void Config::loadSystemRegisters()
     yZeroDev->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     yZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2495,7 +2502,7 @@ void Config::loadSystemRegisters()
     yStepLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000000.0);
+            return QVariant(value.toInt() * 0.000001);
         }
     );
     yStepLength->setInputWidgetType(IWT_FloatEditSlider);
@@ -2594,7 +2601,7 @@ void Config::loadSystemRegisters()
     yStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     yStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2618,7 +2625,7 @@ void Config::loadSystemRegisters()
     yMaxSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     yMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2642,7 +2649,7 @@ void Config::loadSystemRegisters()
     yMaxAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     yMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2666,7 +2673,7 @@ void Config::loadSystemRegisters()
     yUrgentAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     yUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2690,7 +2697,7 @@ void Config::loadSystemRegisters()
     zMaxLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     zMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2756,7 +2763,7 @@ void Config::loadSystemRegisters()
     zZeroDev->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     zZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2780,7 +2787,7 @@ void Config::loadSystemRegisters()
     zStepLength->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000000.0);
+            return QVariant(value.toInt() * 0.000001);
         }
     );
     zStepLength->setInputWidgetType(IWT_FloatEditSlider);
@@ -2879,7 +2886,7 @@ void Config::loadSystemRegisters()
     zStartSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     zStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2903,7 +2910,7 @@ void Config::loadSystemRegisters()
     zMaxSpeed->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     zMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2927,7 +2934,7 @@ void Config::loadSystemRegisters()
     zMaxAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     zMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2951,7 +2958,7 @@ void Config::loadSystemRegisters()
     zUrgentAcceleration->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            return QVariant(value.toInt() / 1000.0);
+            return QVariant(value.toInt() * 0.001);
         }
     );
     zUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -3044,7 +3051,7 @@ void Config::loadSystemRegisters()
     deviceOrigin->setCreateWidgetHook(
         [=](ConfigItem* item) {
             RadioButtonGroup* widget = new RadioButtonGroup(2, 2);
-            widget->setValues(QList<int>() << 0 << 1 << 3 << 2);
+            widget->setValues(QList<int>() << 0 << 3 << 1 << 2);
             return qobject_cast<QWidget*>(widget);
         }
     );
@@ -3117,9 +3124,9 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Unit", nullptr), 
         QCoreApplication::translate("Config", "Unit for user interface.", nullptr));
 
-    General::machiningUnitItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Machining Unit", nullptr), 
-        QCoreApplication::translate("Config", "Unit for machining", nullptr));
+    //General::machiningUnitItem()->setTitleAndDesc(
+        //QCoreApplication::translate("Config", "Machining Unit", nullptr), 
+        //QCoreApplication::translate("Config", "Unit for machining", nullptr));
 
     Layers::maxLayersCountItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Layers Count", nullptr), 

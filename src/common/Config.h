@@ -80,7 +80,7 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(general, language, int, toInt)
         CONFIG_ITEM(general, unit, int, toInt)
-        CONFIG_ITEM(general, machiningUnit, qreal, toReal)
+        //CONFIG_ITEM(general, machiningUnit, qreal, toReal)
 
     private:
         friend class Config;
