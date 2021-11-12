@@ -1,6 +1,8 @@
 #include "RulerWidget.h"
 #include "LaserViewer.h"
 #include "scene/LaserScene.h"
+#include "LaserApplication.h"
+#include "laser/LaserDevice.h"
 #include <QObject>
 #include <QPainter>
 #include <QDebug>
@@ -62,8 +64,6 @@ void RulerWidget::refresh()
 	
 }
 
-
-
 void RulerWidget::viewZoomChanged(const QPointF& topleft) {
 	m_original = topleft;
 	repaint();
@@ -85,8 +85,6 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		else {
 			painter.drawLine(QPoint(m_mousePoint.x(), 0), QPoint(m_mousePoint.x(), m_minHeightSize));
 		}
-		
-		
 	}
 	
 	m_scale = m_viewer->zoomValue();
@@ -181,8 +179,6 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		}
 		drawRuler(dimension, textCoef, painter);
 	}
-	
-	
 }
 
 void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive)
@@ -209,9 +205,9 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 			longStart = originalStart - i * m_longUnit;
 		}
 		if (m_isVertical) {
-			painter.drawLine(QPointF( edge + 7, longStart), QPointF(edge + m_minWidthSize, longStart));
+			painter.drawLine(QPointF(edge + 7, longStart), QPointF(edge + m_minWidthSize, longStart));
 			//text
-			if (m_longUnit > 38 || i%2==0) {
+			if (m_longUnit > 38 || i % 2 == 0) {
 				QString number_str = QString::number(i * textCoef * 10);
 				if (textCoef == 0) {
 					number_str = QString::number(i * 10);
@@ -224,22 +220,22 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 				}
 
 				int length = number_str.length();
-                if (m_scale <= 8) {
-                    for (int j = 0; j < length; j++) {
-                        painter.drawText(QPointF(edge + 3, longStart + 10 + j * font.pixelSize()), QString(number_str[j]));
-                    }
-                }
+				if (m_scale <= 8) {
+					for (int j = 0; j < length; j++) {
+						painter.drawText(QPointF(edge + 3, longStart + 10 + j * font.pixelSize()), QString(number_str[j]));
+					}
+				}
 				painter.setPen(QPen(QColor(200, 200, 200), 1));
 			}
-			
-			
 		}
 		else {
 			painter.drawLine(QPointF(longStart, edge + 7), QPointF(longStart, edge + m_minHeightSize));
 			//text
 			if (m_longUnit > 38 || i % 2 == 0) {
+				//QString number_str = QString::number(LaserApplication::device->deviceTranslateXMm(i * textCoef * 10));
 				QString number_str = QString::number(i * textCoef * 10);
 				if (textCoef == 0) {
+					//number_str = QString::number(LaserApplication::device->deviceTranslateXMm(i * 10));
 					number_str = QString::number(i * 10);
 				}
 				if (i % 2 == 0) {
@@ -281,8 +277,10 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
     if (m_scale > 8) {
         int smallSize = qRound(dimension / m_unit);
         for (int sj = 0; sj < smallSize; sj++) {
+            //QString number_str = QString::number(LaserApplication::device->deviceTranslateXMm(sj));
             QString number_str = QString::number(sj);
             if (m_scale > 22) {
+                //number_str = QString::number(LaserApplication::device->deviceTranslateXMm(sj * 0.5), 'f', 1);
                 number_str = QString::number(sj * 0.5, 'f', 1);
             }
             painter.setPen(QPen(QColor(63, 63, 63), 1));

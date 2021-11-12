@@ -191,7 +191,8 @@ protected slots:
     void onStatusBarActivationClicked(bool checked = false);
     void onActionUpdateSoftware(bool checked = false);
     void onActionUpdateFirmware(bool checked = false);
-    void onActionLaserPosition(bool checked = false);
+    void onActionShowLaserPosition(bool checked = false);
+    void onActionHideLaserPosition(bool checked = false);
     void onProgressBarClicked();
 
 	void onActionMirrorHorizontal(bool checked = false);
@@ -276,7 +277,10 @@ protected slots:
 
     // config items
     void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
-    //void updateAutoRepeatIntervalChanged(const QVariant& valu, ModifiedBy modifiedBye);
+    void deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye);
+    void jobOriginChanged(const QVariant& value, ModifiedBy modifiedBye);
+    void startFromChanged(const QVariant& value, ModifiedBy modifiedBye);
+    void userOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
 
     void askMergeOrNew();
 
@@ -383,7 +387,8 @@ private:
     //QCheckBox* m_checkBoxYEnabled;
     //QCheckBox* m_checkBoxZEnabled;
 
-    QToolButton* m_buttonLaserPosition;
+    QToolButton* m_buttonShowLaserPosition;
+    QToolButton* m_buttonHideLaserPosition;
     QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonUserOrigin1;
     QRadioButton* m_radioButtonUserOrigin2;

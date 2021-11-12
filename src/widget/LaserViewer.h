@@ -92,6 +92,9 @@ public:
     void AcrossLineMirror();
     //detect bounds is in max region
     bool detectBoundsInMaxRegion(QRectF bounds);
+
+	bool showLaserPos() const;
+	void setShowLaserPos(bool laserPos);
 	
 private:
     void init();
@@ -115,7 +118,6 @@ private:
 	qreal topScaleMirror(qreal rate, qreal y);
 	qreal bottomScaleMirror(qreal rate, qreal y);
     
-
 	void setGroupNull();
 	void pointSelectWhenSelectedState(int handleIndex, LaserPrimitive* primitive);
 	void selectingReleaseInBlank();//释放鼠标时，点选和框选的区域为空白（没有图元）
@@ -127,7 +129,6 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
-
     
 public slots:
     void zoomIn();
@@ -173,7 +174,6 @@ signals:
 	void selectedChange();
 	void beginViewDraging();
 	void endViewDraging();
-    
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -327,6 +327,9 @@ private:
     int m_textAlighV;
     //mirror
     LaserPrimitive* m_mirrorLine;
+
+	bool m_showLaserPos;
+
 	friend class LaserScene;
 };
 

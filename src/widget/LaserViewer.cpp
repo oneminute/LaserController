@@ -61,7 +61,7 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_textAlighH(Qt::AlignLeft)
     , m_textAlighV(Qt::AlignBottom)
     , m_isTextMessageBoxShow(false)
-	
+    , m_showLaserPos(false)
 {
     setScene(m_scene.data());
     init();
@@ -113,18 +113,41 @@ void LaserViewer::paintEvent(QPaintEvent* event)
                 painter.drawPolygon(gridBounds);
             }
 
-            //scene()->document()->docOrigin
+            if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+            {
+                QPointF jobOrigin = LaserApplication::device->jobOrigin(rect);
+                QPointF relOrigin = rect.topLeft() - jobOrigin;
+                painter.setPen(QPen(Qt::darkGreen));
+                QPointF origin = mapFromScene(relOrigin);
+                QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
+                painter.drawRect(originRect);
+            }
         }
         
-        painter.setPen(QPen(Qt::darkGreen));
-        QPointF origin = mapFromScene(LaserApplication::device->userOrigin());
-        QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
-        painter.drawRect(originRect);
+        if (Config::Device::startFrom() == SFT_UserOrigin)
+        {
+            painter.setPen(QPen(Qt::darkYellow));
+		    QPointF deviceOrigin = LaserApplication::device->deviceOrigin();
+            QPointF origin = LaserApplication::device->userOrigin();
+            QPointF userOrigin = mapFromScene(origin + deviceOrigin);
+            QRectF originRect(userOrigin - QPointF(2, 2), userOrigin + QPointF(2, 2));
+            painter.drawEllipse(originRect);
+            qreal lineLength = 5;
+            painter.drawLine(userOrigin + QPointF(3, 0), userOrigin + QPointF(3 + lineLength, 0));
+            painter.drawLine(userOrigin - QPointF(3, 0), userOrigin - QPointF(3 + lineLength, 0));
+            painter.drawLine(userOrigin + QPointF(0, 3), userOrigin + QPointF(0, 3 + lineLength));
+            painter.drawLine(userOrigin - QPointF(0, 3), userOrigin - QPointF(0, 3 + lineLength));
+        }
 
-		painter.setPen(QPen(Qt::red, 2));
+		painter.setPen(QPen(Qt::blue, 2));
 		QPointF deviceOrigin = mapFromScene(LaserApplication::device->deviceOrigin());
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
-		painter.drawRect(deviceOriginRect);
+        painter.drawEllipse(deviceOriginRect);
+        qreal lineLength = 5;
+        painter.drawLine(deviceOrigin + QPointF(3, 0), deviceOrigin + QPointF(3 + lineLength, 0));
+        painter.drawLine(deviceOrigin - QPointF(3, 0), deviceOrigin - QPointF(3 + lineLength, 0));
+        painter.drawLine(deviceOrigin + QPointF(0, 3), deviceOrigin + QPointF(0, 3 + lineLength));
+        painter.drawLine(deviceOrigin - QPointF(0, 3), deviceOrigin - QPointF(0, 3 + lineLength));
 
         PointPairList pairs = LaserApplication::mainWindow->printAndCutPoints();
         for (const PointPair& pair : pairs)
@@ -136,6 +159,23 @@ void LaserViewer::paintEvent(QPaintEvent* event)
             painter.drawRect(canvasPointRect);
         }
 	}
+
+    if (m_showLaserPos)
+    {
+        QPointF laserPos = mapFromScene(LaserApplication::device->getCurrentLaserPositionScene());
+		QRectF rect(laserPos - QPointF(2, 2), laserPos + QPointF(2, 2));
+        painter.setPen(QPen(Qt::red, 1));
+        painter.drawEllipse(rect);
+        qreal lineLength = 5;
+        painter.drawLine(laserPos + QPointF(3, 0), laserPos + QPointF(3 + lineLength, 0));
+        painter.drawLine(laserPos - QPointF(3, 0), laserPos - QPointF(3 + lineLength, 0));
+        painter.drawLine(laserPos + QPointF(0, 3), laserPos + QPointF(0, 3 + lineLength));
+        painter.drawLine(laserPos - QPointF(0, 3), laserPos - QPointF(0, 3 + lineLength));
+        painter.drawLine(laserPos + QPointF(2, 2), laserPos + QPointF(4, 4));
+        painter.drawLine(laserPos + QPointF(-2, -2), laserPos + QPointF(-4, -4));
+        painter.drawLine(laserPos + QPointF(2, -2), laserPos + QPointF(4, -4));
+        painter.drawLine(laserPos + QPointF(-2, 2), laserPos + QPointF(-4, 4));
+    }
 
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
 	//painter.drawPolygon (testRect);
@@ -3605,6 +3645,17 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
         m_undoStack->push(cmd);
     }
     
+}
+
+bool LaserViewer::showLaserPos() const
+{
+    return false;
+}
+
+void LaserViewer::setShowLaserPos(bool laserPos)
+{
+    m_showLaserPos = laserPos;
+    viewport()->update();
 }
 
 int LaserViewer::textAlignH()

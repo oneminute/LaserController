@@ -79,6 +79,14 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
         QPointF deviceOriginMM = LaserApplication::device->deviceOriginMachining();
         LaserDocument* document = static_cast<LaserDocument*>(documentItem);
         QPointF docOrigin = document->docOriginMachining();
+        if (Config::Device::startFrom() == SFT_AbsoluteCoords)
+            docOrigin = LaserApplication::device->deviceOriginMachining();
+        else
+        {
+            QRectF bounding = document->docBoundingRectMachining();
+            QPointF jobOrigin = LaserApplication::device->jobOrigin(bounding);
+            docOrigin = bounding.topLeft() + jobOrigin;
+        }
         QLineF line(deviceOriginMM, docOrigin);
         qreal angle = 0;
         if (line.isNull())

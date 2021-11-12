@@ -578,7 +578,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionRegiste, &QAction::triggered, this, &LaserControllerWindow::onActionRegiste);
     connect(m_ui->actionUpdateSoftware, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateSoftware);
     connect(m_ui->actionUpdateFirmware, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateFirmware);
-    connect(m_ui->actionLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionLaserPosition);
+    connect(m_ui->actionShowLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionShowLaserPosition);
+    connect(m_ui->actionHideLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionHideLaserPosition);
 
 	connect(m_ui->actionMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -772,12 +773,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
     // config items
     connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
-    /*connect(Config::Device::userOrigin1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
-    connect(Config::Device::userOrigin2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
-    connect(Config::Device::userOrigin3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
-    connect(Config::Device::userOriginSelectedItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
-    connect(Config::Device::startFromItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);
-    connect(Config::Device::jobOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::applyJobOriginToDocument);*/
+    connect(Config::SystemRegister::deviceOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::deviceOriginChanged);
+    connect(Config::Device::jobOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::jobOriginChanged);
+    connect(Config::Device::startFromItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::startFromChanged);
+    connect(Config::Device::userOrigin1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::Device::userOrigin2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::Device::userOrigin3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
 
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
@@ -1597,18 +1598,6 @@ void LaserControllerWindow::createOutlineDockPanel()
 
 void LaserControllerWindow::createMovementDockPanel()
 {
-    /*m_checkBoxXEnabled = new QCheckBox;
-    m_checkBoxXEnabled->setText(tr("X Enabled"));
-    Config::Device::xEnabledItem()->bindWidget(m_checkBoxXEnabled);
-
-    m_checkBoxYEnabled = new QCheckBox;
-    m_checkBoxYEnabled->setText(tr("Y Enabled"));
-    Config::Device::yEnabledItem()->bindWidget(m_checkBoxYEnabled);
-
-    m_checkBoxZEnabled = new QCheckBox;
-    m_checkBoxZEnabled->setText(tr("Z Enabled"));
-    Config::Device::zEnabledItem()->bindWidget(m_checkBoxZEnabled);*/
-
     m_lineEditCoordinatesX = new QLineEdit;
     m_lineEditCoordinatesX->setReadOnly(true);
     m_lineEditCoordinatesX->setText(QString::number(0.0, 'f', 2));
@@ -1641,9 +1630,6 @@ void LaserControllerWindow::createMovementDockPanel()
 
     QGridLayout* firstRow = new QGridLayout;
     firstRow->setMargin(0);
-    //firstRow->addWidget(m_checkBoxXEnabled, 0, 1, 1, 2);
-    //firstRow->addWidget(m_checkBoxYEnabled, 0, 3, 1, 2);
-    //firstRow->addWidget(m_checkBoxZEnabled, 0, 5, 1, 2);
     firstRow->addWidget(new QLabel(tr("Coordinates")), 0, 0);
     firstRow->addWidget(new QLabel(tr("X")), 0, 1);
     firstRow->addWidget(m_lineEditCoordinatesX, 0, 2);
@@ -1701,8 +1687,10 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveDown->setAutoRepeat(true);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
 
-    m_buttonLaserPosition = new QToolButton;
-    m_buttonLaserPosition->setDefaultAction(m_ui->actionLaserPosition);
+    m_buttonShowLaserPosition = new QToolButton;
+    m_buttonShowLaserPosition->setDefaultAction(m_ui->actionShowLaserPosition);
+    m_buttonHideLaserPosition = new QToolButton;
+    m_buttonHideLaserPosition->setDefaultAction(m_ui->actionHideLaserPosition);
 
     updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay(), MB_Manual);
     //updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
@@ -1720,7 +1708,8 @@ void LaserControllerWindow::createMovementDockPanel()
     secondRow->addWidget(m_buttonMoveBottom, 2, 1);
     secondRow->addWidget(m_buttonMoveBottomRight, 2, 2);
     secondRow->addWidget(m_buttonMoveDown, 2, 3);
-    secondRow->addWidget(m_buttonLaserPosition, 3, 0, 1, 4);
+    secondRow->addWidget(m_buttonShowLaserPosition, 3, 0, 1, 2);
+    secondRow->addWidget(m_buttonHideLaserPosition, 3, 2, 1, 2);
 
     m_radioButtonUserOrigin1 = new QRadioButton(tr("User Origin 1"));
     m_radioButtonUserOrigin2 = new QRadioButton(tr("User Origin 2"));
@@ -2796,7 +2785,8 @@ void LaserControllerWindow::onActionStopMechining(bool checked)
 
 void LaserControllerWindow::onActionBounding(bool checked)
 {
-    if (m_scene->document())
+    if (!m_scene->document())
+        return;
     m_scene->document()->exportBoundingJSON();
     QFileInfo fileInfo("tmp/bounding.json");
     QString filePath = fileInfo.absoluteFilePath();
@@ -3323,9 +3313,23 @@ void LaserControllerWindow::onActionUpdateFirmware(bool checked)
     LaserApplication::device->showFirmwareUpdateWizard();
 }
 
-void LaserControllerWindow::onActionLaserPosition(bool checked)
+void LaserControllerWindow::onActionShowLaserPosition(bool checked)
 {
     LaserApplication::device->getCurrentLaserPositionMM();
+    m_viewer->setShowLaserPos(true);
+    if (Config::Ui::laserCursorTimeout())
+    {
+        QTimer::singleShot(Config::Ui::laserCursorTimeout(), [=]()
+            {
+                m_viewer->setShowLaserPos(false);
+            }
+        );
+    }
+}
+
+void LaserControllerWindow::onActionHideLaserPosition(bool checked)
+{
+    m_viewer->setShowLaserPos(false);
 }
 
 void LaserControllerWindow::onProgressBarClicked()
@@ -3783,7 +3787,7 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
     qreal x = Global::convertToMmH(pos.x());
     qreal y = Global::convertToMmV(pos.y());
     QPointF posMM = QPointF(x, y);
-    posMM = LaserApplication::device->transform().map(posMM);
+    posMM = LaserApplication::device->deviceTransformMM().map(posMM);
     QString posStr = QString("%1mm,%2mm | %3px,%4px")
         .arg(posMM.x(), 8, 'f', 3).arg(posMM.y(), 8, 'f', 3)
         .arg(qFloor(pos.x()), 5).arg(qFloor(pos.y()), 5);
@@ -3857,6 +3861,8 @@ void LaserControllerWindow::onUserOriginRadioButtonChanged(bool checked)
         int originIndex = rb->property("origin").toInt();
         Config::Device::userOriginSelectedItem()->setValue(originIndex, MB_Widget);
     }
+
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onCreatSpline()
@@ -4875,6 +4881,26 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, 
     m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
 }
 
+void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
+{
+    m_viewer->viewport()->update();
+}
+
+void LaserControllerWindow::jobOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
+{
+    m_viewer->viewport()->update();
+}
+
+void LaserControllerWindow::startFromChanged(const QVariant& value, ModifiedBy modifiedBye)
+{
+    m_viewer->viewport()->update();
+}
+
+void LaserControllerWindow::userOriginChanged(const QVariant& value, ModifiedBy modifiedBy)
+{
+    m_viewer->viewport()->update();
+}
+
 void LaserControllerWindow::askMergeOrNew()
 {
     if (m_scene->document()) {
@@ -4930,10 +4956,10 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
 
     // 获取当前原点
     QPointF origin = LaserApplication::device->origin();
-
+    QPointF deviceOrigin = LaserApplication::device->deviceOrigin();
     QPointF jobOrigin = LaserApplication::device->jobOrigin(docBounding);
 
-    QPointF topLeft = origin + jobOrigin;
+    QPointF topLeft = origin + jobOrigin + deviceOrigin;
     
     QPointF offset = topLeft - docBounding.topLeft();
     QTransform t = QTransform::fromTranslate(offset.x(), offset.y());

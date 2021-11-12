@@ -100,7 +100,7 @@ void LaserDevicePrivate::updateDeviceOriginAndTransform()
 
     deviceOriginMachining = QPointF(dx, dy);
     deviceOriginMM = QPointF(dx * 0.001, dy * 0.001);
-    deviceTransformMM = QTransform::fromTranslate(deviceOriginMM.x(), deviceOriginMM.y());
+    deviceTransformMM = QTransform::fromTranslate(-deviceOriginMM.x(), -deviceOriginMM.y());
 }
 
 LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
@@ -1026,6 +1026,18 @@ int LaserDevice::deviceTranslateYMachining(int y) const
     return -d->deviceOriginMachining.y() + y;
 }
 
+int LaserDevice::deviceTranslateXMm(int x) const
+{
+    Q_D(const LaserDevice);
+    return -d->deviceOriginMM.x() + x;
+}
+
+int LaserDevice::deviceTranslateYMm(int y) const
+{
+    Q_D(const LaserDevice);
+    return -d->deviceOriginMM.y() + y;
+}
+
 void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)
 {
     Q_D(LaserDevice);
@@ -1112,6 +1124,16 @@ QPointF LaserDevice::getCurrentLaserPosition() const
     Q_D(const LaserDevice);
     QPointF pos = d->lastState.pos.toPointF();
     return Global::matrix(SU_MM, SU_PX, 0.001, 0.001).map(pos);
+}
+
+QPointF LaserDevice::getCurrentLaserPositionScene() const
+{
+    Q_D(const LaserDevice);
+    QPointF pos = d->lastState.pos.toPointF();
+    QPointF currPos(
+        d->deviceOriginMachining.x() + pos.x(),
+        d->deviceOriginMachining.y() + pos.y());
+    return Global::matrix(SU_MM, SU_PX, 0.001, 0.001).map(currPos);
 }
 
 qreal LaserDevice::engravingAccLength(qreal engravingRunSpeed) const

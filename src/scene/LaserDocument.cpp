@@ -100,8 +100,6 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
     item->layer()->removePrimitive(item);
     scene()->removeLaserPrimitive(item);
     d->primitives.remove(item->id());
-    //item->QObject::deleteLater();
-
 }
 
 //PageInformation LaserDocument::pageInformation() const
@@ -237,7 +235,12 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QPointF docOrigin = LaserApplication::device->originMachining();
     // 这里的原点要进行平移操作
     QTransform deviceTMachining = LaserApplication::device->deviceTransformMachining();
-    laserDocumentInfo["Origin"] = typeUtils::point2Json(deviceTMachining.map(docOrigin));
+    if (Config::Device::startFrom() == SFT_CurrentPosition)
+        laserDocumentInfo["Origin"] = typeUtils::point2Json(QPointF(0, 0));
+    else if (Config::Device::startFrom() == SFT_UserOrigin)
+        laserDocumentInfo["Origin"] = typeUtils::point2Json(LaserApplication::device->userOriginMachining());
+    else
+        laserDocumentInfo["Origin"] = typeUtils::point2Json(deviceTMachining.map(docOrigin));
     // 这里计算出的外包框也要进行平移操作
     QRectF boundingRect = docBoundingRect();
     QRectF boundingRectMachining = Global::matrixToMachining().map(boundingRect).boundingRect();
@@ -318,6 +321,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObj["Width"] = Global::convertToMmH(primitive->boundingRect().width());
                     itemObj["Height"] = Global::convertToMmV(primitive->boundingRect().height());
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
+                    itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
 
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Engraving").arg(primitive->name()), exportProgress);
                     QByteArray data = primitive->engravingImage(progress, lastPoint);
@@ -451,7 +455,12 @@ void LaserDocument::exportBoundingJSON()
     QPointF docOrigin = LaserApplication::device->originMachining();
     // 这里的原点要进行平移操作
     QTransform deviceTMachining = LaserApplication::device->deviceTransformMachining();
-    laserDocumentInfo["Origin"] = typeUtils::point2Json(deviceTMachining.map(docOrigin));
+    if (Config::Device::startFrom() == SFT_CurrentPosition)
+        laserDocumentInfo["Origin"] = typeUtils::point2Json(QPointF(0, 0));
+    else if (Config::Device::startFrom() == SFT_UserOrigin)
+        laserDocumentInfo["Origin"] = typeUtils::point2Json(LaserApplication::device->userOriginMachining());
+    else
+        laserDocumentInfo["Origin"] = typeUtils::point2Json(deviceTMachining.map(docOrigin));
     // 这里计算出的外包框也要进行平移操作
     QRectF boundingRect = docBoundingRect();
     QRectF boundingRectMachining = Global::matrixToMachining().map(boundingRect).boundingRect();
@@ -463,13 +472,6 @@ void LaserDocument::exportBoundingJSON()
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layers;
-    QPointF lastPoint = docOrigin;
-    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-    {
-        QPointF jobOrigin = LaserApplication::device->jobOrigin(boundingRect);
-        jobOrigin = Global::matrixToMachining().map(jobOrigin);
-        lastPoint = boundingRectMachining.topLeft() - jobOrigin;
-    }
 
     QJsonObject layerObj;
     QJsonObject paramObj;
@@ -495,41 +497,67 @@ void LaserDocument::exportBoundingJSON()
     points.append(LaserPoint(boundingRectMachining.bottomLeft()));
     int index = 0;
     bool isMiddle = false;
-    switch (Config::Device::jobOrigin())
+    QPointF lastPoint = docOrigin;
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
     {
-    case 0:
-        index = 1;
-        break;
-    case 1:
-        index = 1;
-        isMiddle = true;
-        break;
-    case 2:
-        index = 2;
-        break;
-    case 3:
-        index = 0;
-        isMiddle = true;
-        break;
-    case 4:
-        index = 0;
-        isMiddle = true;
-        break;
-    case 5:
-        index = 2;
-        isMiddle = true;
-        break;
-    case 6:
-        index = 0;
-        break;
-    case 7:
-        index = 3;
-        isMiddle = true;
-        break;
-    case 8:
-        index = 3;
-        break;
+        switch (Config::SystemRegister::deviceOrigin())
+        {
+        case 0:
+            index = 0;
+            break;
+        case 1:
+            index = 1;
+            break;
+        case 2:
+            index = 2;
+            break;
+        case 3:
+            index = 3;
+            break;
+        }
     }
+    else
+    {
+        QPointF jobOrigin = LaserApplication::device->jobOrigin(boundingRect);
+        jobOrigin = Global::matrixToMachining().map(jobOrigin);
+        lastPoint = boundingRectMachining.topLeft() - jobOrigin;
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            index = 1;
+            break;
+        case 1:
+            index = 1;
+            isMiddle = true;
+            break;
+        case 2:
+            index = 2;
+            break;
+        case 3:
+            index = 0;
+            isMiddle = true;
+            break;
+        case 4:
+            index = 0;
+            isMiddle = true;
+            break;
+        case 5:
+            index = 2;
+            isMiddle = true;
+            break;
+        case 6:
+            index = 0;
+            break;
+        case 7:
+            index = 3;
+            isMiddle = true;
+            break;
+        case 8:
+            index = 3;
+            break;
+        }
+    }
+    
     qLogD << "bounding rect point index: " << index;
     LaserPointList points2;
     for (int i = 0; i < 4; i++)
@@ -551,8 +579,8 @@ void LaserDocument::exportBoundingJSON()
         }
         if (isMiddle)
         {
-            points2.insert(0, LaserPoint(lastPoint));
-            points2.append(points2.first());
+            //points2.insert(0, LaserPoint(lastPoint));
+            points2.append(LaserPoint(lastPoint));
         }
     }
     
@@ -697,7 +725,7 @@ QPointF LaserDocument::docOrigin() const
         break;
     case SFT_CurrentPosition:
     {
-        QPointF laserPos = LaserApplication::device->getCurrentLaserPosition();
+        QPointF laserPos = LaserApplication::device->getCurrentLaserPositionScene();
         dx = laserPos.x();
         dy = laserPos.y();
     }

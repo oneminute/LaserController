@@ -418,6 +418,15 @@ void Config::loadUiItems()
         DT_BOOL
     );
     showDocumentBoundingRect->setInputWidgetType(IWT_CheckBox);
+
+    ConfigItem* laserCursorTimeout = group->addConfigItem(
+        "laserCursorTimeout",
+        3000,
+        DT_INT
+    );
+    laserCursorTimeout->setInputWidgetProperty("textTemplate", "%1ms");
+    laserCursorTimeout->setInputWidgetProperty("minimum", 0);
+    laserCursorTimeout->setInputWidgetProperty("maximum", 10000);
 }
 
 void Config::loadCuttingLayerItems()
@@ -3195,6 +3204,10 @@ void Config::updateTitlesAndDescriptions()
     Ui::showDocumentBoundingRectItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Show Document Bounding Rect", nullptr), 
         QCoreApplication::translate("Config", "Show document bounding rect", nullptr));
+
+    Ui::laserCursorTimeoutItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Show Laser Cursor Timeout", nullptr), 
+        QCoreApplication::translate("Config", "Show laser cursor timeout", nullptr));
 
     CuttingLayer::runSpeedItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Cutting Speed(mm)", nullptr), 

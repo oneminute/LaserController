@@ -118,6 +118,8 @@ public:
     QTransform deviceTransformMachining() const;
     int deviceTranslateXMachining(int x) const;
     int deviceTranslateYMachining(int y) const;
+    int deviceTranslateXMm(int x) const;
+    int deviceTranslateYMm(int y) const;
 
     void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
 
@@ -127,6 +129,7 @@ public:
     QPointF getCurrentLaserPositionMachining() const;
     QPointF getCurrentLaserPositionMM() const;
     QPointF getCurrentLaserPosition() const;
+    QPointF getCurrentLaserPositionScene() const;
 
     qreal engravingAccLength(qreal engravingRunSpeed) const;
 
