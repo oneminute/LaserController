@@ -2027,33 +2027,27 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         }
 		//undo before
 		selectionUndoStackPushBefore();
-		//框选前先将item从group中移除
-		//不然修改完group内的item的selected属性再从group中移除的话，
-		//group子对象selected不论true/false都设为group的isSelected值
-		resetGroup();
 		//框选前被选中的
 		QList<LaserPrimitive*> selectedList = m_scene->document()->selectedPrimitives();
+        //框选前先将item从group中移除
+        //不然修改完group内的item的selected属性再从group中移除的话，
+        //group子对象selected不论true/false都设为group的isSelected值
+        resetGroup();
 		//框选区域内被选中的
 		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
 		QList<LaserPrimitive*> newSelectedList = m_scene->document()->selectedPrimitives();
 		//框选区域，分情况处理selectionUndo
 		if (m_isKeyCtrlPress) {
-            //update tree
-
+            //update tree  
 			for each(LaserPrimitive* item in selectedList) {
 				item->setSelected(true);
 			}
 			for each(LaserPrimitive* newItem in newSelectedList) {
-                LaserPrimitive* p_newItem = qgraphicsitem_cast<LaserPrimitive*>(newItem);
-				if (selectedList.contains(p_newItem)) {
-                    p_newItem->blockSignals(true);
-                    p_newItem->setSelected(false);
-                    p_newItem->blockSignals(false);
+				if (selectedList.contains(newItem)) {
+                    newItem->setSelected(false);
 				}
 				else {
-                    p_newItem->blockSignals(true);
-                    p_newItem->setSelected(true);
-                    p_newItem->blockSignals(false);
+                    newItem->setSelected(true);
 				}
 			}
 			onEndSelectionFillGroup();
@@ -2079,7 +2073,6 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		
 		m_selectedEditCount = 0;
 		m_radians = 0;
-		
 		//group中没有被选中的item，返回idle状态
 		//if (m_group->isEmpty()) {
         if (m_scene->selectedPrimitives().isEmpty()) {
@@ -3256,9 +3249,7 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
             selectedList.insert(item, item->sceneTransform());
 			LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
 			m_group->removeFromGroup(p_item);
-			p_item->blockSignals(true);
 			p_item->setSelected(false);
-			p_item->blockSignals(false);
             
 		}
         //m_scene->destroyItemGroup(m_group);
@@ -3433,8 +3424,7 @@ void LaserViewer::setGroupNull()
 }
 
 void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive * primitive)
-{
-	
+{	
 	//因为图片被选中时需要描外框， 所以在LaserPrimitive的draw里会用类型判断是否描外框
 	QString className = primitive->metaObject()->className();
 	if (className == "LaserBitmap") {
@@ -3442,10 +3432,10 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 		if (!m_group->isAncestorOf(bitmap)) {
 			if (bitmap) {
 				if (m_isKeyCtrlPress) {
-						resetGroup();
+					resetGroup();
 				}
 				else {
-						clearGroupSelection();
+					clearGroupSelection();
 				}
 
 				bitmap->setSelected(true);
@@ -3483,11 +3473,10 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
     if (!scene()->selectedPrimitives().contains(primitive)) {
 		if (primitive) {
 			if (m_isKeyCtrlPress) {
-					resetGroup();
+				resetGroup();
 			}
 			else {
-					clearGroupSelection();
-                    
+				clearGroupSelection();
 			}
 
 			primitive->setSelected(true);
@@ -3501,9 +3490,9 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 	else {
 		if (primitive) {
 			if (m_isKeyCtrlPress) {
-					resetGroup();
+				resetGroup();
 
-				if (m_scene->selectedPrimitives().size() == 1) {
+				if (m_scene->document()->selectedPrimitives().size() == 1) {
 					emit beginSelectedEditing();
 					this->viewport()->repaint();
 					m_curSelectedHandleIndex = handleIndex;//点选
