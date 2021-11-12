@@ -331,6 +331,7 @@ private:
 	bool m_showLaserPos;
 
 	friend class LaserScene;
+    
 };
 
 #endif // LASERVIEWER_H

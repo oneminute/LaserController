@@ -171,6 +171,7 @@ protected slots:
 	void onActionPasteInPlace(bool checked = false);
 	void onActionCut(bool checked = false);
 	void onActionDuplication(bool checked = false);
+    void onActionMultiDuplication(bool checked = false);
 	void onActionGroup(bool checked = false);
 	void onActionUngroup(bool checked = false);
 	bool onActionCloseDocument(bool checked = false);
@@ -562,6 +563,15 @@ private:
 
     QPointF m_redLightAlignment1stPt;
     QPointF m_redLightAlignment2ndPt;
+
+    //MultiDuplicationDialog
+    int m_MultiDuplicationCopies;
+    int m_MultiDuplicationHSettings;
+    int m_MultiDuplicationVSettings;
+    int m_MultiDuplicationHDirection;
+    int m_MultiDuplicationVDirection;
+    qreal m_MultiDuplicationHDistance;
+    qreal m_MultiDuplicationVDistance;
 
     friend class LaserApplication;
 };

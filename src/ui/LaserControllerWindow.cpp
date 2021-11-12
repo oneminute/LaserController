@@ -65,6 +65,7 @@
 #include "ui/ActivationDialog.h"
 #include "ui/RegisteDialog.h"
 #include "ui/UserInfoDialog.h"
+#include "ui/MultiDuplicationDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -97,6 +98,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_lastLockedState(Qt::Unchecked)
     , m_lockEqualRatio(false)
     , m_updateDialog(nullptr)
+    , m_MultiDuplicationCopies(5)
+    , m_MultiDuplicationHSettings(1)
+    , m_MultiDuplicationVSettings(1)
+    , m_MultiDuplicationHDirection(0)
+    , m_MultiDuplicationVDirection(0)
+    , m_MultiDuplicationHDistance(5)
+    , m_MultiDuplicationVDistance(5)
 {
     m_ui->setupUi(this);
 
@@ -530,6 +538,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_ui->actionPasteInPlace, &QAction::triggered, this, &LaserControllerWindow::onActionPasteInPlace);
 	connect(m_ui->actionCut, &QAction::triggered, this, &LaserControllerWindow::onActionCut);
 	connect(m_ui->actionDuplication, &QAction::triggered, this, &LaserControllerWindow::onActionDuplication);
+    connect(m_ui->actionMultiDuplication, &QAction::triggered, this, &LaserControllerWindow::onActionMultiDuplication);
 	connect(m_ui->actionGroup, &QAction::triggered, this, &LaserControllerWindow::onActionGroup);
 	connect(m_ui->actionUngroup, &QAction::triggered, this, &LaserControllerWindow::onActionUngroup);
 	
@@ -2420,6 +2429,7 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 		Context.addAction(m_ui->actionCut);
 		Context.addAction(m_ui->actionPaste);
 		Context.addAction(m_ui->actionDuplication);
+        Context.addAction(m_ui->actionMultiDuplication);
 		Context.addSeparator();
 		Context.addAction(m_ui->actionGroup);
 		Context.addAction(m_ui->actionUngroup);
@@ -3044,6 +3054,26 @@ void LaserControllerWindow::onActionDuplication(bool checked) {
 	}
 	PasteCommand* cmd = new PasteCommand(m_viewer, false, true);
 	m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMultiDuplication(bool checked)
+{
+    if (!m_viewer || m_viewer->group()->isEmpty()) {
+        return;
+    }
+    MultiDuplicationDialog* dialog = new MultiDuplicationDialog(m_viewer,
+        m_MultiDuplicationCopies, m_MultiDuplicationHSettings, m_MultiDuplicationVSettings,
+        m_MultiDuplicationHDirection, m_MultiDuplicationVDirection,
+        m_MultiDuplicationVDistance, m_MultiDuplicationHDistance,
+        this);
+    dialog->exec();
+    m_MultiDuplicationCopies = dialog->copiesVal();
+    m_MultiDuplicationHSettings = dialog->HSettingsVal();
+    m_MultiDuplicationVSettings = dialog->VSettingsVal();
+    m_MultiDuplicationHDistance = dialog->HDistanceVal();
+    m_MultiDuplicationVDistance = dialog->VDistanceVal();
+    m_MultiDuplicationHDirection = dialog->HDirectionVal();
+    m_MultiDuplicationVDirection = dialog->VDirectionVal();
 }
 
 void LaserControllerWindow::onActionGroup(bool checked)
@@ -3685,6 +3715,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		//m_ui->actionPaste->setEnabled(false);
 		m_ui->actionCut->setEnabled(false);
 		m_ui->actionDuplication->setEnabled(false);
+        m_ui->actionMultiDuplication->setEnabled(false);
 		m_ui->actionDeletePrimitive->setEnabled(false);
 		m_ui->actionGroup->setEnabled(false);
 		m_ui->actionUngroup->setEnabled(false);
@@ -3697,6 +3728,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionCopy->setEnabled(true);
 		m_ui->actionCut->setEnabled(true);
 		m_ui->actionDuplication->setEnabled(true);
+        m_ui->actionMultiDuplication->setEnabled(true);
 		m_ui->actionDeletePrimitive->setEnabled(true);
 		//m_ui->actionGroup->setEnabled(true);
 		//m_ui->actionUngroup->setEnabled(true);
@@ -4417,6 +4449,11 @@ void LaserControllerWindow::bindWidgetsProperties()
 	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, initState);
 	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentEmptyState);
 	// end actionDuplication
+
+    // actionMultiDuplication
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentEmptyState);
+    // end actionMultiDuplication
 
 	// actionMirrorHorizontal
 	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
