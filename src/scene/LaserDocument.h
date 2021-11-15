@@ -57,16 +57,62 @@ public:
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
 
-    QPointF docOrigin() const;
-    QPointF docOriginMM() const;
-    QPointF docOriginMachining() const;
-    QTransform docTransform() const;
-    QTransform docTransformMM() const;
-    QRectF docBoundingRect() const;
-    QRectF docBoundingRectMM() const;
-    QRectF docBoundingRectMachining() const;
-    QRectF imagesBoundingRect() const;
-    QRectF imagesBoundingRectMachining() const;
+    /// <summary>
+    /// 返回作业原点。该点值在画布坐标系下，由当前有效图元列表形成
+    /// 的外包矩形9宫格点决定，即，该原点值是相对于外包矩形左上角
+    /// 的相对坐标。
+    /// </summary>
+    /// <param name="docBounding">外包矩形</param>
+    /// <returns></returns>
+    QPointF jobOriginReletiveInScene(const QRectF& docBounding) const;
+
+    QPointF jobOriginReletiveInScene() const;
+
+    QPointF jobOriginReletiveInMech() const;
+
+    /// <summary>
+    /// 返回作业原点。该点值在画布坐标系下，由当前有效图元列表形成
+    /// 的外包矩形9宫格点决定，即，该原点值是在当前画布上的绝对坐标。
+    /// </summary>
+    /// <param name="docBounding">外包矩形</param>
+    /// <returns></returns>
+    QPointF jobOriginInScene() const;
+
+    QPointF jobOriginInDevice() const;
+
+    QPointF jobOriginInMech() const;
+
+    /// <summary>
+    /// 在画布坐标系下，从图元列表外包框移动到指定原点位置的
+    /// 平移变换矩阵。
+    /// </summary>
+    /// <param name="origin">
+    /// 指定的目标原点。一般是用户原点或激光头位置。
+    /// </param>
+    /// <returns></returns>
+    QTransform transformJobOriginInScene(const QPointF& origin) const;
+
+    QRectF docBoundingRectInScene() const;
+    QRectF docBoundingRectInMech() const;
+    QRectF docBoundingRectInDevice() const;
+
+    QRectF machiningDocBoundingRectInScene() const;
+    QRectF machiningDocBoundingRectInMech() const;
+    QRectF machiningDocBoundingRectInDevice() const;
+
+    QRectF imagesBoundingRectInScene() const;
+    QRectF imagesBoundingRectInMech() const;
+    QRectF imagesBoundingRectInDevice() const;
+
+    QRectF machiningImagesBoundingRectInScene() const;
+    QRectF machiningImagesBoundingRectInMech() const;
+    QRectF machiningImagesBoundingRectInDevice() const;
+
+    QPointF docOriginInScene() const;
+    QPointF docOriginInMech() const;
+    QPointF docOriginInDevice() const;
+
+    QTransform transformToReletiveOriginInDevice() const;
 
     bool enablePrintAndCut() const;
     void setEnablePrintAndCut(bool value);

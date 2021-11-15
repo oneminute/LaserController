@@ -84,11 +84,12 @@ void PreviewScene::reset()
 {
     Q_D(PreviewScene);
     clear();
-    QRectF boundingRect = LaserApplication::device->boundRectMachining();
+    QRectF boundingRect = LaserApplication::device->layoutRectInMech();
 
     int width = 2000;
     int height = qRound(boundingRect.height() / boundingRect.width() * width);
-    d->canvasTransform = QTransform::fromScale(width / boundingRect.width(), height / boundingRect.height());
+    d->canvasTransform = LaserApplication::device->transformToMech() *
+        QTransform::fromScale(width / boundingRect.width(), height / boundingRect.height());
     setSceneRect(QRect(QPoint(0, 0), QPoint(width, height)));
 
     d->canvas = QPixmap(width, height);

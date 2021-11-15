@@ -66,6 +66,8 @@ public:
     virtual QByteArray filling(ProgressItem* parentProgress, QPointF& lastPoint) { return QByteArray(); }
     virtual bool isClosed() const = 0;
 
+    QTransform transformToDevice() const;
+
     LaserPrimitiveType primitiveType() const;
     QString typeName() const;
     QString typeLatinName() const;

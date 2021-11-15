@@ -44,8 +44,6 @@ public:
     LaserPoint currentPoint;
 
     LaserPointList startingPoints;
-    //LaserPointList leavesPoints;
-    //LaserPointList outerPoints;
     LaserPoint lastPoint;
 
     int index;
@@ -76,42 +74,25 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
     }
     else if (nodeType == LNT_DOCUMENT)
     {
-        QPointF deviceOriginMM = LaserApplication::device->deviceOriginMachining();
         LaserDocument* document = static_cast<LaserDocument*>(documentItem);
-        QPointF docOrigin = document->docOriginMachining();
-        if (Config::Device::startFrom() == SFT_AbsoluteCoords)
-            docOrigin = LaserApplication::device->deviceOriginMachining();
-        else
-        {
-            QRectF bounding = document->docBoundingRectMachining();
-            QPointF jobOrigin = LaserApplication::device->jobOrigin(bounding);
-            docOrigin = bounding.topLeft() + jobOrigin;
-        }
-        QLineF line(deviceOriginMM, docOrigin);
+        QPointF origin = document->docOriginInDevice();
         qreal angle = 0;
-        if (line.isNull())
+        switch (Config::SystemRegister::deviceOrigin())
         {
-            switch (Config::SystemRegister::deviceOrigin())
-            {
-            case 0:
-                angle = 315;
-                break;
-            case 1:
-                angle = 225;
-                break;
-            case 2:
-                angle = 135;
-                break;
-            case 4:
-                angle = 45;
-                break;
-            }
+        case 0:
+            angle = 315;
+            break;
+        case 1:
+            angle = 225;
+            break;
+        case 2:
+            angle = 135;
+            break;
+        case 4:
+            angle = 45;
+            break;
         }
-        else
-        {
-            angle = line.angle();
-        }
-        currentPoint = LaserPoint(docOrigin, angle, angle);
+        currentPoint = LaserPoint(origin, angle, angle);
     }
 }
 
@@ -374,7 +355,7 @@ void OptimizeNode::findSiblings(QSet<OptimizeNode*>& leaves, QSet<OptimizeNode*>
     }
 }
 
-QPointF OptimizeNode::position() const
+QPointF OptimizeNode::positionInScene() const
 {
     Q_D(const OptimizeNode);
     switch (d->nodeType)
@@ -382,12 +363,12 @@ QPointF OptimizeNode::position() const
     case LNT_DOCUMENT:
     {
         LaserDocument* doc = static_cast<LaserDocument*>(d->documentItem);
-        return doc->docOrigin();
+        return LaserApplication::device->currentOriginInScene();
     }
     case LNT_LAYER:
     {
         LaserLayer* layer = static_cast<LaserLayer*>(d->documentItem);
-        return layer->position();
+        return layer->positionInScene();
     }
     case LNT_PRIMITIVE:
     {
@@ -397,14 +378,14 @@ QPointF OptimizeNode::position() const
     case LNT_VIRTUAL:
     {
         if (hasChildren())
-            return d->childNodes.first()->position();
+            return d->childNodes.first()->positionInScene();
     }
     }
     
     return QPointF(0, 0);
 }
 
-QPointF OptimizeNode::machiningPosition() const
+QPointF OptimizeNode::positionInDevice() const
 {
     Q_D(const OptimizeNode);
     switch (d->nodeType)
@@ -412,22 +393,25 @@ QPointF OptimizeNode::machiningPosition() const
     case LNT_DOCUMENT:
     {
         LaserDocument* doc = static_cast<LaserDocument*>(d->documentItem);
-        return doc->docOriginMachining();
+        return LaserApplication::device->currentOriginInDevice();
     }
     case LNT_LAYER:
     {
         LaserLayer* layer = static_cast<LaserLayer*>(d->documentItem);
-        return layer->positionMachining();
+        return layer->positionInDevice();
     }
     case LNT_PRIMITIVE:
     {
         LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        return Global::matrixToMachining().map(primitive->position());
+        QPointF pos = primitive->position();
+        pos = Global::matrixToUm().map(pos);
+        pos = LaserApplication::device->transformToDevice().map(pos);
+        return pos;
     }
     case LNT_VIRTUAL:
     {
         if (hasChildren())
-            return d->childNodes.first()->machiningPosition();
+            return d->childNodes.first()->positionInScene();
     }
     }
     

@@ -4922,7 +4922,7 @@ Would you like to overwrite it?</source>
         <location line="+2358"/>
         <location line="+9"/>
         <source>Height</source>
-        <translation>长度</translation>
+        <translation>高度</translation>
     </message>
     <message>
         <location line="-2362"/>

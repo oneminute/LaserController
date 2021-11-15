@@ -105,7 +105,8 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	{
         if (scene()->document())
         {
-            QRectF rect = scene()->document()->docBoundingRect();
+            // 绘制填充和雕刻外包框
+            QRectF rect = scene()->document()->imagesBoundingRectInScene();
             if (rect.isValid())
             {
                 painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
@@ -113,23 +114,31 @@ void LaserViewer::paintEvent(QPaintEvent* event)
                 painter.drawPolygon(gridBounds);
             }
 
+            // 绘制文档外包框
+            rect = scene()->document()->docBoundingRectInScene();
+            if (rect.isValid())
+            {
+                painter.setPen(QPen(Qt::darkGray, 1, Qt::DashLine));
+                QPolygonF gridBounds = mapFromScene(rect);
+                painter.drawPolygon(gridBounds);
+            }
+
+            // 绘制文档外包框上的作业原点
             if (Config::Device::startFrom() != SFT_AbsoluteCoords)
             {
-                QPointF jobOrigin = LaserApplication::device->jobOrigin(rect);
-                QPointF relOrigin = rect.topLeft() - jobOrigin;
+                QPointF jobOrigin = scene()->document()->jobOriginInScene();
                 painter.setPen(QPen(Qt::darkGreen));
-                QPointF origin = mapFromScene(relOrigin);
+                QPointF origin = mapFromScene(jobOrigin);
                 QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
                 painter.drawRect(originRect);
             }
         }
         
+        // 绘制用户原点
         if (Config::Device::startFrom() == SFT_UserOrigin)
         {
             painter.setPen(QPen(Qt::darkYellow));
-		    QPointF deviceOrigin = LaserApplication::device->deviceOrigin();
-            QPointF origin = LaserApplication::device->userOrigin();
-            QPointF userOrigin = mapFromScene(origin + deviceOrigin);
+            QPointF userOrigin = mapFromScene(LaserApplication::device->userOriginInScene());
             QRectF originRect(userOrigin - QPointF(2, 2), userOrigin + QPointF(2, 2));
             painter.drawEllipse(originRect);
             qreal lineLength = 5;
@@ -139,8 +148,9 @@ void LaserViewer::paintEvent(QPaintEvent* event)
             painter.drawLine(userOrigin - QPointF(0, 3), userOrigin - QPointF(0, 3 + lineLength));
         }
 
+        // 绘制设备原点
 		painter.setPen(QPen(Qt::blue, 2));
-		QPointF deviceOrigin = mapFromScene(LaserApplication::device->deviceOrigin());
+		QPointF deviceOrigin = mapFromScene(LaserApplication::device->originInScene());
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
         painter.drawEllipse(deviceOriginRect);
         qreal lineLength = 5;
@@ -149,10 +159,11 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         painter.drawLine(deviceOrigin + QPointF(0, 3), deviceOrigin + QPointF(0, 3 + lineLength));
         painter.drawLine(deviceOrigin - QPointF(0, 3), deviceOrigin - QPointF(0, 3 + lineLength));
 
+        // 绘制选点切割
         PointPairList pairs = LaserApplication::mainWindow->printAndCutPoints();
         for (const PointPair& pair : pairs)
         {
-            QPointF canvasPoint(Global::mm2PixelsXF(pair.second.x()), Global::mm2PixelsYF(pair.second.y()));
+            QPointF canvasPoint = LaserApplication::device->transformDeviceToScene().map(pair.second);
             painter.setPen(QPen(Qt::red, 2));
             canvasPoint = mapFromScene(canvasPoint);
             QRectF canvasPointRect(canvasPoint - QPointF(2, 2), canvasPoint + QPointF(2, 2));
@@ -162,7 +173,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 
     if (m_showLaserPos)
     {
-        QPointF laserPos = mapFromScene(LaserApplication::device->getCurrentLaserPositionScene());
+        QPointF laserPos = mapFromScene(LaserApplication::device->laserPositionInScene());
 		QRectF rect(laserPos - QPointF(2, 2), laserPos + QPointF(2, 2));
         painter.setPen(QPen(Qt::red, 1));
         painter.drawEllipse(rect);
@@ -581,7 +592,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
                 if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
                     rateX = rateY;
                     if (_unitIsMM) {
-                        qreal v = Global::pixelsF2mmY(bounds.width() * rateY);
+                        qreal v = Global::sceneToMmH(bounds.width() * rateY);
                         window->widthBox()->setValue(v);
                     }
                     
@@ -589,7 +600,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
                 if (_pp == PrimitiveProperty::PP_Width && isLockRatio) {
                     rateY = rateX;
                     if (_unitIsMM) {
-                        qreal v = Global::pixelsF2mmY(bounds.height() * rateY);
+                        qreal v = Global::sceneToMmV(bounds.height() * rateY);
                         window->heightBox()->setValue(v);
                     }
                 }
@@ -876,9 +887,8 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
     QPoint global = QCursor::pos();
     QPointF mousePoint = mapToScene(mapFromGlobal(global));
     bool isInAllPathBound = false;
-    qreal extend = Global::mm2PixelsXF(10.0);
+    qreal extend = Global::mmToSceneHF(10.0);
     QFontMetrics fontMetrics(m_textFont);
-    
     
     //先遍历整个外框
     for (LaserPrimitive* primitive : m_scene->document()->primitives().values()) {

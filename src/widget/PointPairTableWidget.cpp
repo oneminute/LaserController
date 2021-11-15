@@ -91,8 +91,8 @@ void PointPairTableWidget::setLaserPoint(const QPointF& point)
             itemY = new QTableWidgetItem;
             setItem(row, 1, itemY);
         }
-        itemX->setData(Qt::EditRole, QString::number(point.x() * 0.001, 'f', 2));
-        itemY->setData(Qt::EditRole, QString::number(point.y() * 0.001, 'f', 2));
+        itemX->setData(Qt::EditRole, QString::number(point.x() * 0.001, 'f', 3));
+        itemY->setData(Qt::EditRole, QString::number(point.y() * 0.001, 'f', 3));
     }
 }
 
@@ -116,7 +116,7 @@ void PointPairTableWidget::setCanvasPoint(const QPointF& point)
             itemY = new QTableWidgetItem;
             setItem(row, 3, itemY);
         }
-        itemX->setData(Qt::EditRole, QString::number(point.x(), 'f', 2));
-        itemY->setData(Qt::EditRole, QString::number(point.y(), 'f', 2));
+        itemX->setData(Qt::EditRole, QString::number(point.x() * 0.001, 'f', 3));
+        itemY->setData(Qt::EditRole, QString::number(point.y() * 0.001, 'f', 3));
     }
 }

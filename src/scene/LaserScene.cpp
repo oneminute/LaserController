@@ -50,7 +50,7 @@ void LaserScene::setDocument(LaserDocument * doc)
 
     m_doc->setParent(this);
     
-	QRectF rect = LaserApplication::device->boundingRect();
+	QRectF rect = LaserApplication::device->layoutRectInScene();
     qDebug() << "deivce bounds in pixel:" << rect;
     m_background = new LaserBackgroundItem(rect);
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
@@ -63,7 +63,7 @@ void LaserScene::setDocument(LaserDocument * doc)
 	views()[0]->centerOn(rect.center());
     //创建树
     if (!m_quadTree) {
-        qreal maxSize = Global::mm2PixelsYF(Config::Ui::validMaxRegion());
+        qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
         qreal top = -(maxSize - rect.height()) * 0.5;
         qreal left = -(maxSize - rect.width()) * 0.5;
         m_maxRegion = QRectF(left, top, maxSize, maxSize);
@@ -485,8 +485,8 @@ QuadTreeNode * LaserScene::quadTreeNode()
 
 void LaserScene::updateValidMaxRegionRect()
 {
-    QRectF rect = LaserApplication::device->boundingRect();
-    qreal maxSize = Global::mm2PixelsYF(Config::Ui::validMaxRegion());
+    QRectF rect = LaserApplication::device->layoutRectInMech();
+    qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
     qreal top = -(maxSize - rect.height()) * 0.5;
     qreal left = -(maxSize - rect.width()) * 0.5;
     m_maxRegion = QRectF(left, top, maxSize, maxSize);
@@ -496,8 +496,8 @@ void LaserScene::updateValidMaxRegionRect()
 void LaserScene::updataValidMaxRegion()
 {
     LaserViewer* view = qobject_cast<LaserViewer*>( views()[0]);
-    QRectF rect = LaserApplication::device->boundingRect();
-    qreal maxSize = Global::mm2PixelsYF(Config::Ui::validMaxRegion());
+    QRectF rect = LaserApplication::device->layoutRectInMech();
+    qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
     qreal top = -(maxSize - rect.height()) * 0.5;
     qreal left = -(maxSize - rect.width()) * 0.5;
     qreal lastMaxSize = m_maxRegion.width();

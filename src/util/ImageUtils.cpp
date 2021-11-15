@@ -544,7 +544,7 @@ cv::Mat imageUtils::halftone5(cv::Mat src, float degrees, int gridSize)
 
 cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees, int gridSize)
 {
-    src = 255 - src;
+    //src = 255 - src;
     cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
     cv::Mat rot = cv::getRotationMatrix2D(center, degrees, 1.);
     cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), src.size(), degrees).boundingRect2f();
@@ -559,7 +559,7 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
     cv::warpAffine(src, rotated, rot, cv::Size(rotatedWidth, rotatedHeight), cv::INTER_NEAREST, 0, cv::Scalar(255));
     cv::imwrite("tmp/h6_rotated.bmp", rotated);
 
-    cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(0));
+    cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(255));
     int gridCols = qCeil(dst.cols * 1.0 / gridSize);
     int gridRows = qCeil(dst.rows * 1.0 / gridSize);
     progress->setMaximum(gridCols * gridRows);
@@ -606,7 +606,7 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
 
             //qLogD << r << ", " << c << " src:" << srcRoi.rows << ", " << srcRoi.cols << ", dst:" << dstRoi.rows << ", " << dstRoi.cols;
             //generateGroupingDitcher(srcRoi, dstRoi);
-            qreal full = srcRoi.cols * srcRoi.rows * 255.0;
+            int full = srcRoi.cols * srcRoi.rows * 255;
             QPoint center;
             int sum = sumMat(srcRoi, center);
 
@@ -630,12 +630,12 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
     std::vector<int>param; 
     cv::imwrite("tmp/h6_dst.bmp", dst);
 
-    cv::Mat outMat(dst.rows, dst.cols, CV_8UC1, cv::Scalar(0));
+    //cv::Mat outMat(dst.rows, dst.cols, CV_8UC1, cv::Scalar(255));
     center = cv::Point2f((dst.cols - 1) / 2, (dst.rows - 1) / 2);
     rot = cv::getRotationMatrix2D(center, -degrees, 1.);
     bbox = cv::RotatedRect(cv::Point2f(), dst.size(), 0).boundingRect2f();
     cv::Mat antiRotated;
-    cv::warpAffine(dst, antiRotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
+    cv::warpAffine(dst, antiRotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(0));
     cv::imwrite("tmp/h6_antiRotated.bmp", dst);
 
 	int roix = (antiRotated.cols - src.cols - 1) / 2;
@@ -648,8 +648,8 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
 
 	}
     cv::Rect roi(roix, roiy, roiCols, roiRows);
-    outMat = antiRotated(roi);
-    outMat = 255 - outMat;
+    cv::Mat outMat = antiRotated(roi);
+    //outMat = 255 - outMat;
     cv::imwrite("tmp/h6_outMat.bmp", outMat);
 
 #ifdef _DEBUG
@@ -686,7 +686,7 @@ int imageUtils::sumMat(const cv::Mat& mat, QPoint& point)
     {
         for (int j = 0; j < mat.rows; j++)
         {
-            int grayScale = mat.ptr<quint8>(j)[i];
+            int grayScale = 255 - mat.ptr<quint8>(j)[i];
             sum += grayScale;
             qreal length = j - meanX + i - meanY;
             qreal gaussian = factor * qExp(-length * length / (2 * fullLength2));
@@ -697,7 +697,7 @@ int imageUtils::sumMat(const cv::Mat& mat, QPoint& point)
     {
         for (int j = 0; j < mat.rows; j++)
         {
-            int grayScale = mat.ptr<quint8>(j)[i];
+            int grayScale = 255 - mat.ptr<quint8>(j)[i];
             if (grayScale)
             {
                 center += (static_cast<qreal>(grayScale) / sum) * QPointF(i - meanX, j - meanY);
@@ -984,7 +984,7 @@ void imageUtils::generateGroupingDitcher(cv::Mat& srcRoi, cv::Mat& dstRoi)
 
 void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int initAngle, int rotationAngle, int stepAngle)
 {
-    dstRoi.setTo(cv::Scalar(0));
+    dstRoi.setTo(cv::Scalar(255));
 
     QTransform initTrans;
     initTrans.rotate(initAngle);
@@ -994,10 +994,11 @@ void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int i
     vec = initTrans.map(vec);
 
     int count = 0;
+    //while (false)
     while (sum > 0)
     {
         // 填充颜色并递减总颜色值
-        int grayScale = sum >= 255 ? 255 : 255 - sum;
+        int grayScale = sum >= 255 ? 0 : 255;
         //int grayScale = sum >= 255 ? 0 : sum;
         dstRoi.ptr<quint8>(pt.y())[pt.x()] = grayScale;
         //qLogD << ++count << ": " << pt;
@@ -1025,7 +1026,7 @@ void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int i
                     vec = candidateVec;
                     break;
                 }
-                else if (!dstRoi.ptr<quint8>(candidate.y())[candidate.x()])
+                else if (dstRoi.ptr<quint8>(candidate.y())[candidate.x()])
                 {
                     // 如果该位置有效
                     isAvailable = true;
@@ -1611,14 +1612,15 @@ cv::Mat imageUtils::rotateMat(cv::Mat src, float degrees)
     return cv::Mat();
 }
 
-QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, qreal x, qreal y, qreal rowInterval, qreal width, QPointF& lastPoint, qreal accLength)
+QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
+    const QRectF& boundingRect, qreal rowInterval, QPointF& lastPoint, qreal accLength)
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
     stream.setByteOrder(QDataStream::LittleEndian);
-    int xStart = unitUtils::mm2MicroMM(x);
-    int xEnd = unitUtils::mm2MicroMM(x + width);
-    int yStart = unitUtils::mm2MicroMM(y);
+    int xStart = boundingRect.left();
+    int xEnd = boundingRect.right();
+    int yStart = boundingRect.top();
     FillStyleAndPixelsCount fspc;
     fspc.setCount(mat.cols);
     fspc.setSame(false);
@@ -1626,7 +1628,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
     progress->setMaximum(mat.rows);
     for (int r = 0; r < mat.rows; r++)
     {
-        yStart = unitUtils::mm2MicroMM(y + r * rowInterval);
+        yStart = boundingRect.top() + r * rowInterval;
         int bitCount = 0;
         quint8 byte = 0;
 
@@ -1657,13 +1659,16 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
 
         if (binCheck)
         {
-            int outXStart = LaserApplication::device->deviceTranslateXMachining(xStart);
-            int outXEnd = LaserApplication::device->deviceTranslateXMachining(xEnd);
-            int outYStart = LaserApplication::device->deviceTranslateYMachining(yStart);
             if (forward)
-                stream << outYStart << outXStart << outXEnd << fspc.code;
+            {
+                lastPoint = QPointF(xEnd + accLength, yStart);
+                stream << yStart << xStart << xEnd << fspc.code;
+            }
             else
-                stream << outYStart << outXEnd << outXStart << fspc.code;
+            {
+                lastPoint = QPointF(xStart - accLength, yStart);
+                stream << yStart << xEnd << xStart << fspc.code;
+            }
 
             for (int i = 0; i < rowBytes.length(); i++)
             {
@@ -1675,18 +1680,18 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
         progress->increaseProgress();
     }
 
-    qreal outX;
-    qreal outY = yStart;
-    // 这里要反着计算
-    if (!forward)
-    {
-        outX = xEnd + accLength;
-    }
-    else
-    {
-        outX = xStart - accLength;
-    }
-    lastPoint = QPointF(outX, outY);
+    //qreal outX;
+    //qreal outY = yStart;
+    //// 这里要反着计算
+    //if (!forward)
+    //{
+    //    outX = xEnd + accLength;
+    //}
+    //else
+    //{
+    //    outX = xStart - accLength;
+    //}
+    //lastPoint = QPointF(outX, outY);
     progress->finish();
     return bytes;
 }

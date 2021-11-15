@@ -115,8 +115,8 @@ void MultiDuplicationDialog::accept()
         return;
     }
     qreal v = m_ui->HDistance->value();
-    qreal translateX = Global::mm2PixelsXF(m_ui->HDistance->value());
-    qreal translateY = Global::mm2PixelsYF(m_ui->VDistance->value());
+    qreal translateX = Global::mmToSceneHF(m_ui->HDistance->value());
+    qreal translateY = Global::mmToSceneVF(m_ui->VDistance->value());
     
     switch (m_ui->HSettings->currentIndex())
     {

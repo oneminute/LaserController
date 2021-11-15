@@ -50,32 +50,6 @@ private:
     Q_DISABLE_COPY(PathOptimizer)
 };
 
-//class OptimizerController : public QObject
-//{
-//    Q_OBJECT
-//public:
-//    typedef std::function<void(OptimizerController*)> FinishedCallback;
-//    OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent = nullptr);
-//    ~OptimizerController();
-//
-//    void optimize(ProgressItem* parentProgress);
-//
-//    PathOptimizer::Path path();
-//
-//    void setFinishedCallback(FinishedCallback callback);
-//
-//public slots:
-//    void onFinished();
-//
-//signals:
-//    void start();
-//
-//private:
-//    QThread m_thread;
-//    FinishedCallback m_finishedCallback;
-//    QScopedPointer<PathOptimizer> m_optimizer;
-//};
-
 class Lane : public QSet<OptimizeNode*>
 {
 public:

@@ -4,6 +4,8 @@
 #include <QJsonArray>
 #include<QList>
 
+#include "LaserApplication.h"
+#include "laser/LaserDevice.h"
 #include "util/Utils.h"
 #include "LaserDocument.h"
 #include "LaserPrimitive.h"
@@ -666,19 +668,19 @@ QRectF LaserLayer::boundingRect() const
     return utils::boundingRect(d->primitives);
 }
 
-QPointF LaserLayer::position() const 
+QPointF LaserLayer::positionInScene() const 
 {
     return boundingRect().topLeft();
 }
 
-QPointF LaserLayer::positionMM() const
+QPointF LaserLayer::positionInMech() const
 {
-    return Global::matrixToMM(SU_PX).map(position());
+    return Global::matrixToUm().map(positionInScene());
 }
 
-QPointF LaserLayer::positionMachining() const
+QPointF LaserLayer::positionInDevice() const
 {
-    return Global::matrixToMachining().map(position());
+    return LaserApplication::device->transformToDevice().map(positionInMech());
 }
 
 QCheckBox * LaserLayer::checkBox()

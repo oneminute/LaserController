@@ -26,10 +26,9 @@ public:
         , name("unknown")
         , portName("")
         , printerDrawUnit(1016)
-        , deviceTransformMM()
-        , deviceOriginMM(0, 0)
-        , transform()
-        , origin(0, 0)
+        , originInMech(0, 0)
+        , originInScene(0, 0)
+        , transformToDevice()
         , mainCardActivated(false)
         , mainCardRegistered(false)
     {}
@@ -45,11 +44,9 @@ public:
     QString portName;
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
 
-    QTransform deviceTransformMM;
-    QPointF deviceOriginMM;
-    QPointF deviceOriginMachining;
-    QTransform transform;
-    QPointF origin;
+    QPointF originInMech;
+    QPointF originInScene;
+    QTransform transformToDevice;
 
     QString mainCard;
     QString mainCardRegisteredDate;
@@ -98,9 +95,9 @@ void LaserDevicePrivate::updateDeviceOriginAndTransform()
         break;
     }
 
-    deviceOriginMachining = QPointF(dx, dy);
-    deviceOriginMM = QPointF(dx * 0.001, dy * 0.001);
-    deviceTransformMM = QTransform::fromTranslate(-deviceOriginMM.x(), -deviceOriginMM.y());
+    originInMech = QPointF(dx, dy);
+    originInScene = QPointF(Global::mechToSceneHF(dx), Global::mechToSceneVF(dy));
+    transformToDevice = QTransform::fromTranslate(-originInMech.x(), -originInMech.y());
 }
 
 LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
@@ -361,6 +358,13 @@ QString LaserDevice::requestDongleId() const
         return d->driver->getDongleId();
     }
     return "";
+}
+
+void LaserDevice::updateWorkState()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        d->driver->getDeviceWorkState();
 }
 
 void LaserDevice::requestMainCardInfo()
@@ -696,7 +700,8 @@ void LaserDevice::moveToMachining(const QVector3D& pos, bool xEnabled, bool yEna
     float layoutWidth = LaserApplication::device->layoutWidthMachining();
     float layoutHeight = LaserApplication::device->layoutHeightMachining();
 
-    QVector3D dest = utils::limitToLayout(pos, Config::SystemRegister::deviceOrigin(), layoutWidth, layoutHeight);
+    //QVector3D dest = utils::limitToLayout(pos, Config::SystemRegister::deviceOrigin(), layoutWidth, layoutHeight);
+    QVector3D dest = pos;
     char xyzStyle = 0;
     int xPos = qRound(dest.x());
     int yPos = qRound(dest.y());
@@ -800,242 +805,174 @@ LaserRegister* LaserDevice::systemRegister(int addr) const
         return nullptr;
 }
 
-QPointF LaserDevice::jobOrigin(const QRectF& docBounding) const
-{
-    qreal dx, dy;
-    switch (Config::Device::jobOrigin())
-    {
-    case 0:
-        dx = 0;
-        dy = 0;
-        break;
-    case 1:
-        dx = -docBounding.width() / 2;
-        dy = 0;
-        break;
-    case 2:
-        dx = -docBounding.width();
-        dy = 0;
-        break;
-    case 3:
-        dx = 0;
-        dy = -docBounding.height() / 2;
-        break;
-    case 4:
-        dx = -docBounding.width() / 2;
-        dy = -docBounding.height() / 2;
-        break;
-    case 5:
-        dx = -docBounding.width();
-        dy = -docBounding.height() / 2;
-        break;
-    case 6:
-        dx = 0;
-        dy = -docBounding.height();
-        break;
-    case 7:
-        dx = -docBounding.width() / 2;
-        dy = -docBounding.height();
-        break;
-    case 8:
-        dx = -docBounding.width();
-        dy = -docBounding.height();
-        break;
-    }
-    return QPointF(dx, dy);
-}
-
-QPointF LaserDevice::origin() const
+QPointF LaserDevice::absoluteOriginInMech() const
 {
     Q_D(const LaserDevice);
-    switch (Config::Device::startFrom())
-    {
-    case SFT_AbsoluteCoords:
-        return deviceOrigin();
-        break;
-    case SFT_UserOrigin:
-    {
-        return userOrigin();
-    }
-    case SFT_CurrentPosition:
-    {
-        return getCurrentLaserPosition();
-        break;
-    }
-    }
-    return QPointF(0, 0);
+    return d->originInMech;
 }
 
-QPointF LaserDevice::originMM() const
+QPointF LaserDevice::originInScene() const
 {
     Q_D(const LaserDevice);
-    switch (Config::Device::startFrom())
-    {
-    case SFT_AbsoluteCoords:
-        return deviceOriginMM();
-    case SFT_UserOrigin:
-    {
-        return userOriginMM();
-    }
-    case SFT_CurrentPosition:
-    {
-        return getCurrentLaserPositionMM();
-    }
-    }
-    return QPointF(0, 0);
+    return d->originInScene;
 }
 
-QPointF LaserDevice::originMachining() const
+QTransform LaserDevice::transformToDevice() const
 {
     Q_D(const LaserDevice);
-    switch (Config::Device::startFrom())
-    {
-    case SFT_AbsoluteCoords:
-        return deviceOriginMachining();
-    case SFT_UserOrigin:
-    {
-        return userOriginMachining();
-    }
-    case SFT_CurrentPosition:
-    {
-        return getCurrentLaserPositionMachining();
-    }
-    }
-    return QPointF(0, 0);
+    return d->transformToDevice;
 }
 
-QPointF LaserDevice::deviceOrigin() const
-{
-    return Global::matrix(SU_MM, SU_PX).map(deviceOriginMM());
-}
-
-QPointF LaserDevice::deviceOriginMM() const
+QTransform LaserDevice::transformToMech() const
 {
     Q_D(const LaserDevice);
-    return d->deviceOriginMM;
+    return d->transformToDevice.inverted();
 }
 
-QPointF LaserDevice::deviceOriginMachining() const
+QTransform LaserDevice::transformDeviceToScene() const
 {
-    return deviceOriginMM() * 1000.0;
+    Q_D(const LaserDevice);
+    QTransform trans;
+    trans = d->transformToDevice.inverted() * Global::matrixFromUm();
+    return trans;
 }
 
-QPointF LaserDevice::userOrigin() const
+QTransform LaserDevice::transformSceneToDevice() const
 {
-    return Global::matrix(SU_MM, SU_PX).map(userOriginMM());
+    Q_D(const LaserDevice);
+    QTransform trans;
+    trans = Global::matrixToUm() * d->transformToDevice;
+    return trans;
 }
 
-QPointF LaserDevice::userOriginMM() const
+QPointF LaserDevice::laserPositionInMech() const
 {
-    return userOriginMachining() * 0.001;
+    Q_D(const LaserDevice);
+    return d->transformToDevice.inverted().map(laserPositionInDevice());
 }
 
-QPointF LaserDevice::userOriginMachining() const
+QPointF LaserDevice::laserPositionInDevice() const
 {
+    Q_D(const LaserDevice);
+    return d->lastState.pos.toPointF();
+}
+
+QPointF LaserDevice::laserPositionInScene() const
+{
+    Q_D(const LaserDevice);
+    QPointF pos = Global::matrixFromUm().map(laserPositionInMech());
+    return pos;
+}
+
+QPointF LaserDevice::userOriginInMech() const
+{
+    Q_D(const LaserDevice);
+    QPointF origin = userOriginInDevice();
+    origin = d->transformToDevice.inverted().map(origin);
+    return origin;
+}
+
+QPointF LaserDevice::userOriginInDevice() const
+{
+    QPointF origin;
     switch (Config::Device::userOriginSelected())
     {
     case 0:
-        return Config::Device::userOrigin1();
+        origin = Config::Device::userOrigin1();
+        break;
     case 1:
-        return Config::Device::userOrigin2();
+        origin = Config::Device::userOrigin2();
+        break;
     case 2:
-        return Config::Device::userOrigin3();
-    }
-}
-
-QRectF LaserDevice::boundingRect() const
-{
-    return QRectF(0, 0, 
-        Global::convertFromMmH(layoutWidth()), 
-        Global::convertFromMmV(layoutHeight()));
-}
-
-QRectF LaserDevice::boundingRectMM() const
-{
-    return QRectF(0, 0, layoutWidth(), layoutHeight());
-}
-
-QRectF LaserDevice::boundRectMachining() const
-{
-    return Global::matrixToMachining().map(boundingRect()).boundingRect();
-}
-
-QTransform LaserDevice::transform() const
-{
-    Q_D(const LaserDevice);
-    /*QTransform transform;
-    if (!Config::Device::startFromItem())
-        return QTransform();
-    switch (Config::Device::startFrom())
-    {
-    case SFT_AbsoluteCoords:
-        transform = d->deviceTransformMM;
-        break;
-    case SFT_UserOrigin:
-    case SFT_CurrentPosition:
-    {
-        LaserDocument* document = LaserApplication::mainWindow->currentDocument();
-        if (document)
-        {
-            transform = document->docTransform();
-        }
-        else
-        {
-            transform = d->deviceTransformMM;
-        }
-    }
+        origin = Config::Device::userOrigin3();
         break;
     }
-    return transform;*/
-    return d->deviceTransformMM;
+    return origin;
 }
 
-QTransform LaserDevice::deviceTransform() const
+QPointF LaserDevice::userOriginInScene() const
 {
-    Q_D(const LaserDevice);
-    QTransform t = deviceTransformMM();
-    return QTransform::fromTranslate(
-        Global::convertFromMmH(t.dx()),
-        Global::convertFromMmV(t.dy()));
+    QPointF origin = userOriginInMech();
+    origin = Global::matrixFromUm().map(origin);
+    return origin;
 }
 
-QTransform LaserDevice::deviceTransformMM() const
+QRectF LaserDevice::layoutRectInMech() const
 {
-    Q_D(const LaserDevice);
-    return d->deviceTransformMM;
-}
-
-QTransform LaserDevice::deviceTransformMachining() const
-{
-    Q_D(const LaserDevice);
-    return QTransform::fromTranslate(
-        -d->deviceOriginMachining.x(),
-        -d->deviceOriginMachining.y()
+    return QRectF(
+        QPointF(0, 0),
+        QPointF(
+            Config::SystemRegister::xMaxLength(),
+            Config::SystemRegister::yMaxLength()
+        )
     );
 }
 
-int LaserDevice::deviceTranslateXMachining(int x) const
+QRectF LaserDevice::layoutRectInDevice() const
 {
     Q_D(const LaserDevice);
-    return -d->deviceOriginMachining.x() + x;
+    QRectF rect = layoutRectInMech();
+    return d->transformToDevice.mapRect(rect);
 }
 
-int LaserDevice::deviceTranslateYMachining(int y) const
+QRectF LaserDevice::layoutRectInScene() const
 {
-    Q_D(const LaserDevice);
-    return -d->deviceOriginMachining.y() + y;
+    QRectF rect = layoutRectInMech();
+    return Global::matrixFromUm().mapRect(rect);
 }
 
-int LaserDevice::deviceTranslateXMm(int x) const
+QPointF LaserDevice::currentOriginInScene() const
 {
-    Q_D(const LaserDevice);
-    return -d->deviceOriginMM.x() + x;
+    QPointF origin;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        origin = originInScene();
+        break;
+    case SFT_UserOrigin:
+        origin = userOriginInScene();
+        break;
+    case SFT_CurrentPosition:
+        origin = laserPositionInScene();
+        break;
+    }
+    return origin;
 }
 
-int LaserDevice::deviceTranslateYMm(int y) const
+QPointF LaserDevice::currentOriginInMech() const
 {
-    Q_D(const LaserDevice);
-    return -d->deviceOriginMM.y() + y;
+    QPointF origin;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        origin = absoluteOriginInMech();
+        break;
+    case SFT_UserOrigin:
+        origin = userOriginInMech();
+        break;
+    case SFT_CurrentPosition:
+        origin = laserPositionInMech();
+        break;
+    }
+    return origin;
+}
+
+QPointF LaserDevice::currentOriginInDevice() const
+{
+    QPointF origin;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_AbsoluteCoords:
+        origin = originInDevice();
+        break;
+    case SFT_UserOrigin:
+        origin = userOriginInDevice();
+        break;
+    case SFT_CurrentPosition:
+        origin = laserPositionInDevice();
+        break;
+    }
+    return origin;
 }
 
 void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)
@@ -1107,40 +1044,11 @@ LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified)
     return map;
 }
 
-QPointF LaserDevice::getCurrentLaserPositionMachining() const
-{
-    Q_D(const LaserDevice);
-    return d->lastState.pos.toPointF();
-}
-
-QPointF LaserDevice::getCurrentLaserPositionMM() const
-{
-    Q_D(const LaserDevice);
-    return d->lastState.pos.toPointF() * 0.001;
-}
-
-QPointF LaserDevice::getCurrentLaserPosition() const
-{
-    Q_D(const LaserDevice);
-    QPointF pos = d->lastState.pos.toPointF();
-    return Global::matrix(SU_MM, SU_PX, 0.001, 0.001).map(pos);
-}
-
-QPointF LaserDevice::getCurrentLaserPositionScene() const
-{
-    Q_D(const LaserDevice);
-    QPointF pos = d->lastState.pos.toPointF();
-    QPointF currPos(
-        d->deviceOriginMachining.x() + pos.x(),
-        d->deviceOriginMachining.y() + pos.y());
-    return Global::matrix(SU_MM, SU_PX, 0.001, 0.001).map(currPos);
-}
-
 qreal LaserDevice::engravingAccLength(qreal engravingRunSpeed) const
 {
     qreal minSpeed = Config::UserRegister::scanXStartSpeed();
     qreal acc = Config::UserRegister::scanXAcc();
-    qreal maxSpeed = engravingRunSpeed;
+    qreal maxSpeed = qMax(engravingRunSpeed, minSpeed);
     return (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
 }
 

@@ -138,7 +138,7 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root, ProgressItem* parentProgres
     ProgressItem* optimizeProgress = LaserApplication::progressModel->createSimpleItem(tr("Optimize nodes"), parentProgress);
 
     // 计算泳道宽
-    int laneInterval = qRound(Config::PathOptimization::groupingGridInterval() * 1000);
+    int laneInterval = qRound(Config::PathOptimization::groupingGridInterval());
     Qt::Orientation orient = static_cast<Qt::Orientation>(Config::PathOptimization::groupingOrientation());
 
     // 各泳道节点集合
@@ -269,50 +269,6 @@ void PathOptimizer::printNodeAndEdges()
         }
     }
 }
-
-//OptimizerController::OptimizerController(OptimizeNode* root, int totalNodes, QObject* parent)
-//    : QObject(parent)
-//    , m_optimizer(new PathOptimizer(
-//        root,
-//        totalNodes))
-//{
-//    qLogD << "OptimizerController";
-//    LaserApplication::previewWindow->registerProgressCode(m_optimizer.data(), 0.9);
-//    m_optimizer->moveToThread(&m_thread);
-//    connect(this, &OptimizerController::start, m_optimizer.data(), &PathOptimizer::optimize);
-//    connect(m_optimizer.data(), &PathOptimizer::finished, this, &OptimizerController::onFinished);
-//
-//    m_thread.start();
-//}
-//
-//OptimizerController::~OptimizerController()
-//{
-//}
-//
-//void OptimizerController::optimize()
-//{
-//    emit start();
-//}
-//
-//PathOptimizer::Path OptimizerController::path()
-//{
-//    return m_optimizer->optimizedPath();
-//}
-//
-//void OptimizerController::setFinishedCallback(FinishedCallback callback)
-//{
-//    m_finishedCallback = callback;
-//}
-//
-//void OptimizerController::onFinished()
-//{
-//    if (m_finishedCallback)
-//    {
-//        m_finishedCallback(this);
-//    }
-//    m_thread.quit();
-//    this->deleteLater();
-//}
 
 Lane::Lane()
 {

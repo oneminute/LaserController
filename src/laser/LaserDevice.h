@@ -38,6 +38,7 @@ public:
     QString requestMainCardId() const;
     QString requestRegisteId() const;
     QString requestDongleId() const;
+    void updateWorkState();
 
     void requestMainCardInfo();
     void requestMainCardRegInfo();
@@ -98,38 +99,105 @@ public:
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;
 
-    QPointF jobOrigin(const QRectF& docBounding) const;
+    /// <summary>
+    /// 在机械坐标系下原点的绝对坐标值。左上角恒为(0, 0)
+    /// </summary>
+    /// <returns></returns>
+    QPointF absoluteOriginInMech() const;
 
-    QPointF origin() const;
-    QPointF originMM() const;
-    QPointF originMachining() const;
-    QPointF deviceOrigin() const;
-    QPointF deviceOriginMM() const;
-    QPointF deviceOriginMachining() const;
-    QPointF userOrigin() const;
-    QPointF userOriginMM() const;
-    QPointF userOriginMachining() const;
-    QRectF boundingRect() const;
-    QRectF boundingRectMM() const;
-    QRectF boundRectMachining() const;
-    QTransform transform() const;
-    QTransform deviceTransform() const;
-    QTransform deviceTransformMM() const;
-    QTransform deviceTransformMachining() const;
-    int deviceTranslateXMachining(int x) const;
-    int deviceTranslateYMachining(int y) const;
-    int deviceTranslateXMm(int x) const;
-    int deviceTranslateYMm(int y) const;
+    /// <summary>
+    /// 在画布场景坐标系下的原点坐标值。一般以像素为单位。
+    /// </summary>
+    /// <returns></returns>
+    QPointF originInScene() const;
+
+    /// <summary>
+    /// 在设备坐标系下原点的坐标值。该值恒为(0, 0)。
+    /// </summary>
+    /// <returns></returns>
+    QPointF originInDevice() const { return QPointF(0, 0); }
+
+    /// <summary>
+    /// 在机械坐标系下，向设备坐标系变换的平移变换矩阵。
+    /// </summary>
+    /// <returns></returns>
+    QTransform transformToDevice() const;
+
+    QTransform transformToMech() const;
+
+    QTransform transformDeviceToScene() const;
+
+    QTransform transformSceneToDevice() const;
+
+    /// <summary>
+    /// 当前激光点在机械坐标系下的绝对坐标值。
+    /// </summary>
+    /// <returns></returns>
+    QPointF laserPositionInMech() const;
+
+    /// <summary>
+    /// 当前激光点在设备坐标系下的坐标值。
+    /// </summary>
+    /// <returns></returns>
+    QPointF laserPositionInDevice() const;
+
+    /// <summary>
+    /// 当前激光点在画面场中的坐标值。
+    /// </summary>
+    /// <returns></returns>
+    QPointF laserPositionInScene() const;
+
+    /// <summary>
+    /// 用户原点在机械坐标系下的绝对坐标值。
+    /// </summary>
+    /// <returns></returns>
+    QPointF userOriginInMech() const;
+
+    /// <summary>
+    /// 用户原点在设备坐标系下的坐标值。注意，直接从机器读取的激光
+    /// 坐标即该值。
+    /// </summary>
+    /// <returns></returns>
+    QPointF userOriginInDevice() const;
+
+    /// <summary>
+    /// 用户原点在画布坐标系下的坐标值。
+    /// </summary>
+    /// <returns></returns>
+    QPointF userOriginInScene() const;
+
+    /// <summary>
+    /// 加工幅面矩形，以机械坐标系下的绝对坐标值表示。
+    /// </summary>
+    /// <returns></returns>
+    QRectF layoutRectInMech() const;
+
+    /// <summary>
+    /// 加工幅面矩形，以设备坐标系下的坐标值表示。
+    /// </summary>
+    /// <returns></returns>
+    QRectF layoutRectInDevice() const;
+
+    /// <summary>
+    /// 加工幅面矩形，以画布坐标系下的坐标值表示。
+    /// </summary>
+    /// <returns></returns>
+    QRectF layoutRectInScene() const;
+
+    /// <summary>
+    /// 在绝对坐标下返回加工幅面四角原点。
+    /// 在用户原点下返回用户原点。在当前位置下反回激
+    /// 光点的当前位置。
+    /// </summary>
+    /// <returns></returns>
+    QPointF currentOriginInScene() const;
+    QPointF currentOriginInMech() const;
+    QPointF currentOriginInDevice() const;
 
     void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
 
     LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
     LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
-
-    QPointF getCurrentLaserPositionMachining() const;
-    QPointF getCurrentLaserPositionMM() const;
-    QPointF getCurrentLaserPosition() const;
-    QPointF getCurrentLaserPositionScene() const;
 
     qreal engravingAccLength(qreal engravingRunSpeed) const;
 

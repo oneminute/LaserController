@@ -28,7 +28,7 @@ LaserBackgroundItem::LaserBackgroundItem(const QRectF & rect, QGraphicsItem * pa
 
     QPen pen1(Qt::black, 1.0f, Qt::SolidLine);
     pen1.setCosmetic(true);
-    qreal maxSize = Global::mm2PixelsYF(3000);
+    qreal maxSize = Global::mmToSceneHF(3000);
 
     QRectF m_maxRegion = QRectF(rect.left(), rect.top(), maxSize, maxSize);
     
@@ -94,8 +94,8 @@ void LaserBackgroundItem::onChangeGrids()
 		m_gridSecondNodeYList.clear();
 	}
 	qreal spacing = Config::Ui::visualGridSpacing();//mm
-	qreal intervalH = Global::mm2PixelsYF(spacing);
-	qreal intervalV = Global::mm2PixelsXF(spacing);
+	qreal intervalH = Global::mmToSceneHF(spacing);
+	qreal intervalV = Global::mmToSceneVF(spacing);
 	qreal width = this->rect().width();
 	qreal height = this->rect().height();
 	qreal sH = height / intervalH;

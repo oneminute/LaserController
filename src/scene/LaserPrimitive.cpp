@@ -94,7 +94,6 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
 LaserPrimitive::~LaserPrimitive()
 {
     Q_D(LaserPrimitive);
-    //qDebug() << d->name;
 }
 
 LaserDocument* LaserPrimitive::document() const 
@@ -102,6 +101,7 @@ LaserDocument* LaserPrimitive::document() const
     Q_D(const LaserPrimitive);
     return d->doc; 
 }
+
 //PolyLine or Polygon
 QVector<QLineF> LaserPrimitive::edges(QPainterPath path, bool isPolyline)
 {
@@ -133,10 +133,7 @@ QVector<QLineF> LaserPrimitive::edges()
 {
 	return QVector<QLineF>();
 }
-/*LaserPrimitive* LaserPrimitive::clone(const LaserPrimitive * primitive)
-{
-	return nullptr;
-}*/
+
 void setSelectedInGroup(bool selected) {
 
 }
@@ -147,16 +144,13 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         return;
 
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
-    //qLogD << "primitive " << d->nodeName << " painter transform : " << painter->transform();
 
     QRectF bounds = boundingRect();
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
 	QColor color = Qt::blue;
-	/*QList<QGraphicsView*> views = scene()->views();
-	LaserViewer* view = qobject_cast<LaserViewer*>(views[0]);*/
-	//painter->setPen(QPen(color, 1, Qt::SolidLine));
+
     if (d->layer)
     {
         color = d->layer->color();
@@ -177,17 +171,8 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 			painter->drawRect(bounds);
 		}
 	}
-	//else if (isUnderMouse())
-	else if (d->isHover)
-	{
-		//painter->setPen(QPen(Qt::green, 0.2f, Qt::SolidLine));
-		//painter->drawRect(bounds);
-	}
     else
     {
-		//painter->setPen(QPen(Qt::GlobalColor::magenta, 0.5f, Qt::SolidLine));
-		//painter->drawRect(bounds);
-		
 		QPen pen = QPen(color, 1.2f, Qt::SolidLine);
 		pen.setCosmetic(true);
 		painter->setPen(pen);
@@ -214,7 +199,6 @@ int LaserPrimitive::layerIndex()
 QTransform LaserPrimitive::getAllTransform()
 {
 	Q_D(const LaserPrimitive);
-	//return d->allTransform;
 	return sceneTransform();
 }
 
@@ -244,12 +228,7 @@ QRectF LaserPrimitive::originalBoundingRect(qreal extendPixel) const
 QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
 {
 	QPolygonF bounding = sceneTransform().map(boundingRect());
-	//QPolygonF bounding = transform().map(originalBoundingRect());
-	/*qDebug() << transform();
-	qDebug() << getAllTransform();
-	qDebug() << sceneTransform();
-	qDebug() << "originalBoundingRect(): " << originalBoundingRect();
-	qDebug() <<"bounding: " << bounding;*/
+	
 	if (extendPixel != 0) {
 		QVector2D p12 = QVector2D(bounding[1] - bounding[0]).normalized() * extendPixel;
 		QVector2D p23 = QVector2D(bounding[2] - bounding[1]).normalized() * extendPixel;
@@ -467,6 +446,18 @@ QPointF LaserPrimitive::centerMachiningPoint() const
 {
     Q_D(const LaserPrimitive);
     return d->machiningCenter;
+}
+
+QTransform LaserPrimitive::transformToDevice() const
+{
+    Q_D(const LaserPrimitive);
+    QTransform t = Global::matrixToUm() * 
+        LaserApplication::device->transformToDevice();
+    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    {
+        t = t * d->doc->transformToReletiveOriginInDevice();
+    }
+    return sceneTransform() * t;
 }
 
 LaserPrimitiveType LaserPrimitive::primitiveType() const
@@ -808,19 +799,14 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
 void LaserEllipse::draw(QPainter* painter)
 {
     Q_D(LaserEllipse);
-	//painter->drawRect(boundingRect());
 	painter->drawPath(d->path);
 	painter->setPen(QPen(Qt::black, 1));
-	//painter->drawLine(edges()[0]);
-    //painter->drawPath(shape());
-    //painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserEllipse::toMachiningPath() const
 {
     Q_D(const LaserEllipse);
-    QTransform t = sceneTransform() * Global::matrixToMachining();
-    QPainterPath path = t.map(d->path);
+    QPainterPath path = transformToDevice().map(d->path);
     return path;
 }
 
@@ -983,7 +969,7 @@ LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
     d->machiningPointsList.clear();
     d->startingIndices.clear();
-	QTransform t = sceneTransform() * Global::matrixToMachining();
+	QTransform t = transformToDevice();
     if (isRoundedRect())
     {
         machiningUtils::path2Points(progress, t.map(d->path), d->machiningPointsList, d->startingIndices, d->machiningCenter);
@@ -1041,7 +1027,7 @@ QPainterPath LaserRect::toMachiningPath() const
     QPolygonF rect = sceneTransform().map(d->rect);
     path.addPolygon(rect);
 
-    path = Global::matrixToMachining().map(path);
+    path = transformToDevice().map(path);
 
     return path;
 }
@@ -1155,7 +1141,7 @@ LaserPointListList LaserLine::updateMachiningPoints(ProgressItem* parentProgress
     d->startingIndices.clear();
 
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
-	QTransform t = sceneTransform() * Global::matrixToMachining();
+	QTransform t = transformToDevice();
     QPointF pt1 = t.map(d->line.p1());
     QPointF pt2 = t.map(d->line.p2());
     QLineF line1(pt1, pt2);
@@ -1188,8 +1174,7 @@ QPainterPath LaserLine::toMachiningPath() const
     path.moveTo(line.p1());
     path.lineTo(line.p2());
 
-    QTransform transform = Global::matrixToMachining();
-    path = transform.map(path);
+    path = transformToDevice().map(path);
 
     return path;
 }
@@ -1332,11 +1317,7 @@ QPainterPath LaserPath::toMachiningPath() const
 {
     Q_D(const LaserPath);
     QPainterPath path = d->path;
-    path = sceneTransform().map(path);
-
-    QTransform transform = Global::matrixToMachining();
-    path = transform.map(path);
-    return path;
+    return transformToDevice().map(path);
 }
 
 QList<QPainterPath> LaserPath::subPaths() const
@@ -1495,7 +1476,7 @@ LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProg
     d->startingIndices.clear();
     bool isClosed = this->isClosed();
     LaserPointList points;
-    QTransform t = sceneTransform() * Global::matrixToMachining();
+    QTransform t = transformToDevice();
     d->machiningCenter = QPointF(0, 0);
     for (int i = 0; i < d->poly.size(); i++)
     {
@@ -1542,8 +1523,7 @@ QPainterPath LaserPolyline::toMachiningPath() const
     QPolygonF rect = transform().map(d->poly);
     path.addPolygon(rect);
 
-    QTransform transform = Global::matrixToMachining();
-    path = transform.map(path);
+    path = transformToDevice().map(path);
 
     return path;
 }
@@ -1661,8 +1641,7 @@ LaserPointListList LaserPolygon::updateMachiningPoints(ProgressItem* parentProgr
 {
     Q_D(LaserPolygon);
     d->machiningPointsList.clear();
-    QTransform t = sceneTransform() * Global::matrixToMachining();
-    QPolygonF polygon = t.map(d->poly);
+    QPolygonF polygon = transformToDevice().map(d->poly);
     polygon.append(polygon.first());
     LaserPointList points;
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(tr("%1 update machining points").arg(name()), parentProgress);
@@ -1685,8 +1664,7 @@ QPainterPath LaserPolygon::toMachiningPath() const
     QPolygonF poly = transform().map(d->poly);
     path.addPolygon(poly);
 
-    QTransform transform = Global::matrixToMachining();
-    path = transform.map(path);
+    path = transformToDevice().map(path);
 
     return path;
 }
@@ -2137,19 +2115,17 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& la
 
     parentProgress->setMaximum(2);
     QImage srcImage = d->image.copy();
-    QImage outImage = srcImage.transformed(sceneTransform()).convertToFormat(QImage::Format_Grayscale8);
+    QImage outImage = srcImage.transformed(sceneTransform(), Qt::SmoothTransformation);
+    outImage = outImage.convertToFormat(QImage::Format_Grayscale8);
     QRectF boundingRect = sceneBoundingRect();
-    outImage.save("tmp\\outImage.png");
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
 
-	qreal boundingWidth = Global::convertToMmH(boundingRect.width());
-	qreal boundingHeight = Global::convertToMmV(boundingRect.height());
-    qreal boundingLeft = Global::convertToMmH(boundingRect.left());
-    qreal boundingTop = Global::convertToMmV(boundingRect.top());
+    boundingRect = Global::matrixToUm().mapRect(boundingRect);
+    boundingRect = LaserApplication::device->transformToDevice().mapRect(boundingRect);
 
     int dpi = d->layer->dpi();
-    int pixelWidth = qRound(boundingWidth * MM_TO_INCH * dpi);
-    int pixelHeight = qRound(boundingHeight * MM_TO_INCH * dpi);
+    int pixelWidth = Global::mechToSceneH(boundingRect.width());
+    int pixelHeight = Global::mechToSceneV(boundingRect.height());
 
     int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
 
@@ -2163,18 +2139,21 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& la
     qreal pixelInterval = layer()->engravingRowInterval();
 
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundingHeight * 1000.0 / pixelInterval);
+    int outHeight = qRound(boundingRect.height() / pixelInterval);
     qLogD << "bounding rect: " << boundingRect;
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
-    qDebug() << "out left:" << boundingLeft;
-    qDebug() << "out top:" << boundingTop;
 
     cv::Mat resized;
     cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight));
     
     qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
-    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingLeft, boundingTop, pixelInterval * 0.001, boundingWidth, lastPoint, accLength);
+    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    {
+        QTransform t = d->doc->transformToReletiveOriginInDevice();
+        boundingRect = t.mapRect(boundingRect);
+    }
+    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingRect, pixelInterval, lastPoint, accLength);
 
     parentProgress->finish();
     return ba; 
@@ -2193,12 +2172,8 @@ QPainterPath LaserBitmap::toMachiningPath() const
 {
     Q_D(const LaserBitmap);
     QPainterPath path;
-    QPolygonF rect = sceneTransform().map(d->boundingRect);
+    QPolygonF rect = transformToDevice().map(d->boundingRect);
     path.addPolygon(rect);
-
-    QTransform transform = Global::matrixToMachining();
-    path = transform.map(path);
-
     return path;
 }
 
@@ -2359,21 +2334,22 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint)
     Q_D(LaserShape);
     QByteArray bytes;
     QPainterPath path = toMachiningPath();
-    QRectF boundingRectMachining = path.boundingRect();
-    qreal ratio = boundingRectMachining.width() / boundingRectMachining.height();
-    int canvasWidth = qMin(boundingRectMachining.width(), 1000.0);
+    QRectF boundingRectInMech = path.boundingRect();
+    boundingRectInMech = LaserApplication::device->transformToDevice().mapRect(boundingRectInMech);
+    qreal ratio = boundingRectInMech.width() / boundingRectInMech.height();
+    int canvasWidth = qMin(boundingRectInMech.width(), 1000.0);
     int canvasHeight = qRound(canvasWidth / ratio);
 
     QTransform t = QTransform::fromScale(
-        canvasWidth / boundingRectMachining.width(),
-        canvasHeight / boundingRectMachining.height()
+        canvasWidth / boundingRectInMech.width(),
+        canvasHeight / boundingRectInMech.height()
     );
 
     path = t.map(path);
-    QRectF boundRect = path.boundingRect();
-    t = QTransform::fromTranslate(-boundRect.x(), -boundRect.y());
+    QRectF boundingRect = path.boundingRect();
+    t = QTransform::fromTranslate(-boundingRect.x(), -boundingRect.y());
     path = t.map(path);
-    QImage canvas(boundRect.width(), boundRect.height(), QImage::Format_Grayscale8);
+    QImage canvas(boundingRect.width(), boundingRect.height(), QImage::Format_Grayscale8);
     canvas.fill(Qt::white);
     QPainter painter(&canvas);
     painter.setBrush(Qt::black);
@@ -2381,35 +2357,28 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint)
     //painter.setPen(pen);
     painter.drawPath(path);
 
-    t = QTransform::fromScale(
-        0.001,
-        0.001
-    );
-    QRectF boundingRectMM = t.mapRect(boundingRectMachining);
-
     cv::Mat src(canvas.height(), canvas.width(), CV_8UC1, (void*)canvas.constBits(), canvas.bytesPerLine());
 
     int dpi = d->layer->dpi();
-    int pixelWidth = qRound(boundingRectMM.width() * MM_TO_INCH * dpi);
-    int pixelHeight = qRound(boundingRectMM.height() * MM_TO_INCH * dpi);
+    int pixelWidth = Global::mechToSceneH(boundingRectInMech.width());
+    int pixelHeight = Global::mechToSceneH(boundingRectInMech.height());
 
     qreal pixelInterval = layer()->engravingRowInterval();
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundingRectMM.height() * 1000.0 / pixelInterval);
+    int outHeight = std::round(boundingRectInMech.height() / pixelInterval);
     cv::Mat resized;
     cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_NEAREST);
     //resized = 255 - resized;
 
     cv::imwrite("tmp/" + name().toStdString() + ".png", resized);
 
-    qLogD << "bounding rect: " << boundRect;
+    qLogD << "bounding rect: " << boundingRectInMech;
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
     
     qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
-    bytes = imageUtils::image2EngravingData(progress, resized, boundingRectMM.left(), 
-        boundingRectMM.top(), pixelInterval * 0.001, boundingRectMM.width(), lastPoint, 
-        accLength);
+    bytes = imageUtils::image2EngravingData(progress, resized, 
+        boundingRectInMech, pixelInterval, lastPoint, accLength);
 
     return bytes;
 }
@@ -2908,10 +2877,7 @@ QPainterPath LaserText::toMachiningPath() const
 {
     Q_D(const LaserText);
     QPainterPath path = d->allPath;
-    path = sceneTransform().map(path);
-
-    QTransform transform = Global::matrixToMachining();
-    path = transform.map(path);
+    path = transformToDevice().map(path);
     return path;
 }
 
@@ -2926,7 +2892,7 @@ LaserPointListList LaserText::updateMachiningPoints(ProgressItem* parentProgress
     }
     progress->setMaximum(total);
 
-    QTransform transform = Global::matrixToMachining();
+    QTransform transform = transformToDevice();
 
     d->machiningPointsList.clear();
     d->startingIndices.clear();
@@ -2934,7 +2900,7 @@ LaserPointListList LaserText::updateMachiningPoints(ProgressItem* parentProgress
     for (int i = 0; i < d->pathList.size(); i++) {
         QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
         for (QPainterPath rowPath : rowPathList) {
-            rowPath = sceneTransform().map(rowPath);
+            //rowPath = sceneTransform().map(rowPath);
 
             QList<int> indices;
             LaserPointListList pointsList;
@@ -2965,7 +2931,7 @@ LaserPointListList LaserText::updateMachiningPoints(ProgressItem* parentProgress
         }
     }
     
-    d->machiningCenter = transform.mapRect(sceneBoundingRect()).center();
+    d->machiningCenter = transform.mapRect(path().boundingRect()).center();
     progress->finish();
     
     return d->machiningPointsList;

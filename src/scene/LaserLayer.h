@@ -145,9 +145,9 @@ public:
 
     QRectF boundingRect() const;
 
-    virtual QPointF position() const;
-    virtual QPointF positionMM() const;
-    virtual QPointF positionMachining() const;
+    virtual QPointF positionInScene() const;
+    virtual QPointF positionInDevice() const;
+    virtual QPointF positionInMech() const;
 
     QCheckBox* checkBox();
 

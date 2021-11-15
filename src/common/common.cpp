@@ -12,40 +12,52 @@ qreal Global::highPen1(192);
 qreal Global::highPen2(220);
 SizeUnit Global::unit(SU_MM);
 
-int Global::mm2PixelsX(qreal mm)
+int Global::mechToSceneH(qreal value)
 {
-	return qRound(mm * dpiX / 25.4);
+	return qRound(value * dpiX * 0.001 / 25.4);
 }
 
-qreal Global::mm2PixelsXF(qreal mm)
+qreal Global::mechToSceneHF(qreal value)
 {
-	return mm * dpiX / 25.4;
+	return value * dpiX * 0.001 / 25.4;
 }
 
-int Global::mm2PixelsY(qreal mm)
+int Global::mechToSceneV(qreal value)
 {
-	return qRound(mm * dpiY / 25.4);
-}
-qreal Global::mm2PixelsYF(qreal mm)
-{
-	return mm * dpiY / 25.4;
+	return qRound(value * dpiY * 0.001 / 25.4);
 }
 
-qreal Global::pixels2mmX(int pixels)
+qreal Global::mechToSceneVF(qreal value)
+{
+	return value * dpiY * 0.001 / 25.4;
+}
+
+qreal Global::mmToSceneHF(qreal value)
+{
+	return value * dpiX / 25.4;
+}
+
+qreal Global::mmToSceneVF(qreal value)
+{
+	return value * dpiY / 25.4;
+}
+
+qreal Global::sceneToMechH(int pixels)
+{
+	return pixels * 25400.0 / dpiX;
+}
+
+qreal Global::sceneToMechV(int pixels)
+{
+	return pixels * 25400.0 / dpiY;
+}
+
+qreal Global::sceneToMmH(int pixels)
 {
 	return pixels * 25.4 / dpiX;
 }
 
-qreal Global::pixels2mmY(int pixels)
-{
-	return pixels * 25.4 / dpiY;
-}
-qreal Global::pixelsF2mmX(qreal pixels)
-{
-	return pixels * 25.4 / dpiX;
-}
-
-qreal Global::pixelsF2mmY(qreal pixels)
+qreal Global::sceneToMmV(int pixels)
 {
 	return pixels * 25.4 / dpiY;
 }
@@ -55,108 +67,112 @@ qreal Global::convertUnit(qreal num, SizeUnit from, SizeUnit to, Qt::Orientation
 	if (from == to)
 		return num;
 
-	qreal output = convertToMM(num, from, orientation);
-	output = convertFromMM(num, to, orientation);
+	qreal output = convertToUm(num, from, orientation);
+	output = convertFromUm(num, to, orientation);
 
 	return output;
 }
 
-qreal Global::convertToMM(qreal num, SizeUnit from, Qt::Orientation orientation)
+qreal Global::convertToUm(qreal num, SizeUnit from, Qt::Orientation orientation)
 {
 	qreal factor = 1.0;
 	qreal dpi = orientation == Qt::Horizontal ? dpiX : dpiY;
 	switch (from)
 	{
 	case SU_PX:
-		factor = 1 * 25.4 / dpi;
+		factor = 25400.0 / dpi;
 		break;
 	case SU_PT:
-		factor = 25.4 / 72;
+		factor = 25400.0 / 72;
 		break;
 	case SU_PC:
-		factor = 25.4 / 6;
+		factor = 25400.0 / 6;
 		break;
-	case SU_MM:
+	case SU_UM:
 		factor = 1.0;
 		break;
+	case SU_MM:
+		factor = 1000.0;
+		break;
 	case SU_CM:
-		factor = 10.0;
+		factor = 10000.0;
 		break;
 	case SU_IN:
-		factor = 25.4;
+		factor = 25400;
 		break;
 	}
 	return num * factor;
 }
 
-qreal Global::convertToMmH(qreal num, SizeUnit from)
+qreal Global::convertToUmH(qreal num, SizeUnit from)
 {
-	return convertToMM(num, from, Qt::Horizontal);
+	return convertToUm(num, from, Qt::Horizontal);
 }
 
-qreal Global::convertToMmV(qreal num, SizeUnit from)
+qreal Global::convertToUmV(qreal num, SizeUnit from)
 {
-	return convertToMM(num, from, Qt::Vertical);
+	return convertToUm(num, from, Qt::Vertical);
 }
 
-qreal Global::convertFromMM(qreal num, SizeUnit to, Qt::Orientation orientation)
+qreal Global::convertFromUm(qreal num, SizeUnit to, Qt::Orientation orientation)
 {
 	qreal factor = 1.0;
 	qreal dpi = orientation == Qt::Horizontal ? dpiX : dpiY;
 	switch (to)
 	{
 	case SU_PX:
-		factor = dpi / 25.4;
+		factor = dpi * 0.001 / 25.4;
 		break;
 	case SU_PT:
-		factor = 72 / 25.4;
+		factor = 0.072 / 25.4;
 		break;
 	case SU_PC:
-		factor = 6 / 25.4;
+		factor = 0.006 / 25.4;
 		break;
-	case SU_MM:
+	case SU_UM:
 		factor = 1.0;
 		break;
+	case SU_MM:
+		factor = 0.001;
+		break;
 	case SU_CM:
-		factor = 0.1;
+		factor = 0.0001;
 		break;
 	case SU_IN:
-		factor = 1.0 / 25.4;
+		factor = 0.001 / 25.4;
 		break;
 	}
 	return num * factor;
 }
 
-qreal Global::convertFromMmH(qreal num, SizeUnit to)
+qreal Global::convertFromUmH(qreal num, SizeUnit to)
 {
-	return convertFromMM(num, to, Qt::Horizontal);
+	return convertFromUm(num, to, Qt::Horizontal);
 }
 
-qreal Global::convertFromMmV(qreal num, SizeUnit to)
+qreal Global::convertFromUmV(qreal num, SizeUnit to)
 {
-	return convertFromMM(num, to, Qt::Vertical);
+	return convertFromUm(num, to, Qt::Vertical);
 }
 
-qreal Global::convertToMachining(qreal num, SizeUnit from, Qt::Orientation orientation)
+QTransform Global::matrixToUm(SizeUnit from)
 {
-	return convertToMM(num, from, orientation) * 1000;
+	return QTransform::fromScale(
+		Global::convertToUmH(1.0, from),
+		Global::convertToUmV(1.0, from));
 }
 
-QTransform Global::matrixToMM(SizeUnit from, qreal hScale, qreal vScale)
+QTransform Global::matrixFromUm(SizeUnit to)
 {
-	return QTransform::fromScale(Global::convertToMM(1.0, from) * hScale, 
-		Global::convertToMM(1.0, from, Qt::Vertical) * vScale);
+	return QTransform::fromScale(
+		Global::convertFromUmH(1.0, to),
+		Global::convertFromUmV(1.0, to));
 }
 
-QTransform Global::matrix(SizeUnit from, SizeUnit to, qreal hScale, qreal vScale)
+QTransform Global::matrix(SizeUnit from, SizeUnit to)
 {
-	return QTransform::fromScale(Global::convertUnit(1.0, from, to) * hScale, 
-		Global::convertUnit(1.0, from, to, Qt::Vertical) * vScale);
-}
-
-QTransform Global::matrixToMachining(SizeUnit from)
-{
-	return QTransform::fromScale(Global::convertToMM(1000.0, from), 
-		Global::convertToMM(1000.0, from, Qt::Vertical));
+	return QTransform::fromScale(
+		Global::convertUnit(1.0, from, to), 
+		Global::convertUnit(1.0, from, to, Qt::Vertical));
 }
 

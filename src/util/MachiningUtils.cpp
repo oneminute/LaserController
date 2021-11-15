@@ -364,9 +364,9 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
         buffer.append(QString("pu%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
     else
     {
-        int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
-        int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
-        buffer.append(QString("PU%1 %2;").arg(x).arg(y));
+        //int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
+        //int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
+        buffer.append(QString("PU%1 %2;").arg(pt.x()).arg(pt.y()));
     }
     for (size_t i = 1; i < points.size(); i++)
     {
@@ -399,9 +399,9 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
         }
         else
         {
-            int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
-            int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
-            buffer.append(command.arg(x).arg(y));
+            //int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
+            //int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
+            buffer.append(command.arg(pt.x()).arg(pt.y()));
         }
         lastPoint = pt;
         if (progress)
@@ -483,12 +483,12 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineL
             }
             else
             {
-                int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt1.x()));
-                int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt1.y()));
-                buffer.append(command1.arg(x).arg(y));
-                x = LaserApplication::device->deviceTranslateXMachining(qRound(pt2.x()));
-                y = LaserApplication::device->deviceTranslateYMachining(qRound(pt2.y()));
-                buffer.append(command2.arg(x).arg(y));
+                //int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt1.x()));
+                //int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt1.y()));
+                buffer.append(command1.arg(pt1.x()).arg(pt1.y()));
+                //x = LaserApplication::device->deviceTranslateXMachining(qRound(pt2.x()));
+                //y = LaserApplication::device->deviceTranslateYMachining(qRound(pt2.y()));
+                buffer.append(command2.arg(pt2.x()).arg(pt2.y()));
             }
             //point = line.p2();
             lastPoint = pt2;

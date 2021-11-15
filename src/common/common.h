@@ -28,6 +28,7 @@ enum SizeUnit {
     SU_PX,
     SU_PC,
     SU_PT,
+    SU_UM,
     SU_MM,
     SU_CM,
     SU_IN,
@@ -337,30 +338,30 @@ public:
 	static qreal highPen1;
 	static qreal highPen2;
 
-    static int mm2PixelsX(qreal mm);
-	static qreal Global::mm2PixelsXF(qreal mm);
-    static int mm2PixelsY(qreal mm);
-	static qreal mm2PixelsYF(qreal mm);
-    static qreal pixels2mmX(int pixels);
-    static qreal pixels2mmY(int pixels);
-	static qreal pixelsF2mmX(qreal pixels);
-	static qreal pixelsF2mmY(qreal pixels);
+    static int mechToSceneH(qreal value);
+	static qreal mechToSceneHF(qreal value);
+    static int mechToSceneV(qreal value);
+	static qreal mechToSceneVF(qreal value);
+    static qreal sceneToMechH(int pixels);
+    static qreal sceneToMechV(int pixels);
+	static qreal mmToSceneHF(qreal value);
+	static qreal mmToSceneVF(qreal value);
+    static qreal sceneToMmH(int pixels);
+    static qreal sceneToMmV(int pixels);
 
 	static qreal convertUnit(qreal num, SizeUnit from, SizeUnit to, Qt::Orientation orientation = Qt::Horizontal);
 
-	static qreal convertToMM(qreal num, SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
-	static qreal convertToMmH(qreal num, SizeUnit from = SU_PX);
-	static qreal convertToMmV(qreal num, SizeUnit from = SU_PX);
+	static qreal convertToUm(qreal num, SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertToUmH(qreal num, SizeUnit from = SU_PX);
+	static qreal convertToUmV(qreal num, SizeUnit from = SU_PX);
 
-	static qreal convertToMachining(qreal num, SizeUnit from = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertFromUm(qreal num, SizeUnit to = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
+	static qreal convertFromUmH(qreal num, SizeUnit to = SU_PX);
+	static qreal convertFromUmV(qreal num, SizeUnit to = SU_PX);
 
-	static qreal convertFromMM(qreal num, SizeUnit to = SU_PX, Qt::Orientation orientation = Qt::Horizontal);
-	static qreal convertFromMmH(qreal num, SizeUnit to = SU_PX);
-	static qreal convertFromMmV(qreal num, SizeUnit to = SU_PX);
-
-	static QTransform matrixToMM(SizeUnit from = SU_PX, qreal hScale = 1.f, qreal vScale = 1.f);
-	static QTransform matrix(SizeUnit from, SizeUnit to, qreal hScale = 1.0f, qreal vScale = 1.0f);
-    static QTransform matrixToMachining(SizeUnit from = SU_PX);
+	static QTransform matrixToUm(SizeUnit from = SU_PX);
+	static QTransform matrix(SizeUnit from, SizeUnit to);
+    static QTransform matrixFromUm(SizeUnit to = SU_PX);
 };
 
 typedef QPair<QPointF, QPointF> PointPair;

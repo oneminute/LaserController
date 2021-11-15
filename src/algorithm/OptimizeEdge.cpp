@@ -102,9 +102,9 @@ void OptimizeEdge::print()
         << ", length = " << d->length << ", weight = " << d->weight;
 }
 
-QLineF OptimizeEdge::toLine() const
+QLineF OptimizeEdge::toLineInDevice() const
 {
     Q_D(const OptimizeEdge);
-    return QLineF(d->a->machiningPosition(), d->b->machiningPosition());
+    return QLineF(d->a->positionInDevice(), d->b->positionInDevice());
 }
 

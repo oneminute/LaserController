@@ -67,7 +67,7 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
     }
 
 	QMatrix matrix;
-	matrix.scale(Global::mm2PixelsXF(docScaleWidth), Global::mm2PixelsYF(docScaleHeight));
+	matrix.scale(Global::mmToSceneHF(docScaleWidth), Global::mmToSceneVF(docScaleHeight));
 
     while (!stack.empty())
     {
@@ -139,7 +139,7 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
 				if (area > 0)
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
-                    qreal cornerRaius = Global::mm2PixelsXF(svgRectNode->rx()) * docScaleWidth;
+                    qreal cornerRaius = Global::mmToSceneHF(svgRectNode->rx()) * docScaleWidth;
 					item = new LaserRect(rect, cornerRaius, doc);
 					qDebug() << "rect:" << rect;
 				}
@@ -161,7 +161,7 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
                 qLogD << fontSize;
                 //font.setPointSize(24);
                 //font.setPixelSize(fontPixel);
-                font.setPixelSize(Global::mm2PixelsX(fontSize) * 3);
+                //font.setPixelSize(Global::mm2PixelsX(fontSize) * 3);
                 //qreal scale = 100.0 / font.pointSizeF();
                 //font.setPixelSize(Global::mm2PixelsXF(font.pointSizeF() * scale * docScaleWidth));
                 //font.setPointSizeF(svgFont.pointSizeF() * docScaleWidth);
@@ -201,7 +201,7 @@ void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressIt
                 QTransform t1 = QTransform(
 					t.m11(), t.m12(), t.m13(),
 					t.m21(), t.m22(), t.m23(),
-					Global::convertFromMmH(t.m31() * docScaleWidth), Global::convertFromMmV(t.m32() * docScaleHeight), t.m33()
+					Global::mmToSceneHF(t.m31() * docScaleWidth), Global::mmToSceneVF(t.m32() * docScaleHeight), t.m33()
 				);
 				
                 t = t1;

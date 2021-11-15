@@ -762,12 +762,28 @@ void Config::loadPathOptimizationItems()
 
     ConfigItem* groupingGridInterval = group->addConfigItem(
         "groupingGridInterval",
-        30,
+        30000,
         DT_REAL
     );
     groupingGridInterval->setInputWidgetType(IWT_FloatEditSlider);
-    groupingGridInterval->setInputWidgetProperty("minimum", 1.0);
-    groupingGridInterval->setInputWidgetProperty("maximum", 1000.0);
+    groupingGridInterval->setValueFromWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(qRound(value.toReal() * 1000));
+        }
+    );
+    groupingGridInterval->setValueToWidgetHook(
+        [](const QVariant& value)
+        {
+            return QVariant(value.toInt() * 0.001);
+        }
+    );
+    groupingGridInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    groupingGridInterval->setInputWidgetProperty("step", 10);
+    groupingGridInterval->setInputWidgetProperty("page", 10);
+    groupingGridInterval->setInputWidgetProperty("minimum", 1);
+    groupingGridInterval->setInputWidgetProperty("maximum", 1000);
+    groupingGridInterval->setInputWidgetProperty("decimals", 0);
 
     ConfigItem* searchingXYWeight = group->addConfigItem(
         "searchingXYWeight",
