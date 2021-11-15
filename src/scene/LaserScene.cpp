@@ -496,7 +496,8 @@ void LaserScene::updateValidMaxRegionRect()
 void LaserScene::updataValidMaxRegion()
 {
     LaserViewer* view = qobject_cast<LaserViewer*>( views()[0]);
-    QRectF rect = LaserApplication::device->layoutRectInMech();
+    //QRectF rect = Global::matrixFromUm().mapRect(LaserApplication::device->layoutRectInMech());
+    QRectF rect = LaserApplication::device->layoutRectInScene();
     qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
     qreal top = -(maxSize - rect.height()) * 0.5;
     qreal left = -(maxSize - rect.width()) * 0.5;
