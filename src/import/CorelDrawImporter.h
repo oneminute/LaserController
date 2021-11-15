@@ -13,7 +13,8 @@ public:
     explicit CorelDrawImporter(QObject* parent = nullptr);
     virtual ~CorelDrawImporter();
 
-    virtual void import(const QString& filename, LaserScene* scene, ProgressItem* parentProgres, const QVariantMap& params = QVariantMap());
+protected:
+    virtual void importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgres, const QVariantMap& params = QVariantMap());
 };
 
 #endif // CORELDRAWIMPORTER_H

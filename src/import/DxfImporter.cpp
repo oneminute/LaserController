@@ -44,7 +44,7 @@ DxfImporter::~DxfImporter()
 {
 }
 
-void DxfImporter::import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void DxfImporter::importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
     Q_D(DxfImporter);
     qLogD << "import from dxf";

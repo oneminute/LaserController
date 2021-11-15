@@ -173,7 +173,16 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         LayerButton* button = new LayerButton(m_viewer);
         button->setMinimumWidth(Config::Ui::colorButtonWidth());
         button->setFixedHeight(Config::Ui::colorButtonHeight());
-        button->setColor(colors[i]);
+        QColor color;
+        if (i >= colors.length())
+        {
+            color = QColor::fromRgb(QRandomGenerator::global()->generate());
+        }
+        else
+        {
+            color = colors[i];
+        }
+        button->setColor(color);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
 		//button->setEnabled(false);
@@ -951,6 +960,24 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
         break;
     }
     }
+}
+
+void LaserControllerWindow::findPrintAndCutPoints(const QRectF& bounding)
+{
+    QList<QPointF> points = findCanvasPointsWithinRect(bounding);
+    
+    for (const QPointF& pt : points)
+    {
+        QPointF ptCandidate = LaserApplication::device->transformToDevice()
+            .map(Global::matrixToUm().map(pt));
+        qLogD << "canvas point: " << pt << ", " << ptCandidate;
+        m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
+    }
+}
+
+void LaserControllerWindow::clearPrintAndCutCandidatePoints()
+{
+    m_printAndCutCandidatePoints.clear();
 }
 
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
@@ -1843,9 +1870,10 @@ void LaserControllerWindow::createPrintAndCutPanel()
     QToolButton* buttonFetchLaser = new QToolButton;
     buttonFetchLaser->setDefaultAction(m_ui->actionPrintAndCutFetchLaser);
     buttonsLayout->addWidget(buttonFetchLaser);
-    QToolButton* buttonFetchCanvas = new QToolButton;
-    buttonFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutFetchCanvas);
-    buttonsLayout->addWidget(buttonFetchCanvas);
+    m_buttonPrintAndCutFetchCanvas = new QToolButton;
+    //buttonFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutFetchCanvas);
+    m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
+    buttonsLayout->addWidget(m_buttonPrintAndCutFetchCanvas);
     QToolButton* buttonRemove = new QToolButton;
     buttonRemove->setDefaultAction(m_ui->actionPrintAndCutRemove);
     buttonsLayout->addWidget(buttonRemove);
@@ -2286,6 +2314,39 @@ void LaserControllerWindow::dockPanelOnlyShowIcon(CDockWidget* dockWidget, QPixm
     connect(tab, &CDockWidgetTab::activeTabChanged, this, [=] {
         tab->closeButton()->setVisible(false);
     });
+}
+
+QList<QPointF> LaserControllerWindow::findCanvasPointsWithinRect(const QRectF& bounding) const
+{
+    QList<QPointF> points;
+    QRectF littleBounding(
+        bounding.topLeft() + QPointF(bounding.width() * 0.05, bounding.height() * 0.05),
+        QSizeF(bounding.width() * 0.9, bounding.height() * 0.9));
+    QPainterPath pathBounding;
+    pathBounding.addRect(bounding);
+    QSet<LaserPrimitive*> primitives = m_scene->findPrimitivesByRect(bounding);
+    for (LaserPrimitive* primitive : primitives)
+    {
+        qLogD << primitive->name();
+        QPainterPath path = primitive->getScenePath();
+        QPainterPath inter = pathBounding.intersected(path);
+        if (inter.isEmpty())
+            continue;
+
+        for (int i = 0; i < inter.elementCount(); i++)
+        {
+            QPainterPath::Element e = inter.elementAt(i);
+            if (e.type == QPainterPath::MoveToElement || e.type == QPainterPath::LineToElement)
+            {
+                QPointF pt(e.x, e.y);
+                if (!littleBounding.contains(pt))
+                    continue;
+                if (!points.contains(pt))
+                    points.append(pt);
+            }
+        }
+    }
+    return points;
 }
 
 PointPairList LaserControllerWindow::printAndCutPoints() const
@@ -3424,40 +3485,16 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
         return;
 
     QRectF bounding = laserRect->sceneBoundingRect();
-    QRectF littleBounding(
-        bounding.topLeft() + QPointF(bounding.width() * 0.05, bounding.height() * 0.05),
-        QSizeF(bounding.width() * 0.9, bounding.height() * 0.9));
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
     m_scene->document()->removePrimitive(rectPrimitive);
 
-    QPainterPath rectPath;
-    rectPath.addRect(bounding);
-
-    QSet<LaserPrimitive*> primitives = m_scene->findPrimitivesByRect(bounding);
-    for (LaserPrimitive* primitive : primitives)
+    m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
+    
+    for (const QPointF& pt : m_printAndCutCandidatePoints)
     {
-        if (primitive == rectPrimitive)
-            continue;
-
-        qLogD << primitive->name();
-        QPainterPath path = primitive->getScenePath();
-        QPainterPath inter = rectPath.intersected(path);
-        if (inter.isEmpty())
-            continue;
-
-        for (int i = 0; i < inter.elementCount(); i++)
-        {
-            QPainterPath::Element e = inter.elementAt(i);
-            if (e.type == QPainterPath::MoveToElement || e.type == QPainterPath::LineToElement)
-            {
-                QPointF pt(e.x, e.y);
-                if (!littleBounding.contains(pt))
-                    continue;
-                QPointF ptCandidate = LaserApplication::device->transformToDevice().map(Global::matrixToUm().map(pt));
-                qLogD << "canvas point: " << pt << ", " << ptCandidate;
-                m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
-            }
-        }
+        QPointF ptCandidate = LaserApplication::device->transformToDevice().map(Global::matrixToUm().map(pt));
+        qLogD << "canvas point: " << pt << ", " << ptCandidate;
+        m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
     }
 
     //Config::Ui::visualGridSpacing();
@@ -3565,10 +3602,17 @@ void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
 {
+    m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutSelectPoint);
+    m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutEndSelect);
+    emit startPrintAndCut();
 }
 
 void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
 {
+    m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutEndSelect);
+    m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
+    clearPrintAndCutCandidatePoints();
+    emit finishPrintAndCut();
 }
 
 void LaserControllerWindow::onActionRedLightAlignmentStart(bool checked)
@@ -4068,7 +4112,6 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             //初始化缩放输入
             QString str = QString::number(qFloor(m_viewer->adapterViewScale() * 100)) + "%";
             m_comboBoxScale->setCurrentText(str);
-            doc->open();
         }
     }
 }
@@ -4844,7 +4887,6 @@ void LaserControllerWindow::createNewDocument()
 {
 	LaserDocument* doc = new LaserDocument(m_scene);
 	initDocument(doc);
-	doc->open();
 }
 
 QString LaserControllerWindow::getCurrentFileName()

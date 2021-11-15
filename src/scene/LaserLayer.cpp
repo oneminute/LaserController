@@ -665,7 +665,9 @@ void LaserLayer::setIndex(int i)
 QRectF LaserLayer::boundingRect() const
 {
     Q_D(const LaserLayer);
-    return utils::boundingRect(d->primitives);
+    QRectF bounding;
+    utils::boundingRect(d->primitives, bounding);
+    return bounding;
 }
 
 QPointF LaserLayer::positionInScene() const 

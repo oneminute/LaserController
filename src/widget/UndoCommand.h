@@ -15,7 +15,7 @@ public :
 	virtual void undo() override;
 	virtual void redo() override;
 	virtual bool mergeWith(const QUndoCommand *command) override;
-	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);//¸ù¾ÝsceneTransfrom×ª»¯ÎªItemµÄtransformºÍposition
+	void sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem* item);//ï¿½ï¿½ï¿½ï¿½sceneTransfrom×ªï¿½ï¿½ÎªItemï¿½ï¿½transformï¿½ï¿½position
 private:
 	LaserViewer* m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_undoSelectedList;
@@ -74,7 +74,7 @@ private:
 	//QMap<QList<QGraphicsItem*>, QTransform> m_selectedBeforeAdd;
 	bool m_isDel;
 };
-//¶à±ßÐÎ
+//ï¿½ï¿½ï¿½ï¿½ï¿½
 class PolygonUndoCommand : public QUndoCommand {
 public:
 	PolygonUndoCommand(LaserScene* scene, LaserPrimitive* lastPrimitive, LaserPrimitive* curPrimitive);
@@ -89,7 +89,7 @@ private:
 	LaserViewer* m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
 };
-//Ë®Æ½¾µÏñ
+//Ë®Æ½ï¿½ï¿½ï¿½ï¿½
 class MirrorHCommand : public QUndoCommand {
 public:
 	MirrorHCommand(LaserViewer* v);
@@ -99,7 +99,7 @@ public:
 private:
 	LaserViewer* m_viewer;
 };
-//´¹Ö±¾µÏñ
+//ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
 class MirrorVCommand : public QUndoCommand {
 public:
 	MirrorVCommand(LaserViewer* v);
@@ -109,7 +109,7 @@ public:
 private:
 	LaserViewer * m_viewer;
 };
-//ð¤Ìù
+//ï¿½ï¿½ï¿½
 class PasteCommand : public QUndoCommand {
 public:
 	PasteCommand(LaserViewer* ,bool isPasteInline = false, bool isDuplication = false);
@@ -131,7 +131,7 @@ private :
 	//QPointF m_position;
 
 };
-//½»²æÏß¾µÏñ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ß¾ï¿½ï¿½ï¿½
 /*class MirrorACommand : public QUndoCommand {
 public:
     MirrorACommand(LaserViewer* v);

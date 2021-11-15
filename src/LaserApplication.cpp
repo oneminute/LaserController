@@ -175,7 +175,7 @@ bool LaserApplication::notify(QObject * receiver, QEvent * event)
     {
         qLogD << "QException: " << e;
     }
-    catch (std::exception* e)
+    catch (std::exception* /*e*/)
     {
         qLogD << "std::exception";
     }

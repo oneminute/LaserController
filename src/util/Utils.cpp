@@ -183,32 +183,30 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
-QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives, bool includingAccSpan)
+void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRectF& bounding, QRectF& boundingAcc)
 {
-    QRectF bounding(0, 0, 0, 0);
     int count = 0;
-    for (LaserPrimitive* primitive: primitives)
+    for (LaserPrimitive* primitive : primitives)
     {
         if (!primitive->exportable())
             continue;
 
         QRectF rect = primitive->sceneBoundingRect();
-        if (includingAccSpan)
+        QRectF rectAcc = rect;
+        LaserLayer* layer = primitive->layer();
+        if (primitive->primitiveType() == LPT_BITMAP ||
+            (layer->fillingType() == FT_Pixel && primitive->isShape()))
         {
-            LaserLayer* layer = primitive->layer();
-            if (primitive->primitiveType() == LPT_BITMAP || 
-                (layer->fillingType() == FT_Pixel && primitive->isShape()))
-            {
-                qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed() * 1000);
-                span = Global::mechToSceneHF(span);
-                rect.setLeft(rect.left() - span);
-                rect.setWidth(rect.width() + span * 2);
-            }
+            qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed() * 1000);
+            span = Global::mechToSceneHF(span);
+            rectAcc.setLeft(rect.left() - span);
+            rectAcc.setWidth(rect.width() + span * 2);
         }
 
         if (count++ == 0)
         {
             bounding = rect;
+            boundingAcc = rectAcc;
             continue;
         }
         if (rect.left() < bounding.left())
@@ -219,8 +217,16 @@ QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives, bool includ
             bounding.setRight(rect.right());
         if (rect.bottom() > bounding.bottom())
             bounding.setBottom(rect.bottom());
+
+        if (rectAcc.left() < boundingAcc.left())
+            boundingAcc.setLeft(rectAcc.left());
+        if (rectAcc.top() < boundingAcc.top())
+            boundingAcc.setTop(rectAcc.top());
+        if (rectAcc.right() > boundingAcc.right())
+            boundingAcc.setRight(rectAcc.right());
+        if (rectAcc.bottom() > boundingAcc.bottom())
+            boundingAcc.setBottom(rectAcc.bottom());
     }
-    return bounding;
 }
 
 LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)

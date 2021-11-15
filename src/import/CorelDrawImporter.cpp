@@ -34,7 +34,7 @@ CorelDrawImporter::~CorelDrawImporter()
 {
 }
 
-void CorelDrawImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void CorelDrawImporter::importImpl(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import from Corel Draw", parentProgress);
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);

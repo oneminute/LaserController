@@ -1818,7 +1818,7 @@ public:
         quint32 n = controlPoints.count();
         QMap<quint32, quint32> iMap;
         quint32 nFactorial = utils::factorial(n);
-        for (int i = 0; i <= n; i++)
+        for (quint32 i = 0; i <= n; i++)
         {
             iMap[i] = utils::factorial(i);
         }
@@ -1828,7 +1828,7 @@ public:
         for (int iu = 0; iu < steps; iu++)
         {
             qreal u = iu * 1.0 / steps;
-            for (int i = 0; i <= n; i++)
+            for (quint32 i = 0; i <= n; i++)
             {
                 qreal coefficient = nFactorial / (iMap[i] * iMap[n - i]) * qPow(u, i) * qPow(1 - u, n - i);
                 coefficients[UIPair(iu, i)] = coefficient;
@@ -1862,10 +1862,10 @@ public:
         {
             qreal u = uIndex * 1.0 / steps;
             QString logU;
-            for (int ip = 0; ip <= p; ip++)
+            for (quint32 ip = 0; ip <= p; ip++)
             {
                 logU.append("\n");
-                for (int i = 0; i <= m - 1 - ip; i++)
+                for (quint32 i = 0; i <= m - 1 - ip; i++)
                 {
                     UIPPair key(uIndex, i, ip);
                     if (ip == 0)

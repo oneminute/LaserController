@@ -30,7 +30,7 @@ SvgImporter::~SvgImporter()
 {
 }
 
-void SvgImporter::import(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void SvgImporter::importImpl(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
 {
 	LaserApplication::mainWindow->activateWindow();
     LaserDocument* doc = scene->document();

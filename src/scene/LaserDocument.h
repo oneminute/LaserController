@@ -91,14 +91,6 @@ public:
     QRectF machiningDocBoundingRectInMech() const;
     QRectF machiningDocBoundingRectInDevice(bool includingAccSpan = false) const;
 
-    QRectF imagesBoundingRectInScene() const;
-    QRectF imagesBoundingRectInMech() const;
-    QRectF imagesBoundingRectInDevice() const;
-
-    QRectF machiningImagesBoundingRectInScene() const;
-    QRectF machiningImagesBoundingRectInMech() const;
-    QRectF machiningImagesBoundingRectInDevice() const;
-
     QPointF docOriginInScene() const;
     QPointF docOriginInMech() const;
     QPointF docOriginInDevice() const;
@@ -139,6 +131,7 @@ public slots:
     void save(const QString& filename, QWidget* window);
     void load(const QString& filename, QWidget* window);
     int totalNodes();
+    void updateDocumentBounding();
 
 protected:
 	void init();

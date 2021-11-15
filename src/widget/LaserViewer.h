@@ -14,7 +14,7 @@ class LaserPrimitive;
 class LaserBitmap;
 class LaserLayer;
 class LaserText;
-class LaserTextRowPath;
+struct LaserTextRowPath;
 class LaserControllerWindow;
 
 //Spline Node Struct
@@ -220,6 +220,7 @@ private:
     //bool m_mousePressed;
     QPoint m_lastDragPos;
 	QState* m_mousePressState;
+	bool m_mousePressed;
 
 	bool m_isGridNode;//是否为网格交点node
 	QPointF m_gridNode;

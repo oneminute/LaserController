@@ -15,9 +15,8 @@ public:
     explicit DxfImporter(QObject* parent = nullptr);
     virtual ~DxfImporter();
 
-    virtual void import(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap());
-
 protected:
+    virtual void importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap());
 
 private:
     QScopedPointer<DxfImporterPrivate> m_ptr;

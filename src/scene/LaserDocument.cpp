@@ -63,6 +63,9 @@ public:
     QElapsedTimer boundingRectTimer;
 
     QMap<LaserPrimitiveType, int> typeMax;
+
+    QRectF bounding;
+    QRectF boundingWithAccSpan;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -469,7 +472,6 @@ void LaserDocument::exportBoundingJSON()
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(machiningDocBoundingRectInDevice());
-    laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectInDevice());
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -503,13 +505,13 @@ void LaserDocument::exportBoundingJSON()
         case 0:
             index = 0;
             break;
-        case 1:
+        case 3:
             index = 1;
             break;
         case 2:
             index = 2;
             break;
-        case 3:
+        case 1:
             index = 3;
             break;
         }
@@ -745,7 +747,15 @@ QPointF LaserDocument::jobOriginInMech() const
 
 QRectF LaserDocument::docBoundingRectInScene(bool includingAccSpan) const
 {
-    return utils::boundingRect(primitives().values(), includingAccSpan);
+    Q_D(const LaserDocument);
+    if (includingAccSpan)
+    {
+        return d->boundingWithAccSpan;
+    }
+    else
+    {
+        return d->bounding;
+    }
 }
 
 QRectF LaserDocument::docBoundingRectInMech() const
@@ -817,109 +827,6 @@ QRectF LaserDocument::machiningDocBoundingRectInDevice(bool includingAccSpan) co
         QPointF offset = userOrigin - jobOrigin;
         QPointF target = bounding.topLeft() + offset;
         bounding.moveTopLeft(target);
-    }
-    return bounding;
-}
-
-QRectF LaserDocument::imagesBoundingRectInScene() const
-{
-    Q_D(const LaserDocument);
-    QRectF bounding(0, 0, 0, 0);
-    int count = 0;
-    for (QMap<QString, LaserPrimitive*>::ConstIterator i = d->primitives.constBegin();
-        i != d->primitives.constEnd(); i++)
-    {
-        LaserLayer* layer = i.value()->layer();
-        QRectF rect = i.value()->sceneBoundingRect();
-        if (i.value()->primitiveType() == LPT_BITMAP)
-        {
-            qreal span = LaserApplication::device->engravingAccLength(i.value()->layer()->engravingRunSpeed());
-            rect.setLeft(rect.left() - span);
-            rect.setRight(rect.right() + span);
-        }
-        else if (layer->fillingType() == FT_Pixel && i.value()->isShape())
-        {
-            qreal span = LaserApplication::device->engravingAccLength(i.value()->layer()->engravingRunSpeed());
-            rect.setLeft(rect.left() - span);
-            rect.setRight(rect.right() + span);
-        }
-
-        if (count++ == 0)
-        {
-            bounding = rect;
-            continue;
-        }
-        if (rect.left() < bounding.left())
-            bounding.setLeft(rect.left());
-        if (rect.top() < bounding.top())
-            bounding.setTop(rect.top());
-        if (rect.right() > bounding.right())
-            bounding.setRight(rect.right());
-        if (rect.bottom() > bounding.bottom())
-            bounding.setBottom(rect.bottom());
-    }
-    return bounding;
-}
-
-QRectF LaserDocument::imagesBoundingRectInMech() const
-{
-    return Global::matrixToUm().mapRect(imagesBoundingRectInScene());
-}
-
-QRectF LaserDocument::imagesBoundingRectInDevice() const
-{
-    return LaserApplication::device->transformSceneToDevice()
-        .mapRect(imagesBoundingRectInScene());
-}
-
-QRectF LaserDocument::machiningImagesBoundingRectInScene() const
-{
-    QRectF bounding = imagesBoundingRectInScene();
-    if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(LaserApplication::device->userOriginInScene());
-        QPointF offset = jobOriginReletiveInScene();
-        bounding.moveTopLeft(-offset);
-    }
-    else if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(-bounding.topLeft());
-        QPointF offset = jobOriginReletiveInScene();
-        bounding.moveTopLeft(-offset);
-    }
-    return bounding;
-}
-
-QRectF LaserDocument::machiningImagesBoundingRectInMech() const
-{
-    QRectF bounding = imagesBoundingRectInMech();
-    if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(LaserApplication::device->userOriginInMech());
-        QPointF offset = jobOriginReletiveInMech();
-        bounding.moveTopLeft(-offset);
-    }
-    else if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(-bounding.topLeft());
-        QPointF offset = jobOriginReletiveInMech();
-        bounding.moveTopLeft(-offset);
-    }
-    return bounding;
-}
-
-QRectF LaserDocument::machiningImagesBoundingRectInDevice() const
-{
-    QRectF bounding = machiningImagesBoundingRectInMech();
-    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
-    {
-        bounding = LaserApplication::device->transformToDevice().mapRect(bounding);
-    }
-    else if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(LaserApplication::device->userOriginInDevice());
-        QPointF offset = jobOriginReletiveInMech();
-        bounding.moveTopLeft(-offset);
     }
     return bounding;
 }
@@ -1035,6 +942,7 @@ void LaserDocument::destroy()
 void LaserDocument::open()
 {
     Q_D(LaserDocument);
+    updateDocumentBounding();
     d->isOpened = true;
     emit opened();
 }
@@ -1403,7 +1311,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 	}
     this->blockSignals(false);
     emit updateLayersStructure();
-    //outline();
+    open();
 }
 
 int LaserDocument::totalNodes()
@@ -1422,6 +1330,12 @@ int LaserDocument::totalNodes()
         }
     }
     return count;
+}
+
+void LaserDocument::updateDocumentBounding()
+{
+    Q_D(LaserDocument);
+    utils::boundingRect(d->primitives.values(), d->bounding, d->boundingWithAccSpan);
 }
 
 void LaserDocument::init()
@@ -1448,6 +1362,11 @@ void LaserDocument::init()
 
 	ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
 	ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
+
+    connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromToolBar,
+        this, &LaserDocument::updateDocumentBounding);
+    connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromMouse,
+        this, &LaserDocument::updateDocumentBounding);
     
     d->boundingRectTimer.start();
 }

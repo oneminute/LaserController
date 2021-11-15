@@ -259,7 +259,7 @@ void Config::loadLayersItems()
     );
     maxLayersCount->setInputWidgetType(IWT_EditSlider);
     maxLayersCount->setInputWidgetProperty("minimum", 8);
-    maxLayersCount->setInputWidgetProperty("maximum", 40);
+    maxLayersCount->setInputWidgetProperty("maximum", 16);
 }
 
 void Config::loadUiItems()

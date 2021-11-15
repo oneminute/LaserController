@@ -82,13 +82,13 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
         case 0:
             angle = 315;
             break;
-        case 1:
+        case 3:
             angle = 225;
             break;
         case 2:
             angle = 135;
             break;
-        case 4:
+        case 1:
             angle = 45;
             break;
         }

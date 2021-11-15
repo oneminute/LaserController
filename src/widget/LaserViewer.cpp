@@ -37,6 +37,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 	: QGraphicsView(parent)
 	, m_scene(new LaserScene)
 	, m_rubberBandActive(false)
+    , m_mousePressed(false)
 	, m_isKeyShiftPressed(false)
 	, m_isKeyCtrlPress(false)
 	, m_isItemEdge(false)
@@ -107,10 +108,10 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (scene()->document())
         {
             // 绘制填充和雕刻外包框
-            QRectF rect = scene()->document()->imagesBoundingRectInScene();
+            QRectF rect = scene()->document()->docBoundingRectInScene(true);
             if (rect.isValid())
             {
-                painter.setPen(QPen(Qt::lightGray, 1, Qt::DashLine));
+                painter.setPen(QPen(Qt::green, 1, Qt::DashLine));
                 QPolygonF gridBounds = mapFromScene(rect);
                 painter.drawPolygon(gridBounds);
             }
@@ -212,6 +213,21 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		}
         
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
+    }
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+    {
+        if (m_mousePressed)
+        {
+            painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+            if (m_isLeftSelecting) {
+                painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
+            }
+            else {
+                painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+            }
+
+            painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
+        }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
         //qDebug() << "SelectedEditing paint";
@@ -1467,6 +1483,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
         {
             // 获取选框起点
+            m_mousePressed = true;
             m_selectionStartPoint = event->pos();
             m_selectionEndPoint = m_selectionStartPoint;
             emit beginSelecting();
@@ -2010,18 +2027,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         if (utils::checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
             //点中空白且press与release同一个点
-            selectingReleaseInBlank();
-            //选取区域的属性面板
-            LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
             return;
         }
 
-        QRectF areaRect(m_selectionStartPoint, m_selectionEndPoint);
-        QSet<LaserPrimitive*> primitives = m_scene->findPrimitivesByRect(areaRect);
-        for (LaserPrimitive* primitive : primitives)
-        {
-            qLogD << primitive->name();
-        }
+        QRectF areaRect(mapToScene(m_selectionStartPoint.toPoint()), 
+            mapToScene(m_selectionEndPoint.toPoint()));
+        LaserApplication::mainWindow->findPrintAndCutPoints(areaRect);
+        m_mousePressed = false;
     }
     //select
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))

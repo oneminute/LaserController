@@ -68,6 +68,25 @@ public:
     LaserDoubleSpinBox* fontSpaceYDoubleSpinBox();
 
     PointPairList printAndCutPoints() const;
+
+    LaserViewer* viewer() const { return m_viewer; }
+    LaserScene* scene() const { return m_scene; }
+
+    void findPrintAndCutPoints(const QRectF& bounding);
+    QList<QPointF> printAndCutCandidatePoints() const
+    {
+        return m_printAndCutCandidatePoints;
+    }
+    void clearPrintAndCutCandidatePoints();
+    QPointF selectedPrintAndCutPoint() const
+    {
+        return m_selectedPrintAndCutPoint;
+    }
+    void setPrintAndCutPoint(const QPointF& pt)
+    {
+        m_selectedPrintAndCutPoint = pt;
+    }
+    QPointF hoveredPrintAndCutPoint(const QPointF& mousePos) const;
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -113,6 +132,8 @@ protected:
     void createMixturePropertyPanel();
     //OnlyShowIcon
     void dockPanelOnlyShowIcon(ads::CDockWidget* dockWidget, QPixmap icon, char* text);
+
+    QList<QPointF> findCanvasPointsWithinRect(const QRectF& bounding) const;
 
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
@@ -471,6 +492,7 @@ private:
     // Print and Cut Panel
     QGroupBox* m_groupBoxPrintAndCutPoints;
     PointPairTableWidget* m_tablePrintAndCutPoints;
+    QToolButton* m_buttonPrintAndCutFetchCanvas;
     QGroupBox* m_groupBoxRedLightAlignment;
     QLabel* m_labelRedLightAlignmentFirst;
     QLabel* m_labelRedLightAlignmentSecond;
@@ -484,6 +506,8 @@ private:
     QLabel* m_labelPrintAndCutRotation;
     ads::CDockWidget* m_dockPrintAndCut;
     ads::CDockAreaWidget* m_dockAreaPrintAndCut;
+    QList<QPointF> m_printAndCutCandidatePoints;
+    QPointF m_selectedPrintAndCutPoint;
 
     bool m_created;
     QDir m_tmpDir;
