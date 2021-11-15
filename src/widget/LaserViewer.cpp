@@ -4318,6 +4318,16 @@ void LaserViewer::setVerticalRuler(RulerWidget* _r)
     m_verticalRuler = _r;
 }
 
+RulerWidget * LaserViewer::horizontalRuler()
+{
+    return m_horizontalRuler;
+}
+
+RulerWidget * LaserViewer::verticalRuler()
+{
+    return m_verticalRuler;
+}
+
 LaserPrimitiveGroup* LaserViewer::group()
 {
 	return m_group;
