@@ -268,7 +268,7 @@ protected slots:
 	void onLaserSceneSelectedChanged();
     
     void onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
-	void selectedChange();//items
+	void selectedChangedFromMouse();//items
 	void selectionPropertyBoxChange(int state);//doubleSpinBox's enter or mouse lost focus
 	void onSelectionOriginalClicked(bool clicked);
 	//undo
