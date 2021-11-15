@@ -171,7 +171,8 @@ signals:
 	void creatingText();
 	void readyText();
 	void selectedEding();
-	void selectedChange();
+	void selectedChangedFromMouse();
+    void selectedChangedFromToolBar();
 	void beginViewDraging();
 	void endViewDraging();
 

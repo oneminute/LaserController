@@ -195,7 +195,7 @@ void AddDelUndoCommand::undo()
 		
 	}   
 	m_viewer->viewport()->repaint();
-    emit m_viewer->selectedChange();
+    emit m_viewer->selectedChangedFromMouse();
 }
 
 void AddDelUndoCommand::redo()
@@ -242,7 +242,7 @@ void AddDelUndoCommand::redo()
 	}
     
 	m_viewer->viewport()->repaint();
-    emit m_viewer->selectedChange();
+    emit m_viewer->selectedChangedFromMouse();
 }
 
 void AddDelUndoCommand::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)
@@ -554,7 +554,7 @@ void MirrorACommand::redo()
     QTransform t2 = t.inverted();
     group->setTransform(group->transform() * t * t1 * t2);
     //����ѡ������
-    m_viewer->selectedChange();  
+    m_viewer->selectedChangedFromMouse();  
     m_viewer->viewport()->repaint();
 }*/
 
@@ -788,6 +788,7 @@ void GroupTransformUndoCommand::undo()
 {
     m_group = m_viewer->group();
     m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
+    emit m_viewer->selectedChangedFromMouse();
     //updata tree
     m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();
@@ -803,6 +804,7 @@ void GroupTransformUndoCommand::redo()
     }
     m_group = m_viewer->group();
     m_group->setTransform(m_curTransform);
+    emit m_viewer->selectedChangedFromMouse();
     //updata tree
     m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();

@@ -654,7 +654,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	
 	//selected properties
 	//connect(m_scene, &LaserScene::selectionChanged,this, &LaserControllerWindow::selectionChange);
-	connect(m_viewer, &LaserViewer::selectedChange, this, &LaserControllerWindow::selectedChange);
+	connect(m_viewer, &LaserViewer::selectedChangedFromMouse, this, &LaserControllerWindow::selectedChangedFromMouse);
 	connect(m_posXBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_MOVE;
 		if (m_posXBox->value() > 9000) {
@@ -728,55 +728,55 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_topLeftBtn, &QRadioButton::toggled, this, [=] {
 		if (m_topLeftBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalTopLeft;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_topCenterBtn, &QRadioButton::toggled, this, [=] {
 		if (m_topCenterBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalTopCenter;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_topRightBtn, &QRadioButton::toggled, this, [=] {
 		if (m_topRightBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalTopRight;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_leftCenterBtn, &QRadioButton::toggled, this, [=] {
 		if (m_leftCenterBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalLeftCenter;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_centerBtn, &QRadioButton::toggled, this, [=] {
 		if (m_centerBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalCenter;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_rightCenterBtn, &QRadioButton::toggled, this, [=] {
 		if (m_rightCenterBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalRightCenter;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_bottomLeftBtn, &QRadioButton::toggled, this, [=] {
 		if (m_bottomLeftBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalLeftBottom;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_bottomCenterBtn, &QRadioButton::toggled, this, [=] {
 		if (m_bottomCenterBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalBottomCenter;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	connect(m_bottomRightBtn, &QRadioButton::toggled, this, [=] {
 		if (m_bottomRightBtn->isChecked()) {
 			m_selectionOriginalState = SelectionOriginalBottomRight;
-			selectedChange();
+			selectedChangedFromMouse();
 		}
 	});
 	
@@ -788,6 +788,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(Config::Device::userOrigin1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
     connect(Config::Device::userOrigin2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
     connect(Config::Device::userOrigin3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
+        //updata region
+        m_scene->updataValidMaxRegion();
+
+    });
+
 
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
@@ -3765,7 +3771,7 @@ void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
     }
     else if (i > 0) {
         m_propertyWidget->setEnabled(true);
-        selectedChange();
+        selectedChangedFromMouse();
     }
 }
 
@@ -4098,7 +4104,7 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
 	
 }
 //selected items change,被选中的物体，发生移动，缩放，旋转,以线镜像变换时
-void LaserControllerWindow::selectedChange()
+void LaserControllerWindow::selectedChangedFromMouse()
 {
 	//int size = m_scene->selectedPrimitives().length();
     LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
@@ -4218,46 +4224,13 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
         width = Global::mmToSceneHF(width);
         height = Global::mmToSceneVF(height);
     }
-
-    /*if (m_lockEqualRatio) {
-        QRectF bounds = m_viewer->selectedItemsSceneBoundingRect();
-        qreal widthRatio = 1;
-        qreal heightRatio = 1;
-        if (bounds.width() != 0) {
-            widthRatio = width / bounds.width();
-        }
-        if (bounds.height() != 0) {
-            heightRatio = height / bounds.height();
-        }
-        switch (state)
-        {
-        case PrimitiveProperty::PP_Height: {
-            width *= widthRatio;
-            break;
-        }
-        case PrimitiveProperty::PP_Width: {
-            height *= heightRatio;
-            break;
-        }
-        case PrimitiveProperty::PP_ScaleX: {
-            break;
-        }
-        case PrimitiveProperty::PP_ScaleY: {
-            break;
-        }
-            default:
-                break;
-        }
-    }*/
-    
-	
-	
 	//repaint 
 	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
         m_selectionTranformState, state, m_unitIsMM);
 	m_xRateBox->setValue(100);
 	m_yRateBox->setValue(100);
 	m_rotateBox->setValue(0);
+    emit m_viewer->selectedChangedFromToolBar();
 	m_viewer->viewport()->repaint();
 }
 void LaserControllerWindow::onSelectionOriginalClicked(bool clicked)
@@ -4915,6 +4888,8 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, 
 
 void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
 {
+    //changeRuller
+
     m_viewer->viewport()->update();
 }
 

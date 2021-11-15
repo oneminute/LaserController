@@ -68,11 +68,6 @@ void LaserScene::setDocument(LaserDocument * doc)
         qreal left = -(maxSize - rect.width()) * 0.5;
         m_maxRegion = QRectF(left, top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
-        connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
-            //updata region
-            updataValidMaxRegion();
-        
-        });
     }
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
@@ -496,7 +491,8 @@ void LaserScene::updateValidMaxRegionRect()
 void LaserScene::updataValidMaxRegion()
 {
     LaserViewer* view = qobject_cast<LaserViewer*>( views()[0]);
-    QRectF rect = LaserApplication::device->layoutRectInMech();
+    //QRectF rect = Global::matrixFromUm().mapRect(LaserApplication::device->layoutRectInMech());
+    QRectF rect = LaserApplication::device->layoutRectInScene();
     qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
     qreal top = -(maxSize - rect.height()) * 0.5;
     qreal left = -(maxSize - rect.width()) * 0.5;

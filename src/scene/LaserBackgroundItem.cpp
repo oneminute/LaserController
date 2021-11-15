@@ -39,35 +39,16 @@ LaserBackgroundItem::~LaserBackgroundItem()
 
 void LaserBackgroundItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
-	//QGraphicsItemGroup::paint(painter, option, widget);
-    
-
 	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
 	//this->setBrush(QBrush(Qt::white));
 	pen.setCosmetic(true);
-    QColor red;
+    /*QColor red;
     red.setRed(177);
     painter->setPen(QPen(Qt::red));
-    painter->drawRect(m_maxRegion);
+    painter->drawRect(m_maxRegion);*/
 	painter->setPen(pen);
-	//painter->drawRect(this->rect());
-	//QGraphicsItemGroup::setSelected(true);
-	//����
+	//grides
 	drawGrids(*painter);
-	//QGraphicsItemGroup::paint(painter, option, widget);
-	/*QList<QGraphicsItem*> list = QGraphicsItemGroup::childItems();
-	for (int i = 0; i < list.size(); i++) {
-		LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>( list[i]);
-		QString name = primitive->metaObject()->className();
-		if (name == "LaserRect") {
-			primitive->paint(painter, option, widget);
-			primitive->setSelected(true);
-		}
-		
-	}*/
-	
-	
-	
 }
 //���¼���nodeֵ
 void LaserBackgroundItem::onChangeGrids()

@@ -583,7 +583,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				t2.translate(diff.x(), diff.y());
 				t = t * t2;
 				m_group->setTransform(t);
-				//emit selectedChange();
+				//emit selectedChangedFromMouse();
 				break;
 			}
 			case Transform_RESIZE: {
@@ -1863,7 +1863,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			case 14://点选图片
 			{
 				selectedHandleScale();
-				emit selectedChange();
+				emit selectedChangedFromMouse();
 				this->viewport()->repaint();
 				return;
 			}
