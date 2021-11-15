@@ -82,15 +82,6 @@ public:
 
     QPointF jobOriginInMech() const;
 
-    /// <summary>
-    /// 在画布坐标系下，从图元列表外包框移动到指定原点位置的
-    /// 平移变换矩阵。
-    /// </summary>
-    /// <param name="origin">
-    /// 指定的目标原点。一般是用户原点或激光头位置。
-    /// </param>
-    /// <returns></returns>
-    QTransform transformJobOriginInScene(const QPointF& origin) const;
 
     QRectF docBoundingRectInScene() const;
     QRectF docBoundingRectInMech() const;
@@ -112,6 +103,11 @@ public:
     QPointF docOriginInMech() const;
     QPointF docOriginInDevice() const;
 
+    /// <summary>
+    /// 在画布坐标系下，从图元列表外包框移动到指定原点位置的
+    /// 平移变换矩阵。指定原点是指用户原点或当前激光位置。
+    /// </summary>
+    /// <returns></returns>
     QTransform transformToReletiveOriginInDevice() const;
 
     bool enablePrintAndCut() const;

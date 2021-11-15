@@ -222,6 +222,7 @@ public slots:
     bool requestTemporaryLicense();
     bool createLicenseFile(const QString& licenseCode);
     void moveToOrigin(qreal speed = 15);
+    void updateDeviceOriginAndTransform();
 
 protected:
 

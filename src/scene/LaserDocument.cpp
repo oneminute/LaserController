@@ -736,14 +736,6 @@ QPointF LaserDocument::jobOriginInMech() const
     return Global::matrixToUm().map(jobOriginInScene());
 }
 
-QTransform LaserDocument::transformJobOriginInScene(const QPointF& origin) const
-{
-    QRectF boundingRect = docBoundingRectInScene();
-    QPointF jobOrigin = jobOriginReletiveInScene(boundingRect);
-    QPointF offset = origin - boundingRect.topLeft() - jobOrigin;
-    return QTransform::fromTranslate(offset.x(), offset.y());
-}
-
 QRectF LaserDocument::docBoundingRectInScene() const
 {
     return utils::boundingRect(primitives().values());

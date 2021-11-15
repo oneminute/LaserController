@@ -1122,6 +1122,12 @@ void LaserDevice::moveToOrigin(qreal speed)
     }
 }
 
+void LaserDevice::updateDeviceOriginAndTransform()
+{
+    Q_D(LaserDevice);
+    d->updateDeviceOriginAndTransform();
+}
+
 void LaserDevice::handleError(int code, const QString& message)
 {
     Q_D(LaserDevice);

@@ -69,6 +69,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 
     Global::dpiX = logicalDpiX();
     Global::dpiY = logicalDpiY();
+    LaserApplication::device->updateDeviceOriginAndTransform();
 }
 
 LaserViewer::~LaserViewer()
