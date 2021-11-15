@@ -66,9 +66,9 @@ public:
     /// <returns></returns>
     QPointF jobOriginReletiveInScene(const QRectF& docBounding) const;
 
-    QPointF jobOriginReletiveInScene() const;
+    QPointF jobOriginReletiveInScene(bool includingAccSpan = false) const;
 
-    QPointF jobOriginReletiveInMech() const;
+    QPointF jobOriginReletiveInMech(bool includingAccSpan = false) const;
 
     /// <summary>
     /// 返回作业原点。该点值在画布坐标系下，由当前有效图元列表形成
@@ -83,13 +83,13 @@ public:
     QPointF jobOriginInMech() const;
 
 
-    QRectF docBoundingRectInScene() const;
+    QRectF docBoundingRectInScene(bool includingAccSpan = false) const;
     QRectF docBoundingRectInMech() const;
-    QRectF docBoundingRectInDevice() const;
+    QRectF docBoundingRectInDevice(bool includingAccSpan = false) const;
 
     QRectF machiningDocBoundingRectInScene() const;
     QRectF machiningDocBoundingRectInMech() const;
-    QRectF machiningDocBoundingRectInDevice() const;
+    QRectF machiningDocBoundingRectInDevice(bool includingAccSpan = false) const;
 
     QRectF imagesBoundingRectInScene() const;
     QRectF imagesBoundingRectInMech() const;

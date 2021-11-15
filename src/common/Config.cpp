@@ -1966,7 +1966,7 @@ void Config::loadUserReigsters()
     fillingAcceleration->setInputWidgetProperty("step", 0.001);
     fillingAcceleration->setInputWidgetProperty("page", 10);
     fillingAcceleration->setInputWidgetProperty("minimum", 0.001);
-    fillingAcceleration->setInputWidgetProperty("maximum", 10000);
+    fillingAcceleration->setInputWidgetProperty("maximum", 20000);
 
     ConfigItem* maxFillingPower = group->addConfigItem(
         "maxFillingPower",
@@ -2398,7 +2398,7 @@ void Config::loadSystemRegisters()
     xMaxAcceleration->setInputWidgetProperty("step", 0.001);
     xMaxAcceleration->setInputWidgetProperty("page", 10);
     xMaxAcceleration->setInputWidgetProperty("minimum", 1);
-    xMaxAcceleration->setInputWidgetProperty("maximum", 1000);
+    xMaxAcceleration->setInputWidgetProperty("maximum", 20000);
     xMaxAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* xUrgentAcceleration = group->addConfigItem(
@@ -2422,7 +2422,7 @@ void Config::loadSystemRegisters()
     xUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     xUrgentAcceleration->setInputWidgetProperty("page", 10);
     xUrgentAcceleration->setInputWidgetProperty("minimum", 1);
-    xUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
+    xUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
     xUrgentAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yMaxLength = group->addConfigItem(
@@ -2681,7 +2681,7 @@ void Config::loadSystemRegisters()
     yMaxAcceleration->setInputWidgetProperty("step", 0.001);
     yMaxAcceleration->setInputWidgetProperty("page", 10);
     yMaxAcceleration->setInputWidgetProperty("minimum", 1);
-    yMaxAcceleration->setInputWidgetProperty("maximum", 1000);
+    yMaxAcceleration->setInputWidgetProperty("maximum", 20000);
     yMaxAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yUrgentAcceleration = group->addConfigItem(
@@ -2705,7 +2705,7 @@ void Config::loadSystemRegisters()
     yUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     yUrgentAcceleration->setInputWidgetProperty("page", 10);
     yUrgentAcceleration->setInputWidgetProperty("minimum", 1);
-    yUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
+    yUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
     yUrgentAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* zMaxLength = group->addConfigItem(
@@ -2966,7 +2966,7 @@ void Config::loadSystemRegisters()
     zMaxAcceleration->setInputWidgetProperty("step", 0.001);
     zMaxAcceleration->setInputWidgetProperty("page", 10);
     zMaxAcceleration->setInputWidgetProperty("minimum", 1);
-    zMaxAcceleration->setInputWidgetProperty("maximum", 1000);
+    zMaxAcceleration->setInputWidgetProperty("maximum", 20000);
     zMaxAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* zUrgentAcceleration = group->addConfigItem(
@@ -2990,7 +2990,7 @@ void Config::loadSystemRegisters()
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     zUrgentAcceleration->setInputWidgetProperty("page", 10);
     zUrgentAcceleration->setInputWidgetProperty("minimum", 1);
-    zUrgentAcceleration->setInputWidgetProperty("maximum", 10000);
+    zUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
     zUrgentAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* laserMaxPower = group->addConfigItem(

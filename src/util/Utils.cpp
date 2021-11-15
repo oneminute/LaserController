@@ -1,11 +1,15 @@
 #include "Utils.h"
 #include <QUuid>
 #include <QtMath>
-#include "scene/LaserPrimitive.h"
 #include "Eigen/Core"
 #include "Eigen/Dense"
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
+
+#include "LaserApplication.h"
+#include "laser/LaserDevice.h"
+#include "scene/LaserPrimitive.h"
+#include "scene/LaserLayer.h"
 
 QString utils::createUUID(const QString& prefix)
 {
@@ -179,7 +183,7 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
-QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
+QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives, bool includingAccSpan)
 {
     QRectF bounding(0, 0, 0, 0);
     int count = 0;
@@ -189,6 +193,19 @@ QRectF utils::boundingRect(const QList<LaserPrimitive*>& primitives)
             continue;
 
         QRectF rect = primitive->sceneBoundingRect();
+        if (includingAccSpan)
+        {
+            LaserLayer* layer = primitive->layer();
+            if (primitive->primitiveType() == LPT_BITMAP || 
+                (layer->fillingType() == FT_Pixel && primitive->isShape()))
+            {
+                qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed() * 1000);
+                span = Global::mechToSceneHF(span);
+                rect.setLeft(rect.left() - span);
+                rect.setWidth(rect.width() + span * 2);
+            }
+        }
+
         if (count++ == 0)
         {
             bounding = rect;

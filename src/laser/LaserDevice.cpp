@@ -1049,7 +1049,7 @@ qreal LaserDevice::engravingAccLength(qreal engravingRunSpeed) const
     qreal minSpeed = Config::UserRegister::scanXStartSpeed();
     qreal acc = Config::UserRegister::scanXAcc();
     qreal maxSpeed = qMax(engravingRunSpeed, minSpeed);
-    return (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
+    return qAbs(maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
 }
 
 void LaserDevice::unload()

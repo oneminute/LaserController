@@ -243,8 +243,15 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(machiningDocBoundingRectInDevice());
-    //laserDocumentInfo["ImageBoundingRect"] = typeUtils::rect2Json(imagesBoundingRectInDevice());
+
+    QRectF outBounding = machiningDocBoundingRectInDevice(true);
+    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    {
+        outBounding.moveTopLeft(-outBounding.topLeft());
+        QPointF outJobOrigin = jobOriginReletiveInMech(true);
+        outBounding.moveTopLeft(-outJobOrigin);
+    }
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(outBounding);
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -707,14 +714,14 @@ QPointF LaserDocument::jobOriginReletiveInScene(const QRectF& docBounding) const
     return QPointF(dx, dy);
 }
 
-QPointF LaserDocument::jobOriginReletiveInScene() const
+QPointF LaserDocument::jobOriginReletiveInScene(bool includingAccSpan) const
 {
-    return jobOriginReletiveInScene(docBoundingRectInScene());
+    return jobOriginReletiveInScene(docBoundingRectInScene(includingAccSpan));
 }
 
-QPointF LaserDocument::jobOriginReletiveInMech() const
+QPointF LaserDocument::jobOriginReletiveInMech(bool includingAccSpan) const
 {
-    QPointF origin = jobOriginReletiveInScene();
+    QPointF origin = jobOriginReletiveInScene(includingAccSpan);
     origin = Global::matrixToUm().map(origin);
     return origin;
 }
@@ -736,9 +743,9 @@ QPointF LaserDocument::jobOriginInMech() const
     return Global::matrixToUm().map(jobOriginInScene());
 }
 
-QRectF LaserDocument::docBoundingRectInScene() const
+QRectF LaserDocument::docBoundingRectInScene(bool includingAccSpan) const
 {
-    return utils::boundingRect(primitives().values());
+    return utils::boundingRect(primitives().values(), includingAccSpan);
 }
 
 QRectF LaserDocument::docBoundingRectInMech() const
@@ -746,10 +753,10 @@ QRectF LaserDocument::docBoundingRectInMech() const
     return Global::matrixToUm().mapRect(docBoundingRectInScene());
 }
 
-QRectF LaserDocument::docBoundingRectInDevice() const
+QRectF LaserDocument::docBoundingRectInDevice(bool includingAccSpan) const
 {
     return LaserApplication::device->transformSceneToDevice()
-        .mapRect(docBoundingRectInScene());
+        .mapRect(docBoundingRectInScene(includingAccSpan));
 }
 
 QRectF LaserDocument::machiningDocBoundingRectInScene() const
@@ -792,9 +799,9 @@ QRectF LaserDocument::machiningDocBoundingRectInMech() const
     return bounding;
 }
 
-QRectF LaserDocument::machiningDocBoundingRectInDevice() const
+QRectF LaserDocument::machiningDocBoundingRectInDevice(bool includingAccSpan) const
 {
-    QRectF bounding = docBoundingRectInDevice();
+    QRectF bounding = docBoundingRectInDevice(includingAccSpan);
     if (Config::Device::startFrom() == SFT_UserOrigin)
     {
         QPointF userOrigin = LaserApplication::device->userOriginInDevice();
