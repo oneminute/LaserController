@@ -52,6 +52,8 @@ public:
 	LaserScene* scene();
 	void setHorizontalRuler(RulerWidget* _r);
 	void setVerticalRuler(RulerWidget * _r);
+    RulerWidget* horizontalRuler();
+    RulerWidget* verticalRuler();
 	LaserPrimitiveGroup* group();
 	QRectF selectedItemsSceneBoundingRect();
     QRectF AllItemsSceneBoundingRect();

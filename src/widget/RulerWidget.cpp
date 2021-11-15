@@ -3,6 +3,7 @@
 #include "scene/LaserScene.h"
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
+#include "common/Config.h"
 #include <QObject>
 #include <QPainter>
 #include <QDebug>
@@ -65,7 +66,8 @@ void RulerWidget::refresh()
 }
 
 void RulerWidget::viewZoomChanged(const QPointF& topleft) {
-	m_original = topleft;
+	//m_original = topleft;
+    //m_original = LaserApplication::device->originInScene();
 	repaint();
 }
 
@@ -102,7 +104,8 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	if (!backgroundItem) {
 		return;
 	}
-	m_original = m_viewer->mapFromScene(backgroundItem->pos());
+	//m_original = m_viewer->mapFromScene(backgroundItem->pos());
+    m_original = m_viewer->mapFromScene(LaserApplication::device->originInScene());
 	int textCoef = 1 * m_flag;
 	if (m_scale >= 1.0 && m_scale < 22) {
 		m_unit = m_millimeter;
@@ -188,6 +191,7 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 	font.setPixelSize(m_textMaxSize);
 	painter.setFont(font);
 	painter.setPen(QPen(QColor(200, 200, 200), 1));
+    
 	
 	//size
 	QRectF rect = this->rect();
@@ -197,6 +201,12 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
     if (m_isVertical) {
         originalStart = m_original.y();
         edge = rect.left();
+    }
+    else {
+        //水平方向显示符号
+        if (!isPositive) {
+            textCoef *= -1;
+        }
     }
     
 	for (int i = 0; i <= longSize; i++) {		
@@ -221,10 +231,15 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 
 				int length = number_str.length();
 				if (m_scale <= 8) {
+                    //垂直方向的负值与水平方向的相反
+                    if (isPositive) {
+                        painter.drawText(edge - 2, longStart + 10, QString("-"));
+
+                    }
 					for (int j = 0; j < length; j++) {
-						painter.drawText(QPointF(edge + 3, longStart + 10 + j * font.pixelSize()), QString(number_str[j]));
-					}
-				}
+                        painter.drawText(QPointF(edge + 3, longStart + 10 + j * font.pixelSize()), QString(number_str[j]));
+                    }
+                }
 				painter.setPen(QPen(QColor(200, 200, 200), 1));
 			}
 		}
@@ -276,24 +291,40 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
     //放大到一定比例时，unit显示刻度
     if (m_scale > 8) {
         int smallSize = qRound(dimension / m_unit);
+        float unitStart = originalStart;
+        if (m_isVertical) {
+            if (isPositive) {
+                painter.drawText(edge - 2, edge + 8, QString("-"));
+            }
+        }
+        else {
+            if (!isPositive) {
+                
+            }
+        }
         for (int sj = 0; sj < smallSize; sj++) {
-            //QString number_str = QString::number(LaserApplication::device->deviceTranslateXMm(sj));
             QString number_str = QString::number(sj);
             if (m_scale > 22) {
-                //number_str = QString::number(LaserApplication::device->deviceTranslateXMm(sj * 0.5), 'f', 1);
                 number_str = QString::number(sj * 0.5, 'f', 1);
             }
             painter.setPen(QPen(QColor(63, 63, 63), 1));
-            float unitStart = originalStart + sj * m_unit;
+            unitStart = originalStart + sj * m_unit;
             if (!isPositive) {
                 unitStart = originalStart - sj * m_unit;
             }
             if (m_isVertical) {
+                //垂直方向的负值与水平方向的相反，垂直方向显示符号
+                if (sj > 0 && isPositive) {
+                    painter.drawText(QPointF(edge - 3, unitStart + 10), QString("-"));
+                }
                 for (int j = 0; j < number_str.size(); j++) {
                     painter.drawText(QPointF(edge + 3, unitStart + 10 + j * font.pixelSize()), QString(number_str[j]));
                 }
             }
             else {
+                if (sj > 0 && !isPositive) {
+                    painter.drawText(QPointF(unitStart-2, edge + 8), QString("-"));
+                }
                 painter.drawText(QPointF(unitStart + 2, edge + 8), number_str);
             }
             

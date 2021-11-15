@@ -4930,8 +4930,9 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, 
 
 void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
 {
-    //changeRuller
-
+    //changeRuler
+    m_viewer->horizontalRuler()->repaint();
+    m_viewer->verticalRuler()->repaint();
     m_viewer->viewport()->update();
 }
 
