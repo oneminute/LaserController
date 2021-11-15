@@ -788,7 +788,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(Config::Device::userOrigin1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
     connect(Config::Device::userOrigin2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
     connect(Config::Device::userOrigin3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
-    
+    connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
+        //updata region
+        m_scene->updataValidMaxRegion();
+
+    });
+
 
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
@@ -4219,40 +4224,6 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
         width = Global::mmToSceneHF(width);
         height = Global::mmToSceneVF(height);
     }
-
-    /*if (m_lockEqualRatio) {
-        QRectF bounds = m_viewer->selectedItemsSceneBoundingRect();
-        qreal widthRatio = 1;
-        qreal heightRatio = 1;
-        if (bounds.width() != 0) {
-            widthRatio = width / bounds.width();
-        }
-        if (bounds.height() != 0) {
-            heightRatio = height / bounds.height();
-        }
-        switch (state)
-        {
-        case PrimitiveProperty::PP_Height: {
-            width *= widthRatio;
-            break;
-        }
-        case PrimitiveProperty::PP_Width: {
-            height *= heightRatio;
-            break;
-        }
-        case PrimitiveProperty::PP_ScaleX: {
-            break;
-        }
-        case PrimitiveProperty::PP_ScaleY: {
-            break;
-        }
-            default:
-                break;
-        }
-    }*/
-    
-	
-	
 	//repaint 
 	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
         m_selectionTranformState, state, m_unitIsMM);
@@ -4916,6 +4887,8 @@ void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, 
 
 void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
 {
+    //changeRuller
+
     m_viewer->viewport()->update();
 }
 

@@ -788,6 +788,7 @@ void GroupTransformUndoCommand::undo()
 {
     m_group = m_viewer->group();
     m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
+    emit m_viewer->selectedChange();
     //updata tree
     m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();
@@ -803,6 +804,7 @@ void GroupTransformUndoCommand::redo()
     }
     m_group = m_viewer->group();
     m_group->setTransform(m_curTransform);
+    emit m_viewer->selectedChange();
     //updata tree
     m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();

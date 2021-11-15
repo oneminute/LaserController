@@ -68,11 +68,6 @@ void LaserScene::setDocument(LaserDocument * doc)
         qreal left = -(maxSize - rect.width()) * 0.5;
         m_maxRegion = QRectF(left, top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
-        connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
-            //updata region
-            updataValidMaxRegion();
-        
-        });
     }
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
     for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
