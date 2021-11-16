@@ -2335,7 +2335,7 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint)
     QByteArray bytes;
     QPainterPath path = toMachiningPath();
     QRectF boundingRectInMech = path.boundingRect();
-    boundingRectInMech = LaserApplication::device->transformToDevice().mapRect(boundingRectInMech);
+    //boundingRectInMech = LaserApplication::device->transformToDevice().mapRect(boundingRectInMech);
     qreal ratio = boundingRectInMech.width() / boundingRectInMech.height();
     int canvasWidth = qMin(boundingRectInMech.width(), 1000.0);
     int canvasHeight = qRound(canvasWidth / ratio);

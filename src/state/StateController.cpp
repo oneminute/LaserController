@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QFinalState>
 
+#include "LaserApplication.h"
+
 StateController::StateController(QObject* parent)
     :QObject(parent)
 {
@@ -64,6 +66,16 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(deviceConnected, deviceMachining);
     DEFINE_CHILD_STATE(deviceConnected, devicePaused);
     DEFINE_CHILD_STATE(deviceConnected, deviceError);
+
+    for (QAbstractState* st : m_states.values())
+    {
+        LaserState* state = qobject_cast<LaserState*>(st);
+        LaserFinalState* finalState = qobject_cast<LaserFinalState*>(st);
+        if (state)
+            qLogD << state->title();
+        if (finalState)
+            qLogD << finalState->title();
+    }
 }
 
 StateController::~StateController()
@@ -79,7 +91,7 @@ StateController& StateController::instance()
 
 bool StateController::isInState(QAbstractState * state)
 {
-    return instance().m_currentStates.contains(state->objectName());
+    return instance().m_currentStates.contains(state);
 }
 
 bool StateController::anyState(const QList<QAbstractState*>& states)
@@ -87,7 +99,7 @@ bool StateController::anyState(const QList<QAbstractState*>& states)
     bool result = false;
     for (const QAbstractState* state : states)
     {
-        result = result || instance().m_currentStates.contains(state->objectName());
+        result = result || instance().m_currentStates.contains(const_cast<QAbstractState*>(state));
     }
     return result;
 }
@@ -97,13 +109,40 @@ bool StateController::allStates(const QList<QAbstractState*>& states)
     bool result = true;
     for (const QAbstractState* state : states)
     {
-        result = result && instance().m_currentStates.contains(state->objectName());
+        result = result && instance().m_currentStates.contains(const_cast<QAbstractState*>(state));
     }
     return result;
 }
 
-QSet<QString> StateController::currentStates() 
+QSet<QAbstractState*> StateController::currentStates() 
 {
     return m_currentStates; 
 }
 
+ILaserState::ILaserState(const QString& title)
+    : m_title(title)
+{
+}
+
+QString ILaserState::title() const
+{
+    return ltr(m_title);
+}
+
+LaserState::LaserState(const QString& title)
+    : ILaserState(title)
+{
+}
+
+LaserState::~LaserState()
+{
+}
+
+LaserFinalState::LaserFinalState(const QString& title)
+    : ILaserState(title)
+{
+}
+
+LaserFinalState::~LaserFinalState()
+{
+}

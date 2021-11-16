@@ -91,7 +91,7 @@ bool LaserDriver::load()
     if (m_isLoaded)
         return true;
 
-    qRegisterMetaType<LaserState>("LaserState");
+    qRegisterMetaType<DeviceState>("DeviceState");
 
     m_library.setFileName("LaserLib32.dll");
     if (!m_library.load())

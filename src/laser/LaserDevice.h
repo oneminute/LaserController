@@ -252,7 +252,7 @@ signals:
     void mainCardActivationChanged(bool activated);
     void mainCardInfoFetched();
     void manufacturePasswordVerified(bool pass);
-    void workStateUpdated(LaserState state);
+    void workStateUpdated(DeviceState state);
     void layoutChanged(const QSizeF& size);
 
 private:

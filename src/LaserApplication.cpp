@@ -317,6 +317,51 @@ void LaserApplication::retranslate()
     stringMap["X Pos"] = tr("X Pos");
     stringMap["Y Pos"] = tr("Y Pos");
 
+    stringMap["deviceState"] = tr("Device State");
+    stringMap["deviceConnectedState"] = tr("Connected");
+    stringMap["deviceErrorState"] = tr("Device Error");
+    stringMap["deviceIdleState"] = tr("Device Idle");
+    stringMap["deviceMachiningState"] = tr("Machining");
+    stringMap["devicePausedState"] = tr("Paused");
+    stringMap["deviceUnconnectedState"] = tr("Unconnected");
+    stringMap["documentState"] = tr("Document State");
+    stringMap["documentEmptyState"] = tr("Empty Document");
+    stringMap["documentIdleState"] = tr("Document Idle");
+    stringMap["documentPrimitiveState"] = tr("Primitive State");
+    stringMap["documentPrimitiveEllipseState"] = tr("Ellipse State");
+    stringMap["documentPrimitiveEllipseCreatingState"] = tr("Creating Ellipse");
+    stringMap["documentPrimitiveEllipseReadyState"] = tr("Ellipse Ready");
+    stringMap["documentPrimitiveLineState"] = tr("Line State");
+    stringMap["documentPrimitiveLineCreatingState"] = tr("Creating Line");
+    stringMap["documentPrimitiveLineReadyState"] = tr("Line Ready");
+    stringMap["documentPrimitivePolygonState"] = tr("Polygon State");
+    stringMap["documentPrimitivePolygonCreatingState"] = tr("Creating Polygon");
+    stringMap["documentPrimitivePolygonReadyState"] = tr("Polygon Ready");
+    stringMap["documentPrimitivePolygonStartRectState"] = tr("");
+    stringMap["documentPrimitiveRectState"] = tr("Rect State");
+    stringMap["documentPrimitiveRectCreatingState"] = tr("Creaing Rect");
+    stringMap["documentPrimitiveRectReadyState"] = tr("Rect Ready");
+    stringMap["documentPrimitiveSplineState"] = tr("Spline State");
+    stringMap["documentPrimitiveSplineCreatingState"] = tr("Creating Spline");
+    stringMap["documentPrimitiveSplineEditState"] = tr("Editing Spline");
+    stringMap["documentPrimitiveSplineReadyState"] = tr("Spline Ready");
+    stringMap["documentPrimitiveTextState"] = tr("Text State");
+    stringMap["documentPrimitiveTextCreatingState"] = tr("Creating Text");
+    stringMap["documentPrimitiveTextReadyState"] = tr("Text Ready");
+    stringMap["documentPrintAndCutState"] = tr("Print And Cut");
+    stringMap["documentSelectedState"] = tr("Selected");
+    stringMap["documentSelectedEditingState"] = tr("Selected Editing");
+    stringMap["documentSelectingState"] = tr("Selecting");
+    stringMap["documentSelectionState"] = tr("Selection");
+    stringMap["documentTransformingState"] = tr("Transforming");
+    stringMap["documentViewDragState"] = tr("Drag State");
+    stringMap["documentViewDragReadyState"] = tr("Ready Draging");
+    stringMap["documentViewDragingState"] = tr("Draging");
+    stringMap["documentWorkingState"] = tr("Document Working");
+    stringMap["finishState"] = tr("Finished");
+    stringMap["initState"] = tr("Initialized");
+    stringMap["workingState"] = tr("Working");
+
     Config::updateTitlesAndDescriptions();
 
     emit app->languageChanged();
@@ -325,9 +370,15 @@ void LaserApplication::retranslate()
 QString LaserApplication::str(const QString& key)
 {
     if (stringMap.contains(key))
+    {
+        if (stringMap[key].isEmpty())
+            return key;
         return stringMap[key];
+    }
     else
+    {
         return key;
+    }
 }
 
 int LaserApplication::exec()

@@ -226,11 +226,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
     // init status bar
-    m_statusBarStatus = new QLabel;
-    m_statusBarStatus->setText(ltr("Tips"));
-    m_statusBarStatus->setMinimumWidth(60);
-    m_statusBarStatus->setAlignment(Qt::AlignHCenter);
-    m_ui->statusbar->addWidget(m_statusBarStatus);
+    m_statusBarDeviceStatus = new QLabel;
+    m_statusBarDeviceStatus->setText(ltr("Tips"));
+    m_statusBarDeviceStatus->setMinimumWidth(60);
+    m_statusBarDeviceStatus->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarDeviceStatus);
 
     m_statusBarRegister = new Label;
     m_statusBarRegister->setText(ltr("Unregistered"));
@@ -270,6 +270,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarPageInfo->setMinimumWidth(150);
     m_statusBarPageInfo->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarPageInfo);
+
+    m_statusBarAppStatus = new QLabel;
+    m_statusBarAppStatus->setText("");
+    m_statusBarAppStatus->setMinimumWidth(120);
+    m_statusBarAppStatus->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarAppStatus);
 
     m_statusBarProgress = new ProgressBar;
     m_statusBarProgress->setMinimum(0);
@@ -645,11 +651,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &LaserControllerWindow::onLayoutChanged);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
+    connect(&StateController::instance(), &StateController::stateEntered, this, &LaserControllerWindow::onStateEntered);
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceUnconnectedState);
     connect(StateController::instance().deviceConnectedState(), &QState::entered, this, &LaserControllerWindow::onEnterDeviceConnectedState);
 	connect(StateController::instance().documentPrimitiveSplineState(), &QState::exited, this, &LaserControllerWindow::onCreatSpline);
 	connect(StateController::instance().documentIdleState(), &QState::entered, m_viewer, &LaserViewer::onDocumentIdle);
-
     connect(StateController::instance().documentPrimitiveTextState(), &QState::exited, this, [=] {
         //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
     });
@@ -913,6 +919,7 @@ LaserControllerWindow::~LaserControllerWindow()
 {
 	m_propertyWidget = nullptr;
     m_textFontWidget = nullptr;
+    m_statusBarAppStatus = nullptr;
     
 	if (m_viewer->undoStack()) {
 		delete m_viewer->undoStack();
@@ -964,20 +971,46 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
 
 void LaserControllerWindow::findPrintAndCutPoints(const QRectF& bounding)
 {
-    QList<QPointF> points = findCanvasPointsWithinRect(bounding);
+    m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     
-    for (const QPointF& pt : points)
+    if (m_printAndCutCandidatePoints.length() == 1)
     {
-        QPointF ptCandidate = LaserApplication::device->transformToDevice()
-            .map(Global::matrixToUm().map(pt));
-        qLogD << "canvas point: " << pt << ", " << ptCandidate;
-        m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
+        m_selectedPrintAndCutPointIndex = 0;
+        QPointF selectedPt = m_printAndCutCandidatePoints.at(m_selectedPrintAndCutPointIndex);
+        m_tablePrintAndCutPoints->setCanvasPoint(selectedPt);
+        onActionPrintAndCutEndSelect();
     }
 }
 
 void LaserControllerWindow::clearPrintAndCutCandidatePoints()
 {
     m_printAndCutCandidatePoints.clear();
+}
+
+void LaserControllerWindow::setPrintAndCutPoint(const QPointF& pt)
+{
+    m_selectedPrintAndCutPointIndex = hoveredPrintAndCutPoint(pt);
+    if (m_selectedPrintAndCutPointIndex >= 0)
+    {
+        QPointF selectedPt = m_printAndCutCandidatePoints.at(m_selectedPrintAndCutPointIndex);
+        m_tablePrintAndCutPoints->setCanvasPoint(selectedPt);
+    }
+}
+
+int LaserControllerWindow::hoveredPrintAndCutPoint(const QPointF& mousePos) const
+{
+    qreal radius = 3;
+    qreal radius2 = radius * radius;
+    for (int i = 0; i < m_printAndCutCandidatePoints.length(); i++)
+    {
+        QPointF pt = m_printAndCutCandidatePoints.at(i);
+        qreal squaredLength = QVector2D(pt - mousePos).lengthSquared();
+        if (squaredLength <= radius2)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
@@ -3602,9 +3635,11 @@ void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
 {
+    m_selectedPrintAndCutPointIndex = -1;
     m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutSelectPoint);
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutEndSelect);
     emit startPrintAndCut();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
@@ -3612,7 +3647,9 @@ void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
     m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutEndSelect);
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
     clearPrintAndCutCandidatePoints();
+    m_selectedPrintAndCutPointIndex = -1;
     emit finishPrintAndCut();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionRedLightAlignmentStart(bool checked)
@@ -3671,12 +3708,12 @@ void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 
 void LaserControllerWindow::onDeviceConnected()
 {
-    m_statusBarStatus->setText(tr("Connected"));
+    m_statusBarDeviceStatus->setText(tr("Connected"));
 }
 
 void LaserControllerWindow::onDeviceDisconnected()
 {
-    m_statusBarStatus->setText(tr("Disconnected"));
+    m_statusBarDeviceStatus->setText(tr("Disconnected"));
 }
 
 void LaserControllerWindow::onMainCardRegistrationChanged(bool registered)
@@ -3897,7 +3934,7 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
     }
 }
 
-void LaserControllerWindow::onLaserReturnWorkState(LaserState state)
+void LaserControllerWindow::onLaserReturnWorkState(DeviceState state)
 {
     //m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
     m_lineEditCoordinatesX->setText(QString::number(state.pos.x() * 0.001, 'f', 2));
@@ -3994,6 +4031,42 @@ void LaserControllerWindow::updateUserOriginSelection(const QVariant& index)
         dest->setChecked(true);
         dest->blockSignals(false);
     }
+}
+
+void LaserControllerWindow::onStateEntered(QAbstractState* state)
+{
+    QStringList titles;
+    QList<QAbstractState*> states;
+    QSet<QAbstractState*> dels;
+    for (QAbstractState* st : StateController::instance().currentStates())
+    {
+        states.append(st);
+    }
+    for (QAbstractState* st : states)
+    {
+        QAbstractState* parent = st->parentState();
+        while (parent)
+        {
+            dels.insert(parent);
+            parent = parent->parentState();
+        }
+    }
+    for (QAbstractState* st : dels)
+    {
+        states.removeOne(st);
+    }
+    for (QAbstractState* st : states)
+    {
+        LaserState* state = qobject_cast<LaserState*>(st);
+        LaserFinalState* finalState = qobject_cast<LaserFinalState*>(st);
+        if (state)
+            titles.append(state->title());
+        if (finalState)
+            titles.append(finalState->title());
+    }
+    QString info = titles.join(" | ");
+    if (m_statusBarAppStatus)
+        m_statusBarAppStatus->setText(info);
 }
 
 void LaserControllerWindow::lightOnLaser()
@@ -4887,6 +4960,7 @@ void LaserControllerWindow::createNewDocument()
 {
 	LaserDocument* doc = new LaserDocument(m_scene);
 	initDocument(doc);
+    doc->open();
 }
 
 QString LaserControllerWindow::getCurrentFileName()

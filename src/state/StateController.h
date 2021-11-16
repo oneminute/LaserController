@@ -19,45 +19,74 @@
 
 #define StateControllerInst StateController::instance()
 
+class ILaserState
+{
+public:
+    ILaserState(const QString& title);
+    QString title() const;
+
+private:
+    QString m_title;
+};
+
+class LaserState : public QState, public ILaserState
+{
+    Q_OBJECT
+public:
+    explicit LaserState(const QString& title);
+    ~LaserState();
+};
+
+class LaserFinalState : public QFinalState, public ILaserState
+{
+    Q_OBJECT
+public:
+    explicit LaserFinalState(const QString& title);
+    ~LaserFinalState();
+};
+
 #define DECL_STATE(state) \
     public: \
-        QState* state##State() const { return reinterpret_cast<QState*>(STATES_MEMBER[#state]); } \
+        LaserState* state##State() const { return reinterpret_cast<LaserState*>(STATES_MEMBER[#state]); } \
     public slots: \
         void on##state##StateEntered() \
         { \
             if (DEBUG_STATES) \
                 qDebug().noquote() << "enter state " << #state; \
-            STATES_CURRENT.insert(state##State()->objectName()); \
+            STATES_CURRENT.insert(state##State()); \
+            emit stateEntered(state##State()); \
         } \
         void on##state##StateExited() \
         { \
             if (DEBUG_STATES) \
                 qDebug().noquote() << "exit state " << #state; \
-            STATES_CURRENT.remove(state##State()->objectName()); \
+            STATES_CURRENT.remove(state##State()); \
+            emit stateExited(state##State()); \
         }
 
 #define DECL_FINAL_STATE(state) \
     public: \
-        QFinalState* state##State() const { return reinterpret_cast<QFinalState*>(STATES_MEMBER[#state]); } \
+        LaserFinalState* state##State() const { return reinterpret_cast<LaserFinalState*>(STATES_MEMBER[#state]); } \
     public slots: \
         void on##state##StateEntered() \
         { \
             if (DEBUG_STATES) \
                 qDebug().noquote() << "enter state " << #state; \
-            STATES_CURRENT.insert(state##State()->objectName()); \
+            STATES_CURRENT.insert(state##State()); \
+            emit stateEntered(state##State()); \
         }
 
 #define DEFINE_STATE(state) \
-    QState* state##State = new QState(); \
+    LaserState* state##State = new LaserState(#state"State"); \
     state##State->setObjectName(#state"State"); \
-    connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
-    connect(state##State, &QState::exited, this, &StateController::on##state##StateExited); \
+    connect(state##State, &LaserState::entered, this, &StateController::on##state##StateEntered); \
+    connect(state##State, &LaserState::exited, this, &StateController::on##state##StateExited); \
     STATES_MEMBER.insert(#state, state##State); 
 
 #define DEFINE_FINAL_STATE(state) \
-    QFinalState* state##State = new QFinalState(); \
+    LaserFinalState* state##State = new LaserFinalState(#state"State"); \
     state##State->setObjectName(#state"State"); \
-    connect(state##State, &QState::entered, this, &StateController::on##state##StateEntered); \
+    connect(state##State, &LaserState::entered, this, &StateController::on##state##StateEntered); \
     STATES_MEMBER.insert(#state, state##State); 
 
 #define DEFINE_CHILD_STATE(parent, state) \
@@ -123,7 +152,7 @@ public:
     static bool isInState(QAbstractState* state);
     static bool anyState(const QList<QAbstractState*>& states);
     static bool allStates(const QList<QAbstractState*>& states);
-    QSet<QString> currentStates();
+    QSet<QAbstractState*> currentStates();
 
 #pragma region top level states
     DECL_STATE(init)
@@ -188,11 +217,15 @@ public:
     DECL_FINAL_STATE(finish)
 #pragma endregion top level states
 
+signals:
+    void stateEntered(QAbstractState* state);
+    void stateExited(QAbstractState* state);
+
 private:
     QStateMachine* m_fsm;
 
     QMap<QString, QAbstractState*> m_states;
-    QSet<QString> m_currentStates;
+    QSet<QAbstractState*> m_currentStates;
 };
 
 #endif // STATECONTROLLER_H

@@ -218,15 +218,34 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     {
         if (m_mousePressed)
         {
-            painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-            if (m_isLeftSelecting) {
-                painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
-            }
-            else {
-                painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
-            }
-
+            painter.setPen(QPen(Qt::blue, 1, Qt::DashLine));
             painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
+        }
+
+        QList<QPointF> points = LaserApplication::mainWindow->printAndCutCandidatePoints();
+        for (const QPointF& pt : points)
+        {
+            painter.setBrush(QBrush(Qt::blue, Qt::BrushStyle::SolidPattern));
+            QPointF circlePt = mapFromScene(pt.toPoint());
+            painter.drawEllipse(QRectF(circlePt - QPointF(3, 3), circlePt + QPointF(3, 3)));
+        }
+        QPointF mousePoint = mapToScene(m_mousePoint);
+        int index = LaserApplication::mainWindow->hoveredPrintAndCutPoint(mousePoint);
+        if (index >= 0)
+        {
+            QPointF selectedPt = points.at(index);
+            painter.setBrush(QBrush(Qt::blue, Qt::BrushStyle::SolidPattern));
+            QPointF circlePt = mapFromScene(selectedPt.toPoint());
+            painter.drawEllipse(QRectF(circlePt - QPointF(4, 4), circlePt + QPointF(4, 4)));
+        }
+
+        index = LaserApplication::mainWindow->selectedPrintAndCutPoint();
+        if (index >= 0)
+        {
+            QPointF selectedPt = points.at(index);
+            painter.setBrush(QBrush(Qt::red, Qt::BrushStyle::SolidPattern));
+            QPointF circlePt = mapFromScene(selectedPt.toPoint());
+            painter.drawEllipse(QRectF(circlePt - QPointF(3, 3), circlePt + QPointF(3, 3)));
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
@@ -2024,16 +2043,20 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
     {
         QGraphicsView::mouseReleaseEvent(event);
+        m_mousePressed = false;
         if (utils::checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
             //点中空白且press与release同一个点
+            QPointF meanPt = (m_selectionStartPoint + m_selectionEndPoint) / 2;
+            meanPt = mapToScene(meanPt.toPoint());
+            LaserApplication::mainWindow->setPrintAndCutPoint(meanPt);
             return;
         }
 
         QRectF areaRect(mapToScene(m_selectionStartPoint.toPoint()), 
             mapToScene(m_selectionEndPoint.toPoint()));
         LaserApplication::mainWindow->findPrintAndCutPoints(areaRect);
-        m_mousePressed = false;
+        viewport()->update();
     }
     //select
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))

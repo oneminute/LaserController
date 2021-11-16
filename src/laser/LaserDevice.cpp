@@ -68,7 +68,7 @@ public:
 
     bool mainCardActivated;
     bool mainCardRegistered;
-    LaserState lastState;
+    DeviceState lastState;
 };
 
 void LaserDevicePrivate::updateDeviceOriginAndTransform()
@@ -1493,7 +1493,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_MachineWorking:
     {
-        LaserState state;
+        DeviceState state;
         if (state.parse(message))
         {
             d->lastState = state;

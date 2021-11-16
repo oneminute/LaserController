@@ -216,10 +216,10 @@ enum MainCardActivateResult
     MAR_Other
 };
 
-struct LaserState
+struct DeviceState
 {
 public:
-    LaserState()
+    DeviceState()
         : operation(0)
         , packageNo(0)
         , workingMode(LaserWorkMode::LWM_STOP)
@@ -247,7 +247,7 @@ public:
         return true;
     }
 };
-Q_DECLARE_METATYPE(LaserState)
+Q_DECLARE_METATYPE(DeviceState)
 
 
 #endif // LASERDEFINES_H

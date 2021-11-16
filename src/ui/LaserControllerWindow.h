@@ -78,15 +78,12 @@ public:
         return m_printAndCutCandidatePoints;
     }
     void clearPrintAndCutCandidatePoints();
-    QPointF selectedPrintAndCutPoint() const
+    int selectedPrintAndCutPoint() const
     {
-        return m_selectedPrintAndCutPoint;
+        return m_selectedPrintAndCutPointIndex;
     }
-    void setPrintAndCutPoint(const QPointF& pt)
-    {
-        m_selectedPrintAndCutPoint = pt;
-    }
-    QPointF hoveredPrintAndCutPoint(const QPointF& mousePos) const;
+    void setPrintAndCutPoint(const QPointF& pt);
+    int hoveredPrintAndCutPoint(const QPointF& mousePos) const;
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -261,7 +258,7 @@ protected slots:
     void onComboBoxSxaleIndexChanged(int index);
     void onComboBoxSxaleTextChanged(const QString& text);
 
-    void onLaserReturnWorkState(LaserState state);
+    void onLaserReturnWorkState(DeviceState state);
     void onLayoutChanged(const QSizeF& size);
     void onFloatEditSliderLaserPower(qreal value);
     void onFloatDualEditSliderLowerValueChanged(qreal value);
@@ -275,6 +272,8 @@ protected slots:
     void onPreviewWindowProgressUpdated(qreal progress);
     void onUserOriginConfigValueChanged(const QVariant& index, ModifiedBy modifiedBy);
     void updateUserOriginSelection(const QVariant& index);
+
+    void onStateEntered(QAbstractState* state);
 
     void lightOnLaser();
     void lightOffLaser();
@@ -507,7 +506,7 @@ private:
     ads::CDockWidget* m_dockPrintAndCut;
     ads::CDockAreaWidget* m_dockAreaPrintAndCut;
     QList<QPointF> m_printAndCutCandidatePoints;
-    QPointF m_selectedPrintAndCutPoint;
+    int m_selectedPrintAndCutPointIndex;
 
     bool m_created;
     QDir m_tmpDir;
@@ -516,7 +515,8 @@ private:
     bool m_prepareMachining;
 
     // widgets on status bar
-    QLabel* m_statusBarStatus;
+    QLabel* m_statusBarDeviceStatus;
+    QLabel* m_statusBarAppStatus;
     Label* m_statusBarRegister;
     Label* m_statusBarActivation;
     QLabel* m_statusBarTips;

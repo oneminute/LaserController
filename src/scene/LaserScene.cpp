@@ -272,33 +272,12 @@ void LaserScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 QSet<LaserPrimitive*> LaserScene::findPrimitivesByRect(const QRectF& rect)
 {
     QSet<LaserPrimitive*> primitives;
-    QList<QLineF> selectionEdges;
-    utils::rectEdges(rect, selectionEdges);
     //tree 查找
     QList<QuadTreeNode*> nodes = m_quadTree->search(rect);
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
-                QRectF bounds = primitive->sceneBoundingRect();
-                //图元外包框整个被selection包裹
-                selectedByBounds(bounds, rect, primitive);
-                //图元的边与selection的边交叉
-                bool isIntersected = false;
-                QVector<QLineF> edges = primitive->edges();
-                for (QLineF selectionEdge : selectionEdges) {
-                    for (QLineF edge : edges) {
-                        QPointF p;
-                        if (selectionEdge.intersect(edge, &p) == QLineF::BoundedIntersection) {
-                            isIntersected = true;
-                            primitives.insert(primitive);
-                            break;
-                        }
-                    }
-                    if (isIntersected) {
-                        isIntersected = false;
-                        break;
-                    }
-                }
+                primitives.insert(primitive);
             }
         }
     }
