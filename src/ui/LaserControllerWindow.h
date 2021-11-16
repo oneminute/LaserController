@@ -104,6 +104,14 @@ public slots:
     void retranslate();
 	
 protected:
+    //recent files
+    void loadRecentFilesMenu();
+    void addRecentFile(QString path);
+    void deleteRecentFile(QString path);
+    void updataRecentFilesActions();
+    void updataRecentFilesFile();
+    QString RecentFilesFilePath();
+    //panel
     void createCentralDockPanel();
     void createLayersDockPanel();
     void createCameraDockPanel();
@@ -596,6 +604,10 @@ private:
     int m_MultiDuplicationVDirection;
     qreal m_MultiDuplicationHDistance;
     qreal m_MultiDuplicationVDistance;
+    //recent files
+    QMenu* m_recentFilesMenu;
+    QList<QString> m_recentFileList;
+    int m_maxRecentFilesSize;
 
     friend class LaserApplication;
 };
