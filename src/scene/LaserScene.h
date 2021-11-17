@@ -52,6 +52,7 @@ public:
     void updateValidMaxRegionRect();
     void updataValidMaxRegion();
     void updateTree();
+
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;

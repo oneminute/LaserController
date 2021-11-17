@@ -159,3 +159,9 @@ void PointPairTableWidget::setCanvasPoint(const QPointF& point)
     itemX->setData(Qt::UserRole, pt);
     itemY->setData(Qt::EditRole, QString::number(pt.y() * 0.001, 'f', 3));
 }
+
+bool PointPairTableWidget::isEmpty() const
+{
+    return rowCount() == 0;
+}
+

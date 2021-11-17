@@ -59,9 +59,6 @@ public:
     QTransform printAndCutTransform;
     PointPairList pointPairs;
 
-    //QRectF boundingRect;
-    QElapsedTimer boundingRectTimer;
-
     QMap<LaserPrimitiveType, int> typeMax;
 
     QRectF bounding;
@@ -88,6 +85,7 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
 	d->layers[item->layerIndex()]->addPrimitive(item);
+    updateDocumentBounding();
 }
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
@@ -95,6 +93,7 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
     item->layer()->removePrimitive(item);
     layer->addPrimitive(item);
     updateLayersStructure();
+    updateDocumentBounding();
 }
 
 void LaserDocument::removePrimitive(LaserPrimitive* item)
@@ -103,6 +102,7 @@ void LaserDocument::removePrimitive(LaserPrimitive* item)
     item->layer()->removePrimitive(item);
     scene()->removeLaserPrimitive(item);
     d->primitives.remove(item->id());
+    updateDocumentBounding();
 }
 
 //PageInformation LaserDocument::pageInformation() const
@@ -1367,8 +1367,6 @@ void LaserDocument::init()
         this, &LaserDocument::updateDocumentBounding);
     connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromMouse,
         this, &LaserDocument::updateDocumentBounding);
-    
-    d->boundingRectTimer.start();
 }
 
 void LaserDocument::outlineByLayers(OptimizeNode* node, ProgressItem* progress)

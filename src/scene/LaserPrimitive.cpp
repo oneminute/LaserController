@@ -2124,8 +2124,8 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& la
     boundingRect = LaserApplication::device->transformToDevice().mapRect(boundingRect);
 
     int dpi = d->layer->dpi();
-    int pixelWidth = Global::mechToSceneH(boundingRect.width());
-    int pixelHeight = Global::mechToSceneV(boundingRect.height());
+    int pixelWidth = boundingRect.width() / 25400.0 * dpi;
+    int pixelHeight = boundingRect.height() / 25400.0 * dpi;
 
     int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
 

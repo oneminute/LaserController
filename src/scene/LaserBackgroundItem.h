@@ -3,19 +3,23 @@
 
 #include <QGraphicsRectItem>
 #include <QGraphicsItemGroup>
-class LaserBackgroundItem : public QGraphicsItemGroup
+class LaserBackgroundItem : public QObject, public QGraphicsItemGroup
 {
+	Q_OBJECT
 public:
 	explicit LaserBackgroundItem(QGraphicsItem *parent = nullptr);
-	LaserBackgroundItem(const QRectF &rect, QGraphicsItem *parent = nullptr);
 	~LaserBackgroundItem();
 
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-	void onChangeGrids();//ÖØÐÂ¼ÆËãnodeÖµ
+	void onChangeGrids();//ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½nodeÖµ
 	void drawGrids(QPainter& painter);
-	bool detectGridNode(QPointF& point, QPointF & mousePoint);//¼ì²â»æÖÆÊ±µÄÆðµã»òÖÕµãÊÇ·ñÓ¦¸Ã±»ÉèÎªÍø¸ñÖÐµÄnodeµã
+	bool detectGridNode(QPointF& point, QPointF & mousePoint);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½Ç·ï¿½Ó¦ï¿½Ã±ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½nodeï¿½ï¿½
 	QRectF rect();
+
+protected:
+	void onLayoutChanged(const QSizeF& size);
+
 private:
 	QList<qreal> m_gridNodeXList;
 	QList<qreal> m_gridNodeYList;
@@ -25,4 +29,5 @@ private:
     QRectF m_maxRegion;
 
 };
+
 #endif // LASERBACKGROUNDITEM_H

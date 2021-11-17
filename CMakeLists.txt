@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0074 NEW)
 cmake_policy(SET CMP0087 OLD)
+cmake_policy(SET CMP0121 NEW)
 
 project(CNELaser LANGUAGES CXX)
 
@@ -124,6 +125,7 @@ set(OTHER_FILES
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
     src/res/laser.rc
+    cmake/GenerateConstraints.cmake
     .gitignore
     ${TRANSLATIONS}
 )
@@ -218,26 +220,30 @@ set(LINK_LIBRARIES
     qtadvanceddocking
 )
 
+add_custom_target(GenerateConstraints ALL
+    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateConstraints.cmake"
+)
+
 if(ANDROID)
   add_library(CNELaser SHARED ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS} ${TS_FILES})
 else()
   add_executable(CNELaser ${SRC_FILES} ${SRC_FILES} ${HEADER_FILES} ${OTHER_FILES} ${DOCS})
 endif()
 
-#if(WIN32)
-#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
-#   set_target_properties(CNELaser PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
-#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
-#   set_target_properties(CNELaser PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
-#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:windows")
-#   set_target_properties(CNELaser PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows")
-#endif(WIN32)
+add_dependencies(CNELaser GenerateConstraints)
 
 target_link_libraries(CNELaser PRIVATE ${LINK_LIBRARIES})
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
+
+#add_custom_command(TARGET CNELaser
+#    PRE_BUILD
+#    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateConstraints.cmake"
+#    DEPENDS CNELaser
+#)
+
 
 add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
 target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})

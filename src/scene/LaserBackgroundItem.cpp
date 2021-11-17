@@ -8,31 +8,29 @@
 #include <QStyleOptionGraphicsItem>
 #include "scene/LaserPrimitive.h"
 
+#include "LaserApplication.h"
 #include "widget//LaserViewer.h"
 #include "common/common.h"
 #include "common/Config.h"
-LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem *parent) 
-	:QGraphicsItemGroup(parent)
-{
-	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
-}
-LaserBackgroundItem::LaserBackgroundItem(const QRectF & rect, QGraphicsItem * parent)
+#include "laser/LaserDevice.h"
+
+LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem * parent)
 	: QGraphicsItemGroup(parent)
 {
+	QRectF rect = LaserApplication::device->layoutRectInScene();
+    qDebug() << "deivce bounds in pixel:" << rect;
+
 	m_rectItem = new QGraphicsRectItem(rect);
+	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
+
 	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
 	pen.setCosmetic(true);
 	m_rectItem->setPen(pen);
 	addToGroup(m_rectItem);
-	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
 
-    QPen pen1(Qt::black, 1.0f, Qt::SolidLine);
-    pen1.setCosmetic(true);
-    qreal maxSize = Global::mmToSceneHF(3000);
-
-    QRectF m_maxRegion = QRectF(rect.left(), rect.top(), maxSize, maxSize);
-    
+    connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &LaserBackgroundItem::onLayoutChanged);
 }
+
 LaserBackgroundItem::~LaserBackgroundItem()
 {
 }
@@ -272,4 +270,11 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 QRectF LaserBackgroundItem::rect()
 {
 	return m_rectItem->rect();
+}
+
+void LaserBackgroundItem::onLayoutChanged(const QSizeF& size)
+{
+	QRectF rect = LaserApplication::device->layoutRectInScene();
+    qDebug() << "deivce bounds in pixel:" << rect;
+	m_rectItem->setRect(rect);
 }

@@ -629,9 +629,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionPrintAndCutAlign, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutAlign);
     connect(m_ui->actionPrintAndCutRestore, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutRestore);
     connect(m_ui->actionStartRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentStart);
+    connect(m_ui->actionFinishRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentFinish);
     connect(m_ui->actionPrintAndCutSelectPoint, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutSelectPoint);
     connect(m_ui->actionPrintAndCutEndSelect, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutEndSelect);
-    connect(m_ui->actionFinishRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentFinish);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -815,8 +815,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
-    ADD_TRANSITION(documentIdleState, documentPrintAndCutState, this, SIGNAL(startPrintAndCut()));
-    ADD_TRANSITION(documentPrintAndCutState, documentIdleState, this, SIGNAL(finishPrintAndCut()));
+    ADD_TRANSITION(documentIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentSelectionState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentPrintAndCutSelectingState, documentIdleState, this, SIGNAL(finishPrintAndCutSelecting()));
+    ADD_TRANSITION(documentIdleState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentSelectionState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentPrintAndCutAligningState, documentIdleState, this, SIGNAL(finishPrintAndCutAligning()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
@@ -911,6 +917,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
+    m_layoutRect = LaserApplication::device->layoutRectInScene();
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 }
@@ -972,6 +979,7 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
 void LaserControllerWindow::findPrintAndCutPoints(const QRectF& bounding)
 {
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
+    m_selectedPrintAndCutPointIndex = -1;
     
     if (m_printAndCutCandidatePoints.length() == 1)
     {
@@ -2387,6 +2395,11 @@ PointPairList LaserControllerWindow::printAndCutPoints() const
     return m_tablePrintAndCutPoints->pointPairs();
 }
 
+bool LaserControllerWindow::hasPrintAndCutPoints() const
+{
+    return !m_tablePrintAndCutPoints->isEmpty();
+}
+
 LaserDocument* LaserControllerWindow::currentDocument() const
 {
     return m_viewer->scene()->document();
@@ -2747,6 +2760,7 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
     if (dialog.exec() == QDialog::Accepted)
     {
         m_tableWidgetLayers->updateItems();
+        m_scene->document()->updateDocumentBounding();
     }
 }
 
@@ -2850,6 +2864,12 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //{
             //QString filename = file.fileName();
 
+        if (!LaserApplication::device->checkLayoutForMachining(
+            m_scene->document()->machiningDocBoundingRectInDevice(),
+            m_scene->document()->machiningDocBoundingRectInDevice(true)
+        ))
+            return;
+
         LaserApplication::resetProgressWindow();
         //LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
@@ -2897,6 +2917,13 @@ void LaserControllerWindow::onActionBounding(bool checked)
 {
     if (!m_scene->document())
         return;
+
+    if (!LaserApplication::device->checkLayoutForMachining(
+        m_scene->document()->machiningDocBoundingRectInDevice(),
+        m_scene->document()->machiningDocBoundingRectInDevice(true)
+    ))
+        return;
+
     m_scene->document()->exportBoundingJSON();
     QFileInfo fileInfo("tmp/bounding.json");
     QString filePath = fileInfo.absoluteFilePath();
@@ -3582,17 +3609,18 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     Config::Ui::gridContrastItem()->setValue(gridContrast);
     Config::Ui::showDocumentBoundingRectItem()->setValue(showDocBounding);*/
     m_viewer->viewport()->update();
-    m_viewer->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutRemove(bool checked)
 {
     m_tablePrintAndCutPoints->removeSelected();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutClear(bool checked)
 {
     m_tablePrintAndCutPoints->clearContents();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
@@ -3622,15 +3650,23 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
     m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x()).arg(diff.y()));
 
+    if (!StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+    {
+        emit startPrintAndCutAligning();
+    }
+
     m_scene->document()->setEnablePrintAndCut(true);
     m_scene->document()->setPrintAndCutTransform(t);
     m_scene->document()->setPrintAndCutPointPairs(pointPairs);
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 {
     m_scene->document()->setEnablePrintAndCut(false);
     m_scene->document()->setPrintAndCutTransform(QTransform());
+    emit finishPrintAndCutAligning();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
@@ -3638,7 +3674,7 @@ void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
     m_selectedPrintAndCutPointIndex = -1;
     m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutSelectPoint);
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutEndSelect);
-    emit startPrintAndCut();
+    emit startPrintAndCutSelecting();
     m_viewer->viewport()->update();
 }
 
@@ -3648,7 +3684,7 @@ void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
     clearPrintAndCutCandidatePoints();
     m_selectedPrintAndCutPointIndex = -1;
-    emit finishPrintAndCut();
+    emit finishPrintAndCutSelecting();
     m_viewer->viewport()->update();
 }
 
@@ -3944,9 +3980,39 @@ void LaserControllerWindow::onLaserReturnWorkState(DeviceState state)
 
 void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
 {
+    /*if (m_scene->document())
+    {
+        int result = QMessageBox::question(this, tr("Close Document"),
+            tr("Device layout changed. We should close current document. Do you want to save it or close it without saving?"),
+            QMessageBox::StandardButton::Save, QMessageBox::StandardButton::Close);
+    }*/
+    QRectF newRect = LaserApplication::device->layoutRectInScene();
+    QPointF offset;
+    switch (Config::SystemRegister::deviceOrigin())
+    {
+    case 1:
+        offset = newRect.bottomLeft() - m_layoutRect.bottomLeft();
+        break;
+    case 2:
+        offset = newRect.bottomRight() - m_layoutRect.bottomRight();
+        break;
+    case 3:
+        offset = newRect.topRight() - m_layoutRect.topRight();
+        break;
+    }
+
+    if (m_scene->document())
+    {
+        QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
+        m_scene->document()->transform(t);
+        m_scene->document()->updateDocumentBounding();
+    }
+
+    m_layoutRect = newRect;
     m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
         .arg(LaserApplication::device->layoutWidth())
         .arg(LaserApplication::device->layoutHeight()));
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
@@ -5085,6 +5151,7 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
 
     QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
     m_scene->document()->transform(t);
+    m_scene->document()->updateDocumentBounding();
     m_viewer->viewport()->update();
 }
 

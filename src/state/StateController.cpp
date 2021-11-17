@@ -20,15 +20,18 @@ StateController::StateController(QObject* parent)
 
     DEFINE_CHILD_INIT_STATE(document, documentEmpty);
     DEFINE_CHILD_STATE(document, documentWorking);
+
     DEFINE_CHILD_INIT_STATE(documentWorking, documentIdle);
     DEFINE_CHILD_STATE(documentWorking, documentSelection);
 	DEFINE_CHILD_STATE(documentWorking, documentViewDrag);
+    DEFINE_CHILD_STATE(documentWorking, documentTransforming);
+    DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
+	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCutSelecting);
+	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCutAligning);
+
     DEFINE_CHILD_INIT_STATE(documentSelection, documentSelecting);
     DEFINE_CHILD_STATE(documentSelection, documentSelected);
 	DEFINE_CHILD_STATE(documentSelection, documentSelectedEditing);
-    DEFINE_CHILD_STATE(documentWorking, documentTransforming);
-    DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
-	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCut);
 
 	DEFINE_CHILD_INIT_STATE(documentViewDrag, documentViewDragReady);
 	DEFINE_CHILD_STATE(documentViewDrag, documentViewDraging);

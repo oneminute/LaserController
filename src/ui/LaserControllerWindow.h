@@ -68,6 +68,7 @@ public:
     LaserDoubleSpinBox* fontSpaceYDoubleSpinBox();
 
     PointPairList printAndCutPoints() const;
+    bool hasPrintAndCutPoints() const;
 
     LaserViewer* viewer() const { return m_viewer; }
     LaserScene* scene() const { return m_scene; }
@@ -326,8 +327,10 @@ signals:
 	void readySplineEdit();
 	void readyText();
 	void readyViewDrag();
-    void startPrintAndCut();
-    void finishPrintAndCut();
+    void startPrintAndCutSelecting();
+    void finishPrintAndCutSelecting();
+    void startPrintAndCutAligning();
+    void finishPrintAndCutAligning();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
@@ -340,6 +343,7 @@ private:
     RulerWidget* m_vRuler;
     QComboBox* m_comboBoxScale;
     ads::CDockAreaWidget* m_centralDockArea;
+    QRectF m_layoutRect;
 
     // Layers Panel widgets
     LaserLayerTableWidget* m_tableWidgetLayers;
