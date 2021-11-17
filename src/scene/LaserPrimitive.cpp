@@ -2108,7 +2108,7 @@ QRectF LaserBitmap::bounds() const
     return d->boundingRect; 
 }
 
-QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& lastPoint)
+QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& lastPoint, QPointF& residual)
 { 
     Q_D(LaserBitmap);
     QByteArray ba;
@@ -2145,7 +2145,7 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& la
     qDebug() << "out height:" << outHeight;
 
     cv::Mat resized;
-    cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight));
+    cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight), cv::INTER_NEAREST);
     
     qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
@@ -2153,7 +2153,8 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPointF& la
         QTransform t = d->doc->transformToReletiveOriginInDevice();
         boundingRect = t.mapRect(boundingRect);
     }
-    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingRect, pixelInterval, lastPoint, accLength);
+    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingRect, pixelInterval, 
+        lastPoint, residual, accLength);
 
     parentProgress->finish();
     return ba; 
@@ -2329,7 +2330,7 @@ QDebug operator<<(QDebug debug, const LaserPrimitive & item)
     return debug;
 }
 
-QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint)
+QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint, QPointF& residual)
 {
     Q_D(LaserShape);
     QByteArray bytes;
@@ -2378,7 +2379,7 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint)
     
     qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
     bytes = imageUtils::image2EngravingData(progress, resized, 
-        boundingRectInMech, pixelInterval, lastPoint, accLength);
+        boundingRectInMech, pixelInterval, lastPoint, residual, accLength);
 
     return bytes;
 }

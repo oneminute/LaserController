@@ -275,6 +275,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QJsonArray layers;
     QPointF lastPoint;
+    QPointF residual(0, 0);
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
         lastPoint = docOriginInDevice();
     
@@ -349,7 +350,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, transformPrintAndCut));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, residual, transformPrintAndCut));
                     items.append(itemObjCutting);
                 }
             }
@@ -361,7 +362,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObj["Type"] = primitive->typeLatinName();
                     itemObj["Style"] = LaserLayerType::LLT_CUTTING;
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Points to Plt").arg(primitive->name()), exportProgress);
-                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, transformPrintAndCut));
+                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, residual, transformPrintAndCut));
                     items.append(itemObj);
                 }
             }
@@ -374,7 +375,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     if (layer->fillingType() == FT_Line)
                     {
                         LaserLineListList lineList = primitive->generateFillData(lastPoint);
-                        QByteArray data = machiningUtils::lineList2Plt(progress, lineList, lastPoint);
+                        QByteArray data = machiningUtils::lineList2Plt(progress, lineList, lastPoint, residual);
                         if (!data.isEmpty())
                         {
                             itemObj["Type"] = primitive->typeLatinName();
@@ -409,7 +410,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, transformPrintAndCut));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, residual, transformPrintAndCut));
                     items.append(itemObjCutting);
                 }
             }
@@ -498,6 +499,7 @@ void LaserDocument::exportBoundingJSON()
     int index = 0;
     bool isMiddle = false;
     QPointF lastPoint = docOriginInDevice();
+    QPointF residual(0, 0);
     if (Config::Device::startFrom() == SFT_AbsoluteCoords)
     {
         switch (Config::SystemRegister::deviceOrigin())
@@ -589,7 +591,7 @@ void LaserDocument::exportBoundingJSON()
     
     itemObj["Type"] = "Rect";
     itemObj["Style"] = LaserLayerType::LLT_CUTTING;
-    itemObj["Data"] = QString(machiningUtils::pointList2Plt(nullptr, points2, lastPoint, t));
+    itemObj["Data"] = QString(machiningUtils::pointList2Plt(nullptr, points2, lastPoint, residual, t));
     items.append(itemObj);
 
     layerObj["Items"] = items;
