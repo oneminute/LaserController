@@ -41,6 +41,7 @@
 #include <QPainter>
 #include <QtConcurrent>
 #include <QDialogButtonBox>
+#include <QTextStream>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -80,6 +81,7 @@
 #include "widget/RadioButtonGroup.h"
 #include "widget/PointPairTableWidget.h"
 #include "widget/Label.h"
+#include "exception/LaserException.h"
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
@@ -95,6 +97,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	, m_selectionOriginalState(SelectionOriginalCenter)
     , m_textFontWidget(nullptr)
     , m_propertyWidget(nullptr)
+    , m_recentFilesMenu(nullptr)
     , m_lastLockedState(Qt::Unchecked)
     , m_lockEqualRatio(false)
     , m_updateDialog(nullptr)
@@ -105,9 +108,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_MultiDuplicationVDirection(0)
     , m_MultiDuplicationHDistance(5)
     , m_MultiDuplicationVDistance(5)
+    , m_maxRecentFilesSize(10)
 {
     m_ui->setupUi(this);
-
+    loadRecentFilesMenu();
+    
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
     CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
@@ -1327,6 +1332,138 @@ void LaserControllerWindow::onFontSpaceYEnterOrLostFocus()
     m_viewer->setFocus();
     m_viewer->modifyTextCursor();
     m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::loadRecentFilesMenu()
+{
+    if (!m_recentFilesMenu) {
+        m_recentFilesMenu = m_ui->menuFile->addMenu(tr("Recent Files"));
+    }   
+    try {
+        QString path = RecentFilesFilePath();
+        QFile file(path);
+        if (file.exists()) {
+            if(!file.open(QFile::Text | QFile::ReadOnly)) {
+                file.close();
+            }
+        }
+        else {
+            //create
+            file.open(QFile::Truncate | QIODevice::WriteOnly);
+            file.close();
+            return;
+        }       
+        QTextStream fileStream(&file);
+        m_recentFileList.clear();
+        int size = m_recentFileList.size();
+        while (!fileStream.atEnd() && size < m_maxRecentFilesSize) {
+            QString recentFilePath = fileStream.readLine();
+            m_recentFileList.prepend(recentFilePath);
+        } 
+        qDebug() << fileStream.readAll();
+        file.close();
+        updataRecentFilesActions();
+    }
+    catch (...)
+    {
+        throw new LaserFileException(tr("Save config file error."));
+    }
+}
+
+void LaserControllerWindow::addRecentFile(QString path)
+{
+    if (!m_recentFileList.isEmpty() && m_recentFileList[0] == path) {
+        return;
+    }
+    if (!m_recentFilesMenu) {
+        m_recentFilesMenu = m_ui->menuFile->addMenu(tr("Recent Files"));
+    }
+    if (m_recentFileList.contains(path)) {
+        m_recentFileList.removeOne(path);
+    }
+    if (m_recentFileList.size() < m_maxRecentFilesSize) {
+        m_recentFileList.prepend(path);
+    }
+    else {
+        m_recentFileList.removeLast();
+        m_recentFileList.prepend(path);
+    }
+    updataRecentFilesActions();
+    updataRecentFilesFile();
+}
+
+void LaserControllerWindow::deleteRecentFile(QString path)
+{
+    m_recentFileList.removeOne(path);
+    updataRecentFilesActions();
+    updataRecentFilesFile();
+}
+
+void LaserControllerWindow::updataRecentFilesActions()
+{
+    if (!m_recentFilesMenu) {
+        return;
+    }
+    m_recentFilesMenu->clear();
+    int index = 0;
+    for (QString path : m_recentFileList) {
+        index += 1;
+        QString name = QString::number(index) +QString(". ") + path;
+        QAction* action = m_recentFilesMenu->addAction(QIcon(":/ui/icons/images/file.png"), name);
+        connect(action, &QAction::triggered, [=] {
+            if (path == "") {
+                return;
+            }
+            QFile file(path);
+            if (!file.open(QIODevice::ReadOnly)) {
+                QMessageBox::warning(this, tr("Warning"), tr("The path has not exists, system will delete the recent file record."));
+                deleteRecentFile(path);
+                return;
+            }
+            m_fileDirection = path;
+            setWindowTitle(getCurrentFileName() + " - ");
+            //创建document
+            createNewDocument();
+            m_scene->document()->load(m_fileDirection, this);
+            addRecentFile(m_fileDirection);
+        });
+    }
+}
+
+void LaserControllerWindow::updataRecentFilesFile()
+{
+    
+    try {
+        QString path = RecentFilesFilePath();
+        QFile file(path);
+        if(!file.open(QFile::Truncate | QIODevice::ReadWrite)) {
+            file.close();
+            return;
+        }
+        QTextStream fileStream(&file);
+        for (QString path : m_recentFileList) {
+            QString name = path.trimmed() + QString("\n");
+            fileStream << name;
+        }
+        file.close();
+    }
+    catch (...)
+    {
+        throw new LaserFileException(tr("Save config file error."));
+    }
+    
+    
+}
+
+QString LaserControllerWindow::RecentFilesFilePath()
+{
+    QDir dataPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+    if (!dataPath.exists("CNELaser"))
+    {
+        dataPath.mkdir("CNELaser");
+    }
+    dataPath.cd("CNELaser");
+    return dataPath.absoluteFilePath("recent_files.txt");
 }
 
 void LaserControllerWindow::createCentralDockPanel()
@@ -2585,6 +2722,7 @@ void LaserControllerWindow::onActionImport(bool checked)
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Importing"), nullptr);
         importer->import(filename, m_scene, progress);
         progress->finish();
+        addRecentFile(filename);
     }
 }
 
@@ -2603,6 +2741,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
     importer->import("", m_scene, progress, params);
     progress->finish();
+    
 }
 
 void LaserControllerWindow::onActionNew(bool checked)
@@ -2648,6 +2787,7 @@ bool LaserControllerWindow::onActionSaveAs(bool checked)
 	m_fileDirection = name;
 	setWindowTitle(getCurrentFileName() + " - ");
 	m_scene->document()->save(name, this);
+    addRecentFile(name);
 	return true;
 }
 
@@ -2669,6 +2809,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 	//创建document
 	createNewDocument();
 	m_scene->document()->load(name, this);
+    addRecentFile(name);
 }
 
 void LaserControllerWindow::onActionZoomIn(bool checked)

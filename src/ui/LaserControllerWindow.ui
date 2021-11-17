@@ -1398,6 +1398,11 @@
     <string>Hide Laser Position</string>
    </property>
   </action>
+  <action name="action4">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>
