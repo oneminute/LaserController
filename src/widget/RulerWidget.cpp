@@ -164,7 +164,16 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		
 		if (m_original.y() > 0) {
 			dimension = rect.bottom() - m_original.y();
-			drawRuler(m_original.y() - rect.top(), textCoef, painter, false);
+
+            if (Config::SystemRegister::deviceOrigin() == 0 || Config::SystemRegister::deviceOrigin() == 3) {
+                drawRuler(m_original.y() - rect.top(), textCoef, painter, false, true);
+                drawRuler(dimension, textCoef, painter, true, false);
+            }
+            else {
+                drawRuler(m_original.y() - rect.top(), textCoef, painter, false, false);
+                drawRuler(dimension, textCoef, painter, true, true);
+            }
+			
 		}
 		else {
 			dimension = rect.height() + (-m_original.y());
@@ -175,24 +184,34 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		
 		if (m_original.x() > 0) {
 			dimension = rect.right() - m_original.x();
-			drawRuler(m_original.x() - rect.left(), textCoef, painter, false);
+            if (Config::SystemRegister::deviceOrigin() == 0 || Config::SystemRegister::deviceOrigin() == 1) {
+                drawRuler(m_original.x() - rect.left(), textCoef, painter,false, true);
+                drawRuler(dimension, textCoef, painter, true, false);
+            }
+            else {
+                drawRuler(m_original.x() - rect.left(), textCoef, painter, false, false);
+                drawRuler(dimension, textCoef, painter, true, true);
+            }
+			
+            
 		}
 		else {
 			dimension = rect.width() + (-m_original.x());
+            drawRuler(dimension, textCoef, painter);
 		}
-		drawRuler(dimension, textCoef, painter);
+
+		
 	}
 }
-
-void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive)
+//isNegative: m_original在viewer这个控件中的位置x,y是否为负值
+void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isNegative, bool showMinusSign)
 {
 	//text
 	QFont font = painter.font();
 	font.setPixelSize(m_textMaxSize);
 	painter.setFont(font);
 	painter.setPen(QPen(QColor(200, 200, 200), 1));
-    
-	
+    	
 	//size
 	QRectF rect = this->rect();
 	int longSize = qRound(dimension / m_longUnit);
@@ -204,14 +223,14 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
     }
     else {
         //水平方向显示符号
-        if (!isPositive) {
+        if (showMinusSign) {
             textCoef *= -1;
         }
     }
     
 	for (int i = 0; i <= longSize; i++) {		
 		float longStart = originalStart + i * m_longUnit;
-		if (!isPositive) {
+		if (!isNegative) {
 			longStart = originalStart - i * m_longUnit;
 		}
 		if (m_isVertical) {
@@ -232,7 +251,7 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 				int length = number_str.length();
 				if (m_scale <= 8) {
                     //垂直方向的负值与水平方向的相反
-                    if (isPositive) {
+                    if (i > 0 && showMinusSign) {
                         painter.drawText(edge - 2, longStart + 10, QString("-"));
 
                     }
@@ -271,7 +290,7 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 			int mediumSize = qRound(m_longUnit / m_mediumUnit);
 			for (int mi = 1; mi < mediumSize; mi++) {
 				float mStart = longStart + mi * m_mediumUnit;
-				if (!isPositive) {
+				if (!isNegative) {
 					mStart = longStart - mi * m_mediumUnit;
 				}
 				if (m_isVertical) {
@@ -280,12 +299,12 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 				else {
 					painter.drawLine(QPointF(mStart, edge + 10), QPointF(mStart, edge + m_minHeightSize));
 				}
-				drawSmallUnit(m_mediumUnit, mStart, edge, painter, isPositive);
+				drawSmallUnit(m_mediumUnit, mStart, edge, painter, isNegative);
 			}
-			drawSmallUnit(m_mediumUnit, longStart, edge, painter, isPositive);
+			drawSmallUnit(m_mediumUnit, longStart, edge, painter, isNegative);
 		}
 		else {
-			drawSmallUnit(m_longUnit, longStart, edge, painter, isPositive);
+			drawSmallUnit(m_longUnit, longStart, edge, painter, isNegative);
 		}
 	}
     //放大到一定比例时，unit显示刻度
@@ -293,12 +312,12 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
         int smallSize = qRound(dimension / m_unit);
         float unitStart = originalStart;
         if (m_isVertical) {
-            if (isPositive) {
-                painter.drawText(edge - 2, edge + 8, QString("-"));
+            if (showMinusSign) {
+                //painter.drawText(edge - 2, edge + 8, QString("-"));
             }
         }
         else {
-            if (!isPositive) {
+            if (showMinusSign) {
                 
             }
         }
@@ -309,20 +328,20 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
             }
             painter.setPen(QPen(QColor(63, 63, 63), 1));
             unitStart = originalStart + sj * m_unit;
-            if (!isPositive) {
+            if (!isNegative) {
                 unitStart = originalStart - sj * m_unit;
             }
             if (m_isVertical) {
                 //垂直方向的负值与水平方向的相反，垂直方向显示符号
-                if (sj > 0 && isPositive) {
+                if (sj > 0 && showMinusSign) {
                     painter.drawText(QPointF(edge - 3, unitStart + 10), QString("-"));
                 }
                 for (int j = 0; j < number_str.size(); j++) {
                     painter.drawText(QPointF(edge + 3, unitStart + 10 + j * font.pixelSize()), QString(number_str[j]));
                 }
-            }
+            } 
             else {
-                if (sj > 0 && !isPositive) {
+                if (sj > 0 && showMinusSign) {
                     painter.drawText(QPointF(unitStart-2, edge + 8), QString("-"));
                 }
                 painter.drawText(QPointF(unitStart + 2, edge + 8), number_str);
