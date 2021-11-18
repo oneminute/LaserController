@@ -41,7 +41,7 @@ private:
 	qreal m_textMaxSize = 10;
 	//qreal m_textMinSize = 9;
 private :
-	void drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isPositive = true);
+	void drawRuler(qreal dimension, int textCoef, QPainter& painter, bool isNegative = true, bool showMinusSign = false);
 	void drawMediumUnit(qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isPositive = true);
 	void drawSmallUnit(qreal _length, qreal _left, qreal _top, QPainter& _painter, bool isToRight = true);
 public slots:
