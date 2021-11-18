@@ -332,7 +332,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
 
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Engraving").arg(primitive->name()), exportProgress);
-                    QByteArray data = primitive->engravingImage(progress, lastPoint);
+                    QByteArray data = primitive->engravingImage(progress, lastPoint, residual);
                     if (!data.isEmpty())
                     {
                         itemObj["Type"] = primitive->typeLatinName();

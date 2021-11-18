@@ -1219,7 +1219,7 @@ void Config::loadDeviceItems()
         QPointF(0, 0),
         DT_POINT
     );
-    redLightOffset->setReadOnly(true);
+    redLightOffset->setVisible(false);
 }
 
 void Config::loadUserReigsters()

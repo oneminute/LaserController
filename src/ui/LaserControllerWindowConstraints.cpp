@@ -1520,7 +1520,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutNew
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutNew, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutNew, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutNew, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutNew, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutNew, "enabled", true, deviceIdleState);
@@ -1533,7 +1532,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutFetchLaser
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchLaser, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchLaser, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchLaser, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchLaser, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchLaser, "enabled", true, deviceIdleState);
@@ -1544,22 +1542,8 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchLaser, "enabled", false, documentPrintAndCutAligningState);
     // end m_ui->actionPrintAndCutFetchLaser
 
-    // begin m_ui->actionPrintAndCutFetchCanvas
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, devicePausedState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, deviceErrorState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentPrintAndCutAligningState);
-    // end m_ui->actionPrintAndCutFetchCanvas
-
     // begin m_ui->actionPrintAndCutClear
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutClear, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutClear, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutClear, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutClear, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutClear, "enabled", true, deviceIdleState);
@@ -1572,7 +1556,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutAlign
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, deviceIdleState);
@@ -1585,7 +1568,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutRestore
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRestore, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRestore, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRestore, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRestore, "enabled", false, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRestore, "enabled", false, deviceIdleState);
@@ -1598,7 +1580,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutRemove
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRemove, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRemove, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRemove, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRemove, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutRemove, "enabled", true, deviceIdleState);
@@ -1611,7 +1592,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionStartRedLightAlight
     BIND_PROP_TO_STATE(m_ui->actionStartRedLightAlight, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionStartRedLightAlight, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionStartRedLightAlight, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionStartRedLightAlight, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionStartRedLightAlight, "enabled", true, deviceIdleState);
@@ -1624,7 +1604,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionFinishRedLightAlight
     BIND_PROP_TO_STATE(m_ui->actionFinishRedLightAlight, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionFinishRedLightAlight, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionFinishRedLightAlight, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionFinishRedLightAlight, "enabled", false, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionFinishRedLightAlight, "enabled", false, deviceIdleState);
@@ -1638,17 +1617,19 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionPrintAndCutSelectPoint
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", true, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", false, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", false, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", true, documentPrintAndCutAligningState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutSelectPoint, "enabled", false, documentPrintAndCutAligningState);
     // end m_ui->actionPrintAndCutSelectPoint
 
     // begin m_ui->actionPrintAndCutEndSelect
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", true, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", true, documentPrintAndCutAligningState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentPrintAndCutAligningState);
     // end m_ui->actionPrintAndCutEndSelect
 
 

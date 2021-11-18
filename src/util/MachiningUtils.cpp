@@ -332,7 +332,8 @@ void machiningUtils::polygon2Points(
         progress->finish();
 }
 
-QByteArray machiningUtils::pointListList2Plt(ProgressItem* progress, const LaserPointListList& pointList, QPointF& lastPoint, QPointF& residual, const QTransform& t)
+QByteArray machiningUtils::pointListList2Plt(ProgressItem* progress, 
+    const LaserPointListList& pointList, QPointF& lastPoint, QPointF& residual, const QTransform& t)
 {
     QByteArray buffer;
     int total = 0;
@@ -359,16 +360,18 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
 
     QPointF pt = t.map(points.first().toPointF());
     QPointF diff = pt - lastPoint;
-    lastPoint = pt;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
     {
         QPoint rel = calculateResidual(diff, residual);
-        buffer.append(QString("pu%1 %2;").arg(rel.x()).arg(rel.y()));
+        //buffer.append(QString("pu%1 %2;").arg(rel.x()).arg(rel.y()));
+        buffer.append(QString("pu%1 %2;").arg(qRound(pt.x()) - qRound(lastPoint.x()))
+            .arg(qRound(pt.y()) - qRound(lastPoint.y())));
     }
     else
     {
         buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
     }
+    lastPoint = pt;
     for (size_t i = 1; i < points.size(); i++)
     {
         LaserPoint lPt = points.at(i);
@@ -397,7 +400,9 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
         {
             command = command.toLower();
             QPoint rel = calculateResidual(diff, residual);
-            buffer.append(command.arg(rel.x()).arg(rel.y()));
+            //buffer.append(command.arg(rel.x()).arg(rel.y()));
+            buffer.append(command.arg(qRound(pt.x()) - qRound(lastPoint.x()))
+                .arg(qRound(pt.y()) - qRound(lastPoint.y())));
         }
         else
         {
@@ -418,27 +423,28 @@ QPoint machiningUtils::calculateResidual(const QPointF& diff, QPointF& residual)
     if (residual.x() >= 1)
     {
         x += 1;
-        residual.setX(residual.x() + 1);
+        residual.setX(residual.x() - 1);
     }
     else if (residual.x() <= -1)
     {
         x -= 1;
-        residual.setX(residual.x() - 1);
+        residual.setX(residual.x() + 1);
     }
     if (residual.y() >= 1)
     {
         y += 1;
-        residual.setY(residual.y() + 1);
+        residual.setY(residual.y() - 1);
     }
     else if (residual.y() <= -1)
     {
         y -= 1;
-        residual.setY(residual.y() - 1);
+        residual.setY(residual.y() + 1);
     }
     return QPoint(x, y);
 }
 
-QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineListList& lineList, QPointF& lastPoint, QPointF& residual)
+QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, 
+    const LaserLineListList& lineList, QPointF& lastPoint, QPointF& residual)
 {
     QByteArray buffer;
     // 建立所有线点的kdtree
@@ -506,17 +512,24 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineL
             {
                 command1 = command1.toLower();
                 command2 = command2.toLower();
-                QPoint rel = calculateResidual(diff1, residual);
-                buffer.append(command1.arg(rel.x()).arg(rel.y()));
-                rel = calculateResidual(diff2, residual);
-                buffer.append(command2.arg(rel.x()).arg(rel.y()));
+                //QPoint rel = calculateResidual(diff1, residual);
+                //buffer.append(command1.arg(rel.x()).arg(rel.y()));
+                //rel = calculateResidual(diff2, residual);
+                //buffer.append(command2.arg(rel.x()).arg(rel.y()));
+
+                buffer.append(command1.arg(qRound(pt1.x()) - qRound(lastPoint.x()))
+                    .arg(qRound(pt1.y()) - qRound(lastPoint.y())));
+                lastPoint = pt1;
+                buffer.append(command1.arg(qRound(pt2.x()) - qRound(lastPoint.x()))
+                    .arg(qRound(pt2.y()) - qRound(lastPoint.y())));
+                lastPoint = pt2;
             }
             else
             {
                 buffer.append(command1.arg(qRound(pt1.x())).arg(qRound(pt1.y())));
                 buffer.append(command2.arg(qRound(pt2.x())).arg(qRound(pt2.y())));
+                lastPoint = pt2;
             }
-            lastPoint = pt2;
         }
         forward = !forward;
         progress->increaseProgress();

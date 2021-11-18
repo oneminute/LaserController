@@ -628,7 +628,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionPrintAndCutNew, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutNew);
     connect(m_ui->actionPrintAndCutFetchLaser, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutFetchLaser);
-    connect(m_ui->actionPrintAndCutFetchCanvas, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutFetchCanvas);
     connect(m_ui->actionPrintAndCutRemove, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutRemove);
     connect(m_ui->actionPrintAndCutClear, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutClear);
     connect(m_ui->actionPrintAndCutAlign, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutAlign);
@@ -2049,9 +2048,11 @@ void LaserControllerWindow::createPrintAndCutPanel()
     buttonFetchLaser->setDefaultAction(m_ui->actionPrintAndCutFetchLaser);
     buttonsLayout->addWidget(buttonFetchLaser);
     m_buttonPrintAndCutFetchCanvas = new QToolButton;
-    //buttonFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutFetchCanvas);
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
     buttonsLayout->addWidget(m_buttonPrintAndCutFetchCanvas);
+    m_buttonPrintAndCutFinishFetchCanvas = new QToolButton;
+    m_buttonPrintAndCutFinishFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutEndSelect);
+    buttonsLayout->addWidget(m_buttonPrintAndCutFinishFetchCanvas);
     QToolButton* buttonRemove = new QToolButton;
     buttonRemove->setDefaultAction(m_ui->actionPrintAndCutRemove);
     buttonsLayout->addWidget(buttonRemove);
@@ -3812,17 +3813,14 @@ void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
 {
+    onActionSelectionTool();
     m_selectedPrintAndCutPointIndex = -1;
-    m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutSelectPoint);
-    m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutEndSelect);
     emit startPrintAndCutSelecting();
     m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
 {
-    m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutEndSelect);
-    m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
     clearPrintAndCutCandidatePoints();
     m_selectedPrintAndCutPointIndex = -1;
     emit finishPrintAndCutSelecting();

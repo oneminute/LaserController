@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1298,11 +1298,6 @@
   <action name="actionPrintAndCutFetchLaser">
    <property name="text">
     <string>Fetch Laser</string>
-   </property>
-  </action>
-  <action name="actionPrintAndCutFetchCanvas">
-   <property name="text">
-    <string>Fetch Canvas</string>
    </property>
   </action>
   <action name="actionPrintAndCutClear">

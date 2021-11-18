@@ -504,6 +504,7 @@ private:
     QGroupBox* m_groupBoxPrintAndCutPoints;
     PointPairTableWidget* m_tablePrintAndCutPoints;
     QToolButton* m_buttonPrintAndCutFetchCanvas;
+    QToolButton* m_buttonPrintAndCutFinishFetchCanvas;
     QGroupBox* m_groupBoxRedLightAlignment;
     QLabel* m_labelRedLightAlignmentFirst;
     QLabel* m_labelRedLightAlignmentSecond;
