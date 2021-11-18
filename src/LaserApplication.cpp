@@ -348,12 +348,12 @@ void LaserApplication::retranslate()
     stringMap["documentPrimitiveTextState"] = tr("Text State");
     stringMap["documentPrimitiveTextCreatingState"] = tr("Creating Text");
     stringMap["documentPrimitiveTextReadyState"] = tr("Text Ready");
-    stringMap["documentPrintAndCutState"] = tr("Print And Cut");
+    stringMap["documentPrintAndCutSelectingState"] = tr("Selecting In Canvas");
+    stringMap["documentPrintAndCutAligningState"] = tr("Aligning");
     stringMap["documentSelectedState"] = tr("Selected");
     stringMap["documentSelectedEditingState"] = tr("Selected Editing");
     stringMap["documentSelectingState"] = tr("Selecting");
     stringMap["documentSelectionState"] = tr("Selection");
-    stringMap["documentTransformingState"] = tr("Transforming");
     stringMap["documentViewDragState"] = tr("Drag State");
     stringMap["documentViewDragReadyState"] = tr("Ready Draging");
     stringMap["documentViewDragingState"] = tr("Draging");
@@ -473,6 +473,7 @@ void LaserApplication::handleLogOutput(QtMsgType type, const QMessageLogContext&
 void LaserApplication::onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy)
 {
     retranslate();
+    device->updateDriverLanguage();
 }
 
 void LaserApplication::onEnterDeviceUnconnectedState()

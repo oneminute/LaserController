@@ -2307,26 +2307,14 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMotorCurrent = group->addConfigItem(
         "xMotorCurrent",
-        500,
+        50,
         DT_INT
-    );
-    xMotorCurrent->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    xMotorCurrent->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
     );
     xMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     xMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
-    xMotorCurrent->setInputWidgetProperty("step", 0.1);
+    xMotorCurrent->setInputWidgetProperty("step", 1);
     xMotorCurrent->setInputWidgetProperty("page", 10);
-    xMotorCurrent->setInputWidgetProperty("minimum", 0.1);
+    xMotorCurrent->setInputWidgetProperty("minimum", 0);
     xMotorCurrent->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* xStartSpeed = group->addConfigItem(
@@ -2590,26 +2578,14 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMotorCurrent = group->addConfigItem(
         "yMotorCurrent",
-        500,
+        50,
         DT_INT
-    );
-    yMotorCurrent->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    yMotorCurrent->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
     );
     yMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     yMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
-    yMotorCurrent->setInputWidgetProperty("step", 0.1);
+    yMotorCurrent->setInputWidgetProperty("step", 1);
     yMotorCurrent->setInputWidgetProperty("page", 10);
-    yMotorCurrent->setInputWidgetProperty("minimum", 1);
+    yMotorCurrent->setInputWidgetProperty("minimum", 0);
     yMotorCurrent->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* yStartSpeed = group->addConfigItem(
@@ -2875,26 +2851,14 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMotorCurrent = group->addConfigItem(
         "zMotorCurrent",
-        500,
+        50,
         DT_INT
-    );
-    zMotorCurrent->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    zMotorCurrent->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
     );
     zMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     zMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
-    zMotorCurrent->setInputWidgetProperty("step", 0.1);
+    zMotorCurrent->setInputWidgetProperty("step", 1);
     zMotorCurrent->setInputWidgetProperty("page", 10);
-    zMotorCurrent->setInputWidgetProperty("minimum", 1);
+    zMotorCurrent->setInputWidgetProperty("minimum", 0);
     zMotorCurrent->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* zStartSpeed = group->addConfigItem(
@@ -3518,15 +3482,15 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Scan return pos", nullptr));
 
     UserRegister::backlashXIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Backlash X Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash X Interval(mm)", nullptr), 
         QCoreApplication::translate("Config", "Backlash X interval", nullptr));
 
     UserRegister::backlashYIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Backlash Y Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash Y Interval(mm)", nullptr), 
         QCoreApplication::translate("Config", "Backlash Y interval", nullptr));
 
     UserRegister::backlashZIntervalItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Backlash Z Interval(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Backlash Z Interval(mm)", nullptr), 
         QCoreApplication::translate("Config", "Backlash Z interval", nullptr));
 
     UserRegister::defaultRunSpeedItem()->setTitleAndDesc(

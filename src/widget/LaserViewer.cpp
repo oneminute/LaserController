@@ -193,6 +193,20 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
 	//painter.drawPolygon (testRect);
 	//painter.drawPolygon(testBoundinRect);
+    if (LaserApplication::mainWindow->hasPrintAndCutPoints() &&
+        !StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
+    {
+	    painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
+        for (const PointPair& pt : LaserApplication::mainWindow->printAndCutPoints())
+        {
+            QPointF point = LaserApplication::device->transformDeviceToScene().map(pt.second);
+            point = mapFromScene(point);
+            QLineF line1(point + QPointF(-3, -3), point + QPointF(3, 3));
+            QLineF line2(point + QPointF(-3, 3), point + QPointF(3, -3));
+            painter.drawLine(line1);
+            painter.drawLine(line2);
+        }
+    }
 	
     if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
     {
@@ -214,7 +228,10 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         
         painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
     }
-    else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+    else if (StateControllerInst.anyState(QList<QAbstractState*>() 
+        << StateControllerInst.documentPrintAndCutSelectingState()
+        << StateControllerInst.documentPrintAndCutAligningState())
+        )
     {
         if (m_mousePressed)
         {
@@ -1499,7 +1516,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 emit beginSelecting();
             }
         }
-        else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+        else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
         {
             // 获取选框起点
             m_mousePressed = true;
@@ -1776,7 +1793,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
             }
         }
 	}
-    else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
     {
         m_selectionEndPoint = m_mousePoint;
         m_isLeftSelecting = false;
@@ -2039,8 +2056,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		return;
 	}
 
-    
-    if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutState()))
+    if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
     {
         QGraphicsView::mouseReleaseEvent(event);
         m_mousePressed = false;
@@ -4190,7 +4206,7 @@ void LaserViewer::selectedHandleScale()
 		}
 	}
 	QTransform t;
-	qDebug() << " rate: "<< rate;
+	//qDebug() << " rate: "<< rate;
 	switch (m_curSelectedHandleIndex) {
 		case 0: 
 		{

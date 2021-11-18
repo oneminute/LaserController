@@ -95,6 +95,10 @@ public:
     int showUpdateDialog();
     void showSoftwareUpdateWizard();
     void showFirmwareUpdateWizard();
+    void updateDriverLanguage();
+
+    bool checkLayoutForMoving(const QPointF& dest);
+    bool checkLayoutForMachining(const QRectF& docBounding, const QRectF& docBoundingAcc);
 
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;

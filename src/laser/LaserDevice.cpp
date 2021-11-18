@@ -696,9 +696,8 @@ void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int cur
 
 void LaserDevice::moveToMachining(const QVector3D& pos, bool xEnabled, bool yEnabled, bool zEnabled)
 {
-    // Get layout size
-    float layoutWidth = LaserApplication::device->layoutWidthMachining();
-    float layoutHeight = LaserApplication::device->layoutHeightMachining();
+    if (!checkLayoutForMoving(pos.toPointF()))
+        return;
 
     //QVector3D dest = utils::limitToLayout(pos, Config::SystemRegister::deviceOrigin(), layoutWidth, layoutHeight);
     QVector3D dest = pos;
@@ -781,6 +780,113 @@ void LaserDevice::showFirmwareUpdateWizard()
     Q_D(LaserDevice);
     if (d->driver)
         d->driver->startFirmwareUpdateWizard();
+}
+
+void LaserDevice::updateDriverLanguage()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
+}
+
+bool LaserDevice::checkLayoutForMoving(const QPointF& dest)
+{
+    QRectF bounding = LaserApplication::device->layoutRectInDevice();
+    if (bounding.contains(dest))
+        return true;
+    else
+    {
+        QMessageBox::warning(LaserApplication::mainWindow, tr("Exceed layout"), 
+            tr("The target point exceeds the device layout! Please check your target point."));
+        return false;
+    }
+}
+
+bool LaserDevice::checkLayoutForMachining(const QRectF& docBounding, const QRectF& docBoundingAcc)
+{
+    QRectF layoutRect = layoutRectInDevice();
+    QString info1 = "";
+    QString info2 = "";
+
+    bool ok1 = true;
+    bool ok2 = true;
+    bool needCheckAcc = docBounding != docBoundingAcc;
+    bool left = false;
+    bool right = false;
+
+    if (docBounding.left() < layoutRect.left())
+    {
+        ok1 = false;
+        info1.append(tr("Left edge of current document bounding exceeds device layout: %1mm\n")
+            .arg((layoutRect.left() - docBounding.left()) * 0.001, 0, 'f', 3));
+        left = true;
+    }
+    if (docBounding.top() < layoutRect.top())
+    {
+        ok1 = false;
+        info1.append(tr("Top edge of current document bounding exceeds device layout: %1mm\n")
+            .arg((layoutRect.top() - docBounding.left()) * 0.001, 0, 'f', 3));
+    }
+    if (docBounding.right() > layoutRect.right())
+    {
+        ok1 = false;
+        info1.append(tr("Right edge of current document bounding exceeds device layout: %1mm\n")
+            .arg((docBounding.right() - layoutRect.right()) * 0.001, 0, 'f', 3));
+        right = true;
+    }
+    if (docBounding.bottom() > layoutRect.bottom())
+    {
+        ok1 = false;
+        info1.append(tr("Bottom edge of current document bounding exceeds device layout: %1mm\n")
+            .arg((docBounding.bottom() - layoutRect.bottom()) * 0.001, 0, 'f', 3));
+    }
+
+    if (ok1)
+        info1 = tr("Document bounding is OK.\n");
+
+    if (needCheckAcc)
+    {
+        if (!left && docBoundingAcc.left() < layoutRect.left())
+        {
+            ok2 = false;
+            info2.append(tr("Left edge of current document bounding with acc interval exceeds device layout: %1mm\n")
+                .arg((layoutRect.left() - docBoundingAcc.left()) * 0.001, 0, 'f', 3));
+        }
+        if (!right && docBoundingAcc.right() > layoutRect.right())
+        {
+            ok2 = false;
+            info2.append(tr("Right edge of current document bounding with acc interval exceeds device layout: %1mm\n")
+                .arg((docBoundingAcc.right() - layoutRect.right()) * 0.001, 0, 'f', 3));
+        }
+
+        if (ok2)
+            info2 = tr("Document bounding with acc interval is OK.\n");
+    }
+
+    QString info;
+    if (ok1 && !ok2)
+    {
+        info = "";
+        info.append(info1);
+        info.append(info2);
+    }
+    else
+    {
+        if (!ok1)
+        {
+            info.append(info1);
+        }
+        if (!ok2)
+        {
+            info.append(info2);
+        }
+    }
+
+    info = info.trimmed();
+    if (!ok1 || !ok2)
+        QMessageBox::warning(LaserApplication::mainWindow, tr("Exceed layout"), info);
+
+    return ok1 && ok2;
 }
 
 LaserRegister* LaserDevice::userRegister(int addr) const
@@ -1654,7 +1760,7 @@ void LaserDevice::onLibraryInitialized()
     qLogD << "LaserDevice::onLibraryInitialized";
     d->driver->setupCallbacks();
     d->isInit = true;
-    d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
+    updateDriverLanguage();
     d->driver->getPortList();
 }
 
@@ -1725,11 +1831,13 @@ void LaserDevice::onConfigJobOriginChanged(const QVariant& value, ModifiedBy mod
 
 void LaserDevice::onLayerWidthChanged(const QVariant& value)
 {
+    updateDeviceOriginAndTransform();
     emit layoutChanged(QSizeF(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength()));
 }
 
 void LaserDevice::onLayerHeightChanged(const QVariant& value)
 {
+    updateDeviceOriginAndTransform();
     emit layoutChanged(QSizeF(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength()));
 }
 

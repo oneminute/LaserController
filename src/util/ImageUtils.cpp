@@ -1613,8 +1613,10 @@ cv::Mat imageUtils::rotateMat(cv::Mat src, float degrees)
 }
 
 QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
-    const QRectF& boundingRect, qreal rowInterval, QPointF& lastPoint, qreal accLength)
+    const QRectF& boundingRect, qreal rowInterval, QPointF& lastPoint, 
+    QPointF& residual, qreal accLength)
 {
+    cv::imwrite("tmp/engraving.bmp", mat);
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -1629,36 +1631,46 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
     for (int r = 0; r < mat.rows; r++)
     {
         yStart = boundingRect.top() + r * rowInterval;
-        int bitCount = 0;
         quint8 byte = 0;
+        int bitCount = 0;
 
         quint8 binCheck = 0;
+        quint8 lastBin;
         QList<quint8> rowBytes;
         //QString rowString;
+        bool same = true;
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
-            quint8 bin = pixel >= 255 ? 0 : 1;
+            quint8 bin = pixel >= 128 ? 0 : 0x80;
+            if (c == 0)
+                lastBin = bin;
+            else
+            {
+                same = same && (lastBin == bin);
+                lastBin = bin;
+            }
             //rowString.append(QString::number(bin));
             binCheck |= bin;
-            byte = byte << 1;
-            byte |= bin;
+            byte = byte | (bin >> (c % 8));
             bitCount++;
             if (bitCount == 8)
             {
+                bitCount = 0;
                 rowBytes.append(byte);
                 //stream << byte;
-                bitCount = 0;
                 byte = 0;
             }
         }
         //rowString.append("\n\r");
-        if (mat.cols % 8 != 0)
+        //rowBytes.append(byte);
+        if (bitCount != 0)
             rowBytes.append(byte);
             //stream << byte;
 
         if (binCheck)
         {
+            //fspc.setSame(same);
             if (forward)
             {
                 lastPoint = QPointF(xEnd + accLength, yStart);
@@ -1680,19 +1692,11 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
         progress->increaseProgress();
     }
 
-    //qreal outX;
-    //qreal outY = yStart;
-    //// 这里要反着计算
-    //if (!forward)
-    //{
-    //    outX = xEnd + accLength;
-    //}
-    //else
-    //{
-    //    outX = xStart - accLength;
-    //}
-    //lastPoint = QPointF(outX, outY);
+    residual = QPointF(0, 0);
     progress->finish();
+
+    //parseImageData(bytes);
+
     return bytes;
 }
 
@@ -1752,5 +1756,80 @@ bool imageUtils::hit(const QLineF& ray, const QPainterPath& target, QPointF& hit
 
     hitPos = closestPointTo(ray.p1(), intersection);
     return true;
+}
+
+QImage imageUtils::parseImageData(const QByteArray& data)
+{
+    QDataStream stream(const_cast<QByteArray*>(&data), QIODevice::ReadOnly);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    FillStyleAndPixelsCount fspc;
+    int bytesRead = 0;
+    int line = 0;
+    int minY = 0x7fffffff;
+    int maxY = 0;
+    int width = 0;
+    int height = 0;
+    QMap<int, QByteArray> lineBytes;
+    while (true)
+    {
+        int xStart;
+        int xEnd;
+        int yStart;
+        stream >> yStart
+            >> xStart
+            >> xEnd
+            >> fspc.code;
+        bytesRead += 4;
+        bool forward = xStart < xEnd;
+
+        if (yStart < minY)
+            minY = yStart;
+        if (yStart > maxY)
+            maxY = yStart;
+
+        if (width == 0)
+            width = fspc.count();
+        QByteArray grays;
+        grays.resize(fspc.count());
+        int bitCount = fspc.count() % 8 == 0 ? fspc.count() / 8 : fspc.count() / 8 + 1;
+        int counter = 0;
+        quint8 byte;
+        for (int i = 0; i < width; i++)
+        {
+            if (i % 8 == 0)
+            {
+                stream >> byte;
+                bytesRead++;
+            }
+            int bit = byte & (0x80 >> (i % 8));
+            quint8 pixel = bit ? 0 : 255;
+            if (forward)
+                grays[i] = pixel;
+            else
+                grays[width - i - 1] = pixel;
+        }
+        lineBytes.insert(line, grays);
+        line++;
+
+        if (bytesRead >= data.length())
+            break;
+    }
+
+    height = (maxY - minY) / 70;
+    QImage image(width, height, QImage::Format_Grayscale8);
+    image.fill(Qt::white);
+
+    for (QMap<int, QByteArray>::ConstIterator i = lineBytes.constBegin(); i != lineBytes.constEnd(); i++)
+    {
+        int row = i.key() - minY;
+        const QByteArray& data = i.value();
+        for (int col = 0; col < data.length(); col++)
+        {
+            image.setPixel(col, row, data[col]);
+        }
+    }
+    image.save("tmp/bitmap.bmp");
+
+    return image;
 }
 

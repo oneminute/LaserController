@@ -634,9 +634,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionPrintAndCutAlign, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutAlign);
     connect(m_ui->actionPrintAndCutRestore, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutRestore);
     connect(m_ui->actionStartRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentStart);
+    connect(m_ui->actionFinishRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentFinish);
     connect(m_ui->actionPrintAndCutSelectPoint, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutSelectPoint);
     connect(m_ui->actionPrintAndCutEndSelect, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutEndSelect);
-    connect(m_ui->actionFinishRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentFinish);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -820,8 +820,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
-    ADD_TRANSITION(documentIdleState, documentPrintAndCutState, this, SIGNAL(startPrintAndCut()));
-    ADD_TRANSITION(documentPrintAndCutState, documentIdleState, this, SIGNAL(finishPrintAndCut()));
+    ADD_TRANSITION(documentIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentSelectionState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentPrintAndCutSelectingState, documentIdleState, this, SIGNAL(finishPrintAndCutSelecting()));
+    ADD_TRANSITION(documentIdleState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentSelectionState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentPrintAndCutAligningState, documentIdleState, this, SIGNAL(finishPrintAndCutAligning()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
@@ -916,6 +922,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
+    m_layoutRect = LaserApplication::device->layoutRectInScene();
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 }
@@ -977,6 +984,7 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
 void LaserControllerWindow::findPrintAndCutPoints(const QRectF& bounding)
 {
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
+    m_selectedPrintAndCutPointIndex = -1;
     
     if (m_printAndCutCandidatePoints.length() == 1)
     {
@@ -2524,6 +2532,11 @@ PointPairList LaserControllerWindow::printAndCutPoints() const
     return m_tablePrintAndCutPoints->pointPairs();
 }
 
+bool LaserControllerWindow::hasPrintAndCutPoints() const
+{
+    return !m_tablePrintAndCutPoints->isEmpty();
+}
+
 LaserDocument* LaserControllerWindow::currentDocument() const
 {
     return m_viewer->scene()->document();
@@ -2888,6 +2901,7 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
     if (dialog.exec() == QDialog::Accepted)
     {
         m_tableWidgetLayers->updateItems();
+        m_scene->document()->updateDocumentBounding();
     }
 }
 
@@ -2991,6 +3005,12 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //{
             //QString filename = file.fileName();
 
+        if (!LaserApplication::device->checkLayoutForMachining(
+            m_scene->document()->machiningDocBoundingRectInDevice(),
+            m_scene->document()->machiningDocBoundingRectInDevice(true)
+        ))
+            return;
+
         LaserApplication::resetProgressWindow();
         //LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
@@ -3038,6 +3058,13 @@ void LaserControllerWindow::onActionBounding(bool checked)
 {
     if (!m_scene->document())
         return;
+
+    if (!LaserApplication::device->checkLayoutForMachining(
+        m_scene->document()->machiningDocBoundingRectInDevice(),
+        m_scene->document()->machiningDocBoundingRectInDevice(true)
+    ))
+        return;
+
     m_scene->document()->exportBoundingJSON();
     QFileInfo fileInfo("tmp/bounding.json");
     QString filePath = fileInfo.absoluteFilePath();
@@ -3723,17 +3750,18 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     Config::Ui::gridContrastItem()->setValue(gridContrast);
     Config::Ui::showDocumentBoundingRectItem()->setValue(showDocBounding);*/
     m_viewer->viewport()->update();
-    m_viewer->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutRemove(bool checked)
 {
     m_tablePrintAndCutPoints->removeSelected();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutClear(bool checked)
 {
     m_tablePrintAndCutPoints->clearContents();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
@@ -3763,15 +3791,23 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
     m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x()).arg(diff.y()));
 
+    if (!StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+    {
+        emit startPrintAndCutAligning();
+    }
+
     m_scene->document()->setEnablePrintAndCut(true);
     m_scene->document()->setPrintAndCutTransform(t);
     m_scene->document()->setPrintAndCutPointPairs(pointPairs);
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 {
     m_scene->document()->setEnablePrintAndCut(false);
     m_scene->document()->setPrintAndCutTransform(QTransform());
+    emit finishPrintAndCutAligning();
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
@@ -3779,7 +3815,7 @@ void LaserControllerWindow::onActionPrintAndCutSelectPoint(bool checked)
     m_selectedPrintAndCutPointIndex = -1;
     m_buttonPrintAndCutFetchCanvas->removeAction(m_ui->actionPrintAndCutSelectPoint);
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutEndSelect);
-    emit startPrintAndCut();
+    emit startPrintAndCutSelecting();
     m_viewer->viewport()->update();
 }
 
@@ -3789,7 +3825,7 @@ void LaserControllerWindow::onActionPrintAndCutEndSelect(bool checked)
     m_buttonPrintAndCutFetchCanvas->setDefaultAction(m_ui->actionPrintAndCutSelectPoint);
     clearPrintAndCutCandidatePoints();
     m_selectedPrintAndCutPointIndex = -1;
-    emit finishPrintAndCut();
+    emit finishPrintAndCutSelecting();
     m_viewer->viewport()->update();
 }
 
@@ -4085,9 +4121,39 @@ void LaserControllerWindow::onLaserReturnWorkState(DeviceState state)
 
 void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
 {
+    /*if (m_scene->document())
+    {
+        int result = QMessageBox::question(this, tr("Close Document"),
+            tr("Device layout changed. We should close current document. Do you want to save it or close it without saving?"),
+            QMessageBox::StandardButton::Save, QMessageBox::StandardButton::Close);
+    }*/
+    QRectF newRect = LaserApplication::device->layoutRectInScene();
+    QPointF offset;
+    switch (Config::SystemRegister::deviceOrigin())
+    {
+    case 1:
+        offset = newRect.bottomLeft() - m_layoutRect.bottomLeft();
+        break;
+    case 2:
+        offset = newRect.bottomRight() - m_layoutRect.bottomRight();
+        break;
+    case 3:
+        offset = newRect.topRight() - m_layoutRect.topRight();
+        break;
+    }
+
+    if (m_scene->document())
+    {
+        QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
+        m_scene->document()->transform(t);
+        m_scene->document()->updateDocumentBounding();
+    }
+
+    m_layoutRect = newRect;
     m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
         .arg(LaserApplication::device->layoutWidth())
         .arg(LaserApplication::device->layoutHeight()));
+    m_viewer->viewport()->update();
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
@@ -4536,556 +4602,556 @@ void LaserControllerWindow::onCanRedoChanged(bool can)
 	
 }
 
-void LaserControllerWindow::bindWidgetsProperties()
-{
-    //text font bar widget
-    BIND_PROP_TO_STATE(m_textFontWidget, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_textFontWidget, "enabled", false, documentEmptyState);
-    //text font bar widget
-    
-    // actionOpen
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentWorkingState);
-    // end actionOpen
-
-    // actionImport
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentWorkingState);
-    // end actionImportSVG
-
-	// actionNew
-	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentWorkingState);
-	// end actionNew
-
-    // actionImportCorelDraw
-    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentWorkingState);
-    // end actionImportCorelDraw
-
-    // actionExportJSON
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentWorkingState);
-    // end actionExportJSON
-
-    // actionSave
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentWorkingState);
-    // end actionSave
-
-    // actionSaveAs
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
-    // end actionSaveAs
-
-	// actionUndo
-	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentWorkingState);
-	// end actionUndo
-
-	// actionRedo
-	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentWorkingState);
-	// end actionRedo
-
-	// actionZoomIn
-	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", true, documentWorkingState);
-	// end actionZoomIn
-
-	// actionZoomOut
-	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", true, documentWorkingState);
-	// end actionZoomOut
-
-	// actionZoomToPage
-	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", true, documentWorkingState);
-	// end actionZoomToPage
-
-	// actionZoomToSelection
-	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", true, documentWorkingState);
-	// end actionZoomToSelection
-
-	// ZoomInput comboBoxScale
-	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", true, documentWorkingState);
-	// end ZoomInput comboBoxScale
-
-    // actionCloseDocument
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentWorkingState);
-    // end actionCloseDocument
-
-	// actionDeletePrimitive
-	BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentEmptyState);
-	// end actionDeletePrimitive
-
-	// actionCopy
-	BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentEmptyState);
-	// end actionCopy
-
-	// actionGroup
-	BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentEmptyState);
-	// end actionGroup
-
-	// actionUngroup
-	BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentEmptyState);
-	// end actionUngroup
-
-	// actionPaste
-	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", true, documentWorkingState);
-	// end actionPaste
-
-	// actionPasteInLine
-	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", true, documentWorkingState);
-	// end actionPasteInLine
-
-	// actionCut
-	BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentEmptyState);
-	// end actionCut
-
-	// actionDuplication
-	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentEmptyState);
-	// end actionDuplication
-
-    // actionMultiDuplication
-    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentEmptyState);
-    // end actionMultiDuplication
-
-	// actionMirrorHorizontal
-	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
-	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
-	// end actionMirrorHorizontal
-
-	// actionMirrorVertical
-	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
-	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
-	// end actionMirrorVertical
-
-    // actionMirrorAcrossLine
-    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentEmptyState);
-    // end actionMirrorAcrossLine
-
-    // actionAddEngravingLayer
-    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", true, documentWorkingState);
-    // end actionAddEngravingLayer
-
-    // actionAddCuttingLayer
-    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", true, documentWorkingState);
-    // end actionAddCuttingLayer
-
-    // actionConnect
-    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", true, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, devicePausedState);
-    // end actionConnect
-
-    // actionDisconnect
-    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePausedState);
-    // end actionDisconnect
-
-    // actionMachining
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePausedState);
-    // end actionMachining
-
-    // actionPause
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, devicePausedState);
-    // end actionPause
-
-    // actionStop
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePausedState);
-    // end actionStop
-
-    // actionLaserSpotShot
-    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, devicePausedState);
-    // end actionLaserSpotShot
-
-    // actionLaserCut
-    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", true, devicePausedState);
-    // end actionLaserCut
-
-    // actionLaserMove
-    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, devicePausedState);
-    // end actionLaserMove
-
-    // actionReset
-    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, devicePausedState);
-    // end actionReset
-
-    // actionMoveTop
-    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, devicePausedState);
-    // end actionMoveTop
-
-    // actionMoveBottom
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, devicePausedState);
-    // end actionMoveBottom
-
-    // actionMoveLeft
-    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, devicePausedState);
-    // end actionMoveLeft
-
-    // actionMoveRight
-    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, devicePausedState);
-    // end actionMoveRight
-
-    // actionMoveTopRight
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, devicePausedState);
-    // end actionMoveTopRight
-
-    // actionMoveTopLeft
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, devicePausedState);
-    // end actionMoveTopLeft
-
-    // actionMoveBottomLeft
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, devicePausedState);
-    // end actionMoveBottomLeft
-
-    // actionMoveBottomRight
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, devicePausedState);
-    // end actionMoveBottomRight
-
-    // actionMoveUp
-    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, devicePausedState);
-    // end actionMoveUp
-
-    // actionMoveDown
-    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, devicePausedState);
-    // end actionMoveDown
-
-    // actionMoveToOrigin
-    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, devicePausedState);
-    // end actionMoveToOrigin
-
-    // actionFetchToUserOrigin
-    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, devicePausedState);
-    // end actionFetchToUserOrigin
-
-    // actionSelectionTool
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentSelectionState);
-	
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, initState);	
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentViewDragState);
-    // end 
-	// actionViewDragTool
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragState);
-
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveTextState);
-	// end 
-
-    // actionRectangleTool
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", true, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentViewDragState);
-    // end actionRectangleTool
-
-	// actionElippseTool
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", true, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentViewDragState);
-	// end actionElippseTool
-
-	// actionLineTool
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", true, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentViewDragState);
-	// end actionLineTool
-
-	// actionPolygonTool
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", true, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentViewDragState);
-	// end actionPolygonTool
-
-	// actionSplineTool
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", true, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentViewDragState);
-	// end actionSplineTool
-
-	// actionSplineEditTool
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", true, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentViewDragState);
-	// end actionSplineEditTool
-
-	// actionTextTool
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentWorkingState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentIdleState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectionState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveRectState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveEllipseState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveLineState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitivePolygonState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineEditState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", true, documentPrimitiveTextState);
-	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentViewDragState);
-	// end actionTextTool
-
-	// actionBitmapTool
-	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentWorkingState);
-	// end actionBitmapTool
-
-    // actionRemoveLayer
-	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentIdleState);
-    // end actionRemoveLayer
-
-    // actionMoveLayerUp
-	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentIdleState);
-    // end actionMoveLayerUp
-
-    // actionMoveLayerDown
-	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentIdleState);
-    // end actionMoveLayerDown
-
-    // actionAnalysisDocument
-	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, initState);
-	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentEmptyState);
-	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", true, documentIdleState);
-    // end actionAnalysisDocument
-
-    // actionPrintAndCutFetchCanvas
-	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, initState);
-	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentEmptyState);
-	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentIdleState);
-	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, documentIdleState);
-	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentPrintAndCutState);
-    // end actionPrintAndCutFetchCanvas
-
-    // actionPathOptimization
-    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);
-    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentEmptyState);
-    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", true, documentIdleState);
-    // end actionPathOptimization
-}
+//void LaserControllerWindow::bindWidgetsProperties()
+//{
+//    //text font bar widget
+//    BIND_PROP_TO_STATE(m_textFontWidget, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_textFontWidget, "enabled", false, documentEmptyState);
+//    //text font bar widget
+//    
+//    // actionOpen
+//    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentWorkingState);
+//    // end actionOpen
+//
+//    // actionImport
+//    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentWorkingState);
+//    // end actionImportSVG
+//
+//	// actionNew
+//	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentWorkingState);
+//	// end actionNew
+//
+//    // actionImportCorelDraw
+//    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentWorkingState);
+//    // end actionImportCorelDraw
+//
+//    // actionExportJSON
+//    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentWorkingState);
+//    // end actionExportJSON
+//
+//    // actionSave
+//    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentWorkingState);
+//    // end actionSave
+//
+//    // actionSaveAs
+//    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
+//    // end actionSaveAs
+//
+//	// actionUndo
+//	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentWorkingState);
+//	// end actionUndo
+//
+//	// actionRedo
+//	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentWorkingState);
+//	// end actionRedo
+//
+//	// actionZoomIn
+//	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", true, documentWorkingState);
+//	// end actionZoomIn
+//
+//	// actionZoomOut
+//	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", true, documentWorkingState);
+//	// end actionZoomOut
+//
+//	// actionZoomToPage
+//	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", true, documentWorkingState);
+//	// end actionZoomToPage
+//
+//	// actionZoomToSelection
+//	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", true, documentWorkingState);
+//	// end actionZoomToSelection
+//
+//	// ZoomInput comboBoxScale
+//	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_comboBoxScale, "enabled", true, documentWorkingState);
+//	// end ZoomInput comboBoxScale
+//
+//    // actionCloseDocument
+//    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentWorkingState);
+//    // end actionCloseDocument
+//
+//	// actionDeletePrimitive
+//	BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentEmptyState);
+//	// end actionDeletePrimitive
+//
+//	// actionCopy
+//	BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentEmptyState);
+//	// end actionCopy
+//
+//	// actionGroup
+//	BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentEmptyState);
+//	// end actionGroup
+//
+//	// actionUngroup
+//	BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentEmptyState);
+//	// end actionUngroup
+//
+//	// actionPaste
+//	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", true, documentWorkingState);
+//	// end actionPaste
+//
+//	// actionPasteInLine
+//	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", true, documentWorkingState);
+//	// end actionPasteInLine
+//
+//	// actionCut
+//	BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentEmptyState);
+//	// end actionCut
+//
+//	// actionDuplication
+//	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentEmptyState);
+//	// end actionDuplication
+//
+//    // actionMultiDuplication
+//    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentEmptyState);
+//    // end actionMultiDuplication
+//
+//	// actionMirrorHorizontal
+//	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
+//	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
+//	// end actionMirrorHorizontal
+//
+//	// actionMirrorVertical
+//	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
+//	//BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectionState);
+//	// end actionMirrorVertical
+//
+//    // actionMirrorAcrossLine
+//    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentEmptyState);
+//    // end actionMirrorAcrossLine
+//
+//    // actionAddEngravingLayer
+//    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", true, documentWorkingState);
+//    // end actionAddEngravingLayer
+//
+//    // actionAddCuttingLayer
+//    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentEmptyState);
+//    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", true, documentWorkingState);
+//    // end actionAddCuttingLayer
+//
+//    // actionConnect
+//    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", true, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionConnect, "enabled", false, devicePausedState);
+//    // end actionConnect
+//
+//    // actionDisconnect
+//    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionDisconnect, "enabled", false, devicePausedState);
+//    // end actionDisconnect
+//
+//    // actionMachining
+//    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceConnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, devicePausedState);
+//    // end actionMachining
+//
+//    // actionPause
+//    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", true, devicePausedState);
+//    // end actionPause
+//
+//    // actionStop
+//    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionStop, "enabled", true, devicePausedState);
+//    // end actionStop
+//
+//    // actionLaserSpotShot
+//    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserSpotShot, "enabled", true, devicePausedState);
+//    // end actionLaserSpotShot
+//
+//    // actionLaserCut
+//    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", true, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionBounding, "enabled", true, devicePausedState);
+//    // end actionLaserCut
+//
+//    // actionLaserMove
+//    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionLaserMove, "enabled", true, devicePausedState);
+//    // end actionLaserMove
+//
+//    // actionReset
+//    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionReset, "enabled", false, devicePausedState);
+//    // end actionReset
+//
+//    // actionMoveTop
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTop, "enabled", false, devicePausedState);
+//    // end actionMoveTop
+//
+//    // actionMoveBottom
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottom, "enabled", false, devicePausedState);
+//    // end actionMoveBottom
+//
+//    // actionMoveLeft
+//    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveLeft, "enabled", false, devicePausedState);
+//    // end actionMoveLeft
+//
+//    // actionMoveRight
+//    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveRight, "enabled", false, devicePausedState);
+//    // end actionMoveRight
+//
+//    // actionMoveTopRight
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopRight, "enabled", false, devicePausedState);
+//    // end actionMoveTopRight
+//
+//    // actionMoveTopLeft
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveTopLeft, "enabled", false, devicePausedState);
+//    // end actionMoveTopLeft
+//
+//    // actionMoveBottomLeft
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomLeft, "enabled", false, devicePausedState);
+//    // end actionMoveBottomLeft
+//
+//    // actionMoveBottomRight
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveBottomRight, "enabled", false, devicePausedState);
+//    // end actionMoveBottomRight
+//
+//    // actionMoveUp
+//    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveUp, "enabled", false, devicePausedState);
+//    // end actionMoveUp
+//
+//    // actionMoveDown
+//    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", false, devicePausedState);
+//    // end actionMoveDown
+//
+//    // actionMoveToOrigin
+//    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", true, deviceIdleState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionMoveToOrigin, "enabled", false, devicePausedState);
+//    // end actionMoveToOrigin
+//
+//    // actionFetchToUserOrigin
+//    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, initState);
+//    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, deviceUnconnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", true, deviceConnectedState);
+//    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, deviceMachiningState);
+//    BIND_PROP_TO_STATE(m_ui->actionFetchToUserOrigin, "enabled", false, devicePausedState);
+//    // end actionFetchToUserOrigin
+//
+//    // actionSelectionTool
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", true, documentSelectionState);
+//	
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, initState);	
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentViewDragState);
+//    // end 
+//	// actionViewDragTool
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragState);
+//
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveTextState);
+//	// end 
+//
+//    // actionRectangleTool
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", true, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentViewDragState);
+//    // end actionRectangleTool
+//
+//	// actionElippseTool
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", true, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentViewDragState);
+//	// end actionElippseTool
+//
+//	// actionLineTool
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", true, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentViewDragState);
+//	// end actionLineTool
+//
+//	// actionPolygonTool
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", true, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentViewDragState);
+//	// end actionPolygonTool
+//
+//	// actionSplineTool
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", true, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentViewDragState);
+//	// end actionSplineTool
+//
+//	// actionSplineEditTool
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", true, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentViewDragState);
+//	// end actionSplineEditTool
+//
+//	// actionTextTool
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentWorkingState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentIdleState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentSelectionState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveRectState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveEllipseState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveLineState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitivePolygonState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineEditState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", true, documentPrimitiveTextState);
+//	BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentViewDragState);
+//	// end actionTextTool
+//
+//	// actionBitmapTool
+//	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentWorkingState);
+//	// end actionBitmapTool
+//
+//    // actionRemoveLayer
+//	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentIdleState);
+//    // end actionRemoveLayer
+//
+//    // actionMoveLayerUp
+//	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentIdleState);
+//    // end actionMoveLayerUp
+//
+//    // actionMoveLayerDown
+//	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentIdleState);
+//    // end actionMoveLayerDown
+//
+//    // actionAnalysisDocument
+//	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, initState);
+//	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentEmptyState);
+//	BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", true, documentIdleState);
+//    // end actionAnalysisDocument
+//
+//    // actionPrintAndCutFetchCanvas
+//	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, initState);
+//	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentEmptyState);
+//	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentIdleState);
+//	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", true, documentIdleState);
+//	//BIND_PROP_TO_STATE(m_ui->actionPrintAndCutFetchCanvas, "enabled", false, documentPrintAndCutState);
+//    // end actionPrintAndCutFetchCanvas
+//
+//    // actionPathOptimization
+//    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, initState);
+//    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentEmptyState);
+//    //BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", true, documentIdleState);
+//    // end actionPathOptimization
+//}
 
 void LaserControllerWindow::showEvent(QShowEvent * event)
 {
@@ -5226,6 +5292,7 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
 
     QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
     m_scene->document()->transform(t);
+    m_scene->document()->updateDocumentBounding();
     m_viewer->viewport()->update();
 }
 

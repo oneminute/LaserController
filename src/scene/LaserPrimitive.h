@@ -62,8 +62,8 @@ public:
     LaserPoint firstStartingPoint() const;
     LaserPoint lastStartingPoint() const;
     QPointF centerMachiningPoint() const;
-    virtual QByteArray engravingImage(ProgressItem* parentProgress, QPointF& lastPoint) { return QByteArray(); }
-    virtual QByteArray filling(ProgressItem* parentProgress, QPointF& lastPoint) { return QByteArray(); }
+    virtual QByteArray engravingImage(ProgressItem* parentProgress, QPointF& lastPoint, QPointF& residual = QPointF()) { return QByteArray(); }
+    virtual QByteArray filling(ProgressItem* parentProgress, QPointF& lastPoint, QPointF& residual = QPointF()) { return QByteArray(); }
     virtual bool isClosed() const = 0;
 
     QTransform transformToDevice() const;
@@ -138,7 +138,7 @@ class LaserShape : public LaserPrimitive
 public:
     LaserShape(LaserShapePrivate* data, LaserDocument* doc, LaserPrimitiveType type, int layerIndex = 1, QTransform transform = QTransform());
     virtual ~LaserShape() { } 
-    virtual QByteArray filling(ProgressItem* progress, QPointF& lastPoint) override;
+    virtual QByteArray filling(ProgressItem* progress, QPointF& lastPoint, QPointF& residual = QPointF()) override;
 	int layerIndex();
 private:
     Q_DISABLE_COPY(LaserShape);
@@ -371,7 +371,7 @@ public:
 
     QRectF bounds() const;
 
-    virtual QByteArray engravingImage(ProgressItem* parentProgress, QPointF& lastPoint);
+    virtual QByteArray engravingImage(ProgressItem* parentProgress, QPointF& lastPoint, QPointF& residual = QPointF());
     virtual void draw(QPainter* painter);
     virtual QPainterPath toMachiningPath() const;
     virtual LaserPrimitiveType type() { return LPT_BITMAP; }

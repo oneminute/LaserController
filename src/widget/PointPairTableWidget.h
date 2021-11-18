@@ -18,6 +18,8 @@ public:
     void setLaserPoint(const QPointF& point);
     void setCanvasPoint(const QPointF& point);
 
+    bool isEmpty() const;
+
 private:
     Q_DISABLE_COPY(PointPairTableWidget)
 };

@@ -51,8 +51,7 @@ void LaserScene::setDocument(LaserDocument * doc)
     m_doc->setParent(this);
     
 	QRectF rect = LaserApplication::device->layoutRectInScene();
-    qDebug() << "deivce bounds in pixel:" << rect;
-    m_background = new LaserBackgroundItem(rect);
+    m_background = new LaserBackgroundItem();
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
 	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));

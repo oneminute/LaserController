@@ -11,14 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Multi Duplication</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1,0,0">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="font">
       <font>
-       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>

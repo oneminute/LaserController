@@ -332,7 +332,7 @@ void machiningUtils::polygon2Points(
         progress->finish();
 }
 
-QByteArray machiningUtils::pointListList2Plt(ProgressItem* progress, const LaserPointListList& pointList, QPointF& lastPoint, const QTransform& t)
+QByteArray machiningUtils::pointListList2Plt(ProgressItem* progress, const LaserPointListList& pointList, QPointF& lastPoint, QPointF& residual, const QTransform& t)
 {
     QByteArray buffer;
     int total = 0;
@@ -344,14 +344,14 @@ QByteArray machiningUtils::pointListList2Plt(ProgressItem* progress, const Laser
         progress->setMaximum(total);
     for (const LaserPointList& points : pointList)
     {
-        buffer.append(pointList2Plt(progress, points, lastPoint, t));
+        buffer.append(pointList2Plt(progress, points, lastPoint, residual, t));
     }
     if (progress)
         progress->finish();
     return buffer;
 }
 
-QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPointList& points, QPointF& lastPoint, const QTransform& t)
+QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPointList& points, QPointF& lastPoint, QPointF& residual, const QTransform& t)
 {
     QByteArray buffer;
     if (points.empty())
@@ -361,11 +361,12 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
     QPointF diff = pt - lastPoint;
     lastPoint = pt;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-        buffer.append(QString("pu%1 %2;").arg(qRound(diff.x())).arg(qRound(diff.y())));
+    {
+        QPoint rel = calculateResidual(diff, residual);
+        buffer.append(QString("pu%1 %2;").arg(rel.x()).arg(rel.y()));
+    }
     else
     {
-        //int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
-        //int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
         buffer.append(QString("PU%1 %2;").arg(qRound(pt.x())).arg(qRound(pt.y())));
     }
     for (size_t i = 1; i < points.size(); i++)
@@ -395,12 +396,11 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
         if (Config::Device::startFrom() != SFT_AbsoluteCoords)
         {
             command = command.toLower();
-            buffer.append(command.arg(qRound(diff.x())).arg(qRound(diff.y())));
+            QPoint rel = calculateResidual(diff, residual);
+            buffer.append(command.arg(rel.x()).arg(rel.y()));
         }
         else
         {
-            //int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt.x()));
-            //int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt.y()));
             buffer.append(command.arg(qRound(pt.x())).arg(qRound(pt.y())));
         }
         lastPoint = pt;
@@ -410,7 +410,35 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
     return buffer;
 }
 
-QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineListList& lineList, QPointF& lastPoint)
+QPoint machiningUtils::calculateResidual(const QPointF& diff, QPointF& residual)
+{
+    int x = qRound(diff.x());
+    int y = qRound(diff.y());
+    residual += QPointF(diff.x() - x, diff.y() - y);
+    if (residual.x() >= 1)
+    {
+        x += 1;
+        residual.setX(residual.x() + 1);
+    }
+    else if (residual.x() <= -1)
+    {
+        x -= 1;
+        residual.setX(residual.x() - 1);
+    }
+    if (residual.y() >= 1)
+    {
+        y += 1;
+        residual.setY(residual.y() + 1);
+    }
+    else if (residual.y() <= -1)
+    {
+        y -= 1;
+        residual.setY(residual.y() - 1);
+    }
+    return QPoint(x, y);
+}
+
+QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineListList& lineList, QPointF& lastPoint, QPointF& residual)
 {
     QByteArray buffer;
     // 建立所有线点的kdtree
@@ -478,19 +506,16 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress, const LaserLineL
             {
                 command1 = command1.toLower();
                 command2 = command2.toLower();
-                buffer.append(command1.arg(qRound(diff1.x())).arg(qRound(diff1.y())));
-                buffer.append(command2.arg(qRound(diff2.x())).arg(qRound(diff2.y())));
+                QPoint rel = calculateResidual(diff1, residual);
+                buffer.append(command1.arg(rel.x()).arg(rel.y()));
+                rel = calculateResidual(diff2, residual);
+                buffer.append(command2.arg(rel.x()).arg(rel.y()));
             }
             else
             {
-                //int x = LaserApplication::device->deviceTranslateXMachining(qRound(pt1.x()));
-                //int y = LaserApplication::device->deviceTranslateYMachining(qRound(pt1.y()));
                 buffer.append(command1.arg(qRound(pt1.x())).arg(qRound(pt1.y())));
-                //x = LaserApplication::device->deviceTranslateXMachining(qRound(pt2.x()));
-                //y = LaserApplication::device->deviceTranslateYMachining(qRound(pt2.y()));
                 buffer.append(command2.arg(qRound(pt2.x())).arg(qRound(pt2.y())));
             }
-            //point = line.p2();
             lastPoint = pt2;
         }
         forward = !forward;
