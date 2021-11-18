@@ -354,7 +354,6 @@ void LaserApplication::retranslate()
     stringMap["documentSelectedEditingState"] = tr("Selected Editing");
     stringMap["documentSelectingState"] = tr("Selecting");
     stringMap["documentSelectionState"] = tr("Selection");
-    stringMap["documentTransformingState"] = tr("Transforming");
     stringMap["documentViewDragState"] = tr("Drag State");
     stringMap["documentViewDragReadyState"] = tr("Ready Draging");
     stringMap["documentViewDragingState"] = tr("Draging");

@@ -171,7 +171,6 @@ public:
     DECL_STATE(documentSelecting)
     DECL_STATE(documentSelected)
 	DECL_STATE(documentSelectedEditing)
-    DECL_STATE(documentTransforming)
 	DECL_STATE(documentViewDrag)
 	DECL_STATE(documentViewDragReady)
 	DECL_STATE(documentViewDraging)

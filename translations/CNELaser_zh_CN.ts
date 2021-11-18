@@ -3632,7 +3632,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+1"/>
         <source>Ready Draging</source>
-        <translation>拖动完成</translation>
+        <translation>准备拖动</translation>
     </message>
     <message>
         <location line="+1"/>

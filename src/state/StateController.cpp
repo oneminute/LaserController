@@ -24,7 +24,6 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_INIT_STATE(documentWorking, documentIdle);
     DEFINE_CHILD_STATE(documentWorking, documentSelection);
 	DEFINE_CHILD_STATE(documentWorking, documentViewDrag);
-    DEFINE_CHILD_STATE(documentWorking, documentTransforming);
     DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
 	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCutSelecting);
 	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCutAligning);
@@ -94,7 +93,8 @@ StateController& StateController::instance()
 
 bool StateController::isInState(QAbstractState * state)
 {
-    return instance().m_currentStates.contains(state);
+    //return instance().m_currentStates.contains(state);
+    return state->active();
 }
 
 bool StateController::anyState(const QList<QAbstractState*>& states)
@@ -102,7 +102,8 @@ bool StateController::anyState(const QList<QAbstractState*>& states)
     bool result = false;
     for (const QAbstractState* state : states)
     {
-        result = result || instance().m_currentStates.contains(const_cast<QAbstractState*>(state));
+        //result = result || instance().m_currentStates.contains(const_cast<QAbstractState*>(state));
+        result = result || state->active();
     }
     return result;
 }
@@ -112,7 +113,8 @@ bool StateController::allStates(const QList<QAbstractState*>& states)
     bool result = true;
     for (const QAbstractState* state : states)
     {
-        result = result && instance().m_currentStates.contains(const_cast<QAbstractState*>(state));
+        //result = result && instance().m_currentStates.contains(const_cast<QAbstractState*>(state));
+        result = result && state->active();
     }
     return result;
 }
