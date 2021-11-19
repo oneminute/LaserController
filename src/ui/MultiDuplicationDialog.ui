@@ -18,6 +18,7 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="font">
       <font>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -47,7 +48,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="HDistance"/>
+         <widget class="QDoubleSpinBox" name="HDistance">
+          <property name="minimum">
+           <double>-1000.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_3">
@@ -118,7 +126,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="VDistance"/>
+         <widget class="QDoubleSpinBox" name="VDistance">
+          <property name="minimum">
+           <double>-1000.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_7">

@@ -101,7 +101,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_lastLockedState(Qt::Unchecked)
     , m_lockEqualRatio(false)
     , m_updateDialog(nullptr)
-    , m_MultiDuplicationCopies(5)
+    , m_MultiDuplicationCopies(1)
     , m_MultiDuplicationHSettings(1)
     , m_MultiDuplicationVSettings(1)
     , m_MultiDuplicationHDirection(0)
@@ -1357,9 +1357,9 @@ void LaserControllerWindow::loadRecentFilesMenu()
         int size = m_recentFileList.size();
         while (!fileStream.atEnd() && size < m_maxRecentFilesSize) {
             QString recentFilePath = fileStream.readLine();
-            m_recentFileList.prepend(recentFilePath);
+            m_recentFileList.append(recentFilePath);
         } 
-        qDebug() << fileStream.readAll();
+        qDebug() << m_recentFileList;
         file.close();
         updataRecentFilesActions();
     }
@@ -3341,7 +3341,7 @@ void LaserControllerWindow::onActionMultiDuplication(bool checked)
     MultiDuplicationDialog* dialog = new MultiDuplicationDialog(m_viewer,
         m_MultiDuplicationCopies, m_MultiDuplicationHSettings, m_MultiDuplicationVSettings,
         m_MultiDuplicationHDirection, m_MultiDuplicationVDirection,
-        m_MultiDuplicationVDistance, m_MultiDuplicationHDistance,
+        m_MultiDuplicationHDistance, m_MultiDuplicationVDistance,
         this);
     dialog->exec();
     m_MultiDuplicationCopies = dialog->copiesVal();

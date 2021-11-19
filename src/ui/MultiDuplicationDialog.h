@@ -27,8 +27,8 @@ public:
     int VSettingsVal();
     int HDirectionVal();
     int VDirectionVal();
-    int HDistanceVal();
-    int VDistanceVal();
+    double HDistanceVal();
+    double VDistanceVal();
     int copiesVal();
 private:
     QScopedPointer<Ui::MultiDuplicationDialog> m_ui;
