@@ -1354,6 +1354,13 @@ QRectF LaserPath::sceneBoundingRect() const
 	
 }
 
+QRectF LaserPath::boundingRect() const
+{
+    Q_D(const LaserPath);
+    QPainterPath path = sceneTransform().map(d->path);
+    return path.boundingRect();
+}
+
 QJsonObject LaserPath::toJson()
 {
     Q_D(const LaserPath);

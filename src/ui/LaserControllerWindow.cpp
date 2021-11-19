@@ -923,11 +923,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 
-    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-6996, 100675));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(944.888, 569.527));
-    m_tablePrintAndCutPoints->addNewLine();
-    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-84729, 21033));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(744.043, 196.827));
+    //m_tablePrintAndCutPoints->setLaserPoint(QPointF(-6996, 100675));
+    //m_tablePrintAndCutPoints->setCanvasPoint(QPointF(944.888, 569.527));
+    //m_tablePrintAndCutPoints->addNewLine();
+    //m_tablePrintAndCutPoints->setLaserPoint(QPointF(-84729, 21033));
+    //m_tablePrintAndCutPoints->setCanvasPoint(QPointF(744.043, 196.827));
 }
 
 LaserControllerWindow::~LaserControllerWindow()

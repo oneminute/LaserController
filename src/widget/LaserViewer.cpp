@@ -3826,6 +3826,7 @@ void LaserViewer::init()
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing | QGraphicsView::DontClipPainter | QGraphicsView::DontSavePainterState);	
 	horizontalScrollBar()->setEnabled(false);
 	verticalScrollBar()->setEnabled(false);
+    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 	//undo stack
 	m_undoStack = new QUndoStack(this);
 	m_copyedList = QMap<LaserPrimitive*, QTransform>();

@@ -1,5 +1,6 @@
 #include "LaserApplication.h"
 
+#include <QApplication>
 #include <QDateTime>
 #include <QDir>
 #include <QStyleFactory>

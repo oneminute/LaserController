@@ -253,6 +253,7 @@ public:
 
     virtual QList<QPainterPath> subPaths() const;
 	virtual QRectF sceneBoundingRect() const;
+    virtual QRectF boundingRect() const;
 
     virtual QJsonObject toJson();
 
