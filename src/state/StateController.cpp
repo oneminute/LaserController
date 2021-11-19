@@ -25,8 +25,6 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(documentWorking, documentSelection);
 	DEFINE_CHILD_STATE(documentWorking, documentViewDrag);
     DEFINE_CHILD_STATE(documentWorking, documentPrimitive);
-	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCutSelecting);
-	DEFINE_CHILD_STATE(documentWorking, documentPrintAndCutAligning);
 
     DEFINE_CHILD_INIT_STATE(documentSelection, documentSelecting);
     DEFINE_CHILD_STATE(documentSelection, documentSelected);
@@ -68,6 +66,8 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(deviceConnected, deviceMachining);
     DEFINE_CHILD_STATE(deviceConnected, devicePaused);
     DEFINE_CHILD_STATE(deviceConnected, deviceError);
+	DEFINE_CHILD_STATE(deviceConnected, documentPrintAndCutSelecting);
+	DEFINE_CHILD_STATE(deviceConnected, documentPrintAndCutAligning);
 
     for (QAbstractState* st : m_states.values())
     {

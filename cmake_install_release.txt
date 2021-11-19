@@ -6,8 +6,6 @@ INSTALL(FILES
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.md"
-            "${CMAKE_SOURCE_DIR}/config.json"
-            "${CMAKE_SOURCE_DIR}/dev_cache.bin"
         DESTINATION ${CMAKE_INSTALL_PREFIX}_Release
 		CONFIGURATIONS Release)
 

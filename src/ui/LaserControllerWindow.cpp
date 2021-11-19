@@ -823,10 +823,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentSelectionState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
     ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
     ADD_TRANSITION(documentPrintAndCutSelectingState, documentIdleState, this, SIGNAL(finishPrintAndCutSelecting()));
-    ADD_TRANSITION(documentIdleState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
-    ADD_TRANSITION(documentSelectionState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
-    ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
-    ADD_TRANSITION(documentPrintAndCutAligningState, documentIdleState, this, SIGNAL(finishPrintAndCutAligning()));
+    ADD_TRANSITION(deviceIdleState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
+    ADD_TRANSITION(documentPrintAndCutAligningState, deviceIdleState, this, SIGNAL(finishPrintAndCutAligning()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
@@ -924,6 +922,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_layoutRect = LaserApplication::device->layoutRectInScene();
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
+
+    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-6996, 100675));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(944.888, 569.527));
+    m_tablePrintAndCutPoints->addNewLine();
+    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-84729, 21033));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(744.043, 196.827));
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -3773,8 +3777,8 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     qLogD << "Point pairs count: " << pointPairs.length();
 
     //PointPairList pointPairs;
-    //pointPairs << PointPair(QPointF(56880, 8930), QPointF(31220, 20110))
-        //<< PointPair(QPointF(223010, 154010), QPointF(234950, 103980));
+    //pointPairs << PointPair(QPointF(-6996, 100675), QPointF(-49999, 150.87))
+        //<< PointPair(QPointF(-84729, 21033), QPointF(-103139, 52077));
     //<< PointPair(QPointF(70010, 80540), QPointF(65880, 83870));
 
     if (pointPairs.length() < 2)
@@ -3796,6 +3800,18 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     {
         emit startPrintAndCutAligning();
     }
+
+    /*QRectF bounding = m_scene->document()->docBoundingRectInScene();
+    QTransform rotation(t.m11(), t.m12(), t.m21(), t.m22(), 0, 0);
+    QTransform translate = QTransform::fromTranslate(
+        Global::mechToSceneHF(t.dx()),
+        Global::mechToSceneVF(t.dy()));
+    QTransform pacTransform = translate * rotation;
+    QTransform transform = QTransform::fromTranslate(-bounding.center().x(), -bounding.center().y());
+    transform = transform * rotation;
+    transform = transform * QTransform::fromTranslate(bounding.center().x(), bounding.center().y());
+    transform = transform * translate;
+    m_scene->document()->transform(transform);*/
 
     m_scene->document()->setEnablePrintAndCut(true);
     m_scene->document()->setPrintAndCutTransform(t);
@@ -4448,8 +4464,8 @@ void LaserControllerWindow::selectedChangedFromMouse()
 		//qDebug() << rectReal.top();
 		qreal x = 0, y = 0, width = 0, height = 0; 
 		if (m_unitIsMM) {
-			width = Global::sceneToMmH(rectReal.width());
-			height = Global::sceneToMmV(rectReal.height());
+			width = qRound(Global::sceneToMechH(rectReal.width())) * 0.001;
+			height = qRound(Global::sceneToMechV(rectReal.height())) * 0.001;
 		}
 
 		switch (m_selectionOriginalState) {

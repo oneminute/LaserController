@@ -36,6 +36,7 @@
 #include "algorithm/QuadTreeNode.h"
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
+#include "state/StateController.h"
 
 class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
@@ -178,6 +179,19 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(pen);
     }
 	
+    if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+    {
+        QTransform t = document()->printAndCutTransform();
+        QTransform rotation(t.m11(), t.m12(), t.m21(), t.m22(), 0, 0);
+        QTransform translate = QTransform::fromTranslate(
+            Global::mechToSceneHF(t.dx()),
+            Global::mechToSceneVF(t.dy()));
+        //QTransform pacTransform = rotation * translate;
+        QTransform current = painter->transform();
+        QTransform currentTrans = QTransform::fromTranslate(current.dx(), current.dy());
+        QTransform pacTransform = current* currentTrans.inverted()* rotation* currentTrans* translate;
+        //painter->setTransform(pacTransform);
+    }
     draw(painter);
 
     QPainterPath outline = this->outline();

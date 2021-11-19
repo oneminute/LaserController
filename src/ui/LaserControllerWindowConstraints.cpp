@@ -424,7 +424,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectedState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveRectState);
@@ -433,6 +433,8 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveTextState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrintAndCutAligningState);
     // end m_ui->actionDragView
 
     // begin m_ui->actionSelectionTool
@@ -582,13 +584,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionDragView
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectedState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentViewDragReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveRectState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveEllipseState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveLineState);
@@ -1556,6 +1558,9 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutAlign
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, deviceIdleState);
