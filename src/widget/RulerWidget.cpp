@@ -164,16 +164,8 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		
 		if (m_original.y() > 0) {
 			dimension = rect.bottom() - m_original.y();
-
-            if (Config::SystemRegister::deviceOrigin() == 0 || Config::SystemRegister::deviceOrigin() == 3) {
-                drawRuler(m_original.y() - rect.top(), textCoef, painter, false, true);
-                drawRuler(dimension, textCoef, painter, true, false);
-            }
-            else {
-                drawRuler(m_original.y() - rect.top(), textCoef, painter, false, false);
-                drawRuler(dimension, textCoef, painter, true, true);
-            }
-			
+            drawRuler(m_original.y() - rect.top(), textCoef, painter, false, true);
+            drawRuler(dimension, textCoef, painter, true, false);
 		}
 		else {
 			dimension = rect.height() + (-m_original.y());
@@ -184,16 +176,8 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		
 		if (m_original.x() > 0) {
 			dimension = rect.right() - m_original.x();
-            if (Config::SystemRegister::deviceOrigin() == 0 || Config::SystemRegister::deviceOrigin() == 1) {
-                drawRuler(m_original.x() - rect.left(), textCoef, painter,false, true);
-                drawRuler(dimension, textCoef, painter, true, false);
-            }
-            else {
-                drawRuler(m_original.x() - rect.left(), textCoef, painter, false, false);
-                drawRuler(dimension, textCoef, painter, true, true);
-            }
-			
-            
+            drawRuler(m_original.x() - rect.left(), textCoef, painter,false, true);
+            drawRuler(dimension, textCoef, painter, true, false);
 		}
 		else {
 			dimension = rect.width() + (-m_original.x());
