@@ -199,35 +199,42 @@ void MultiDuplicationDialog::accept()
 
 int MultiDuplicationDialog::HSettingsVal()
 {
-    return m_HSettingsVal;
+    //return m_HSettingsVal;
+    return m_ui->HSettings->currentIndex();
 }
 
 int MultiDuplicationDialog::VSettingsVal()
 {
-    return m_VSettingsVal;
+    //return m_VSettingsVal;
+    return m_ui->VSettings->currentIndex();
 }
 
 int MultiDuplicationDialog::HDirectionVal()
 {
-    return m_HDirectionVal;
+    //return m_HDirectionVal;
+    return m_ui->HDirection->currentIndex();
 }
 
 int MultiDuplicationDialog::VDirectionVal()
 {
-    return m_VDirectionVal;
+    //return m_VDirectionVal;
+    return m_ui->VDirection->currentIndex();
 }
 
-int MultiDuplicationDialog::HDistanceVal()
+double MultiDuplicationDialog::HDistanceVal()
 {
-    return m_HDistanceVal;
+    //return m_HDistanceVal;
+    return m_ui->HDistance->value();
 }
 
-int MultiDuplicationDialog::VDistanceVal()
+double MultiDuplicationDialog::VDistanceVal()
 {
-    return m_VDistanceVal;
+    //return m_VDistanceVal;
+    return m_ui->VDistance->value();
 }
 
 int MultiDuplicationDialog::copiesVal()
 {
-    return m_copiesVal;
+    //return m_copiesVal;
+    return m_ui->Copies->value();
 }
