@@ -4460,85 +4460,86 @@ void LaserControllerWindow::selectedChangedFromMouse()
     m_propertyWidget->setEnabled(true);
     int size = view->group()->childItems().size();
 	if (size > 0) {
-		QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
+		QRectF rect = Global::matrixToUm().mapRect(m_viewer->selectedItemsSceneBoundingRect());
 		if (rect.width() == 0 && rect.height() == 0) {
 			return;
 		}
-		LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
-		if (!backgroudItem) {
-			return;
-		}
-		QRectF rectReal = QRectF(backgroudItem->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
+		//LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
+		//if (!backgroudItem) {
+			//return;
+		//}
+		//QRectF rectReal = QRectF(backgroudItem->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
+        QRectF rectReal = rect;
 		//qDebug() << rectReal.top();
 		qreal x = 0, y = 0, width = 0, height = 0; 
 		if (m_unitIsMM) {
-			width = qRound(Global::sceneToMechH(rectReal.width())) * 0.001;
-			height = qRound(Global::sceneToMechV(rectReal.height())) * 0.001;
+			width = qRound(rectReal.width() * 0.001);
+			height = qRound(rectReal.height() * 0.001);
 		}
 
 		switch (m_selectionOriginalState) {
 			case SelectionOriginalTopLeft:{
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.topLeft().x());
-					y = Global::sceneToMmV(rectReal.topLeft().y());
+					x = rectReal.topLeft().x() * 0.001;
+					y = rectReal.topLeft().y() * 0.001;
 				}
 				break;
 			}
 			case SelectionOriginalTopCenter: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.center().x());
-					y = Global::sceneToMmV(rectReal.topLeft().y());
+					x = rectReal.center().x() * 0.001;
+					y = rectReal.topLeft().y() * 0.001;
 				}
 				break;
 			}
 			case SelectionOriginalTopRight: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.bottomRight().x());
-					y = Global::sceneToMmV(rectReal.topLeft().y());
+					x = rectReal.bottomRight().x() * 0.001;
+					y = rectReal.topLeft().y() * 0.001;
 				}
 				break;
 			}
 			
 			case SelectionOriginalLeftCenter: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.topLeft().x());
-					y = Global::sceneToMmV(rectReal.center().y());
+					x = rectReal.topLeft().x() * 0.001;
+					y = rectReal.center().y() * 0.001;
 				}
 				break;
 			}
 			case SelectionOriginalCenter: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.center().x());
-					y = Global::sceneToMmV(rectReal.center().y());
+					x = rectReal.center().x() * 0.001;
+					y = rectReal.center().y() * 0.001;
 				}
 				
 				break;
 			}
 			case SelectionOriginalRightCenter: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.bottomRight().x());
-					y = Global::sceneToMmV(rectReal.center().y());
+					x = rectReal.bottomRight().x() * 0.001;
+					y = rectReal.center().y() * 0.001;
 				}
 				break;
 			}
 			case SelectionOriginalLeftBottom: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.topLeft().x());
-					y = Global::sceneToMmV(rectReal.bottomRight().y());
+					x = rectReal.topLeft().x() * 0.001;
+					y = rectReal.bottomRight().y() * 0.001;
 				}
 				break;
 			}
 			case SelectionOriginalBottomCenter: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.center().x());
-					y = Global::sceneToMmV(rectReal.bottomRight().y());
+					x = rectReal.center().x() * 0.001;
+					y = rectReal.bottomRight().y() * 0.001;
 				}
 				break;
 			}
 			case SelectionOriginalBottomRight: {
 				if (m_unitIsMM) {
-					x = Global::sceneToMmH(rectReal.bottomRight().x());
-					y = Global::sceneToMmV(rectReal.bottomRight().y());
+					x = rectReal.bottomRight().x() * 0.001;
+					y = rectReal.bottomRight().y() * 0.001;
 				}
 				break;
 			}

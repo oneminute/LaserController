@@ -461,12 +461,10 @@ void LaserViewer::detectRect(LaserPrimitive& item, int i, qreal& left, qreal& ri
 		}
 	}
 }
+
 QRectF LaserViewer::selectedItemsSceneBoundingRect() {
-	//QList<QGraphicsItem*> items = m_scene->selectedItems();
 	QRectF rect;
 	
-	//QList<LaserPrimitive*> items = m_scene->selectedPrimitives();
-	//QList<LaserPrimitive*> items = m_;
 	if (!m_group) {
 		return rect;
 	}
@@ -476,17 +474,25 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
 	qreal top = 0;
 	qreal bottom = 0;
 
-	QList<QGraphicsItem*> group_items = m_group->childItems();
-	if (group_items.size() == 0) {
-		return rect;
-	}
-	for (int i = 0; i < group_items.size(); i++) {
-		LaserPrimitive* item = qgraphicsitem_cast<LaserPrimitive*>(group_items[i]);
-		detectRect(*item, i, left, right, top, bottom);
-	}
-	rect = QRectF(left, top, right - left, bottom - top);
+    QList<LaserPrimitive*> primitives;
+    for (QGraphicsItem* item : m_group->childItems())
+    {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        if (primitive)
+            primitives.append(primitive);
+    }
+    utils::boundingRect(primitives, rect);
+
+	//QList<QGraphicsItem*> group_items = m_group->childItems();
+	//if (group_items.size() == 0) {
+	//	return rect;
+	//}
+	//for (int i = 0; i < group_items.size(); i++) {
+	//	LaserPrimitive* item = qgraphicsitem_cast<LaserPrimitive*>(group_items[i]);
+	//	detectRect(*item, i, left, right, top, bottom);
+	//}
+	//rect = QRectF(left, top, right - left, bottom - top);
 	return rect;
-	
 }
 QRectF LaserViewer::AllItemsSceneBoundingRect()
 {

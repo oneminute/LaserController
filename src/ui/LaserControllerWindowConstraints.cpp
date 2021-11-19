@@ -168,6 +168,9 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveRectState);
@@ -181,29 +184,41 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionSave
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionSave
 
     // begin m_ui->actionSaveAs
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionSaveAs
 
     // begin m_ui->actionNew
@@ -424,7 +439,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectedState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveRectState);
@@ -433,8 +448,6 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveTextState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveSplineState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrintAndCutAligningState);
     // end m_ui->actionDragView
 
     // begin m_ui->actionSelectionTool
@@ -1558,9 +1571,6 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionPrintAndCutAlign
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, documentWorkingState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutAlign, "enabled", true, deviceIdleState);
