@@ -3881,7 +3881,7 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
             .arg(y, 8, 'f', 3, QLatin1Char(' ')));
 
         Config::Device::redLightOffsetItem()->setValue(
-            m_redLightAlignment2ndPt - m_redLightAlignment1stPt
+            m_redLightAlignment1stPt - m_redLightAlignment2ndPt
         );
 
         x = Config::Device::redLightOffset().x() * 0.001;

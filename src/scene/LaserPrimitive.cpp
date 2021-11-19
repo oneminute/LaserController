@@ -151,6 +151,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
 	QColor color = Qt::blue;
+    QPen pen(color, 1, Qt::DashLine);
+    //pen.setCosmetic(true);
+    //painter->setPen(pen);
+    //painter->drawRect(bounds);
 
     if (d->layer)
     {
@@ -268,7 +272,6 @@ QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
 	QRectF bounds = d->boundingRect;
-    //qDebug() << d->boundingRect;
     return bounds;
 }
 
@@ -747,9 +750,6 @@ public:
     LaserEllipsePrivate(LaserEllipse* ptr)
         : LaserShapePrivate(ptr)
     {}
-
-    QRectF bounds;
-	//QPainterPath path;
 };
 
 LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform saveTransform, int layerIndex)
@@ -757,32 +757,29 @@ LaserEllipse::LaserEllipse(const QRectF bounds, LaserDocument * doc, QTransform 
 {
 	
     Q_D(LaserEllipse);
-    d->bounds = bounds;
+    d->boundingRect = bounds;
 	d->originalBoundingRect = bounds;
 	sceneTransformToItemTransform(saveTransform);
-	d->path.addEllipse(d->bounds);
-	//d->path.addEllipse(d->bounds);
-	//d->path = saveTransform.map(d->path);
+	d->path.addEllipse(bounds);
 	d->boundingRect = d->path.boundingRect();
-	//��е�ӹ���ʹ�
     d->outline.addEllipse(bounds);
-	//d->layerIndex = layerIndex;
-    //setLocked(true);
 }
 
 QRectF LaserEllipse::bounds() const 
 {
     Q_D(const LaserEllipse);
-    return d->bounds; 
+    return d->boundingRect; 
 } 
 
 void LaserEllipse::setBounds(const QRectF& bounds) 
 {
     Q_D(LaserEllipse);
-    d->bounds = bounds; 
-	QPainterPath path;
-	path.addEllipse(d->bounds);
-	d->path = path;
+    d->boundingRect = bounds; 
+	d->originalBoundingRect = bounds;
+    d->path = QPainterPath();
+	d->path.addEllipse(d->boundingRect);
+    d->outline = QPainterPath();
+    d->outline.addEllipse(bounds);
 }
 
 LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgress)
@@ -827,7 +824,7 @@ QPainterPath LaserEllipse::toMachiningPath() const
 QRectF LaserEllipse::sceneBoundingRect() const
 {
 	Q_D(const LaserEllipse);
-	return sceneTransform().map(d->path).boundingRect();
+	return sceneTransform().mapRect(d->boundingRect);
 }
 
 /*void LaserEllipse::reShape()
@@ -855,7 +852,7 @@ QJsonObject LaserEllipse::toJson()
 	QJsonArray parentMatrix = { parentTransform.m11(), parentTransform.m12(), parentTransform.m13(), parentTransform.m21(), parentTransform.m22(), parentTransform.m23(), parentTransform.m31(), parentTransform.m32(), parentTransform.m33() };
 	object.insert("parentMatrix", parentMatrix);
 	//bounds
-	QJsonArray bounds = { d->bounds.x(), d->bounds.y(),d->bounds.width(), d->bounds.height() };
+	QJsonArray bounds = { d->boundingRect.x(), d->boundingRect.y(),d->boundingRect.width(), d->boundingRect.height() };
 	QJsonArray();
 	object.insert("name", name());
 	object.insert("className", this->metaObject()->className());
@@ -899,16 +896,14 @@ public:
         , cornerRadius(0)
     {}
 
-    QRectF rect;
     qreal cornerRadius;
-	//QPainterPath path;
 };
 
 LaserRect::LaserRect(const QRectF rect, qreal cornerRadius, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserRectPrivate(this), doc, LPT_RECT, layerIndex, saveTransform)
 {
     Q_D(LaserRect);
-    d->rect = rect;
+    d->boundingRect = rect;
 	d->originalBoundingRect = rect;
     d->cornerRadius = cornerRadius;
 
@@ -922,24 +917,24 @@ LaserRect::LaserRect(const QRectF rect, qreal cornerRadius, LaserDocument * doc,
     }
 
 	sceneTransformToItemTransform(saveTransform);
-	//d->path = saveTransform.map(d->path);q
-    d->boundingRect = d->path.boundingRect();
     d->outline.addRect(rect);
 }
 
 QRectF LaserRect::rect() const 
 {
     Q_D(const LaserRect);
-    return d->rect; 
+    return d->boundingRect; 
 }
 
 void LaserRect::setRect(const QRectF& rect) 
 {
     Q_D(LaserRect);
-    d->rect = rect; 
-	QPainterPath path;
-	path.addRect(d->rect);
-	d->path = path;
+    d->boundingRect = rect; 
+	d->originalBoundingRect = rect;
+	d->path = QPainterPath();
+	d->path.addRect(d->boundingRect);
+    d->outline = QPainterPath();
+    d->outline.addRect(rect);
 }
 
 qreal LaserRect::cornerRadius() const
@@ -955,11 +950,11 @@ void LaserRect::setCornerRadius(qreal cornerRadius)
     QPainterPath path;
     if (cornerRadius == 0)
     {
-        path.addRect(d->rect);
+        path.addRect(d->boundingRect);
     }
     else
     {
-        path.addRoundedRect(d->rect, cornerRadius, cornerRadius);
+        path.addRoundedRect(d->boundingRect, cornerRadius, cornerRadius);
     }
     d->path = path;
 }
@@ -1038,27 +1033,16 @@ QPainterPath LaserRect::toMachiningPath() const
 {
     Q_D(const LaserRect);
     QPainterPath path;
-    path.addPolygon(d->rect);
-
+    path.addPolygon(d->boundingRect);
     path = transformToDevice().map(path);
-
     return path;
 }
 
 QRectF LaserRect::sceneBoundingRect() const
 {
 	Q_D(const LaserRect);
-	return sceneTransform().map(d->path).boundingRect();
+	return sceneTransform().mapRect(d->boundingRect);
 }
-
-/*void LaserRect::reShape()
-{
-	Q_D(LaserRect);
-	d->path = transform().map(d->path);
-	d->boundingRect = d->path.boundingRect();
-	d->allTransform = d->allTransform * transform();
-	setTransform(QTransform());
-}*/
 
 QJsonObject LaserRect::toJson()
 {
@@ -1076,7 +1060,7 @@ QJsonObject LaserRect::toJson()
 	object.insert("parentMatrix", parentMatrix);
     object.insert("cornerRadius", d->cornerRadius);
 	//rect
-	QJsonArray bounds = { d->rect.x(), d->rect.y(),d->rect.width(), d->rect.height() };
+	QJsonArray bounds = { d->boundingRect.x(), d->boundingRect.y(),d->boundingRect.width(), d->boundingRect.height() };
 	//QJsonArray();
 	object.insert("name", name());
 	object.insert("className", this->metaObject()->className());
@@ -1108,7 +1092,7 @@ bool LaserRect::isClosed() const
 QPointF LaserRect::position() const
 {
     Q_D(const LaserRect);
-    return sceneTransform().map(d->rect.topLeft());
+    return sceneTransform().map(d->boundingRect.topLeft());
 }
 
 class LaserLinePrivate : public LaserShapePrivate
@@ -1129,6 +1113,8 @@ LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, QTransform saveTr
     d->line = line;
     d->boundingRect = QRectF(d->line.p1(), d->line.p2());
 	sceneTransformToItemTransform(saveTransform);
+    d->path.moveTo(d->line.p1());
+    d->path.moveTo(d->line.p2());
 	d->originalBoundingRect = d->boundingRect;
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
@@ -1145,6 +1131,14 @@ void LaserLine::setLine(const QLineF& line)
 {
     Q_D(LaserLine);
     d->line = line; 
+    d->boundingRect = QRectF(d->line.p1(), d->line.p2());
+    d->path = QPainterPath();
+    d->path.moveTo(d->line.p1());
+    d->path.moveTo(d->line.p2());
+	d->originalBoundingRect = d->boundingRect;
+    d->outline = QPainterPath();
+    d->outline.moveTo(d->line.p1());
+    d->outline.lineTo(d->line.p2());
 }
 
 LaserPointListList LaserLine::updateMachiningPoints(ProgressItem* parentProgress)
@@ -1200,20 +1194,6 @@ QRectF LaserLine::sceneBoundingRect() const
 	path.lineTo(line.p2());
 	return path.boundingRect();
 }
-//after removeFromGroup
-/*void LaserLine::reShape()
-{
-	Q_D(LaserLine);
-	setLine(transform().map(d->line));
-	QPainterPath path;
-	//QLineF line = sceneTransform().map(d->line);
-	path.moveTo(d->line.p1());
-	path.lineTo(d->line.p2());
-	d->boundingRect = path.boundingRect();
-	//d->line = d->line;
-	d->allTransform = d->allTransform * transform();
-	setTransform(QTransform());
-}*/
 
 QJsonObject LaserLine::toJson()
 {
@@ -1274,16 +1254,15 @@ public:
     LaserPathPrivate(LaserPath* ptr)
         : LaserShapePrivate(ptr)
     {}
-
-    //QPainterPath path;
 };
 
 LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserPathPrivate(this), doc,  LPT_PATH, layerIndex, saveTransform)
 {
     Q_D(LaserPath);
+	//d->path = saveTransform.map(d->path);
     d->path = path;
-	d->path = saveTransform.map(d->path);
+	sceneTransformToItemTransform(saveTransform);
     d->boundingRect = path.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
     d->outline.addPath(path);
@@ -1299,6 +1278,9 @@ void LaserPath::setPath(const QPainterPath& path)
 {
     Q_D(LaserPath);
     d->path = path; 
+    d->boundingRect = path.boundingRect();
+	d->originalBoundingRect = d->boundingRect;
+    d->outline.addPath(path);
 }
 
 LaserPointListList LaserPath::updateMachiningPoints(ProgressItem* parentProgress)
@@ -1322,7 +1304,6 @@ void LaserPath::draw(QPainter * painter)
 {
     Q_D(LaserPath);
     painter->drawPath(d->path);
-    //painter->drawRect(boundingRect());
 }
 
 QPainterPath LaserPath::toMachiningPath() const
@@ -1352,13 +1333,6 @@ QRectF LaserPath::sceneBoundingRect() const
 	Q_D(const LaserPath);
 	return sceneTransform().map(d->path).boundingRect();
 	
-}
-
-QRectF LaserPath::boundingRect() const
-{
-    Q_D(const LaserPath);
-    QPainterPath path = sceneTransform().map(d->path);
-    return path.boundingRect();
 }
 
 QJsonObject LaserPath::toJson()
@@ -1406,15 +1380,6 @@ QJsonObject LaserPath::toJson()
     return object;
 }
 
-/*void LaserPath::reShape()
-{
-	Q_D(LaserPath);
-	d->path = transform().map(d->path);
-	d->boundingRect = d->path.boundingRect();
-	d->allTransform = d->allTransform * transform();
-	setTransform(QTransform());
-}*/
-
 QVector<QLineF> LaserPath::edges()
 {
 	Q_D(LaserPath);
@@ -1447,7 +1412,6 @@ public:
     LaserPolylinePrivate(LaserPolyline* ptr)
         : LaserShapePrivate(ptr)
     {}
-	//QPainterPath path;
     QPolygonF poly;
 };
 
@@ -1460,7 +1424,6 @@ LaserPolyline::LaserPolyline(const QPolygonF & poly, LaserDocument * doc, QTrans
 	sceneTransformToItemTransform(saveTransform);
     d->boundingRect = d->poly.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
-
     d->outline.moveTo(*d->poly.begin());
     for (int i = 1; i < d->poly.count(); i++)
     {
@@ -1478,6 +1441,16 @@ void LaserPolyline::setPolyline(const QPolygonF& poly)
 {
     Q_D(LaserPolyline);
     d->poly = poly; 
+    d->path = QPainterPath();
+	d->path.addPolygon(d->poly);
+    d->boundingRect = d->poly.boundingRect();
+	d->originalBoundingRect = d->boundingRect;
+    d->outline = QPainterPath();
+    d->outline.moveTo(*d->poly.begin());
+    for (int i = 1; i < d->poly.count(); i++)
+    {
+        d->outline.lineTo(d->poly[i]);
+    }
 }
 
 QRectF LaserPolyline::sceneBoundingRect() const
@@ -1545,22 +1518,6 @@ QPainterPath LaserPolyline::toMachiningPath() const
 
     return path;
 }
-
-/*void LaserPolyline::reShape()
-{
-	Q_D(LaserPolyline);
-	d->poly = transform().map(d->poly);
-	//QPainterPath path;
-	//path.addPolygon(d->poly);
-	d->path = transform().map(d->path);
-	//d->boundingRect = path.boundingRect();
-	d->boundingRect = d->path.boundingRect();
-	d->allTransform = d->allTransform*transform();
-	qDebug() << transform();
-	qDebug() << sceneTransform();
-	QGraphicsItem* parentItem = this->parentItem();
-	setTransform(QTransform());
-}*/
 
 QJsonObject LaserPolyline::toJson()
 {
@@ -1637,9 +1594,9 @@ LaserPolygon::LaserPolygon(const QPolygonF & poly, LaserDocument * doc, QTransfo
     Q_D(LaserPolygon);
 	d->poly = poly;
 	sceneTransformToItemTransform(saveTransform);
-    //d->poly = saveTransform.map(poly);
     d->boundingRect = d->poly.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
+    d->path.addPolygon(d->poly);
     d->outline.addPolygon(d->poly);
 }
 
@@ -1653,6 +1610,12 @@ void LaserPolygon::setPolyline(const QPolygonF& poly)
 {
     Q_D(LaserPolygon);
     d->poly = poly; 
+    d->boundingRect = d->poly.boundingRect();
+	d->originalBoundingRect = d->boundingRect;
+    d->path = QPainterPath();
+    d->path.addPolygon(d->poly);
+    d->outline = QPainterPath();
+    d->outline.addPolygon(d->poly);
 }
 
 LaserPointListList LaserPolygon::updateMachiningPoints(ProgressItem* parentProgress)
@@ -2086,7 +2049,6 @@ public:
     {}
 
     QImage image;
-    //QRectF bounds;
 };
 
 LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocument * doc, QTransform saveTransform, int layerIndex)
@@ -2095,9 +2057,9 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     Q_D(LaserBitmap);
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
+	d->originalBoundingRect = d->boundingRect;
     d->primitiveType = LPT_BITMAP;
     d->outline.addRect(bounds);
-	d->originalBoundingRect = d->boundingRect;
 	sceneTransformToItemTransform(saveTransform);
 
 	setFlags(ItemIsSelectable | ItemIsMovable);
@@ -2111,8 +2073,6 @@ QImage LaserBitmap::image() const
     Q_D(const LaserBitmap);
     return d->image; 
 }
-
-
 
 void LaserBitmap::setImage(const QImage& image)
 {
@@ -2424,7 +2384,7 @@ public:
     //QList<QPainterPath> pathList;
     //QMap<QPointF, QList<QPainterPath>> pathList;
     QList<LaserTextRowPath> pathList;
-    QPainterPath allPath;
+    //QPainterPath allPath;
     QFont font;
     int alignHType;
     int lastAlignHType;
@@ -2495,7 +2455,7 @@ QPainterPath LaserText::path() const
         paths.addPath(rowPath);
     }*/
     
-    return d->allPath;
+    return d->path;
 }
 
 QVector<QLineF> LaserText::edges()
@@ -2690,7 +2650,7 @@ void LaserText::modifyPathList()
     }
     qreal allHeight = fontSize * subRowPathList.size() + (subRowPathList.size()-1)* spaceY();
     d->pathList.clear();
-    d->allPath = QPainterPath();
+    d->path = QPainterPath();
     for (int j = 0; j < subRowPathList.size(); j++) {
         QList<QPainterPath> subRowPath = subRowPathList[j];
         QList<QRectF> subRowBound = subBoundList[j];
@@ -2775,7 +2735,7 @@ void LaserText::modifyPathList()
         rowPathStruct.setSubRowPathlist(newRowSubPaths);
         rowPathStruct.setSubRowBoundlist(newRowBounds);
         d->pathList.append(rowPathStruct);
-        d->allPath.addPath(newRowPath);
+        d->path.addPath(newRowPath);
     }
     
 }
@@ -2791,7 +2751,7 @@ QRectF LaserText::boundingRect() const
 {
     Q_D(const LaserText);
     //d->boundingRect = d->path.boundingRect();
-    return path().boundingRect();
+    return sceneTransform().mapRect(path().boundingRect());
 }
 
 QRectF LaserText::sceneBoundingRect() const
@@ -2804,10 +2764,11 @@ QRectF LaserText::originalBoundingRect(qreal extendPixel) const
 {
     
     Q_D(const LaserPrimitive);
-    qreal x = boundingRect().topLeft().x() - extendPixel;
-    qreal y = boundingRect().topLeft().y() - extendPixel;
-    qreal width = boundingRect().width() + 2 * extendPixel;
-    qreal height = boundingRect().height() + 2 * extendPixel;
+    QRectF boundingRect = path().boundingRect();;
+    qreal x = boundingRect.topLeft().x() - extendPixel;
+    qreal y = boundingRect.topLeft().y() - extendPixel;
+    qreal width = boundingRect.width() + 2 * extendPixel;
+    qreal height = boundingRect.height() + 2 * extendPixel;
     QRectF rect = QRectF(x, y, width, height);
     return rect;
 }
@@ -2895,8 +2856,7 @@ QPointF LaserText::position() const
 QPainterPath LaserText::toMachiningPath() const
 {
     Q_D(const LaserText);
-    QPainterPath path = d->allPath;
-    path = transformToDevice().map(path);
+    QPainterPath path = transformToDevice().map(d->path);
     return path;
 }
 
