@@ -1410,6 +1410,7 @@ void LaserControllerWindow::updataRecentFilesActions()
         QString name = QString::number(index) +QString(". ") + path;
         QAction* action = m_recentFilesMenu->addAction(QIcon(":/ui/icons/images/file.png"), name);
         connect(action, &QAction::triggered, [=] {
+            //path 是否可用
             if (path == "") {
                 return;
             }
@@ -1419,6 +1420,14 @@ void LaserControllerWindow::updataRecentFilesActions()
                 deleteRecentFile(path);
                 return;
             }
+            //保存当前文档
+            LaserDocument* doc = m_scene->document();
+            if (doc) {
+                if (!onActionCloseDocument()) {
+                    return;
+                }
+            }
+            //设置window名称
             m_fileDirection = path;
             setWindowTitle(getCurrentFileName() + " - ");
             //创建document
@@ -2723,7 +2732,6 @@ void LaserControllerWindow::onActionImport(bool checked)
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Importing"), nullptr);
         importer->import(filename, m_scene, progress);
         progress->finish();
-        addRecentFile(filename);
     }
 }
 
