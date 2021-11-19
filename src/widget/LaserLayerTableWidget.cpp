@@ -171,6 +171,11 @@ void LaserLayerTableWidget::updateItems()
                     layer->setExportable(checked);
                     LaserViewer* view = qobject_cast<LaserViewer*>(m_doc->scene()->views()[0]);
                     view->viewport()->update();
+                    LaserDocument* doc = view->scene()->document();
+                    if (doc)
+                    {
+                        doc->updateDocumentBounding();
+                    }
                 }
             );
             setCellWidget(row, 5, exportablePanel);

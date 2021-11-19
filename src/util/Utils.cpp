@@ -183,21 +183,22 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
-void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRectF& bounding, QRectF& boundingAcc)
+void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRectF& bounding, QRectF& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     bounding = QRectF();
     boundingAcc = QRectF();
     for (LaserPrimitive* primitive : primitives)
     {
-        if (!primitive->exportable())
+        if (exludeUnexport && !primitive->exportable())
             continue;
 
         QRectF rect = primitive->sceneBoundingRect();
         QRectF rectAcc = rect;
         LaserLayer* layer = primitive->layer();
-        if (primitive->primitiveType() == LPT_BITMAP ||
-            (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel && primitive->isShape()))
+        if (primitive->isBitmap() ||
+            (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel && 
+                (primitive->isShape() || primitive->isText())))
         {
             qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed() * 1000);
             span = Global::mechToSceneHF(span);

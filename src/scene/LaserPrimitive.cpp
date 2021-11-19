@@ -1038,8 +1038,7 @@ QPainterPath LaserRect::toMachiningPath() const
 {
     Q_D(const LaserRect);
     QPainterPath path;
-    QPolygonF rect = sceneTransform().map(d->rect);
-    path.addPolygon(rect);
+    path.addPolygon(d->rect);
 
     path = transformToDevice().map(path);
 
@@ -1184,9 +1183,8 @@ QPainterPath LaserLine::toMachiningPath() const
 {
     Q_D(const LaserLine);
     QPainterPath path;
-    QLineF line = sceneTransform().map(d->line);
-    path.moveTo(line.p1());
-    path.lineTo(line.p2());
+    path.moveTo(d->line.p1());
+    path.lineTo(d->line.p2());
 
     path = transformToDevice().map(path);
 
@@ -1534,8 +1532,7 @@ QPainterPath LaserPolyline::toMachiningPath() const
 {
     Q_D(const LaserPolyline);
     QPainterPath path;
-    QPolygonF rect = transform().map(d->poly);
-    path.addPolygon(rect);
+    path.addPolygon(d->poly);
 
     path = transformToDevice().map(path);
 
@@ -1675,8 +1672,7 @@ QPainterPath LaserPolygon::toMachiningPath() const
 {
     Q_D(const LaserPolygon);
     QPainterPath path;
-    QPolygonF poly = transform().map(d->poly);
-    path.addPolygon(poly);
+    path.addPolygon(d->poly);
 
     path = transformToDevice().map(path);
 
@@ -2030,7 +2026,8 @@ void LaserNurbs::draw(QPainter* painter)
 QPainterPath LaserNurbs::toMachiningPath() const
 {
     Q_D(const LaserNurbs);
-    return d->drawingPath;
+    QPainterPath path = transformToDevice().map(d->drawingPath);
+    return path;
 }
 
 QRectF LaserNurbs::sceneBoundingRect() const
@@ -2349,15 +2346,15 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint, QPoin
     Q_D(LaserShape);
     QByteArray bytes;
     QPainterPath path = toMachiningPath();
-    QRectF boundingRectInMech = path.boundingRect();
-    //boundingRectInMech = LaserApplication::device->transformToDevice().mapRect(boundingRectInMech);
-    qreal ratio = boundingRectInMech.width() / boundingRectInMech.height();
-    int canvasWidth = qMin(boundingRectInMech.width(), 1000.0);
+    QRectF boundingRectInDevice = path.boundingRect();
+    //boundingRectInDevice = LaserApplication::device->transformToDevice().mapRect(boundingRectInDevice);
+    qreal ratio = boundingRectInDevice.width() / boundingRectInDevice.height();
+    int canvasWidth = qMin(boundingRectInDevice.width(), 1000.0);
     int canvasHeight = qRound(canvasWidth / ratio);
 
     QTransform t = QTransform::fromScale(
-        canvasWidth / boundingRectInMech.width(),
-        canvasHeight / boundingRectInMech.height()
+        canvasWidth / boundingRectInDevice.width(),
+        canvasHeight / boundingRectInDevice.height()
     );
 
     path = t.map(path);
@@ -2375,25 +2372,25 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPointF& lastPoint, QPoin
     cv::Mat src(canvas.height(), canvas.width(), CV_8UC1, (void*)canvas.constBits(), canvas.bytesPerLine());
 
     int dpi = d->layer->dpi();
-    int pixelWidth = Global::mechToSceneH(boundingRectInMech.width());
-    int pixelHeight = Global::mechToSceneH(boundingRectInMech.height());
+    int pixelWidth = Global::mechToSceneH(boundingRectInDevice.width());
+    int pixelHeight = Global::mechToSceneH(boundingRectInDevice.height());
 
     qreal pixelInterval = layer()->engravingRowInterval();
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundingRectInMech.height() / pixelInterval);
+    int outHeight = std::round(boundingRectInDevice.height() / pixelInterval);
     cv::Mat resized;
     cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_NEAREST);
     //resized = 255 - resized;
 
     cv::imwrite("tmp/" + name().toStdString() + ".png", resized);
 
-    qLogD << "bounding rect: " << boundingRectInMech;
+    qLogD << "bounding rect: " << boundingRectInDevice;
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
     
     qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
     bytes = imageUtils::image2EngravingData(progress, resized, 
-        boundingRectInMech, pixelInterval, lastPoint, residual, accLength);
+        boundingRectInDevice, pixelInterval, lastPoint, residual, accLength);
 
     return bytes;
 }
