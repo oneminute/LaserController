@@ -27,10 +27,6 @@ public:
     explicit LaserDocument(LaserScene* scene, QObject* parent = nullptr);
     ~LaserDocument();
 
-    void addPrimitive(LaserPrimitive* item);
-    void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
-    void removePrimitive(LaserPrimitive* item);
-
     QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
 	QList<LaserPrimitive*> selectedPrimitives() const;
@@ -118,6 +114,11 @@ public:
 
     void transform(const QTransform& trans);
 
+protected:
+    void addPrimitive(LaserPrimitive* item);
+    void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
+    void removePrimitive(LaserPrimitive* item);
+
 public slots:
     void exportJSON(const QString& filename, ProgressItem* parentProgress);
     void exportBoundingJSON();
@@ -163,6 +164,7 @@ protected:
     friend class OptimizeNode;
     friend class OptimizeNodePrivate;
     friend class LaserPrimitive;
+    friend class LaserScene;
 };
 
 #endif // LASERDOCUMENT_H

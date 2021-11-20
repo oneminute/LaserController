@@ -85,7 +85,6 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
 	d->layers[item->layerIndex()]->addPrimitive(item);
-    updateDocumentBounding();
 }
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
@@ -93,35 +92,14 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
     item->layer()->removePrimitive(item);
     layer->addPrimitive(item);
     updateLayersStructure();
-    updateDocumentBounding();
 }
 
 void LaserDocument::removePrimitive(LaserPrimitive* item)
 {
     Q_D(LaserDocument);
     item->layer()->removePrimitive(item);
-    scene()->removeLaserPrimitive(item);
     d->primitives.remove(item->id());
-    updateDocumentBounding();
 }
-
-//PageInformation LaserDocument::pageInformation() const
-//{
-//    Q_D(const LaserDocument);
-//    return d->pageInfo;
-//}
-//
-//void LaserDocument::setPageInformation(const PageInformation& page)
-//{
-//    Q_D(LaserDocument);
-//    d->pageInfo = page;
-//}
-//
-//QRectF LaserDocument::pageBounds() const
-//{
-//    Q_D(const LaserDocument);
-//    return QRectF(0, 0, d->pageInfo.width(), d->pageInfo.height());
-//}
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
 {
@@ -1044,6 +1022,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 	QJsonArray layers = doc.object()["layers"].toArray();
 	QList<LaserLayer*> laserLayers = this->layers();
 	
+    QList<LaserPrimitive*> unavailables;
     this->blockSignals(true);
 	for (int i = 0; i < layers.size(); i++) {
 		QJsonObject layer = layers[i].toObject();
@@ -1148,10 +1127,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("type")) {
             laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
         }
-        /*if (layer.contains("halftoneGridSize"))
-        {
-            laserLayers[index]->setHalftoneGridSize(layer.value("halftoneGridSize").toInt());
-        }*/
 
 		//primitive
 		for (int j = 0; j < array.size(); j++) {
@@ -1160,8 +1135,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             QString name = primitiveJson["name"].toString();
 			int layerIndex = primitiveJson["layerIndex"].toInt();
 			//postion
-			//QJsonArray posArray = primitiveJson["position"].toArray();
-			//QPointF position(posArray[0].toDouble(), posArray[1].toDouble());
 			//transform
 			QJsonArray matrixArray = primitiveJson["matrix"].toArray();
 			QTransform transform;
@@ -1181,8 +1154,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 			//
             LaserPrimitive* primitive = nullptr;
 			if (className == "LaserEllipse" || className == "LaserRect" || className == "LaserBitmap") {
-				//QTransform saveTransform = transform * transformP;
-				
 				//bounds
 				QJsonArray boundsArray = primitiveJson["bounds"].toArray();
 				QRectF bounds = QRectF(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
@@ -1199,17 +1170,12 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					QRectF bounds = QRectF(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
 					//image
 					QByteArray array = QByteArray::fromBase64(primitiveJson["image"].toString().toLatin1());
-					//QBuffer buffer(&array);
-					//buffer.open(QIODevice::ReadOnly);
 					
 					QImage img = QImage::fromData(array, "tiff");
 
 					qDebug() << img.size();
 					primitive = new LaserBitmap(img, bounds, this, saveTransform, layerIndex);
 				}
-				//laserLayers[index]->addPrimitive(rect);
-				//this->addPrimitive(rect);
-				//this->scene()->addLaserPrimitive(rect);
 			}
 			else if (className == "LaserLine") {
 				
@@ -1219,10 +1185,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				QPointF p2 = QPointF(lineArray[2].toDouble(), lineArray[3].toDouble());
 
 				primitive = new LaserLine(QLineF(p1, p2), this, saveTransform, layerIndex);
-				//laserLayers[index]->addPrimitive(line);
-				//this->addPrimitive(line);
-				//this->scene()->addItem(line);
-                //this->scene()->addLaserPrimitive(line);
 			}
 			else if (className == "LaserPolyline" || className == "LaserPolygon") {
 				QJsonArray polyArray = primitiveJson["poly"].toArray();
@@ -1239,10 +1201,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 					primitive = new LaserPolygon(QPolygonF(vector), this, saveTransform, layerIndex);
 				}
 				
-				//laserLayers[index]->addPrimitive(poly);
-				//this->addPrimitive(poly);
-				//this->scene()->addItem(poly);
-                //this->scene()->addLaserPrimitive(poly);
             }
             else if (className == "LaserText") {
                 QString content = primitiveJson["content"].toString();
@@ -1259,10 +1217,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                     font, fontObj["alignH"].toInt(), fontObj["alignV"].toInt(), saveTransform, layerIndex);
                 text->setContent(content);
                 text->modifyPathList();   
-                //this->addPrimitive(text);
-                //this->scene()->addItem(text);
                 primitive = text;
-                //this->scene()->addLaserPrimitive(text);
             }
             else if (className == "LaserPath") {
                 QByteArray buffer = QByteArray::fromBase64(primitiveJson["path"].toString().toLatin1());
@@ -1270,15 +1225,14 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QDataStream stream(buffer);
                 stream >> path;
                 primitive = new LaserPath(path, this, saveTransform, layerIndex);
-                //this->addPrimitive(laserPath);
-                //this->scene()->addItem(laserPath);
-                //this->scene()->addLaserPrimitive(laserPath);
             }
             
             if (primitive)
             {
-				//laserLayers[index]->addPrimitive(primitive);
-                this->scene()->addLaserPrimitive(primitive);
+                if (primitive->isAvailable())
+                    this->scene()->addLaserPrimitive(primitive, true);
+                else
+                    unavailables.append(primitive);
 
                 QStringList segs = name.split("_");
                 if (segs.length() == 2)
@@ -1304,13 +1258,17 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("visible")) {
             bool bl = layer.value("visible").toBool();
             laserLayers[index]->setVisible(bl);
-            //LaserControllerWindow* window = LaserApplication::mainWindow;
         }
         if (layer.contains("exportable")) {
             bool exportable = layer.value("exportable").toBool();
             laserLayers[index]->setExportable(exportable);
         }
 	}
+    if (!unavailables.isEmpty())
+    {
+        QMessageBox::warning(LaserApplication::mainWindow, tr("Warning"),
+            tr("Found unavailable primitives, count is %1. These primitives will not be loaded.").arg(unavailables.count()));
+    }
     this->blockSignals(false);
     emit updateLayersStructure();
     open();

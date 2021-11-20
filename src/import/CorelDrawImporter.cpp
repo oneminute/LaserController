@@ -8,6 +8,7 @@
 #include "util/TypeUtils.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserScene.h"
+#include "scene/LaserPrimitive.h"
 #include <VGCoreAuto.tlh>
 #include <ObjIdl.h>
 
@@ -34,7 +35,7 @@ CorelDrawImporter::~CorelDrawImporter()
 {
 }
 
-void CorelDrawImporter::importImpl(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void CorelDrawImporter::importImpl(const QString & filename, LaserScene* scene, QList<LaserPrimitive*>& unavailables, ProgressItem* parentProgress, const QVariantMap& params)
 {
     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import from Corel Draw", parentProgress);
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -175,7 +176,7 @@ void CorelDrawImporter::importImpl(const QString & filename, LaserScene* scene, 
     if (success)
     {
         QSharedPointer<Importer> importer = Importer::getImporter(LaserApplication::mainWindow, Importer::SVG);
-        importer->import(tmpSvgFilename, scene, parentProgress, params);
+        importer->importImpl(tmpSvgFilename, scene, unavailables, parentProgress, params);
 
         if (tmpDir.exists(tmpSvgFilename))
         {

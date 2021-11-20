@@ -125,7 +125,6 @@ public:
         CONFIG_ITEM(ui, validMaxRegion, qreal, toReal)
         CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
         CONFIG_ITEM(ui, autoRepeatDelay, int, toInt)
-        //CONFIG_ITEM(ui, autoRepeatInterval, int, toInt)
         CONFIG_ITEM(ui, showDocumentBoundingRect, bool, toBool)
         CONFIG_ITEM(ui, laserCursorTimeout, int, toInt)
 

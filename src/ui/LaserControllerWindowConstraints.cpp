@@ -139,22 +139,54 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionOpen
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionOpen
+
+    // begin m_ui->actionCloseDocument
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveSplineState);
+    // end m_ui->actionCloseDocument
 
     // begin m_ui->actionImport
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveRectState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveEllipseState);
@@ -167,11 +199,14 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionExportJSON
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentSelectingState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentSelectedState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveRectState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveEllipseState);
@@ -226,13 +261,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionNew
 
     // begin m_ui->actionAddEngravingLayer
@@ -625,20 +660,6 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveTextState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionImportCorelDraw
-
-    // begin m_ui->actionCloseDocument
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", false, documentPrimitiveSplineState);
-    // end m_ui->actionCloseDocument
 
     // begin m_ui->actionLoadJson
     BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, initState);

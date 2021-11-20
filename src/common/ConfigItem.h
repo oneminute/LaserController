@@ -149,6 +149,7 @@ public:
     ModifiedBy modifiedBy() const;
 
     void setValue(const QVariant& value, ModifiedBy modifiedBy = MB_Manual);
+    //void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
 
 public slots:
     void reset();

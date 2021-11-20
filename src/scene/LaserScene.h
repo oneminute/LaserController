@@ -24,10 +24,11 @@ public:
 
     void setDocument(LaserDocument* doc);
     void clearDocument(bool delDoc = false);
-    void addLaserPrimitive(LaserPrimitive* primitive);
-    void addLaserPrimitiveWithoutTreeNode(LaserPrimitive* primitive);
+    void addLaserPrimitive(LaserPrimitive* primitive, bool ignoreUpdateDocBounding);
+    void addLaserPrimitive(LaserPrimitive* primitive, LaserLayer* layer, bool ignoreUpdateDocBounding);
+    void addLaserPrimitiveWithoutTreeNode(LaserPrimitive* primitive, bool ignoreUpdateDocBounding);
     void addGroupItemsToTreeNode();
-	void removeLaserPrimitive(LaserPrimitive* primitive);
+	void removeLaserPrimitive(LaserPrimitive* primitive, bool ignoreUpdateDocBounding);
 	LaserBackgroundItem* backgroundItem() { return m_background; }
 
     LaserDocument* document() { return m_doc; }

@@ -30,7 +30,7 @@ SvgImporter::~SvgImporter()
 {
 }
 
-void SvgImporter::importImpl(const QString & filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<LaserPrimitive*>& unavailables, ProgressItem* parentProgress, const QVariantMap& params)
 {
 	LaserApplication::mainWindow->activateWindow();
     LaserDocument* doc = scene->document();
@@ -212,7 +212,13 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, Progre
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setName(node->nodeId());
 
-            scene->addLaserPrimitive(item);
+            if (item)
+            {
+                if (item->isAvailable())
+                    scene->addLaserPrimitive(item, true);
+                else
+                    unavailables.append(item);
+            }
         }
         progress->increaseProgress();
     }

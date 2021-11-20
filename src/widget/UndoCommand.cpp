@@ -147,13 +147,13 @@ void AddDelUndoCommand::undo()
         if (m_primitiveList.isEmpty()) {
             for each(QGraphicsItem* item in m_list) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-                m_scene->addLaserPrimitive(primitive);
+                m_scene->addLaserPrimitive(primitive, true);
                 primitive->setSelected(true);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
-                m_scene->addLaserPrimitive(primitive);
+                m_scene->addLaserPrimitive(primitive, true);
                 primitive->setSelected(true);
             }
         }
@@ -170,13 +170,13 @@ void AddDelUndoCommand::undo()
             for each(QGraphicsItem* item in m_list) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
                 sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->document()->removePrimitive(primitive);
+                m_scene->removeLaserPrimitive(primitive, true);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
                 sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->document()->removePrimitive(primitive);
+                m_scene->removeLaserPrimitive(primitive, true);
             }
         }
 		//�ָ�֮ǰ��group
@@ -192,8 +192,8 @@ void AddDelUndoCommand::undo()
 		if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
 			emit m_viewer->selectionToIdle();
 		}
-		
-	}   
+	}
+    m_scene->document()->updateDocumentBounding();
 	m_viewer->viewport()->repaint();
     emit m_viewer->selectedChangedFromMouse();
 }
@@ -206,12 +206,12 @@ void AddDelUndoCommand::redo()
 		    for each(QGraphicsItem* item in m_list) {
 			    LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
 			    sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->document()->removePrimitive(primitive);
+                m_scene->removeLaserPrimitive(primitive, true);
 		    }
         }else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
                 sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->document()->removePrimitive(primitive);
+                m_scene->removeLaserPrimitive(primitive, true);
             }
         }
 		if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
@@ -225,13 +225,13 @@ void AddDelUndoCommand::redo()
         if (m_primitiveList.isEmpty()) {
             for each(QGraphicsItem* item in m_list) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-                m_scene->addLaserPrimitive(primitive);
+                m_scene->addLaserPrimitive(primitive, true);
                 primitive->setSelected(true);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
-                m_scene->addLaserPrimitive(primitive);
+                m_scene->addLaserPrimitive(primitive, true);
                 primitive->setSelected(true);
             }
         }
@@ -240,7 +240,7 @@ void AddDelUndoCommand::redo()
 			emit m_viewer->idleToSelected();
 		}
 	}
-    
+    m_scene->document()->updateDocumentBounding();
 	m_viewer->viewport()->repaint();
     emit m_viewer->selectedChangedFromMouse();
 }
@@ -276,11 +276,11 @@ void PolygonUndoCommand::undo()
 		m_viewer->clearGroupSelection();
 		sceneTransformToItemTransform(m_curItem->sceneTransform(), m_curItem);
 		//m_scene->removeLaserPrimitive(m_curItem);
-        m_scene->document()->removePrimitive(m_curItem);
+        m_scene->removeLaserPrimitive(m_curItem, false);
 	}
 	if (m_lastItem) {
 
-		m_scene->addLaserPrimitive(m_lastItem);
+		m_scene->addLaserPrimitive(m_lastItem, false);
 		m_lastItem->setSelected(true);
 		m_viewer->onSelectedFillGroup();
 		/*if (m_curItem == nullptr) {
@@ -316,13 +316,13 @@ void PolygonUndoCommand::redo()
 		m_viewer->clearGroupSelection();
 		sceneTransformToItemTransform(m_lastItem->sceneTransform(), m_lastItem);
 		//m_scene->removeLaserPrimitive(m_lastItem);
-        m_scene->document()->removePrimitive(m_lastItem);
+        m_scene->removeLaserPrimitive(m_lastItem, false);
 	}
 	else {
 		m_selectedBeforeAdd = m_viewer->clearGroupSelection();
 	}
 	if (m_curItem) {
-		m_scene->addLaserPrimitive(m_curItem);
+		m_scene->addLaserPrimitive(m_curItem, false);
 		m_curItem->setSelected(true);
 		m_viewer->onSelectedFillGroup();
 
@@ -412,7 +412,7 @@ void PasteCommand::undo()
 		utils::sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
 		primitive->setSelected(false);
 		//m_scene->removeLaserPrimitive(primitive);
-        m_scene->document()->removePrimitive(primitive);
+        m_scene->removeLaserPrimitive(primitive, true);
 	}
 	m_viewer->clearGroupSelection();
 	//�ָ�֮ǰ��group
@@ -421,6 +421,7 @@ void PasteCommand::undo()
 		utils::sceneTransformToItemTransform(i.value(), i.key());
 		i.key()->setSelected(true);
 	}
+    m_scene->document()->updateDocumentBounding();
 	m_viewer->onSelectedFillGroup();
 	m_viewer->viewport()->repaint();
 }
@@ -465,13 +466,14 @@ void PasteCommand::addImp(bool isAddToTreeNode)
 	m_viewer->clearGroupSelection();
 	for each(LaserPrimitive* primitive in m_pasteList) {
         if (isAddToTreeNode) {
-            m_scene->addLaserPrimitive(primitive);
+            m_scene->addLaserPrimitive(primitive, true);
         }
         else {
-            m_scene->addLaserPrimitiveWithoutTreeNode(primitive);
+            m_scene->addLaserPrimitiveWithoutTreeNode(primitive, true);
         }
         primitive->setSelected(true);
 	}
+    m_scene->document()->updateDocumentBounding();
 	m_viewer->onSelectedFillGroup();
 }
 

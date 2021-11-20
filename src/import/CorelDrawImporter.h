@@ -5,6 +5,7 @@
 #include "Importer.h"
 
 class ProgressItem;
+class LaserPrimitive;
 
 class CorelDrawImporter : public Importer
 {
@@ -14,7 +15,7 @@ public:
     virtual ~CorelDrawImporter();
 
 protected:
-    virtual void importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgres, const QVariantMap& params = QVariantMap());
+    virtual void importImpl(const QString& filename, LaserScene* scene, QList<LaserPrimitive*>& unavailables, ProgressItem* parentProgres, const QVariantMap& params = QVariantMap());
 };
 
 #endif // CORELDRAWIMPORTER_H

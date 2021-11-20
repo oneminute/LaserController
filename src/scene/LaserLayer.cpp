@@ -728,7 +728,7 @@ void LaserLayer::onClicked()
     {
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
         {
-            scene->document()->addPrimitive(primitive, this);
+            scene->addLaserPrimitive(primitive, this, false);
         }
 
        /* QList<LaserPrimitiveType> types;

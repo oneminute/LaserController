@@ -9,6 +9,7 @@
 class LaserDocument;
 class LaserScene;
 class ProgressItem;
+class LaserPrimitive;
 
 class Importer : public QObject
 {
@@ -32,7 +33,11 @@ signals:
     void imported();
 
 protected:
-    virtual void importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap()) = 0;
+    virtual void importImpl(const QString& filename, LaserScene* scene, QList<LaserPrimitive*>& unavailables, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap()) = 0;
+
+    friend class SvgImporter;
+    friend class DxfImporter;
+    friend class CorelDrawImporter;
 };
 
 #endif // IMPORTER_H

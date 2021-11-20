@@ -963,7 +963,7 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
         qDebug() << text->content().length();
         laserText = text;
         if (text->content().trimmed().isEmpty()) {
-            m_scene->removeLaserPrimitive(laserText);
+            m_scene->removeLaserPrimitive(laserText, false);
             laserText = nullptr;
             m_insertIndex = -1;
             return false;
@@ -3919,7 +3919,7 @@ void LaserViewer::addText(QString str)
         
         m_editingText->addPath(str, m_insertIndex);
         m_insertIndex += str.size();
-        m_scene->addLaserPrimitive(m_editingText);
+        m_scene->addLaserPrimitive(m_editingText, false);
     }
     else {
         
@@ -3948,7 +3948,7 @@ void LaserViewer::removeBackText()
         m_editingText->delPath(m_insertIndex);
         modifyTextCursor();
         if (m_editingText->path().isEmpty()) {
-            m_scene->removeLaserPrimitive(m_editingText);
+            m_scene->removeLaserPrimitive(m_editingText, false);
             m_editingText = nullptr;
         }
         viewport()->repaint();
@@ -3968,7 +3968,7 @@ void LaserViewer::removeFrontText()
         m_insertIndex -= 1;
         modifyTextCursor();
         if (m_editingText->path().isEmpty()) {
-            m_scene->removeLaserPrimitive(m_editingText);
+            m_scene->removeLaserPrimitive(m_editingText, false);
             m_editingText = nullptr;
         }
         viewport()->repaint();
@@ -4354,7 +4354,7 @@ void LaserViewer::createSpline()
     }
 
     LaserPath* laserPath = new LaserPath(path, m_scene->document(), QTransform(), m_curLayerIndex);
-    m_scene->addLaserPrimitive(laserPath);
+    m_scene->addLaserPrimitive(laserPath, false);
     m_handlingSpline.objectName = laserPath->objectName();
     m_splineList.append(m_handlingSpline);
     initSpline();

@@ -112,6 +112,8 @@ public:
     void removeAllTreeNode();
     void removeOneTreeNode(QuadTreeNode* node);
 
+    virtual bool isAvailable() const;
+
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

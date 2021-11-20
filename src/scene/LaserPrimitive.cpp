@@ -686,6 +686,17 @@ void LaserPrimitive::removeOneTreeNode(QuadTreeNode * node)
     }
 }
 
+bool LaserPrimitive::isAvailable() const
+{
+    Q_D(const LaserPrimitive);
+    bool available = true;
+    if (!d->boundingRect.isValid())
+        available = false;
+    if (d->path.isEmpty())
+        available = false;
+    return available;
+}
+
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
@@ -1111,10 +1122,10 @@ LaserLine::LaserLine(const QLineF & line, LaserDocument * doc, QTransform saveTr
 {
     Q_D(LaserLine);
     d->line = line;
-    d->boundingRect = QRectF(d->line.p1(), d->line.p2());
 	sceneTransformToItemTransform(saveTransform);
     d->path.moveTo(d->line.p1());
-    d->path.moveTo(d->line.p2());
+    d->path.lineTo(d->line.p2());
+    d->boundingRect = d->path.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
@@ -1131,10 +1142,10 @@ void LaserLine::setLine(const QLineF& line)
 {
     Q_D(LaserLine);
     d->line = line; 
-    d->boundingRect = QRectF(d->line.p1(), d->line.p2());
     d->path = QPainterPath();
     d->path.moveTo(d->line.p1());
-    d->path.moveTo(d->line.p2());
+    d->path.lineTo(d->line.p2());
+    d->boundingRect = d->path.boundingRect();
 	d->originalBoundingRect = d->boundingRect;
     d->outline = QPainterPath();
     d->outline.moveTo(d->line.p1());

@@ -2887,14 +2887,14 @@ void LaserControllerWindow::onActionRemoveLayer(bool checked)
 		{
 			for (LaserPrimitive* primitive : layer->primitives())
 			{
-				m_scene->document()->addPrimitive(primitive, m_scene->document()->defaultEngravingLayer());
+				m_scene->addLaserPrimitive(primitive, m_scene->document()->defaultEngravingLayer(), false);
 			}
 		}
 		else if (layer->type() == LLT_CUTTING)
 		{
 			for (LaserPrimitive* primitive : layer->primitives())
 			{
-				m_scene->document()->addPrimitive(primitive, m_scene->document()->defaultCuttingLayer());
+				m_scene->addLaserPrimitive(primitive, m_scene->document()->defaultCuttingLayer(), false);
 			}
 		}
 	}
@@ -3700,7 +3700,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
 
     QRectF bounding = laserRect->sceneBoundingRect();
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
-    m_scene->document()->removePrimitive(rectPrimitive);
+    m_scene->removeLaserPrimitive(rectPrimitive, false);
 
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     

@@ -44,7 +44,7 @@ DxfImporter::~DxfImporter()
 {
 }
 
-void DxfImporter::importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params)
+void DxfImporter::importImpl(const QString& filename, LaserScene* scene, QList<LaserPrimitive*>& unavailables, ProgressItem* parentProgress, const QVariantMap& params)
 {
     Q_D(DxfImporter);
     qLogD << "import from dxf";
@@ -84,7 +84,10 @@ void DxfImporter::importImpl(const QString& filename, LaserScene* scene, Progres
         LaserPrimitive* primitive = node->convertTo(laserDoc, t);
         if (primitive)
         {
-            laserDoc->addPrimitive(primitive);
+            if (primitive->isAvailable())
+                scene->addLaserPrimitive(primitive, true);
+            else
+                unavailables.append(primitive);
         }
         progress->increaseProgress();
     }

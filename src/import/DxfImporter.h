@@ -6,6 +6,7 @@
 
 class QTextStream;
 class DxfNode;
+class LaserPrimitive;
 
 class DxfImporterPrivate;
 class DxfImporter : public Importer
@@ -16,7 +17,7 @@ public:
     virtual ~DxfImporter();
 
 protected:
-    virtual void importImpl(const QString& filename, LaserScene* scene, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap());
+    virtual void importImpl(const QString& filename, LaserScene* scene, QList<LaserPrimitive*>& unavailables, ProgressItem* parentProgress, const QVariantMap& params = QVariantMap());
 
 private:
     QScopedPointer<DxfImporterPrivate> m_ptr;

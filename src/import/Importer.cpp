@@ -1,10 +1,15 @@
 #include "Importer.h"
+
+#include <QMessageBox>
+
+#include "LaserApplication.h"
 #include "SvgImporter.h"
 #include "DxfImporter.h"
 #include "CorelDrawImporter.h"
 #include "task/ProgressItem.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
+#include "ui/LaserControllerWindow.h"
 
 Importer::Importer(QObject* parent)
     : QObject(parent)
@@ -12,7 +17,13 @@ Importer::Importer(QObject* parent)
 
 void Importer::import(const QString & filename, LaserScene * scene, ProgressItem * parentProgress, const QVariantMap & params)
 {
-    importImpl(filename, scene, parentProgress, params);
+    QList<LaserPrimitive*> unavailables;
+    importImpl(filename, scene, unavailables, parentProgress, params);
+    if (!unavailables.isEmpty())
+    {
+        QMessageBox::warning(LaserApplication::mainWindow, tr("Warning"),
+            tr("Found unavailable primitives, count is %1. These primitives will not be loaded.").arg(unavailables.count()));
+    }
     scene->document()->open();
 }
 
