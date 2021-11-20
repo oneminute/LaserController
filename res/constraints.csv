@@ -120,5 +120,5 @@ m_ui->actionPrintAndCutRestore,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
 m_ui->actionPrintAndCutRemove,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,0,0,1,1,0
 m_ui->actionStartRedLightAlight,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,0,0,1,1,1
 m_ui->actionFinishRedLightAlight,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,0,0,0,0,0,1,1
-m_ui->actionPrintAndCutSelectPoint,enabled,0,0,0,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,0
-m_ui->actionPrintAndCutEndSelect,enabled,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,1,0
+m_ui->actionPrintAndCutSelectPoint,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,-,1,0,0,0,0,0
+m_ui->actionPrintAndCutEndSelect,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,-,0,0,0,0,1,0
