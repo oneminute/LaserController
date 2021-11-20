@@ -2068,6 +2068,7 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRectF& bounds, LaserDocume
     Q_D(LaserBitmap);
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
+    d->path.addRect(bounds);
 	d->originalBoundingRect = d->boundingRect;
     d->primitiveType = LPT_BITMAP;
     d->outline.addRect(bounds);
