@@ -89,6 +89,8 @@ src/widget/LRWidgets
 
 src/widget/ADS
 
+src/ui/LaserControllerWindowConstraints.cpp
+
 .vscode/
 
 config.json

@@ -821,10 +821,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
-    ADD_TRANSITION(documentIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
-    ADD_TRANSITION(documentSelectionState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
-    ADD_TRANSITION(documentPrimitiveState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
-    ADD_TRANSITION(documentPrintAndCutSelectingState, documentIdleState, this, SIGNAL(finishPrintAndCutSelecting()));
+    ADD_TRANSITION(deviceIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
+    ADD_TRANSITION(documentPrintAndCutSelectingState, deviceIdleState, this, SIGNAL(finishPrintAndCutSelecting()));
     ADD_TRANSITION(deviceIdleState, documentPrintAndCutAligningState, this, SIGNAL(startPrintAndCutAligning()));
     ADD_TRANSITION(documentPrintAndCutAligningState, deviceIdleState, this, SIGNAL(finishPrintAndCutAligning()));
 
@@ -4475,8 +4473,8 @@ void LaserControllerWindow::selectedChangedFromMouse()
 		//qDebug() << rectReal.top();
 		qreal x = 0, y = 0, width = 0, height = 0; 
 		if (m_unitIsMM) {
-			width = qRound(rectReal.width() * 0.001);
-			height = qRound(rectReal.height() * 0.001);
+			width = qRound(rectReal.width()) * 0.001;
+			height = qRound(rectReal.height()) * 0.001;
 		}
 
 		switch (m_selectionOriginalState) {

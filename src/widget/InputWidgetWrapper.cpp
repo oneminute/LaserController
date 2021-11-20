@@ -20,6 +20,7 @@ public:
     QLabel* labelDesc;
     InputWidgetType type;
     ConfigItem* configItem;
+    StoreStrategy storeStrategy;
 };
 
 InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
@@ -290,6 +291,18 @@ QVariant InputWidgetWrapper::value() const
 {
     Q_D(const InputWidgetWrapper);
     return d->configItem->value();
+}
+
+StoreStrategy InputWidgetWrapper::storeStrategy() const
+{
+    Q_D(const InputWidgetWrapper);
+    return d->storeStrategy;
+}
+
+void InputWidgetWrapper::setStoreStrategy(StoreStrategy storeStrategy)
+{
+    Q_D(InputWidgetWrapper);
+    d->storeStrategy = storeStrategy;
 }
 
 void InputWidgetWrapper::retranslate()

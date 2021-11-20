@@ -56,9 +56,9 @@ bool LaserApplication::initialize()
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
     LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
-    LaserApplication::setApplicationDisplayName(QObject::tr("CNE Laser %1").arg(LC_VERSION_STR));
+    LaserApplication::setApplicationDisplayName(QObject::tr("CNE Laser %1").arg(LC_VERSION_STR_WITH_TAG));
     LaserApplication::setOrganizationName(tr(""));
-    LaserApplication::setApplicationVersion(QString("%1").arg(LC_VERSION_STR));
+    LaserApplication::setApplicationVersion(QString("%1").arg(LC_VERSION_STR_WITH_TAG));
     //LaserApplication::setStyle(QStyleFactory::create("Fusion"));
     
     qLogD << "product name:" << LaserApplication::applicationName() << ", version:" << LaserApplication::applicationVersion();

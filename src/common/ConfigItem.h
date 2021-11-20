@@ -28,8 +28,6 @@ public:
 
     explicit ConfigItem(const QString& name
         , ConfigItemGroup* group
-        //, const QString& title
-        //, const QString& description
         , const QVariant& value
         , DataType dataType = DT_INT
         , bool advanced = false

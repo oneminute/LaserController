@@ -51,6 +51,9 @@ public:
     bool isModified();
     QVariant value() const;
 
+    StoreStrategy storeStrategy() const;
+    void setStoreStrategy(StoreStrategy storeStrategy);
+
     void retranslate();
 
     template<typename T = QWidget*>
