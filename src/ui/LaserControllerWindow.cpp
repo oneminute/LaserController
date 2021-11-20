@@ -444,6 +444,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //family m_height
     m_textFontWidget->setLayout(m_textLayout);
     m_ui->textFontBar->addWidget(m_textFontWidget);
+    m_textFontWidget->setEnabled(false);
     m_fontFamily = new LaserFontComboBox();
     m_fontFamily->setEditable(false);
     m_fontFamily->setCurrentText("Times New Roman");
@@ -668,7 +669,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 		m_viewer->viewport()->repaint();
 	});
 	connect(StateController::instance().documentSelectedState(), &QState::entered, m_viewer, [=] {
-		m_viewer->viewport()->repaint();
+		//m_viewer->viewport()->repaint();
+        m_viewer->viewport()->update();
 	});
 	
 	//selected properties
