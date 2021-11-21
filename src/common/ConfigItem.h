@@ -32,7 +32,7 @@ public:
         , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
-        , StoreStrategy storeStrategy = StoreStrategy::SS_CONFIRMED
+        , StoreStrategy storeStrategy = StoreStrategy::SS_AS_IS
     );
     ~ConfigItem();
 
@@ -68,6 +68,7 @@ public:
     void setStoreStrategy(StoreStrategy type);
 
     QVariant value() const;
+    QVariant oldValue() const;
 
     QVariant defaultValue() const;
     void setDefaultValue(const QVariant& value);
@@ -144,26 +145,29 @@ public:
 
     const QList<QWidget*>& boundedWidgets() const;
 
-    ModifiedBy modifiedBy() const;
-
-    void setValue(const QVariant& value, ModifiedBy modifiedBy = MB_Manual);
-    //void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
+    void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
 
 public slots:
     void reset();
     void restore();
     void restoreSystem();
-    void confirm();
+
+    void apply();
+    void confirm(const QVariant& value);
+    void load(const QVariant& value);
 
 protected slots:
     void onRegisterLoaded(const QVariant& value);
 
 signals:
     void visibleChanged(bool value);
-    void valueChanged(const QVariant& value, ModifiedBy modifiedBy);
     void defaultValueChanged(const QVariant& value);
     void modifiedChanged(bool modified);
     void enabledChanged(bool enabled);
+
+    void valueChanged(const QVariant& value, void* senderPtr);
+    void dirtyValueChanged(const QVariant& value, void* senderPtr);
+    void lazyValueChanged(const QVariant& value, void* snederPtr);
 
 private:
     QScopedPointer<ConfigItemPrivate> m_ptr;

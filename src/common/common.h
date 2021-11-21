@@ -181,15 +181,14 @@ enum SelectionTransformType {
 /// </summary>
 enum StoreStrategy
 {
+    SS_AS_IS,
+
     /// <summary>
     /// 直接修改
     /// </summary>
     SS_DIRECTLY,
 
-    /// <summary>
-    /// 该策略是在用户确认保存后，再直接将选项值通过setValue函数写入到文件中。
-    /// </summary>
-    SS_CONFIRMED,
+    SS_NORMAL,
 
     /// <summary>
     /// 延后保存，一般是与寄存器相关，由板卡返回寄存器的值后再修改当前内存中的值
@@ -247,14 +246,14 @@ enum StartFromType
     SFT_AbsoluteCoords
 };
 
-enum ModifiedBy
-{
-    MB_Manual,
-    MB_ConfigFile,
-    MB_Widget,
-    MB_Register,
-    MB_RegisterConfirmed
-};
+//enum ModifiedBy
+//{
+//    MB_Manual,
+//    MB_ConfigFile,
+//    MB_Widget,
+//    MB_Register,
+//    MB_RegisterConfirmed
+//};
 
 enum PrimitiveProperty
 {
