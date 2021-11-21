@@ -183,7 +183,7 @@ void MultiDuplicationDialog::accept()
         LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
         for (int i = 0; i < copies; i++) {
             int count = i + 1;
-            QTransform t = primitive->transform();
+            QTransform t = primitive->sceneTransform();
             QTransform t1;
             t1 = t1.translate(count * translateX, count * translateY);      
             LaserPrimitive* newPrimitive = primitive->clone(t * t1);
