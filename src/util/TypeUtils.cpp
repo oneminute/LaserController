@@ -180,9 +180,9 @@ QPointF typeUtils::json2Point(const QJsonValue& json)
 QJsonObject typeUtils::rect2Json(const QRectF& rect)
 {
     QJsonObject json;
-    json["x1"] = rect.topLeft().x();
-    json["y1"] = rect.topLeft().y();
-    json["x2"] = rect.bottomRight().x();
-    json["y2"] = rect.bottomRight().y();
+    json["x1"] = qRound(rect.topLeft().x());
+    json["y1"] = qRound(rect.topLeft().y());
+    json["x2"] = qRound(rect.bottomRight().x());
+    json["y2"] = qRound(rect.bottomRight().y());
     return json;
 }
