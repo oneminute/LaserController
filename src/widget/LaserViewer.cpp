@@ -646,6 +646,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 			}
 			case Transform_RESIZE: {
                 qDebug() << bounds.width();
+                qDebug() << bounds.width();
 				qreal rateX = widthReal / bounds.width();
 				qreal rateY = heightReal / bounds.height();
                 if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
@@ -3833,8 +3834,7 @@ void LaserViewer::init()
 	//arrange
 	m_copyedList = QMap<LaserPrimitive*, QTransform>();
 	m_groupedMap = QMap<QString, QList<LaserPrimitive*>>();
-	m_selectedGroupedList = QList<QString>();
-	
+	m_selectedGroupedList = QList<QString>();	
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);
