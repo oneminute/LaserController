@@ -17,9 +17,7 @@ public:
         , exportable(true)
         , readOnly(false)
         , writeOnly(false)
-        //, modified(false)
         , inputWidgetType(IWT_EditSlider)
-        //, modifiedBy(MB_Manual)
         , widgetInitializeHook(nullptr)
         , valueToWidgetHook(nullptr)
         , valueFromWidgetHook(nullptr)
@@ -118,11 +116,6 @@ public:
     QVariant dirtyValue;
 
     /// <summary>
-    /// 是否已经被修改
-    /// </summary>
-    //bool modified;
-
-    /// <summary>
     /// 数据类型
     /// </summary>
     DataType dataType;
@@ -141,7 +134,8 @@ public:
 
     QList<QWidget*> widgets;
 
-    //ModifiedBy modifiedBy;
+    QDateTime lastValueModifiedTime;
+    QDateTime lastDirtyModifiedTime;
 
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
     ConfigItem::ValueHook valueToWidgetHook;
@@ -861,6 +855,13 @@ void ConfigItem::reset()
     }
 }
 
+void ConfigItem::cancel()
+{
+    Q_D(ConfigItem);
+    d->dirtyValue = d->value;
+    emit dirtyValueChanged(d->dirtyValue, this);
+}
+
 void ConfigItem::restore()
 {
     Q_D(ConfigItem);
@@ -870,14 +871,19 @@ void ConfigItem::restore()
     }
     else
     {
-        setValue(d->defaultValue, MB_Widget);
+        d->dirtyValue = d->value = d->defaultValue;
     }
+    emit dirtyValueChanged(d->dirtyValue, this);
+    emit valueChanged(d->value, this);
 }
 
 void ConfigItem::restoreSystem()
 {
     Q_D(ConfigItem);
-    setValue(d->systemDefaultValue, MB_Widget);
+    d->dirtyValue = d->value = d->systemDefaultValue;
+    
+    emit dirtyValueChanged(d->dirtyValue, this);
+    emit valueChanged(d->value, this);
 }
 
 void ConfigItem::apply()
@@ -887,17 +893,15 @@ void ConfigItem::apply()
     emit valueChanged(d->value, this);
 }
 
-void ConfigItem::confirm(const QVariant& value)
+void ConfigItem::confirm(const QVariant& value, bool& success)
 {
     Q_D(ConfigItem);
-    if (d->storeStrategy == SS_CONFIRMED)
-        d->value = d->dirtyValue;
-}
+    if (d->dirtyValue == value)
+        success = true;
+    else
+        success = false;
 
-void ConfigItem::onRegisterLoaded(const QVariant& value)
-{
-    Q_D(ConfigItem);
-    setValue(value, MB_Register);
+    d->dirtyValue = d->value = value;
 }
 
 QDebug operator<<(QDebug debug, const ConfigItem& item)

@@ -99,38 +99,74 @@ public:
     void setExtraProperty(const QString& key, const QVariant& value);
     QVariant& extraProperty(const QString& key);
 
+    /// <summary>
+    /// 绑定的控件在初始化时的回调函数
+    /// </summary>
+    /// <returns></returns>
     WidgetInitializeHook widgetInitializeHook();
     void setWidgetInitializeHook(WidgetInitializeHook fn);
     void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
 
+    /// <summary>
+    /// 当填充控件值时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ValueHook valueToWidgetHook();
     void setValueToWidgetHook(ValueHook fn);
     QVariant doValueToWidgetHook(const QVariant& value) const;
 
+    /// <summary>
+    /// 当用控件的值改写选项值时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ValueHook valueFromWidgetHook();
     void setValueFromWidgetHook(ValueHook fn);
     QVariant doValueFromWidgetHook(const QVariant& value);
 
+    /// <summary>
+    /// 当创建控件时的回调函数
+    /// </summary>
+    /// <returns></returns>
     CreateWidgetHook createWidgetHook();
     void setCreateWidgetHook(CreateWidgetHook fn);
     QWidget* doCreateWidgetHook();
 
+    /// <summary>
+    /// 销毁控件时的回调函数
+    /// </summary>
+    /// <returns></returns>
     DestroyHook destroyHook();
     void setDestroyHook(DestroyHook fn);
     void doDestroyHook();
 
+    /// <summary>
+    /// 生成Json时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ToJsonHook toJsonHook();
     void setToJsonHook(ToJsonHook fn);
     QJsonObject doToJsonHook() const;
 
+    /// <summary>
+    /// 从json解析时的回调函数
+    /// </summary>
+    /// <returns></returns>
     FromJsonHook fromJsonHook();
     void setFromJsonHook(FromJsonHook fn);
     void doFromJsonHook(const QJsonObject& json);
 
+    /// <summary>
+    /// 重置时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ResetHook resetHook();
     void setResetHook(ResetHook fn);
     void doResetHook();
 
+    /// <summary>
+    /// 恢复时的回调函数
+    /// </summary>
+    /// <returns></returns>
     RestoreHook restoreHook();
     void setRestoreHook(RestoreHook fn);
     void doRestoreHook();
@@ -148,16 +184,15 @@ public:
     void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
 
 public slots:
+    void cancel();
     void reset();
     void restore();
     void restoreSystem();
 
     void apply();
-    void confirm(const QVariant& value);
+    void confirm(const QVariant& value, bool& success);
     void load(const QVariant& value);
 
-protected slots:
-    void onRegisterLoaded(const QVariant& value);
 
 signals:
     void visibleChanged(bool value);
