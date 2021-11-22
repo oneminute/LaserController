@@ -4452,6 +4452,7 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
 void LaserControllerWindow::selectedChangedFromMouse()
 {
 	//int size = m_scene->selectedPrimitives().length();
+    QRectF sceneRect = m_scene->backgroundItem()->rect();
     LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
     LaserPrimitiveGroup* group =  view->group();
     if (!group) {
@@ -4460,16 +4461,33 @@ void LaserControllerWindow::selectedChangedFromMouse()
     m_propertyWidget->setEnabled(true);
     int size = view->group()->childItems().size();
 	if (size > 0) {
-		QRectF rect = Global::matrixToUm().mapRect(m_viewer->selectedItemsSceneBoundingRect());
+		QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
 		if (rect.width() == 0 && rect.height() == 0) {
 			return;
 		}
-		//LaserBackgroundItem* backgroudItem = m_scene->backgroundItem();
-		//if (!backgroudItem) {
-			//return;
-		//}
-		//QRectF rectReal = QRectF(backgroudItem->mapFromScene(rect.topLeft()), m_scene->backgroundItem()->mapFromScene(rect.bottomRight()));
-        QRectF rectReal = rect;
+        //ruler origianl position
+        switch (Config::SystemRegister::deviceOrigin()) {
+        case 0: {//topLeft
+            break;
+        }
+        case 1: {//bottomLeft
+            qreal top = -(sceneRect.height() - rect.top());
+            rect = QRectF(rect.left(), top, rect.width(), rect.height());
+            break;
+        }
+        case 2: {//bottomRight
+            qreal left = -(sceneRect.width() - rect.left());
+            qreal top = -(sceneRect.height() - rect.top());
+            rect = QRectF(left, top, rect.width(), rect.height());
+            break;
+        }
+        case 3: {//topRight
+            qreal left = -(sceneRect.width() - rect.left());
+            rect = QRectF(left, rect.top(), rect.width(), rect.height());
+            break;
+        }
+        }
+        QRectF rectReal = Global::matrixToUm().mapRect(rect);
 		//qDebug() << rectReal.top();
 		qreal x = 0, y = 0, width = 0, height = 0; 
 		if (m_unitIsMM) {
@@ -4479,72 +4497,59 @@ void LaserControllerWindow::selectedChangedFromMouse()
 
 		switch (m_selectionOriginalState) {
 			case SelectionOriginalTopLeft:{
-				if (m_unitIsMM) {
-					x = rectReal.topLeft().x() * 0.001;
-					y = rectReal.topLeft().y() * 0.001;
-				}
+				x = rectReal.topLeft().x();
+				y = rectReal.topLeft().y();
 				break;
 			}
 			case SelectionOriginalTopCenter: {
-				if (m_unitIsMM) {
-					x = rectReal.center().x() * 0.001;
-					y = rectReal.topLeft().y() * 0.001;
-				}
+				x = rectReal.center().x();
+				y = rectReal.topLeft().y();
 				break;
 			}
 			case SelectionOriginalTopRight: {
-				if (m_unitIsMM) {
-					x = rectReal.bottomRight().x() * 0.001;
-					y = rectReal.topLeft().y() * 0.001;
-				}
+				x = rectReal.bottomRight().x();
+				y = rectReal.topLeft().y();
 				break;
 			}
 			
 			case SelectionOriginalLeftCenter: {
-				if (m_unitIsMM) {
-					x = rectReal.topLeft().x() * 0.001;
-					y = rectReal.center().y() * 0.001;
-				}
+				x = rectReal.topLeft().x();
+				y = rectReal.center().y();
 				break;
 			}
 			case SelectionOriginalCenter: {
-				if (m_unitIsMM) {
-					x = rectReal.center().x() * 0.001;
-					y = rectReal.center().y() * 0.001;
-				}
-				
+				x = rectReal.center().x();
+				y = rectReal.center().y();
 				break;
 			}
 			case SelectionOriginalRightCenter: {
-				if (m_unitIsMM) {
-					x = rectReal.bottomRight().x() * 0.001;
-					y = rectReal.center().y() * 0.001;
-				}
+				x = rectReal.bottomRight().x();
+				y = rectReal.center().y();
 				break;
 			}
 			case SelectionOriginalLeftBottom: {
-				if (m_unitIsMM) {
-					x = rectReal.topLeft().x() * 0.001;
-					y = rectReal.bottomRight().y() * 0.001;
-				}
+				x = rectReal.topLeft().x();
+				y = rectReal.bottomRight().y();
 				break;
 			}
 			case SelectionOriginalBottomCenter: {
-				if (m_unitIsMM) {
-					x = rectReal.center().x() * 0.001;
-					y = rectReal.bottomRight().y() * 0.001;
-				}
+				x = rectReal.center().x();
+				y = rectReal.bottomRight().y();
 				break;
 			}
 			case SelectionOriginalBottomRight: {
-				if (m_unitIsMM) {
-					x = rectReal.bottomRight().x() * 0.001;
-					y = rectReal.bottomRight().y() * 0.001;
-				}
+				x = rectReal.bottomRight().x();
+				y = rectReal.bottomRight().y();
 				break;
 			}
 											   
 		}
+        
+        if (m_unitIsMM) {
+            x = x * 0.001;
+            y = y * 0.001;
+        }
+        
 		m_posXBox->setValue(x);
 		m_posYBox->setValue(y);
 		m_widthBox->setValue(width);
@@ -4569,6 +4574,25 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
         y = Global::mmToSceneVF(y);
         width = Global::mmToSceneHF(width);
         height = Global::mmToSceneVF(height);
+        //ruler origianl position
+        switch (Config::SystemRegister::deviceOrigin()) {
+            case 0: {//topLeft
+                break;
+            }
+            case 1: {//bottomLeft
+                y = height + y;
+                break;
+            }
+            case 2: {//bottomRight
+                x = width + x;
+                y = height + y;
+                break;
+            }
+            case 3: {//topRight
+                x = width + x;
+                break;
+            }
+        }
     }
 	//repaint 
 	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
@@ -5237,6 +5261,8 @@ void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedB
     //changeRuler
     m_viewer->horizontalRuler()->repaint();
     m_viewer->verticalRuler()->repaint();
+    //selection
+    selectedChangedFromMouse();
     m_viewer->viewport()->update();
 }
 
