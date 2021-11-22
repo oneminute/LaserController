@@ -268,24 +268,24 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         QJsonObject engravingParamObj;
         QJsonObject cuttingParamObj;
         QJsonObject fillingParamObj;
-        layerObj["Type"] = layer->type();
+        /*layerObj["Type"] = layer->type();
         if (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel)
-            layerObj["Type"] = LLT_ENGRAVING;
+            layerObj["Type"] = LLT_ENGRAVING;*/
 
         engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
-        engravingParamObj["LaserPower"] = layer->engravingLaserPower() * 10;
-        engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower() * 10;
-        engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower() * 10;
+        engravingParamObj["LaserPower"] = qRound(layer->engravingLaserPower() * 10);
+        engravingParamObj["MinSpeedPower"] = qRound(layer->engravingMinSpeedPower() * 10);
+        engravingParamObj["RunSpeedPower"] = qRound(layer->engravingRunSpeedPower() * 10);
         engravingParamObj["CarveForward"] = layer->engravingForward();
         engravingParamObj["CarveStyle"] = layer->engravingStyle();
 
         cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
-        cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower() * 10;
-        cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower() * 10;
+        cuttingParamObj["MinSpeedPower"] = qRound(layer->cuttingMinSpeedPower() * 10);
+        cuttingParamObj["RunSpeedPower"] = qRound(layer->cuttingRunSpeedPower() * 10);
 
         fillingParamObj["RunSpeed"] = layer->fillingRunSpeed() * 1000;
-        fillingParamObj["MinSpeedPower"] = layer->fillingMinSpeedPower() * 10;
-        fillingParamObj["RunSpeedPower"] = layer->fillingRunSpeedPower() * 10;
+        fillingParamObj["MinSpeedPower"] = qRound(layer->fillingMinSpeedPower() * 10);
+        fillingParamObj["RunSpeedPower"] = qRound(layer->fillingRunSpeedPower() * 10);
         fillingParamObj["RowInterval"] = layer->fillingRowInterval();
 
         paramObj["EngravingParams"] = engravingParamObj;

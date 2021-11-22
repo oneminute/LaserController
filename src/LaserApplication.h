@@ -40,7 +40,7 @@ protected:
 
 protected slots:
     void onEnterDeviceUnconnectedState();
-    void onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onLanguageChanged(const QVariant& value, void* senderPtr);
 
 signals:
     void languageChanged();

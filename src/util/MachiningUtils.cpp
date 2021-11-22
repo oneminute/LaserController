@@ -520,7 +520,7 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress,
                 buffer.append(command1.arg(qRound(pt1.x()) - qRound(lastPoint.x()))
                     .arg(qRound(pt1.y()) - qRound(lastPoint.y())));
                 lastPoint = pt1;
-                buffer.append(command1.arg(qRound(pt2.x()) - qRound(lastPoint.x()))
+                buffer.append(command2.arg(qRound(pt2.x()) - qRound(lastPoint.x()))
                     .arg(qRound(pt2.y()) - qRound(lastPoint.y())));
                 lastPoint = pt2;
             }

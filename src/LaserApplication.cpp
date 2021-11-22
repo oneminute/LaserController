@@ -471,7 +471,7 @@ void LaserApplication::handleLogOutput(QtMsgType type, const QMessageLogContext&
     }
 }
 
-void LaserApplication::onLanguageChanged(const QVariant& value, ModifiedBy modifiedBy)
+void LaserApplication::onLanguageChanged(const QVariant& value, void* senderPtr)
 {
     retranslate();
     device->updateDriverLanguage();
