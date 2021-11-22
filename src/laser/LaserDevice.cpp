@@ -804,41 +804,43 @@ bool LaserDevice::checkLayoutForMoving(const QPointF& dest)
 
 bool LaserDevice::checkLayoutForMachining(const QRectF& docBounding, const QRectF& docBoundingAcc)
 {
-    QRectF layoutRect = layoutRectInDevice();
+    QRect layoutRect = layoutRectInDevice().toRect();
+    QRect docBound = docBounding.toRect();
+    QRect docBoundAcc = docBoundingAcc.toRect();
     QString info1 = "";
     QString info2 = "";
 
     bool ok1 = true;
     bool ok2 = true;
-    bool needCheckAcc = docBounding != docBoundingAcc;
+    bool needCheckAcc = docBound!= docBoundAcc;
     bool left = false;
     bool right = false;
 
-    if (docBounding.left() < layoutRect.left())
+    if (docBound.left() < layoutRect.left())
     {
         ok1 = false;
         info1.append(tr("Left edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((layoutRect.left() - docBounding.left()) * 0.001, 0, 'f', 3));
+            .arg((layoutRect.left() - docBound.left()) * 0.001, 0, 'f', 3));
         left = true;
     }
-    if (docBounding.top() < layoutRect.top())
+    if (docBound.top() < layoutRect.top())
     {
         ok1 = false;
         info1.append(tr("Top edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((layoutRect.top() - docBounding.left()) * 0.001, 0, 'f', 3));
+            .arg((layoutRect.top() - docBound.left()) * 0.001, 0, 'f', 3));
     }
-    if (docBounding.right() > layoutRect.right())
+    if (docBound.right() > layoutRect.right())
     {
         ok1 = false;
         info1.append(tr("Right edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((docBounding.right() - layoutRect.right()) * 0.001, 0, 'f', 3));
+            .arg((docBound.right() - layoutRect.right()) * 0.001, 0, 'f', 3));
         right = true;
     }
-    if (docBounding.bottom() > layoutRect.bottom())
+    if (docBound.bottom() > layoutRect.bottom())
     {
         ok1 = false;
         info1.append(tr("Bottom edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((docBounding.bottom() - layoutRect.bottom()) * 0.001, 0, 'f', 3));
+            .arg((docBound.bottom() - layoutRect.bottom()) * 0.001, 0, 'f', 3));
     }
 
     if (ok1)
@@ -846,17 +848,22 @@ bool LaserDevice::checkLayoutForMachining(const QRectF& docBounding, const QRect
 
     if (needCheckAcc)
     {
-        if (!left && docBoundingAcc.left() < layoutRect.left())
+        qreal accLeft = docBoundAcc.left();
+        qreal accRight = docBoundAcc.right();
+        qLogD << "acc left: " << accLeft << ", acc right: " << accRight;
+        qreal diffLeft = layoutRect.left() - accLeft;
+        qreal diffRight = accRight - layoutRect.right();
+        if (!left && diffLeft > 1)
         {
             ok2 = false;
             info2.append(tr("Left edge of current document bounding with acc interval exceeds device layout: %1mm\n")
-                .arg((layoutRect.left() - docBoundingAcc.left()) * 0.001, 0, 'f', 3));
+                .arg(diffLeft * 0.001, 0, 'f', 3));
         }
-        if (!right && docBoundingAcc.right() > layoutRect.right())
+        if (!right && accRight > 1)
         {
             ok2 = false;
             info2.append(tr("Right edge of current document bounding with acc interval exceeds device layout: %1mm\n")
-                .arg((docBoundingAcc.right() - layoutRect.right()) * 0.001, 0, 'f', 3));
+                .arg(accRight * 0.001, 0, 'f', 3));
         }
 
         if (ok2)
