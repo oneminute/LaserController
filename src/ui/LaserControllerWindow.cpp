@@ -4563,6 +4563,8 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
 	qreal y = m_posYBox->value();
 	qreal width = m_widthBox->value();
 	qreal height = m_heightBox->value();
+    qreal sceneHeight = m_scene->backgroundItem()->rect().height();
+    qreal sceneWidth = m_scene->backgroundItem()->rect().width();
 	
 	qreal xScale = m_xRateBox->value() * 0.01;
 	qreal yScale = m_yRateBox->value() * 0.01;
@@ -4580,16 +4582,16 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
                 break;
             }
             case 1: {//bottomLeft
-                y = height + y;
+                y = sceneHeight + y;
                 break;
             }
             case 2: {//bottomRight
-                x = width + x;
-                y = height + y;
+                x = sceneWidth + x;
+                y = sceneHeight + y;
                 break;
             }
             case 3: {//topRight
-                x = width + x;
+                x = sceneWidth + x;
                 break;
             }
         }
