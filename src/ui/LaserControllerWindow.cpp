@@ -3359,11 +3359,18 @@ void LaserControllerWindow::onActionMultiDuplication(bool checked)
 
 void LaserControllerWindow::onActionGroup(bool checked)
 {
-
+    JoinedGroupCommand* cmd = new JoinedGroupCommand(m_viewer, m_ui->actionGroup, m_ui->actionUngroup);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionUngroup(bool checked)
 {
+    for (LaserPrimitive* primitive : m_scene->document()->selectedPrimitives()) {
+        primitive->setJoinedGroup(false);
+    }
+    m_viewer->viewport()->repaint();
+    m_ui->actionGroup->setEnabled(true);
+    m_ui->actionUngroup->setEnabled(false);
 }
 
 bool LaserControllerWindow::onActionCloseDocument(bool checked)
@@ -4013,17 +4020,43 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionDuplication->setEnabled(true);
         m_ui->actionMultiDuplication->setEnabled(true);
 		m_ui->actionDeletePrimitive->setEnabled(true);
-		//m_ui->actionGroup->setEnabled(true);
-		//m_ui->actionUngroup->setEnabled(true);
 		if (items.length() > 1) {
-			if (m_viewer->selectedGroupedList().isEmpty()) {
-				m_ui->actionUngroup->setEnabled(false);
-				m_ui->actionGroup->setEnabled(true);
-			}
-			else {
-				m_ui->actionGroup->setEnabled(true);
-				m_ui->actionUngroup->setEnabled(false);
-			}  
+            //m_ui->actionGroup->setEnabled(true);
+            //m_ui->actionUngroup->setEnabled(false);
+            bool hasJoined = false;
+            bool hasNotJoined = false;
+            for (LaserPrimitive* p : items) {
+                if (p->isJoinedGroup()) {
+                    hasJoined = true;
+                }
+                else {
+                    hasNotJoined = true;
+                }
+                if (hasJoined && hasNotJoined) {
+                    break;
+                }
+            } 
+            if (hasJoined) {
+                if (hasNotJoined) {
+                    m_ui->actionGroup->setEnabled(true);
+                    m_ui->actionUngroup->setEnabled(true);
+                }
+                else {
+                    m_ui->actionGroup->setEnabled(false);
+                    m_ui->actionUngroup->setEnabled(true);
+                }
+                
+            }
+            else {
+                if (hasNotJoined) {
+                    m_ui->actionGroup->setEnabled(true);
+                    m_ui->actionUngroup->setEnabled(false);
+                }
+                else {
+                    m_ui->actionGroup->setEnabled(false);
+                    m_ui->actionUngroup->setEnabled(false);
+                }
+            }
             
 		}
 		else {
@@ -4034,7 +4067,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
     //判断显示哪个属性面板，shape properties panel
     showShapePropertyPanel();
 }
-
+//改变的过程中也会执行（例如：移动的整个过程）
 void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
 {
     //qDebug() << "onLaserPrimitiveGroupItemChanged";

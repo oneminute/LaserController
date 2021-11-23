@@ -1,4 +1,5 @@
 #include "UndoCommand.h"
+#include <QAction>
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
@@ -590,17 +591,19 @@ void LockedCommand::undo()
         break;
     }
     case Qt::Unchecked: {
+        group->setTransform(QTransform());
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
             primitive->setLocked(false);
             group->addToGroup(primitive);
-        }
-        
+            
+        }        
         break;
 
     }
     case Qt::PartiallyChecked: {
 
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            //group->setTransform(QTransform());
             bool isLocked = false;
             for (LaserPrimitive* lockedP : m_lastLockedList) {
                 if (primitive == lockedP) {
@@ -637,16 +640,17 @@ void LockedCommand::redo()
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
             primitive->setLocked(true);
             group->removeFromGroup(primitive);
-
         }
         m_locked->setCheckState(m_curCheckState);
         break;
     }
     case Qt::Unchecked: {
+        //group->setTransform(QTransform());
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
-            primitive->setLocked(false);
-            group->addToGroup(primitive);
+            primitive->setLocked(false);            
         }
+        m_viewer->resetGroup();
+        m_viewer->onSelectedFillGroup();
         m_locked->setCheckState(m_curCheckState);
         break;
 
@@ -846,4 +850,37 @@ void SingleTransformUndoCommand::redo()
     utils::sceneTransformToItemTransform(m_curTransform, m_primitive);
     m_tree->upDatePrimitive(m_primitive);
     m_viewer->repaint();
+}
+
+JoinedGroupCommand::JoinedGroupCommand(LaserViewer * viewer, QAction* _joinedGroupAction, QAction* _joinedUngroupAction, bool _isUngroup)
+    :m_viewer(viewer), m_isUngroup(_isUngroup), m_joinedGroupAction(_joinedGroupAction), m_joinedUngroupAction(_joinedUngroupAction)
+{
+    m_list = m_viewer->scene()->selectedPrimitives();
+    int i = m_list.size();
+}
+
+JoinedGroupCommand::~JoinedGroupCommand()
+{
+
+}
+
+void JoinedGroupCommand::undo()
+{
+
+}
+
+void JoinedGroupCommand::redo()
+{
+    if (m_isUngroup) {
+        for (LaserPrimitive* primitive : m_list) {
+            primitive->setJoinedGroup(true);
+        }
+        m_viewer->viewport()->repaint();
+        m_joinedGroupAction->setEnabled(false);
+        m_joinedUngroupAction->setEnabled(true);
+    }
+    else {
+
+    }
+    
 }

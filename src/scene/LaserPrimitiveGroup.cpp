@@ -115,7 +115,7 @@ void LaserPrimitiveGroup::removeFromGroup(LaserPrimitive * primitive)
     QTransform transform = primitive->sceneTransform();
     primitive->setParentItem(0);
     primitive->setTransform(transform);
-    
+    primitive->setPos(0, 0);
 }
 
 QRectF LaserPrimitiveGroup::boundingRect() const

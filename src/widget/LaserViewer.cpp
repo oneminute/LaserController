@@ -1167,10 +1167,7 @@ QMap<QString, QList<LaserPrimitive*>>& LaserViewer::groupedMap()
 {
 	return m_groupedMap;
 }
-QList<QString>& LaserViewer::selectedGroupedList()
-{
-	return m_selectedGroupedList;
-}
+
 int LaserViewer::curLayerIndex()
 {
 	return m_curLayerIndex;
@@ -3834,7 +3831,6 @@ void LaserViewer::init()
 	//arrange
 	m_copyedList = QMap<LaserPrimitive*, QTransform>();
 	m_groupedMap = QMap<QString, QList<LaserPrimitive*>>();
-	m_selectedGroupedList = QList<QString>();	
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);

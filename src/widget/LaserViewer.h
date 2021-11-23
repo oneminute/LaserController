@@ -74,8 +74,6 @@ public:
 
 	QMap<LaserPrimitive*, QTransform>& copyedList();
 	QMap<QString, QList<LaserPrimitive*>>& groupedMap();
-	QList<QString>& selectedGroupedList();
-
 	int curLayerIndex();
 
 	void setCurLayerIndex(int index);
@@ -316,7 +314,6 @@ private:
 	//arrange
 	QMap<LaserPrimitive*, QTransform> m_copyedList;
 	QMap<QString, QList<LaserPrimitive*>> m_groupedMap;
-	QList<QString> m_selectedGroupedList;
 	//layer
 	int m_curLayerIndex;
     //text

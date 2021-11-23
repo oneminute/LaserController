@@ -74,7 +74,7 @@ private:
 	//QMap<QList<QGraphicsItem*>, QTransform> m_selectedBeforeAdd;
 	bool m_isDel;
 };
-//�����
+//Polygon
 class PolygonUndoCommand : public QUndoCommand {
 public:
 	PolygonUndoCommand(LaserScene* scene, LaserPrimitive* lastPrimitive, LaserPrimitive* curPrimitive);
@@ -89,7 +89,7 @@ private:
 	LaserViewer* m_viewer;
 	QMap<QGraphicsItem*, QTransform> m_selectedBeforeAdd;
 };
-//ˮƽ����
+//MirrorHCommand
 class MirrorHCommand : public QUndoCommand {
 public:
 	MirrorHCommand(LaserViewer* v);
@@ -99,7 +99,7 @@ public:
 private:
 	LaserViewer* m_viewer;
 };
-//��ֱ����
+//MirrorVCommand
 class MirrorVCommand : public QUndoCommand {
 public:
 	MirrorVCommand(LaserViewer* v);
@@ -109,7 +109,7 @@ public:
 private:
 	LaserViewer * m_viewer;
 };
-//���
+//PasteCommand
 class PasteCommand : public QUndoCommand {
 public:
 	PasteCommand(LaserViewer* ,bool isPasteInline = false, bool isDuplication = false);
@@ -187,4 +187,19 @@ private:
     bool m_lastIsInGroup;
     bool m_lastSelected;
 };
+//group/ungroup
+class JoinedGroupCommand : public QUndoCommand {
+public:
+    JoinedGroupCommand(LaserViewer* viewer, QAction* _joinedGroupAction, QAction* _joinedUngroupAction, bool _isUngroup = false);
+    ~JoinedGroupCommand();
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserViewer * m_viewer;
+    QList<LaserPrimitive*> m_list;
+    bool m_isUngroup;
+    QAction* m_joinedGroupAction;
+    QAction* m_joinedUngroupAction;
+};
+
 #endif // UNDOCOMMAND_H

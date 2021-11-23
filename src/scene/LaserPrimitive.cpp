@@ -52,6 +52,7 @@ public:
         , isLocked(false)
         , exportable(true)
         , visible(true)
+        , isJoinedGroup(false)
     {}
 
     LaserDocument* doc;
@@ -72,6 +73,8 @@ public:
     QList<QuadTreeNode*> treeNodes;
     bool exportable;
     bool visible;
+    bool isJoinedGroup;
+    QList<LaserPrimitive*> joinedGroupList;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
@@ -170,11 +173,14 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		//isSelected();
 		QString name = this->metaObject()->className();
 		QPen pen = QPen(color, 1.2f, Qt::DashLine);
-		pen.setCosmetic(true);
-		painter->setPen(pen);
-		if (name == "LaserBitmap") {
-			painter->drawRect(bounds);
-		}
+		pen.setCosmetic(true);		
+        if (isJoinedGroup()) {
+            pen.setStyle(Qt::DashDotDotLine);
+        }
+        painter->setPen(pen);
+        if (name == "LaserBitmap") {
+            painter->drawRect(bounds);
+        }
 	}
     else
     {
@@ -651,6 +657,34 @@ bool LaserPrimitive::isLocked()
 {
     Q_D(LaserPrimitive);
     return d->isLocked;
+}
+
+void LaserPrimitive::setJoinedGroup(bool isJoinedGroup)
+{
+    Q_D(LaserPrimitive);
+    d->isJoinedGroup = isJoinedGroup;
+    if (!isJoinedGroup) {
+        d->joinedGroupList.clear();
+    }
+    else {
+        d->joinedGroupList.clear();
+        for (QGraphicsItem* item : parentItem()->childItems()) {
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+            d->joinedGroupList.append(primitive);
+        }
+    }
+}
+
+bool LaserPrimitive::isJoinedGroup()
+{
+    Q_D(const LaserPrimitive);
+    return d->isJoinedGroup;
+}
+
+QList<LaserPrimitive*>& LaserPrimitive::joinedGroupList()
+{
+    Q_D(LaserPrimitive);
+    return d->joinedGroupList;
 }
 
 QList<QuadTreeNode*>& LaserPrimitive::treeNodesList()
