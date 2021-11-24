@@ -134,7 +134,7 @@ public slots:
     void onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr);
 
 signals:
-    //void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
+    void updated();
 
 private:
     QScopedPointer<InputWidgetWrapperPrivate> m_ptr;

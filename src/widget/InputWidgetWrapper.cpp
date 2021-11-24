@@ -119,8 +119,6 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         break;
     }
     configItem->blockSignals(true);
-    //if (d->configItem->name() == "searchingXYWeight")
-        //qLogD << "debugging " << d->configItem->name();
     updateWidgetValue(d->configItem->value(), nullptr);
     configItem->blockSignals(false);
 
@@ -411,24 +409,28 @@ void InputWidgetWrapper::onVector2DChanged(qreal x, qreal y)
 void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
 {
     updateLabelColor();
+    emit updated();
 }
 
 void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, void* senderPtr)
 {
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
+    emit updated();
 }
 
 void InputWidgetWrapper::onConfigItemDirtyValueChanged(const QVariant& value, void* senderPtr)
 {
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
+    emit updated();
 }
 
 void InputWidgetWrapper::onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr)
 {
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
+    emit updated();
 }
 
 

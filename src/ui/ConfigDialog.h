@@ -69,6 +69,8 @@ protected slots:
 
     void retranslate();
 
+    void onConfigItemUpdated();
+
 private:
     QScopedPointer<Ui::ConfigDialog> m_ui;
     QMap<QString, QWidget*> m_panels;
