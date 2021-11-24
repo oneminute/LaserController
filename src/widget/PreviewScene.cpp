@@ -49,7 +49,11 @@ PreviewScene::PreviewScene(QObject* parent)
     : QGraphicsScene(parent)
     , d_ptr(new PreviewScenePrivate(this))
 {
+    Q_D(PreviewScene);
     reset();
+
+    connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &PreviewScene::onDeviceLayoutChanged);
+    connect(&d->timer, &QTimer::timeout, this, &PreviewScene::drawAllItems);
 }
 
 PreviewScene::~PreviewScene()
@@ -98,7 +102,6 @@ void PreviewScene::reset()
     d->canvasItem = addPixmap(d->canvas);
     setBackgroundBrush(Qt::lightGray);
 
-    connect(&d->timer, &QTimer::timeout, this, &PreviewScene::drawAllItems);
     d->timer.setInterval(200);
     d->timer.start();
 }
@@ -213,5 +216,10 @@ void PreviewScene::drawAllItems()
         painter.drawPath(item.path);
     }
     d->canvasItem->setPixmap(d->canvas);
+}
+
+void PreviewScene::onDeviceLayoutChanged(const QSizeF& size)
+{
+    reset();
 }
 

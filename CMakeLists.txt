@@ -116,7 +116,6 @@ FILE(GLOB TRANSLATIONS translations/*.ts)
 LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 
 set(OTHER_FILES
-    config.json
     README.md
     ReleaseNotes.md
     cmake_install_debug.txt

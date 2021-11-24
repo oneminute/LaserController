@@ -207,6 +207,10 @@ public:
 
     qreal engravingAccLength(qreal engravingRunSpeed) const;
 
+    void debugPrintUserRegisters() const;
+    void debugPrintSystemRegisters() const;
+    void debugPrintRegisters() const;
+
 public slots:
     void load();
     void unload();

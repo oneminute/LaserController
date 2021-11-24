@@ -840,6 +840,11 @@ void ConfigItem::loadValue(const QVariant& value)
     if (!value.isValid())
         return;
 
+    if (d->name == "yMaxLength")
+    {
+        qLogD << "debug " << d->name;
+    }
+
     bool dirtyChanged = value != d->dirtyValue;
     bool valueChanged = value != d->value;
 

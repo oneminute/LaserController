@@ -2752,7 +2752,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
 
 void LaserControllerWindow::onActionNew(bool checked)
 {
-	
+    LaserApplication::device->debugPrintSystemRegisters();
 	LaserDocument* doc = m_scene->document();
 	if (doc) {
 		if (!onActionCloseDocument()) {
@@ -3223,18 +3223,8 @@ void LaserControllerWindow::onActionHalfTone(bool checked)
 
         int gridSize = qRound(Config::EngravingLayer::DPI() * 1.0 / Config::EngravingLayer::LPI());
         
-        switch (Config::Export::halfToneStyle())
-        {
-        case 0:
-            imageUtils::halftone4(progress, src, Config::EngravingLayer::halftoneAngles(), gridSize);
-            break;
-        case 1:
-            imageUtils::halftone5(src, Config::EngravingLayer::halftoneAngles(), gridSize);
-            break;
-        case 2:
-            imageUtils::halftone6(progress, src, Config::EngravingLayer::halftoneAngles(), gridSize);
-            break;
-        }
+        imageUtils::halftone6(progress, src, Config::EngravingLayer::halftoneAngles(), gridSize);
+        
         QFileInfo tmpFile("tmp/dst.bmp");
         QUrl url = QUrl::fromLocalFile(tmpFile.absolutePath());
         QDesktopServices::openUrl(url);
