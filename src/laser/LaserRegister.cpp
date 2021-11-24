@@ -89,14 +89,10 @@ bool LaserRegister::writeOnly() const
     return d->writeOnly;
 }
 
-void LaserRegister::setValue(const QVariant& value, ModifiedBy modifiedBy)
+void LaserRegister::setValue(const QVariant& value)
 {
     Q_D(LaserRegister);
     if (readOnly())
-        return;
-
-    if (modifiedBy == MB_Register ||
-        modifiedBy == MB_RegisterConfirmed)
         return;
 
     d->value = value;
@@ -131,11 +127,11 @@ QVariant LaserRegister::value() const
     return d->value;
 }
 
-void LaserRegister::parse(const QString& raw, ModifiedBy modifiedBy)
+void LaserRegister::parse(const QString& raw)
 {
     Q_D(LaserRegister);
     d->value = typeUtils::stringToVariant(raw, dataType());
-    d->configItem->setValue(d->value, modifiedBy);
+    //d->configItem->setValue(d->value, SS_DIRECTLY, this);
 }
 
 bool LaserRegister::read()

@@ -17,6 +17,7 @@
 #include <QTableWidget>
 #include <QTreeWidgetItem>
 #include <QPushButton>
+#include <QFileDialog>
 #include <widget/EditSlider.h>
 
 #include "LaserApplication.h"
@@ -29,6 +30,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     , m_ui(new Ui::ConfigDialog)
     , m_windowTitle(ltr("Config Dialog"))
     , m_systemRegisterPage(nullptr)
+    , m_done(false)
 {
     m_ui->setupUi(this);
     m_ui->splitter->setStretchFactor(0, 0);
@@ -53,6 +55,8 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     for (ConfigItemGroup* group : groups)
     {
         QWidget* page = new QWidget(this);
+        if (group == Config::UserRegister::group)
+            m_userRegisterPage = page;
         page->setWindowTitle(group->title());
         m_ui->stackedWidgetPanels->addWidget(page);
 
@@ -70,9 +74,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         m_pages.insert(treeItem, page);
         m_groups.insert(treeItem, group);
         m_groupBoxes.insert(treeItem, groupBox);
-        //treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
-        //treeItem->setData(0, Qt::UserRole + 1, QVariant::fromValue<ConfigItemGroup*>(group));
-        //treeItem->setData(0, Qt::UserRole + 2, QVariant::fromValue<QGroupBox*>(groupBox));
+
         m_ui->treeWidgetCatalogue->addTopLevelItem(treeItem);
 
         for (ConfigItem* item : group->items())
@@ -139,17 +141,64 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         m_ui->treeWidgetCatalogue->addTopLevelItem(treeItem);
     }
 
+    Config::UserRegister::group->setPreSaveHook(
+        [=]() {
+            if (Config::UserRegister::group->isModified())
+                return LaserApplication::device->writeUserRegisters();
+            return false;
+        }
+    );
+    Config::SystemRegister::group->setPreSaveHook(
+        [=]() {
+            if (Config::SystemRegister::group->isModified())
+            {
+                // show password input dialog
+                QString password = QInputDialog::getText(
+                    this,
+                    tr("Manufacture Password"),
+                    tr("Password"),
+                    QLineEdit::Normal
+                );
+                return LaserApplication::device->writeSystemRegisters(password);
+            }
+            return false;
+        }
+    );
+
     m_ui->stackedWidgetPanels->setCurrentIndex(0);
     m_ui->treeWidgetCatalogue->setCurrentItem(m_ui->treeWidgetCatalogue->topLevelItem(0));
 
     connect(m_ui->treeWidgetCatalogue, &QTreeWidget::currentItemChanged, this, &ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged);
-    connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &ConfigDialog::onButtonClicked);
-    connect(LaserApplication::device, &LaserDevice::manufacturePasswordVerified, this, &ConfigDialog::onManufacturePasswordVerified);
+    connect(LaserApplication::device, &LaserDevice::connected, this, &ConfigDialog::onDeviceConnected);
+    connect(LaserApplication::device, &LaserDevice::disconnected, this, &ConfigDialog::onDeviceDisconnected);
+    connect(LaserApplication::device, &LaserDevice::userRegistersConfirmed, this, &ConfigDialog::onUserRegistersConfirmed);
+    connect(LaserApplication::device, &LaserDevice::systemRegistersConfirmed, this, &ConfigDialog::onSystemRegistersConfirmed);
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &ConfigDialog::retranslate);
+    connect(m_ui->pushButtonRstoreToSystemDefault, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonRestoreToSystemDefault);
+    connect(m_ui->pushButtonRestoreToDefault, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonRestoreToDefault);
+    connect(m_ui->pushButtonApplyToDefault, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonApplyToDefault);
+    connect(m_ui->pushButtonImport, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonImport);
+    connect(m_ui->pushButtonExport, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonExport);
+    connect(m_ui->pushButtonSave, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonSave);
+    connect(m_ui->pushButtonReset, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonReset);
+    connect(m_ui->pushButtonReload, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonReload);
+    connect(m_ui->pushButtonSaveClose, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonSaveAndClose);
+    connect(m_ui->pushButtonResetClose, &QPushButton::clicked,
+        this, &ConfigDialog::onButtonSaveAndClose);
 
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
     LaserApplication::device->readSystemRegisters();
+    updatePanelsStatus();
 
     retranslate();
 }
@@ -163,7 +212,7 @@ bool ConfigDialog::isModified()
     bool modified = false;
     for (QList<InputWidgetWrapper*>::ConstIterator i = m_wrappers.constBegin(); i != m_wrappers.constEnd(); i++)
     {
-        if ((*i)->isModified())
+        if ((*i)->configItem()->isModified())
         {
             modified = true;
             break;
@@ -172,53 +221,23 @@ bool ConfigDialog::isModified()
     return modified;
 }
 
+bool ConfigDialog::isDirty()
+{
+    bool dirty = false;
+    for (QList<InputWidgetWrapper*>::ConstIterator i = m_wrappers.constBegin(); i != m_wrappers.constEnd(); i++)
+    {
+        if ((*i)->configItem()->isDirty())
+        {
+            dirty = true;
+            break;
+        }
+    }
+    return dirty;
+}
+
 void ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
     setCurrentPanel(m_pages[current]);
-}
-
-void ConfigDialog::onButtonClicked(QAbstractButton * button)
-{
-    QDialogButtonBox::StandardButton stdButton = m_ui->buttonBox->standardButton(button);
-    if (stdButton == QDialogButtonBox::Reset)
-    {
-        for (QList<InputWidgetWrapper*>::ConstIterator i = m_wrappers.constBegin(); i != m_wrappers.constEnd(); i++)
-        {
-            if ((*i)->isModified())
-            {
-                (*i)->reset();
-            }
-        }
-    }
-    else if (stdButton == QDialogButtonBox::RestoreDefaults)
-    {
-        for (QList<InputWidgetWrapper*>::ConstIterator i = m_wrappers.constBegin(); i != m_wrappers.constEnd(); i++)
-        {
-            if ((*i)->isModified())
-            {
-                (*i)->restoreDefault();
-            }
-        }
-    }
-    else if (stdButton == QDialogButtonBox::Save)
-    {
-        if (Config::UserRegister::group->isModified())
-            LaserApplication::device->writeUserRegisters();
-        if (Config::SystemRegister::group->isModified())
-        {
-            // show password input dialog
-            QString password = QInputDialog::getText(
-                this,
-                tr("Manufacture Password"),
-                tr("Password"),
-                QLineEdit::Normal
-            );
-            //Config::SystemRegister::passwordItem()->setValue(password, MB_Manual);
-            LaserApplication::device->writeSystemRegisters(password);
-        }
-        Config::save(LaserApplication::device->mainCardId());
-        onValueChanged(QVariant());
-    }
 }
 
 void ConfigDialog::setCurrentPanel(QWidget * panel)
@@ -233,6 +252,73 @@ void ConfigDialog::setCurrentPanel(const QString & title)
     m_ui->treeWidgetCatalogue->setCurrentItem(items[0]);
 }
 
+void ConfigDialog::restoreToDefault()
+{
+    for (ConfigItemGroup* group : Config::groups)
+    {
+        for (ConfigItem* item : group->items())
+        {
+            item->restoreToDefault();
+        }
+    }
+}
+
+void ConfigDialog::restoreToSystemDefault()
+{
+    for (ConfigItemGroup* group : Config::groups)
+    {
+        for (ConfigItem* item : group->items())
+        {
+            item->restoreToSystemDefault();
+        }
+    }
+}
+
+void ConfigDialog::reset()
+{
+    for (ConfigItemGroup* group : Config::groups)
+    {
+        for (ConfigItem* item : group->items())
+        {
+            item->reset();
+        }
+    }
+}
+
+void ConfigDialog::applyToDefault()
+{
+    for (ConfigItemGroup* group : Config::groups)
+    {
+        for (ConfigItem* item : group->items())
+        {
+            item->applyToDefault();
+        }
+    }
+}
+
+void ConfigDialog::save()
+{
+    Config::save(false, false);
+    updateTitle();
+}
+
+void ConfigDialog::load()
+{
+    Config::load();
+    updateTitle();
+}
+
+void ConfigDialog::apply()
+{
+    for (ConfigItemGroup* group : Config::groups)
+    {
+        for (ConfigItem* item : group->items())
+        {
+            item->apply();
+        }
+    }
+}
+
 void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QString& exlusion)
 {
     QFormLayout * layout = qobject_cast<QFormLayout*>(parent->layout());
@@ -242,14 +328,35 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
     if (!widget)
         return;
 
+    InputWidgetWrapper* wrapper = item->bindWidget(widget, SS_NORMAL);
     widget->setParent(parent);
     QLabel* labelName = new QLabel(parent);
-
     layout->addRow(labelName, widget);
 
-    InputWidgetWrapper* wrapper = item->bindWidget(widget);
     wrapper->setNameLabel(labelName);
     m_wrappers.append(wrapper);
+}
+
+void ConfigDialog::updatePanelsStatus()
+{
+    if (LaserApplication::device->isConnected())
+    {
+        m_systemRegisterPage->setEnabled(true);
+        m_userRegisterPage->setEnabled(true);
+    }
+    else
+    {
+        m_systemRegisterPage->setEnabled(false);
+        m_userRegisterPage->setEnabled(false);
+    }
+}
+
+void ConfigDialog::closeEvent(QCloseEvent* e)
+{
+    if (!m_done)
+    {
+        reset();
+    }
 }
 
 void ConfigDialog::keyPressEvent(QKeyEvent* e)
@@ -259,18 +366,142 @@ void ConfigDialog::keyPressEvent(QKeyEvent* e)
     QDialog::keyPressEvent(e);
 }
 
-void ConfigDialog::onManufacturePasswordVerified(bool pass)
+void ConfigDialog::onDeviceConnected()
 {
-    if (pass)
+    updatePanelsStatus();
+}
+
+void ConfigDialog::onDeviceDisconnected()
+{
+    updatePanelsStatus();
+}
+
+void ConfigDialog::onSystemRegistersConfirmed()
+{
+    QStringList errors;
+    QMap<int, LaserRegister*> registers = LaserApplication::device->systemRegisters(true);
+    for (QMap<int, LaserRegister*>::Iterator i = registers.begin(); i != registers.end(); i++)
     {
-        LaserApplication::device->readSystemRegisters();
-        m_ui->stackedWidgetPanels->setCurrentWidget(m_systemRegisterPage);
-        m_ui->scrollAreaConfigs->verticalScrollBar()->setValue(0);
+        LaserRegister* laserRegister = i.value();
+        ConfigItem* configItem = laserRegister->configItem();
+
+        if (!configItem->confirm(laserRegister->value()))
+        {
+            errors.append(tr("Register '%1' save failure, expected value is '%2', actual value is '%3'.")
+            .arg(laserRegister->name()).arg(configItem->value().toString()).arg(laserRegister->value().toString()));
+        }
+    }
+    if (errors.isEmpty())
+    {
+        QMessageBox::information(this, tr("Success"), tr("Save system registers successfully!"));
+        Config::SystemRegister::group->save(true, true);
     }
     else
     {
-        QMessageBox::warning(this, tr("Invalid Manufacture Password"), tr("Invalid manufacture password!"));
+        errors.insert(0, tr("Save system registers failure:"));
+        QString info = errors.join("\n");
+        QMessageBox::warning(this, tr("Failure"), info);
     }
+}
+
+void ConfigDialog::onUserRegistersConfirmed()
+{
+    QStringList errors;
+    QMap<int, LaserRegister*> registers = LaserApplication::device->userRegisters(true);
+    for (QMap<int, LaserRegister*>::Iterator i = registers.begin(); i != registers.end(); i++)
+    {
+        LaserRegister* laserRegister = i.value();
+        ConfigItem* configItem = laserRegister->configItem();
+
+        if (!configItem->confirm(laserRegister->value()))
+        {
+            errors.append(tr("Register '%1' save failure, expected value is '%2', actual value is '%3'.")
+            .arg(laserRegister->name()).arg(configItem->value().toString()).arg(laserRegister->value().toString()));
+        }
+    }
+    if (errors.isEmpty())
+    {
+        QMessageBox::information(this, tr("Success"), tr("Save user registers successfully!"));
+        Config::SystemRegister::group->save(true, true);
+    }
+    else
+    {
+        errors.insert(0, tr("Save user registers failure:"));
+        QString info = errors.join("\n");
+        QMessageBox::warning(this, tr("Failure"), info);
+    }
+}
+
+void ConfigDialog::onButtonRestoreToSystemDefault(bool checked)
+{
+    restoreToSystemDefault();
+}
+
+void ConfigDialog::onButtonRestoreToDefault(bool checked)
+{
+    restoreToDefault();
+}
+
+void ConfigDialog::onButtonApplyToDefault(bool checked)
+{
+    applyToDefault();
+}
+
+void ConfigDialog::onButtonImport(bool checked)
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Import Settings"), QString(),
+        "Config (*.config *.json)");
+    Config::importFrom(filename);
+}
+
+void ConfigDialog::onButtonExport(bool checked)
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export Settings"), QString(),
+        "Config ((*.config *.json)");
+    Config::exportTo(filename);
+}
+
+void ConfigDialog::onButtonSave(bool checked)
+{
+    save();
+    m_done = true;
+}
+
+void ConfigDialog::onButtonReset(bool checked)
+{
+    // 提示用户当前修改会丢失
+    if (QMessageBox::question(this, tr("Confirm"),
+        tr("If you modified settings, clicked 'OK' button will lose these modifications. Do you want to reset?"),
+        QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    {
+        reset();
+    }
+    m_done = true;
+}
+
+void ConfigDialog::onButtonReload(bool checked)
+{
+    // 提示用户当前修改会被覆盖
+    if (QMessageBox::question(this, tr("Confirm"),
+        tr("If you modified settings, clicked 'OK' button will lose these modifications. Do you want to reset?"),
+        QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    {
+        load();
+    }
+}
+
+void ConfigDialog::onButtonSaveAndClose(bool checked)
+{
+    save();
+    m_done = true;
+    this->close();
+}
+
+void ConfigDialog::onButtonsResetAndClose(bool checked)
+{
+    reset();
+    m_done = true;
+    this->close();
 }
 
 void ConfigDialog::retranslate()
@@ -296,14 +527,9 @@ void ConfigDialog::retranslate()
     m_systemPage->setTabText(1, tr("X"));
     m_systemPage->setTabText(2, tr("Y"));
     m_systemPage->setTabText(3, tr("Z"));
-
-    m_ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Save"));
-    m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
-    m_ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(tr("Restore Defaults"));
-    m_ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Reset"));
 }
 
-void ConfigDialog::onValueChanged(const QVariant& value)
+void ConfigDialog::updateTitle(const QVariant& value)
 {
     if (isModified())
     {

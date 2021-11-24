@@ -1088,7 +1088,7 @@ QPointF LaserDevice::currentOriginInDevice() const
     return origin;
 }
 
-void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy)
+void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed)
 {
     Q_D(LaserDevice);
     QStringList segments = raw.split(";");
@@ -1110,14 +1110,18 @@ void LaserDevice::batchParse(const QString& raw, bool isSystem, ModifiedBy modif
         {
             if (d->systemRegisters.contains(addr))
             {
-                d->systemRegisters[addr]->parse(value, modifiedBy);
+                d->systemRegisters[addr]->parse(value);
+                if (!isConfirmed)
+                    d->systemRegisters[addr]->configItem()->loadValue(value);
             }
         }
         else
         {
             if (d->userRegisters.contains(addr))
             {
-                d->userRegisters[addr]->parse(value, modifiedBy);
+                d->userRegisters[addr]->parse(value);
+                if (!isConfirmed)
+                    d->systemRegisters[addr]->configItem()->loadValue(value);
             }
         }
     }
@@ -1146,15 +1150,57 @@ LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified)
     LaserRegister::RegistersMap map;
     for (LaserRegister* item : d->systemRegisters.values())
     {
-        if (onlyModified && !item->configItem()->isModified())
+        if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
             continue;
 
-        LaserRegister::RegisterPair pair(item->address(), item->value());
+        LaserRegister::RegisterPair pair(item->address(), item->configItem()->value());
         if (!pair.second.isValid())
             continue;
         map.insert(pair.first, pair.second);
     }
     return map;
+}
+
+QMap<int, LaserRegister*> LaserDevice::userRegisters(bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    if (onlyModified)
+    {
+        QMap<int, LaserRegister*> map;
+        for (LaserRegister* item : d->userRegisters.values())
+        {
+            if (onlyModified && !item->configItem()->isModified())
+                continue;
+
+            map.insert(item->address(), item);
+        }
+        return map;
+    }
+    else
+    {
+        return d->userRegisters;
+    }
+}
+
+QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    if (onlyModified)
+    {
+        QMap<int, LaserRegister*> map;
+        for (LaserRegister* item : d->systemRegisters.values())
+        {
+            if (onlyModified && !item->configItem()->isModified())
+                continue;
+
+            map.insert(item->address(), item);
+        }
+        return map;
+    }
+    else
+    {
+        return d->systemRegisters;
+    }
 }
 
 qreal LaserDevice::engravingAccLength(qreal engravingRunSpeed) const
@@ -1493,7 +1539,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        batchParse(message, true, MB_Register);
+        batchParse(message, true, false);
         break;
     }
     case M_WriteSysParamToCardOK:
@@ -1502,7 +1548,8 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        batchParse(message, true, MB_RegisterConfirmed);
+        batchParse(message, true, true);
+        emit systemRegistersConfirmed();
         break;
     }
     case M_ReadUserParamFromCardOK:
@@ -1511,7 +1558,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        batchParse(message, false, MB_Register);
+        batchParse(message, false, false);
         break;
     }
     case M_WriteUserParamToCardOK:
@@ -1520,7 +1567,8 @@ void LaserDevice::handleMessage(int code, const QString& message)
         {
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
-        batchParse(message, false, MB_RegisterConfirmed);
+        batchParse(message, false, true);
+        emit userRegistersConfirmed();
         break;
     }
     case M_ReadComputerParamFromCardOK:
@@ -1824,13 +1872,13 @@ void LaserDevice::onMainCardActivationChanged(bool activated)
     qLogD << "main card activation changed: " << activated;
 }
 
-void LaserDevice::onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy)
+void LaserDevice::onConfigStartFromChanged(const QVariant& value, void* senderPtr)
 {
     Q_D(LaserDevice);
     d->updateDeviceOriginAndTransform();
 }
 
-void LaserDevice::onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy)
+void LaserDevice::onConfigJobOriginChanged(const QVariant& value, void* senderPtr)
 {
     Q_D(LaserDevice);
     d->updateDeviceOriginAndTransform();

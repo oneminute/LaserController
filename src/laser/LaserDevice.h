@@ -198,10 +198,12 @@ public:
     QPointF currentOriginInMech() const;
     QPointF currentOriginInDevice() const;
 
-    void batchParse(const QString& raw, bool isSystem, ModifiedBy modifiedBy);
+    void batchParse(const QString& raw, bool isSystem, bool isConfirmed);
 
     LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
     LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
+    QMap<int, LaserRegister*> userRegisters(bool onlyModified = false) const;
+    QMap<int, LaserRegister*> systemRegisters(bool onlyModified = false) const;
 
     qreal engravingAccLength(qreal engravingRunSpeed) const;
 
@@ -241,8 +243,8 @@ protected slots:
     void onMainCardRegistrationChanged(bool registered);
     void onMainCardActivationChanged(bool activated);
 
-    void onConfigStartFromChanged(const QVariant& value, ModifiedBy modifiedBy);
-    void onConfigJobOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onConfigStartFromChanged(const QVariant& value, void* senderPtr);
+    void onConfigJobOriginChanged(const QVariant& value, void* senderPtr);
 
     void onLayerWidthChanged(const QVariant& value);
     void onLayerHeightChanged(const QVariant& value);
@@ -258,6 +260,8 @@ signals:
     void manufacturePasswordVerified(bool pass);
     void workStateUpdated(DeviceState state);
     void layoutChanged(const QSizeF& size);
+    void systemRegistersConfirmed();
+    void userRegistersConfirmed();
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

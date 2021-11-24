@@ -45,10 +45,12 @@ private:
 
 public:
     static void init();
+    static void importFrom(const QString& filename);
+    static void exportTo(const QString& filename);
     static void load();
-    static void save(const QString& mainCardId = "");
+    static void save(bool force, bool ignorePreSaveHook);
     static void restore();
-    static QString configFilePath();
+    static QString configFilePath(const QString& filename = "Config.json");
     static bool isModified();
     static QList<ConfigItemGroup*> getGroups();
     static void updateTitlesAndDescriptions();
@@ -423,6 +425,7 @@ private:
     static QMap<QString, ConfigItemGroup*> groupsMap;
 
     friend class ConfigItemGroup;
+    friend class ConfigDialog;
 };
 
 #endif // CONFIG_H

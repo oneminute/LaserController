@@ -21,8 +21,6 @@ public:
     typedef std::function<void(ConfigItem*)> DestroyHook;
     typedef std::function<QJsonObject(const ConfigItem*)> ToJsonHook;
     typedef std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> FromJsonHook;
-    typedef std::function<void(ConfigItem*)> ResetHook;
-    typedef std::function<void(ConfigItem*)> RestoreHook;
     typedef std::function<void(QWidget* widget, const QVariant& value)> UpdateWidgetValueHook;
     typedef std::function<void(QWidget*, ConfigItem*)> RetranslateHook;
 
@@ -49,6 +47,8 @@ public:
     bool isAdvanced() const;
     void setAdvanced(bool advanced);
 
+    bool needRelaunch() const;
+
     bool isVisible() const;
     void setVisible(bool visible);
 
@@ -57,12 +57,6 @@ public:
 
     bool exportable() const;
     void setExportable(bool exportable);
-
-    bool readOnly() const;
-    void setReadOnly(bool readOnly = true);
-
-    bool writeOnly() const;
-    void setWriteOnly(bool writeOnly = true);
 
     StoreStrategy storeStrategy() const;
     void setStoreStrategy(StoreStrategy type);
@@ -79,9 +73,8 @@ public:
     QVariant lastValue() const;
     void setLastValue(const QVariant& value);
 
+    bool isDirty() const;
     bool isModified() const;
-
-    InputWidgetWrapper* bindWidget(QWidget* widget);
 
     QString toString() const;
     QJsonObject toJson() const;
@@ -98,6 +91,11 @@ public:
     QVariantMap& extraProperties();
     void setExtraProperty(const QString& key, const QVariant& value);
     QVariant& extraProperty(const QString& key);
+
+    void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
+
+protected:
+    InputWidgetWrapper* bindWidget(QWidget* widget, StoreStrategy ss);
 
     /// <summary>
     /// 绑定的控件在初始化时的回调函数
@@ -155,22 +153,6 @@ public:
     void setFromJsonHook(FromJsonHook fn);
     void doFromJsonHook(const QJsonObject& json);
 
-    /// <summary>
-    /// 重置时的回调函数
-    /// </summary>
-    /// <returns></returns>
-    ResetHook resetHook();
-    void setResetHook(ResetHook fn);
-    void doResetHook();
-
-    /// <summary>
-    /// 恢复时的回调函数
-    /// </summary>
-    /// <returns></returns>
-    RestoreHook restoreHook();
-    void setRestoreHook(RestoreHook fn);
-    void doRestoreHook();
-
     UpdateWidgetValueHook updateWidgetValueHook();
     void setUpdateWidgetValueHook(UpdateWidgetValueHook fn);
     bool doUpdateWidgetValueHook(QWidget* widget, const QVariant& value);
@@ -181,18 +163,15 @@ public:
 
     const QList<QWidget*>& boundedWidgets() const;
 
-    void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
-
-public slots:
-    void cancel();
     void reset();
-    void restore();
-    void restoreSystem();
+    void restoreToDefault();
+    void restoreToSystemDefault();
 
     void apply();
-    void confirm(const QVariant& value, bool& success);
-    void load(const QVariant& value);
-
+    void applyToDefault();
+    bool confirm(const QVariant& value);
+    void loadValue(const QVariant& value);
+    void clearModified();
 
 signals:
     void visibleChanged(bool value);
@@ -211,6 +190,11 @@ private:
     Q_DISABLE_COPY(ConfigItem)
 
     friend class Config;
+    friend class ConfigItemGroup;
+    friend class ConfigDialog;
+    friend class InputWidgetWrapper;
+    friend class LaserControllerWindow;
+    friend class LaserDevice;
 };
 
 QDebug operator<<(QDebug debug, const ConfigItem & item);

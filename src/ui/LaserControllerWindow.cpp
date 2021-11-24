@@ -802,7 +802,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	});
 	
     // config items
-    connect(Config::Ui::autoRepeatDelayItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::updateAutoRepeatDelayChanged);
     connect(Config::SystemRegister::deviceOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::deviceOriginChanged);
     connect(Config::Device::jobOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::jobOriginChanged);
     connect(Config::Device::startFromItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::startFromChanged);
@@ -814,7 +813,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         m_scene->updataValidMaxRegion();
 
     });
-
 
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
@@ -1711,10 +1709,10 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationOrigin->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_comboBoxStartPosition = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::startFromItem());
-    Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition);
+    Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition, SS_DIRECTLY);
 
     m_radioButtonGroupJobOrigin = InputWidgetWrapper::createWidget<RadioButtonGroup*>(Config::Device::jobOriginItem());
-    Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin);
+    Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin, SS_DIRECTLY);
     int index = Config::Device::startFrom();
     switch (index)
     {
@@ -1924,9 +1922,6 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonHideLaserPosition = new QToolButton;
     m_buttonHideLaserPosition->setDefaultAction(m_ui->actionHideLaserPosition);
 
-    updateAutoRepeatDelayChanged(Config::Ui::autoRepeatDelay(), MB_Manual);
-    //updateAutoRepeatIntervalChanged(Config::Ui::autoRepeatInterval(), MB_Manual);
-
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
     secondRow->addWidget(m_buttonMoveTopLeft, 0, 0);
@@ -1959,9 +1954,9 @@ void LaserControllerWindow::createMovementDockPanel()
     m_userOrigin2 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin2Item());
     m_userOrigin3 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin3Item());
 
-    Config::Device::userOrigin1Item()->bindWidget(m_userOrigin1);
-    Config::Device::userOrigin2Item()->bindWidget(m_userOrigin2);
-    Config::Device::userOrigin3Item()->bindWidget(m_userOrigin3);
+    Config::Device::userOrigin1Item()->bindWidget(m_userOrigin1, SS_DIRECTLY);
+    Config::Device::userOrigin2Item()->bindWidget(m_userOrigin2, SS_DIRECTLY);
+    Config::Device::userOrigin3Item()->bindWidget(m_userOrigin3, SS_DIRECTLY);
 
     QGridLayout* thirdRow = new QGridLayout;
     thirdRow->setMargin(0);
@@ -2006,22 +2001,22 @@ void LaserControllerWindow::createMovementDockPanel()
 void LaserControllerWindow::createLaserPowerDockPanel()
 {
     m_floatEditSliderScanLaserPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::scanLaserPowerItem());
-    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower);
+    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower, SS_DIRECTLY);
 
     m_editSliderScanMaxGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::maxScanGrayRatioItem());
-    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray);
+    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray, SS_DIRECTLY);
 
     m_editSliderScanMinGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::minScanGrayRatioItem());
-    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray);
+    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray, SS_DIRECTLY);
 
     m_floatEditSliderCuttingMaxPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMaxCuttingPowerItem());
-    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower);
+    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower, SS_DIRECTLY);
 
     m_floatEditSliderCuttingMinPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMinCuttingPowerItem());
-    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower);
+    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower, SS_DIRECTLY);
 
     m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
-    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower);
+    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower, SS_DIRECTLY);
     QFormLayout* layout = new QFormLayout;
     layout->setMargin(3);
     layout->addRow(Config::UserRegister::scanLaserPowerItem()->title(), m_floatEditSliderScanLaserPower);
@@ -3551,13 +3546,13 @@ void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
     switch (Config::Device::userOriginSelected())
     {
     case 0:
-        Config::Device::userOrigin1Item()->setValue(laserPos);
+        Config::Device::userOrigin1Item()->setValue(laserPos, SS_DIRECTLY, this);
         break;
     case 1:
-        Config::Device::userOrigin2Item()->setValue(laserPos);
+        Config::Device::userOrigin2Item()->setValue(laserPos, SS_DIRECTLY, this);
         break;
     case 2:
-        Config::Device::userOrigin3Item()->setValue(laserPos);
+        Config::Device::userOrigin3Item()->setValue(laserPos, SS_DIRECTLY, this);
         break;
     }
 }
@@ -3881,7 +3876,9 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
             .arg(y, 8, 'f', 3, QLatin1Char(' ')));
 
         Config::Device::redLightOffsetItem()->setValue(
-            m_redLightAlignment1stPt - m_redLightAlignment2ndPt
+            m_redLightAlignment1stPt - m_redLightAlignment2ndPt,
+            SS_DIRECTLY,
+            this
         );
 
         x = Config::Device::redLightOffset().x() * 0.001;
@@ -4183,16 +4180,6 @@ void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
     //qLogD << "real time laser power: " << value;
 }
 
-void LaserControllerWindow::onFloatDualEditSliderLowerValueChanged(qreal value)
-{
-    Config::SystemRegister::laserMinPowerItem()->setValue(value, MB_Widget);
-}
-
-void LaserControllerWindow::onFloatDualEditSliderHigherValueChanged(qreal value)
-{
-    Config::SystemRegister::laserMaxPowerItem()->setValue(value, MB_Widget);
-}
-
 void LaserControllerWindow::onUserOriginRadioButtonChanged(bool checked)
 {
     if (!checked)
@@ -4202,7 +4189,7 @@ void LaserControllerWindow::onUserOriginRadioButtonChanged(bool checked)
     if (rb)
     {
         int originIndex = rb->property("origin").toInt();
-        Config::Device::userOriginSelectedItem()->setValue(originIndex, MB_Widget);
+        Config::Device::userOriginSelectedItem()->setValue(originIndex, SS_DIRECTLY, this);
     }
 
     m_viewer->viewport()->update();
@@ -4233,7 +4220,7 @@ void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
     m_statusBarProgress->setValue(qRound(progress * 100));
 }
 
-void LaserControllerWindow::onUserOriginConfigValueChanged(const QVariant& index, ModifiedBy modifiedBy)
+void LaserControllerWindow::onUserOriginConfigValueChanged(const QVariant& index, void* senderPtr)
 {
     updateUserOriginSelection(index);
 }
@@ -4441,7 +4428,7 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
     }
     else if (result == QDialog::Rejected) {
         if (lastValidMaxRegion != validMaxRegion) {
-            Config::Ui::validMaxRegionItem()->setValue(lastValidMaxRegion);
+            Config::Ui::validMaxRegionItem()->setValue(lastValidMaxRegion, SS_DIRECTLY, this);
             //updata region
             m_scene->updateValidMaxRegionRect();
         }
@@ -4452,7 +4439,8 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
 void LaserControllerWindow::selectedChangedFromMouse()
 {
 	//int size = m_scene->selectedPrimitives().length();
-    QRectF sceneRect = m_scene->backgroundItem()->rect();
+    //QRectF sceneRect = m_scene->backgroundItem()->rect();
+    QRectF sceneRect = LaserApplication::device->layoutRectInScene();
     LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
     LaserPrimitiveGroup* group =  view->group();
     if (!group) {
@@ -5244,21 +5232,7 @@ void LaserControllerWindow::documentClose()
     updateOutlineTree();
 }
 
-void LaserControllerWindow::updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy)
-{
-    m_buttonMoveTopLeft->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveTop->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveTopRight->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveLeft->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveRight->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveBottomLeft->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveBottom->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveBottomRight->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveUp->setAutoRepeatDelay(value.toInt());
-    m_buttonMoveDown->setAutoRepeatDelay(value.toInt());
-}
-
-void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
+void LaserControllerWindow::deviceOriginChanged(const QVariant& value, void* senderPtr)
 {
     //changeRuler
     m_viewer->horizontalRuler()->repaint();
@@ -5268,17 +5242,17 @@ void LaserControllerWindow::deviceOriginChanged(const QVariant& value, ModifiedB
     m_viewer->viewport()->update();
 }
 
-void LaserControllerWindow::jobOriginChanged(const QVariant& value, ModifiedBy modifiedBye)
+void LaserControllerWindow::jobOriginChanged(const QVariant& value, void* senderPtr)
 {
     m_viewer->viewport()->update();
 }
 
-void LaserControllerWindow::startFromChanged(const QVariant& value, ModifiedBy modifiedBye)
+void LaserControllerWindow::startFromChanged(const QVariant& value, void* senderPtr)
 {
     m_viewer->viewport()->update();
 }
 
-void LaserControllerWindow::userOriginChanged(const QVariant& value, ModifiedBy modifiedBy)
+void LaserControllerWindow::userOriginChanged(const QVariant& value, void* senderPtr)
 {
     m_viewer->viewport()->update();
 }

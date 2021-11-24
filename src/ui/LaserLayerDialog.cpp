@@ -224,31 +224,33 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 	}
 	else if (stdButton == QDialogButtonBox::Save)
 	{
-		Config::CuttingLayer::runSpeedItem()->setValue(m_ui->editSliderCuttingRunSpeed->value());
-		Config::CuttingLayer::minPowerItem()->setValue(m_ui->editSliderCuttingMinSpeedPower->value());
-		Config::CuttingLayer::maxPowerItem()->setValue(m_ui->editSliderCuttingRunSpeedPower->value());
+		Config::CuttingLayer::runSpeedItem()->setValue(m_ui->editSliderCuttingRunSpeed->value(), SS_DIRECTLY, this);
+		Config::CuttingLayer::minPowerItem()->setValue(m_ui->editSliderCuttingMinSpeedPower->value(), SS_DIRECTLY, this);
+		Config::CuttingLayer::maxPowerItem()->setValue(m_ui->editSliderCuttingRunSpeedPower->value(), SS_DIRECTLY, this);
 
-        Config::EngravingLayer::enableCuttingItem()->setValue(m_ui->checkBoxEngravingEnableCutting->isChecked());
-		Config::EngravingLayer::runSpeedItem()->setValue(m_ui->editSliderEngravingRunSpeed->value());
-		Config::EngravingLayer::laserPowerItem()->setValue(m_ui->editSliderEngravingLaserPower->value());
-		Config::EngravingLayer::minPowerItem()->setValue(m_ui->editSliderEngravingMinSpeedPower->value());
-		Config::EngravingLayer::maxPowerItem()->setValue(m_ui->editSliderEngravingRunSpeedPower->value());
-        Config::EngravingLayer::rowIntervalItem()->setValue(m_ui->editSliderEngravingRowInterval->value());
-        Config::EngravingLayer::halftoneAnglesItem()->setValue(m_ui->doubleSpinBoxHalftoneAngles->value());
-		Config::EngravingLayer::LPIItem()->setValue(m_ui->editSliderLPI->value());
-		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value());
-		Config::EngravingLayer::useHalftoneItem()->setValue(m_ui->checkBoxUseHalftone->isChecked());
+        Config::EngravingLayer::enableCuttingItem()->setValue(m_ui->checkBoxEngravingEnableCutting->isChecked(), SS_DIRECTLY, this);
+		Config::EngravingLayer::runSpeedItem()->setValue(m_ui->editSliderEngravingRunSpeed->value(), SS_DIRECTLY, this);
+		Config::EngravingLayer::laserPowerItem()->setValue(m_ui->editSliderEngravingLaserPower->value(), SS_DIRECTLY, this);
+		Config::EngravingLayer::minPowerItem()->setValue(m_ui->editSliderEngravingMinSpeedPower->value(), SS_DIRECTLY, this);
+		Config::EngravingLayer::maxPowerItem()->setValue(m_ui->editSliderEngravingRunSpeedPower->value(), SS_DIRECTLY, this);
+        Config::EngravingLayer::rowIntervalItem()->setValue(m_ui->editSliderEngravingRowInterval->value(), SS_DIRECTLY, this);
+        Config::EngravingLayer::halftoneAnglesItem()->setValue(m_ui->doubleSpinBoxHalftoneAngles->value(), SS_DIRECTLY, this);
+		Config::EngravingLayer::LPIItem()->setValue(m_ui->editSliderLPI->value(), SS_DIRECTLY, this);
+		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value(), SS_DIRECTLY, this);
+		Config::EngravingLayer::useHalftoneItem()->setValue(m_ui->checkBoxUseHalftone->isChecked(), SS_DIRECTLY, this);
 
-        Config::FillingLayer::enableCuttingItem()->setValue(m_ui->checkBoxFillingEnableCutting->isChecked());
-        Config::FillingLayer::fillingTypeItem()->setValue(m_ui->comboBoxFillingType->currentData().toInt());
-		Config::FillingLayer::runSpeedItem()->setValue(m_ui->editSliderFillingRunSpeed->value());
-		Config::FillingLayer::minPowerItem()->setValue(m_ui->editSliderFillingMinSpeedPower->value());
-		Config::FillingLayer::maxPowerItem()->setValue(m_ui->editSliderFillingRunSpeedPower->value());
-        Config::FillingLayer::rowIntervalItem()->setValue(m_ui->editSliderFillingRowInterval->value());
+        Config::FillingLayer::enableCuttingItem()->setValue(m_ui->checkBoxFillingEnableCutting->isChecked(), SS_DIRECTLY, this);
+        Config::FillingLayer::fillingTypeItem()->setValue(m_ui->comboBoxFillingType->currentData().toInt(), SS_DIRECTLY, this);
+		Config::FillingLayer::runSpeedItem()->setValue(m_ui->editSliderFillingRunSpeed->value(), SS_DIRECTLY, this);
+		Config::FillingLayer::minPowerItem()->setValue(m_ui->editSliderFillingMinSpeedPower->value(), SS_DIRECTLY, this);
+		Config::FillingLayer::maxPowerItem()->setValue(m_ui->editSliderFillingRunSpeedPower->value(), SS_DIRECTLY, this);
+        Config::FillingLayer::rowIntervalItem()->setValue(m_ui->editSliderFillingRowInterval->value(), SS_DIRECTLY, this);
 
 		if (Config::isModified())
 		{
-			Config::save();
+            Config::FillingLayer::group->save(true, true);
+            Config::EngravingLayer::group->save(true, true);
+            Config::CuttingLayer::group->save(true, true);
 		}
 	}
 }
