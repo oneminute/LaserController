@@ -471,7 +471,7 @@ void ConfigDialog::onButtonReset(bool checked)
 {
     // 提示用户当前修改会丢失
     if (QMessageBox::question(this, tr("Confirm"),
-        tr("If you modified settings, clicked 'OK' button will lose these modifications. Do you want to reset?"),
+        tr("If you have modified settings, clicked 'OK' button will lose these modifications. Do you want to reset?"),
         QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
         reset();
@@ -483,7 +483,7 @@ void ConfigDialog::onButtonReload(bool checked)
 {
     // 提示用户当前修改会被覆盖
     if (QMessageBox::question(this, tr("Confirm"),
-        tr("If you modified settings, clicked 'OK' button will lose these modifications. Do you want to reset?"),
+        tr("If you have modified settings, clicked 'OK' button will lose these modifications. Do you want to reset?"),
         QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
         load();

@@ -1121,7 +1121,7 @@ void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed
             {
                 d->userRegisters[addr]->parse(value);
                 if (!isConfirmed)
-                    d->systemRegisters[addr]->configItem()->loadValue(value);
+                    d->userRegisters[addr]->configItem()->loadValue(value);
             }
         }
     }
@@ -1209,6 +1209,40 @@ qreal LaserDevice::engravingAccLength(qreal engravingRunSpeed) const
     qreal acc = Config::UserRegister::scanXAcc();
     qreal maxSpeed = qMax(engravingRunSpeed, minSpeed);
     return qAbs(maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
+}
+
+void LaserDevice::debugPrintUserRegisters() const
+{
+#ifdef _DEBUG
+    Q_D(const LaserDevice);
+    for (QMap<int, LaserRegister*>::ConstIterator i = d->userRegisters.constBegin();
+        i != d->userRegisters.constEnd(); i++)
+    {
+        qLogD << "user register [" << i.key() << "](" << i.value()->configItem()->title() << ") = "
+            << i.value()->configItem()->value();
+    }
+#endif
+}
+
+void LaserDevice::debugPrintSystemRegisters() const
+{
+#ifdef _DEBUG
+    Q_D(const LaserDevice);
+    for (QMap<int, LaserRegister*>::ConstIterator i = d->systemRegisters.constBegin();
+        i != d->systemRegisters.constEnd(); i++)
+    {
+        qLogD << "system register [" << i.key() << "](" << i.value()->configItem()->title() << ") = "
+            << i.value()->configItem()->value();
+    }
+#endif
+}
+
+void LaserDevice::debugPrintRegisters() const
+{
+#ifdef _DEBUG
+    debugPrintUserRegisters();
+    debugPrintSystemRegisters();
+#endif
 }
 
 void LaserDevice::unload()
@@ -1540,6 +1574,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
         batchParse(message, true, false);
+        debugPrintSystemRegisters();
         break;
     }
     case M_WriteSysParamToCardOK:
@@ -1559,6 +1594,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
             throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
         }
         batchParse(message, false, false);
+        debugPrintUserRegisters();
         break;
     }
     case M_WriteUserParamToCardOK:

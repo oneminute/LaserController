@@ -25,6 +25,8 @@ public slots:
 
     void drawAllItems();
 
+    void onDeviceLayoutChanged(const QSizeF& size);
+
 private:
     QScopedPointer<PreviewScenePrivate> d_ptr;
 

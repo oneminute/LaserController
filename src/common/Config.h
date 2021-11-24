@@ -228,13 +228,8 @@ public:
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
-        CONFIG_ITEM(export, halfToneStyle, int, toInt)
-        CONFIG_ITEM(export, imageUseGaussian, bool, toBool)
-        CONFIG_ITEM(export, gaussianFactor, qreal, toReal)
         CONFIG_ITEM(export, curveFlatteningThreshold, qreal, toReal)
-        CONFIG_ITEM(export, a, qreal, toReal)
-        CONFIG_ITEM(export, b, qreal, toReal)
-        CONFIG_ITEM(export, c, qreal, toReal)
+        CONFIG_ITEM(export, gaussianFactorA, qreal, toReal)
 
     private:
         friend class Config;

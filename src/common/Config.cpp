@@ -905,52 +905,6 @@ void Config::loadExportItems()
         }
     );
 
-    /*ConfigItem* enableRelativeCoordinates = group->addConfigItem(
-        "enableRelativeCoordinates",
-        false,
-        DT_BOOL
-    );
-    enableRelativeCoordinates->setStoreStrategy(SS_DIRECTLY);*/
-
-    ConfigItem* halfToneStyle = group->addConfigItem(
-        "halfToneStyle",
-        2,
-        DT_INT
-    );
-    halfToneStyle->setInputWidgetType(IWT_ComboBox);
-    halfToneStyle->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
-        {
-            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-            if (!comboBox)
-                return;
-
-            comboBox->addItem(ltr("Style 1"), 0);
-            comboBox->addItem(ltr("Style 2"), 1);
-            comboBox->addItem(ltr("Style 3"), 2);
-
-            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
-        }
-    );
-    halfToneStyle->setVisible(false);
-
-    ConfigItem* imageUseGaussian = group->addConfigItem(
-        "imageUseGaussian",
-        false,
-        DT_BOOL
-    );
-    imageUseGaussian->setVisible(false);
-
-    ConfigItem* gaussianFactor = group->addConfigItem(
-        "gaussianFactor",
-        1.5,
-        DT_REAL
-    );
-    gaussianFactor->setInputWidgetProperty("minimum", 0);
-    gaussianFactor->setInputWidgetProperty("maximum", 5);
-    gaussianFactor->setVisible(false);
-
     ConfigItem* curveFlatteningThreshold = group->addConfigItem(
         "curveFlatteningThreshold",
         20,
@@ -959,32 +913,14 @@ void Config::loadExportItems()
     curveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
     curveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
 
-    ConfigItem* a = group->addConfigItem(
-        "a",
-        12,
-        DT_REAL
-    );
-    a->setInputWidgetProperty("minimum", 0);
-    a->setInputWidgetProperty("maximum", 1000);
-    a->setInputWidgetProperty("decimals", 3);
-
-    ConfigItem* b = group->addConfigItem(
-        "b",
+    ConfigItem* gaussianFactorA = group->addConfigItem(
+        "gaussianFactorA",
         1.25,
         DT_REAL
     );
-    b->setInputWidgetProperty("minimum", 0);
-    b->setInputWidgetProperty("maximum", 1000);
-    b->setInputWidgetProperty("decimals", 3);
-
-    ConfigItem* c = group->addConfigItem(
-        "c",
-        20,
-        DT_REAL
-    );
-    c->setInputWidgetProperty("minimum", 0);
-    c->setInputWidgetProperty("maximum", 1000);
-    c->setInputWidgetProperty("decimals", 3);
+    gaussianFactorA->setInputWidgetProperty("minimum", 0);
+    gaussianFactorA->setInputWidgetProperty("maximum", 1000);
+    gaussianFactorA->setInputWidgetProperty("decimals", 3);
 }
 
 void Config::loadDeviceItems()
@@ -1269,6 +1205,7 @@ void Config::loadUserReigsters()
     );
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
+    head->setVisible(false);
 
     ConfigItem* accMode = group->addConfigItem(
         "accMode",
@@ -3339,37 +3276,13 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Small Diagonal Limitation", nullptr), 
         QCoreApplication::translate("Config", "Details of small diagonal limitation", nullptr));
 
-    //Export::enableRelativeCoordinatesItem()->setTitleAndDesc(
-        //QCoreApplication::translate("Config", "Enable Relative Coordinates", nullptr), 
-        //QCoreApplication::translate("Config", "Enable relative coordinates for exporting machining points", nullptr));
-
-    Export::halfToneStyleItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Half Tone Style", nullptr), 
-        QCoreApplication::translate("Config", "Half Tone Style", nullptr));
-
-    Export::imageUseGaussianItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Image Use Gaussian", nullptr), 
-        QCoreApplication::translate("Config", "Use gaussian when generating images", nullptr));
-
-    Export::gaussianFactorItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Gaussian Factor", nullptr), 
-        QCoreApplication::translate("Config", "Factor of gaussian", nullptr));
-
     Export::curveFlatteningThresholdItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr), 
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr));
 
-    Export::aItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "a", nullptr), 
-        QCoreApplication::translate("Config", "a", nullptr));
-
-    Export::bItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "b", nullptr), 
-        QCoreApplication::translate("Config", "b", nullptr));
-
-    Export::cItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "c", nullptr), 
-        QCoreApplication::translate("Config", "c", nullptr));
+    Export::gaussianFactorAItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Gaussian Factor A", nullptr), 
+        QCoreApplication::translate("Config", "Gaussian factor a", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 
