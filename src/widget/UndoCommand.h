@@ -36,7 +36,8 @@ private:
     LaserViewer* m_viewer;
     LaserPrimitiveGroup* m_group;
     QTransform m_lastTransform;
-    QTransform m_curTransform;
+    QTransform m_curUndoTransform;
+    QTransform m_curRedoTransform;
     QuadTreeNode* m_tree;
     bool isRedo;
 };
@@ -196,10 +197,12 @@ public:
     virtual void redo() override;
 private:
     LaserViewer * m_viewer;
-    QList<LaserPrimitive*> m_list;
+    QList<QGraphicsItem*> m_list;
     bool m_isUngroup;
     QAction* m_joinedGroupAction;
     QAction* m_joinedUngroupAction;
+    void handleGroup();
+    void handleUnGroup();
 };
 
 #endif // UNDOCOMMAND_H
