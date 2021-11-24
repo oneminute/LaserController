@@ -121,11 +121,13 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     configItem->blockSignals(true);
     //if (d->configItem->name() == "searchingXYWeight")
         //qLogD << "debugging " << d->configItem->name();
-    updateValue(d->configItem->value());
+    updateWidgetValue(d->configItem->value(), nullptr);
     configItem->blockSignals(false);
-    connect(this, &InputWidgetWrapper::valueChanged, d->configItem, &ConfigItem::setValue);
+
     connect(d->configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
     connect(d->configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
+    connect(d->configItem, &ConfigItem::dirtyValueChanged, this, &InputWidgetWrapper::onConfigItemDirtyValueChanged);
+    connect(d->configItem, &ConfigItem::lazyValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
 }
 
 InputWidgetWrapper::~InputWidgetWrapper()
@@ -150,22 +152,11 @@ QWidget* InputWidgetWrapper::widget() const
     return qobject_cast<QWidget*>(parent());
 }
 
-void InputWidgetWrapper::reset()
+void InputWidgetWrapper::updateWidgetValue(const QVariant& newValue, void* senderPtr)
 {
     Q_D(InputWidgetWrapper);
-    d->configItem->reset();
-    updateValue(d->configItem->value());
-}
-
-void InputWidgetWrapper::restoreDefault()
-{
-    Q_D(InputWidgetWrapper);
-    updateValue(d->configItem->defaultValue());
-}
-
-void InputWidgetWrapper::updateValue(const QVariant& newValue)
-{
-    Q_D(InputWidgetWrapper);
+    if (senderPtr == this)
+        return;
     QVariant value = d->configItem->doValueToWidgetHook(newValue);
     QWidget* widget = qobject_cast<QWidget*>(parent());
     widget->blockSignals(true);
@@ -272,19 +263,11 @@ void InputWidgetWrapper::updateValue(const QVariant& newValue)
     widget->blockSignals(false);
 }
 
-void InputWidgetWrapper::changeValue(const QVariant& value)
+void InputWidgetWrapper::modifyConfigItemValue(const QVariant& value)
 {
     Q_D(InputWidgetWrapper);
-    if (d->configItem->readOnly())
-        return;
     QVariant newValue = d->configItem->doValueFromWidgetHook(value);
-    emit valueChanged(newValue, MB_Widget);
-}
-
-bool InputWidgetWrapper::isModified()
-{
-    Q_D(InputWidgetWrapper);
-    return d->configItem->isModified();
+    d->configItem->setValue(newValue, d->storeStrategy, this);
 }
 
 QVariant InputWidgetWrapper::value() const
@@ -312,99 +295,18 @@ void InputWidgetWrapper::retranslate()
     d->labelName->setToolTip(d->configItem->description());
 }
 
-void InputWidgetWrapper::setEnabled(bool enabled)
-{
-    Q_D(InputWidgetWrapper);
-    qobject_cast<QWidget*>(parent())->setEnabled(enabled);
-}
-
-void InputWidgetWrapper::onTextChanged(const QString & text)
-{
-    Q_D(InputWidgetWrapper);
-    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
-}
-
-void InputWidgetWrapper::onCheckBoxStateChanged(int state)
-{
-    QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
-    changeValue(state == Qt::Checked);
-}
-
-void InputWidgetWrapper::onComboBoxIndexChanged(int index)
-{
-    QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
-    changeValue(comboBox->currentData());
-}
-
-void InputWidgetWrapper::onTextEditTextChanged()
-{
-    Q_D(InputWidgetWrapper);
-    QTextEdit* textEdit = qobject_cast<QTextEdit*>(sender());
-    QString text = textEdit->toPlainText();
-    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
-}
-
-void InputWidgetWrapper::onPlainTextEditTextChanged()
-{
-    Q_D(InputWidgetWrapper);
-    QPlainTextEdit* textEdit = qobject_cast<QPlainTextEdit*>(sender());
-    QString text = textEdit->toPlainText();
-    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
-}
-
-void InputWidgetWrapper::onEditingFinished()
-{
-    Q_D(InputWidgetWrapper);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
-    QString text = lineEdit->text();
-    changeValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
-}
-
-void InputWidgetWrapper::onValueChanged(int value)
-{
-    changeValue(value);
-}
-
-void InputWidgetWrapper::onValueChanged(double value)
-{
-    changeValue(value);
-}
-
-void InputWidgetWrapper::onValueChanged(const SmallDiagonalLimitation& value)
-{
-    QVariant var;
-    var.setValue(value);
-    changeValue(var);
-}
-
-void InputWidgetWrapper::onTimeChanged(const QTime & time)
-{
-    changeValue(time);
-}
-
-void InputWidgetWrapper::onDateChanged(const QDate & date)
-{
-    changeValue(date);
-}
-
-void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
-{
-    changeValue(dateTime);
-}
-
-void InputWidgetWrapper::onVector2DChanged(qreal x, qreal y)
-{
-    changeValue(QPointF(x, y));
-}
-
-void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
+void InputWidgetWrapper::updateLabelColor()
 {
     Q_D(InputWidgetWrapper);
 	if (!d->labelName)
 		return;
     QPalette::ColorRole role = d->labelName->foregroundRole();
     QPalette palette = d->labelName->palette();
-    if (modified)
+    if (d->configItem->isModified())
+    {
+        palette.setColor(role, Qt::blue);
+    }
+    else if (d->configItem->isDirty())
     {
         palette.setColor(role, Qt::red);
     }
@@ -415,9 +317,118 @@ void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
     d->labelName->setPalette(palette);
 }
 
-void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy)
+ConfigItem* InputWidgetWrapper::configItem() const
 {
-    if (modifiedBy != MB_Widget)
-        updateValue(value);
+    Q_D(const InputWidgetWrapper);
+    return d->configItem;
 }
+
+void InputWidgetWrapper::setEnabled(bool enabled)
+{
+    Q_D(InputWidgetWrapper);
+    qobject_cast<QWidget*>(parent())->setEnabled(enabled);
+}
+
+void InputWidgetWrapper::onTextChanged(const QString & text)
+{
+    Q_D(InputWidgetWrapper);
+    modifyConfigItemValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
+}
+
+void InputWidgetWrapper::onCheckBoxStateChanged(int state)
+{
+    QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
+    modifyConfigItemValue(state == Qt::Checked);
+}
+
+void InputWidgetWrapper::onComboBoxIndexChanged(int index)
+{
+    QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
+    modifyConfigItemValue(comboBox->currentData());
+}
+
+void InputWidgetWrapper::onTextEditTextChanged()
+{
+    Q_D(InputWidgetWrapper);
+    QTextEdit* textEdit = qobject_cast<QTextEdit*>(sender());
+    QString text = textEdit->toPlainText();
+    modifyConfigItemValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
+}
+
+void InputWidgetWrapper::onPlainTextEditTextChanged()
+{
+    Q_D(InputWidgetWrapper);
+    QPlainTextEdit* textEdit = qobject_cast<QPlainTextEdit*>(sender());
+    QString text = textEdit->toPlainText();
+    modifyConfigItemValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
+}
+
+void InputWidgetWrapper::onEditingFinished()
+{
+    Q_D(InputWidgetWrapper);
+    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
+    QString text = lineEdit->text();
+    modifyConfigItemValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
+}
+
+void InputWidgetWrapper::onValueChanged(int value)
+{
+    modifyConfigItemValue(value);
+}
+
+void InputWidgetWrapper::onValueChanged(double value)
+{
+    modifyConfigItemValue(value);
+}
+
+void InputWidgetWrapper::onValueChanged(const SmallDiagonalLimitation& value)
+{
+    QVariant var;
+    var.setValue(value);
+    modifyConfigItemValue(var);
+}
+
+void InputWidgetWrapper::onTimeChanged(const QTime & time)
+{
+    modifyConfigItemValue(time);
+}
+
+void InputWidgetWrapper::onDateChanged(const QDate & date)
+{
+    modifyConfigItemValue(date);
+}
+
+void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
+{
+    modifyConfigItemValue(dateTime);
+}
+
+void InputWidgetWrapper::onVector2DChanged(qreal x, qreal y)
+{
+    modifyConfigItemValue(QPointF(x, y));
+}
+
+void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
+{
+    updateLabelColor();
+}
+
+void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, void* senderPtr)
+{
+    updateLabelColor();
+    updateWidgetValue(value, senderPtr);
+}
+
+void InputWidgetWrapper::onConfigItemDirtyValueChanged(const QVariant& value, void* senderPtr)
+{
+    updateLabelColor();
+    updateWidgetValue(value, senderPtr);
+}
+
+void InputWidgetWrapper::onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr)
+{
+    updateLabelColor();
+    updateWidgetValue(value, senderPtr);
+}
+
 

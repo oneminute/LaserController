@@ -12,14 +12,12 @@ public:
         : q_ptr(ptr)
         , group(nullptr)
         , advanced(false)
+        , needRelaunch(false)
         , visible(true)
         , enabled(true)
         , exportable(true)
-        , readOnly(false)
-        , writeOnly(false)
-        //, modified(false)
+        , modified(false)
         , inputWidgetType(IWT_EditSlider)
-        , modifiedBy(MB_Manual)
         , widgetInitializeHook(nullptr)
         , valueToWidgetHook(nullptr)
         , valueFromWidgetHook(nullptr)
@@ -27,8 +25,6 @@ public:
         , destroyHook(nullptr)
         , toJsonHook(nullptr)
         , fromJsonHook(nullptr)
-        , resetHook(nullptr)
-        , restoreHook(nullptr)
         , updateWidgetValueHook(nullptr)
         , retranslateHook(nullptr)
     {
@@ -63,6 +59,11 @@ public:
     bool advanced;
 
     /// <summary>
+    /// 需要重新启动软件
+    /// </summary>
+    bool needRelaunch;
+
+    /// <summary>
     /// 是否在选项窗口中出现
     /// </summary>
     bool visible;
@@ -78,14 +79,9 @@ public:
     bool exportable;
 
     /// <summary>
-    /// 是否为只读选项
+    /// 是否已修改
     /// </summary>
-    bool readOnly;
-
-    /// <summary>
-    /// 只写
-    /// </summary>
-    bool writeOnly;
+    bool modified;
 
     /// <summary>
     /// 保存方式
@@ -118,11 +114,6 @@ public:
     QVariant dirtyValue;
 
     /// <summary>
-    /// 是否已经被修改
-    /// </summary>
-    //bool modified;
-
-    /// <summary>
     /// 数据类型
     /// </summary>
     DataType dataType;
@@ -141,7 +132,8 @@ public:
 
     QList<QWidget*> widgets;
 
-    ModifiedBy modifiedBy;
+    QDateTime lastValueModifiedTime;
+    QDateTime lastDirtyModifiedTime;
 
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
     ConfigItem::ValueHook valueToWidgetHook;
@@ -150,8 +142,6 @@ public:
     ConfigItem::DestroyHook destroyHook;
     ConfigItem::ToJsonHook toJsonHook;
     ConfigItem::FromJsonHook fromJsonHook;
-    ConfigItem::ResetHook resetHook;
-    ConfigItem::RestoreHook restoreHook;
     ConfigItem::UpdateWidgetValueHook updateWidgetValueHook;
     ConfigItem::RetranslateHook retranslateHook;
 };
@@ -159,8 +149,6 @@ public:
 ConfigItem::ConfigItem(
     const QString& name
     , ConfigItemGroup* group
-    //, const QString& title
-    //, const QString& description
     , const QVariant& value
     , DataType dataType
     , bool advanced
@@ -172,17 +160,16 @@ ConfigItem::ConfigItem(
     Q_D(ConfigItem);
     d->name = name;
     d->group = group;
-    //d->title = title;
-    //d->description = description;
+
     d->value = value;
     d->dirtyValue = value;
     d->defaultValue = value;
     d->systemDefaultValue = value;
+
     d->dataType = dataType;
     d->advanced = advanced;
     d->visible = visible;
     d->storeStrategy = storeStrategy;
-    d->modifiedBy = MB_Manual;
 
     switch (d->dataType)
     {
@@ -282,21 +269,23 @@ void ConfigItem::setAdvanced(bool advanced)
     d->advanced = advanced;
 }
 
+bool ConfigItem::needRelaunch() const
+{
+    Q_D(const ConfigItem);
+    return d->needRelaunch;
+}
+
 bool ConfigItem::isVisible() const
 {
     Q_D(const ConfigItem);
-    if (readOnly())
-        return false;
     return d->visible;
 }
 
 void ConfigItem::setVisible(bool visible)
 {
     Q_D(ConfigItem);
-    bool changed = d->visible != visible;
     d->visible = visible;
-    if (changed) 
-        emit visibleChanged(visible);
+    emit visibleChanged(visible);
 }
 
 bool ConfigItem::isEnabled() const
@@ -324,30 +313,6 @@ void ConfigItem::setExportable(bool exportable)
     d->exportable = exportable;
 }
 
-bool ConfigItem::readOnly() const
-{
-    Q_D(const ConfigItem);
-    return d->readOnly;
-}
-
-void ConfigItem::setReadOnly(bool readOnly)
-{
-    Q_D(ConfigItem);
-    d->readOnly = readOnly;
-}
-
-bool ConfigItem::writeOnly() const
-{
-    Q_D(const ConfigItem);
-    return d->writeOnly;
-}
-
-void ConfigItem::setWriteOnly(bool writeOnly)
-{
-    Q_D(ConfigItem);
-    d->writeOnly = writeOnly;
-}
-
 StoreStrategy ConfigItem::storeStrategy() const
 {
     Q_D(const ConfigItem);
@@ -363,7 +328,7 @@ void ConfigItem::setStoreStrategy(StoreStrategy type)
 QVariant ConfigItem::value() const
 {
     Q_D(const ConfigItem);
-    if (isModified())
+    if (isDirty())
     {
         return d->dirtyValue;
     }
@@ -371,6 +336,12 @@ QVariant ConfigItem::value() const
     {
         return d->value;
     }
+}
+
+QVariant ConfigItem::oldValue() const
+{
+    Q_D(const ConfigItem);
+    return d->value;
 }
 
 QVariant ConfigItem::defaultValue() const
@@ -382,10 +353,8 @@ QVariant ConfigItem::defaultValue() const
 void ConfigItem::setDefaultValue(const QVariant& value)
 {
     Q_D(ConfigItem);
-    bool changed = value != d->defaultValue;
     d->defaultValue = value;
-    if (changed)
-        emit defaultValueChanged(value);
+    emit defaultValueChanged(value);
 }
 
 QVariant ConfigItem::systemDefaultValue() const
@@ -412,14 +381,19 @@ void ConfigItem::setLastValue(const QVariant& value)
     d->lastValue = value;
 }
 
-bool ConfigItem::isModified() const
+bool ConfigItem::isDirty() const
 {
     Q_D(const ConfigItem);
-    //return d->modified;
     return d->dirtyValue != d->value;
 }
 
-InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
+bool ConfigItem::isModified() const
+{
+    Q_D(const ConfigItem);
+    return d->modified;
+}
+
+InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget, StoreStrategy ss)
 {
     Q_D(ConfigItem);
     for (QMap<QString, QVariant>::ConstIterator i = d->inputWidgetProperties.constBegin(); i != d->inputWidgetProperties.constEnd(); i++)
@@ -427,6 +401,7 @@ InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
         widget->setProperty(i.key().toStdString().c_str(), i.value());
     }
     InputWidgetWrapper* wrapper = new InputWidgetWrapper(widget, this);
+    wrapper->setStoreStrategy(ss);
     d->widgets.append(widget);
     connect(this, &ConfigItem::enabledChanged, wrapper, &InputWidgetWrapper::setEnabled);
     connect(widget, &QWidget::destroyed,
@@ -436,6 +411,13 @@ InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget)
     );
     doInitWidget(widget, wrapper);
     return wrapper;
+}
+
+void ConfigItem::clearModified()
+{
+    Q_D(ConfigItem);
+    Q_ASSERT(d->dirtyValue == d->value);
+    d->modified = false;
 }
 
 QString ConfigItem::toString() const
@@ -477,14 +459,12 @@ void ConfigItem::fromJson(const QJsonObject& jsonObject)
     {
         doFromJsonHook(jsonObject);
         d->dirtyValue = d->value;
-        //d->modified = false;
     }
     else
     {
         if (jsonObject.contains("value"))
         {
             d->value = d->dirtyValue = jsonObject["value"].toVariant();
-            //d->modified = false;
         }
 
         if (jsonObject.contains("defaultValue"))
@@ -492,12 +472,8 @@ void ConfigItem::fromJson(const QJsonObject& jsonObject)
             setDefaultValue(jsonObject["defaultValue"].toVariant());
         }
     }
-    d->modifiedBy = MB_ConfigFile;
-    bool changed = oldValue != value();
-    if (changed)
-    {
-        emit valueChanged(value(), MB_ConfigFile);
-    }
+    d->modified = false;
+    emit valueChanged(value(), this);
 }
 
 DataType ConfigItem::dataType() const
@@ -708,48 +684,6 @@ void ConfigItem::doFromJsonHook(const QJsonObject& json)
     }
 }
 
-ConfigItem::ResetHook ConfigItem::resetHook()
-{
-    Q_D(ConfigItem);
-    return d->resetHook;
-}
-
-void ConfigItem::setResetHook(ResetHook fn)
-{
-    Q_D(ConfigItem);
-    d->resetHook = fn;
-}
-
-void ConfigItem::doResetHook()
-{
-    Q_D(ConfigItem);
-    if (d->resetHook)
-    {
-        d->resetHook(this);
-    }
-}
-
-ConfigItem::RestoreHook ConfigItem::restoreHook()
-{
-    Q_D(ConfigItem);
-    return d->restoreHook;
-}
-
-void ConfigItem::setRestoreHook(RestoreHook fn)
-{
-    Q_D(ConfigItem);
-    d->restoreHook = fn;
-}
-
-void ConfigItem::doRestoreHook()
-{
-    Q_D(ConfigItem);
-    if (d->restoreHook)
-    {
-        d->restoreHook(this);
-    }
-}
-
 ConfigItem::UpdateWidgetValueHook ConfigItem::updateWidgetValueHook()
 {
     Q_D(ConfigItem);
@@ -800,107 +734,122 @@ const QList<QWidget*>& ConfigItem::boundedWidgets() const
     return d->widgets;
 }
 
-ModifiedBy ConfigItem::modifiedBy() const
-{
-    Q_D(const ConfigItem);
-    return d->modifiedBy;
-}
-
-void ConfigItem::setValue(const QVariant& value, ModifiedBy modifiedBy)
+void ConfigItem::setValue(const QVariant& value, StoreStrategy strategy_, void* senderPtr)
 {
     Q_D(ConfigItem);
     if (!value.isValid())
         return;
 
-    d->modifiedBy = modifiedBy;
-    bool changed = value != d->value;
+    bool dirtyChanged = value != d->dirtyValue;
+    bool valueChanged = value != d->value;
 
-    switch(modifiedBy)
-    {
-    case MB_Manual:
-        d->dirtyValue = value;
-        break;
-    case MB_Widget:
-        d->dirtyValue = value;
-        break;
-    case MB_ConfigFile:
-        changed = false;
-        d->value = d->dirtyValue = value;
-        break;
-    case MB_Register:
-        changed = false;
-        d->value = d->dirtyValue = value;
-        break;
-    case MB_RegisterConfirmed:
-        changed = false;
-        d->value = d->dirtyValue = value;
-        break;
-    }
+    StoreStrategy strategy = d->storeStrategy;
+    if (strategy_ != SS_AS_IS)
+        strategy = strategy_;
 
-    // 如果当前的保存策略是SS_DIRECTLY，那么无论前述值如何处理，
-    // dirtyValue和value都会一致。
-    if (d->storeStrategy == SS_DIRECTLY)
+    switch (strategy)
     {
-        d->value = d->dirtyValue = value;
-    }
-    
-    emit modifiedChanged(changed);
-    
-    if (changed)
-    {
-        emit valueChanged(value, modifiedBy);
+    break;
+    case SS_DIRECTLY:
+        d->dirtyValue = d->value = value;
+        if (dirtyChanged)
+            emit dirtyValueChanged(value, senderPtr);
+        if (valueChanged)
+        {
+            emit this->valueChanged(value, senderPtr);
+            emit modifiedChanged(true);
+        }
+        break;
+    case SS_NORMAL:
+        d->dirtyValue = value;
+        if (dirtyChanged)
+            emit dirtyValueChanged(value, senderPtr);
+    case SS_LAZY:
+        d->dirtyValue = value;
+        if (dirtyChanged)
+            emit dirtyValueChanged(value, senderPtr);
+        break;
     }
 }
 
 void ConfigItem::reset()
 {
     Q_D(ConfigItem);
-    if (isModified())
+    if (isDirty())
     {
-        if (d->resetHook)
-        {
-            doResetHook();
-        }
-        else
-        {
-            d->dirtyValue = d->value;
-            //d->modified = false;
-        }
+        d->dirtyValue = d->value;
 
+        emit dirtyValueChanged(d->dirtyValue, this);
         emit modifiedChanged(false);
     }
 }
 
-void ConfigItem::restore()
+void ConfigItem::restoreToDefault()
 {
     Q_D(ConfigItem);
-    if (d->restoreHook)
-    {
-        doRestoreHook();
-    }
+    bool dirtyChanged = d->defaultValue != d->dirtyValue;
+    d->dirtyValue = d->defaultValue;
+    if (dirtyChanged)
+        emit dirtyValueChanged(d->dirtyValue, this);
+}
+
+void ConfigItem::restoreToSystemDefault()
+{
+    Q_D(ConfigItem);
+    bool dirtyChanged = d->systemDefaultValue != d->dirtyValue;
+    d->dirtyValue = d->systemDefaultValue;
+    if (dirtyChanged)
+        emit dirtyValueChanged(d->dirtyValue, this);
+}
+
+void ConfigItem::apply()
+{
+    Q_D(ConfigItem);
+    bool changed = d->value != d->dirtyValue;
+    d->value = d->dirtyValue;
+    if (changed)
+        emit valueChanged(d->value, this);
+}
+
+void ConfigItem::applyToDefault()
+{
+    Q_D(ConfigItem);
+    bool changed = d->value != d->dirtyValue;
+    d->value = d->dirtyValue;
+    d->defaultValue = d->dirtyValue;
+    if (changed)
+        emit valueChanged(d->value, this);
+}
+
+bool ConfigItem::confirm(const QVariant& value)
+{
+    Q_D(ConfigItem);
+    bool success;
+    if (d->dirtyValue == value)
+        success = true;
     else
-    {
-        setValue(d->defaultValue, MB_Widget);
-    }
+        success = false;
+
+    d->dirtyValue = d->value = value;
+    return success;
 }
 
-void ConfigItem::restoreSystem()
+void ConfigItem::loadValue(const QVariant& value)
 {
     Q_D(ConfigItem);
-    setValue(d->systemDefaultValue, MB_Widget);
-}
+    if (!value.isValid())
+        return;
 
-void ConfigItem::confirm()
-{
-    Q_D(ConfigItem);
-    if (d->storeStrategy == SS_CONFIRMED)
-        d->value = d->dirtyValue;
-}
+    bool dirtyChanged = value != d->dirtyValue;
+    bool valueChanged = value != d->value;
 
-void ConfigItem::onRegisterLoaded(const QVariant& value)
-{
-    Q_D(ConfigItem);
-    setValue(value, MB_Register);
+    d->dirtyValue = d->value = value;
+    clearModified();
+
+    if (dirtyChanged)
+        emit dirtyValueChanged(d->dirtyValue, this);
+    if (valueChanged)
+        emit this->valueChanged(d->value, this);
 }
 
 QDebug operator<<(QDebug debug, const ConfigItem& item)

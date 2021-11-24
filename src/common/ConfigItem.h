@@ -21,8 +21,6 @@ public:
     typedef std::function<void(ConfigItem*)> DestroyHook;
     typedef std::function<QJsonObject(const ConfigItem*)> ToJsonHook;
     typedef std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> FromJsonHook;
-    typedef std::function<void(ConfigItem*)> ResetHook;
-    typedef std::function<void(ConfigItem*)> RestoreHook;
     typedef std::function<void(QWidget* widget, const QVariant& value)> UpdateWidgetValueHook;
     typedef std::function<void(QWidget*, ConfigItem*)> RetranslateHook;
 
@@ -32,7 +30,7 @@ public:
         , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
-        , StoreStrategy storeStrategy = StoreStrategy::SS_CONFIRMED
+        , StoreStrategy storeStrategy = StoreStrategy::SS_AS_IS
     );
     ~ConfigItem();
 
@@ -49,6 +47,8 @@ public:
     bool isAdvanced() const;
     void setAdvanced(bool advanced);
 
+    bool needRelaunch() const;
+
     bool isVisible() const;
     void setVisible(bool visible);
 
@@ -58,16 +58,11 @@ public:
     bool exportable() const;
     void setExportable(bool exportable);
 
-    bool readOnly() const;
-    void setReadOnly(bool readOnly = true);
-
-    bool writeOnly() const;
-    void setWriteOnly(bool writeOnly = true);
-
     StoreStrategy storeStrategy() const;
     void setStoreStrategy(StoreStrategy type);
 
     QVariant value() const;
+    QVariant oldValue() const;
 
     QVariant defaultValue() const;
     void setDefaultValue(const QVariant& value);
@@ -78,9 +73,8 @@ public:
     QVariant lastValue() const;
     void setLastValue(const QVariant& value);
 
+    bool isDirty() const;
     bool isModified() const;
-
-    InputWidgetWrapper* bindWidget(QWidget* widget);
 
     QString toString() const;
     QJsonObject toJson() const;
@@ -98,41 +92,66 @@ public:
     void setExtraProperty(const QString& key, const QVariant& value);
     QVariant& extraProperty(const QString& key);
 
+    void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
+
+protected:
+    InputWidgetWrapper* bindWidget(QWidget* widget, StoreStrategy ss);
+
+    /// <summary>
+    /// 绑定的控件在初始化时的回调函数
+    /// </summary>
+    /// <returns></returns>
     WidgetInitializeHook widgetInitializeHook();
     void setWidgetInitializeHook(WidgetInitializeHook fn);
     void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
 
+    /// <summary>
+    /// 当填充控件值时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ValueHook valueToWidgetHook();
     void setValueToWidgetHook(ValueHook fn);
     QVariant doValueToWidgetHook(const QVariant& value) const;
 
+    /// <summary>
+    /// 当用控件的值改写选项值时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ValueHook valueFromWidgetHook();
     void setValueFromWidgetHook(ValueHook fn);
     QVariant doValueFromWidgetHook(const QVariant& value);
 
+    /// <summary>
+    /// 当创建控件时的回调函数
+    /// </summary>
+    /// <returns></returns>
     CreateWidgetHook createWidgetHook();
     void setCreateWidgetHook(CreateWidgetHook fn);
     QWidget* doCreateWidgetHook();
 
+    /// <summary>
+    /// 销毁控件时的回调函数
+    /// </summary>
+    /// <returns></returns>
     DestroyHook destroyHook();
     void setDestroyHook(DestroyHook fn);
     void doDestroyHook();
 
+    /// <summary>
+    /// 生成Json时的回调函数
+    /// </summary>
+    /// <returns></returns>
     ToJsonHook toJsonHook();
     void setToJsonHook(ToJsonHook fn);
     QJsonObject doToJsonHook() const;
 
+    /// <summary>
+    /// 从json解析时的回调函数
+    /// </summary>
+    /// <returns></returns>
     FromJsonHook fromJsonHook();
     void setFromJsonHook(FromJsonHook fn);
     void doFromJsonHook(const QJsonObject& json);
-
-    ResetHook resetHook();
-    void setResetHook(ResetHook fn);
-    void doResetHook();
-
-    RestoreHook restoreHook();
-    void setRestoreHook(RestoreHook fn);
-    void doRestoreHook();
 
     UpdateWidgetValueHook updateWidgetValueHook();
     void setUpdateWidgetValueHook(UpdateWidgetValueHook fn);
@@ -144,26 +163,25 @@ public:
 
     const QList<QWidget*>& boundedWidgets() const;
 
-    ModifiedBy modifiedBy() const;
-
-    void setValue(const QVariant& value, ModifiedBy modifiedBy = MB_Manual);
-    //void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
-
-public slots:
     void reset();
-    void restore();
-    void restoreSystem();
-    void confirm();
+    void restoreToDefault();
+    void restoreToSystemDefault();
 
-protected slots:
-    void onRegisterLoaded(const QVariant& value);
+    void apply();
+    void applyToDefault();
+    bool confirm(const QVariant& value);
+    void loadValue(const QVariant& value);
+    void clearModified();
 
 signals:
     void visibleChanged(bool value);
-    void valueChanged(const QVariant& value, ModifiedBy modifiedBy);
     void defaultValueChanged(const QVariant& value);
     void modifiedChanged(bool modified);
     void enabledChanged(bool enabled);
+
+    void valueChanged(const QVariant& value, void* senderPtr);
+    void dirtyValueChanged(const QVariant& value, void* senderPtr);
+    void lazyValueChanged(const QVariant& value, void* snederPtr);
 
 private:
     QScopedPointer<ConfigItemPrivate> m_ptr;
@@ -172,6 +190,11 @@ private:
     Q_DISABLE_COPY(ConfigItem)
 
     friend class Config;
+    friend class ConfigItemGroup;
+    friend class ConfigDialog;
+    friend class InputWidgetWrapper;
+    friend class LaserControllerWindow;
+    friend class LaserDevice;
 };
 
 QDebug operator<<(QDebug debug, const ConfigItem & item);

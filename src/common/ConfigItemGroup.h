@@ -14,6 +14,8 @@ class ConfigItemGroup: public QObject
 {
     Q_OBJECT
 public:
+    typedef std::function<bool()> PreSaveHook;
+
     explicit ConfigItemGroup(const QString& name, const QString& title, const QString& description, QObject* parent = nullptr);
 
     ~ConfigItemGroup();
@@ -27,13 +29,11 @@ public:
     void addConfigItem(ConfigItem* item);
 
     ConfigItem* addConfigItem(const QString& name
-        //, const QString& title
-        //, const QString& description
         , const QVariant& value
         , DataType dataType = DT_INT
         , bool advanced = false
         , bool visible = true
-        , StoreStrategy storeStrategy = StoreStrategy::SS_CONFIRMED
+        , StoreStrategy storeStrategy = StoreStrategy::SS_NORMAL
     );
 
     QList<ConfigItem*>& items();
@@ -42,11 +42,16 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject& jsonObject);
 
+    bool isLazy() const;
+    void setLazy(bool lazy);
     bool isModified() const;
 
-    void confirm();
-
     void updateTitleAndDesc(const QString& title, const QString& desc);
+
+    bool load();
+    bool save(bool force, bool ignorePreSaveHook);
+
+    void setPreSaveHook(PreSaveHook hook);
 
 protected:
 

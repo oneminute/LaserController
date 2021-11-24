@@ -270,8 +270,6 @@ protected slots:
     void onLaserReturnWorkState(DeviceState state);
     void onLayoutChanged(const QSizeF& size);
     void onFloatEditSliderLaserPower(qreal value);
-    void onFloatDualEditSliderLowerValueChanged(qreal value);
-    void onFloatDualEditSliderHigherValueChanged(qreal value);
 
     void onUserOriginRadioButtonChanged(bool checked);
 
@@ -279,7 +277,7 @@ protected slots:
     void onDocumentExportFinished(const QString& filename);
 
     void onPreviewWindowProgressUpdated(qreal progress);
-    void onUserOriginConfigValueChanged(const QVariant& index, ModifiedBy modifiedBy);
+    void onUserOriginConfigValueChanged(const QVariant& index, void* senderPtr);
     void updateUserOriginSelection(const QVariant& index);
 
     void onStateEntered(QAbstractState* state);
@@ -304,11 +302,10 @@ protected slots:
 	void onCanRedoChanged(bool can);
 
     // config items
-    void updateAutoRepeatDelayChanged(const QVariant& value, ModifiedBy modifiedBy);
-    void deviceOriginChanged(const QVariant& value, ModifiedBy modifiedBye);
-    void jobOriginChanged(const QVariant& value, ModifiedBy modifiedBye);
-    void startFromChanged(const QVariant& value, ModifiedBy modifiedBye);
-    void userOriginChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void deviceOriginChanged(const QVariant& value, void* senderPtr);
+    void jobOriginChanged(const QVariant& value, void* senderPtr);
+    void startFromChanged(const QVariant& value, void* senderPtr);
+    void userOriginChanged(const QVariant& value, void* senderPtr);
 
     void askMergeOrNew();
 

@@ -43,18 +43,19 @@ public:
     void setDescriptionLabel(QLabel* label);
 
     QWidget* widget() const;
-    void reset();
-    void restoreDefault();
-    void updateValue(const QVariant& value);
-    void changeValue(const QVariant& value);
+    void updateWidgetValue(const QVariant& value, void* senderPtr);
+    void modifyConfigItemValue(const QVariant& value);
 
-    bool isModified();
     QVariant value() const;
 
     StoreStrategy storeStrategy() const;
     void setStoreStrategy(StoreStrategy storeStrategy);
 
     void retranslate();
+
+    void updateLabelColor();
+
+    ConfigItem* configItem() const;
 
     template<typename T = QWidget*>
     static T createWidget(ConfigItem* item, Qt::Orientation orientation = Qt::Horizontal)
@@ -128,10 +129,12 @@ public slots:
     void onVector2DChanged(qreal x, qreal y);
 
     void onConfigItemModifiedChanged(bool modified);
-    void onConfigItemValueChanged(const QVariant& value, ModifiedBy modifiedBy);
+    void onConfigItemValueChanged(const QVariant& value, void* senderPtr);
+    void onConfigItemDirtyValueChanged(const QVariant& value, void* senderPtr);
+    void onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr);
 
 signals:
-    void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
+    //void valueChanged(const QVariant& newValue, ModifiedBy modifiedBy);
 
 private:
     QScopedPointer<InputWidgetWrapperPrivate> m_ptr;

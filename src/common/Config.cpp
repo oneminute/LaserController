@@ -67,9 +67,10 @@ void Config::init()
     loadDebug();
 }
 
-void Config::load()
+void Config::importFrom(const QString& filename)
 {
-    QFile configFile(configFilePath());
+    // 如果有Config.json文件，则加载该文件，读取后删除。
+    QFile configFile(filename);
     if (configFile.exists())
     {
         if (!configFile.open(QFile::Text | QFile::ReadOnly))
@@ -92,19 +93,21 @@ void Config::load()
                 group->fromJson(g.value().toObject());
             }
         }
+        configFile.remove();
     }
     else
     {
+        // 每一个选项组读取各自的配置文件
         configFile.close();
         qLogD << "No valid config.json file found! We will create one.";
-        save();
+        save(true, true);
     }
 }
 
-void Config::save(const QString& mainCardId)
+void Config::exportTo(const QString& filename)
 {
     try {
-        QFile configFile(configFilePath());
+        QFile configFile(filename);
         if (!configFile.open(QFile::Truncate | QFile::WriteOnly))
         {
             QMessageBox::warning(nullptr, QObject::tr("Save Failure"), QObject::tr("An error occured when saving configuration file!"));
@@ -119,25 +122,6 @@ void Config::save(const QString& mainCardId)
         QJsonDocument doc(json);
         configFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
         configFile.close();
-
-        if (!mainCardId.isEmpty() && !mainCardId.isNull())
-        {
-            QFile registerFile(QString("config/%1.lcr").arg(mainCardId));
-            if (registerFile.open(QFile::Truncate | QFile::WriteOnly))
-            {
-                QJsonObject json;
-                json[UserRegister::group->name()] = UserRegister::group->toJson();
-                json[SystemRegister::group->name()] = SystemRegister::group->toJson();
-                QJsonDocument doc(json);
-                registerFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
-                registerFile.close();
-            }
-        }
-
-        for (ConfigItemGroup* group : groups)
-        {
-            group->confirm();
-        }
     }
     catch (...)
     {
@@ -145,11 +129,61 @@ void Config::save(const QString& mainCardId)
     }
 }
 
+void Config::load()
+{
+    // 如果有Config.json文件，则加载该文件，读取后删除。
+    QFile configFile(configFilePath());
+    if (configFile.exists())
+    {
+        if (!configFile.open(QFile::Text | QFile::ReadOnly))
+        {
+            //QMessageBox::warning(nullptr, QObject::tr("Open Failure"), QObject::tr("An error occured when opening configuration file!"));
+            configFile.close();
+            return;
+        }
+
+        QByteArray data = configFile.readAll();
+
+        QJsonDocument doc(QJsonDocument::fromJson(data));
+
+        QJsonObject json = doc.object();
+        for (QJsonObject::ConstIterator g = json.constBegin(); g != json.constEnd(); g++)
+        {
+            if (groupsMap.contains(g.key()))
+            {
+                ConfigItemGroup* group = groupsMap[g.key()];
+                group->fromJson(g.value().toObject());
+                group->save(true, true);
+            }
+        }
+        configFile.remove();
+    }
+    else
+    {
+        // 每一个选项组读取各自的配置文件
+        configFile.close();
+        qLogD << "No valid config.json file found! We will create one.";
+        for (ConfigItemGroup* group : groups)
+        {
+            group->load();
+        }
+    }
+
+}
+
+void Config::save(bool force, bool ignorePreSaveHook)
+{
+    for (ConfigItemGroup* group : groups)
+    {
+        group->save(force, ignorePreSaveHook);
+    }
+}
+
 void Config::restore()
 {
 }
 
-QString Config::configFilePath()
+QString Config::configFilePath(const QString& filename)
 {
     QDir dataPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     if (!dataPath.exists("CNELaser"))
@@ -158,7 +192,7 @@ QString Config::configFilePath()
     }
     dataPath.cd("CNELaser");
     qLogD << "configPath: " << dataPath.absolutePath();
-    return dataPath.absoluteFilePath("config.json");
+    return dataPath.absoluteFilePath(filename);
 }
 
 bool Config::isModified()
@@ -865,7 +899,7 @@ void Config::loadExportItems()
         }
     );
     connect(enableSmallDiagonal, &ConfigItem::valueChanged,
-        [=](const QVariant& value, ModifiedBy modifiedBy) {
+        [=](const QVariant& value, void* senderPtr) {
             bool enabled = value.toBool();
             smallDiagonalLimitation->setEnabled(enabled);
         }
@@ -1012,7 +1046,7 @@ void Config::loadDeviceItems()
         }
     );
     connect(startFrom, &ConfigItem::valueChanged,
-        [=](const QVariant& value, ModifiedBy modifiedBy) {
+        [=](const QVariant& value, void* senderPtr) {
             for (QWidget* widget : jobOrigin->boundedWidgets())
             {
                 RadioButtonGroup* group = qobject_cast<RadioButtonGroup*>(widget);
@@ -1225,6 +1259,7 @@ void Config::loadDeviceItems()
 void Config::loadUserReigsters()
 {
     ConfigItemGroup* group = new Config::UserRegister;
+    group->setLazy(true);
     Config::UserRegister::group = group;
 
     ConfigItem* head = group->addConfigItem(
@@ -1232,7 +1267,6 @@ void Config::loadUserReigsters()
         0x12345678,
         DT_INT
     );
-    head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
 
@@ -2034,6 +2068,7 @@ void Config::loadUserReigsters()
 void Config::loadSystemRegisters()
 {
     ConfigItemGroup* group = new Config::SystemRegister;
+    group->setLazy(true);
     Config::SystemRegister::group = group;
 
     ConfigItem* head = group->addConfigItem(
@@ -2041,7 +2076,6 @@ void Config::loadSystemRegisters()
         0x12345678,
         DT_INT
     );
-    head->setReadOnly();
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
     head->setVisible(false);
@@ -2051,7 +2085,6 @@ void Config::loadSystemRegisters()
         "",
         DT_STRING
     );
-    password->setWriteOnly();
     password->setInputWidgetType(IWT_LineEdit);
     password->setVisible(false);
 
@@ -2060,7 +2093,6 @@ void Config::loadSystemRegisters()
         "",
         DT_STRING
     );
-    storedPassword->setWriteOnly();
     storedPassword->setInputWidgetType(IWT_LineEdit);
     storedPassword->setVisible(false);
 
@@ -2069,7 +2101,6 @@ void Config::loadSystemRegisters()
         "",
         DT_STRING
     );
-    hardwareID1->setReadOnly();
     hardwareID1->setInputWidgetType(IWT_LineEdit);
     hardwareID1->setInputWidgetProperty("readOnly", true);
     hardwareID1->setVisible(false);
@@ -2079,7 +2110,6 @@ void Config::loadSystemRegisters()
         "",
         DT_STRING
     );
-    hardwareID2->setReadOnly();
     hardwareID2->setInputWidgetType(IWT_LineEdit);
     hardwareID2->setInputWidgetProperty("readOnly", true);
     hardwareID2->setVisible(false);
@@ -2089,7 +2119,6 @@ void Config::loadSystemRegisters()
         "",
         DT_STRING
     );
-    hardwareID3->setReadOnly();
     hardwareID3->setInputWidgetType(IWT_LineEdit);
     hardwareID3->setInputWidgetProperty("readOnly", true);
     hardwareID3->setVisible(false);
@@ -2123,7 +2152,6 @@ void Config::loadSystemRegisters()
         0,
         DT_INT
     );
-    sysRunTime->setReadOnly(true);
     sysRunTime->setInputWidgetType(IWT_LineEdit);
 
     ConfigItem* laserRunTime = group->addConfigItem(
@@ -2131,7 +2159,6 @@ void Config::loadSystemRegisters()
         0,
         DT_INT
     );
-    laserRunTime->setReadOnly(true);
     laserRunTime->setInputWidgetType(IWT_LineEdit);
 
     ConfigItem* sysRunNum = group->addConfigItem(
@@ -2139,7 +2166,6 @@ void Config::loadSystemRegisters()
         0,
         DT_INT
     );
-    sysRunNum->setReadOnly(true);
     sysRunNum->setInputWidgetType(IWT_LineEdit);
 
     ConfigItem* xMaxLength = group->addConfigItem(
@@ -3113,10 +3139,6 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Unit", nullptr), 
         QCoreApplication::translate("Config", "Unit for user interface.", nullptr));
 
-    //General::machiningUnitItem()->setTitleAndDesc(
-        //QCoreApplication::translate("Config", "Machining Unit", nullptr), 
-        //QCoreApplication::translate("Config", "Unit for machining", nullptr));
-
     Layers::maxLayersCountItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Layers Count", nullptr), 
         QCoreApplication::translate("Config", "Max Layers Count", nullptr));
@@ -3856,7 +3878,7 @@ void Config::updateTitlesAndDescriptions()
 
 void Config::destroy()
 {
-    save();
+    save(true, true);
     qDeleteAll(groups);
     groups.clear();
     groupsMap.clear();

@@ -2444,18 +2444,13 @@ LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int aligh
 	: LaserShape(new LaserTextPrivate(this),  doc,  LPT_TEXT, layerIndex, saveTransform)
 {
     Q_D(LaserText);
-    //d->boundingRect = d->path.boundingRect();
-    //d->rect = d->boundingRect.toRect();
     d->outline.addRect(d->rect);
-    //d->baseSpace = Global::mm2PixelsXF(2.0);
-    //d->textSpace = d->baseSpace + space;;
     d->startPos = startPos;
     d->font = font;
     d->alignHType = alighHType;
     d->lastAlignHType = alighHType;
     d->alignVType = alighVType;
     d->lastAlignVType = alighVType;
-    //d->position = d->rect.center();
     d->startPos = mapFromScene(d->startPos);
     d->view = doc->scene()->views()[0];
     d->allTransform = saveTransform;
@@ -2784,6 +2779,7 @@ void LaserText::modifyPathList()
         d->path.addPath(newRowPath);
     }
     
+    d->boundingRect = d->path.boundingRect();
 }
 
 QList<LaserTextRowPath> LaserText::subPathList()

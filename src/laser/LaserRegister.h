@@ -37,12 +37,12 @@ public:
 
     bool read();
     bool write(const QVariant& value);
-    void parse(const QString& raw, ModifiedBy modifiedBy);
+    void parse(const QString& raw);
 
     QString toString() const;
 
 protected slots:
-    void setValue(const QVariant& value, ModifiedBy modifiedBy);
+    void setValue(const QVariant& value);
 
 signals:
     void readyRead(const QVariant& value);
