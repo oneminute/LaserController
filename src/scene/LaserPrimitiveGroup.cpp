@@ -108,6 +108,7 @@ void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsIt
 void LaserPrimitiveGroup::addToGroup(LaserPrimitive * primitive)
 {
     primitive->setParentItem(this);
+    emit childrenChanged();
 }
 
 void LaserPrimitiveGroup::removeFromGroup(LaserPrimitive * primitive)
@@ -115,7 +116,8 @@ void LaserPrimitiveGroup::removeFromGroup(LaserPrimitive * primitive)
     QTransform transform = primitive->sceneTransform();
     primitive->setParentItem(0);
     primitive->setTransform(transform);
-    
+    primitive->setPos(0, 0);
+    emit childrenChanged();
 }
 
 QRectF LaserPrimitiveGroup::boundingRect() const

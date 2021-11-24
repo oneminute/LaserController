@@ -975,60 +975,24 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorHorizontal
 
     // begin m_ui->actionMirrorVertical
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorVertical
 
     // begin m_ui->actionGroup
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionGroup
 
     // begin m_ui->actionUngroup
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionUngroup
 
     // begin m_ui->actionDuplication

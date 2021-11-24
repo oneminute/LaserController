@@ -107,13 +107,15 @@ public:
 
     void setLocked(bool isLocked);
     bool isLocked();
+    void setJoinedGroup(bool isJoinedGroup);
+    bool isJoinedGroup();
+    QList<LaserPrimitive*>& joinedGroupList();
     QList<QuadTreeNode*>& treeNodesList();
     void addTreeNode(QuadTreeNode* node);
     void removeAllTreeNode();
     void removeOneTreeNode(QuadTreeNode* node);
 
     virtual bool isAvailable() const;
-
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

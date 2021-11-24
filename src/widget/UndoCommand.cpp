@@ -1,4 +1,5 @@
 #include "UndoCommand.h"
+#include <QAction>
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
@@ -590,17 +591,18 @@ void LockedCommand::undo()
         break;
     }
     case Qt::Unchecked: {
+        group->setTransform(QTransform());
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
             primitive->setLocked(false);
             group->addToGroup(primitive);
-        }
-        
+            
+        }        
         break;
 
     }
     case Qt::PartiallyChecked: {
-
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
+            //group->setTransform(QTransform());
             bool isLocked = false;
             for (LaserPrimitive* lockedP : m_lastLockedList) {
                 if (primitive == lockedP) {
@@ -637,16 +639,17 @@ void LockedCommand::redo()
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
             primitive->setLocked(true);
             group->removeFromGroup(primitive);
-
         }
         m_locked->setCheckState(m_curCheckState);
         break;
     }
     case Qt::Unchecked: {
+        //group->setTransform(QTransform());
         for (LaserPrimitive * primitive : m_scene->selectedPrimitives()) {
-            primitive->setLocked(false);
-            group->addToGroup(primitive);
+            primitive->setLocked(false);            
         }
+        m_viewer->resetGroup();
+        m_viewer->onSelectedFillGroup();
         m_locked->setCheckState(m_curCheckState);
         break;
 
@@ -771,13 +774,13 @@ void CornerRadiusCommand::redo()
 }
 
 GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, QTransform lastTransform, QTransform curTransform)
-    :m_scene(scene), m_lastTransform(lastTransform), m_curTransform(curTransform)
+    :m_scene(scene), m_lastTransform(lastTransform), m_curUndoTransform(curTransform)
 {
     m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
     m_group = m_viewer->group();
     m_tree = m_scene->quadTreeNode();
-    m_lastTransform = lastTransform;
-    m_curTransform = curTransform;
+    //m_lastTransform = lastTransform;
+    //m_curUndoTransform = curTransform;
     isRedo = false;
 }
 
@@ -789,7 +792,7 @@ GroupTransformUndoCommand::~GroupTransformUndoCommand()
 void GroupTransformUndoCommand::undo()
 {
     m_group = m_viewer->group();
-    m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curTransform).inverted());
+    m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curUndoTransform).inverted());
     emit m_viewer->selectedChangedFromMouse();
     //updata tree
     m_viewer->updateGroupTreeNode();
@@ -805,7 +808,7 @@ void GroupTransformUndoCommand::redo()
         return;
     }
     m_group = m_viewer->group();
-    m_group->setTransform(m_curTransform);
+    m_group->setTransform(m_group->transform()*(m_curUndoTransform.inverted()*m_lastTransform).inverted());
     emit m_viewer->selectedChangedFromMouse();
     //updata tree
     m_viewer->updateGroupTreeNode();
@@ -846,4 +849,61 @@ void SingleTransformUndoCommand::redo()
     utils::sceneTransformToItemTransform(m_curTransform, m_primitive);
     m_tree->upDatePrimitive(m_primitive);
     m_viewer->repaint();
+}
+
+JoinedGroupCommand::JoinedGroupCommand(LaserViewer * viewer, QAction* _joinedGroupAction, QAction* _joinedUngroupAction, bool _isUngroup)
+    :m_viewer(viewer), m_isUngroup(_isUngroup), m_joinedGroupAction(_joinedGroupAction), m_joinedUngroupAction(_joinedUngroupAction)
+{
+    m_list = m_viewer->group()->childItems();
+    int i = m_list.size();
+}
+
+JoinedGroupCommand::~JoinedGroupCommand()
+{
+
+}
+
+void JoinedGroupCommand::undo()
+{
+    if (!m_isUngroup) {
+        handleUnGroup();
+        
+    }
+    else {
+        handleGroup();
+    }
+}
+
+void JoinedGroupCommand::redo()
+{
+    if (!m_isUngroup) {
+        
+        handleGroup();
+    }
+    else {
+        handleUnGroup();
+    }
+    
+}
+
+void JoinedGroupCommand::handleGroup()
+{
+    for (QGraphicsItem* item : m_list) {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        primitive->setJoinedGroup(true);
+    }
+    m_viewer->viewport()->repaint();
+    m_joinedGroupAction->setEnabled(false);
+    m_joinedUngroupAction->setEnabled(true);
+}
+
+void JoinedGroupCommand::handleUnGroup()
+{
+    for (QGraphicsItem* item : m_list) {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        primitive->setJoinedGroup(false);
+    }
+    m_viewer->viewport()->repaint();
+    m_joinedGroupAction->setEnabled(true);
+    m_joinedUngroupAction->setEnabled(false);
 }

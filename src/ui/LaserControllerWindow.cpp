@@ -640,8 +640,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
-    connect(m_scene, QOverload<QGraphicsItem *, QGraphicsItem *, Qt::FocusReason>::of(&LaserScene::focusItemChanged), 
-        this, &LaserControllerWindow::onLaserSceneFocusItemChanged);
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
     connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
@@ -3354,11 +3352,14 @@ void LaserControllerWindow::onActionMultiDuplication(bool checked)
 
 void LaserControllerWindow::onActionGroup(bool checked)
 {
-
+    JoinedGroupCommand* cmd = new JoinedGroupCommand(m_viewer, m_ui->actionGroup, m_ui->actionUngroup);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionUngroup(bool checked)
 {
+    JoinedGroupCommand* cmd = new JoinedGroupCommand(m_viewer, m_ui->actionGroup, m_ui->actionUngroup, true);
+    m_viewer->undoStack()->push(cmd);
 }
 
 bool LaserControllerWindow::onActionCloseDocument(bool checked)
@@ -4010,31 +4011,72 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionDuplication->setEnabled(true);
         m_ui->actionMultiDuplication->setEnabled(true);
 		m_ui->actionDeletePrimitive->setEnabled(true);
-		//m_ui->actionGroup->setEnabled(true);
-		//m_ui->actionUngroup->setEnabled(true);
-		if (items.length() > 1) {
-			if (m_viewer->selectedGroupedList().isEmpty()) {
-				m_ui->actionUngroup->setEnabled(false);
-				m_ui->actionGroup->setEnabled(true);
-			}
-			else {
-				m_ui->actionGroup->setEnabled(true);
-				m_ui->actionUngroup->setEnabled(false);
-			}  
-            
-		}
-		else {
-			m_ui->actionGroup->setEnabled(false);
-			m_ui->actionUngroup->setEnabled(false);
-		}
+		
 	}
     //判断显示哪个属性面板，shape properties panel
     showShapePropertyPanel();
 }
-
-void LaserControllerWindow::onLaserPrimitiveGroupItemChanged()
+void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
 {
-    //qDebug() << "onLaserPrimitiveGroupItemChanged";
+    LaserPrimitiveGroup*g = m_viewer->group();
+    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
+    //selection property panel, others in onLaserPrimitiveGroupItemTransformChanged
+    if (items.length() > 0) {
+        m_propertyWidget->setEnabled(true);
+    }
+    else {
+        m_propertyWidget->setEnabled(false);
+    }
+    //joinedGroupButtonsChanged
+    if (items.length() > 1) {
+        //m_ui->actionGroup->setEnabled(true);
+        //m_ui->actionUngroup->setEnabled(false);
+        bool hasJoined = false;
+        bool hasNotJoined = false;
+        for (QGraphicsItem* item : items) {
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            if (p->isJoinedGroup()) {
+                hasJoined = true;
+            }
+            else {
+                hasNotJoined = true;
+            }
+            if (hasJoined && hasNotJoined) {
+                break;
+            }
+        }
+        if (hasJoined) {
+            if (hasNotJoined) {
+                m_ui->actionGroup->setEnabled(true);
+                m_ui->actionUngroup->setEnabled(true);
+            }
+            else {
+                m_ui->actionGroup->setEnabled(false);
+                m_ui->actionUngroup->setEnabled(true);
+            }
+
+        }
+        else {
+            if (hasNotJoined) {
+                m_ui->actionGroup->setEnabled(true);
+                m_ui->actionUngroup->setEnabled(false);
+            }
+            else {
+                m_ui->actionGroup->setEnabled(false);
+                m_ui->actionUngroup->setEnabled(false);
+            }
+        }
+
+    }
+    else {
+        m_ui->actionGroup->setEnabled(false);
+        m_ui->actionUngroup->setEnabled(false);
+    }
+}
+//改变的过程中也会执行（例如：移动的整个过程）
+void LaserControllerWindow::onLaserPrimitiveGroupItemTransformChanged()
+{
+    //qDebug() << "onLaserPrimitiveGroupItemTransformChanged";
     if (!m_viewer) {
         return;
     }
@@ -4087,11 +4129,6 @@ void LaserControllerWindow::retranslate()
     qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 6)->widget())->setText(tr("Bold"));
     qobject_cast<QLabel*>(m_textLayout->itemAtPosition(0, 8)->widget())->setText(tr("Italic"));
     qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 6)->widget())->setText(tr("Upper Case"));
-}
-
-void LaserControllerWindow::onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)
-{
-    qDebug() << "";
 }
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)

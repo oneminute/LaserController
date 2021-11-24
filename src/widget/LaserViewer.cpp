@@ -1167,10 +1167,7 @@ QMap<QString, QList<LaserPrimitive*>>& LaserViewer::groupedMap()
 {
 	return m_groupedMap;
 }
-QList<QString>& LaserViewer::selectedGroupedList()
-{
-	return m_selectedGroupedList;
-}
+
 int LaserViewer::curLayerIndex()
 {
 	return m_curLayerIndex;
@@ -1482,6 +1479,9 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 
                 //clearGroupSelection();
                 m_detectedPrimitive->setSelected(true);
+                for (LaserPrimitive* p : m_detectedPrimitive->joinedGroupList()) {
+                    p->setSelected(true);
+                }
                 if (onSelectedFillGroup()) {
                     m_curSelectedHandleIndex = 13;
                     emit beginIdelEditing();
@@ -1491,7 +1491,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 //undo redo
                 selectionUndoStackPush();
                 //选取区域的属性面板
-                LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
+                LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
                 return;
             }
             else {
@@ -1504,6 +1504,9 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                     selectionUndoStackPushBefore();
                     //transformUndoStackPushBefore();
                     m_detectedBitmap->setSelected(true);
+                    for (LaserPrimitive* p : m_detectedBitmap->joinedGroupList()) {
+                        p->setSelected(true);
+                    }
                     if (onSelectedFillGroup()) {
                         m_curSelectedHandleIndex = 14;
                         emit beginIdelEditing();
@@ -1513,7 +1516,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                     //undo redo
                     selectionUndoStackPush();
                     //选取区域的属性面板
-                    LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
+                    LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
                     return;
                 }
                 // 获取选框起点
@@ -2091,7 +2094,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			//点中空白且press与release同一个点
 			selectingReleaseInBlank();
             //选取区域的属性面板
-            LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
+            LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
 			return;
         }
 		//undo before
@@ -2136,7 +2139,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			}
 		}
         //选取区域的属性面板
-        LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
+        LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -2173,7 +2176,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			transformUndoStackPush();
 		}
         //选取区域的属性面板
-        LaserApplication::mainWindow->onLaserPrimitiveGroupItemChanged();
+        LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
 		this->viewport()->repaint();
 		return;
     }
@@ -2215,9 +2218,29 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			return;
 		}
 		
-        QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
-			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));
-		//QRectF rect(0, 0, 500, 300);
+        /*QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
+			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));*/
+        //防止宽高为负值
+        QPointF p1 = backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint);
+        QPointF p2 = backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint);
+        qreal left = 0, top = 0, right = 0,bottom = 0;
+        if (p1.x() < p2.x()) {
+            left = p1.x();
+            right = p2.x();
+        }
+        else {
+            left = p2.x();
+            right = p1.x();
+        }
+        if (p1.y() < p2.y()) {
+            top = p1.y();
+            bottom = p2.y();
+        }
+        else {
+            top = p2.y();
+            bottom = p1.y();
+        }
+        QRectF rect(QPointF(left, top), QPointF(right, bottom));
         if (rect.width() != 0 && rect.height() != 0) {
             LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(), QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
@@ -3508,6 +3531,9 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 				}
 
 				bitmap->setSelected(true);
+                for (LaserPrimitive* p : bitmap->joinedGroupList()) {
+                    p->setSelected(true);
+                }
 				if (!onSelectedFillGroup()) {
 					emit selectionToIdle();
 				}
@@ -3525,6 +3551,9 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 						m_curSelectedHandleIndex = handleIndex;//点选
 					}
 					bitmap->setSelected(false);
+                    for (LaserPrimitive* p : bitmap->joinedGroupList()) {
+                        p->setSelected(false);
+                    }
 					if (!onSelectedFillGroup()) {
 						this->viewport()->repaint();
 						return;
@@ -3547,8 +3576,10 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 			else {
 				clearGroupSelection();
 			}
-
 			primitive->setSelected(true);
+            for (LaserPrimitive* p : primitive->joinedGroupList()) {
+                p->setSelected(true);
+            }
 			if (!onSelectedFillGroup()) {
 				emit selectionToIdle();
 			}
@@ -3567,6 +3598,9 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 					m_curSelectedHandleIndex = handleIndex;//点选
 				}
 				primitive->setSelected(false);
+                for (LaserPrimitive* p : primitive->joinedGroupList()) {
+                    p->setSelected(false);
+                }
 				if (!onSelectedFillGroup()) {
 					this->viewport()->repaint();
 					return;
@@ -3834,7 +3868,6 @@ void LaserViewer::init()
 	//arrange
 	m_copyedList = QMap<LaserPrimitive*, QTransform>();
 	m_groupedMap = QMap<QString, QList<LaserPrimitive*>>();
-	m_selectedGroupedList = QList<QString>();	
 	
     ADD_TRANSITION(documentIdleState, documentSelectingState, this, &LaserViewer::beginSelecting);
 	ADD_TRANSITION(documentIdleState, documentSelectedEditingState, this, &LaserViewer::beginIdelEditing);
@@ -4038,6 +4071,7 @@ bool LaserViewer::onSelectedFillGroup()
 			return false;
 		}
 		m_group = m_scene->createItemGroup(list);
+        connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
 		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
 		m_group->setSelected(true);
 		m_group->setZValue(1);

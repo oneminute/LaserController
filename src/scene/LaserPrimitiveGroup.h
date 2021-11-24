@@ -7,29 +7,9 @@
 class LaserPrimitive;
 class LaserPrimitiveGroupPrivate;
 //class LaserPrimitiveGroup : public QObject, public QGraphicsItemGroup
-class LaserPrimitiveGroup : public QGraphicsItem
+class LaserPrimitiveGroup : public QObject, public QGraphicsItem
 {
-    /*Q_OBJECT
-public:
-	LaserPrimitiveGroup(QGraphicsItem* parent = nullptr);
-	virtual ~LaserPrimitiveGroup();
-	void addToGroup(LaserPrimitive* primitive);
-	void removeFromGroup(LaserPrimitive* primitive, bool updateBounding = false);
-	virtual QRectF boundingRect() const override;
-	QRectF sceneBoundingRect() const;
-	bool isEmpty() const;
-
-	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-
-protected:
-
-    virtual QVariant
-        itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
-private:
-	QScopedPointer<LaserPrimitiveGroupPrivate> m_ptr;
-
-	Q_DECLARE_PRIVATE_D(m_ptr, LaserPrimitiveGroup)
-	Q_DISABLE_COPY(LaserPrimitiveGroup)*/
+    Q_OBJECT
 public:
     LaserPrimitiveGroup(QGraphicsItem *parent = nullptr);
     ~LaserPrimitiveGroup();
@@ -42,6 +22,8 @@ public:
     virtual QRectF boundingRect() const override;
     QRectF sceneBoundingRect() const;
     bool isEmpty() const;
+public: signals:
+    void childrenChanged();
 };
 
 #endif // LASERPRIMITIVEGROUP_H

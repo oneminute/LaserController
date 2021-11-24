@@ -100,7 +100,7 @@ public slots:
     void onFontUpperStateChanged();
     void onFontSpaceXEnterOrLostFocus();
     void onFontSpaceYEnterOrLostFocus();
-    void onLaserPrimitiveGroupItemChanged();
+    void onLaserPrimitiveGroupItemTransformChanged();
 
     void retranslate();
 	
@@ -292,9 +292,7 @@ protected slots:
     void showConfigDialog(const QString& title = QString());
 
 	//selection
-	void onLaserSceneSelectedChanged();
-    
-    void onLaserSceneFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
+	void onLaserSceneSelectedChanged();//scene emit
 	void selectedChangedFromMouse();//items
 	void selectionPropertyBoxChange(int state);//doubleSpinBox's enter or mouse lost focus
 	void onSelectionOriginalClicked(bool clicked);
@@ -312,6 +310,8 @@ protected slots:
     void askMergeOrNew();
 
     void applyJobOriginToDocument(const QVariant& value);
+public slots:
+    void onLaserPrimitiveGroupChildrenChanged();//group emit
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");

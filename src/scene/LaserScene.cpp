@@ -7,6 +7,7 @@
 #include "widget/LaserViewer.h"
 #include "laser/LaserDevice.h"
 #include "LaserApplication.h"
+#include "ui/LaserControllerWindow.h"
 
 #include<QGraphicsSceneMouseEvent>
 #include<QGraphicsSceneWheelEvent>
@@ -193,7 +194,7 @@ LaserPrimitiveGroup * LaserScene::createItemGroup(const QList<LaserPrimitive*>& 
 	// Create a new group at that level
 	LaserPrimitiveGroup *group = new LaserPrimitiveGroup(commonAncestor);
 	if (!commonAncestor)
-		addItem(group);
+		addItem(group);   
 	for (LaserPrimitive *item : items)
 	{
         if (item->isLocked())
@@ -322,7 +323,9 @@ void LaserScene::findSelectedByLine(QRectF selection)
                             isIntersected = true;
                             if (!primitive->isSelected()) {
                                 primitive->setSelected(true);
-                                //primitive->blockSignals(true);
+                                for (LaserPrimitive* p : primitive->joinedGroupList()) {
+                                    p->setSelected(true);
+                                }
                             }
                             break;
                         }
@@ -423,6 +426,9 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
                 QRectF bounds = primitive->sceneBoundingRect();
+                if (!primitive->joinedGroupList().isEmpty()) {
+                    utils::boundingRect(primitive->joinedGroupList(), bounds);
+                }
                 selectedByBounds(bounds, selection, primitive);
             }           
         } 
