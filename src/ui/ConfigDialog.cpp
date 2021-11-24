@@ -39,7 +39,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     QList<ConfigItemGroup*> groups;
     groups  
         << Config::General::group
-        << Config::Layers::group
+        //<< Config::Layers::group
         << Config::Ui::group
         << Config::CuttingLayer::group
         << Config::EngravingLayer::group
@@ -47,7 +47,9 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         << Config::PathOptimization::group
         << Config::Export::group
         << Config::Device::group
+#ifdef _DEBUG
         << Config::Debug::group
+#endif
         << Config::UserRegister::group
         //<< Config::SystemRegister::group
         ;
@@ -71,6 +73,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         QTreeWidgetItem* treeItem = new QTreeWidgetItem;
         treeItem->setText(0, group->title());
+        treeItem->setData(0, Qt::UserRole, QVariant::fromValue<ConfigItemGroup*>(group));
         m_pages.insert(treeItem, page);
         m_groups.insert(treeItem, group);
         m_groupBoxes.insert(treeItem, groupBox);
@@ -329,6 +332,7 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
         return;
 
     InputWidgetWrapper* wrapper = item->bindWidget(widget, SS_NORMAL);
+    connect(wrapper, &InputWidgetWrapper::updated, this, &ConfigDialog::onConfigItemUpdated);
     widget->setParent(parent);
     QLabel* labelName = new QLabel(parent);
     layout->addRow(labelName, widget);
@@ -527,6 +531,23 @@ void ConfigDialog::retranslate()
     m_systemPage->setTabText(1, tr("X"));
     m_systemPage->setTabText(2, tr("Y"));
     m_systemPage->setTabText(3, tr("Z"));
+}
+
+void ConfigDialog::onConfigItemUpdated()
+{
+    for (int i = 0; i < m_ui->treeWidgetCatalogue->topLevelItemCount(); i++)
+    {
+        QTreeWidgetItem* item = m_ui->treeWidgetCatalogue->topLevelItem(i);
+        ConfigItemGroup* group = m_groups[item];
+        if (group->isModified())
+        {
+            item->setTextColor(0, Qt::red);
+        }
+        else
+        {
+            item->setTextColor(0, Qt::black);
+        }
+    }
 }
 
 void ConfigDialog::updateTitle(const QVariant& value)
