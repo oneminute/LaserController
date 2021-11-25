@@ -3815,7 +3815,6 @@ bool LaserViewer::detectBoundsInMaxRegion(QRectF bounds)
 
 qreal LaserViewer::zoomValue() const
 {
-	
     return transform().m11();
 }
 

@@ -346,6 +346,7 @@ private:
     RulerWidget* m_hRuler;
     RulerWidget* m_vRuler;
     QComboBox* m_comboBoxScale;
+    QLabel* m_labelPercentage;
     ads::CDockAreaWidget* m_centralDockArea;
     QRectF m_layoutRect;
 

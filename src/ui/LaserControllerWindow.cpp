@@ -85,6 +85,8 @@
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 using namespace ads;
 
@@ -264,7 +266,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     
     m_statusBarLocation = new QLabel;
     m_statusBarLocation->setText(ltr("Top Left"));
-    m_statusBarLocation->setMinimumWidth(300);
+    m_statusBarLocation->setMinimumWidth(180);
     m_statusBarLocation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarLocation);
 
@@ -1495,30 +1497,33 @@ void LaserControllerWindow::createCentralDockPanel()
      // 初始化缩放列表控件
     m_comboBoxScale = new QComboBox;
     m_comboBoxScale->setEditable(true);
-    m_comboBoxScale->addItem("0.01%");
-    m_comboBoxScale->addItem("0.1%");
-    m_comboBoxScale->addItem("1%");
-    m_comboBoxScale->addItem("10%");
-    m_comboBoxScale->addItem("25%");
-    m_comboBoxScale->addItem("50%");
-    m_comboBoxScale->addItem("75%");
-    m_comboBoxScale->addItem("100%");
-    m_comboBoxScale->addItem("150%");
-    m_comboBoxScale->addItem("200%");
-    m_comboBoxScale->addItem("300%");
-    m_comboBoxScale->addItem("400%");
-    m_comboBoxScale->addItem("500%");
-    m_comboBoxScale->addItem("1000%");
-    m_comboBoxScale->setCurrentText("100%");
-    QRegularExpression percentageRE("^[0-9]+%$");
-    QValidator* percentageValidator = new QRegularExpressionValidator(percentageRE, m_comboBoxScale);
-    m_comboBoxScale->setValidator(percentageValidator);
+    m_comboBoxScale->addItem("0.01");
+    m_comboBoxScale->addItem("0.1");
+    m_comboBoxScale->addItem("1");
+    m_comboBoxScale->addItem("10");
+    m_comboBoxScale->addItem("25");
+    m_comboBoxScale->addItem("50");
+    m_comboBoxScale->addItem("75");
+    m_comboBoxScale->addItem("100");
+    m_comboBoxScale->addItem("150");
+    m_comboBoxScale->addItem("200");
+    m_comboBoxScale->addItem("300");
+    m_comboBoxScale->addItem("400");
+    m_comboBoxScale->addItem("500");
+    m_comboBoxScale->addItem("1000");
+    m_comboBoxScale->setCurrentText("100");
+    m_comboBoxScale->setMinimumWidth(60);
+
+    m_labelPercentage = new QLabel;
+    m_labelPercentage->setText("%");
 
     QBoxLayout* viewHoriBottomLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
     viewHoriBottomLayout->setSpacing(0);
     viewHoriBottomLayout->setMargin(0);
     viewHoriBottomLayout->addWidget(m_comboBoxScale);
+    viewHoriBottomLayout->addWidget(m_labelPercentage);
     viewHoriBottomLayout->setStretch(0, 0);
+    viewHoriBottomLayout->setStretch(1, 0);
     viewHoriBottomLayout->addStretch(1);
 
     m_hRuler = new RulerWidget;
@@ -4125,17 +4130,16 @@ void LaserControllerWindow::retranslate()
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
-    QPointF posUm = LaserApplication::device->transformSceneToDevice().map(pos);
-    QPointF posMM = posUm * 0.001;
-    QString posStr = QString("%1mm,%2mm | %3px,%4px")
-        .arg(posMM.x(), 8, 'f', 3).arg(posMM.y(), 8, 'f', 3)
-        .arg(qFloor(pos.x()), 5).arg(qFloor(pos.y()), 5);
+    qreal mmX = pos.x() * 0.001;
+    qreal mmY = pos.y() * 0.001;
+    QString posStr = QString("%1mm,%2mm")
+        .arg(mmX, 8, 'f', 3).arg(mmY, 8, 'f', 3);
     m_statusBarLocation->setText(posStr);
 }
 
 void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 {
-    QString value = QString("%1%").arg(factor * 100, 0, 'f', 3);
+    QString value = QString("%1").arg(factor * 100, 0, 'f', 3);
     m_comboBoxScale->blockSignals(true);
     m_comboBoxScale->setCurrentText(value);
     m_comboBoxScale->blockSignals(false);
@@ -4144,12 +4148,13 @@ void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 {
     // 使用正则表达式检查输入的内容，并获取数字部分的字符串。
-    QRegularExpression percentageRE("^(.*)%$");
-    QRegularExpressionMatch match = percentageRE.match(text);
-    if (match.hasMatch())
+    QDoubleValidator validator;
+    int pos;
+    QString value = text;
+    QValidator::State state = validator.validate(value, pos);
+    if (state == QValidator::Acceptable)
     {
-        QString number = percentageRE.match(text).captured(1);
-        qreal zoom = number.toDouble() / 100;
+        qreal zoom = text.toDouble() / 100;
         m_viewer->setZoomValue(zoom);
     }
 }
@@ -4421,11 +4426,15 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             if (backgroundItem) {
                 backgroundItem->onChangeGrids();
             }
-            m_comboBoxScale->setCurrentText("100%");
+            m_comboBoxScale->setCurrentText("100");
             //初始化缩放输入
-            qreal zoomValue = m_viewer->adapterViewScale() * 100;
-            QString str = QString::number(zoomValue, 'f', 3) + "%";
+            qreal scale = m_viewer->adapterViewScale();
+            m_viewer->setZoomValue(scale);
+            qreal zoomValuePerc = scale * 100;
+            QString str = QString("%1").arg(zoomValuePerc, 0, 'f', 3);
+            m_comboBoxScale->blockSignals(true);
             m_comboBoxScale->setCurrentText(str);
+            m_comboBoxScale->blockSignals(false);
         }
     }
 }
