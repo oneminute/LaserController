@@ -42,7 +42,7 @@ public:
     QString toString() const;
 
 protected slots:
-    void setValue(const QVariant& value);
+    //void setValue(const QVariant& value);
 
 signals:
     void readyRead(const QVariant& value);

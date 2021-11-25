@@ -51,8 +51,6 @@ LaserRegister::LaserRegister(int addr, ConfigItem* configItem,
     d->readOnly = readOnly;
     d->writeOnly = writeOnly;
     d->configItem = configItem;
-
-    connect(configItem, &ConfigItem::valueChanged, this, &LaserRegister::setValue);
 }
 
 LaserRegister::~LaserRegister()
@@ -89,19 +87,19 @@ bool LaserRegister::writeOnly() const
     return d->writeOnly;
 }
 
-void LaserRegister::setValue(const QVariant& value)
-{
-    Q_D(LaserRegister);
-    if (readOnly())
-        return;
-
-    d->value = value;
-
-    if (storeStrategy() == SS_DIRECTLY)
-    {
-        write(value);
-    }
-}
+//void LaserRegister::setValue(const QVariant& value)
+//{
+//    Q_D(LaserRegister);
+//    if (readOnly())
+//        return;
+//
+//    d->value = value;
+//
+//    if (storeStrategy() == SS_DIRECTLY)
+//    {
+//        write(value);
+//    }
+//}
 
 DataType LaserRegister::dataType() const
 {

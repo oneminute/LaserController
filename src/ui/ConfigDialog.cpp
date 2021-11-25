@@ -426,7 +426,7 @@ void ConfigDialog::onUserRegistersConfirmed()
     if (errors.isEmpty())
     {
         QMessageBox::information(this, tr("Success"), tr("Save user registers successfully!"));
-        Config::SystemRegister::group->save(true, true);
+        Config::UserRegister::group->save(true, true);
     }
     else
     {
@@ -455,13 +455,25 @@ void ConfigDialog::onButtonImport(bool checked)
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Import Settings"), QString(),
         "Config (*.config *.json)");
+    if (filename.isEmpty() || filename.isNull())
+        return;
     Config::importFrom(filename);
+    QString password = QInputDialog::getText(
+        this,
+        tr("Manufacture Password"),
+        tr("Password"),
+        QLineEdit::Normal
+    );
+    LaserApplication::device->writeSystemRegisters(password);
+    LaserApplication::device->writeUserRegisters();
 }
 
 void ConfigDialog::onButtonExport(bool checked)
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("Export Settings"), QString(),
         "Config ((*.config *.json)");
+    if (filename.isEmpty() || filename.isNull())
+        return;
     Config::exportTo(filename);
 }
 

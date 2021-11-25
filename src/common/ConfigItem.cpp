@@ -418,6 +418,7 @@ void ConfigItem::clearModified()
     Q_D(ConfigItem);
     Q_ASSERT(d->dirtyValue == d->value);
     d->modified = false;
+    emit modifiedChanged(false);
 }
 
 QString ConfigItem::toString() const
