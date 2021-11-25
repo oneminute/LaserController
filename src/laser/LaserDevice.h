@@ -162,7 +162,7 @@ public:
     /// 坐标即该值。
     /// </summary>
     /// <returns></returns>
-    QPointF userOriginInDevice() const;
+    QPoint userOriginInDevice() const;
 
     /// <summary>
     /// 用户原点在画布坐标系下的坐标值。
@@ -174,13 +174,13 @@ public:
     /// 加工幅面矩形，以机械坐标系下的绝对坐标值表示。
     /// </summary>
     /// <returns></returns>
-    QRectF layoutRectInMech() const;
+    QRect layoutRectInMech() const;
 
     /// <summary>
     /// 加工幅面矩形，以设备坐标系下的坐标值表示。
     /// </summary>
     /// <returns></returns>
-    QRectF layoutRectInDevice() const;
+    QRect layoutRectInDevice() const;
 
     /// <summary>
     /// 加工幅面矩形，以画布坐标系下的坐标值表示。

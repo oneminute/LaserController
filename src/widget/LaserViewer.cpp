@@ -152,7 +152,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 
         // 绘制设备原点
 		painter.setPen(QPen(Qt::blue, 2));
-		QPointF deviceOrigin = mapFromScene(LaserApplication::device->originInScene());
+		QPointF deviceOrigin = mapFromScene(LaserApplication::device->originInDevice());
 		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
         painter.drawEllipse(deviceOriginRect);
         qreal lineLength = 5;
@@ -1377,7 +1377,7 @@ bool LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter
 {
 
     const qreal currentZoom = zoomValue();
-    if ((factor < 1 && currentZoom < 0.01) || (factor > 1 && currentZoom > 58))
+    if ((factor < 1 && currentZoom < 0.001) || (factor > 1 && currentZoom > 58))
         return false;
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {

@@ -4,6 +4,7 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 #include <boost/foreach.hpp>
 
@@ -49,6 +50,11 @@ int main()
         std::cout << i++ << " polygon's area: " << boost::geometry::area(p) << std::endl;
     }*/
 
+    boost::multiprecision::cpp_dec_float_50 decimal("0.45");
+    double dbl = 0.45; //for comparison
+
+    std::cout << std::fixed << std::setprecision(50) << "boost:   " << decimal << std::endl;
+    std::cout << "double:  " << dbl << std::endl;
 
     return 0;
 }

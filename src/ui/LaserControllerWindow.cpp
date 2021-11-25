@@ -642,7 +642,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
-    connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
     connect(m_comboBoxScale, &QComboBox::currentTextChanged, this, &LaserControllerWindow::onComboBoxSxaleTextChanged);
 
     connect(LaserApplication::device, &LaserDevice::comPortsFetched, this, &LaserControllerWindow::onDeviceComPortsFetched);
@@ -1496,6 +1495,9 @@ void LaserControllerWindow::createCentralDockPanel()
      // 初始化缩放列表控件
     m_comboBoxScale = new QComboBox;
     m_comboBoxScale->setEditable(true);
+    m_comboBoxScale->addItem("0.01%");
+    m_comboBoxScale->addItem("0.1%");
+    m_comboBoxScale->addItem("1%");
     m_comboBoxScale->addItem("10%");
     m_comboBoxScale->addItem("25%");
     m_comboBoxScale->addItem("50%");
@@ -4133,21 +4135,16 @@ void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 
 void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 {
-    QString value = QString("%1%").arg(factor * 100, 0, 'f', 0);
+    QString value = QString("%1%").arg(factor * 100, 0, 'f', 3);
     m_comboBoxScale->blockSignals(true);
     m_comboBoxScale->setCurrentText(value);
     m_comboBoxScale->blockSignals(false);
 }
 
-void LaserControllerWindow::onComboBoxSxaleIndexChanged(int index)
-{
-    //m_viewer->setZoomValue(m_comboBoxScale->currentData().toReal());
-}
-
 void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 {
     // 使用正则表达式检查输入的内容，并获取数字部分的字符串。
-    QRegularExpression percentageRE("^([0-9]+)%$");
+    QRegularExpression percentageRE("^(.*)%$");
     QRegularExpressionMatch match = percentageRE.match(text);
     if (match.hasMatch())
     {
@@ -4426,7 +4423,8 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             }
             m_comboBoxScale->setCurrentText("100%");
             //初始化缩放输入
-            QString str = QString::number(qFloor(m_viewer->adapterViewScale() * 100)) + "%";
+            qreal zoomValue = m_viewer->adapterViewScale() * 100;
+            QString str = QString::number(zoomValue, 'f', 3) + "%";
             m_comboBoxScale->setCurrentText(str);
         }
     }

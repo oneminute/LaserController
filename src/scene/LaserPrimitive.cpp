@@ -141,6 +141,7 @@ QVector<QLineF> LaserPrimitive::edges()
 void setSelectedInGroup(bool selected) {
 
 }
+
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
@@ -155,9 +156,6 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     bounds = QRectF(topLeft, bottomRight);
 	QColor color = Qt::blue;
     QPen pen(color, 1, Qt::DashLine);
-    //pen.setCosmetic(true);
-    //painter->setPen(pen);
-    //painter->drawRect(bounds);
 
     if (d->layer)
     {

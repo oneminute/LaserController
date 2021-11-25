@@ -223,7 +223,7 @@ private:
 	bool m_mousePressed;
 
 	bool m_isGridNode;//是否为网格交点node
-	QPointF m_gridNode;
+	QPoint m_gridNode;
 	bool m_isPrimitiveInteractPoint;//绘制是否获取附近图元的最近点
 	QPointF m_primitiveInteractPoint;//scene
 	//QPointF m_isPrimitiveInteractPoint;

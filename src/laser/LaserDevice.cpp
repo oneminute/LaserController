@@ -44,9 +44,10 @@ public:
     QString portName;
     int printerDrawUnit;    // 绘图仪单位，这里值的意思是一英寸分为多少个单位
 
-    QPointF originInMech;
+    QPoint originInMech;
     QPointF originInScene;
     QTransform transformToDevice;
+    QRect layoutRectInDevice;
 
     QString mainCard;
     QString mainCardRegisteredDate;
@@ -73,29 +74,35 @@ public:
 
 void LaserDevicePrivate::updateDeviceOriginAndTransform()
 {
-    qreal dx = 0;
-    qreal dy = 0;
+    int dx = 0;
+    int dy = 0;
+    int maxX = Config::SystemRegister::xMaxLength();
+    int maxY = Config::SystemRegister::yMaxLength();
     switch (Config::SystemRegister::deviceOrigin())
     {
     case 0:
         dx = 0;
         dy = 0;
+        layoutRectInDevice = QRect(QPoint(0, 0), QPoint(maxX, maxY));
         break;
     case 3:
-        dx = Config::SystemRegister::xMaxLength();
+        dx = maxX;
         dy = 0;
+        layoutRectInDevice = QRect(QPoint(-maxX, 0), QPoint(0, maxY));
         break;
     case 2:
-        dx = Config::SystemRegister::xMaxLength();
-        dy = Config::SystemRegister::yMaxLength();
+        dx = maxX;
+        dy = maxY;
+        layoutRectInDevice = QRect(QPoint(-maxX, -maxY), QPoint(0, 0));
         break;
     case 1:
         dx = 0;
-        dy = Config::SystemRegister::yMaxLength();
+        dy = maxY;
+        layoutRectInDevice = QRect(QPoint(0, -maxY), QPoint(0, maxX));
         break;
     }
 
-    originInMech = QPointF(dx, dy);
+    originInMech = QPoint(dx, dy);
     originInScene = QPointF(Global::mechToSceneHF(dx), Global::mechToSceneVF(dy));
     transformToDevice = QTransform::fromTranslate(-originInMech.x(), -originInMech.y());
 }
@@ -804,7 +811,7 @@ bool LaserDevice::checkLayoutForMoving(const QPointF& dest)
 
 bool LaserDevice::checkLayoutForMachining(const QRectF& docBounding, const QRectF& docBoundingAcc)
 {
-    QRect layoutRect = layoutRectInDevice().toRect();
+    QRect layoutRect = layoutRectInDevice();
     QRect docBound = docBounding.toRect();
     QRect docBoundAcc = docBoundingAcc.toRect();
     QString info1 = "";
@@ -985,9 +992,9 @@ QPointF LaserDevice::userOriginInMech() const
     return origin;
 }
 
-QPointF LaserDevice::userOriginInDevice() const
+QPoint LaserDevice::userOriginInDevice() const
 {
-    QPointF origin;
+    QPoint origin;
     switch (Config::Device::userOriginSelected())
     {
     case 0:
@@ -1010,22 +1017,21 @@ QPointF LaserDevice::userOriginInScene() const
     return origin;
 }
 
-QRectF LaserDevice::layoutRectInMech() const
+QRect LaserDevice::layoutRectInMech() const
 {
-    return QRectF(
-        QPointF(0, 0),
-        QPointF(
+    return QRect(
+        QPoint(0, 0),
+        QPoint(
             Config::SystemRegister::xMaxLength(),
             Config::SystemRegister::yMaxLength()
         )
     );
 }
 
-QRectF LaserDevice::layoutRectInDevice() const
+QRect LaserDevice::layoutRectInDevice() const
 {
     Q_D(const LaserDevice);
-    QRectF rect = layoutRectInMech();
-    return d->transformToDevice.mapRect(rect);
+    return d->layoutRectInDevice;
 }
 
 QRectF LaserDevice::layoutRectInScene() const

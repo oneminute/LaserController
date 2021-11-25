@@ -402,11 +402,12 @@ void Config::loadUiItems()
 
 	ConfigItem* visualGridSpacing = group->addConfigItem(
 		"visualGridSpacing",
-		10
+		10,
+        DT_INT
 	);
     visualGridSpacing->setInputWidgetProperty("textTemplate", "%1mm");
-	visualGridSpacing->setInputWidgetProperty("minimum", 0);
-	visualGridSpacing->setInputWidgetProperty("maximum", 10);
+	visualGridSpacing->setInputWidgetProperty("minimum", 1);
+	visualGridSpacing->setInputWidgetProperty("maximum", 50);
 
    
     ConfigItem* validMaxRegion = group->addConfigItem(
@@ -1023,7 +1024,7 @@ void Config::loadDeviceItems()
 
     ConfigItem* userOrigin1 = group->addConfigItem(
         "userOrigin1",
-        QPointF(0, 0),
+        QPoint(0, 0),
         DT_POINT
     );
     userOrigin1->setStoreStrategy(SS_DIRECTLY);
@@ -1033,21 +1034,21 @@ void Config::loadDeviceItems()
     userOrigin1->setValueFromWidgetHook(
         [](const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 1000);
         }
     );
     userOrigin1->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 0.001);
         }
     );
     userOrigin1->setToJsonHook(
         [=](const ConfigItem* item) {
-            QPointF pt = item->value().toPointF();
-            QPointF defPt = item->defaultValue().toPointF();
+            QPoint pt = item->value().toPoint();
+            QPoint defPt = item->defaultValue().toPoint();
             QJsonObject jsonObj;
             jsonObj["value"] = typeUtils::point2Json(pt);
             jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
@@ -1069,7 +1070,7 @@ void Config::loadDeviceItems()
 
     ConfigItem* userOrigin2 = group->addConfigItem(
         "userOrigin2",
-        QPointF(0, 0),
+        QPoint(0, 0),
         DT_POINT
     );
     userOrigin2->setStoreStrategy(SS_DIRECTLY);
@@ -1079,21 +1080,21 @@ void Config::loadDeviceItems()
     userOrigin2->setValueFromWidgetHook(
         [](const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 1000);
         }
     );
     userOrigin2->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 0.001);
         }
     );
     userOrigin2->setToJsonHook(
         [=](const ConfigItem* item) {
-            QPointF pt = item->value().toPointF();
-            QPointF defPt = item->defaultValue().toPointF();
+            QPoint pt = item->value().toPoint();
+            QPoint defPt = item->defaultValue().toPoint();
             QJsonObject jsonObj;
             jsonObj["value"] = typeUtils::point2Json(pt);
             jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
@@ -1115,7 +1116,7 @@ void Config::loadDeviceItems()
 
     ConfigItem* userOrigin3 = group->addConfigItem(
         "userOrigin3",
-        QPointF(0, 0),
+        QPoint(0, 0),
         DT_POINT
     );
     userOrigin3->setStoreStrategy(SS_DIRECTLY);
@@ -1125,21 +1126,21 @@ void Config::loadDeviceItems()
     userOrigin3->setValueFromWidgetHook(
         [](const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 1000);
         }
     );
     userOrigin3->setValueToWidgetHook(
         [](const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 0.001);
         }
     );
     userOrigin3->setToJsonHook(
         [=](const ConfigItem* item) {
-            QPointF pt = item->value().toPointF();
-            QPointF defPt = item->defaultValue().toPointF();
+            QPoint pt = item->value().toPoint();
+            QPoint defPt = item->defaultValue().toPoint();
             QJsonObject jsonObj;
             jsonObj["value"] = typeUtils::point2Json(pt);
             jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
@@ -2106,7 +2107,7 @@ void Config::loadSystemRegisters()
     ConfigItem* xMaxLength = group->addConfigItem(
         "xMaxLength",
         320000,
-        DT_REAL
+        DT_INT
     );
     xMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
@@ -2377,7 +2378,7 @@ void Config::loadSystemRegisters()
     ConfigItem* yMaxLength = group->addConfigItem(
         "yMaxLength",
         200000,
-        DT_REAL
+        DT_INT
     );
     yMaxLength->setValueFromWidgetHook(
         [](const QVariant& value)
