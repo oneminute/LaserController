@@ -418,6 +418,7 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
     //已经被选中的恢复正常状态
     for (LaserPrimitive* primitive : selectedPrimitives()) {
         primitive->setSelected(false);
+
         //primitive->blockSignals(true);
     }
     //tree 查找
@@ -425,24 +426,30 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
-                QRectF bounds = primitive->sceneBoundingRect();
+                QRectF bounds;
                 if (!primitive->joinedGroupList().isEmpty()) {
-                    utils::boundingRect(primitive->joinedGroupList(), bounds);
+                    utils::boundingRect(primitive->joinedGroupList(), bounds, QRectF(), false);
+                    for (LaserPrimitive* primitive : primitive->joinedGroupList()) {
+                        selectedByBounds(bounds, selection, primitive);
+                    }
                 }
-                selectedByBounds(bounds, selection, primitive);
+                else {
+                    bounds = primitive->sceneBoundingRect();
+                    selectedByBounds(bounds, selection, primitive);
+                }
+                
+                
             }           
         } 
     }
     
 }
-
 void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive)
-{  
+{
     if (selection.contains(bounds)) {
         if (!primitive->isSelected()) {
             primitive->setSelected(true);
         }
-
     }
     //point
     else if (bounds.width() == 0 && bounds.height() == 0) {
@@ -464,7 +471,6 @@ void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitiv
         }
     }
 }
-
 QRectF LaserScene::maxRegion()
 {
     return m_maxRegion;
