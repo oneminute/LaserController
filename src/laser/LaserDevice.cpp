@@ -1133,10 +1133,10 @@ LaserRegister::RegistersMap LaserDevice::userRegisterValues(bool onlyModified) c
     LaserRegister::RegistersMap map;
     for (LaserRegister* item : d->userRegisters.values())
     {
-        if (onlyModified && !item->configItem()->isModified())
+        if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
             continue;
 
-        LaserRegister::RegisterPair pair(item->address(), item->value());
+        LaserRegister::RegisterPair pair(item->address(), item->configItem()->value());
         if (!pair.second.isValid())
             continue;
         map.insert(pair.first, pair.second);

@@ -384,12 +384,12 @@
 <context>
     <name>Config</name>
     <message>
-        <location filename="../src/common/Config.cpp" line="+128"/>
+        <location filename="../src/common/Config.cpp" line="+127"/>
         <source>Save config file error.</source>
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+2944"/>
+        <location line="+2943"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -2679,16 +2679,34 @@
     </message>
     <message>
         <location line="+7"/>
+        <location line="+3"/>
+        <source>Apply current settings to default settings.</source>
+        <translation>将当前选项值保存为默认值。</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Apply To Default</source>
         <translation>应用到默认值</translation>
     </message>
     <message>
         <location line="+7"/>
+        <location line="+3"/>
+        <source>Import settings from a valid config file.</source>
+        <translation>从有效的配置文件中导入配置数据。</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Import</source>
         <translation>导入</translation>
     </message>
     <message>
         <location line="+7"/>
+        <location line="+3"/>
+        <source>Export settings to a file.</source>
+        <translation>导出当前配置值到文件。</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
@@ -2744,8 +2762,8 @@
         <translation type="vanished">PLT输出</translation>
     </message>
     <message>
-        <location filename="../src/ui/ConfigDialog.cpp" line="+103"/>
-        <location line="+423"/>
+        <location filename="../src/ui/ConfigDialog.cpp" line="+106"/>
+        <location line="+436"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
@@ -2774,35 +2792,37 @@
         <translation type="vanished">您选择的语言&quot;%1&quot;无法识别，请检查你的配置文件。</translation>
     </message>
     <message>
-        <location line="-418"/>
-        <location line="+419"/>
+        <location line="-431"/>
+        <location line="+432"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location line="-414"/>
-        <location line="+415"/>
+        <location line="-427"/>
+        <location line="+428"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <location line="-410"/>
-        <location line="+411"/>
+        <location line="-423"/>
+        <location line="+424"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location line="-371"/>
+        <location line="-384"/>
+        <location line="+302"/>
         <source>Manufacture Password</source>
         <translation>厂商密码</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-301"/>
+        <location line="+302"/>
         <source>Password</source>
         <translation>密码</translation>
     </message>
     <message>
-        <location line="+231"/>
+        <location line="-70"/>
         <location line="+28"/>
         <source>Register &apos;%1&apos; save failure, expected value is &apos;%2&apos;, actual value is &apos;%3&apos;.</source>
         <translation>参数%1保存失败，期望值为&quot;%2&quot;，实际值为&quot;%3&quot;。</translation>
@@ -2845,12 +2865,12 @@
         <translation>导入配置</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+17"/>
         <source>Export Settings</source>
         <translation>导出配置</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+16"/>
         <location line="+12"/>
         <source>Confirm</source>
         <translation>确认</translation>
@@ -10043,7 +10063,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3668"/>
+        <location filename="../src/common/Config.cpp" line="-3667"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
