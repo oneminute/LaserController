@@ -63,10 +63,10 @@ void LaserScene::setDocument(LaserDocument * doc)
 	views()[0]->centerOn(rect.center());
     //创建树
     if (!m_quadTree) {
-        qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
+        qreal maxSize = Config::Ui::validMaxRegion() * 1000;
         qreal top = -(maxSize - rect.height()) * 0.5;
         qreal left = -(maxSize - rect.width()) * 0.5;
-        m_maxRegion = QRectF(left, top, maxSize, maxSize);
+        m_maxRegion = QRectF(rect.left() + left, rect.top() + top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
     }
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
@@ -483,11 +483,11 @@ QuadTreeNode * LaserScene::quadTreeNode()
 
 void LaserScene::updateValidMaxRegionRect()
 {
-    QRectF rect = LaserApplication::device->layoutRectInMech();
-    qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
+    QRectF rect = LaserApplication::device->layoutRectInDevice();
+    qreal maxSize = Config::Ui::validMaxRegion() * 1000;
     qreal top = -(maxSize - rect.height()) * 0.5;
     qreal left = -(maxSize - rect.width()) * 0.5;
-    m_maxRegion = QRectF(left, top, maxSize, maxSize);
+    m_maxRegion = QRectF(rect.left() + left, rect.top() + top, maxSize, maxSize);
     views()[0]->viewport()->repaint();
 }
 
@@ -497,12 +497,12 @@ void LaserScene::updataValidMaxRegion()
         return;
     LaserViewer* view = qobject_cast<LaserViewer*>( views()[0]);
     //QRectF rect = Global::matrixFromUm().mapRect(LaserApplication::device->layoutRectInMech());
-    QRectF rect = LaserApplication::device->layoutRectInScene();
-    qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
+    QRectF rect = LaserApplication::device->layoutRectInDevice();
+    qreal maxSize = Config::Ui::validMaxRegion() * 1000;
     qreal top = -(maxSize - rect.height()) * 0.5;
     qreal left = -(maxSize - rect.width()) * 0.5;
     qreal lastMaxSize = m_maxRegion.width();
-    m_maxRegion = QRectF(left, top, maxSize, maxSize);
+    m_maxRegion = QRectF(rect.left() + left, rect.top() + top, maxSize, maxSize);
     view->viewport()->repaint();
     //所有图元bounds
     qreal bLeft = 0;

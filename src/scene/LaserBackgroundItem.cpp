@@ -209,8 +209,8 @@ bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
 	for (int i = 0; i < m_gridNodeXList.size(); i++) {
 		for (int j = 0; j < m_gridNodeYList.size(); j++) {
 			QPoint node = QPoint(m_gridNodeXList[i], m_gridNodeYList[j]);
-			qreal absX = node.x() - documentPoint.x();
-			qreal absY = node.y() - documentPoint.y();
+			qreal absX = qAbs(node.x() - documentPoint.x());
+			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
 				//node ��documentת����view
 				point = mapToScene(node).toPoint();
@@ -219,8 +219,8 @@ bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
 		}
 		for (int j2 = 0; j2 < m_gridSecondNodeYList.size(); j2++) {
 			QPointF node = QPointF(m_gridNodeXList[i], m_gridSecondNodeYList[j2]);
-			qreal absX = node.x() - documentPoint.x();
-			qreal absY = node.y() - documentPoint.y();
+			qreal absX = qAbs(node.x() - documentPoint.x());
+			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
 				//node ��documentת����view
 				point = mapToScene(node).toPoint();

@@ -1377,7 +1377,7 @@ bool LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter
 {
 
     const qreal currentZoom = zoomValue();
-    if ((factor < 1 && currentZoom < 0.001) || (factor > 1 && currentZoom > 58))
+    if ((factor < 1 && currentZoom < 0.0001) || (factor > 1 && currentZoom > 58))
         return false;
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {
