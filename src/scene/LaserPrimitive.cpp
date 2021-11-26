@@ -999,9 +999,29 @@ void LaserRect::setCornerRadius(qreal cornerRadius)
     }
     else
     {
-        path.addRoundedRect(d->boundingRect, cornerRadius, cornerRadius);
+        if (cornerRadius >= 0) {
+            path.addRoundedRect(d->boundingRect, cornerRadius, cornerRadius);
+        }
+        else {
+            concaveRect(d->boundingRect, path, qAbs(cornerRadius));
+        }
     }
     d->path = path;
+}
+
+void LaserRect::concaveRect(QRectF rect, QPainterPath& path, qreal cornerRadius)
+{
+    QPainterPath rectPath, circleLeftTopPath, circleRightTopPath, circleLeftBottomPath, circleRightBottomPath;
+    rectPath.addRect(rect);
+    circleLeftTopPath.addEllipse(rect.topLeft(), cornerRadius, cornerRadius);
+    circleRightTopPath.addEllipse(rect.topRight(), cornerRadius, cornerRadius);
+    circleLeftBottomPath.addEllipse(rect.bottomLeft(), cornerRadius, cornerRadius);
+    circleRightBottomPath.addEllipse(rect.bottomRight(), cornerRadius, cornerRadius);
+    path.addPath(rectPath.
+        subtracted(circleLeftTopPath).
+        subtracted(circleRightTopPath).
+        subtracted(circleLeftBottomPath).
+        subtracted(circleRightBottomPath));
 }
 
 bool LaserRect::isRoundedRect() const

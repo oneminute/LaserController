@@ -2149,25 +2149,63 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_maxWidth = new LaserDoubleSpinBox();
     m_maxWidthLabel = new QLabel("Max Width");
     m_cornerRadius = new LaserDoubleSpinBox();
-    m_cornerRadius->setMinimum(0);
+    m_cornerRadius->setMinimum(-DBL_MAX);
     m_cornerRadius->setMaximum(DBL_MAX);
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
     m_lockedLabel = new QLabel("Locked");
-
+    //cornerRadius
     m_cornerRadius->connect(m_cornerRadius, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
-        if (list.count() != 1) {
-            return;
+        bool isMulti = false;
+        if(m_cornerRadius->prefix() == "multi"){
+            isMulti = true;
         }
-        LaserRect* rect = nullptr;
-        rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+        if (!isMulti) {
+            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+            if (rect->cornerRadius() == m_cornerRadius->value()) {
+                return;
+            }
+        }
+        qreal cornerRadius = m_cornerRadius->value();
+        qreal shorter = 0;
+        int i = 0;
+        //shortest border
+        for (LaserPrimitive* primitive : list) {
+            QRectF bounding = primitive->sceneBoundingRect();
+            qreal w = qAbs(bounding.width());
+            qreal h = qAbs(bounding.height());
+            if (i == 0) {
+                shorter = h;
+                if (w < h) {
+                    shorter = w;
+                }
+            }else {
+                qreal sBorder = h;
+                if (w < h) {
+                    sBorder = w;
+                }
+                if (shorter > sBorder) {
+                    shorter = sBorder;
+                }
+            }
+            i = i + 1;
+        }
+        if (cornerRadius >= 0) {
+           
+            if (qAbs(cornerRadius) > shorter) {
+                cornerRadius = shorter;
+            }
+        }
+        else {            
+            if (qAbs(cornerRadius) > shorter) {
+                cornerRadius = -shorter * 0.5;
 
-        if (rect) {
-            CornerRadiusCommand* cmd = new CornerRadiusCommand(m_viewer, rect, m_cornerRadius, m_cornerRadius->value());
-            view->undoStack()->push(cmd);            
-        }        
+            }
+        }
+        CornerRadiusCommand* cmd = new CornerRadiusCommand(m_viewer, list, m_cornerRadius, cornerRadius, isMulti);
+        view->undoStack()->push(cmd);           
     });
     
     m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
@@ -2290,10 +2328,24 @@ void LaserControllerWindow::showShapePropertyPanel()
 
             m_rectPropertyWidget->setLayout(m_rectPropertyLayout);
             m_propertyDockWidget->setWidget(m_rectPropertyWidget);
-            LaserRect* rect = nullptr;
-            rect = qgraphicsitem_cast<LaserRect*>(list[0]);
-            m_cornerRadius->setValue(rect->cornerRadius());
-            m_lastCornerRadiusValue = rect->cornerRadius();
+            qreal firstCornerRadius = qgraphicsitem_cast<LaserRect*>(list[0])->cornerRadius();
+            bool isMulti = false;
+            for (LaserPrimitive* primitive : list) {
+                LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
+                qreal cornerRadius = rect->cornerRadius();
+                if (cornerRadius != firstCornerRadius) {
+                    isMulti = true;
+                    break;
+                }
+            }
+            if (isMulti) {
+                m_cornerRadius->setValue(0.0);
+                m_cornerRadius->setPrefix(tr("multi"));
+            }
+            else {
+                m_cornerRadius->setValue(firstCornerRadius);
+                m_cornerRadius->setPrefix("");
+            }
             break;
         }
         case LPT_ELLIPSE: {

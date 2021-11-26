@@ -18,8 +18,10 @@ protected:
 	virtual void focusOutEvent(QFocusEvent *event);
 signals:
 	void enterOrLostFocus();
-
-
+private:
+    bool m_isPressEnterKey;
+    qreal m_lastValue;
+    bool m_isValueChanged;
 };
 #endif // LASERDOUBLESPINBOX_H
 

@@ -161,17 +161,20 @@ private:
 //corner radius
 class CornerRadiusCommand :public QUndoCommand {
 public:
-    CornerRadiusCommand(LaserViewer*  view, LaserRect* rect, LaserDoubleSpinBox* cornerRadius, qreal curVal);
+    CornerRadiusCommand(LaserViewer*  view, QList<LaserPrimitive*>& list, 
+        LaserDoubleSpinBox* cornerRadius, qreal curVal, bool _isMulti = false);
     ~CornerRadiusCommand();
     virtual void undo() override;
     virtual void redo() override;
 private:
     LaserViewer * m_view;
-    LaserRect* m_rect;
+    QList<LaserPrimitive*> m_rectList;
+    QMap<LaserRect*, qreal> m_lastMultiRadiusMap;
     LaserDoubleSpinBox* m_cornerRadius;
     qreal m_lastRadius;
     qreal m_curRadius;
     LaserControllerWindow* m_window;
+    bool m_isMulti;
 };
 //layer visible
 class LayerVisibleCommand : public QUndoCommand {

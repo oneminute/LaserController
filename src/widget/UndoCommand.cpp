@@ -732,14 +732,19 @@ void LayerVisibleCommand::redo()
     m_viewer->viewport()->repaint();
 }
 
-CornerRadiusCommand::CornerRadiusCommand(LaserViewer * view, LaserRect * rect, LaserDoubleSpinBox* cornerRadius, qreal curVal)
+CornerRadiusCommand::CornerRadiusCommand(LaserViewer * view, QList<LaserPrimitive*>& list, 
+    LaserDoubleSpinBox* cornerRadius, qreal curVal, bool _isMulti)
+    :m_isMulti(_isMulti), m_view(view), m_rectList(list), 
+    m_cornerRadius(cornerRadius), m_curRadius(curVal)
 {
-    m_view = view;
-    m_rect = rect;
-    m_cornerRadius = cornerRadius;
     m_window = LaserApplication::mainWindow;
     m_lastRadius = m_window->lastCornerRadiusValue();
-    m_curRadius = curVal;
+    if (m_isMulti) {
+        for (LaserPrimitive* primitive : m_rectList) {
+            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
+            m_lastMultiRadiusMap.insert(rect, rect->cornerRadius());
+        }
+    }
 }
 
 CornerRadiusCommand::~CornerRadiusCommand()
@@ -748,27 +753,64 @@ CornerRadiusCommand::~CornerRadiusCommand()
 
 void CornerRadiusCommand::undo()
 {
-    m_cornerRadius->setValue(m_lastRadius);
-    m_rect->setCornerRadius(m_lastRadius);
+    if (!m_isMulti) {
+        m_cornerRadius->setValue(m_lastRadius);
+        m_cornerRadius->setPrefix("");
+        for (LaserPrimitive* primitive : m_rectList) {
+            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
+            //prevent the same operation
+            if (rect->cornerRadius() == m_lastRadius) {
+                return;
+            }
+            rect->setCornerRadius(m_lastRadius);
+        }
+    }
+    else {
+        m_cornerRadius->setValue(0.0);
+        m_cornerRadius->setPrefix(QObject::tr("multi"));
+        for (QMap<LaserRect*, qreal>::Iterator i = m_lastMultiRadiusMap.begin(); i != m_lastMultiRadiusMap.end(); i++) {
+            i.key()->setCornerRadius(i.value());
+        }
+
+    }
+    
     m_view->viewport()->repaint();
 }
 
 void CornerRadiusCommand::redo()
 {
-    QRectF bounding = m_rect->boundingRect();
-    qreal w = bounding.width();
-    qreal h = bounding.height();
+    QRectF bounding;
+    utils::boundingRect(m_rectList, bounding, QRectF(), false);
+    qreal w = qAbs(bounding.width());
+    qreal h = qAbs(bounding.height());
     qreal shorter = h;
-    if (w < h) {
-        shorter = w;
+    
+    if (m_curRadius >= 0) {
+        if (w < h) {
+            shorter = w;
+        }
+        if (qAbs(m_curRadius) > shorter) {
+            m_curRadius = shorter;
+
+        }
     }
-    //qreal val = m_curRadius;
-    if (m_curRadius > shorter) {
-        m_curRadius = shorter;
-        
+    else {
+        if (w < h) {
+            shorter = w ;
+        }
+        if (qAbs(m_curRadius) > shorter) {
+            m_curRadius = -shorter * 0.5;
+
+        }
     }
+    
     m_cornerRadius->setValue(m_curRadius);
-    m_rect->setCornerRadius(m_curRadius);
+    m_cornerRadius->setPrefix("");
+    for (LaserPrimitive* primitive : m_rectList) {
+        LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
+        rect->setCornerRadius(m_curRadius);
+    }
+    //m_rectList->setCornerRadius(m_curRadius);
     m_window->setLastCornerRadiusValue(m_curRadius);
     m_view->viewport()->repaint();
 }

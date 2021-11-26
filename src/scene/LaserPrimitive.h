@@ -191,6 +191,7 @@ public:
 
     qreal cornerRadius() const;
     void setCornerRadius(qreal cornerRadius);
+    void concaveRect(QRectF rect, QPainterPath& path, qreal cornerRadius);
 
     bool isRoundedRect() const;
 
