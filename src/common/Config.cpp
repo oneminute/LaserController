@@ -93,7 +93,6 @@ void Config::importFrom(const QString& filename)
                 group->fromJson(g.value().toObject());
             }
         }
-        configFile.remove();
     }
     else
     {
@@ -191,7 +190,6 @@ QString Config::configFilePath(const QString& filename)
         dataPath.mkdir("CNELaser");
     }
     dataPath.cd("CNELaser");
-    qLogD << "configPath: " << dataPath.absolutePath();
     return dataPath.absoluteFilePath(filename);
 }
 
