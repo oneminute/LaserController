@@ -63,8 +63,8 @@ public:
     bool lockEqualRatio();
     LaserDoubleSpinBox* widthBox();
     LaserDoubleSpinBox* heightBox();
-    void setLastCornerRadiusValue(qreal val);
-    qreal lastCornerRadiusValue();
+    //void setLastCornerRadiusValue(qreal val);
+    //qreal lastCornerRadiusValue();
     LaserDoubleSpinBox* fontSpaceYDoubleSpinBox();
 
     PointPairList printAndCutPoints() const;

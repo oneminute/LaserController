@@ -738,12 +738,16 @@ CornerRadiusCommand::CornerRadiusCommand(LaserViewer * view, QList<LaserPrimitiv
     m_cornerRadius(cornerRadius), m_curRadius(curVal)
 {
     m_window = LaserApplication::mainWindow;
-    m_lastRadius = m_window->lastCornerRadiusValue();
+    
     if (m_isMulti) {
         for (LaserPrimitive* primitive : m_rectList) {
             LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
             m_lastMultiRadiusMap.insert(rect, rect->cornerRadius());
         }
+    }
+    else {
+        LaserRect* rect = qgraphicsitem_cast<LaserRect*>(m_rectList[0]);
+        m_lastRadius = rect->cornerRadius();
     }
 }
 
@@ -810,10 +814,66 @@ void CornerRadiusCommand::redo()
         LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
         rect->setCornerRadius(m_curRadius);
     }
-    //m_rectList->setCornerRadius(m_curRadius);
-    m_window->setLastCornerRadiusValue(m_curRadius);
     m_view->viewport()->repaint();
 }
+
+/*RectCommand::RectCommand(LaserViewer * view, QList<LaserPrimitive*>& list, LaserDoubleSpinBox * spinBox, QRectF curRect, bool _isMulti)
+    :m_view(view), m_list(list), m_spinBox(spinBox), m_isMulti(_isMulti)
+    , m_curRectF(curRect)
+{
+    LaserPrimitive* firstPrimitive = m_list[0];
+    m_type = firstPrimitive->primitiveType();
+    if (m_isMulti) {
+        for (LaserPrimitive* primitive : m_list) {
+            if (m_type == LPT_RECT) {
+                LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
+                m_lastMultiMap.insert(rect, rect->rect());
+            }
+            else if (m_type == LPT_ELLIPSE) {
+                LaserEllipse* ellipse = qgraphicsitem_cast<LaserEllipse*>(primitive);
+                m_lastMultiMap.insert(ellipse, ellipse->bounds());
+            }
+            
+        }
+    }
+    else {
+        
+        if (m_type == LPT_RECT) {
+            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(firstPrimitive);
+            m_lastRectF = rect->rect();
+        }
+        else if (m_type == LPT_ELLIPSE) {
+            LaserEllipse* ellipse = qgraphicsitem_cast<LaserEllipse*>(firstPrimitive);
+            m_lastRectF = ellipse->bounds();
+        }
+        
+    }
+}
+
+RectCommand::~RectCommand()
+{
+}
+
+void RectCommand::undo()
+{
+}
+
+void RectCommand::redo()
+{
+    if (m_type == LPT_RECT) {
+        for (LaserPrimitive* primitive : m_list) {
+            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
+            rect->setRect(m_curRectF);
+        }
+    }
+    else if (m_type == LPT_ELLIPSE) {
+        for (LaserPrimitive* primitive : m_list) {
+            LaserEllipse* ellipse = qgraphicsitem_cast<LaserEllipse*>(primitive);
+            ellipse->setBounds(m_curRectF);
+        }
+    }
+}*/
+
 
 GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, QTransform lastTransform, QTransform curTransform)
     :m_scene(scene), m_lastTransform(lastTransform), m_curUndoTransform(curTransform)
@@ -949,3 +1009,4 @@ void JoinedGroupCommand::handleUnGroup()
     m_joinedGroupAction->setEnabled(true);
     m_joinedUngroupAction->setEnabled(false);
 }
+
