@@ -45,7 +45,7 @@ namespace utils
 
     LaserPoint center(const LaserPointList& points);
 
-    void boundingRect(const QList<LaserPrimitive*>& primitives, QRectF& bounding, QRectF& boundingAcc = QRectF(), bool exludeUnexport = true);
+    void boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
     LaserLineListList interLines(const QPainterPath& path, qreal rowInterval = 1);
 

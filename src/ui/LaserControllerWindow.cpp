@@ -916,7 +916,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
-    m_layoutRect = LaserApplication::device->layoutRectInScene();
+    m_layoutRect = LaserApplication::device->layoutRect();
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 
@@ -3019,8 +3019,8 @@ void LaserControllerWindow::onActionMachining(bool checked)
             //QString filename = file.fileName();
 
         if (!LaserApplication::device->checkLayoutForMachining(
-            m_scene->document()->machiningDocBoundingRectInDevice(),
-            m_scene->document()->machiningDocBoundingRectInDevice(true)
+            m_scene->document()->currentDocBoundingRect(),
+            m_scene->document()->currentDocBoundingRect(true)
         ))
             return;
 
@@ -3073,8 +3073,8 @@ void LaserControllerWindow::onActionBounding(bool checked)
         return;
 
     if (!LaserApplication::device->checkLayoutForMachining(
-        m_scene->document()->machiningDocBoundingRectInDevice(),
-        m_scene->document()->machiningDocBoundingRectInDevice(true)
+        m_scene->document()->currentDocBoundingRect(),
+        m_scene->document()->currentDocBoundingRect(true)
     ))
         return;
 
@@ -3540,7 +3540,7 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 {
-    QPointF laserPos = LaserApplication::device->laserPositionInDevice();
+    QPointF laserPos = LaserApplication::device->laserPosition();
     switch (Config::Device::userOriginSelected())
     {
     case 0:
@@ -3557,7 +3557,7 @@ void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 
 void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 {
-    QPointF userOrigin = LaserApplication::device->userOriginInDevice();
+    QPointF userOrigin = LaserApplication::device->userOrigin();
     qLogD << "user origin: " << userOrigin;
     LaserApplication::device->moveToMachining(QVector3D(userOrigin));
 }
@@ -3570,9 +3570,15 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 		return;
 	}
 	QImage image(name);
-	qreal width = image.size().width();
-	qreal height = image.size().height();
-	LaserBitmap* bitmap = new LaserBitmap(image, QRectF(0, 0, width, height), m_scene->document());
+    // 这里像素要转微米
+	int width = Global::sceneToMechH(image.size().width());
+	int height = Global::sceneToMechV(image.size().height());
+    QRect layout = LaserApplication::device->layoutRect();
+    QRect bitmapRect(
+        layout.left() + (layout.width() - width) / 2,
+        layout.top() + (layout.height() - height) / 2,
+        width, height);
+	LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document());
 	//undo 创建完后会执行redo
 	QList<QGraphicsItem*> list;
 	list.append(bitmap);
@@ -3664,8 +3670,6 @@ void LaserControllerWindow::onActionMirrorACrossLine(bool checked)
     if (!m_viewer || !m_viewer->group()) {
         return;
     }
-    //MirrorACommand* cmd = new MirrorACommand(m_viewer);
-    //m_viewer->undoStack()->push(cmd);
     m_viewer->AcrossLineMirror();
     
 }
@@ -3677,7 +3681,7 @@ void LaserControllerWindow::onActionPrintAndCutNew(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutFetchLaser(bool checked)
 {
-    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->laserPositionInDevice());
+    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->laserPosition());
 }
 
 void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
@@ -3699,9 +3703,8 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     
     for (const QPointF& pt : m_printAndCutCandidatePoints)
     {
-        QPointF ptCandidate = LaserApplication::device->transformToDevice().map(Global::matrixToUm().map(pt));
-        qLogD << "canvas point: " << pt << ", " << ptCandidate;
-        m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
+        qLogD << "canvas point: " << pt;
+        m_tablePrintAndCutPoints->setCanvasPoint(pt);
     }
 
     //Config::Ui::visualGridSpacing();
@@ -3850,7 +3853,7 @@ void LaserControllerWindow::onActionRedLightAlignmentStart(bool checked)
     {
         m_ui->actionStartRedLightAlight->setEnabled(false);
         m_ui->actionFinishRedLightAlight->setEnabled(true);
-        m_redLightAlignment1stPt = LaserApplication::device->laserPositionInDevice();
+        m_redLightAlignment1stPt = LaserApplication::device->laserPosition();
         qreal x = m_redLightAlignment1stPt.x() * 0.001;
         qreal y = m_redLightAlignment1stPt.y() * 0.001;
         m_labelRedLightAlignmentFirst->setText(tr("x: %1, y: %2")
@@ -3865,7 +3868,7 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
     {
         m_ui->actionStartRedLightAlight->setEnabled(true);
         m_ui->actionFinishRedLightAlight->setEnabled(false);
-        m_redLightAlignment2ndPt = LaserApplication::device->laserPositionInDevice();
+        m_redLightAlignment2ndPt = LaserApplication::device->laserPosition();
 
         qreal x = m_redLightAlignment2ndPt.x() * 0.001;
         qreal y = m_redLightAlignment2ndPt.y() * 0.001;
@@ -4175,8 +4178,8 @@ void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
             tr("Device layout changed. We should close current document. Do you want to save it or close it without saving?"),
             QMessageBox::StandardButton::Save, QMessageBox::StandardButton::Close);
     }*/
-    QRectF newRect = LaserApplication::device->layoutRectInScene();
-    QPointF offset;
+    QRect newRect = LaserApplication::device->layoutRect();
+    QPoint offset;
     switch (Config::SystemRegister::deviceOrigin())
     {
     case 1:
@@ -4226,7 +4229,8 @@ void LaserControllerWindow::onUserOriginRadioButtonChanged(bool checked)
 
 void LaserControllerWindow::onCreatSpline()
 {
-	m_viewer->createSpline();
+    if (m_viewer)
+	    m_viewer->createSpline();
 }
 
 void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
@@ -4417,7 +4421,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         m_viewer->undoStack()->clear();
         LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         if (m_viewer) {
-            QRectF rect = LaserApplication::device->layoutRectInScene();
+            QRect rect = LaserApplication::device->layoutRect();
 
             m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -4474,7 +4478,7 @@ void LaserControllerWindow::selectedChangedFromMouse()
 {
 	//int size = m_scene->selectedPrimitives().length();
     //QRectF sceneRect = m_scene->backgroundItem()->rect();
-    QRectF sceneRect = LaserApplication::device->layoutRectInScene();
+    QRect sceneRect = LaserApplication::device->layoutRect();
     LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
     LaserPrimitiveGroup* group =  view->group();
     if (!group) {
@@ -5342,11 +5346,11 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
     }
 
     // 计算文档外包框
-    QRectF docBounding = m_scene->document()->docBoundingRectInScene();
+    QRectF docBounding = m_scene->document()->currentDocBoundingRect();
 
     // 获取当前原点
-    QPointF targetOrigin = LaserApplication::device->currentOriginInScene();
-    QPointF currentOrigin = m_scene->document()->docOriginInScene();
+    QPointF targetOrigin = LaserApplication::device->currentOrigin();
+    QPointF currentOrigin = m_scene->document()->docOrigin();
     QPointF offset = targetOrigin - currentOrigin;
 
     QTransform t = QTransform::fromTranslate(offset.x(), offset.y());

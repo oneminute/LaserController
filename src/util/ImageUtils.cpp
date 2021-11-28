@@ -251,8 +251,7 @@ void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int i
 }
 
 QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
-    const QRectF& boundingRect, qreal rowInterval, QPointF& lastPoint, 
-    QPointF& residual, qreal accLength)
+    const QRect& boundingRect, int rowInterval, QPoint& lastPoint, int accLength)
 {
     cv::imwrite("tmp/engraving.bmp", mat);
     QByteArray bytes;
@@ -311,12 +310,12 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             //fspc.setSame(same);
             if (forward)
             {
-                lastPoint = QPointF(xEnd + accLength, yStart);
+                lastPoint = QPoint(xEnd + accLength, yStart);
                 stream << yStart << xStart << xEnd << fspc.code;
             }
             else
             {
-                lastPoint = QPointF(xStart - accLength, yStart);
+                lastPoint = QPoint(xStart - accLength, yStart);
                 stream << yStart << xEnd << xStart << fspc.code;
             }
 
@@ -330,7 +329,6 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
         progress->increaseProgress();
     }
 
-    residual = QPointF(0, 0);
     progress->finish();
 
     //parseImageData(bytes);

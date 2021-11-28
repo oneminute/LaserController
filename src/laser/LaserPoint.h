@@ -2,8 +2,7 @@
 #define LASERPOINT_H
 
 #include <QtGlobal>
-#include <QPointF>
-#include <QVector4D>
+#include <QPoint>
 
 class LaserPrimitive;
 
@@ -11,22 +10,22 @@ class LaserPoint
 {
 public:
     explicit LaserPoint();
-    explicit LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_);
-    explicit LaserPoint(const QPointF& point, qreal angle1_ = 0, qreal angle2_ = 360);
+    explicit LaserPoint(int x_, int y_, int angle1_, int angle2_);
+    explicit LaserPoint(const QPoint& point, int angle1_ = 0, int angle2_ = 360);
 
     static int vectorSize();
-    qreal* vector();
+    int* vector();
 
-    qreal x() const { return m_x; }
-    qreal y() const { return m_y; }
-    qreal angle1() const { return m_angle1; }
-    qreal angle2() const { return m_angle2; }
+    int x() const { return m_x; }
+    int y() const { return m_y; }
+    int angle1() const { return m_angle1; }
+    int angle2() const { return m_angle2; }
 
-    void setX(qreal x) { m_x = x; }
-    void setY(qreal y) { m_y = y; }
-    void setAngle1(qreal angle1) { m_angle1 = angle1; }
-    void setAngle2(qreal angle2) { m_angle2 = angle2; }
-    void setAll(qreal x, qreal y, qreal angle1, qreal angle2)
+    void setX(int x) { m_x = x; }
+    void setY(int y) { m_y = y; }
+    void setAngle1(int angle1) { m_angle1 = angle1; }
+    void setAngle2(int angle2) { m_angle2 = angle2; }
+    void setAll(int x, int y, int angle1, int angle2)
     {
         m_x = x;
         m_y = y;
@@ -34,7 +33,7 @@ public:
         m_angle2 = angle2 >= 0 ? angle2 : angle2 + 360;
     }
 
-    void setAll(const QPointF& point, qreal angle)
+    void setAll(const QPoint& point, int angle)
     {
         m_x = point.x();
         m_y = point.y();
@@ -50,7 +49,7 @@ public:
         }
     }
 
-    void setAll(const QPointF& point, qreal angle1, qreal angle2)
+    void setAll(const QPoint& point, int angle1, int angle2)
     {
         m_x = point.x();
         m_y = point.y();
@@ -80,22 +79,21 @@ public:
 
     //friend inline const bool qFuzzyCompare(const LaserPoint& l1, const LaserPoint& l2);
 
-    inline QPointF toPointF() const;
-    inline QVector4D toVector4D() const;
+    inline QPoint toPoint() const;
 
-    qreal length() const;
+    int length() const;
 
 private:
     union 
     {
         struct 
         {
-            qreal m_x;
-            qreal m_y;
-            qreal m_angle1;
-            qreal m_angle2;
+            int m_x;
+            int m_y;
+            int m_angle1;
+            int m_angle2;
         };
-        qreal m_vec[4];
+        int m_vec[4];
     };
 };
 
@@ -193,14 +191,9 @@ inline const LaserPoint operator/(const LaserPoint& l1, const LaserPoint& l2)
 //        qFuzzyCompare(l1.m_angle2, l2.m_angle2);
 //}
 
-inline QPointF LaserPoint::toPointF() const
+inline QPoint LaserPoint::toPoint() const
 {
-    return QPointF(m_x, m_y);
-}
-
-inline QVector4D LaserPoint::toVector4D() const
-{
-    return QVector4D(m_x, m_y, m_angle1, m_angle2);
+    return QPoint(m_x, m_y);
 }
 
 #endif // LASERPOINT_H

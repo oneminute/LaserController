@@ -109,8 +109,8 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
         //LaserApplication::previewWindow->addProgress(this, 1.0 * 0.1 / d->totalNodes, tr("Arranged machining points of node %1.").arg(node->nodeName()));
         if (last)
         {
-            QPointF from = last->arrangedEndingPoint().toPointF();
-            QPointF to = node->arrangedStartingPoint().toPointF();
+            QPoint from = last->arrangedEndingPoint().toPoint();
+            QPoint to = node->arrangedStartingPoint().toPoint();
             /*qLogD << last->nodeName() << " --> " << node->nodeName() << ": "
                 << from << ", " << to;*/
             LaserApplication::previewWindow->addLine(
@@ -138,7 +138,7 @@ void PathOptimizer::optimizeFrom(OptimizeNode* root, ProgressItem* parentProgres
     ProgressItem* optimizeProgress = LaserApplication::progressModel->createSimpleItem(tr("Optimize nodes"), parentProgress);
 
     // 计算泳道宽
-    int laneInterval = qRound(Config::PathOptimization::groupingGridInterval());
+    int laneInterval = Config::PathOptimization::groupingGridInterval();
     Qt::Orientation orient = static_cast<Qt::Orientation>(Config::PathOptimization::groupingOrientation());
 
     // 各泳道节点集合

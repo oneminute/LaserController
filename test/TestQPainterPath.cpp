@@ -130,13 +130,48 @@ void paintTest()
     painter.drawLine(QPointF(1, 0), QPointF(0, 1));
 }
 
+void subPathPolygonsTest1()
+{
+    QPainterPath path;
+    QRect rect(QPoint(0, 0), QPoint(10, 10));
+    path.addRect(rect);
+    QList<QPolygonF> polys = path.toSubpathPolygons();
+    Q_ASSERT(polys.length() == 1);
+    qDebug() << polys[0].length();
+    for (int i = 0; i < polys[0].length(); i++)
+    {
+        qDebug() << polys[0].at(i);
+    }
+}
+
+void subPathPolygonsTest2()
+{
+    QPainterPath path;
+    QPolygonF polyIn;
+    polyIn.append(QPointF(0, 2));
+    polyIn.append(QPointF(2, 3));
+    polyIn.append(QPointF(3, 5));
+    polyIn.append(QPointF(20, 5));
+    polyIn.append(QPointF(12, 8));
+    polyIn.append(QPointF(2, 3));
+    path.addPolygon(polyIn);
+    QPolygonF polys = path.toFillPolygon();
+    //Q_ASSERT(polys.length() == 1);
+    qDebug() << polys.length();
+    for (int i = 0; i < polys.length(); i++)
+    {
+        qDebug() << polys.at(i);
+    }
+}
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
     //PathTest();
     //interactionTest();
-    paintTest();
+    //paintTest();
+    subPathPolygonsTest2();
 
     return app.exec();
 }

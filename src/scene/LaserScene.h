@@ -48,7 +48,7 @@ public:
 	void findSelectedByLine(QRectF rect);
 	void findSelectedByBoundingRect(QRectF rect);
     void selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive);
-    QRectF maxRegion();
+    QRect maxRegion();
     QuadTreeNode* quadTreeNode();
     void updateValidMaxRegionRect();
     void updataValidMaxRegion();
@@ -61,7 +61,7 @@ private:
 	bool m_mouseMoveBlock = false;
 	LaserBitmap* m_detectedBitmap = nullptr;
     QuadTreeNode* m_quadTree;
-    QRectF m_maxRegion;
+    QRect m_maxRegion;
 };
 
 #endif // LASERSCENE_H

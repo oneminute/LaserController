@@ -331,6 +331,8 @@ void ConfigDialog::addConfigItem(ConfigItem * item, QWidget* parent, const QStri
     if (!widget)
         return;
 
+    if (item->name() == "xStepLength")
+        qLogD << item->name() << ", " << item->value();
     InputWidgetWrapper* wrapper = item->bindWidget(widget, SS_NORMAL);
     connect(wrapper, &InputWidgetWrapper::updated, this, &ConfigDialog::onConfigItemUpdated);
     widget->setParent(parent);

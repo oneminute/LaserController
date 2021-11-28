@@ -348,7 +348,7 @@ private:
     QComboBox* m_comboBoxScale;
     QLabel* m_labelPercentage;
     ads::CDockAreaWidget* m_centralDockArea;
-    QRectF m_layoutRect;
+    QRect m_layoutRect;
 
     // Layers Panel widgets
     LaserLayerTableWidget* m_tableWidgetLayers;

@@ -59,17 +59,17 @@ public:
 
     // normal fields
     int cuttingRunSpeed;
-    qreal cuttingMinSpeedPower;
-    qreal cuttingRunSpeedPower;
+    int cuttingMinSpeedPower;
+    int cuttingRunSpeedPower;
     int engravingRunSpeed;
-    qreal engravingLaserPower;
-    qreal engravingMinSpeedPower;
-    qreal engravingRunSpeedPower;
+    int engravingLaserPower;
+    int engravingMinSpeedPower;
+    int engravingRunSpeedPower;
     int engravingRowInterval;
     bool engravingEnableCutting;
     int fillingRunSpeed;
-    qreal fillingMinSpeedPower;
-    qreal fillingRunSpeedPower;
+    int fillingMinSpeedPower;
+    int fillingRunSpeedPower;
     int fillingRowInterval;
     bool fillingEnableCutting;
     int fillingType;
@@ -169,25 +169,25 @@ void LaserLayer::setCuttingRunSpeed(int runSpeed)
     d->cuttingRunSpeed = runSpeed;
 }
 
-qreal LaserLayer::cuttingMinSpeedPower() const
+int LaserLayer::cuttingMinSpeedPower() const
 {
     Q_D(const LaserLayer);
     return d->cuttingMinSpeedPower;
 }
 
-void LaserLayer::setCuttingMinSpeedPower(qreal minSpeedPower)
+void LaserLayer::setCuttingMinSpeedPower(int minSpeedPower)
 {
     Q_D(LaserLayer);
     d->cuttingMinSpeedPower = minSpeedPower;
 }
 
-qreal LaserLayer::cuttingRunSpeedPower() const
+int LaserLayer::cuttingRunSpeedPower() const
 {
     Q_D(const LaserLayer);
     return d->cuttingRunSpeedPower;
 }
 
-void LaserLayer::setCuttingRunSpeedPower(qreal runSpeedPower)
+void LaserLayer::setCuttingRunSpeedPower(int runSpeedPower)
 {
     Q_D(LaserLayer);
     d->cuttingRunSpeedPower = runSpeedPower;
@@ -205,37 +205,37 @@ void LaserLayer::setEngravingRunSpeed(int runSpeed)
     d->engravingRunSpeed = runSpeed;
 }
 
-qreal LaserLayer::engravingLaserPower() const
+int LaserLayer::engravingLaserPower() const
 {
     Q_D(const LaserLayer);
     return d->engravingLaserPower;
 }
 
-void LaserLayer::setEngravingLaserPower(qreal laserPower)
+void LaserLayer::setEngravingLaserPower(int laserPower)
 {
     Q_D(LaserLayer);
     d->engravingLaserPower = laserPower;
 }
 
-qreal LaserLayer::engravingMinSpeedPower() const
+int LaserLayer::engravingMinSpeedPower() const
 {
     Q_D(const LaserLayer);
     return d->engravingMinSpeedPower;
 }
 
-void LaserLayer::setEngravingMinSpeedPower(qreal minSpeedPower)
+void LaserLayer::setEngravingMinSpeedPower(int minSpeedPower)
 {
     Q_D(LaserLayer);
     d->engravingMinSpeedPower = minSpeedPower;
 }
 
-qreal LaserLayer::engravingRunSpeedPower() const
+int LaserLayer::engravingRunSpeedPower() const
 {
     Q_D(const LaserLayer);
     return d->engravingRunSpeedPower;
 }
 
-void LaserLayer::setEngravingRunSpeedPower(qreal runSpeedPower)
+void LaserLayer::setEngravingRunSpeedPower(int runSpeedPower)
 {
     Q_D(LaserLayer);
     d->engravingRunSpeedPower = runSpeedPower;
@@ -277,25 +277,25 @@ void LaserLayer::setFillingRunSpeed(int runSpeed)
     d->fillingRunSpeed = runSpeed;
 }
 
-qreal LaserLayer::fillingMinSpeedPower() const
+int LaserLayer::fillingMinSpeedPower() const
 {
     Q_D(const LaserLayer);
     return d->fillingMinSpeedPower;
 }
 
-void LaserLayer::setFillingMinSpeedPower(qreal minSpeedPower)
+void LaserLayer::setFillingMinSpeedPower(int minSpeedPower)
 {
     Q_D(LaserLayer);
     d->fillingMinSpeedPower = minSpeedPower;
 }
 
-qreal LaserLayer::fillingRunSpeedPower() const
+int LaserLayer::fillingRunSpeedPower() const
 {
     Q_D(const LaserLayer);
     return d->fillingRunSpeedPower;
 }
 
-void LaserLayer::setFillingRunSpeedPower(qreal runSpeedPower)
+void LaserLayer::setFillingRunSpeedPower(int runSpeedPower)
 {
     Q_D(LaserLayer);
     d->fillingRunSpeedPower = runSpeedPower;
@@ -662,27 +662,17 @@ void LaserLayer::setIndex(int i)
 	m_index = i;
 }
 
-QRectF LaserLayer::boundingRect() const
+QRect LaserLayer::boundingRect() const
 {
     Q_D(const LaserLayer);
-    QRectF bounding;
+    QRect bounding;
     utils::boundingRect(d->primitives, bounding);
     return bounding;
 }
 
-QPointF LaserLayer::positionInScene() const 
+QPoint LaserLayer::position() const 
 {
     return boundingRect().topLeft();
-}
-
-QPointF LaserLayer::positionInMech() const
-{
-    return Global::matrixToUm().map(positionInScene());
-}
-
-QPointF LaserLayer::positionInDevice() const
-{
-    return LaserApplication::device->transformToDevice().map(positionInMech());
 }
 
 QCheckBox * LaserLayer::checkBox()
@@ -693,31 +683,6 @@ QCheckBox * LaserLayer::checkBox()
 void LaserLayer::setCheckBox(QCheckBox * box)
 {
     m_checkBox = box;
-}
-
-qreal LaserLayer::accelerationLength(LaserLayerType layerType) const
-{
-    Q_D(const LaserLayer);
-    qreal minSpeed = Config::UserRegister::scanXStartSpeed();
-    qreal acc = Config::UserRegister::scanXAcc();
-    //qreal maxSpeed = i.value()->layer()->engravingRunSpeed() * 1000;
-    //qreal span = (maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2);
-    switch (layerType)
-    {
-    case LLT_CUTTING:
-        //minSpeed = d->min
-        break;
-    case LLT_ENGRAVING:
-        break;
-    case LLT_FILLING:
-        break;
-    }
-    return 0;
-}
-
-qreal LaserLayer::accelerationSegmentLength(LaserLayerType layerType) const
-{
-    return qreal();
 }
 
 void LaserLayer::onClicked()
@@ -731,47 +696,6 @@ void LaserLayer::onClicked()
             scene->addLaserPrimitive(primitive, this, false);
         }
 
-       /* QList<LaserPrimitiveType> types;
-        for (LaserPrimitive* primitive : d->primitives)
-        {
-            if (primitive->isShape())
-            {
-                if (!types.contains(LPT_SHAPE))
-                {
-                    types.append(LPT_SHAPE);
-                }
-            }
-            else if (primitive->isBitmap())
-            {
-                if (!types.contains(LPT_BITMAP))
-                {
-                    types.append(LPT_BITMAP);
-                }
-            }
-            else if (primitive->isText()) {
-                if (!types.contains(LPT_TEXT))
-                {
-                    types.append(LPT_TEXT);
-                }
-            }
-        }
-
-        if (types.size() > 1)
-        {
-            setType(LLT_ENGRAVING);
-        }
-        else if (types[0] == LPT_SHAPE)
-        {
-            setType(LLT_CUTTING);
-        }
-        else if (types[0] == LPT_BITMAP)
-        {
-            setType(LLT_ENGRAVING);
-        }
-        else if (types[0] == LPT_TEXT)
-        {
-            setType(LLT_CUTTING);
-        }*/
         scene->document()->updateLayersStructure();
     }
 }

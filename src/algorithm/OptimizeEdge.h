@@ -26,7 +26,7 @@ public:
 
     void print();
 
-    QLineF toLineInDevice() const;
+    QLine toLine() const;
 
 private:
     QScopedPointer<OptimizeEdgePrivate> d_ptr;

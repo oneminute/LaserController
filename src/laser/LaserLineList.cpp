@@ -3,7 +3,7 @@
 #include <util/Utils.h>
 
 LaserLineList::LaserLineList()
-    : QList<QLineF>()
+    : QList<QLine>()
     , m_kdtree(nullptr)
 {
 }
@@ -31,7 +31,7 @@ void LaserLineList::buildKdtree()
 
     m_matrix.resize(4 * count());
     int i = 0;
-    for (QLineF& line : *this)
+    for (QLine& line : *this)
     {
         m_matrix[i] = line.p1().x();
         m_matrix[i + 1] = line.p1().y();
@@ -39,15 +39,15 @@ void LaserLineList::buildKdtree()
         m_matrix[i + 3] = line.p2().y();
         i += 4;
     }
-    flann::Matrix<qreal> samplePoints = flann::Matrix<qreal>((qreal*)(m_matrix.data()), count() * 2, 2);
+    flann::Matrix<int> samplePoints = flann::Matrix<int>((int*)(m_matrix.data()), count() * 2, 2);
     flann::KDTreeSingleIndexParams singleIndexParams = flann::KDTreeSingleIndexParams(10);
-    m_kdtree = new flann::KDTreeSingleIndex<flann::L2_Simple<qreal>>(samplePoints, singleIndexParams);
+    m_kdtree = new flann::KDTreeSingleIndex<flann::L2_Simple<int>>(samplePoints, singleIndexParams);
     m_kdtree->buildIndex();
 }
 
-QLineF LaserLineList::nearestSearch(const QPointF& point, bool remove)
+QLine LaserLineList::nearestSearch(const QPoint& point, bool remove)
 {
-    QVector<qreal> queries;
+    QVector<int> queries;
     queries.resize(2);
     queries[0] = point.x();
     queries[1] = point.y();
@@ -56,21 +56,21 @@ QLineF LaserLineList::nearestSearch(const QPointF& point, bool remove)
     indices.resize(1);
     flann::Matrix<int> indicesMatrix(indices.data(), 1, 1);
 
-    QVector<qreal> dists;
+    QVector<float> dists;
     dists.resize(1);
-    flann::Matrix<qreal> distsMatrix(dists.data(), 1, 1);
+    flann::Matrix<float> distsMatrix(dists.data(), 1, 1);
 
     flann::SearchParams searchParams = flann::SearchParams(128);
     searchParams.use_heap = flann::FLANN_True;
-    flann::Matrix<qreal> queryMatrix = flann::Matrix<qreal>(queries.data(), 1, 2);
+    flann::Matrix<int> queryMatrix = flann::Matrix<int>(queries.data(), 1, 2);
     m_kdtree->knnSearch(queryMatrix, indicesMatrix, distsMatrix, 1, searchParams);
 
     int index = indices[0];
-    QPointF dstPoint(m_matrix[index * 2], m_matrix[index * 2 + 1]);
-    QLineF line = at(index >> 1);
-    if (utils::fuzzyCompare(dstPoint, line.p2()))
+    QPoint dstPoint(m_matrix[index * 2], m_matrix[index * 2 + 1]);
+    QLine line = at(index >> 1);
+    if (dstPoint == line.p2())
     {
-        line = QLineF(line.p2(), line.p1());
+        line = QLine(line.p2(), line.p1());
     }
     if (remove)
     {

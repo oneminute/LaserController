@@ -27,14 +27,14 @@ public:
 
     OptimizeNode* nearestSearch(OptimizeNode* srcNode, bool remove = true);
 
-    QList<QPointF> toPoints() const;
+    QList<QPoint> toPoints() const;
 
     QPainterPath toPainterPath() const;
 
 private:
-    QVector<qreal> m_matrix;
-    QVector<qreal> m_weights;
-    flann::NNIndex<flann::L2_Simple<qreal>>* m_kdtree;
+    QVector<int> m_matrix;
+    QVector<int> m_weights;
+    flann::NNIndex<flann::L2_Simple<int>>* m_kdtree;
     QMap<int, OptimizeNode*> m_indexNodeMap;
     QMultiMap<OptimizeNode*, int> m_nodeIndicesMap;
     QMap<int, int> m_indexMap;

@@ -17,11 +17,10 @@ class ConfigItem: public QObject
 public:
     typedef std::function<QWidget*(ConfigItem*)> CreateWidgetHook;
     typedef std::function<void(QWidget*, ConfigItem*, InputWidgetWrapper*)> WidgetInitializeHook;
-    typedef std::function<QVariant(const QVariant&)> ValueHook;
     typedef std::function<void(ConfigItem*)> DestroyHook;
     typedef std::function<QJsonObject(const ConfigItem*)> ToJsonHook;
     typedef std::function<void(QVariant& value, QVariant& defaultValue, const QJsonObject&, ConfigItem*)> FromJsonHook;
-    typedef std::function<void(QWidget* widget, const QVariant& value)> UpdateWidgetValueHook;
+    typedef std::function<QVariant(QWidget* widget, const QVariant& value)> WidgetValueHook;
     typedef std::function<void(QWidget*, ConfigItem*)> RetranslateHook;
 
     explicit ConfigItem(const QString& name
@@ -105,21 +104,21 @@ protected:
     void setWidgetInitializeHook(WidgetInitializeHook fn);
     void doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper);
 
-    /// <summary>
+    /*/// <summary>
     /// 当填充控件值时的回调函数
     /// </summary>
     /// <returns></returns>
     ValueHook valueToWidgetHook();
     void setValueToWidgetHook(ValueHook fn);
-    QVariant doValueToWidgetHook(const QVariant& value) const;
+    QVariant doValueToWidgetHook(const QVariant& value) const;*/
 
     /// <summary>
     /// 当用控件的值改写选项值时的回调函数
     /// </summary>
     /// <returns></returns>
-    ValueHook valueFromWidgetHook();
-    void setValueFromWidgetHook(ValueHook fn);
-    QVariant doValueFromWidgetHook(const QVariant& value);
+    WidgetValueHook valueFromWidgetHook();
+    void setValueFromWidgetHook(WidgetValueHook fn);
+    QVariant doValueFromWidgetHook(QWidget* widget, const QVariant& value);
 
     /// <summary>
     /// 当创建控件时的回调函数
@@ -153,8 +152,8 @@ protected:
     void setFromJsonHook(FromJsonHook fn);
     void doFromJsonHook(const QJsonObject& json);
 
-    UpdateWidgetValueHook updateWidgetValueHook();
-    void setUpdateWidgetValueHook(UpdateWidgetValueHook fn);
+    WidgetValueHook updateWidgetValueHook();
+    void setUpdateWidgetValueHook(WidgetValueHook fn);
     bool doUpdateWidgetValueHook(QWidget* widget, const QVariant& value);
 
     RetranslateHook retranslateHook();

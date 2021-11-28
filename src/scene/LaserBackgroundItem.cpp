@@ -18,7 +18,7 @@ LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem * parent)
 	: QGraphicsItemGroup(parent)
 {
 	//QRectF rect = LaserApplication::device->layoutRectInScene();
-	QRectF rect = LaserApplication::device->layoutRectInDevice();
+	QRect rect = LaserApplication::device->layoutRect();
     qDebug() << "deivce bounds in device:" << rect;
 
 	m_rectItem = new QGraphicsRectItem(rect);
@@ -74,7 +74,7 @@ void LaserBackgroundItem::onChangeGrids()
 		m_gridSecondNodeYList.clear();
 	}
 
-	QRect rect = LaserApplication::device->layoutRectInDevice();
+	QRect rect = LaserApplication::device->layoutRect();
 	int spacing = Config::Ui::visualGridSpacing() * 1000; //um
 	int width = rect.width();
 	int height = rect.height();
@@ -117,7 +117,7 @@ void LaserBackgroundItem::onChangeGrids()
 
 void LaserBackgroundItem::drawGrids(QPainter& painter)
 {
-	QRect rect = LaserApplication::device->layoutRectInDevice();
+	QRect rect = LaserApplication::device->layoutRect();
 	int left = rect.left();
 	int right = rect.right();
 	int top = rect.top();
@@ -240,7 +240,7 @@ QRectF LaserBackgroundItem::rect()
 void LaserBackgroundItem::onLayoutChanged(const QSizeF& size)
 {
 	//QRectF rect = LaserApplication::device->layoutRectInScene();
-	QRectF rect = LaserApplication::device->layoutRectInDevice();
+	QRect rect = LaserApplication::device->layoutRect();
     qDebug() << "deivce bounds in device:" << rect;
 	m_rectItem->setRect(rect);
 }

@@ -108,30 +108,30 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (scene()->document())
         {
             // 绘制填充和雕刻外包框
-            QRectF rect = scene()->document()->docBoundingRectInScene(true);
+            QRect rect = scene()->document()->absoluteDocBoundingRect(true);
             if (rect.isValid())
             {
                 painter.setPen(QPen(Qt::green, 1, Qt::DashLine));
-                QPolygonF gridBounds = mapFromScene(rect);
+                QPolygon gridBounds = mapFromScene(rect);
                 painter.drawPolygon(gridBounds);
             }
 
             // 绘制文档外包框
-            rect = scene()->document()->docBoundingRectInScene();
+            rect = scene()->document()->absoluteDocBoundingRect();
             if (rect.isValid())
             {
                 painter.setPen(QPen(Qt::darkGray, 1, Qt::DashLine));
-                QPolygonF gridBounds = mapFromScene(rect);
+                QPolygon gridBounds = mapFromScene(rect);
                 painter.drawPolygon(gridBounds);
             }
 
             // 绘制文档外包框上的作业原点
             if (Config::Device::startFrom() != SFT_AbsoluteCoords)
             {
-                QPointF jobOrigin = scene()->document()->jobOriginInScene();
+                QPoint jobOrigin = scene()->document()->jobOriginOnDocBoundingRect();
                 painter.setPen(QPen(Qt::darkGreen));
-                QPointF origin = mapFromScene(jobOrigin);
-                QRectF originRect(origin - QPointF(2, 2), origin + QPointF(2, 2));
+                QPoint origin = mapFromScene(jobOrigin);
+                QRectF originRect(origin - QPoint(2, 2), origin + QPoint(2, 2));
                 painter.drawRect(originRect);
             }
         }
@@ -140,54 +140,53 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (Config::Device::startFrom() == SFT_UserOrigin)
         {
             painter.setPen(QPen(Qt::darkYellow));
-            QPointF userOrigin = mapFromScene(LaserApplication::device->userOriginInScene());
-            QRectF originRect(userOrigin - QPointF(2, 2), userOrigin + QPointF(2, 2));
+            QPoint userOrigin = mapFromScene(LaserApplication::device->userOrigin());
+            QRect originRect(userOrigin - QPoint(2, 2), userOrigin + QPoint(2, 2));
             painter.drawEllipse(originRect);
-            qreal lineLength = 5;
-            painter.drawLine(userOrigin + QPointF(3, 0), userOrigin + QPointF(3 + lineLength, 0));
-            painter.drawLine(userOrigin - QPointF(3, 0), userOrigin - QPointF(3 + lineLength, 0));
-            painter.drawLine(userOrigin + QPointF(0, 3), userOrigin + QPointF(0, 3 + lineLength));
-            painter.drawLine(userOrigin - QPointF(0, 3), userOrigin - QPointF(0, 3 + lineLength));
+            int lineLength = 5;
+            painter.drawLine(userOrigin + QPoint(3, 0), userOrigin + QPoint(3 + lineLength, 0));
+            painter.drawLine(userOrigin - QPoint(3, 0), userOrigin - QPoint(3 + lineLength, 0));
+            painter.drawLine(userOrigin + QPoint(0, 3), userOrigin + QPoint(0, 3 + lineLength));
+            painter.drawLine(userOrigin - QPoint(0, 3), userOrigin - QPoint(0, 3 + lineLength));
         }
 
         // 绘制设备原点
 		painter.setPen(QPen(Qt::blue, 2));
-		QPointF deviceOrigin = mapFromScene(LaserApplication::device->originInDevice());
-		QRectF deviceOriginRect(deviceOrigin - QPointF(2, 2), deviceOrigin + QPointF(2, 2));
+		QPoint deviceOrigin = mapFromScene(LaserApplication::device->origin());
+		QRect deviceOriginRect(deviceOrigin - QPoint(2, 2), deviceOrigin + QPoint(2, 2));
         painter.drawEllipse(deviceOriginRect);
-        qreal lineLength = 5;
-        painter.drawLine(deviceOrigin + QPointF(3, 0), deviceOrigin + QPointF(3 + lineLength, 0));
-        painter.drawLine(deviceOrigin - QPointF(3, 0), deviceOrigin - QPointF(3 + lineLength, 0));
-        painter.drawLine(deviceOrigin + QPointF(0, 3), deviceOrigin + QPointF(0, 3 + lineLength));
-        painter.drawLine(deviceOrigin - QPointF(0, 3), deviceOrigin - QPointF(0, 3 + lineLength));
+        int lineLength = 5;
+        painter.drawLine(deviceOrigin + QPoint(3, 0), deviceOrigin + QPoint(3 + lineLength, 0));
+        painter.drawLine(deviceOrigin - QPoint(3, 0), deviceOrigin - QPoint(3 + lineLength, 0));
+        painter.drawLine(deviceOrigin + QPoint(0, 3), deviceOrigin + QPoint(0, 3 + lineLength));
+        painter.drawLine(deviceOrigin - QPoint(0, 3), deviceOrigin - QPoint(0, 3 + lineLength));
 
         // 绘制选点切割
         PointPairList pairs = LaserApplication::mainWindow->printAndCutPoints();
         for (const PointPair& pair : pairs)
         {
-            QPointF canvasPoint = LaserApplication::device->transformDeviceToScene().map(pair.second);
             painter.setPen(QPen(Qt::red, 2));
-            canvasPoint = mapFromScene(canvasPoint);
-            QRectF canvasPointRect(canvasPoint - QPointF(2, 2), canvasPoint + QPointF(2, 2));
+            QPoint canvasPoint = mapFromScene(pair.second);
+            QRect canvasPointRect(canvasPoint - QPoint(2, 2), canvasPoint + QPoint(2, 2));
             painter.drawRect(canvasPointRect);
         }
 	}
 
     if (m_showLaserPos)
     {
-        QPointF laserPos = mapFromScene(LaserApplication::device->laserPositionInScene());
-		QRectF rect(laserPos - QPointF(2, 2), laserPos + QPointF(2, 2));
+        QPoint laserPos = mapFromScene(LaserApplication::device->laserPosition());
+		QRect rect(laserPos - QPoint(2, 2), laserPos + QPoint(2, 2));
         painter.setPen(QPen(Qt::red, 1));
         painter.drawEllipse(rect);
-        qreal lineLength = 5;
-        painter.drawLine(laserPos + QPointF(3, 0), laserPos + QPointF(3 + lineLength, 0));
-        painter.drawLine(laserPos - QPointF(3, 0), laserPos - QPointF(3 + lineLength, 0));
-        painter.drawLine(laserPos + QPointF(0, 3), laserPos + QPointF(0, 3 + lineLength));
-        painter.drawLine(laserPos - QPointF(0, 3), laserPos - QPointF(0, 3 + lineLength));
-        painter.drawLine(laserPos + QPointF(2, 2), laserPos + QPointF(4, 4));
-        painter.drawLine(laserPos + QPointF(-2, -2), laserPos + QPointF(-4, -4));
-        painter.drawLine(laserPos + QPointF(2, -2), laserPos + QPointF(4, -4));
-        painter.drawLine(laserPos + QPointF(-2, 2), laserPos + QPointF(-4, 4));
+        int lineLength = 5;
+        painter.drawLine(laserPos + QPoint(3, 0), laserPos + QPoint(3 + lineLength, 0));
+        painter.drawLine(laserPos - QPoint(3, 0), laserPos - QPoint(3 + lineLength, 0));
+        painter.drawLine(laserPos + QPoint(0, 3), laserPos + QPoint(0, 3 + lineLength));
+        painter.drawLine(laserPos - QPoint(0, 3), laserPos - QPoint(0, 3 + lineLength));
+        painter.drawLine(laserPos + QPoint(2, 2), laserPos + QPoint(4, 4));
+        painter.drawLine(laserPos + QPoint(-2, -2), laserPos + QPoint(-4, -4));
+        painter.drawLine(laserPos + QPoint(2, -2), laserPos + QPoint(4, -4));
+        painter.drawLine(laserPos + QPoint(-2, 2), laserPos + QPoint(-4, 4));
     }
 
 	//painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
@@ -199,10 +198,9 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	    painter.setPen(QPen(Qt::red, 1, Qt::SolidLine));
         for (const PointPair& pt : LaserApplication::mainWindow->printAndCutPoints())
         {
-            QPointF point = LaserApplication::device->transformDeviceToScene().map(pt.second);
-            point = mapFromScene(point);
-            QLineF line1(point + QPointF(-3, -3), point + QPointF(3, 3));
-            QLineF line2(point + QPointF(-3, 3), point + QPointF(3, -3));
+            QPoint point = mapFromScene(pt.second);
+            QLine line1(point + QPoint(-3, -3), point + QPoint(3, 3));
+            QLine line2(point + QPoint(-3, 3), point + QPoint(3, -3));
             painter.drawLine(line1);
             painter.drawLine(line2);
         }
@@ -434,7 +432,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 		painter.drawPolygon(boundingRect);
 	}*/
 }
-void LaserViewer::detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom) {
+void LaserViewer::detectRect(LaserPrimitive& item, int i, int& left, int& right, int& top, int& bottom) {
 	QRectF boundingRect = item.sceneBoundingRect();
 	if (i == 0) {
 		left = boundingRect.left();
@@ -462,17 +460,17 @@ void LaserViewer::detectRect(LaserPrimitive& item, int i, qreal& left, qreal& ri
 	}
 }
 
-QRectF LaserViewer::selectedItemsSceneBoundingRect() {
-	QRectF rect;
+QRect LaserViewer::selectedItemsSceneBoundingRect() {
+	QRect rect;
 	
 	if (!m_group) {
 		return rect;
 	}
 
-	qreal left = 0;
-	qreal right = 0;
-	qreal top = 0;
-	qreal bottom = 0;
+	int left = 0;
+	int right = 0;
+	int top = 0;
+	int bottom = 0;
 
     QList<LaserPrimitive*> primitives;
     for (QGraphicsItem* item : m_group->childItems())
@@ -481,7 +479,7 @@ QRectF LaserViewer::selectedItemsSceneBoundingRect() {
         if (primitive)
             primitives.append(primitive);
     }
-    utils::boundingRect(primitives, rect, QRectF(), false);
+    utils::boundingRect(primitives, rect, QRect(), false);
 	return rect;
 }
 QRectF LaserViewer::AllItemsSceneBoundingRect()
@@ -2232,9 +2230,9 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         }
         QRectF rect(QPointF(left, top), QPointF(right, bottom));
         if (rect.width() != 0 && rect.height() != 0) {
-            LaserRect* rectItem = new LaserRect(rect, 0, m_scene->document(), QTransform(), m_curLayerIndex);
+            LaserRect* rectItem = new LaserRect(rect.toRect(), 0, m_scene->document(), QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
-            if (m_scene->maxRegion().contains(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint))) {
+            if (m_scene->maxRegion().contains(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint).toRect())) {
                 //undo 创建完后会执行redo
                 QList<QGraphicsItem*> list;
                 list.append(rectItem);
@@ -2259,10 +2257,10 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			return;
 		}
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
-        LaserEllipse* ellipseItem = new LaserEllipse(rect, m_scene->document(), QTransform(), m_curLayerIndex);
+        LaserEllipse* ellipseItem = new LaserEllipse(rect.toRect(), m_scene->document(), QTransform(), m_curLayerIndex);
         //m_scene->addLaserPrimitive(ellipseItem);
         //判断是否在4叉树的有效区域内
-        if (m_scene->maxRegion().contains(rect)) {
+        if (m_scene->maxRegion().contains(rect.toRect())) {
             //undo 创建完后会执行redo
             QList<QGraphicsItem*> list;
             list.append(ellipseItem);
@@ -2297,10 +2295,11 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		if (m_creatingLineStartPoint != m_creatingLineEndPoint) {
 			if (event->button() == Qt::LeftButton) {
 				QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
-				LaserLine* lineItem = new LaserLine(line, m_scene->document(), QTransform(), m_curLayerIndex);
+				LaserLine* lineItem = new LaserLine(line.toLine(), m_scene->document(), QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(lineItem);
                 //判断是否在4叉树的有效区域内
-                if (m_scene->maxRegion().contains(m_creatingLineStartPoint) && m_scene->maxRegion().contains(m_creatingLineEndPoint)) {
+                if (m_scene->maxRegion().contains(m_creatingLineStartPoint.toPoint()) && 
+                    m_scene->maxRegion().contains(m_creatingLineEndPoint.toPoint())) {
                     //undo 创建完后会执行redo
                     QList<QGraphicsItem*> list;
                     list.append(lineItem);
@@ -2360,12 +2359,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				m_creatingPolygonLines.append(QLineF(m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1], m_creatingPolygonEndPoint));
 				m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
 				LaserPrimitive* primitive;
-				LaserPolyline * curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document(),
+				LaserPolyline * curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
 					QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(curPolyline);
 				primitive = curPolyline;
 				if (m_creatingPolygonEndPoint == m_creatingPolygonStartPoint) {
-					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints), m_scene->document(),
+					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
 						QTransform(), m_curLayerIndex);
 					//m_scene->addLaserPrimitive(polygon);
 					//onReplaceGroup(polygon);
@@ -2375,7 +2374,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 					primitive = polygon;
 				}	
                 //判断是否在4叉树的有效区域内
-                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint)) {
+                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
                     //undo
                     PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, primitive);
                     m_undoStack->push(polyCmd);
@@ -2390,7 +2389,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
 		else if (event->button() == Qt::RightButton) {
 			if ( m_creatingPolygonPoints.size() > 0) {
-				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints), m_scene->document(), 
+				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(), 
 					QTransform(), m_curLayerIndex);
 				//m_scene->addLaserPrimitive(polyLine);
 				//onReplaceGroup(polyLine);
@@ -3799,13 +3798,14 @@ bool LaserViewer::detectBoundsInMaxRegion(QRectF bounds)
 {
     //垂直或水平线，点的情况
     if (bounds.width() == 0 || bounds.height() == 0) {
-        if (!m_scene->maxRegion().contains(bounds.topLeft()) || !m_scene->maxRegion().contains(bounds.bottomRight())) {
+        if (!m_scene->maxRegion().contains(bounds.topLeft().toPoint()) || 
+            !m_scene->maxRegion().contains(bounds.bottomRight().toPoint())) {
             QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
             return false;
         }
     }
     else {
-        if (!m_scene->maxRegion().contains(bounds)) {
+        if (!m_scene->maxRegion().contains(bounds.toRect())) {
             QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
             return false;
         }
@@ -3950,7 +3950,8 @@ void LaserViewer::addText(QString str)
     }
     QLineF cursorLine = modifyTextCursor();
     //判断是否在4叉树的有效区域内
-    if (!m_scene->maxRegion().contains(cursorLine.p1()) || !m_scene->maxRegion().contains(cursorLine.p2())) {
+    if (!m_scene->maxRegion().contains(cursorLine.p1().toPoint()) || 
+        !m_scene->maxRegion().contains(cursorLine.p2().toPoint())) {
         QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
         //OverstepMessageBoxWarn msgBox;
         //msgBox.exec();

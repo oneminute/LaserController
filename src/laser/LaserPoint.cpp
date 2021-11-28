@@ -13,7 +13,7 @@ LaserPoint::LaserPoint()
 {
 }
 
-LaserPoint::LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_)
+LaserPoint::LaserPoint(int x_, int y_, int angle1_, int angle2_)
     : m_x(x_)
     , m_y(y_)
     , m_angle1(angle1_)
@@ -21,7 +21,7 @@ LaserPoint::LaserPoint(qreal x_, qreal y_, qreal angle1_, qreal angle2_)
 {
 }
 
-LaserPoint::LaserPoint(const QPointF& point, qreal angle1_, qreal angle2_)
+LaserPoint::LaserPoint(const QPoint& point, int angle1_, int angle2_)
     : m_x(point.x())
     , m_y(point.y())
     , m_angle1(angle1_)
@@ -32,19 +32,19 @@ LaserPoint::LaserPoint(const QPointF& point, qreal angle1_, qreal angle2_)
 
 int LaserPoint::vectorSize()
 {
-    return sizeof(m_vec) / sizeof(qreal);
+    return sizeof(m_vec) / sizeof(int);
 }
 
-qreal* LaserPoint::vector()
+int* LaserPoint::vector()
 {
     return m_vec;
 }
 
 int LaserPoint::laneIndex() const
 {
-    qreal coord = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?
+    int coord = Config::PathOptimization::groupingOrientation() == Qt::Horizontal ?
         m_y : m_x;
-    int index = qRound(coord / (Config::PathOptimization::groupingGridInterval() * 1000));
+    int index = coord / (Config::PathOptimization::groupingGridInterval() * 1000);
     return index;
 }
 
@@ -68,10 +68,10 @@ LaserPoint& LaserPoint::operator-=(const LaserPoint& laserPoint)
 
 LaserPoint& LaserPoint::operator*=(float factor)
 {
-    m_x *= factor;
-    m_y *= factor;
-    m_angle1 *= factor;
-    m_angle2 *= factor;
+    m_x = qRound(m_x * factor);
+    m_y = qRound(m_y * factor);
+    m_angle1 = qRound(m_angle1 * factor);
+    m_angle2 = qRound(m_angle2 * factor);
     return *this;
 }
 
@@ -86,14 +86,14 @@ LaserPoint& LaserPoint::operator*=(const LaserPoint& laserPoint)
 
 LaserPoint& LaserPoint::operator/=(float factor)
 {
-    m_x /= factor;
-    m_y /= factor;
-    m_angle1 /= factor;
-    m_angle2 /= factor;
+    m_x = qRound(m_x / factor);
+    m_y = qRound(m_y / factor);
+    m_angle1 = qRound(m_angle1 / factor);
+    m_angle2 = qRound(m_angle2 / factor);
     return *this;
 }
 
-qreal LaserPoint::length() const
+int LaserPoint::length() const
 {
     return qSqrt(m_x * m_x + m_y * m_y);
 }

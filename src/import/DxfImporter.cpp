@@ -71,11 +71,10 @@ void DxfImporter::importImpl(const QString& filename, LaserScene* scene, QList<L
     LaserDocument* laserDoc = scene->document();
     laserDoc->blockSignals(true);
 
-    QRectF deviceRect = LaserApplication::device->layoutRectInScene();
-    qreal scaleX = Global::mmToSceneHF(1);
-    qreal scaleY = Global::mmToSceneVF(1);
+    QRect deviceRect = LaserApplication::device->layoutRect();
 
-    QTransform t(scaleX, 0, 0, -scaleY, 0, deviceRect.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
+    // 毫米转微米
+    QTransform t(1000, 0, 0, -1000, 0, deviceRect.height()); //= QTransform::fromScale(scaleX, -scaleY).translate(0, -page.m_height());
 
     const DxfEntitiesNode& entities = d->documentNode->entities();
     progress->setMaximum(entities.length());

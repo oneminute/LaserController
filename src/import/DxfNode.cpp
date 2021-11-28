@@ -1212,11 +1212,11 @@ LaserPrimitive* DxfLWPolylineNode::convertTo(LaserDocument* doc, const QTransfor
     }
     if (d->polylineFlag == 0)
     {
-        primitive = new LaserPolyline(t.map(polygon), doc);
+        primitive = new LaserPolyline(t.map(polygon).toPolygon(), doc);
     }
     else if (d->polylineFlag == 1)
     {
-        primitive = new LaserPolygon(t.map(polygon), doc);
+        primitive = new LaserPolygon(t.map(polygon).toPolygon(), doc);
     }
     return primitive;
 }
@@ -1333,7 +1333,7 @@ LaserPrimitive* DxfCircleNode::convertTo(LaserDocument* doc, const QTransform& t
     Q_D(const DxfCircleNode);
     QPointF center = d->center.toPointF();
     QRectF rect(center.x() - d->radius, center.y() - d->radius, d->radius * 2, d->radius * 2);
-    LaserEllipse* primitive = new LaserEllipse(t.mapRect(rect), doc);
+    LaserEllipse* primitive = new LaserEllipse(t.mapRect(rect).toRect(), doc);
     return primitive;
 }
 
@@ -1547,7 +1547,7 @@ LaserPrimitive* DxfLineNode::convertTo(LaserDocument* doc, const QTransform& t) 
 {
     Q_D(const DxfLineNode);
     QLineF line(d->startPoint.toPointF(), d->endPoint.toPointF());
-    LaserLine* primitive = new LaserLine(t.map(line), doc);
+    LaserLine* primitive = new LaserLine(t.map(line).toLine(), doc);
     return primitive;
 }
 
@@ -2202,7 +2202,7 @@ LaserPrimitive* DxfImageNode::convertTo(LaserDocument* doc, const QTransform& t)
 
     QRectF bounding(d->insertionPoint.toPointF(), 
         QSize(d->uVector.x() * d->imageSize.width(), d->vVector.y() * d->imageSize.height()));
-    LaserBitmap* primitive = new LaserBitmap(image, t.mapRect(bounding), doc);
+    LaserBitmap* primitive = new LaserBitmap(image, t.mapRect(bounding).toRect(), doc);
     return primitive;
 }
 

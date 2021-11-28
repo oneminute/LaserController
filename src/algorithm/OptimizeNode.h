@@ -55,9 +55,6 @@ public:
     void findSiblings(QSet<OptimizeNode*>& leaves, QSet<OptimizeNode*>& branches,
         const QSet<OptimizeNode*>& excludes = QSet<OptimizeNode*>());
 
-    QPointF positionInScene() const;
-    QPointF positionInDevice() const;
-
     void update(ProgressItem* parentProgress);
 
     ILaserDocumentItem* documentItem() const;

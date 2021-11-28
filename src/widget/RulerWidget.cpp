@@ -105,7 +105,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		return;
 	}
 	//m_original = m_viewer->mapFromScene(backgroundItem->pos());
-    m_original = m_viewer->mapFromScene(LaserApplication::device->originInScene());
+    m_original = m_viewer->mapFromScene(LaserApplication::device->origin());
 	int textCoef = 1 * m_flag;
 	if (m_scale >= 1.0 && m_scale < 22) {
 		m_unit = m_millimeter;

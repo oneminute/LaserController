@@ -49,8 +49,9 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
     QRectF viewBox = svgDoc->viewBox();
     
     QSize svgSize = svgDoc->size();
-    qreal docScaleWidth = svgSize.width() * 1.0 / viewBox.width();
-    qreal docScaleHeight = svgSize.height() * 1.0 / viewBox.height();
+    // 转换为微米
+    qreal docScaleWidth = svgSize.width() * 1000.0 / viewBox.width();
+    qreal docScaleHeight = svgSize.height() * 1000.0 / viewBox.height();
 
     doc->blockSignals(true);
 
@@ -97,14 +98,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
 			QRectF bounds = matrix.mapRect(svgEllipseNode->bounds());
-            item = new LaserEllipse(bounds, doc);
+            item = new LaserEllipse(bounds.toRect(), doc);
         }
             break;
         case QSvgNode::LINE:
         {
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
 			QLineF line = matrix.map(svgLineNode->line());
-            item = new LaserLine(line, doc);
+            item = new LaserLine(line.toLine(), doc);
         }
             break;
         case QSvgNode::ARC:
@@ -120,14 +121,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgPolygon* svgPolygonNode = reinterpret_cast<QSvgPolygon*>(node);
 			QPolygonF polygon = matrix.map(svgPolygonNode->polygon());
-            item = new LaserPolygon(polygon, doc);
+            item = new LaserPolygon(polygon.toPolygon(), doc);
         }
             break;
         case QSvgNode::POLYLINE:
         {
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
 			QPolygonF polyline = matrix.map(svgPolylineNode->polyline());
-            item = new LaserPolyline(polyline, doc);
+            item = new LaserPolyline(polyline.toPolygon(), doc);
         }
             break;
         case QSvgNode::RECT:
@@ -140,7 +141,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
                     qreal cornerRaius = Global::mmToSceneHF(svgRectNode->rx()) * docScaleWidth;
-					item = new LaserRect(rect, cornerRaius, doc);
+					item = new LaserRect(rect.toRect(), cornerRaius, doc);
 					qDebug() << "rect:" << rect;
 				}
             }
@@ -184,7 +185,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
 			QRectF bounds = matrix.mapRect(svgImageNode->imageBounds());
-            item = new LaserBitmap(svgImageNode->image(), bounds, doc);
+            item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc);
         }
             break;
         default:
@@ -201,7 +202,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
                 QTransform t1 = QTransform(
 					t.m11(), t.m12(), t.m13(),
 					t.m21(), t.m22(), t.m23(),
-					Global::mmToSceneHF(t.m31() * docScaleWidth), Global::mmToSceneVF(t.m32() * docScaleHeight), t.m33()
+					t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
 				);
 				
                 t = t1;
