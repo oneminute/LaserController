@@ -264,6 +264,10 @@
    <addaction name="separator"/>
    <addaction name="actionMirrorHorizontal"/>
    <addaction name="actionMirrorVertical"/>
+   <addaction name="separator"/>
+   <addaction name="actionAlignCenter"/>
+   <addaction name="actionAlignVertical"/>
+   <addaction name="actionAlignHorizontal"/>
   </widget>
   <widget class="QToolBar" name="textFontBar">
    <property name="windowTitle">
@@ -1396,6 +1400,102 @@
   <action name="action4">
    <property name="text">
     <string>1</string>
+   </property>
+  </action>
+  <action name="actionAlignCenter">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/selected_center.png</normaloff>:/ui/icons/images/selected_center.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignCenter</string>
+   </property>
+   <property name="toolTip">
+    <string>Align both horizontal and vertical centers</string>
+   </property>
+  </action>
+  <action name="actionAlignVerticalLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/vertical_left.png</normaloff>:/ui/icons/images/vertical_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignVerticalLeft</string>
+   </property>
+   <property name="toolTip">
+    <string>Align vertical left</string>
+   </property>
+  </action>
+  <action name="actionAlignVerticalRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/vertical_right.png</normaloff>:/ui/icons/images/vertical_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignVerticalRight</string>
+   </property>
+   <property name="toolTip">
+    <string>Align vertical right</string>
+   </property>
+  </action>
+  <action name="actionAlignVerticalMiddle">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/vertical_middle.png</normaloff>:/ui/icons/images/vertical_middle.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignVerticalMiddle</string>
+   </property>
+   <property name="toolTip">
+    <string>Align vertical middle</string>
+   </property>
+  </action>
+  <action name="actionAlignVertical">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/vertical_middle.png</normaloff>:/ui/icons/images/vertical_middle.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignVertical</string>
+   </property>
+   <property name="toolTip">
+    <string>Selected align vertical</string>
+   </property>
+  </action>
+  <action name="actionAlignHorizontal">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/horizontal_middle.png</normaloff>:/ui/icons/images/horizontal_middle.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignHorizontal</string>
+   </property>
+   <property name="toolTip">
+    <string>Selected align horizontal</string>
+   </property>
+  </action>
+  <action name="actionAlighnHorinzontalTop">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/horizontal_top.png</normaloff>:/ui/icons/images/horizontal_top.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlighnHorinzontalTop</string>
+   </property>
+   <property name="toolTip">
+    <string>Alighn horinzontal Top</string>
+   </property>
+  </action>
+  <action name="actionalignHorinzontalBottom">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/horizontal_bottom.png</normaloff>:/ui/icons/images/horizontal_bottom.png</iconset>
+   </property>
+   <property name="text">
+    <string>alignHorinzontalBottom</string>
+   </property>
+   <property name="toolTip">
+    <string>Align horinzontal bottom</string>
    </property>
   </action>
  </widget>

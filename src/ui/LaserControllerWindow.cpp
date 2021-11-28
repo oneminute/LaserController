@@ -2132,8 +2132,6 @@ void LaserControllerWindow::createPrintAndCutPanel()
 
     m_dockPrintAndCut = dockWidget;
     m_dockAreaPrintAndCut = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaOperations);
-    //m_dockPrintAndCut->setFloating();
-    //m_dockAreaPrintAndCut->setBaseSize(QSize(300, 500));
 }
 
 void LaserControllerWindow::createShapePropertyDockPanel()
@@ -2202,7 +2200,6 @@ void LaserControllerWindow::createShapePropertyDockPanel()
                     break;
                 }
             }
-            
         
     });*/
     //cornerRadius
@@ -2501,6 +2498,21 @@ void LaserControllerWindow::showShapePropertyPanel()
             //m_lockedLabel->setText("LPT_BITMAP");
             break;
         }
+        case LPT_PATH: {
+            m_pathPropertyLayout->setMargin(10);
+            m_pathPropertyLayout->setSpacing(10);
+            m_pathPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+            m_pathPropertyLayout->addWidget(m_cutOrderPriorityLabel, 0, 0, Qt::AlignRight);
+            m_pathPropertyLayout->addWidget(m_cutOrderPriority, 0, 1);
+            m_pathPropertyLayout->addWidget(m_powerScaleLabel, 1, 0, Qt::AlignRight);
+            m_pathPropertyLayout->addWidget(m_powerScale, 1, 1);
+            m_pathPropertyLayout->addWidget(m_lockedLabel, 2, 0, Qt::AlignRight);
+            m_pathPropertyLayout->addWidget(m_locked, 2, 1);
+
+            m_pathPropertyWidget->setLayout(m_pathPropertyLayout);
+            m_propertyDockWidget->setWidget(m_pathPropertyWidget);
+        }
     }
     
 
@@ -2543,7 +2555,9 @@ void LaserControllerWindow::createPrimitivePropertiesPanel()
     //null
     m_nullPropertyLayout = new QGridLayout();
     m_nullPropertyWidget = new QWidget();
-    
+    //path
+    m_pathPropertyLayout = new QGridLayout();
+    m_pathPropertyWidget = new QWidget();
 }
 
 void LaserControllerWindow::createPrimitiveLinePropertyPanel()
