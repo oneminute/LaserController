@@ -146,6 +146,9 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 	virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+
+
 protected slots:
 	void onActionUndo(bool checked = false);
 	void onActionRedo(bool checked);
@@ -309,6 +312,15 @@ protected slots:
     void askMergeOrNew();
 
     void applyJobOriginToDocument(const QVariant& value);
+    //arrange align
+    void onActionAlignHorinzontalMiddle();
+    void onActionAlignHorinzontalTop();
+    void onActionAlignHorinzontalBottom();
+    void onActionAlignVerticalMiddle();
+    void onActionAlignVerticalLeft();
+    void onActionAlignVerticalRight();
+    void onActionAlignHorinzontal();
+    void onActionAlignVertical();
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
 
@@ -612,7 +624,8 @@ private:
     QMenu* m_recentFilesMenu;
     QList<QString> m_recentFileList;
     int m_maxRecentFilesSize;
-
+    QToolButton* m_arrangeButtonAlignHorinzontal;
+    QToolButton* m_arrangeButtonAlignVertical;
     friend class LaserApplication;
 };
 

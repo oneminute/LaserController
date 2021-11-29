@@ -266,8 +266,6 @@
    <addaction name="actionMirrorVertical"/>
    <addaction name="separator"/>
    <addaction name="actionAlignCenter"/>
-   <addaction name="actionAlignVertical"/>
-   <addaction name="actionAlignHorizontal"/>
   </widget>
   <widget class="QToolBar" name="textFontBar">
    <property name="windowTitle">
@@ -1462,31 +1460,19 @@
     <string>Selected align vertical</string>
    </property>
   </action>
-  <action name="actionAlignHorizontal">
-   <property name="icon">
-    <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/horizontal_middle.png</normaloff>:/ui/icons/images/horizontal_middle.png</iconset>
-   </property>
-   <property name="text">
-    <string>AlignHorizontal</string>
-   </property>
-   <property name="toolTip">
-    <string>Selected align horizontal</string>
-   </property>
-  </action>
-  <action name="actionAlighnHorinzontalTop">
+  <action name="actionAlignHorinzontalTop">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/horizontal_top.png</normaloff>:/ui/icons/images/horizontal_top.png</iconset>
    </property>
    <property name="text">
-    <string>AlighnHorinzontalTop</string>
+    <string>AlignHorinzontalTop</string>
    </property>
    <property name="toolTip">
-    <string>Alighn horinzontal Top</string>
+    <string>Align horinzontal Top</string>
    </property>
   </action>
-  <action name="actionalignHorinzontalBottom">
+  <action name="actionAlignHorinzontalBottom">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/horizontal_bottom.png</normaloff>:/ui/icons/images/horizontal_bottom.png</iconset>
@@ -1496,6 +1482,18 @@
    </property>
    <property name="toolTip">
     <string>Align horinzontal bottom</string>
+   </property>
+  </action>
+  <action name="actionAlignHorinzontalMiddle">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/horizontal_middle.png</normaloff>:/ui/icons/images/horizontal_middle.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignHorinzontalMiddle</string>
+   </property>
+   <property name="toolTip">
+    <string>Selected align horizontal</string>
    </property>
   </action>
  </widget>

@@ -13,9 +13,11 @@
 RulerWidget::RulerWidget(QWidget * parent, bool _isVertical)
 	:QWidget(parent), m_isVertical(_isVertical), m_mousePoint(0, 0)
 {
-	m_baseMillimeter = Global::mmToSceneHF(1.0);
+	//m_baseMillimeter = Global::convertFromUm(1000);
+    m_baseMillimeter = 1.0;
 	if (m_isVertical) {
-		m_baseMillimeter = Global::mmToSceneVF(1.0);
+		//m_baseMillimeter = Global::convertFromUm(1000);
+        m_baseMillimeter = 1.0;
 	}
 	m_millimeter = m_baseMillimeter;
 	m_unit = m_millimeter;
@@ -88,16 +90,17 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 			painter.drawLine(QPoint(m_mousePoint.x(), 0), QPoint(m_mousePoint.x(), m_minHeightSize));
 		}
 	}
-	
-	m_scale = m_viewer->zoomValue();
+    //ruler scale is 1,when scene size adapter View size
+    qreal delta = m_viewer->adapterViewScale();
+	m_scale = m_viewer->zoomValue() / delta;
     //qDebug() << m_scale;
 	//Ruller
 	QRectF rect = this->rect();
 	painter.setPen(QPen(QColor(200, 200, 200), 1, Qt::SolidLine));
 	
 	//Axes
-	m_millimeter = m_baseMillimeter * m_scale;
-	qreal minification = 1 / m_scale;
+	m_millimeter = (m_baseMillimeter * 1000) * m_viewer->zoomValue();
+	qreal minification = 0.0057 / m_scale;
 	int pow_10 = qLn(minification) / qLn(10);
 	m_flag = qRound(qPow(10, pow_10));//1,10,100,1000...��С����
 	LaserBackgroundItem* backgroundItem = m_viewer->scene()->backgroundItem();
@@ -155,10 +158,6 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		}
 		
 	}
-	
-	
-	QRectF documentRect = m_viewer->scene()->backgroundItem()->rect();
-	QRectF viewerRect = m_viewer->rect();
 	qreal dimension = 0;
 	if (m_isVertical) {
 		
