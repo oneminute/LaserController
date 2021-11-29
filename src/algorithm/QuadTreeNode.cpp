@@ -79,7 +79,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
     //line
     else if (bound.width() == 0 || bound.height() == 0) {
         QPointF p1 = bound.topLeft();
-        QPointF p2 = bound.bottomRight();
+        QPointF p2 = QPoint(bound.left() + bound.width(), bound.top() + bound.height());
         QLineF line(p1, p2);
         //�������ͼԪ
         if (m_topLeftRegion.contains(p1) && m_topLeftRegion.contains(p2)) {

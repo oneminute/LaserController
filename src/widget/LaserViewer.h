@@ -56,7 +56,7 @@ public:
     RulerWidget* verticalRuler();
 	LaserPrimitiveGroup* group();
 	QRect selectedItemsSceneBoundingRect();
-    QRectF AllItemsSceneBoundingRect();
+    QRect AllItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate,
         int _state, int _transformType, int _pp, bool _unitIsMM);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);

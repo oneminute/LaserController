@@ -82,9 +82,9 @@ void LaserBackgroundItem::onChangeGrids()
 	int sizeV = width / spacing;
 
 	int left = rect.left();
-	int right = rect.right();
+	int right = left + rect.width();
 	int top = rect.top();
-	int bottom = rect.bottom();
+	int bottom = top + rect.height();
 
 	int count = 10;
 	for (int n = top, i = 0; n <= bottom; n += spacing, i++) {
@@ -119,9 +119,9 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 {
 	QRect rect = LaserApplication::device->layoutRect();
 	int left = rect.left();
-	int right = rect.right();
+	int right = left + rect.width();
 	int top = rect.top();
-	int bottom = rect.bottom();
+	int bottom = top + rect.height();
 	int width = rect.width();
 	int height = rect.height();
 	int contrastValue = Config::Ui::gridContrast();

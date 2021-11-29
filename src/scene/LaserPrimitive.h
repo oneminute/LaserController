@@ -190,7 +190,7 @@ public:
 
     int cornerRadius() const;
     void setCornerRadius(int cornerRadius);
-    void concaveRect(QRectF rect, QPainterPath& path, qreal cornerRadius);
+    void concaveRect(QRect rect, QPainterPath& path, qreal cornerRadius);
 
     bool isRoundedRect() const;
 
@@ -461,5 +461,7 @@ private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)
 };
+
+QDebug operator<<(QDebug debug, const QRect& rect);
 
 #endif // LASERPRIMITIVE_H

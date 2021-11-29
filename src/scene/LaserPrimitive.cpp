@@ -152,7 +152,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
     QRectF bounds = boundingRect();
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
-    QPointF bottomRight = bounds.bottomRight() + QPointF(2, 2);
+    QPointF bottomRight = QPoint(bounds.left() + bounds.width(), bounds.top() + bounds.height()) + QPointF(2, 2);
     bounds = QRectF(topLeft, bottomRight);
 	QColor color = Qt::blue;
     QPen pen(color, 1, Qt::DashLine);
@@ -690,12 +690,12 @@ void LaserPrimitive::removeOneTreeNode(QuadTreeNode * node)
 bool LaserPrimitive::isAvailable() const
 {
     Q_D(const LaserPrimitive);
-    bool available = true;
-    if (!d->boundingRect.isValid())
-        available = false;
     if (d->path.isEmpty())
-        available = false;
-    return available;
+        return false;
+    if (qFuzzyCompare(d->boundingRect.width(), 0.0) &&
+        qFuzzyCompare(d->boundingRect.height(), 0.0))
+        return false;
+    return true;
 }
 
 
@@ -970,14 +970,18 @@ void LaserRect::setCornerRadius(int cornerRadius)
     d->path = path;
 }
 
-void LaserRect::concaveRect(QRectF rect, QPainterPath& path, qreal cornerRadius)
+void LaserRect::concaveRect(QRect rect, QPainterPath& path, qreal cornerRadius)
 {
     QPainterPath rectPath, circleLeftTopPath, circleRightTopPath, circleLeftBottomPath, circleRightBottomPath;
     rectPath.addRect(rect);
-    circleLeftTopPath.addEllipse(rect.topLeft(), cornerRadius, cornerRadius);
-    circleRightTopPath.addEllipse(rect.topRight(), cornerRadius, cornerRadius);
-    circleLeftBottomPath.addEllipse(rect.bottomLeft(), cornerRadius, cornerRadius);
-    circleRightBottomPath.addEllipse(rect.bottomRight(), cornerRadius, cornerRadius);
+    QPoint topLeft = rect.topLeft();
+    QPoint topRight(rect.left() + rect.width(), rect.top());
+    QPoint bottomLeft(rect.left(), rect.top() + rect.height());
+    QPoint bottomRight(rect.left() + rect.width(), rect.top() + rect.height());
+    circleLeftTopPath.addEllipse(topLeft, cornerRadius, cornerRadius);
+    circleRightTopPath.addEllipse(topRight, cornerRadius, cornerRadius);
+    circleLeftBottomPath.addEllipse(bottomLeft, cornerRadius, cornerRadius);
+    circleRightBottomPath.addEllipse(bottomRight, cornerRadius, cornerRadius);
     path.addPath(rectPath.
         subtracted(circleLeftTopPath).
         subtracted(circleRightTopPath).
@@ -2855,3 +2859,10 @@ LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
     return lineList;
 }
 
+QDebug operator<<(QDebug debug, const QRect& rect)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << '[' << rect.topLeft() << ", " << rect.bottomRight()
+        << ", " << rect.width() << "x" << rect.height() << "]";
+    return debug;
+}

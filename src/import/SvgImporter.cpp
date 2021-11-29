@@ -53,6 +53,8 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
     qreal docScaleWidth = svgSize.width() * 1000.0 / viewBox.width();
     qreal docScaleHeight = svgSize.height() * 1000.0 / viewBox.height();
 
+    QPoint originOffset = -LaserApplication::device->originOffset();
+
     doc->blockSignals(true);
 
     qDebug() << "svg size:" << svgSize;
@@ -68,7 +70,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
     }
 
 	QMatrix matrix;
-	matrix.scale(Global::mmToSceneHF(docScaleWidth), Global::mmToSceneVF(docScaleHeight));
+	matrix.scale(docScaleWidth, docScaleHeight);
 
     while (!stack.empty())
     {
@@ -204,10 +206,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 					t.m21(), t.m22(), t.m23(),
 					t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
 				);
-				
                 t = t1;
 				qDebug() << t;
 			}
+            t = QTransform(
+                t.m11(), t.m12(), t.m13(),
+                t.m21(), t.m22(), t.m23(),
+                t.m31() + originOffset.x(), t.m32() + originOffset.y(), t.m33()
+            );
             item->setTransform(t);
 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())

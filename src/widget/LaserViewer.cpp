@@ -433,18 +433,18 @@ void LaserViewer::paintEvent(QPaintEvent* event)
 	}*/
 }
 void LaserViewer::detectRect(LaserPrimitive& item, int i, int& left, int& right, int& top, int& bottom) {
-	QRectF boundingRect = item.sceneBoundingRect();
+	QRect boundingRect = item.sceneBoundingRect();
 	if (i == 0) {
 		left = boundingRect.left();
-		right = boundingRect.right();
+		right = left + boundingRect.width();
 		top = boundingRect.top();
-		bottom = boundingRect.bottom();
+		bottom = top + boundingRect.height();
 	}
 	else {
-		qreal curLeft = boundingRect.left();
-		qreal curRight = boundingRect.right();
-		qreal curTop = boundingRect.top();
-		qreal curBottom = boundingRect.bottom();
+		int curLeft = boundingRect.left();
+		int curRight = curLeft + boundingRect.width();
+		int curTop = boundingRect.top();
+		int curBottom = curTop + boundingRect.height();
 		if (curLeft < left) {
 			left = curLeft;
 		}
@@ -482,33 +482,34 @@ QRect LaserViewer::selectedItemsSceneBoundingRect() {
     utils::boundingRect(primitives, rect, QRect(), false);
 	return rect;
 }
-QRectF LaserViewer::AllItemsSceneBoundingRect()
+
+QRect LaserViewer::AllItemsSceneBoundingRect()
 {
     QList<LaserPrimitive*> list = m_scene->document()->primitives().values();
     if (list.isEmpty()) {
-        return QRectF();
+        return QRect();
     }
-    QRectF firstBound = list[0]->sceneBoundingRect();
-    qreal top = firstBound.top();
-    qreal left = firstBound.left();
-    qreal bottom = firstBound.bottom();
-    qreal right = firstBound.right();
+    QRect firstBound = list[0]->sceneBoundingRect();
+    int top = firstBound.top();
+    int left = firstBound.left();
+    int bottom = top + firstBound.height();
+    int right = left + firstBound.width();
     for (LaserPrimitive* primitive : list) {
-        QRectF bound = primitive->sceneBoundingRect();
+        QRect bound = primitive->sceneBoundingRect();
         if (top > bound.top()) {
             top = bound.top();
         }
         if (left > bound.left()) {
             left = bound.left();
         }
-        if (bottom < bound.bottom()) {
-            bottom = bound.bottom();
+        if (bottom < (bound.top() + bound.height())) {
+            bottom = bound.top() + bound.height();
         }
-        if (right < bound.right()) {
-            right = bound.right();
+        if (right < bound.left() + bound.width()) {
+            right = bound.left() + bound.width();
         }
     }
-    return QRectF(QPointF(left, top), QPointF(right, bottom));
+    return QRect(QPoint(left, top), QPoint(right, bottom));
 }
 void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
     int _state, int _transformType, int _pp, bool _unitIsMM)
