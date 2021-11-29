@@ -17,8 +17,9 @@
 LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem * parent)
 	: QGraphicsItemGroup(parent)
 {
-	QRectF rect = LaserApplication::device->layoutRectInScene();
-    qDebug() << "deivce bounds in pixel:" << rect;
+	//QRectF rect = LaserApplication::device->layoutRectInScene();
+	QRect rect = LaserApplication::device->layoutRect();
+    qDebug() << "deivce bounds in device:" << rect;
 
 	m_rectItem = new QGraphicsRectItem(rect);
 	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
@@ -72,56 +73,42 @@ void LaserBackgroundItem::onChangeGrids()
 	if (!m_gridSecondNodeYList.isEmpty()) {
 		m_gridSecondNodeYList.clear();
 	}
-	qreal spacing = Config::Ui::visualGridSpacing();//mm
-	qreal intervalH = Global::mmToSceneHF(spacing);
-	qreal intervalV = Global::mmToSceneVF(spacing);
-	qreal width = this->rect().width();
-	qreal height = this->rect().height();
-	qreal sH = height / intervalH;
-	qreal sV = width / intervalV;
 
-	int sizeH = qCeil(sH);
-	int sizeV = qCeil(sV);
-	//�����ֵ�Ƿ񳬹�2������
-	qreal diffH = (sH - qFloor(sH)) * intervalH * zoomValue;
-	qreal diffV = (sV - qFloor(sV)) * intervalV * zoomValue;
-	if (diffH < 2 && diffH > 0) {
-		sizeH -= 1;
-	}
-	if (diffV < 2 && diffV > 0) {
-		sizeV -= 1;
-	}
-	//qDebug() <<"diffH: " << diffH ;
-	//qDebug() <<"diffV: " << diffV ;
+	QRect rect = LaserApplication::device->layoutRect();
+	int spacing = Config::Ui::visualGridSpacing() * 1000; //um
+	int width = rect.width();
+	int height = rect.height();
+	int sizeH = height / spacing;
+	int sizeV = width / spacing;
+
+	int left = rect.left();
+	int right = rect.right();
+	int top = rect.top();
+	int bottom = rect.bottom();
+
 	int count = 10;
-	//���������С
-	//qreal intervalH_1 = intervalH * 0.1;
-	//qreal intervalV_1 = intervalV * 0.1;
-	for (int i = 0; i <= sizeH; i++) {
-		//painter.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
-		qreal startY = intervalH * i;
+	for (int n = top, i = 0; n <= bottom; n += spacing, i++) {
+		int startY = top + spacing * i;
 		m_gridNodeYList.append(startY);
 		
-		if (zoomValue > 2 && i < sizeH) {
-			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
-			//int count = 
+		if (zoomValue > 0.02 && i < sizeH) {
 			for (int ic = 0; ic < count; ic++) {
-				qreal intervalH_1 = intervalH / count;
-				qreal y_1 = startY + intervalH_1 * ic;
+				int intervalH_1 = spacing / count;
+				int y_1 = startY + intervalH_1 * ic;
 				m_gridSecondNodeYList.append(y_1);
 			}
 
 		}
 	}
-	for (int j = 0; j <= sizeV; j++) {
-		qreal startX = intervalV * j;
+	for (int n = left, j = 0; n <= right; n += spacing, j++) {
+		int startX = left + spacing * j;
 		m_gridNodeXList.append(startX);
 
-		if (zoomValue > 2 && j < sizeV) {
+		if (zoomValue > 0.02 && j < sizeV) {
 			//painter.setPen(QPen(QColor(230, 230, 230), 1, Qt::SolidLine));
 			for (int jc = 0; jc < count; jc++) {
-				qreal intervalV_1 = intervalV / count;
-				qreal x_1 = startX + intervalV_1 * jc;
+				int intervalV_1 = spacing / count;
+				int x_1 = startX + intervalV_1 * jc;
 				m_gridSecondNodeXList.append(x_1);
 			}
 		}
@@ -130,8 +117,13 @@ void LaserBackgroundItem::onChangeGrids()
 
 void LaserBackgroundItem::drawGrids(QPainter& painter)
 {
-	qreal width = this->rect().width();
-	qreal height = this->rect().height();
+	QRect rect = LaserApplication::device->layoutRect();
+	int left = rect.left();
+	int right = rect.right();
+	int top = rect.top();
+	int bottom = rect.bottom();
+	int width = rect.width();
+	int height = rect.height();
 	int contrastValue = Config::Ui::gridContrast();
 	//qDebug() << "contrastValue: " << contrastValue;
 	bool isShow = true;
@@ -169,17 +161,13 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	//2������
 	painter.setPen(pen2);
 	for (int i1 = 0; i1 < m_gridSecondNodeYList.size(); i1++) {
-		//QPointF p1SecondH = mapFromScene(mapToScene(QPointF(0, m_gridSecondNodeYList[i1])));
-		//QPointF p2SecondH = mapFromScene(mapToScene(QPointF(m_width, m_gridSecondNodeYList[i1])));
-		QPointF p1SecondH = QPointF(0, m_gridSecondNodeYList[i1]);
-		QPointF p2SecondH = QPointF(width, m_gridSecondNodeYList[i1]);
+		QPointF p1SecondH = mapFromScene(QPoint(left, m_gridSecondNodeYList[i1]));
+		QPointF p2SecondH = mapFromScene(QPoint(right, m_gridSecondNodeYList[i1]));
 		painter.drawLine(p1SecondH, p2SecondH);
 	}
 	for (int j1 = 0; j1 < m_gridSecondNodeXList.size(); j1++) {
-		//QPointF p1SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], 0)));
-		//QPointF p2SecondV = mapFromScene(mapToScene(QPointF(m_gridSecondNodeXList[j1], m_height)));
-		QPointF p1SecondV = QPointF(m_gridSecondNodeXList[j1], 0);
-		QPointF p2SecondV = QPointF(m_gridSecondNodeXList[j1], height);
+		QPointF p1SecondV = mapFromScene(QPoint(m_gridSecondNodeXList[j1], top));
+		QPointF p2SecondV = mapFromScene(QPoint(m_gridSecondNodeXList[j1], bottom));
 		painter.drawLine(p1SecondV, p2SecondV);
 	}
 	//1������
@@ -187,20 +175,20 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	for (int i = 1; i < m_gridNodeYList.size()-1; i++) {
 		//QPointF p1H = mapFromScene(mapToScene(QPointF(0, m_gridNodeYList[i])));
 		//QPointF p2H = mapFromScene(mapToScene(QPointF(m_width, m_gridNodeYList[i])));
-		QPointF p1H = QPointF(0, m_gridNodeYList[i]);
-		QPointF p2H = QPointF(width, m_gridNodeYList[i]);
+		QPointF p1H = mapFromScene(QPoint(left, m_gridNodeYList[i]));
+		QPointF p2H = mapFromScene(QPoint(right, m_gridNodeYList[i]));
 		painter.drawLine(p1H, p2H);
 	}
 	for (int j = 1; j < m_gridNodeXList.size()-1; j++) {
 		//QPointF p1V = mapFromScene(mapToScene(QPointF(m_gridNodeXList[j], 0)));
 		//QPointF p2V = mapFromScene(mapToScene(QPointF(m_gridNodeXList[j], m_height)));
-		QPointF p1V = QPointF(m_gridNodeXList[j], 0);
-		QPointF p2V = QPointF(m_gridNodeXList[j], height);
+		QPointF p1V = mapFromScene(QPoint(m_gridNodeXList[j], top));
+		QPointF p2V = mapFromScene(QPoint(m_gridNodeXList[j], bottom));
 		painter.drawLine(p1V, p2V);
 	}
 	
 }
-bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
+bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
 {
 	QGraphicsScene* scene = this->scene();
 	if (!scene) {
@@ -220,12 +208,12 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 	qreal valueY = distance / view->zoomValue();
 	for (int i = 0; i < m_gridNodeXList.size(); i++) {
 		for (int j = 0; j < m_gridNodeYList.size(); j++) {
-			QPointF node = QPointF(m_gridNodeXList[i], m_gridNodeYList[j]);
+			QPoint node = QPoint(m_gridNodeXList[i], m_gridNodeYList[j]);
 			qreal absX = qAbs(node.x() - documentPoint.x());
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
 				//node ��documentת����view
-				point = mapToScene(node);
+				point = mapToScene(node).toPoint();
 				return true;
 			}
 		}
@@ -235,34 +223,11 @@ bool LaserBackgroundItem::detectGridNode(QPointF & point, QPointF & mousePoint)
 			qreal absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
 				//node ��documentת����view
-				point = mapToScene(node);
+				point = mapToScene(node).toPoint();
 				return true;
 			}
 		}
 	}
-
-	/*for (int i2 = 0; i2 < m_gridSecondNodeXList.size(); i2++) {
-		for (int j = 0; j < m_gridNodeYList.size(); j++) {
-			QPointF node = QPointF(m_gridSecondNodeXList[i2], m_gridNodeYList[j]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
-			if (absX < valueX && absY < valueY) {
-				//node ��documentת����scene
-				point = mapToScene(node);
-				return true;
-			}
-		}
-		for (int j2 = 0; j2 < m_gridSecondNodeYList.size(); j2++) {
-			QPointF node = QPointF(m_gridSecondNodeXList[i2], m_gridSecondNodeYList[j2]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
-			if (absX < valueX && absY < valueY) {
-				//node ��documentת����scene
-				point = mapToScene(node);
-				return true;
-			}
-		}
-	}*/
 
 	return false;
 }
@@ -274,7 +239,8 @@ QRectF LaserBackgroundItem::rect()
 
 void LaserBackgroundItem::onLayoutChanged(const QSizeF& size)
 {
-	QRectF rect = LaserApplication::device->layoutRectInScene();
-    qDebug() << "deivce bounds in pixel:" << rect;
+	//QRectF rect = LaserApplication::device->layoutRectInScene();
+	QRect rect = LaserApplication::device->layoutRect();
+    qDebug() << "deivce bounds in device:" << rect;
 	m_rectItem->setRect(rect);
 }

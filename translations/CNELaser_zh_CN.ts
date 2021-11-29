@@ -1324,7 +1324,7 @@
     <message>
         <location line="+4"/>
         <source>X Start Speed(mm/s)</source>
-        <translation>X轴起跳速度(mm/s)</translation>
+        <translation>XY复位速度(mm/s)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1538,7 +1538,7 @@
     <message>
         <location line="+12"/>
         <source>Scan Row Speed(mm/s)</source>
-        <translation>扫描行速度(mm/s)</translation>
+        <translation>扫描换行速度(mm/s)</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -1602,17 +1602,17 @@
     <message>
         <location line="+4"/>
         <source>Filling speed</source>
-        <translation>填充速度</translation>
+        <translation>填充线速度</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Filling Start Speed(mm/s)</source>
-        <translation>填充起跳速度(mm/s)</translation>
+        <translation>填充线起跳速度(mm/s)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Filling start speed</source>
-        <translation>填充起跳速度</translation>
+        <translation>填充线起跳速度</translation>
     </message>
     <message>
         <source>Filling Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
@@ -1621,7 +1621,7 @@
     <message>
         <location line="+4"/>
         <source>Filling acceleration</source>
-        <translation>填充加速度</translation>
+        <translation>填充线加速度</translation>
     </message>
     <message>
         <source>Max Filling Power</source>
@@ -1630,7 +1630,7 @@
     <message>
         <location line="+4"/>
         <source>Max filling power</source>
-        <translation>最大填充功率</translation>
+        <translation>填充线最大功率</translation>
     </message>
     <message>
         <source>Min Filling Power</source>
@@ -1639,7 +1639,7 @@
     <message>
         <location line="+4"/>
         <source>Min filling power</source>
-        <translation>最小填充功率</translation>
+        <translation>填充线最小功率</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1712,7 +1712,7 @@
     <message>
         <location line="+4"/>
         <source>X Step Length(mm)</source>
-        <translation>X轴电机步距(mm)</translation>
+        <translation>X轴电机步距(um)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1786,7 +1786,7 @@
     <message>
         <location line="-1"/>
         <source>Z Step Length(mm)</source>
-        <translation>Z轴电机步距(mm)</translation>
+        <translation>Z轴电机步距(um)</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2178,27 +2178,27 @@
     <message>
         <location line="+4"/>
         <source>Default Run Speed(mm/s)</source>
-        <translation>默认加工速度(mm/s)</translation>
+        <translation>切割速度(mm/s)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Default run speed</source>
-        <translation>默认加工速度</translation>
+        <translation>切割速度</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Default Max Cutting Power(%)</source>
-        <translation>默认最大切割功率(%)</translation>
+        <translation>最大切割功率(%)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Default Min Cutting Power(%)</source>
-        <translation>默认最小切割功率(%)</translation>
+        <translation>最小切割功率(%)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Default Scan Speed(mm/s)</source>
-        <translation>默认扫描速度(mm/s)</translation>
+        <translation>扫描速度(mm/s)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2372,17 +2372,17 @@
         <location line="+36"/>
         <location line="+256"/>
         <source>Filling Speed(mm/s)</source>
-        <translation>填充速度(mm/s)</translation>
+        <translation>填充线速度(mm/s)</translation>
     </message>
     <message>
         <location line="-252"/>
         <source>Filling Min Power(%)</source>
-        <translation>最小填充功率(%)</translation>
+        <translation>填充线最小功率(%)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Filling Max Power(%)</source>
-        <translation>最大填充功率(%)</translation>
+        <translation>填充线最大功率(%)</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2418,7 +2418,7 @@
         <location line="+8"/>
         <location line="+1"/>
         <source>Laser Frequency</source>
-        <translation>激光频率</translation>
+        <translation>开关光频率</translation>
     </message>
     <message>
         <source>Backlash X Interval</source>
@@ -2435,17 +2435,17 @@
     <message>
         <location line="+87"/>
         <source>Filling Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
-        <translation>填充加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
+        <translation>填充线加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Max Filling Power(%)</source>
-        <translation>最大填充功率(%)</translation>
+        <translation>填充线最大功率(%)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Min Filling Power(%)</source>
-        <translation>最小填充功率(%)</translation>
+        <translation>填充线最小功率(%)</translation>
     </message>
     <message>
         <location line="+89"/>
@@ -2494,7 +2494,7 @@
     <message>
         <location line="+7"/>
         <source>Y Step Length(mm)</source>
-        <translation>Y轴电机步距(mm)</translation>
+        <translation>Y轴电机步距(um)</translation>
     </message>
     <message>
         <source>Y Max Acceleration(mm/s&lt;sub&gt;2&lt;/sub&gt;)</source>
@@ -4883,7 +4883,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+3"/>
         <source>zoom to page</source>
-        <translation>绽放到文档大小</translation>
+        <translation>缩放到文档大小</translation>
     </message>
     <message>
         <location line="+3"/>

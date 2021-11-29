@@ -51,22 +51,22 @@ void LaserScene::setDocument(LaserDocument * doc)
 
     m_doc->setParent(this);
     
-	QRectF rect = LaserApplication::device->layoutRectInScene();
+	QRect rect = LaserApplication::device->layoutRect();
     m_background = new LaserBackgroundItem();
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
 	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));
-	setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+	setSceneRect(QRect(QPoint(-5000000, -5000000), QPoint(5000000, 5000000)));
 	//views()[0]->horizontalScrollBar()->setSliderPosition(rect.center().x());
 	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
 	views()[0]->setTransform(QTransform());
 	views()[0]->centerOn(rect.center());
     //创建树
     if (!m_quadTree) {
-        qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
-        qreal top = -(maxSize - rect.height()) * 0.5;
-        qreal left = -(maxSize - rect.width()) * 0.5;
-        m_maxRegion = QRectF(left, top, maxSize, maxSize);
+        int maxSize = Config::Ui::validMaxRegion() * 1000;
+        int top = -(maxSize - rect.height()) / 2;
+        int left = -(maxSize - rect.width()) / 2;
+        m_maxRegion = QRect(rect.left() + left, rect.top() + top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
     }
     QMap<QString, LaserPrimitive*> items = m_doc->primitives();
@@ -426,9 +426,9 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
     for (QuadTreeNode* node : nodes) {
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
-                QRectF bounds;
+                QRect bounds;
                 if (!primitive->joinedGroupList().isEmpty()) {
-                    utils::boundingRect(primitive->joinedGroupList(), bounds, QRectF(), false);
+                    utils::boundingRect(primitive->joinedGroupList(), bounds, QRect(), false);
                     for (LaserPrimitive* primitive : primitive->joinedGroupList()) {
                         selectedByBounds(bounds, selection, primitive);
                     }
@@ -471,7 +471,7 @@ void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitiv
         }
     }
 }
-QRectF LaserScene::maxRegion()
+QRect LaserScene::maxRegion()
 {
     return m_maxRegion;
 }
@@ -483,11 +483,11 @@ QuadTreeNode * LaserScene::quadTreeNode()
 
 void LaserScene::updateValidMaxRegionRect()
 {
-    QRectF rect = LaserApplication::device->layoutRectInMech();
-    qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
-    qreal top = -(maxSize - rect.height()) * 0.5;
-    qreal left = -(maxSize - rect.width()) * 0.5;
-    m_maxRegion = QRectF(left, top, maxSize, maxSize);
+    QRect rect = LaserApplication::device->layoutRect();
+    int maxSize = Config::Ui::validMaxRegion() * 1000;
+    int top = -(maxSize - rect.height()) / 2;
+    int left = -(maxSize - rect.width()) / 2;
+    m_maxRegion = QRect(rect.left() + left, rect.top() + top, maxSize, maxSize);
     views()[0]->viewport()->repaint();
 }
 
@@ -497,24 +497,24 @@ void LaserScene::updataValidMaxRegion()
         return;
     LaserViewer* view = qobject_cast<LaserViewer*>( views()[0]);
     //QRectF rect = Global::matrixFromUm().mapRect(LaserApplication::device->layoutRectInMech());
-    QRectF rect = LaserApplication::device->layoutRectInScene();
-    qreal maxSize = Global::mechToSceneHF(Config::Ui::validMaxRegion() * 1000);
-    qreal top = -(maxSize - rect.height()) * 0.5;
-    qreal left = -(maxSize - rect.width()) * 0.5;
-    qreal lastMaxSize = m_maxRegion.width();
-    m_maxRegion = QRectF(left, top, maxSize, maxSize);
+    QRect rect = LaserApplication::device->layoutRect();
+    int maxSize = Config::Ui::validMaxRegion() * 1000;
+    int top = -(maxSize - rect.height()) / 2;
+    int left = -(maxSize - rect.width()) / 2;
+    int lastMaxSize = m_maxRegion.width();
+    m_maxRegion = QRect(rect.left() + left, rect.top() + top, maxSize, maxSize);
     view->viewport()->repaint();
     //所有图元bounds
-    qreal bLeft = 0;
-    qreal bRight = 0;
-    qreal bTop = 0;
-    qreal bBottom = 0;
+    int bLeft = 0;
+    int bRight = 0;
+    int bTop = 0;
+    int bBottom = 0;
     int i = 0;
     for (LaserPrimitive* primitive : document()->primitives()) {
         view->detectRect(*primitive, i, bLeft, bRight, bTop, bBottom);
         i++;
     }
-    QRectF bounds = QRectF(bLeft, bTop, bRight - bLeft, bBottom - bTop);
+    QRect bounds = QRect(bLeft, bTop, bRight - bLeft, bBottom - bTop);
     //垂直或水平线，点的情况
     if (bounds.width() == 0 || bounds.height() == 0) {
         if (!maxRegion().contains(bounds.topLeft()) || !maxRegion().contains(bounds.bottomRight())) {

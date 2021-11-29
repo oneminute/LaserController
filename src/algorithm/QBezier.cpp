@@ -54,8 +54,8 @@ QT_BEGIN_NAMESPACE
 /*!
   \internal
 */
-QBezier QBezier::fromPoints(const QPointF &p1, const QPointF &p2,
-                            const QPointF &p3, const QPointF &p4)
+QBezier QBezier::fromPoints(const QPoint &p1, const QPoint &p2,
+                            const QPoint &p3, const QPoint &p4)
 {
     QBezier b;
     b.x1 = p1.x();
@@ -72,7 +72,7 @@ QBezier QBezier::fromPoints(const QPointF &p1, const QPointF &p2,
 /*!
   \internal
 */
-QPolygonF QBezier::toPolygon(qreal bezier_flattening_threshold) const
+QPolygon QBezier::toPolygon(qreal bezier_flattening_threshold) const
 {
     // flattening is done by splitting the bezier until we can replace the segment by a straight
     // line. We split further until the control points are close enough to the line connecting the
@@ -85,8 +85,8 @@ QPolygonF QBezier::toPolygon(qreal bezier_flattening_threshold) const
     // We can stop splitting if both control points are close enough to the line.
     // To make the algorithm faster we use the manhattan length of the line.
 
-    QPolygonF polygon;
-    polygon.append(QPointF(x1, y1));
+    QPolygon polygon;
+    polygon.append(QPoint(x1, y1));
     addToPolygon(&polygon, bezier_flattening_threshold);
     return polygon;
 }
@@ -116,7 +116,7 @@ QBezier QBezier::getSubRange(qreal t0, qreal t1) const
     return result;
 }
 
-void QBezier::addToPolygon(QPolygonF *polygon, qreal bezier_flattening_threshold) const
+void QBezier::addToPolygon(QPolygon *polygon, qreal bezier_flattening_threshold) const
 {
     QBezier beziers[10];
     int levels[10];
@@ -127,10 +127,10 @@ void QBezier::addToPolygon(QPolygonF *polygon, qreal bezier_flattening_threshold
 
     while (b >= beziers) {
         // check if we can pop the top bezier curve from the stack
-        qreal y4y1 = b->y4 - b->y1;
-        qreal x4x1 = b->x4 - b->x1;
-        qreal l = qAbs(x4x1) + qAbs(y4y1);
-        qreal d;
+        int y4y1 = b->y4 - b->y1;
+        int x4x1 = b->x4 - b->x1;
+        int l = qAbs(x4x1) + qAbs(y4y1);
+        int d;
         if (l > 1.) {
             d = qAbs( (x4x1)*(b->y1 - b->y2) - (y4y1)*(b->x1 - b->x2) )
                 + qAbs( (x4x1)*(b->y1 - b->y3) - (y4y1)*(b->x1 - b->x3) );
@@ -141,7 +141,7 @@ void QBezier::addToPolygon(QPolygonF *polygon, qreal bezier_flattening_threshold
         }
         if (d < bezier_flattening_threshold*l || *lvl == 0) {
             // good enough, we pop it off and add the endpoint
-            polygon->append(QPointF(b->x4, b->y4));
+            polygon->append(QPoint(b->x4, b->y4));
             --b;
             --lvl;
         } else {
@@ -330,8 +330,8 @@ static ShiftResult shift(const QBezier *orig, QBezier *shifted, qreal offset, qr
 
     points_shifted[np - 1] = points[np - 1] + offset * prev_normal;
 
-    *shifted = QBezier::fromPoints(points_shifted[map[0]], points_shifted[map[1]],
-                                   points_shifted[map[2]], points_shifted[map[3]]);
+    *shifted = QBezier::fromPoints(points_shifted[map[0]].toPoint(), points_shifted[map[1]].toPoint(),
+                                   points_shifted[map[2]].toPoint(), points_shifted[map[3]].toPoint());
 
     return good_offset(orig, shifted, offset, threshold);
 }
@@ -407,8 +407,8 @@ int QBezier::shifted(QBezier *curveSegments, int maxSegments, qreal offset, floa
     Q_ASSERT(curveSegments);
     Q_ASSERT(maxSegments > 0);
 
-    if (qFuzzyCompare(x1, x2) && qFuzzyCompare(x1, x3) && qFuzzyCompare(x1, x4) &&
-        qFuzzyCompare(y1, y2) && qFuzzyCompare(y1, y3) && qFuzzyCompare(y1, y4))
+    if (x1 == x2 && x1 == x3 && x1 == x4 &&
+        y1 == y2 && y1 == y3 && y1 == y4)
         return 0;
 
     --maxSegments;

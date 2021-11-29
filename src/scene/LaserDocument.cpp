@@ -61,8 +61,8 @@ public:
 
     QMap<LaserPrimitiveType, int> typeMax;
 
-    QRectF bounding;
-    QRectF boundingWithAccSpan;
+    QRect bounding;
+    QRect boundingWithAccSpan;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -202,15 +202,15 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QJsonObject jsonObj;
 
     QTransform transformPrintAndCut = enablePrintAndCut() ? printAndCutTransform() : QTransform();
-    QPointF docOrigin(0, 0);
+    QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
     {
     case SFT_AbsoluteCoords:
     case SFT_CurrentPosition:
-        docOrigin = QPointF(0, 0);
+        docOrigin = QPoint(0, 0);
         break;
     case SFT_UserOrigin:
-        docOrigin = LaserApplication::device->userOriginInDevice();
+        docOrigin = LaserApplication::device->userOrigin();
         break;
     }
 
@@ -225,11 +225,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
 
-    QRectF outBounding = machiningDocBoundingRectInDevice(true);
+    QRectF outBounding = absoluteDocBoundingRect(true);
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
     {
         outBounding.moveTopLeft(-outBounding.topLeft());
-        QPointF outJobOrigin = jobOriginReletiveInMech(true);
+        QPointF outJobOrigin = reletiveJobOrigin();
         outBounding.moveTopLeft(-outJobOrigin);
     }
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(outBounding);
@@ -252,10 +252,9 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     }
 
     QJsonArray layers;
-    QPointF lastPoint;
-    QPointF residual(0, 0);
+    QPoint lastPoint;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-        lastPoint = docOriginInDevice();
+        lastPoint = this->docOrigin();
     
     for (LaserLayer* layer : layerList)
     {
@@ -268,24 +267,21 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         QJsonObject engravingParamObj;
         QJsonObject cuttingParamObj;
         QJsonObject fillingParamObj;
-        /*layerObj["Type"] = layer->type();
-        if (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel)
-            layerObj["Type"] = LLT_ENGRAVING;*/
 
-        engravingParamObj["RunSpeed"] = layer->engravingRunSpeed() * 1000;
-        engravingParamObj["LaserPower"] = qRound(layer->engravingLaserPower() * 10);
-        engravingParamObj["MinSpeedPower"] = qRound(layer->engravingMinSpeedPower() * 10);
-        engravingParamObj["RunSpeedPower"] = qRound(layer->engravingRunSpeedPower() * 10);
+        engravingParamObj["RunSpeed"] = layer->engravingRunSpeed();
+        engravingParamObj["LaserPower"] = layer->engravingLaserPower();
+        engravingParamObj["MinSpeedPower"] = layer->engravingMinSpeedPower();
+        engravingParamObj["RunSpeedPower"] = layer->engravingRunSpeedPower();
         engravingParamObj["CarveForward"] = layer->engravingForward();
         engravingParamObj["CarveStyle"] = layer->engravingStyle();
 
-        cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed() * 1000;
-        cuttingParamObj["MinSpeedPower"] = qRound(layer->cuttingMinSpeedPower() * 10);
-        cuttingParamObj["RunSpeedPower"] = qRound(layer->cuttingRunSpeedPower() * 10);
+        cuttingParamObj["RunSpeed"] = layer->cuttingRunSpeed();
+        cuttingParamObj["MinSpeedPower"] = layer->cuttingMinSpeedPower();
+        cuttingParamObj["RunSpeedPower"] = layer->cuttingRunSpeedPower();
 
-        fillingParamObj["RunSpeed"] = layer->fillingRunSpeed() * 1000;
-        fillingParamObj["MinSpeedPower"] = qRound(layer->fillingMinSpeedPower() * 10);
-        fillingParamObj["RunSpeedPower"] = qRound(layer->fillingRunSpeedPower() * 10);
+        fillingParamObj["RunSpeed"] = layer->fillingRunSpeed();
+        fillingParamObj["MinSpeedPower"] = layer->fillingMinSpeedPower();
+        fillingParamObj["RunSpeedPower"] = layer->fillingRunSpeedPower();
         fillingParamObj["RowInterval"] = layer->fillingRowInterval();
 
         paramObj["EngravingParams"] = engravingParamObj;
@@ -302,15 +298,14 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
             {
                 if (!enablePrintAndCut())
                 {
-                    QRectF boundingRect = LaserApplication::device->transformSceneToDevice()
-                        .mapRect(primitive->sceneBoundingRect());
+                    QRectF boundingRect = primitive->sceneBoundingRect();
                     itemObj["Width"] = boundingRect.width();
                     itemObj["Height"] = boundingRect.height();
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
                     itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
 
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Engraving").arg(primitive->name()), exportProgress);
-                    QByteArray data = primitive->engravingImage(progress, lastPoint, residual);
+                    QByteArray data = primitive->engravingImage(progress, lastPoint);
                     if (!data.isEmpty())
                     {
                         itemObj["Type"] = primitive->typeLatinName();
@@ -328,7 +323,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, residual, transformPrintAndCut));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, transformPrintAndCut));
                     items.append(itemObjCutting);
                 }
             }
@@ -340,7 +335,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObj["Type"] = primitive->typeLatinName();
                     itemObj["Style"] = LaserLayerType::LLT_CUTTING;
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Points to Plt").arg(primitive->name()), exportProgress);
-                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, residual, transformPrintAndCut));
+                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, transformPrintAndCut));
                     items.append(itemObj);
                 }
             }
@@ -352,8 +347,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), exportProgress);
                     if (layer->fillingType() == FT_Line)
                     {
-                        LaserLineListList lineList = primitive->generateFillData(lastPoint);
-                        QByteArray data = machiningUtils::lineList2Plt(progress, lineList, lastPoint, residual);
+                        LaserLineListList lineList = primitive->generateFillData();
+                        QByteArray data = machiningUtils::lineList2Plt(progress, lineList, lastPoint);
                         if (!data.isEmpty())
                         {
                             itemObj["Type"] = primitive->typeLatinName();
@@ -367,8 +362,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                         QByteArray data = primitive->filling(progress, lastPoint);
                         if (!data.isEmpty())
                         {
-                            QRectF boundingRect = LaserApplication::device->transformSceneToDevice()
-                                .mapRect(primitive->sceneBoundingRect());
+                            QRectF boundingRect = primitive->sceneBoundingRect();
                             itemObj["Width"] = boundingRect.width();
                             itemObj["Height"] = boundingRect.height();
                             itemObj["Type"] = "Bitmap";
@@ -388,7 +382,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, residual, transformPrintAndCut));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, transformPrintAndCut));
                     items.append(itemObjCutting);
                 }
             }
@@ -430,15 +424,15 @@ void LaserDocument::exportBoundingJSON()
     QJsonObject jsonObj;
 
     QTransform t = enablePrintAndCut() ? printAndCutTransform() : QTransform();
-    QPointF docOrigin(0, 0);
+    QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
     {
     case SFT_AbsoluteCoords:
     case SFT_CurrentPosition:
-        docOrigin = QPointF(0, 0);
+        docOrigin = QPoint(0, 0);
         break;
     case SFT_UserOrigin:
-        docOrigin = LaserApplication::device->userOriginInDevice();
+        docOrigin = LaserApplication::device->userOrigin();
         break;
     }
     QJsonObject laserDocumentInfo;
@@ -450,7 +444,7 @@ void LaserDocument::exportBoundingJSON()
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(machiningDocBoundingRectInDevice());
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect());
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -476,8 +470,7 @@ void LaserDocument::exportBoundingJSON()
     itemObj["Name"] = "BoundingRect";
     int index = 0;
     bool isMiddle = false;
-    QPointF lastPoint = docOriginInDevice();
-    QPointF residual(0, 0);
+    QPoint lastPoint = this->docOrigin();
     if (Config::Device::startFrom() == SFT_AbsoluteCoords)
     {
         switch (Config::SystemRegister::deviceOrigin())
@@ -535,7 +528,7 @@ void LaserDocument::exportBoundingJSON()
         }
     }
     
-    QRectF docBoundingRect = machiningDocBoundingRectInDevice();
+    QRect docBoundingRect = absoluteDocBoundingRect();
     LaserPointList points;
     points.append(LaserPoint(docBoundingRect.topLeft()));
     points.append(LaserPoint(docBoundingRect.topRight()));
@@ -569,7 +562,7 @@ void LaserDocument::exportBoundingJSON()
     
     itemObj["Type"] = "Rect";
     itemObj["Style"] = LaserLayerType::LLT_CUTTING;
-    itemObj["Data"] = QString(machiningUtils::pointList2Plt(nullptr, points2, lastPoint, residual, t));
+    itemObj["Data"] = QString(machiningUtils::pointList2Plt(nullptr, points2, lastPoint, t));
     items.append(itemObj);
 
     layerObj["Items"] = items;
@@ -651,9 +644,10 @@ void LaserDocument::setUnit(SizeUnit unit)
     d->unit = unit;
 }
 
-QPointF LaserDocument::jobOriginReletiveInScene(const QRectF& docBounding) const
+QPoint LaserDocument::reletiveJobOrigin() const
 {
-    qreal dx, dy;
+    Q_D(const LaserDocument);
+    int dx, dy;
     switch (Config::Device::jobOrigin())
     {
     case 0:
@@ -661,71 +655,49 @@ QPointF LaserDocument::jobOriginReletiveInScene(const QRectF& docBounding) const
         dy = 0;
         break;
     case 1:
-        dx = docBounding.width() / 2;
+        dx = d->bounding.width() / 2;
         dy = 0;
         break;
     case 2:
-        dx = docBounding.width();
+        dx = d->bounding.width();
         dy = 0;
         break;
     case 3:
         dx = 0;
-        dy = docBounding.height() / 2;
+        dy = d->bounding.height() / 2;
         break;
     case 4:
-        dx = docBounding.width() / 2;
-        dy = docBounding.height() / 2;
+        dx = d->bounding.width() / 2;
+        dy = d->bounding.height() / 2;
         break;
     case 5:
-        dx = docBounding.width();
-        dy = docBounding.height() / 2;
+        dx = d->bounding.width();
+        dy = d->bounding.height() / 2;
         break;
     case 6:
         dx = 0;
-        dy = docBounding.height();
+        dy = d->bounding.height();
         break;
     case 7:
-        dx = docBounding.width() / 2;
-        dy = docBounding.height();
+        dx = d->bounding.width() / 2;
+        dy = d->bounding.height();
         break;
     case 8:
-        dx = docBounding.width();
-        dy = docBounding.height();
+        dx = d->bounding.width();
+        dy = d->bounding.height();
         break;
     }
-    return QPointF(dx, dy);
+    return QPoint(dx, dy);
 }
 
-QPointF LaserDocument::jobOriginReletiveInScene(bool includingAccSpan) const
+QPoint LaserDocument::jobOriginOnDocBoundingRect() const
 {
-    return jobOriginReletiveInScene(docBoundingRectInScene(includingAccSpan));
+    Q_D(const LaserDocument);
+    QPoint jobOrigin = reletiveJobOrigin();
+    return d->bounding.topLeft() + jobOrigin;
 }
 
-QPointF LaserDocument::jobOriginReletiveInMech(bool includingAccSpan) const
-{
-    QPointF origin = jobOriginReletiveInScene(includingAccSpan);
-    origin = Global::matrixToUm().map(origin);
-    return origin;
-}
-
-QPointF LaserDocument::jobOriginInScene() const
-{
-    QRectF bounding = docBoundingRectInScene();
-    QPointF jobOrigin = jobOriginReletiveInScene();
-    return bounding.topLeft() + jobOrigin;
-}
-
-QPointF LaserDocument::jobOriginInDevice() const
-{
-    return LaserApplication::device->transformSceneToDevice().map(jobOriginInScene());
-}
-
-QPointF LaserDocument::jobOriginInMech() const
-{
-    return Global::matrixToUm().map(jobOriginInScene());
-}
-
-QRectF LaserDocument::docBoundingRectInScene(bool includingAccSpan) const
+QRect LaserDocument::absoluteDocBoundingRect(bool includingAccSpan) const
 {
     Q_D(const LaserDocument);
     if (includingAccSpan)
@@ -738,125 +710,50 @@ QRectF LaserDocument::docBoundingRectInScene(bool includingAccSpan) const
     }
 }
 
-QRectF LaserDocument::docBoundingRectInMech() const
+QRect LaserDocument::currentDocBoundingRect(bool includingAccSpan) const
 {
-    return Global::matrixToUm().mapRect(docBoundingRectInScene());
-}
-
-QRectF LaserDocument::docBoundingRectInDevice(bool includingAccSpan) const
-{
-    return LaserApplication::device->transformSceneToDevice()
-        .mapRect(docBoundingRectInScene(includingAccSpan));
-}
-
-QRectF LaserDocument::machiningDocBoundingRectInScene() const
-{
-    QRectF bounding = docBoundingRectInScene();
-    if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(LaserApplication::device->userOriginInScene());
-        QPointF offset = jobOriginReletiveInScene();
-        bounding.moveTopLeft(-offset);
-    }
-    else if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        bounding.moveTopLeft(-bounding.topLeft());
-        QPointF offset = jobOriginReletiveInScene();
-        bounding.moveTopLeft(-offset);
-    }
-    return bounding;
-}
-
-QRectF LaserDocument::machiningDocBoundingRectInMech() const
-{
-    QRectF bounding = docBoundingRectInMech();
+    Q_D(const LaserDocument);
+    QRect bounding = absoluteDocBoundingRect(includingAccSpan);
     if (Config::Device::startFrom() == SFT_UserOrigin)
     {
-        QPointF userOrigin = LaserApplication::device->userOriginInMech();
-        QPointF jobOrigin = jobOriginInMech();
-        QPointF offset = userOrigin - jobOrigin;
-        QPointF target = bounding.topLeft() + offset;
+        QPoint userOrigin = LaserApplication::device->userOrigin();
+        QPoint jobOrigin = this->jobOriginOnDocBoundingRect();
+        QPoint offset = userOrigin - jobOrigin;
+        QPoint target = bounding.topLeft() + offset;
         bounding.moveTopLeft(target);
     }
     else if (Config::Device::startFrom() == SFT_CurrentPosition)
     {
-        QPointF userOrigin = LaserApplication::device->currentOriginInMech();
-        QPointF jobOrigin = jobOriginInMech();
-        QPointF offset = userOrigin - jobOrigin;
-        QPointF target = bounding.topLeft() + offset;
+        QPoint userOrigin = LaserApplication::device->laserPosition();
+        QPoint jobOrigin = this->jobOriginOnDocBoundingRect();
+        QPoint offset = userOrigin - jobOrigin;
+        QPoint target = bounding.topLeft() + offset;
         bounding.moveTopLeft(target);
     }
     return bounding;
 }
 
-QRectF LaserDocument::machiningDocBoundingRectInDevice(bool includingAccSpan) const
+QPoint LaserDocument::docOrigin() const
 {
-    QRectF bounding = docBoundingRectInDevice(includingAccSpan);
-    if (Config::Device::startFrom() == SFT_UserOrigin)
-    {
-        QPointF userOrigin = LaserApplication::device->userOriginInDevice();
-        QPointF jobOrigin = jobOriginInDevice();
-        QPointF offset = userOrigin - jobOrigin;
-        QPointF target = bounding.topLeft() + offset;
-        bounding.moveTopLeft(target);
-    }
-    else if (Config::Device::startFrom() == SFT_CurrentPosition)
-    {
-        QPointF userOrigin = LaserApplication::device->currentOriginInDevice();
-        QPointF jobOrigin = jobOriginInDevice();
-        QPointF offset = userOrigin - jobOrigin;
-        QPointF target = bounding.topLeft() + offset;
-        bounding.moveTopLeft(target);
-    }
-    return bounding;
-}
-
-QPointF LaserDocument::docOriginInScene() const
-{
-    QRectF bounding = docBoundingRectInScene();
-    QPointF origin(0, 0);
+    QPoint origin(0, 0);
     if (Config::Device::startFrom() == SFT_AbsoluteCoords)
-        origin = LaserApplication::device->originInScene();
+        origin = LaserApplication::device->origin();
     else
     {
-        origin = jobOriginInScene();
+        origin = jobOriginOnDocBoundingRect();
     }
     return origin;
 }
 
-QPointF LaserDocument::docOriginInMech() const
-{
-    QPointF origin(0, 0);
-    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
-        origin = LaserApplication::device->absoluteOriginInMech();
-    else
-    {
-        origin = jobOriginInMech();
-    }
-    return origin;
-}
-
-QPointF LaserDocument::docOriginInDevice() const
-{
-    QPointF origin(0, 0);
-    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
-        origin = LaserApplication::device->originInDevice();
-    else
-    {
-        origin = transformToReletiveOriginInDevice().map(jobOriginInDevice());
-    }
-    return origin;
-}
-
-QTransform LaserDocument::transformToReletiveOriginInDevice() const
+QTransform LaserDocument::transformToReletiveOrigin() const
 {
     QTransform transform;
     QPointF origin;
     if (Config::Device::startFrom() == SFT_UserOrigin)
-        origin = LaserApplication::device->userOriginInDevice();
+        origin = LaserApplication::device->userOrigin();
     else if (Config::Device::startFrom() == SFT_CurrentPosition)
-        origin = LaserApplication::device->laserPositionInDevice();
-    QPointF jobOrigin = jobOriginInDevice();
+        origin = LaserApplication::device->laserPosition();
+    QPointF jobOrigin = jobOriginOnDocBoundingRect();
     QPointF offset = origin - jobOrigin;
     transform = QTransform::fromTranslate(offset.x(), offset.y());
     return transform;
@@ -1156,7 +1053,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 			if (className == "LaserEllipse" || className == "LaserRect" || className == "LaserBitmap") {
 				//bounds
 				QJsonArray boundsArray = primitiveJson["bounds"].toArray();
-				QRectF bounds = QRectF(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
+				QRect bounds = QRect(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
 				if (className == "LaserEllipse") {
 					primitive = new LaserEllipse(bounds, this, saveTransform, layerIndex);
 				}
@@ -1167,7 +1064,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				else if (className == "LaserBitmap") {
 					//bounds
 					QJsonArray boundsArray = primitiveJson["bounds"].toArray();
-					QRectF bounds = QRectF(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
+					QRect bounds = QRect(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
 					//image
 					QByteArray array = QByteArray::fromBase64(primitiveJson["image"].toString().toLatin1());
 					
@@ -1181,24 +1078,24 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 				
 				//line
 				QJsonArray lineArray = primitiveJson["line"].toArray();
-				QPointF p1 = QPointF(lineArray[0].toDouble(), lineArray[1].toDouble());
-				QPointF p2 = QPointF(lineArray[2].toDouble(), lineArray[3].toDouble());
+				QPoint p1 = QPoint(lineArray[0].toInt(), lineArray[1].toInt());
+				QPoint p2 = QPoint(lineArray[2].toInt(), lineArray[3].toInt());
 
-				primitive = new LaserLine(QLineF(p1, p2), this, saveTransform, layerIndex);
+				primitive = new LaserLine(QLine(p1, p2), this, saveTransform, layerIndex);
 			}
 			else if (className == "LaserPolyline" || className == "LaserPolygon") {
 				QJsonArray polyArray = primitiveJson["poly"].toArray();
-				QVector<QPointF> vector;
+				QVector<QPoint> vector;
 				for each(QJsonValue point in polyArray) {
 					QJsonArray pointArray = point.toArray();
-					vector.append(QPointF(pointArray[0].toDouble(), pointArray[1].toDouble()));
+					vector.append(QPoint(pointArray[0].toInt(), pointArray[1].toInt()));
 				}
 				//LaserPrimitive * poly;
 				if (className == "LaserPolyline") {
-					primitive = new LaserPolyline(QPolygonF(vector), this, saveTransform, layerIndex);
+					primitive = new LaserPolyline(QPolygon(vector), this, saveTransform, layerIndex);
 				}
 				else if (className == "LaserPolygon") {
-					primitive = new LaserPolygon(QPolygonF(vector), this, saveTransform, layerIndex);
+					primitive = new LaserPolygon(QPolygon(vector), this, saveTransform, layerIndex);
 				}
 				
             }
@@ -1383,102 +1280,102 @@ void LaserDocument::clearTree(OptimizeNode* node, ProgressItem* progress)
     progress->finish();
 }
 
-void LaserDocument::optimizeGroups(OptimizeNode* node, int level, bool sorted)
-{
-    qLogD << "node " << node->nodeName() << " has " << node->childCount() << " child nodes.";
-    if (!node->hasChildren())
-    {
-        return;
-    }
-
-    QList<OptimizeNode*> children = node->childNodes();
-    if (!sorted)
-    {
-        // 将当前节点下的子节点按行或列分到不同的组中
-        QMap<int, QList<OptimizeNode*>> childrenMap;
-        for (OptimizeNode* node : node->childNodes())
-        {
-            int groupIndex = 0;
-            if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
-            {
-                groupIndex = node->positionInDevice().y() / Config::PathOptimization::groupingGridInterval();
-            }
-            else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
-            {
-                groupIndex = node->positionInDevice().x() / Config::PathOptimization::groupingGridInterval();
-            }
-            childrenMap[groupIndex].append(node);
-        }
-        qLogD << "  child nodes were seperated into " << childrenMap.size() << " groups by grid.";
-
-        if (childrenMap.size() > 1)
-        {
-            // 清空当前的子节点列表。
-            node->childNodes().clear();
-
-            // 加入新排列的子节点列表
-            for (QMap<int, QList<OptimizeNode*>>::Iterator i = childrenMap.begin(); i != childrenMap.end(); i++)
-            {
-                OptimizeNode* newNode = new OptimizeNode();
-                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-                newNode->setNodeName(nodeName);
-                newNode->addChildNodes(i.value());
-                node->addChildNode(newNode);
-
-                // 递归调用
-                //optimizeGroups(newNode, level + 1);
-            }
-        }
-
-        // 获取当前节点的所有子节点，进行排序。
-        children = node->childNodes();
-        qSort(children.begin(), children.end(),
-            [=](OptimizeNode* a, OptimizeNode* b) -> bool {
-                if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
-                {
-                    return a->positionInDevice().x() < b->positionInDevice().x();
-                }
-                else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
-                {
-                    return a->positionInDevice().y() < b->positionInDevice().y();
-                }
-                return false;
-            }
-        );
-    }
-
-    // 获取每个分组中子节点的最大个数。
-    int maxChildNodes = Config::PathOptimization::maxGroupSize();
-    // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
-    // 新建一个父节点，将该父节点作为当前父节点的子节点。
-    if (children.count() > maxChildNodes)
-    {
-        node->childNodes().clear();
-        OptimizeNode* newNode = nullptr;
-        for (int i = 0, count = 0; i < children.count(); i++)
-        {
-            if ((count++ % maxChildNodes) == 0)
-            {
-                newNode = new OptimizeNode();
-                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
-                newNode->setNodeName(nodeName);
-                node->addChildNode(newNode);
-            }
-            newNode->addChildNode(children.at(i));
-        }
-        qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
-
-        // 如果子对象数量还是多于最大数，则再递归处理
-        if (node->childCount() > maxChildNodes)
-            optimizeGroups(node, level, true);
-    }
-
-    // 对每一个子节点再次递归进行整理。
-    for (OptimizeNode* item : node->childNodes())
-    {
-        optimizeGroups(item, level + 1);
-    }
-}
+//void LaserDocument::optimizeGroups(OptimizeNode* node, int level, bool sorted)
+//{
+//    qLogD << "node " << node->nodeName() << " has " << node->childCount() << " child nodes.";
+//    if (!node->hasChildren())
+//    {
+//        return;
+//    }
+//
+//    QList<OptimizeNode*> children = node->childNodes();
+//    if (!sorted)
+//    {
+//        // 将当前节点下的子节点按行或列分到不同的组中
+//        QMap<int, QList<OptimizeNode*>> childrenMap;
+//        for (OptimizeNode* node : node->childNodes())
+//        {
+//            int groupIndex = 0;
+//            if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+//            {
+//                groupIndex = node->currentPos().y() / Config::PathOptimization::groupingGridInterval();
+//            }
+//            else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+//            {
+//                groupIndex = node->positionInDevice().x() / Config::PathOptimization::groupingGridInterval();
+//            }
+//            childrenMap[groupIndex].append(node);
+//        }
+//        qLogD << "  child nodes were seperated into " << childrenMap.size() << " groups by grid.";
+//
+//        if (childrenMap.size() > 1)
+//        {
+//            // 清空当前的子节点列表。
+//            node->childNodes().clear();
+//
+//            // 加入新排列的子节点列表
+//            for (QMap<int, QList<OptimizeNode*>>::Iterator i = childrenMap.begin(); i != childrenMap.end(); i++)
+//            {
+//                OptimizeNode* newNode = new OptimizeNode();
+//                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+//                newNode->setNodeName(nodeName);
+//                newNode->addChildNodes(i.value());
+//                node->addChildNode(newNode);
+//
+//                // 递归调用
+//                //optimizeGroups(newNode, level + 1);
+//            }
+//        }
+//
+//        // 获取当前节点的所有子节点，进行排序。
+//        children = node->childNodes();
+//        qSort(children.begin(), children.end(),
+//            [=](OptimizeNode* a, OptimizeNode* b) -> bool {
+//                if (Config::PathOptimization::groupingOrientation() == Qt::Horizontal)
+//                {
+//                    return a->positionInDevice().x() < b->positionInDevice().x();
+//                }
+//                else if (Config::PathOptimization::groupingOrientation() == Qt::Vertical)
+//                {
+//                    return a->positionInDevice().y() < b->positionInDevice().y();
+//                }
+//                return false;
+//            }
+//        );
+//    }
+//
+//    // 获取每个分组中子节点的最大个数。
+//    int maxChildNodes = Config::PathOptimization::maxGroupSize();
+//    // 如果当前节点下的子节点数大于允许的最大个数，则进行分拆。即在该父节点下，每maxChildNodes个子节点将会
+//    // 新建一个父节点，将该父节点作为当前父节点的子节点。
+//    if (children.count() > maxChildNodes)
+//    {
+//        node->childNodes().clear();
+//        OptimizeNode* newNode = nullptr;
+//        for (int i = 0, count = 0; i < children.count(); i++)
+//        {
+//            if ((count++ % maxChildNodes) == 0)
+//            {
+//                newNode = new OptimizeNode();
+//                QString nodeName = QString("vnode_%1_%2").arg(level).arg(node->childNodes().count() + 1);
+//                newNode->setNodeName(nodeName);
+//                node->addChildNode(newNode);
+//            }
+//            newNode->addChildNode(children.at(i));
+//        }
+//        qLogD << "  child nodes were seperated into " << node->childNodes().size() << " groups by maxChildNodes.";
+//
+//        // 如果子对象数量还是多于最大数，则再递归处理
+//        if (node->childCount() > maxChildNodes)
+//            optimizeGroups(node, level, true);
+//    }
+//
+//    // 对每一个子节点再次递归进行整理。
+//    for (OptimizeNode* item : node->childNodes())
+//    {
+//        optimizeGroups(item, level + 1);
+//    }
+//}
 
 //void LaserDocument::clearOutline(OptimizeNode* node, bool clearLayers)
 //{

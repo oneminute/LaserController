@@ -39,32 +39,32 @@ PointPairList PointPairTableWidget::pointPairs() const
     for (int i = 0; i < rowCount(); i++)
     {
         QTableWidgetItem* x1Item = this->item(i, 0);
-        //QTableWidgetItem* y1Item = this->item(i, 1);
+        QTableWidgetItem* y1Item = this->item(i, 1);
         QTableWidgetItem* x2Item = this->item(i, 2);
-        //QTableWidgetItem* y2Item = this->item(i, 3);
+        QTableWidgetItem* y2Item = this->item(i, 3);
 
-        if (!x1Item || !x2Item)
-            continue;
-        //if (!x1Item || !y1Item || !x2Item || !y2Item)
+        //if (!x1Item || !x2Item)
             //continue;
-
-        //QVariant x1Var = x1Item->data(Qt::EditRole);
-        //QVariant y1Var = y1Item->data(Qt::EditRole);
-        //QVariant x2Var = x2Item->data(Qt::EditRole);
-        //QVariant y2Var = y2Item->data(Qt::EditRole);
-
-        //if (x1Var.isNull() || y1Var.isNull() || x2Var.isNull() || y2Var.isNull())
-            //continue;
-
-        QVariant pt1Var = x1Item->data(Qt::UserRole);
-        QVariant pt2Var = x2Item->data(Qt::UserRole);
-        if (pt1Var.isNull() || pt2Var.isNull())
+        if (!x1Item || !y1Item || !x2Item || !y2Item)
             continue;
 
-        //QPointF pt1(x1Var.toReal(), y1Var.toReal());
-        //QPointF pt2(x2Var.toReal(), y2Var.toReal());
+        QVariant x1Var = x1Item->data(Qt::EditRole);
+        QVariant y1Var = y1Item->data(Qt::EditRole);
+        QVariant x2Var = x2Item->data(Qt::EditRole);
+        QVariant y2Var = y2Item->data(Qt::EditRole);
 
-        PointPair pair(pt1Var.toPointF(), pt2Var.toPointF());
+        if (x1Var.isNull() || y1Var.isNull() || x2Var.isNull() || y2Var.isNull())
+            continue;
+
+        //QVariant pt1Var = x1Item->data(Qt::UserRole);
+        //QVariant pt2Var = x2Item->data(Qt::UserRole);
+        //if (pt1Var.isNull() || pt2Var.isNull())
+            //continue;
+
+        QPoint pt1(x1Var.toInt(), y1Var.toInt());
+        QPoint pt2(x2Var.toInt(), y2Var.toInt());
+
+        PointPair pair(pt1, pt2);
         list.append(pair);
     }
     return list;
@@ -112,9 +112,8 @@ void PointPairTableWidget::setLaserPoint(const QPointF& point)
         itemY = new QTableWidgetItem;
         setItem(row, 1, itemY);
     }
-    itemX->setData(Qt::EditRole, QString::number(point.x() * 0.001, 'f', 3));
-    itemX->setData(Qt::UserRole, point);
-    itemY->setData(Qt::EditRole, QString::number(point.y() * 0.001, 'f', 3));
+    itemX->setData(Qt::EditRole, QString::number(point.x()));
+    itemY->setData(Qt::EditRole, QString::number(point.y()));
 }
 
 void PointPairTableWidget::setCanvasPoint(const QPointF& point)
@@ -152,12 +151,9 @@ void PointPairTableWidget::setCanvasPoint(const QPointF& point)
         setItem(row, 3, itemY);
     }
 
-    QPointF pt = LaserApplication::device->transformToDevice()
-        .map(Global::matrixToUm().map(point));
-    qLogD << "canvas point: " << point << ", " << pt;
-    itemX->setData(Qt::EditRole, QString::number(pt.x() * 0.001, 'f', 3));
-    itemX->setData(Qt::UserRole, pt);
-    itemY->setData(Qt::EditRole, QString::number(pt.y() * 0.001, 'f', 3));
+    qLogD << "canvas point: " << point;
+    itemX->setData(Qt::EditRole, QString::number(point.x()));
+    itemY->setData(Qt::EditRole, QString::number(point.y()));
 }
 
 bool PointPairTableWidget::isEmpty() const

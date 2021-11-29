@@ -183,18 +183,18 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
-void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRectF& bounding, QRectF& boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
-    bounding = QRectF();
-    boundingAcc = QRectF();
+    bounding = QRect();
+    boundingAcc = QRect();
     for (LaserPrimitive* primitive : primitives)
     {
         if (exludeUnexport && !primitive->exportable())
             continue;
 
-        QRectF rect = primitive->sceneBoundingRect();
-        QRectF rectAcc = rect;
+        QRect rect = primitive->sceneBoundingRect();
+        QRect rectAcc = rect;
         LaserLayer* layer = primitive->layer();
         if (primitive->isBitmap() ||
             (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel && 
@@ -274,7 +274,7 @@ LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
                 qreal x1 = last;
                 qreal x2 = curr;
                 if (x1 > x2) qSwap(x1, x2);
-                lines.append(QLineF(QPointF(x1, y), QPointF(x2, y)));
+                lines.append(QLineF(QPointF(x1, y), QPointF(x2, y)).toLine());
             }
             last = curr;
         }

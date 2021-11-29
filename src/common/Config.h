@@ -120,7 +120,7 @@ public:
         CONFIG_ITEM(ui, colorButtonWidth, int, toInt)
         CONFIG_ITEM(ui, colorButtonHeight, int, toInt)
         CONFIG_ITEM(ui, gridContrast, int, toInt)
-        CONFIG_ITEM(ui, visualGridSpacing, qreal, toReal)
+        CONFIG_ITEM(ui, visualGridSpacing, int, toInt)
         CONFIG_ITEM(ui, gridShapeDistance, qreal, toReal)
         CONFIG_ITEM(ui, objectShapeDistance, qreal, toReal)
         CONFIG_ITEM(ui, clickSelectionTolerance, qreal, toReal)
@@ -144,8 +144,8 @@ public:
     public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(cuttingLayer, runSpeed, int, toInt)
-        CONFIG_ITEM(cuttingLayer, minPower, qreal, toReal)
-        CONFIG_ITEM(cuttingLayer, maxPower, qreal, toReal)
+        CONFIG_ITEM(cuttingLayer, minPower, int, toInt)
+        CONFIG_ITEM(cuttingLayer, maxPower, int, toInt)
 
     private:
         friend class Config;
@@ -207,7 +207,7 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(pathOptimization, maxStartingPoints, int, toInt)
         CONFIG_ITEM(pathOptimization, groupingOrientation, int, toInt)
-        CONFIG_ITEM(pathOptimization, groupingGridInterval, qreal, toReal)
+        CONFIG_ITEM(pathOptimization, groupingGridInterval, int, toInt)
         CONFIG_ITEM(pathOptimization, maxGroupSize, int, toInt)
         CONFIG_ITEM(pathOptimization, searchingXYWeight, qreal, toReal)
 
@@ -250,9 +250,9 @@ public:
         CONFIG_ITEM(device, xEnabled, bool, toBool)
         CONFIG_ITEM(device, yEnabled, bool, toBool)
         CONFIG_ITEM(device, zEnabled, bool, toBool)
-        CONFIG_ITEM(device, userOrigin1, QPointF, toPointF)
-        CONFIG_ITEM(device, userOrigin2, QPointF, toPointF)
-        CONFIG_ITEM(device, userOrigin3, QPointF, toPointF)
+        CONFIG_ITEM(device, userOrigin1, QPoint, toPoint)
+        CONFIG_ITEM(device, userOrigin2, QPoint, toPoint)
+        CONFIG_ITEM(device, userOrigin3, QPoint, toPoint)
         CONFIG_ITEM(device, userOriginSelected, int, toInt)
         CONFIG_ITEM(device, redLightOffset, QPointF, toPointF)
         //CONFIG_ITEM_T(device, userOrigins, QList<QPointF>, QList<QPointF>)
@@ -288,9 +288,9 @@ public:
         CONFIG_ITEM(userRegister, scanLaserFrequency, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnError, int, toInt)
         CONFIG_ITEM(userRegister, scanLaserPower, qreal, toReal)
-        CONFIG_ITEM(userRegister, scanXResetEnabled, bool, toBool)
-        CONFIG_ITEM(userRegister, scanYResetEnabled, bool, toBool)
-        CONFIG_ITEM(userRegister, scanZResetEnabled, bool, toBool)
+        CONFIG_ITEM(userRegister, scanXResetEnabled, int, toInt)
+        CONFIG_ITEM(userRegister, scanYResetEnabled, int, toInt)
+        CONFIG_ITEM(userRegister, scanZResetEnabled, int, toInt)
         CONFIG_ITEM(userRegister, resetSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, scanReturnPos, int, toInt)
         CONFIG_ITEM(userRegister, backlashXInterval, qreal, toReal)
@@ -356,10 +356,10 @@ public:
         CONFIG_ITEM(systemRegister, xMaxAcceleration, int, toInt)
         CONFIG_ITEM(systemRegister, xUrgentAcceleration, int, toInt)
 
-        CONFIG_ITEM(systemRegister, yMaxLength, qreal, toReal)
-        CONFIG_ITEM(systemRegister, yDirPhase, bool, toBool)
-        CONFIG_ITEM(systemRegister, yLimitPhase, bool, toBool)
-        CONFIG_ITEM(systemRegister, yZeroDev, bool, toBool)
+        CONFIG_ITEM(systemRegister, yMaxLength, int, toInt)
+        CONFIG_ITEM(systemRegister, yDirPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, yLimitPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, yZeroDev, int, toInt)
         CONFIG_ITEM(systemRegister, yStepLength, int, toInt)
         CONFIG_ITEM(systemRegister, yLimitNum, int, toInt)
         CONFIG_ITEM(systemRegister, yResetEnabled, int, toInt)
@@ -387,9 +387,9 @@ public:
         CONFIG_ITEM(systemRegister, laserMaxPower, int, toInt)
         CONFIG_ITEM(systemRegister, laserMinPower, int, toInt)
         CONFIG_ITEM(systemRegister, laserPowerFreq, int, toInt)
-        CONFIG_ITEM(systemRegister, xPhaseEnabled, bool, toBool)
-        CONFIG_ITEM(systemRegister, yPhaseEnabled, bool, toBool)
-        CONFIG_ITEM(systemRegister, zPhaseEnabled, bool, toBool)
+        CONFIG_ITEM(systemRegister, xPhaseEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, yPhaseEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, zPhaseEnabled, int, toInt)
         CONFIG_ITEM(systemRegister, deviceOrigin, int, toInt)
 
     private:

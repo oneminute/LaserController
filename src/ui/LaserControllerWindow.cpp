@@ -85,6 +85,8 @@
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 using namespace ads;
 
@@ -264,7 +266,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     
     m_statusBarLocation = new QLabel;
     m_statusBarLocation->setText(ltr("Top Left"));
-    m_statusBarLocation->setMinimumWidth(300);
+    m_statusBarLocation->setMinimumWidth(180);
     m_statusBarLocation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarLocation);
 
@@ -642,7 +644,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
     connect(m_viewer, &LaserViewer::scaleChanged, this, &LaserControllerWindow::onLaserViewerScaleChanged);
-    connect(m_comboBoxScale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LaserControllerWindow::onComboBoxSxaleIndexChanged);
     connect(m_comboBoxScale, &QComboBox::currentTextChanged, this, &LaserControllerWindow::onComboBoxSxaleTextChanged);
 
     connect(LaserApplication::device, &LaserDevice::comPortsFetched, this, &LaserControllerWindow::onDeviceComPortsFetched);
@@ -915,7 +916,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         appDir.mkpath("tmp");
     }
 
-    m_layoutRect = LaserApplication::device->layoutRectInScene();
+    m_layoutRect = LaserApplication::device->layoutRect();
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 
@@ -1496,27 +1497,33 @@ void LaserControllerWindow::createCentralDockPanel()
      // 初始化缩放列表控件
     m_comboBoxScale = new QComboBox;
     m_comboBoxScale->setEditable(true);
-    m_comboBoxScale->addItem("10%");
-    m_comboBoxScale->addItem("25%");
-    m_comboBoxScale->addItem("50%");
-    m_comboBoxScale->addItem("75%");
-    m_comboBoxScale->addItem("100%");
-    m_comboBoxScale->addItem("150%");
-    m_comboBoxScale->addItem("200%");
-    m_comboBoxScale->addItem("300%");
-    m_comboBoxScale->addItem("400%");
-    m_comboBoxScale->addItem("500%");
-    m_comboBoxScale->addItem("1000%");
-    m_comboBoxScale->setCurrentText("100%");
-    QRegularExpression percentageRE("^[0-9]+%$");
-    QValidator* percentageValidator = new QRegularExpressionValidator(percentageRE, m_comboBoxScale);
-    m_comboBoxScale->setValidator(percentageValidator);
+    m_comboBoxScale->addItem("0.01");
+    m_comboBoxScale->addItem("0.1");
+    m_comboBoxScale->addItem("1");
+    m_comboBoxScale->addItem("10");
+    m_comboBoxScale->addItem("25");
+    m_comboBoxScale->addItem("50");
+    m_comboBoxScale->addItem("75");
+    m_comboBoxScale->addItem("100");
+    m_comboBoxScale->addItem("150");
+    m_comboBoxScale->addItem("200");
+    m_comboBoxScale->addItem("300");
+    m_comboBoxScale->addItem("400");
+    m_comboBoxScale->addItem("500");
+    m_comboBoxScale->addItem("1000");
+    m_comboBoxScale->setCurrentText("100");
+    m_comboBoxScale->setMinimumWidth(60);
+
+    m_labelPercentage = new QLabel;
+    m_labelPercentage->setText("%");
 
     QBoxLayout* viewHoriBottomLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
     viewHoriBottomLayout->setSpacing(0);
     viewHoriBottomLayout->setMargin(0);
     viewHoriBottomLayout->addWidget(m_comboBoxScale);
+    viewHoriBottomLayout->addWidget(m_labelPercentage);
     viewHoriBottomLayout->setStretch(0, 0);
+    viewHoriBottomLayout->setStretch(1, 0);
     viewHoriBottomLayout->addStretch(1);
 
     m_hRuler = new RulerWidget;
@@ -3130,8 +3137,8 @@ void LaserControllerWindow::onActionMachining(bool checked)
             //QString filename = file.fileName();
 
         if (!LaserApplication::device->checkLayoutForMachining(
-            m_scene->document()->machiningDocBoundingRectInDevice(),
-            m_scene->document()->machiningDocBoundingRectInDevice(true)
+            m_scene->document()->currentDocBoundingRect(),
+            m_scene->document()->currentDocBoundingRect(true)
         ))
             return;
 
@@ -3184,8 +3191,8 @@ void LaserControllerWindow::onActionBounding(bool checked)
         return;
 
     if (!LaserApplication::device->checkLayoutForMachining(
-        m_scene->document()->machiningDocBoundingRectInDevice(),
-        m_scene->document()->machiningDocBoundingRectInDevice(true)
+        m_scene->document()->currentDocBoundingRect(),
+        m_scene->document()->currentDocBoundingRect(true)
     ))
         return;
 
@@ -3651,7 +3658,7 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 {
-    QPointF laserPos = LaserApplication::device->laserPositionInDevice();
+    QPointF laserPos = LaserApplication::device->laserPosition();
     switch (Config::Device::userOriginSelected())
     {
     case 0:
@@ -3668,7 +3675,7 @@ void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 
 void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 {
-    QPointF userOrigin = LaserApplication::device->userOriginInDevice();
+    QPointF userOrigin = LaserApplication::device->userOrigin();
     qLogD << "user origin: " << userOrigin;
     LaserApplication::device->moveToMachining(QVector3D(userOrigin));
 }
@@ -3681,9 +3688,15 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 		return;
 	}
 	QImage image(name);
-	qreal width = image.size().width();
-	qreal height = image.size().height();
-	LaserBitmap* bitmap = new LaserBitmap(image, QRectF(0, 0, width, height), m_scene->document());
+    // 这里像素要转微米
+	int width = Global::sceneToMechH(image.size().width());
+	int height = Global::sceneToMechV(image.size().height());
+    QRect layout = LaserApplication::device->layoutRect();
+    QRect bitmapRect(
+        layout.left() + (layout.width() - width) / 2,
+        layout.top() + (layout.height() - height) / 2,
+        width, height);
+	LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document());
 	//undo 创建完后会执行redo
 	QList<QGraphicsItem*> list;
 	list.append(bitmap);
@@ -3775,8 +3788,6 @@ void LaserControllerWindow::onActionMirrorACrossLine(bool checked)
     if (!m_viewer || !m_viewer->group()) {
         return;
     }
-    //MirrorACommand* cmd = new MirrorACommand(m_viewer);
-    //m_viewer->undoStack()->push(cmd);
     m_viewer->AcrossLineMirror();
     
 }
@@ -3788,7 +3799,7 @@ void LaserControllerWindow::onActionPrintAndCutNew(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutFetchLaser(bool checked)
 {
-    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->laserPositionInDevice());
+    m_tablePrintAndCutPoints->setLaserPoint(LaserApplication::device->laserPosition());
 }
 
 void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
@@ -3810,9 +3821,8 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     
     for (const QPointF& pt : m_printAndCutCandidatePoints)
     {
-        QPointF ptCandidate = LaserApplication::device->transformToDevice().map(Global::matrixToUm().map(pt));
-        qLogD << "canvas point: " << pt << ", " << ptCandidate;
-        m_tablePrintAndCutPoints->setCanvasPoint(ptCandidate);
+        qLogD << "canvas point: " << pt;
+        m_tablePrintAndCutPoints->setCanvasPoint(pt);
     }
 
     //Config::Ui::visualGridSpacing();
@@ -3961,7 +3971,7 @@ void LaserControllerWindow::onActionRedLightAlignmentStart(bool checked)
     {
         m_ui->actionStartRedLightAlight->setEnabled(false);
         m_ui->actionFinishRedLightAlight->setEnabled(true);
-        m_redLightAlignment1stPt = LaserApplication::device->laserPositionInDevice();
+        m_redLightAlignment1stPt = LaserApplication::device->laserPosition();
         qreal x = m_redLightAlignment1stPt.x() * 0.001;
         qreal y = m_redLightAlignment1stPt.y() * 0.001;
         m_labelRedLightAlignmentFirst->setText(tr("x: %1, y: %2")
@@ -3976,7 +3986,7 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
     {
         m_ui->actionStartRedLightAlight->setEnabled(true);
         m_ui->actionFinishRedLightAlight->setEnabled(false);
-        m_redLightAlignment2ndPt = LaserApplication::device->laserPositionInDevice();
+        m_redLightAlignment2ndPt = LaserApplication::device->laserPosition();
 
         qreal x = m_redLightAlignment2ndPt.x() * 0.001;
         qreal y = m_redLightAlignment2ndPt.y() * 0.001;
@@ -4241,36 +4251,31 @@ void LaserControllerWindow::retranslate()
 
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
-    QPointF posUm = LaserApplication::device->transformSceneToDevice().map(pos);
-    QPointF posMM = posUm * 0.001;
-    QString posStr = QString("%1mm,%2mm | %3px,%4px")
-        .arg(posMM.x(), 8, 'f', 3).arg(posMM.y(), 8, 'f', 3)
-        .arg(qFloor(pos.x()), 5).arg(qFloor(pos.y()), 5);
+    qreal mmX = pos.x() * 0.001;
+    qreal mmY = pos.y() * 0.001;
+    QString posStr = QString("%1mm,%2mm")
+        .arg(mmX, 8, 'f', 3).arg(mmY, 8, 'f', 3);
     m_statusBarLocation->setText(posStr);
 }
 
 void LaserControllerWindow::onLaserViewerScaleChanged(qreal factor)
 {
-    QString value = QString("%1%").arg(factor * 100, 0, 'f', 0);
+    QString value = QString("%1").arg(factor * 100, 0, 'f', 3);
     m_comboBoxScale->blockSignals(true);
     m_comboBoxScale->setCurrentText(value);
     m_comboBoxScale->blockSignals(false);
 }
 
-void LaserControllerWindow::onComboBoxSxaleIndexChanged(int index)
-{
-    //m_viewer->setZoomValue(m_comboBoxScale->currentData().toReal());
-}
-
 void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 {
     // 使用正则表达式检查输入的内容，并获取数字部分的字符串。
-    QRegularExpression percentageRE("^([0-9]+)%$");
-    QRegularExpressionMatch match = percentageRE.match(text);
-    if (match.hasMatch())
+    QDoubleValidator validator;
+    int pos;
+    QString value = text;
+    QValidator::State state = validator.validate(value, pos);
+    if (state == QValidator::Acceptable)
     {
-        QString number = percentageRE.match(text).captured(1);
-        qreal zoom = number.toDouble() / 100;
+        qreal zoom = text.toDouble() / 100;
         m_viewer->setZoomValue(zoom);
     }
 }
@@ -4291,8 +4296,8 @@ void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
             tr("Device layout changed. We should close current document. Do you want to save it or close it without saving?"),
             QMessageBox::StandardButton::Save, QMessageBox::StandardButton::Close);
     }*/
-    QRectF newRect = LaserApplication::device->layoutRectInScene();
-    QPointF offset;
+    QRect newRect = LaserApplication::device->layoutRect();
+    QPoint offset;
     switch (Config::SystemRegister::deviceOrigin())
     {
     case 1:
@@ -4342,7 +4347,8 @@ void LaserControllerWindow::onUserOriginRadioButtonChanged(bool checked)
 
 void LaserControllerWindow::onCreatSpline()
 {
-	m_viewer->createSpline();
+    if (m_viewer)
+	    m_viewer->createSpline();
 }
 
 void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
@@ -4533,7 +4539,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
         m_viewer->undoStack()->clear();
         LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         if (m_viewer) {
-            QRectF rect = LaserApplication::device->layoutRectInScene();
+            QRect rect = LaserApplication::device->layoutRect();
 
             m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
             m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -4542,10 +4548,15 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
             if (backgroundItem) {
                 backgroundItem->onChangeGrids();
             }
-            m_comboBoxScale->setCurrentText("100%");
+            m_comboBoxScale->setCurrentText("100");
             //初始化缩放输入
-            QString str = QString::number(qFloor(m_viewer->adapterViewScale() * 100)) + "%";
+            qreal scale = m_viewer->adapterViewScale();
+            m_viewer->setZoomValue(scale);
+            qreal zoomValuePerc = scale * 100;
+            QString str = QString("%1").arg(zoomValuePerc, 0, 'f', 3);
+            m_comboBoxScale->blockSignals(true);
             m_comboBoxScale->setCurrentText(str);
+            m_comboBoxScale->blockSignals(false);
         }
     }
 }
@@ -4585,7 +4596,7 @@ void LaserControllerWindow::selectedChangedFromMouse()
 {
 	//int size = m_scene->selectedPrimitives().length();
     //QRectF sceneRect = m_scene->backgroundItem()->rect();
-    QRectF sceneRect = LaserApplication::device->layoutRectInScene();
+    QRect sceneRect = LaserApplication::device->layoutRect();
     LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
     LaserPrimitiveGroup* group =  view->group();
     if (!group) {
@@ -5453,11 +5464,11 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
     }
 
     // 计算文档外包框
-    QRectF docBounding = m_scene->document()->docBoundingRectInScene();
+    QRectF docBounding = m_scene->document()->currentDocBoundingRect();
 
     // 获取当前原点
-    QPointF targetOrigin = LaserApplication::device->currentOriginInScene();
-    QPointF currentOrigin = m_scene->document()->docOriginInScene();
+    QPointF targetOrigin = LaserApplication::device->currentOrigin();
+    QPointF currentOrigin = m_scene->document()->docOrigin();
     QPointF offset = targetOrigin - currentOrigin;
 
     QTransform t = QTransform::fromTranslate(offset.x(), offset.y());

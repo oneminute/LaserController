@@ -55,7 +55,7 @@ public:
     RulerWidget* horizontalRuler();
     RulerWidget* verticalRuler();
 	LaserPrimitiveGroup* group();
-	QRectF selectedItemsSceneBoundingRect();
+	QRect selectedItemsSceneBoundingRect();
     QRectF AllItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate,
         int _state, int _transformType, int _pp, bool _unitIsMM);//change selection property by tool bar
@@ -108,7 +108,7 @@ private:
 	void selectedHandleRotate();
 	
 	//void getSelctedItemsRect(qreal& left, qreal&right, qreal& top, qreal& bottom);
-	void detectRect(LaserPrimitive& item, int i, qreal& left, qreal& right, qreal& top, qreal& bottom);
+	void detectRect(LaserPrimitive& item, int i, int& left, int& right, int& top, int& bottom);
 	//bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
 	//bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
 	bool isRepeatPoint();
@@ -223,7 +223,7 @@ private:
 	bool m_mousePressed;
 
 	bool m_isGridNode;//是否为网格交点node
-	QPointF m_gridNode;
+	QPoint m_gridNode;
 	bool m_isPrimitiveInteractPoint;//绘制是否获取附近图元的最近点
 	QPointF m_primitiveInteractPoint;//scene
 	//QPointF m_isPrimitiveInteractPoint;

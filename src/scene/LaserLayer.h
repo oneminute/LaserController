@@ -35,23 +35,23 @@ public:
     int cuttingRunSpeed() const;
     void setCuttingRunSpeed(int runSpeed);
 
-    qreal cuttingMinSpeedPower() const;
-    void setCuttingMinSpeedPower(qreal minSpeedPower);
+    int cuttingMinSpeedPower() const;
+    void setCuttingMinSpeedPower(int minSpeedPower);
 
-    qreal cuttingRunSpeedPower() const;
-    void setCuttingRunSpeedPower(qreal runSpeedPower);
+    int cuttingRunSpeedPower() const;
+    void setCuttingRunSpeedPower(int runSpeedPower);
 
     int engravingRunSpeed() const;
     void setEngravingRunSpeed(int runSpeed);
 
-    qreal engravingLaserPower() const;
-    void setEngravingLaserPower(qreal laserPower);
+    int engravingLaserPower() const;
+    void setEngravingLaserPower(int laserPower);
 
-    qreal engravingMinSpeedPower() const;
-    void setEngravingMinSpeedPower(qreal minSpeedPower);
+    int engravingMinSpeedPower() const;
+    void setEngravingMinSpeedPower(int minSpeedPower);
 
-    qreal engravingRunSpeedPower() const;
-    void setEngravingRunSpeedPower(qreal runSpeedPower);
+    int engravingRunSpeedPower() const;
+    void setEngravingRunSpeedPower(int runSpeedPower);
 
     bool engravingForward() const;
     void setEngravingForward(bool engravingForward);
@@ -68,11 +68,11 @@ public:
     int fillingRunSpeed() const;
     void setFillingRunSpeed(int runSpeed);
 
-    qreal fillingMinSpeedPower() const;
-    void setFillingMinSpeedPower(qreal minSpeedPower);
+    int fillingMinSpeedPower() const;
+    void setFillingMinSpeedPower(int minSpeedPower);
 
-    qreal fillingRunSpeedPower() const;
-    void setFillingRunSpeedPower(qreal runSpeedPower);
+    int fillingRunSpeedPower() const;
+    void setFillingRunSpeedPower(int runSpeedPower);
 
     int fillingRowInterval() const;
     void setFillingRowInterval(int rowInterval);
@@ -108,9 +108,6 @@ public:
     int dpi() const;
     void setDpi(int dpi);
 
-    //qreal nonlinearCoefficient() const { return m_nonlinearCoefficient; }
-    //void setNonlinearCoefficient(qreal value) { m_nonlinearCoefficient = value; }
-
     LaserDocument* document() const;
 
     void bindButton(LayerButton* button, int index);
@@ -130,9 +127,6 @@ public:
     qreal halftoneAngles() const;
     void setHalftoneAngles(qreal angles);
 
-    //int halftoneGridSize() const;
-    //void setHalftoneGridSize(int gridSize);
-
     bool isDefault() const;
 
     virtual bool isAvailable() const;
@@ -143,18 +137,13 @@ public:
 
 	void setIndex(int i);
 
-    QRectF boundingRect() const;
+    QRect boundingRect() const;
 
-    virtual QPointF positionInScene() const;
-    virtual QPointF positionInDevice() const;
-    virtual QPointF positionInMech() const;
+    virtual QPoint position() const;
 
     QCheckBox* checkBox();
 
     void setCheckBox(QCheckBox* box);
-
-    qreal accelerationLength(LaserLayerType layerType) const;
-    qreal accelerationSegmentLength(LaserLayerType layerType) const;
 
 protected:
     void onClicked();

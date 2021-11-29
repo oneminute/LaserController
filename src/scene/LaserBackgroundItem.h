@@ -14,17 +14,17 @@ public:
 
 	void onChangeGrids();//���¼���nodeֵ
 	void drawGrids(QPainter& painter);
-	bool detectGridNode(QPointF& point, QPointF & mousePoint);//������ʱ�������յ��Ƿ�Ӧ�ñ���Ϊ�����е�node��
+	bool detectGridNode(QPoint& point, QPointF & mousePoint);//������ʱ�������յ��Ƿ�Ӧ�ñ���Ϊ�����е�node��
 	QRectF rect();
 
 protected:
 	void onLayoutChanged(const QSizeF& size);
 
 private:
-	QList<qreal> m_gridNodeXList;
-	QList<qreal> m_gridNodeYList;
-	QList<qreal> m_gridSecondNodeXList;
-	QList<qreal> m_gridSecondNodeYList;
+	QList<int> m_gridNodeXList;
+	QList<int> m_gridNodeYList;
+	QList<int> m_gridSecondNodeXList;
+	QList<int> m_gridSecondNodeYList;
 	QGraphicsRectItem* m_rectItem;
     QRectF m_maxRegion;
 

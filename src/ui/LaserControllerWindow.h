@@ -264,7 +264,6 @@ protected slots:
 
     void onLaserViewerMouseMoved(const QPointF& pos);
     void onLaserViewerScaleChanged(qreal factor);
-    void onComboBoxSxaleIndexChanged(int index);
     void onComboBoxSxaleTextChanged(const QString& text);
 
     void onLaserReturnWorkState(DeviceState state);
@@ -347,8 +346,9 @@ private:
     RulerWidget* m_hRuler;
     RulerWidget* m_vRuler;
     QComboBox* m_comboBoxScale;
+    QLabel* m_labelPercentage;
     ads::CDockAreaWidget* m_centralDockArea;
-    QRectF m_layoutRect;
+    QRect m_layoutRect;
 
     // Layers Panel widgets
     LaserLayerTableWidget* m_tableWidgetLayers;

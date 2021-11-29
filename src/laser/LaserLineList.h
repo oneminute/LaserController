@@ -2,10 +2,10 @@
 #define LASERLINELIST_H
 
 #include <QList>
-#include <QLineF>
+#include <QLine>
 #include <flann/flann.hpp>
 
-class LaserLineList : public QList<QLineF>
+class LaserLineList : public QList<QLine>
 {
 public:
     explicit LaserLineList();
@@ -13,10 +13,10 @@ public:
 
     void buildKdtree();
 
-    QLineF nearestSearch(const QPointF& point, bool remove = true);
+    QLine nearestSearch(const QPoint& point, bool remove = true);
 
 private:
-    flann::NNIndex<flann::L2_Simple<qreal>>* m_kdtree;
+    flann::NNIndex<flann::L2_Simple<int>>* m_kdtree;
     QVector<qreal> m_matrix;
 };
 

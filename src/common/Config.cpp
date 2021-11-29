@@ -226,7 +226,7 @@ void Config::loadGeneralItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("English"), static_cast<int>(QLocale::English));
+            comboBox->addItem("English", static_cast<int>(QLocale::English));
             comboBox->addItem(tr("Chinese"), static_cast<int>(QLocale::Chinese));
 
             QTimer::singleShot(0, 
@@ -247,7 +247,6 @@ void Config::loadGeneralItems()
             comboBox->setItemText(1, tr("Chinese"));
         }
     );
-    language->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* unit = group->addConfigItem(
         "unit"
@@ -268,16 +267,7 @@ void Config::loadGeneralItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
-
-    /*ConfigItem* machiningUnit = group->addConfigItem(
-        "machiningUnit",
-        1000,
-        DT_REAL
-    );
-    machiningUnit->setInputWidgetType(IWT_DoubleSpinBox);
-    machiningUnit->setInputWidgetProperty("minimum", 1);
-    machiningUnit->setInputWidgetProperty("maximum", 1000);
-    machiningUnit->setVisible(false);*/
+    unit->setVisible(false);
 }
 
 void Config::loadLayersItems()
@@ -361,11 +351,6 @@ void Config::loadUiItems()
             if (!comboBox)
                 return;
 
-            //comboBox->addItem(QCoreApplication::translate("Config", ("Off"), nullptr), 0);
-            //comboBox->addItem(QCoreApplication::translate("Config", ("Low Contrast"), nullptr), 1);
-            //comboBox->addItem(QCoreApplication::translate("Config", ("Medium Contrast"), nullptr), 2);
-            //comboBox->addItem(QCoreApplication::translate("Config", ("High Contrast"), nullptr), 3);
-
             comboBox->addItem(ltr("Off"), 0);
             comboBox->addItem(ltr("Low Contrast"), 1);
             comboBox->addItem(ltr("Medium Contrast"), 2);
@@ -402,17 +387,18 @@ void Config::loadUiItems()
 
 	ConfigItem* visualGridSpacing = group->addConfigItem(
 		"visualGridSpacing",
-		10
+		10,
+        DT_INT
 	);
     visualGridSpacing->setInputWidgetProperty("textTemplate", "%1mm");
-	visualGridSpacing->setInputWidgetProperty("minimum", 0);
-	visualGridSpacing->setInputWidgetProperty("maximum", 10);
+	visualGridSpacing->setInputWidgetProperty("minimum", 1);
+	visualGridSpacing->setInputWidgetProperty("maximum", 50);
 
    
     ConfigItem* validMaxRegion = group->addConfigItem(
         "validMaxRegion",
         3000,
-        DT_REAL
+        DT_INT
     );
     validMaxRegion->setInputWidgetProperty("textTemplate", "%1mm");
     validMaxRegion->setInputWidgetProperty("minimum", 0);
@@ -433,16 +419,6 @@ void Config::loadUiItems()
     autoRepeatDelay->setInputWidgetProperty("textTemplate", "%1ms");
     autoRepeatDelay->setInputWidgetProperty("minimum", 0);
     autoRepeatDelay->setInputWidgetProperty("maximum", 2000);
-
-    /*ConfigItem* autoRepeatInterval = group->addConfigItem(
-        "autoRepeatInterval",
-        tr("Auto repeat interval"),
-        tr("Auto repeat interval when pressing a button"),
-        200
-    );
-    autoRepeatInterval->setInputWidgetProperty("textTemplate", "%1ms");
-    autoRepeatInterval->setInputWidgetProperty("minimum", 0);
-    autoRepeatInterval->setInputWidgetProperty("maximum", 2000);*/
 
     ConfigItem* showDocumentBoundingRect = group->addConfigItem(
         "showDocumentBoundingRect",
@@ -468,55 +444,39 @@ void Config::loadCuttingLayerItems()
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
-        60
+        60000,
+        DT_INT
     );
+    runSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    runSpeed->setInputWidgetProperty("decimals", 0);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
+    runSpeed->setInputWidgetProperty("step", 0.001);
     runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* minPower = group->addConfigItem(
         "minPower",
-        70,
-        DT_REAL
+        700,
+        DT_INT
     );
-    minPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    minPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    minPower->setInputWidgetType(IWT_FloatEditSlider);
     minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
+    minPower->setInputWidgetProperty("step", 0.1);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* maxPower = group->addConfigItem(
         "maxPower",
-        100,
-        DT_REAL
+        1000,
+        DT_INT
     );
-    maxPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    maxPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    maxPower->setInputWidgetType(IWT_FloatEditSlider);
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
+    maxPower->setInputWidgetProperty("step", 0.1);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
 }
 
@@ -527,75 +487,48 @@ void Config::loadEngravingLayerItems()
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
-        60
+        60000,
+        DT_INT
     );
+    runSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    runSpeed->setInputWidgetProperty("decimals", 0);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
+    runSpeed->setInputWidgetProperty("step", 0.001);
     runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
-        70,
-        DT_REAL
+        700,
+        DT_INT
     );
-    laserPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    laserPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    laserPower->setInputWidgetType(IWT_FloatEditSlider);
     laserPower->setInputWidgetProperty("decimals", 1);
     laserPower->setInputWidgetProperty("minimum", 0);
     laserPower->setInputWidgetProperty("maximum", 100);
+    laserPower->setInputWidgetProperty("step", 0.1);
     laserPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* minPower= group->addConfigItem(
         "minPower",
-        70,
-        DT_REAL
+        700,
+        DT_INT
     );
-    minPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    minPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetType(IWT_FloatEditSlider);
+    minPower->setInputWidgetProperty("step", 0.1);
+    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* maxPower= group->addConfigItem(
         "maxPower",
-        100,
-        DT_REAL
+        1000,
+        DT_INT
     );
-    maxPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    maxPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    maxPower->setInputWidgetType(IWT_FloatEditSlider);
+    maxPower->setInputWidgetProperty("step", 0.1);
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
@@ -633,6 +566,7 @@ void Config::loadEngravingLayerItems()
     halftoneGridSize->setInputWidgetType(IWT_EditSlider);
     halftoneGridSize->setInputWidgetProperty("minimum", 4);
     halftoneGridSize->setInputWidgetProperty("maximum", 100);
+
     ConfigItem* lpi = group->addConfigItem(
         "LPI",
         100,
@@ -663,8 +597,12 @@ void Config::loadFillingLayerItems()
 
     ConfigItem* runSpeed = group->addConfigItem(
         "runSpeed",
-        30
+        30000,
+        DT_INT
     );
+    runSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    runSpeed->setInputWidgetProperty("step", 0.001);
+    runSpeed->setInputWidgetProperty("decimals", 0);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
@@ -672,44 +610,23 @@ void Config::loadFillingLayerItems()
 
     ConfigItem* minPower= group->addConfigItem(
         "minPower",
-        4,
-        DT_REAL
+        40,
+        DT_INT
     );
-    minPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    minPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetType(IWT_FloatEditSlider);
+    minPower->setInputWidgetProperty("step", 0.1);
+    minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* maxPower= group->addConfigItem(
         "maxPower",
-        12,
-        DT_REAL
+        120,
+        DT_INT
     );
-    maxPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    maxPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    minPower->setInputWidgetType(IWT_FloatEditSlider);
+    minPower->setInputWidgetProperty("step", 0.1);
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
@@ -795,27 +712,16 @@ void Config::loadPathOptimizationItems()
     ConfigItem* groupingGridInterval = group->addConfigItem(
         "groupingGridInterval",
         30000,
-        DT_REAL
+        DT_INT
     );
     groupingGridInterval->setInputWidgetType(IWT_FloatEditSlider);
-    groupingGridInterval->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    groupingGridInterval->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
+    groupingGridInterval->setInputWidgetProperty("step", 0.001);
+    groupingGridInterval->setInputWidgetProperty("decimals", 0);
     groupingGridInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     groupingGridInterval->setInputWidgetProperty("step", 10);
     groupingGridInterval->setInputWidgetProperty("page", 10);
     groupingGridInterval->setInputWidgetProperty("minimum", 1);
     groupingGridInterval->setInputWidgetProperty("maximum", 1000);
-    groupingGridInterval->setInputWidgetProperty("decimals", 0);
 
     ConfigItem* searchingXYWeight = group->addConfigItem(
         "searchingXYWeight",
@@ -855,7 +761,6 @@ void Config::loadExportItems()
         false,
         DT_BOOL
     );
-    enableSmallDiagonal->setStoreStrategy(SS_DIRECTLY);
 
     QVariant smallDiagonalLimitationVar;
     SmallDiagonalLimitation* limitation = new SmallDiagonalLimitation;
@@ -938,7 +843,6 @@ void Config::loadDeviceItems()
         DT_INT
     );
     startFrom->setInputWidgetType(IWT_ComboBox);
-    startFrom->setStoreStrategy(SS_DIRECTLY);
     startFrom->setWidgetInitializeHook(
         [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
@@ -961,7 +865,6 @@ void Config::loadDeviceItems()
         DT_INT
     );
     jobOrigin->setInputWidgetType(IWT_Custom);
-    jobOrigin->setStoreStrategy(SS_DIRECTLY);
     jobOrigin->setCreateWidgetHook(
         [=](ConfigItem* item) {
             return qobject_cast<QWidget*>(new RadioButtonGroup());
@@ -977,6 +880,7 @@ void Config::loadDeviceItems()
         [=](QWidget* widget, const QVariant& value) {
             RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
             radioGroup->setValue(value.toInt());
+            return value;
         }
     );
     connect(startFrom, &ConfigItem::valueChanged,
@@ -1005,49 +909,47 @@ void Config::loadDeviceItems()
         true,
         DT_BOOL
     );
-    xEnabled->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* yEnabled = group->addConfigItem(
         "yEnabled",
         true,
         DT_BOOL
     );
-    yEnabled->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* zEnabled = group->addConfigItem(
         "zEnabled",
         true,
         DT_BOOL
     );
-    zEnabled->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* userOrigin1 = group->addConfigItem(
         "userOrigin1",
-        QPointF(0, 0),
+        QPoint(0, 0),
         DT_POINT
     );
-    userOrigin1->setStoreStrategy(SS_DIRECTLY);
     userOrigin1->setInputWidgetProperty("minimum", -1000000);
     userOrigin1->setInputWidgetProperty("maximum", 1000000);
     userOrigin1->setInputWidgetProperty("decimals", 3);
     userOrigin1->setValueFromWidgetHook(
-        [](const QVariant& value)
+        [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 1000);
         }
     );
-    userOrigin1->setValueToWidgetHook(
-        [](const QVariant& value)
+    userOrigin1->setUpdateWidgetValueHook(
+        [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
-            return QVariant(pt * 0.001);
+            Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
+            QPoint pt = value.toPoint();
+            v2w->setValue(pt * 0.001);
+            return v2w->toPointF();
         }
     );
     userOrigin1->setToJsonHook(
         [=](const ConfigItem* item) {
-            QPointF pt = item->value().toPointF();
-            QPointF defPt = item->defaultValue().toPointF();
+            QPoint pt = item->value().toPoint();
+            QPoint defPt = item->defaultValue().toPoint();
             QJsonObject jsonObj;
             jsonObj["value"] = typeUtils::point2Json(pt);
             jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
@@ -1069,31 +971,32 @@ void Config::loadDeviceItems()
 
     ConfigItem* userOrigin2 = group->addConfigItem(
         "userOrigin2",
-        QPointF(0, 0),
+        QPoint(0, 0),
         DT_POINT
     );
-    userOrigin2->setStoreStrategy(SS_DIRECTLY);
     userOrigin2->setInputWidgetProperty("minimum", -1000000);
     userOrigin2->setInputWidgetProperty("maximum", 1000000);
     userOrigin2->setInputWidgetProperty("decimals", 3);
     userOrigin2->setValueFromWidgetHook(
-        [](const QVariant& value)
+        [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 1000);
         }
     );
-    userOrigin2->setValueToWidgetHook(
-        [](const QVariant& value)
+    userOrigin2->setUpdateWidgetValueHook(
+        [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
-            return QVariant(pt * 0.001);
+            Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
+            QPoint pt = value.toPoint();
+            v2w->setValue(pt * 0.001);
+            return v2w->toPointF();
         }
     );
     userOrigin2->setToJsonHook(
         [=](const ConfigItem* item) {
-            QPointF pt = item->value().toPointF();
-            QPointF defPt = item->defaultValue().toPointF();
+            QPoint pt = item->value().toPoint();
+            QPoint defPt = item->defaultValue().toPoint();
             QJsonObject jsonObj;
             jsonObj["value"] = typeUtils::point2Json(pt);
             jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
@@ -1115,31 +1018,32 @@ void Config::loadDeviceItems()
 
     ConfigItem* userOrigin3 = group->addConfigItem(
         "userOrigin3",
-        QPointF(0, 0),
+        QPoint(0, 0),
         DT_POINT
     );
-    userOrigin3->setStoreStrategy(SS_DIRECTLY);
     userOrigin3->setInputWidgetProperty("minimum", -1000000);
     userOrigin3->setInputWidgetProperty("maximum", 1000000);
     userOrigin3->setInputWidgetProperty("decimals", 3);
     userOrigin3->setValueFromWidgetHook(
-        [](const QVariant& value)
+        [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
+            QPoint pt = value.toPoint();
             return QVariant(pt * 1000);
         }
     );
-    userOrigin3->setValueToWidgetHook(
-        [](const QVariant& value)
+    userOrigin3->setUpdateWidgetValueHook(
+        [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
-            return QVariant(pt * 0.001);
+            Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
+            QPoint pt = value.toPoint();
+            v2w->setValue(pt * 0.001);
+            return v2w->toPointF();
         }
     );
     userOrigin3->setToJsonHook(
         [=](const ConfigItem* item) {
-            QPointF pt = item->value().toPointF();
-            QPointF defPt = item->defaultValue().toPointF();
+            QPoint pt = item->value().toPoint();
+            QPoint defPt = item->defaultValue().toPoint();
             QJsonObject jsonObj;
             jsonObj["value"] = typeUtils::point2Json(pt);
             jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
@@ -1165,7 +1069,6 @@ void Config::loadDeviceItems()
         DT_INT
     );
     userOriginSelected->setInputWidgetType(IWT_ComboBox);
-    userOriginSelected->setStoreStrategy(SS_DIRECTLY);
     userOriginSelected->setWidgetInitializeHook(
         [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
         {
@@ -1228,137 +1131,88 @@ void Config::loadUserReigsters()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+    accMode->setVisible(false);
 
     ConfigItem* cuttingMoveSpeed = group->addConfigItem(
         "cuttingMoveSpeed",
-        15,
+        200000,
         DT_INT
     );
-    cuttingMoveSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    cuttingMoveSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    cuttingMoveSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingMoveSpeed->setInputWidgetType(IWT_FloatEditSlider);
     cuttingMoveSpeed->setInputWidgetProperty("step", 0.001);
+    cuttingMoveSpeed->setInputWidgetProperty("decimals", 0);
+    cuttingMoveSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveSpeed->setInputWidgetProperty("page", 10);
-    cuttingMoveSpeed->setInputWidgetProperty("minimum", 0.001);
-    cuttingMoveSpeed->setInputWidgetProperty("maximum", 100000);
+    cuttingMoveSpeed->setInputWidgetProperty("minimum", 1);
+    cuttingMoveSpeed->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* cuttingMoveAcc = group->addConfigItem(
         "cuttingMoveAcc",
-        45,
+        2500000,
         DT_INT
     );
-    cuttingMoveAcc->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    cuttingMoveAcc->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    cuttingMoveAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingMoveAcc->setInputWidgetType(IWT_FloatEditSlider);
     cuttingMoveAcc->setInputWidgetProperty("step", 0.001);
+    cuttingMoveAcc->setInputWidgetProperty("decimals", 0);
+    cuttingMoveAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveAcc->setInputWidgetProperty("page", 10);
-    cuttingMoveAcc->setInputWidgetProperty("minimum", 0.001);
-    cuttingMoveAcc->setInputWidgetProperty("maximum", 10000);
+    cuttingMoveAcc->setInputWidgetProperty("minimum", 1);
+    cuttingMoveAcc->setInputWidgetProperty("maximum", 20000);
 
     ConfigItem* cuttingTurnSpeed = group->addConfigItem(
         "cuttingTurnSpeed",
-        15,
+        8000,
         DT_INT
     );
-    cuttingTurnSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    cuttingTurnSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    cuttingTurnSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingTurnSpeed->setInputWidgetType(IWT_FloatEditSlider);
     cuttingTurnSpeed->setInputWidgetProperty("step", 0.001);
+    cuttingTurnSpeed->setInputWidgetProperty("decimals", 0);
+    cuttingTurnSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingTurnSpeed->setInputWidgetProperty("page", 10);
     cuttingTurnSpeed->setInputWidgetProperty("minimum", 1);
-    cuttingTurnSpeed->setInputWidgetProperty("maximum", 1000);
+    cuttingTurnSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* cuttingTurnAcc = group->addConfigItem(
         "cuttingTurnAcc",
-        45,
+        400000,
         DT_INT
     );
-    cuttingTurnAcc->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    cuttingTurnAcc->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    cuttingTurnAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingTurnAcc->setInputWidgetType(IWT_FloatEditSlider);
     cuttingTurnAcc->setInputWidgetProperty("step", 0.001);
+    cuttingTurnAcc->setInputWidgetProperty("decimals", 0);
+    cuttingTurnAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingTurnAcc->setInputWidgetProperty("page", 10);
     cuttingTurnAcc->setInputWidgetProperty("minimum", 1);
-    cuttingTurnAcc->setInputWidgetProperty("maximum", 1000);
+    cuttingTurnAcc->setInputWidgetProperty("maximum", 5000);
 
     ConfigItem* cuttingWorkAcc = group->addConfigItem(
         "cuttingWorkAcc",
-        60,
+        800000,
         DT_INT
     );
-    cuttingWorkAcc->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    cuttingWorkAcc->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    cuttingWorkAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingWorkAcc->setInputWidgetType(IWT_FloatEditSlider);
     cuttingWorkAcc->setInputWidgetProperty("step", 0.001);
+    cuttingWorkAcc->setInputWidgetProperty("decimals", 0);
+    cuttingWorkAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingWorkAcc->setInputWidgetProperty("page", 10);
     cuttingWorkAcc->setInputWidgetProperty("minimum", 1);
     cuttingWorkAcc->setInputWidgetProperty("maximum", 10000);
 
     ConfigItem* cuttingMoveSpeedFactor = group->addConfigItem(
         "cuttingMoveSpeedFactor",
-        2
+        100
     );
     cuttingMoveSpeedFactor->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveSpeedFactor->setInputWidgetProperty("minimum", 1);
-    cuttingMoveSpeedFactor->setInputWidgetProperty("maximum", 100);
+    cuttingMoveSpeedFactor->setInputWidgetProperty("maximum", 200);
 
     ConfigItem* cuttingWorkSpeedFactor = group->addConfigItem(
         "cuttingWorkSpeedFactor",
-        2
+        100
     );
     cuttingWorkSpeedFactor->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingWorkSpeedFactor->setInputWidgetProperty("minimum", 1);
-    cuttingWorkSpeedFactor->setInputWidgetProperty("maximum", 100);
+    cuttingWorkSpeedFactor->setInputWidgetProperty("maximum", 200);
 
     ConfigItem* cuttingSpotSize = group->addConfigItem(
         "cuttingSpotSize",
@@ -1368,177 +1222,106 @@ void Config::loadUserReigsters()
     cuttingSpotSize->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingSpotSize->setInputWidgetProperty("minimum", 1);
     cuttingSpotSize->setInputWidgetProperty("maximum", 1000);
+    cuttingSpotSize->setVisible(false);
 
     ConfigItem* scanXStartSpeed = group->addConfigItem(
         "scanXStartSpeed",
-        15,
+        30000,
         DT_INT
     );
-    scanXStartSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    scanXStartSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanXStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanXStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     scanXStartSpeed->setInputWidgetProperty("step", 0.001);
+    scanXStartSpeed->setInputWidgetProperty("decimals", 0);
+    scanXStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanXStartSpeed->setInputWidgetProperty("page", 10);
     scanXStartSpeed->setInputWidgetProperty("minimum", 1);
-    scanXStartSpeed->setInputWidgetProperty("maximum", 10000);
+    scanXStartSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* scanYStartSpeed = group->addConfigItem(
         "scanYStartSpeed",
-        15,
+        15000,
         DT_INT
     );
-    scanYStartSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    scanYStartSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanYStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanYStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     scanYStartSpeed->setInputWidgetProperty("step", 0.001);
+    scanYStartSpeed->setInputWidgetProperty("decimals", 0);
+    scanYStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanYStartSpeed->setInputWidgetProperty("page", 10);
     scanYStartSpeed->setInputWidgetProperty("minimum", 1);
-    scanYStartSpeed->setInputWidgetProperty("maximum", 10000);
+    scanYStartSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* scanXAcc = group->addConfigItem(
         "scanXAcc",
-        5,
+        6000000,
         DT_INT
     );
-    scanXAcc->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    scanXAcc->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanXAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanXAcc->setInputWidgetType(IWT_FloatEditSlider);
     scanXAcc->setInputWidgetProperty("step", 0.001);
+    scanXAcc->setInputWidgetProperty("decimals", 0);
+    scanXAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanXAcc->setInputWidgetProperty("page", 10);
     scanXAcc->setInputWidgetProperty("minimum", 1);
-    scanXAcc->setInputWidgetProperty("maximum", 10000);
+    scanXAcc->setInputWidgetProperty("maximum", 20000);
 
     ConfigItem* scanYAcc = group->addConfigItem(
         "scanYAcc",
-        45,
+        1000000,
         DT_INT
     );
-    scanYAcc->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    scanYAcc->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanYAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanYAcc->setInputWidgetType(IWT_FloatEditSlider);
     scanYAcc->setInputWidgetProperty("step", 0.001);
+    scanYAcc->setInputWidgetProperty("decimals", 0);
+    scanYAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanYAcc->setInputWidgetProperty("page", 10);
     scanYAcc->setInputWidgetProperty("minimum", 1);
-    scanYAcc->setInputWidgetProperty("maximum", 10000);
+    scanYAcc->setInputWidgetProperty("maximum", 20000);
 
     ConfigItem* scanRowSpeed = group->addConfigItem(
         "scanRowSpeed",
-        15,
-        DT_REAL
+        50000,
+        DT_INT
     );
-    scanRowSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    scanRowSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanRowSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanRowSpeed->setInputWidgetType(IWT_FloatEditSlider);
     scanRowSpeed->setInputWidgetProperty("step", 0.001);
+    scanRowSpeed->setInputWidgetProperty("decimals", 0);
+    scanRowSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanRowSpeed->setInputWidgetProperty("page", 10);
     scanRowSpeed->setInputWidgetProperty("minimum", 1);
-    scanRowSpeed->setInputWidgetProperty("maximum", 10000);
+    scanRowSpeed->setInputWidgetProperty("maximum", 500);
 
     ConfigItem* scanLaserFrequency = group->addConfigItem(
         "scanLaserFrequency",
-        4000,
+        20000,
         DT_INT
     );
     scanLaserFrequency->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanLaserFrequency->setInputWidgetProperty("page", 100);
-    scanLaserFrequency->setInputWidgetProperty("minimum", 1000);
-    scanLaserFrequency->setInputWidgetProperty("maximum", 10000);
+    scanLaserFrequency->setInputWidgetProperty("minimum", 5000);
+    scanLaserFrequency->setInputWidgetProperty("maximum", 100000);
 
     ConfigItem* scanReturnError = group->addConfigItem(
         "scanReturnError",
         0,
         DT_INT
     );
-    scanReturnError->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    scanReturnError->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    scanReturnError->setInputWidgetProperty("maximumLineEditWidth", 75);
+    scanReturnError->setInputWidgetType(IWT_FloatEditSlider);
     scanReturnError->setInputWidgetProperty("step", 0.001);
+    scanReturnError->setInputWidgetProperty("decimals", 3);
+    scanReturnError->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanReturnError->setInputWidgetProperty("page", 1);
-    scanReturnError->setInputWidgetProperty("minimum", -20);
-    scanReturnError->setInputWidgetProperty("maximum", 20);
+    scanReturnError->setInputWidgetProperty("minimum", -50);
+    scanReturnError->setInputWidgetProperty("maximum", 50);
 
     ConfigItem* scanLaserPower = group->addConfigItem(
         "scanLaserPower",
-        120,
-        DT_REAL
+        1200,
+        DT_INT
     );
     scanLaserPower->setInputWidgetType(IWT_FloatEditSlider);
-    scanLaserPower->setStoreStrategy(SS_DIRECTLY);
-    scanLaserPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    scanLaserPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    scanLaserPower->setInputWidgetProperty("step", 0.1);
+    scanLaserPower->setInputWidgetProperty("decimals", 1);
     scanLaserPower->setInputWidgetProperty("textTemplate", "%1%");
     scanLaserPower->setInputWidgetProperty("maximumLineEditWidth", 75);
-    scanLaserPower->setInputWidgetProperty("step", 0.1);
     scanLaserPower->setInputWidgetProperty("page", 10);
     scanLaserPower->setInputWidgetProperty("minimum", 1);
     scanLaserPower->setInputWidgetProperty("maximum", 100);
@@ -1546,80 +1329,37 @@ void Config::loadUserReigsters()
     ConfigItem* scanXResetEnabled = group->addConfigItem(
         "scanXResetEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
-    scanXResetEnabled->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() == 1);
-        }
-    );
-    scanXResetEnabled->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toBool() ? 1 : 0);
-        }
-    );
+    scanXResetEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* scanYResetEnabled = group->addConfigItem(
         "scanYResetEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
-    scanYResetEnabled->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() == 1);
-        }
-    );
-    scanYResetEnabled->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toBool() ? 1 : 0);
-        }
-    );
+    scanYResetEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* scanZResetEnabled = group->addConfigItem(
         "scanZResetEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
-    scanZResetEnabled->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() == 1);
-        }
-    );
-    scanZResetEnabled->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toBool() ? 1 : 0);
-        }
-    );
+    scanZResetEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* resetSpeed = group->addConfigItem(
         "resetSpeed",
-        10,
+        50000,
         DT_INT
     );
-    resetSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    resetSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    resetSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    resetSpeed->setInputWidgetProperty("step", 0.001);
+    resetSpeed->setInputWidgetProperty("decimals", 0);
     resetSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     resetSpeed->setInputWidgetProperty("textTemplate", "%1");
-    resetSpeed->setInputWidgetProperty("step", 0.001);
     resetSpeed->setInputWidgetProperty("page", 10);
-    resetSpeed->setInputWidgetProperty("minimum", 0.001);
-    resetSpeed->setInputWidgetProperty("maximum", 10000);
+    resetSpeed->setInputWidgetProperty("minimum", 1);
+    resetSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* scanReturnPos = group->addConfigItem(
         "scanReturnPos",
@@ -1635,369 +1375,224 @@ void Config::loadUserReigsters()
         0,
         DT_INT
     );
-    backlashXInterval->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    backlashXInterval->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    backlashXInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    backlashXInterval->setInputWidgetType(IWT_FloatEditSlider);
     backlashXInterval->setInputWidgetProperty("step", 0.001);
-    backlashXInterval->setInputWidgetProperty("page", 10);
-    backlashXInterval->setInputWidgetProperty("minimum", 0);
-    backlashXInterval->setInputWidgetProperty("maximum", 100);
+    backlashXInterval->setInputWidgetProperty("decimals", 3);
+    backlashXInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    backlashXInterval->setInputWidgetProperty("page", 1);
+    backlashXInterval->setInputWidgetProperty("minimum", -20);
+    backlashXInterval->setInputWidgetProperty("maximum", 20);
 
     ConfigItem* backlashYInterval = group->addConfigItem(
         "backlashYInterval",
         0,
         DT_INT
     );
-    backlashYInterval->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    backlashYInterval->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    backlashYInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    backlashYInterval->setInputWidgetType(IWT_FloatEditSlider);
     backlashYInterval->setInputWidgetProperty("step", 0.001);
-    backlashYInterval->setInputWidgetProperty("page", 10);
-    backlashYInterval->setInputWidgetProperty("minimum", 0);
-    backlashYInterval->setInputWidgetProperty("maximum", 100);
+    backlashYInterval->setInputWidgetProperty("decimals", 3);
+    backlashYInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
+    backlashYInterval->setInputWidgetProperty("page", 1);
+    backlashYInterval->setInputWidgetProperty("minimum", -20);
+    backlashYInterval->setInputWidgetProperty("maximum", 20);
 
     ConfigItem* backlashZInterval = group->addConfigItem(
         "backlashZInterval",
         0,
         DT_INT
     );
-    backlashZInterval->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    backlashZInterval->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    backlashZInterval->setInputWidgetType(IWT_FloatEditSlider);
     backlashZInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     backlashZInterval->setInputWidgetProperty("step", 0.001);
     backlashZInterval->setInputWidgetProperty("page", 10);
-    backlashZInterval->setInputWidgetProperty("minimum", 0);
-    backlashZInterval->setInputWidgetProperty("maximum", 100);
+    backlashZInterval->setInputWidgetProperty("minimum", -20);
+    backlashZInterval->setInputWidgetProperty("maximum", 20);
+    backlashZInterval->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* defaultRunSpeed = group->addConfigItem(
         "defaultRunSpeed",
-        10000,
+        120,
         DT_INT
     );
-    defaultRunSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    defaultRunSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    defaultRunSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    defaultRunSpeed->setInputWidgetProperty("step", 0.001);
+    defaultRunSpeed->setInputWidgetProperty("decimals", 0);
     defaultRunSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     defaultRunSpeed->setInputWidgetProperty("textTemplate", "%1");
-    defaultRunSpeed->setInputWidgetProperty("step", 0.001);
     defaultRunSpeed->setInputWidgetProperty("page", 10);
     defaultRunSpeed->setInputWidgetProperty("minimum", 1);
-    defaultRunSpeed->setInputWidgetProperty("maximum", 10000);
+    defaultRunSpeed->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* defaultMaxCuttingPower = group->addConfigItem(
         "defaultMaxCuttingPower",
-        1000,
-        DT_REAL
+        100,
+        DT_INT
     );
     defaultMaxCuttingPower->setInputWidgetType(IWT_FloatEditSlider);
-    defaultMaxCuttingPower->setStoreStrategy(SS_DIRECTLY);
-    defaultMaxCuttingPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    defaultMaxCuttingPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    defaultMaxCuttingPower->setInputWidgetProperty("step", 0.1);
+    defaultMaxCuttingPower->setInputWidgetProperty("decimals", 1);
     defaultMaxCuttingPower->setInputWidgetProperty("textTemplate", "%1%");
     defaultMaxCuttingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
-    defaultMaxCuttingPower->setInputWidgetProperty("step", 0.1);
     defaultMaxCuttingPower->setInputWidgetProperty("page", 10);
     defaultMaxCuttingPower->setInputWidgetProperty("minimum", 0);
     defaultMaxCuttingPower->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* defaultMinCuttingPower = group->addConfigItem(
         "defaultMinCuttingPower",
-        100,
-        DT_REAL
+        90,
+        DT_INT
     );
     defaultMinCuttingPower->setInputWidgetType(IWT_FloatEditSlider);
-    defaultMinCuttingPower->setStoreStrategy(SS_DIRECTLY);
-    defaultMinCuttingPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    defaultMinCuttingPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    defaultMinCuttingPower->setInputWidgetProperty("step", 0.1);
+    defaultMinCuttingPower->setInputWidgetProperty("decimals", 1);
     defaultMinCuttingPower->setInputWidgetProperty("textTemplate", "%1%");
     defaultMinCuttingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
-    defaultMinCuttingPower->setInputWidgetProperty("step", 0.1);
     defaultMinCuttingPower->setInputWidgetProperty("page", 10);
     defaultMinCuttingPower->setInputWidgetProperty("minimum", 0);
     defaultMinCuttingPower->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* defaultScanSpeed = group->addConfigItem(
         "defaultScanSpeed",
-        500000,
+        400000,
         DT_INT
     );
-    defaultScanSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    defaultScanSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    defaultScanSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    defaultScanSpeed->setInputWidgetProperty("step", 0.001);
+    defaultScanSpeed->setInputWidgetProperty("decimals", 0);
     defaultScanSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1");
-    defaultScanSpeed->setInputWidgetProperty("step", 0.001);
     defaultScanSpeed->setInputWidgetProperty("page", 10);
-    defaultScanSpeed->setInputWidgetProperty("minimum", 0.001);
-    defaultScanSpeed->setInputWidgetProperty("maximum", 10000);
+    defaultScanSpeed->setInputWidgetProperty("minimum", 1);
+    defaultScanSpeed->setInputWidgetProperty("maximum", 2000);
 
     ConfigItem* maxScanGrayRatio = group->addConfigItem(
         "maxScanGrayRatio",
-        800,
+        950,
         DT_INT
     );
-    maxScanGrayRatio->setStoreStrategy(SS_DIRECTLY);
     maxScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxScanGrayRatio->setInputWidgetProperty("minimum", 0);
     maxScanGrayRatio->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* minScanGrayRatio = group->addConfigItem(
         "minScanGrayRatio",
-        50,
+        0,
         DT_INT
     );
-    minScanGrayRatio->setStoreStrategy(SS_DIRECTLY);
     minScanGrayRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     minScanGrayRatio->setInputWidgetProperty("minimum", 0);
     minScanGrayRatio->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* cuttingTurnOnDelay = group->addConfigItem(
         "cuttingTurnOnDelay",
-        0.01,
+        0.0,
         DT_REAL
     );
-    cuttingTurnOnDelay->setStoreStrategy(SS_DIRECTLY);
-    cuttingTurnOnDelay->setInputWidgetProperty("minimum", 0.001);
-    cuttingTurnOnDelay->setInputWidgetProperty("maximum", 1);
+    cuttingTurnOnDelay->setInputWidgetProperty("minimum", 0.0);
+    cuttingTurnOnDelay->setInputWidgetProperty("maximum", 10000.0);
     cuttingTurnOnDelay->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* cuttingTurnOffDelay = group->addConfigItem(
         "cuttingTurnOffDelay",
-        0.01,
+        0.0,
         DT_REAL
     );
-    cuttingTurnOffDelay->setStoreStrategy(SS_DIRECTLY);
-    cuttingTurnOffDelay->setInputWidgetProperty("minimum", 0.001);
-    cuttingTurnOffDelay->setInputWidgetProperty("maximum", 1);
+    cuttingTurnOffDelay->setInputWidgetProperty("minimum", 0.0);
+    cuttingTurnOffDelay->setInputWidgetProperty("maximum", 10000.0);
     cuttingTurnOffDelay->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* spotShotPower = group->addConfigItem(
         "spotShotPower",
         100,
-        DT_REAL
+        DT_INT
     );
     spotShotPower->setInputWidgetType(IWT_FloatEditSlider);
-    spotShotPower->setStoreStrategy(SS_DIRECTLY);
-    spotShotPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    spotShotPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    spotShotPower->setInputWidgetProperty("step", 0.1);
+    spotShotPower->setInputWidgetProperty("decimals", 1);
     spotShotPower->setInputWidgetProperty("textTemplate", "%1%");
     spotShotPower->setInputWidgetProperty("maximumLineEditWidth", 75);
-    spotShotPower->setInputWidgetProperty("step", 0.1);
     spotShotPower->setInputWidgetProperty("page", 10);
-    spotShotPower->setInputWidgetProperty("minimum", 1);
+    spotShotPower->setInputWidgetProperty("minimum", 0);
     spotShotPower->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* fillingSpeed = group->addConfigItem(
         "fillingSpeed",
-        100000,
-        DT_REAL
+        200000,
+        DT_INT
     );
-    fillingSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    fillingSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    fillingSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    fillingSpeed->setInputWidgetProperty("step", 0.001);
+    fillingSpeed->setInputWidgetProperty("decimals", 0);
     fillingSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingSpeed->setInputWidgetProperty("textTemplate", "%1");
-    fillingSpeed->setInputWidgetProperty("step", 0.001);
     fillingSpeed->setInputWidgetProperty("page", 10);
-    fillingSpeed->setInputWidgetProperty("minimum", 0.001);
-    fillingSpeed->setInputWidgetProperty("maximum", 10000);
+    fillingSpeed->setInputWidgetProperty("minimum", 1);
+    fillingSpeed->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* fillingStartSpeed = group->addConfigItem(
         "fillingStartSpeed",
-        50000,
-        DT_REAL
+        30000,
+        DT_INT
     );
-    fillingStartSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    fillingStartSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    fillingStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    fillingStartSpeed->setInputWidgetProperty("step", 0.001);
+    fillingStartSpeed->setInputWidgetProperty("decimals", 0);
     fillingStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingStartSpeed->setInputWidgetProperty("textTemplate", "%1");
-    fillingStartSpeed->setInputWidgetProperty("step", 0.001);
     fillingStartSpeed->setInputWidgetProperty("page", 10);
-    fillingStartSpeed->setInputWidgetProperty("minimum", 0.001);
-    fillingStartSpeed->setInputWidgetProperty("maximum", 10000);
+    fillingStartSpeed->setInputWidgetProperty("minimum", 1);
+    fillingStartSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* fillingAcceleration = group->addConfigItem(
         "fillingAcceleration",
-        100000,
-        DT_REAL
+        3000000,
+        DT_INT
     );
-    fillingAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    fillingAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
+    fillingAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    fillingAcceleration->setInputWidgetProperty("step", 0.001);
+    fillingAcceleration->setInputWidgetProperty("decimals", 0);
     fillingAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingAcceleration->setInputWidgetProperty("textTemplate", "%1");
-    fillingAcceleration->setInputWidgetProperty("step", 0.001);
     fillingAcceleration->setInputWidgetProperty("page", 10);
-    fillingAcceleration->setInputWidgetProperty("minimum", 0.001);
-    fillingAcceleration->setInputWidgetProperty("maximum", 20000);
+    fillingAcceleration->setInputWidgetProperty("minimum", 1);
+    fillingAcceleration->setInputWidgetProperty("maximum", 10000);
 
     ConfigItem* maxFillingPower = group->addConfigItem(
         "maxFillingPower",
-        1000,
-        DT_REAL
+        124,
+        DT_INT
     );
     maxFillingPower->setInputWidgetType(IWT_FloatEditSlider);
-    maxFillingPower->setStoreStrategy(SS_DIRECTLY);
-    maxFillingPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    maxFillingPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    maxFillingPower->setInputWidgetProperty("step", 0.1);
+    maxFillingPower->setInputWidgetProperty("decimals", 1);
     maxFillingPower->setInputWidgetProperty("textTemplate", "%1%");
     maxFillingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
-    maxFillingPower->setInputWidgetProperty("step", 0.1);
     maxFillingPower->setInputWidgetProperty("page", 10);
     maxFillingPower->setInputWidgetProperty("minimum", 0);
     maxFillingPower->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* minFillingPower = group->addConfigItem(
         "minFillingPower",
-        100,
-        DT_REAL
+        97,
+        DT_INT
     );
     minFillingPower->setInputWidgetType(IWT_FloatEditSlider);
-    minFillingPower->setStoreStrategy(SS_DIRECTLY);
-    minFillingPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
-    minFillingPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
+    minFillingPower->setInputWidgetProperty("step", 0.1);
+    minFillingPower->setInputWidgetProperty("decimals", 1);
     minFillingPower->setInputWidgetProperty("textTemplate", "%1%");
     minFillingPower->setInputWidgetProperty("maximumLineEditWidth", 75);
-    minFillingPower->setInputWidgetProperty("step", 0.1);
     minFillingPower->setInputWidgetProperty("page", 10);
     minFillingPower->setInputWidgetProperty("minimum", 0);
     minFillingPower->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* fillingAccRatio = group->addConfigItem(
         "fillingAccRatio",
-        800,
+        100,
         DT_INT
     );
-    fillingAccRatio->setStoreStrategy(SS_DIRECTLY);
     fillingAccRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
-    fillingAccRatio->setInputWidgetProperty("minimum", 0);
-    fillingAccRatio->setInputWidgetProperty("maximum", 1000);
+    fillingAccRatio->setInputWidgetProperty("minimum", 1);
+    fillingAccRatio->setInputWidgetProperty("maximum", 200);
 }
 
 void Config::loadSystemRegisters()
@@ -2105,27 +1700,16 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMaxLength = group->addConfigItem(
         "xMaxLength",
-        320000,
-        DT_REAL
+        260000,
+        DT_INT
     );
-    xMaxLength->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    xMaxLength->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xMaxLength->setInputWidgetType(IWT_FloatEditSlider);
     xMaxLength->setInputWidgetProperty("step", 0.001);
+    xMaxLength->setInputWidgetProperty("decimals", 0);
+    xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxLength->setInputWidgetProperty("page", 10);
     xMaxLength->setInputWidgetProperty("minimum", 1);
-    xMaxLength->setInputWidgetProperty("maximum", 5000);
-    xMaxLength->setInputWidgetProperty("decimals", 3);
+    xMaxLength->setInputWidgetProperty("maximum", 3000);
 
     ConfigItem* xDirPhase = group->addConfigItem(
         "xDirPhase",
@@ -2140,8 +1724,8 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -2160,8 +1744,8 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -2170,51 +1754,28 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xZeroDev = group->addConfigItem(
         "xZeroDev",
-        2000,
-        DT_REAL
+        5000,
+        DT_INT
     );
-    xZeroDev->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    xZeroDev->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xZeroDev->setInputWidgetType(IWT_FloatEditSlider);
     xZeroDev->setInputWidgetProperty("step", 0.001);
+    xZeroDev->setInputWidgetProperty("decimals", 0);
+    xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     xZeroDev->setInputWidgetProperty("page", 1);
     xZeroDev->setInputWidgetProperty("minimum", 0);
-    xZeroDev->setInputWidgetProperty("maximum", 10);
-    xZeroDev->setInputWidgetProperty("decimals", 3);
+    xZeroDev->setInputWidgetProperty("maximum", 3000);
 
     ConfigItem* xStepLength = group->addConfigItem(
         "xStepLength",
-        3164557,
-        DT_REAL
-    );
-    xStepLength->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000000));
-        }
-    );
-    xStepLength->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.000001);
-        }
+        6329114,
+        DT_INT
     );
     xStepLength->setInputWidgetType(IWT_FloatEditSlider);
     xStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStepLength->setInputWidgetProperty("step", 0.000001);
     xStepLength->setInputWidgetProperty("page", 0.001);
     xStepLength->setInputWidgetProperty("minimum", 0.000001);
-    xStepLength->setInputWidgetProperty("maximum", 10000000);
+    xStepLength->setInputWidgetProperty("maximum", 100);
     xStepLength->setInputWidgetProperty("decimals", 6);
 
     ConfigItem* xLimitNum = group->addConfigItem(
@@ -2229,10 +1790,9 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 1);
-            comboBox->addItem(tr("3"), 1);
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2241,8 +1801,9 @@ void Config::loadSystemRegisters()
     ConfigItem* xResetEnabled = group->addConfigItem(
         "xResetEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
+    xResetEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* xMotorNum = group->addConfigItem(
         "xMotorNum",
@@ -2257,10 +1818,9 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 1);
-            comboBox->addItem(tr("3"), 1);
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2268,135 +1828,80 @@ void Config::loadSystemRegisters()
 
     ConfigItem* xMotorCurrent = group->addConfigItem(
         "xMotorCurrent",
-        50,
+        60,
         DT_INT
     );
     xMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     xMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMotorCurrent->setInputWidgetProperty("step", 1);
     xMotorCurrent->setInputWidgetProperty("page", 10);
-    xMotorCurrent->setInputWidgetProperty("minimum", 0);
+    xMotorCurrent->setInputWidgetProperty("minimum", 20);
     xMotorCurrent->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* xStartSpeed = group->addConfigItem(
         "xStartSpeed",
-        15000,
-        DT_REAL
+        30000,
+        DT_INT
     );
-    xStartSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    xStartSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    xStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     xStartSpeed->setInputWidgetProperty("step", 0.001);
+    xStartSpeed->setInputWidgetProperty("decimals", 0);
+    xStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStartSpeed->setInputWidgetProperty("page", 10);
-    xStartSpeed->setInputWidgetProperty("minimum", 0.001);
-    xStartSpeed->setInputWidgetProperty("maximum", 1000);
-    xStartSpeed->setInputWidgetProperty("decimals", 3);
+    xStartSpeed->setInputWidgetProperty("minimum", 1);
+    xStartSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* xMaxSpeed = group->addConfigItem(
         "xMaxSpeed",
-        4500,
-        DT_REAL
+        600000,
+        DT_INT
     );
-    xMaxSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    xMaxSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    xMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
     xMaxSpeed->setInputWidgetProperty("step", 0.001);
+    xMaxSpeed->setInputWidgetProperty("decimals", 0);
+    xMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxSpeed->setInputWidgetProperty("page", 10);
-    xMaxSpeed->setInputWidgetProperty("minimum", 0.001);
-    xMaxSpeed->setInputWidgetProperty("maximum", 1000);
-    xMaxSpeed->setInputWidgetProperty("decimals", 3);
+    xMaxSpeed->setInputWidgetProperty("minimum", 1);
+    xMaxSpeed->setInputWidgetProperty("maximum", 2000);
 
     ConfigItem* xMaxAcceleration = group->addConfigItem(
         "xMaxAcceleration",
-        45,
-        DT_REAL
+        8000000,
+        DT_INT
     );
-    xMaxAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    xMaxAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    xMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     xMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    xMaxAcceleration->setInputWidgetProperty("decimals", 0);
+    xMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxAcceleration->setInputWidgetProperty("page", 10);
     xMaxAcceleration->setInputWidgetProperty("minimum", 1);
     xMaxAcceleration->setInputWidgetProperty("maximum", 20000);
-    xMaxAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* xUrgentAcceleration = group->addConfigItem(
         "xUrgentAcceleration",
-        45,
-        DT_REAL
+        4000000,
+        DT_INT
     );
-    xUrgentAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    xUrgentAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    xUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    xUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     xUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    xUrgentAcceleration->setInputWidgetProperty("decimals", 0);
+    xUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xUrgentAcceleration->setInputWidgetProperty("page", 10);
     xUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     xUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
-    xUrgentAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yMaxLength = group->addConfigItem(
         "yMaxLength",
         200000,
-        DT_REAL
+        DT_INT
     );
-    yMaxLength->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    yMaxLength->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    yMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yMaxLength->setInputWidgetType(IWT_FloatEditSlider);
     yMaxLength->setInputWidgetProperty("step", 0.001);
+    yMaxLength->setInputWidgetProperty("decimals", 0);
+    yMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxLength->setInputWidgetProperty("page", 1);
     yMaxLength->setInputWidgetProperty("minimum", 1);
     yMaxLength->setInputWidgetProperty("maximum", 5000);
-    yMaxLength->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yDirPhase = group->addConfigItem(
         "yDirPhase",
@@ -2411,8 +1916,8 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2431,8 +1936,8 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2440,44 +1945,21 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yZeroDev = group->addConfigItem(
         "yZeroDev",
-        2000,
-        DT_REAL
+        5000,
+        DT_INT
     );
-    yZeroDev->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    yZeroDev->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    yZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yZeroDev->setInputWidgetType(IWT_FloatEditSlider);
     yZeroDev->setInputWidgetProperty("step", 0.001);
+    yZeroDev->setInputWidgetProperty("decimals", 0);
+    yZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     yZeroDev->setInputWidgetProperty("page", 1);
-    yZeroDev->setInputWidgetProperty("minimum", 1);
-    yZeroDev->setInputWidgetProperty("maximum", 10);
-    yZeroDev->setInputWidgetProperty("decimals", 3);
+    yZeroDev->setInputWidgetProperty("minimum", 0);
+    yZeroDev->setInputWidgetProperty("maximum", 5000);
 
     ConfigItem* yStepLength = group->addConfigItem(
         "yStepLength",
-        3164557,
+        6329114,
         DT_INT
-    );
-    yStepLength->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000000));
-        }
-    );
-    yStepLength->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.000001);
-        }
     );
     yStepLength->setInputWidgetType(IWT_FloatEditSlider);
     yStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2500,10 +1982,9 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 1);
-            comboBox->addItem(tr("3"), 1);
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2512,8 +1993,9 @@ void Config::loadSystemRegisters()
     ConfigItem* yResetEnabled = group->addConfigItem(
         "yResetEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
+    yResetEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* yMotorNum = group->addConfigItem(
         "yMotorNum",
@@ -2528,10 +2010,9 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 1);
-            comboBox->addItem(tr("3"), 1);
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2539,135 +2020,80 @@ void Config::loadSystemRegisters()
 
     ConfigItem* yMotorCurrent = group->addConfigItem(
         "yMotorCurrent",
-        50,
+        60,
         DT_INT
     );
     yMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     yMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMotorCurrent->setInputWidgetProperty("step", 1);
     yMotorCurrent->setInputWidgetProperty("page", 10);
-    yMotorCurrent->setInputWidgetProperty("minimum", 0);
+    yMotorCurrent->setInputWidgetProperty("minimum", 20);
     yMotorCurrent->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* yStartSpeed = group->addConfigItem(
         "yStartSpeed",
-        15,
-        DT_REAL
+        15000,
+        DT_INT
     );
-    yStartSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    yStartSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    yStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     yStartSpeed->setInputWidgetProperty("step", 0.001);
+    yStartSpeed->setInputWidgetProperty("decimals", 0);
+    yStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yStartSpeed->setInputWidgetProperty("page", 10);
     yStartSpeed->setInputWidgetProperty("minimum", 1);
-    yStartSpeed->setInputWidgetProperty("maximum", 1000);
-    yStartSpeed->setInputWidgetProperty("decimals", 3);
+    yStartSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* yMaxSpeed = group->addConfigItem(
         "yMaxSpeed",
-        45,
-        DT_REAL
+        500000,
+        DT_INT
     );
-    yMaxSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    yMaxSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    yMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
     yMaxSpeed->setInputWidgetProperty("step", 0.001);
+    yMaxSpeed->setInputWidgetProperty("decimals", 0);
+    yMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxSpeed->setInputWidgetProperty("page", 10);
     yMaxSpeed->setInputWidgetProperty("minimum", 1);
     yMaxSpeed->setInputWidgetProperty("maximum", 1000);
-    yMaxSpeed->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yMaxAcceleration = group->addConfigItem(
         "yMaxAcceleration",
-        45,
-        DT_REAL
+        4000000,
+        DT_INT
     );
-    yMaxAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    yMaxAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    yMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     yMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    yMaxAcceleration->setInputWidgetProperty("decimals", 0);
+    yMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxAcceleration->setInputWidgetProperty("page", 10);
     yMaxAcceleration->setInputWidgetProperty("minimum", 1);
     yMaxAcceleration->setInputWidgetProperty("maximum", 20000);
-    yMaxAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* yUrgentAcceleration = group->addConfigItem(
         "yUrgentAcceleration",
-        20,
-        DT_REAL
+        3000000,
+        DT_INT
     );
-    yUrgentAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    yUrgentAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    yUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    yUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     yUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    yUrgentAcceleration->setInputWidgetProperty("decimals", 0);
+    yUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yUrgentAcceleration->setInputWidgetProperty("page", 10);
     yUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     yUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
-    yUrgentAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* zMaxLength = group->addConfigItem(
         "zMaxLength",
         200000,
-        DT_REAL
+        DT_INT
     );
-    zMaxLength->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    zMaxLength->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    zMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zMaxLength->setInputWidgetType(IWT_FloatEditSlider);
     zMaxLength->setInputWidgetProperty("step", 0.001);
+    zMaxLength->setInputWidgetProperty("decimals", 0);
+    zMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxLength->setInputWidgetProperty("page", 1);
     zMaxLength->setInputWidgetProperty("minimum", 1);
-    zMaxLength->setInputWidgetProperty("maximum", 5000);
-    zMaxLength->setInputWidgetProperty("decimals", 3);
+    zMaxLength->setInputWidgetProperty("maximum", 2000);
 
     ConfigItem* zDirPhase = group->addConfigItem(
         "zDirPhase",
@@ -2682,8 +2108,8 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2703,8 +2129,8 @@ void Config::loadSystemRegisters()
                 return;
 
             comboBox->blockSignals(true);
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
             comboBox->blockSignals(false);
@@ -2713,44 +2139,21 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zZeroDev = group->addConfigItem(
         "zZeroDev",
-        2000,
-        DT_REAL
+        0,
+        DT_INT
     );
-    zZeroDev->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    zZeroDev->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    zZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zZeroDev->setInputWidgetType(IWT_FloatEditSlider);
     zZeroDev->setInputWidgetProperty("step", 0.001);
+    zZeroDev->setInputWidgetProperty("decimals", 0);
+    zZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     zZeroDev->setInputWidgetProperty("page", 1);
-    zZeroDev->setInputWidgetProperty("minimum", 1);
-    zZeroDev->setInputWidgetProperty("maximum", 10);
-    zZeroDev->setInputWidgetProperty("decimals", 3);
+    zZeroDev->setInputWidgetProperty("minimum", 0);
+    zZeroDev->setInputWidgetProperty("maximum", 2000);
 
     ConfigItem* zStepLength = group->addConfigItem(
         "zStepLength",
-        6200000,
+        6329114,
         DT_INT
-    );
-    zStepLength->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000000));
-        }
-    );
-    zStepLength->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.000001);
-        }
     );
     zStepLength->setInputWidgetType(IWT_FloatEditSlider);
     zStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
@@ -2773,10 +2176,9 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 2);
-            comboBox->addItem(tr("3"), 3);
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 2);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2785,8 +2187,9 @@ void Config::loadSystemRegisters()
     ConfigItem* zResetEnabled = group->addConfigItem(
         "zResetEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
+    zResetEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* zMotorNum = group->addConfigItem(
         "zMotorNum",
@@ -2801,10 +2204,9 @@ void Config::loadSystemRegisters()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(tr("0"), 0);
-            comboBox->addItem(tr("1"), 1);
-            comboBox->addItem(tr("2"), 2);
-            comboBox->addItem(tr("3"), 3);
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 2);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2812,157 +2214,95 @@ void Config::loadSystemRegisters()
 
     ConfigItem* zMotorCurrent = group->addConfigItem(
         "zMotorCurrent",
-        50,
+        60,
         DT_INT
     );
     zMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
     zMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMotorCurrent->setInputWidgetProperty("step", 1);
     zMotorCurrent->setInputWidgetProperty("page", 10);
-    zMotorCurrent->setInputWidgetProperty("minimum", 0);
+    zMotorCurrent->setInputWidgetProperty("minimum", 20);
     zMotorCurrent->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* zStartSpeed = group->addConfigItem(
         "zStartSpeed",
-        15000,
-        DT_REAL
+        1000,
+        DT_INT
     );
-    zStartSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    zStartSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    zStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     zStartSpeed->setInputWidgetProperty("step", 0.001);
+    zStartSpeed->setInputWidgetProperty("decimals", 0);
+    zStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zStartSpeed->setInputWidgetProperty("page", 10);
     zStartSpeed->setInputWidgetProperty("minimum", 1);
     zStartSpeed->setInputWidgetProperty("maximum", 100);
-    zStartSpeed->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* zMaxSpeed = group->addConfigItem(
         "zMaxSpeed",
-        10000,
-        DT_REAL
+        5000,
+        DT_INT
     );
-    zMaxSpeed->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    zMaxSpeed->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
+    zMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    zMaxSpeed->setInputWidgetProperty("step", 0.001);
+    zMaxSpeed->setInputWidgetProperty("decimals", 0);
     zMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxSpeed->setInputWidgetProperty("step", 0.001);
     zMaxSpeed->setInputWidgetProperty("page", 10);
     zMaxSpeed->setInputWidgetProperty("minimum", 1);
-    zMaxSpeed->setInputWidgetProperty("maximum", 1000);
-    zMaxSpeed->setInputWidgetProperty("decimals", 3);
+    zMaxSpeed->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* zMaxAcceleration = group->addConfigItem(
         "zMaxAcceleration",
-        30000,
-        DT_REAL
+        500000,
+        DT_INT
     );
-    zMaxAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    zMaxAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
-    zMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     zMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    zMaxAcceleration->setInputWidgetProperty("decimals", 0);
+    zMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxAcceleration->setInputWidgetProperty("page", 10);
     zMaxAcceleration->setInputWidgetProperty("minimum", 1);
     zMaxAcceleration->setInputWidgetProperty("maximum", 20000);
-    zMaxAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* zUrgentAcceleration = group->addConfigItem(
         "zUrgentAcceleration",
-        30000,
-        DT_REAL
+        500000,
+        DT_INT
     );
-    zUrgentAcceleration->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 1000));
-        }
-    );
-    zUrgentAcceleration->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() * 0.001);
-        }
-    );
+    zUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    zUrgentAcceleration->setInputWidgetProperty("decimals", 0);
     zUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     zUrgentAcceleration->setInputWidgetProperty("page", 10);
     zUrgentAcceleration->setInputWidgetProperty("minimum", 1);
     zUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
-    zUrgentAcceleration->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* laserMaxPower = group->addConfigItem(
         "laserMaxPower",
         1000,
         DT_INT
     );
-    laserMaxPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    laserMaxPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
+    laserMaxPower->setInputWidgetType(IWT_FloatEditSlider);
+    laserMaxPower->setInputWidgetProperty("step", 0.1);
+    laserMaxPower->setInputWidgetProperty("decimals", 1);
     laserMaxPower->setInputWidgetProperty("textTemplate", "%1%");
     laserMaxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMaxPower->setInputWidgetProperty("minimum", 1);
     laserMaxPower->setInputWidgetProperty("maximum", 100);
-    laserMaxPower->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* laserMinPower = group->addConfigItem(
         "laserMinPower",
         100,
         DT_INT
     );
-    laserMinPower->setValueFromWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(qRound(value.toReal() * 10));
-        }
-    );
-    laserMinPower->setValueToWidgetHook(
-        [](const QVariant& value)
-        {
-            return QVariant(value.toInt() / 10.0);
-        }
-    );
+    laserMinPower->setInputWidgetType(IWT_FloatEditSlider);
+    laserMinPower->setInputWidgetProperty("step", 0.1);
+    laserMinPower->setInputWidgetProperty("decimals", 1);
     laserMinPower->setInputWidgetProperty("textTemplate", "%1%");
     laserMinPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserMinPower->setInputWidgetProperty("minimum", 1);
     laserMinPower->setInputWidgetProperty("maximum", 100);
-    laserMinPower->setStoreStrategy(SS_DIRECTLY);
 
     ConfigItem* laserPowerFreq = group->addConfigItem(
         "laserPowerFreq",
@@ -2972,25 +2312,28 @@ void Config::loadSystemRegisters()
     laserPowerFreq->setInputWidgetProperty("page", 1000);
     laserPowerFreq->setInputWidgetProperty("minimum", 1);
     laserPowerFreq->setInputWidgetProperty("maximum", 10000);
-    laserPowerFreq->setStoreStrategy(SS_DIRECTLY);
+    laserPowerFreq->setVisible(false);
 
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
+    xPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* yPhaseEnabled = group->addConfigItem(
         "yPhaseEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
+    yPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* zPhaseEnabled = group->addConfigItem(
         "zPhaseEnabled",
         true,
-        DT_BOOL
+        DT_INT
     );
+    zPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* deviceOrigin = group->addConfigItem(
         "deviceOrigin",
@@ -3015,6 +2358,7 @@ void Config::loadSystemRegisters()
         [=](QWidget* widget, const QVariant& value) {
             RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
             radioGroup->setValue(value.toInt());
+            return value;
         }
     );
 }
@@ -3127,8 +2471,8 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "The visual grid spacing in mm", nullptr));
 
     Ui::validMaxRegionItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Valid Max Region(m)", nullptr),
-        QCoreApplication::translate("Config", "The Valid Max Region Width Or Height in m", nullptr));
+        QCoreApplication::translate("Config", "Valid Max Region(mm)", nullptr),
+        QCoreApplication::translate("Config", "The Valid Max Region Width Or Height in mm", nullptr));
 
     Ui::splitterHandleWidthItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Splitter Handle Width(px)", nullptr), 

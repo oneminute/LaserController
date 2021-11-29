@@ -60,11 +60,7 @@ public:
     /// </summary>
     /// <param name="docBounding">外包矩形</param>
     /// <returns></returns>
-    QPointF jobOriginReletiveInScene(const QRectF& docBounding) const;
-
-    QPointF jobOriginReletiveInScene(bool includingAccSpan = false) const;
-
-    QPointF jobOriginReletiveInMech(bool includingAccSpan = false) const;
+    QPoint reletiveJobOrigin() const;
 
     /// <summary>
     /// 返回作业原点。该点值在画布坐标系下，由当前有效图元列表形成
@@ -72,31 +68,31 @@ public:
     /// </summary>
     /// <param name="docBounding">外包矩形</param>
     /// <returns></returns>
-    QPointF jobOriginInScene() const;
+    QPoint jobOriginOnDocBoundingRect() const;
 
-    QPointF jobOriginInDevice() const;
+    QRect absoluteDocBoundingRect(bool includingAccSpan = false) const;
 
-    QPointF jobOriginInMech() const;
+    /// <summary>
+    /// 在当前原点下的文档外包框。如果开始方式为相对坐标，则该外包框
+    /// 将按照9宫格对应到当前的相对原点下。
+    /// </summary>
+    /// <param name="includingAccSpan"></param>
+    /// <returns></returns>
+    QRect currentDocBoundingRect(bool includingAccSpan = false) const;
 
-
-    QRectF docBoundingRectInScene(bool includingAccSpan = false) const;
-    QRectF docBoundingRectInMech() const;
-    QRectF docBoundingRectInDevice(bool includingAccSpan = false) const;
-
-    QRectF machiningDocBoundingRectInScene() const;
-    QRectF machiningDocBoundingRectInMech() const;
-    QRectF machiningDocBoundingRectInDevice(bool includingAccSpan = false) const;
-
-    QPointF docOriginInScene() const;
-    QPointF docOriginInMech() const;
-    QPointF docOriginInDevice() const;
+    /// <summary>
+    /// 若是绝对坐标系，则返回(0, 0)；若是相对坐标系，则返回在当前画
+    /// 布中文档外包框上9宫格对应的原点。
+    /// </summary>
+    /// <returns></returns>
+    QPoint docOrigin() const;
 
     /// <summary>
     /// 在画布坐标系下，从图元列表外包框移动到指定原点位置的
     /// 平移变换矩阵。指定原点是指用户原点或当前激光位置。
     /// </summary>
     /// <returns></returns>
-    QTransform transformToReletiveOriginInDevice() const;
+    QTransform transformToReletiveOrigin() const;
 
     bool enablePrintAndCut() const;
     void setEnablePrintAndCut(bool value);
@@ -144,7 +140,7 @@ protected:
     /// </summary>
     /// <param name="node">待分组节点</param>
     /// <param name="level">当前的组级别</param>
-    void optimizeGroups(OptimizeNode* node, int level = 1, bool sorted = false);
+    //void optimizeGroups(OptimizeNode* node, int level = 1, bool sorted = false);
     //void clearOutline(OptimizeNode* node, bool clearLayers = false);
     void addPrimitiveToNodesTree(LaserPrimitive* primitive, OptimizeNode* node);
 

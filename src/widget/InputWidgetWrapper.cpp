@@ -110,7 +110,7 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     case IWT_FloatEditSlider:
     {
         FloatEditSlider* floatEditSlider = qobject_cast<FloatEditSlider*>(widget);
-        connect(floatEditSlider, &FloatEditSlider::valueChanged, this, QOverload<qreal>::of(&InputWidgetWrapper::onValueChanged));
+        connect(floatEditSlider, &FloatEditSlider::valueChanged, this, &InputWidgetWrapper::onFloatEditSliderValueChanged);
         break;
     }
     case IWT_Vector2DWidget:
@@ -118,9 +118,11 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         connect(vector2DWidget, &Vector2DWidget::valueChanged, this, QOverload<qreal, qreal>::of(&InputWidgetWrapper::onVector2DChanged));
         break;
     }
-    configItem->blockSignals(true);
+    //configItem->blockSignals(true);
+    if (d->configItem->name() == "xStepLength")
+        qLogD << "debugging " << d->configItem->name();
     updateWidgetValue(d->configItem->value(), nullptr);
-    configItem->blockSignals(false);
+    //configItem->blockSignals(false);
 
     connect(d->configItem, &ConfigItem::modifiedChanged, this, &InputWidgetWrapper::onConfigItemModifiedChanged);
     connect(d->configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
@@ -155,116 +157,130 @@ void InputWidgetWrapper::updateWidgetValue(const QVariant& newValue, void* sende
     Q_D(InputWidgetWrapper);
     if (senderPtr == this)
         return;
-    QVariant value = d->configItem->doValueToWidgetHook(newValue);
+    //QVariant value = d->configItem->doValueToWidgetHook(newValue);
     QWidget* widget = qobject_cast<QWidget*>(parent());
-    widget->blockSignals(true);
+    //widget->blockSignals(true);
     // for debugging
-    //if (d->configItem->name() == "searchingXYWeight")
-        //qLogD << "debugging " << d->configItem->name();
-    if (!d->configItem->doUpdateWidgetValueHook(widget, newValue))
+    if (d->configItem->name() == "xStepLength")
+        qLogD << "debugging " << d->configItem->name();
+    bool done = d->configItem->doUpdateWidgetValueHook(widget, newValue);
+    if (!done)
     {
         switch (d->type)
         {
         case IWT_CheckBox:
         {
             QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
-            checkBox->setCheckState(value.toBool() ? Qt::Checked : Qt::Unchecked);
+            Qt::CheckState checked;
+            if (d->configItem->dataType() == DT_INT)
+                checked = newValue.toInt() == 1 ? Qt::Checked : Qt::Unchecked;
+            else
+                checked = newValue.toBool() ? Qt::Checked : Qt::Unchecked;
+            checkBox->setCheckState(checked);
             break;
         }
         case IWT_ComboBox:
         {
             QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-            if (value.type() == QVariant::String)
+            if (newValue.type() == QVariant::String)
             {
-                comboBox->setCurrentText(value.toString());
+                comboBox->setCurrentText(newValue.toString());
             }
-            else if (value.type() == QVariant::Int)
+            else if (newValue.type() == QVariant::Int)
             {
-                comboBox->setCurrentIndex(value.toInt());
+                comboBox->setCurrentIndex(newValue.toInt());
             }
             break;
         }
         case IWT_LineEdit:
         {
             QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
-            lineEdit->setText(value.toString());
+            lineEdit->setText(newValue.toString());
             break;
         }
         case IWT_TextEdit:
         {
             QTextEdit* textEdit = qobject_cast<QTextEdit*>(widget);
-            textEdit->setText(value.toString());
+            textEdit->setText(newValue.toString());
             break;
         }
         case IWT_PlainTextEdit:
         {
             QPlainTextEdit* plainTextEdit = qobject_cast<QPlainTextEdit*>(widget);
-            plainTextEdit->setPlainText(value.toString());
+            plainTextEdit->setPlainText(newValue.toString());
             break;
         }
         case IWT_SpinBox:
         {
             QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget);
-            spinBox->setValue(value.toInt());
+            spinBox->setValue(newValue.toInt());
             break;
         }
         case IWT_DoubleSpinBox:
         {
             QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget);
-            doubleSpinBox->setValue(value.toDouble());
+            doubleSpinBox->setValue(newValue.toDouble());
             break;
         }
         case IWT_TimeEdit:
         {
             QTimeEdit* timeEdit = qobject_cast<QTimeEdit*>(widget);
-            timeEdit->setTime(value.toTime());
+            timeEdit->setTime(newValue.toTime());
             break;
         }
         case IWT_DateEdit:
         {
             QDateEdit* dateEdit = qobject_cast<QDateEdit*>(widget);
-            dateEdit->setDate(value.toDate());
+            dateEdit->setDate(newValue.toDate());
             break;
         }
         case IWT_DateTimeEdit:
         {
             QDateTimeEdit* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget);
-            dateTimeEdit->setDateTime(value.toDateTime());
+            dateTimeEdit->setDateTime(newValue.toDateTime());
             break;
         }
         case IWT_Dial:
         {
             QDial* dial = qobject_cast<QDial*>(widget);
-            dial->setValue(value.toInt());
+            dial->setValue(newValue.toInt());
             break;
         }
         case IWT_EditSlider:
         {
             EditSlider* editSlider = qobject_cast<EditSlider*>(widget);
-            editSlider->setValue(value.toInt());
+            editSlider->setValue(newValue.toInt());
             break;
         }
         case IWT_FloatEditSlider:
         {
             FloatEditSlider* editSlider = qobject_cast<FloatEditSlider*>(widget);
-            editSlider->setValue(value.toReal());
+            if (d->configItem->dataType() == DT_REAL ||
+                d->configItem->dataType() == DT_FLOAT ||
+                d->configItem->dataType() == DT_DOUBLE)
+                editSlider->setValue(newValue.toReal());
+            else if (d->configItem->dataType() == DT_INT)
+                editSlider->setIntValue(newValue.toInt());
             break;
         }
         case IWT_Vector2DWidget:
         {
             Vector2DWidget* vector2DWidget = qobject_cast<Vector2DWidget*>(widget);
-            vector2DWidget->setValue(value.toPointF());
+            vector2DWidget->setValue(newValue.toPointF());
             break;
         }
         }
     }
-    widget->blockSignals(false);
+    //widget->blockSignals(false);
 }
 
 void InputWidgetWrapper::modifyConfigItemValue(const QVariant& value)
 {
     Q_D(InputWidgetWrapper);
-    QVariant newValue = d->configItem->doValueFromWidgetHook(value);
+    if (d->configItem->name() == "xStepLength")
+        qLogD << "debugging " << d->configItem->name();
+    QWidget* widget = qobject_cast<QWidget*>(parent());
+    QVariant newValue = d->configItem->doValueFromWidgetHook(widget, value);
     d->configItem->setValue(newValue, d->storeStrategy, this);
 }
 
@@ -335,8 +351,12 @@ void InputWidgetWrapper::onTextChanged(const QString & text)
 
 void InputWidgetWrapper::onCheckBoxStateChanged(int state)
 {
+    Q_D(InputWidgetWrapper);
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender());
-    modifyConfigItemValue(state == Qt::Checked);
+    QVariant value = state == Qt::Checked;
+    if (d->configItem->dataType() == DT_INT)
+        value = state == Qt::Checked ? 1 : 0;
+    modifyConfigItemValue(value);
 }
 
 void InputWidgetWrapper::onComboBoxIndexChanged(int index)
@@ -367,6 +387,24 @@ void InputWidgetWrapper::onEditingFinished()
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
     QString text = lineEdit->text();
     modifyConfigItemValue(typeUtils::stringToVariant(text, d->configItem->dataType()));
+}
+
+void InputWidgetWrapper::onFloatEditSliderValueChanged(qreal value)
+{
+    Q_D(InputWidgetWrapper);
+    QVariant var;
+    FloatEditSlider* editSlider = qobject_cast<FloatEditSlider*>(sender());
+    if (d->configItem->dataType() == DT_REAL ||
+        d->configItem->dataType() == DT_FLOAT ||
+        d->configItem->dataType() == DT_DOUBLE)
+        var = value;
+    else if (d->configItem->dataType() == DT_INT)
+    {
+        if (d->configItem->name() == "xStepLength")
+            qLogD << "debugging " << d->configItem->name();
+        var = editSlider->intValue();
+    }
+    modifyConfigItemValue(var);
 }
 
 void InputWidgetWrapper::onValueChanged(int value)

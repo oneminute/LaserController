@@ -42,7 +42,7 @@ OptimizeEdge::OptimizeEdge(OptimizeNode* a, OptimizeNode* b, bool force, bool fo
     d->force = force;
     d->forward = forward;
 
-    d->length = QVector2D(a->startPos().toPointF() - b->startPos().toPointF()).length();
+    d->length = QVector2D(a->startPos().toPoint() - b->startPos().toPoint()).length();
 }
 
 OptimizeEdge::~OptimizeEdge()
@@ -102,9 +102,9 @@ void OptimizeEdge::print()
         << ", length = " << d->length << ", weight = " << d->weight;
 }
 
-QLineF OptimizeEdge::toLineInDevice() const
+QLine OptimizeEdge::toLine() const
 {
     Q_D(const OptimizeEdge);
-    return QLineF(d->a->positionInDevice(), d->b->positionInDevice());
+    return QLine(d->a->currentPos().toPoint(), d->b->currentPos().toPoint());
 }
 

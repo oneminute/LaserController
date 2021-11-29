@@ -783,8 +783,8 @@ void CornerRadiusCommand::undo()
 
 void CornerRadiusCommand::redo()
 {
-    QRectF bounding;
-    utils::boundingRect(m_rectList, bounding, QRectF(), false);
+    QRect bounding;
+    utils::boundingRect(m_rectList, bounding, QRect(), false);
     qreal w = qAbs(bounding.width());
     qreal h = qAbs(bounding.height());
     qreal shorter = h;

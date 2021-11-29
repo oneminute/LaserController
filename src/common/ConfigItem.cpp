@@ -19,7 +19,7 @@ public:
         , modified(false)
         , inputWidgetType(IWT_EditSlider)
         , widgetInitializeHook(nullptr)
-        , valueToWidgetHook(nullptr)
+        //, valueToWidgetHook(nullptr)
         , valueFromWidgetHook(nullptr)
         , createWidgetHook(nullptr)
         , destroyHook(nullptr)
@@ -136,13 +136,13 @@ public:
     QDateTime lastDirtyModifiedTime;
 
     ConfigItem::WidgetInitializeHook widgetInitializeHook;
-    ConfigItem::ValueHook valueToWidgetHook;
-    ConfigItem::ValueHook valueFromWidgetHook;
+    //ConfigItem::ValueHook valueToWidgetHook;
+    ConfigItem::WidgetValueHook valueFromWidgetHook;
     ConfigItem::CreateWidgetHook createWidgetHook;
     ConfigItem::DestroyHook destroyHook;
     ConfigItem::ToJsonHook toJsonHook;
     ConfigItem::FromJsonHook fromJsonHook;
-    ConfigItem::UpdateWidgetValueHook updateWidgetValueHook;
+    ConfigItem::WidgetValueHook updateWidgetValueHook;
     ConfigItem::RetranslateHook retranslateHook;
 };
 
@@ -170,6 +170,9 @@ ConfigItem::ConfigItem(
     d->advanced = advanced;
     d->visible = visible;
     d->storeStrategy = storeStrategy;
+
+    if (d->name == "xStepLength")
+        qLogD << "debugging " << d->name;
 
     switch (d->dataType)
     {
@@ -555,46 +558,46 @@ void ConfigItem::doInitWidget(QWidget* widget, InputWidgetWrapper* wrapper)
     }
 }
 
-ConfigItem::ValueHook ConfigItem::valueToWidgetHook()
-{
-    Q_D(ConfigItem);
-    return d->valueToWidgetHook;
-}
+//ConfigItem::ValueHook ConfigItem::valueToWidgetHook()
+//{
+//    Q_D(ConfigItem);
+//    return d->valueToWidgetHook;
+//}
+//
+//void ConfigItem::setValueToWidgetHook(ValueHook fn)
+//{
+//    Q_D(ConfigItem);
+//    d->valueToWidgetHook = fn;
+//}
+//
+//QVariant ConfigItem::doValueToWidgetHook(const QVariant& value) const
+//{
+//    Q_D(const ConfigItem);
+//    if (d->valueToWidgetHook)
+//    {
+//        return d->valueToWidgetHook(value);
+//    }
+//    return value;
+//}
 
-void ConfigItem::setValueToWidgetHook(ValueHook fn)
-{
-    Q_D(ConfigItem);
-    d->valueToWidgetHook = fn;
-}
-
-QVariant ConfigItem::doValueToWidgetHook(const QVariant& value) const
-{
-    Q_D(const ConfigItem);
-    if (d->valueToWidgetHook)
-    {
-        return d->valueToWidgetHook(value);
-    }
-    return value;
-}
-
-ConfigItem::ValueHook ConfigItem::valueFromWidgetHook()
+ConfigItem::WidgetValueHook ConfigItem::valueFromWidgetHook()
 {
     Q_D(ConfigItem);
     return d->valueFromWidgetHook;
 }
 
-void ConfigItem::setValueFromWidgetHook(ValueHook fn)
+void ConfigItem::setValueFromWidgetHook(WidgetValueHook fn)
 {
     Q_D(ConfigItem);
     d->valueFromWidgetHook = fn;
 }
 
-QVariant ConfigItem::doValueFromWidgetHook(const QVariant& value)
+QVariant ConfigItem::doValueFromWidgetHook(QWidget* widget, const QVariant& value)
 {
     Q_D(ConfigItem);
     if (d->valueFromWidgetHook)
     {
-        return d->valueFromWidgetHook(value);
+        return d->valueFromWidgetHook(widget, value);
     }
     return value;
 }
@@ -685,13 +688,13 @@ void ConfigItem::doFromJsonHook(const QJsonObject& json)
     }
 }
 
-ConfigItem::UpdateWidgetValueHook ConfigItem::updateWidgetValueHook()
+ConfigItem::WidgetValueHook ConfigItem::updateWidgetValueHook()
 {
     Q_D(ConfigItem);
     return d->updateWidgetValueHook;
 }
 
-void ConfigItem::setUpdateWidgetValueHook(UpdateWidgetValueHook fn)
+void ConfigItem::setUpdateWidgetValueHook(WidgetValueHook fn)
 {
     Q_D(ConfigItem);
     d->updateWidgetValueHook = fn;

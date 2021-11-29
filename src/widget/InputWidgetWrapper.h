@@ -120,6 +120,7 @@ public slots:
     void onTextEditTextChanged();
     void onPlainTextEditTextChanged();
     void onEditingFinished();
+    void onFloatEditSliderValueChanged(qreal value);
     void onValueChanged(int value);
     void onValueChanged(double value);
     void onValueChanged(const SmallDiagonalLimitation& value);

@@ -72,11 +72,16 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
         startingPoints.buildKdtree();
         currentPoint = primitive->firstStartingPoint();
     }
+    else if (nodeType == LNT_LAYER)
+    {
+        LaserLayer* layer = static_cast<LaserLayer*>(documentItem);
+        currentPoint = LaserPoint(layer->position());
+    }
     else if (nodeType == LNT_DOCUMENT)
     {
         LaserDocument* document = static_cast<LaserDocument*>(documentItem);
-        QPointF origin = document->docOriginInDevice();
-        qreal angle = 0;
+        QPoint origin = document->docOrigin();
+        int angle = 0;
         switch (Config::SystemRegister::deviceOrigin())
         {
         case 0:
@@ -93,6 +98,11 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
             break;
         }
         currentPoint = LaserPoint(origin, angle, angle);
+    }
+    else if (nodeType == LNT_VIRTUAL)
+    {
+        if (!childNodes.isEmpty())
+            currentPoint = childNodes.first()->currentPos();
     }
 }
 
@@ -201,24 +211,6 @@ int OptimizeNode::childCount() const
     Q_D(const OptimizeNode);
     return d->childNodes.count();
 }
-
-//QPointF OptimizeNode::position() const
-//{
-//    Q_D(const OptimizeNode);
-//    return d->position;
-//}
-//
-//void OptimizeNode::setPosition(QPointF& value)
-//{
-//    Q_D(OptimizeNode);
-//    d->position = value;
-//}
-
-//bool OptimizeNode::isVirtual() const
-//{
-    //Q_D(const OptimizeNode);
-    //return d->nodeType == LaserNodeType::LNT_VIRTUAL;
-//}
 
 bool OptimizeNode::isDocument() const
 {
@@ -353,69 +345,6 @@ void OptimizeNode::findSiblings(QSet<OptimizeNode*>& leaves, QSet<OptimizeNode*>
             leaves.insert(node);
         }
     }
-}
-
-QPointF OptimizeNode::positionInScene() const
-{
-    Q_D(const OptimizeNode);
-    switch (d->nodeType)
-    {
-    case LNT_DOCUMENT:
-    {
-        LaserDocument* doc = static_cast<LaserDocument*>(d->documentItem);
-        return LaserApplication::device->currentOriginInScene();
-    }
-    case LNT_LAYER:
-    {
-        LaserLayer* layer = static_cast<LaserLayer*>(d->documentItem);
-        return layer->positionInScene();
-    }
-    case LNT_PRIMITIVE:
-    {
-        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        return primitive->position();
-    }
-    case LNT_VIRTUAL:
-    {
-        if (hasChildren())
-            return d->childNodes.first()->positionInScene();
-    }
-    }
-    
-    return QPointF(0, 0);
-}
-
-QPointF OptimizeNode::positionInDevice() const
-{
-    Q_D(const OptimizeNode);
-    switch (d->nodeType)
-    {
-    case LNT_DOCUMENT:
-    {
-        LaserDocument* doc = static_cast<LaserDocument*>(d->documentItem);
-        return LaserApplication::device->currentOriginInDevice();
-    }
-    case LNT_LAYER:
-    {
-        LaserLayer* layer = static_cast<LaserLayer*>(d->documentItem);
-        return layer->positionInDevice();
-    }
-    case LNT_PRIMITIVE:
-    {
-        LaserPrimitive* primitive = static_cast<LaserPrimitive*>(d->documentItem);
-        QPointF pos = primitive->position();
-        pos = Global::matrixToUm().map(pos);
-        pos = LaserApplication::device->transformToDevice().map(pos);
-        return pos;
-    }
-    case LNT_VIRTUAL:
-    {
-        if (hasChildren())
-            return d->childNodes.first()->positionInScene();
-    }
-    }
-    
-    return QPointF(0, 0);
 }
 
 void OptimizeNode::update(ProgressItem* parentProgress)
