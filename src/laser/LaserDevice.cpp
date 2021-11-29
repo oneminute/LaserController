@@ -97,7 +97,7 @@ void LaserDevicePrivate::updateDeviceOriginAndTransform()
     case 1:
         dx = 0;
         dy = maxY;
-        layoutRect = QRect(QPoint(0, -maxY), QPoint(0, maxX));
+        layoutRect = QRect(QPoint(0, -maxY), QPoint(maxX, 0));
         break;
     }
 
