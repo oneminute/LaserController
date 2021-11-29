@@ -96,7 +96,7 @@ public:
     void updateDriverLanguage();
 
     bool checkLayoutForMoving(const QPoint& dest);
-    bool checkLayoutForMachining(const QRectF& docBounding, const QRectF& docBoundingAcc);
+    bool checkLayoutForMachining(const QRect& docBounding, const QRect& docBoundingAcc);
 
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;
@@ -106,6 +106,12 @@ public:
     /// </summary>
     /// <returns></returns>
     QPoint origin() const { return QPoint(0, 0); }
+
+    /// <summary>
+    /// 当前坐标原点相对于绝对左上角0,0点偏移的量。
+    /// </summary>
+    /// <returns></returns>
+    QPoint originOffset() const;
 
     /// <summary>
     /// 当前激光点在设备坐标系下的坐标值。

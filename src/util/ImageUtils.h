@@ -24,7 +24,7 @@ namespace imageUtils
     QPointF closestPointTo(const QPointF &target, const QPainterPath &sourcePath);
     bool hit(const QLineF& ray, const QPainterPath& target, QPointF& hitPos);
 
-    QImage parseImageData(const QByteArray& data);
+    QImage parseImageData(const QByteArray& data, int rowInterval);
 }
 
 #endif // 

@@ -28,7 +28,7 @@ void ProgressBarDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
     int border = 1;
     QPoint topLeft = option.rect.topLeft() - QPoint(border, border);
-    QPoint bottomRight = option.rect.bottomRight() + QPoint(border, border);
+    QPoint bottomRight = option.rect.topLeft() + QPoint(option.rect.width(), option.rect.height()) + QPoint(border, border);
     QRect rect(topLeft, bottomRight);
 
     QStyleOptionProgressBar bar;

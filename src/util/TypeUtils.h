@@ -44,7 +44,7 @@ namespace typeUtils
 
     QPointF json2Point(const QJsonValue& json);
 
-    QJsonObject rect2Json(const QRectF& rect);
+    QJsonObject rect2Json(const QRect& rect);
 }
 
 #endif // TYPEUTILS_H

@@ -795,45 +795,56 @@ bool LaserDevice::checkLayoutForMoving(const QPoint& dest)
     }
 }
 
-bool LaserDevice::checkLayoutForMachining(const QRectF& docBounding, const QRectF& docBoundingAcc)
+bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect& docBoundingAcc)
 {
     QRect layoutRect = this->layoutRect();
-    QRect docBound = docBounding.toRect();
-    QRect docBoundAcc = docBoundingAcc.toRect();
     QString info1 = "";
     QString info2 = "";
 
     bool ok1 = true;
     bool ok2 = true;
-    bool needCheckAcc = docBound!= docBoundAcc;
-    bool left = false;
-    bool right = false;
+    bool needCheckAcc = docBounding != docBoundingAcc;
+    bool exceedLeft = false;
+    bool exceedRight = false;
 
-    if (docBound.left() < layoutRect.left())
+    int docLeft = docBounding.left();
+    int docRight = docLeft + docBounding.width();
+    int docTop = docBounding.top();
+    int docBottom = docTop + docBounding.height();
+
+    int accLeft = docBoundingAcc.left();
+    int accRight = accLeft + docBoundingAcc.width();
+
+    int layoutLeft = layoutRect.left();
+    int layoutRight = layoutLeft + layoutRect.width();
+    int layoutTop = layoutRect.top();
+    int layoutBottom = layoutTop + layoutRect.height();
+
+    if (docLeft < layoutLeft)
     {
         ok1 = false;
         info1.append(tr("Left edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((layoutRect.left() - docBound.left()) * 0.001, 0, 'f', 3));
-        left = true;
+            .arg((layoutLeft - docLeft) * 0.001, 0, 'f', 3));
+        exceedLeft = true;
     }
-    if (docBound.top() < layoutRect.top())
+    if (docTop < layoutTop)
     {
         ok1 = false;
         info1.append(tr("Top edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((layoutRect.top() - docBound.left()) * 0.001, 0, 'f', 3));
+            .arg((layoutTop - docTop) * 0.001, 0, 'f', 3));
     }
-    if (docBound.right() > layoutRect.right())
+    if (docRight > layoutRight)
     {
         ok1 = false;
         info1.append(tr("Right edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((docBound.right() - layoutRect.right()) * 0.001, 0, 'f', 3));
-        right = true;
+            .arg((docRight - layoutRight) * 0.001, 0, 'f', 3));
+        exceedRight = true;
     }
-    if (docBound.bottom() > layoutRect.bottom())
+    if (docBottom > layoutBottom)
     {
         ok1 = false;
         info1.append(tr("Bottom edge of current document bounding exceeds device layout: %1mm\n")
-            .arg((docBound.bottom() - layoutRect.bottom()) * 0.001, 0, 'f', 3));
+            .arg((docBottom - layoutBottom) * 0.001, 0, 'f', 3));
     }
 
     if (ok1)
@@ -841,22 +852,17 @@ bool LaserDevice::checkLayoutForMachining(const QRectF& docBounding, const QRect
 
     if (needCheckAcc)
     {
-        qreal accLeft = docBoundAcc.left();
-        qreal accRight = docBoundAcc.right();
-        qLogD << "acc left: " << accLeft << ", acc right: " << accRight;
-        qreal diffLeft = layoutRect.left() - accLeft;
-        qreal diffRight = accRight - layoutRect.right();
-        if (!left && diffLeft > 1)
+        if (accLeft < layoutLeft)
         {
             ok2 = false;
             info2.append(tr("Left edge of current document bounding with acc interval exceeds device layout: %1mm\n")
-                .arg(diffLeft * 0.001, 0, 'f', 3));
+                .arg((layoutLeft - accLeft) * 0.001, 0, 'f', 3));
         }
-        if (!right && accRight > 1)
+        if (accRight > layoutRight)
         {
             ok2 = false;
             info2.append(tr("Right edge of current document bounding with acc interval exceeds device layout: %1mm\n")
-                .arg(accRight * 0.001, 0, 'f', 3));
+                .arg((accRight - layoutRight) * 0.001, 0, 'f', 3));
         }
 
         if (ok2)
@@ -909,6 +915,12 @@ LaserRegister* LaserDevice::systemRegister(int addr) const
     }
     else
         return nullptr;
+}
+
+QPoint LaserDevice::originOffset() const
+{
+    Q_D(const LaserDevice);
+    return d->absoluteOrigin;
 }
 
 QPoint LaserDevice::laserPosition() const

@@ -225,11 +225,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
 
-    QRectF outBounding = absoluteDocBoundingRect(true);
+    QRect outBounding = absoluteDocBoundingRect(true);
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
     {
         outBounding.moveTopLeft(-outBounding.topLeft());
-        QPointF outJobOrigin = reletiveJobOrigin();
+        QPoint outJobOrigin = reletiveJobOrigin();
         outBounding.moveTopLeft(-outJobOrigin);
     }
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(outBounding);
@@ -529,11 +529,15 @@ void LaserDocument::exportBoundingJSON()
     }
     
     QRect docBoundingRect = absoluteDocBoundingRect();
+    int docLeft = docBoundingRect.left();
+    int docTop = docBoundingRect.top();
+    int docRight = docLeft + docBoundingRect.width();
+    int docBottom = docTop + docBoundingRect.height();
     LaserPointList points;
-    points.append(LaserPoint(docBoundingRect.topLeft()));
-    points.append(LaserPoint(docBoundingRect.topRight()));
-    points.append(LaserPoint(docBoundingRect.bottomRight()));
-    points.append(LaserPoint(docBoundingRect.bottomLeft()));
+    points.append(LaserPoint(docLeft, docTop));
+    points.append(LaserPoint(docRight, docTop));
+    points.append(LaserPoint(docRight, docBottom));
+    points.append(LaserPoint(docLeft, docBottom));
     qLogD << "bounding rect point index: " << index;
     LaserPointList points2;
     for (int i = 0; i < 4; i++)
@@ -549,11 +553,11 @@ void LaserDocument::exportBoundingJSON()
     }
     else
     {
-        points2.insert(0, LaserPoint(lastPoint));
         if (Config::Device::jobOrigin() == 4)
         {
             points2.append(points2.first());
         }
+        points2.insert(0, LaserPoint(lastPoint));
         if (isMiddle)
         {
             points2.append(LaserPoint(lastPoint));

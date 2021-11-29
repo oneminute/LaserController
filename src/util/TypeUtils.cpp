@@ -177,12 +177,16 @@ QPointF typeUtils::json2Point(const QJsonValue& json)
     return json2Point(json.toObject());
 }
 
-QJsonObject typeUtils::rect2Json(const QRectF& rect)
+QJsonObject typeUtils::rect2Json(const QRect& rect)
 {
     QJsonObject json;
-    json["x1"] = qRound(rect.topLeft().x());
-    json["y1"] = qRound(rect.topLeft().y());
-    json["x2"] = qRound(rect.bottomRight().x());
-    json["y2"] = qRound(rect.bottomRight().y());
+    int left = rect.left();
+    int right = left + rect.width();
+    int top = rect.top();
+    int bottom = top + rect.height();
+    json["x1"] = left;
+    json["y1"] = top;
+    json["x2"] = right;
+    json["y2"] = bottom;
     return json;
 }

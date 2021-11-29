@@ -2889,7 +2889,7 @@ void LaserControllerWindow::onActionImport(bool checked)
     if (!importer.isNull())
     {
         LaserApplication::resetProgressWindow();
-        LaserApplication::showProgressWindow();
+        //LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Importing"), nullptr);
         importer->import(filename, m_scene, progress);
         progress->finish();

@@ -10,7 +10,7 @@ class LaserPoint
 {
 public:
     explicit LaserPoint();
-    explicit LaserPoint(int x_, int y_, int angle1_, int angle2_);
+    explicit LaserPoint(int x_, int y_, int angle1_ = 0, int angle2_ = 360);
     explicit LaserPoint(const QPoint& point, int angle1_ = 0, int angle2_ = 360);
 
     static int vectorSize();

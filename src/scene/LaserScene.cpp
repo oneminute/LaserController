@@ -515,9 +515,11 @@ void LaserScene::updataValidMaxRegion()
         i++;
     }
     QRect bounds = QRect(bLeft, bTop, bRight - bLeft, bBottom - bTop);
+    QPoint topLeft = bounds.topLeft();
+    QPoint bottomRight(bounds.left() + bounds.width(), bounds.right() + bounds.height());
     //垂直或水平线，点的情况
     if (bounds.width() == 0 || bounds.height() == 0) {
-        if (!maxRegion().contains(bounds.topLeft()) || !maxRegion().contains(bounds.bottomRight())) {
+        if (!maxRegion().contains(topLeft) || !maxRegion().contains(bottomRight)) {
             QMessageBox::warning(view, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
             
         }

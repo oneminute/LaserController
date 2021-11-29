@@ -331,7 +331,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
 
     progress->finish();
 
-    //parseImageData(bytes);
+    parseImageData(bytes, rowInterval);
 
     return bytes;
 }
@@ -394,7 +394,7 @@ bool imageUtils::hit(const QLineF& ray, const QPainterPath& target, QPointF& hit
     return true;
 }
 
-QImage imageUtils::parseImageData(const QByteArray& data)
+QImage imageUtils::parseImageData(const QByteArray& data, int rowInterval)
 {
     QDataStream stream(const_cast<QByteArray*>(&data), QIODevice::ReadOnly);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -451,7 +451,7 @@ QImage imageUtils::parseImageData(const QByteArray& data)
             break;
     }
 
-    height = (maxY - minY) / 70;
+    height = (maxY - minY) / rowInterval;
     QImage image(width, height, QImage::Format_Grayscale8);
     image.fill(Qt::white);
 
