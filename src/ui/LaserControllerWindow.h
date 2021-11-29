@@ -63,8 +63,8 @@ public:
     bool lockEqualRatio();
     LaserDoubleSpinBox* widthBox();
     LaserDoubleSpinBox* heightBox();
-    void setLastCornerRadiusValue(qreal val);
-    qreal lastCornerRadiusValue();
+    //void setLastCornerRadiusValue(qreal val);
+    //qreal lastCornerRadiusValue();
     LaserDoubleSpinBox* fontSpaceYDoubleSpinBox();
 
     PointPairList printAndCutPoints() const;
@@ -471,6 +471,7 @@ private:
     QGridLayout* m_nurbsPropertyLayout;
     QGridLayout* m_mixturePropertyLayout;
     QGridLayout* m_nullPropertyLayout;
+    QGridLayout* m_pathPropertyLayout;
     QWidget* m_propertyPanelWidget;
     QWidget* m_rectPropertyWidget;
     QWidget* m_linePropertyWidget;
@@ -482,6 +483,7 @@ private:
     QWidget* m_nurbsPropertyWidget;
     QWidget* m_mixturePropertyWidget;
     QWidget* m_nullPropertyWidget;
+    QWidget* m_pathPropertyWidget;
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;
     ads::CDockAreaWidget* m_dockAreaProperty;

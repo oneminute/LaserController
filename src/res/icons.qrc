@@ -95,5 +95,16 @@
         <file>images/app_icon_128.png</file>
         <file>images/app_icon_256.png</file>
         <file>images/file.png</file>
+        <file>images/selected_center.png</file>
+        <file>images/vertical_left.png</file>
+        <file>images/vertical_right.png</file>
+        <file>images/vertical_middle.png</file>
+        <file>images/horizontal_top.png</file>
+        <file>images/horizontal_bottom.png</file>
+        <file>images/horizontal_middle.png</file>
+        <file>images/distribute_horizontalSpace.png</file>
+        <file>images/distribute_verticalSpace.png</file>
+        <file>images/distribute_horizontalCenter.png</file>
+        <file>images/distribute_verticalCenter.png</file>
     </qresource>
 </RCC>
