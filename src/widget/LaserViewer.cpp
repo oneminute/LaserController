@@ -1373,7 +1373,6 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 //输入的点zoomAnchor是view的widget为坐标系
 bool LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
 {
-
     const qreal currentZoom = zoomValue();
     if ((factor < 1 && currentZoom < 0.0001) || (factor > 1 && currentZoom > 58))
         return false;
@@ -1920,19 +1919,19 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			}
 			
 		}
-		//QGraphicsView::mouseMoveEvent(event);
+		//QGraphicsView::mouseReleaseEvent(event);
 		//事件被Item截断
 		if (m_scene->mouseMoveBlock()) {
 			this->viewport()->repaint();
 			return;
 		}
 		
-		//QGraphicsView::mouseMoveEvent(event);
+		//QGraphicsView::mouseReleaseEvent(event);
         
     }
 	//View Draging
 	else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
-		//QGraphicsView::mouseMoveEvent(event);
+		//QGraphicsView::mouseReleaseEvent(event);
 		//QPixmap cMap(":/ui/icons/images/dragging_hand.png");
 		//this->setCursor(cMap.scaled(32, 32, Qt::KeepAspectRatio));
 		QPointF viewDragPoint = event->pos();
@@ -1955,7 +1954,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 		}
 		m_creatingRectBeforeShiftPoint = m_creatingRectEndPoint;
 		this->viewport()->repaint();
-		//QGraphicsView::mouseMoveEvent(event);
+		//QGraphicsView::mouseReleaseEvent(event);
         return;
 
     }
@@ -3829,15 +3828,22 @@ void LaserViewer::setZoomValue(qreal zoomValue)
 qreal LaserViewer::adapterViewScale()
 {
     QRectF viewRect = this->rect();
+    qreal w = viewRect.width();
+    qreal h = viewRect.height();
+    //qreal width1 = QRectF(mapToScene(viewRect.topLeft().toPoint()), mapToScene(viewRect.bottomRight().toPoint())).width();
     QRectF docRect = m_scene->backgroundItem()->rect();
-    qreal wScale = viewRect.width() / docRect.width();
-    qreal hScale = viewRect.height() / docRect.height();
+    //qreal docWidth = Global::mechToSceneHF(docRect.width());
+    //qreal docHeight = Global::mechToSceneVF(docRect.height());
+    qreal docWidth = docRect.width();
+    qreal docHeight = docRect.height();
+    qreal wScale = viewRect.width() / docWidth;
+    qreal hScale = viewRect.height() / docHeight;
     qreal scale = 1;
     if (wScale < hScale) {
-        scale = (viewRect.width() - 20) / docRect.width();
+        scale = (viewRect.width() - 20) / docWidth;
     }
     else {
-        scale = (viewRect.height() - 20) / docRect.height();
+        scale = (viewRect.height() - 20) / docHeight;
     }
     return scale;
 }
