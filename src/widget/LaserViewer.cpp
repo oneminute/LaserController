@@ -1440,9 +1440,10 @@ void LaserViewer::enterEvent(QEvent* event)
 
 void LaserViewer::mousePressEvent(QMouseEvent* event)
 {
+    
     // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
-        m_mousePressState = nullptr;
+        LaserApplication::mainWindow->initAlignTarget();
         //qDebug() << mapFromGlobal(QCursor::pos());
         //qDebug() << mapToScene(mapFromGlobal(QCursor::pos()));
         //附近的图元交点

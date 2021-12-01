@@ -74,6 +74,7 @@ public:
     bool exportable;
     bool visible;
     bool isJoinedGroup;
+    bool isAlignTarget;
     QList<LaserPrimitive*> joinedGroupList;
 };
 
@@ -93,6 +94,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     d->name = doc->newPrimitiveName(this);
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
+    d->isAlignTarget = false;
 }
 
 LaserPrimitive::~LaserPrimitive()
@@ -170,7 +172,11 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	{
 		//isSelected();
 		QString name = this->metaObject()->className();
-		QPen pen = QPen(color, 1.2f, Qt::DashLine);
+        qreal penSize = 1.0;
+        if (d->isAlignTarget) {
+            penSize = 3.0;
+        }
+		QPen pen = QPen(color, penSize, Qt::DashLine);
 		pen.setCosmetic(true);		
         if (isJoinedGroup()) {
             pen.setStyle(Qt::DashDotDotLine);
@@ -520,6 +526,18 @@ bool LaserPrimitive::visible() const
 
 void LaserPrimitive::setVisible(bool value)
 {
+}
+
+bool LaserPrimitive::isAlignTarget()
+{
+    Q_D(const LaserPrimitive);
+    return d->isAlignTarget;
+}
+
+void LaserPrimitive::setAlignTarget(bool value)
+{
+    Q_D(LaserPrimitive);
+    d->isAlignTarget = value;
 }
 
 LaserLayer* LaserPrimitive::layer() const

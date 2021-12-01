@@ -15,6 +15,8 @@
 #include "laser/LaserDriver.h"
 #include "widget/LaserDoubleSpinBox.h"
 #include "widget/LaserFontComboBox.h"
+#include "widget/LaserToolButton.h"
+#include "ui/LaserMeuu.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
@@ -48,6 +50,7 @@ class Vector2DWidget;
 class RadioButtonGroup;
 class PointPairTableWidget;
 class UpdateDialog;
+class LaserMenu;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -85,6 +88,12 @@ public:
     }
     void setPrintAndCutPoint(const QPointF& pt);
     int hoveredPrintAndCutPoint(const QPointF& mousePos) const;
+    LaserPrimitive* alignTarget();
+    //align
+    void initAlignTarget();
+    void changeAlignButtonsEnable();
+    void tabAlignTarget();
+    void setAlignTargetState(bool isAlignTarget);
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -145,10 +154,6 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 	virtual void contextMenuEvent(QContextMenuEvent *event) override;
-
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-
-
 protected slots:
 	void onActionUndo(bool checked = false);
 	void onActionRedo(bool checked);
@@ -313,6 +318,7 @@ protected slots:
 
     void applyJobOriginToDocument(const QVariant& value);
     //arrange align
+    void onActionAlignCenter();
     void onActionAlignHorinzontalMiddle();
     void onActionAlignHorinzontalTop();
     void onActionAlignHorinzontalBottom();
@@ -323,6 +329,8 @@ protected slots:
     void onActionAlignVertical();
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
+    void onJoinedGroupChanged();
+    void onLaserToolButtonShowMenu();
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");
@@ -347,6 +355,7 @@ signals:
     void finishPrintAndCutSelecting();
     void startPrintAndCutAligning();
     void finishPrintAndCutAligning();
+    void joinedGroupChanged();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
@@ -624,8 +633,11 @@ private:
     QMenu* m_recentFilesMenu;
     QList<QString> m_recentFileList;
     int m_maxRecentFilesSize;
-    QToolButton* m_arrangeButtonAlignHorinzontal;
-    QToolButton* m_arrangeButtonAlignVertical;
+    LaserToolButton* m_arrangeButtonAlignHorinzontal;
+    LaserToolButton* m_arrangeButtonAlignVertical;
+    LaserToolButton* m_arrangeButtonAlignCenter;
+    int m_alignTargetIndex;
+    LaserPrimitive* m_alignTarget;
     friend class LaserApplication;
 };
 

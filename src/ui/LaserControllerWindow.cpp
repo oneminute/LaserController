@@ -111,6 +111,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_MultiDuplicationHDistance(5)
     , m_MultiDuplicationVDistance(5)
     , m_maxRecentFilesSize(10)
+    , m_alignTarget(nullptr)
 {
     m_ui->setupUi(this);
     loadRecentFilesMenu();
@@ -210,8 +211,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     QToolButton* toolButtonLineTool = new QToolButton;
     QToolButton* toolButtonSplineTool = new QToolButton;
     QToolButton* toolButtonBitmapTool = new QToolButton;
-    m_arrangeButtonAlignHorinzontal = new QToolButton(this);
-    m_arrangeButtonAlignVertical = new QToolButton(this);
+    m_arrangeButtonAlignCenter = new LaserToolButton(this);
+    m_arrangeButtonAlignHorinzontal = new LaserToolButton(this);
+    m_arrangeButtonAlignVertical = new LaserToolButton(this);
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -224,16 +226,46 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
     //arrange align
+    //center align
+    m_arrangeButtonAlignCenter->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonAlignCenter->setIcon(QIcon(":/ui/icons/images/selected_center.png"));
+    LaserMenu* cMenu = new LaserMenu(m_arrangeButtonAlignCenter);
+    cMenu->addAction(m_ui->actionAlignCenter);
+    m_arrangeButtonAlignCenter->setMenu(cMenu);
+    connect(cMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+    //horinzontal align
     m_arrangeButtonAlignHorinzontal->setPopupMode(QToolButton::InstantPopup);
-    m_arrangeButtonAlignHorinzontal->setIcon(QIcon(":/ui/icons/images/horizontal_middle.png"));
-    m_arrangeButtonAlignHorinzontal->addAction(m_ui->actionAlignHorinzontalMiddle);
-    m_arrangeButtonAlignHorinzontal->addAction(m_ui->actionAlignHorinzontalTop);
-    m_arrangeButtonAlignHorinzontal->addAction(m_ui->actionAlignHorinzontalBottom);
+    m_arrangeButtonAlignHorinzontal->setIcon(QIcon(":/ui/icons/images/horizontal_middle.png")); 
+    LaserMenu* hMenu = new LaserMenu(m_arrangeButtonAlignHorinzontal);
+    hMenu->addAction(m_ui->actionAlignHorinzontalMiddle);
+    hMenu->addAction(m_ui->actionAlignHorinzontalTop);
+    hMenu->addAction(m_ui->actionAlignHorinzontalBottom);
+    m_arrangeButtonAlignHorinzontal->setMenu(hMenu);
+    connect(hMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+    //vertical align
     m_arrangeButtonAlignVertical->setPopupMode(QToolButton::InstantPopup);
     m_arrangeButtonAlignVertical->setIcon(QIcon(":/ui/icons/images/vertical_middle.png"));
-    m_arrangeButtonAlignVertical->addAction(m_ui->actionAlignVerticalMiddle);
-    m_arrangeButtonAlignVertical->addAction(m_ui->actionAlignVerticalLeft);
-    m_arrangeButtonAlignVertical->addAction(m_ui->actionAlignVerticalRight);
+    LaserMenu* vMenu = new LaserMenu(m_arrangeButtonAlignVertical);
+    vMenu->addAction(m_ui->actionAlignVerticalMiddle);
+    vMenu->addAction(m_ui->actionAlignVerticalLeft);
+    vMenu->addAction(m_ui->actionAlignVerticalRight);
+    m_arrangeButtonAlignVertical->setMenu(vMenu);
+    connect(vMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+    m_arrangeButtonAlignCenter->connect(m_arrangeButtonAlignCenter,
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
+    m_arrangeButtonAlignVertical->connect(m_arrangeButtonAlignVertical, 
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
+    m_arrangeButtonAlignHorinzontal->connect(m_arrangeButtonAlignHorinzontal,
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
 
     m_ui->toolBarTools->addWidget(toolButtonSelectionTool);
     m_ui->toolBarTools->addWidget(toolButtonRectangleTool);
@@ -244,9 +276,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
+
+    m_ui->arrangeBar->addWidget(m_arrangeButtonAlignCenter);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignHorinzontal);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignVertical);
-    m_ui->actionAlignCenter->setEnabled(false);
+    m_arrangeButtonAlignCenter->setEnabled(false);
     m_arrangeButtonAlignHorinzontal->setEnabled(false);
     m_arrangeButtonAlignVertical->setEnabled(false);
     // init status bar
@@ -583,6 +617,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMultiDuplication, &QAction::triggered, this, &LaserControllerWindow::onActionMultiDuplication);
 	connect(m_ui->actionGroup, &QAction::triggered, this, &LaserControllerWindow::onActionGroup);
 	connect(m_ui->actionUngroup, &QAction::triggered, this, &LaserControllerWindow::onActionUngroup);
+    connect(this, &LaserControllerWindow::joinedGroupChanged, this, &LaserControllerWindow::onJoinedGroupChanged);
 	
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
@@ -835,15 +870,16 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
     //arrange align
+    connect(m_ui->actionAlignHorinzontalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignCenter);
     connect(m_ui->actionAlignHorinzontalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignHorinzontalMiddle);
     connect(m_ui->actionAlignHorinzontalTop, &QAction::triggered, this, &LaserControllerWindow::onActionAlignHorinzontalTop);
     connect(m_ui->actionAlignHorinzontalBottom, &QAction::triggered, this, &LaserControllerWindow::onActionAlignHorinzontalBottom);
     connect(m_ui->actionAlignVerticalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalMiddle);
     connect(m_ui->actionAlignVerticalLeft, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalLeft);
     connect(m_ui->actionAlignVerticalRight, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalRight);
-    //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::clicked, this, &LaserControllerWindow::onActionAlignHorinzontal);
-    connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
-    connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
+
+    //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
+    //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     ADD_TRANSITION(deviceIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
@@ -1052,6 +1088,117 @@ int LaserControllerWindow::hoveredPrintAndCutPoint(const QPointF& mousePos) cons
         }
     }
     return -1;
+}
+
+LaserPrimitive * LaserControllerWindow::alignTarget()
+{
+    return m_alignTarget;
+}
+
+void LaserControllerWindow::initAlignTarget()
+{
+    if (m_alignTarget) {
+        
+        //m_alignTarget->setAlignTarget(false);
+        setAlignTargetState(false);
+        m_alignTarget = nullptr;
+    }
+    
+}
+
+void LaserControllerWindow::changeAlignButtonsEnable()
+{
+    LaserPrimitiveGroup*g = m_viewer->group();
+    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
+
+    if (items.size() > 1) {
+        m_arrangeButtonAlignCenter->setEnabled(true);
+        m_arrangeButtonAlignHorinzontal->setEnabled(true);
+        m_arrangeButtonAlignVertical->setEnabled(true);
+        //align
+        int notJoinedSize = 0;
+        for (QGraphicsItem* item : items) {
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+
+            //not exist joined group
+            if (!p->isJoinedGroup()) {
+                notJoinedSize += 1;
+            }
+            else {
+                //exist joined group
+                if (p->joinedGroupList().size() == items.size()) {
+                    m_arrangeButtonAlignCenter->setEnabled(false);
+                    m_arrangeButtonAlignHorinzontal->setEnabled(false);
+                    m_arrangeButtonAlignVertical->setEnabled(false);
+                    break;
+                }
+                else {
+                    break;
+                }
+            }
+            if (notJoinedSize > 1) {
+                break;
+            }
+        }
+    }
+    else {
+        m_arrangeButtonAlignCenter->setEnabled(false);
+        m_arrangeButtonAlignHorinzontal->setEnabled(false);
+        m_arrangeButtonAlignVertical->setEnabled(false);
+    }
+    
+}
+
+void LaserControllerWindow::tabAlignTarget()
+{
+    //m_viewer->setFocus();
+    //d
+    if (m_alignTarget) {
+        if (!viewer()) {
+            return;
+        }
+        LaserPrimitiveGroup* group = viewer()->group();
+        if (!group) {
+            return;
+        }
+        QList<QGraphicsItem*> list = group->childItems();
+        int size = list.size();
+        if (m_alignTargetIndex < size - 1) {
+            m_alignTargetIndex += 1;
+        }
+        else {
+            m_alignTargetIndex = 0;
+        }
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(group->childItems()[m_alignTargetIndex]);
+        if (p->isAlignTarget()) {
+            tabAlignTarget();
+        }
+        else {
+            setAlignTargetState(false);
+            m_alignTarget = p;
+            //m_alignTarget->setAlignTarget(false);
+
+            //m_alignTarget->setAlignTarget(true);
+            setAlignTargetState(true);
+            viewer()->viewport()->repaint();
+        }
+        
+    }
+}
+
+void LaserControllerWindow::setAlignTargetState(bool isAlignTarget)
+{
+    if (!m_alignTarget) {
+        return;
+    }
+    if (m_alignTarget->isJoinedGroup()) {
+        for (LaserPrimitive* p : m_alignTarget->joinedGroupList()) {
+            p->setAlignTarget(isAlignTarget);
+        }
+    }
+    else {
+        m_alignTarget->setAlignTarget(isAlignTarget);
+    }
 }
 
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
@@ -2762,7 +2909,7 @@ void LaserControllerWindow::keyPressEvent(QKeyEvent * event)
                 onActionDeletePrimitive();
             }
         }
-	
+        
 	}
 	
 }
@@ -2816,7 +2963,10 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
             }
 			break;
 		}
+        case Qt::Key_Alt: {
+            
 
+        }
 	}
 	
 }
@@ -2845,17 +2995,6 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 		Context.addAction(m_ui->actionUngroup);
 		Context.exec(QCursor::pos());
 	}
-}
-
-void LaserControllerWindow::mouseReleaseEvent(QMouseEvent * event)
-{
-    QMainWindow::mouseReleaseEvent(event);
-    if (m_arrangeButtonAlignHorinzontal->isChecked()) {
-        qDebug() << "";
-    }
-    if (m_arrangeButtonAlignHorinzontal->isDown()) {
-        qDebug() << "";
-    }
 }
 
 void LaserControllerWindow::onActionUndo(bool checked) {
@@ -4157,10 +4296,7 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
         m_ui->actionDeletePrimitive->setEnabled(false);
         m_ui->actionGroup->setEnabled(false);
         m_ui->actionUngroup->setEnabled(false);
-        m_viewer->setMirrorLine(nullptr);
-        m_ui->actionAlignCenter->setEnabled(false);
-        m_arrangeButtonAlignHorinzontal->setEnabled(false);
-        m_arrangeButtonAlignVertical->setEnabled(false);
+        m_viewer->setMirrorLine(nullptr);       
     }
 	else if (items.length() > 0) {
 		m_ui->actionMirrorHorizontal->setEnabled(true);
@@ -4189,13 +4325,13 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
     }
     //joinedGroupButtonsChanged
     if (items.length() > 1) {
-        m_ui->actionAlignCenter->setEnabled(true);
-        m_arrangeButtonAlignHorinzontal->setEnabled(true);
-        m_arrangeButtonAlignVertical->setEnabled(true);
+        
+        //group,ungroup
         bool hasJoined = false;
         bool hasNotJoined = false;
         for (QGraphicsItem* item : items) {
             LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            //group,ungroup
             if (p->isJoinedGroup()) {
                 hasJoined = true;
             }
@@ -4233,6 +4369,32 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         m_ui->actionGroup->setEnabled(false);
         m_ui->actionUngroup->setEnabled(false);
     }
+    //Align
+    changeAlignButtonsEnable();
+}
+void LaserControllerWindow::onJoinedGroupChanged()
+{
+    //Align
+    changeAlignButtonsEnable();
+}
+void LaserControllerWindow::onLaserToolButtonShowMenu()
+{
+    if (!viewer()) {
+        return;
+    }
+    LaserPrimitiveGroup* group = viewer()->group();
+    if (!group) {
+        return;
+    }
+    if (m_alignTarget) {
+        return;
+    }
+    QList<QGraphicsItem*> list = group->childItems();
+    m_alignTargetIndex = list.size() - 1;
+    LaserPrimitive* alignPrimitive = qgraphicsitem_cast<LaserPrimitive*>(group->childItems()[m_alignTargetIndex]);   
+    m_alignTarget = alignPrimitive;
+    setAlignTargetState(true);
+    viewer()->viewport()->repaint();
 }
 //改变的过程中也会执行（例如：移动的整个过程）
 void LaserControllerWindow::onLaserPrimitiveGroupItemTransformChanged()
@@ -5522,46 +5684,57 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
     m_viewer->viewport()->update();
 }
 
+void LaserControllerWindow::onActionAlignCenter()
+{
+    if (!m_alignTarget) {
+        return;
+    }
+
+    for (QGraphicsItem* item : viewer()->group()->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+
+    }
+}
+
 void LaserControllerWindow::onActionAlignHorinzontalMiddle()
 {
-    qDebug() << "onActionAlignHorinzontalMiddle";
+    
 }
 
 void LaserControllerWindow::onActionAlignHorinzontalTop()
 {
-    qDebug() << "onActionAlignHorinzontalTop";
+    
 }
 
 void LaserControllerWindow::onActionAlignHorinzontalBottom()
 {
-    qDebug() << "onActionAlignHorinzontalBottom";
+    
 }
 
 void LaserControllerWindow::onActionAlignVerticalMiddle()
 {
-    qDebug() << "onActionAlignVerticalMiddle";
+    
 }
 
 void LaserControllerWindow::onActionAlignVerticalLeft()
 {
-    qDebug() << "onActionAlignVerticalLeft";
+    
 }
 
 void LaserControllerWindow::onActionAlignVerticalRight()
 {
-    qDebug() << "onActionAlignVerticalRight";
+    
 }
 
 void LaserControllerWindow::onActionAlignHorinzontal()
 {
-    qDebug() << "onActionAlignHorinzontal";
+    
 }
 
 void LaserControllerWindow::onActionAlignVertical()
 {
-    qDebug() << "onActionAlignVertical";
+    
 }
-
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
 //{
 //    m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());

@@ -974,6 +974,7 @@ void JoinedGroupCommand::undo()
     else {
         handleGroup();
     }
+    emit LaserApplication::mainWindow->joinedGroupChanged();
 }
 
 void JoinedGroupCommand::redo()
@@ -985,7 +986,7 @@ void JoinedGroupCommand::redo()
     else {
         handleUnGroup();
     }
-    
+    emit LaserApplication::mainWindow->joinedGroupChanged();
 }
 
 void JoinedGroupCommand::handleGroup()

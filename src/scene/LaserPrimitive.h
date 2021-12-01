@@ -81,6 +81,8 @@ public:
     void setExportable(bool value);
     bool visible() const;
     void setVisible(bool value);
+    bool isAlignTarget();
+    void setAlignTarget(bool value);
 
     LaserLayer* layer() const;
     void setLayer(LaserLayer* layer);
