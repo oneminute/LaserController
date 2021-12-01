@@ -276,13 +276,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarTips->setAlignment(Qt::AlignHCenter);
 
     m_statusBarCoordinate = new QLabel;
-    m_statusBarCoordinate->setText(tr("0,0"));
-    m_statusBarCoordinate->setMinimumWidth(45);
+    m_statusBarCoordinate->setText("");
+    m_statusBarCoordinate->setMinimumWidth(60);
     m_statusBarCoordinate->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarCoordinate);
     
     m_statusBarLocation = new QLabel;
-    m_statusBarLocation->setText(ltr("Top Left"));
+    m_statusBarLocation->setText("0mm, 0mm");
     m_statusBarLocation->setMinimumWidth(180);
     m_statusBarLocation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarLocation);
@@ -948,11 +948,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 
-    //m_tablePrintAndCutPoints->setLaserPoint(QPointF(-6996, 100675));
-    //m_tablePrintAndCutPoints->setCanvasPoint(QPointF(944.888, 569.527));
-    //m_tablePrintAndCutPoints->addNewLine();
-    //m_tablePrintAndCutPoints->setLaserPoint(QPointF(-84729, 21033));
-    //m_tablePrintAndCutPoints->setCanvasPoint(QPointF(744.043, 196.827));
+    onLayoutChanged(LaserApplication::device->layoutSize());
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -1147,10 +1143,9 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         LaserText* text = m_viewer->editingText();
         //family
         QFont font = text->font();
-        qreal t = font.pixelSize();
         m_fontFamily->setCurrentText(font.family());
         //m_height
-        m_fontHeight->setValue(Global::sceneToMechV(font.pixelSize()));
+        m_fontHeight->setValue(qRound(font.pixelSize() * m_viewer->logicalDpiY() / 25400.0));
         //align
         int aV = text->alignV();
         int aH = text->alignH();
@@ -1201,7 +1196,7 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         m_fontSpaceY->setValue(spaceY);
 
         m_viewer->textFont()->setFamily(font.family());
-        m_viewer->textFont()->setPixelSize(font.pixelSize());
+        m_viewer->textFont()->setPixelSize(font.pixelSize() * 25400.0 / m_viewer->logicalDpiY());
         m_viewer->textFont()->setBold(bold);
         m_viewer->textFont()->setItalic(italic);
         m_viewer->textFont()->setCapitalization(capitalization);
@@ -1237,12 +1232,11 @@ void LaserControllerWindow::onFontComboBoxHidePopup()
 void LaserControllerWindow::onFontHeightBoxEnterOrLostFocus()
 {
     if (m_viewer) {
-        qreal size = Global::mmToSceneVF(m_fontHeight->value());
+        qreal size = m_fontHeight->value() * 25400.0 / m_viewer->logicalDpiY();
         m_viewer->textFont()->setPixelSize(size);
         LaserText* text = m_viewer->editingText();
         if (text) {
             QFont font(text->font());
-            //qreal q = m_fontHeight->value();
             font.setPixelSize(size);
             m_viewer->editingText()->setFont(font);
         }
@@ -1512,7 +1506,7 @@ void LaserControllerWindow::createCentralDockPanel()
     m_viewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //设置初始值
     m_viewer->textFont()->setFamily("Times New Roman");
-    m_viewer->textFont()->setPixelSize(Global::mmToSceneVF(20.0));
+    m_viewer->textFont()->setPixelSize(20000.0);
     m_viewer->setTextAlignH(Qt::AlignLeft);
     m_viewer->setTextAlignV(Qt::AlignVCenter);
     m_viewer->textFont()->setBold(false);
@@ -3521,6 +3515,9 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 	QMessageBox msgBox(QMessageBox::NoIcon,
 		tr("Close document?"), tr("Do you want to save current document?"),
 		QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
+    msgBox.setButtonText(QMessageBox::Save, tr("Save"));
+    msgBox.setButtonText(QMessageBox::Close, tr("Close"));
+    msgBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
 	int result = msgBox.exec();
 	switch (result) {
 		case QMessageBox::StandardButton::Save: {
@@ -4331,26 +4328,25 @@ void LaserControllerWindow::onLaserReturnWorkState(DeviceState state)
     m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() * 0.001, 'f', 2));
 }
 
-void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
+void LaserControllerWindow::onLayoutChanged(const QSize& size)
 {
-    /*if (m_scene->document())
-    {
-        int result = QMessageBox::question(this, tr("Close Document"),
-            tr("Device layout changed. We should close current document. Do you want to save it or close it without saving?"),
-            QMessageBox::StandardButton::Save, QMessageBox::StandardButton::Close);
-    }*/
     QRect newRect = LaserApplication::device->layoutRect();
     QPoint offset;
     switch (Config::SystemRegister::deviceOrigin())
     {
+    case 0:
+        m_statusBarCoordinate->setText(ltr("Top Left"));
     case 1:
         offset = newRect.bottomLeft() - m_layoutRect.bottomLeft();
+        m_statusBarCoordinate->setText(ltr("Bottom Left"));
         break;
     case 2:
         offset = newRect.bottomRight() - m_layoutRect.bottomRight();
+        m_statusBarCoordinate->setText(ltr("Bottom Right"));
         break;
     case 3:
         offset = newRect.topRight() - m_layoutRect.topRight();
+        m_statusBarCoordinate->setText(ltr("Top Right"));
         break;
     }
 
@@ -4362,10 +4358,11 @@ void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
     }
 
     m_layoutRect = newRect;
-    m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
-        .arg(LaserApplication::device->layoutWidth())
-        .arg(LaserApplication::device->layoutHeight()));
+    m_statusBarPageInfo->setText(tr("Layout(mm): %1x%2")
+        .arg(LaserApplication::device->layoutWidth() * 0.001, 0, 'f', 3)
+        .arg(LaserApplication::device->layoutHeight() * 0.001, 0, 'f', 3));
     m_viewer->viewport()->update();
+
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)

@@ -252,30 +252,13 @@ void LaserApplication::retranslate()
     QLocale locale(static_cast<QLocale::Language>(Config::General::language()));
     QLocale::setDefault(locale);
 
-    /*stringMap["Absolute Coords"] = translate("LaserApplication", "Absolute Coords", nullptr);
-    stringMap["Config Dialog"] = translate("LaserApplication", "Config Dialog", nullptr);
-    stringMap["Current Position"] = translate("LaserApplication", "Current Position", nullptr);
-    stringMap["Cutting"] = translate("LaserApplication", "Cutting", nullptr);
-    stringMap["Chinese"] = translate("LaserApplication", "Chinese", nullptr);
-    stringMap["English"] = translate("LaserApplication", "English", nullptr);
-    stringMap["Engraving"] = translate("LaserApplication", "Engraving", nullptr);
-    stringMap["Filling"] = translate("LaserApplication", "Filling", nullptr);
-    stringMap["High Contrast"] = translate("LaserApplication", ("High Contrast"), nullptr);
-    stringMap["Horizontal"] = translate("LaserApplication", "Horizontal", nullptr);
-    stringMap["Low Contrast"] = translate("LaserApplication", ("Low Contrast"), nullptr);
-    stringMap["Medium Contrast"] = translate("LaserApplication", ("Medium Contrast"), nullptr);
-    stringMap["Off"] = translate("LaserApplication", ("Off"), nullptr);
-    stringMap["Power"] = translate("LaserApplication", ("Power"), nullptr);
-    stringMap["Size"] = translate("LaserApplication", ("Size"), nullptr);
-    stringMap["Speed"] = translate("LaserApplication", ("Speed"), nullptr);
-    stringMap["User Origin"] = translate("LaserApplication", "User Origin", nullptr);
-    stringMap["Vertical"] = translate("LaserApplication", "Vertical", nullptr);*/
-
     stringMap["Absolute Coords"] = tr("Absolute Coords");
     stringMap["Align X"] = tr("Align X");
     stringMap["Align Y"] = tr("Align Y");
     stringMap["Bold"] = tr("Bold");
     stringMap["Bottom"] = tr("Bottom");
+    stringMap["Bottom Left"] = tr("Bottom Left");
+    stringMap["Bottom Right"] = tr("Bottom Right");
     stringMap["Config Dialog"] = tr("Config Dialog");
     stringMap["Current Position"] = tr("Current Position");
     stringMap["Cutting"] = tr("Cutting");
@@ -307,6 +290,7 @@ void LaserApplication::retranslate()
     stringMap["Tips"] = tr("Tips");
     stringMap["Top"] = tr("Top");
     stringMap["Top Left"] = tr("Top Left");
+    stringMap["Top Right"] = tr("Top Right");
     stringMap["User Origin"] = tr("User Origin");
     stringMap["Unregistered"] = tr("Unregistered");
     stringMap["Upper Case"] = tr("Upper Case");

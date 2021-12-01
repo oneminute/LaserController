@@ -207,13 +207,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentViewDragingState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionExportJSON
 
     // begin m_ui->actionSave
@@ -975,24 +975,44 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorHorizontal
 
     // begin m_ui->actionMirrorVertical
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorVertical
 
     // begin m_ui->actionGroup
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentViewDragState);
     // end m_ui->actionGroup
 
     // begin m_ui->actionUngroup
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentViewDragState);
     // end m_ui->actionUngroup
 
     // begin m_ui->actionDuplication
@@ -1474,14 +1494,11 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionApplyJobOriginToDocument
     BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", false, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", false, devicePausedState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, deviceErrorState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentPrintAndCutAligningState);
+    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentWorkingState);
+    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionApplyJobOriginToDocument, "enabled", true, documentSelectedEditingState);
     // end m_ui->actionApplyJobOriginToDocument
 
     // begin m_ui->actionUpdateSoftware
@@ -1613,6 +1630,114 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", true, documentPrintAndCutSelectingState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentPrintAndCutAligningState);
     // end m_ui->actionPrintAndCutEndSelect
+
+    // begin Config::UserRegister::scanLaserPowerItem()
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::UserRegister::scanLaserPowerItem()
+
+    // begin Config::UserRegister::maxScanGrayRatioItem()
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::UserRegister::maxScanGrayRatioItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::UserRegister::maxScanGrayRatioItem()
+
+    // begin Config::UserRegister::minScanGrayRatioItem()
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::UserRegister::minScanGrayRatioItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::UserRegister::minScanGrayRatioItem()
+
+    // begin Config::UserRegister::defaultMaxCuttingPowerItem()
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMaxCuttingPowerItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::UserRegister::defaultMaxCuttingPowerItem()
+
+    // begin Config::UserRegister::defaultMinCuttingPowerItem()
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::UserRegister::defaultMinCuttingPowerItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::UserRegister::defaultMinCuttingPowerItem()
+
+    // begin Config::UserRegister::spotShotPowerItem()
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::UserRegister::spotShotPowerItem()
+
+    // begin m_doubleSpinBoxDistanceX
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, documentPrintAndCutAligningState);
+    // end m_doubleSpinBoxDistanceX
+
+    // begin m_doubleSpinBoxDistanceY
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, documentPrintAndCutAligningState);
+    // end m_doubleSpinBoxDistanceY
+
+    // begin m_doubleSpinBoxDistanceZ
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, documentPrintAndCutAligningState);
+    // end m_doubleSpinBoxDistanceZ
 
 
 }

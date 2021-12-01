@@ -65,7 +65,7 @@ protected slots:
     void onButtonReset(bool checked);
     void onButtonReload(bool checked);
     void onButtonSaveAndClose(bool checked);
-    void onButtonsResetAndClose(bool checked);
+    void onButtonResetAndClose(bool checked);
 
     void retranslate();
 
@@ -83,6 +83,9 @@ private:
     QMap<QTreeWidgetItem*, QGroupBox*> m_groupBoxes;
     QTabWidget* m_systemPage;
     bool m_done;
+    bool m_closing;
+    bool m_needUserRegisterConfirm;
+    bool m_needSystemRegisterConfirm;
 };
 
 #endif // CONFIG_DIALOG

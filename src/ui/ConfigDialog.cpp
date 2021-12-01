@@ -31,6 +31,9 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     , m_windowTitle(ltr("Config Dialog"))
     , m_systemRegisterPage(nullptr)
     , m_done(false)
+    , m_closing(false)
+    , m_needUserRegisterConfirm(false)
+    , m_needSystemRegisterConfirm(false)
 {
     m_ui->setupUi(this);
     m_ui->splitter->setStretchFactor(0, 0);
@@ -162,6 +165,8 @@ ConfigDialog::ConfigDialog(QWidget* parent)
                     tr("Password"),
                     QLineEdit::Normal
                 );
+                if (password.isEmpty())
+                    return false;
                 return LaserApplication::device->writeSystemRegisters(password);
             }
             return false;
@@ -196,7 +201,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     connect(m_ui->pushButtonSaveClose, &QPushButton::clicked,
         this, &ConfigDialog::onButtonSaveAndClose);
     connect(m_ui->pushButtonResetClose, &QPushButton::clicked,
-        this, &ConfigDialog::onButtonSaveAndClose);
+        this, &ConfigDialog::onButtonResetAndClose);
 
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
@@ -385,6 +390,7 @@ void ConfigDialog::onDeviceDisconnected()
 void ConfigDialog::onSystemRegistersConfirmed()
 {
     QStringList errors;
+    bool success = true;
     QMap<int, LaserRegister*> registers = LaserApplication::device->systemRegisters(true);
     for (QMap<int, LaserRegister*>::Iterator i = registers.begin(); i != registers.end(); i++)
     {
@@ -395,9 +401,10 @@ void ConfigDialog::onSystemRegistersConfirmed()
         {
             errors.append(tr("Register '%1' save failure, expected value is '%2', actual value is '%3'.")
             .arg(laserRegister->name()).arg(configItem->value().toString()).arg(laserRegister->value().toString()));
+            success = false;
         }
     }
-    if (errors.isEmpty())
+    if (success)
     {
         QMessageBox::information(this, tr("Success"), tr("Save system registers successfully!"));
         Config::SystemRegister::group->save(true, true);
@@ -408,11 +415,19 @@ void ConfigDialog::onSystemRegistersConfirmed()
         QString info = errors.join("\n");
         QMessageBox::warning(this, tr("Failure"), info);
     }
+
+    m_needSystemRegisterConfirm = false;
+    if (success && m_closing)
+    {
+        if (!m_needSystemRegisterConfirm && !m_needUserRegisterConfirm)
+            this->close();
+    }
 }
 
 void ConfigDialog::onUserRegistersConfirmed()
 {
     QStringList errors;
+    bool success = true;
     QMap<int, LaserRegister*> registers = LaserApplication::device->userRegisters(true);
     for (QMap<int, LaserRegister*>::Iterator i = registers.begin(); i != registers.end(); i++)
     {
@@ -423,9 +438,10 @@ void ConfigDialog::onUserRegistersConfirmed()
         {
             errors.append(tr("Register '%1' save failure, expected value is '%2', actual value is '%3'.")
             .arg(laserRegister->name()).arg(configItem->value().toString()).arg(laserRegister->value().toString()));
+            success = true;
         }
     }
-    if (errors.isEmpty())
+    if (success)
     {
         QMessageBox::information(this, tr("Success"), tr("Save user registers successfully!"));
         Config::UserRegister::group->save(true, true);
@@ -435,6 +451,13 @@ void ConfigDialog::onUserRegistersConfirmed()
         errors.insert(0, tr("Save user registers failure:"));
         QString info = errors.join("\n");
         QMessageBox::warning(this, tr("Failure"), info);
+    }
+    
+    m_needUserRegisterConfirm = false;
+    if (success && m_closing)
+    {
+        if (!m_needSystemRegisterConfirm && !m_needUserRegisterConfirm)
+            this->close();
     }
 }
 
@@ -512,10 +535,16 @@ void ConfigDialog::onButtonSaveAndClose(bool checked)
 {
     save();
     m_done = true;
-    this->close();
+    m_closing = true;
+    if (Config::SystemRegister::group->isModified())
+        m_needSystemRegisterConfirm = true;
+    if (Config::UserRegister::group->isModified())
+        m_needUserRegisterConfirm = true;
+    if (!m_needUserRegisterConfirm && !m_needSystemRegisterConfirm)
+        this->close();
 }
 
-void ConfigDialog::onButtonsResetAndClose(bool checked)
+void ConfigDialog::onButtonResetAndClose(bool checked)
 {
     reset();
     m_done = true;

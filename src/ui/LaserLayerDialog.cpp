@@ -42,46 +42,80 @@ void LaserLayerDialog::initUi()
     m_ui->comboBoxFillingType->addItem(tr("Pixel"), 1);
 
     m_ui->editSliderCuttingRunSpeed->setStep(0.001);
-    m_ui->editSliderCuttingRunSpeed->setMinimum(0);
+    m_ui->editSliderCuttingRunSpeed->setMinimum(1);
     m_ui->editSliderCuttingRunSpeed->setMaximum(2000);
-    m_ui->editSliderCuttingMinSpeedPower->setMaximum(100);
+    m_ui->editSliderCuttingRunSpeed->setPage(10);
+    m_ui->editSliderCuttingRunSpeed->setDecimals(3);
+
     m_ui->editSliderCuttingMinSpeedPower->setTextTemplate("%1%");
     m_ui->editSliderCuttingMinSpeedPower->setStep(0.1);
-    m_ui->editSliderCuttingRunSpeedPower->setMaximum(100);
+    m_ui->editSliderCuttingMinSpeedPower->setPage(10);
+    m_ui->editSliderCuttingMinSpeedPower->setDecimals(1);
+    m_ui->editSliderCuttingMinSpeedPower->setMaximum(100);
+
     m_ui->editSliderCuttingRunSpeedPower->setTextTemplate("%1%");
     m_ui->editSliderCuttingRunSpeedPower->setStep(0.1);
+    m_ui->editSliderCuttingRunSpeedPower->setPage(10);
+    m_ui->editSliderCuttingRunSpeedPower->setMaximum(100);
+    m_ui->editSliderCuttingRunSpeedPower->setDecimals(1);
 
     m_ui->editSliderEngravingRunSpeed->setStep(0.001);
-    m_ui->editSliderEngravingRunSpeed->setMinimum(0);
+    m_ui->editSliderEngravingRunSpeed->setMinimum(1);
     m_ui->editSliderEngravingRunSpeed->setMaximum(2000);
+    m_ui->editSliderEngravingRunSpeed->setPage(10);
+    m_ui->editSliderEngravingRunSpeed->setDecimals(3);
+
     m_ui->editSliderEngravingLaserPower->setMaximum(100);
     m_ui->editSliderEngravingLaserPower->setTextTemplate("%1%");
     m_ui->editSliderEngravingLaserPower->setStep(0.1);
+    m_ui->editSliderEngravingLaserPower->setPage(10);
+    m_ui->editSliderEngravingLaserPower->setDecimals(1);
+
     m_ui->editSliderEngravingMinSpeedPower->setMaximum(100);
     m_ui->editSliderEngravingMinSpeedPower->setTextTemplate("%1%");
     m_ui->editSliderEngravingMinSpeedPower->setStep(0.1);
-    m_ui->editSliderEngravingRunSpeedPower->setMaximum(100);
+    m_ui->editSliderEngravingMinSpeedPower->setPage(10);
+    m_ui->editSliderEngravingMinSpeedPower->setDecimals(1);
+
     m_ui->editSliderEngravingRunSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderEngravingRunSpeedPower->setMaximum(100);
+    m_ui->editSliderEngravingRunSpeedPower->setDecimals(0);
+    m_ui->editSliderEngravingRunSpeedPower->setPage(10);
     m_ui->editSliderEngravingRunSpeedPower->setStep(0.1);
+
     m_ui->editSliderEngravingRowInterval->setMinimum(1);
     m_ui->editSliderEngravingRowInterval->setMaximum(10000);
+    m_ui->editSliderEngravingRowInterval->setPageStep(10);
 
     m_ui->editSliderDPI->setMinimum(1);
     m_ui->editSliderDPI->setMaximum(1200);
+    m_ui->editSliderDPI->setPageStep(10);
+
     m_ui->editSliderLPI->setMinimum(1);
     m_ui->editSliderLPI->setMaximum(1200);
+    m_ui->editSliderLPI->setPageStep(10);
 
     m_ui->editSliderFillingRunSpeed->setStep(0.001);
-    m_ui->editSliderFillingRunSpeed->setMinimum(0);
+    m_ui->editSliderFillingRunSpeed->setMinimum(1);
     m_ui->editSliderFillingRunSpeed->setMaximum(2000);
-    m_ui->editSliderFillingMinSpeedPower->setMaximum(100);
+    m_ui->editSliderFillingRunSpeed->setPage(10);
+    m_ui->editSliderFillingRunSpeed->setDecimals(3);
+
     m_ui->editSliderFillingMinSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderFillingMinSpeedPower->setMaximum(100);
     m_ui->editSliderFillingMinSpeedPower->setStep(0.1);
-    m_ui->editSliderFillingRunSpeedPower->setMaximum(100);
-    m_ui->editSliderFillingRunSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderFillingMinSpeedPower->setPage(10);
+    m_ui->editSliderFillingMinSpeedPower->setDecimals(1);
+
     m_ui->editSliderFillingRunSpeedPower->setStep(0.1);
+    m_ui->editSliderFillingRunSpeedPower->setMaximum(100);
+    m_ui->editSliderFillingRunSpeedPower->setPage(10);
+    m_ui->editSliderFillingRunSpeedPower->setTextTemplate("%1%");
+    m_ui->editSliderFillingRunSpeedPower->setDecimals(0);
+
     m_ui->editSliderFillingRowInterval->setMinimum(1);
     m_ui->editSliderFillingRowInterval->setMaximum(1000);
+    m_ui->editSliderFillingRowInterval->setPageStep(10);
 
     m_ui->lineEditLayerName->setText(m_layer->name());
 
