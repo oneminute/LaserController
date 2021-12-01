@@ -445,7 +445,7 @@ public:
     void modifyPathList();
     QList<LaserTextRowPath> subPathList();
 
-    virtual QRectF boundingRect() const;
+    //virtual QRectF boundingRect() const;
     virtual QRect sceneBoundingRect() const;
     QRectF originalBoundingRect(qreal extendPixel = 0) const;
 	virtual void draw(QPainter* painter);

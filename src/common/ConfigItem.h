@@ -14,6 +14,8 @@ class ConfigItemPrivate;
 class ConfigItem: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled)
+
 public:
     typedef std::function<QWidget*(ConfigItem*)> CreateWidgetHook;
     typedef std::function<void(QWidget*, ConfigItem*, InputWidgetWrapper*)> WidgetInitializeHook;

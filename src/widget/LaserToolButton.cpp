@@ -6,7 +6,6 @@
 LaserToolButton::LaserToolButton(QWidget *parent) 
     :QToolButton(parent)
 {
-    qDebug() << "";
 }
 LaserToolButton::~LaserToolButton()
 {

@@ -635,22 +635,22 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 			}
 			case Transform_RESIZE: {
                 qDebug() << bounds.width();
-                qDebug() << bounds.width();
+                qDebug() << bounds.height();
 				qreal rateX = widthReal / bounds.width();
 				qreal rateY = heightReal / bounds.height();
                 if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
                     rateX = rateY;
                     if (_unitIsMM) {
-                        qreal v = Global::sceneToMmH(bounds.width() * rateY);
-                        window->widthBox()->setValue(v);
+                        qreal v = bounds.width() * rateY;
+                        window->widthBox()->setValue(v * 0.001);
                     }
                     
                 }
                 if (_pp == PrimitiveProperty::PP_Width && isLockRatio) {
                     rateY = rateX;
                     if (_unitIsMM) {
-                        qreal v = Global::sceneToMmV(bounds.height() * rateY);
-                        window->heightBox()->setValue(v);
+                        qreal v = bounds.height() * rateY;
+                        window->heightBox()->setValue(v * 0.001);
                     }
                 }
 
@@ -758,7 +758,6 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				break;
 			}
 		}
-		
 	}
 }
 void LaserViewer::setAnchorPoint(QPointF point)
@@ -1418,7 +1417,9 @@ return;
     //QPointF fitInRectTopLeft = mapFromScene(backgroundItem->pos());
     QGraphicsView::resizeEvent(event);
     qreal scale = adapterViewScale();
-    zoomBy(scale / zoomValue(), mapTo(this, mapFromScene(backgroundItem->rect().center().toPoint())), true);
+    QRect bgRect = backgroundItem->rect();
+    QPoint center(bgRect.left() + bgRect.width(), bgRect.top() + bgRect.height());
+    zoomBy(scale / zoomValue(), mapTo(this, mapFromScene(center)), true);
     viewport()->repaint();
 }
 

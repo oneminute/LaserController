@@ -132,6 +132,8 @@ public:
     /// <returns></returns>
     QRect layoutRect() const;
 
+    QSize layoutSize() const;
+
     /// <summary>
     /// 在绝对坐标下返回加工幅面四角原点。
     /// 在用户原点下返回用户原点。在当前位置下反回激
@@ -191,9 +193,10 @@ protected slots:
 
     void onConfigStartFromChanged(const QVariant& value, void* senderPtr);
     void onConfigJobOriginChanged(const QVariant& value, void* senderPtr);
+    void onDeviceOriginChanged(const QVariant& value, void* senderPtr);
 
-    void onLayerWidthChanged(const QVariant& value);
-    void onLayerHeightChanged(const QVariant& value);
+    void onLayerWidthChanged(const QVariant& value, void* senderPtr);
+    void onLayerHeightChanged(const QVariant& value, void* senderPtr);
 
 signals:
     void comPortsFetched(const QStringList& ports);
@@ -205,7 +208,7 @@ signals:
     void mainCardInfoFetched();
     void manufacturePasswordVerified(bool pass);
     void workStateUpdated(DeviceState state);
-    void layoutChanged(const QSizeF& size);
+    void layoutChanged(const QSize& size);
     void systemRegistersConfirmed();
     void userRegistersConfirmed();
 
