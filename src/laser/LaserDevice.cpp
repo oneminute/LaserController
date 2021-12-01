@@ -82,22 +82,22 @@ void LaserDevicePrivate::updateDeviceOriginAndTransform()
     case 0:
         dx = 0;
         dy = 0;
-        layoutRect = QRect(QPoint(0, 0), QPoint(maxX, maxY));
+        layoutRect = QRect(QPoint(0, 0), QSize(maxX, maxY));
         break;
     case 3:
         dx = maxX;
         dy = 0;
-        layoutRect = QRect(QPoint(-maxX, 0), QPoint(0, maxY));
+        layoutRect = QRect(QPoint(-maxX, 0), QSize(maxX, maxY));
         break;
     case 2:
         dx = maxX;
         dy = maxY;
-        layoutRect = QRect(QPoint(-maxX, -maxY), QPoint(0, 0));
+        layoutRect = QRect(QPoint(-maxX, -maxY), QSize(maxX, maxY));
         break;
     case 1:
         dx = 0;
         dy = maxY;
-        layoutRect = QRect(QPoint(0, -maxY), QPoint(maxX, 0));
+        layoutRect = QRect(QPoint(0, -maxY), QSize(maxX, maxY));
         break;
     }
 

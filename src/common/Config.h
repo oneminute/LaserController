@@ -124,7 +124,7 @@ public:
         CONFIG_ITEM(ui, gridShapeDistance, qreal, toReal)
         CONFIG_ITEM(ui, objectShapeDistance, qreal, toReal)
         CONFIG_ITEM(ui, clickSelectionTolerance, qreal, toReal)
-        CONFIG_ITEM(ui, validMaxRegion, qreal, toReal)
+        CONFIG_ITEM(ui, validMaxRegion, int, toInt)
         CONFIG_ITEM(ui, splitterHandleWidth, int, toInt)
         CONFIG_ITEM(ui, autoRepeatDelay, int, toInt)
         CONFIG_ITEM(ui, showDocumentBoundingRect, bool, toBool)
