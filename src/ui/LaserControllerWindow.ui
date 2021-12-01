@@ -265,7 +265,6 @@
    <addaction name="actionMirrorHorizontal"/>
    <addaction name="actionMirrorVertical"/>
    <addaction name="separator"/>
-   <addaction name="actionAlignCenter"/>
   </widget>
   <widget class="QToolBar" name="textFontBar">
    <property name="windowTitle">
