@@ -896,6 +896,7 @@ void LaserDocument::save(const QString& filename, QWidget* window)
 		array.append(layerObj);
 	}
 	obj.insert("layers", array);
+    obj.insert("deviceOrigin", Config::SystemRegister::deviceOrigin());
 
 	doc.setObject(obj);
 	QFile file(filename);
