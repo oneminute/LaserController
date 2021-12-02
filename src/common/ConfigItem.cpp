@@ -420,6 +420,8 @@ void ConfigItem::clearModified()
 {
     Q_D(ConfigItem);
     Q_ASSERT(d->dirtyValue == d->value);
+    if (d->name == "deviceOrigin")
+        qLogD << "debug deviceOrigin: " << d->dirtyValue << ", " << d->value;
     d->modified = false;
     emit modifiedChanged(false);
 }
@@ -834,7 +836,12 @@ bool ConfigItem::confirm(const QVariant& value)
     else
         success = false;
 
-    d->dirtyValue = d->value = value;
+    if (success)
+    {
+        d->dirtyValue = d->value = value;
+        clearModified();
+        emit valueChanged(d->value, this);
+    }
     return success;
 }
 

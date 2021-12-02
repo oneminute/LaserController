@@ -448,11 +448,10 @@ void Config::loadCuttingLayerItems()
         DT_INT
     );
     runSpeed->setInputWidgetType(IWT_FloatEditSlider);
-    runSpeed->setInputWidgetProperty("decimals", 0);
+    runSpeed->setInputWidgetProperty("decimals", 3);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("step", 0.001);
-    runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* minPower = group->addConfigItem(
@@ -491,11 +490,10 @@ void Config::loadEngravingLayerItems()
         DT_INT
     );
     runSpeed->setInputWidgetType(IWT_FloatEditSlider);
-    runSpeed->setInputWidgetProperty("decimals", 0);
+    runSpeed->setInputWidgetProperty("decimals", 3);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("step", 0.001);
-    runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* laserPower = group->addConfigItem(
@@ -602,10 +600,9 @@ void Config::loadFillingLayerItems()
     );
     runSpeed->setInputWidgetType(IWT_FloatEditSlider);
     runSpeed->setInputWidgetProperty("step", 0.001);
-    runSpeed->setInputWidgetProperty("decimals", 0);
+    runSpeed->setInputWidgetProperty("decimals", 3);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
-    runSpeed->setInputWidgetProperty("textTemplate", "%1mm/s");
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
 
     ConfigItem* minPower= group->addConfigItem(
@@ -1140,7 +1137,7 @@ void Config::loadUserReigsters()
     );
     cuttingMoveSpeed->setInputWidgetType(IWT_FloatEditSlider);
     cuttingMoveSpeed->setInputWidgetProperty("step", 0.001);
-    cuttingMoveSpeed->setInputWidgetProperty("decimals", 0);
+    cuttingMoveSpeed->setInputWidgetProperty("decimals", 3);
     cuttingMoveSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveSpeed->setInputWidgetProperty("page", 10);
     cuttingMoveSpeed->setInputWidgetProperty("minimum", 1);
@@ -1153,7 +1150,7 @@ void Config::loadUserReigsters()
     );
     cuttingMoveAcc->setInputWidgetType(IWT_FloatEditSlider);
     cuttingMoveAcc->setInputWidgetProperty("step", 0.001);
-    cuttingMoveAcc->setInputWidgetProperty("decimals", 0);
+    cuttingMoveAcc->setInputWidgetProperty("decimals", 3);
     cuttingMoveAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingMoveAcc->setInputWidgetProperty("page", 10);
     cuttingMoveAcc->setInputWidgetProperty("minimum", 1);
@@ -1166,7 +1163,7 @@ void Config::loadUserReigsters()
     );
     cuttingTurnSpeed->setInputWidgetType(IWT_FloatEditSlider);
     cuttingTurnSpeed->setInputWidgetProperty("step", 0.001);
-    cuttingTurnSpeed->setInputWidgetProperty("decimals", 0);
+    cuttingTurnSpeed->setInputWidgetProperty("decimals", 3);
     cuttingTurnSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingTurnSpeed->setInputWidgetProperty("page", 10);
     cuttingTurnSpeed->setInputWidgetProperty("minimum", 1);
@@ -1179,7 +1176,7 @@ void Config::loadUserReigsters()
     );
     cuttingTurnAcc->setInputWidgetType(IWT_FloatEditSlider);
     cuttingTurnAcc->setInputWidgetProperty("step", 0.001);
-    cuttingTurnAcc->setInputWidgetProperty("decimals", 0);
+    cuttingTurnAcc->setInputWidgetProperty("decimals", 3);
     cuttingTurnAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingTurnAcc->setInputWidgetProperty("page", 10);
     cuttingTurnAcc->setInputWidgetProperty("minimum", 1);
@@ -1192,7 +1189,7 @@ void Config::loadUserReigsters()
     );
     cuttingWorkAcc->setInputWidgetType(IWT_FloatEditSlider);
     cuttingWorkAcc->setInputWidgetProperty("step", 0.001);
-    cuttingWorkAcc->setInputWidgetProperty("decimals", 0);
+    cuttingWorkAcc->setInputWidgetProperty("decimals", 3);
     cuttingWorkAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     cuttingWorkAcc->setInputWidgetProperty("page", 10);
     cuttingWorkAcc->setInputWidgetProperty("minimum", 1);
@@ -1231,7 +1228,7 @@ void Config::loadUserReigsters()
     );
     scanXStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     scanXStartSpeed->setInputWidgetProperty("step", 0.001);
-    scanXStartSpeed->setInputWidgetProperty("decimals", 0);
+    scanXStartSpeed->setInputWidgetProperty("decimals", 3);
     scanXStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanXStartSpeed->setInputWidgetProperty("page", 10);
     scanXStartSpeed->setInputWidgetProperty("minimum", 1);
@@ -1244,7 +1241,7 @@ void Config::loadUserReigsters()
     );
     scanYStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     scanYStartSpeed->setInputWidgetProperty("step", 0.001);
-    scanYStartSpeed->setInputWidgetProperty("decimals", 0);
+    scanYStartSpeed->setInputWidgetProperty("decimals", 3);
     scanYStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanYStartSpeed->setInputWidgetProperty("page", 10);
     scanYStartSpeed->setInputWidgetProperty("minimum", 1);
@@ -1257,7 +1254,7 @@ void Config::loadUserReigsters()
     );
     scanXAcc->setInputWidgetType(IWT_FloatEditSlider);
     scanXAcc->setInputWidgetProperty("step", 0.001);
-    scanXAcc->setInputWidgetProperty("decimals", 0);
+    scanXAcc->setInputWidgetProperty("decimals", 3);
     scanXAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanXAcc->setInputWidgetProperty("page", 10);
     scanXAcc->setInputWidgetProperty("minimum", 1);
@@ -1270,7 +1267,7 @@ void Config::loadUserReigsters()
     );
     scanYAcc->setInputWidgetType(IWT_FloatEditSlider);
     scanYAcc->setInputWidgetProperty("step", 0.001);
-    scanYAcc->setInputWidgetProperty("decimals", 0);
+    scanYAcc->setInputWidgetProperty("decimals", 3);
     scanYAcc->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanYAcc->setInputWidgetProperty("page", 10);
     scanYAcc->setInputWidgetProperty("minimum", 1);
@@ -1283,7 +1280,7 @@ void Config::loadUserReigsters()
     );
     scanRowSpeed->setInputWidgetType(IWT_FloatEditSlider);
     scanRowSpeed->setInputWidgetProperty("step", 0.001);
-    scanRowSpeed->setInputWidgetProperty("decimals", 0);
+    scanRowSpeed->setInputWidgetProperty("decimals", 3);
     scanRowSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     scanRowSpeed->setInputWidgetProperty("page", 10);
     scanRowSpeed->setInputWidgetProperty("minimum", 1);
@@ -1354,7 +1351,7 @@ void Config::loadUserReigsters()
     );
     resetSpeed->setInputWidgetType(IWT_FloatEditSlider);
     resetSpeed->setInputWidgetProperty("step", 0.001);
-    resetSpeed->setInputWidgetProperty("decimals", 0);
+    resetSpeed->setInputWidgetProperty("decimals", 3);
     resetSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     resetSpeed->setInputWidgetProperty("textTemplate", "%1");
     resetSpeed->setInputWidgetProperty("page", 10);
@@ -1416,7 +1413,7 @@ void Config::loadUserReigsters()
     );
     defaultRunSpeed->setInputWidgetType(IWT_FloatEditSlider);
     defaultRunSpeed->setInputWidgetProperty("step", 0.001);
-    defaultRunSpeed->setInputWidgetProperty("decimals", 0);
+    defaultRunSpeed->setInputWidgetProperty("decimals", 3);
     defaultRunSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     defaultRunSpeed->setInputWidgetProperty("textTemplate", "%1");
     defaultRunSpeed->setInputWidgetProperty("page", 10);
@@ -1458,7 +1455,7 @@ void Config::loadUserReigsters()
     );
     defaultScanSpeed->setInputWidgetType(IWT_FloatEditSlider);
     defaultScanSpeed->setInputWidgetProperty("step", 0.001);
-    defaultScanSpeed->setInputWidgetProperty("decimals", 0);
+    defaultScanSpeed->setInputWidgetProperty("decimals", 3);
     defaultScanSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     defaultScanSpeed->setInputWidgetProperty("textTemplate", "%1");
     defaultScanSpeed->setInputWidgetProperty("page", 10);
@@ -1522,7 +1519,7 @@ void Config::loadUserReigsters()
     );
     fillingSpeed->setInputWidgetType(IWT_FloatEditSlider);
     fillingSpeed->setInputWidgetProperty("step", 0.001);
-    fillingSpeed->setInputWidgetProperty("decimals", 0);
+    fillingSpeed->setInputWidgetProperty("decimals", 3);
     fillingSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingSpeed->setInputWidgetProperty("textTemplate", "%1");
     fillingSpeed->setInputWidgetProperty("page", 10);
@@ -1536,7 +1533,7 @@ void Config::loadUserReigsters()
     );
     fillingStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     fillingStartSpeed->setInputWidgetProperty("step", 0.001);
-    fillingStartSpeed->setInputWidgetProperty("decimals", 0);
+    fillingStartSpeed->setInputWidgetProperty("decimals", 3);
     fillingStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingStartSpeed->setInputWidgetProperty("textTemplate", "%1");
     fillingStartSpeed->setInputWidgetProperty("page", 10);
@@ -1550,7 +1547,7 @@ void Config::loadUserReigsters()
     );
     fillingAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     fillingAcceleration->setInputWidgetProperty("step", 0.001);
-    fillingAcceleration->setInputWidgetProperty("decimals", 0);
+    fillingAcceleration->setInputWidgetProperty("decimals", 3);
     fillingAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingAcceleration->setInputWidgetProperty("textTemplate", "%1");
     fillingAcceleration->setInputWidgetProperty("page", 10);
@@ -1705,7 +1702,7 @@ void Config::loadSystemRegisters()
     );
     xMaxLength->setInputWidgetType(IWT_FloatEditSlider);
     xMaxLength->setInputWidgetProperty("step", 0.001);
-    xMaxLength->setInputWidgetProperty("decimals", 0);
+    xMaxLength->setInputWidgetProperty("decimals", 3);
     xMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxLength->setInputWidgetProperty("page", 10);
     xMaxLength->setInputWidgetProperty("minimum", 1);
@@ -1759,7 +1756,7 @@ void Config::loadSystemRegisters()
     );
     xZeroDev->setInputWidgetType(IWT_FloatEditSlider);
     xZeroDev->setInputWidgetProperty("step", 0.001);
-    xZeroDev->setInputWidgetProperty("decimals", 0);
+    xZeroDev->setInputWidgetProperty("decimals", 3);
     xZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     xZeroDev->setInputWidgetProperty("page", 1);
     xZeroDev->setInputWidgetProperty("minimum", 0);
@@ -1845,7 +1842,7 @@ void Config::loadSystemRegisters()
     );
     xStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     xStartSpeed->setInputWidgetProperty("step", 0.001);
-    xStartSpeed->setInputWidgetProperty("decimals", 0);
+    xStartSpeed->setInputWidgetProperty("decimals", 3);
     xStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xStartSpeed->setInputWidgetProperty("page", 10);
     xStartSpeed->setInputWidgetProperty("minimum", 1);
@@ -1858,7 +1855,7 @@ void Config::loadSystemRegisters()
     );
     xMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
     xMaxSpeed->setInputWidgetProperty("step", 0.001);
-    xMaxSpeed->setInputWidgetProperty("decimals", 0);
+    xMaxSpeed->setInputWidgetProperty("decimals", 3);
     xMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxSpeed->setInputWidgetProperty("page", 10);
     xMaxSpeed->setInputWidgetProperty("minimum", 1);
@@ -1871,7 +1868,7 @@ void Config::loadSystemRegisters()
     );
     xMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     xMaxAcceleration->setInputWidgetProperty("step", 0.001);
-    xMaxAcceleration->setInputWidgetProperty("decimals", 0);
+    xMaxAcceleration->setInputWidgetProperty("decimals", 3);
     xMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xMaxAcceleration->setInputWidgetProperty("page", 10);
     xMaxAcceleration->setInputWidgetProperty("minimum", 1);
@@ -1884,7 +1881,7 @@ void Config::loadSystemRegisters()
     );
     xUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     xUrgentAcceleration->setInputWidgetProperty("step", 0.001);
-    xUrgentAcceleration->setInputWidgetProperty("decimals", 0);
+    xUrgentAcceleration->setInputWidgetProperty("decimals", 3);
     xUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     xUrgentAcceleration->setInputWidgetProperty("page", 10);
     xUrgentAcceleration->setInputWidgetProperty("minimum", 1);
@@ -1897,7 +1894,7 @@ void Config::loadSystemRegisters()
     );
     yMaxLength->setInputWidgetType(IWT_FloatEditSlider);
     yMaxLength->setInputWidgetProperty("step", 0.001);
-    yMaxLength->setInputWidgetProperty("decimals", 0);
+    yMaxLength->setInputWidgetProperty("decimals", 3);
     yMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxLength->setInputWidgetProperty("page", 1);
     yMaxLength->setInputWidgetProperty("minimum", 1);
@@ -1950,7 +1947,7 @@ void Config::loadSystemRegisters()
     );
     yZeroDev->setInputWidgetType(IWT_FloatEditSlider);
     yZeroDev->setInputWidgetProperty("step", 0.001);
-    yZeroDev->setInputWidgetProperty("decimals", 0);
+    yZeroDev->setInputWidgetProperty("decimals", 3);
     yZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     yZeroDev->setInputWidgetProperty("page", 1);
     yZeroDev->setInputWidgetProperty("minimum", 0);
@@ -2037,7 +2034,7 @@ void Config::loadSystemRegisters()
     );
     yStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     yStartSpeed->setInputWidgetProperty("step", 0.001);
-    yStartSpeed->setInputWidgetProperty("decimals", 0);
+    yStartSpeed->setInputWidgetProperty("decimals", 3);
     yStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yStartSpeed->setInputWidgetProperty("page", 10);
     yStartSpeed->setInputWidgetProperty("minimum", 1);
@@ -2050,7 +2047,7 @@ void Config::loadSystemRegisters()
     );
     yMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
     yMaxSpeed->setInputWidgetProperty("step", 0.001);
-    yMaxSpeed->setInputWidgetProperty("decimals", 0);
+    yMaxSpeed->setInputWidgetProperty("decimals", 3);
     yMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxSpeed->setInputWidgetProperty("page", 10);
     yMaxSpeed->setInputWidgetProperty("minimum", 1);
@@ -2063,7 +2060,7 @@ void Config::loadSystemRegisters()
     );
     yMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     yMaxAcceleration->setInputWidgetProperty("step", 0.001);
-    yMaxAcceleration->setInputWidgetProperty("decimals", 0);
+    yMaxAcceleration->setInputWidgetProperty("decimals", 3);
     yMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yMaxAcceleration->setInputWidgetProperty("page", 10);
     yMaxAcceleration->setInputWidgetProperty("minimum", 1);
@@ -2076,7 +2073,7 @@ void Config::loadSystemRegisters()
     );
     yUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     yUrgentAcceleration->setInputWidgetProperty("step", 0.001);
-    yUrgentAcceleration->setInputWidgetProperty("decimals", 0);
+    yUrgentAcceleration->setInputWidgetProperty("decimals", 3);
     yUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     yUrgentAcceleration->setInputWidgetProperty("page", 10);
     yUrgentAcceleration->setInputWidgetProperty("minimum", 1);
@@ -2089,7 +2086,7 @@ void Config::loadSystemRegisters()
     );
     zMaxLength->setInputWidgetType(IWT_FloatEditSlider);
     zMaxLength->setInputWidgetProperty("step", 0.001);
-    zMaxLength->setInputWidgetProperty("decimals", 0);
+    zMaxLength->setInputWidgetProperty("decimals", 3);
     zMaxLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxLength->setInputWidgetProperty("page", 1);
     zMaxLength->setInputWidgetProperty("minimum", 1);
@@ -2144,7 +2141,7 @@ void Config::loadSystemRegisters()
     );
     zZeroDev->setInputWidgetType(IWT_FloatEditSlider);
     zZeroDev->setInputWidgetProperty("step", 0.001);
-    zZeroDev->setInputWidgetProperty("decimals", 0);
+    zZeroDev->setInputWidgetProperty("decimals", 3);
     zZeroDev->setInputWidgetProperty("maximumLineEditWidth", 75);
     zZeroDev->setInputWidgetProperty("page", 1);
     zZeroDev->setInputWidgetProperty("minimum", 0);
@@ -2231,7 +2228,7 @@ void Config::loadSystemRegisters()
     );
     zStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
     zStartSpeed->setInputWidgetProperty("step", 0.001);
-    zStartSpeed->setInputWidgetProperty("decimals", 0);
+    zStartSpeed->setInputWidgetProperty("decimals", 3);
     zStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zStartSpeed->setInputWidgetProperty("page", 10);
     zStartSpeed->setInputWidgetProperty("minimum", 1);
@@ -2244,7 +2241,7 @@ void Config::loadSystemRegisters()
     );
     zMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
     zMaxSpeed->setInputWidgetProperty("step", 0.001);
-    zMaxSpeed->setInputWidgetProperty("decimals", 0);
+    zMaxSpeed->setInputWidgetProperty("decimals", 3);
     zMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxSpeed->setInputWidgetProperty("step", 0.001);
     zMaxSpeed->setInputWidgetProperty("page", 10);
@@ -2258,7 +2255,7 @@ void Config::loadSystemRegisters()
     );
     zMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     zMaxAcceleration->setInputWidgetProperty("step", 0.001);
-    zMaxAcceleration->setInputWidgetProperty("decimals", 0);
+    zMaxAcceleration->setInputWidgetProperty("decimals", 3);
     zMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zMaxAcceleration->setInputWidgetProperty("page", 10);
     zMaxAcceleration->setInputWidgetProperty("minimum", 1);
@@ -2271,7 +2268,7 @@ void Config::loadSystemRegisters()
     );
     zUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
-    zUrgentAcceleration->setInputWidgetProperty("decimals", 0);
+    zUrgentAcceleration->setInputWidgetProperty("decimals", 3);
     zUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
     zUrgentAcceleration->setInputWidgetProperty("step", 0.001);
     zUrgentAcceleration->setInputWidgetProperty("page", 10);

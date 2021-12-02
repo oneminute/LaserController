@@ -254,7 +254,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QJsonArray layers;
     QPoint lastPoint;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-        lastPoint = this->docOrigin();
+        lastPoint = this->jobOriginOnDocBoundingRect();
     
     for (LaserLayer* layer : layerList)
     {
@@ -296,13 +296,13 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
             itemObj["Name"] = pathNode->nodeName();
             if (layer->type() == LLT_ENGRAVING)
             {
+                itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                 if (!enablePrintAndCut())
                 {
                     QRectF boundingRect = primitive->sceneBoundingRect();
                     itemObj["Width"] = boundingRect.width();
                     itemObj["Height"] = boundingRect.height();
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
-                    itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
 
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Engraving").arg(primitive->name()), exportProgress);
                     QByteArray data = primitive->engravingImage(progress, lastPoint);
@@ -341,6 +341,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
             }
             else if (layer->type() == LLT_FILLING)
             {
+                itemObj["Absolute"] = Config::Device::startFrom() == SFT_AbsoluteCoords;
                 if (!enablePrintAndCut())
                 {
                     itemObj["Type"] = primitive->typeLatinName();

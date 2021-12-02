@@ -311,13 +311,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarTips->setAlignment(Qt::AlignHCenter);
 
     m_statusBarCoordinate = new QLabel;
-    m_statusBarCoordinate->setText(tr("0,0"));
-    m_statusBarCoordinate->setMinimumWidth(45);
+    m_statusBarCoordinate->setText("");
+    m_statusBarCoordinate->setMinimumWidth(60);
     m_statusBarCoordinate->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarCoordinate);
     
     m_statusBarLocation = new QLabel;
-    m_statusBarLocation->setText(ltr("Top Left"));
+    m_statusBarLocation->setText("0mm, 0mm");
     m_statusBarLocation->setMinimumWidth(180);
     m_statusBarLocation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarLocation);
@@ -368,9 +368,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_posXBox = new LaserDoubleSpinBox();
 	m_posXBox->setMinimum(-DBL_MAX);
 	m_posXBox->setMaximum(DBL_MAX);
+    m_posXBox->setFixedWidth(90);
 	m_posYBox = new LaserDoubleSpinBox();
 	m_posYBox->setMinimum(-DBL_MAX);
 	m_posYBox->setMaximum(DBL_MAX);
+    m_posYBox->setFixedWidth(90);
 	m_posXBox->setDecimals(3);
 	m_posYBox->setDecimals(3);
 	m_posXUnit = new QLabel("mm");
@@ -406,10 +408,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_widthBox = new LaserDoubleSpinBox();
 	m_widthBox->setMinimum(DBL_MIN);
 	m_widthBox->setMaximum(DBL_MAX);
+    m_widthBox->setFixedWidth(90);
     m_widthBox->setDecimals(3);
 	m_heightBox = new LaserDoubleSpinBox();
 	m_heightBox->setMinimum(DBL_MIN);
 	m_heightBox->setMaximum(DBL_MAX);
+    m_heightBox->setFixedWidth(90);
 	//m_heightBox->setDecimals(3);
 	m_heightBox->setDecimals(3);
 	m_widthUnit = new QLabel("mm");
@@ -436,8 +440,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 	m_xRateBox->setMaximum(DBL_MAX);
 	m_xRateBox->setMinimum(DBL_MIN);
+    m_xRateBox->setFixedWidth(90);
 	m_yRateBox->setMaximum(DBL_MAX);
 	m_yRateBox->setMinimum(DBL_MIN);
+    m_yRateBox->setFixedWidth(90);
 	m_xRateBox->setDecimals(3);
 	m_yRateBox->setDecimals(3);
 	m_xRateBox->setValue(100);
@@ -732,21 +738,21 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_viewer, &LaserViewer::selectedChangedFromMouse, this, &LaserControllerWindow::selectedChangedFromMouse);
 	connect(m_posXBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_MOVE;
-		if (m_posXBox->value() > 9000) {
-			m_posXBox->setValue(9000);
+		if (m_posXBox->value() > Config::Ui::validMaxRegion()) {
+			m_posXBox->setValue(Config::Ui::validMaxRegion());
 		}
-		if (m_posXBox->value() < -9000) {
-			m_posXBox->setValue(-9000);
+		if (m_posXBox->value() < -Config::Ui::validMaxRegion()) {
+			m_posXBox->setValue(-Config::Ui::validMaxRegion());
 		}
 		selectionPropertyBoxChange(PrimitiveProperty::PP_PosX);
 	});
 	connect(m_posYBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_MOVE;
-		if (m_posYBox->value() > 9000) {
-			m_posYBox->setValue(9000);
+		if (m_posYBox->value() > Config::Ui::validMaxRegion()) {
+			m_posYBox->setValue(Config::Ui::validMaxRegion());
 		}
-		if (m_posYBox->value() < -9000) {
-			m_posYBox->setValue(-9000);
+		if (m_posYBox->value() < -Config::Ui::validMaxRegion()) {
+			m_posYBox->setValue(-Config::Ui::validMaxRegion());
 		}
 		selectionPropertyBoxChange(PrimitiveProperty::PP_PosY);
 	});
@@ -756,8 +762,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
             return;
         }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
-		if (m_widthBox->value() > 20000) {
-			m_widthBox->setValue(20000);
+		if (m_widthBox->value() > Config::Ui::validMaxRegion()) {
+			m_widthBox->setValue(Config::Ui::validMaxRegion());
 		}
 		if (m_widthBox->value() <= 0) {
 			m_widthBox->setValue(0.001);
@@ -771,8 +777,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
             return;
         }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
-		if (m_heightBox->value() > 20000) {
-			m_heightBox->setValue(20000);
+		if (m_heightBox->value() > Config::Ui::validMaxRegion()) {
+			m_heightBox->setValue(Config::Ui::validMaxRegion());
 		}
 		if (m_heightBox->value() <= 0) {
 			m_heightBox->setValue(0.001);
@@ -985,11 +991,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //updatePostEventWidgets(m_ui->comboBoxPostEvent->currentIndex());
     qLogD << "main window initialized";
 
-    //m_tablePrintAndCutPoints->setLaserPoint(QPointF(-6996, 100675));
-    //m_tablePrintAndCutPoints->setCanvasPoint(QPointF(944.888, 569.527));
-    //m_tablePrintAndCutPoints->addNewLine();
-    //m_tablePrintAndCutPoints->setLaserPoint(QPointF(-84729, 21033));
-    //m_tablePrintAndCutPoints->setCanvasPoint(QPointF(744.043, 196.827));
+    onLayoutChanged(LaserApplication::device->layoutSize());
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -1291,10 +1293,9 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         LaserText* text = m_viewer->editingText();
         //family
         QFont font = text->font();
-        qreal t = font.pixelSize();
         m_fontFamily->setCurrentText(font.family());
         //m_height
-        m_fontHeight->setValue(Global::sceneToMechV(font.pixelSize()));
+        m_fontHeight->setValue(qRound(font.pixelSize() * m_viewer->logicalDpiY() / 25400.0));
         //align
         int aV = text->alignV();
         int aH = text->alignH();
@@ -1345,7 +1346,7 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         m_fontSpaceY->setValue(spaceY);
 
         m_viewer->textFont()->setFamily(font.family());
-        m_viewer->textFont()->setPixelSize(font.pixelSize());
+        m_viewer->textFont()->setPixelSize(font.pixelSize() * 25400.0 / m_viewer->logicalDpiY());
         m_viewer->textFont()->setBold(bold);
         m_viewer->textFont()->setItalic(italic);
         m_viewer->textFont()->setCapitalization(capitalization);
@@ -1381,12 +1382,11 @@ void LaserControllerWindow::onFontComboBoxHidePopup()
 void LaserControllerWindow::onFontHeightBoxEnterOrLostFocus()
 {
     if (m_viewer) {
-        qreal size = Global::mmToSceneVF(m_fontHeight->value());
+        qreal size = m_fontHeight->value() * 25400.0 / m_viewer->logicalDpiY();
         m_viewer->textFont()->setPixelSize(size);
         LaserText* text = m_viewer->editingText();
         if (text) {
             QFont font(text->font());
-            //qreal q = m_fontHeight->value();
             font.setPixelSize(size);
             m_viewer->editingText()->setFont(font);
         }
@@ -1656,7 +1656,7 @@ void LaserControllerWindow::createCentralDockPanel()
     m_viewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //设置初始值
     m_viewer->textFont()->setFamily("Times New Roman");
-    m_viewer->textFont()->setPixelSize(Global::mmToSceneVF(20.0));
+    m_viewer->textFont()->setPixelSize(20000.0);
     m_viewer->setTextAlignH(Qt::AlignLeft);
     m_viewer->setTextAlignV(Qt::AlignVCenter);
     m_viewer->textFont()->setBold(false);
@@ -3657,6 +3657,9 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 	QMessageBox msgBox(QMessageBox::NoIcon,
 		tr("Close document?"), tr("Do you want to save current document?"),
 		QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
+    msgBox.setButtonText(QMessageBox::Save, tr("Save"));
+    msgBox.setButtonText(QMessageBox::Close, tr("Close"));
+    msgBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
 	int result = msgBox.exec();
 	switch (result) {
 		case QMessageBox::StandardButton::Save: {
@@ -4488,26 +4491,25 @@ void LaserControllerWindow::onLaserReturnWorkState(DeviceState state)
     m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() * 0.001, 'f', 2));
 }
 
-void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
+void LaserControllerWindow::onLayoutChanged(const QSize& size)
 {
-    /*if (m_scene->document())
-    {
-        int result = QMessageBox::question(this, tr("Close Document"),
-            tr("Device layout changed. We should close current document. Do you want to save it or close it without saving?"),
-            QMessageBox::StandardButton::Save, QMessageBox::StandardButton::Close);
-    }*/
     QRect newRect = LaserApplication::device->layoutRect();
     QPoint offset;
     switch (Config::SystemRegister::deviceOrigin())
     {
+    case 0:
+        m_statusBarCoordinate->setText(ltr("Top Left"));
     case 1:
         offset = newRect.bottomLeft() - m_layoutRect.bottomLeft();
+        m_statusBarCoordinate->setText(ltr("Bottom Left"));
         break;
     case 2:
         offset = newRect.bottomRight() - m_layoutRect.bottomRight();
+        m_statusBarCoordinate->setText(ltr("Bottom Right"));
         break;
     case 3:
         offset = newRect.topRight() - m_layoutRect.topRight();
+        m_statusBarCoordinate->setText(ltr("Top Right"));
         break;
     }
 
@@ -4519,10 +4521,11 @@ void LaserControllerWindow::onLayoutChanged(const QSizeF& size)
     }
 
     m_layoutRect = newRect;
-    m_statusBarPageInfo->setText(tr("Page Size(mm): %1x%2")
-        .arg(LaserApplication::device->layoutWidth())
-        .arg(LaserApplication::device->layoutHeight()));
+    m_statusBarPageInfo->setText(tr("Layout(mm): %1x%2")
+        .arg(LaserApplication::device->layoutWidth() * 0.001, 0, 'f', 3)
+        .arg(LaserApplication::device->layoutHeight() * 0.001, 0, 'f', 3));
     m_viewer->viewport()->update();
+
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
@@ -4794,9 +4797,6 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
 //selected items change,被选中的物体，发生移动，缩放，旋转,以线镜像变换时
 void LaserControllerWindow::selectedChangedFromMouse()
 {
-	//int size = m_scene->selectedPrimitives().length();
-    //QRectF sceneRect = m_scene->backgroundItem()->rect();
-    QRect sceneRect = LaserApplication::device->layoutRect();
     LaserViewer* view = qobject_cast<LaserViewer*> (m_scene->views()[0]);
     LaserPrimitiveGroup* group =  view->group();
     if (!group) {
@@ -4805,143 +4805,83 @@ void LaserControllerWindow::selectedChangedFromMouse()
     m_propertyWidget->setEnabled(true);
     int size = view->group()->childItems().size();
 	if (size > 0) {
-		QRectF rect = m_viewer->selectedItemsSceneBoundingRect();
-		if (rect.width() == 0 && rect.height() == 0) {
-			return;
-		}
-        //ruler origianl position
-        switch (Config::SystemRegister::deviceOrigin()) {
-        case 0: {//topLeft
-            break;
-        }
-        case 1: {//bottomLeft
-            qreal top = -(sceneRect.height() - rect.top());
-            rect = QRectF(rect.left(), top, rect.width(), rect.height());
-            break;
-        }
-        case 2: {//bottomRight
-            qreal left = -(sceneRect.width() - rect.left());
-            qreal top = -(sceneRect.height() - rect.top());
-            rect = QRectF(left, top, rect.width(), rect.height());
-            break;
-        }
-        case 3: {//topRight
-            qreal left = -(sceneRect.width() - rect.left());
-            rect = QRectF(left, rect.top(), rect.width(), rect.height());
-            break;
-        }
-        }
-        //QRectF rectReal = Global::matrixToUm().mapRect(rect);
-        QRectF rectReal = QRectF(rect.left(), rect.top(),
-            rect.width() * 0.001, rect.height() * 0.001);
-		qDebug() << rectReal;
-		qreal x = 0, y = 0, width = 0, height = 0; 
-		if (m_unitIsMM) {
-			width = qRound(rectReal.width());
-			height = qRound(rectReal.height());
-		}
+		QRect rect = m_viewer->selectedItemsSceneBoundingRect();
+		
+        int width = rect.width();
+        int height = rect.height();
+        int x = 0;
+        int y = 0;
 
-		switch (m_selectionOriginalState) {
-			case SelectionOriginalTopLeft:{
-				x = rectReal.topLeft().x();
-				y = rectReal.topLeft().y();
-				break;
-			}
-			case SelectionOriginalTopCenter: {
-				x = rectReal.center().x();
-				y = rectReal.topLeft().y();
-				break;
-			}
-			case SelectionOriginalTopRight: {
-				x = rectReal.bottomRight().x();
-				y = rectReal.topLeft().y();
-				break;
-			}
-			
-			case SelectionOriginalLeftCenter: {
-				x = rectReal.topLeft().x();
-				y = rectReal.center().y();
-				break;
-			}
-			case SelectionOriginalCenter: {
-				x = rectReal.center().x();
-				y = rectReal.center().y();
-				break;
-			}
-			case SelectionOriginalRightCenter: {
-				x = rectReal.bottomRight().x();
-				y = rectReal.center().y();
-				break;
-			}
-			case SelectionOriginalLeftBottom: {
-				x = rectReal.topLeft().x();
-				y = rectReal.bottomRight().y();
-				break;
-			}
-			case SelectionOriginalBottomCenter: {
-				x = rectReal.center().x();
-				y = rectReal.bottomRight().y();
-				break;
-			}
-			case SelectionOriginalBottomRight: {
-				x = rectReal.bottomRight().x();
-				y = rectReal.bottomRight().y();
-				break;
-			}
-											   
-		}
-        
-        if (m_unitIsMM) {
-            x = x * 0.001;
-            y = y * 0.001;
+        switch (m_selectionOriginalState) {
+        case SelectionOriginalTopLeft: {
+            x = rect.left();
+            y = rect.top();
+            break;
+        }
+        case SelectionOriginalTopCenter: {
+            x = rect.left() + rect.width() / 2;
+            y = rect.top();
+            break;
+        }
+        case SelectionOriginalTopRight: {
+            x = rect.left() + rect.width();
+            y = rect.top();
+            break;
+        }
+
+        case SelectionOriginalLeftCenter: {
+            x = rect.left();
+            y = rect.top() + rect.height() / 2;
+            break;
+        }
+        case SelectionOriginalCenter: {
+            x = rect.left() + rect.width() / 2;
+            y = rect.top() + rect.height() / 2;
+            break;
+        }
+        case SelectionOriginalRightCenter: {
+            x = rect.left() + rect.width();
+            y = rect.top() + rect.height() / 2;
+            break;
+        }
+        case SelectionOriginalLeftBottom: {
+            x = rect.left();
+            y = rect.top() + rect.height();
+            break;
+        }
+        case SelectionOriginalBottomCenter: {
+            x = rect.left() + rect.width() / 2;
+            y = rect.top() + rect.height();
+            break;
+        }
+        case SelectionOriginalBottomRight: {
+            x = rect.left() + rect.width();
+            y = rect.top() + rect.height();
+            break;
+        }
         }
         
-		m_posXBox->setValue(x);
-		m_posYBox->setValue(y);
-		m_widthBox->setValue(width);
-		m_heightBox->setValue(height);
+		m_posXBox->setValue(x * 0.001);
+		m_posYBox->setValue(y * 0.001);
+		m_widthBox->setValue(width * 0.001);
+		m_heightBox->setValue(height * 0.001);
 		
 	}
 }
 void LaserControllerWindow::selectionPropertyBoxChange(int state)
 {
-	qreal x = m_posXBox->value();
-	qreal y = m_posYBox->value();
-	qreal width = m_widthBox->value();
-	qreal height = m_heightBox->value();
-    qreal sceneHeight = m_scene->backgroundItem()->rect().height();
-    qreal sceneWidth = m_scene->backgroundItem()->rect().width();
+    int x = qRound(m_posXBox->value() * 1000);
+	int y = qRound(m_posYBox->value() * 1000);
+	int width = qRound(m_widthBox->value() * 1000);
+	int height = qRound(m_heightBox->value() * 1000);
+    int sceneHeight = m_scene->backgroundItem()->rect().height();
+    int sceneWidth = m_scene->backgroundItem()->rect().width();
 	
 	qreal xScale = m_xRateBox->value() * 0.01;
 	qreal yScale = m_yRateBox->value() * 0.01;
 
 	qreal rotate = m_rotateBox->value() / 180 * M_PI;
 
-    if (m_unitIsMM) {
-        x = Global::mmToSceneHF(x);
-        y = Global::mmToSceneVF(y);
-        width = Global::mmToSceneHF(width);
-        height = Global::mmToSceneVF(height);
-        //ruler origianl position
-        switch (Config::SystemRegister::deviceOrigin()) {
-            case 0: {//topLeft
-                break;
-            }
-            case 1: {//bottomLeft
-                y = sceneHeight + y;
-                break;
-            }
-            case 2: {//bottomRight
-                x = sceneWidth + x;
-                y = sceneHeight + y;
-                break;
-            }
-            case 3: {//topRight
-                x = sceneWidth + x;
-                break;
-            }
-        }
-    }
 	//repaint 
 	m_viewer->resetSelectedItemsGroupRect(QRectF(x, y, width, height), xScale, yScale, rotate, m_selectionOriginalState, 
         m_selectionTranformState, state, m_unitIsMM);
@@ -4950,6 +4890,7 @@ void LaserControllerWindow::selectionPropertyBoxChange(int state)
 	m_rotateBox->setValue(0);
     emit m_viewer->selectedChangedFromToolBar();
 	m_viewer->viewport()->repaint();
+    m_scene->updateTree();
 }
 void LaserControllerWindow::onSelectionOriginalClicked(bool clicked)
 {

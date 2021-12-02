@@ -2083,8 +2083,8 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
 
     int dpi = d->layer->dpi();
-    int pixelWidth = boundingRect.width() / 25400.0 * dpi;
-    int pixelHeight = boundingRect.height() / 25400.0 * dpi;
+    int pixelWidth = boundingRect.width() * dpi / 25400.0;
+    int pixelHeight = boundingRect.height() * dpi / 25400.0;
 
     int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
 
@@ -2106,7 +2106,7 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
     cv::Mat resized;
     cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight), cv::INTER_NEAREST);
     
-    qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
+    qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed());
     
     ba = imageUtils::image2EngravingData(parentProgress, resized, boundingRect, pixelInterval, 
         lastPoint, accLength);
@@ -2288,8 +2288,8 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     int canvasHeight = qRound(canvasWidth / ratio);
 
     QTransform t = QTransform::fromScale(
-        canvasWidth / boundingRectInDevice.width(),
-        canvasHeight / boundingRectInDevice.height()
+        canvasWidth * 1.0 / boundingRectInDevice.width(),
+        canvasHeight * 1.0 / boundingRectInDevice.height()
     );
 
     path = t.map(path);
@@ -2305,8 +2305,8 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     cv::Mat src(canvas.height(), canvas.width(), CV_8UC1, (void*)canvas.constBits(), canvas.bytesPerLine());
 
     int dpi = d->layer->dpi();
-    int pixelWidth = boundingRect.width() / 25400.0 * dpi;
-    int pixelHeight = boundingRect.height() / 25400.0 * dpi;
+    int pixelWidth = boundingRectInDevice.width() * dpi / 25400.0;
+    int pixelHeight = boundingRectInDevice.height() * dpi / 25400.0;
 
     int pixelInterval = layer()->engravingRowInterval();
     int outWidth = pixelWidth;
@@ -2320,7 +2320,7 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
     
-    int accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed() * 1000);
+    int accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed());
     bytes = imageUtils::image2EngravingData(progress, resized, 
         boundingRectInDevice, pixelInterval, lastPoint, accLength);
 
@@ -2429,7 +2429,6 @@ void LaserText::setFont(QFont font)
     Q_D(LaserText);
     d->font = font;
     modifyPathList();
-
 }
 
 QFont LaserText::font()
@@ -2699,6 +2698,7 @@ void LaserText::modifyPathList()
     }
     
     d->boundingRect = d->path.boundingRect().toRect();
+    document()->updateDocumentBounding();
 }
 
 QList<LaserTextRowPath> LaserText::subPathList()
@@ -2708,17 +2708,17 @@ QList<LaserTextRowPath> LaserText::subPathList()
     return d->pathList;
 }
 
-QRectF LaserText::boundingRect() const
-{
-    Q_D(const LaserText);
-    //d->boundingRect = d->path.boundingRect();
-    return sceneTransform().mapRect(path().boundingRect());
-}
+//QRectF LaserText::boundingRect() const
+//{
+//    Q_D(const LaserText);
+//    //d->boundingRect = d->path.boundingRect();
+//    return sceneTransform().mapRect(path().boundingRect());
+//}
 
 QRect LaserText::sceneBoundingRect() const
 {
     Q_D(const LaserText);
-    return sceneTransform().map(path()).boundingRect().toRect();
+    return sceneTransform().mapRect(d->boundingRect);
 }
 
 QRectF LaserText::originalBoundingRect(qreal extendPixel) const

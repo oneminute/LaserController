@@ -82,22 +82,22 @@ void LaserDevicePrivate::updateDeviceOriginAndTransform()
     case 0:
         dx = 0;
         dy = 0;
-        layoutRect = QRect(QPoint(0, 0), QPoint(maxX, maxY));
+        layoutRect = QRect(QPoint(0, 0), QSize(maxX, maxY));
         break;
     case 3:
         dx = maxX;
         dy = 0;
-        layoutRect = QRect(QPoint(-maxX, 0), QPoint(0, maxY));
+        layoutRect = QRect(QPoint(-maxX, 0), QSize(maxX, maxY));
         break;
     case 2:
         dx = maxX;
         dy = maxY;
-        layoutRect = QRect(QPoint(-maxX, -maxY), QPoint(0, 0));
+        layoutRect = QRect(QPoint(-maxX, -maxY), QSize(maxX, maxY));
         break;
     case 1:
         dx = 0;
         dy = maxY;
-        layoutRect = QRect(QPoint(0, -maxY), QPoint(maxX, 0));
+        layoutRect = QRect(QPoint(0, -maxY), QSize(maxX, maxY));
         break;
     }
 
@@ -218,6 +218,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
+    connect(Config::SystemRegister::deviceOriginItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
     connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
     connect(this, &LaserDevice::mainCardRegistrationChanged, this, &LaserDevice::onMainCardRegistrationChanged);
@@ -953,6 +954,11 @@ QRect LaserDevice::layoutRect() const
     return d->layoutRect;
 }
 
+QSize LaserDevice::layoutSize() const
+{
+    return QSize(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength());
+}
+
 QPointF LaserDevice::currentOrigin() const
 {
     QPointF origin;
@@ -1052,7 +1058,7 @@ QMap<int, LaserRegister*> LaserDevice::userRegisters(bool onlyModified) const
         QMap<int, LaserRegister*> map;
         for (LaserRegister* item : d->userRegisters.values())
         {
-            if (onlyModified && !item->configItem()->isModified())
+            if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
                 continue;
 
             map.insert(item->address(), item);
@@ -1073,7 +1079,7 @@ QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
         QMap<int, LaserRegister*> map;
         for (LaserRegister* item : d->systemRegisters.values())
         {
-            if (onlyModified && !item->configItem()->isModified())
+            if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
                 continue;
 
             map.insert(item->address(), item);
@@ -1803,15 +1809,21 @@ void LaserDevice::onConfigJobOriginChanged(const QVariant& value, void* senderPt
     d->updateDeviceOriginAndTransform();
 }
 
-void LaserDevice::onLayerWidthChanged(const QVariant& value)
+void LaserDevice::onDeviceOriginChanged(const QVariant& value, void* senderPtr)
 {
     updateDeviceOriginAndTransform();
-    emit layoutChanged(QSizeF(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength()));
+    emit layoutChanged(layoutSize());
 }
 
-void LaserDevice::onLayerHeightChanged(const QVariant& value)
+void LaserDevice::onLayerWidthChanged(const QVariant& value, void* senderPtr)
 {
     updateDeviceOriginAndTransform();
-    emit layoutChanged(QSizeF(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength()));
+    emit layoutChanged(layoutSize());
+}
+
+void LaserDevice::onLayerHeightChanged(const QVariant& value, void* senderPtr)
+{
+    updateDeviceOriginAndTransform();
+    emit layoutChanged(layoutSize());
 }
 
