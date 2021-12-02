@@ -100,7 +100,7 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 	
 	//Axes
 	m_millimeter = (m_baseMillimeter * 1000) * m_viewer->zoomValue();
-	qreal minification = 0.0057 / m_scale;
+	qreal minification = 1 / m_scale;
 	int pow_10 = qLn(minification) / qLn(10);
 	m_flag = qRound(qPow(10, pow_10));//1,10,100,1000...��С����
 	LaserBackgroundItem* backgroundItem = m_viewer->scene()->backgroundItem();
