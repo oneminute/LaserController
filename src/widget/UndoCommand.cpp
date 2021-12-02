@@ -1,5 +1,6 @@
 #include "UndoCommand.h"
 #include <QAction>
+#include <QMessageBox>
 #include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
@@ -1011,3 +1012,111 @@ void JoinedGroupCommand::handleUnGroup()
     m_joinedUngroupAction->setEnabled(false);
 }
 
+ArrangeAlignCommand::ArrangeAlignCommand(LaserViewer * viewer, int type)
+{
+    m_viewer = viewer;
+    m_scene = viewer->scene();
+    m_group = m_viewer->group();
+    m_type = type;
+    m_alignTarget = LaserApplication::mainWindow->alignTarget();
+}
+
+ArrangeAlignCommand::~ArrangeAlignCommand()
+{
+}
+
+void ArrangeAlignCommand::undo()
+{
+    if (m_undoMap.isEmpty()) {
+        return;
+    }
+    for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_undoMap.begin(); i != m_undoMap.end(); i++) {
+        i.key()->setTransform(i.value());
+        i.key()->setPos(0, 0);
+    }
+    m_group->setTransform(QTransform());
+    emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
+}
+void ArrangeAlignCommand::redo()
+{
+    if (!m_alignTarget) {
+        return;
+    }
+    
+    QPointF diff;
+    QPointF c;
+    for (QGraphicsItem* item : m_group->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        if (!m_alignTarget->isJoinedGroup()) {
+
+            if (m_alignTarget != p) {
+                m_undoMap.insert(p, p->sceneTransform());
+                if (!moveByType(p, m_alignTarget->sceneBoundingRect(), p->sceneBoundingRect())) {
+                    break;
+                }
+            }
+        }
+        else {
+            QList<LaserPrimitive*> alignTargetList = m_alignTarget->joinedGroupList();
+            QRect bounds;
+            utils::boundingRect(alignTargetList, bounds, QRect(), false);
+            diff = c - m_group->mapFromScene(p->sceneBoundingRect().center());
+            if (!alignTargetList.contains(p)) {
+                m_undoMap.insert(p, p->sceneTransform());
+                if (!moveByType(p, bounds, p->sceneBoundingRect())) {
+                    break;
+                }
+            }
+        }
+    }   
+    emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
+}
+
+bool ArrangeAlignCommand::moveByType(LaserPrimitive* p, QRect target, QRect src)
+{
+    LaserPrimitiveGroup* g = m_viewer->group();
+    QPointF diff;
+    switch (m_type) {
+        case Qt::AlignCenter:{
+            diff = g->mapFromScene(target.center()) - g->mapFromScene(src.center());
+            break;
+        }
+        case Qt::AlignLeft: {
+            diff = QPointF((g->mapFromScene(target.topLeft()) - g->mapFromScene(src.topLeft())).x(), 0);
+            break;
+        }
+        case Qt::AlignRight: {
+            diff = QPointF((g->mapFromScene(target.topRight()) - g->mapFromScene(src.topRight())).x(), 0);
+            break;
+        }
+        case Qt::AlignHCenter: {
+            diff = QPointF((g->mapFromScene(target.center()) - g->mapFromScene(src.center())).x(), 0);
+            break;
+        }
+        case Qt::AlignTop: {
+            diff = QPointF(0, (g->mapFromScene(target.topLeft()) - g->mapFromScene(src.topLeft())).y());
+            break;
+        }
+        case Qt::AlignBottom: {
+            diff = QPointF(0, (g->mapFromScene(target.bottomLeft()) - g->mapFromScene(src.bottomLeft())).y());
+            break;
+        }
+        case Qt::AlignVCenter: {
+            diff = QPointF(0, (g->mapFromScene(target.center()) - g->mapFromScene(src.center())).y());
+            break;
+        } 
+    }
+    p->moveBy(diff.x(), diff.y());
+    if (m_scene->maxRegion().contains(p->sceneBoundingRect())) {
+        m_scene->quadTreeNode()->upDatePrimitive(p);
+        return true;
+    }
+    else {
+        QMessageBox::warning(m_viewer, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        undo();
+        return false;
+    }
+
+}

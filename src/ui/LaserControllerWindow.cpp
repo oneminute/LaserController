@@ -1,6 +1,7 @@
 ﻿#include "LaserControllerWindow.h"
 #include "ui_LaserControllerWindow.h"
 #include "widget/UndoCommand.h"
+#include "util/Utils.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -870,7 +871,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
     //arrange align
-    connect(m_ui->actionAlignHorinzontalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignCenter);
+    connect(m_ui->actionAlignCenter, &QAction::triggered, this, &LaserControllerWindow::onActionAlignCenter);
     connect(m_ui->actionAlignHorinzontalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignHorinzontalMiddle);
     connect(m_ui->actionAlignHorinzontalTop, &QAction::triggered, this, &LaserControllerWindow::onActionAlignHorinzontalTop);
     connect(m_ui->actionAlignHorinzontalBottom, &QAction::triggered, this, &LaserControllerWindow::onActionAlignHorinzontalBottom);
@@ -1101,7 +1102,7 @@ void LaserControllerWindow::initAlignTarget()
         
         //m_alignTarget->setAlignTarget(false);
         setAlignTargetState(false);
-        m_alignTarget = nullptr;
+        //m_alignTarget = nullptr;
     }
     
 }
@@ -1176,13 +1177,9 @@ void LaserControllerWindow::tabAlignTarget()
         else {
             setAlignTargetState(false);
             m_alignTarget = p;
-            //m_alignTarget->setAlignTarget(false);
-
-            //m_alignTarget->setAlignTarget(true);
             setAlignTargetState(true);
             viewer()->viewport()->repaint();
         }
-        
     }
 }
 
@@ -4386,9 +4383,7 @@ void LaserControllerWindow::onLaserToolButtonShowMenu()
     if (!group) {
         return;
     }
-    if (m_alignTarget) {
-        return;
-    }
+  
     QList<QGraphicsItem*> list = group->childItems();
     m_alignTargetIndex = list.size() - 1;
     LaserPrimitive* alignPrimitive = qgraphicsitem_cast<LaserPrimitive*>(group->childItems()[m_alignTargetIndex]);   
@@ -5686,55 +5681,46 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
 
 void LaserControllerWindow::onActionAlignCenter()
 {
-    if (!m_alignTarget) {
-        return;
-    }
-
-    for (QGraphicsItem* item : viewer()->group()->childItems()) {
-        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-
-    }
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignCenter);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionAlignHorinzontalMiddle()
 {
-    
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignHCenter);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionAlignHorinzontalTop()
 {
-    
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignTop);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionAlignHorinzontalBottom()
 {
-    
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignBottom);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionAlignVerticalMiddle()
 {
-    
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignVCenter);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionAlignVerticalLeft()
 {
-    
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignLeft);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionAlignVerticalRight()
 {
-    
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignRight);
+    m_viewer->undoStack()->push(cmd);
 }
 
-void LaserControllerWindow::onActionAlignHorinzontal()
-{
-    
-}
-
-void LaserControllerWindow::onActionAlignVertical()
-{
-    
-}
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
 //{
 //    m_buttonMoveTopLeft->setAutoRepeatInterval(value.toInt());

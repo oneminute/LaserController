@@ -325,8 +325,6 @@ protected slots:
     void onActionAlignVerticalMiddle();
     void onActionAlignVerticalLeft();
     void onActionAlignVerticalRight();
-    void onActionAlignHorinzontal();
-    void onActionAlignVertical();
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
     void onJoinedGroupChanged();
