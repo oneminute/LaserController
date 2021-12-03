@@ -552,6 +552,7 @@ private:
     Label* m_statusBarRegister;
     Label* m_statusBarActivation;
     QLabel* m_statusBarTips;
+    QLabel* m_statusSelectionCount;
     ProgressBar* m_statusBarProgress;
     QLabel* m_statusBarCoordinate;
     QLabel* m_statusBarLocation;

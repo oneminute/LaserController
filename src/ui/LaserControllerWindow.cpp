@@ -333,6 +333,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarAppStatus->setMinimumWidth(120);
     m_statusBarAppStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarAppStatus);
+    
+    m_statusSelectionCount = new QLabel;
+    m_statusSelectionCount->setText(tr("Selection: 0"));
+    m_statusSelectionCount->setMinimumWidth(90);
+    m_statusSelectionCount->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusSelectionCount);
 
     m_statusBarProgress = new ProgressBar;
     m_statusBarProgress->setMinimum(0);
@@ -4309,6 +4315,8 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 	}
     //判断显示哪个属性面板，shape properties panel
     showShapePropertyPanel();
+
+    m_statusSelectionCount->setText(tr("Selection: %1").arg(items.length()));
 }
 void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
 {
