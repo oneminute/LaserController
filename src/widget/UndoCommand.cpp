@@ -1030,11 +1030,12 @@ void ArrangeAlignCommand::undo()
     if (m_undoMap.isEmpty()) {
         return;
     }
+    m_group->setTransform(QTransform());
     for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_undoMap.begin(); i != m_undoMap.end(); i++) {
         i.key()->setTransform(i.value());
         i.key()->setPos(0, 0);
     }
-    m_group->setTransform(QTransform());
+    
     emit m_viewer->selectedChangedFromMouse();
     m_viewer->viewport()->repaint();
 }
@@ -1046,14 +1047,19 @@ void ArrangeAlignCommand::redo()
     
     QPointF diff;
     QPointF c;
+    bool moveFail = false;
     for (QGraphicsItem* item : m_group->childItems()) {
         LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_undoMap.insert(p, p->sceneTransform());
+        if (moveFail) {
+            continue;
+        }
         if (!m_alignTarget->isJoinedGroup()) {
 
             if (m_alignTarget != p) {
-                m_undoMap.insert(p, p->sceneTransform());
-                if (!moveByType(p, m_alignTarget->sceneBoundingRect(), p->sceneBoundingRect())) {
-                    break;
+                if (!moveByType(p, m_alignTarget->sceneBoundingRect(),
+                    p->sceneBoundingRect())) {
+                    moveFail = true;
                 }
             }
         }
@@ -1061,11 +1067,10 @@ void ArrangeAlignCommand::redo()
             QList<LaserPrimitive*> alignTargetList = m_alignTarget->joinedGroupList();
             QRect bounds;
             utils::boundingRect(alignTargetList, bounds, QRect(), false);
-            diff = c - m_group->mapFromScene(p->sceneBoundingRect().center());
             if (!alignTargetList.contains(p)) {
-                m_undoMap.insert(p, p->sceneTransform());
+                
                 if (!moveByType(p, bounds, p->sceneBoundingRect())) {
-                    break;
+                    moveFail = true;
                 }
             }
         }
@@ -1080,31 +1085,32 @@ bool ArrangeAlignCommand::moveByType(LaserPrimitive* p, QRect target, QRect src)
     QPointF diff;
     switch (m_type) {
         case Qt::AlignCenter:{
-            diff = g->mapFromScene(target.center()) - g->mapFromScene(src.center());
+            
+            diff = m_group->mapFromScene(target.center()) - m_group->mapFromScene(src.center());
             break;
         }
         case Qt::AlignLeft: {
-            diff = QPointF((g->mapFromScene(target.topLeft()) - g->mapFromScene(src.topLeft())).x(), 0);
+            diff = g->mapFromScene(target.left(), 0) - g->mapFromScene(src.left(), 0);
             break;
         }
         case Qt::AlignRight: {
-            diff = QPointF((g->mapFromScene(target.topRight()) - g->mapFromScene(src.topRight())).x(), 0);
+            diff = g->mapFromScene(target.right(), 0) - g->mapFromScene(src.right(), 0);
             break;
         }
         case Qt::AlignHCenter: {
-            diff = QPointF((g->mapFromScene(target.center()) - g->mapFromScene(src.center())).x(), 0);
+            diff = g->mapFromScene(target.center().x(), 0) - g->mapFromScene(src.center().x(), 0);
             break;
         }
         case Qt::AlignTop: {
-            diff = QPointF(0, (g->mapFromScene(target.topLeft()) - g->mapFromScene(src.topLeft())).y());
+            diff = g->mapFromScene(0, target.top()) - g->mapFromScene(0, src.top());
             break;
         }
         case Qt::AlignBottom: {
-            diff = QPointF(0, (g->mapFromScene(target.bottomLeft()) - g->mapFromScene(src.bottomLeft())).y());
+            diff = g->mapFromScene(0, target.bottom()) - g->mapFromScene(0, src.bottom());
             break;
         }
         case Qt::AlignVCenter: {
-            diff = QPointF(0, (g->mapFromScene(target.center()) - g->mapFromScene(src.center())).y());
+            diff = g->mapFromScene(0, target.center().y()) - g->mapFromScene(0, src.center().y());
             break;
         } 
     }
