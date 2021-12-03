@@ -306,8 +306,28 @@ void ConfigDialog::applyToDefault()
 
 void ConfigDialog::save()
 {
+    bool needRelaunch = false;
+    for (ConfigItemGroup* group : Config::groups)
+    {
+        if (group->needRelaunch())
+        {
+            needRelaunch = true;
+            break;
+        }
+    }
     Config::save(false, false);
     updateTitle();
+
+    if (needRelaunch)
+    {
+        QMessageBox dlg(QMessageBox::Question, tr("Need restart"), tr("The modification you are currently making needs to restart the software immediately. Do you want to restart the software now?"),
+            QMessageBox::Yes | QMessageBox::No);
+        dlg.setButtonText(QMessageBox::Yes, tr("Yes"));
+        dlg.setButtonText(QMessageBox::No, tr("No"));
+        int result = dlg.exec();
+        if (result == QMessageBox::StandardButton::Yes)
+            LaserApplication::restart();
+    }
 }
 
 void ConfigDialog::load()

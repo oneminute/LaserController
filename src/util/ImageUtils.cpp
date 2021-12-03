@@ -302,12 +302,15 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
         quint8 binCheck = 0;
         quint8 lastBin;
         QList<quint8> rowBytes;
-        //QString rowString;
+#if _DEBUG
+        QString rowString;
+#endif
         bool same = true;
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
-            quint8 bin = pixel >= 128 ? 0 : 0x80;
+            quint8 bin = pixel >= 128 ? 0 : 0x01;
+            //quint8 bin = pixel >= 128 ? 0 : 0x80;
             if (c == 0)
                 lastBin = bin;
             else
@@ -315,9 +318,12 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
                 same = same && (lastBin == bin);
                 lastBin = bin;
             }
-            //rowString.append(QString::number(bin));
+#if _DEBUG
+            rowString.append(QString::number(mat.ptr<quint8>(r)[c] >= 128 ? 0 : 1));
+#endif
             binCheck |= bin;
-            byte = byte | (bin >> (c % 8));
+            byte = byte | (bin << (c % 8));
+            //byte = byte | (bin >> (c % 8));
             bitCount++;
             if (bitCount == 8)
             {
@@ -327,8 +333,11 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
                 byte = 0;
             }
         }
-        //rowString.append("\n\r");
+#if _DEBUG
+        rowString.append("\n");
         //rowBytes.append(byte);
+        qLogD << rowString;
+#endif
         if (bitCount != 0)
             rowBytes.append(byte);
             //stream << byte;
@@ -340,13 +349,13 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             {
                 lastPoint = QPoint(boundingRight + accLength, boundingTop + r * rowInterval);
                 stream << yStart << xStart << xEnd << fspc.code;
-                qLogD << yStart << ", " << xStart << ", " << xEnd;
+                //qLogD << yStart << ", " << xStart << ", " << xEnd;
             }
             else
             {
                 lastPoint = QPoint(boundingLeft - accLength, boundingTop + r * rowInterval);
                 stream << yStart << xEnd << xStart << fspc.code;
-                qLogD << yStart << ", " << xEnd << ", " << xStart;
+                //qLogD << yStart << ", " << xEnd << ", " << xStart;
             }
 
             for (int i = 0; i < rowBytes.length(); i++)
@@ -460,6 +469,10 @@ QImage imageUtils::parseImageData(const QByteArray& data, int rowInterval)
         int bitCount = fspc.count() % 8 == 0 ? fspc.count() / 8 : fspc.count() / 8 + 1;
         int counter = 0;
         quint8 byte;
+        
+#ifdef _DEBUG
+        QString rowString;
+#endif
         for (int i = 0; i < width; i++)
         {
             if (i % 8 == 0)
@@ -468,12 +481,19 @@ QImage imageUtils::parseImageData(const QByteArray& data, int rowInterval)
                 bytesRead++;
             }
             int bit = byte & (0x80 >> (i % 8));
+#ifdef _DEBUG
+            rowString.append(QString::number(bit ? 1 : 0));
+#endif
             quint8 pixel = bit ? 0 : 255;
             if (forward)
                 grays[i] = pixel;
             else
                 grays[width - i - 1] = pixel;
         }
+#ifdef _DEBUG
+        rowString.append("\n");
+        qLogD << rowString;
+#endif
         lineBytes.insert(line, grays);
         line++;
 

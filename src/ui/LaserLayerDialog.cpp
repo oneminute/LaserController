@@ -284,7 +284,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::FillingLayer::runSpeedItem()->setValue(m_ui->editSliderFillingRunSpeed->intValue(), SS_DIRECTLY, this);
 		Config::FillingLayer::minPowerItem()->setValue(m_ui->editSliderFillingMinSpeedPower->intValue(), SS_DIRECTLY, this);
 		Config::FillingLayer::maxPowerItem()->setValue(m_ui->editSliderFillingRunSpeedPower->intValue(), SS_DIRECTLY, this);
-        Config::FillingLayer::rowIntervalItem()->setValue(m_ui->editSliderFillingRowInterval->value() * 1000, SS_DIRECTLY, this);
+        Config::FillingLayer::rowIntervalItem()->setValue(m_ui->editSliderFillingRowInterval->value(), SS_DIRECTLY, this);
 
 		if (Config::isModified())
 		{

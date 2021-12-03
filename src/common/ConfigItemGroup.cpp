@@ -157,6 +157,21 @@ bool ConfigItemGroup::isModified() const
     return modified;
 }
 
+bool ConfigItemGroup::needRelaunch() const
+{
+    Q_D(const ConfigItemGroup);
+    bool needRelaunch = false;
+    for (ConfigItem* item : d->items)
+    {
+        if (item->needRelaunch() && (item->isModified() || item->isDirty()))
+        {
+            needRelaunch = true;
+            break;
+        }
+    }
+    return needRelaunch;
+}
+
 void ConfigItemGroup::updateTitleAndDesc(const QString& title, const QString& desc)
 {
     Q_D(ConfigItemGroup);

@@ -33,10 +33,7 @@ LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
     setColumnCount(7);
     setHorizontalHeaderLabels(columnHeaders);
     
-    
-    
-    /*setColumnWidth(0, 45);
-    setColumnWidth(1, 30);
+    /*setColumnWidth(1, 30);
     setColumnWidth(2, 75);
     setColumnWidth(3, 45);
     setColumnWidth(4, 75);
@@ -64,6 +61,8 @@ LaserLayerTableWidget::LaserLayerTableWidget(QWidget* parent)
         setColumnWidth(i, 35);
         
     }
+
+    setColumnWidth(0, 50);
     setColumnWidth(2, 78);
     setColumnWidth(4, 68);
     
@@ -146,15 +145,18 @@ void LaserLayerTableWidget::updateItems()
             QTableWidgetItem* itemSpeedPower = new QTableWidgetItem();
             if (layer->type() == LLT_CUTTING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(layer->cuttingRunSpeed()).arg(layer->cuttingRunSpeedPower()));
+                itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->cuttingRunSpeed() * 0.001)).arg(layer->cuttingRunSpeedPower()));
             }
             else if (layer->type() == LLT_ENGRAVING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(layer->engravingRunSpeed()).arg(layer->engravingLaserPower()));
+                itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower()));
             }
             else if (layer->type() == LLT_FILLING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(layer->fillingRunSpeed()).arg(layer->fillingRunSpeedPower()));
+                if (layer->fillingType() == FT_Line)
+                    itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->fillingRunSpeed() * 0.001)).arg(layer->fillingRunSpeedPower()));
+                else if (layer->fillingType() == FT_Pixel)
+                    itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->fillingRunSpeedPower()));
             }
             itemSpeedPower->setTextAlignment(Qt::AlignCenter);
 
