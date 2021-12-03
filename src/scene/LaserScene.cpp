@@ -56,7 +56,7 @@ void LaserScene::setDocument(LaserDocument * doc)
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
 	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));
-	setSceneRect(QRect(QPoint(-5000000, -5000000), QPoint(5000000, 5000000)));
+	setSceneRect(QRect(QPoint(-99000000000, -99000000000), QPoint(99000000000, 99000000000)));
 	//views()[0]->horizontalScrollBar()->setSliderPosition(rect.center().x());
 	//views()[0]->verticalScrollBar()->setSliderPosition(rect.center().y());
 	views()[0]->setTransform(QTransform());

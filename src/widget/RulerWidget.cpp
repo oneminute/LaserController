@@ -115,8 +115,18 @@ void RulerWidget::paintEvent(QPaintEvent *event)
 		m_longUnit = 10 * m_millimeter;
 		m_mediumUnit = 5 * m_millimeter;
 	}
-    else if(m_scale >= 22){
+    else if(m_scale >= 22 && m_scale <= 48){
         m_unit = m_millimeter * 0.5;
+        m_longUnit = 10 * m_millimeter;
+        m_mediumUnit = 5 * m_millimeter;
+    }
+    else if (m_scale > 48 && m_scale < 78) {
+        m_unit = m_millimeter * 0.25;
+        m_longUnit = 10 * m_millimeter;
+        m_mediumUnit = 5 * m_millimeter;
+    }
+    else if (m_scale >= 78) {
+        m_unit = m_millimeter * 0.125;
         m_longUnit = 10 * m_millimeter;
         m_mediumUnit = 5 * m_millimeter;
     }
@@ -306,8 +316,14 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
         }
         for (int sj = 0; sj < smallSize; sj++) {
             QString number_str = QString::number(sj);
-            if (m_scale > 22) {
+            if (m_scale > 22 && m_scale <= 48) {
                 number_str = QString::number(sj * 0.5, 'f', 1);
+            }
+            else if (m_scale > 48 && m_scale < 78) {
+                number_str = QString::number(sj * 0.25, 'f', 1);
+            }
+            else if (m_scale >= 78) {
+                number_str = QString::number(sj * 0.125, 'f', 1);
             }
             painter.setPen(QPen(QColor(63, 63, 63), 1));
             unitStart = originalStart + sj * m_unit;
