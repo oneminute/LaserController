@@ -416,6 +416,12 @@ InputWidgetWrapper* ConfigItem::bindWidget(QWidget* widget, StoreStrategy ss)
     return wrapper;
 }
 
+void ConfigItem::setNeedRelaunch(bool needRelaunch)
+{
+    Q_D(ConfigItem);
+    d->needRelaunch = needRelaunch;
+}
+
 void ConfigItem::clearModified()
 {
     Q_D(ConfigItem);

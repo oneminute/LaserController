@@ -97,6 +97,7 @@ public:
 
 protected:
     InputWidgetWrapper* bindWidget(QWidget* widget, StoreStrategy ss);
+    void setNeedRelaunch(bool needRelaunch);
 
     /// <summary>
     /// 绑定的控件在初始化时的回调函数

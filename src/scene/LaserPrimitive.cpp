@@ -2286,6 +2286,11 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     qreal ratio = boundingRectInDevice.width() * 1.0 / boundingRectInDevice.height();
     int canvasWidth = qMin(boundingRectInDevice.width(), 1000);
     int canvasHeight = qRound(canvasWidth / ratio);
+    if (ratio < 1)
+    {
+        canvasHeight = qMin(boundingRectInDevice.height(), 1000);
+        canvasWidth = qRound(canvasHeight * ratio);
+    }
 
     QTransform t = QTransform::fromScale(
         canvasWidth * 1.0 / boundingRectInDevice.width(),
@@ -2301,6 +2306,7 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     QPainter painter(&canvas);
     painter.setBrush(Qt::black);
     painter.drawPath(path);
+    canvas.save("tmp/" + name() + "_canvas.png");
 
     cv::Mat src(canvas.height(), canvas.width(), CV_8UC1, (void*)canvas.constBits(), canvas.bytesPerLine());
 
@@ -2310,11 +2316,11 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
 
     int pixelInterval = layer()->engravingRowInterval();
     int outWidth = pixelWidth;
-    int outHeight = std::round(boundingRectInDevice.height() / pixelInterval);
+    int outHeight = qCeil(boundingRectInDevice.height() * 1.0 / pixelInterval);
     cv::Mat resized;
     cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_NEAREST);
 
-    cv::imwrite("tmp/" + name().toStdString() + ".png", resized);
+    cv::imwrite("tmp/" + name().toStdString() + "_resized.png", resized);
 
     qLogD << "bounding rect: " << boundingRectInDevice;
     qDebug() << "out width:" << outWidth;

@@ -194,14 +194,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         button->setColor(color);
         button->setText(QString(tr("%1")).arg(i + 1, 2, 10, QLatin1Char('0')));
         button->update();
-		//button->setEnabled(false);
         m_ui->layoutLayerButtons->addWidget(button);
         m_layerButtons.append(button);
 
         connect(button, &LayerButton::colorUpdated, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     }
     m_ui->layoutLayerButtons->addStretch();
-    //m_ui->actionMirrorAcrossLine->setVisible(false);
     
     // set up tools buttons
     QToolButton* toolButtonSelectionTool = new QToolButton;

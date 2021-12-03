@@ -31,6 +31,7 @@ public:
     static void retranslate();
     static QString str(const QString& key);
     static int exec();
+    static void restart();
 
 protected:
     void initLog();

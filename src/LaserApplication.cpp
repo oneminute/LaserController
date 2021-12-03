@@ -379,6 +379,12 @@ int LaserApplication::exec()
     }
 }
 
+void LaserApplication::restart()
+{
+    LaserApplication::quit();
+    QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
+}
+
 void LaserApplication::initLog()
 {
     google::InitGoogleLogging(this->arguments()[0].toStdString().c_str());

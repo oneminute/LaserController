@@ -247,6 +247,7 @@ void Config::loadGeneralItems()
             comboBox->setItemText(1, tr("Chinese"));
         }
     );
+    language->setNeedRelaunch(true);
 
     ConfigItem* unit = group->addConfigItem(
         "unit"
@@ -1707,6 +1708,7 @@ void Config::loadSystemRegisters()
     xMaxLength->setInputWidgetProperty("page", 10);
     xMaxLength->setInputWidgetProperty("minimum", 1);
     xMaxLength->setInputWidgetProperty("maximum", 3000);
+    xMaxLength->setNeedRelaunch(true);
 
     ConfigItem* xDirPhase = group->addConfigItem(
         "xDirPhase",
@@ -1899,6 +1901,7 @@ void Config::loadSystemRegisters()
     yMaxLength->setInputWidgetProperty("page", 1);
     yMaxLength->setInputWidgetProperty("minimum", 1);
     yMaxLength->setInputWidgetProperty("maximum", 5000);
+    yMaxLength->setNeedRelaunch(true);
 
     ConfigItem* yDirPhase = group->addConfigItem(
         "yDirPhase",
@@ -2091,6 +2094,7 @@ void Config::loadSystemRegisters()
     zMaxLength->setInputWidgetProperty("page", 1);
     zMaxLength->setInputWidgetProperty("minimum", 1);
     zMaxLength->setInputWidgetProperty("maximum", 2000);
+    zMaxLength->setNeedRelaunch(true);
 
     ConfigItem* zDirPhase = group->addConfigItem(
         "zDirPhase",
@@ -2358,6 +2362,7 @@ void Config::loadSystemRegisters()
             return value;
         }
     );
+    deviceOrigin->setNeedRelaunch(true);
 }
 
 void Config::loadDebug()

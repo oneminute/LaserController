@@ -45,6 +45,7 @@ public:
     bool isLazy() const;
     void setLazy(bool lazy);
     bool isModified() const;
+    bool needRelaunch() const;
 
     void updateTitleAndDesc(const QString& title, const QString& desc);
 
