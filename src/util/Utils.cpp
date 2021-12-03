@@ -183,6 +183,22 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
+void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
+{
+    int count = 0;
+    bounding = QRect();
+    boundingAcc = QRect();
+    for (QGraphicsItem* item : primitives)
+    {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        if (exludeUnexport && !primitive->exportable())
+            continue;
+        if (computeBoundingRect(primitive, bounding, count, boundingAcc, exludeUnexport)) {
+            continue;
+        }
+    }
+}
+
 void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
@@ -192,43 +208,50 @@ void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& boundi
     {
         if (exludeUnexport && !primitive->exportable())
             continue;
-
-        QRect rect = primitive->sceneBoundingRect();
-        QRect rectAcc = rect;
-        LaserLayer* layer = primitive->layer();
-        if (primitive->isBitmap() ||
-            (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel && 
-                (primitive->isShape() || primitive->isText())))
-        {
-            qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed());
-            rectAcc.setLeft(rect.left() - span);
-            rectAcc.setWidth(rect.width() + span * 2);
-        }
-
-        if (count++ == 0)
-        {
-            bounding = rect;
-            boundingAcc = rectAcc;
+        if (computeBoundingRect(primitive, bounding, count, boundingAcc, exludeUnexport)) {
             continue;
         }
-        if (rect.left() < bounding.left())
-            bounding.setLeft(rect.left());
-        if (rect.top() < bounding.top())
-            bounding.setTop(rect.top());
-        if (rect.right() > bounding.right())
-            bounding.setRight(rect.right());
-        if (rect.bottom() > bounding.bottom())
-            bounding.setBottom(rect.bottom());
-
-        if (rectAcc.left() < boundingAcc.left())
-            boundingAcc.setLeft(rectAcc.left());
-        if (rectAcc.top() < boundingAcc.top())
-            boundingAcc.setTop(rectAcc.top());
-        if (rectAcc.right() > boundingAcc.right())
-            boundingAcc.setRight(rectAcc.right());
-        if (rectAcc.bottom() > boundingAcc.bottom())
-            boundingAcc.setBottom(rectAcc.bottom());
     }
+}
+
+bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, int& count, QRect& boundingAcc, bool exludeUnexport)
+{
+    QRect rect = primitive->sceneBoundingRect();
+    QRect rectAcc = rect;
+    LaserLayer* layer = primitive->layer();
+    if (primitive->isBitmap() ||
+        (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel &&
+        (primitive->isShape() || primitive->isText())))
+    {
+        qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed());
+        rectAcc.setLeft(rect.left() - span);
+        rectAcc.setWidth(rect.width() + span * 2);
+    }
+
+    if (count++ == 0)
+    {
+        bounding = rect;
+        boundingAcc = rectAcc;
+        return true;
+    }
+    if (rect.left() < bounding.left())
+        bounding.setLeft(rect.left());
+    if (rect.top() < bounding.top())
+        bounding.setTop(rect.top());
+    if (rect.right() > bounding.right())
+        bounding.setRight(rect.right());
+    if (rect.bottom() > bounding.bottom())
+        bounding.setBottom(rect.bottom());
+
+    if (rectAcc.left() < boundingAcc.left())
+        boundingAcc.setLeft(rectAcc.left());
+    if (rectAcc.top() < boundingAcc.top())
+        boundingAcc.setTop(rectAcc.top());
+    if (rectAcc.right() > boundingAcc.right())
+        boundingAcc.setRight(rectAcc.right());
+    if (rectAcc.bottom() > boundingAcc.bottom())
+        boundingAcc.setBottom(rectAcc.bottom());
+    return false;
 }
 
 LaserLineListList utils::interLines(const QPainterPath& path, qreal rowInterval)
