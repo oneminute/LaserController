@@ -274,6 +274,9 @@ bool LaserDriver::load()
     m_fnSendAuthenticationEmail = (FN_INT_WCHART_WCHART_INT)m_library.resolve("SendAuthenticationEmail");
     CHECK_FN(m_fnSendAuthenticationEmail)
 
+    m_fnImportData = (FN_INT_BYTEPTR_INT)m_library.resolve("ImportData");
+    CHECK_FN(m_fnImportData)
+
     Q_ASSERT(m_fnLoadDataFromFile);
 
     m_isLoaded = true;
@@ -866,6 +869,11 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
     m_isDownloading = false;
     //emit machiningStarted();
     return ret;
+}
+
+int LaserDriver::importData(const char* data, int length)
+{
+    return m_fnImportData(const_cast<char*>(data), length);
 }
 
 void LaserDriver::getDeviceWorkState()

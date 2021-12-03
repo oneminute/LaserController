@@ -200,8 +200,7 @@ void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& boundi
             (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel && 
                 (primitive->isShape() || primitive->isText())))
         {
-            qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed() * 1000);
-            span = Global::mechToSceneHF(span);
+            qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed());
             rectAcc.setLeft(rect.left() - span);
             rectAcc.setWidth(rect.width() + span * 2);
         }

@@ -152,6 +152,7 @@ signals:
     void closed();
     void outlineUpdated();
     void exportFinished(const QString& filename);
+    //void exportFinished(const QByteArray& data);
 
 protected:
     Q_DISABLE_COPY(LaserDocument)

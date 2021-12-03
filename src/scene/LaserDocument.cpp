@@ -413,6 +413,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     saveFile.close();
     exportProgress->finish();
     emit exportFinished(filename);
+    //emit exportFinished(rawJson);
 }
 
 void LaserDocument::exportBoundingJSON()
@@ -896,7 +897,7 @@ void LaserDocument::save(const QString& filename, QWidget* window)
 		array.append(layerObj);
 	}
 	obj.insert("layers", array);
-    obj.insert("deviceOrigin", Config::SystemRegister::deviceOrigin());
+    obj.insert("deviceOrigin", typeUtils::point2Json(LaserApplication::device->originOffset()));
 
 	doc.setObject(obj);
 	QFile file(filename);
@@ -922,9 +923,21 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		qDebug() << "parseJson:" << error->errorString();
 		return;
 	}
-	QJsonArray layers = doc.object()["layers"].toArray();
+
+    QJsonObject docObject = doc.object();
+    QPoint originOffset = LaserApplication::device->originOffset();
+    if (docObject.contains("deviceOrigin"))
+    {
+        originOffset = typeUtils::json2Point(docObject["deviceOrigin"]);
+    }
+
+    QJsonArray layers;
+    if (docObject.contains("layers"))
+    {
+        layers = doc.object()["layers"].toArray();
+    }
+
 	QList<LaserLayer*> laserLayers = this->layers();
-	
     QList<LaserPrimitive*> unavailables;
     this->blockSignals(true);
 	for (int i = 0; i < layers.size(); i++) {
@@ -1171,6 +1184,13 @@ void LaserDocument::load(const QString& filename, QWidget* window)
     {
         QMessageBox::warning(LaserApplication::mainWindow, tr("Warning"),
             tr("Found unavailable primitives, count is %1. These primitives will not be loaded.").arg(unavailables.count()));
+    }
+
+    if (originOffset != LaserApplication::device->originOffset())
+    {
+        QPoint offset = originOffset - LaserApplication::device->originOffset();
+        QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
+        transform(t);
     }
     this->blockSignals(false);
     emit updateLayersStructure();

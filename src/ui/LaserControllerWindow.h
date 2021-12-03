@@ -282,6 +282,7 @@ protected slots:
 
 	void onCreatSpline();
     void onDocumentExportFinished(const QString& filename);
+    //void onDocumentExportFinished(const QByteArray& data);
 
     void onPreviewWindowProgressUpdated(qreal progress);
     void onUserOriginConfigValueChanged(const QVariant& index, void* senderPtr);

@@ -273,7 +273,7 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 		Config::EngravingLayer::laserPowerItem()->setValue(m_ui->editSliderEngravingLaserPower->intValue(), SS_DIRECTLY, this);
 		Config::EngravingLayer::minPowerItem()->setValue(m_ui->editSliderEngravingMinSpeedPower->intValue(), SS_DIRECTLY, this);
 		Config::EngravingLayer::maxPowerItem()->setValue(m_ui->editSliderEngravingRunSpeedPower->intValue(), SS_DIRECTLY, this);
-        Config::EngravingLayer::rowIntervalItem()->setValue(m_ui->editSliderEngravingRowInterval->value() * 1000, SS_DIRECTLY, this);
+        Config::EngravingLayer::rowIntervalItem()->setValue(m_ui->editSliderEngravingRowInterval->value(), SS_DIRECTLY, this);
         Config::EngravingLayer::halftoneAnglesItem()->setValue(m_ui->doubleSpinBoxHalftoneAngles->value(), SS_DIRECTLY, this);
 		Config::EngravingLayer::LPIItem()->setValue(m_ui->editSliderLPI->value(), SS_DIRECTLY, this);
 		Config::EngravingLayer::DPIItem()->setValue(m_ui->editSliderDPI->value(), SS_DIRECTLY, this);
