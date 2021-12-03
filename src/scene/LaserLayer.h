@@ -127,7 +127,7 @@ public:
     qreal halftoneAngles() const;
     void setHalftoneAngles(qreal angles);
 
-    bool isDefault() const;
+    //bool isDefault() const;
 
     virtual bool isAvailable() const;
 

@@ -187,13 +187,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentViewDragState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentViewDragingState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionImport
 
     // begin m_ui->actionExportJSON
@@ -301,15 +301,21 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionRemoveLayer
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionRemoveLayer
 
     // begin m_ui->actionAreaSelection
@@ -1704,7 +1710,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end Config::UserRegister::spotShotPowerItem()
 
     // begin m_doubleSpinBoxDistanceX
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceIdleState);
@@ -1716,7 +1722,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end m_doubleSpinBoxDistanceX
 
     // begin m_doubleSpinBoxDistanceY
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceIdleState);
@@ -1728,7 +1734,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     // end m_doubleSpinBoxDistanceY
 
     // begin m_doubleSpinBoxDistanceZ
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", false, deviceUnconnectedState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceConnectedState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceIdleState);
