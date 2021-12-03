@@ -38,11 +38,14 @@ namespace typeUtils
 
     QString variantToString(const QVariant& src, DataType dataType);
 
-    QJsonObject point2Json(const QPointF& point);
+    QJsonObject point2JsonF(const QPointF& point);
+    QJsonObject point2Json(const QPoint& point);
 
-    QPointF json2Point(const QJsonObject& json);
+    QPointF json2PointF(const QJsonObject& json);
+    QPoint json2Point(const QJsonObject& json);
 
-    QPointF json2Point(const QJsonValue& json);
+    QPointF json2PointF(const QJsonValue& json);
+    QPoint json2Point(const QJsonValue& json);
 
     QJsonObject rect2Json(const QRect& rect);
 }

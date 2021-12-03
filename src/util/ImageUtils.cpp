@@ -278,8 +278,8 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             if (r == 0)
             {
                 xStart = boundingLeft - lastPoint.x();
-                yStart = boundingTop - lastPoint.y();
                 xEnd = boundingRect.width();
+                yStart = boundingTop - lastPoint.y();
             }
             else
             {
@@ -290,10 +290,10 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
                 }
                 else
                 {
-                    xEnd = 0;
-                    xStart = -boundingRect.width();
+                    xEnd = boundingRect.width();
+                    xStart = 0;
                 }
-                yStart = rowInterval;
+                yStart = rowInterval * r;
             }
         }
         quint8 byte = 0;

@@ -150,7 +150,7 @@ QString typeUtils::variantToString(const QVariant& src, DataType dataType)
     return dst;
 }
 
-QJsonObject typeUtils::point2Json(const QPointF& point)
+QJsonObject typeUtils::point2JsonF(const QPointF& point)
 {
     QJsonObject json;
     json["x"] = point.x();
@@ -158,7 +158,15 @@ QJsonObject typeUtils::point2Json(const QPointF& point)
     return json;
 }
 
-QPointF typeUtils::json2Point(const QJsonObject& json)
+QJsonObject typeUtils::point2Json(const QPoint& point)
+{
+    QJsonObject json;
+    json["x"] = point.x();
+    json["y"] = point.y();
+    return json;
+}
+
+QPointF typeUtils::json2PointF(const QJsonObject& json)
 {
     QPointF point(0, 0);
     if (json.contains("x"))
@@ -172,7 +180,26 @@ QPointF typeUtils::json2Point(const QJsonObject& json)
     return point;
 }
 
-QPointF typeUtils::json2Point(const QJsonValue& json)
+QPoint typeUtils::json2Point(const QJsonObject& json)
+{
+    QPoint point(0, 0);
+    if (json.contains("x"))
+    {
+        point.setX(json["x"].toInt());
+    }
+    if (json.contains("y"))
+    {
+        point.setY(json["y"].toInt());
+    }
+    return point;
+}
+
+QPointF typeUtils::json2PointF(const QJsonValue& json)
+{
+    return json2Point(json.toObject());
+}
+
+QPoint typeUtils::json2Point(const QJsonValue& json)
 {
     return json2Point(json.toObject());
 }

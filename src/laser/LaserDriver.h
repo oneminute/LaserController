@@ -86,6 +86,8 @@ private:
     typedef wchar_t* (__stdcall* FN_WCHART_WCHART)(wchar_t*);
     typedef int(__stdcall* FN_INT_WCHART_WCHART_INT)(wchar_t*, wchar_t*, int);
 
+    typedef int(__stdcall* FN_INT_BYTEPTR_INT)(char*, int);
+
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -185,6 +187,7 @@ public:
     int controlMotor(bool open);
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
+    int importData(const char* data, int length);
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
     int getUpdatePanelHandle(int version, int wndId);
@@ -313,6 +316,8 @@ private:
     FN_INT_WCHART m_fnActivationMainCardEx;
     FN_WCHART_WCHART m_fnRegisteMainCard;
     FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
+
+    FN_INT_BYTEPTR_INT m_fnImportData;
 
     wchar_t m_wcharBuffer[2048];
 

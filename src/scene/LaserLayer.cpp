@@ -691,9 +691,27 @@ void LaserLayer::onClicked()
     LaserScene* scene = d->doc->scene();
     if (scene->selectedPrimitives().count() > 0)
     {
+        int shapes = 0;
+        int bitmaps = 0;
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
         {
             scene->addLaserPrimitive(primitive, this, false);
+            if (primitive->isShape())
+            {
+                shapes++;
+            }
+            else if (primitive->isBitmap())
+            {
+                bitmaps++;
+            }
+        }
+        if (bitmaps > shapes)
+        {
+            setType(LLT_ENGRAVING);
+        }
+        else
+        {
+            setType(LLT_CUTTING);
         }
 
         scene->document()->updateLayersStructure();

@@ -4555,6 +4555,7 @@ void LaserControllerWindow::onCreatSpline()
 }
 
 void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
+//void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
     if (!m_prepareMachining)
         return;
@@ -4566,7 +4567,7 @@ void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
     //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
 #endif
     LaserApplication::driver->loadDataFromFile(filePath);
-    //LaserApplication::driver->startMachining(0);
+    //LaserApplication::driver->importData(data.data(), data.size());
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
