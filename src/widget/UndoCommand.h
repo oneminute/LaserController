@@ -225,5 +225,22 @@ private:
     void handleGroup();
     void handleUnGroup();
 };
+//arrange align
+class ArrangeAlignCommand : public QUndoCommand {
+public:
+    ArrangeAlignCommand(LaserViewer* viewer, int type);
+    ~ArrangeAlignCommand();
+private:
+    LaserViewer* m_viewer;
+    LaserScene* m_scene;
+    LaserPrimitiveGroup* m_group;
+    QMap< LaserPrimitive *, QTransform > m_undoMap;
+    int m_type;
+    LaserPrimitive* m_alignTarget;
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+    bool moveByType(LaserPrimitive* p, QRect target, QRect src);
+};
 
 #endif // UNDOCOMMAND_H

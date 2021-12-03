@@ -767,7 +767,7 @@ void LaserViewer::setAnchorPoint(QPointF point)
 bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint)
 {
 	isSpecialPoint = false;
-	qreal delta = Config::Ui::objectShapeDistance();
+	qreal delta = Config::Ui::objectShapeDistance() * (1 / zoomValue());
 	if (delta <= 0) {
 		return false;
 	}
@@ -809,7 +809,7 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 		QLineF bottom = QLineF(rect[1], rect[2]);
 		QLineF left = QLineF(rect[2], rect[3]);
 		QLineF right = QLineF(rect[3], rect[0]);
-		if (utils::checkTwoPointEqueal(top.center(), result, 5.0f)) {
+		if (utils::checkTwoPointEqueal(top.center(), result, delta)) {
 			result = top.center();
 			isSpecialPoint = true;
 		}
@@ -827,7 +827,7 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 		}
 	}
 	else {
-		if (utils::checkTwoPointEqueal(edge.center(), result, 5.0f)) {
+		if (utils::checkTwoPointEqueal(edge.center(), result, delta)) {
 			result = edge.center();
 			isSpecialPoint = true;
 		}
@@ -903,7 +903,7 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
 {
 	
-	qreal delta = Config::Ui::clickSelectionTolerance();
+	qreal delta = Config::Ui::clickSelectionTolerance() * (1 / zoomValue());
 	if (delta <= 0) {
 		return false;
 	}
@@ -1444,7 +1444,6 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
     
     // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
-        LaserApplication::mainWindow->initAlignTarget();
         //qDebug() << mapFromGlobal(QCursor::pos());
         //qDebug() << mapToScene(mapFromGlobal(QCursor::pos()));
         //附近的图元交点
