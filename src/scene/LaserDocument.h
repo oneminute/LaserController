@@ -34,8 +34,8 @@ public:
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
-	LaserLayer* defaultCuttingLayer() const;
-	LaserLayer* defaultEngravingLayer() const;
+	//LaserLayer* defaultCuttingLayer() const;
+	//LaserLayer* defaultEngravingLayer() const;
 
     QString newLayerName() const;
 
@@ -109,6 +109,8 @@ public:
     virtual QPointF position() const { return QPoint(0, 0); }
 
     void transform(const QTransform& trans);
+
+    LaserLayer* idleLayer() const;
 
 protected:
     void addPrimitive(LaserPrimitive* item);

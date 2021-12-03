@@ -34,6 +34,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 {
 	LaserApplication::mainWindow->activateWindow();
     LaserDocument* doc = scene->document();
+    LaserLayer* idleLayer = doc->idleLayer();
 
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
@@ -100,14 +101,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
 			QRectF bounds = matrix.mapRect(svgEllipseNode->bounds());
-            item = new LaserEllipse(bounds.toRect(), doc);
+            item = new LaserEllipse(bounds.toRect(), doc, QTransform(), idleLayer->index());
         }
             break;
         case QSvgNode::LINE:
         {
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
 			QLineF line = matrix.map(svgLineNode->line());
-            item = new LaserLine(line.toLine(), doc);
+            item = new LaserLine(line.toLine(), doc, QTransform(), idleLayer->index());
         }
             break;
         case QSvgNode::ARC:
@@ -115,7 +116,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
-            item = new LaserPath(path, doc);
+            item = new LaserPath(path, doc, QTransform(), idleLayer->index());
             int i = item->layerIndex();
         }
             break;
@@ -123,14 +124,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgPolygon* svgPolygonNode = reinterpret_cast<QSvgPolygon*>(node);
 			QPolygonF polygon = matrix.map(svgPolygonNode->polygon());
-            item = new LaserPolygon(polygon.toPolygon(), doc);
+            item = new LaserPolygon(polygon.toPolygon(), doc, QTransform(), idleLayer->index());
         }
             break;
         case QSvgNode::POLYLINE:
         {
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
 			QPolygonF polyline = matrix.map(svgPolylineNode->polyline());
-            item = new LaserPolyline(polyline.toPolygon(), doc);
+            item = new LaserPolyline(polyline.toPolygon(), doc, QTransform(), idleLayer->index());
         }
             break;
         case QSvgNode::RECT:
@@ -143,7 +144,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
                     qreal cornerRaius = Global::mmToSceneHF(svgRectNode->rx()) * docScaleWidth;
-					item = new LaserRect(rect.toRect(), cornerRaius, doc);
+					item = new LaserRect(rect.toRect(), cornerRaius, doc, QTransform(), idleLayer->index());
 					qDebug() << "rect:" << rect;
 				}
             }
@@ -175,7 +176,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             }
             qLogD << font;
             QPointF pos = matrix.map(svgTextNode->coord());
-            LaserText* laserText = new LaserText(doc, pos, font, Qt::AlignLeft, Qt::AlignVCenter);
+            LaserText* laserText = new LaserText(doc, pos, font, Qt::AlignLeft, Qt::AlignVCenter, QTransform(), idleLayer->index());
             laserText->setContent(svgTextNode->text());
             laserText->modifyPathList();
             item = laserText;
@@ -187,7 +188,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
 			QRectF bounds = matrix.mapRect(svgImageNode->imageBounds());
-            item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc);
+            item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc, QTransform(), idleLayer->index());
         }
             break;
         default:
@@ -222,7 +223,9 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             if (item)
             {
                 if (item->isAvailable())
+                {
                     scene->addLaserPrimitive(item, true);
+                }
                 else
                     unavailables.append(item);
             }

@@ -21,6 +21,7 @@ public:
     LaserLayerPrivate(LaserLayer* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_LAYER)
         , removable(true)
+        , type(LLT_CUTTING)
         , engravingForward(true)
         , engravingStyle(0)
         , startX(25)
@@ -560,11 +561,11 @@ void LaserLayer::setHalftoneAngles(qreal angles)
     d->halftoneAngles = angles;
 }
 
-bool LaserLayer::isDefault() const
-{ 
-    Q_D(const LaserLayer);
-    return d->isDefault; 
-}
+//bool LaserLayer::isDefault() const
+//{ 
+//    Q_D(const LaserLayer);
+//    return d->isDefault; 
+//}
 
 bool LaserLayer::isAvailable() const
 {

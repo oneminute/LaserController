@@ -84,7 +84,19 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
 {
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
-	d->layers[item->layerIndex()]->addPrimitive(item);
+    LaserLayer* layer = d->layers[item->layerIndex()];
+    if (layer->isEmpty())
+    {
+        if (item->isShape())
+        {
+            layer->setType(LLT_CUTTING);
+        }
+        else if (item->isBitmap())
+        {
+            layer->setType(LLT_ENGRAVING);
+        }
+    }
+	layer->addPrimitive(item);
 }
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
@@ -153,17 +165,17 @@ void LaserDocument::removeLayer(LaserLayer* layer)
     updateLayersStructure();
 }
 
-LaserLayer* LaserDocument::defaultCuttingLayer() const
-{
-    Q_D(const LaserDocument);
-    return d->layers[1];
-}
-
-LaserLayer* LaserDocument::defaultEngravingLayer() const
-{
-    Q_D(const LaserDocument);
-    return d->layers[0];
-}
+//LaserLayer* LaserDocument::defaultCuttingLayer() const
+//{
+//    Q_D(const LaserDocument);
+//    return d->layers[1];
+//}
+//
+//LaserLayer* LaserDocument::defaultEngravingLayer() const
+//{
+//    Q_D(const LaserDocument);
+//    return d->layers[0];
+//}
 
 QString LaserDocument::newLayerName() const
 {
@@ -811,6 +823,26 @@ void LaserDocument::transform(const QTransform& trans)
     }
 }
 
+LaserLayer* LaserDocument::idleLayer() const
+{
+    Q_D(const LaserDocument);
+    LaserLayer* idle = nullptr;
+    for (LaserLayer* layer : d->layers)
+    {
+        qLogD << layer->isEmpty();
+        if (layer->isEmpty())
+        {
+            idle = layer;
+            break;
+        }
+    }
+    if (!idle)
+    {
+        idle = d->layers.last();
+    }
+    return idle;
+}
+
 void LaserDocument::updateLayersStructure()
 {
     Q_D(LaserDocument);
@@ -1225,7 +1257,8 @@ void LaserDocument::init()
 {
 	Q_D(LaserDocument);
 	d->name = tr("Untitled");
-	QString layerName = newLayerName();
+
+	/*QString layerName = newLayerName();
 	LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
     layer->setIndex(0);
 	addLayer(layer);
@@ -1233,9 +1266,9 @@ void LaserDocument::init()
 	layerName = newLayerName();
 	layer = new LaserLayer(layerName, LLT_CUTTING, this, true);
     layer->setIndex(1);
-	addLayer(layer);
+	addLayer(layer);*/
 
-	for (int i = 2; i < Config::Layers::maxLayersCount(); i++)
+	for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
 	{
 		QString layerName = newLayerName();
 		LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
