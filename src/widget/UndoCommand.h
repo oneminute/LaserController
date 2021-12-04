@@ -237,10 +237,13 @@ private:
     QMap< LaserPrimitive *, QTransform > m_undoMap;
     int m_type;
     LaserPrimitive* m_alignTarget;
+    //prevent repeate compute bounds， use with  Function:joinedGroupSceneBounds(LaserPrimitive* p)
+    QMap<LaserPrimitive*, QRect> joinedGroupBoundsMap;
 protected:
     virtual void undo() override;
     virtual void redo() override;
     bool moveByType(LaserPrimitive* p, QRect target, QRect src);
+    QRect joinedGroupSceneBounds(LaserPrimitive* p);
 };
 
 #endif // UNDOCOMMAND_H

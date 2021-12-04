@@ -124,6 +124,8 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+private:
+    QRect m_joinedGroupSceneBoundingRect;
 	
 protected:
 

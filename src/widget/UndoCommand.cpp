@@ -992,9 +992,12 @@ void JoinedGroupCommand::redo()
 
 void JoinedGroupCommand::handleGroup()
 {
+    //QRect sceneBoundingRect;
+    //utils::boundingRect(m_list, sceneBoundingRect, QRect(), false);
     for (QGraphicsItem* item : m_list) {
         LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
         primitive->setJoinedGroup(true);
+        //primitive->setJoinedGroupSceneBoundingRect(sceneBoundingRect);
     }
     m_viewer->viewport()->repaint();
     m_joinedGroupAction->setEnabled(false);
@@ -1019,6 +1022,10 @@ ArrangeAlignCommand::ArrangeAlignCommand(LaserViewer * viewer, int type)
     m_group = m_viewer->group();
     m_type = type;
     m_alignTarget = LaserApplication::mainWindow->alignTarget();
+    for (QGraphicsItem* item : m_group->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_undoMap.insert(p, p->sceneTransform());
+    }
 }
 
 ArrangeAlignCommand::~ArrangeAlignCommand()
@@ -1030,12 +1037,16 @@ void ArrangeAlignCommand::undo()
     if (m_undoMap.isEmpty()) {
         return;
     }
+    for (QGraphicsItem* item : m_group->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_group->removeFromGroup(p);
+    }
     m_group->setTransform(QTransform());
     for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_undoMap.begin(); i != m_undoMap.end(); i++) {
         i.key()->setTransform(i.value());
         i.key()->setPos(0, 0);
+        m_group->addToGroup(i.key());
     }
-    
     emit m_viewer->selectedChangedFromMouse();
     m_viewer->viewport()->repaint();
 }
@@ -1044,33 +1055,42 @@ void ArrangeAlignCommand::redo()
     if (!m_alignTarget) {
         return;
     }
-    
+    joinedGroupBoundsMap.clear();
     QPointF diff;
     QPointF c;
-    bool moveFail = false;
     for (QGraphicsItem* item : m_group->childItems()) {
         LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-        m_undoMap.insert(p, p->sceneTransform());
-        if (moveFail) {
-            continue;
-        }
+       
         if (!m_alignTarget->isJoinedGroup()) {
-
+            
             if (m_alignTarget != p) {
-                if (!moveByType(p, m_alignTarget->sceneBoundingRect(),
-                    p->sceneBoundingRect())) {
-                    moveFail = true;
+                QRect targetBounds = m_alignTarget->sceneBoundingRect();
+                QRect scrBound;
+                if (!p->isJoinedGroup()) {
+                    scrBound = p->sceneBoundingRect();
+                }
+                else {
+                    scrBound = joinedGroupSceneBounds(p);
+                }
+                if (!moveByType(p, targetBounds, scrBound)) {
+                    break;
                 }
             }
         }
         else {
-            QList<LaserPrimitive*> alignTargetList = m_alignTarget->joinedGroupList();
-            QRect bounds;
-            utils::boundingRect(alignTargetList, bounds, QRect(), false);
+            QList<LaserPrimitive*> alignTargetList = m_alignTarget->joinedGroupList();           
             if (!alignTargetList.contains(p)) {
-                
-                if (!moveByType(p, bounds, p->sceneBoundingRect())) {
-                    moveFail = true;
+                QRect targetBounds;
+                utils::boundingRect(alignTargetList, targetBounds, QRect(), false);
+                QRect scrBound;
+                if (!p->isJoinedGroup()) {
+                    scrBound = p->sceneBoundingRect();
+                }
+                else {
+                    scrBound = joinedGroupSceneBounds(p);
+                }
+                if (!moveByType(p, targetBounds, scrBound)) {
+                    break;
                 }
             }
         }
@@ -1081,7 +1101,6 @@ void ArrangeAlignCommand::redo()
 
 bool ArrangeAlignCommand::moveByType(LaserPrimitive* p, QRect target, QRect src)
 {
-    LaserPrimitiveGroup* g = m_viewer->group();
     QPointF diff;
     switch (m_type) {
         case Qt::AlignCenter:{
@@ -1090,27 +1109,27 @@ bool ArrangeAlignCommand::moveByType(LaserPrimitive* p, QRect target, QRect src)
             break;
         }
         case Qt::AlignLeft: {
-            diff = g->mapFromScene(target.left(), 0) - g->mapFromScene(src.left(), 0);
+            diff = m_group->mapFromScene(target.left(), 0) - m_group->mapFromScene(src.left(), 0);
             break;
         }
         case Qt::AlignRight: {
-            diff = g->mapFromScene(target.right(), 0) - g->mapFromScene(src.right(), 0);
+            diff = m_group->mapFromScene(target.right(), 0) - m_group->mapFromScene(src.right(), 0);
             break;
         }
         case Qt::AlignHCenter: {
-            diff = g->mapFromScene(target.center().x(), 0) - g->mapFromScene(src.center().x(), 0);
+            diff = m_group->mapFromScene(target.center().x(), 0) - m_group->mapFromScene(src.center().x(), 0);
             break;
         }
         case Qt::AlignTop: {
-            diff = g->mapFromScene(0, target.top()) - g->mapFromScene(0, src.top());
+            diff = m_group->mapFromScene(0, target.top()) - m_group->mapFromScene(0, src.top());
             break;
         }
         case Qt::AlignBottom: {
-            diff = g->mapFromScene(0, target.bottom()) - g->mapFromScene(0, src.bottom());
+            diff = m_group->mapFromScene(0, target.bottom()) - m_group->mapFromScene(0, src.bottom());
             break;
         }
         case Qt::AlignVCenter: {
-            diff = g->mapFromScene(0, target.center().y()) - g->mapFromScene(0, src.center().y());
+            diff = m_group->mapFromScene(0, target.center().y()) - m_group->mapFromScene(0, src.center().y());
             break;
         } 
     }
@@ -1125,4 +1144,17 @@ bool ArrangeAlignCommand::moveByType(LaserPrimitive* p, QRect target, QRect src)
         return false;
     }
 
+}
+//prevent repeate compute bounds
+QRect ArrangeAlignCommand::joinedGroupSceneBounds(LaserPrimitive * p)
+{
+    QRect bounds;
+    for (QMap<LaserPrimitive*, QRect>::Iterator i = joinedGroupBoundsMap.begin(); i != joinedGroupBoundsMap.end(); i++) {
+        if (p->joinedGroupList().contains(i.key())) {
+            return i.value();
+        }
+    }
+    utils::boundingRect(p->joinedGroupList(), bounds, QRect(), false);
+    joinedGroupBoundsMap.insert(p, bounds);
+    return bounds;
 }
