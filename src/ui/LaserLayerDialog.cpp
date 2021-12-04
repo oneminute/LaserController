@@ -45,7 +45,7 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderCuttingRunSpeed->setMinimum(1);
     m_ui->editSliderCuttingRunSpeed->setMaximum(2000);
     m_ui->editSliderCuttingRunSpeed->setPage(10);
-    m_ui->editSliderCuttingRunSpeed->setDecimals(3);
+    m_ui->editSliderCuttingRunSpeed->setDecimals(0);
 
     m_ui->editSliderCuttingMinSpeedPower->setTextTemplate("%1%");
     m_ui->editSliderCuttingMinSpeedPower->setStep(0.1);
@@ -63,7 +63,7 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderEngravingRunSpeed->setMinimum(1);
     m_ui->editSliderEngravingRunSpeed->setMaximum(2000);
     m_ui->editSliderEngravingRunSpeed->setPage(10);
-    m_ui->editSliderEngravingRunSpeed->setDecimals(3);
+    m_ui->editSliderEngravingRunSpeed->setDecimals(0);
 
     m_ui->editSliderEngravingLaserPower->setMaximum(100);
     m_ui->editSliderEngravingLaserPower->setTextTemplate("%1%");
@@ -99,7 +99,7 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderFillingRunSpeed->setMinimum(1);
     m_ui->editSliderFillingRunSpeed->setMaximum(2000);
     m_ui->editSliderFillingRunSpeed->setPage(10);
-    m_ui->editSliderFillingRunSpeed->setDecimals(3);
+    m_ui->editSliderFillingRunSpeed->setDecimals(0);
 
     m_ui->editSliderFillingMinSpeedPower->setTextTemplate("%1%");
     m_ui->editSliderFillingMinSpeedPower->setMaximum(100);

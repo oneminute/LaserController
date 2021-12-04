@@ -175,11 +175,11 @@ bool LaserDriver::load()
     m_fnSetFactoryType = (FN_VOID_WCHART)m_library.resolve("SetFactoryType");
     CHECK_FN(m_fnSetFactoryType)
 
-    //m_fnCheckFactoryPassword = (FN_INT_WCHART)m_library.resolve("CheckFactroyPassWord");
-    //CHECK_FN(m_fnCheckFactoryPassword)
+    m_fnCheckFactoryPassword = (FN_BOOL_WCHART_INTREF)m_library.resolve("CheckFactoryPassword");
+    CHECK_FN(m_fnCheckFactoryPassword)
 
-    m_fnWriteFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("WriteFactoryPassWord");
-    CHECK_FN(m_fnWriteFactoryPassword)
+    m_fnChangeFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("ChangeFactoryPassword");
+    CHECK_FN(m_fnChangeFactoryPassword)
 
     m_fnLPenMoveToOriginalPoint = (FN_VOID_DOUBLE)m_library.resolve("LPenMoveToOriginalPoint");
     CHECK_FN(m_fnLPenMoveToOriginalPoint)
@@ -625,19 +625,19 @@ void LaserDriver::setFactoryType(const QString& factory)
     delete[] strFactory;
 }
 
-//bool LaserDriver::checkFactoryPassword(const QString& password)
-//{
-//    wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
-//    bool success = m_fnCheckFactoryPassword(wcPassword) != -1;
-//    delete[] wcPassword;
-//    return success;
-//}
+bool LaserDriver::checkFactoryPassword(const QString& password, int& errorCount)
+{
+    wchar_t* wcPassword = typeUtils::qStringToWCharPtr(password);
+    bool success = m_fnCheckFactoryPassword(wcPassword, &errorCount);
+    delete[] wcPassword;
+    return success;
+}
 
 bool LaserDriver::changeFactoryPassword(const QString& oldPassword, const QString& newPassword)
 {
     wchar_t* wcOldPassword = typeUtils::qStringToWCharPtr(oldPassword);
     wchar_t* wcNewPassword = typeUtils::qStringToWCharPtr(newPassword);
-    bool success = m_fnWriteFactoryPassword(wcOldPassword, wcNewPassword) != -1;
+    bool success = m_fnChangeFactoryPassword(wcOldPassword, wcNewPassword) == 0;
     delete[] wcOldPassword;
     delete[] wcNewPassword;
     return success;

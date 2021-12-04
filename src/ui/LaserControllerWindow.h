@@ -425,7 +425,7 @@ private:
     PressedToolButton* m_buttonMoveTop;
     PressedToolButton* m_buttonMoveTopRight;
     PressedToolButton* m_buttonMoveLeft;
-    QToolButton* m_buttonMoveToOrigin;
+    PressedToolButton* m_buttonMoveToOrigin;
     PressedToolButton* m_buttonMoveRight;
     PressedToolButton* m_buttonMoveBottomLeft;
     PressedToolButton* m_buttonMoveBottom;

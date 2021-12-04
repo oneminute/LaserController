@@ -34,6 +34,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     , m_closing(false)
     , m_needUserRegisterConfirm(false)
     , m_needSystemRegisterConfirm(false)
+    , m_changingPassword(false)
 {
     m_ui->setupUi(this);
     m_ui->splitter->setStretchFactor(0, 0);
@@ -140,7 +141,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
         QTreeWidgetItem* treeItem = new QTreeWidgetItem;
         treeItem->setText(0, Config::SystemRegister::group->title());
-        //treeItem->setData(0, Qt::UserRole, QVariant::fromValue<QWidget*>(page));
+        treeItem->setData(0, Qt::UserRole, QVariant::fromValue<ConfigItemGroup*>(Config::SystemRegister::group));
         m_pages.insert(treeItem, m_systemPage);
         m_groups.insert(treeItem, Config::SystemRegister::group);
         m_groupBoxes.insert(treeItem, nullptr);
@@ -176,6 +177,38 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     m_ui->stackedWidgetPanels->setCurrentIndex(0);
     m_ui->treeWidgetCatalogue->setCurrentItem(m_ui->treeWidgetCatalogue->topLevelItem(0));
 
+    // 创建密码相关的面板
+    m_passwordPage = new QWidget(this);
+    QGridLayout* passwordLayout = new QGridLayout;
+    m_labelPassword = new QLabel(m_passwordPage);
+    if (Config::General::language() == QLocale::Chinese)
+        m_labelPassword->setMinimumWidth(45);
+    else
+        m_labelPassword->setMinimumWidth(80);
+    m_labelNewPassword = new QLabel(m_passwordPage);
+    m_labelConfirm = new QLabel(m_passwordPage);
+    m_buttonPassword = new QPushButton(m_passwordPage);
+    m_buttonChangePassword = new QPushButton(m_passwordPage);
+    m_editPassword = new QLineEdit(m_passwordPage);
+    m_editNewPassword = new QLineEdit(m_passwordPage);
+    m_editConfirm = new QLineEdit(m_passwordPage);
+    m_checkBoxChangePassword = new QCheckBox(m_passwordPage);
+    passwordLayout->addWidget(m_labelPassword, 0, 0);
+    passwordLayout->addWidget(m_editPassword, 0, 1);
+    passwordLayout->addWidget(m_buttonPassword, 0, 2);
+    passwordLayout->addWidget(m_checkBoxChangePassword, 1, 0, 1, 3);
+    passwordLayout->addWidget(m_labelNewPassword, 2, 0);
+    passwordLayout->addWidget(m_editNewPassword, 2, 1);
+    passwordLayout->addWidget(m_labelConfirm, 3, 0);
+    passwordLayout->addWidget(m_editConfirm, 3, 1);
+    passwordLayout->addWidget(m_buttonChangePassword, 3, 2);
+    passwordLayout->setColumnStretch(0, 0);
+    passwordLayout->setColumnStretch(1, 1);
+    passwordLayout->setColumnStretch(2, 0);
+    passwordLayout->setRowStretch(4, 1);
+    m_passwordPage->setLayout(passwordLayout);
+    m_ui->stackedWidgetPanels->addWidget(m_passwordPage);
+
     connect(m_ui->treeWidgetCatalogue, &QTreeWidget::currentItemChanged, this, &ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged);
     connect(LaserApplication::device, &LaserDevice::connected, this, &ConfigDialog::onDeviceConnected);
     connect(LaserApplication::device, &LaserDevice::disconnected, this, &ConfigDialog::onDeviceDisconnected);
@@ -202,12 +235,21 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         this, &ConfigDialog::onButtonSaveAndClose);
     connect(m_ui->pushButtonResetClose, &QPushButton::clicked,
         this, &ConfigDialog::onButtonResetAndClose);
+    connect(m_buttonPassword, &QPushButton::clicked, this, &ConfigDialog::onButtonPasswordClicked);
+    connect(m_buttonChangePassword, &QPushButton::clicked, this, &ConfigDialog::onButtonChangedPasswordClicked);
+    connect(m_checkBoxChangePassword, &QCheckBox::stateChanged, this, &ConfigDialog::onCheckBoxChangePasswordStateChanged);
+    connect(&m_passwordTimer, &QTimer::timeout, this, &ConfigDialog::onPasswordTimerTimeout);
+    connect(LaserApplication::device, &LaserDevice::manufacturePasswordChangeOk,
+        this, &ConfigDialog::onPasswordChangeOk);
+    connect(LaserApplication::device, &LaserDevice::manufacturePasswordChangeFailed,
+        this, &ConfigDialog::onPasswordChangeFailed);
 
     setWindowTitle(m_windowTitle);
     LaserApplication::device->readUserRegisters();
     LaserApplication::device->readSystemRegisters();
     updatePanelsStatus();
 
+    m_errorCount = 0;
     retranslate();
 }
 
@@ -245,7 +287,25 @@ bool ConfigDialog::isDirty()
 
 void ConfigDialog::onTreeWidgetCatalogueCurrentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
-    setCurrentPanel(m_pages[current]);
+    ConfigItemGroup* group = current->data(0, Qt::UserRole).value<ConfigItemGroup*>();
+    if (group == Config::SystemRegister::group)
+    {
+        // 判断当前密码验证计时器是否正在工作
+        if (m_passwordTimer.isActive())
+        {
+            m_ui->stackedWidgetPanels->setCurrentWidget(m_systemPage);
+            m_passwordTimer.start();
+        }
+        else
+        {
+            m_ui->stackedWidgetPanels->setCurrentWidget(m_passwordPage);
+            showPasswordWidgets(false);
+        }
+    }
+    else
+    {
+        setCurrentPanel(m_pages[current]);
+    }
 }
 
 void ConfigDialog::setCurrentPanel(QWidget * panel)
@@ -395,6 +455,32 @@ void ConfigDialog::keyPressEvent(QKeyEvent* e)
     if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
         return;
     QDialog::keyPressEvent(e);
+}
+
+void ConfigDialog::handlePasswordError()
+{
+    m_errorCount++;
+    // 验证失败
+    QMessageBox dlg(QMessageBox::Warning, tr("Wrong password"), tr(""), QMessageBox::Ok);
+    dlg.setButtonText(QMessageBox::Ok, tr("Ok"));
+    if (m_errorCount < 3)
+    {
+        dlg.setText(tr("Wrong password! You have %1 chances to check password.").arg(3 - m_errorCount));
+    }
+    else
+    {
+        dlg.setText(tr("Too many incorrect passwords, please restart the software and try again."));
+    }
+    dlg.exec();
+}
+
+void ConfigDialog::showPasswordWidgets(bool show)
+{
+    m_labelNewPassword->setVisible(show);
+    m_labelConfirm->setVisible(show);
+    m_editNewPassword->setVisible(show);
+    m_editConfirm->setVisible(show);
+    m_buttonChangePassword->setVisible(show);
 }
 
 void ConfigDialog::onDeviceConnected()
@@ -571,6 +657,101 @@ void ConfigDialog::onButtonResetAndClose(bool checked)
     this->close();
 }
 
+void ConfigDialog::onButtonPasswordClicked(bool checked)
+{
+    if (LaserApplication::device->verifyManufacturePassword(m_editPassword->text(), m_errorCount))
+    {
+        // 验证成功
+        m_passwordTimer.start(10000);
+        m_ui->stackedWidgetPanels->setCurrentWidget(m_systemPage);
+        m_editPassword->clear();
+        m_errorCount = 0;
+    }
+    else
+    {
+        handlePasswordError();
+    }
+}
+
+void ConfigDialog::onCheckBoxChangePasswordStateChanged(int state)
+{
+    showPasswordWidgets(m_checkBoxChangePassword->isChecked());
+}
+
+void ConfigDialog::onButtonChangedPasswordClicked(bool checked)
+{
+    if (LaserApplication::device->verifyManufacturePassword(m_editPassword->text(), m_errorCount))
+    {
+        // 验证成功
+        m_errorCount = 0;
+        QMessageBox dlg(QMessageBox::Warning, tr("Failed"), "", QMessageBox::Ok);
+        dlg.setButtonText(QMessageBox::Ok, tr("Ok"));
+        if (m_editNewPassword->text().length() < 6 || m_editConfirm->text().length() < 6)
+        {
+            dlg.setText(tr("Failed to modify the factory password, the password or confirmation password cannot be less than 6 characters!"));
+            dlg.exec();
+            return;
+        }
+        if (m_editNewPassword->text() == m_editConfirm->text())
+        {
+            if (LaserApplication::device->changeManufacturePassword(
+                m_editPassword->text(),
+                m_editNewPassword->text()
+            ))
+            {
+                m_changingPassword = true;
+            }
+            else
+            {
+                dlg.setText(tr("Failed to modify the factory password, please confirm that the device is connected normally."));
+                dlg.exec();
+                return;
+            }
+        }
+        else
+        {
+            dlg.setText(tr("The new password dose not match the confirmed password!"));
+            dlg.exec();
+            return;
+        }
+    }
+    else
+    {
+        handlePasswordError();
+    }
+}
+
+void ConfigDialog::onPasswordTimerTimeout()
+{
+    m_passwordTimer.stop();
+}
+
+void ConfigDialog::onPasswordChangeOk()
+{
+    if (!m_changingPassword)
+        return;
+
+    QMessageBox dlg(QMessageBox::Information, tr("Successful"), tr("Successfully change password!"),
+        QMessageBox::Ok);
+    dlg.setButtonText(QMessageBox::Ok, tr("Ok"));
+    dlg.exec();
+    m_changingPassword = false;
+
+    showPasswordWidgets(false);
+    m_editPassword->setText("");
+}
+
+void ConfigDialog::onPasswordChangeFailed()
+{
+    if (!m_changingPassword)
+        return;
+
+    QMessageBox dlg(QMessageBox::Warning, tr("Failed"), tr("Failed to modify password!"), QMessageBox::Ok);
+    dlg.setButtonText(QMessageBox::Ok, tr("Ok"));
+    dlg.exec();
+    m_changingPassword = false;
+}
+
 void ConfigDialog::retranslate()
 {
     for (InputWidgetWrapper* wrapper : m_wrappers)
@@ -594,6 +775,13 @@ void ConfigDialog::retranslate()
     m_systemPage->setTabText(1, tr("X"));
     m_systemPage->setTabText(2, tr("Y"));
     m_systemPage->setTabText(3, tr("Z"));
+
+    m_labelPassword->setText(tr("Password"));
+    m_labelNewPassword->setText(tr("New Password"));
+    m_labelConfirm->setText(tr("Confirm Password"));
+    m_buttonPassword->setText(tr("OK"));
+    m_buttonChangePassword->setText(tr("Change Password"));
+    m_checkBoxChangePassword->setText(tr("Change Password"));
 }
 
 void ConfigDialog::onConfigItemUpdated()

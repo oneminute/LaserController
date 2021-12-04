@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QGridLayout>
 #include <QScopedPointer>
+#include <QTimer>
 #include <QMap>
 #include "common/Config.h"
 #include "widget/InputWidgetWrapper.h"
@@ -49,6 +50,10 @@ protected:
     virtual void closeEvent(QCloseEvent* e) override;
     virtual void keyPressEvent(QKeyEvent* e) override;
 
+    void handlePasswordError();
+
+    void showPasswordWidgets(bool show);
+
 protected slots:
     void updateTitle(const QVariant& value = QVariant());
     void onDeviceConnected();
@@ -67,6 +72,14 @@ protected slots:
     void onButtonSaveAndClose(bool checked);
     void onButtonResetAndClose(bool checked);
 
+    void onButtonPasswordClicked(bool checked);
+    void onCheckBoxChangePasswordStateChanged(int state);
+    void onButtonChangedPasswordClicked(bool checked);
+    void onPasswordTimerTimeout();
+
+    void onPasswordChangeOk();
+    void onPasswordChangeFailed();
+
     void retranslate();
 
     void onConfigItemUpdated();
@@ -82,10 +95,25 @@ private:
     QMap<QTreeWidgetItem*, ConfigItemGroup*> m_groups;
     QMap<QTreeWidgetItem*, QGroupBox*> m_groupBoxes;
     QTabWidget* m_systemPage;
+    QWidget* m_passwordPage;
+    QLabel* m_labelPassword;
+    QLabel* m_labelNewPassword;
+    QLabel* m_labelConfirm;
+    QPushButton* m_buttonPassword;
+    QPushButton* m_buttonChangePassword;
+    QLineEdit* m_editPassword;
+    QLineEdit* m_editNewPassword;
+    QLineEdit* m_editConfirm;
+    QCheckBox* m_checkBoxChangePassword;
     bool m_done;
     bool m_closing;
     bool m_needUserRegisterConfirm;
     bool m_needSystemRegisterConfirm;
+    int m_errorCount;
+    bool m_changingPassword;
+
+    QString m_password;
+    QTimer m_passwordTimer;
 };
 
 #endif // CONFIG_DIALOG

@@ -309,8 +309,8 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
-            quint8 bin = pixel >= 128 ? 0 : 0x01;
-            //quint8 bin = pixel >= 128 ? 0 : 0x80;
+            //quint8 bin = pixel >= 128 ? 0 : 0x01;
+            quint8 bin = pixel >= 128 ? 0 : 0x80;
             if (c == 0)
                 lastBin = bin;
             else
@@ -322,8 +322,8 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             rowString.append(QString::number(mat.ptr<quint8>(r)[c] >= 128 ? 0 : 1));
 #endif
             binCheck |= bin;
-            byte = byte | (bin << (c % 8));
-            //byte = byte | (bin >> (c % 8));
+            //byte = byte | (bin << (c % 8));
+            byte = byte | (bin >> (c % 8));
             bitCount++;
             if (bitCount == 8)
             {
