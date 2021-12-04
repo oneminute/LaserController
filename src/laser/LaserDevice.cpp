@@ -541,11 +541,25 @@ QString LaserDevice::apiLibCompileInfo() const
     return "";
 }
 
-bool LaserDevice::verifyManufacturePassword(const QString& password)
+bool LaserDevice::verifyManufacturePassword(const QString& password, int errorCount)
 {
     Q_D(LaserDevice);
-    //return d->driver->checkFactoryPassword(password);
-    return true;
+    if (d->driver)
+    {
+        return d->driver->checkFactoryPassword(password, errorCount);
+    }
+    errorCount = 0;
+    return false;
+}
+
+bool LaserDevice::changeManufacturePassword(const QString& password, const QString& newPassword)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->changeFactoryPassword(password, newPassword);
+    }
+    return false;
 }
 
 MainCardActivateResult LaserDevice::autoActivateMainCard()
@@ -1285,7 +1299,8 @@ void LaserDevice::handleError(int code, const QString& message)
         throw new LaserDeviceSecurityException(code, tr("Input incorrect factory password too many times"));
         break;
     case E_ChangeFactoryPasswordError:
-        throw new LaserDeviceSecurityException(code, tr("Failed to change factory password"));
+        //throw new LaserDeviceSecurityException(code, tr("Failed to change factory password"));
+        emit manufacturePasswordChangeFailed();
         break;
     case E_ReadSysParamFromCardError:
         throw new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
@@ -1511,6 +1526,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_ChangeFactoryPasswordOK:
     {
+        emit manufacturePasswordChangeOk();
         break;
     }
     case M_ReturnTextMsgFromCallback:
