@@ -60,8 +60,8 @@ void PreviewViewer::setZoomValue(qreal zoomScale)
 
 bool PreviewViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
 {
-    const qreal currentZoom = zoomValue();
-    if ((factor < 1 && currentZoom < 0.00001) || (factor > 1 && currentZoom > 58))
+    const qreal currentZoom = zoomValue(); 
+    if ((factor < 1 && currentZoom < 0.0000001) || (factor > 1 && currentZoom > 0.58))
         return false;
     
     QTransform t = transform();
