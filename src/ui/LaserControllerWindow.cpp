@@ -3282,7 +3282,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
                     m_scene->document()->outline(progress);
                     m_scene->document()->setFinishRun(finishRun());
                     m_prepareMachining = false;
-                    m_scene->document()->exportJSON(filename, progress);
+                    m_scene->document()->exportJSON(filename, progress, true);
                     progress->finish();
                 }
             );
@@ -4573,20 +4573,20 @@ void LaserControllerWindow::onCreatSpline()
 	    m_viewer->createSpline();
 }
 
-void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
-//void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
+//void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
+void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
     if (!m_prepareMachining)
         return;
 
-    QFileInfo fileInfo(filename);
-    QString filePath = fileInfo.absoluteFilePath();
-#ifdef Q_OS_WIN
-    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
-    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
-#endif
-    LaserApplication::driver->loadDataFromFile(filePath);
-    //LaserApplication::driver->importData(data.data(), data.size());
+//    QFileInfo fileInfo(filename);
+//    QString filePath = fileInfo.absoluteFilePath();
+//#ifdef Q_OS_WIN
+//    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
+//    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
+//#endif
+//    LaserApplication::driver->loadDataFromFile(filePath);
+    LaserApplication::driver->importData(data.data(), data.size());
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
