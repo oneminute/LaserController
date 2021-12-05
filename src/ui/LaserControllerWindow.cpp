@@ -159,14 +159,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     setDockNestingEnabled(true);
 
     QList<QColor> colors;
-    colors << QColor(Qt::red)
-        << QColor(Qt::blue)
-        << QColor(Qt::darkRed)
+    colors << QColor(Qt::blue)
+        << QColor(Qt::darkGreen)
         << QColor(Qt::darkBlue)
         << QColor(Qt::green)
         << QColor(Qt::cyan)
-        << QColor(Qt::darkGreen)
         << QColor(Qt::darkCyan)
+        << QColor(Qt::red)
+        << QColor(Qt::darkRed)
         << QColor(Qt::magenta)
         << QColor(Qt::yellow)
         << QColor(Qt::darkMagenta)
@@ -996,6 +996,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     qLogD << "main window initialized";
 
     onLayoutChanged(LaserApplication::device->layoutSize());
+
+    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-164000, 39000));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-180000, 30000));
+    m_tablePrintAndCutPoints->addNewLine();
+    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-131000, 76000));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-140000, 60000));
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -4131,7 +4137,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     m_scene->document()->transform(transform);*/
 
     m_scene->document()->setEnablePrintAndCut(true);
-    m_scene->document()->setPrintAndCutTransform(t);
+    m_scene->document()->setTransform(t);
     m_scene->document()->setPrintAndCutPointPairs(pointPairs);
     m_viewer->viewport()->update();
 }
@@ -4139,7 +4145,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 {
     m_scene->document()->setEnablePrintAndCut(false);
-    m_scene->document()->setPrintAndCutTransform(QTransform());
+    m_scene->document()->setTransform(QTransform());
     emit finishPrintAndCutAligning();
     m_viewer->viewport()->update();
 }

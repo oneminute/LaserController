@@ -96,8 +96,8 @@ public:
 
     bool enablePrintAndCut() const;
     void setEnablePrintAndCut(bool value);
-    QTransform printAndCutTransform() const;
-    void setPrintAndCutTransform(const QTransform& t);
+    QTransform transform() const;
+    void setTransform(const QTransform& t);
     //QList<QPointF> printAndCutCanvasPoints() const;
     PointPairList printAndCutPointPairs() const;
     void setPrintAndCutPointPairs(const PointPairList& pairs);

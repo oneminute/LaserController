@@ -143,6 +143,8 @@ public:
     /// <returns></returns>
     QPointF currentOrigin() const;
 
+    bool isAbsolute() const;
+
     void batchParse(const QString& raw, bool isSystem, bool isConfirmed);
 
     LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;

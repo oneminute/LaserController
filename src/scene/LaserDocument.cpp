@@ -56,7 +56,7 @@ public:
     SizeUnit unit;
 
     bool enablePrintAndCut;
-    QTransform printAndCutTransform;
+    QTransform transform;
     PointPairList pointPairs;
 
     QMap<LaserPrimitiveType, int> typeMax;
@@ -212,7 +212,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QJsonObject jsonObj;
 
-    QTransform transformPrintAndCut = enablePrintAndCut() ? printAndCutTransform() : QTransform();
+    QTransform transformPrintAndCut = enablePrintAndCut() ? transform() : QTransform();
     QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
     {
@@ -445,7 +445,7 @@ void LaserDocument::exportBoundingJSON()
     QFile saveFile("tmp/bounding.json");
     QJsonObject jsonObj;
 
-    QTransform t = enablePrintAndCut() ? printAndCutTransform() : QTransform();
+    QTransform t = enablePrintAndCut() ? transform() : QTransform();
     QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
     {
@@ -798,16 +798,16 @@ void LaserDocument::setEnablePrintAndCut(bool value)
     d->enablePrintAndCut = value;
 }
 
-QTransform LaserDocument::printAndCutTransform() const
+QTransform LaserDocument::transform() const
 {
     Q_D(const LaserDocument);
-    return d->printAndCutTransform;
+    return d->transform;
 }
 
-void LaserDocument::setPrintAndCutTransform(const QTransform& t)
+void LaserDocument::setTransform(const QTransform& t)
 {
     Q_D(LaserDocument);
-    d->printAndCutTransform = t;
+    d->transform = t;
 }
 
 PointPairList LaserDocument::printAndCutPointPairs() const

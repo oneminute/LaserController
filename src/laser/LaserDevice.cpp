@@ -991,6 +991,14 @@ QPointF LaserDevice::currentOrigin() const
     return origin;
 }
 
+bool LaserDevice::isAbsolute() const
+{
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords ||
+        StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+        return true;
+    return false;
+}
+
 void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed)
 {
     Q_D(LaserDevice);

@@ -155,9 +155,22 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QRectF bounds = boundingRect();
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = QPoint(bounds.left() + bounds.width(), bounds.top() + bounds.height()) + QPointF(2, 2);
-    bounds = QRectF(topLeft, bottomRight);
+    QRectF selectionBounds = QRectF(topLeft, bottomRight);
 	QColor color = Qt::blue;
     QPen pen(color, 1, Qt::DashLine);
+
+    QPainterPath outline = this->outline();
+    QPointF startPos = outline.pointAtPercent(0);
+    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
+    if (Config::Debug::showPrimitiveName())
+    {
+        painter->drawText(startPos, name());
+        QColor color = Qt::blue;
+        QPen pen(color, 1, Qt::DashLine);
+        painter->drawRect(bounds);
+    }
+    if (Config::Debug::showPrimitiveFirstPoint())
+        painter->drawEllipse(startPos, 2, 2);
 
     if (d->layer)
     {
@@ -183,7 +196,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         }
         painter->setPen(pen);
         if (name == "LaserBitmap") {
-            painter->drawRect(bounds);
+            painter->drawRect(selectionBounds);
         }
 	}
     else
@@ -192,30 +205,22 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		pen.setCosmetic(true);
 		painter->setPen(pen);
     }
-	
-    if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
-    {
-        QTransform t = document()->printAndCutTransform();
-        QTransform rotation(t.m11(), t.m12(), t.m21(), t.m22(), 0, 0);
-        QTransform translate = QTransform::fromTranslate(
-            Global::mechToSceneHF(t.dx()),
-            Global::mechToSceneVF(t.dy()));
-        //QTransform pacTransform = rotation * translate;
-        QTransform current = painter->transform();
-        QTransform currentTrans = QTransform::fromTranslate(current.dx(), current.dy());
-        QTransform pacTransform = current* currentTrans.inverted()* rotation* currentTrans* translate;
-        //painter->setTransform(pacTransform);
-    }
-    draw(painter);
 
-    QPainterPath outline = this->outline();
-
-    QPointF startPos = outline.pointAtPercent(0);
-    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
-    if (Config::Debug::showPrimitiveName())
-        painter->drawText(startPos, name());
-    if (Config::Debug::showPrimitiveFirstPoint())
-        painter->drawEllipse(startPos, 2, 2);
+    //if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+    //{
+    //    QPointF center = d->boundingRect.center();
+    //    QTransform sceneInverted = sceneTransform().inverted();
+    //    QTransform transformInverted = transform().inverted();
+    //    QTransform t;
+    //    t *= document()->transform();
+    //    t *= sceneInverted;
+    //    t *= transformInverted;
+    //    //t *= QTransform::fromTranslate(-center.x(), -center.y());
+    //    //t *= QTransform::fromTranslate(center.x(), center.y());
+    //    t *= painter->transform();
+    //    painter->setTransform(t);
+    //}
+    draw(painter); 
 }
 
 int LaserPrimitive::layerIndex()
@@ -275,7 +280,14 @@ QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
 QRectF LaserPrimitive::boundingRect() const
 {
     Q_D(const LaserPrimitive);
-	return d->boundingRect;
+    /*QPointF center = d->boundingRect.center();
+    QTransform t;
+    t = sceneTransform().inverted();
+    t *= QTransform::fromTranslate(-center.x(), -center.y());
+    t *= document()->transform();
+    t *= QTransform::fromTranslate(center.x(), center.y());
+	return t.mapRect(d->boundingRect);*/
+    return d->boundingRect;
 }
 
 QRect LaserPrimitive::sceneBoundingRect() const
