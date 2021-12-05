@@ -2691,7 +2691,7 @@
     <message>
         <location line="+78"/>
         <source>System Default</source>
-        <translation>恢复系统默认值</translation>
+        <translation>恢复出厂设置</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2733,18 +2733,20 @@
     </message>
     <message>
         <location line="+34"/>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
         <source>Reload</source>
-        <translation>重新加载</translation>
+        <translation type="vanished">重新加载</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save &amp;&amp; Close</source>
-        <translation>保存并关闭</translation>
+        <translation type="vanished">保存并关闭</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Reset &amp;&amp; Close</source>
-        <translation>重置并关闭</translation>
+        <translation type="vanished">重置并关闭</translation>
     </message>
     <message>
         <source>Internationalization</source>
@@ -3016,7 +3018,7 @@
         <translation type="vanished">原厂商密码不正确！</translation>
     </message>
     <message>
-        <location filename="../src/ui/ConfigDialog.ui" line="-28"/>
+        <location filename="../src/ui/ConfigDialog.ui" line="-14"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
@@ -6161,12 +6163,12 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">文档已保存。</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+45"/>
         <source>Export Json</source>
         <translation>导出JSON文件</translation>
     </message>
     <message>
-        <location line="+195"/>
+        <location line="+205"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
@@ -10490,7 +10492,7 @@ Do you want to delete it anyway?</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-940"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-950"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>

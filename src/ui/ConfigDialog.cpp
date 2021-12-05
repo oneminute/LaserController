@@ -229,10 +229,10 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         this, &ConfigDialog::onButtonSave);
     connect(m_ui->pushButtonReset, &QPushButton::clicked,
         this, &ConfigDialog::onButtonReset);
-    connect(m_ui->pushButtonReload, &QPushButton::clicked,
-        this, &ConfigDialog::onButtonReload);
-    connect(m_ui->pushButtonSaveClose, &QPushButton::clicked,
-        this, &ConfigDialog::onButtonSaveAndClose);
+    //connect(m_ui->pushButtonReload, &QPushButton::clicked,
+        //this, &ConfigDialog::onButtonReload);
+    //connect(m_ui->pushButtonSaveClose, &QPushButton::clicked,
+        //this, &ConfigDialog::onButtonSaveAndClose);
     connect(m_ui->pushButtonResetClose, &QPushButton::clicked,
         this, &ConfigDialog::onButtonResetAndClose);
     connect(m_buttonPassword, &QPushButton::clicked, this, &ConfigDialog::onButtonPasswordClicked);
