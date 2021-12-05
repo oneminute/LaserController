@@ -1350,7 +1350,7 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         m_fontSpaceY->setValue(spaceY);
 
         m_viewer->textFont()->setFamily(font.family());
-        m_viewer->textFont()->setPixelSize(font.pixelSize() * 25400.0 / m_viewer->logicalDpiY());
+        m_viewer->textFont()->setPixelSize(font.pixelSize());
         m_viewer->textFont()->setBold(bold);
         m_viewer->textFont()->setItalic(italic);
         m_viewer->textFont()->setCapitalization(capitalization);

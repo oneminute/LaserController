@@ -935,8 +935,9 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
     QPoint global = QCursor::pos();
     QPointF mousePoint = mapToScene(mapFromGlobal(global));
     bool isInAllPathBound = false;
-    qreal extend = Global::mmToSceneHF(10.0);
+    qreal extend = 10.0 * 1000;
     QFontMetrics fontMetrics(m_textFont);
+    qDebug() << m_textFont.pixelSize();
     
     //先遍历整个外框
     for (LaserPrimitive* primitive : m_scene->document()->primitives().values()) {
