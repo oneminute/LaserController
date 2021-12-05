@@ -2150,17 +2150,7 @@
     </message>
     <message>
         <location filename="../src/ui/ConfigDialog.ui" line="172"/>
-        <source>Reload</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ConfigDialog.ui" line="179"/>
-        <source>Save &amp;&amp; Close</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/ConfigDialog.ui" line="186"/>
-        <source>Reset &amp;&amp; Close</source>
+        <source>Close</source>
         <translation></translation>
     </message>
     <message>
@@ -4817,37 +4807,37 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="229"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="228"/>
         <source>Export Json</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="424"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="433"/>
         <source>Done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="881"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="890"/>
         <source>Clear tree</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="882"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="891"/>
         <source>Outline by layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1217"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1226"/>
         <source>Warning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1218"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1227"/>
         <source>Found unavailable primitives, count is %1. These primitives will not be loaded.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1259"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1268"/>
         <source>Untitled</source>
         <translation></translation>
     </message>
@@ -5529,17 +5519,17 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="319"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="318"/>
         <source>%1 Engraving</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="349"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="348"/>
         <source>%1 Points to Plt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="360"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="359"/>
         <source>%1 Lines to Plt</source>
         <translation></translation>
     </message>
