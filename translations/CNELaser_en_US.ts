@@ -2347,7 +2347,7 @@
     <message>
         <location filename="../src/ui/ConfigDialog.cpp" line="781"/>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/ConfigDialog.cpp" line="782"/>
@@ -3001,7 +3001,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="372"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="374"/>
         <source>Bitmap</source>
         <translation></translation>
     </message>
@@ -5178,7 +5178,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="453"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="455"/>
         <source>Text</source>
         <translation></translation>
     </message>

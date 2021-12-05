@@ -2994,7 +2994,7 @@
     <message>
         <location line="+1"/>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>确认密码</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3963,7 +3963,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="+372"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="+374"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>

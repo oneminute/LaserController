@@ -281,8 +281,8 @@ protected slots:
     void onUserOriginRadioButtonChanged(bool checked);
 
 	void onCreatSpline();
-    void onDocumentExportFinished(const QString& filename);
-    //void onDocumentExportFinished(const QByteArray& data);
+    //void onDocumentExportFinished(const QString& filename);
+    void onDocumentExportFinished(const QByteArray& data);
 
     void onPreviewWindowProgressUpdated(qreal progress);
     void onUserOriginConfigValueChanged(const QVariant& index, void* senderPtr);

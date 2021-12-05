@@ -182,7 +182,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     QGridLayout* passwordLayout = new QGridLayout;
     m_labelPassword = new QLabel(m_passwordPage);
     if (Config::General::language() == QLocale::Chinese)
-        m_labelPassword->setMinimumWidth(45);
+        m_labelPassword->setMinimumWidth(60);
     else
         m_labelPassword->setMinimumWidth(80);
     m_labelNewPassword = new QLabel(m_passwordPage);

@@ -202,7 +202,7 @@ QString LaserDocument::newLayerName() const
     return name;
 }
 
-void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProgress)
+void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProgress, bool exportJson)
 {
     Q_D(LaserDocument);
 
@@ -210,7 +210,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     optimizer.optimize(parentProgress);
     PathOptimizer::Path path = optimizer.optimizedPath();
 
-    QFile saveFile(filename);
     QJsonObject jsonObj;
 
     QTransform transformPrintAndCut = enablePrintAndCut() ? printAndCutTransform() : QTransform();
@@ -411,21 +410,30 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QJsonDocument jsonDoc(jsonObj);
 
-    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    QByteArray rawJson;
+
+    if (exportJson)
     {
-        qWarning("Couldn't open save file.");
-        return;
+        rawJson = jsonDoc.toJson(QJsonDocument::Indented);
+        QFile saveFile(filename);
+        if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+        {
+            qWarning("Couldn't open save file.");
+            return;
+        }
+        qint64 writtenBytes = saveFile.write(rawJson);
+        qDebug() << "written bytes:" << writtenBytes;
+        saveFile.close();
+    }
+    else
+    {
+        rawJson = jsonDoc.toJson(QJsonDocument::Compact);
     }
 
-    QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
-    qint64 writtenBytes = saveFile.write(rawJson);
-    qDebug() << "written bytes:" << writtenBytes;
-
     LaserApplication::previewWindow->addMessage(tr("Done"));
-    saveFile.close();
     exportProgress->finish();
-    emit exportFinished(filename);
-    //emit exportFinished(rawJson);
+    //emit exportFinished(filename);
+    emit exportFinished(rawJson);
 }
 
 void LaserDocument::exportBoundingJSON()
@@ -598,12 +606,13 @@ void LaserDocument::exportBoundingJSON()
         return;
     }
 
-    QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Indented);
-    qint64 writtenBytes = saveFile.write(rawJson);
-    qDebug() << "written bytes:" << writtenBytes;
+    QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
+    //qint64 writtenBytes = saveFile.write(rawJson);
+    //qDebug() << "written bytes:" << writtenBytes;
 
     saveFile.close();
     //emit exportFinished(filename);
+    emit exportFinished(rawJson);
 }
 
 bool LaserDocument::isOpened() const
