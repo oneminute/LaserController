@@ -108,16 +108,17 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (scene()->document())
         {
             // 绘制填充和雕刻外包框
-            QRect rect = scene()->document()->absoluteDocBoundingRect(true);
-            if (rect.isValid())
+            QRect accRect = scene()->document()->absoluteDocBoundingRect(true);
+            QRect rect = scene()->document()->absoluteDocBoundingRect();
+
+            if (accRect.isValid() && accRect != rect)
             {
                 painter.setPen(QPen(Qt::green, 1, Qt::DashLine));
-                QPolygon gridBounds = mapFromScene(rect);
+                QPolygon gridBounds = mapFromScene(accRect);
                 painter.drawPolygon(gridBounds);
             }
 
             // 绘制文档外包框
-            rect = scene()->document()->absoluteDocBoundingRect();
             if (rect.isValid())
             {
                 painter.setPen(QPen(Qt::darkGray, 1, Qt::DashLine));
