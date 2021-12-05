@@ -87,6 +87,7 @@ private:
     typedef int(__stdcall* FN_INT_WCHART_WCHART_INT)(wchar_t*, wchar_t*, int);
 
     typedef int(__stdcall* FN_INT_BYTEPTR_INT)(char*, int);
+    typedef bool(__stdcall* FN_BOOL_WCHART_INTREF)(wchar_t*, int* errorCount);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
@@ -127,7 +128,7 @@ public:
     void closeAboutWindow();
     QString getLaserLibraryInfo();
     void setFactoryType(const QString& factory);
-    //bool checkFactoryPassword(const QString& password);
+    bool checkFactoryPassword(const QString& password, int& errorCount);
     bool changeFactoryPassword(const QString& oldPassword, const QString& newPassword);
     void lPenMoveToOriginalPoint(double speed);
     void lPenQuickMoveTo(
@@ -275,8 +276,8 @@ private:
     FN_VOID_VOID m_fnCloseAboutWindow;
     FN_VOID_VOID m_fnGetLaserLibInfo;
     FN_VOID_WCHART m_fnSetFactoryType;
-    //FN_INT_WCHART m_fnCheckFactoryPassword;
-    FN_INT_WCHART_WCHART m_fnWriteFactoryPassword;
+    FN_BOOL_WCHART_INTREF m_fnCheckFactoryPassword;
+    FN_INT_WCHART_WCHART m_fnChangeFactoryPassword;
 
     FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;
     FNLPenQuickMoveTo m_fnLPenQuickMoveTo;

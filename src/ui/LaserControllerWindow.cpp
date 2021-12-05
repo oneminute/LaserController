@@ -2063,39 +2063,51 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->setColumnStretch(5, 0);
     firstRow->setColumnStretch(6, 1);
 
+    int w = 40;
+    int h = 40;
+    QSize fixedSize(w, h);
     m_buttonMoveTopLeft = new PressedToolButton;
+    m_buttonMoveTopLeft->setFixedSize(fixedSize);
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
 
     m_buttonMoveTop = new PressedToolButton;
+    m_buttonMoveTop->setFixedSize(fixedSize);
     m_buttonMoveTop->setDefaultAction(m_ui->actionMoveTop);
 
     m_buttonMoveTopRight = new PressedToolButton;
+    m_buttonMoveTopRight->setFixedSize(fixedSize);
     m_buttonMoveTopRight->setDefaultAction(m_ui->actionMoveTopRight);
 
     m_buttonMoveLeft = new PressedToolButton;
+    m_buttonMoveLeft->setFixedSize(fixedSize);
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
-    m_buttonMoveToOrigin = new QToolButton;
+    m_buttonMoveToOrigin = new PressedToolButton;
+    m_buttonMoveToOrigin->setFixedSize(fixedSize);
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
     m_buttonMoveRight = new PressedToolButton;
+    m_buttonMoveRight->setFixedSize(fixedSize);
     m_buttonMoveRight->setDefaultAction(m_ui->actionMoveRight);
 
     m_buttonMoveBottomLeft = new PressedToolButton;
+    m_buttonMoveBottomLeft->setFixedSize(fixedSize);
     m_buttonMoveBottomLeft->setDefaultAction(m_ui->actionMoveBottomLeft);
 
     m_buttonMoveBottom = new PressedToolButton;
+    m_buttonMoveBottom->setFixedSize(fixedSize);
     m_buttonMoveBottom->setDefaultAction(m_ui->actionMoveBottom);
 
     m_buttonMoveBottomRight = new PressedToolButton;
+    m_buttonMoveBottomRight->setFixedSize(fixedSize);
     m_buttonMoveBottomRight->setDefaultAction(m_ui->actionMoveBottomRight);
 
     m_buttonMoveUp = new PressedToolButton;
-    m_buttonMoveUp->setAutoRepeat(true);
+    m_buttonMoveUp->setFixedSize(fixedSize);
     m_buttonMoveUp->setDefaultAction(m_ui->actionMoveUp);
 
     m_buttonMoveDown = new PressedToolButton;
-    m_buttonMoveDown->setAutoRepeat(true);
+    m_buttonMoveDown->setFixedSize(fixedSize);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
 
     m_buttonShowLaserPosition = new QToolButton;
@@ -2105,19 +2117,21 @@ void LaserControllerWindow::createMovementDockPanel()
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
-    secondRow->addWidget(m_buttonMoveTopLeft, 0, 0);
-    secondRow->addWidget(m_buttonMoveTop, 0, 1);
-    secondRow->addWidget(m_buttonMoveTopRight, 0, 2);
-    secondRow->addWidget(m_buttonMoveUp, 0, 3);
-    secondRow->addWidget(m_buttonMoveLeft, 1, 0);
-    secondRow->addWidget(m_buttonMoveToOrigin, 1, 1);
-    secondRow->addWidget(m_buttonMoveRight, 1, 2);
-    secondRow->addWidget(m_buttonMoveBottomLeft, 2, 0);
-    secondRow->addWidget(m_buttonMoveBottom, 2, 1);
-    secondRow->addWidget(m_buttonMoveBottomRight, 2, 2);
-    secondRow->addWidget(m_buttonMoveDown, 2, 3);
-    secondRow->addWidget(m_buttonShowLaserPosition, 3, 0, 1, 2);
-    secondRow->addWidget(m_buttonHideLaserPosition, 3, 2, 1, 2);
+    secondRow->addWidget(m_buttonMoveTopLeft, 0, 1);
+    secondRow->addWidget(m_buttonMoveTop, 0, 2);
+    secondRow->addWidget(m_buttonMoveTopRight, 0, 3);
+    secondRow->addWidget(m_buttonMoveUp, 0, 4);
+    secondRow->addWidget(m_buttonMoveLeft, 1, 1);
+    secondRow->addWidget(m_buttonMoveToOrigin, 1, 2);
+    secondRow->addWidget(m_buttonMoveRight, 1, 3);
+    secondRow->addWidget(m_buttonMoveBottomLeft, 2, 1);
+    secondRow->addWidget(m_buttonMoveBottom, 2, 2);
+    secondRow->addWidget(m_buttonMoveBottomRight, 2, 3);
+    secondRow->addWidget(m_buttonMoveDown, 2, 4);
+    secondRow->addWidget(m_buttonShowLaserPosition, 3, 1, 1, 2);
+    secondRow->addWidget(m_buttonHideLaserPosition, 3, 3, 1, 2);
+    secondRow->setColumnStretch(0, 1);
+    secondRow->setColumnStretch(5, 1);
 
     m_radioButtonUserOrigin1 = new QRadioButton(tr("User Origin 1"));
     m_radioButtonUserOrigin2 = new QRadioButton(tr("User Origin 2"));
@@ -3268,7 +3282,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
                     m_scene->document()->outline(progress);
                     m_scene->document()->setFinishRun(finishRun());
                     m_prepareMachining = false;
-                    m_scene->document()->exportJSON(filename, progress);
+                    m_scene->document()->exportJSON(filename, progress, true);
                     progress->finish();
                 }
             );
@@ -4559,20 +4573,20 @@ void LaserControllerWindow::onCreatSpline()
 	    m_viewer->createSpline();
 }
 
-void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
-//void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
+//void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
+void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
     if (!m_prepareMachining)
         return;
 
-    QFileInfo fileInfo(filename);
-    QString filePath = fileInfo.absoluteFilePath();
-#ifdef Q_OS_WIN
-    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
-    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
-#endif
-    LaserApplication::driver->loadDataFromFile(filePath);
-    //LaserApplication::driver->importData(data.data(), data.size());
+//    QFileInfo fileInfo(filename);
+//    QString filePath = fileInfo.absoluteFilePath();
+//#ifdef Q_OS_WIN
+//    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
+//    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
+//#endif
+//    LaserApplication::driver->loadDataFromFile(filePath);
+    LaserApplication::driver->importData(data.data(), data.size());
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)

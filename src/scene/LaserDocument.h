@@ -118,7 +118,7 @@ protected:
     void removePrimitive(LaserPrimitive* item);
 
 public slots:
-    void exportJSON(const QString& filename, ProgressItem* parentProgress);
+    void exportJSON(const QString& filename, ProgressItem* parentProgress, bool exportJson = false);
     void exportBoundingJSON();
     void updateLayersStructure();
     void destroy();
@@ -153,8 +153,8 @@ signals:
     void opened();
     void closed();
     void outlineUpdated();
-    void exportFinished(const QString& filename);
-    //void exportFinished(const QByteArray& data);
+    //void exportFinished(const QString& filename);
+    void exportFinished(const QByteArray& data);
 
 protected:
     Q_DISABLE_COPY(LaserDocument)

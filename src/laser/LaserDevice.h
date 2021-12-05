@@ -62,7 +62,8 @@ public:
     QString apiLibVersion() const;
     QString apiLibCompileInfo() const;
 
-    bool verifyManufacturePassword(const QString& password);
+    bool verifyManufacturePassword(const QString& password, int errorCount);
+    bool changeManufacturePassword(const QString& password, const QString& newPassword);
 
     MainCardActivateResult autoActivateMainCard();
     bool sendAuthenticationEmail(const QString& email);
@@ -207,6 +208,8 @@ signals:
     void mainCardActivationChanged(bool activated);
     void mainCardInfoFetched();
     void manufacturePasswordVerified(bool pass);
+    void manufacturePasswordChangeFailed();
+    void manufacturePasswordChangeOk();
     void workStateUpdated(DeviceState state);
     void layoutChanged(const QSize& size);
     void systemRegistersConfirmed();
