@@ -4441,12 +4441,11 @@ void LaserViewer::zoomOut()
 
 void LaserViewer::resetZoom()
 {
-    if (!qFuzzyCompare(zoomValue(), qreal(1))) {
-        //resetTransform();
+    //if (!qFuzzyCompare(zoomValue(), qreal(1))) {
 		setTransform(QTransform());
-		setZoomValue(1);//zoomBy()中更新网格和标尺
-        //emit zoomChanged(mapFromScene(m_scene->backgroundItem()->QGraphicsItemGroup::pos()));
-    }
+		setZoomValue(adapterViewScale());//zoomBy()中更新网格和标尺
+        
+    //}
 }
 
 void LaserViewer::zoomToSelection()

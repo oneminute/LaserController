@@ -213,6 +213,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonAlignCenter = new LaserToolButton(this);
     m_arrangeButtonAlignHorinzontal = new LaserToolButton(this);
     m_arrangeButtonAlignVertical = new LaserToolButton(this);
+    m_arrangeButtonSameWidth = new LaserToolButton(this);
+    m_arrangeButtonSameHeight = new LaserToolButton(this);
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -259,11 +261,36 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         initAlignTarget();
         m_viewer->viewport()->repaint();
     });
+    //same width
+    m_arrangeButtonSameWidth->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonSameWidth->setIcon(QIcon(":/ui/icons/images/same_width.png"));
+    LaserMenu* sWMenu = new LaserMenu(m_arrangeButtonSameWidth);
+    sWMenu->addAction(m_ui->actionSameWidth);
+    m_arrangeButtonSameWidth->setMenu(sWMenu);
+    connect(sWMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+    //same height
+    m_arrangeButtonSameHeight->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonSameHeight->setIcon(QIcon(":/ui/icons/images/same_height.png"));
+    LaserMenu* sHMenu = new LaserMenu(m_arrangeButtonSameHeight);
+    sHMenu->addAction(m_ui->actionSameHeight);
+    m_arrangeButtonSameHeight->setMenu(sHMenu);
+    connect(sHMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+
     m_arrangeButtonAlignCenter->connect(m_arrangeButtonAlignCenter,
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
     m_arrangeButtonAlignVertical->connect(m_arrangeButtonAlignVertical, 
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
     m_arrangeButtonAlignHorinzontal->connect(m_arrangeButtonAlignHorinzontal,
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
+    m_arrangeButtonSameWidth->connect(m_arrangeButtonSameWidth,
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
+    m_arrangeButtonSameHeight->connect(m_arrangeButtonSameHeight,
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
 
     m_ui->toolBarTools->addWidget(toolButtonSelectionTool);
@@ -279,9 +306,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignCenter);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignHorinzontal);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignVertical);
+    m_ui->arrangeBar->addWidget(m_arrangeButtonSameWidth);
+    m_ui->arrangeBar->addWidget(m_arrangeButtonSameHeight);
     m_arrangeButtonAlignCenter->setEnabled(false);
     m_arrangeButtonAlignHorinzontal->setEnabled(false);
     m_arrangeButtonAlignVertical->setEnabled(false);
+    m_arrangeButtonSameWidth->setEnabled(false);
+    m_arrangeButtonSameHeight->setEnabled(false);
     // init status bar
     m_statusBarDeviceStatus = new QLabel;
     m_statusBarDeviceStatus->setText(ltr("Tips"));
@@ -888,6 +919,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionAlignVerticalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalMiddle);
     connect(m_ui->actionAlignVerticalLeft, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalLeft);
     connect(m_ui->actionAlignVerticalRight, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalRight);
+    connect(m_ui->actionSameWidth, &QAction::triggered, this, &LaserControllerWindow::onActionSameWidth);
+    connect(m_ui->actionSameHeight, &QAction::triggered, this, &LaserControllerWindow::onActionSameHeight);
 
     //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
     //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
@@ -1122,6 +1155,8 @@ void LaserControllerWindow::changeAlignButtonsEnable()
         m_arrangeButtonAlignCenter->setEnabled(true);
         m_arrangeButtonAlignHorinzontal->setEnabled(true);
         m_arrangeButtonAlignVertical->setEnabled(true);
+        m_arrangeButtonSameWidth->setEnabled(true);
+        m_arrangeButtonSameHeight->setEnabled(true);
         //align
         int notJoinedSize = 0;
         for (QGraphicsItem* item : items) {
@@ -1137,6 +1172,8 @@ void LaserControllerWindow::changeAlignButtonsEnable()
                     m_arrangeButtonAlignCenter->setEnabled(false);
                     m_arrangeButtonAlignHorinzontal->setEnabled(false);
                     m_arrangeButtonAlignVertical->setEnabled(false);
+                    m_arrangeButtonSameWidth->setEnabled(false);
+                    m_arrangeButtonSameHeight->setEnabled(false);
                     break;
                 }
                 else {
@@ -1152,6 +1189,8 @@ void LaserControllerWindow::changeAlignButtonsEnable()
         m_arrangeButtonAlignCenter->setEnabled(false);
         m_arrangeButtonAlignHorinzontal->setEnabled(false);
         m_arrangeButtonAlignVertical->setEnabled(false);
+        m_arrangeButtonSameWidth->setEnabled(false);
+        m_arrangeButtonSameHeight->setEnabled(false);
     }
     
 }
@@ -5128,6 +5167,18 @@ void LaserControllerWindow::onActionAlignVerticalLeft()
 void LaserControllerWindow::onActionAlignVerticalRight()
 {
     ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignRight);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionSameWidth()
+{
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, ArrangeType::AT_SameWidth);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionSameHeight()
+{
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, ArrangeType::AT_SameHeight);
     m_viewer->undoStack()->push(cmd);
 }
 

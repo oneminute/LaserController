@@ -106,5 +106,15 @@
         <file>images/distribute_verticalSpace.png</file>
         <file>images/distribute_horizontalCenter.png</file>
         <file>images/distribute_verticalCenter.png</file>
+        <file>images/same_width.png</file>
+        <file>images/page_center.png</file>
+        <file>images/page_top.png</file>
+        <file>images/page_left.png</file>
+        <file>images/page_bottom.png</file>
+        <file>images/page_right.png</file>
+        <file>images/page_topLeft.png</file>
+        <file>images/page_topRight.png</file>
+        <file>images/page_bottomRight.png</file>
+        <file>images/page_bottomLeft.png</file>
     </qresource>
 </RCC>
