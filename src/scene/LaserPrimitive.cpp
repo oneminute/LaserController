@@ -206,20 +206,20 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(pen);
     }
 
-    //if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
-    //{
-    //    QPointF center = d->boundingRect.center();
-    //    QTransform sceneInverted = sceneTransform().inverted();
-    //    QTransform transformInverted = transform().inverted();
-    //    QTransform t;
-    //    t *= document()->transform();
-    //    t *= sceneInverted;
-    //    t *= transformInverted;
-    //    //t *= QTransform::fromTranslate(-center.x(), -center.y());
-    //    //t *= QTransform::fromTranslate(center.x(), center.y());
-    //    t *= painter->transform();
-    //    painter->setTransform(t);
-    //}
+    if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+    {
+        QPointF center = d->boundingRect.center();
+        QTransform sceneInverted = sceneTransform().inverted();
+        QTransform transformInverted = transform().inverted();
+        QTransform t;
+        //t *= QTransform::fromTranslate(-center.x(), -center.y());
+        t *= document()->transform();
+        //t *= sceneInverted;
+        //t *= transformInverted;
+        //t *= QTransform::fromTranslate(center.x(), center.y());
+        t *= painter->transform();
+        //painter->setTransform(t);
+    }
     draw(painter); 
 }
 
@@ -1029,7 +1029,6 @@ void LaserRect::draw(QPainter* painter)
 {
     Q_D(LaserRect);
     painter->drawPath(d->path);
-    //painter->drawRect(d->boundingRect);
 }
 
 LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress)
@@ -2089,7 +2088,13 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
 
     parentProgress->setMaximum(2);
     QImage srcImage = d->image.copy();
-    QImage outImage = srcImage.transformed(sceneTransform(), Qt::SmoothTransformation);
+    QImage rotated = srcImage.transformed(sceneTransform(), Qt::SmoothTransformation);
+    QImage outImage(rotated.size(), QImage::Format_ARGB32);;
+    outImage.fill(Qt::white);
+    QPainter p(&outImage);
+    p.begin(&outImage);
+    p.drawImage(0, 0, rotated);
+    p.end();
     outImage = outImage.convertToFormat(QImage::Format_Grayscale8);
     QRect boundingRect = sceneBoundingRect();
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
@@ -2296,11 +2301,11 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     QPainterPath path = sceneTransform().map(d->path);
     QRect boundingRectInDevice = path.boundingRect().toRect();
     qreal ratio = boundingRectInDevice.width() * 1.0 / boundingRectInDevice.height();
-    int canvasWidth = qMin(boundingRectInDevice.width(), 1000);
+    int canvasWidth = qMin(boundingRectInDevice.width(), 16384);
     int canvasHeight = qRound(canvasWidth / ratio);
     if (ratio < 1)
     {
-        canvasHeight = qMin(boundingRectInDevice.height(), 1000);
+        canvasHeight = qMin(boundingRectInDevice.height(), 16384);
         canvasWidth = qRound(canvasHeight * ratio);
     }
 
@@ -2314,6 +2319,11 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     t = QTransform::fromTranslate(-boundingRect.x(), -boundingRect.y());
     path = t.map(path);
     QImage canvas(boundingRect.width(), boundingRect.height(), QImage::Format_Grayscale8);
+    if (canvas.isNull())
+    {
+        progress->finish();
+        return QByteArray();
+    }
     canvas.fill(Qt::white);
     QPainter painter(&canvas);
     painter.setBrush(Qt::black);
@@ -2330,7 +2340,7 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     int outWidth = pixelWidth;
     int outHeight = qCeil(boundingRectInDevice.height() * 1.0 / pixelInterval);
     cv::Mat resized;
-    cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_NEAREST);
+    cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_CUBIC);
 
     cv::imwrite("tmp/" + name().toStdString() + "_resized.png", resized);
 
