@@ -277,6 +277,9 @@ bool LaserDriver::load()
     m_fnImportData = (FN_INT_BYTEPTR_INT)m_library.resolve("ImportData");
     CHECK_FN(m_fnImportData)
 
+    m_fnLPenMoveToOriginalPointZ = (FN_VOID_INT)m_library.resolve("LPenMoveToOriginalPointZ");
+    CHECK_FN(m_fnLPenMoveToOriginalPointZ)
+
     Q_ASSERT(m_fnLoadDataFromFile);
 
     m_isLoaded = true;
@@ -903,6 +906,11 @@ void LaserDriver::startSoftUpdateWizard()
 void LaserDriver::startFirmwareUpdateWizard()
 {
     m_fnStartFirmwareUpdateWizard();
+}
+
+void LaserDriver::lPenMoveToOriginalPointZ(int moveTo)
+{
+    m_fnLPenMoveToOriginalPointZ(moveTo);
 }
 
 QString LaserDriver::registeMainCard(const QString& registeCode)

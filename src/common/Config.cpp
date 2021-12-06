@@ -605,6 +605,7 @@ void Config::loadFillingLayerItems()
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+    runSpeed->setVisible(false);
 
     ConfigItem* minPower= group->addConfigItem(
         "minPower",
@@ -617,18 +618,20 @@ void Config::loadFillingLayerItems()
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
+    minPower->setVisible(false);
 
     ConfigItem* maxPower= group->addConfigItem(
         "maxPower",
         120,
         DT_INT
     );
-    minPower->setInputWidgetType(IWT_FloatEditSlider);
-    minPower->setInputWidgetProperty("step", 0.1);
+    maxPower->setInputWidgetType(IWT_FloatEditSlider);
+    maxPower->setInputWidgetProperty("step", 0.1);
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
+    maxPower->setVisible(false);
 
     ConfigItem* rowInterval = group->addConfigItem(
         "rowInterval",
@@ -638,6 +641,7 @@ void Config::loadFillingLayerItems()
     rowInterval->setInputWidgetProperty("minimum", 0);
     rowInterval->setInputWidgetProperty("maximum", 1000);
     rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
+    rowInterval->setVisible(false);
 
     ConfigItem* enableCutting = group->addConfigItem(
         "enableCutting",
@@ -665,6 +669,7 @@ void Config::loadFillingLayerItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+    fillingType->setVisible(false);
 }
 
 void Config::loadPathOptimizationItems()

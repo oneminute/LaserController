@@ -1134,6 +1134,52 @@ bool ArrangeAlignCommand::moveByType(LaserPrimitive* p, QRect target, QRect src)
         } 
     }
     p->moveBy(diff.x(), diff.y());
+    qreal scaleVal = 1;
+    switch (m_type) {
+        case ArrangeType::AT_SameWidth: {
+            qreal targetW = target.width();
+            qreal srcW = src.width();
+            if (targetW == 0) {
+                scaleVal = 0.001/ src.width();
+            }
+            else if (srcW == 0) {
+                scaleVal = 1;
+            }
+            else {
+                scaleVal = targetW / srcW;
+            }
+            QTransform t1;
+            t1.scale(scaleVal, 1);
+            QTransform t2;
+            QPointF diff = p->boundingRect().center() - t1.map(p->boundingRect().center());
+            t2.translate(diff.x(), diff.y());
+            QTransform t = p->transform() * t1 * t2;
+            p->setTransform(t);
+            break;
+        }
+        case ArrangeType::AT_SameHeight: {
+            qreal targetH = target.height();
+            qreal srcH = src.height();
+            if (targetH == 0) {
+                scaleVal = 1/srcH;
+            }
+            else if (srcH == 0) {
+                scaleVal = 1;
+            }
+            else {
+                scaleVal = targetH / srcH;
+            }
+            QTransform t1;
+            t1.scale(1, scaleVal);
+            QTransform t2;
+            QPointF diff = p->boundingRect().center() - t1.map(p->boundingRect().center());
+            t2.translate(diff.x(), diff.y());
+            QTransform t = p->transform() * t1 * t2;
+            p->setTransform(t);
+            break;
+        }
+    }
+    
     if (m_scene->maxRegion().contains(p->sceneBoundingRect())) {
         m_scene->quadTreeNode()->upDatePrimitive(p);
         return true;

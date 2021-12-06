@@ -1495,9 +1495,141 @@
     <string>Selected align horizontal</string>
    </property>
   </action>
-  <action name="actionZReset">
+  <action name="actionMoveToZOrigin">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/z_origin.png</normaloff>:/ui/icons/images/z_origin.png</iconset>
+   </property>
    <property name="text">
-    <string>Z Reset</string>
+    <string>Z Origin</string>
+   </property>
+   <property name="toolTip">
+    <string>Z Origin</string>
+   </property>
+  </action>
+  <action name="actionSameWidth">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/same_width.png</normaloff>:/ui/icons/images/same_width.png</iconset>
+   </property>
+   <property name="text">
+    <string>SameWidth</string>
+   </property>
+   <property name="toolTip">
+    <string>Make selected items same width</string>
+   </property>
+  </action>
+  <action name="actionSameHeight">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/ui/icons/images/same_height.png</normaloff>:/ui/icons/images/same_height.png</iconset>
+   </property>
+   <property name="text">
+    <string>SameHeight</string>
+   </property>
+   <property name="toolTip">
+    <string>Make selected items same height</string>
+   </property>
+  </action>
+  <action name="actionmoveToPageCenter">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_center.png</normaloff>:/ui/icons/images/page_center.png</iconset>
+   </property>
+   <property name="text">
+    <string>moveToPageCenter</string>
+   </property>
+   <property name="toolTip">
+    <string>Move selection to ...</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageTop">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_top.png</normaloff>:/ui/icons/images/page_top.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Top</string>
+   </property>
+   <property name="toolTip">
+    <string>MoveToPageTop</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageBottom">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_bottom.png</normaloff>:/ui/icons/images/page_bottom.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Bottom</string>
+   </property>
+   <property name="toolTip">
+    <string>Move To Page Bottom</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_left.png</normaloff>:/ui/icons/images/page_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Move To Page Left</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_right.png</normaloff>:/ui/icons/images/page_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Right</string>
+   </property>
+   <property name="toolTip">
+    <string>Move To Page Right</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageTopLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_topLeft.png</normaloff>:/ui/icons/images/page_topLeft.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Upper Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Move To Page Upper Left</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageTopRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_topRight.png</normaloff>:/ui/icons/images/page_topRight.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Upper Right</string>
+   </property>
+   <property name="toolTip">
+    <string>Move To Page Upper Right</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageBottomLeft">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_bottomLeft.png</normaloff>:/ui/icons/images/page_bottomLeft.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Lower Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Move To Page Lower Left</string>
+   </property>
+  </action>
+  <action name="actionSaveZOrigin">
+   <property name="text">
+    <string>Save Z Origin</string>
    </property>
   </action>
  </widget>

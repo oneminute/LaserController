@@ -280,6 +280,11 @@ enum FinishRunType
     FT_BackToUserOrigin
 };
 
+enum ArrangeType
+{
+    AT_SameWidth = 5,
+    AT_SameHeight = 6
+};
 struct FillStyleAndPixelsCount
 {
     int code;

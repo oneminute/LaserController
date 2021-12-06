@@ -195,6 +195,8 @@ public:
     void startSoftUpdateWizard();
     void startFirmwareUpdateWizard();
 
+    void lPenMoveToOriginalPointZ(int moveTo);
+
     QString registeMainCard(const QString& registeCode);
 
     bool isLoaded() const { return m_isLoaded; }
@@ -319,6 +321,8 @@ private:
     FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
 
     FN_INT_BYTEPTR_INT m_fnImportData;
+
+    FN_VOID_INT m_fnLPenMoveToOriginalPointZ;
 
     wchar_t m_wcharBuffer[2048];
 

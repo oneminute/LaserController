@@ -213,6 +213,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonAlignCenter = new LaserToolButton(this);
     m_arrangeButtonAlignHorinzontal = new LaserToolButton(this);
     m_arrangeButtonAlignVertical = new LaserToolButton(this);
+    m_arrangeButtonSameWidth = new LaserToolButton(this);
+    m_arrangeButtonSameHeight = new LaserToolButton(this);
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -259,11 +261,36 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         initAlignTarget();
         m_viewer->viewport()->repaint();
     });
+    //same width
+    m_arrangeButtonSameWidth->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonSameWidth->setIcon(QIcon(":/ui/icons/images/same_width.png"));
+    LaserMenu* sWMenu = new LaserMenu(m_arrangeButtonSameWidth);
+    sWMenu->addAction(m_ui->actionSameWidth);
+    m_arrangeButtonSameWidth->setMenu(sWMenu);
+    connect(sWMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+    //same height
+    m_arrangeButtonSameHeight->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonSameHeight->setIcon(QIcon(":/ui/icons/images/same_height.png"));
+    LaserMenu* sHMenu = new LaserMenu(m_arrangeButtonSameHeight);
+    sHMenu->addAction(m_ui->actionSameHeight);
+    m_arrangeButtonSameHeight->setMenu(sHMenu);
+    connect(sHMenu, &QMenu::aboutToHide, this, [=] {
+        initAlignTarget();
+        m_viewer->viewport()->repaint();
+    });
+
     m_arrangeButtonAlignCenter->connect(m_arrangeButtonAlignCenter,
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
     m_arrangeButtonAlignVertical->connect(m_arrangeButtonAlignVertical, 
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
     m_arrangeButtonAlignHorinzontal->connect(m_arrangeButtonAlignHorinzontal,
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
+    m_arrangeButtonSameWidth->connect(m_arrangeButtonSameWidth,
+        &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
+    m_arrangeButtonSameHeight->connect(m_arrangeButtonSameHeight,
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
 
     m_ui->toolBarTools->addWidget(toolButtonSelectionTool);
@@ -279,9 +306,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignCenter);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignHorinzontal);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignVertical);
+    m_ui->arrangeBar->addWidget(m_arrangeButtonSameWidth);
+    m_ui->arrangeBar->addWidget(m_arrangeButtonSameHeight);
     m_arrangeButtonAlignCenter->setEnabled(false);
     m_arrangeButtonAlignHorinzontal->setEnabled(false);
     m_arrangeButtonAlignVertical->setEnabled(false);
+    m_arrangeButtonSameWidth->setEnabled(false);
+    m_arrangeButtonSameHeight->setEnabled(false);
     // init status bar
     m_statusBarDeviceStatus = new QLabel;
     m_statusBarDeviceStatus->setText(ltr("Tips"));
@@ -677,6 +708,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionUpdateFirmware, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateFirmware);
     connect(m_ui->actionShowLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionShowLaserPosition);
     connect(m_ui->actionHideLaserPosition, &QAction::triggered, this, &LaserControllerWindow::onActionHideLaserPosition);
+    connect(m_ui->actionSaveZOrigin, &QAction::triggered, this, &LaserControllerWindow::onActionSaveZOrigin);
 
 	connect(m_ui->actionMainCardInfo, &QAction::triggered, this, &LaserControllerWindow::onActionMainCardInfo);
 	connect(m_ui->actionTemporaryLicense, &QAction::triggered, this, &LaserControllerWindow::onActionTemporaryLicense);
@@ -688,6 +720,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionReset, &QAction::triggered, this, &LaserControllerWindow::laserResetToOriginalPoint);
     connect(m_ui->actionMoveToOrigin, &QAction::triggered, this, &LaserControllerWindow::laserBackToMachiningOriginalPoint);
+    connect(m_ui->actionMoveToZOrigin, &QAction::triggered, this, &LaserControllerWindow::moveToZOrigin);
     connect(m_ui->actionApplyJobOriginToDocument, &QAction::triggered, this, &LaserControllerWindow::applyJobOriginToDocument);
 
     connect(m_ui->actionUpdateOutline, &QAction::triggered, this, &LaserControllerWindow::onActionUpdateOutline);
@@ -888,6 +921,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionAlignVerticalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalMiddle);
     connect(m_ui->actionAlignVerticalLeft, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalLeft);
     connect(m_ui->actionAlignVerticalRight, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalRight);
+    connect(m_ui->actionSameWidth, &QAction::triggered, this, &LaserControllerWindow::onActionSameWidth);
+    connect(m_ui->actionSameHeight, &QAction::triggered, this, &LaserControllerWindow::onActionSameHeight);
 
     //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
     //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
@@ -997,11 +1032,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     onLayoutChanged(LaserApplication::device->layoutSize());
 
-    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-164000, 39000));
+    /*m_tablePrintAndCutPoints->setLaserPoint(QPointF(-164000, 39000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-180000, 30000));
     m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPointF(-131000, 76000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-140000, 60000));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-140000, 60000));*/
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -1128,6 +1163,8 @@ void LaserControllerWindow::changeAlignButtonsEnable()
         m_arrangeButtonAlignCenter->setEnabled(true);
         m_arrangeButtonAlignHorinzontal->setEnabled(true);
         m_arrangeButtonAlignVertical->setEnabled(true);
+        m_arrangeButtonSameWidth->setEnabled(true);
+        m_arrangeButtonSameHeight->setEnabled(true);
         //align
         int notJoinedSize = 0;
         for (QGraphicsItem* item : items) {
@@ -1143,6 +1180,8 @@ void LaserControllerWindow::changeAlignButtonsEnable()
                     m_arrangeButtonAlignCenter->setEnabled(false);
                     m_arrangeButtonAlignHorinzontal->setEnabled(false);
                     m_arrangeButtonAlignVertical->setEnabled(false);
+                    m_arrangeButtonSameWidth->setEnabled(false);
+                    m_arrangeButtonSameHeight->setEnabled(false);
                     break;
                 }
                 else {
@@ -1158,6 +1197,8 @@ void LaserControllerWindow::changeAlignButtonsEnable()
         m_arrangeButtonAlignCenter->setEnabled(false);
         m_arrangeButtonAlignHorinzontal->setEnabled(false);
         m_arrangeButtonAlignVertical->setEnabled(false);
+        m_arrangeButtonSameWidth->setEnabled(false);
+        m_arrangeButtonSameHeight->setEnabled(false);
     }
     
 }
@@ -2088,7 +2129,7 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveLeft->setFixedSize(fixedSize);
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
 
-    m_buttonMoveToOrigin = new PressedToolButton;
+    m_buttonMoveToOrigin = new QToolButton;
     m_buttonMoveToOrigin->setFixedSize(fixedSize);
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
 
@@ -2112,14 +2153,13 @@ void LaserControllerWindow::createMovementDockPanel()
     m_buttonMoveUp->setFixedSize(fixedSize);
     m_buttonMoveUp->setDefaultAction(m_ui->actionMoveUp);
 
+    m_buttonMoveToZOrigin = new QToolButton;
+    m_buttonMoveToZOrigin->setFixedSize(fixedSize);
+    m_buttonMoveToZOrigin->setDefaultAction(m_ui->actionMoveToZOrigin);
+
     m_buttonMoveDown = new PressedToolButton;
     m_buttonMoveDown->setFixedSize(fixedSize);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
-
-    m_buttonShowLaserPosition = new QToolButton;
-    m_buttonShowLaserPosition->setDefaultAction(m_ui->actionShowLaserPosition);
-    m_buttonHideLaserPosition = new QToolButton;
-    m_buttonHideLaserPosition->setDefaultAction(m_ui->actionHideLaserPosition);
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
@@ -2130,14 +2170,25 @@ void LaserControllerWindow::createMovementDockPanel()
     secondRow->addWidget(m_buttonMoveLeft, 1, 1);
     secondRow->addWidget(m_buttonMoveToOrigin, 1, 2);
     secondRow->addWidget(m_buttonMoveRight, 1, 3);
+    secondRow->addWidget(m_buttonMoveToZOrigin, 1, 4);
     secondRow->addWidget(m_buttonMoveBottomLeft, 2, 1);
     secondRow->addWidget(m_buttonMoveBottom, 2, 2);
     secondRow->addWidget(m_buttonMoveBottomRight, 2, 3);
     secondRow->addWidget(m_buttonMoveDown, 2, 4);
-    secondRow->addWidget(m_buttonShowLaserPosition, 3, 1, 1, 2);
-    secondRow->addWidget(m_buttonHideLaserPosition, 3, 3, 1, 2);
     secondRow->setColumnStretch(0, 1);
     secondRow->setColumnStretch(5, 1);
+
+    m_buttonShowLaserPosition = new QToolButton;
+    m_buttonShowLaserPosition->setDefaultAction(m_ui->actionShowLaserPosition);
+    m_buttonHideLaserPosition = new QToolButton;
+    m_buttonHideLaserPosition->setDefaultAction(m_ui->actionHideLaserPosition);
+    m_buttonSaveZOrigin = new QToolButton;
+    m_buttonSaveZOrigin->setDefaultAction(m_ui->actionSaveZOrigin);
+
+    QHBoxLayout* additionRow = new QHBoxLayout;
+    additionRow->addWidget(m_buttonShowLaserPosition);
+    additionRow->addWidget(m_buttonHideLaserPosition);
+    additionRow->addWidget(m_buttonSaveZOrigin);
 
     m_radioButtonUserOrigin1 = new QRadioButton(tr("User Origin 1"));
     m_radioButtonUserOrigin2 = new QRadioButton(tr("User Origin 2"));
@@ -2183,6 +2234,7 @@ void LaserControllerWindow::createMovementDockPanel()
     layout->setMargin(3);
     layout->addLayout(firstRow);
     layout->addLayout(secondRow);
+    layout->addLayout(additionRow);
     layout->addLayout(thirdRow);
     layout->addLayout(fourthRow);
     layout->addStretch(1);
@@ -3517,12 +3569,18 @@ void LaserControllerWindow::onActionMoveBottomRight()
 
 void LaserControllerWindow::onActionMoveUp()
 {
-    QVector3D delta(0, 0, m_doubleSpinBoxDistanceZ->value());
+    int z = Config::Device::zReverseDirection() ?
+        -m_doubleSpinBoxDistanceZ->value() :
+        m_doubleSpinBoxDistanceZ->value();
+    QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveDown()
 {
+    int z = Config::Device::zReverseDirection() ?
+        m_doubleSpinBoxDistanceZ->value() :
+        -m_doubleSpinBoxDistanceZ->value();
     QVector3D delta(0, 0, -m_doubleSpinBoxDistanceZ->value());
     LaserApplication::device->moveBy(delta);
 }
@@ -3959,6 +4017,14 @@ void LaserControllerWindow::onActionShowLaserPosition(bool checked)
 void LaserControllerWindow::onActionHideLaserPosition(bool checked)
 {
     m_viewer->setShowLaserPos(false);
+}
+
+void LaserControllerWindow::onActionSaveZOrigin(bool checked)
+{
+    Config::Device::zFocalLengthItem()->setValue(
+        LaserApplication::device->currentZ(),
+        SS_DIRECTLY, this
+    );
 }
 
 void LaserControllerWindow::onProgressBarClicked()
@@ -4707,12 +4773,17 @@ void LaserControllerWindow::updatePostEventWidgets(int index)
 
 void LaserControllerWindow::laserBackToMachiningOriginalPoint(bool checked)
 {
-    LaserApplication::device->moveToMachining(QVector3D(0, 0, 0));
+    LaserApplication::device->moveToXYOrigin();
 }
 
 void LaserControllerWindow::laserResetToOriginalPoint(bool checked)
 {
-    LaserApplication::device->moveToOrigin();
+    LaserApplication::device->moveToXYOrigin();
+}
+
+void LaserControllerWindow::moveToZOrigin(bool checked)
+{
+    LaserApplication::device->moveToZOrigin();
 }
 
 void LaserControllerWindow::updateOutlineTree()
@@ -5134,6 +5205,18 @@ void LaserControllerWindow::onActionAlignVerticalLeft()
 void LaserControllerWindow::onActionAlignVerticalRight()
 {
     ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignRight);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionSameWidth()
+{
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, ArrangeType::AT_SameWidth);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionSameHeight()
+{
+    ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, ArrangeType::AT_SameHeight);
     m_viewer->undoStack()->push(cmd);
 }
 

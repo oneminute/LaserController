@@ -86,6 +86,8 @@ public:
 
     void moveToMachining(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
     void moveBy(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
+    void moveToZOrigin();
+    void moveToXYOrigin();
 
     bool isAvailable() const;
 
@@ -143,6 +145,8 @@ public:
     /// <returns></returns>
     QPointF currentOrigin() const;
 
+    int currentZ() const;
+
     bool isAbsolute() const;
 
     void batchParse(const QString& raw, bool isSystem, bool isConfirmed);
@@ -178,7 +182,6 @@ public slots:
     );
     bool requestTemporaryLicense();
     bool createLicenseFile(const QString& licenseCode);
-    void moveToOrigin(qreal speed = 15);
     void updateDeviceOriginAndTransform();
 
 protected:
