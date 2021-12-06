@@ -738,6 +738,27 @@ void LaserDevice::moveBy(const QVector3D& pos, bool xEnabled, bool yEnabled, boo
     );
 }
 
+void LaserDevice::moveToZOrigin()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        int target = Config::Device::zFocalLength() - Config::Device::calibrationBlockThickness();
+        if (Config::Device::zReverseDirection())
+            target = -target;
+        d->driver->lPenMoveToOriginalPointZ(target);
+    }
+}
+
+void LaserDevice::moveToXYOrigin()
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+    {
+        d->driver->lPenMoveToOriginalPoint(0);
+    }
+}
+
 bool LaserDevice::isAvailable() const
 {
     Q_D(const LaserDevice);
@@ -991,6 +1012,20 @@ QPointF LaserDevice::currentOrigin() const
     return origin;
 }
 
+int LaserDevice::currentZ() const
+{
+    Q_D(const LaserDevice);
+    return d->lastState.pos.z();
+}
+
+bool LaserDevice::isAbsolute() const
+{
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords ||
+        StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
+        return true;
+    return false;
+}
+
 void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed)
 {
     Q_D(LaserDevice);
@@ -1207,15 +1242,6 @@ bool LaserDevice::createLicenseFile(const QString& licenseCode)
         return d->driver->createLicenseFile(licenseCode);
     }
     return false;
-}
-
-void LaserDevice::moveToOrigin(qreal speed)
-{
-    Q_D(LaserDevice);
-    if (d->driver)
-    {
-        d->driver->lPenMoveToOriginalPoint(speed);
-    }
 }
 
 void LaserDevice::updateDeviceOriginAndTransform()

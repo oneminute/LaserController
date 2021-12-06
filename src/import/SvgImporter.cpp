@@ -78,6 +78,26 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         QSvgNode* node = stack.pop();
         QSvgRenderer* renderer = nullptr;
         LaserPrimitive* item = nullptr;
+
+        QTransform t;
+        t = node->getCascadeTransform();
+
+        if (!qFuzzyCompare(t.dx(), 0) || !qFuzzyCompare(t.dy(), 0))
+        {
+            QTransform t1 = QTransform(
+                t.m11(), t.m12(), t.m13(),
+                t.m21(), t.m22(), t.m23(),
+                t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
+            );
+            t = t1;
+            qDebug() << t;
+        }
+        t = QTransform(
+            t.m11(), t.m12(), t.m13(),
+            t.m21(), t.m22(), t.m23(),
+            t.m31() + originOffset.x(), t.m32() + originOffset.y(), t.m33()
+        );
+
         switch (node->type())
         {
         case QSvgNode::DOC:
@@ -101,7 +121,11 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgEllipse* svgEllipseNode = reinterpret_cast<QSvgEllipse*>(node);
 			QRectF bounds = matrix.mapRect(svgEllipseNode->bounds());
-            item = new LaserEllipse(bounds.toRect(), doc, QTransform(), idleLayer->index());
+            QPainterPath path;
+            path.addEllipse(bounds);
+            path = t.map(path);
+            //item = new LaserEllipse(bounds.toRect(), doc, QTransform(), idleLayer->index());
+            item = new LaserPath(path, doc, QTransform(), idleLayer->index());
         }
             break;
         case QSvgNode::LINE:
@@ -116,14 +140,15 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
+            path = t.map(path);
             item = new LaserPath(path, doc, QTransform(), idleLayer->index());
-            int i = item->layerIndex();
         }
             break;
         case QSvgNode::POLYGON:
         {
             QSvgPolygon* svgPolygonNode = reinterpret_cast<QSvgPolygon*>(node);
 			QPolygonF polygon = matrix.map(svgPolygonNode->polygon());
+            polygon = t.map(polygon);
             item = new LaserPolygon(polygon.toPolygon(), doc, QTransform(), idleLayer->index());
         }
             break;
@@ -131,6 +156,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
 			QPolygonF polyline = matrix.map(svgPolylineNode->polyline());
+            polyline = t.map(polyline);
             item = new LaserPolyline(polyline.toPolygon(), doc, QTransform(), idleLayer->index());
         }
             break;
@@ -143,9 +169,11 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 				if (area > 0)
 				{
 					QRectF rect = matrix.mapRect(svgRectNode->rect());
-                    qreal cornerRaius = Global::mmToSceneHF(svgRectNode->rx()) * docScaleWidth;
-					item = new LaserRect(rect.toRect(), cornerRaius, doc, QTransform(), idleLayer->index());
-					qDebug() << "rect:" << rect;
+                    qreal cornerRadius = svgRectNode->rx() * docScaleWidth;
+                    QPainterPath path;
+                    path.addRoundedRect(rect, cornerRadius, cornerRadius);
+                    path = t.map(path);
+                    item = new LaserPath(path, doc, QTransform(), idleLayer->index());
 				}
             }
             break;
@@ -188,7 +216,8 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
 			QRectF bounds = matrix.mapRect(svgImageNode->imageBounds());
-            item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc, QTransform(), idleLayer->index());
+            //bounds = t.mapRect(bounds);
+            item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc, t, idleLayer->index());
         }
             break;
         default:
@@ -197,25 +226,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 
         if (item)
         {
-            QTransform t;
-            t = node->getCascadeTransform();
-
-			if (!qFuzzyCompare(t.dx(), 0) || !qFuzzyCompare(t.dy(), 0))
-			{
-                QTransform t1 = QTransform(
-					t.m11(), t.m12(), t.m13(),
-					t.m21(), t.m22(), t.m23(),
-					t.m31() * docScaleWidth, t.m32() * docScaleHeight, t.m33()
-				);
-                t = t1;
-				qDebug() << t;
-			}
-            t = QTransform(
-                t.m11(), t.m12(), t.m13(),
-                t.m21(), t.m22(), t.m23(),
-                t.m31() + originOffset.x(), t.m32() + originOffset.y(), t.m33()
-            );
-            item->setTransform(t);
+            //item->setTransform(t);
 
             if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
                 item->setName(node->nodeId());

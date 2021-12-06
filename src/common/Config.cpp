@@ -605,6 +605,7 @@ void Config::loadFillingLayerItems()
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+    runSpeed->setVisible(false);
 
     ConfigItem* minPower= group->addConfigItem(
         "minPower",
@@ -617,18 +618,20 @@ void Config::loadFillingLayerItems()
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
+    minPower->setVisible(false);
 
     ConfigItem* maxPower= group->addConfigItem(
         "maxPower",
         120,
         DT_INT
     );
-    minPower->setInputWidgetType(IWT_FloatEditSlider);
-    minPower->setInputWidgetProperty("step", 0.1);
+    maxPower->setInputWidgetType(IWT_FloatEditSlider);
+    maxPower->setInputWidgetProperty("step", 0.1);
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
+    maxPower->setVisible(false);
 
     ConfigItem* rowInterval = group->addConfigItem(
         "rowInterval",
@@ -638,6 +641,7 @@ void Config::loadFillingLayerItems()
     rowInterval->setInputWidgetProperty("minimum", 0);
     rowInterval->setInputWidgetProperty("maximum", 1000);
     rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
+    rowInterval->setVisible(false);
 
     ConfigItem* enableCutting = group->addConfigItem(
         "enableCutting",
@@ -665,6 +669,7 @@ void Config::loadFillingLayerItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+    fillingType->setVisible(false);
 }
 
 void Config::loadPathOptimizationItems()
@@ -1089,6 +1094,54 @@ void Config::loadDeviceItems()
         DT_POINT
     );
     redLightOffset->setVisible(false);
+
+    ConfigItem* zReverseDirection = group->addConfigItem(
+        "zReverseDirection",
+        false,
+        DT_BOOL
+    );
+
+    ConfigItem* zFocalLength = group->addConfigItem(
+        "zFocalLength",
+        200000,
+        DT_INT
+    );
+    zFocalLength->setInputWidgetType(IWT_FloatEditSlider);
+    zFocalLength->setInputWidgetProperty("step", 0.001);
+    zFocalLength->setInputWidgetProperty("decimals", 3);
+    zFocalLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zFocalLength->setInputWidgetProperty("page", 10);
+    zFocalLength->setInputWidgetProperty("minimum", 1);
+    zFocalLength->setInputWidgetProperty("maximum", 2000);
+    zFocalLength->setNeedRelaunch(true);
+
+    ConfigItem* zResetSpeed = group->addConfigItem(
+        "zResetSpeed",
+        50000,
+        DT_INT
+    );
+    zResetSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    zResetSpeed->setInputWidgetProperty("step", 0.001);
+    zResetSpeed->setInputWidgetProperty("decimals", 0);
+    zResetSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zResetSpeed->setInputWidgetProperty("textTemplate", "%1");
+    zResetSpeed->setInputWidgetProperty("page", 10);
+    zResetSpeed->setInputWidgetProperty("minimum", 1);
+    zResetSpeed->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* calibrationBlockThickness = group->addConfigItem(
+        "calibrationBlockThickness",
+        3000,
+        DT_INT
+    );
+    calibrationBlockThickness->setInputWidgetType(IWT_FloatEditSlider);
+    calibrationBlockThickness->setInputWidgetProperty("step", 0.001);
+    calibrationBlockThickness->setInputWidgetProperty("decimals", 0);
+    calibrationBlockThickness->setInputWidgetProperty("maximumLineEditWidth", 75);
+    calibrationBlockThickness->setInputWidgetProperty("textTemplate", "%1");
+    calibrationBlockThickness->setInputWidgetProperty("page", 10);
+    calibrationBlockThickness->setInputWidgetProperty("minimum", 1);
+    calibrationBlockThickness->setInputWidgetProperty("maximum", 50);
 }
 
 void Config::loadUserReigsters()
@@ -2667,6 +2720,22 @@ void Config::updateTitlesAndDescriptions()
     Device::userOriginSelectedItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "User Origin", nullptr), 
         QCoreApplication::translate("Config", "Selected user origin", nullptr));
+
+    Device::zReverseDirectionItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Reverse Z Direction", nullptr), 
+        QCoreApplication::translate("Config", "Reverse Z Direction", nullptr));
+
+    Device::zFocalLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Z Focal Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Z Focal Length", nullptr));
+
+    Device::zResetSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Z Reset Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "Z Reset Speed", nullptr));
+
+    Device::calibrationBlockThicknessItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Calibration block thickness", nullptr), 
+        QCoreApplication::translate("Config", "Calibration block thickness", nullptr));
 
     UserRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

@@ -229,6 +229,7 @@ protected slots:
     void onActionUpdateFirmware(bool checked = false);
     void onActionShowLaserPosition(bool checked = false);
     void onActionHideLaserPosition(bool checked = false);
+    void onActionSaveZOrigin(bool checked = false);
     void onProgressBarClicked();
 
 	void onActionMirrorHorizontal(bool checked = false);
@@ -295,6 +296,7 @@ protected slots:
     void updatePostEventWidgets(int index);
     void laserBackToMachiningOriginalPoint(bool checked = false);
     void laserResetToOriginalPoint(bool checked = false);
+    void moveToZOrigin(bool checked = false);
     void updateOutlineTree();
     void initDocument(LaserDocument* doc);
     void showConfigDialog(const QString& title = QString());
@@ -427,12 +429,13 @@ private:
     PressedToolButton* m_buttonMoveTop;
     PressedToolButton* m_buttonMoveTopRight;
     PressedToolButton* m_buttonMoveLeft;
-    PressedToolButton* m_buttonMoveToOrigin;
+    QToolButton* m_buttonMoveToOrigin;
     PressedToolButton* m_buttonMoveRight;
     PressedToolButton* m_buttonMoveBottomLeft;
     PressedToolButton* m_buttonMoveBottom;
     PressedToolButton* m_buttonMoveBottomRight;
     PressedToolButton* m_buttonMoveUp;
+    QToolButton* m_buttonMoveToZOrigin;
     PressedToolButton* m_buttonMoveDown;
 
     //QCheckBox* m_checkBoxXEnabled;
@@ -441,6 +444,7 @@ private:
 
     QToolButton* m_buttonShowLaserPosition;
     QToolButton* m_buttonHideLaserPosition;
+    QToolButton* m_buttonSaveZOrigin;
     QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonUserOrigin1;
     QRadioButton* m_radioButtonUserOrigin2;

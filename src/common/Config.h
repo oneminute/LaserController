@@ -255,7 +255,10 @@ public:
         CONFIG_ITEM(device, userOrigin3, QPoint, toPoint)
         CONFIG_ITEM(device, userOriginSelected, int, toInt)
         CONFIG_ITEM(device, redLightOffset, QPointF, toPointF)
-        //CONFIG_ITEM_T(device, userOrigins, QList<QPointF>, QList<QPointF>)
+        CONFIG_ITEM(device, zReverseDirection, bool, toBool)
+        CONFIG_ITEM(device, zFocalLength, int, toInt)
+        CONFIG_ITEM(device, zResetSpeed, int, toInt)
+        CONFIG_ITEM(device, calibrationBlockThickness, int, toInt)
 
     private:
         friend class Config;

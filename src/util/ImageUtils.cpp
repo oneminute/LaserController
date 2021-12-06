@@ -303,7 +303,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
         quint8 lastBin;
         QList<quint8> rowBytes;
 #if _DEBUG
-        QString rowString;
+        //QString rowString;
 #endif
         bool same = true;
         for (int c = 0; c < mat.cols; c++)
@@ -319,7 +319,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
                 lastBin = bin;
             }
 #if _DEBUG
-            rowString.append(QString::number(mat.ptr<quint8>(r)[c] >= 128 ? 0 : 1));
+            //rowString.append(QString::number(mat.ptr<quint8>(r)[c] >= 128 ? 0 : 1));
 #endif
             binCheck |= bin;
             //byte = byte | (bin << (c % 8));
@@ -334,9 +334,9 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             }
         }
 #if _DEBUG
-        rowString.append("\n");
+        //rowString.append("\n");
         //rowBytes.append(byte);
-        qLogD << rowString;
+        //qLogD << rowString;
 #endif
         if (bitCount != 0)
             rowBytes.append(byte);
