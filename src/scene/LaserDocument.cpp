@@ -483,6 +483,19 @@ void LaserDocument::exportBoundingJSON()
     cuttingParamObj["RunSpeed"] = Config::UserRegister::cuttingMoveSpeed();
     cuttingParamObj["MinSpeedPower"] = 0;
     cuttingParamObj["RunSpeedPower"] = 0;
+
+    engravingParamObj["RunSpeed"] = 0;
+    engravingParamObj["LaserPower"] = 0;
+    engravingParamObj["MinSpeedPower"] = 0;
+    engravingParamObj["RunSpeedPower"] = 0;
+    engravingParamObj["CarveForward"] = false;
+    engravingParamObj["CarveStyle"] = 0;
+
+    fillingParamObj["RunSpeed"] = 0;
+    fillingParamObj["MinSpeedPower"] = 0;
+    fillingParamObj["RunSpeedPower"] = 0;
+    fillingParamObj["RowInterval"] = 0;
+
     paramObj["EngravingParams"] = engravingParamObj;
     paramObj["CuttingParams"] = cuttingParamObj;
     paramObj["FillingParams"] = fillingParamObj;
@@ -612,6 +625,7 @@ void LaserDocument::exportBoundingJSON()
 
     saveFile.close();
     //emit exportFinished(filename);
+    qLogD << "rawJson: " << rawJson;
     emit exportFinished(rawJson);
 }
 

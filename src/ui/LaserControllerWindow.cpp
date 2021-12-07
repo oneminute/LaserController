@@ -1032,11 +1032,17 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     onLayoutChanged(LaserApplication::device->layoutSize());
 
-    /*m_tablePrintAndCutPoints->setLaserPoint(QPointF(-164000, 39000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-180000, 30000));
+    /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
     m_tablePrintAndCutPoints->addNewLine();
-    m_tablePrintAndCutPoints->setLaserPoint(QPointF(-131000, 76000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPointF(-140000, 60000));*/
+    m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));*/
+
+    m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(90304, 74802));
+    m_tablePrintAndCutPoints->addNewLine();
+    m_tablePrintAndCutPoints->setLaserPoint(QPoint(140310, 124805));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -1093,7 +1099,7 @@ void LaserControllerWindow::handleSecurityException(int code, const QString& mes
     }
 }
 
-void LaserControllerWindow::findPrintAndCutPoints(const QRectF& bounding)
+void LaserControllerWindow::findPrintAndCutPoints(const QRect& bounding)
 {
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     m_selectedPrintAndCutPointIndex = -1;
@@ -1101,7 +1107,7 @@ void LaserControllerWindow::findPrintAndCutPoints(const QRectF& bounding)
     if (m_printAndCutCandidatePoints.length() == 1)
     {
         m_selectedPrintAndCutPointIndex = 0;
-        QPointF selectedPt = m_printAndCutCandidatePoints.at(m_selectedPrintAndCutPointIndex);
+        QPoint selectedPt = m_printAndCutCandidatePoints.at(m_selectedPrintAndCutPointIndex);
         m_tablePrintAndCutPoints->setCanvasPoint(selectedPt);
         onActionPrintAndCutEndSelect();
     }
@@ -1112,24 +1118,24 @@ void LaserControllerWindow::clearPrintAndCutCandidatePoints()
     m_printAndCutCandidatePoints.clear();
 }
 
-void LaserControllerWindow::setPrintAndCutPoint(const QPointF& pt)
+void LaserControllerWindow::setPrintAndCutPoint(const QPoint& pt)
 {
     m_selectedPrintAndCutPointIndex = hoveredPrintAndCutPoint(pt);
     if (m_selectedPrintAndCutPointIndex >= 0)
     {
-        QPointF selectedPt = m_printAndCutCandidatePoints.at(m_selectedPrintAndCutPointIndex);
+        QPoint selectedPt = m_printAndCutCandidatePoints.at(m_selectedPrintAndCutPointIndex);
         m_tablePrintAndCutPoints->setCanvasPoint(selectedPt);
     }
 }
 
-int LaserControllerWindow::hoveredPrintAndCutPoint(const QPointF& mousePos) const
+int LaserControllerWindow::hoveredPrintAndCutPoint(const QPoint& mousePos) const
 {
-    qreal radius = 3;
-    qreal radius2 = radius * radius;
+    int radius = 3;
+    int radius2 = radius * radius;
     for (int i = 0; i < m_printAndCutCandidatePoints.length(); i++)
     {
-        QPointF pt = m_printAndCutCandidatePoints.at(i);
-        qreal squaredLength = QVector2D(pt - mousePos).lengthSquared();
+        QPoint pt = m_printAndCutCandidatePoints.at(i);
+        int squaredLength = QVector2D(pt - mousePos).lengthSquared();
         if (squaredLength <= radius2)
         {
             return i;
@@ -2874,12 +2880,15 @@ void LaserControllerWindow::dockPanelOnlyShowIcon(CDockWidget* dockWidget, QPixm
     });
 }
 
-QList<QPointF> LaserControllerWindow::findCanvasPointsWithinRect(const QRectF& bounding) const
+QList<QPoint> LaserControllerWindow::findCanvasPointsWithinRect(const QRect& bounding) const
 {
-    QList<QPointF> points;
-    QRectF littleBounding(
-        bounding.topLeft() + QPointF(bounding.width() * 0.05, bounding.height() * 0.05),
-        QSizeF(bounding.width() * 0.9, bounding.height() * 0.9));
+    QList<QPoint> points;
+    QRect littleBounding(
+        bounding.topLeft() + QPoint(
+            qRound(bounding.width() * 0.05),
+            qRound(bounding.height() * 0.05)),
+        QSize(qRound(bounding.width() * 0.9), 
+            qRound(bounding.height() * 0.9)));
     QPainterPath pathBounding;
     pathBounding.addRect(bounding);
     QSet<LaserPrimitive*> primitives = m_scene->findPrimitivesByRect(bounding);
@@ -2896,7 +2905,7 @@ QList<QPointF> LaserControllerWindow::findCanvasPointsWithinRect(const QRectF& b
             QPainterPath::Element e = inter.elementAt(i);
             if (e.type == QPainterPath::MoveToElement || e.type == QPainterPath::LineToElement)
             {
-                QPointF pt(e.x, e.y);
+                QPoint pt(qRound(e.x), qRound(e.y));
                 if (!littleBounding.contains(pt))
                     continue;
                 if (!points.contains(pt))
@@ -3446,14 +3455,8 @@ void LaserControllerWindow::onActionBounding(bool checked)
     ))
         return;
 
+    m_prepareMachining = true;
     m_scene->document()->exportBoundingJSON();
-    QFileInfo fileInfo("tmp/bounding.json");
-    QString filePath = fileInfo.absoluteFilePath();
-#ifdef Q_OS_WIN
-    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
-    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
-#endif
-    LaserApplication::driver->loadDataFromFile(filePath);
 }
 
 void LaserControllerWindow::onActionLaserSpotShot(bool checked)
@@ -3570,8 +3573,8 @@ void LaserControllerWindow::onActionMoveBottomRight()
 void LaserControllerWindow::onActionMoveUp()
 {
     int z = Config::Device::zReverseDirection() ?
-        -m_doubleSpinBoxDistanceZ->value() :
-        m_doubleSpinBoxDistanceZ->value();
+        m_doubleSpinBoxDistanceZ->value() :
+        -m_doubleSpinBoxDistanceZ->value();
     QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
@@ -3579,9 +3582,9 @@ void LaserControllerWindow::onActionMoveUp()
 void LaserControllerWindow::onActionMoveDown()
 {
     int z = Config::Device::zReverseDirection() ?
-        m_doubleSpinBoxDistanceZ->value() :
-        -m_doubleSpinBoxDistanceZ->value();
-    QVector3D delta(0, 0, -m_doubleSpinBoxDistanceZ->value());
+        -m_doubleSpinBoxDistanceZ->value() :
+        m_doubleSpinBoxDistanceZ->value();
+    QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
 
@@ -3936,7 +3939,8 @@ void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 {
     QPointF userOrigin = LaserApplication::device->userOrigin();
     qLogD << "user origin: " << userOrigin;
-    LaserApplication::device->moveToMachining(QVector3D(userOrigin));
+    LaserApplication::device->moveTo(QVector3D(userOrigin.x(), userOrigin.y(), 
+        LaserApplication::device->currentZ()));
 }
 
 void LaserControllerWindow::onActionBitmap(bool checked)
@@ -4080,13 +4084,13 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
     if (!laserRect)
         return;
 
-    QRectF bounding = laserRect->sceneBoundingRect();
+    QRect bounding = laserRect->sceneBoundingRect();
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
     m_scene->removeLaserPrimitive(rectPrimitive, false);
 
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     
-    for (const QPointF& pt : m_printAndCutCandidatePoints)
+    for (const QPoint& pt : m_printAndCutCandidatePoints)
     {
         qLogD << "canvas point: " << pt;
         m_tablePrintAndCutPoints->setCanvasPoint(pt);
@@ -4182,8 +4186,8 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
     QPointF diff(t.dx(), t.dy());
 
     t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx(), t.dy());
-    m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle));
-    m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x()).arg(diff.y()));
+    m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle, 0, 'f', 3));
+    m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x(), 0, 'f', 3).arg(diff.y(), 0, 'f', 3));
 
     if (!StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
     {
@@ -4577,9 +4581,9 @@ void LaserControllerWindow::onComboBoxSxaleTextChanged(const QString& text)
 void LaserControllerWindow::onLaserReturnWorkState(DeviceState state)
 {
     //m_ui->labelCoordinates->setText(QString("X = %1, Y = %2, Z = %3").arg(state.x, 0, 'g').arg(state.y, 0, 'g').arg(state.z, 0, 'g'));
-    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() * 0.001, 'f', 2));
-    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() * 0.001, 'f', 2));
-    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() * 0.001, 'f', 2));
+    m_lineEditCoordinatesX->setText(QString::number(state.pos.x() * 0.001, 'f', 3));
+    m_lineEditCoordinatesY->setText(QString::number(state.pos.y() * 0.001, 'f', 3));
+    m_lineEditCoordinatesZ->setText(QString::number(state.pos.z() * 0.001, 'f', 3));
 }
 
 void LaserControllerWindow::onLayoutChanged(const QSize& size)
@@ -4648,16 +4652,12 @@ void LaserControllerWindow::onCreatSpline()
 //void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
 void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
+    qLogD << "onDocumentExportFinished: " << m_prepareMachining;
     if (!m_prepareMachining)
         return;
 
-//    QFileInfo fileInfo(filename);
-//    QString filePath = fileInfo.absoluteFilePath();
-//#ifdef Q_OS_WIN
-//    filePath = QDir::toNativeSeparators(fileInfo.absoluteFilePath());
-//    //filePath = fileInfo.absoluteFilePath().replace("/", "\\");
-//#endif
-//    LaserApplication::driver->loadDataFromFile(filePath);
+    qLogD << "json data: ";
+    qLogD << data;
     LaserApplication::driver->importData(data.data(), data.size());
 }
 
@@ -4773,7 +4773,8 @@ void LaserControllerWindow::updatePostEventWidgets(int index)
 
 void LaserControllerWindow::laserBackToMachiningOriginalPoint(bool checked)
 {
-    LaserApplication::device->moveToXYOrigin();
+    //LaserApplication::device->moveToXYOrigin();
+    LaserApplication::device->moveTo(QVector3D(0, 0, LaserApplication::device->currentZ()));
 }
 
 void LaserControllerWindow::laserResetToOriginalPoint(bool checked)

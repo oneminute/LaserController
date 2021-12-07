@@ -76,8 +76,8 @@ public:
     LaserViewer* viewer() const { return m_viewer; }
     LaserScene* scene() const { return m_scene; }
 
-    void findPrintAndCutPoints(const QRectF& bounding);
-    QList<QPointF> printAndCutCandidatePoints() const
+    void findPrintAndCutPoints(const QRect& bounding);
+    QList<QPoint> printAndCutCandidatePoints() const
     {
         return m_printAndCutCandidatePoints;
     }
@@ -86,8 +86,8 @@ public:
     {
         return m_selectedPrintAndCutPointIndex;
     }
-    void setPrintAndCutPoint(const QPointF& pt);
-    int hoveredPrintAndCutPoint(const QPointF& mousePos) const;
+    void setPrintAndCutPoint(const QPoint& pt);
+    int hoveredPrintAndCutPoint(const QPoint& mousePos) const;
     LaserPrimitive* alignTarget();
     //align
     void initAlignTarget();
@@ -148,7 +148,7 @@ protected:
     //OnlyShowIcon
     void dockPanelOnlyShowIcon(ads::CDockWidget* dockWidget, QPixmap icon, char* text);
 
-    QList<QPointF> findCanvasPointsWithinRect(const QRectF& bounding) const;
+    QList<QPoint> findCanvasPointsWithinRect(const QRect& bounding) const;
 
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
@@ -543,7 +543,7 @@ private:
     QLabel* m_labelPrintAndCutRotation;
     ads::CDockWidget* m_dockPrintAndCut;
     ads::CDockAreaWidget* m_dockAreaPrintAndCut;
-    QList<QPointF> m_printAndCutCandidatePoints;
+    QList<QPoint> m_printAndCutCandidatePoints;
     int m_selectedPrintAndCutPointIndex;
 
     bool m_created;

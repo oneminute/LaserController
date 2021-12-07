@@ -78,7 +78,7 @@ void PointPairTableWidget::removeSelected()
     }
 }
 
-void PointPairTableWidget::setLaserPoint(const QPointF& point)
+void PointPairTableWidget::setLaserPoint(const QPoint& point)
 {
     int row = 0;
     if (selectionModel()->hasSelection())
@@ -116,7 +116,7 @@ void PointPairTableWidget::setLaserPoint(const QPointF& point)
     itemY->setData(Qt::EditRole, QString::number(point.y()));
 }
 
-void PointPairTableWidget::setCanvasPoint(const QPointF& point)
+void PointPairTableWidget::setCanvasPoint(const QPoint& point)
 {
     int row = 0;
     if (selectionModel()->hasSelection())

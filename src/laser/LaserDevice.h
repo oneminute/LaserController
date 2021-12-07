@@ -84,7 +84,7 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
-    void moveToMachining(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
+    void moveTo(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
     void moveBy(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
     void moveToZOrigin();
     void moveToXYOrigin();
