@@ -238,15 +238,15 @@ void LaserViewer::paintEvent(QPaintEvent* event)
             painter.drawRect(QRectF(m_selectionStartPoint, m_selectionEndPoint));
         }
 
-        QList<QPointF> points = LaserApplication::mainWindow->printAndCutCandidatePoints();
-        for (const QPointF& pt : points)
+        QList<QPoint> points = LaserApplication::mainWindow->printAndCutCandidatePoints();
+        for (const QPoint& pt : points)
         {
             painter.setBrush(QBrush(Qt::blue, Qt::BrushStyle::SolidPattern));
-            QPointF circlePt = mapFromScene(pt.toPoint());
-            painter.drawEllipse(QRectF(circlePt - QPointF(3, 3), circlePt + QPointF(3, 3)));
+            QPoint circlePt = mapFromScene(pt);
+            painter.drawEllipse(QRect(circlePt - QPoint(3, 3), circlePt + QPoint(3, 3)));
         }
         QPointF mousePoint = mapToScene(m_mousePoint);
-        int index = LaserApplication::mainWindow->hoveredPrintAndCutPoint(mousePoint);
+        int index = LaserApplication::mainWindow->hoveredPrintAndCutPoint(mousePoint.toPoint());
         if (index >= 0)
         {
             QPointF selectedPt = points.at(index);
@@ -2066,13 +2066,13 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             //点中空白且press与release同一个点
             QPointF meanPt = (m_selectionStartPoint + m_selectionEndPoint) / 2;
             meanPt = mapToScene(meanPt.toPoint());
-            LaserApplication::mainWindow->setPrintAndCutPoint(meanPt);
+            LaserApplication::mainWindow->setPrintAndCutPoint(meanPt.toPoint());
             return;
         }
 
         QRectF areaRect(mapToScene(m_selectionStartPoint.toPoint()), 
             mapToScene(m_selectionEndPoint.toPoint()));
-        LaserApplication::mainWindow->findPrintAndCutPoints(areaRect);
+        LaserApplication::mainWindow->findPrintAndCutPoints(areaRect.toRect());
         viewport()->update();
     }
     //select

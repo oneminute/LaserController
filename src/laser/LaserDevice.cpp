@@ -215,6 +215,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->systemRegisters.insert(55, new LaserRegister(55, Config::SystemRegister::yPhaseEnabledItem(), true));
     d->systemRegisters.insert(56, new LaserRegister(56, Config::SystemRegister::zPhaseEnabledItem(), true));
     d->systemRegisters.insert(57, new LaserRegister(57, Config::SystemRegister::deviceOriginItem(), true));
+    d->systemRegisters.insert(59, new LaserRegister(59, Config::SystemRegister::zResetSpeedItem(), true));
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
@@ -702,7 +703,7 @@ void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int cur
     d->driver->checkVersionUpdate(hardware, flag, 0, versionNoteToJsonFile);
 }
 
-void LaserDevice::moveToMachining(const QVector3D& pos, bool xEnabled, bool yEnabled, bool zEnabled)
+void LaserDevice::moveTo(const QVector3D& pos, bool xEnabled, bool yEnabled, bool zEnabled)
 {
     if (!checkLayoutForMoving(pos.toPoint()))
         return;
@@ -744,8 +745,7 @@ void LaserDevice::moveToZOrigin()
     if (d->driver)
     {
         int target = Config::Device::zFocalLength() - Config::Device::calibrationBlockThickness();
-        if (Config::Device::zReverseDirection())
-            target = -target;
+        target = qBound(0, target, Config::Device::zFocalLength());
         d->driver->lPenMoveToOriginalPointZ(target);
     }
 }

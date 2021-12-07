@@ -9,6 +9,7 @@
 #        pragma comment(linker, "/SUBSYSTEM:CONSOLE")
 #    endif
 #endif
+//#        pragma comment(linker, "/SUBSYSTEM:CONSOLE")
 
 int main(int argc, char *argv[])
 {

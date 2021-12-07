@@ -359,7 +359,6 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="230"/>
         <location filename="../src/common/Config.cpp" line="247"/>
         <source>Chinese</source>
         <translation></translation>
@@ -1423,6 +1422,10 @@
     </message>
     <message>
         <location filename="../src/common/Config.cpp" line="2737"/>
+        <source>Calibration block thickness(mm)</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../src/common/Config.cpp" line="2738"/>
         <source>Calibration block thickness</source>
         <translation></translation>
@@ -3148,7 +3151,7 @@ Would you like to overwrite it?</source>
         <location filename="../src/ui/LaserControllerWindow.ui" line="364"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="367"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1296"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5113"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5115"/>
         <source>New</source>
         <translation></translation>
     </message>
@@ -3673,7 +3676,7 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="839"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="554"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4529"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4530"/>
         <source>Left</source>
         <translation></translation>
     </message>
@@ -3685,7 +3688,7 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="851"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="556"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4531"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4532"/>
         <source>Right</source>
         <translation></translation>
     </message>
@@ -4092,17 +4095,17 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4314"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4315"/>
         <source>Inactivated</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4524"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4525"/>
         <source>Pos X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4525"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4526"/>
         <source>Pos Y</source>
         <translation></translation>
     </message>
@@ -4135,7 +4138,7 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="441"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="1857"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4526"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4527"/>
         <source>Width</source>
         <translation></translation>
     </message>
@@ -4143,8 +4146,8 @@ Would you like to overwrite it?</source>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="442"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="572"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="1861"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4527"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4536"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4528"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4537"/>
         <source>Height</source>
         <translation></translation>
     </message>
@@ -4185,7 +4188,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="2016"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4513"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4514"/>
         <source>Operations</source>
         <translation></translation>
     </message>
@@ -4234,75 +4237,75 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="515"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4528"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4529"/>
         <source>Rotate</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="555"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="559"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4530"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4533"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4531"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4534"/>
         <source>Middle</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="558"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4532"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4533"/>
         <source>Top</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="560"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4534"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4535"/>
         <source>Bottom</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="570"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4535"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4536"/>
         <source>Font</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="574"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4537"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4538"/>
         <source>Align X</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="576"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4538"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4539"/>
         <source>Align Y</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="578"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4539"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4540"/>
         <source>Spacing X</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="580"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4540"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4541"/>
         <source>Spacing Y</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="582"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4541"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4542"/>
         <source>Bold</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="584"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4542"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4543"/>
         <source>Italic</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="586"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4543"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4544"/>
         <source>Upper Case</source>
         <translation></translation>
     </message>
@@ -4357,7 +4360,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="2286"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4514"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4515"/>
         <source>Laser Power</source>
         <translation></translation>
     </message>
@@ -4529,69 +4532,69 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4185"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4186"/>
         <source>%1 degrees</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4186"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4187"/>
         <source>%1, %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4244"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4260"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4272"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4245"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4261"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4273"/>
         <source>x: %1, y: %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4293"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4294"/>
         <source>Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4298"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4299"/>
         <source>Disconnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4304"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4305"/>
         <source>Registered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4306"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4307"/>
         <source>Unregistered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4312"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4313"/>
         <source>Activated</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4404"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4405"/>
         <source>Selection: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4615"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4616"/>
         <source>Layout(mm): %1x%2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5110"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5112"/>
         <source>A document is opened.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5111"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5113"/>
         <source>Do you want to merge or create a new one?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5112"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5114"/>
         <source>Merge</source>
         <translation></translation>
     </message>
@@ -4599,321 +4602,321 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDevice</name>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1260"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1261"/>
         <source>Laser device fatal error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1267"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1268"/>
         <source>Failed to initialize laser device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1270"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1271"/>
         <source>Failed to uninitialize laser device normally</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1273"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1274"/>
         <source>Com port not available</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1276"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1277"/>
         <source>Failed to get COM port list</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1279"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1280"/>
         <source>Dongle does not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1282"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1283"/>
         <source>Dongle activation is disabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="591"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="592"/>
         <source>Registration success</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="591"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="592"/>
         <source>Registration success!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="594"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="595"/>
         <source>Registration failure</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="594"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="595"/>
         <source>Registration failure!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="828"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="929"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="829"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="930"/>
         <source>Exceed layout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="829"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="830"/>
         <source>The target point exceeds the device layout! Please check your target point.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="862"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="863"/>
         <source>Left edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="869"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="870"/>
         <source>Top edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="875"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="876"/>
         <source>Right edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="882"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="883"/>
         <source>Bottom edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="887"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="888"/>
         <source>Document bounding is OK.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="894"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="895"/>
         <source>Left edge of current document bounding with acc interval exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="900"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="901"/>
         <source>Right edge of current document bounding with acc interval exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="905"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="906"/>
         <source>Document bounding with acc interval is OK.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1293"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1294"/>
         <source>Invalid main card ID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1296"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1297"/>
         <source>Invalid dongle ID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1299"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1300"/>
         <source>Failed to bind card with dongle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1302"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1303"/>
         <source>The card is repeatedly bound to the dongle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1305"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1306"/>
         <source>The number of times the card is bound to the dongle exceeds the allowable range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1308"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1309"/>
         <source>The card is illegally bound to the dongle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1311"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1312"/>
         <source>Failed to clear duration of laser tube</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1314"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1315"/>
         <source>Incorrect factory password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1316"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1317"/>
         <source>Invalid password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1316"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1317"/>
         <source>Invalid Manufacture password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1319"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1320"/>
         <source>Invalid length of factory password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1322"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1323"/>
         <source>Factory password expired</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1325"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1326"/>
         <source>Input incorrect factory password too many times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1332"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1338"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1333"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1339"/>
         <source>Failed to read parameters from device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1335"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1341"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1336"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1342"/>
         <source>Failed to write parameters to device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1344"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1345"/>
         <source>Failed to save parameters to server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1347"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1348"/>
         <source>Failed to load parameters from server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1350"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1351"/>
         <source>File does not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1353"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1354"/>
         <source>Invalid data format</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1356"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1357"/>
         <source>Failed to decrypt data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1359"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1360"/>
         <source>Invalid image data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1362"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1363"/>
         <source>Min size of image is too small</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1365"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1366"/>
         <source>Max size of image is too large</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1368"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1369"/>
         <source>No data transfered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1371"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1372"/>
         <source>Transfering data timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1377"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1378"/>
         <source>Retransfer data too many times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1380"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1381"/>
         <source>Failed to transfer data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1383"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1384"/>
         <source>Receive invalid data too many times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1386"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1387"/>
         <source>Failed to transfer data with breakpoint</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1392"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1393"/>
         <source>Failed to connect to server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1395"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1396"/>
         <source>Failed to log in to server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1398"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1399"/>
         <source>Login too frequently</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1401"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1402"/>
         <source>Failed to submit data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1404"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1405"/>
         <source>Updating info file does not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1407"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1408"/>
         <source>Updating file dose not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1410"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1411"/>
         <source>Failed to update</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1413"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1414"/>
         <source>Failed to download firmware</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1416"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1417"/>
         <source>Update firmware timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1472"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1473"/>
         <source>Main card info incomplete.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1504"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1514"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1524"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1534"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1505"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1515"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1525"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1535"/>
         <source>Registers data incomplete.</source>
         <translation></translation>
     </message>

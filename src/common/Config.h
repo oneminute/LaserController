@@ -257,7 +257,6 @@ public:
         CONFIG_ITEM(device, redLightOffset, QPointF, toPointF)
         CONFIG_ITEM(device, zReverseDirection, bool, toBool)
         CONFIG_ITEM(device, zFocalLength, int, toInt)
-        CONFIG_ITEM(device, zResetSpeed, int, toInt)
         CONFIG_ITEM(device, calibrationBlockThickness, int, toInt)
 
     private:
@@ -394,6 +393,7 @@ public:
         CONFIG_ITEM(systemRegister, yPhaseEnabled, int, toInt)
         CONFIG_ITEM(systemRegister, zPhaseEnabled, int, toInt)
         CONFIG_ITEM(systemRegister, deviceOrigin, int, toInt)
+        CONFIG_ITEM(systemRegister, zResetSpeed, int, toInt)
 
     private:
         friend class Config;

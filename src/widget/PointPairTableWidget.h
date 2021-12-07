@@ -15,8 +15,8 @@ public:
     PointPairList pointPairs() const;
     void removeSelected();
 
-    void setLaserPoint(const QPointF& point);
-    void setCanvasPoint(const QPointF& point);
+    void setLaserPoint(const QPoint& point);
+    void setCanvasPoint(const QPoint& point);
 
     bool isEmpty() const;
 
