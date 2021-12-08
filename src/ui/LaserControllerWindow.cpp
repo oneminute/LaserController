@@ -949,7 +949,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveToPageBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToBottom);
     connect(m_ui->actionMoveToPageLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToLeft);
     connect(m_ui->actionMoveToPageRight, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToRight);
-    connect(m_ui->actionSelecteAll, &QAction::triggered, this, &LaserControllerWindow::onActionSelecteAll);
+    connect(m_ui->actionSelectAll, &QAction::triggered, this, &LaserControllerWindow::onActionSelectAll);
+    connect(m_ui->actionInvertSelection, &QAction::triggered, this, &LaserControllerWindow::onActionInvertSelect);
     //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
     //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
@@ -5303,9 +5304,15 @@ void LaserControllerWindow::onActionMovePageToRight()
     m_viewer->undoStack()->push(cmd);
 }
 
-void LaserControllerWindow::onActionSelecteAll()
+void LaserControllerWindow::onActionSelectAll()
 {
-    SelecteAllCommand* cmd = new SelecteAllCommand(m_viewer);
+    CommonSelectionCommand* cmd = new CommonSelectionCommand(m_viewer);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionInvertSelect()
+{
+    CommonSelectionCommand* cmd = new CommonSelectionCommand(m_viewer, true);
     m_viewer->undoStack()->push(cmd);
 }
 

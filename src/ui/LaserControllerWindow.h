@@ -339,7 +339,8 @@ protected slots:
     void onActionMovePageToBottom();
     void onActionMovePageToLeft();
     void onActionMovePageToRight();
-    void onActionSelecteAll();
+    void onActionSelectAll();
+    void onActionInvertSelect();
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
     void onJoinedGroupChanged();

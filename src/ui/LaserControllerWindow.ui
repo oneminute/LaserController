@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -74,7 +74,8 @@
     <addaction name="actionPaste"/>
     <addaction name="actionPasteInPlace"/>
     <addaction name="separator"/>
-    <addaction name="actionSelecteAll"/>
+    <addaction name="actionSelectAll"/>
+    <addaction name="actionInvertSelection"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -1646,19 +1647,34 @@
     <string>MoveToPageBottomRight</string>
    </property>
   </action>
-  <action name="actionSelecteAll">
+  <action name="actionSelectAll">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/selecte_all.png</normaloff>:/ui/icons/images/selecte_all.png</iconset>
    </property>
    <property name="text">
-    <string>Selecte All</string>
+    <string>Select All</string>
    </property>
    <property name="toolTip">
-    <string>Selecte All</string>
+    <string>Select All</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionInvertSelection">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/selecte_all.png</normaloff>:/ui/icons/images/selecte_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Invert Selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Invert Selection</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
    </property>
   </action>
  </widget>

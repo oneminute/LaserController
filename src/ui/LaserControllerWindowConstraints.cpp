@@ -695,38 +695,71 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionHalfTone
 
-    // begin m_ui->actionSelecteAll
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentSelectedEditingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentViewDragReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentViewDragingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveSplineState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveRectReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitiveRectCreatingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveEllipseReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitiveEllipseCreatingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveLineReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitiveLineCreatingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitivePolygonReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitivePolygonCreatingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitivePolygonStartRectState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveTextReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitiveTextCreatingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", true, documentPrimitiveSplineReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitiveSplineCreatingState);
-    BIND_PROP_TO_STATE(m_ui->actionSelecteAll, "enabled", false, documentPrimitiveSplineEditState);
-    // end m_ui->actionSelecteAll
+    // begin m_ui->actionSelectAll
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveRectReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveRectCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveEllipseReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveEllipseCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveLineReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveLineCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitivePolygonReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitivePolygonCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitivePolygonStartRectState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveTextReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveTextCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveSplineReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveSplineCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveSplineEditState);
+    // end m_ui->actionSelectAll
+
+    // begin m_ui->actionInvertSelection
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveRectReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveRectCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveEllipseReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveEllipseCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveLineReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveLineCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitivePolygonReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitivePolygonCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitivePolygonStartRectState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveTextReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveTextCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveSplineReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveSplineCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveSplineEditState);
+    // end m_ui->actionInvertSelection
 
     // begin m_ui->actionCut
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, initState);

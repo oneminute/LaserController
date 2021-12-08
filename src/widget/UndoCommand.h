@@ -260,14 +260,15 @@ private:
     QPointF m_undoPos;
     int m_type;
 };
-class SelecteAllCommand : public QUndoCommand {
+class CommonSelectionCommand : public QUndoCommand {
 public:
-    SelecteAllCommand(LaserViewer* viewer);
-    ~SelecteAllCommand();
+    CommonSelectionCommand(LaserViewer* viewer, bool isInvert = false);
+    ~CommonSelectionCommand();
 private:
     LaserViewer * m_viewer;
     LaserPrimitiveGroup* m_group;
     QList<LaserPrimitive*> m_undoList;
+    bool m_isInvert;
 protected:
     virtual void undo() override;
     virtual void redo() override;

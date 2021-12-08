@@ -1298,7 +1298,7 @@ void ArrangeMoveToPageCommand::redo()
     
 }
 
-SelecteAllCommand::SelecteAllCommand(LaserViewer* viewer)
+CommonSelectionCommand::CommonSelectionCommand(LaserViewer* viewer, bool isInvert)
 {
     m_viewer = viewer;
     m_group = m_viewer->group();
@@ -1306,13 +1306,14 @@ SelecteAllCommand::SelecteAllCommand(LaserViewer* viewer)
         LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
         m_undoList.append(p);
     }
+    m_isInvert = isInvert;
 }
 
-SelecteAllCommand::~SelecteAllCommand()
+CommonSelectionCommand::~CommonSelectionCommand()
 {
 }
 
-void SelecteAllCommand::undo()
+void CommonSelectionCommand::undo()
 {
     m_group->removeAllFromGroup(true);
     m_group->setTransform(QTransform());
@@ -1323,15 +1324,26 @@ void SelecteAllCommand::undo()
     m_viewer->viewport()->repaint();
 }
 
-void SelecteAllCommand::redo()
+void CommonSelectionCommand::redo()
 {
     m_group->removeAllFromGroup();
     m_group->setTransform(QTransform());
     for (LaserPrimitive* p : m_viewer->scene()->document()->primitives()) {
-        if (!m_group->isAncestorOf(p)) {
+        if (m_isInvert) {
+            if (p->isSelected()) {
+                p->setSelected(false);
+            }
+            else {
+                p->setSelected(true);
+                m_group->addToGroup(p);
+            }
+        }
+        //select all
+        else {
             p->setSelected(true);
             m_group->addToGroup(p);
         }
+        
     }
     if (!m_viewer->group()->isEmpty() && StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
         emit m_viewer->idleToSelected();
