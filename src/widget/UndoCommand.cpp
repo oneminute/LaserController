@@ -29,17 +29,10 @@ void SelectionUndoCommand::undo()
 {
 	
 	handle(m_undoSelectedList);
-	/*if (m_reshapeCmd) {
-		m_reshapeCmd->undo();
-	}
-	m_reshapeCmd = nullptr;*/
 }
 
 void SelectionUndoCommand::redo()
 {
-	//qDebug() << m_groupUndoTransform;
-	//qDebug() << m_groupRedoTransform;
-    //m_viewer->scene()->selectedPrimitives()
     QList<LaserPrimitive*> lPList= m_viewer->scene()->selectedPrimitives();
     QSet<QGraphicsItem*> list;
     QSet<QGraphicsItem*> redoList;
@@ -51,9 +44,6 @@ void SelectionUndoCommand::redo()
     for (QGraphicsItem* primitive : m_redoSelectedList.keys()) {
         redoList.insert(primitive);
     }
-
-    //qDebug() << list;
-    //qDebug() << redoList;
 	if(!m_viewer || !m_viewer->group()|| list == redoList){
 		return;
 	}
@@ -1045,6 +1035,7 @@ void ArrangeAlignCommand::undo()
     for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_undoMap.begin(); i != m_undoMap.end(); i++) {
         i.key()->setTransform(i.value());
         i.key()->setPos(0, 0);
+        m_scene->quadTreeNode()->upDatePrimitive(i.key());
         m_group->addToGroup(i.key());
     }
     emit m_viewer->selectedChangedFromMouse();
@@ -1073,7 +1064,7 @@ void ArrangeAlignCommand::redo()
                     scrBound = joinedGroupSceneBounds(p);
                 }
                 if (!moveByType(p, targetBounds, scrBound)) {
-                    break;
+                    return;
                 }
             }
         }
@@ -1090,7 +1081,7 @@ void ArrangeAlignCommand::redo()
                     scrBound = joinedGroupSceneBounds(p);
                 }
                 if (!moveByType(p, targetBounds, scrBound)) {
-                    break;
+                    return;
                 }
             }
         }
@@ -1203,4 +1194,147 @@ QRect ArrangeAlignCommand::joinedGroupSceneBounds(LaserPrimitive * p)
     utils::boundingRect(p->joinedGroupList(), bounds, QRect(), false);
     joinedGroupBoundsMap.insert(p, bounds);
     return bounds;
+}
+
+ArrangeMoveToPageCommand::ArrangeMoveToPageCommand(LaserViewer * viewer, int type)
+{
+    m_viewer = viewer;
+    m_type = type;
+    m_scene = m_viewer->scene();
+    m_group = m_viewer->group();
+    QRect bounds;
+    utils::boundingRect(m_group->childItems(), bounds, QRect(), false);
+    m_undoPos = bounds.center();
+}
+
+ArrangeMoveToPageCommand::~ArrangeMoveToPageCommand()
+{
+}
+
+void ArrangeMoveToPageCommand::undo()
+{
+    QRect bounds;
+    utils::boundingRect(m_group->childItems(), bounds, QRect(), false);
+    QPointF pos(bounds.center());
+    m_group->moveBy(m_undoPos.x() - pos.x(), m_undoPos.y() - pos.y());
+    for (QGraphicsItem* item : m_group->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_scene->quadTreeNode()->upDatePrimitive(p);
+    }
+    emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
+}
+
+void ArrangeMoveToPageCommand::redo()
+{
+    //group
+    QRect bounds;
+    utils::boundingRect(m_group->childItems(), bounds, QRect(), false);
+    QPointF pos;
+    //scene
+    QRect sceneBounds = m_scene->backgroundItem()->rect();
+    QPointF scenePos;
+    switch (m_type) {
+        case Qt::TopLeftCorner: {
+            pos = bounds.center();
+            scenePos = sceneBounds.topLeft();
+            break;
+        }
+        case Qt::TopRightCorner: {
+            pos = bounds.center();
+            scenePos = sceneBounds.topRight();
+            break;
+        }
+        case Qt::BottomLeftCorner: {
+            pos = bounds.center();
+            scenePos = sceneBounds.bottomLeft();
+            break;
+        }
+        case Qt::BottomRightCorner: {
+            pos = bounds.center();
+            scenePos = sceneBounds.bottomRight();
+            break;
+        }
+        case AT_Center: {
+            pos = bounds.center();
+            scenePos = sceneBounds.center();
+            break;
+        }
+        case AT_Left: {
+            pos = QPointF(bounds.left(), bounds.center().y());
+            scenePos = QPointF(sceneBounds.left(), sceneBounds.center().y());
+            break;
+        }
+        case AT_Right: {
+            pos = QPointF(bounds.right(), bounds.center().y());
+            scenePos = QPointF(sceneBounds.right(), sceneBounds.center().y());
+            break;
+        }
+        case AT_Top: {
+            pos = QPointF(bounds.center().x(), bounds.top());
+            scenePos = QPointF(sceneBounds.center().x(), sceneBounds.top());
+            break;
+        }
+        case AT_Bottom: {
+            pos = QPointF(bounds.center().x(), bounds.bottom());
+            scenePos = QPointF(sceneBounds.center().x(), sceneBounds.bottom());
+            break;
+        }
+    }
+    m_group->moveBy(scenePos.x() - pos.x(), scenePos.y() - pos.y());
+    if (m_scene->maxRegion().contains(m_group->sceneBoundingRect().toRect())) {
+        for (QGraphicsItem* item : m_group->childItems()) {
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            m_scene->quadTreeNode()->upDatePrimitive(p);
+        }
+        emit m_viewer->selectedChangedFromMouse();
+        m_viewer->viewport()->repaint();
+    }
+    else {
+        QMessageBox::warning(m_viewer, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        undo();
+    }
+    
+    
+}
+
+SelecteAllCommand::SelecteAllCommand(LaserViewer* viewer)
+{
+    m_viewer = viewer;
+    m_group = m_viewer->group();
+    for (QGraphicsItem* item : m_group->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_undoList.append(p);
+    }
+}
+
+SelecteAllCommand::~SelecteAllCommand()
+{
+}
+
+void SelecteAllCommand::undo()
+{
+    m_group->removeAllFromGroup(true);
+    m_group->setTransform(QTransform());
+    for (LaserPrimitive* p : m_undoList) {
+        m_group->addToGroup(p);
+        p->setSelected(true);
+    }
+    m_viewer->viewport()->repaint();
+}
+
+void SelecteAllCommand::redo()
+{
+    m_group->removeAllFromGroup();
+    m_group->setTransform(QTransform());
+    for (LaserPrimitive* p : m_viewer->scene()->document()->primitives()) {
+        if (!m_group->isAncestorOf(p)) {
+            p->setSelected(true);
+            m_group->addToGroup(p);
+        }
+    }
+    if (!m_viewer->group()->isEmpty() && StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
+        emit m_viewer->idleToSelected();
+    }
+    m_viewer->viewport()->repaint();
 }

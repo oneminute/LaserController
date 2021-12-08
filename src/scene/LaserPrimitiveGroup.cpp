@@ -146,6 +146,16 @@ bool LaserPrimitiveGroup::isEmpty() const
 {
     return childItems().isEmpty();
 }
+void LaserPrimitiveGroup::removeAllFromGroup(bool resetSelected)
+{
+    for (QGraphicsItem* item : childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        removeFromGroup(p);
+        if (resetSelected) {
+            p->setSelected(false);
+        }
+    }
+}
 QRectF LaserPrimitiveGroup::sceneBoundingRect() const
 {
     return this->mapRectToScene(boundingRect());

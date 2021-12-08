@@ -330,6 +330,16 @@ protected slots:
     void onActionAlignVerticalRight();
     void onActionSameWidth();
     void onActionSameHeight();
+    void onActionMovePageToTopLeft();
+    void onActionMovePageToTopRight();
+    void onActionMovePageToBottomRight();
+    void onActionMovePageToBottomLeft();
+    void onActionMovePageToCenter();
+    void onActionMovePageToTop();
+    void onActionMovePageToBottom();
+    void onActionMovePageToLeft();
+    void onActionMovePageToRight();
+    void onActionSelecteAll();
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
     void onJoinedGroupChanged();
@@ -644,6 +654,7 @@ private:
     LaserToolButton* m_arrangeButtonAlignCenter;
     LaserToolButton* m_arrangeButtonSameWidth;
     LaserToolButton* m_arrangeButtonSameHeight;
+    LaserToolButton* m_arrangeMoveToPage;
     int m_alignTargetIndex;
     LaserPrimitive* m_alignTarget;
     friend class LaserApplication;

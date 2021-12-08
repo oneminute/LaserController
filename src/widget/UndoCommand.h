@@ -245,5 +245,31 @@ protected:
     bool moveByType(LaserPrimitive* p, QRect target, QRect src);
     QRect joinedGroupSceneBounds(LaserPrimitive* p);
 };
-
+//move to page
+class ArrangeMoveToPageCommand : public QUndoCommand {
+public:
+    ArrangeMoveToPageCommand(LaserViewer* viewer, int type);
+    ~ArrangeMoveToPageCommand();
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserViewer * m_viewer;
+    LaserScene* m_scene;
+    LaserPrimitiveGroup* m_group;
+    QPointF m_undoPos;
+    int m_type;
+};
+class SelecteAllCommand : public QUndoCommand {
+public:
+    SelecteAllCommand(LaserViewer* viewer);
+    ~SelecteAllCommand();
+private:
+    LaserViewer * m_viewer;
+    LaserPrimitiveGroup* m_group;
+    QList<LaserPrimitive*> m_undoList;
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+};
 #endif // UNDOCOMMAND_H

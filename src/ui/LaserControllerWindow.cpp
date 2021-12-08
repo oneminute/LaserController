@@ -215,6 +215,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonAlignVertical = new LaserToolButton(this);
     m_arrangeButtonSameWidth = new LaserToolButton(this);
     m_arrangeButtonSameHeight = new LaserToolButton(this);
+    m_arrangeMoveToPage = new LaserToolButton(this);
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -281,6 +282,20 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         initAlignTarget();
         m_viewer->viewport()->repaint();
     });
+    //move to page
+    m_arrangeMoveToPage->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeMoveToPage->setIcon(QIcon(":/ui/icons/images/page_center.png"));
+    LaserMenu* moveToPageMenu = new LaserMenu(m_arrangeMoveToPage);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageCenter);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageTopLeft);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageTopRight);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageBottomLeft);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageBottomRight);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageTop);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageBottom);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageLeft);
+    moveToPageMenu->addAction(m_ui->actionMoveToPageRight);
+    m_arrangeMoveToPage->setMenu(moveToPageMenu);
 
     m_arrangeButtonAlignCenter->connect(m_arrangeButtonAlignCenter,
         &LaserToolButton::showMenu, this, &LaserControllerWindow::onLaserToolButtonShowMenu);
@@ -308,11 +323,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignVertical);
     m_ui->arrangeBar->addWidget(m_arrangeButtonSameWidth);
     m_ui->arrangeBar->addWidget(m_arrangeButtonSameHeight);
+    m_ui->arrangeBar->addWidget(m_arrangeMoveToPage);
     m_arrangeButtonAlignCenter->setEnabled(false);
     m_arrangeButtonAlignHorinzontal->setEnabled(false);
     m_arrangeButtonAlignVertical->setEnabled(false);
     m_arrangeButtonSameWidth->setEnabled(false);
     m_arrangeButtonSameHeight->setEnabled(false);
+    m_arrangeMoveToPage->setEnabled(false);
     // init status bar
     m_statusBarDeviceStatus = new QLabel;
     m_statusBarDeviceStatus->setText(ltr("Tips"));
@@ -923,7 +940,16 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionAlignVerticalRight, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalRight);
     connect(m_ui->actionSameWidth, &QAction::triggered, this, &LaserControllerWindow::onActionSameWidth);
     connect(m_ui->actionSameHeight, &QAction::triggered, this, &LaserControllerWindow::onActionSameHeight);
-
+    connect(m_ui->actionMoveToPageTopLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToTopLeft);
+    connect(m_ui->actionMoveToPageTopRight, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToTopRight);
+    connect(m_ui->actionMoveToPageBottomLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToBottomLeft);
+    connect(m_ui->actionMoveToPageBottomRight, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToBottomRight);
+    connect(m_ui->actionMoveToPageCenter, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToCenter);
+    connect(m_ui->actionMoveToPageTop, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToTop);
+    connect(m_ui->actionMoveToPageBottom, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToBottom);
+    connect(m_ui->actionMoveToPageLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToLeft);
+    connect(m_ui->actionMoveToPageRight, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToRight);
+    connect(m_ui->actionSelecteAll, &QAction::triggered, this, &LaserControllerWindow::onActionSelecteAll);
     //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
     //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
@@ -4414,9 +4440,11 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
     //selection property panel, others in onLaserPrimitiveGroupItemTransformChanged
     if (items.length() > 0) {
         m_propertyWidget->setEnabled(true);
+        m_arrangeMoveToPage->setEnabled(true);
     }
     else {
         m_propertyWidget->setEnabled(false);
+        m_arrangeMoveToPage->setEnabled(false);
     }
     //joinedGroupButtonsChanged
     if (items.length() > 1) {
@@ -5218,6 +5246,66 @@ void LaserControllerWindow::onActionSameWidth()
 void LaserControllerWindow::onActionSameHeight()
 {
     ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, ArrangeType::AT_SameHeight);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToTopLeft()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, Qt::TopLeftCorner);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToTopRight()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, Qt::TopRightCorner);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToBottomRight()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, Qt::BottomRightCorner);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToBottomLeft()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, Qt::BottomLeftCorner);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToCenter()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, ArrangeType::AT_Center);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToTop()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, ArrangeType::AT_Top);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToBottom()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, ArrangeType::AT_Bottom);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToLeft()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, ArrangeType::AT_Left);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionMovePageToRight()
+{
+    ArrangeMoveToPageCommand* cmd = new ArrangeMoveToPageCommand(m_viewer, ArrangeType::AT_Right);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionSelecteAll()
+{
+    SelecteAllCommand* cmd = new SelecteAllCommand(m_viewer);
     m_viewer->undoStack()->push(cmd);
 }
 

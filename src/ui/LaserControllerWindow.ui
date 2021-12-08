@@ -73,6 +73,8 @@
     <addaction name="actionMultiDuplication"/>
     <addaction name="actionPaste"/>
     <addaction name="actionPasteInPlace"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelecteAll"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -1521,7 +1523,7 @@
   </action>
   <action name="actionSameHeight">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/same_height.png</normaloff>:/ui/icons/images/same_height.png</iconset>
    </property>
    <property name="text">
@@ -1531,13 +1533,13 @@
     <string>Make selected items same height</string>
    </property>
   </action>
-  <action name="actionmoveToPageCenter">
+  <action name="actionMoveToPageCenter">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/page_center.png</normaloff>:/ui/icons/images/page_center.png</iconset>
    </property>
    <property name="text">
-    <string>moveToPageCenter</string>
+    <string>Move To Page Center</string>
    </property>
    <property name="toolTip">
     <string>Move selection to ...</string>
@@ -1630,6 +1632,33 @@
   <action name="actionSaveZOrigin">
    <property name="text">
     <string>Save Z Origin</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageBottomRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_bottomRight.png</normaloff>:/ui/icons/images/page_bottomRight.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Lower Right</string>
+   </property>
+   <property name="toolTip">
+    <string>MoveToPageBottomRight</string>
+   </property>
+  </action>
+  <action name="actionSelecteAll">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/selecte_all.png</normaloff>:/ui/icons/images/selecte_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Selecte All</string>
+   </property>
+   <property name="toolTip">
+    <string>Selecte All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

@@ -4498,17 +4498,15 @@ void LaserViewer::onDocumentIdle()
 		int size = items.size();
 		if (items.size() > 0) {
 			emit endSelecting();
-			//
+            return;
 		}
 
 	}
-	//viewport()->repaint();
+	viewport()->repaint();
 }
 
 QMap<QGraphicsItem*, QTransform> LaserViewer::onCancelSelected()
 {
-	
-	//emit cancelSelected();
 	QMap<QGraphicsItem*, QTransform> selectedList = clearGroupSelection();
 	emit beginSelecting();
 	viewport()->repaint();
