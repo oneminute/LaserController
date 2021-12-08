@@ -59,6 +59,7 @@
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
     <addaction name="actionRemoteAssistance"/>
+    <addaction name="actionCameraTools"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -1675,6 +1676,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+I</string>
+   </property>
+  </action>
+  <action name="actionCameraTools">
+   <property name="text">
+    <string>Camera Tools</string>
    </property>
   </action>
  </widget>

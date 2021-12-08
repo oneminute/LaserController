@@ -68,6 +68,7 @@
 #include "ui/RegisteDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
+#include "ui/CameraToolsWindow.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -755,6 +756,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionPrintAndCutSelectPoint, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutSelectPoint);
     connect(m_ui->actionPrintAndCutEndSelect, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutEndSelect);
 
+    connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
+
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
     connect(m_viewer, &LaserViewer::mouseMoved, this, &LaserControllerWindow::onLaserViewerMouseMoved);
@@ -1065,11 +1068,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));*/
 
-    m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
+    /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(90304, 74802));
     m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(140310, 124805));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));*/
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -2386,7 +2389,7 @@ void LaserControllerWindow::createPrintAndCutPanel()
     resultLayout->setMargin(2);
     m_labelPrintAndCutTranslationResult = new QLabel(tr("Translation"));
     m_labelPrintAndCutRotationResult = new QLabel(tr("Rotation"));
-    m_labelPrintAndCutTranslation= new QLabel(tr("0.000, 0.000"));
+    m_labelPrintAndCutTranslation= new QLabel(tr("0.000mm, 0.000mm"));
     m_labelPrintAndCutRotation= new QLabel(tr("0.00 degrees"));
     QFormLayout* resultFormLayout = new QFormLayout;
     resultFormLayout->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
@@ -4214,7 +4217,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 
     t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx(), t.dy());
     m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle, 0, 'f', 3));
-    m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x(), 0, 'f', 3).arg(diff.y(), 0, 'f', 3));
+    m_labelPrintAndCutTranslation->setText(tr("%1mm, %2mm").arg(diff.x() * 0.001, 0, 'f', 3).arg(diff.y() * 0.001, 0, 'f', 3));
 
     if (!StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
     {
@@ -4304,6 +4307,12 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
             .arg(x, 8, 'f', 3, QLatin1Char(' '))
             .arg(y, 8, 'f', 3, QLatin1Char(' ')));
     }
+}
+
+void LaserControllerWindow::onActionCameraTools(bool checked)
+{
+    CameraToolsWindow* ctWindow = new CameraToolsWindow(this);
+    ctWindow->show();
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -4623,6 +4632,8 @@ void LaserControllerWindow::onLayoutChanged(const QSize& size)
     {
     case 0:
         m_statusBarCoordinate->setText(ltr("Top Left"));
+        offset = newRect.topLeft() - m_layoutRect.topLeft();
+        break;
     case 1:
         offset = newRect.bottomLeft() - m_layoutRect.bottomLeft();
         m_statusBarCoordinate->setText(ltr("Bottom Left"));

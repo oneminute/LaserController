@@ -32,7 +32,7 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Eigen3 REQUIRED)
 find_package(Boost 1.66 COMPONENTS timer REQUIRED)
-find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Test CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Multimedia MultimediaWidgets Test CONFIG REQUIRED)
 find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui videoio flann xfeatures2d REQUIRED)
 find_package(OpenMP REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
@@ -124,6 +124,7 @@ set(OTHER_FILES
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
     src/res/laser.rc
+    cmake/Compress.cmake
     cmake/GenerateConstraints.cmake
     .gitignore
     ${TRANSLATIONS}
@@ -208,7 +209,7 @@ ENDIF(MSVC)
 
 include_directories(${INCLUDE_DIRS})
 set(LINK_LIBRARIES 
-    Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Concurrent Qt5::Test
+    Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Concurrent Qt5::Test Qt5::Multimedia Qt5::MultimediaWidgets
     FLANN::FLANN
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
@@ -275,4 +276,4 @@ add_custom_target (GenerateTranslations
 
 include(cmake_install_Debug.txt)
 include(cmake_install_Release.txt)
-include(cmake_install_RelWithDebInfo.txt)
+#include(cmake_install_RelWithDebInfo.txt)
