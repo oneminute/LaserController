@@ -119,6 +119,6 @@
         <file>images/page_bottomLeft.png</file>
         <file>images/selecte_all.png</file>
         <file>images/z_origin.png</file>
+        <file>images/camera_capture.png</file>
     </qresource>
-    
 </RCC>

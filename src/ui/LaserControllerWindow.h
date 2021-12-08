@@ -257,6 +257,8 @@ protected slots:
     void onActionRedLightAlignmentStart(bool checked = false);
     void onActionRedLightAlignmentFinish(bool checked = false);
 
+    void onActionCameraTools(bool checked = false);
+
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
     void onDeviceDisconnected();

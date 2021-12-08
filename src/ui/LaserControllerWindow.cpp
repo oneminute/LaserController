@@ -68,6 +68,7 @@
 #include "ui/RegisteDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
+#include "ui/CameraToolsWindow.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -754,6 +755,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionFinishRedLightAlight, &QAction::triggered, this, &LaserControllerWindow::onActionRedLightAlignmentFinish);
     connect(m_ui->actionPrintAndCutSelectPoint, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutSelectPoint);
     connect(m_ui->actionPrintAndCutEndSelect, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutEndSelect);
+
+    connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -4306,6 +4309,12 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
     }
 }
 
+void LaserControllerWindow::onActionCameraTools(bool checked)
+{
+    CameraToolsWindow* ctWindow = new CameraToolsWindow(this);
+    ctWindow->show();
+}
+
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -4623,6 +4632,8 @@ void LaserControllerWindow::onLayoutChanged(const QSize& size)
     {
     case 0:
         m_statusBarCoordinate->setText(ltr("Top Left"));
+        offset = newRect.topLeft() - m_layoutRect.topLeft();
+        break;
     case 1:
         offset = newRect.bottomLeft() - m_layoutRect.bottomLeft();
         m_statusBarCoordinate->setText(ltr("Bottom Left"));
