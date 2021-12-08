@@ -1322,7 +1322,7 @@
     <message>
         <location line="+4"/>
         <source>X Start Speed(mm/s)</source>
-        <translation>X复位速度(mm/s)</translation>
+        <translation>X轴起跳速度(mm/s)</translation>
     </message>
     <message>
         <location line="+1"/>

@@ -1038,11 +1038,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));*/
 
-    m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
+    /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(90304, 74802));
     m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(140310, 124805));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));*/
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -2359,7 +2359,7 @@ void LaserControllerWindow::createPrintAndCutPanel()
     resultLayout->setMargin(2);
     m_labelPrintAndCutTranslationResult = new QLabel(tr("Translation"));
     m_labelPrintAndCutRotationResult = new QLabel(tr("Rotation"));
-    m_labelPrintAndCutTranslation= new QLabel(tr("0.000, 0.000"));
+    m_labelPrintAndCutTranslation= new QLabel(tr("0.000mm, 0.000mm"));
     m_labelPrintAndCutRotation= new QLabel(tr("0.00 degrees"));
     QFormLayout* resultFormLayout = new QFormLayout;
     resultFormLayout->setLabelAlignment(Qt::AlignmentFlag::AlignRight);
@@ -4187,7 +4187,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 
     t = QTransform(t.m11(), t.m12(), t.m21(), t.m22(), t.dx(), t.dy());
     m_labelPrintAndCutRotation->setText(tr("%1 degrees").arg(angle, 0, 'f', 3));
-    m_labelPrintAndCutTranslation->setText(tr("%1, %2").arg(diff.x(), 0, 'f', 3).arg(diff.y(), 0, 'f', 3));
+    m_labelPrintAndCutTranslation->setText(tr("%1mm, %2mm").arg(diff.x() * 0.001, 0, 'f', 3).arg(diff.y() * 0.001, 0, 'f', 3));
 
     if (!StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
     {

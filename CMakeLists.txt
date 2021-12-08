@@ -124,6 +124,7 @@ set(OTHER_FILES
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
     src/res/laser.rc
+    cmake/Compress.cmake
     cmake/GenerateConstraints.cmake
     .gitignore
     ${TRANSLATIONS}
@@ -275,4 +276,4 @@ add_custom_target (GenerateTranslations
 
 include(cmake_install_Debug.txt)
 include(cmake_install_Release.txt)
-include(cmake_install_RelWithDebInfo.txt)
+#include(cmake_install_RelWithDebInfo.txt)
