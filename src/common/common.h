@@ -283,7 +283,12 @@ enum FinishRunType
 enum ArrangeType
 {
     AT_SameWidth = 5,
-    AT_SameHeight = 6
+    AT_SameHeight = 6,
+    AT_Left = 7,
+    AT_Right = 8,
+    AT_Top = 9,
+    AT_Bottom = 10,
+    AT_Center = 11,
 };
 struct FillStyleAndPixelsCount
 {

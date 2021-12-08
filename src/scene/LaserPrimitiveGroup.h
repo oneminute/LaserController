@@ -22,6 +22,7 @@ public:
     virtual QRectF boundingRect() const override;
     QRectF sceneBoundingRect() const;
     bool isEmpty() const;
+    void removeAllFromGroup(bool resetSelected = false);
 public: signals:
     void childrenChanged();
 };

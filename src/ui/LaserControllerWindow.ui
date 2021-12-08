@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -73,6 +73,9 @@
     <addaction name="actionMultiDuplication"/>
     <addaction name="actionPaste"/>
     <addaction name="actionPasteInPlace"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelectAll"/>
+    <addaction name="actionInvertSelection"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -1521,7 +1524,7 @@
   </action>
   <action name="actionSameHeight">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/same_height.png</normaloff>:/ui/icons/images/same_height.png</iconset>
    </property>
    <property name="text">
@@ -1531,13 +1534,13 @@
     <string>Make selected items same height</string>
    </property>
   </action>
-  <action name="actionmoveToPageCenter">
+  <action name="actionMoveToPageCenter">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/page_center.png</normaloff>:/ui/icons/images/page_center.png</iconset>
    </property>
    <property name="text">
-    <string>moveToPageCenter</string>
+    <string>Move To Page Center</string>
    </property>
    <property name="toolTip">
     <string>Move selection to ...</string>
@@ -1630,6 +1633,48 @@
   <action name="actionSaveZOrigin">
    <property name="text">
     <string>Save Z Origin</string>
+   </property>
+  </action>
+  <action name="actionMoveToPageBottomRight">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/page_bottomRight.png</normaloff>:/ui/icons/images/page_bottomRight.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move To Page Lower Right</string>
+   </property>
+   <property name="toolTip">
+    <string>MoveToPageBottomRight</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/selecte_all.png</normaloff>:/ui/icons/images/selecte_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="toolTip">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionInvertSelection">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/selecte_all.png</normaloff>:/ui/icons/images/selecte_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Invert Selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Invert Selection</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
    </property>
   </action>
  </widget>
