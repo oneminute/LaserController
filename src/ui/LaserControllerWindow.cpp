@@ -1062,11 +1062,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     onLayoutChanged(LaserApplication::device->layoutSize());
 
-    /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
+    m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
     m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));*/
+    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));
 
     /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(90304, 74802));
@@ -4221,6 +4221,8 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 
     if (!StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
     {
+        Config::Device::startFromItem()->setValue(SFT_AbsoluteCoords, SS_DIRECTLY, this);
+        Config::Device::startFromItem()->setEnabled(false);
         emit startPrintAndCutAligning();
     }
 
@@ -4244,6 +4246,7 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
 
 void LaserControllerWindow::onActionPrintAndCutRestore(bool checked)
 {
+    Config::Device::startFromItem()->setEnabled(true);
     m_scene->document()->setEnablePrintAndCut(false);
     m_scene->document()->setTransform(QTransform());
     emit finishPrintAndCutAligning();
