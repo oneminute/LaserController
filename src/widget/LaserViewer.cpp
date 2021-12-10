@@ -523,6 +523,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
         LaserControllerWindow* window = LaserApplication::mainWindow;
        
 		QTransform t = m_group->transform();
+        QTransform lastTransform = m_group->sceneTransform();
         
         bool isLockRatio = window->lockEqualRatio();
 		switch (_transformType) {
@@ -568,6 +569,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 						break;
 					}
 				}
+                
 				t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
 				m_group->setTransform(t);
 				break;
@@ -631,7 +633,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				t2.translate(diff.x(), diff.y());
 				t = t * t2;
 				m_group->setTransform(t);
-				//emit selectedChangedFromMouse();
+                emit selectedChangedFromMouse();
 				break;
 			}
 			case Transform_RESIZE: {
@@ -704,6 +706,7 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				diff = original - newOriginal;
 				t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
 				m_group->setTransform(t);
+                emit selectedChangedFromMouse();
 				break;
 			}
 			case Transform_ROTATE: {
@@ -756,9 +759,12 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				t2.translate(diff.x(), diff.y());
 				t = t * t1 * t2;
 				m_group->setTransform(t);
+                emit selectedChangedFromMouse();
 				break;
 			}
 		}
+        GroupTransformUndoCommand* cmd = new GroupTransformUndoCommand(m_scene.data(), lastTransform, m_group->sceneTransform());
+        m_undoStack->push(cmd);
 	}
 }
 void LaserViewer::setAnchorPoint(QPointF point)

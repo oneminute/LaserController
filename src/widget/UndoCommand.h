@@ -273,4 +273,17 @@ protected:
     virtual void undo() override;
     virtual void redo() override;
 };
+//distribute v-spaced/center h-spaced
+class DistributeUndoCommand : public QUndoCommand {
+public:
+    DistributeUndoCommand(LaserViewer* viewer);
+    ~DistributeUndoCommand();
+    void findTopAndBottomPrimitive(LaserPrimitive* & topPrimitive, LaserPrimitive* & bottomPrimitive);
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+private:
+    LaserViewer * m_viewer;
+    LaserPrimitiveGroup* m_group;
+};
 #endif // UNDOCOMMAND_H

@@ -289,6 +289,10 @@ enum ArrangeType
     AT_Top = 9,
     AT_Bottom = 10,
     AT_Center = 11,
+    AT_VSpaced = 12,
+    AT_VCentered = 13,
+    AT_HSpaced = 14,
+    AT_HCentered = 15
 };
 struct FillStyleAndPixelsCount
 {
