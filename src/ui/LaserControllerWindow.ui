@@ -1683,6 +1683,51 @@
     <string>Camera Tools</string>
    </property>
   </action>
+  <action name="actionDistributeVSpaced">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/distribute_verticalSpace.png</normaloff>:/ui/icons/images/distribute_verticalSpace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Distribute V-Spaced</string>
+   </property>
+   <property name="toolTip">
+    <string>Distribute V-Spaced</string>
+   </property>
+  </action>
+  <action name="actionDistributeVCentered">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/distribute_verticalCenter.png</normaloff>:/ui/icons/images/distribute_verticalCenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Distribute V-Centered</string>
+   </property>
+   <property name="toolTip">
+    <string>Distribute V-Centered</string>
+   </property>
+  </action>
+  <action name="actionDistributeHCentered">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/distribute_horizontalCenter.png</normaloff>:/ui/icons/images/distribute_horizontalCenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Distribute H-Centered</string>
+   </property>
+  </action>
+  <action name="actionDistributeHSpaced">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/distribute_horizontalSpace.png</normaloff>:/ui/icons/images/distribute_horizontalSpace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Distribute H-Spaced</string>
+   </property>
+   <property name="toolTip">
+    <string>Distribute H-Spaced</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

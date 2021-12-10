@@ -214,6 +214,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonAlignCenter = new LaserToolButton(this);
     m_arrangeButtonAlignHorinzontal = new LaserToolButton(this);
     m_arrangeButtonAlignVertical = new LaserToolButton(this);
+    m_arrangeButtonDistributeHorinzontal = new LaserToolButton(this);
+    m_arrangeButtonDistributeVertical = new LaserToolButton(this);
     m_arrangeButtonSameWidth = new LaserToolButton(this);
     m_arrangeButtonSameHeight = new LaserToolButton(this);
     m_arrangeMoveToPage = new LaserToolButton(this);
@@ -263,6 +265,20 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         initAlignTarget();
         m_viewer->viewport()->repaint();
     });
+    //horizontal distribute
+    m_arrangeButtonDistributeHorinzontal->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonDistributeHorinzontal->setIcon(QIcon(":/ui/icons/images/distribute_horizontalSpace.png"));
+    LaserMenu* distributeHMenu = new LaserMenu(m_arrangeButtonDistributeHorinzontal);
+    distributeHMenu->addAction(m_ui->actionDistributeHSpaced);
+    distributeHMenu->addAction(m_ui->actionDistributeHCentered);
+    m_arrangeButtonDistributeHorinzontal->setMenu(distributeHMenu);
+    //vertical distribute
+    m_arrangeButtonDistributeVertical->setPopupMode(QToolButton::InstantPopup);
+    m_arrangeButtonDistributeVertical->setIcon(QIcon(":/ui/icons/images/distribute_verticalSpace.png"));
+    LaserMenu* distributeVMenu = new LaserMenu(m_arrangeButtonDistributeHorinzontal);
+    distributeVMenu->addAction(m_ui->actionDistributeVSpaced);
+    distributeVMenu->addAction(m_ui->actionDistributeVCentered);
+    m_arrangeButtonDistributeVertical->setMenu(distributeVMenu);
     //same width
     m_arrangeButtonSameWidth->setPopupMode(QToolButton::InstantPopup);
     m_arrangeButtonSameWidth->setIcon(QIcon(":/ui/icons/images/same_width.png"));
@@ -322,12 +338,16 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignCenter);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignHorinzontal);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignVertical);
+    m_ui->arrangeBar->addWidget(m_arrangeButtonDistributeHorinzontal);
+    m_ui->arrangeBar->addWidget(m_arrangeButtonDistributeVertical);
     m_ui->arrangeBar->addWidget(m_arrangeButtonSameWidth);
     m_ui->arrangeBar->addWidget(m_arrangeButtonSameHeight);
     m_ui->arrangeBar->addWidget(m_arrangeMoveToPage);
     m_arrangeButtonAlignCenter->setEnabled(false);
     m_arrangeButtonAlignHorinzontal->setEnabled(false);
     m_arrangeButtonAlignVertical->setEnabled(false);
+    m_arrangeButtonDistributeHorinzontal->setEnabled(false);
+    m_arrangeButtonDistributeVertical->setEnabled(false);
     m_arrangeButtonSameWidth->setEnabled(false);
     m_arrangeButtonSameHeight->setEnabled(false);
     m_arrangeMoveToPage->setEnabled(false);
@@ -941,6 +961,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionAlignVerticalMiddle, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalMiddle);
     connect(m_ui->actionAlignVerticalLeft, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalLeft);
     connect(m_ui->actionAlignVerticalRight, &QAction::triggered, this, &LaserControllerWindow::onActionAlignVerticalRight);
+    connect(m_ui->actionDistributeVSpaced, &QAction::triggered, this, &LaserControllerWindow::onActionDistributeVSpaced);
+    connect(m_ui->actionDistributeVCentered, &QAction::triggered, this, &LaserControllerWindow::onActionDistributeVCentered);
+    connect(m_ui->actionDistributeHCentered, &QAction::triggered, this, &LaserControllerWindow::onActionDistributeHCentered);
+    connect(m_ui->actionDistributeHSpaced, &QAction::triggered, this, &LaserControllerWindow::onActionDistributeHSpaced);
     connect(m_ui->actionSameWidth, &QAction::triggered, this, &LaserControllerWindow::onActionSameWidth);
     connect(m_ui->actionSameHeight, &QAction::triggered, this, &LaserControllerWindow::onActionSameHeight);
     connect(m_ui->actionMoveToPageTopLeft, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToTopLeft);
@@ -1237,6 +1261,14 @@ void LaserControllerWindow::changeAlignButtonsEnable()
         m_arrangeButtonAlignVertical->setEnabled(false);
         m_arrangeButtonSameWidth->setEnabled(false);
         m_arrangeButtonSameHeight->setEnabled(false);
+    }
+    if (items.size() > 2) {
+        m_arrangeButtonDistributeHorinzontal->setEnabled(true);
+        m_arrangeButtonDistributeVertical->setEnabled(true);
+    }
+    else {
+        m_arrangeButtonDistributeHorinzontal->setEnabled(false);
+        m_arrangeButtonDistributeVertical->setEnabled(false);
     }
     
 }
@@ -4369,8 +4401,9 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    //m_dockManager->deleteLater();
+    onActionCloseDocument();
     QMainWindow::closeEvent(event);
+
 }
 
 void LaserControllerWindow::onEnterDeviceUnconnectedState()
@@ -5256,6 +5289,25 @@ void LaserControllerWindow::onActionAlignVerticalRight()
 {
     ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignRight);
     m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionDistributeVSpaced()
+{
+    DistributeUndoCommand* cmd = new DistributeUndoCommand(m_viewer);
+    m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionDistributeVCentered()
+{
+    
+}
+
+void LaserControllerWindow::onActionDistributeHSpaced()
+{
+}
+
+void LaserControllerWindow::onActionDistributeHCentered()
+{
 }
 
 void LaserControllerWindow::onActionSameWidth()

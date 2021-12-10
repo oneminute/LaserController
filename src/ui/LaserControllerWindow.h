@@ -330,6 +330,10 @@ protected slots:
     void onActionAlignVerticalMiddle();
     void onActionAlignVerticalLeft();
     void onActionAlignVerticalRight();
+    void onActionDistributeVSpaced();
+    void onActionDistributeVCentered();
+    void onActionDistributeHSpaced();
+    void onActionDistributeHCentered();
     void onActionSameWidth();
     void onActionSameHeight();
     void onActionMovePageToTopLeft();
@@ -655,6 +659,8 @@ private:
     LaserToolButton* m_arrangeButtonAlignHorinzontal;
     LaserToolButton* m_arrangeButtonAlignVertical;
     LaserToolButton* m_arrangeButtonAlignCenter;
+    LaserToolButton* m_arrangeButtonDistributeHorinzontal;
+    LaserToolButton* m_arrangeButtonDistributeVertical;
     LaserToolButton* m_arrangeButtonSameWidth;
     LaserToolButton* m_arrangeButtonSameHeight;
     LaserToolButton* m_arrangeMoveToPage;

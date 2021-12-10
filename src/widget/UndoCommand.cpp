@@ -29,6 +29,7 @@ void SelectionUndoCommand::undo()
 {
 	
 	handle(m_undoSelectedList);
+    
 }
 
 void SelectionUndoCommand::redo()
@@ -110,6 +111,7 @@ void SelectionUndoCommand::handle(QMap<QGraphicsItem*, QTransform> list)
 	if (!m_viewer->group()->isEmpty() && StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
 		emit m_viewer->idleToSelected();
 	}
+    //emit m_viewer->selectedChangedFromMouse();
 	m_viewer->viewport()->repaint();
 }
 
@@ -866,14 +868,13 @@ void RectCommand::redo()
 }*/
 
 
-GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, QTransform lastTransform, QTransform curTransform)
+GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, 
+    QTransform lastTransform, QTransform curTransform)
     :m_scene(scene), m_lastTransform(lastTransform), m_curUndoTransform(curTransform)
 {
     m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
     m_group = m_viewer->group();
     m_tree = m_scene->quadTreeNode();
-    //m_lastTransform = lastTransform;
-    //m_curUndoTransform = curTransform;
     isRedo = false;
 }
 
@@ -1349,4 +1350,105 @@ void CommonSelectionCommand::redo()
         emit m_viewer->idleToSelected();
     }
     m_viewer->viewport()->repaint();
+}
+
+DistributeUndoCommand::DistributeUndoCommand(LaserViewer * viewer)
+{
+    m_viewer = viewer;
+    m_group = m_viewer->group();
+}
+
+DistributeUndoCommand::~DistributeUndoCommand()
+{
+}
+
+void DistributeUndoCommand::findTopAndBottomPrimitive(LaserPrimitive* & topPrimitive, LaserPrimitive* & bottomPrimitive)
+{
+    topPrimitive = nullptr;
+    bottomPrimitive = nullptr;
+    int index = 0;
+    for (QGraphicsItem* item : m_group->childItems()) {
+        
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        QRectF bounds = p->boundingRect();
+        if (index == 0) {
+            topPrimitive = p;
+            bottomPrimitive = p;
+        }
+        else {
+            if (topPrimitive->boundingRect().top() > bounds.top()) {
+                topPrimitive = p;
+            }
+            if (bottomPrimitive->boundingRect().bottom() < bounds.bottom()) {
+                bottomPrimitive = p;
+            }
+        }
+        index++;
+    }
+    
+}
+
+void DistributeUndoCommand::undo()
+{
+}
+
+void DistributeUndoCommand::redo()
+{
+    LaserPrimitive* toppestPrimitive = nullptr;
+    LaserPrimitive* bottommestPrimitive = nullptr;
+    findTopAndBottomPrimitive(toppestPrimitive, bottommestPrimitive);
+    qreal tPBottom = toppestPrimitive->sceneBoundingRect().bottom();
+    qreal bPTop = bottommestPrimitive->sceneBoundingRect().top();
+    qreal Tbspace = bPTop - tPBottom;
+    //except toppestPrimitive and bottommerPrimitive
+    qreal othersLength = 0;
+    QList<LaserPrimitive*> sortedList;
+    //sort primitives except toppestPrimitive and bottommerPrimitive
+    int whileIndex = 0;
+    while (1) {
+        int index = 0;
+        LaserPrimitive* topperPrimitive = nullptr;
+        for (QGraphicsItem* item : m_group->childItems()) {
+            
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            if (whileIndex == 0 && p != toppestPrimitive && p != bottommestPrimitive) {
+                othersLength += p->sceneBoundingRect().height();
+            }
+            if (p == toppestPrimitive || p == bottommestPrimitive
+                || sortedList.contains(p)) {
+                continue;
+            }
+            if (index == 0) {
+                topperPrimitive = p;
+            }
+            if (topperPrimitive->sceneBoundingRect().top() > p->sceneBoundingRect().top()) {
+                
+                topperPrimitive = p;
+            }
+            index++;
+        }
+        if (topperPrimitive) {
+            sortedList.append(topperPrimitive);
+        }
+        else {
+            break;
+        }
+        whileIndex++;
+    }
+    qreal diff = Tbspace - othersLength;
+    qreal space = diff/(sortedList.size() + 1);
+    qreal baseBottom = tPBottom;
+    for (LaserPrimitive* primitive : sortedList) {
+        primitive->moveBy(0, 
+            baseBottom - primitive->sceneBoundingRect().top() + space);
+        baseBottom = primitive->sceneBoundingRect().bottom();
+    }
+    int s = sortedList.size();
+    qDebug() << s;
+    //bottommest primitive need move
+    if (diff < 0) {
+        bottommestPrimitive->moveBy(0,
+            baseBottom - bottommestPrimitive->boundingRect().top() + space);       
+    }
+    
 }
