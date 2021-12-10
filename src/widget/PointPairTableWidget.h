@@ -21,6 +21,12 @@ public:
     bool isEmpty() const;
 
 private:
+    int findEmptyLaserRow();
+    int findEmptyCanvasRow();
+    bool containsLaserPoint(const QPoint& pt);
+    bool containsCanvasPoint(const QPoint& pt);
+
+private:
     Q_DISABLE_COPY(PointPairTableWidget)
 };
 

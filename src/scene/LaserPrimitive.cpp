@@ -1090,7 +1090,8 @@ LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress
 QRect LaserRect::sceneBoundingRect() const
 {
 	Q_D(const LaserRect);
-	return sceneTransform().mapRect(d->boundingRect);
+    QTransform t = sceneTransform();
+	return t.mapRect(d->boundingRect);
 }
 
 QJsonObject LaserRect::toJson()
