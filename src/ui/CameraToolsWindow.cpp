@@ -23,6 +23,7 @@
 #include <QVBoxLayout>
 
 #include "widget/ImageViewer.h"
+#include "widget/Vector2DWidget.h"
 #include "util/WidgetUtils.h"
 
 using namespace ads;
@@ -248,6 +249,52 @@ void CameraToolsWindow::createCameraSettings()
     connect(m_comboBoxShutterSpeed, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CameraToolsWindow::onComboBoxShutterSpeedChanged);
     layout->addRow(tr("Shutter Speed"), m_comboBoxShutterSpeed);
 
+    line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    QLabel* labelFocus = new QLabel(tr("Focus"));
+    labelFocus->setFont(font);
+    layout->addRow(labelFocus, line);
+    layout->setAlignment(line, Qt::AlignBottom);
+
+    m_layoutFocusMode = new QVBoxLayout;
+    layout->addRow(tr("Focus Mode"), m_layoutFocusMode);
+
+    m_vector2DFocusPoint = new Vector2DWidget;
+    m_vector2DFocusPoint->setXMinimum(0);
+    m_vector2DFocusPoint->setYMinimum(0);
+    m_vector2DFocusPoint->setXMaximum(1);
+    m_vector2DFocusPoint->setYMaximum(1);
+    m_vector2DFocusPoint->setValue(QPointF(0.5, 0.5));
+    connect(m_vector2DFocusPoint, &Vector2DWidget::valueChanged, this, &CameraToolsWindow::onVector2DFocusPointChanged);
+    layout->addRow(tr("Focus Point"), m_vector2DFocusPoint);
+
+    m_comboBoxFocusPointMode = new QComboBox;
+    connect(m_comboBoxFocusPointMode, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CameraToolsWindow::onComboBoxFocusPointModeChanged);
+    layout->addRow(tr("Focus Point Mode"), m_comboBoxFocusPointMode);
+
+    m_doubleSpinBoxDigitalZoom = new QDoubleSpinBox;
+    m_doubleSpinBoxDigitalZoom->setMinimum(0.01);
+    m_doubleSpinBoxDigitalZoom->setMaximum(100.0);
+    connect(m_doubleSpinBoxDigitalZoom, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &CameraToolsWindow::onDoubleSpinBoxExposureCompensationChanged);
+    layout->addRow(tr("Digital Zoom"), m_doubleSpinBoxDigitalZoom);
+
+    m_doubleSpinBoxOpticalZoom = new QDoubleSpinBox;
+    m_doubleSpinBoxOpticalZoom->setMinimum(0.01);
+    m_doubleSpinBoxOpticalZoom->setMaximum(100.0);
+    connect(m_doubleSpinBoxOpticalZoom, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &CameraToolsWindow::onDoubleSpinBoxOpticalZoomChanged);
+    layout->addRow(tr("Optical Zoom"), m_doubleSpinBoxOpticalZoom);
+
+    m_lineEditMaximumDigitalZoom = new QLineEdit;
+    m_lineEditMaximumDigitalZoom->setReadOnly(true);
+    m_lineEditMaximumDigitalZoom->setText("0");
+    layout->addRow(tr("Digital Zoom"), m_lineEditMaximumDigitalZoom);
+
+    m_lineEditMaximumOpticalZoom = new QLineEdit;
+    m_lineEditMaximumOpticalZoom->setReadOnly(true);
+    m_lineEditMaximumOpticalZoom->setText("0");
+    layout->addRow(tr("Optical Zoom"), m_lineEditMaximumOpticalZoom);
+
     QWidget* widget = new QWidget;
     widget->setLayout(layout);
 
@@ -426,7 +473,7 @@ void CameraToolsWindow::onComboBoxMeteringModeChanged(int index)
     m_camera->exposure()->setMeteringMode(m_comboBoxMeteringMode->currentData().value<QCameraExposure::MeteringMode>());
 }
 
-void CameraToolsWindow::onComboBoxApertureChanged(qreal value)
+void CameraToolsWindow::onComboBoxApertureChanged(int index)
 {
     if (m_camera.isNull())
         return;
@@ -442,12 +489,59 @@ void CameraToolsWindow::onComboBoxIsoSensitivityChanged(int value)
     m_camera->exposure()->setManualIsoSensitivity(m_comboBoxIsoSensitivity->currentData().toInt());
 }
 
-void CameraToolsWindow::onComboBoxShutterSpeedChanged(qreal value)
+void CameraToolsWindow::onComboBoxShutterSpeedChanged(int index)
 {
     if (m_camera.isNull())
         return;
 
     m_camera->exposure()->setManualShutterSpeed(m_comboBoxShutterSpeed->currentData().toReal());
+}
+
+void CameraToolsWindow::onVector2DFocusPointChanged(qreal x, qreal y)
+{
+    if (m_camera.isNull())
+        return;
+
+    QPointF point = m_camera->focus()->customFocusPoint();
+    m_camera->focus()->setCustomFocusPoint(point);
+}
+
+void CameraToolsWindow::onChecBoxFocusModeChanged(int state)
+{
+    if (m_camera.isNull())
+        return;
+    QCheckBox* w = qobject_cast<QCheckBox*>(sender());
+    QCameraFocus::FocusMode mode = static_cast<QCameraFocus::FocusMode>(w->property("flag").toInt());
+
+    QCameraFocus::FocusModes modes = m_camera->focus()->focusMode();
+    modes.setFlag(mode, w->isChecked());
+    m_camera->focus()->setFocusMode(modes);
+}
+
+void CameraToolsWindow::onComboBoxFocusPointModeChanged(int index)
+{
+    if (m_camera.isNull())
+        return;
+
+    m_camera->focus()->setFocusPointMode(m_comboBoxFocusPointMode->currentData().value<QCameraFocus::FocusPointMode>());
+}
+
+void CameraToolsWindow::onDoubleSpinBoxDigitalZoomChanged(qreal value)
+{
+    if (m_camera.isNull())
+        return;
+
+    qreal optZoom = m_camera->focus()->opticalZoom();
+    m_camera->focus()->zoomTo(value, optZoom);
+}
+
+void CameraToolsWindow::onDoubleSpinBoxOpticalZoomChanged(qreal value)
+{
+    if (m_camera.isNull())
+        return;
+
+    qreal digZoom = m_camera->focus()->opticalZoom();
+    m_camera->focus()->zoomTo(digZoom, value);
 }
 
 void CameraToolsWindow::onActionRefreshCameras(bool checked)
@@ -728,6 +822,77 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
             );
         }
         m_comboBoxShutterSpeed->blockSignals(false);
+
+        QCameraFocus* focus = m_camera->focus();
+        QPointF focusPoint = focus->customFocusPoint();
+        m_vector2DFocusPoint->blockSignals(true);
+        m_vector2DFocusPoint->setValue(focusPoint);
+        m_vector2DFocusPoint->blockSignals(false);
+
+        for (QCheckBox* w : m_checkBoxFocusMode)
+        {
+            m_layoutFocusMode->removeWidget(w);
+            delete w;
+        }
+        m_checkBoxFocusMode.clear();
+        if (focus->isFocusModeSupported(QCameraFocus::ManualFocus))
+        {
+            QCheckBox* w = new QCheckBox(tr("Manual"));
+            w->setProperty("flag", 0x1);
+            m_checkBoxFocusMode.append(w);
+        }
+        if (focus->isFocusModeSupported(QCameraFocus::HyperfocalFocus))
+        {
+            QCheckBox* w = new QCheckBox(tr("Hyperfocal"));
+            w->setProperty("flag", 0x2);
+            m_checkBoxFocusMode.append(w);
+        }
+        if (focus->isFocusModeSupported(QCameraFocus::InfinityFocus))
+        {
+            QCheckBox* w = new QCheckBox(tr("Infinity"));
+            w->setProperty("flag", 0x4);
+            m_checkBoxFocusMode.append(w);
+        }
+        if (focus->isFocusModeSupported(QCameraFocus::AutoFocus))
+        {
+            QCheckBox* w = new QCheckBox(tr("Auto"));
+            w->setProperty("flag", 0x8);
+            m_checkBoxFocusMode.append(w);
+        }
+        if (focus->isFocusModeSupported(QCameraFocus::ContinuousFocus))
+        {
+            QCheckBox* w = new QCheckBox(tr("Continuous"));
+            w->setProperty("flag", 0x10);
+            m_checkBoxFocusMode.append(w);
+        }
+        if (focus->isFocusModeSupported(QCameraFocus::MacroFocus))
+        {
+            QCheckBox* w = new QCheckBox(tr("Macro"));
+            w->setProperty("flag", 0x20);
+            m_checkBoxFocusMode.append(w);
+        }
+        for (QCheckBox* w : m_checkBoxFocusMode)
+        {
+            connect(w, &QCheckBox::stateChanged, this, &CameraToolsWindow::onChecBoxFocusModeChanged);
+        }
+
+        m_comboBoxFocusPointMode->blockSignals(true);
+        m_comboBoxFocusPointMode->clear();
+        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointAuto))
+            m_comboBoxFocusPointMode->addItem(tr("Auto"), 0);
+        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointCenter))
+            m_comboBoxFocusPointMode->addItem(tr("Center"), 1);
+        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointFaceDetection))
+            m_comboBoxFocusPointMode->addItem(tr("Detection"), 2);
+        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointCustom))
+            m_comboBoxFocusPointMode->addItem(tr("Custom"), 3);
+        m_vector2DFocusPoint->setEnabled(focus->focusPointMode() == QCameraFocus::FocusPointCustom);
+        index = widgetUtils::findComboBoxIndexByValue(m_comboBoxFocusPointMode, focus->focusPointMode());
+        m_comboBoxFocusPointMode->setCurrentIndex(index);
+        m_comboBoxFocusPointMode->blockSignals(false);
+
+        m_lineEditMaximumDigitalZoom->setText(QString::number(focus->maximumDigitalZoom()));
+        m_lineEditMaximumOpticalZoom->setText(QString::number(focus->maximumOpticalZoom()));
 
         m_actionConnectCamera->setText(tr("Disconnect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/disconnect.png")));

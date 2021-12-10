@@ -20,6 +20,7 @@ class QLineEdit;
 class QSpinBox;
 class QVBoxLayout;
 class ImageViewer;
+class Vector2DWidget;
 
 class CameraToolsWindow : public QMainWindow
 {
@@ -59,9 +60,15 @@ protected slots:
     void onComboBoxExposureModeChanged(int index);
     void onCheckBoxFlashModeChanged(int state);
     void onComboBoxMeteringModeChanged(int index);
-    void onComboBoxApertureChanged(qreal value);
-    void onComboBoxIsoSensitivityChanged(int value);
-    void onComboBoxShutterSpeedChanged(qreal value);
+    void onComboBoxApertureChanged(int index);
+    void onComboBoxIsoSensitivityChanged(int index);
+    void onComboBoxShutterSpeedChanged(int index);
+
+    void onVector2DFocusPointChanged(qreal x, qreal y);
+    void onChecBoxFocusModeChanged(int state);
+    void onComboBoxFocusPointModeChanged(int index);
+    void onDoubleSpinBoxDigitalZoomChanged(qreal value);
+    void onDoubleSpinBoxOpticalZoomChanged(qreal value);
 
     void onActionRefreshCameras(bool checked);
     void onActionConnectCamera(bool checked);
@@ -122,6 +129,15 @@ private:
     QComboBox* m_comboBoxAperture;
     QComboBox* m_comboBoxIsoSensitivity;
     QComboBox* m_comboBoxShutterSpeed;
+
+    Vector2DWidget* m_vector2DFocusPoint;
+    QList<QCheckBox*> m_checkBoxFocusMode;
+    QVBoxLayout* m_layoutFocusMode;
+    QComboBox* m_comboBoxFocusPointMode;
+    QDoubleSpinBox* m_doubleSpinBoxDigitalZoom;
+    QDoubleSpinBox* m_doubleSpinBoxOpticalZoom;
+    QLineEdit* m_lineEditMaximumDigitalZoom;
+    QLineEdit* m_lineEditMaximumOpticalZoom;
 
     Q_DISABLE_COPY(CameraToolsWindow)
 };
