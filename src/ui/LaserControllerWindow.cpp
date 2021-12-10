@@ -1062,9 +1062,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     onLayoutChanged(LaserApplication::device->layoutSize());
 
+#ifdef _DEBUG
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
-    m_tablePrintAndCutPoints->addNewLine();
+    //m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));
 
@@ -1073,6 +1074,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(140310, 124805));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));*/
+#endif
 }
 
 LaserControllerWindow::~LaserControllerWindow()
@@ -2340,7 +2342,7 @@ void LaserControllerWindow::createPrintAndCutPanel()
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
     QToolButton* buttonNewLine = new QToolButton;
     buttonNewLine->setDefaultAction(m_ui->actionPrintAndCutNew);
-    buttonsLayout->addWidget(buttonNewLine);
+    //buttonsLayout->addWidget(buttonNewLine);
     QToolButton* buttonFetchLaser = new QToolButton;
     buttonFetchLaser->setDefaultAction(m_ui->actionPrintAndCutFetchLaser);
     buttonsLayout->addWidget(buttonFetchLaser);
@@ -2401,6 +2403,10 @@ void LaserControllerWindow::createPrintAndCutPanel()
     QToolButton* buttonAlign = new QToolButton;
     buttonAlign->setDefaultAction(m_ui->actionPrintAndCutAlign);
     buttonsLayout->addWidget(buttonAlign);
+    QToolButton* buttonMachining = new QToolButton;
+    buttonMachining->setDefaultAction(m_ui->actionMachining);
+    buttonMachining->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextOnly);
+    buttonsLayout->addWidget(buttonMachining);
     QToolButton* buttonRestore = new QToolButton;
     buttonRestore->setDefaultAction(m_ui->actionPrintAndCutRestore);
     buttonsLayout->addWidget(buttonRestore);

@@ -22,6 +22,8 @@ PointPairTableWidget::PointPairTableWidget(QWidget* parent)
 
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 PointPairTableWidget::~PointPairTableWidget()
@@ -80,6 +82,9 @@ void PointPairTableWidget::removeSelected()
 
 void PointPairTableWidget::setLaserPoint(const QPoint& point)
 {
+    if (containsLaserPoint(point))
+        return;
+
     int row = 0;
     if (selectionModel()->hasSelection())
     {
@@ -88,14 +93,11 @@ void PointPairTableWidget::setLaserPoint(const QPoint& point)
     }
     else
     {
-        if (rowCount() == 0)
+        row = findEmptyLaserRow();
+        if (row == -1)
         {
-            this->insertRow(0);
-            row = 0;
-        }
-        else
-        {
-            row = rowCount() - 1;
+            this->insertRow(this->rowCount());
+            row = this->rowCount() - 1;
         }
     }
 
@@ -112,12 +114,16 @@ void PointPairTableWidget::setLaserPoint(const QPoint& point)
         itemY = new QTableWidgetItem;
         setItem(row, 1, itemY);
     }
+
     itemX->setData(Qt::EditRole, QString::number(point.x()));
     itemY->setData(Qt::EditRole, QString::number(point.y()));
 }
 
 void PointPairTableWidget::setCanvasPoint(const QPoint& point)
 {
+    if (containsCanvasPoint(point))
+        return;
+
     int row = 0;
     if (selectionModel()->hasSelection())
     {
@@ -126,14 +132,11 @@ void PointPairTableWidget::setCanvasPoint(const QPoint& point)
     }
     else
     {
-        if (rowCount() == 0)
+        row = findEmptyCanvasRow();
+        if (row == -1)
         {
-            this->insertRow(0);
-            row = 0;
-        }
-        else
-        {
-            row = rowCount() - 1;
+            this->insertRow(this->rowCount());
+            row = this->rowCount() - 1;
         }
     }
 
@@ -159,5 +162,87 @@ void PointPairTableWidget::setCanvasPoint(const QPoint& point)
 bool PointPairTableWidget::isEmpty() const
 {
     return rowCount() == 0;
+}
+
+int PointPairTableWidget::findEmptyLaserRow()
+{
+    for (int i = 0; i < this->rowCount(); i++)
+    {
+        QTableWidgetItem* x1Item = this->item(i, 0);
+        QTableWidgetItem* y1Item = this->item(i, 1);
+
+        if (!x1Item || !y1Item)
+            return i;
+
+        QVariant x1Var = x1Item->data(Qt::EditRole);
+        QVariant y1Var = y1Item->data(Qt::EditRole);
+
+        if (x1Var.isNull() || y1Var.isNull())
+            return i;
+    }
+    return -1;
+}
+
+int PointPairTableWidget::findEmptyCanvasRow()
+{
+    for (int i = 0; i < this->rowCount(); i++)
+    {
+        QTableWidgetItem* x2Item = this->item(i, 2);
+        QTableWidgetItem* y2Item = this->item(i, 3);
+
+        if (!x2Item || !y2Item)
+            return i;
+
+        QVariant x2Var = x2Item->data(Qt::EditRole);
+        QVariant y2Var = y2Item->data(Qt::EditRole);
+
+        if (x2Var.isNull() || y2Var.isNull())
+            return i;
+    }
+    return -1;
+}
+
+bool PointPairTableWidget::containsLaserPoint(const QPoint& pt)
+{
+    for (int i = 0; i < this->rowCount(); i++)
+    {
+        QTableWidgetItem* x1Item = this->item(i, 0);
+        QTableWidgetItem* y1Item = this->item(i, 1);
+
+        if (!x1Item || !y1Item)
+            continue;
+
+        QVariant x1Var = x1Item->data(Qt::EditRole);
+        QVariant y1Var = y1Item->data(Qt::EditRole);
+
+        if (x1Var.isNull() || y1Var.isNull())
+            continue;
+
+        if (x1Var.toInt() == pt.x() && y1Var.toInt() == pt.y())
+            return true;
+    }
+    return false;
+}
+
+bool PointPairTableWidget::containsCanvasPoint(const QPoint& pt)
+{
+    for (int i = 0; i < this->rowCount(); i++)
+    {
+        QTableWidgetItem* x2Item = this->item(i, 2);
+        QTableWidgetItem* y2Item = this->item(i, 3);
+
+        if (!x2Item || !y2Item)
+            continue;
+
+        QVariant x2Var = x2Item->data(Qt::EditRole);
+        QVariant y2Var = y2Item->data(Qt::EditRole);
+
+        if (x2Var.isNull() || y2Var.isNull())
+            continue;
+
+        if (x2Var.toInt() == pt.x() && y2Var.toInt() == pt.y())
+            return true;
+    }
+    return false;
 }
 

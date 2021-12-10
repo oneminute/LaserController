@@ -67,11 +67,15 @@ void ActivationDialog::onPushButtonSendClicked(bool checked)
         m_updateTimer.setInterval(250);
         m_updateTimer.start();
         m_ui->pushButtonSend->setEnabled(false);
-        QMessageBox::information(this, tr("Sent successfully"), tr("Sent successfully. Please check your mail box to receive the activation code."));
+        //QMessageBox::information(this, tr("Sent successfully"), tr("Sent successfully. Please check your mail box to receive the activation code."));
+        m_ui->labelStatus->setText(tr("Sent successfully"));
+        m_ui->labelDescription->setText(tr("Please check your mail box to receive the activation code."));
     }
     else
     {
-        QMessageBox::warning(this, tr("Sent failure"), tr("Please check your email or network connection."));
+        //QMessageBox::warning(this, tr("Sent failure"), tr("Please check your email or network connection."));
+        m_ui->labelStatus->setText(tr("Sent Failure"));
+        m_ui->labelDescription->setText(tr("Please check your email address or network connection."));
     }
 }
 
@@ -87,8 +91,7 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
             m_ui->labelStatus->setText(tr("Activated"));
             m_ui->labelDescription->setText(tr("Your main board is already activated"));
             m_ui->pushButtonActivate->hide();
-            QMessageBox::information(this, tr("Activated"), tr("Activated"));
-            this->close();
+            //QMessageBox::information(this, tr("Activated"), tr("Activated"));
             break;
         }
         case MAR_Inactivated:
@@ -97,7 +100,7 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
             m_ui->labelStatus->setText(tr("Inactivated"));
             m_ui->labelDescription->setText(tr("1. Networking is required to activate the board, please confirm that you have a vlid connection;\n2. To continue activation, please click the \"Activate\" button below."));
             m_ui->pushButtonActivate->show();
-            QMessageBox::warning(this, tr("Activate failure"), tr("You should use the email to fetch activation code and activate your main card online."));
+            //QMessageBox::warning(this, tr("Activate failure"), tr("You should use the email to fetch activation code and activate your main card online."));
             m_ui->stackedWidget->setCurrentIndex(1);
             onFieldTextEdited("");
             m_ui->pushButtonSend->setEnabled(false);
