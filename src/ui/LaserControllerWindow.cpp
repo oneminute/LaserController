@@ -4401,7 +4401,9 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    onActionCloseDocument();
+    if (scene()->document() != nullptr) {
+        onActionCloseDocument();
+    }
     QMainWindow::closeEvent(event);
 
 }
@@ -5293,7 +5295,7 @@ void LaserControllerWindow::onActionAlignVerticalRight()
 
 void LaserControllerWindow::onActionDistributeVSpaced()
 {
-    DistributeUndoCommand* cmd = new DistributeUndoCommand(m_viewer);
+    DistributeUndoCommand* cmd = new DistributeUndoCommand(m_viewer, ArrangeType::AT_VSpaced);
     m_viewer->undoStack()->push(cmd);
 }
 

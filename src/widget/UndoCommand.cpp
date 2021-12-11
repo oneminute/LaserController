@@ -1352,10 +1352,11 @@ void CommonSelectionCommand::redo()
     m_viewer->viewport()->repaint();
 }
 
-DistributeUndoCommand::DistributeUndoCommand(LaserViewer * viewer)
+DistributeUndoCommand::DistributeUndoCommand(LaserViewer * viewer, int type)
 {
     m_viewer = viewer;
     m_group = m_viewer->group();
+    m_type = type;
 }
 
 DistributeUndoCommand::~DistributeUndoCommand()
@@ -1443,8 +1444,6 @@ void DistributeUndoCommand::redo()
             baseBottom - primitive->sceneBoundingRect().top() + space);
         baseBottom = primitive->sceneBoundingRect().bottom();
     }
-    int s = sortedList.size();
-    qDebug() << s;
     //bottommest primitive need move
     if (diff < 0) {
         bottommestPrimitive->moveBy(0,

@@ -276,7 +276,7 @@ protected:
 //distribute v-spaced/center h-spaced
 class DistributeUndoCommand : public QUndoCommand {
 public:
-    DistributeUndoCommand(LaserViewer* viewer);
+    DistributeUndoCommand(LaserViewer* viewer, int type);
     ~DistributeUndoCommand();
     void findTopAndBottomPrimitive(LaserPrimitive* & topPrimitive, LaserPrimitive* & bottomPrimitive);
 protected:
@@ -285,5 +285,6 @@ protected:
 private:
     LaserViewer * m_viewer;
     LaserPrimitiveGroup* m_group;
+    int m_type;
 };
 #endif // UNDOCOMMAND_H
