@@ -285,6 +285,10 @@ protected:
 private:
     LaserViewer * m_viewer;
     LaserPrimitiveGroup* m_group;
+    LaserScene* m_scene;
     int m_type;
+    QMap<LaserPrimitive*, QTransform> m_undoMap;
+    LaserPrimitive* m_frontestPrimitive;
+    LaserPrimitive* m_backestPrimitive;
 };
 #endif // UNDOCOMMAND_H

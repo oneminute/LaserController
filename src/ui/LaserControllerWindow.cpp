@@ -5301,15 +5301,20 @@ void LaserControllerWindow::onActionDistributeVSpaced()
 
 void LaserControllerWindow::onActionDistributeVCentered()
 {
-    
+    DistributeUndoCommand* cmd = new DistributeUndoCommand(m_viewer, ArrangeType::AT_VCentered);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionDistributeHSpaced()
 {
+    DistributeUndoCommand* cmd = new DistributeUndoCommand(m_viewer, ArrangeType::AT_HSpaced);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionDistributeHCentered()
 {
+    DistributeUndoCommand* cmd = new DistributeUndoCommand(m_viewer, ArrangeType::AT_HCentered);
+    m_viewer->undoStack()->push(cmd);
 }
 
 void LaserControllerWindow::onActionSameWidth()

@@ -1357,6 +1357,9 @@ DistributeUndoCommand::DistributeUndoCommand(LaserViewer * viewer, int type)
     m_viewer = viewer;
     m_group = m_viewer->group();
     m_type = type;
+    m_scene = m_viewer->scene();
+    m_frontestPrimitive = nullptr;
+    m_backestPrimitive = nullptr;
 }
 
 DistributeUndoCommand::~DistributeUndoCommand()
@@ -1371,18 +1374,56 @@ void DistributeUndoCommand::findTopAndBottomPrimitive(LaserPrimitive* & topPrimi
     for (QGraphicsItem* item : m_group->childItems()) {
         
         LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-        QRectF bounds = p->boundingRect();
+        QRectF bounds = p->sceneBoundingRect();
         if (index == 0) {
             topPrimitive = p;
             bottomPrimitive = p;
         }
         else {
-            if (topPrimitive->boundingRect().top() > bounds.top()) {
-                topPrimitive = p;
+            switch (m_type)
+            {
+                case ArrangeType::AT_VCentered:
+                {
+                    if (topPrimitive->sceneBoundingRect().center().y() > bounds.center().y()) {
+                        topPrimitive = p;
+                    }
+                    if (bottomPrimitive->sceneBoundingRect().center().y() < bounds.center().y()) {
+                        bottomPrimitive = p;
+                    }
+                    break;
+                }
+                case ArrangeType::AT_VSpaced:
+                {
+                    if (topPrimitive->sceneBoundingRect().top() > bounds.top()) {
+                        topPrimitive = p;
+                    }
+                    if (bottomPrimitive->sceneBoundingRect().bottom() < bounds.bottom()) {
+                        bottomPrimitive = p;
+                    }
+                    break;
+                }
+                case ArrangeType::AT_HCentered:
+                {
+                    if (topPrimitive->sceneBoundingRect().center().x() > bounds.center().x()) {
+                        topPrimitive = p;
+                    }
+                    if (bottomPrimitive->sceneBoundingRect().center().x() < bounds.center().x()) {
+                        bottomPrimitive = p;
+                    }
+                    break;
+                }
+                case ArrangeType::AT_HSpaced:
+                {
+                    if (topPrimitive->sceneBoundingRect().left() > bounds.left()) {
+                        topPrimitive = p;
+                    }
+                    if (bottomPrimitive->sceneBoundingRect().right() < bounds.right()) {
+                        bottomPrimitive = p;
+                    }
+                    break;
+                }
             }
-            if (bottomPrimitive->boundingRect().bottom() < bounds.bottom()) {
-                bottomPrimitive = p;
-            }
+            
         }
         index++;
     }
@@ -1391,16 +1432,28 @@ void DistributeUndoCommand::findTopAndBottomPrimitive(LaserPrimitive* & topPrimi
 
 void DistributeUndoCommand::undo()
 {
+    for (QGraphicsItem* item : m_group->childItems()) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_group->removeFromGroup(p);
+    }
+    m_group->setTransform(QTransform());
+    for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_undoMap.begin(); i != m_undoMap.end(); i++) {
+        i.key()->setTransform(i.value());
+        i.key()->setPos(0, 0);
+        m_scene->quadTreeNode()->upDatePrimitive(i.key());
+        m_group->addToGroup(i.key());
+    }
+    m_group->addToGroup(m_frontestPrimitive);
+    m_group->addToGroup(m_backestPrimitive);
+    emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
+    
 }
 
 void DistributeUndoCommand::redo()
 {
-    LaserPrimitive* toppestPrimitive = nullptr;
-    LaserPrimitive* bottommestPrimitive = nullptr;
-    findTopAndBottomPrimitive(toppestPrimitive, bottommestPrimitive);
-    qreal tPBottom = toppestPrimitive->sceneBoundingRect().bottom();
-    qreal bPTop = bottommestPrimitive->sceneBoundingRect().top();
-    qreal Tbspace = bPTop - tPBottom;
+    
+    findTopAndBottomPrimitive(m_frontestPrimitive, m_backestPrimitive);
     //except toppestPrimitive and bottommerPrimitive
     qreal othersLength = 0;
     QList<LaserPrimitive*> sortedList;
@@ -1410,12 +1463,35 @@ void DistributeUndoCommand::redo()
         int index = 0;
         LaserPrimitive* topperPrimitive = nullptr;
         for (QGraphicsItem* item : m_group->childItems()) {
-            
+
             LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-            if (whileIndex == 0 && p != toppestPrimitive && p != bottommestPrimitive) {
-                othersLength += p->sceneBoundingRect().height();
+            if (whileIndex == 0 && p != m_frontestPrimitive && p != m_backestPrimitive) {
+                switch (m_type)
+                {
+                    case ArrangeType::AT_VCentered:
+                    {
+                        othersLength = 0;
+                        break;
+                    }
+                    case ArrangeType::AT_VSpaced: 
+                    {
+                        othersLength += p->sceneBoundingRect().height();
+                        break;
+                    }
+                    case ArrangeType::AT_HCentered:
+                    {
+                        othersLength = 0;
+                        break;
+                    }
+                    case ArrangeType::AT_HSpaced:
+                    {
+                        othersLength += p->sceneBoundingRect().width();
+                        break;
+                    }
+                }
+                
             }
-            if (p == toppestPrimitive || p == bottommestPrimitive
+            if (p == m_frontestPrimitive || p == m_backestPrimitive
                 || sortedList.contains(p)) {
                 continue;
             }
@@ -1423,7 +1499,7 @@ void DistributeUndoCommand::redo()
                 topperPrimitive = p;
             }
             if (topperPrimitive->sceneBoundingRect().top() > p->sceneBoundingRect().top()) {
-                
+
                 topperPrimitive = p;
             }
             index++;
@@ -1436,18 +1512,117 @@ void DistributeUndoCommand::redo()
         }
         whileIndex++;
     }
-    qreal diff = Tbspace - othersLength;
-    qreal space = diff/(sortedList.size() + 1);
-    qreal baseBottom = tPBottom;
+    qreal minVal;
+    qreal maxVal;
+    switch (m_type) {
+        case ArrangeType::AT_VSpaced: {
+            minVal = m_frontestPrimitive->sceneBoundingRect().bottom();
+            maxVal = m_backestPrimitive->sceneBoundingRect().top();
+            
+            break;
+        }
+        case ArrangeType::AT_VCentered: {
+            minVal = m_frontestPrimitive->sceneBoundingRect().center().y();
+            maxVal = m_backestPrimitive->sceneBoundingRect().center().y();
+            break;
+        }
+        case ArrangeType::AT_HSpaced: {
+            minVal = m_frontestPrimitive->sceneBoundingRect().right();
+            maxVal = m_backestPrimitive->sceneBoundingRect().left();
+            break;
+        }
+        case ArrangeType::AT_HCentered: {
+            minVal = m_frontestPrimitive->sceneBoundingRect().center().x();
+            maxVal = m_backestPrimitive->sceneBoundingRect().center().x();
+            break;
+        }
+    }
+    qreal diff = (maxVal - minVal) - othersLength;
+    qreal space = diff / (sortedList.size() + 1);
+    qreal baseVal = minVal;
+    
     for (LaserPrimitive* primitive : sortedList) {
-        primitive->moveBy(0, 
-            baseBottom - primitive->sceneBoundingRect().top() + space);
-        baseBottom = primitive->sceneBoundingRect().bottom();
+        QPointF pos;
+        m_undoMap.insert(primitive, primitive->sceneTransform());
+        switch (m_type)
+        {
+            case ArrangeType::AT_VCentered: {
+                pos = primitive->scenePos() + QPointF(0,
+                    baseVal - primitive->sceneBoundingRect().center().y() + space);
+                primitive->setPos(m_group->mapFromScene(pos));
+                baseVal = primitive->sceneBoundingRect().center().y();
+                break;
+            }
+            case ArrangeType::AT_VSpaced:
+            {
+                pos = primitive->scenePos() + QPointF(0,
+                    baseVal - primitive->sceneBoundingRect().top() + space);
+                
+                primitive->setPos(m_group->mapFromScene(pos));
+                baseVal = primitive->sceneBoundingRect().bottom();
+                break;
+            }
+            case ArrangeType::AT_HCentered: {
+                pos = primitive->scenePos() + QPointF(
+                    baseVal - primitive->sceneBoundingRect().center().x() + space,
+                    0);
+                primitive->setPos(m_group->mapFromScene(pos));
+                baseVal = primitive->sceneBoundingRect().center().x();
+                break;
+            }
+            case ArrangeType::AT_HSpaced:
+            {
+                pos = primitive->scenePos() + QPointF(
+                    baseVal - primitive->sceneBoundingRect().left() + space,
+                    0);
+                primitive->setPos(m_group->mapFromScene(pos));
+                baseVal = primitive->sceneBoundingRect().right();
+                break;
+            }
+            
+        } 
+        m_scene->quadTreeNode()->upDatePrimitive(primitive);
     }
     //bottommest primitive need move
-    if (diff < 0) {
-        bottommestPrimitive->moveBy(0,
-            baseBottom - bottommestPrimitive->boundingRect().top() + space);       
+    if (diff < 0 && (m_type == AT_VSpaced || m_type == AT_HSpaced)) {
+        QPointF pos;
+        switch (m_type)
+        {
+        /*case ArrangeType::AT_VCentered: {
+            pos = m_backestPrimitive->scenePos() + QPointF(0,
+                baseVal - m_backestPrimitive->sceneBoundingRect().center().y() + space);
+        }*/
+        case ArrangeType::AT_VSpaced:
+        {
+            pos = m_backestPrimitive->scenePos() + QPointF(0,
+                baseVal - m_backestPrimitive->sceneBoundingRect().top() + space);
+            break;
+        }
+        /*case ArrangeType::AT_HCentered: {
+            pos = m_backestPrimitive->scenePos() + QPointF(
+                baseVal - m_backestPrimitive->sceneBoundingRect().center().x() + space,
+                0);
+            break;
+        }*/
+        case ArrangeType::AT_HSpaced:
+        {
+            pos = m_backestPrimitive->scenePos() + QPointF(
+                baseVal - m_backestPrimitive->sceneBoundingRect().left() + space,
+                0);
+            break;
+        }
+        }
+        m_undoMap.insert(m_backestPrimitive, m_backestPrimitive->sceneTransform());
+        m_backestPrimitive->setPos(m_group->mapFromScene(pos));
+        m_scene->quadTreeNode()->upDatePrimitive(m_backestPrimitive);
     }
-    
+    //is extend max region
+    if (m_scene->maxRegion().contains(m_group->sceneBoundingRect().toRect())) {      
+        emit m_viewer->selectedChangedFromMouse();
+        m_viewer->viewport()->repaint();
+    }
+    else {
+        QMessageBox::warning(m_viewer, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        undo();
+    }
 }
