@@ -9,6 +9,7 @@
 #include <QStatusBar>
 
 #include <DockManager.h>
+#include "camera/VideoFrameGrabber.h"
 
 class QCameraImageCapture;
 class QCameraViewfinder;
@@ -44,6 +45,11 @@ public slots:
 
 protected slots:
     void onComboBoxCamerasIndexChanged(int index);
+
+    void onComboBoxFrameRateRangeChanged(int index);
+    void onComboBoxPixelFormatChanged(int index);
+    void onComboBoxResolutionChanged(int index);
+
     void onDoubleSpinBoxBrightnessChanged(qreal value);
     void onComboBoxFilterChanged(int index);
     void onDoubleSpinBoxContrastChanged(qreal value);
@@ -74,6 +80,8 @@ protected slots:
     void onActionConnectCamera(bool checked);
     void onActionCapture(bool checked);
 
+    void onCaptureImageAvailable(int id, const QVideoFrame& frame);
+
 signals:
 
 private:
@@ -96,7 +104,9 @@ private:
     ads::CDockManager* m_dockManager;
     ads::CDockAreaWidget* m_cameraDockArea;
     QCameraImageCapture* m_capture;
-    QCameraViewfinder* m_viewfinder;
+    //QCameraViewfinder* m_viewfinder;
+    ImageViewer* m_imageViewerCamera;
+    //QLabel* m_labelCamera;
 
     ads::CDockAreaWidget* m_imageDockArea;
     ImageViewer* m_imageViewerCapture;
@@ -106,6 +116,12 @@ private:
     // camera variables
     QScopedPointer<QCamera> m_camera;
     QScopedPointer<QCameraImageCapture> m_cameraCapture;
+    QScopedPointer<VideoFrameGrabber> m_videoFrameGrabber;
+
+    // camera general variables
+    QComboBox* m_comboBoxFrameRateRange;
+    QComboBox* m_comboBoxPixelFormat;
+    QComboBox* m_comboBoxResolution;
 
     // camera image processing variables
     QDoubleSpinBox* m_doubleSpinBoxCameraBrightness;
@@ -130,6 +146,7 @@ private:
     QComboBox* m_comboBoxIsoSensitivity;
     QComboBox* m_comboBoxShutterSpeed;
 
+    // camera focus variables
     Vector2DWidget* m_vector2DFocusPoint;
     QList<QCheckBox*> m_checkBoxFocusMode;
     QVBoxLayout* m_layoutFocusMode;
