@@ -198,7 +198,11 @@ enum LaserEventType
 
     M_SendEmailComplete,
     M_MainlBoxValid,
-    M_MainlBoxAccountOK
+    M_MainlBoxAccountOK,
+
+    m_RequestProcessing = 2074, //面板通过板卡返回请求:开始加工
+    m_RequestLensFocus = 2075, //面板通过板卡返回请求:镜头对焦
+    m_RequestDrawBounding = 2076 //面板通过板卡返回请求:走边框
 };
 
 enum LaserWorkMode

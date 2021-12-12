@@ -71,6 +71,9 @@ FILE(GLOB BASE_SOURCES src/*.cpp)
 FILE(GLOB COMMON_HEADERS src/common/*.h)
 FILE(GLOB COMMON_SOURCES src/common/*.cpp)
 
+FILE(GLOB CAMERA_HEADERS src/camera/*.h)
+FILE(GLOB CAMERA_SOURCES src/camera/*.cpp)
+
 FILE(GLOB EXCEPTION_HEADERS src/exception/*.h)
 FILE(GLOB EXCEPTION_SOURCES src/exception/*.cpp)
 
@@ -139,6 +142,7 @@ set(HEADER_FILES
     ${HEADER_FILES}
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
+    ${CAMERA_HEADERS}
     ${EXCEPTION_HEADERS}
     ${ALGORITHM_HEADERS}
     ${HALFTONE_HEADERS}
@@ -157,6 +161,7 @@ set(SRC_FILES
     ${SRC_FILES}
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
+    ${CAMERA_SOURCES}
     ${EXCEPTION_SOURCES}
     ${ALGORITHM_SOURCES}
     ${WYKOBI_SOURCES}
@@ -177,6 +182,8 @@ set(SRC_FILES
 IF(MSVC)
     source_group("source\\common" FILES ${COMMON_SOURCES})
     source_group("header\\common" FILES ${COMMON_HEADERS})
+    source_group("source\\camera" FILES ${CAMERA_SOURCES})
+    source_group("header\\camera" FILES ${CAMERA_HEADERS})
     source_group("source\\algorithm" FILES ${ALGORITHM_SOURCES})
     source_group("header\\algorithm" FILES ${ALGORITHM_HEADERS})
     source_group("source\\exception" FILES ${EXCEPTION_SOURCES})
