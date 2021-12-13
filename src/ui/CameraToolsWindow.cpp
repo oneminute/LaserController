@@ -66,14 +66,13 @@ CameraToolsWindow::CameraToolsWindow(QWidget* parent)
     CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
     m_dockManager = new CDockManager(this);
 
-    // initialize variables
-    m_cameraCapture.reset(new QCameraImageCapture(m_camera.data()));
-    m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-
     createVideoPanel();
     createImagePanel();
     createCameraSettings();
     createImageSettings();
+
+    m_videoFrameGrabber.reset(new VideoFrameGrabber(m_imageViewerCamera));
+    //m_videoFrameGrabber.reset(new VideoFrameGrabber(m_labelCamera));
 
     m_cameraDockArea->setCurrentIndex(0);
     m_cameraDockArea->resize(600, 800);
@@ -104,8 +103,12 @@ void CameraToolsWindow::updateCameras()
 void CameraToolsWindow::createVideoPanel()
 {
     QVBoxLayout* layout = new QVBoxLayout;
-    m_viewfinder = new QCameraViewfinder;
-    layout->addWidget(m_viewfinder);
+    //m_viewfinder = new QCameraViewfinder;
+    //layout->addWidget(m_viewfinder);
+    m_imageViewerCamera = new ImageViewer;
+    layout->addWidget(m_imageViewerCamera);
+    //m_labelCamera = new QLabel;
+    //layout->addWidget(m_labelCamera);
 
     // create center widget
     QWidget* cameraWidget = new QWidget;
@@ -139,9 +142,29 @@ void CameraToolsWindow::createCameraSettings()
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
-    QLabel* labelImageProcessing = new QLabel(tr("Image Processing"));
-    QFont font = labelImageProcessing->font();
+    QLabel* labelGeneral = new QLabel(tr("General"));
+    QFont font = labelGeneral->font();
     font.setBold(true);
+    labelGeneral->setFont(font);
+    layout->addRow(labelGeneral, line);
+    layout->setAlignment(line, Qt::AlignBottom);
+
+    m_comboBoxFrameRateRange = new QComboBox;
+    connect(m_comboBoxFrameRateRange, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CameraToolsWindow::onComboBoxFrameRateRangeChanged);
+    layout->addRow(tr("Frame Rate Range"), m_comboBoxFrameRateRange);
+
+    m_comboBoxPixelFormat = new QComboBox;
+    connect(m_comboBoxPixelFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CameraToolsWindow::onComboBoxPixelFormatChanged);
+    layout->addRow(tr("Pixel Format"), m_comboBoxPixelFormat);
+
+    m_comboBoxResolution = new QComboBox;
+    connect(m_comboBoxResolution, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CameraToolsWindow::onComboBoxResolutionChanged);
+    layout->addRow(tr("Resolution"), m_comboBoxResolution);
+
+    line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    QLabel* labelImageProcessing = new QLabel(tr("Image Processing"));
     labelImageProcessing->setFont(font);
     layout->addRow(labelImageProcessing, line);
     layout->setAlignment(line, Qt::AlignBottom);
@@ -311,6 +334,18 @@ void CameraToolsWindow::createImageSettings()
 void CameraToolsWindow::closeEvent(QCloseEvent* event)
 {
     deleteLater();
+}
+
+void CameraToolsWindow::onComboBoxFrameRateRangeChanged(int index)
+{
+}
+
+void CameraToolsWindow::onComboBoxPixelFormatChanged(int index)
+{
+}
+
+void CameraToolsWindow::onComboBoxResolutionChanged(int index)
+{
 }
 
 void CameraToolsWindow::onDoubleSpinBoxBrightnessChanged(qreal value)
@@ -555,9 +590,53 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
     {
         QCameraInfo& info = m_comboBoxCameras->currentData().value<QCameraInfo>();
         m_camera.reset(new QCamera(info));
-        m_camera->setViewfinder(m_viewfinder);
+        m_camera->setViewfinder(m_videoFrameGrabber.data());
         m_camera->setCaptureMode(QCamera::CaptureStillImage);
-        m_camera->searchAndLock();
+
+        // initialize variables
+        m_cameraCapture.reset(new QCameraImageCapture(m_camera.data()));
+        m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+        connect(m_cameraCapture.data(), &QCameraImageCapture::imageAvailable,
+            this, &CameraToolsWindow::onCaptureImageAvailable);
+
+        QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
+        QList<QCamera::FrameRateRange> ranges = m_camera->supportedViewfinderFrameRateRanges();
+        m_comboBoxFrameRateRange->blockSignals(true);
+        for (QCamera::FrameRateRange range : ranges)
+        {
+            m_comboBoxFrameRateRange->addItem(
+                QString("%1 - %2").arg(range.minimumFrameRate).arg(range.maximumFrameRate),
+                QVariant::fromValue<QPair<qreal, qreal>>(QPair<qreal, qreal>(range.minimumFrameRate, range.maximumFrameRate))
+            );
+        }
+        m_comboBoxFrameRateRange->setCurrentText(
+            QString("%1 - %2").arg(settings.minimumFrameRate()).arg(settings.maximumFrameRate())
+        );
+        m_comboBoxFrameRateRange->blockSignals(false);
+
+        QList<QVideoFrame::PixelFormat> formats = m_camera->supportedViewfinderPixelFormats();
+        m_comboBoxPixelFormat->blockSignals(true);
+        for (QVideoFrame::PixelFormat format : formats)
+        {
+            m_comboBoxPixelFormat->addItem(
+                QString::number(format), format
+            );
+        }
+        m_comboBoxPixelFormat->setCurrentText(QString::number(settings.pixelFormat()));
+        m_comboBoxPixelFormat->blockSignals(false);
+
+        QList<QSize> sizes = m_camera->supportedViewfinderResolutions();
+        m_comboBoxResolution->blockSignals(true);
+        for (QSize size : sizes)
+        {
+            m_comboBoxResolution->addItem(
+                QString("%1 x %2").arg(size.width()).arg(size.height()),
+                size
+            );
+        }
+        QSize size = settings.resolution();
+        m_comboBoxResolution->setCurrentText(QString("%1 x %2").arg(size.width()).arg(size.height()));
+        m_comboBoxResolution->blockSignals(false);
 
         QCameraImageProcessing* imageProcessing = m_camera->imageProcessing();
 
@@ -896,6 +975,8 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
 
         m_actionConnectCamera->setText(tr("Disconnect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/disconnect.png")));
+
+        m_camera->searchAndLock();
         m_camera->start();
     }
     else
@@ -909,8 +990,11 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
 
 void CameraToolsWindow::onActionCapture(bool checked)
 {
-    QPixmap image = m_viewfinder->grab();
-    m_imageViewerCapture->setImage(image);
+    m_imageViewerCapture->setImage(m_imageViewerCamera->pixmap());
+}
+
+void CameraToolsWindow::onCaptureImageAvailable(int id, const QVideoFrame& frame)
+{
 }
 
 void CameraToolsWindow::retranslate()

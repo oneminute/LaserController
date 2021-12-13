@@ -14,23 +14,35 @@ public:
     void loadImage(const QString& filename);
     void setImage(const QImage& image);
     void setImage(const QPixmap& image);
+    QImage image() const;
+    QPixmap pixmap() const;
 
     void zoomIn();
     void zoomOut();
     void scaleImage(qreal factor);
+    void fixSize();
 
     qreal scaleFactor() const;
 
 protected:
     void adjustScrollBar(QScrollBar* scrollBar, double factor);
 
+    virtual bool event(QEvent* e) override;
+    virtual void wheelEvent(QWheelEvent* e) override;
+
+protected slots:
+
+
 private:
     QLabel* m_labelImage;
     QPixmap m_image;
 
+    bool m_ctrlPressed;
+
     qreal m_scaleFactor;
     qreal m_minScaleFactor;
     qreal m_maxScaleFactor;
+
 };
 
 #endif //IMAGEVIEWER
