@@ -27,7 +27,8 @@ private:
 };
 class GroupTransformUndoCommand : public QUndoCommand {
 public:
-    GroupTransformUndoCommand(LaserScene* scene,  QTransform lastTransform , QTransform curTransform);
+    GroupTransformUndoCommand(LaserScene* scene,  QTransform lastTransform , 
+        QTransform curTransform, bool updataSelectionPanel = true);
     ~GroupTransformUndoCommand();
     virtual void undo() override;
     virtual void redo() override;
@@ -40,6 +41,7 @@ private:
     QTransform m_curRedoTransform;
     QuadTreeNode* m_tree;
     bool isRedo;
+    bool m_upDataSelectionPanel;
 };
 class SingleTransformUndoCommand : public QUndoCommand {
 public:

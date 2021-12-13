@@ -3,6 +3,8 @@
 
 int Global::dpiX(96);
 int Global::dpiY(96);
+qreal Global::mmToInchCoef(0.03937007874);
+qreal Global::inchToMmCoef(25.4);
 //grid
 qreal Global::lowPen1(224);
 qreal Global::lowPen2(236);

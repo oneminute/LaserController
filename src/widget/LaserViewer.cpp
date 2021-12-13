@@ -515,6 +515,7 @@ QRect LaserViewer::AllItemsSceneBoundingRect()
 void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale, qreal rotate, 
     int _state, int _transformType, int _pp, bool _unitIsMM)
 {
+
 	if (m_group && !m_group->isEmpty()) {
 		QRectF bounds = selectedItemsSceneBoundingRect();
 		QPointF point = _sceneRect.topLeft();
@@ -633,7 +634,8 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				t2.translate(diff.x(), diff.y());
 				t = t * t2;
 				m_group->setTransform(t);
-                emit selectedChangedFromMouse();
+                //更新一下面板的值，可能pos或者大小没有改变
+                selectedChangedFromMouse();
 				break;
 			}
 			case Transform_RESIZE: {
@@ -643,17 +645,23 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				qreal rateY = heightReal / bounds.height();
                 if (_pp == PrimitiveProperty::PP_Height && isLockRatio) {
                     rateX = rateY;
+                    qreal v = bounds.width() * rateY;
                     if (_unitIsMM) {
-                        qreal v = bounds.width() * rateY;
                         window->widthBox()->setValue(v * 0.001);
+                    }
+                    else {
+                        window->widthBox()->setValue(v * 0.001 * 0.03937007874);
                     }
                     
                 }
                 if (_pp == PrimitiveProperty::PP_Width && isLockRatio) {
                     rateY = rateX;
+                    qreal v = bounds.height() * rateY;
                     if (_unitIsMM) {
-                        qreal v = bounds.height() * rateY;
                         window->heightBox()->setValue(v * 0.001);
+                    }
+                    else {
+                        window->heightBox()->setValue(v * 0.001 * 0.03937007874);
                     }
                 }
 
@@ -706,7 +714,8 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				diff = original - newOriginal;
 				t.setMatrix(t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31() + diff.x(), t.m32() + diff.y(), t.m33());
 				m_group->setTransform(t);
-                emit selectedChangedFromMouse();
+                //更新一下面板的值，可能pos或者大小没有改变
+                selectedChangedFromMouse();
 				break;
 			}
 			case Transform_ROTATE: {
@@ -759,7 +768,8 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
 				t2.translate(diff.x(), diff.y());
 				t = t * t1 * t2;
 				m_group->setTransform(t);
-                emit selectedChangedFromMouse();
+                //更新一下面板的值，可能pos或者大小没有改变
+                selectedChangedFromMouse();
 				break;
 			}
 		}
@@ -1382,7 +1392,7 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 bool LaserViewer::zoomBy(qreal factor, QPointF zoomAnchor, bool zoomAnchorCenter)
 {
     const qreal currentZoom = zoomValue();
-    if ((factor < 1 && currentZoom < 0.00030) || (factor > 1 && currentZoom > 1.30))
+    if ((factor < 1 && currentZoom < 0.00038) || (factor > 1 && currentZoom > 1.30))
         return false;
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {

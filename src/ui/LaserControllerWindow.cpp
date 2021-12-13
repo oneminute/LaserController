@@ -43,6 +43,7 @@
 #include <QtConcurrent>
 #include <QDialogButtonBox>
 #include <QTextStream>
+#include <QPushButton>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -555,10 +556,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_rotateBox->setMinimum(-360.0);
 	m_rotateBox->setMaximum(360.0);
 	m_rotateBox->setDecimals(1);
-	m_mmOrIn = new QToolButton();
-	m_ui->actionUnitChange->setText("mm");
-	m_mmOrIn->setDefaultAction(m_ui->actionUnitChange);
-	m_mmOrIn->setEnabled(false);
+    m_mmOrIn = new QPushButton(this);
+    m_mmOrIn->setFixedWidth(50);
+    m_mmOrIn->setText("mm");
+    connect(m_mmOrIn, &QPushButton::clicked, this, &LaserControllerWindow::onClickedMmOrInch);
 
 	m_propertyLayout->addWidget(m_rotateLabel, 0, 11, 2, 1);
 	m_propertyLayout->addWidget(m_rotateBox, 0, 12, 2, 1);
@@ -815,22 +816,31 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	connect(m_viewer, &LaserViewer::selectedChangedFromMouse, this, &LaserControllerWindow::selectedChangedFromMouse);
 	connect(m_posXBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_MOVE;
-		if (m_posXBox->value() > Config::Ui::validMaxRegion()) {
-			m_posXBox->setValue(Config::Ui::validMaxRegion());
+        qreal maxRegion = Config::Ui::validMaxRegion();
+        if (!m_unitIsMM) {
+            maxRegion *= Global::mmToInchCoef;
+        }
+        
+		if (m_posXBox->value() > maxRegion) {
+			m_posXBox->setValue(maxRegion);
 		}
-		if (m_posXBox->value() < -Config::Ui::validMaxRegion()) {
-			m_posXBox->setValue(-Config::Ui::validMaxRegion());
+		if (m_posXBox->value() < -maxRegion) {
+			m_posXBox->setValue(-maxRegion);
 		}
 		selectionPropertyBoxChange(PrimitiveProperty::PP_PosX);
 	});
 	connect(m_posYBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
 		m_selectionTranformState = SelectionTransformType::Transform_MOVE;
-		if (m_posYBox->value() > Config::Ui::validMaxRegion()) {
-			m_posYBox->setValue(Config::Ui::validMaxRegion());
+        qreal maxRegion = Config::Ui::validMaxRegion();
+        if (!m_unitIsMM) {
+            maxRegion *= Global::mmToInchCoef;
+        }
+		/*if (m_posYBox->value() > maxRegion) {
+			m_posYBox->setValue(maxRegion);
 		}
-		if (m_posYBox->value() < -Config::Ui::validMaxRegion()) {
-			m_posYBox->setValue(-Config::Ui::validMaxRegion());
-		}
+		if (m_posYBox->value() < -maxRegion) {
+			m_posYBox->setValue(-maxRegion);
+		}*/
 		selectionPropertyBoxChange(PrimitiveProperty::PP_PosY);
 	});
 	connect(m_widthBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
@@ -839,9 +849,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
             return;
         }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
-		if (m_widthBox->value() > Config::Ui::validMaxRegion()) {
+		/*if (m_widthBox->value() > Config::Ui::validMaxRegion()) {
 			m_widthBox->setValue(Config::Ui::validMaxRegion());
-		}
+		}*/
 		if (m_widthBox->value() <= 0) {
 			m_widthBox->setValue(0.001);
 		}
@@ -854,9 +864,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
             return;
         }
 		m_selectionTranformState = SelectionTransformType::Transform_RESIZE;
-		if (m_heightBox->value() > Config::Ui::validMaxRegion()) {
+		/*if (m_heightBox->value() > Config::Ui::validMaxRegion()) {
 			m_heightBox->setValue(Config::Ui::validMaxRegion());
-		}
+		}*/
 		if (m_heightBox->value() <= 0) {
 			m_heightBox->setValue(0.001);
 		}
@@ -1321,12 +1331,17 @@ void LaserControllerWindow::setAlignTargetState(bool isAlignTarget)
     }
 }
 
+bool LaserControllerWindow::unitIsMM()
+{
+    return m_unitIsMM;
+}
+
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
 {
     if (m_viewer) {
         QString family = m_fontFamily->itemText(index);
         m_viewer->textFont()->setFamily(family);
-        qDebug() << m_fontFamily->itemData(index);
+        //qDebug() << m_fontFamily->itemData(index);
         LaserText* text = m_viewer->editingText();
         if (text) {
             QFont font(text->font());
@@ -4571,6 +4586,21 @@ void LaserControllerWindow::onLaserToolButtonShowMenu()
     setAlignTargetState(true);
     viewer()->viewport()->repaint();
 }
+void LaserControllerWindow::onClickedMmOrInch()
+{
+    if (m_unitIsMM) {
+        m_unitIsMM = false;
+        m_mmOrIn->setText("inch");        
+    }
+    else {
+        m_unitIsMM = true;
+        m_mmOrIn->setText("mm");
+    }
+    //更新一下面板的值
+    selectedChangedFromMouse();
+    m_viewer->horizontalRuler()->repaint();
+    m_viewer->verticalRuler()->repaint();
+}
 //改变的过程中也会执行（例如：移动的整个过程）
 void LaserControllerWindow::onLaserPrimitiveGroupItemTransformChanged()
 {
@@ -5042,20 +5072,40 @@ void LaserControllerWindow::selectedChangedFromMouse()
             break;
         }
         }
-        
-		m_posXBox->setValue(x * 0.001);
-		m_posYBox->setValue(y * 0.001);
-		m_widthBox->setValue(width * 0.001);
-		m_heightBox->setValue(height * 0.001);
+        if(m_unitIsMM){
+            m_posXBox->setValue(x * 0.001);
+            m_posYBox->setValue(y * 0.001);
+            m_widthBox->setValue(width * 0.001);
+            m_heightBox->setValue(height * 0.001);
+        }
+        else {
+            m_posXBox->setValue(x * 0.001 * Global::mmToInchCoef);
+            m_posYBox->setValue(y * 0.001 * Global::mmToInchCoef);
+            m_widthBox->setValue(width * 0.001 * Global::mmToInchCoef);
+            m_heightBox->setValue(height * 0.001 * Global::mmToInchCoef);
+        }
+		
 		
 	}
 }
 void LaserControllerWindow::selectionPropertyBoxChange(int state)
 {
-    int x = qRound(m_posXBox->value() * 1000);
-	int y = qRound(m_posYBox->value() * 1000);
-	int width = qRound(m_widthBox->value() * 1000);
-	int height = qRound(m_heightBox->value() * 1000);
+    int x;
+	int y;
+	int width;
+	int height;
+    if (m_unitIsMM) {
+        x = qRound(m_posXBox->value() * 1000);
+        y = qRound(m_posYBox->value() * 1000);
+        width = qRound(m_widthBox->value() * 1000);
+        height = qRound(m_heightBox->value() * 1000);
+    }
+    else {
+        x = qRound(m_posXBox->value()* Global::inchToMmCoef * 1000);
+        y = qRound(m_posYBox->value()* Global::inchToMmCoef * 1000);
+        width = qRound(m_widthBox->value()* Global::inchToMmCoef * 1000);
+        height = qRound(m_heightBox->value()* Global::inchToMmCoef * 1000);
+    }
     int sceneHeight = m_scene->backgroundItem()->rect().height();
     int sceneWidth = m_scene->backgroundItem()->rect().width();
 	

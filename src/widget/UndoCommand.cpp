@@ -869,13 +869,14 @@ void RectCommand::redo()
 
 
 GroupTransformUndoCommand::GroupTransformUndoCommand(LaserScene * scene, 
-    QTransform lastTransform, QTransform curTransform)
+    QTransform lastTransform, QTransform curTransform, bool updataSelectionPanel)
     :m_scene(scene), m_lastTransform(lastTransform), m_curUndoTransform(curTransform)
 {
     m_viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
     m_group = m_viewer->group();
     m_tree = m_scene->quadTreeNode();
     isRedo = false;
+    m_upDataSelectionPanel = updataSelectionPanel;
 }
 
 GroupTransformUndoCommand::~GroupTransformUndoCommand()
@@ -887,7 +888,9 @@ void GroupTransformUndoCommand::undo()
 {
     m_group = m_viewer->group();
     m_group->setTransform(m_group->transform()*(m_lastTransform.inverted()*m_curUndoTransform).inverted());
-    emit m_viewer->selectedChangedFromMouse();
+    if (m_upDataSelectionPanel) {
+        emit m_viewer->selectedChangedFromMouse();
+    }
     //updata tree
     m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();
@@ -903,7 +906,9 @@ void GroupTransformUndoCommand::redo()
     }
     m_group = m_viewer->group();
     m_group->setTransform(m_group->transform()*(m_curUndoTransform.inverted()*m_lastTransform).inverted());
-    emit m_viewer->selectedChangedFromMouse();
+    if (m_upDataSelectionPanel) {
+        emit m_viewer->selectedChangedFromMouse();
+    }
     //updata tree
     m_viewer->updateGroupTreeNode();
     m_viewer->viewport()->repaint();
