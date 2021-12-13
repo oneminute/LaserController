@@ -94,6 +94,8 @@ public:
     void changeAlignButtonsEnable();
     void tabAlignTarget();
     void setAlignTargetState(bool isAlignTarget);
+    //selection property
+    bool unitIsMM();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -351,6 +353,7 @@ public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
     void onJoinedGroupChanged();
     void onLaserToolButtonShowMenu();
+    void onClickedMmOrInch();
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");
@@ -612,7 +615,8 @@ private:
 	QRadioButton* m_rightCenterBtn;
     QLabel* m_rotateLabel;
 	LaserDoubleSpinBox* m_rotateBox;
-	QToolButton* m_mmOrIn;
+	//QToolButton* m_mmOrIn;
+    QPushButton* m_mmOrIn;
 	bool m_unitIsMM;
     bool m_lockEqualRatio;
 	//selection tool bar

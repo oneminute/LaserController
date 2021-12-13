@@ -340,6 +340,8 @@ public:
 	static int dpiX;
 	static int dpiY;
 	static SizeUnit unit;
+    static qreal mmToInchCoef;
+    static qreal inchToMmCoef;
 	//static QWidget* mainWindow;
 	//grid pen
 	static qreal lowPen1;

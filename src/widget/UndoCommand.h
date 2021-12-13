@@ -27,7 +27,8 @@ private:
 };
 class GroupTransformUndoCommand : public QUndoCommand {
 public:
-    GroupTransformUndoCommand(LaserScene* scene,  QTransform lastTransform , QTransform curTransform);
+    GroupTransformUndoCommand(LaserScene* scene,  QTransform lastTransform , 
+        QTransform curTransform, bool updataSelectionPanel = true);
     ~GroupTransformUndoCommand();
     virtual void undo() override;
     virtual void redo() override;
@@ -40,6 +41,7 @@ private:
     QTransform m_curRedoTransform;
     QuadTreeNode* m_tree;
     bool isRedo;
+    bool m_upDataSelectionPanel;
 };
 class SingleTransformUndoCommand : public QUndoCommand {
 public:
@@ -276,7 +278,7 @@ protected:
 //distribute v-spaced/center h-spaced
 class DistributeUndoCommand : public QUndoCommand {
 public:
-    DistributeUndoCommand(LaserViewer* viewer);
+    DistributeUndoCommand(LaserViewer* viewer, int type);
     ~DistributeUndoCommand();
     void findTopAndBottomPrimitive(LaserPrimitive* & topPrimitive, LaserPrimitive* & bottomPrimitive);
 protected:
@@ -285,5 +287,10 @@ protected:
 private:
     LaserViewer * m_viewer;
     LaserPrimitiveGroup* m_group;
+    LaserScene* m_scene;
+    int m_type;
+    QMap<LaserPrimitive*, QTransform> m_undoMap;
+    LaserPrimitive* m_frontestPrimitive;
+    LaserPrimitive* m_backestPrimitive;
 };
 #endif // UNDOCOMMAND_H

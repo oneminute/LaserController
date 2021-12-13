@@ -3,6 +3,7 @@
 #include "scene/LaserScene.h"
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
+#include "ui/LaserControllerWindow.h"
 #include "common/Config.h"
 #include <QObject>
 #include <QPainter>
@@ -220,7 +221,6 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
             textCoef *= -1;
         }
     }
-    
 	for (int i = 0; i <= longSize; i++) {		
 		float longStart = originalStart + i * m_longUnit;
 		if (!isNegative) {
@@ -230,9 +230,21 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 			painter.drawLine(QPointF(edge + 7, longStart), QPointF(edge + m_minWidthSize, longStart));
 			//text
 			if (m_longUnit > 38 || i % 2 == 0) {
-				QString number_str = QString::number(i * textCoef * 10);
+                QString number_str;
+                if (LaserApplication::mainWindow->unitIsMM()) {
+                    number_str = QString::number(i * textCoef * 10);
+                }
+                else {
+                    number_str = QString::number(i * textCoef * 10 * Global::mmToInchCoef, 'f', 2);
+                }
+
 				if (textCoef == 0) {
-					number_str = QString::number(i * 10);
+                    if (LaserApplication::mainWindow->unitIsMM()) {
+                        number_str = QString::number(i * 10);
+                    }
+                    else {
+                        number_str = QString::number(i * 10 * Global::mmToInchCoef, 'f', 2);
+                    }
 				}
 				if (i % 2 == 0) {
 					painter.setPen(QPen(QColor(63, 63, 63), 1));
@@ -259,8 +271,15 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
 			painter.drawLine(QPointF(longStart, edge + 7), QPointF(longStart, edge + m_minHeightSize));
 			//text
 			if (m_longUnit > 38 || i % 2 == 0) {
-				//QString number_str = QString::number(LaserApplication::device->deviceTranslateXMm(i * textCoef * 10));
-				QString number_str = QString::number(i * textCoef * 10);
+                QString number_str;
+                if (LaserApplication::mainWindow->unitIsMM()) {
+                    number_str = QString::number(i * textCoef * 10);
+                }
+                else {
+                    number_str = QString::number(i * textCoef * 10 * Global::mmToInchCoef, 'g', 2);
+                }
+				//QString number_str = QString::number(i * textCoef * 10 * 0.03937007874,'g', 2);
+                //QString number_str = QString::number(i * textCoef * 10);
 				if (textCoef == 0) {
 					//number_str = QString::number(LaserApplication::device->deviceTranslateXMm(i * 10));
 					number_str = QString::number(i * 10);
@@ -304,26 +323,48 @@ void RulerWidget::drawRuler(qreal dimension, int textCoef, QPainter& painter, bo
     if (m_scale > 8) {
         int smallSize = qRound(dimension / m_unit);
         float unitStart = originalStart;
-        if (m_isVertical) {
-            if (showMinusSign) {
-                //painter.drawText(edge - 2, edge + 8, QString("-"));
-            }
-        }
-        else {
-            if (showMinusSign) {
-                
-            }
-        }
         for (int sj = 0; sj < smallSize; sj++) {
-            QString number_str = QString::number(sj);
+            QString number_str;
+            qreal number;
+            int decimalDigits = 0;
+            if (LaserApplication::mainWindow->unitIsMM()) {
+                //number_str = QString::number(sj);
+                number = sj;
+            }
+            else {
+                number = sj * Global::mmToInchCoef;
+            }
+            
+            if (!LaserApplication::mainWindow->unitIsMM()) {
+                decimalDigits = 2;
+            }
+            number_str = QString::number(number, 'f', decimalDigits);
             if (m_scale > 22 && m_scale <= 48) {
-                number_str = QString::number(sj * 0.5, 'f', 1);
+                if (LaserApplication::mainWindow->unitIsMM()) {
+                    decimalDigits = 1;
+                }
+                else {
+                    decimalDigits = 2;
+                }
+                number_str = QString::number(number * 0.5, 'f', decimalDigits);
             }
             else if (m_scale > 48 && m_scale < 78) {
-                number_str = QString::number(sj * 0.25, 'f', 1);
+                if (LaserApplication::mainWindow->unitIsMM()) {
+                    decimalDigits = 1;
+                }
+                else {
+                    decimalDigits = 2;
+                }
+                number_str = QString::number(number * 0.25, 'f', decimalDigits);
             }
             else if (m_scale >= 78) {
-                number_str = QString::number(sj * 0.125, 'f', 1);
+                if (LaserApplication::mainWindow->unitIsMM()) {
+                    decimalDigits = 2;
+                }
+                else {
+                    decimalDigits = 3;
+                }
+                number_str = QString::number(number * 0.125, 'f', decimalDigits);
             }
             painter.setPen(QPen(QColor(63, 63, 63), 1));
             unitStart = originalStart + sj * m_unit;
