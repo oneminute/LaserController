@@ -220,6 +220,9 @@ bool LaserDriver::load()
     m_fnGetMainCardInfo = (FN_WCHART_VOID)m_library.resolve("GetMainCardInfo");
     CHECK_FN(m_fnGetMainCardInfo)
 
+    m_fnGetMainHardModal = (FN_WCHART_VOID)m_library.resolve("GetMainHardModal");
+    CHECK_FN(m_fnGetMainHardModal)
+
     m_fnCreateLicenseFile = (FN_BOOL_WCHART)m_library.resolve("CreateLicenseFile");
     CHECK_FN(m_fnCreateLicenseFile)
 
@@ -268,8 +271,8 @@ bool LaserDriver::load()
     m_fnActivationMainCardEx = (FN_INT_WCHART)m_library.resolve("ActivationMainCardEx");
     CHECK_FN(m_fnActivationMainCardEx);
 
-    m_fnRegisteMainCard = (FN_WCHART_WCHART)m_library.resolve("RegisterMainCard");
-    CHECK_FN(m_fnRegisteMainCard)
+    m_fnRegisterMainCard = (FN_WCHART_WCHART_WCHART)m_library.resolve("RegisterMainCard");
+    CHECK_FN(m_fnRegisterMainCard)
 
     m_fnSendAuthenticationEmail = (FN_INT_WCHART_WCHART_INT)m_library.resolve("SendAuthenticationEmail");
     CHECK_FN(m_fnSendAuthenticationEmail)
@@ -806,6 +809,11 @@ QString LaserDriver::getMainCardInfo()
     return QString::fromWCharArray(m_fnGetMainCardInfo());
 }
 
+QString LaserDriver::getMainHardModal()
+{
+    return QString::fromWCharArray(m_fnGetMainHardModal());
+}
+
 bool LaserDriver::createLicenseFile(const QString& licenseCode)
 {
     wchar_t* licBuf = typeUtils::qStringToWCharPtr(licenseCode);
@@ -913,12 +921,15 @@ void LaserDriver::lPenMoveToOriginalPointZ(int moveTo)
     m_fnLPenMoveToOriginalPointZ(moveTo);
 }
 
-QString LaserDriver::registeMainCard(const QString& registeCode)
+QString LaserDriver::registerMainCard(const QString& registeCode, const QString& password)
 {
     wchar_t* registeCodeBuf = typeUtils::qStringToWCharPtr(registeCode);
-    wchar_t* returnBuf = m_fnRegisteMainCard(registeCodeBuf);
-    delete[] registeCodeBuf;
+    wchar_t* passwordBuf = typeUtils::qStringToWCharPtr(password);
+    wchar_t* returnBuf = m_fnRegisterMainCard(registeCodeBuf, passwordBuf);
+    qLogD << sizeof(QChar);
     QString returnRegisteCode = QString::fromWCharArray(returnBuf);
+    delete[] registeCodeBuf;
+    delete[] passwordBuf;
     return returnRegisteCode;
 }
 

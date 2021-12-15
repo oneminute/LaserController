@@ -95,6 +95,7 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
         {
             layer->setType(LLT_ENGRAVING);
         }
+        layer->init();
     }
 	layer->addPrimitive(item);
 }
@@ -1095,9 +1096,6 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         {
             laserLayers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
         }
-        if (layer.contains("type")) {
-            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
-        }
 
 		//primitive
 		for (int j = 0; j < array.size(); j++) {
@@ -1233,6 +1231,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("exportable")) {
             bool exportable = layer.value("exportable").toBool();
             laserLayers[index]->setExportable(exportable);
+        }
+        if (layer.contains("type")) {
+            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
         }
 	}
     if (!unavailables.isEmpty())

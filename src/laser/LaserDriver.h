@@ -84,6 +84,7 @@ private:
     typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
 
     typedef wchar_t* (__stdcall* FN_WCHART_WCHART)(wchar_t*);
+    typedef wchar_t* (__stdcall* FN_WCHART_WCHART_WCHART)(wchar_t*, wchar_t*);
     typedef int(__stdcall* FN_INT_WCHART_WCHART_INT)(wchar_t*, wchar_t*, int);
 
     typedef int(__stdcall* FN_INT_BYTEPTR_INT)(char*, int);
@@ -178,6 +179,7 @@ public:
     QString getDongleId();
     void getMainCardRegisterState();
     QString getMainCardInfo();
+    QString getMainHardModal();
     bool createLicenseFile(const QString& licenseCode);
 
     QVector3D getCurrentLaserPos();
@@ -197,7 +199,7 @@ public:
 
     void lPenMoveToOriginalPointZ(int moveTo);
 
-    QString registeMainCard(const QString& registeCode);
+    QString registerMainCard(const QString& registeCode, const QString& password);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
@@ -298,6 +300,7 @@ private:
     FN_BOOL_WCHART m_fnCreateLicenseFile;
     FN_VOID_VOID m_fnStartSoftUpdateWizard;
     FN_VOID_VOID m_fnStartFirmwareUpdateWizard;
+    FN_WCHART_VOID m_fnGetMainHardModal;
 
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FNSmallScaleMovement m_fnSmallScaleMovement;
@@ -317,7 +320,7 @@ private:
     FN_INT_INT_INT m_fnGetUpdatePanelHandle;
 
     FN_INT_WCHART m_fnActivationMainCardEx;
-    FN_WCHART_WCHART m_fnRegisteMainCard;
+    FN_WCHART_WCHART_WCHART m_fnRegisterMainCard;
     FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
 
     FN_INT_BYTEPTR_INT m_fnImportData;

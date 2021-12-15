@@ -1,13 +1,12 @@
 #include "VideoFrameGrabber.h"
 
 #include "widget/ImageViewer.h"
+#include <QMutexLocker>
 
-VideoFrameGrabber::VideoFrameGrabber(ImageViewer* viewer)
-    : m_viewer(viewer)
-//VideoFrameGrabber::VideoFrameGrabber(QLabel* viewer)
-    //: m_label(viewer)
+VideoFrameGrabber::VideoFrameGrabber(QObject* parent)
+    : QAbstractVideoSurface(parent)
+    , m_maxQueueLength(10)
 {
-    QObject::connect(this, &VideoFrameGrabber::imageCaptured, this, &VideoFrameGrabber::onImageCaptured, Qt::ConnectionType::QueuedConnection);
 }
 
 VideoFrameGrabber::~VideoFrameGrabber()
@@ -16,7 +15,13 @@ VideoFrameGrabber::~VideoFrameGrabber()
 
 QImage VideoFrameGrabber::image() const
 {
-    return m_currentImage;
+    QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
+    if (m_images.empty())
+        return QImage();
+    else
+    {
+        return m_images.last();
+    }
 }
 
 QList<QVideoFrame::PixelFormat> VideoFrameGrabber::supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
@@ -58,23 +63,21 @@ bool VideoFrameGrabber::present(const QVideoFrame& frame)
             cloneFrame.height(),
             QVideoFrame::imageFormatFromPixelFormat(cloneFrame.pixelFormat()));
 
-        m_currentImage = img.mirrored(false, true);
-        emit imageCaptured();
-        /*if (m_viewer)
-        {
-            m_viewer->setImage(m_currentImage);
-        }*/
+        addImage(img.mirrored(false, true));
 
         cloneFrame.unmap();
+        emit imageCaptured();
         return true;
     }
     return false;
 }
 
-void VideoFrameGrabber::onImageCaptured()
+void VideoFrameGrabber::addImage(const QImage& image)
 {
-    if (m_viewer)
+    QMutexLocker locker(&m_mutex);
+    m_images.enqueue(image);
+    if (m_images.length() > m_maxQueueLength)
     {
-        m_viewer->setImage(m_currentImage);
+        m_images.dequeue();
     }
 }
