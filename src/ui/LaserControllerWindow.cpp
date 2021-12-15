@@ -5212,6 +5212,7 @@ void LaserControllerWindow::documentClose()
 	m_tableWidgetLayers->updateItems();
 	this->m_fileDirection = "";
 	this->m_fileName = "";
+    setWindowTitle("");
 	//layer color buttons not enabled
 	for each(LayerButton* button in m_layerButtons) {
 		//button->setEnabled(false);
