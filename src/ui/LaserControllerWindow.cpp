@@ -1108,6 +1108,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_tablePrintAndCutPoints->addNewLine();
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(140310, 124805));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(140305, 124802));*/
+#else
+    //m_ui->actionCameraTools->setEnabled(false);
 #endif
 }
 

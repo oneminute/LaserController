@@ -40,6 +40,7 @@ public:
 
     void requestMainCardInfo();
     void requestMainCardRegInfo();
+    QString getMainCardModal();
     QString firmwareVersion() const;
     QString hardwareIdentID() const;
     QString mainCardId() const;
@@ -67,7 +68,7 @@ public:
 
     MainCardActivateResult autoActivateMainCard();
     bool sendAuthenticationEmail(const QString& email);
-    bool registeMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
+    bool registerMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 
     bool writeUserRegisters();
     bool writeSystemRegisters(const QString& password);

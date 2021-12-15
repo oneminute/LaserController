@@ -2,6 +2,7 @@
 
 #include <QDate>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "LaserApplication.h"
 #include "LaserDriver.h"
@@ -166,56 +167,56 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->systemRegisters.insert(6, new LaserRegister(6, Config::SystemRegister::cdKey1Item(), true));
     d->systemRegisters.insert(7, new LaserRegister(7, Config::SystemRegister::cdKey2Item(), true));
     d->systemRegisters.insert(8, new LaserRegister(8, Config::SystemRegister::cdKey3Item(), true));
-    d->systemRegisters.insert(9, new LaserRegister(9, Config::SystemRegister::sysRunTimeItem(), true));
-    d->systemRegisters.insert(10, new LaserRegister(10, Config::SystemRegister::laserRunTimeItem(), true));
-    d->systemRegisters.insert(11, new LaserRegister(11, Config::SystemRegister::sysRunNumItem(), true));
-    d->systemRegisters.insert(12, new LaserRegister(12, Config::SystemRegister::xMaxLengthItem(), true));
-    d->systemRegisters.insert(13, new LaserRegister(13, Config::SystemRegister::xDirPhaseItem(), true));
-    d->systemRegisters.insert(14, new LaserRegister(14, Config::SystemRegister::xLimitPhaseItem(), true));
-    d->systemRegisters.insert(15, new LaserRegister(15, Config::SystemRegister::xZeroDevItem(), true));
-    d->systemRegisters.insert(16, new LaserRegister(16, Config::SystemRegister::xStepLengthItem(), true));
-    d->systemRegisters.insert(17, new LaserRegister(17, Config::SystemRegister::xLimitNumItem(), true));
-    d->systemRegisters.insert(18, new LaserRegister(18, Config::SystemRegister::xResetEnabledItem(), true));
-    d->systemRegisters.insert(19, new LaserRegister(19, Config::SystemRegister::xMotorNumItem(), true));
-    d->systemRegisters.insert(20, new LaserRegister(20, Config::SystemRegister::xMotorCurrentItem(), true));
-    d->systemRegisters.insert(21, new LaserRegister(21, Config::SystemRegister::xStartSpeedItem(), true));
-    d->systemRegisters.insert(22, new LaserRegister(22, Config::SystemRegister::xMaxSpeedItem(), true));
-    d->systemRegisters.insert(23, new LaserRegister(23, Config::SystemRegister::xMaxAccelerationItem(), true));
-    d->systemRegisters.insert(24, new LaserRegister(24, Config::SystemRegister::xUrgentAccelerationItem(), true));
-    d->systemRegisters.insert(25, new LaserRegister(25, Config::SystemRegister::yMaxLengthItem(), true));
-    d->systemRegisters.insert(26, new LaserRegister(26, Config::SystemRegister::yDirPhaseItem(), true));
-    d->systemRegisters.insert(27, new LaserRegister(27, Config::SystemRegister::yLimitPhaseItem(), true));
-    d->systemRegisters.insert(28, new LaserRegister(28, Config::SystemRegister::yZeroDevItem(), true));
-    d->systemRegisters.insert(29, new LaserRegister(29, Config::SystemRegister::yStepLengthItem(), true));
-    d->systemRegisters.insert(30, new LaserRegister(30, Config::SystemRegister::yLimitNumItem(), true));
-    d->systemRegisters.insert(31, new LaserRegister(31, Config::SystemRegister::yResetEnabledItem(), true));
-    d->systemRegisters.insert(32, new LaserRegister(32, Config::SystemRegister::yMotorNumItem(), true));
-    d->systemRegisters.insert(33, new LaserRegister(33, Config::SystemRegister::yMotorCurrentItem(), true));
-    d->systemRegisters.insert(34, new LaserRegister(34, Config::SystemRegister::yStartSpeedItem(), true));
-    d->systemRegisters.insert(35, new LaserRegister(35, Config::SystemRegister::yMaxSpeedItem(), true));
-    d->systemRegisters.insert(36, new LaserRegister(36, Config::SystemRegister::yMaxAccelerationItem(), true));
-    d->systemRegisters.insert(37, new LaserRegister(37, Config::SystemRegister::yUrgentAccelerationItem(), true));
-    d->systemRegisters.insert(38, new LaserRegister(38, Config::SystemRegister::zMaxLengthItem(), true));
-    d->systemRegisters.insert(39, new LaserRegister(39, Config::SystemRegister::zDirPhaseItem(), true));
-    d->systemRegisters.insert(40, new LaserRegister(40, Config::SystemRegister::zLimitPhaseItem(), true));
-    d->systemRegisters.insert(41, new LaserRegister(41, Config::SystemRegister::zZeroDevItem(), true));
-    d->systemRegisters.insert(42, new LaserRegister(42, Config::SystemRegister::zStepLengthItem(), true));
-    d->systemRegisters.insert(43, new LaserRegister(43, Config::SystemRegister::zLimitNumItem(), true));
-    d->systemRegisters.insert(44, new LaserRegister(44, Config::SystemRegister::zResetEnabledItem(), true));
-    d->systemRegisters.insert(45, new LaserRegister(45, Config::SystemRegister::zMotorNumItem(), true));
-    d->systemRegisters.insert(46, new LaserRegister(46, Config::SystemRegister::zMotorCurrentItem(), true));
-    d->systemRegisters.insert(47, new LaserRegister(47, Config::SystemRegister::zStartSpeedItem(), true));
-    d->systemRegisters.insert(48, new LaserRegister(48, Config::SystemRegister::zMaxSpeedItem(), true));
-    d->systemRegisters.insert(49, new LaserRegister(49, Config::SystemRegister::zMaxAccelerationItem(), true));
-    d->systemRegisters.insert(50, new LaserRegister(50, Config::SystemRegister::zUrgentAccelerationItem(), true));
-    d->systemRegisters.insert(51, new LaserRegister(51, Config::SystemRegister::laserMaxPowerItem(), true));
-    d->systemRegisters.insert(52, new LaserRegister(52, Config::SystemRegister::laserMinPowerItem(), true));
-    d->systemRegisters.insert(53, new LaserRegister(53, Config::SystemRegister::laserPowerFreqItem(), true));
-    d->systemRegisters.insert(54, new LaserRegister(54, Config::SystemRegister::xPhaseEnabledItem(), true));
-    d->systemRegisters.insert(55, new LaserRegister(55, Config::SystemRegister::yPhaseEnabledItem(), true));
-    d->systemRegisters.insert(56, new LaserRegister(56, Config::SystemRegister::zPhaseEnabledItem(), true));
-    d->systemRegisters.insert(57, new LaserRegister(57, Config::SystemRegister::deviceOriginItem(), true));
-    d->systemRegisters.insert(59, new LaserRegister(59, Config::SystemRegister::zResetSpeedItem(), true));
+    d->systemRegisters.insert(12, new LaserRegister(12, Config::SystemRegister::sysRunTimeItem(), true));
+    d->systemRegisters.insert(13, new LaserRegister(13, Config::SystemRegister::laserRunTimeItem(), true));
+    d->systemRegisters.insert(14, new LaserRegister(14, Config::SystemRegister::sysRunNumItem(), true));
+    d->systemRegisters.insert(15, new LaserRegister(15, Config::SystemRegister::xMaxLengthItem(), true));
+    d->systemRegisters.insert(16, new LaserRegister(16, Config::SystemRegister::xDirPhaseItem(), true));
+    d->systemRegisters.insert(17, new LaserRegister(17, Config::SystemRegister::xLimitPhaseItem(), true));
+    d->systemRegisters.insert(18, new LaserRegister(18, Config::SystemRegister::xZeroDevItem(), true));
+    d->systemRegisters.insert(19, new LaserRegister(19, Config::SystemRegister::xStepLengthItem(), true));
+    d->systemRegisters.insert(20, new LaserRegister(20, Config::SystemRegister::xLimitNumItem(), true));
+    d->systemRegisters.insert(21, new LaserRegister(21, Config::SystemRegister::xResetEnabledItem(), true));
+    d->systemRegisters.insert(22, new LaserRegister(22, Config::SystemRegister::xMotorNumItem(), true));
+    d->systemRegisters.insert(23, new LaserRegister(23, Config::SystemRegister::xMotorCurrentItem(), true));
+    d->systemRegisters.insert(24, new LaserRegister(24, Config::SystemRegister::xStartSpeedItem(), true));
+    d->systemRegisters.insert(25, new LaserRegister(25, Config::SystemRegister::xMaxSpeedItem(), true));
+    d->systemRegisters.insert(26, new LaserRegister(26, Config::SystemRegister::xMaxAccelerationItem(), true));
+    d->systemRegisters.insert(27, new LaserRegister(27, Config::SystemRegister::xUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(28, new LaserRegister(28, Config::SystemRegister::yMaxLengthItem(), true));
+    d->systemRegisters.insert(29, new LaserRegister(29, Config::SystemRegister::yDirPhaseItem(), true));
+    d->systemRegisters.insert(30, new LaserRegister(30, Config::SystemRegister::yLimitPhaseItem(), true));
+    d->systemRegisters.insert(31, new LaserRegister(31, Config::SystemRegister::yZeroDevItem(), true));
+    d->systemRegisters.insert(32, new LaserRegister(32, Config::SystemRegister::yStepLengthItem(), true));
+    d->systemRegisters.insert(33, new LaserRegister(33, Config::SystemRegister::yLimitNumItem(), true));
+    d->systemRegisters.insert(34, new LaserRegister(34, Config::SystemRegister::yResetEnabledItem(), true));
+    d->systemRegisters.insert(35, new LaserRegister(35, Config::SystemRegister::yMotorNumItem(), true));
+    d->systemRegisters.insert(36, new LaserRegister(36, Config::SystemRegister::yMotorCurrentItem(), true));
+    d->systemRegisters.insert(37, new LaserRegister(37, Config::SystemRegister::yStartSpeedItem(), true));
+    d->systemRegisters.insert(38, new LaserRegister(38, Config::SystemRegister::yMaxSpeedItem(), true));
+    d->systemRegisters.insert(39, new LaserRegister(39, Config::SystemRegister::yMaxAccelerationItem(), true));
+    d->systemRegisters.insert(40, new LaserRegister(40, Config::SystemRegister::yUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(41, new LaserRegister(41, Config::SystemRegister::zMaxLengthItem(), true));
+    d->systemRegisters.insert(42, new LaserRegister(42, Config::SystemRegister::zDirPhaseItem(), true));
+    d->systemRegisters.insert(43, new LaserRegister(43, Config::SystemRegister::zLimitPhaseItem(), true));
+    d->systemRegisters.insert(44, new LaserRegister(44, Config::SystemRegister::zZeroDevItem(), true));
+    d->systemRegisters.insert(45, new LaserRegister(45, Config::SystemRegister::zStepLengthItem(), true));
+    d->systemRegisters.insert(46, new LaserRegister(46, Config::SystemRegister::zLimitNumItem(), true));
+    d->systemRegisters.insert(47, new LaserRegister(47, Config::SystemRegister::zResetEnabledItem(), true));
+    d->systemRegisters.insert(48, new LaserRegister(48, Config::SystemRegister::zMotorNumItem(), true));
+    d->systemRegisters.insert(49, new LaserRegister(49, Config::SystemRegister::zMotorCurrentItem(), true));
+    d->systemRegisters.insert(50, new LaserRegister(50, Config::SystemRegister::zStartSpeedItem(), true));
+    d->systemRegisters.insert(51, new LaserRegister(51, Config::SystemRegister::zMaxSpeedItem(), true));
+    d->systemRegisters.insert(52, new LaserRegister(52, Config::SystemRegister::zMaxAccelerationItem(), true));
+    d->systemRegisters.insert(53, new LaserRegister(53, Config::SystemRegister::zUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(54, new LaserRegister(54, Config::SystemRegister::laserMaxPowerItem(), true));
+    d->systemRegisters.insert(55, new LaserRegister(55, Config::SystemRegister::laserMinPowerItem(), true));
+    d->systemRegisters.insert(56, new LaserRegister(56, Config::SystemRegister::laserPowerFreqItem(), true));
+    d->systemRegisters.insert(57, new LaserRegister(57, Config::SystemRegister::xPhaseEnabledItem(), true));
+    d->systemRegisters.insert(58, new LaserRegister(58, Config::SystemRegister::yPhaseEnabledItem(), true));
+    d->systemRegisters.insert(59, new LaserRegister(59, Config::SystemRegister::zPhaseEnabledItem(), true));
+    d->systemRegisters.insert(60, new LaserRegister(60, Config::SystemRegister::deviceOriginItem(), true));
+    d->systemRegisters.insert(61, new LaserRegister(61, Config::SystemRegister::zResetSpeedItem(), true));
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
@@ -406,6 +407,16 @@ void LaserDevice::requestMainCardRegInfo()
     }
 }
 
+QString LaserDevice::getMainCardModal()
+{
+    Q_D(const LaserDevice);
+    if (d->driver)
+    {
+        return d->driver->getMainHardModal();
+    }
+    return "";
+}
+
 QString LaserDevice::firmwareVersion() const
 {
     Q_D(const LaserDevice);
@@ -583,10 +594,18 @@ bool LaserDevice::sendAuthenticationEmail(const QString& email)
     return false;
 }
 
-bool LaserDevice::registeMainCard(const QString& registeCode, QWidget* parentWidget)
+bool LaserDevice::registerMainCard(const QString& registeCode, QWidget* parentWidget)
 {
     Q_D(LaserDevice);
-    QString retCode = d->driver->registeMainCard(registeCode);
+    QInputDialog dlg(parentWidget);
+    dlg.setWindowTitle(tr("Password"));
+    dlg.setLabelText(tr("Please input vendor password."));
+    dlg.setOkButtonText(tr("Ok"));
+    dlg.setCancelButtonText(tr("Cancel"));
+    if (dlg.exec() == QDialog::Rejected)
+        return false;
+    QString password = dlg.textValue();
+    QString retCode = d->driver->registerMainCard(registeCode, password);
     if (retCode == registeCode)
     {
         QMessageBox::information(parentWidget, tr("Registration success"), tr("Registration success!"), QMessageBox::StandardButton::Ok);

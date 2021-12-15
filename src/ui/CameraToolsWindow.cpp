@@ -18,6 +18,7 @@
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGridLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QVBoxLayout>
@@ -32,8 +33,7 @@ Q_DECLARE_METATYPE(QCameraInfo)
 
 CameraToolsWindow::CameraToolsWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_camera(nullptr)
-    , m_cameraCapture(nullptr)
+    , m_cameraController(nullptr)
 {
     m_actionRefreshCameras = new QAction(QIcon(QStringLiteral(":/ui/icons/images/reset.png")), tr("Refresh"), this);
     connect(m_actionRefreshCameras, &QAction::triggered, this, &CameraToolsWindow::onActionRefreshCameras);
@@ -60,6 +60,14 @@ CameraToolsWindow::CameraToolsWindow(QWidget* parent)
     m_statusBar = new QStatusBar(this);
     setStatusBar(m_statusBar);
 
+    m_labelStatus = new QLabel;
+    m_labelStatus->setText("");
+    m_statusBar->addWidget(m_labelStatus);
+    
+    m_labelImageSize = new QLabel;
+    m_labelImageSize->setText("");
+    m_statusBar->addWidget(m_labelImageSize);
+
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
     CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
@@ -71,7 +79,7 @@ CameraToolsWindow::CameraToolsWindow(QWidget* parent)
     createCameraSettings();
     createImageSettings();
 
-    m_videoFrameGrabber.reset(new VideoFrameGrabber(m_imageViewerCamera));
+    //m_videoFrameGrabber.reset(new VideoFrameGrabber(m_imageViewerCamera));
     //m_videoFrameGrabber.reset(new VideoFrameGrabber(m_labelCamera));
 
     m_cameraDockArea->setCurrentIndex(0);
@@ -87,17 +95,31 @@ CameraToolsWindow::CameraToolsWindow(QWidget* parent)
 
 CameraToolsWindow::~CameraToolsWindow()
 {
+    
 }
 
 void CameraToolsWindow::updateCameras()
 {
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     m_comboBoxCameras->clear();
+    int prefered = -1;
+    int index = -1;
+    m_comboBoxCameras->blockSignals(true);
     for (const QCameraInfo& cameraInfo : cameras)
     {
+        index++;
         qLogD << cameraInfo.deviceName();
         m_comboBoxCameras->addItem(cameraInfo.description(), QVariant::fromValue<QCameraInfo>(cameraInfo));
+        if (cameraInfo.description().toLower().contains("lightburn"))
+        {
+            prefered = index;
+        }
     }
+    m_comboBoxCameras->blockSignals(false);
+    if (prefered >= 0)
+        m_comboBoxCameras->setCurrentIndex(prefered);
+    else if (index >= 0)
+        m_comboBoxCameras->setCurrentIndex(0);
 }
 
 void CameraToolsWindow::createVideoPanel()
@@ -331,6 +353,383 @@ void CameraToolsWindow::createImageSettings()
 {
 }
 
+void CameraToolsWindow::initCameraSettings()
+{
+    QCameraViewfinderSettings settings = m_cameraController->camera()->viewfinderSettings();
+    QList<QCamera::FrameRateRange> ranges = m_cameraController->camera()->supportedViewfinderFrameRateRanges();
+    m_comboBoxFrameRateRange->blockSignals(true);
+    for (QCamera::FrameRateRange range : ranges)
+    {
+        m_comboBoxFrameRateRange->addItem(
+            QString("%1 - %2").arg(range.minimumFrameRate).arg(range.maximumFrameRate),
+            QVariant::fromValue<QPair<qreal, qreal>>(QPair<qreal, qreal>(range.minimumFrameRate, range.maximumFrameRate))
+        );
+    }
+    m_comboBoxFrameRateRange->setCurrentText(
+        QString("%1 - %2").arg(settings.minimumFrameRate()).arg(settings.maximumFrameRate())
+    );
+    m_comboBoxFrameRateRange->blockSignals(false);
+
+    QList<QVideoFrame::PixelFormat> formats = m_cameraController->camera()->supportedViewfinderPixelFormats();
+    m_comboBoxPixelFormat->blockSignals(true);
+    for (QVideoFrame::PixelFormat format : formats)
+    {
+        m_comboBoxPixelFormat->addItem(
+            QString::number(format), format
+        );
+    }
+    m_comboBoxPixelFormat->setCurrentText(QString::number(settings.pixelFormat()));
+    m_comboBoxPixelFormat->blockSignals(false);
+
+    QList<QSize> sizes = m_cameraController->camera()->supportedViewfinderResolutions();
+    m_comboBoxResolution->blockSignals(true);
+    for (QSize size : sizes)
+    {
+        m_comboBoxResolution->addItem(
+            QString("%1 x %2").arg(size.width()).arg(size.height()),
+            size
+        );
+    }
+    QSize size = settings.resolution();
+    m_comboBoxResolution->setCurrentText(QString("%1 x %2").arg(size.width()).arg(size.height()));
+    m_comboBoxResolution->blockSignals(false);
+
+    QCameraImageProcessing* imageProcessing = m_cameraController->camera()->imageProcessing();
+
+    m_doubleSpinBoxCameraBrightness->blockSignals(true);
+    m_doubleSpinBoxCameraBrightness->setValue(imageProcessing->brightness());
+    m_doubleSpinBoxCameraBrightness->blockSignals(false);
+
+    m_comboBoxColorCameraFilter->blockSignals(true);
+    m_comboBoxColorCameraFilter->clear();
+    m_comboBoxColorCameraFilter->addItem(tr("None"), 0);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterGrayscale))
+        m_comboBoxColorCameraFilter->addItem(tr("Grayscale"), 1);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterNegative))
+        m_comboBoxColorCameraFilter->addItem(tr("Negative"), 2);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterSolarize))
+        m_comboBoxColorCameraFilter->addItem(tr("Solarize"), 3);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterSepia))
+        m_comboBoxColorCameraFilter->addItem(tr("Sepia"), 4);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterPosterize))
+        m_comboBoxColorCameraFilter->addItem(tr("Posterize"), 5);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterWhiteboard))
+        m_comboBoxColorCameraFilter->addItem(tr("Whiteboard"), 6);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterBlackboard))
+        m_comboBoxColorCameraFilter->addItem(tr("Blackboard"), 7);
+    if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterAqua))
+        m_comboBoxColorCameraFilter->addItem(tr("Aqua"), 8);
+    int index = widgetUtils::findComboBoxIndexByValue(m_comboBoxColorCameraFilter, imageProcessing->colorFilter());
+    m_comboBoxColorCameraFilter->setCurrentIndex(index);
+    m_comboBoxColorCameraFilter->blockSignals(false);
+
+    m_doubleSpinBoxCameraContrast->blockSignals(true);
+    m_doubleSpinBoxCameraContrast->setValue(imageProcessing->contrast());
+    m_doubleSpinBoxCameraContrast->blockSignals(false);
+
+    m_doubleSpinBoxDenoisingLevel->blockSignals(true);
+    m_doubleSpinBoxDenoisingLevel->setValue(imageProcessing->denoisingLevel());
+    m_doubleSpinBoxDenoisingLevel->blockSignals(false);
+
+    m_comboBoxWhiteBalanceMode->blockSignals(true);
+    m_comboBoxWhiteBalanceMode->clear();
+    m_comboBoxWhiteBalanceMode->addItem(tr("Auto"), 0);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceManual))
+        m_comboBoxColorCameraFilter->addItem(tr("Manual"), 1);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceSunlight))
+        m_comboBoxColorCameraFilter->addItem(tr("Sunlight"), 2);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceCloudy))
+        m_comboBoxColorCameraFilter->addItem(tr("Cloudy"), 3);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceShade))
+        m_comboBoxColorCameraFilter->addItem(tr("Shade"), 4);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceTungsten))
+        m_comboBoxColorCameraFilter->addItem(tr("Tungsten"), 5);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceFluorescent))
+        m_comboBoxColorCameraFilter->addItem(tr("Fluorescent"), 6);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceFlash))
+        m_comboBoxColorCameraFilter->addItem(tr("Flash"), 7);
+    if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceSunset))
+        m_comboBoxColorCameraFilter->addItem(tr("Sunset"), 8);
+    index = widgetUtils::findComboBoxIndexByValue(m_comboBoxWhiteBalanceMode, imageProcessing->whiteBalanceMode());
+    m_comboBoxWhiteBalanceMode->setCurrentIndex(index);
+    m_doubleSpinBoxWhiteBalance->setEnabled(imageProcessing->whiteBalanceMode() == QCameraImageProcessing::WhiteBalanceManual);
+    m_comboBoxWhiteBalanceMode->blockSignals(false);
+
+    m_doubleSpinBoxWhiteBalance->blockSignals(true);
+    m_doubleSpinBoxWhiteBalance->setValue(imageProcessing->manualWhiteBalance());
+    m_doubleSpinBoxWhiteBalance->blockSignals(false);
+
+    m_doubleSpinBoxSaturation->blockSignals(true);
+    m_doubleSpinBoxSaturation->setValue(imageProcessing->saturation());
+    m_doubleSpinBoxSaturation->blockSignals(false);
+
+    m_doubleSpinBoxSharpeningLevel->blockSignals(true);
+    m_doubleSpinBoxSharpeningLevel->setValue(imageProcessing->sharpeningLevel());
+    m_doubleSpinBoxSharpeningLevel->blockSignals(false);
+
+    QCameraExposure* exposure = m_cameraController->camera()->exposure();
+    m_checkBoxAutoAperture->blockSignals(true);
+    m_checkBoxAutoAperture->setChecked(false);
+    m_checkBoxAutoAperture->blockSignals(false);
+
+    m_checkBoxAutoIsoSensitivity->blockSignals(true);
+    m_checkBoxAutoIsoSensitivity->setChecked(false);
+    m_checkBoxAutoIsoSensitivity->blockSignals(false);
+
+    m_checkBoxAutoShutterSpeed->blockSignals(true);
+    m_checkBoxAutoShutterSpeed->setChecked(false);
+    m_checkBoxAutoShutterSpeed->blockSignals(false);
+
+    m_doubleSpinBoxExposureCompensation->blockSignals(true);
+    m_doubleSpinBoxExposureCompensation->setValue(exposure->exposureCompensation());
+    m_doubleSpinBoxExposureCompensation->blockSignals(false);
+
+    m_comboBoxExposureMode->blockSignals(true);
+    m_comboBoxExposureMode->clear();
+    m_comboBoxExposureMode->addItem(tr("Auto"), 0);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureManual))
+        m_comboBoxExposureMode->addItem(tr("Manual"), 1);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposurePortrait))
+        m_comboBoxExposureMode->addItem(tr("Portrait"), 2);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureNight))
+        m_comboBoxExposureMode->addItem(tr("Night"), 3);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureBacklight))
+        m_comboBoxExposureMode->addItem(tr("Backlight"), 4);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureSpotlight))
+        m_comboBoxExposureMode->addItem(tr("Spotlight"), 5);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureSports))
+        m_comboBoxExposureMode->addItem(tr("Sports"), 6);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureSnow))
+        m_comboBoxExposureMode->addItem(tr("Snow"), 7);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureBeach))
+        m_comboBoxExposureMode->addItem(tr("Beach"), 8);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureLargeAperture))
+        m_comboBoxExposureMode->addItem(tr("LargeAperture"), 9);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureSmallAperture))
+        m_comboBoxExposureMode->addItem(tr("SmallAperture"), 10);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureAction))
+        m_comboBoxExposureMode->addItem(tr("Action"), 11);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureLandscape))
+        m_comboBoxExposureMode->addItem(tr("Landscape"), 12);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureNightPortrait))
+        m_comboBoxExposureMode->addItem(tr("NightPortrait"), 13);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureTheatre))
+        m_comboBoxExposureMode->addItem(tr("Theatre"), 14);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureSunset))
+        m_comboBoxExposureMode->addItem(tr("Sunset"), 15);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureSteadyPhoto))
+        m_comboBoxExposureMode->addItem(tr("SteadyPhoto"), 16);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureFireworks))
+        m_comboBoxExposureMode->addItem(tr("Fireworks"), 17);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureParty))
+        m_comboBoxExposureMode->addItem(tr("Party"), 18);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureCandlelight))
+        m_comboBoxExposureMode->addItem(tr("Candlelight"), 19);
+    if (exposure->isExposureModeSupported(QCameraExposure::ExposureBarcode))
+        m_comboBoxExposureMode->addItem(tr("Barcode"), 20);
+    index = widgetUtils::findComboBoxIndexByValue(m_comboBoxWhiteBalanceMode, exposure->exposureMode());
+    m_comboBoxExposureMode->setCurrentIndex(index);
+    m_doubleSpinBoxExposureCompensation->setEnabled(exposure->exposureMode() == QCameraExposure::ExposureManual);
+    m_comboBoxExposureMode->blockSignals(false);
+
+    for (QCheckBox* w : m_checkBoxFlashMode)
+    {
+        m_layoutFlashMode->removeWidget(w);
+        delete w;
+    }
+    m_checkBoxFlashMode.clear();
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashAuto))
+    {
+        QCheckBox* w = new QCheckBox(tr("Auto"));
+        w->setProperty("flag", 0x1);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashOff))
+    {
+        QCheckBox* w = new QCheckBox(tr("Off"));
+        w->setProperty("flag", 0x2);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashOn))
+    {
+        QCheckBox* w = new QCheckBox(tr("On"));
+        w->setProperty("flag", 0x4);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashRedEyeReduction))
+    {
+        QCheckBox* w = new QCheckBox(tr("Red Eye Reduction"));
+        w->setProperty("flag", 0x8);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashFill))
+    {
+        QCheckBox* w = new QCheckBox(tr("Fill"));
+        w->setProperty("flag", 0x10);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashTorch))
+    {
+        QCheckBox* w = new QCheckBox(tr("Torch"));
+        w->setProperty("flag", 0x20);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashVideoLight))
+    {
+        QCheckBox* w = new QCheckBox(tr("Video Ligth"));
+        w->setProperty("flag", 0x40);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashSlowSyncFrontCurtain))
+    {
+        QCheckBox* w = new QCheckBox(tr("Slow Sync Front Curtain"));
+        w->setProperty("flag", 0x80);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashSlowSyncRearCurtain))
+    {
+        QCheckBox* w = new QCheckBox(tr("Slow Sync Rear Curtain"));
+        w->setProperty("flag", 0x100);
+        m_checkBoxFlashMode.append(w);
+    }
+    if (exposure->isFlashModeSupported(QCameraExposure::FlashManual))
+    {
+        QCheckBox* w = new QCheckBox(tr("Manual"));
+        w->setProperty("flag", 0x200);
+        m_checkBoxFlashMode.append(w);
+    }
+    for (QCheckBox* w : m_checkBoxFlashMode)
+    {
+        connect(w, &QCheckBox::stateChanged, this, &CameraToolsWindow::onCheckBoxFlashModeChanged);
+    }
+
+    m_comboBoxMeteringMode->blockSignals(true);
+    m_comboBoxMeteringMode->clear();
+    if (exposure->isMeteringModeSupported(QCameraExposure::MeteringMatrix))
+        m_comboBoxMeteringMode->addItem(tr("Matrix"), 1);
+    if (exposure->isMeteringModeSupported(QCameraExposure::MeteringAverage))
+        m_comboBoxMeteringMode->addItem(tr("Average"), 2);
+    if (exposure->isMeteringModeSupported(QCameraExposure::MeteringSpot))
+        m_comboBoxMeteringMode->addItem(tr("Spot"), 3);
+    index = widgetUtils::findComboBoxIndexByValue(m_comboBoxMeteringMode, exposure->meteringMode());
+    m_comboBoxMeteringMode->setCurrentIndex(index);
+    m_comboBoxMeteringMode->blockSignals(false);
+
+    bool ok;
+    m_comboBoxAperture->blockSignals(true);
+    QList<qreal> apertureValues = exposure->supportedApertures(&ok);
+    if (ok)
+    {
+        for (qreal v : apertureValues)
+        {
+            m_comboBoxAperture->addItem(QString::number(v), v);
+        }
+        m_comboBoxAperture->setCurrentText(
+            QString::number(exposure->requestedAperture())
+        );
+    }
+    m_comboBoxAperture->blockSignals(false);
+
+    m_comboBoxIsoSensitivity->blockSignals(true);
+    QList<int> isoValues = exposure->supportedIsoSensitivities(&ok);
+    if (ok)
+    {
+        for (int v : isoValues)
+        {
+            m_comboBoxIsoSensitivity->addItem(QString::number(v), v);
+        }
+        m_comboBoxIsoSensitivity->setCurrentText(
+            QString::number(exposure->requestedAperture())
+        );
+    }
+    m_comboBoxIsoSensitivity->blockSignals(false);
+
+    m_comboBoxShutterSpeed->blockSignals(true);
+    QList<qreal> speedValues = exposure->supportedShutterSpeeds(&ok);
+    if (ok)
+    {
+        for (qreal v : speedValues)
+        {
+            m_comboBoxShutterSpeed->addItem(QString::number(v), v);
+        }
+        m_comboBoxShutterSpeed->setCurrentText(
+            QString::number(exposure->requestedAperture())
+        );
+    }
+    m_comboBoxShutterSpeed->blockSignals(false);
+
+    QCameraFocus* focus = m_cameraController->camera()->focus();
+    QPointF focusPoint = focus->customFocusPoint();
+    m_vector2DFocusPoint->blockSignals(true);
+    m_vector2DFocusPoint->setValue(focusPoint);
+    m_vector2DFocusPoint->blockSignals(false);
+
+    for (QCheckBox* w : m_checkBoxFocusMode)
+    {
+        m_layoutFocusMode->removeWidget(w);
+        delete w;
+    }
+    m_checkBoxFocusMode.clear();
+    if (focus->isFocusModeSupported(QCameraFocus::ManualFocus))
+    {
+        QCheckBox* w = new QCheckBox(tr("Manual"));
+        w->setProperty("flag", 0x1);
+        m_checkBoxFocusMode.append(w);
+    }
+    if (focus->isFocusModeSupported(QCameraFocus::HyperfocalFocus))
+    {
+        QCheckBox* w = new QCheckBox(tr("Hyperfocal"));
+        w->setProperty("flag", 0x2);
+        m_checkBoxFocusMode.append(w);
+    }
+    if (focus->isFocusModeSupported(QCameraFocus::InfinityFocus))
+    {
+        QCheckBox* w = new QCheckBox(tr("Infinity"));
+        w->setProperty("flag", 0x4);
+        m_checkBoxFocusMode.append(w);
+    }
+    if (focus->isFocusModeSupported(QCameraFocus::AutoFocus))
+    {
+        QCheckBox* w = new QCheckBox(tr("Auto"));
+        w->setProperty("flag", 0x8);
+        m_checkBoxFocusMode.append(w);
+    }
+    if (focus->isFocusModeSupported(QCameraFocus::ContinuousFocus))
+    {
+        QCheckBox* w = new QCheckBox(tr("Continuous"));
+        w->setProperty("flag", 0x10);
+        m_checkBoxFocusMode.append(w);
+    }
+    if (focus->isFocusModeSupported(QCameraFocus::MacroFocus))
+    {
+        QCheckBox* w = new QCheckBox(tr("Macro"));
+        w->setProperty("flag", 0x20);
+        m_checkBoxFocusMode.append(w);
+    }
+    for (QCheckBox* w : m_checkBoxFocusMode)
+    {
+        connect(w, &QCheckBox::stateChanged, this, &CameraToolsWindow::onChecBoxFocusModeChanged);
+    }
+
+    m_comboBoxFocusPointMode->blockSignals(true);
+    m_comboBoxFocusPointMode->clear();
+    if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointAuto))
+        m_comboBoxFocusPointMode->addItem(tr("Auto"), 0);
+    if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointCenter))
+        m_comboBoxFocusPointMode->addItem(tr("Center"), 1);
+    if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointFaceDetection))
+        m_comboBoxFocusPointMode->addItem(tr("Detection"), 2);
+    if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointCustom))
+        m_comboBoxFocusPointMode->addItem(tr("Custom"), 3);
+    m_vector2DFocusPoint->setEnabled(focus->focusPointMode() == QCameraFocus::FocusPointCustom);
+    index = widgetUtils::findComboBoxIndexByValue(m_comboBoxFocusPointMode, focus->focusPointMode());
+    m_comboBoxFocusPointMode->setCurrentIndex(index);
+    m_comboBoxFocusPointMode->blockSignals(false);
+
+    m_lineEditMaximumDigitalZoom->setText(QString::number(focus->maximumDigitalZoom()));
+    m_lineEditMaximumOpticalZoom->setText(QString::number(focus->maximumOpticalZoom()));
+}
+
 void CameraToolsWindow::closeEvent(QCloseEvent* event)
 {
     deleteLater();
@@ -338,100 +737,118 @@ void CameraToolsWindow::closeEvent(QCloseEvent* event)
 
 void CameraToolsWindow::onComboBoxFrameRateRangeChanged(int index)
 {
+    if (m_cameraController.isNull())
+        return;
+
+    QPair<qreal, qreal> pair = m_comboBoxFrameRateRange->currentData().value<QPair<qreal, qreal>>();
+    m_cameraController->camera()->viewfinderSettings().setMinimumFrameRate(pair.first);
+    m_cameraController->camera()->viewfinderSettings().setMaximumFrameRate(pair.second);
 }
 
 void CameraToolsWindow::onComboBoxPixelFormatChanged(int index)
 {
+    if (m_cameraController.isNull())
+        return;
+
+    QVideoFrame::PixelFormat pixelFormat = static_cast<QVideoFrame::PixelFormat>(m_comboBoxPixelFormat->currentData().toInt());
+    m_cameraController->camera()->viewfinderSettings().setPixelFormat(pixelFormat);
 }
 
 void CameraToolsWindow::onComboBoxResolutionChanged(int index)
 {
+    if (m_cameraController.isNull())
+        return;
+
+    QSize resolution = static_cast<QSize>(m_comboBoxResolution->currentData().toSize());
+    QCameraViewfinderSettings settings = m_cameraController->camera()->viewfinderSettings();
+    settings.setResolution(resolution);
+    m_cameraController->camera()->setViewfinderSettings(settings);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxBrightnessChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setBrightness(value);
+    m_cameraController->camera()->imageProcessing()->setBrightness(value);
 }
 
 void CameraToolsWindow::onComboBoxFilterChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setColorFilter(static_cast<QCameraImageProcessing::ColorFilter>(
+    m_cameraController->camera()->imageProcessing()->setColorFilter(static_cast<QCameraImageProcessing::ColorFilter>(
         m_comboBoxColorCameraFilter->currentData().toInt()));
 }
 
 void CameraToolsWindow::onDoubleSpinBoxContrastChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setContrast(value);
+    m_cameraController->camera()->imageProcessing()->setContrast(value);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxDenoisingLevelChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setDenoisingLevel(value);
+    m_cameraController->camera()->imageProcessing()->setDenoisingLevel(value);
 }
 
 void CameraToolsWindow::onComboBoxWhiteBalanceModeChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setWhiteBalanceMode(static_cast<QCameraImageProcessing::WhiteBalanceMode>(
+    m_cameraController->camera()->imageProcessing()->setWhiteBalanceMode(static_cast<QCameraImageProcessing::WhiteBalanceMode>(
         m_comboBoxWhiteBalanceMode->currentData().toInt()));
-    m_doubleSpinBoxWhiteBalance->setEnabled(m_camera->imageProcessing()->whiteBalanceMode()
+    m_doubleSpinBoxWhiteBalance->setEnabled(m_cameraController->camera()->imageProcessing()->whiteBalanceMode()
         == QCameraImageProcessing::WhiteBalanceManual);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxWhiteBalanceChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setManualWhiteBalance(value);
+    m_cameraController->camera()->imageProcessing()->setManualWhiteBalance(value);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxSaturationChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setSaturation(value);
+    m_cameraController->camera()->imageProcessing()->setSaturation(value);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxSharpeningLevelChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->imageProcessing()->setSharpeningLevel(value);
+    m_cameraController->camera()->imageProcessing()->setSharpeningLevel(value);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxExposureCompensationChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->exposure()->setExposureCompensation(value);
+    m_cameraController->camera()->exposure()->setExposureCompensation(value);
 }
 
 void CameraToolsWindow::onCheckBoxAutoApertureStateChanged(int state)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
     if (m_checkBoxAutoAperture->isChecked())
     {
-        m_camera->exposure()->setAutoAperture();
+        m_cameraController->camera()->exposure()->setAutoAperture();
         m_comboBoxAperture->setEnabled(false);
     }
     else
@@ -443,12 +860,12 @@ void CameraToolsWindow::onCheckBoxAutoApertureStateChanged(int state)
 
 void CameraToolsWindow::onCheckBoxAutoIsoSensitivityStateChanged(int state)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
     if (m_checkBoxAutoIsoSensitivity->isChecked())
     {
-        m_camera->exposure()->setAutoIsoSensitivity();
+        m_cameraController->camera()->exposure()->setAutoIsoSensitivity();
         m_comboBoxIsoSensitivity->setEnabled(false);
     }
     else
@@ -460,12 +877,12 @@ void CameraToolsWindow::onCheckBoxAutoIsoSensitivityStateChanged(int state)
 
 void CameraToolsWindow::onCheckBoxAutoShutterSpeedStateChanged(int state)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
     if (m_checkBoxAutoShutterSpeed->isChecked())
     {
-        m_camera->exposure()->setAutoShutterSpeed();
+        m_cameraController->camera()->exposure()->setAutoShutterSpeed();
         m_comboBoxShutterSpeed->setEnabled(false);
     }
     else
@@ -477,10 +894,10 @@ void CameraToolsWindow::onCheckBoxAutoShutterSpeedStateChanged(int state)
 
 void CameraToolsWindow::onComboBoxExposureModeChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->exposure()->setExposureMode(
+    m_cameraController->camera()->exposure()->setExposureMode(
         m_comboBoxExposureMode->currentData().value<QCameraExposure::ExposureMode>());
     m_doubleSpinBoxExposureCompensation->setEnabled(
         m_comboBoxExposureMode->currentData().value<QCameraExposure::ExposureMode>() == 
@@ -489,94 +906,94 @@ void CameraToolsWindow::onComboBoxExposureModeChanged(int index)
 
 void CameraToolsWindow::onCheckBoxFlashModeChanged(int state)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
     QCheckBox* w = qobject_cast<QCheckBox*>(sender());
     QCameraExposure::FlashMode mode = static_cast<QCameraExposure::FlashMode>(w->property("flag").toInt());
 
-    QCameraExposure::FlashModes modes = m_camera->exposure()->flashMode();
+    QCameraExposure::FlashModes modes = m_cameraController->camera()->exposure()->flashMode();
     modes.setFlag(mode, w->isChecked());
-    m_camera->exposure()->setFlashMode(modes);
+    m_cameraController->camera()->exposure()->setFlashMode(modes);
 }
 
 void CameraToolsWindow::onComboBoxMeteringModeChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->exposure()->setMeteringMode(m_comboBoxMeteringMode->currentData().value<QCameraExposure::MeteringMode>());
+    m_cameraController->camera()->exposure()->setMeteringMode(m_comboBoxMeteringMode->currentData().value<QCameraExposure::MeteringMode>());
 }
 
 void CameraToolsWindow::onComboBoxApertureChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->exposure()->setManualAperture(m_comboBoxAperture->currentData().toReal());
+    m_cameraController->camera()->exposure()->setManualAperture(m_comboBoxAperture->currentData().toReal());
 }
 
 void CameraToolsWindow::onComboBoxIsoSensitivityChanged(int value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->exposure()->setManualIsoSensitivity(m_comboBoxIsoSensitivity->currentData().toInt());
+    m_cameraController->camera()->exposure()->setManualIsoSensitivity(m_comboBoxIsoSensitivity->currentData().toInt());
 }
 
 void CameraToolsWindow::onComboBoxShutterSpeedChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->exposure()->setManualShutterSpeed(m_comboBoxShutterSpeed->currentData().toReal());
+    m_cameraController->camera()->exposure()->setManualShutterSpeed(m_comboBoxShutterSpeed->currentData().toReal());
 }
 
 void CameraToolsWindow::onVector2DFocusPointChanged(qreal x, qreal y)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    QPointF point = m_camera->focus()->customFocusPoint();
-    m_camera->focus()->setCustomFocusPoint(point);
+    QPointF point = m_cameraController->camera()->focus()->customFocusPoint();
+    m_cameraController->camera()->focus()->setCustomFocusPoint(point);
 }
 
 void CameraToolsWindow::onChecBoxFocusModeChanged(int state)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
     QCheckBox* w = qobject_cast<QCheckBox*>(sender());
     QCameraFocus::FocusMode mode = static_cast<QCameraFocus::FocusMode>(w->property("flag").toInt());
 
-    QCameraFocus::FocusModes modes = m_camera->focus()->focusMode();
+    QCameraFocus::FocusModes modes = m_cameraController->camera()->focus()->focusMode();
     modes.setFlag(mode, w->isChecked());
-    m_camera->focus()->setFocusMode(modes);
+    m_cameraController->camera()->focus()->setFocusMode(modes);
 }
 
 void CameraToolsWindow::onComboBoxFocusPointModeChanged(int index)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    m_camera->focus()->setFocusPointMode(m_comboBoxFocusPointMode->currentData().value<QCameraFocus::FocusPointMode>());
+    m_cameraController->camera()->focus()->setFocusPointMode(m_comboBoxFocusPointMode->currentData().value<QCameraFocus::FocusPointMode>());
 }
 
 void CameraToolsWindow::onDoubleSpinBoxDigitalZoomChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    qreal optZoom = m_camera->focus()->opticalZoom();
-    m_camera->focus()->zoomTo(value, optZoom);
+    qreal optZoom = m_cameraController->camera()->focus()->opticalZoom();
+    m_cameraController->camera()->focus()->zoomTo(value, optZoom);
 }
 
 void CameraToolsWindow::onDoubleSpinBoxOpticalZoomChanged(qreal value)
 {
-    if (m_camera.isNull())
+    if (m_cameraController.isNull())
         return;
 
-    qreal digZoom = m_camera->focus()->opticalZoom();
-    m_camera->focus()->zoomTo(digZoom, value);
+    qreal digZoom = m_cameraController->camera()->focus()->opticalZoom();
+    m_cameraController->camera()->focus()->zoomTo(digZoom, value);
 }
 
 void CameraToolsWindow::onActionRefreshCameras(bool checked)
@@ -588,403 +1005,13 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
 {
     if (checked)
     {
-        QCameraInfo& info = m_comboBoxCameras->currentData().value<QCameraInfo>();
-        m_camera.reset(new QCamera(info));
-        m_camera->setViewfinder(m_videoFrameGrabber.data());
-        m_camera->setCaptureMode(QCamera::CaptureStillImage);
-
-        // initialize variables
-        m_cameraCapture.reset(new QCameraImageCapture(m_camera.data()));
-        m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-        connect(m_cameraCapture.data(), &QCameraImageCapture::imageAvailable,
-            this, &CameraToolsWindow::onCaptureImageAvailable);
-
-        QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-        QList<QCamera::FrameRateRange> ranges = m_camera->supportedViewfinderFrameRateRanges();
-        m_comboBoxFrameRateRange->blockSignals(true);
-        for (QCamera::FrameRateRange range : ranges)
-        {
-            m_comboBoxFrameRateRange->addItem(
-                QString("%1 - %2").arg(range.minimumFrameRate).arg(range.maximumFrameRate),
-                QVariant::fromValue<QPair<qreal, qreal>>(QPair<qreal, qreal>(range.minimumFrameRate, range.maximumFrameRate))
-            );
-        }
-        m_comboBoxFrameRateRange->setCurrentText(
-            QString("%1 - %2").arg(settings.minimumFrameRate()).arg(settings.maximumFrameRate())
-        );
-        m_comboBoxFrameRateRange->blockSignals(false);
-
-        QList<QVideoFrame::PixelFormat> formats = m_camera->supportedViewfinderPixelFormats();
-        m_comboBoxPixelFormat->blockSignals(true);
-        for (QVideoFrame::PixelFormat format : formats)
-        {
-            m_comboBoxPixelFormat->addItem(
-                QString::number(format), format
-            );
-        }
-        m_comboBoxPixelFormat->setCurrentText(QString::number(settings.pixelFormat()));
-        m_comboBoxPixelFormat->blockSignals(false);
-
-        QList<QSize> sizes = m_camera->supportedViewfinderResolutions();
-        m_comboBoxResolution->blockSignals(true);
-        for (QSize size : sizes)
-        {
-            m_comboBoxResolution->addItem(
-                QString("%1 x %2").arg(size.width()).arg(size.height()),
-                size
-            );
-        }
-        QSize size = settings.resolution();
-        m_comboBoxResolution->setCurrentText(QString("%1 x %2").arg(size.width()).arg(size.height()));
-        m_comboBoxResolution->blockSignals(false);
-
-        QCameraImageProcessing* imageProcessing = m_camera->imageProcessing();
-
-        m_doubleSpinBoxCameraBrightness->blockSignals(true);
-        m_doubleSpinBoxCameraBrightness->setValue(imageProcessing->brightness());
-        m_doubleSpinBoxCameraBrightness->blockSignals(false);
-
-        m_comboBoxColorCameraFilter->blockSignals(true);
-        m_comboBoxColorCameraFilter->clear();
-        m_comboBoxColorCameraFilter->addItem(tr("None"), 0);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterGrayscale))
-            m_comboBoxColorCameraFilter->addItem(tr("Grayscale"), 1);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterNegative))
-            m_comboBoxColorCameraFilter->addItem(tr("Negative"), 2);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterSolarize))
-            m_comboBoxColorCameraFilter->addItem(tr("Solarize"), 3);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterSepia))
-            m_comboBoxColorCameraFilter->addItem(tr("Sepia"), 4);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterPosterize))
-            m_comboBoxColorCameraFilter->addItem(tr("Posterize"), 5);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterWhiteboard))
-            m_comboBoxColorCameraFilter->addItem(tr("Whiteboard"), 6);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterBlackboard))
-            m_comboBoxColorCameraFilter->addItem(tr("Blackboard"), 7);
-        if (imageProcessing->isColorFilterSupported(QCameraImageProcessing::ColorFilterAqua))
-            m_comboBoxColorCameraFilter->addItem(tr("Aqua"), 8);
-        int index = widgetUtils::findComboBoxIndexByValue(m_comboBoxColorCameraFilter, imageProcessing->colorFilter());
-        m_comboBoxColorCameraFilter->setCurrentIndex(index);
-        m_comboBoxColorCameraFilter->blockSignals(false);
-
-        m_doubleSpinBoxCameraContrast->blockSignals(true);
-        m_doubleSpinBoxCameraContrast->setValue(imageProcessing->contrast());
-        m_doubleSpinBoxCameraContrast->blockSignals(false);
-
-        m_doubleSpinBoxDenoisingLevel->blockSignals(true);
-        m_doubleSpinBoxDenoisingLevel->setValue(imageProcessing->denoisingLevel());
-        m_doubleSpinBoxDenoisingLevel->blockSignals(false);
-
-        m_comboBoxWhiteBalanceMode->blockSignals(true);
-        m_comboBoxWhiteBalanceMode->clear();
-        m_comboBoxWhiteBalanceMode->addItem(tr("Auto"), 0);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceManual))
-            m_comboBoxColorCameraFilter->addItem(tr("Manual"), 1);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceSunlight))
-            m_comboBoxColorCameraFilter->addItem(tr("Sunlight"), 2);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceCloudy))
-            m_comboBoxColorCameraFilter->addItem(tr("Cloudy"), 3);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceShade))
-            m_comboBoxColorCameraFilter->addItem(tr("Shade"), 4);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceTungsten))
-            m_comboBoxColorCameraFilter->addItem(tr("Tungsten"), 5);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceFluorescent))
-            m_comboBoxColorCameraFilter->addItem(tr("Fluorescent"), 6);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceFlash))
-            m_comboBoxColorCameraFilter->addItem(tr("Flash"), 7);
-        if (imageProcessing->isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceSunset))
-            m_comboBoxColorCameraFilter->addItem(tr("Sunset"), 8);
-        index = widgetUtils::findComboBoxIndexByValue(m_comboBoxWhiteBalanceMode, imageProcessing->whiteBalanceMode());
-        m_comboBoxWhiteBalanceMode->setCurrentIndex(index);
-        m_doubleSpinBoxWhiteBalance->setEnabled(imageProcessing->whiteBalanceMode() == QCameraImageProcessing::WhiteBalanceManual);
-        m_comboBoxWhiteBalanceMode->blockSignals(false);
-
-        m_doubleSpinBoxWhiteBalance->blockSignals(true);
-        m_doubleSpinBoxWhiteBalance->setValue(imageProcessing->manualWhiteBalance());
-        m_doubleSpinBoxWhiteBalance->blockSignals(false);
-
-        m_doubleSpinBoxSaturation->blockSignals(true);
-        m_doubleSpinBoxSaturation->setValue(imageProcessing->saturation());
-        m_doubleSpinBoxSaturation->blockSignals(false);
-
-        m_doubleSpinBoxSharpeningLevel->blockSignals(true);
-        m_doubleSpinBoxSharpeningLevel->setValue(imageProcessing->sharpeningLevel());
-        m_doubleSpinBoxSharpeningLevel->blockSignals(false);
-
-        QCameraExposure* exposure = m_camera->exposure();
-        m_checkBoxAutoAperture->blockSignals(true);
-        m_checkBoxAutoAperture->setChecked(false);
-        m_checkBoxAutoAperture->blockSignals(false);
-
-        m_checkBoxAutoIsoSensitivity->blockSignals(true);
-        m_checkBoxAutoIsoSensitivity->setChecked(false);
-        m_checkBoxAutoIsoSensitivity->blockSignals(false);
-
-        m_checkBoxAutoShutterSpeed->blockSignals(true);
-        m_checkBoxAutoShutterSpeed->setChecked(false);
-        m_checkBoxAutoShutterSpeed->blockSignals(false);
-
-        m_doubleSpinBoxExposureCompensation->blockSignals(true);
-        m_doubleSpinBoxExposureCompensation->setValue(exposure->exposureCompensation());
-        m_doubleSpinBoxExposureCompensation->blockSignals(false);
-
-        m_comboBoxExposureMode->blockSignals(true);
-        m_comboBoxExposureMode->clear();
-        m_comboBoxExposureMode->addItem(tr("Auto"), 0);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureManual))
-            m_comboBoxExposureMode->addItem(tr("Manual"), 1);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposurePortrait))
-            m_comboBoxExposureMode->addItem(tr("Portrait"), 2);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureNight))
-            m_comboBoxExposureMode->addItem(tr("Night"), 3);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureBacklight))
-            m_comboBoxExposureMode->addItem(tr("Backlight"), 4);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureSpotlight))
-            m_comboBoxExposureMode->addItem(tr("Spotlight"), 5);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureSports))
-            m_comboBoxExposureMode->addItem(tr("Sports"), 6);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureSnow))
-            m_comboBoxExposureMode->addItem(tr("Snow"), 7);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureBeach))
-            m_comboBoxExposureMode->addItem(tr("Beach"), 8);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureLargeAperture))
-            m_comboBoxExposureMode->addItem(tr("LargeAperture"), 9);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureSmallAperture))
-            m_comboBoxExposureMode->addItem(tr("SmallAperture"), 10);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureAction))
-            m_comboBoxExposureMode->addItem(tr("Action"), 11);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureLandscape))
-            m_comboBoxExposureMode->addItem(tr("Landscape"), 12);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureNightPortrait))
-            m_comboBoxExposureMode->addItem(tr("NightPortrait"), 13);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureTheatre))
-            m_comboBoxExposureMode->addItem(tr("Theatre"), 14);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureSunset))
-            m_comboBoxExposureMode->addItem(tr("Sunset"), 15);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureSteadyPhoto))
-            m_comboBoxExposureMode->addItem(tr("SteadyPhoto"), 16);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureFireworks))
-            m_comboBoxExposureMode->addItem(tr("Fireworks"), 17);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureParty))
-            m_comboBoxExposureMode->addItem(tr("Party"), 18);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureCandlelight))
-            m_comboBoxExposureMode->addItem(tr("Candlelight"), 19);
-        if (exposure->isExposureModeSupported(QCameraExposure::ExposureBarcode))
-            m_comboBoxExposureMode->addItem(tr("Barcode"), 20);
-        index = widgetUtils::findComboBoxIndexByValue(m_comboBoxWhiteBalanceMode, exposure->exposureMode());
-        m_comboBoxExposureMode->setCurrentIndex(index);
-        m_doubleSpinBoxExposureCompensation->setEnabled(exposure->exposureMode() == QCameraExposure::ExposureManual);
-        m_comboBoxExposureMode->blockSignals(false);
-
-        for (QCheckBox* w : m_checkBoxFlashMode)
-        {
-            m_layoutFlashMode->removeWidget(w);
-            delete w;
-        }
-        m_checkBoxFlashMode.clear();
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashAuto))
-        {
-            QCheckBox* w = new QCheckBox(tr("Auto"));
-            w->setProperty("flag", 0x1);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashOff))
-        {
-            QCheckBox* w = new QCheckBox(tr("Off"));
-            w->setProperty("flag", 0x2);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashOn))
-        {
-            QCheckBox* w = new QCheckBox(tr("On"));
-            w->setProperty("flag", 0x4);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashRedEyeReduction))
-        {
-            QCheckBox* w = new QCheckBox(tr("Red Eye Reduction"));
-            w->setProperty("flag", 0x8);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashFill))
-        {
-            QCheckBox* w = new QCheckBox(tr("Fill"));
-            w->setProperty("flag", 0x10);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashTorch))
-        {
-            QCheckBox* w = new QCheckBox(tr("Torch"));
-            w->setProperty("flag", 0x20);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashVideoLight))
-        {
-            QCheckBox* w = new QCheckBox(tr("Video Ligth"));
-            w->setProperty("flag", 0x40);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashSlowSyncFrontCurtain))
-        {
-            QCheckBox* w = new QCheckBox(tr("Slow Sync Front Curtain"));
-            w->setProperty("flag", 0x80);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashSlowSyncRearCurtain))
-        {
-            QCheckBox* w = new QCheckBox(tr("Slow Sync Rear Curtain"));
-            w->setProperty("flag", 0x100);
-            m_checkBoxFlashMode.append(w);
-        }
-        if (exposure->isFlashModeSupported(QCameraExposure::FlashManual))
-        {
-            QCheckBox* w = new QCheckBox(tr("Manual"));
-            w->setProperty("flag", 0x200);
-            m_checkBoxFlashMode.append(w);
-        }
-        for (QCheckBox* w : m_checkBoxFlashMode)
-        {
-            connect(w, &QCheckBox::stateChanged, this, &CameraToolsWindow::onCheckBoxFlashModeChanged);
-        } 
-
-        m_comboBoxMeteringMode->blockSignals(true);
-        m_comboBoxMeteringMode->clear();
-        if (exposure->isMeteringModeSupported(QCameraExposure::MeteringMatrix))
-            m_comboBoxMeteringMode->addItem(tr("Matrix"), 1);
-        if (exposure->isMeteringModeSupported(QCameraExposure::MeteringAverage))
-            m_comboBoxMeteringMode->addItem(tr("Average"), 2);
-        if (exposure->isMeteringModeSupported(QCameraExposure::MeteringSpot))
-            m_comboBoxMeteringMode->addItem(tr("Spot"), 3);
-        index = widgetUtils::findComboBoxIndexByValue(m_comboBoxMeteringMode, exposure->meteringMode());
-        m_comboBoxMeteringMode->setCurrentIndex(index);
-        m_comboBoxMeteringMode->blockSignals(false);
-
-        bool ok;
-        m_comboBoxAperture->blockSignals(true);
-        QList<qreal> apertureValues = exposure->supportedApertures(&ok);
-        if (ok)
-        {
-            for (qreal v : apertureValues)
-            {
-                m_comboBoxAperture->addItem(QString::number(v), v);
-            }
-            m_comboBoxAperture->setCurrentText(
-                QString::number(exposure->requestedAperture())
-            );
-        }
-        m_comboBoxAperture->blockSignals(false);
-
-        m_comboBoxIsoSensitivity->blockSignals(true);
-        QList<int> isoValues = exposure->supportedIsoSensitivities(&ok);
-        if (ok)
-        {
-            for (int v : isoValues)
-            {
-                m_comboBoxIsoSensitivity->addItem(QString::number(v), v);
-            }
-            m_comboBoxIsoSensitivity->setCurrentText(
-                QString::number(exposure->requestedAperture())
-            );
-        }
-        m_comboBoxIsoSensitivity->blockSignals(false);
-
-        m_comboBoxShutterSpeed->blockSignals(true);
-        QList<qreal> speedValues = exposure->supportedShutterSpeeds(&ok);
-        if (ok)
-        {
-            for (qreal v : speedValues)
-            {
-                m_comboBoxShutterSpeed->addItem(QString::number(v), v);
-            }
-            m_comboBoxShutterSpeed->setCurrentText(
-                QString::number(exposure->requestedAperture())
-            );
-        }
-        m_comboBoxShutterSpeed->blockSignals(false);
-
-        QCameraFocus* focus = m_camera->focus();
-        QPointF focusPoint = focus->customFocusPoint();
-        m_vector2DFocusPoint->blockSignals(true);
-        m_vector2DFocusPoint->setValue(focusPoint);
-        m_vector2DFocusPoint->blockSignals(false);
-
-        for (QCheckBox* w : m_checkBoxFocusMode)
-        {
-            m_layoutFocusMode->removeWidget(w);
-            delete w;
-        }
-        m_checkBoxFocusMode.clear();
-        if (focus->isFocusModeSupported(QCameraFocus::ManualFocus))
-        {
-            QCheckBox* w = new QCheckBox(tr("Manual"));
-            w->setProperty("flag", 0x1);
-            m_checkBoxFocusMode.append(w);
-        }
-        if (focus->isFocusModeSupported(QCameraFocus::HyperfocalFocus))
-        {
-            QCheckBox* w = new QCheckBox(tr("Hyperfocal"));
-            w->setProperty("flag", 0x2);
-            m_checkBoxFocusMode.append(w);
-        }
-        if (focus->isFocusModeSupported(QCameraFocus::InfinityFocus))
-        {
-            QCheckBox* w = new QCheckBox(tr("Infinity"));
-            w->setProperty("flag", 0x4);
-            m_checkBoxFocusMode.append(w);
-        }
-        if (focus->isFocusModeSupported(QCameraFocus::AutoFocus))
-        {
-            QCheckBox* w = new QCheckBox(tr("Auto"));
-            w->setProperty("flag", 0x8);
-            m_checkBoxFocusMode.append(w);
-        }
-        if (focus->isFocusModeSupported(QCameraFocus::ContinuousFocus))
-        {
-            QCheckBox* w = new QCheckBox(tr("Continuous"));
-            w->setProperty("flag", 0x10);
-            m_checkBoxFocusMode.append(w);
-        }
-        if (focus->isFocusModeSupported(QCameraFocus::MacroFocus))
-        {
-            QCheckBox* w = new QCheckBox(tr("Macro"));
-            w->setProperty("flag", 0x20);
-            m_checkBoxFocusMode.append(w);
-        }
-        for (QCheckBox* w : m_checkBoxFocusMode)
-        {
-            connect(w, &QCheckBox::stateChanged, this, &CameraToolsWindow::onChecBoxFocusModeChanged);
-        }
-
-        m_comboBoxFocusPointMode->blockSignals(true);
-        m_comboBoxFocusPointMode->clear();
-        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointAuto))
-            m_comboBoxFocusPointMode->addItem(tr("Auto"), 0);
-        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointCenter))
-            m_comboBoxFocusPointMode->addItem(tr("Center"), 1);
-        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointFaceDetection))
-            m_comboBoxFocusPointMode->addItem(tr("Detection"), 2);
-        if (focus->isFocusPointModeSupported(QCameraFocus::FocusPointCustom))
-            m_comboBoxFocusPointMode->addItem(tr("Custom"), 3);
-        m_vector2DFocusPoint->setEnabled(focus->focusPointMode() == QCameraFocus::FocusPointCustom);
-        index = widgetUtils::findComboBoxIndexByValue(m_comboBoxFocusPointMode, focus->focusPointMode());
-        m_comboBoxFocusPointMode->setCurrentIndex(index);
-        m_comboBoxFocusPointMode->blockSignals(false);
-
-        m_lineEditMaximumDigitalZoom->setText(QString::number(focus->maximumDigitalZoom()));
-        m_lineEditMaximumOpticalZoom->setText(QString::number(focus->maximumOpticalZoom()));
-
-        m_actionConnectCamera->setText(tr("Disconnect"));
-        m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/disconnect.png")));
-
-        m_camera->searchAndLock();
-        m_camera->start();
+        m_cameraController->start();
     }
     else
     {
-        m_camera->stop();
-        m_cameraCapture->cancelCapture();
-        m_actionConnectCamera->setText(tr("Connect"));
-        m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/connect.png")));
+        m_cameraController->stop();
+        //m_actionConnectCamera->setText(tr("Connect"));
+        //m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/connect.png")));
     }
 }
 
@@ -993,8 +1020,62 @@ void CameraToolsWindow::onActionCapture(bool checked)
     m_imageViewerCapture->setImage(m_imageViewerCamera->pixmap());
 }
 
-void CameraToolsWindow::onCaptureImageAvailable(int id, const QVideoFrame& frame)
+void CameraToolsWindow::onCameraStateChanged(QCamera::State state)
 {
+    switch (state) {
+    case QCamera::ActiveState:
+        break;
+    case QCamera::UnloadedState:
+        break;
+    case QCamera::LoadedState:
+        break;
+    }
+}
+
+void CameraToolsWindow::onCameraStatusChanged(QCamera::Status status)
+{
+    switch (status)
+    {
+    case QCamera::UnavailableStatus:
+        m_labelStatus->setText(tr("Unavailable"));
+        break;
+    case QCamera::UnloadedStatus:
+        m_labelStatus->setText(tr("Unloaded"));
+        break;
+    case QCamera::LoadingStatus:
+        m_labelStatus->setText(tr("Loading"));
+        break;
+    case QCamera::UnloadingStatus:
+        m_labelStatus->setText(tr("Unloading"));
+        break;
+    case QCamera::LoadedStatus:
+        m_labelStatus->setText(tr("Loaded"));
+        initCameraSettings();
+        break;
+    case QCamera::StandbyStatus:
+        m_labelStatus->setText(tr("Standby"));
+        break;
+    case QCamera::StartingStatus:
+        m_labelStatus->setText(tr("Starting"));
+        break;
+    case QCamera::StoppingStatus:
+        m_labelStatus->setText(tr("Stopping"));
+        m_actionConnectCamera->setText(tr("Connect"));
+        m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/connect.png")));
+        break;
+    case QCamera::ActiveStatus:
+        m_labelStatus->setText(tr("Active"));
+        m_actionConnectCamera->setText(tr("Disconnect"));
+        m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/disconnect.png")));
+        break;
+    }
+}
+
+void CameraToolsWindow::onFrameCaptured()
+{
+    QImage image = m_cameraController->image();
+    m_labelImageSize->setText(QString("%1 x %2").arg(image.width()).arg(image.height()));
+    m_imageViewerCamera->setImage(image);
 }
 
 void CameraToolsWindow::retranslate()
@@ -1006,4 +1087,18 @@ void CameraToolsWindow::onComboBoxCamerasIndexChanged(int index)
 {
     QCameraInfo& info = m_comboBoxCameras->currentData().value<QCameraInfo>();
     qLogD << info.description() << ", " << info.deviceName();
+
+    if (!m_cameraController.isNull())
+        m_cameraController->unload();
+
+    m_cameraController.reset(new CameraController(info));
+
+    connect(m_cameraController->camera(), &QCamera::stateChanged,
+        this, &CameraToolsWindow::onCameraStateChanged);
+    connect(m_cameraController->camera(), &QCamera::statusChanged,
+        this, &CameraToolsWindow::onCameraStatusChanged);
+    connect(m_cameraController.data(), &CameraController::frameCaptured,
+        this, &CameraToolsWindow::onFrameCaptured);
+
+    m_cameraController->load();
 }
