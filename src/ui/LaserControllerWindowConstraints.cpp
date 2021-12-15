@@ -477,18 +477,31 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentSelectedEditingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragReadyState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentViewDragingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveRectReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveRectCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveEllipseReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveEllipseCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveLineReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveLineCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitivePolygonReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitivePolygonCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitivePolygonStartRectState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveTextReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveTextCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveSplineCreatingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", false, documentPrimitiveSplineEditState);
     // end m_ui->actionDragView
 
     // begin m_ui->actionSelectionTool
@@ -638,19 +651,8 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionDragView
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentSelectedEditingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", true, documentViewDragingState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionDragView
 
     // begin m_ui->actionImportCorelDraw

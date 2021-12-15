@@ -4592,11 +4592,19 @@ void LaserControllerWindow::onClickedMmOrInch()
 {
     if (m_unitIsMM) {
         m_unitIsMM = false;
-        m_mmOrIn->setText("inch");        
+        m_mmOrIn->setText("inch");     
+        m_widthUnit->setText("inch");
+        m_heightUnit->setText("inch");
+        m_posXUnit->setText("inch");
+        m_posYUnit->setText("inch");
     }
     else {
         m_unitIsMM = true;
         m_mmOrIn->setText("mm");
+        m_widthUnit->setText("mm");
+        m_heightUnit->setText("mm");
+        m_posXUnit->setText("mm");
+        m_posYUnit->setText("mm");
     }
     //更新一下面板的值
     selectedChangedFromMouse();
@@ -5206,6 +5214,7 @@ void LaserControllerWindow::documentClose()
 	m_tableWidgetLayers->updateItems();
 	this->m_fileDirection = "";
 	this->m_fileName = "";
+    setWindowTitle("");
 	//layer color buttons not enabled
 	for each(LayerButton* button in m_layerButtons) {
 		//button->setEnabled(false);
