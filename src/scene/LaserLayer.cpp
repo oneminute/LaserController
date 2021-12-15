@@ -42,16 +42,16 @@ public:
         , fillingRowInterval(Config::FillingLayer::rowInterval())
         , fillingEnableCutting(Config::FillingLayer::enableCutting())
         , fillingType(Config::FillingLayer::fillingType())
-        , doc(nullptr)
-        , lpi(60)
-        , dpi(600)
+        , lpi(Config::EngravingLayer::LPI())
+        , dpi(Config::EngravingLayer::DPI())
+        , useHalftone(Config::EngravingLayer::useHalftone())
+        , halftoneAngles(Config::EngravingLayer::halftoneAngles())
         , button(nullptr)
         , exportable(true)
         , visible(true)
         , row(-1)
-        , useHalftone(true)
-        , halftoneAngles(Config::EngravingLayer::halftoneAngles())
         //, halftoneGridSize(Config::EngravingLayer::halftoneGridSize())
+        , doc(nullptr)
         , isDefault(false)  
     {}
 
@@ -111,14 +111,35 @@ LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* 
     d->name = document->newLayerName();
     setParent(document);
 
-	d->useHalftone = Config::EngravingLayer::useHalftone();
-	d->lpi = Config::EngravingLayer::LPI();
-	d->dpi = Config::EngravingLayer::DPI();
     m_checkBox = box;
 }
 
 LaserLayer::~LaserLayer()
 {
+}
+
+void LaserLayer::init()
+{
+    Q_D(LaserLayer);
+    d->cuttingRunSpeed = Config::CuttingLayer::runSpeed();
+    d->cuttingMinSpeedPower = Config::CuttingLayer::minPower();
+    d->cuttingRunSpeedPower = Config::CuttingLayer::maxPower();
+    d->engravingRunSpeed = Config::EngravingLayer::runSpeed();
+    d->engravingLaserPower = Config::EngravingLayer::laserPower();
+    d->engravingMinSpeedPower = Config::EngravingLayer::minPower();
+    d->engravingRunSpeedPower = Config::EngravingLayer::maxPower();
+    d->engravingRowInterval = Config::EngravingLayer::rowInterval();
+    d->engravingEnableCutting = Config::EngravingLayer::enableCutting();
+    d->fillingRunSpeed = Config::FillingLayer::runSpeed();
+    d->fillingMinSpeedPower = Config::FillingLayer::minPower();
+    d->fillingRunSpeedPower = Config::FillingLayer::maxPower();
+    d->fillingRowInterval = Config::FillingLayer::rowInterval();
+    d->fillingEnableCutting = Config::FillingLayer::enableCutting();
+    d->fillingType = Config::FillingLayer::fillingType();
+    d->lpi = Config::EngravingLayer::LPI();
+    d->dpi = Config::EngravingLayer::DPI();
+    d->useHalftone = Config::EngravingLayer::useHalftone();
+    d->halftoneAngles = Config::EngravingLayer::halftoneAngles();
 }
 
 bool LaserLayer::removable() const 

@@ -22,6 +22,7 @@ RegisteDialog::RegisteDialog(QWidget* parent)
     m_ui->lineEditRegisteId->setText(registeId);
     m_ui->lineEditDongleId->setText(dongleId);
 
+    m_ui->labelMainCardModal->setText(LaserApplication::device->getMainCardModal());
     m_ui->labelFirmwareVersion->setText(LaserApplication::device->firmwareVersion());
     m_ui->labelAPIVersion->setText(LaserApplication::device->apiLibVersion());
     m_ui->labelEXEVersion->setText(LaserApplication::applicationVersion());
@@ -55,7 +56,7 @@ void RegisteDialog::onButtonRegiste(bool checked)
         return;
     }
 
-    LaserApplication::device->registeMainCard(code, this);
+    LaserApplication::device->registerMainCard(code, this);
 }
 
 void RegisteDialog::onButtonStatusClicked(bool checked)

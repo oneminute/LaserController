@@ -119,7 +119,7 @@ void LaserLayerTableWidget::updateItems()
             }
             else if (laserType == LLT_FILLING)
             {
-                type = tr("C+F");
+                type = tr("F");
                 fullType = tr("Filling");
             }
 

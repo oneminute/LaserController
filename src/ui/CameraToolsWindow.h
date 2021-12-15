@@ -9,7 +9,7 @@
 #include <QStatusBar>
 
 #include <DockManager.h>
-#include "camera/VideoFrameGrabber.h"
+#include "camera/CameraController.h"
 
 class QCameraImageCapture;
 class QCameraViewfinder;
@@ -17,11 +17,13 @@ class QCamera;
 class QComboBox;
 class QCheckBox;
 class QDoubleSpinBox;
+class QLabel;
 class QLineEdit;
 class QSpinBox;
 class QVBoxLayout;
 class ImageViewer;
 class Vector2DWidget;
+class CameraController;
 
 class CameraToolsWindow : public QMainWindow
 {
@@ -37,6 +39,8 @@ protected:
     void createImagePanel();
     void createCameraSettings();
     void createImageSettings();
+
+    void initCameraSettings();
 
     virtual void closeEvent(QCloseEvent* event) override;
 
@@ -80,7 +84,9 @@ protected slots:
     void onActionConnectCamera(bool checked);
     void onActionCapture(bool checked);
 
-    void onCaptureImageAvailable(int id, const QVideoFrame& frame);
+    void onCameraStateChanged(QCamera::State state);
+    void onCameraStatusChanged(QCamera::Status status);
+    void onFrameCaptured();
 
 signals:
 
@@ -99,14 +105,14 @@ private:
 
     // status bar
     QStatusBar* m_statusBar;
+    QLabel* m_labelStatus;
+    QLabel* m_labelImageSize;
 
     // dock panels
     ads::CDockManager* m_dockManager;
     ads::CDockAreaWidget* m_cameraDockArea;
     QCameraImageCapture* m_capture;
-    //QCameraViewfinder* m_viewfinder;
     ImageViewer* m_imageViewerCamera;
-    //QLabel* m_labelCamera;
 
     ads::CDockAreaWidget* m_imageDockArea;
     ImageViewer* m_imageViewerCapture;
@@ -114,9 +120,9 @@ private:
     ads::CDockAreaWidget* m_cameraSettingsDockArea;
 
     // camera variables
-    QScopedPointer<QCamera> m_camera;
-    QScopedPointer<QCameraImageCapture> m_cameraCapture;
-    QScopedPointer<VideoFrameGrabber> m_videoFrameGrabber;
+    //QScopedPointer<QCamera> m_camera;
+    //QScopedPointer<VideoFrameGrabber> m_videoFrameGrabber;
+    QScopedPointer<CameraController> m_cameraController;
 
     // camera general variables
     QComboBox* m_comboBoxFrameRateRange;

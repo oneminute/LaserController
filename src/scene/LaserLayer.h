@@ -25,6 +25,8 @@ public:
     explicit LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault = false, QCheckBox* box = nullptr);
     virtual ~LaserLayer();
 
+    void init();
+
     bool removable() const;
     void setRemovable(bool removable);
 
