@@ -1287,7 +1287,12 @@ void ArrangeMoveToPageCommand::redo()
             break;
         }
     }
-    m_group->moveBy(scenePos.x() - pos.x(), scenePos.y() - pos.y());
+    //m_group->moveBy(scenePos.x() - pos.x(), scenePos.y() - pos.y());
+    QPointF diff = (scenePos - pos);
+    QTransform t = m_group->transform();
+    QTransform t1;
+    t1.translate(diff.x(), diff.y());
+    m_group->setTransform(t * t1);
     if (m_scene->maxRegion().contains(m_group->sceneBoundingRect().toRect())) {
         for (QGraphicsItem* item : m_group->childItems()) {
             LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
