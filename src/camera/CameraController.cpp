@@ -1,80 +1,120 @@
 #include "CameraController.h"
-#include "VideoFrameGrabber.h"
+//#include "VideoFrameGrabber.h"
 
 #include "common/common.h"
 #include "LaserApplication.h"
+#include "util/ImageUtils.h"
 
-#include <QCamera>
+#include <opencv2/videoio/videoio.hpp>
+//#include <QCamera>
 
-CameraController::CameraController(const QCameraInfo& info, QObject* parent)
-    : QObject(parent)
-    , m_cameraInfo(info)
+CameraController::CameraController(QObject* parent)
+    : QThread(parent)
+    , m_videoCapture(new cv::VideoCapture)
+    , m_status(CS_IDLE)
+    , m_maxQueueLength(10)
 {
-    m_camera = new QCamera(info);
-    m_grabber = new VideoFrameGrabber;
-
-    connect(m_grabber, &VideoFrameGrabber::imageCaptured, this, &CameraController::frameCaptured);
-
-    m_camera->setViewfinder(m_grabber);
 }
 
 CameraController::~CameraController()
 {
-    m_camera->blockSignals(true);
     stop();
-    unload();
 }
 
-QCamera* CameraController::camera() const
+cv::Mat CameraController::image() const
 {
-    return m_camera;
+    QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
+    if (m_images.empty())
+        return cv::Mat();
+    else
+    {
+        return m_images.last();
+    }
 }
 
-QCameraInfo CameraController::cameraInfo() const
+bool CameraController::setResolution(const QSize& size)
 {
-    return m_cameraInfo;
+    bool done = true;
+    done = done && m_videoCapture->set(cv::CAP_PROP_FRAME_WIDTH, size.width());
+    done = done && m_videoCapture->set(cv::CAP_PROP_FRAME_HEIGHT, size.height());
+    return done;
 }
 
-QImage CameraController::image() const
+QSize CameraController::resolution() const
 {
-    return m_grabber->image();
+    QSize size;
+    size.setWidth(qRound(m_videoCapture->get(cv::CAP_PROP_FRAME_WIDTH)));
+    size.setHeight(qRound(m_videoCapture->get(cv::CAP_PROP_FRAME_HEIGHT)));
+    return size;
 }
 
-void CameraController::start()
+void CameraController::run()
 {
-    if (!m_camera)
-        return;
+    cv::Mat frame;
+    m_status = CS_STARTED;
+    while (m_status == CS_STARTED)
+    {
+        m_videoCapture->read(frame);
+        if (frame.empty())
+        {
+            emit error();
+            continue;
+        }
 
-    m_thread.start();
-    m_camera->searchAndLock();
-    m_camera->start();
+        addImage(frame);
+        emit frameCaptured();
+    }
+}
+
+void CameraController::addImage(const cv::Mat& mat)
+{
+    QMutexLocker locker(&m_mutex);
+    cv::Mat out;
+    cv::cvtColor(mat, out, cv::COLOR_RGB2BGR);
+    m_images.enqueue(out);
+    if (m_images.length() > m_maxQueueLength)
+    {
+        m_images.dequeue();
+    }
+}
+
+bool CameraController::start()
+{
+    if (m_status != CS_IDLE)
+        return true;
+
+    m_status = CS_STARTING;
+    QThread::start();
+    return true;
 }
 
 void CameraController::stop()
 {
-    if (!m_camera)
+    if (m_status == CS_IDLE)
         return;
 
-    m_camera->stop();
-    m_thread.quit();
-    m_thread.wait();
+    m_status = CS_STOPPING;
+    m_videoCapture->release();
+    this->wait();
+    m_status = CS_IDLE;
 }
 
-void CameraController::load()
+bool CameraController::load(int cameraIndex)
 {
-    if (!m_camera)
-        return;
+    if (m_status != CS_IDLE)
+        return true;
 
-    moveToThread(&m_thread);
-    m_camera->load();
+    m_cameraIndex = cameraIndex;
+
+    m_videoCapture->open(m_cameraIndex, cv::CAP_ANY);
+    if (!m_videoCapture->isOpened())
+    {
+        qLogW << "Cannot open camera " << m_cameraIndex;
+        m_status = CS_IDLE;
+        return false;
+    }
+
+    return true;
 }
 
-void CameraController::unload()
-{
-    if (!m_camera)
-        return;
-
-    m_camera->unload();
-    SAFE_DELETE(m_camera);
-}
 

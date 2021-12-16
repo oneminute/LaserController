@@ -217,3 +217,35 @@ QJsonObject typeUtils::rect2Json(const QRect& rect)
     json["y2"] = bottom;
     return json;
 }
+
+QImage typeUtils::cvMat2QImage(const cv::Mat& mat)
+{
+    uchar depth = mat.type() & CV_MAT_DEPTH_MASK;
+    uchar channels = 1 + (mat.type() >> CV_CN_SHIFT);
+    int rows = mat.rows;
+    int cols = mat.cols;
+
+    QImage image;
+
+    QImage::Format format;
+    switch (depth) {
+    case CV_8U:
+        break;
+    case CV_8S:
+        break;
+    case CV_16U:
+        break;
+    case CV_16S:
+        break;
+    case CV_32S:
+        break;
+    case CV_32F:
+        break;
+    case CV_64F:
+        break;
+    default:
+        break;
+    }
+    
+    return image;
+}

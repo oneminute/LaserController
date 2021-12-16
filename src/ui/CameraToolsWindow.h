@@ -50,42 +50,11 @@ public slots:
 protected slots:
     void onComboBoxCamerasIndexChanged(int index);
 
-    void onComboBoxFrameRateRangeChanged(int index);
-    void onComboBoxPixelFormatChanged(int index);
-    void onComboBoxResolutionChanged(int index);
-
-    void onDoubleSpinBoxBrightnessChanged(qreal value);
-    void onComboBoxFilterChanged(int index);
-    void onDoubleSpinBoxContrastChanged(qreal value);
-    void onDoubleSpinBoxDenoisingLevelChanged(qreal value);
-    void onComboBoxWhiteBalanceModeChanged(int index);
-    void onDoubleSpinBoxWhiteBalanceChanged(qreal value);
-    void onDoubleSpinBoxSaturationChanged(qreal value);
-    void onDoubleSpinBoxSharpeningLevelChanged(qreal value);
-    void onDoubleSpinBoxExposureCompensationChanged(qreal value);
-
-    void onCheckBoxAutoApertureStateChanged(int state);
-    void onCheckBoxAutoIsoSensitivityStateChanged(int state);
-    void onCheckBoxAutoShutterSpeedStateChanged(int state);
-    void onComboBoxExposureModeChanged(int index);
-    void onCheckBoxFlashModeChanged(int state);
-    void onComboBoxMeteringModeChanged(int index);
-    void onComboBoxApertureChanged(int index);
-    void onComboBoxIsoSensitivityChanged(int index);
-    void onComboBoxShutterSpeedChanged(int index);
-
-    void onVector2DFocusPointChanged(qreal x, qreal y);
-    void onChecBoxFocusModeChanged(int state);
-    void onComboBoxFocusPointModeChanged(int index);
-    void onDoubleSpinBoxDigitalZoomChanged(qreal value);
-    void onDoubleSpinBoxOpticalZoomChanged(qreal value);
-
     void onActionRefreshCameras(bool checked);
     void onActionConnectCamera(bool checked);
     void onActionCapture(bool checked);
+    void onActionApplyCameraSettings(bool checked);
 
-    void onCameraStateChanged(QCamera::State state);
-    void onCameraStatusChanged(QCamera::Status status);
     void onFrameCaptured();
 
 signals:
@@ -95,6 +64,7 @@ private:
     QAction* m_actionRefreshCameras;
     QAction* m_actionConnectCamera;
     QAction* m_actionCapture;
+    QAction* m_actionApplyCameraSettings;
 
     // menu bar 
     QMenuBar* m_menuBar;
@@ -120,8 +90,6 @@ private:
     ads::CDockAreaWidget* m_cameraSettingsDockArea;
 
     // camera variables
-    //QScopedPointer<QCamera> m_camera;
-    //QScopedPointer<VideoFrameGrabber> m_videoFrameGrabber;
     QScopedPointer<CameraController> m_cameraController;
 
     // camera general variables
@@ -131,37 +99,19 @@ private:
 
     // camera image processing variables
     QDoubleSpinBox* m_doubleSpinBoxCameraBrightness;
-    QComboBox* m_comboBoxColorCameraFilter;
     QDoubleSpinBox* m_doubleSpinBoxCameraContrast;
     QDoubleSpinBox* m_doubleSpinBoxDenoisingLevel;
-    QComboBox* m_comboBoxWhiteBalanceMode;
-    QDoubleSpinBox* m_doubleSpinBoxWhiteBalance;
+    QDoubleSpinBox* m_doubleSpinBoxWhiteBalanceRed;
+    QDoubleSpinBox* m_doubleSpinBoxWhiteBalanceBlue;
     QDoubleSpinBox* m_doubleSpinBoxSaturation;
     QDoubleSpinBox* m_doubleSpinBoxSharpeningLevel;
 
     // camera exposure variables
-    QCheckBox* m_checkBoxAutoAperture;
-    QCheckBox* m_checkBoxAutoIsoSensitivity;
-    QCheckBox* m_checkBoxAutoShutterSpeed;
     QDoubleSpinBox* m_doubleSpinBoxExposureCompensation;
-    QComboBox* m_comboBoxExposureMode;
-    QList<QCheckBox*> m_checkBoxFlashMode;
-    QVBoxLayout* m_layoutFlashMode;
-    QComboBox* m_comboBoxMeteringMode;
-    QComboBox* m_comboBoxAperture;
-    QComboBox* m_comboBoxIsoSensitivity;
-    QComboBox* m_comboBoxShutterSpeed;
 
     // camera focus variables
-    Vector2DWidget* m_vector2DFocusPoint;
-    QList<QCheckBox*> m_checkBoxFocusMode;
-    QVBoxLayout* m_layoutFocusMode;
-    QComboBox* m_comboBoxFocusPointMode;
-    QDoubleSpinBox* m_doubleSpinBoxDigitalZoom;
-    QDoubleSpinBox* m_doubleSpinBoxOpticalZoom;
-    QLineEdit* m_lineEditMaximumDigitalZoom;
-    QLineEdit* m_lineEditMaximumOpticalZoom;
-
+    QComboBox* m_comboBoxFocus;
+    
     Q_DISABLE_COPY(CameraToolsWindow)
 };
 

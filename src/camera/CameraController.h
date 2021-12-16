@@ -4,43 +4,61 @@
 #include <QObject>
 #include <QThread>
 #include <QQueue>
-#include <QVideoFrame>
+//#include <QVideoFrame>
+#include <QImage>
 #include <QMutex>
-#include <QCameraInfo>
+//#include <QCameraInfo>
+#include <opencv2/opencv.hpp>
 
-class QCamera;
-class VideoFrameGrabber;
+//class QCamera;
+//class VideoFrameGrabber;
 
-class CameraController : public QObject
+namespace cv
+{
+    class VideoCapture;
+}
+
+class CameraController : public QThread
 {
     Q_OBJECT
 public:
-    explicit CameraController(const QCameraInfo& info, QObject* parent = nullptr);
+    enum CameraStatus
+    {
+        CS_IDLE,
+        CS_LOADED,
+        CS_STARTING,
+        CS_STARTED,
+        CS_STOPPING
+    };
+
+    explicit CameraController(QObject* parent = nullptr);
     ~CameraController();
 
-    QCamera* camera() const;
-    QCameraInfo cameraInfo() const;
+    cv::Mat image() const;
 
-    QImage image() const;
+    bool setResolution(const QSize& size);
+    QSize resolution() const;
+
+protected:
+    void run() override;
+    void addImage(const cv::Mat& mat);
 
 public slots:
-    void start();
+    bool start();
     void stop();
-    void load();
-    void unload();
+    bool load(int cameraIndex);
 
 signals:
-    void started();
-    void stopped();
     void frameCaptured();
+    void error();
 
 private:
-    QThread m_thread;
-    QCamera* m_camera;
-    QCameraInfo m_cameraInfo;
-    VideoFrameGrabber* m_grabber;
+    QScopedPointer<cv::VideoCapture> m_videoCapture;
+    int m_cameraIndex;
     QMutex m_mutex;
-    int m_maxFramesQueueLength;
+    QQueue<cv::Mat> m_images;
+    int m_maxQueueLength;
+    CameraStatus m_status;
 };
 
 #endif // CAMERACONTROLLER_H
