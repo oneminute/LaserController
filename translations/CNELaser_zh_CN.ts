@@ -5562,13 +5562,13 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location line="+9"/>
         <source>Distribute H-Centered</source>
-        <translation>水平间隔分布</translation>
+        <translation>水平中心分布</translation>
     </message>
     <message>
         <location line="+9"/>
         <location line="+3"/>
         <source>Distribute H-Spaced</source>
-        <translation>水平中心分布</translation>
+        <translation>水平间隔分布</translation>
     </message>
     <message>
         <source>Z Reset</source>

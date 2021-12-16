@@ -3281,11 +3281,11 @@ void LaserControllerWindow::onActionOpen(bool checked)
 	if (name == "") {
 		return;
 	}
-	setWindowTitle(getCurrentFileName() + " - ");
 	//创建document
 	createNewDocument();
 	m_scene->document()->load(name, this);
     addRecentFile(name);
+    setWindowTitle(getCurrentFileName() + " - ");
 }
 
 void LaserControllerWindow::onActionZoomIn(bool checked)

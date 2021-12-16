@@ -1553,28 +1553,30 @@ void DistributeUndoCommand::redo()
     
     for (LaserPrimitive* primitive : sortedList) {
         QPointF pos;
+        QPointF scenePos = m_group->mapToScene(primitive->pos());
+        QRect sceneBounds = primitive->sceneBoundingRect();
         m_undoMap.insert(primitive, primitive->sceneTransform());
         switch (m_type)
         {
             case ArrangeType::AT_VCentered: {
-                pos = primitive->scenePos() + QPointF(0,
-                    baseVal - primitive->sceneBoundingRect().center().y() + space);
+                pos = scenePos + QPointF(0,
+                    baseVal - sceneBounds.center().y() + space);
                 primitive->setPos(m_group->mapFromScene(pos));
                 baseVal = primitive->sceneBoundingRect().center().y();
                 break;
             }
             case ArrangeType::AT_VSpaced:
             {
-                pos = primitive->scenePos() + QPointF(0,
-                    baseVal - primitive->sceneBoundingRect().top() + space);
+                pos = scenePos + QPointF(0,
+                    baseVal - sceneBounds.top() + space);
                 
                 primitive->setPos(m_group->mapFromScene(pos));
                 baseVal = primitive->sceneBoundingRect().bottom();
                 break;
             }
             case ArrangeType::AT_HCentered: {
-                pos = primitive->scenePos() + QPointF(
-                    baseVal - primitive->sceneBoundingRect().center().x() + space,
+                pos = scenePos + QPointF(
+                    baseVal - sceneBounds.center().x() + space,
                     0);
                 primitive->setPos(m_group->mapFromScene(pos));
                 baseVal = primitive->sceneBoundingRect().center().x();
@@ -1582,8 +1584,8 @@ void DistributeUndoCommand::redo()
             }
             case ArrangeType::AT_HSpaced:
             {
-                pos = primitive->scenePos() + QPointF(
-                    baseVal - primitive->sceneBoundingRect().left() + space,
+                pos = scenePos + QPointF(
+                    baseVal - sceneBounds.left() + space,
                     0);
                 primitive->setPos(m_group->mapFromScene(pos));
                 baseVal = primitive->sceneBoundingRect().right();
