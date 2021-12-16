@@ -27,19 +27,19 @@ MultiDuplicationDialog::MultiDuplicationDialog(
     m_group = m_viewer->group();
     
     m_ui->setupUi(this);
-    m_ui->HSettings->addItem("No Offset");//0
-    m_ui->HSettings->addItem("Offset");//1
-    m_ui->HSettings->addItem("Margins");//2
+    m_ui->HSettings->addItem(tr("No Offset"));//0
+    m_ui->HSettings->addItem(tr("Offset"));//1
+    m_ui->HSettings->addItem(tr("Margins"));//2
     m_ui->HSettings->setCurrentIndex(1);
-    m_ui->VSettings->addItem("No Offset");//0
-    m_ui->VSettings->addItem("Offset");//1
-    m_ui->VSettings->addItem("Margins");//2
+    m_ui->VSettings->addItem(tr("No Offset"));//0
+    m_ui->VSettings->addItem(tr("Offset"));//1
+    m_ui->VSettings->addItem(tr("Margins"));//2
     m_ui->VSettings->setCurrentIndex(1);
-    m_ui->HDirection->addItem("Left");//0
-    m_ui->HDirection->addItem("Right");//1
+    m_ui->HDirection->addItem(tr("Left"));//0
+    m_ui->HDirection->addItem(tr("Right"));//1
     m_ui->HDirection->setEnabled(false);
-    m_ui->VDirection->addItem("Top");//0
-    m_ui->VDirection->addItem("Bottom");//1
+    m_ui->VDirection->addItem(tr("Top"));//0
+    m_ui->VDirection->addItem(tr("Bottom"));//1
     m_ui->VDirection->setEnabled(false);
     //m_ui->HSettings->currentIndex();
     
@@ -115,8 +115,8 @@ void MultiDuplicationDialog::accept()
         return;
     }
     qreal v = m_ui->HDistance->value();
-    qreal translateX = Global::mmToSceneHF(m_ui->HDistance->value());
-    qreal translateY = Global::mmToSceneVF(m_ui->VDistance->value());
+    qreal translateX = m_ui->HDistance->value()*1000;
+    qreal translateY = m_ui->VDistance->value()*1000;
     
     switch (m_ui->HSettings->currentIndex())
     {

@@ -3281,11 +3281,11 @@ void LaserControllerWindow::onActionOpen(bool checked)
 	if (name == "") {
 		return;
 	}
-	setWindowTitle(getCurrentFileName() + " - ");
 	//创建document
 	createNewDocument();
 	m_scene->document()->load(name, this);
     addRecentFile(name);
+    setWindowTitle(getCurrentFileName() + " - ");
 }
 
 void LaserControllerWindow::onActionZoomIn(bool checked)
@@ -4473,13 +4473,14 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
     if (!m_viewer) {
         return;
     }
+    m_ui->actionPaste->setEnabled(true);
+    m_ui->actionPasteInPlace->setEnabled(true);
     if (items.length() == 0) {
         QAction* mirrorH = m_ui->actionMirrorHorizontal;
         m_ui->actionMirrorHorizontal->setEnabled(false);
         m_ui->actionMirrorVertical->setEnabled(false);
         m_ui->actionMirrorAcrossLine->setEnabled(false);
         m_ui->actionCopy->setEnabled(false);
-        //m_ui->actionPaste->setEnabled(false);
         m_ui->actionCut->setEnabled(false);
         m_ui->actionDuplication->setEnabled(false);
         m_ui->actionMultiDuplication->setEnabled(false);
