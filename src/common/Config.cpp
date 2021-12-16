@@ -936,8 +936,8 @@ void Config::loadDeviceItems()
     userOrigin1->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QPoint pt = value.toPoint();
-            return QVariant(pt * 1000);
+            QPointF pt = value.toPointF();
+            return QVariant(QPoint(qRound(pt.x() * 1000), qRound(pt.y() * 1000)));
         }
     );
     userOrigin1->setUpdateWidgetValueHook(
@@ -945,7 +945,7 @@ void Config::loadDeviceItems()
         {
             Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
             QPoint pt = value.toPoint();
-            v2w->setValue(pt * 0.001);
+            v2w->setValue(QPointF(pt.x() * 0.001, pt.y() * 0.001));
             return v2w->toPointF();
         }
     );
@@ -983,8 +983,8 @@ void Config::loadDeviceItems()
     userOrigin2->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QPoint pt = value.toPoint();
-            return QVariant(pt * 1000);
+            QPointF pt = value.toPointF();
+            return QVariant(QPoint(qRound(pt.x() * 1000), qRound(pt.y() * 1000)));
         }
     );
     userOrigin2->setUpdateWidgetValueHook(
@@ -992,7 +992,7 @@ void Config::loadDeviceItems()
         {
             Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
             QPoint pt = value.toPoint();
-            v2w->setValue(pt * 0.001);
+            v2w->setValue(QPointF(pt.x() * 0.001, pt.y() * 0.001));
             return v2w->toPointF();
         }
     );
@@ -1030,8 +1030,8 @@ void Config::loadDeviceItems()
     userOrigin3->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QPoint pt = value.toPoint();
-            return QVariant(pt * 1000);
+            QPointF pt = value.toPointF();
+            return QVariant(QPoint(qRound(pt.x() * 1000), qRound(pt.y() * 1000)));
         }
     );
     userOrigin3->setUpdateWidgetValueHook(
@@ -1039,7 +1039,7 @@ void Config::loadDeviceItems()
         {
             Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
             QPoint pt = value.toPoint();
-            v2w->setValue(pt * 0.001);
+            v2w->setValue(QPointF(pt.x() * 0.001, pt.y() * 0.001));
             return v2w->toPointF();
         }
     );
