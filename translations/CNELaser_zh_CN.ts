@@ -7514,6 +7514,44 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <source>Copies:</source>
         <translation>克隆数量：</translation>
     </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="+30"/>
+        <location line="+4"/>
+        <source>No Offset</source>
+        <translation>无偏移</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <location line="+4"/>
+        <source>Offset</source>
+        <translation>偏移</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <location line="+4"/>
+        <source>Margins</source>
+        <translation>边距</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Left</source>
+        <translation>左边</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Right</source>
+        <translation>右边</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Top</source>
+        <translation>顶部</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bottom</source>
+        <translation>底部</translation>
+    </message>
 </context>
 <context>
     <name>PathOptimizer</name>

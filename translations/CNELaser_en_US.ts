@@ -5604,6 +5604,44 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <source>Copies:</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="30"/>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="34"/>
+        <source>No Offset</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="31"/>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="35"/>
+        <source>Offset</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="32"/>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="36"/>
+        <source>Margins</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="38"/>
+        <source>Left</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="39"/>
+        <source>Right</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="41"/>
+        <source>Top</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MultiDuplicationDialog.cpp" line="42"/>
+        <source>Bottom</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>PathOptimizer</name>

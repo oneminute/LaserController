@@ -417,6 +417,7 @@ void PasteCommand::undo()
 	}
     m_scene->document()->updateDocumentBounding();
 	m_viewer->onSelectedFillGroup();
+    emit m_viewer->selectedChangedFromMouse();
 	m_viewer->viewport()->repaint();
 }
 
@@ -512,6 +513,7 @@ void PasteCommand::redoImp(bool isRedo)
     else {
         addImp(true);
     }
+    m_viewer->selectedChangedFromMouse();
 }
 
 /*MirrorACommand::MirrorACommand(LaserViewer * v)
