@@ -205,6 +205,19 @@ void Vector2DWidget::setYMaximum(qreal value)
     d->spinBoxY->setMaximum(value);
 }
 
+int Vector2DWidget::decimals() const
+{
+    Q_D(const Vector2DWidget);
+    return d->spinBoxX->decimals();
+}
+
+void Vector2DWidget::setDecimals(int value)
+{
+    Q_D(Vector2DWidget);
+    d->spinBoxX->setDecimals(value);
+    d->spinBoxY->setDecimals(value);
+}
+
 void Vector2DWidget::init()
 {
     Q_D(Vector2DWidget);

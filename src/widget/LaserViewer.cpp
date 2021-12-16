@@ -4458,10 +4458,41 @@ void LaserViewer::zoomOut()
 void LaserViewer::resetZoom()
 {
     //if (!qFuzzyCompare(zoomValue(), qreal(1))) {
-		setTransform(QTransform());
-		setZoomValue(adapterViewScale());//zoomBy()中更新网格和标尺
-        
+    setTransform(QTransform());
+    setZoomValue(adapterViewScale());//zoomBy()中更新网格和标尺
+
     //}
+    if (!m_scene->backgroundItem())
+        return;
+    QRectF rect = m_scene->backgroundItem()->rect();
+    if (!rect.isValid())
+        return;
+
+    rect = QRectF(QPointF(mapFromScene(rect.topLeft())), QPointF(mapFromScene(rect.bottomRight())));
+    QRectF viewRect = this->rect();
+    QPointF center = rect.center();
+    qreal width = rect.width();
+    qreal height = rect.height();
+    qreal viewWidth = viewRect.width();
+    qreal viewHeight = viewRect.height();
+    qreal scale = 1;
+    qreal scaleW = (viewWidth - 20) / width;
+    qreal scaleH = (viewHeight - 20) / height;
+    if (scaleW < scaleH) {
+        scale = scaleW;
+    }
+    else {
+        scale = scaleH;
+    }
+
+    if (!zoomBy(scale, center, true)) {
+        QPointF diff = mapFrom(this, this->rect().center()) - center.toPoint();
+        QTransform t = transform();
+        QTransform t1;
+        t1.translate(diff.x(), diff.y());
+
+        this->setTransform(t * t1);
+    }
 }
 
 void LaserViewer::zoomToSelection()

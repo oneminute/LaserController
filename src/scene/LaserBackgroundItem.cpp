@@ -17,11 +17,9 @@
 LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem * parent)
 	: QGraphicsItemGroup(parent)
 {
-	//QRectF rect = LaserApplication::device->layoutRectInScene();
-	m_rect = LaserApplication::device->layoutRect();
-    qDebug() << "deivce bounds in device:" << m_rect;
+    qDebug() << "deivce bounds in device:" << LaserApplication::device->layoutRect();
 
-	m_rectItem = new QGraphicsRectItem(m_rect);
+	m_rectItem = new QGraphicsRectItem(LaserApplication::device->layoutRect());
 	QGraphicsItemGroup::setFlag(ItemIsSelectable, true);
 
 	QPen pen(Qt::black, 1.0f, Qt::SolidLine);
@@ -230,13 +228,11 @@ bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
 
 QRect LaserBackgroundItem::rect()
 {
-	return m_rect;
+	return LaserApplication::device->layoutRect();
 }
 
 void LaserBackgroundItem::onLayoutChanged(const QSizeF& size)
 {
-	//QRectF rect = LaserApplication::device->layoutRectInScene();
-	m_rect = LaserApplication::device->layoutRect();
-    qDebug() << "deivce bounds in device:" << m_rect;
-	m_rectItem->setRect(m_rect);
+    qDebug() << "deivce bounds in device:" << LaserApplication::device->layoutRect();
+	m_rectItem->setRect(LaserApplication::device->layoutRect());
 }

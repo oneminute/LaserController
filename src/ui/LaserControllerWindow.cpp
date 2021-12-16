@@ -4744,6 +4744,11 @@ void LaserControllerWindow::onLayoutChanged(const QSize& size)
     m_statusBarPageInfo->setText(tr("Layout(mm): %1x%2")
         .arg(LaserApplication::device->layoutWidth() * 0.001, 0, 'f', 3)
         .arg(LaserApplication::device->layoutHeight() * 0.001, 0, 'f', 3));
+    LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+    if (backgroundItem) {
+        backgroundItem->onChangeGrids();
+	    m_viewer->resetZoom();
+    }
     m_viewer->viewport()->update();
 
 }
