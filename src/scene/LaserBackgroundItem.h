@@ -26,7 +26,7 @@ private:
 	QList<int> m_gridSecondNodeXList;
 	QList<int> m_gridSecondNodeYList;
 	QGraphicsRectItem* m_rectItem;
-    QRect m_rect;
+    //QRect m_rect;
 
 };
 
