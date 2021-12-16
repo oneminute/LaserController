@@ -1,6 +1,7 @@
 #ifndef TYPEUTILS_H
 #define TYPEUTILS_H
 
+#include <QImage>
 #include <QJsonObject>
 #include <QObject>
 #include <QPoint>
@@ -48,6 +49,8 @@ namespace typeUtils
     QPoint json2Point(const QJsonValue& json);
 
     QJsonObject rect2Json(const QRect& rect);
+
+    QImage cvMat2QImage(const cv::Mat& mat);
 }
 
 #endif // TYPEUTILS_H

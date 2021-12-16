@@ -3476,7 +3476,7 @@ void LaserControllerWindow::onActionMachining(bool checked)
         }
         QString filename = QDir::current().absoluteFilePath("tmp/export.json");
         //QTemporaryFile file;
-        //if (file.open())
+        //if (file.load())
         //{
             //QString filename = file.fileName();
 
