@@ -89,6 +89,7 @@ public:
     void setPrintAndCutPoint(const QPoint& pt);
     int hoveredPrintAndCutPoint(const QPoint& mousePos) const;
     LaserPrimitive* alignTarget();
+    LaserDoubleSpinBox* textSpaceYSpinBox();
     //align
     void initAlignTarget();
     void changeAlignButtonsEnable();

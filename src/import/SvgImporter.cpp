@@ -204,7 +204,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             }
             qLogD << font;
             QPointF pos = matrix.map(svgTextNode->coord());
-            LaserText* laserText = new LaserText(doc, pos, font, Qt::AlignLeft, Qt::AlignVCenter, QTransform(), idleLayer->index());
+            LaserText* laserText = new LaserText(doc, pos, font,0,  Qt::AlignLeft, Qt::AlignVCenter, QTransform(), idleLayer->index());
             laserText->setContent(svgTextNode->text());
             laserText->modifyPathList();
             item = laserText;
