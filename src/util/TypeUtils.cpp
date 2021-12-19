@@ -204,6 +204,33 @@ QPoint typeUtils::json2Point(const QJsonValue& json)
     return json2Point(json.toObject());
 }
 
+QJsonObject typeUtils::size2Json(const QSize& size)
+{
+    QJsonObject json;
+    json["width"] = size.width();
+    json["height"] = size.height();
+    return json;
+}
+
+QSize typeUtils::json2Size(const QJsonObject& json)
+{
+    QSize size;
+    if (json.contains("width"))
+    {
+        size.setWidth(json["width"].toInt());
+    }
+    if (json.contains("height"))
+    {
+        size.setHeight(json["height"].toInt());
+    }
+    return size;
+}
+
+QSize typeUtils::json2Size(const QJsonValue& json)
+{
+    return json2Size(json.toObject());
+}
+
 QJsonObject typeUtils::rect2Json(const QRect& rect)
 {
     QJsonObject json;

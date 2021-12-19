@@ -4,14 +4,11 @@
 #include <QObject>
 #include <QThread>
 #include <QQueue>
-//#include <QVideoFrame>
 #include <QImage>
 #include <QMutex>
-//#include <QCameraInfo>
 #include <opencv2/opencv.hpp>
 
-//class QCamera;
-//class VideoFrameGrabber;
+class ImageProcessor;
 
 namespace cv
 {
@@ -39,6 +36,9 @@ public:
     bool setResolution(const QSize& size);
     QSize resolution() const;
 
+    void installProcessor(ImageProcessor* processor);
+    void uninstallProcessor(ImageProcessor* processor);
+
 protected:
     void run() override;
     void addImage(const cv::Mat& mat);
@@ -59,6 +59,7 @@ private:
     QQueue<cv::Mat> m_images;
     int m_maxQueueLength;
     CameraStatus m_status;
+    QList<ImageProcessor*> m_processors;
 };
 
 #endif // CAMERACONTROLLER_H

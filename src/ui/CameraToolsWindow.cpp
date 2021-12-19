@@ -35,7 +35,8 @@ Q_DECLARE_METATYPE(QCameraInfo)
 
 CameraToolsWindow::CameraToolsWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_cameraController(new CameraController())
+    , m_cameraController(new CameraController)
+    , m_calibrator(nullptr)
 {
     m_actionRefreshCameras = new QAction(QIcon(QStringLiteral(":/ui/icons/images/reset.png")), tr("Refresh"), this);
     connect(m_actionRefreshCameras, &QAction::triggered, this, &CameraToolsWindow::onActionRefreshCameras);
@@ -105,7 +106,10 @@ CameraToolsWindow::CameraToolsWindow(QWidget* parent)
 
 CameraToolsWindow::~CameraToolsWindow()
 {
-    
+    if (!m_calibrator)
+    {
+        m_cameraController->uninstallProcessor(m_calibrator);
+    }
 }
 
 void CameraToolsWindow::updateCameras()
@@ -192,15 +196,6 @@ void CameraToolsWindow::createCameraSettings()
     m_comboBoxPixelFormat->addItem("MJPEG", "MJPG");
     m_comboBoxPixelFormat->addItem("YUY2", "YUY2");
     layout->addRow(tr("Pixel Format"), m_comboBoxPixelFormat);
-
-    m_comboBoxResolution = new QComboBox;
-    m_comboBoxResolution->addItem("640x480", QSize(640, 480));
-    m_comboBoxResolution->addItem("800x600", QSize(800, 600));
-    m_comboBoxResolution->addItem("1280x720", QSize(1280, 720));
-    m_comboBoxResolution->addItem("1920x1080", QSize(1920, 1080));
-    m_comboBoxResolution->addItem("2048x1536", QSize(2048, 1536));
-    m_comboBoxResolution->addItem("2952x1944", QSize(2952, 1944));
-    layout->addRow(tr("Resolution"), m_comboBoxResolution);
 
     line = new QFrame();
     line->setFrameShape(QFrame::HLine);
@@ -309,6 +304,9 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
 {
     if (checked)
     {
+        m_calibrator = new DistortionCalibrator;
+        m_calibrator->validate();
+        m_cameraController->installProcessor(m_calibrator);
         m_cameraController->start();
         m_actionConnectCamera->setText(tr("Disconnect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/disconnect.png")));
@@ -316,6 +314,7 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
     else
     {
         m_cameraController->stop();
+        SAFE_DELETE(m_calibrator);
         m_actionConnectCamera->setText(tr("Connect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/connect.png")));
     }
@@ -329,21 +328,6 @@ void CameraToolsWindow::onActionCapture(bool checked)
 void CameraToolsWindow::onActionApplyCameraSettings(bool checked)
 {
     m_cameraController->load(m_comboBoxCameras->currentIndex());
-
-    if (!m_cameraController->setResolution(m_comboBoxResolution->currentData().toSize()))
-    {
-        QSize resolution = m_cameraController->resolution();
-        if (resolution.isValid())
-        {
-            QString text = QString("%1x%2").arg(resolution.width()).arg(resolution.height());
-            int index = widgetUtils::findComboBoxIndexByValue(m_comboBoxResolution, resolution);
-            if (index < 0)
-            {
-                m_comboBoxResolution->addItem(text, resolution);
-            }
-            m_comboBoxResolution->setCurrentText(text);
-        }
-    }
 }
 
 void CameraToolsWindow::onFrameCaptured()

@@ -48,6 +48,10 @@ namespace typeUtils
     QPointF json2PointF(const QJsonValue& json);
     QPoint json2Point(const QJsonValue& json);
 
+    QJsonObject size2Json(const QSize& size);
+    QSize json2Size(const QJsonValue& json);
+    QSize json2Size(const QJsonObject& json);
+
     QJsonObject rect2Json(const QRect& rect);
 
     QImage cvMat2QImage(const cv::Mat& mat);

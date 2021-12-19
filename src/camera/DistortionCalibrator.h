@@ -2,6 +2,7 @@
 #define DISTORTIONCALIBRATOR_H
 
 #include <QObject>
+#include "common/common.h"
 #include "ImageProcessor.h"
 
 #include <opencv2/core.hpp>
@@ -14,14 +15,6 @@ class DistortionCalibrator : public QObject, public ImageProcessor
 {
     Q_OBJECT
 public:
-    enum Pattern 
-    {
-        NOT_EXISTING, 
-        CHESSBOARD, 
-        CIRCLES_GRID, 
-        ASYMMETRIC_CIRCLES_GRID 
-    };
-
     explicit DistortionCalibrator(QObject* parent = nullptr);
     ~DistortionCalibrator();
 
@@ -34,6 +27,15 @@ public:
     bool calibration(cv::Size imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
         std::vector<std::vector<cv::Point2f>> imagePoints, float grid_width, bool release_object);
 
+    double computeReprojectionErrors(const std::vector<std::vector<cv::Point3f> >& objectPoints,
+        const std::vector<std::vector<cv::Point2f> >& imagePoints,
+        const std::vector<cv::Mat>& rvecs, const std::vector<cv::Mat>& tvecs,
+        const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs,
+        std::vector<float>& perViewErrors, bool fisheye);
+
+    void calcBoardCornerPositions(cv::Size boardSize, float squareSize, std::vector<cv::Point3f>& corners,
+        CalibrationPattern patternType /*= Settings::CHESSBOARD*/);
+
 protected:
     bool runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
         std::vector<std::vector<cv::Point2f> > imagePoints, std::vector<cv::Mat>& rvecs, std::vector<cv::Mat>& tvecs,
@@ -41,10 +43,6 @@ protected:
         float grid_width, bool release_object);
 
 private:
-    cv::Size boardSize;              // The size of the board -> Number of items by width and height
-    Pattern calibrationPattern;  // One of the Chessboard, circles, or asymmetric circle pattern
-    float squareSize;            // The size of a square in your defined unit (point, millimeter,etc).
-    int nrFrames;                // The number of frames to use from the input for calibration
     float aspectRatio;           // The aspect ratio
     int delay;                   // In case of a video input
     bool writePoints;            // Write detected feature points

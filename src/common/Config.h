@@ -59,6 +59,7 @@ public:
 protected:
     static void loadGeneralItems();
     static void loadLayersItems();
+    static void loadCameraItems();
     static void loadUiItems();
     static void loadCuttingLayerItems();
     static void loadEngravingLayerItems();
@@ -100,6 +101,26 @@ public:
         CONFIG_ITEM(layers, maxLayersCount, int, toInt)
 
     private:
+        friend class Config;
+    };
+
+    class Camera : public ConfigItemGroup
+    {
+    protected:
+        Camera(QObject* parent = nullptr)
+            : ConfigItemGroup("camera", tr("Camera"), tr("Camera"), parent)
+        {}
+
+    public:
+        static ConfigItemGroup* group;
+
+        CONFIG_ITEM(camera, resolution, QSize, toSize)
+        CONFIG_ITEM(camera, hCornersCount, int, toInt)
+        CONFIG_ITEM(camera, vCornersCount, int, toInt)
+        CONFIG_ITEM(camera, squareSize, int, toInt)
+        CONFIG_ITEM_T(camera, calibrationPattern, CalibrationPattern)
+        CONFIG_ITEM(camera, minCalibrationFrames, int, toInt)
+
         friend class Config;
     };
 

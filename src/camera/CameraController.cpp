@@ -1,9 +1,10 @@
 #include "CameraController.h"
-//#include "VideoFrameGrabber.h"
 
 #include "common/common.h"
+#include "common/Config.h"
 #include "LaserApplication.h"
 #include "util/ImageUtils.h"
+#include "ImageProcessor.h"
 
 #include <opencv2/videoio/videoio.hpp>
 //#include <QCamera>
@@ -48,6 +49,26 @@ QSize CameraController::resolution() const
     return size;
 }
 
+void CameraController::installProcessor(ImageProcessor* processor)
+{
+    if (!processor)
+        return;
+
+    QMutexLocker locker(&m_mutex);
+    if (m_processors.contains(processor))
+        return;
+    m_processors.append(processor);
+}
+
+void CameraController::uninstallProcessor(ImageProcessor* processor)
+{
+    if (!processor)
+        return;
+
+    QMutexLocker locker(&m_mutex);
+    m_processors.removeOne(processor);
+}
+
 void CameraController::run()
 {
     cv::Mat frame;
@@ -61,8 +82,22 @@ void CameraController::run()
             continue;
         }
 
-        addImage(frame);
-        emit frameCaptured();
+        bool done = true;
+        for (ImageProcessor* processor : m_processors)
+        {
+            if (!processor->process(frame))
+            {
+                done = false;
+                emit error();
+                break;
+            }
+        }
+
+        if (done)
+        {
+            addImage(frame);
+            emit frameCaptured();
+        }
     }
 }
 
@@ -113,6 +148,8 @@ bool CameraController::load(int cameraIndex)
         m_status = CS_IDLE;
         return false;
     }
+
+    setResolution(Config::Camera::resolution());
 
     return true;
 }

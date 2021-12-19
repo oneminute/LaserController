@@ -4769,7 +4769,6 @@ void LaserControllerWindow::onLayoutChanged(const QSize& size)
 	    m_viewer->resetZoom();
     }
     m_viewer->viewport()->update();
-
 }
 
 void LaserControllerWindow::onFloatEditSliderLaserPower(qreal value)
