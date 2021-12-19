@@ -10,6 +10,7 @@
 
 #include <DockManager.h>
 #include "camera/CameraController.h"
+#include "camera/DistortionCalibrator.h"
 
 class QCameraImageCapture;
 class QCameraViewfinder;
@@ -24,6 +25,7 @@ class QVBoxLayout;
 class ImageViewer;
 class Vector2DWidget;
 class CameraController;
+class ImageProcessor;
 
 class CameraToolsWindow : public QMainWindow
 {
@@ -91,11 +93,11 @@ private:
 
     // camera variables
     QScopedPointer<CameraController> m_cameraController;
+    DistortionCalibrator* m_calibrator;
 
     // camera general variables
     QComboBox* m_comboBoxFrameRateRange;
     QComboBox* m_comboBoxPixelFormat;
-    QComboBox* m_comboBoxResolution;
 
     // camera image processing variables
     QDoubleSpinBox* m_doubleSpinBoxCameraBrightness;

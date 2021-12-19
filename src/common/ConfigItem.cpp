@@ -453,7 +453,7 @@ QJsonObject ConfigItem::toJson() const
     else
     {
         QJsonObject item;
-        if (this == Config::Device::userOrigin1Item())
+        if (this == Config::Camera::resolutionItem())
         {
             qLogD << "break point: " << value().toString();
         }
@@ -873,6 +873,50 @@ void ConfigItem::loadValue(const QVariant& value)
         emit dirtyValueChanged(d->dirtyValue, this);
     if (valueChanged)
         emit this->valueChanged(d->value, this);
+}
+
+QJsonObject qSizeItemToJson(const ConfigItem* configItem)
+{
+    QSize value = configItem->value().toSize();
+    QSize defaultValue = configItem->defaultValue().toSize();
+    QJsonObject jsonObj;
+    jsonObj["value"] = typeUtils::size2Json(value);
+    jsonObj["defaultValue"] = typeUtils::size2Json(defaultValue);
+    return jsonObj;
+}
+
+void parseQSizeItemFromJson(QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item)
+{
+    if (json.contains("value"))
+    {
+        value = typeUtils::json2Size(json["value"]);
+    }
+    if (json.contains("defaultValue"))
+    {
+        defaultValue = typeUtils::json2Size(json["defaultValue"]);
+    }
+}
+
+QJsonObject qPointItemToJson(const ConfigItem* configItem)
+{
+    QPoint pt = configItem->value().toPoint();
+    QPoint defPt = configItem->defaultValue().toPoint();
+    QJsonObject jsonObj;
+    jsonObj["value"] = typeUtils::point2Json(pt);
+    jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
+    return jsonObj;
+}
+
+void parseQPointItemFromJson(QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item)
+{
+    if (json.contains("value"))
+    {
+        value = typeUtils::json2Point(json["value"]);
+    }
+    if (json.contains("defaultValue"))
+    {
+        defaultValue = typeUtils::json2Point(json["defaultValue"]);
+    }
 }
 
 QDebug operator<<(QDebug debug, const ConfigItem& item)

@@ -132,6 +132,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         {
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
 			QLineF line = matrix.map(svgLineNode->line());
+            line = t.map(line);
             item = new LaserLine(line.toLine(), doc, QTransform(), idleLayer->index());
         }
             break;

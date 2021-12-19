@@ -294,6 +294,16 @@ enum ArrangeType
     AT_HSpaced = 14,
     AT_HCentered = 15
 };
+
+enum CalibrationPattern
+{
+    CP_CHESSBOARD,
+    CP_CIRCLES_GRID,
+    CP_ASYMMETRIC_CIRCLES_GRID,
+    CP_CHARUCO_BOARD
+};
+Q_DECLARE_METATYPE(CalibrationPattern)
+
 struct FillStyleAndPixelsCount
 {
     int code;

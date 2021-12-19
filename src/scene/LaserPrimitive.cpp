@@ -2295,11 +2295,11 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     QPainterPath path = sceneTransform().map(d->path);
     QRect boundingRectInDevice = path.boundingRect().toRect();
     qreal ratio = boundingRectInDevice.width() * 1.0 / boundingRectInDevice.height();
-    int canvasWidth = qMin(boundingRectInDevice.width(), 16384);
+    int canvasWidth = qMin(boundingRectInDevice.width(), 8192);
     int canvasHeight = qRound(canvasWidth / ratio);
     if (ratio < 1)
     {
-        canvasHeight = qMin(boundingRectInDevice.height(), 16384);
+        canvasHeight = qMin(boundingRectInDevice.height(), 8192);
         canvasWidth = qRound(canvasHeight * ratio);
     }
 
