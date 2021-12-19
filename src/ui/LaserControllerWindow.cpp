@@ -584,9 +584,19 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_fontFamily->setCurrentText("Times New Roman");
     //m_fontFamily->setWritingSystem(QFontDatabase::SimplifiedChinese);
     m_fontHeight = new LaserDoubleSpinBox();
-    m_fontHeight->setValue(20);
+    m_fontHeight->setValue(90);
     m_fontHeight->setMinimum(0.01);
     m_fontHeight->setMaximum(2000);
+    //设置viewer中textFont的初始值
+    m_viewer->textFont()->setFamily("Times New Roman");
+    qreal size = qRound(m_fontHeight->value() * 25400.0 / m_viewer->logicalDpiY());
+    //qreal size = m_fontHeight->value() * 1000;
+    m_viewer->textFont()->setPixelSize(size);
+    m_viewer->setTextAlignH(Qt::AlignLeft);
+    m_viewer->setTextAlignV(Qt::AlignVCenter);
+    m_viewer->textFont()->setBold(false);
+    m_viewer->textFont()->setLetterSpacing(QFont::SpacingType::AbsoluteSpacing, 0);
+    m_viewer->textFont()->setWordSpacing(0);
     //align
     m_fontAlignX = new QComboBox(this);
     m_fontAlignY = new QComboBox(this);
@@ -605,6 +615,10 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //sapcex , spacey
     m_fontSpaceX = new LaserDoubleSpinBox(this);
     m_fontSpaceY = new LaserDoubleSpinBox(this);
+    m_fontSpaceX->setMaximum(2000);
+    m_fontSpaceX->setMinimum(0);
+    m_fontSpaceY->setMaximum(2000);
+    m_fontSpaceY->setMinimum(0);
     //layot
     m_textLayout->addWidget(new QLabel(tr("Font")), 0, 0);
     m_textLayout->addWidget(m_fontFamily, 0, 1);
@@ -1217,6 +1231,11 @@ LaserPrimitive * LaserControllerWindow::alignTarget()
     return m_alignTarget;
 }
 
+LaserDoubleSpinBox * LaserControllerWindow::textSpaceYSpinBox()
+{
+    return m_fontSpaceY;
+}
+
 void LaserControllerWindow::initAlignTarget()
 {
     if (m_alignTarget) {
@@ -1478,8 +1497,8 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
             m_fontUpper->setChecked(false);
         }  
         //space
-        qreal spaceX = font.letterSpacing();
-        qreal spaceY = font.wordSpacing();
+        qreal spaceX = qRound(font.letterSpacing() * m_viewer->logicalDpiY() / 25400.0);
+        qreal spaceY = qRound(text->spaceY() * m_viewer->logicalDpiY() / 25400.0);
         m_fontSpaceX->setValue(spaceX);
         m_fontSpaceY->setValue(spaceY);
 
@@ -1488,8 +1507,8 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
         m_viewer->textFont()->setBold(bold);
         m_viewer->textFont()->setItalic(italic);
         m_viewer->textFont()->setCapitalization(capitalization);
-        m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing,  spaceX);
-        m_viewer->textFont()->setWordSpacing(spaceY);
+        m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing, font.letterSpacing());
+        //m_viewer->textFont()->setWordSpacing(spaceY);
         m_viewer->setTextAlignH(aH);
         m_viewer->setTextAlignV(aV);
     }
@@ -1520,7 +1539,8 @@ void LaserControllerWindow::onFontComboBoxHidePopup()
 void LaserControllerWindow::onFontHeightBoxEnterOrLostFocus()
 {
     if (m_viewer) {
-        qreal size = m_fontHeight->value() * 25400.0 / m_viewer->logicalDpiY();
+        qreal size = qRound(m_fontHeight->value() * 25400.0 / m_viewer->logicalDpiY());
+        //qreal size = m_fontHeight->value() * 1000;
         m_viewer->textFont()->setPixelSize(size);
         LaserText* text = m_viewer->editingText();
         if (text) {
@@ -1540,6 +1560,9 @@ void LaserControllerWindow::onFontBoldStateChanged()
         return;
     }
     LaserText* text = m_viewer->editingText();
+    if(!text){
+        return;
+    }
     QFont font(text->font());
     if (m_fontBold->isChecked()) {  
         if (text) {
@@ -1617,10 +1640,14 @@ void LaserControllerWindow::onFontUpperStateChanged()
 
 void LaserControllerWindow::onFontSpaceXEnterOrLostFocus()
 {
+    if (!m_viewer->editingText()) {
+        return;
+    }
     QFont font = m_viewer->editingText()->font();
-    font.setLetterSpacing(QFont::AbsoluteSpacing, m_fontSpaceX->value());
+    qreal size = qRound(m_fontSpaceX->value() * 25400.0 / m_viewer->logicalDpiY());
+    font.setLetterSpacing(QFont::AbsoluteSpacing, size);
     m_viewer->editingText()->setFont(QFont(font));
-    m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing, m_fontSpaceX->value());
+    m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing, size);
 
     m_viewer->setFocus();
     m_viewer->modifyTextCursor();
@@ -1634,10 +1661,10 @@ void LaserControllerWindow::onFontSpaceYEnterOrLostFocus()
     }
     //QFont font = m_viewer->editingText()->font();
     //font.setWordSpacing(m_fontSpaceY->value());
-    qreal space = m_fontSpaceY->value();
-    m_viewer->editingText()->setSpacceY(space);
+    qreal size = qRound(m_fontSpaceY->value() * 25400.0 / m_viewer->logicalDpiY());
+    m_viewer->editingText()->setSpacceY(size);
     m_viewer->editingText()->modifyPathList();
-    //m_viewer->textFont()->setWordSpacing(m_fontSpaceY->value());
+    //m_viewer->textFont()->setWordSpacing(size);
 
     m_viewer->setFocus();
     m_viewer->modifyTextCursor();
@@ -1793,14 +1820,6 @@ void LaserControllerWindow::createCentralDockPanel()
     m_viewer->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_viewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //设置初始值
-    m_viewer->textFont()->setFamily("Times New Roman");
-    m_viewer->textFont()->setPixelSize(20000.0);
-    m_viewer->setTextAlignH(Qt::AlignLeft);
-    m_viewer->setTextAlignV(Qt::AlignVCenter);
-    m_viewer->textFont()->setBold(false);
-    m_viewer->textFont()->setLetterSpacing(QFont::SpacingType::AbsoluteSpacing, 0);
-    m_viewer->textFont()->setWordSpacing(0);
-    
     //m_viewer->setAttribute(Qt::WA_InputMethodEnabled, false);
     m_scene = qobject_cast<LaserScene*>(m_viewer->scene());
 

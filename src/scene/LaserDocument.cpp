@@ -1180,10 +1180,11 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 font.setBold(fontObj["bold"].toBool());
                 font.setItalic(fontObj["italic"].toBool());
                 font.setLetterSpacing(QFont::SpacingType(fontObj["letterSpaceTpye"].toInt()), fontObj["spaceX"].toDouble());
-                font.setWordSpacing(fontObj["spaceY"].toDouble());
+                //font.setWordSpacing(fontObj["spaceY"].toDouble());
                 //create
                 LaserText* text = new LaserText(this, QPointF(startPos[0].toDouble(), startPos[1].toDouble()), 
-                    font, fontObj["alignH"].toInt(), fontObj["alignV"].toInt(), saveTransform, layerIndex);
+                    font, fontObj["spaceY"].toDouble(),
+                    fontObj["alignH"].toInt(), fontObj["alignV"].toInt(), saveTransform, layerIndex);
                 text->setContent(content);
                 text->modifyPathList();   
                 primitive = text;

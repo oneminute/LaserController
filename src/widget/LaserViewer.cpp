@@ -953,7 +953,7 @@ bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
     QPointF mousePoint = mapToScene(mapFromGlobal(global));
     bool isInAllPathBound = false;
     qreal extend = 10.0 * 1000;
-    QFontMetrics fontMetrics(m_textFont);
+    //QFontMetrics fontMetrics(m_textFont);
     qDebug() << m_textFont.pixelSize();
     
     //先遍历整个外框
@@ -3961,8 +3961,9 @@ void LaserViewer::addText(QString str)
     
     if (!m_editingText) {
         m_insertIndex = 0;
+        qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
         m_editingText = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
-            m_textFont, m_textAlighH, m_textAlighV,
+            m_textFont, spaceY, m_textAlighH, m_textAlighV,
             QTransform(),  m_curLayerIndex);
         
         m_editingText->addPath(str, m_insertIndex);

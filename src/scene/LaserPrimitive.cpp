@@ -2381,7 +2381,7 @@ public:
     qreal spaceY;
 };
 
-LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
+LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spaceY, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
 	: LaserShape(new LaserTextPrivate(this),  doc,  LPT_TEXT, layerIndex, saveTransform)
 {
     Q_D(LaserText);
@@ -2395,6 +2395,7 @@ LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, int aligh
     d->startPos = mapFromScene(d->startPos);
     d->view = doc->scene()->views()[0];
     d->allTransform = saveTransform;
+    d->spaceY = spaceY;
     sceneTransformToItemTransform(saveTransform);
 }
 
@@ -2781,7 +2782,7 @@ void LaserText::draw(QPainter * painter)
 LaserPrimitive * LaserText::clone(QTransform t)
 {
 	Q_D(LaserText);
-	LaserText* text = new LaserText(document(), d->startPos, d->font, d->alignHType, d->alignVType, sceneTransform(), d->layerIndex);
+	LaserText* text = new LaserText(document(), d->startPos, d->font,d->spaceY, d->alignHType, d->alignVType, sceneTransform(), d->layerIndex);
     text->setContent(d->content);
     text->modifyPathList();
 	return text;
