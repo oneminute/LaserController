@@ -4102,7 +4102,8 @@ bool LaserViewer::onSelectedFillGroup()
 	}
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
-	m_curSelectedHandleIndex = -1;
+    m_curSelectedHandleIndex = -1;
+    viewport()->repaint();
 	return true;
 }
 //目前只在画完图元使用

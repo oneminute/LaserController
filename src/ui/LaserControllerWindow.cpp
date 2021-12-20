@@ -3516,7 +3516,6 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
         return;
     }
     LaserLayer* layer = list[index];
-    m_scene->blockSignals(true);
     //m_scene->clearSelection();
     //清理之前的选区
     LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
@@ -3528,7 +3527,7 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     {
         primitive->setSelected(true);
     }
-    m_scene->blockSignals(false);
+    view->onSelectedFillGroup();
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)
