@@ -1,6 +1,7 @@
 #include "DistortionCalibrator.h"
 
 #include "common/common.h"
+#include "common/Config.h"
 
 DistortionCalibrator::DistortionCalibrator(QObject* parent)
     : QObject(parent)
@@ -16,21 +17,6 @@ DistortionCalibrator::~DistortionCalibrator()
 bool DistortionCalibrator::validate()
 {
     bool goodInput = true;
-    if (boardSize.width <= 0 || boardSize.height <= 0)
-    {
-        qLogW << "Invalid Board size: " << boardSize.width << " " << boardSize.height << endl;
-        goodInput = false;
-    }
-    if (squareSize <= 10e-6)
-    {
-        qLogW << "Invalid square size " << squareSize << endl;
-        goodInput = false;
-    }
-    if (nrFrames <= 0)
-    {
-        qLogW << "Invalid number of frames " << nrFrames << endl;
-        goodInput = false;
-    }
 
     flag = 0;
     if (calibFixPrincipalPoint) flag |= cv::CALIB_FIX_PRINCIPAL_POINT;
@@ -52,9 +38,6 @@ bool DistortionCalibrator::validate()
         if (calibFixPrincipalPoint)   flag |= cv::fisheye::CALIB_FIX_PRINCIPAL_POINT;
     }
 
-    calibrationPattern = NOT_EXISTING;
-    calibrationPattern = CHESSBOARD;
-    
     return goodInput;
 }
 
@@ -62,6 +45,7 @@ bool DistortionCalibrator::process(cv::Mat& mat)
 {
     cv::Mat view;
     bool blinkOutput = false;
+    validate();
 
     if (mat.empty())
         return false;
@@ -82,17 +66,19 @@ bool DistortionCalibrator::process(cv::Mat& mat)
         chessBoardFlags |= cv::CALIB_CB_FAST_CHECK;
     }
 
-    switch (calibrationPattern) // Find feature points on the input format
+    cv::Size boardSize(Config::Camera::hCornersCount(), Config::Camera::vCornersCount());
+    switch (Config::Camera::calibrationPattern()) // Find feature points on the input format
     {
-    case CHESSBOARD:
+    case CP_CHESSBOARD:
         found = cv::findChessboardCorners(view, boardSize, pointBuf, chessBoardFlags);
         break;
-    case CIRCLES_GRID:
+    case CP_CIRCLES_GRID:
         found = cv::findCirclesGrid(view, boardSize, pointBuf);
         break;
-    case ASYMMETRIC_CIRCLES_GRID:
+    case CP_ASYMMETRIC_CIRCLES_GRID:
         found = cv::findCirclesGrid(view, boardSize, pointBuf, cv::CALIB_CB_ASYMMETRIC_GRID);
         break;
+    case CP_CHARUCO_BOARD:
     default:
         found = false;
         break;
@@ -102,7 +88,7 @@ bool DistortionCalibrator::process(cv::Mat& mat)
     if (found)                // If done with success,
     {
         // improve the found corners' coordinate accuracy for chessboard
-        if (calibrationPattern == CHESSBOARD)
+        if (Config::Camera::calibrationPattern() == CP_CHESSBOARD)
         {
             cv::Mat viewGray;
             cvtColor(view, viewGray, cv::COLOR_BGR2GRAY);
@@ -141,79 +127,135 @@ bool DistortionCalibrator::calibration(cv::Size imageSize, cv::Mat& cameraMatrix
     std::vector<cv::Point3f> newObjPoints;
 
     bool ok = false;
-    /*ok = cv::runCalibration(s, imageSize, cameraMatrix, distCoeffs, imagePoints, rvecs, tvecs, reprojErrs,
+    ok = runCalibration(imageSize, cameraMatrix, distCoeffs, imagePoints, rvecs, tvecs, reprojErrs,
         totalAvgErr, newObjPoints, grid_width, release_object);
-    cout << (ok ? "Calibration succeeded" : "Calibration failed")
-        << ". avg re projection error = " << totalAvgErr << endl;
+    qLogD << (ok ? "Calibration succeeded" : "Calibration failed") << ". avg re projection error = " << totalAvgErr << endl;
 
-    if (ok)
+    this->cameraMatrix = cameraMatrix;
+    this->distCoeffs = distCoeffs;
+    /*if (ok)
         saveCameraParams(s, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, reprojErrs, imagePoints,
             totalAvgErr, newObjPoints);*/
+
     return ok;
 }
 
 bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs, std::vector<std::vector<cv::Point2f>> imagePoints, std::vector<cv::Mat>& rvecs, std::vector<cv::Mat>& tvecs, std::vector<float>& reprojErrs, double& totalAvgErr, std::vector<cv::Point3f>& newObjPoints, float grid_width, bool release_object)
 {
     bool ok = false;
-    ////! [fixed_aspect]
-    //cameraMatrix = Mat::eye(3, 3, CV_64F);
-    //if (!s.useFisheye && s.flag & CALIB_FIX_ASPECT_RATIO)
-    //    cameraMatrix.at<double>(0, 0) = s.aspectRatio;
-    ////! [fixed_aspect]
-    //if (s.useFisheye) {
-    //    distCoeffs = Mat::zeros(4, 1, CV_64F);
-    //}
-    //else {
-    //    distCoeffs = Mat::zeros(8, 1, CV_64F);
-    //}
+    //! [fixed_aspect]
+    cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+    if (!useFisheye && flag & cv::CALIB_FIX_ASPECT_RATIO)
+        cameraMatrix.at<double>(0, 0) = aspectRatio;
+    //! [fixed_aspect]
+    if (useFisheye) {
+        distCoeffs = cv::Mat::zeros(4, 1, CV_64F);
+    }
+    else {
+        distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+    }
 
-    //vector<vector<Point3f> > objectPoints(1);
-    //calcBoardCornerPositions(s.boardSize, s.squareSize, objectPoints[0], s.calibrationPattern);
-    //objectPoints[0][s.boardSize.width - 1].x = objectPoints[0][0].x + grid_width;
-    //newObjPoints = objectPoints[0];
+    std::vector<std::vector<cv::Point3f> > objectPoints(1);
+    cv::Size boardSize(Config::Camera::hCornersCount(), Config::Camera::vCornersCount());
+    calcBoardCornerPositions(boardSize, Config::Camera::squareSize(), objectPoints[0], Config::Camera::calibrationPattern());
+    objectPoints[0][boardSize.width - 1].x = objectPoints[0][0].x + grid_width;
+    newObjPoints = objectPoints[0];
 
-    //objectPoints.resize(imagePoints.size(), objectPoints[0]);
+    objectPoints.resize(imagePoints.size(), objectPoints[0]);
 
-    ////Find intrinsic and extrinsic camera parameters
-    //double rms;
+    //Find intrinsic and extrinsic camera parameters
+    double rms;
 
-    //if (s.useFisheye) {
-    //    Mat _rvecs, _tvecs;
-    //    rms = fisheye::calibrate(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, _rvecs,
-    //        _tvecs, s.flag);
+    if (useFisheye) {
+        cv::Mat _rvecs, _tvecs;
+        rms = cv::fisheye::calibrate(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, _rvecs,
+            _tvecs, flag);
 
-    //    rvecs.reserve(_rvecs.rows);
-    //    tvecs.reserve(_tvecs.rows);
-    //    for (int i = 0; i < int(objectPoints.size()); i++) {
-    //        rvecs.push_back(_rvecs.row(i));
-    //        tvecs.push_back(_tvecs.row(i));
-    //    }
-    //}
-    //else {
-    //    int iFixedPoint = -1;
-    //    if (release_object)
-    //        iFixedPoint = s.boardSize.width - 1;
-    //    rms = calibrateCameraRO(objectPoints, imagePoints, imageSize, iFixedPoint,
-    //        cameraMatrix, distCoeffs, rvecs, tvecs, newObjPoints,
-    //        s.flag | CALIB_USE_LU);
-    //}
+        rvecs.reserve(_rvecs.rows);
+        tvecs.reserve(_tvecs.rows);
+        for (int i = 0; i < int(objectPoints.size()); i++) {
+            rvecs.push_back(_rvecs.row(i));
+            tvecs.push_back(_tvecs.row(i));
+        }
+    }
+    else {
+        int iFixedPoint = -1;
+        if (release_object)
+            iFixedPoint = boardSize.width - 1;
+        rms = calibrateCameraRO(objectPoints, imagePoints, imageSize, iFixedPoint,
+            cameraMatrix, distCoeffs, rvecs, tvecs, newObjPoints,
+            flag | cv::CALIB_USE_LU);
+    }
 
-    //if (release_object) {
-    //    cout << "New board corners: " << endl;
-    //    cout << newObjPoints[0] << endl;
-    //    cout << newObjPoints[s.boardSize.width - 1] << endl;
-    //    cout << newObjPoints[s.boardSize.width * (s.boardSize.height - 1)] << endl;
-    //    cout << newObjPoints.back() << endl;
-    //}
+    qLogD << "Re-projection error reported by calibrateCamera: " << rms;
 
-    //cout << "Re-projection error reported by calibrateCamera: " << rms << endl;
+    ok = checkRange(cameraMatrix) && checkRange(distCoeffs);
 
-    //ok = checkRange(cameraMatrix) && checkRange(distCoeffs);
-
-    //objectPoints.clear();
-    //objectPoints.resize(imagePoints.size(), newObjPoints);
-    //totalAvgErr = computeReprojectionErrors(objectPoints, imagePoints, rvecs, tvecs, cameraMatrix,
-    //    distCoeffs, reprojErrs, s.useFisheye);
+    objectPoints.clear();
+    objectPoints.resize(imagePoints.size(), newObjPoints);
+    totalAvgErr = computeReprojectionErrors(objectPoints, imagePoints, rvecs, tvecs, cameraMatrix,
+        distCoeffs, reprojErrs, useFisheye);
 
     return ok;
 }
+
+//! [compute_errors]
+double DistortionCalibrator::computeReprojectionErrors(const std::vector<std::vector<cv::Point3f> >& objectPoints,
+    const std::vector<std::vector<cv::Point2f> >& imagePoints,
+    const std::vector<cv::Mat>& rvecs, const std::vector<cv::Mat>& tvecs,
+    const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs,
+    std::vector<float>& perViewErrors, bool fisheye)
+{
+    std::vector<cv::Point2f> imagePoints2;
+    size_t totalPoints = 0;
+    double totalErr = 0, err;
+    perViewErrors.resize(objectPoints.size());
+
+    for (size_t i = 0; i < objectPoints.size(); ++i)
+    {
+        if (fisheye)
+        {
+            cv::fisheye::projectPoints(objectPoints[i], imagePoints2, rvecs[i], tvecs[i], cameraMatrix,
+                distCoeffs);
+        }
+        else
+        {
+            projectPoints(objectPoints[i], rvecs[i], tvecs[i], cameraMatrix, distCoeffs, imagePoints2);
+        }
+        err = norm(imagePoints[i], imagePoints2, cv::NORM_L2);
+
+        size_t n = objectPoints[i].size();
+        perViewErrors[i] = (float)std::sqrt(err * err / n);
+        totalErr += err * err;
+        totalPoints += n;
+    }
+
+    return std::sqrt(totalErr / totalPoints);
+}
+//! [compute_errors]
+//! [board_corners]
+void DistortionCalibrator::calcBoardCornerPositions(cv::Size boardSize, float squareSize, std::vector<cv::Point3f>& corners,
+    CalibrationPattern patternType /*= Settings::CHESSBOARD*/)
+{
+    corners.clear();
+
+    switch (patternType)
+    {
+    case CP_CHESSBOARD:
+    case CP_CIRCLES_GRID:
+        for (int i = 0; i < boardSize.height; ++i)
+            for (int j = 0; j < boardSize.width; ++j)
+                corners.push_back(cv::Point3f(j * squareSize, i * squareSize, 0));
+        break;
+
+    case CP_ASYMMETRIC_CIRCLES_GRID:
+        for (int i = 0; i < boardSize.height; i++)
+            for (int j = 0; j < boardSize.width; j++)
+                corners.push_back(cv::Point3f((2 * j + i % 2) * squareSize, i * squareSize, 0));
+        break;
+    case CP_CHARUCO_BOARD:
+    default:
+        break;
+    }
+}
+

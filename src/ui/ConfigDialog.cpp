@@ -44,6 +44,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     groups  
         << Config::General::group
         //<< Config::Layers::group
+        << Config::Camera::group
         << Config::Ui::group
         << Config::CuttingLayer::group
         << Config::EngravingLayer::group

@@ -27,6 +27,7 @@ QMap<QString, ConfigItemGroup*> Config::groupsMap;
 
 ConfigItemGroup* Config::General::group(nullptr);
 ConfigItemGroup* Config::Layers::group(nullptr);
+ConfigItemGroup* Config::Camera::group(nullptr);
 ConfigItemGroup* Config::Ui::group(nullptr);
 ConfigItemGroup* Config::CuttingLayer::group(nullptr);
 ConfigItemGroup* Config::EngravingLayer::group(nullptr);
@@ -55,6 +56,7 @@ void Config::init()
 
     loadGeneralItems();
     loadLayersItems();
+    loadCameraItems();
     loadUiItems();
     loadCuttingLayerItems();
     loadEngravingLayerItems();
@@ -283,6 +285,90 @@ void Config::loadLayersItems()
     maxLayersCount->setInputWidgetType(IWT_EditSlider);
     maxLayersCount->setInputWidgetProperty("minimum", 8);
     maxLayersCount->setInputWidgetProperty("maximum", 16);
+}
+
+void Config::loadCameraItems()
+{
+    ConfigItemGroup* group = new Config::Camera;
+    Config::Camera::group = group;
+
+    ConfigItem* resolution = group->addConfigItem(
+        "resolution"
+        , QSize(1920, 1280)
+        , DT_SIZE
+    );
+    resolution->setInputWidgetType(IWT_ComboBox);
+    resolution->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem("640x480", QSize(640, 480));
+            comboBox->addItem("800x600", QSize(800, 600));
+            comboBox->addItem("1280x720", QSize(1280, 720));
+            comboBox->addItem("1920x1080", QSize(1920, 1080));
+            comboBox->addItem("2048x1536", QSize(2048, 1536));
+            comboBox->addItem("2952x1944", QSize(2952, 1944));
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+    resolution->setToJsonHook(qSizeItemToJson);
+    resolution->setFromJsonHook(parseQSizeItemFromJson);
+
+    ConfigItem* hCornersCount = group->addConfigItem(
+        "hCornersCount"
+        , 8
+    );
+    hCornersCount->setInputWidgetProperty("minimum", 2);
+    hCornersCount->setInputWidgetProperty("maximum", 40);
+
+    ConfigItem* vCornersCount = group->addConfigItem(
+        "vCornersCount"
+        , 8
+    );
+    vCornersCount->setInputWidgetProperty("minimum", 2);
+    vCornersCount->setInputWidgetProperty("maximum", 40);
+
+    ConfigItem* squareSize = group->addConfigItem(
+        "squareSize"
+        , 10
+    );
+    squareSize->setInputWidgetProperty("minimum", 2);
+    squareSize->setInputWidgetProperty("maximum", 50);
+
+    ConfigItem* calibrationPattern = group->addConfigItem(
+        "calibrationPattern"
+        , CP_CHESSBOARD
+    );
+    calibrationPattern->setInputWidgetType(IWT_ComboBox);
+    calibrationPattern->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("Chessboard"), CP_CHESSBOARD);
+            comboBox->addItem(ltr("Circles Grid"), CP_CIRCLES_GRID);
+            comboBox->addItem(ltr("Asymmetric Circles Grid"), CP_ASYMMETRIC_CIRCLES_GRID);
+            comboBox->addItem(ltr("Charuco Board"), CP_CHARUCO_BOARD);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+    
+
+    ConfigItem* minCalibrationFrames = group->addConfigItem(
+        "minCalibrationFrames"
+        , 20
+    );
+    minCalibrationFrames->setInputWidgetProperty("minimum", 10);
+    minCalibrationFrames->setInputWidgetProperty("maximum", 100);
 }
 
 void Config::loadUiItems()
@@ -949,28 +1035,8 @@ void Config::loadDeviceItems()
             return v2w->toPointF();
         }
     );
-    userOrigin1->setToJsonHook(
-        [=](const ConfigItem* item) {
-            QPoint pt = item->value().toPoint();
-            QPoint defPt = item->defaultValue().toPoint();
-            QJsonObject jsonObj;
-            jsonObj["value"] = typeUtils::point2Json(pt);
-            jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
-            return jsonObj;
-        }
-    );
-    userOrigin1->setFromJsonHook(
-        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
-            if (json.contains("value"))
-            {
-                value = typeUtils::json2Point(json["value"]);
-            }
-            if (json.contains("defaultValue"))
-            {
-                defaultValue = typeUtils::json2Point(json["defaultValue"]);
-            }
-        }
-    );
+    userOrigin1->setToJsonHook(qPointItemToJson);
+    userOrigin1->setFromJsonHook(parseQPointItemFromJson);
 
     ConfigItem* userOrigin2 = group->addConfigItem(
         "userOrigin2",
@@ -996,28 +1062,8 @@ void Config::loadDeviceItems()
             return v2w->toPointF();
         }
     );
-    userOrigin2->setToJsonHook(
-        [=](const ConfigItem* item) {
-            QPoint pt = item->value().toPoint();
-            QPoint defPt = item->defaultValue().toPoint();
-            QJsonObject jsonObj;
-            jsonObj["value"] = typeUtils::point2Json(pt);
-            jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
-            return jsonObj;
-        }
-    );
-    userOrigin2->setFromJsonHook(
-        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
-            if (json.contains("value"))
-            {
-                value = typeUtils::json2Point(json["value"]);
-            }
-            if (json.contains("defaultValue"))
-            {
-                defaultValue = typeUtils::json2Point(json["defaultValue"]);
-            }
-        }
-    );
+    userOrigin2->setToJsonHook(qPointItemToJson);
+    userOrigin2->setFromJsonHook(parseQPointItemFromJson);
 
     ConfigItem* userOrigin3 = group->addConfigItem(
         "userOrigin3",
@@ -1043,28 +1089,8 @@ void Config::loadDeviceItems()
             return v2w->toPointF();
         }
     );
-    userOrigin3->setToJsonHook(
-        [=](const ConfigItem* item) {
-            QPoint pt = item->value().toPoint();
-            QPoint defPt = item->defaultValue().toPoint();
-            QJsonObject jsonObj;
-            jsonObj["value"] = typeUtils::point2Json(pt);
-            jsonObj["defaultValue"] = typeUtils::point2Json(defPt);
-            return jsonObj;
-        }
-    );
-    userOrigin3->setFromJsonHook(
-        [=](QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item) {
-            if (json.contains("value"))
-            {
-                value = typeUtils::json2Point(json["value"]);
-            }
-            if (json.contains("defaultValue"))
-            {
-                defaultValue = typeUtils::json2Point(json["defaultValue"]);
-            }
-        }
-    );
+    userOrigin3->setToJsonHook(qPointItemToJson);
+    userOrigin3->setFromJsonHook(parseQPointItemFromJson);
 
     ConfigItem* userOriginSelected = group->addConfigItem(
         "userOriginSelected",
@@ -2477,6 +2503,30 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Max Layers Count", nullptr), 
         QCoreApplication::translate("Config", "Max Layers Count", nullptr));
 
+    Camera::resolutionItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Resolution", nullptr), 
+        QCoreApplication::translate("Config", "Resolution", nullptr));
+
+    Camera::hCornersCountItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Horizontal Corners Count", nullptr), 
+        QCoreApplication::translate("Config", "Horizontal Corners Count", nullptr));
+
+    Camera::vCornersCountItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Vertical Corners Count", nullptr), 
+        QCoreApplication::translate("Config", "Vertical Corners Count", nullptr));
+
+    Camera::squareSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Squre Size", nullptr), 
+        QCoreApplication::translate("Config", "Squre Size", nullptr));
+
+    Camera::calibrationPatternItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Calibration pattern", nullptr), 
+        QCoreApplication::translate("Config", "Calibration pattern", nullptr));
+
+    Camera::minCalibrationFramesItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Min calibration frames", nullptr), 
+        QCoreApplication::translate("Config", "Min calibration frames", nullptr));
+
     Ui::operationButtonIconSizeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Operation Button Icon Size(px)", nullptr), 
         QCoreApplication::translate("Config", "Size of operation buttons' icons", nullptr));
@@ -3160,6 +3210,10 @@ void Config::updateTitlesAndDescriptions()
     groupsMap["layers"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "Layers", nullptr),
         QCoreApplication::translate("Config", "Layers", nullptr));
+
+    groupsMap["camera"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Camera", nullptr),
+        QCoreApplication::translate("Config", "Camera", nullptr));
 
     groupsMap["ui"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "UI", nullptr),

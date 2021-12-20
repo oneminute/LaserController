@@ -255,10 +255,14 @@ void LaserApplication::retranslate()
     stringMap["Absolute Coords"] = tr("Absolute Coords");
     stringMap["Align X"] = tr("Align X");
     stringMap["Align Y"] = tr("Align Y");
+    stringMap["Asymmetric Circles Grid"] = tr("Asymmetric Circles Grid");
     stringMap["Bold"] = tr("Bold");
     stringMap["Bottom"] = tr("Bottom");
     stringMap["Bottom Left"] = tr("Bottom Left");
     stringMap["Bottom Right"] = tr("Bottom Right");
+    stringMap["Chessboard"] = tr("Chessboard");
+    stringMap["Charuco Board"] = tr("Charuco Board");
+    stringMap["Circles Grid"] = tr("Circles Grid");
     stringMap["Config Dialog"] = tr("Config Dialog");
     stringMap["Current Position"] = tr("Current Position");
     stringMap["Cutting"] = tr("Cutting");
@@ -381,6 +385,7 @@ int LaserApplication::exec()
 
 void LaserApplication::restart()
 {
+    mainWindow->close();
     LaserApplication::quit();
     QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
 }
