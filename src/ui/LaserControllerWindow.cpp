@@ -3522,12 +3522,24 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     if (!view) {
         return;
     }
-    view->clearGroupSelection();
+    
+    //view->clearGroupSelection();
+    //清空group
+    if (m_viewer->group()) {
+        m_viewer->group()->removeAllFromGroup(true);
+    }
+    else {
+        m_viewer->createGroup();
+    }
     for (LaserPrimitive* primitive : layer->primitives())
     {
         primitive->setSelected(true);
+        m_viewer->group()->addToGroup(primitive);
     }
-    view->onSelectedFillGroup();
+    if (StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
+        emit m_viewer->idleToSelected();
+    }
+    m_viewer->viewport()->repaint();
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)

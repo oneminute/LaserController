@@ -142,6 +142,7 @@ public slots:
 	QMap<QGraphicsItem*, QTransform> onCancelSelected();
 	bool resetGroup();
 	bool onSelectedFillGroup();
+    void createGroup();
 	QMap<QGraphicsItem*, QTransform> onReplaceGroup(LaserPrimitive* item);
     //text
     void onEndText();

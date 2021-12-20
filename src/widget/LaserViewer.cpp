@@ -3358,15 +3358,12 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
     //清空选取区域
     for (QGraphicsItem *item : m_scene->document()->selectedPrimitives()) {
         LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
-        p_item->blockSignals(true);
         p_item->setSelected(false);
-        p_item->blockSignals(false);
         selectedList.insert(p_item, p_item->sceneTransform());
     }
 	m_group->setTransform(QTransform());
     
 	m_scene->clearSelection();
-	m_scene->blockSignals(false);
     viewport()->repaint();
 	emit m_scene->selectionChanged();
 	return selectedList;
@@ -4090,21 +4087,23 @@ bool LaserViewer::onSelectedFillGroup()
 	}
 	else
 	{
-		QList<LaserPrimitive*>list = m_scene->document()->selectedPrimitives();
-		if (list.isEmpty()) {
-			return false;
-		}
-		m_group = m_scene->createItemGroup(list);
-        connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
-		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-		m_group->setSelected(true);
-		m_group->setZValue(1);
+		
+        createGroup();
 	}
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
     m_curSelectedHandleIndex = -1;
-    viewport()->repaint();
+    
 	return true;
+}
+void LaserViewer::createGroup()
+{
+    QList<LaserPrimitive*>list = m_scene->document()->selectedPrimitives();
+    m_group = m_scene->createItemGroup(list);
+    connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
+    m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    m_group->setSelected(true);
+    m_group->setZValue(1);
 }
 //目前只在画完图元使用
 QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* item)
