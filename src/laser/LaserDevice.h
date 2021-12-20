@@ -220,6 +220,7 @@ signals:
     void layoutChanged(const QSize& size);
     void systemRegistersConfirmed();
     void userRegistersConfirmed();
+    void activeFailed(int reason);
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

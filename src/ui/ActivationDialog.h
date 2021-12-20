@@ -35,6 +35,8 @@ protected slots:
     void onSendTimerTimeout();
     void onUpdateTimerTimeout();
 
+    void onActiveFailed(int reason);
+
 private:
     QScopedPointer<Ui::ActivationDialog> m_ui;
 
@@ -43,6 +45,8 @@ private:
     QRegularExpression m_reEmail;
     QRegularExpression m_reCode;
     QRegularExpression m_reUserName;
+
+    QStringList m_errorMsgs;
 };
 
 #endif // ACTIVATIONDIALOG_H

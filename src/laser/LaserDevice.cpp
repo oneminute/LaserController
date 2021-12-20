@@ -220,7 +220,6 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
-    connect(Config::SystemRegister::deviceOriginItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
     connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
     connect(this, &LaserDevice::mainCardRegistrationChanged, this, &LaserDevice::onMainCardRegistrationChanged);
@@ -1434,6 +1433,16 @@ void LaserDevice::handleError(int code, const QString& message)
     case E_UpdateFirmwareTimeout:
         throw new LaserNetworkException(code, tr("Update firmware timeout"));
         break;
+    case E_InadequatePermissions:
+        break;
+    case E_SendEmailFailed:
+    case E_MailboxInvalid:
+    case E_MailboxAccountError:
+    case E_ActiveCodeInvalid:
+    case E_ValidateCodeInvalid:
+    case E_MailboxNameInvalid:
+        emit activeFailed(code);
+        break;
     }
     /*if (exception)
     {
@@ -1862,6 +1871,7 @@ void LaserDevice::onConfigStartFromChanged(const QVariant& value, void* senderPt
 {
     Q_D(LaserDevice);
     d->updateDeviceOriginAndTransform();
+    emit layoutChanged(layoutSize());
 }
 
 void LaserDevice::onConfigJobOriginChanged(const QVariant& value, void* senderPtr)

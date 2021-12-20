@@ -1170,6 +1170,7 @@ void Config::loadUserReigsters()
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
     head->setVisible(false);
+    head->setExportable(false);
 
     ConfigItem* accMode = group->addConfigItem(
         "accMode",
@@ -1672,6 +1673,7 @@ void Config::loadSystemRegisters()
     head->setInputWidgetType(IWT_LineEdit);
     head->setInputWidgetProperty("readOnly", true);
     head->setVisible(false);
+    head->setExportable(false);
 
     ConfigItem* password = group->addConfigItem(
         "password",
@@ -1680,6 +1682,7 @@ void Config::loadSystemRegisters()
     );
     password->setInputWidgetType(IWT_LineEdit);
     password->setVisible(false);
+    password->setExportable(false);
 
     ConfigItem* storedPassword = group->addConfigItem(
         "storedPassword",
@@ -1688,6 +1691,7 @@ void Config::loadSystemRegisters()
     );
     storedPassword->setInputWidgetType(IWT_LineEdit);
     storedPassword->setVisible(false);
+    storedPassword->setExportable(false);
 
     ConfigItem* hardwareID1 = group->addConfigItem(
         "hardwareID1",
@@ -1697,6 +1701,7 @@ void Config::loadSystemRegisters()
     hardwareID1->setInputWidgetType(IWT_LineEdit);
     hardwareID1->setInputWidgetProperty("readOnly", true);
     hardwareID1->setVisible(false);
+    hardwareID1->setExportable(false);
 
     ConfigItem* hardwareID2 = group->addConfigItem(
         "hardwareID2",
@@ -1706,6 +1711,7 @@ void Config::loadSystemRegisters()
     hardwareID2->setInputWidgetType(IWT_LineEdit);
     hardwareID2->setInputWidgetProperty("readOnly", true);
     hardwareID2->setVisible(false);
+    hardwareID2->setExportable(false);
 
     ConfigItem* hardwareID3 = group->addConfigItem(
         "hardwareID3",
@@ -1715,6 +1721,7 @@ void Config::loadSystemRegisters()
     hardwareID3->setInputWidgetType(IWT_LineEdit);
     hardwareID3->setInputWidgetProperty("readOnly", true);
     hardwareID3->setVisible(false);
+    hardwareID3->setExportable(false);
 
     ConfigItem* cdKey1 = group->addConfigItem(
         "cdKey1",
@@ -1723,6 +1730,7 @@ void Config::loadSystemRegisters()
     );
     cdKey1->setInputWidgetType(IWT_LineEdit);
     cdKey1->setVisible(false);
+    cdKey1->setExportable(false);
 
     ConfigItem* cdKey2 = group->addConfigItem(
         "cdKey2",
@@ -1731,6 +1739,7 @@ void Config::loadSystemRegisters()
     );
     cdKey2->setInputWidgetType(IWT_LineEdit);
     cdKey2->setVisible(false);
+    cdKey2->setExportable(false);
 
     ConfigItem* cdKey3 = group->addConfigItem(
         "cdKey3",
@@ -1739,6 +1748,7 @@ void Config::loadSystemRegisters()
     );
     cdKey3->setInputWidgetType(IWT_LineEdit);
     cdKey3->setVisible(false);
+    cdKey3->setExportable(false);
 
     ConfigItem* sysRunTime = group->addConfigItem(
         "sysRunTime",
