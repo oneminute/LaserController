@@ -938,6 +938,7 @@ void SingleTransformUndoCommand::undo()
     //m_primitive->setTransform(m_lastTransform);
     utils::sceneTransformToItemTransform(m_lastTransform, m_primitive);
     m_tree->upDatePrimitive(m_primitive);
+    emit m_viewer->selectedChangedFromMouse();
     m_viewer->repaint();
 }
 
@@ -949,6 +950,7 @@ void SingleTransformUndoCommand::redo()
     }
     utils::sceneTransformToItemTransform(m_curTransform, m_primitive);
     m_tree->upDatePrimitive(m_primitive);
+    emit m_viewer->selectedChangedFromMouse();
     m_viewer->repaint();
 }
 

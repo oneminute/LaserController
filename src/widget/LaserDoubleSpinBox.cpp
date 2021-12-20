@@ -1,5 +1,7 @@
 #include "LaserDoubleSpinBox.h"
 #include<QDebug>
+#include "LaserApplication.h"
+#include "ui/LaserControllerWindow.h"
 
 LaserDoubleSpinBox::LaserDoubleSpinBox(QWidget * parent)
 	:QDoubleSpinBox(parent), m_isPressEnterKey(false), m_isValueChanged(false)
@@ -36,7 +38,7 @@ void LaserDoubleSpinBox::keyReleaseEvent(QKeyEvent * event)
         event->accept();
         emit enterOrLostFocus();
         m_isPressEnterKey = true;
-        //qDebug() << "keyReleaseEvent";
+        LaserApplication::mainWindow->labelPercentage()->setFocus();
         break;
     }
     }

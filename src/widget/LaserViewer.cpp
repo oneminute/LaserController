@@ -3358,15 +3358,12 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
     //清空选取区域
     for (QGraphicsItem *item : m_scene->document()->selectedPrimitives()) {
         LaserPrimitive* p_item = qgraphicsitem_cast<LaserPrimitive*>(item);
-        p_item->blockSignals(true);
         p_item->setSelected(false);
-        p_item->blockSignals(false);
         selectedList.insert(p_item, p_item->sceneTransform());
     }
 	m_group->setTransform(QTransform());
     
 	m_scene->clearSelection();
-	m_scene->blockSignals(false);
     viewport()->repaint();
 	emit m_scene->selectionChanged();
 	return selectedList;
@@ -3730,6 +3727,7 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
         else {
             m_group->setTransform(m_groupLastTransform);
         }
+        emit selectedChangedFromMouse();
         return;
     }
     //TransformUndoCommand
@@ -3979,11 +3977,17 @@ void LaserViewer::addText(QString str)
     //判断是否在4叉树的有效区域内
     if (!m_scene->maxRegion().contains(cursorLine.p1().toPoint()) || 
         !m_scene->maxRegion().contains(cursorLine.p2().toPoint())) {
-        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        LaserApplication::mainWindow->labelPercentage()->setFocus();
+        QMessageBox::StandardButton btn  =  QMessageBox::warning(LaserApplication::mainWindow, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        removeFrontText();
         //OverstepMessageBoxWarn msgBox;
         //msgBox.exec();
-        removeFrontText();
+        
     }
+    else {
+        m_scene->quadTreeNode()->upDatePrimitive(m_editingText);
+    }
+
     viewport()->repaint();
     
 }
@@ -4083,20 +4087,23 @@ bool LaserViewer::onSelectedFillGroup()
 	}
 	else
 	{
-		QList<LaserPrimitive*>list = m_scene->document()->selectedPrimitives();
-		if (list.isEmpty()) {
-			return false;
-		}
-		m_group = m_scene->createItemGroup(list);
-        connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
-		m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-		m_group->setSelected(true);
-		m_group->setZValue(1);
+		
+        createGroup();
 	}
 	//绘制操作柄之前先清理一下
 	m_selectedHandleList.clear();
-	m_curSelectedHandleIndex = -1;
+    m_curSelectedHandleIndex = -1;
+    
 	return true;
+}
+void LaserViewer::createGroup()
+{
+    QList<LaserPrimitive*>list = m_scene->document()->selectedPrimitives();
+    m_group = m_scene->createItemGroup(list);
+    connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
+    m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    m_group->setSelected(true);
+    m_group->setZValue(1);
 }
 //目前只在画完图元使用
 QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* item)
