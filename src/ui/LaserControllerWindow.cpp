@@ -2,6 +2,7 @@
 #include "ui_LaserControllerWindow.h"
 #include "widget/UndoCommand.h"
 #include "util/Utils.h"
+#include "widget/OverstepMessageBoxWarn.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -115,6 +116,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_MultiDuplicationVDistance(5)
     , m_maxRecentFilesSize(10)
     , m_alignTarget(nullptr)
+    , m_hasMessageBox(false)
 {
     m_ui->setupUi(this);
     loadRecentFilesMenu();
@@ -1357,6 +1359,11 @@ bool LaserControllerWindow::unitIsMM()
     return m_unitIsMM;
 }
 
+QLabel * LaserControllerWindow::labelPercentage()
+{
+    return m_labelPercentage;
+}
+
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
 {
     if (m_viewer) {
@@ -1378,16 +1385,31 @@ void LaserControllerWindow::onFontComboBoxHighLighted(int index)
 
 void LaserControllerWindow::onFontComboBoxActived(int index)
 {
+    if (!m_viewer->editingText()) {
+        return;
+    }
     m_viewer->setFocus();
+    QFont font = m_viewer->editingText()->font();
     if (m_fontComboxLightedIndex != index) {
         onFontComboBoxHighLighted(index);
+        //判断是否在4叉树的有效区域内
+        if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            m_viewer->editingText()->setFont(font);
+        
+        }
+        else {
+            m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+        }
     }
-    
-    //m_fontFamily->setIsChangedItem(true);
+   
 }
 
 void LaserControllerWindow::onAlignHBoxChanged(int index)
 {
+    if (!m_viewer->editingText()) {
+        return;
+    }
     int align;
     switch (index) {
         case 0: {
@@ -1405,18 +1427,33 @@ void LaserControllerWindow::onAlignHBoxChanged(int index)
         }
 
     }
+    int lastAlign = m_viewer->textAlignH();
     m_viewer->setTextAlignH(align);
-    if (m_viewer->editingText()) {
-        m_viewer->editingText()->setAlignH(align);
+    m_viewer->editingText()->setAlignH(align);
+    m_viewer->editingText()->modifyPathList();
+
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->setTextAlignH(lastAlign);
+        m_viewer->editingText()->setAlignH(lastAlign);
         m_viewer->editingText()->modifyPathList();
     }
-    m_viewer->modifyTextCursor();
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+        
+    }
+    
     m_viewer->viewport()->repaint();
     m_viewer->setFocus();
 }
 
 void LaserControllerWindow::onAlignVBoxChanged(int index)
 {
+    if (!m_viewer->editingText()) {
+        return;
+    }
     int align;
     switch (index) {
     case 0: {
@@ -1434,12 +1471,22 @@ void LaserControllerWindow::onAlignVBoxChanged(int index)
     }
 
     }
+    int lastAlign = m_viewer->textAlignV();
     m_viewer->setTextAlignV(align);
-    if (m_viewer->editingText()) {
-        m_viewer->editingText()->setAlignV(align);
+    m_viewer->editingText()->setAlignV(align);
+    m_viewer->editingText()->modifyPathList();
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->setTextAlignV(lastAlign);
+        m_viewer->editingText()->setAlignV(lastAlign);
         m_viewer->editingText()->modifyPathList();
     }
-    m_viewer->modifyTextCursor();
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+    }
+    
     m_viewer->viewport()->repaint();
     m_viewer->setFocus();
 }
@@ -1516,24 +1563,7 @@ void LaserControllerWindow::onChangeFontComboBoxByEditingText()
 
 void LaserControllerWindow::onFontComboBoxHidePopup()
 {
-    //qDebug() << m_fontFamily->currentText();
-
     onFontComboBoxHighLighted(m_fontFamily->currentIndex());
-    
-    
-    /*if (m_viewer) {
-        QString family = m_fontFamily->currentText();
-        m_viewer->textFont()->setFamily(family);
-        LaserText* text = m_viewer->editingText();
-        if (text) {
-            QFont font(text->font());
-            font.setFamily(family);
-            text->setFont(font);
-            m_viewer->modifyTextCursor();
-        }
-
-        m_viewer->viewport()->repaint();
-    }*/
 }
 
 void LaserControllerWindow::onFontHeightBoxEnterOrLostFocus()
@@ -1543,12 +1573,27 @@ void LaserControllerWindow::onFontHeightBoxEnterOrLostFocus()
         //qreal size = m_fontHeight->value() * 1000;
         m_viewer->textFont()->setPixelSize(size);
         LaserText* text = m_viewer->editingText();
+        if (!text) {
+            return;
+        }
+        QFont lastFont = text->font();
         if (text) {
             QFont font(text->font());
             font.setPixelSize(size);
             m_viewer->editingText()->setFont(font);
         }
-        m_viewer->modifyTextCursor();
+        //判断是否在4叉树的有效区域内
+        if (!m_scene->maxRegion().contains(text->sceneBoundingRect())) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            //OverstepMessageBoxWarn(this);
+            text->setFont(lastFont);
+            m_fontHeight->setValue(qRound(lastFont.pixelSize() * m_viewer->logicalDpiY() / 25400.0));
+        }
+        else {
+            m_viewer->modifyTextCursor();
+            m_scene->quadTreeNode()->upDatePrimitive(text);
+            
+        }
         m_viewer->setFocus();
         m_viewer->viewport()->repaint();
     }
@@ -1563,7 +1608,8 @@ void LaserControllerWindow::onFontBoldStateChanged()
     if(!text){
         return;
     }
-    QFont font(text->font());
+    QFont lastFont = text->font();
+    QFont font(lastFont);
     if (m_fontBold->isChecked()) {  
         if (text) {
             font.setBold(true);
@@ -1580,7 +1626,19 @@ void LaserControllerWindow::onFontBoldStateChanged()
         m_viewer->textFont()->setBold(false);
     }
     m_viewer->setFocus();
-    m_viewer->modifyTextCursor();
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->textFont()->setBold(lastFont.bold());
+        m_viewer->editingText()->setFont(lastFont);
+        m_fontBold->setChecked(lastFont.bold());
+    }
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+
+    }
+    
     m_viewer->viewport()->repaint();
 }
 
@@ -1590,7 +1648,8 @@ void LaserControllerWindow::onFontItalicStateChanged()
         return;
     }
     LaserText* text = m_viewer->editingText();
-    QFont font(text->font());
+    QFont lastFont = text->font();
+    QFont font(lastFont);
     if (m_fontItalic->isChecked()) {
         if (text) {
             font.setItalic(true);
@@ -1606,8 +1665,19 @@ void LaserControllerWindow::onFontItalicStateChanged()
         }
         m_viewer->textFont()->setItalic(false);
     }
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->textFont()->setItalic(lastFont.italic());
+        m_viewer->editingText()->setFont(lastFont);
+        m_fontItalic->setChecked(lastFont.italic());
+    }
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+    }
     m_viewer->setFocus();
-    m_viewer->modifyTextCursor();
+    
     m_viewer->viewport()->repaint();
 }
 
@@ -1617,7 +1687,8 @@ void LaserControllerWindow::onFontUpperStateChanged()
         return;
     }
     LaserText* text = m_viewer->editingText();
-    QFont font(text->font());
+    QFont lastFont = text->font();
+    QFont font(lastFont);
     if (m_fontUpper->isChecked()) {
         if (text) {
             font.setCapitalization(QFont::AllUppercase);
@@ -1634,7 +1705,17 @@ void LaserControllerWindow::onFontUpperStateChanged()
         m_viewer->textFont()->setCapitalization(QFont::MixedCase);
     }
     m_viewer->setFocus();
-    m_viewer->modifyTextCursor();
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->editingText()->setFont(lastFont);
+        m_viewer->textFont()->setCapitalization(lastFont.capitalization());
+        m_fontUpper->setChecked(lastFont.capitalization());
+    }
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+    }
     m_viewer->viewport()->repaint();
 }
 
@@ -1643,14 +1724,25 @@ void LaserControllerWindow::onFontSpaceXEnterOrLostFocus()
     if (!m_viewer->editingText()) {
         return;
     }
+    QFont lastFont = m_viewer->editingText()->font();
     QFont font = m_viewer->editingText()->font();
     qreal size = qRound(m_fontSpaceX->value() * 25400.0 / m_viewer->logicalDpiY());
     font.setLetterSpacing(QFont::AbsoluteSpacing, size);
     m_viewer->editingText()->setFont(QFont(font));
     m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing, size);
-
     m_viewer->setFocus();
-    m_viewer->modifyTextCursor();
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->editingText()->setFont(lastFont);
+        m_viewer->textFont()->setLetterSpacing(QFont::AbsoluteSpacing, lastFont.letterSpacing());
+        m_fontSpaceX->setValue(qRound(lastFont.letterSpacing() / 25400.0 * m_viewer->logicalDpiY()));
+    }
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+    }
+    
     m_viewer->viewport()->repaint();
 }
 
@@ -1659,15 +1751,23 @@ void LaserControllerWindow::onFontSpaceYEnterOrLostFocus()
     if (!m_viewer->editingText()) {
         return;
     }
-    //QFont font = m_viewer->editingText()->font();
-    //font.setWordSpacing(m_fontSpaceY->value());
+    qreal lastSize = m_viewer->editingText()->spaceY();
     qreal size = qRound(m_fontSpaceY->value() * 25400.0 / m_viewer->logicalDpiY());
     m_viewer->editingText()->setSpacceY(size);
     m_viewer->editingText()->modifyPathList();
-    //m_viewer->textFont()->setWordSpacing(size);
-
+    //判断是否在4叉树的有效区域内
+    if (!m_scene->maxRegion().contains(m_viewer->editingText()->sceneBoundingRect())) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        m_viewer->editingText()->setSpacceY(lastSize);
+        m_viewer->editingText()->modifyPathList();
+        m_fontSpaceY->setValue(qRound(lastSize / 25400.0 * m_viewer->logicalDpiY()));
+    }
+    else {
+        m_viewer->modifyTextCursor();
+        m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+    }
+    
     m_viewer->setFocus();
-    m_viewer->modifyTextCursor();
     m_viewer->viewport()->repaint();
 }
 
@@ -3140,7 +3240,7 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 				}
 				else if (m_lastState == StateControllerInst.documentIdleState()) {
 					emit isIdle();
-				}
+                }
 				m_lastState = nullptr;
 				m_viewer->viewport()->repaint();
 			}
@@ -3149,9 +3249,8 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
             }
 			break;
 		}
-        case Qt::Key_Alt: {
+        case Qt::Key_Enter: {
             
-
         }
 	}
 	

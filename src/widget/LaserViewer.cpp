@@ -3730,6 +3730,7 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
         else {
             m_group->setTransform(m_groupLastTransform);
         }
+        emit selectedChangedFromMouse();
         return;
     }
     //TransformUndoCommand
@@ -3979,11 +3980,17 @@ void LaserViewer::addText(QString str)
     //判断是否在4叉树的有效区域内
     if (!m_scene->maxRegion().contains(cursorLine.p1().toPoint()) || 
         !m_scene->maxRegion().contains(cursorLine.p2().toPoint())) {
-        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        LaserApplication::mainWindow->labelPercentage()->setFocus();
+        QMessageBox::StandardButton btn  =  QMessageBox::warning(LaserApplication::mainWindow, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        removeFrontText();
         //OverstepMessageBoxWarn msgBox;
         //msgBox.exec();
-        removeFrontText();
+        
     }
+    else {
+        m_scene->quadTreeNode()->upDatePrimitive(m_editingText);
+    }
+
     viewport()->repaint();
     
 }

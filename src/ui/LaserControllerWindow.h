@@ -58,6 +58,7 @@ class LaserControllerWindow : public QMainWindow
 public:
     LaserControllerWindow(QWidget* parent = nullptr);
     ~LaserControllerWindow();
+    bool m_hasMessageBox;
 
     FinishRunType finishRun();
 
@@ -97,6 +98,7 @@ public:
     void setAlignTargetState(bool isAlignTarget);
     //selection property
     bool unitIsMM();
+    QLabel* labelPercentage();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -632,6 +634,7 @@ private:
     QWidget * m_textFontWidget;
     LaserFontComboBox* m_fontFamily;
     LaserDoubleSpinBox* m_fontHeight;
+    
     QComboBox* m_fontAlignX;
     QComboBox* m_fontAlignY;
     QCheckBox* m_fontBold;
