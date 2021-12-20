@@ -111,6 +111,8 @@ QJsonObject ConfigItemGroup::toJson() const
     QJsonObject group;
     for (ConfigItem* item : d->items)
     {
+        if (!item->exportable())
+            continue;
         group[item->name()] = item->toJson();
     }
     return group;
@@ -124,6 +126,8 @@ void ConfigItemGroup::fromJson(const QJsonObject& jsonObject)
         if (d->itemsMap.contains(i.key()))
         {
             ConfigItem* item = d->itemsMap[i.key()];
+            if (!item->exportable())
+                continue;
             item->fromJson(i.value().toObject());
             qLogD << *item;
         }

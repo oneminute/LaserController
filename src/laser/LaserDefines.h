@@ -92,11 +92,11 @@ enum LaserErrorCode
     E_InadequatePermissions,
 
     E_SendEmailFailed,
-    E_MainlboxInvalid,
-    E_MailBoxAccountError,
+    E_MailboxInvalid,
+    E_MailboxAccountError,
     E_ActiveCodeInvalid,
     E_ValidateCodeInvalid,
-    E_MailBoxNameInvalid
+    E_MailboxNameInvalid
 };
 
 enum LaserEventType

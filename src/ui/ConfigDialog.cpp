@@ -161,15 +161,15 @@ ConfigDialog::ConfigDialog(QWidget* parent)
             if (Config::SystemRegister::group->isModified())
             {
                 // show password input dialog
-                QString password = QInputDialog::getText(
+                /*QString password = QInputDialog::getText(
                     this,
                     tr("Manufacture Password"),
                     tr("Password"),
                     QLineEdit::Normal
                 );
                 if (password.isEmpty())
-                    return false;
-                return LaserApplication::device->writeSystemRegisters(password);
+                    return false;*/
+                return LaserApplication::device->writeSystemRegisters(m_password);
             }
             return false;
         }
@@ -664,6 +664,7 @@ void ConfigDialog::onButtonPasswordClicked(bool checked)
     {
         // 验证成功
         m_passwordTimer.start(10000);
+        m_password = m_editPassword->text();
         m_ui->stackedWidgetPanels->setCurrentWidget(m_systemPage);
         m_editPassword->clear();
         m_errorCount = 0;
