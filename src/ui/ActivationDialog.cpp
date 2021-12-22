@@ -29,6 +29,7 @@ ActivationDialog::ActivationDialog(QWidget* parent)
 
     connect(&m_sendTimer, &QTimer::timeout, this, &ActivationDialog::onSendTimerTimeout);
     connect(&m_updateTimer, &QTimer::timeout, this, &ActivationDialog::onUpdateTimerTimeout);
+    connect(LaserApplication::device, &LaserDevice::activeFailed, this, &ActivationDialog::onActiveFailed);
 
     //QMovie* loading = new QMovie(":/ui/icons/images/loading_anim.gif");
     //m_ui->labelIcon->setMovie(loading);
@@ -67,15 +68,12 @@ void ActivationDialog::onPushButtonSendClicked(bool checked)
         m_updateTimer.setInterval(250);
         m_updateTimer.start();
         m_ui->pushButtonSend->setEnabled(false);
-        //QMessageBox::information(this, tr("Sent successfully"), tr("Sent successfully. Please check your mail box to receive the activation code."));
-        m_ui->labelStatus->setText(tr("Sent successfully"));
-        m_ui->labelDescription->setText(tr("Please check your mail box to receive the activation code."));
+        m_ui->lineEditCode->setFocus();
+        m_ui->labelTips->setText(tr("Sent successfully!\nPlease check your mail box to receive the activation code."));
     }
     else
     {
-        //QMessageBox::warning(this, tr("Sent failure"), tr("Please check your email or network connection."));
-        m_ui->labelStatus->setText(tr("Sent Failure"));
-        m_ui->labelDescription->setText(tr("Please check your email address or network connection."));
+        m_ui->labelTips->setText(tr("Sent Failure!\nPlease check your email address or network connection."));
     }
 }
 
@@ -123,27 +121,29 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
             m_ui->lineEditMail->text(),
             m_ui->lineEditCode->text(),
             m_ui->lineEditUserName->text(),
-            m_ui->lineEditTelephone->text(),
-            m_ui->lineEditAddress->text(),
-            m_ui->lineEditQQ->text(),
-            m_ui->lineEditWechat->text(),
-            m_ui->lineEditCountry->text(),
-            m_ui->comboBoxDistributor->currentText(),
-            m_ui->comboBoxBrand->currentText(),
-            m_ui->comboBoxModel->currentText()
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
         );
         m_ui->pushButtonActivate->setEnabled(false);
         if (!result.isEmpty())
         {
-            m_ui->labelTips->setStyleSheet("color: rgb(0, 255, 0);font: 12pt;");
+            m_ui->labelTips->setStyleSheet("color: rgb(0, 255, 0);font: 9pt;");
             m_ui->labelTips->setText(tr("Activation successful!"));
             emit LaserApplication::device->mainCardActivationChanged(true);
         }
         else
         {
-            m_ui->labelTips->setStyleSheet("color: rgb(255, 0, 0);font: 12pt;");
-            m_ui->labelTips->setText(tr("Activation failure!"));
+            m_errorMsgs.append(tr("Activation failure!"));
+            m_ui->labelTips->setStyleSheet("color: rgb(255, 0, 0);font: 9pt;");
+            m_ui->labelTips->setText(m_errorMsgs.join("\n"));
             m_ui->pushButtonActivate->setEnabled(true);
+            m_errorMsgs.clear();
             emit LaserApplication::device->mainCardActivationChanged(false);
         }
     }
@@ -206,6 +206,7 @@ void ActivationDialog::onFieldTextEdited(const QString& text)
         errorMsg.append(tr("Invalid User Name!"));
     }
 
+    m_ui->labelTips->setStyleSheet("color: rgb(255, 0, 0);font: 9pt;");
     m_ui->labelTips->setText(errorMsg);
 
     if (mailValid && codeValid && userNameValid)
@@ -223,14 +224,43 @@ void ActivationDialog::onSendTimerTimeout()
     m_sendTimer.stop();
     m_updateTimer.stop();
     m_ui->pushButtonSend->setText(tr("Send"));
-    validateMail();
+    onFieldTextEdited("");
 }
 
 void ActivationDialog::onUpdateTimerTimeout()
 {
     if (m_sendTimer.isActive())
     {
-        m_ui->pushButtonSend->setText(tr("Send(%1)").arg(m_sendTimer.remainingTime() * 0.001));
+        m_ui->pushButtonSend->setText(tr("Send(%1)").arg(qFloor(m_sendTimer.remainingTime() * 0.001)));
     }
+}
+
+void ActivationDialog::onActiveFailed(int reason)
+{
+    switch (reason)
+    {
+    case E_SendEmailFailed:
+        m_errorMsgs.append(tr("Send Email Failed!"));
+        break;
+    case E_MailboxInvalid:
+        m_errorMsgs.append(tr("Invalid email address!"));
+        break;
+    case E_MailboxAccountError:
+        m_errorMsgs.append(tr("Invalid email account!"));
+        break;
+    case E_ActiveCodeInvalid:
+        m_errorMsgs.append(tr("Active code expired!"));
+        break;
+    case E_ValidateCodeInvalid:
+        m_errorMsgs.append(tr("Invalid validation code!"));
+        break;
+    case E_MailboxNameInvalid:
+        m_errorMsgs.append(tr("Invalid emailbox name!"));
+        break;
+    }
+    //m_ui->labelTips->setStyleSheet("color: rgb(255, 0, 0);font: 9pt;");
+    //m_ui->pushButtonActivate->setEnabled(true);
+    //onFieldTextEdited("");
+    emit LaserApplication::device->mainCardActivationChanged(false);
 }
 

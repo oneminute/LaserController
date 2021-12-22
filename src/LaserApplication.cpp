@@ -133,6 +133,7 @@ void LaserApplication::destroy()
     g_deviceThread.exit();
     g_deviceThread.wait();
 
+    clearCrash();
     Config::destroy();
 
     qDeleteAll(translators);
