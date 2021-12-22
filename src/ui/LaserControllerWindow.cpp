@@ -230,8 +230,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     toolButtonPolygonTool->setDefaultAction(m_ui->actionPolygonTool);
     toolButtonTextTool->setDefaultAction(m_ui->actionTextTool); 
     toolButtonLineTool->setDefaultAction(m_ui->actionLineTool);
-    toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
-	toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
+    //toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
+	//toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
+    //toolButtonSplineTool->setDisabled(true);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
     //arrange align
     //center align
@@ -334,7 +335,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonPolygonTool);
     m_ui->toolBarTools->addWidget(toolButtonTextTool);
     m_ui->toolBarTools->addWidget(toolButtonLineTool);
-    m_ui->toolBarTools->addWidget(toolButtonSplineTool);
+    //m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
 
@@ -4642,10 +4643,14 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
     if (items.length() > 0) {
         m_propertyWidget->setEnabled(true);
         m_arrangeMoveToPage->setEnabled(true);
+        m_ui->actionMirrorHorizontal->setEnabled(true);
+        m_ui->actionMirrorVertical->setEnabled(true);
     }
     else {
         m_propertyWidget->setEnabled(false);
         m_arrangeMoveToPage->setEnabled(false);
+        m_ui->actionMirrorHorizontal->setEnabled(false);
+        m_ui->actionMirrorVertical->setEnabled(false);
     }
     //joinedGroupButtonsChanged
     if (items.length() > 1) {

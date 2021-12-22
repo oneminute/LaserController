@@ -449,19 +449,19 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", true, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionSplineTool
 
     // begin m_ui->actionEditSplineTool
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", false, documentIdleState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentViewDragState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveRectState);
@@ -758,16 +758,45 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionCut
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCut
 
     // begin m_ui->actionCopy
     BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCopy
 
     // begin m_ui->actionPaste
     BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionPaste
 
     // begin m_ui->actionPasteInPlace
@@ -985,55 +1014,40 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionUndo
     BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", true, documentIdleState);
     // end m_ui->actionUndo
 
     // begin m_ui->actionRedo
     BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionRedo
 
     // begin m_ui->actionMirrorHorizontal
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorHorizontal
 
     // begin m_ui->actionMirrorVertical
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorVertical
 
     // begin m_ui->actionGroup
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, documentViewDragState);
     // end m_ui->actionGroup
 
     // begin m_ui->actionUngroup
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionUngroup, "enabled", false, documentViewDragState);
     // end m_ui->actionUngroup
 
     // begin m_ui->actionDuplication
@@ -1070,8 +1084,6 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", true, documentSelectedState);
-    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentViewDragState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveRectState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveEllipseState);
