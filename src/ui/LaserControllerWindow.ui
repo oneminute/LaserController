@@ -176,6 +176,7 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomToSelection"/>
    <addaction name="separator"/>
+   <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
   </widget>
@@ -1726,6 +1727,18 @@
    </property>
    <property name="toolTip">
     <string>Distribute H-Spaced</string>
+   </property>
+  </action>
+  <action name="actionPrimitiveWeld">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/ui/icons/images/primitive_weld.png</normaloff>:/ui/icons/images/primitive_weld.png</iconset>
+   </property>
+   <property name="text">
+    <string>Primitive Weld</string>
+   </property>
+   <property name="toolTip">
+    <string>Primitive Weld</string>
    </property>
   </action>
  </widget>

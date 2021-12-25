@@ -4548,11 +4548,35 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    if (scene()->document() != nullptr) {
+    /*if (scene()->document() != nullptr) {
         onActionCloseDocument();
     }
-    QMainWindow::closeEvent(event);
 
+    QMainWindow::closeEvent(event);*/
+    QMessageBox msgBox(QMessageBox::NoIcon,
+        tr("Close softeware?"), tr("Do you want to save current document,before close softeware?"),
+        QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
+    msgBox.setButtonText(QMessageBox::Save, tr("Save"));
+    msgBox.setButtonText(QMessageBox::Close, tr("Close"));
+    msgBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
+    int result = msgBox.exec();
+    switch (result) {
+        case QMessageBox::StandardButton::Save: {
+            onActionSave();
+            event->accept();
+            //QMainWindow::closeEvent(event);
+            break;
+        }
+        case QMessageBox::StandardButton::Close: {
+            event->accept();
+            //QMainWindow::closeEvent(event);
+            break;
+        }
+        default: {
+            event->ignore();
+        }
+    }
+   
 }
 
 void LaserControllerWindow::onEnterDeviceUnconnectedState()
