@@ -590,7 +590,7 @@ void QSvgStyle::apply(QPainter *p, const QSvgNode *node, QSvgExtraStates &states
     if (!animateTransforms.isEmpty()) {
         qreal totalTimeElapsed = node->document()->currentElapsed();
         // Find the last animateTransform with additive="replace", since this will override all
-        // previous animateTransforms.
+        // moveToPreviousPage animateTransforms.
         QList<QSvgRefCounter<QSvgAnimateTransform> >::const_iterator itr = animateTransforms.constEnd();
         do {
             --itr;

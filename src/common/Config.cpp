@@ -369,6 +369,13 @@ void Config::loadCameraItems()
     );
     minCalibrationFrames->setInputWidgetProperty("minimum", 10);
     minCalibrationFrames->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* calibrationAutoCapture = group->addConfigItem(
+        "calibrationAutoCapture",
+        false,
+        DT_BOOL
+    );
+    calibrationAutoCapture->setInputWidgetType(IWT_CheckBox);
 }
 
 void Config::loadUiItems()
@@ -2536,6 +2543,10 @@ void Config::updateTitlesAndDescriptions()
     Camera::minCalibrationFramesItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Min calibration frames", nullptr), 
         QCoreApplication::translate("Config", "Min calibration frames", nullptr));
+
+    Camera::calibrationAutoCaptureItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Calibration Auto Capture", nullptr), 
+        QCoreApplication::translate("Config", "Calibration Auto Capture", nullptr));
 
     Ui::operationButtonIconSizeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Operation Button Icon Size(px)", nullptr), 

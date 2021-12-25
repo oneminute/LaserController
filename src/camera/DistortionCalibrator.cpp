@@ -6,6 +6,7 @@
 DistortionCalibrator::DistortionCalibrator(QObject* parent)
     : QObject(parent)
     , winSize(11)
+    , m_requestCalibration(false)
 {
 
 }
@@ -83,6 +84,7 @@ bool DistortionCalibrator::process(cv::Mat& mat)
         found = false;
         break;
     }
+    qLogD << "point buf size: " << pointBuf.size();
     //! [find_pattern]
     //! [pattern_found]
     if (found)                // If done with success,
@@ -98,9 +100,15 @@ bool DistortionCalibrator::process(cv::Mat& mat)
 
         // Draw the corners.
         drawChessboardCorners(view, boardSize, cv::Mat(pointBuf), found);
+
+        if (m_requestCalibration)
+        {
+            
+            m_imagePoints.push_back(pointBuf);
+        }
     }
     //! [pattern_found]
-    
+
     return true;
 }
 
@@ -119,16 +127,20 @@ bool DistortionCalibrator::undistortImage(cv::Mat& inMat)
     return false;
 }
 
-bool DistortionCalibrator::calibration(cv::Size imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs, std::vector<std::vector<cv::Point2f>> imagePoints, float grid_width, bool release_object)
+bool DistortionCalibrator::calibration()
 {
+    cv::Size imageSize;
+    cv::Mat cameraMatrix;
+    cv::Mat distCoeffs;
     std::vector<cv::Mat> rvecs, tvecs;
     std::vector<float> reprojErrs;
     double totalAvgErr = 0;
     std::vector<cv::Point3f> newObjPoints;
 
     bool ok = false;
-    ok = runCalibration(imageSize, cameraMatrix, distCoeffs, imagePoints, rvecs, tvecs, reprojErrs,
-        totalAvgErr, newObjPoints, grid_width, release_object);
+    ok = runCalibration(imageSize, cameraMatrix, distCoeffs, m_imagePoints, rvecs, tvecs, 
+        reprojErrs, totalAvgErr, newObjPoints, 
+        (Config::Camera::hCornersCount() - 1) * Config::Camera::squareSize(), false);
     qLogD << (ok ? "Calibration succeeded" : "Calibration failed") << ". avg re projection error = " << totalAvgErr << endl;
 
     this->cameraMatrix = cameraMatrix;
@@ -140,7 +152,10 @@ bool DistortionCalibrator::calibration(cv::Size imageSize, cv::Mat& cameraMatrix
     return ok;
 }
 
-bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs, std::vector<std::vector<cv::Point2f>> imagePoints, std::vector<cv::Mat>& rvecs, std::vector<cv::Mat>& tvecs, std::vector<float>& reprojErrs, double& totalAvgErr, std::vector<cv::Point3f>& newObjPoints, float grid_width, bool release_object)
+bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
+    std::vector<std::vector<cv::Point2f>> imagePoints, std::vector<cv::Mat>& rvecs, std::vector<cv::Mat>& tvecs,
+    std::vector<float>& reprojErrs, double& totalAvgErr, std::vector<cv::Point3f>& newObjPoints, 
+    float grid_width, bool release_object)
 {
     bool ok = false;
     //! [fixed_aspect]
@@ -258,4 +273,10 @@ void DistortionCalibrator::calcBoardCornerPositions(cv::Size boardSize, float sq
         break;
     }
 }
+
+void DistortionCalibrator::requestCalibration()
+{
+    m_requestCalibration = true;
+}
+
 

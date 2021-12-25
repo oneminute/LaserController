@@ -263,6 +263,7 @@ protected slots:
     void onActionRedLightAlignmentFinish(bool checked = false);
 
     void onActionCameraTools(bool checked = false);
+    void onActionCameraCalibration();
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -352,6 +353,7 @@ protected slots:
     void onActionMovePageToRight();
     void onActionSelectAll();
     void onActionInvertSelect();
+
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
     void onJoinedGroupChanged();

@@ -6,6 +6,8 @@
 #include <QQueue>
 #include <QImage>
 #include <QMutex>
+#include <QTimer>
+#include <QCameraInfo>
 #include <opencv2/opencv.hpp>
 
 class ImageProcessor;
@@ -39,6 +41,11 @@ public:
     void installProcessor(ImageProcessor* processor);
     void uninstallProcessor(ImageProcessor* processor);
 
+    void autoLoading() const;
+    void setAutoLoading(bool value);
+
+    static QList<int> supportedCameras();
+
 protected:
     void run() override;
     void addImage(const cv::Mat& mat);
@@ -48,7 +55,11 @@ public slots:
     void stop();
     bool load(int cameraIndex);
 
+protected slots:
+
 signals:
+    void connected();
+    void disconnected();
     void frameCaptured();
     void error();
 
@@ -60,6 +71,7 @@ private:
     int m_maxQueueLength;
     CameraStatus m_status;
     QList<ImageProcessor*> m_processors;
+    bool m_autoLoading;
 };
 
 #endif // CAMERACONTROLLER_H

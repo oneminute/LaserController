@@ -11,6 +11,13 @@
 #include <opencv2/calib3d.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+struct CalibratorItem
+{
+    cv::Mat sample;
+    qreal confidence;
+    cv::Mat3f transform;
+};
+
 class DistortionCalibrator : public QObject, public ImageProcessor
 {
     Q_OBJECT
@@ -24,8 +31,7 @@ public:
 
     bool undistortImage(cv::Mat& inMat);
 
-    bool calibration(cv::Size imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
-        std::vector<std::vector<cv::Point2f>> imagePoints, float grid_width, bool release_object);
+    bool calibration();
 
     double computeReprojectionErrors(const std::vector<std::vector<cv::Point3f> >& objectPoints,
         const std::vector<std::vector<cv::Point2f> >& imagePoints,
@@ -36,11 +42,15 @@ public:
     void calcBoardCornerPositions(cv::Size boardSize, float squareSize, std::vector<cv::Point3f>& corners,
         CalibrationPattern patternType /*= Settings::CHESSBOARD*/);
 
+    void requestCalibration();
+
 protected:
     bool runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
         std::vector<std::vector<cv::Point2f> > imagePoints, std::vector<cv::Mat>& rvecs, std::vector<cv::Mat>& tvecs,
         std::vector<float>& reprojErrs, double& totalAvgErr, std::vector<cv::Point3f>& newObjPoints,
         float grid_width, bool release_object);
+
+
 
 private:
     float aspectRatio;           // The aspect ratio
@@ -63,7 +73,9 @@ private:
     cv::Mat cameraMatrix;
     cv::Mat distCoeffs;
 
-    QList<cv::Mat> m_images;
+    bool m_requestCalibration;
+    QList<CalibratorItem> m_samples;
+    std::vector<std::vector<cv::Point2f>> m_imagePoints;
 };
 
 #endif // DISTORTIONCALIBRATOR_H
