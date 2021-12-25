@@ -231,8 +231,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     toolButtonPolygonTool->setDefaultAction(m_ui->actionPolygonTool);
     toolButtonTextTool->setDefaultAction(m_ui->actionTextTool); 
     toolButtonLineTool->setDefaultAction(m_ui->actionLineTool);
-    toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
-	toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
+    //toolButtonSplineTool->setDefaultAction(m_ui->actionSplineTool);
+	//toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
+    //toolButtonSplineTool->setDisabled(true);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
     //arrange align
     //center align
@@ -335,7 +336,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonPolygonTool);
     m_ui->toolBarTools->addWidget(toolButtonTextTool);
     m_ui->toolBarTools->addWidget(toolButtonLineTool);
-    m_ui->toolBarTools->addWidget(toolButtonSplineTool);
+    //m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
 
@@ -4555,11 +4556,35 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    if (scene()->document() != nullptr) {
+    /*if (scene()->document() != nullptr) {
         onActionCloseDocument();
     }
-    QMainWindow::closeEvent(event);
 
+    QMainWindow::closeEvent(event);*/
+    QMessageBox msgBox(QMessageBox::NoIcon,
+        tr("Close softeware?"), tr("Do you want to save current document,before close softeware?"),
+        QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
+    msgBox.setButtonText(QMessageBox::Save, tr("Save"));
+    msgBox.setButtonText(QMessageBox::Close, tr("Close"));
+    msgBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
+    int result = msgBox.exec();
+    switch (result) {
+        case QMessageBox::StandardButton::Save: {
+            onActionSave();
+            event->accept();
+            //QMainWindow::closeEvent(event);
+            break;
+        }
+        case QMessageBox::StandardButton::Close: {
+            event->accept();
+            //QMainWindow::closeEvent(event);
+            break;
+        }
+        default: {
+            event->ignore();
+        }
+    }
+   
 }
 
 void LaserControllerWindow::onEnterDeviceUnconnectedState()
@@ -4650,10 +4675,14 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
     if (items.length() > 0) {
         m_propertyWidget->setEnabled(true);
         m_arrangeMoveToPage->setEnabled(true);
+        m_ui->actionMirrorHorizontal->setEnabled(true);
+        m_ui->actionMirrorVertical->setEnabled(true);
     }
     else {
         m_propertyWidget->setEnabled(false);
         m_arrangeMoveToPage->setEnabled(false);
+        m_ui->actionMirrorHorizontal->setEnabled(false);
+        m_ui->actionMirrorVertical->setEnabled(false);
     }
     //joinedGroupButtonsChanged
     if (items.length() > 1) {

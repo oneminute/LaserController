@@ -3894,6 +3894,7 @@ void LaserViewer::init()
     ADD_TRANSITION(documentSelectedState, documentSelectingState, this, &LaserViewer::beginSelecting);
     ADD_TRANSITION(documentSelectedState, documentSelectedEditingState, this, &LaserViewer::beginSelectedEditing);
 	ADD_TRANSITION(documentIdleState, documentSelectedState, this, &LaserViewer::endSelecting);
+    //ADD_TRANSITION(documentPrimitiveState, documentSelectedState, this, &LaserViewer::endSelecting);
 
     ADD_TRANSITION(documentSelectedEditingState, documentSelectedState, this, &LaserViewer::endSelectedEditing);
 
@@ -4553,10 +4554,11 @@ void LaserViewer::onDocumentIdle()
 		int size = items.size();
 		if (items.size() > 0) {
 			emit endSelecting();
-            return;
+            //return;
 		}
 
 	}
+
 	viewport()->repaint();
 }
 
