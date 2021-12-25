@@ -69,35 +69,88 @@ void CameraController::uninstallProcessor(ImageProcessor* processor)
     m_processors.removeOne(processor);
 }
 
+void CameraController::autoLoading() const
+{
+}
+
+void CameraController::setAutoLoading(bool value)
+{
+}
+
+QList<int> CameraController::supportedCameras()
+{
+    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+    QList<int> supportedCameraIndices;
+    int index = 0;
+    for (const QCameraInfo& cameraInfo : cameras)
+    {
+        if (cameraInfo.description().toLower().contains("lightburn"))
+        {
+            supportedCameraIndices.append(index);
+        }
+        index++;
+    }
+    return supportedCameraIndices;
+}
+
 void CameraController::run()
 {
     cv::Mat frame;
     m_status = CS_STARTED;
+    int errorCount = 0;
     while (m_status == CS_STARTED)
     {
-        m_videoCapture->read(frame);
-        if (frame.empty())
+        if (m_videoCapture->isOpened())
         {
-            emit error();
-            continue;
-        }
-
-        bool done = true;
-        for (ImageProcessor* processor : m_processors)
-        {
-            if (!processor->process(frame))
+            while (m_status == CS_STARTED)
             {
-                done = false;
-                emit error();
-                break;
+                bool ok = m_videoCapture->read(frame);
+                if (!ok || frame.empty())
+                {
+                    emit error();
+                    errorCount++;
+                    if (errorCount >= 1)
+                    {
+                        qLogW << "Camera disconnected!";
+                        m_videoCapture->release();
+                        emit disconnected();
+                        break;
+                    }
+                    continue;
+                }
+
+                bool done = true;
+                for (ImageProcessor* processor : m_processors)
+                {
+                    if (!processor->process(frame))
+                    {
+                        done = false;
+                        emit error();
+                        break;
+                    }
+                }
+
+                if (done)
+                {
+                    addImage(frame);
+                    emit frameCaptured();
+                }
+            }
+        }
+        else
+        {
+            QList<int> cameraIndices = supportedCameras();
+            if (!cameraIndices.empty())
+            {
+                if (m_videoCapture->open(cameraIndices.first(), cv::CAP_ANY))
+                {
+                    setResolution(Config::Camera::resolution());
+                    emit connected();
+                }
             }
         }
 
-        if (done)
-        {
-            addImage(frame);
-            emit frameCaptured();
-        }
+        QThread::currentThread()->msleep(500);
     }
 }
 
@@ -139,7 +192,7 @@ bool CameraController::load(int cameraIndex)
     if (m_status != CS_IDLE)
         return true;
 
-    m_cameraIndex = cameraIndex;
+    /*m_cameraIndex = cameraIndex;
 
     m_videoCapture->open(m_cameraIndex, cv::CAP_ANY);
     if (!m_videoCapture->isOpened())
@@ -147,11 +200,11 @@ bool CameraController::load(int cameraIndex)
         qLogW << "Cannot open camera " << m_cameraIndex;
         m_status = CS_IDLE;
         return false;
-    }
+    }*/
 
-    setResolution(Config::Camera::resolution());
+    //setResolution(Config::Camera::resolution());
+    m_status = CS_LOADED;
 
     return true;
 }
-
 

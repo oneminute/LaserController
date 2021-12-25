@@ -314,6 +314,7 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
     else
     {
         m_cameraController->stop();
+        m_cameraController->uninstallProcessor(m_calibrator);
         SAFE_DELETE(m_calibrator);
         m_actionConnectCamera->setText(tr("Connect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/connect.png")));

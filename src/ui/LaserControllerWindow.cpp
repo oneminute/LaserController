@@ -71,6 +71,7 @@
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
 #include "ui/CameraToolsWindow.h"
+#include "ui/CalibrationDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -795,6 +796,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionPrintAndCutEndSelect, &QAction::triggered, this, &LaserControllerWindow::onActionPrintAndCutEndSelect);
 
     connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
+    connect(m_ui->actionCameraCalibration, &QAction::triggered, this, &LaserControllerWindow::onActionCameraCalibration);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -4501,6 +4503,12 @@ void LaserControllerWindow::onActionCameraTools(bool checked)
 {
     CameraToolsWindow* ctWindow = new CameraToolsWindow(this);
     ctWindow->show();
+}
+
+void LaserControllerWindow::onActionCameraCalibration()
+{
+    CalibrationDialog dlg;
+    dlg.exec();
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)

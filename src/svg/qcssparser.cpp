@@ -2716,7 +2716,7 @@ bool Parser::parseFunction(QString *name, QString *args)
         args->append(symbols.at(i).lexem());
     /*
     if (!nextExpr(&arguments)) return false;
-    if (!next(RPAREN)) return false;
+    if (!moveToNextPage(RPAREN)) return false;
     */
     skipSpace();
     return true;

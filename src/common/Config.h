@@ -120,6 +120,7 @@ public:
         CONFIG_ITEM(camera, squareSize, int, toInt)
         CONFIG_ITEM_T(camera, calibrationPattern, CalibrationPattern)
         CONFIG_ITEM(camera, minCalibrationFrames, int, toInt)
+        CONFIG_ITEM(camera, calibrationAutoCapture, bool, toBool)
 
         friend class Config;
     };

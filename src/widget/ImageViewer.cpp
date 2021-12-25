@@ -41,6 +41,8 @@ void ImageViewer::setImage(const QPixmap& image)
 {
     m_image = image;
     m_labelImage->setPixmap(m_image);
+    //m_labelImage->resize(m_image.size());
+    m_labelImage->resize(m_scaleFactor * m_labelImage->pixmap()->size());
     m_labelImage->update();
 }
 

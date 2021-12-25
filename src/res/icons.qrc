@@ -120,5 +120,11 @@
         <file>images/selecte_all.png</file>
         <file>images/z_origin.png</file>
         <file>images/camera_capture.png</file>
+        <file>images/circle.png</file>
+        <file>images/tick.png</file>
+        <file>images/circle_point.png</file>
+        <file>images/adjust_focal.png</file>
+        <file>images/calibration_chessboard.png</file>
+        <file>images/calibration_guide.png</file>
     </qresource>
 </RCC>
