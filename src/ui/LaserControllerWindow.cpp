@@ -1008,7 +1008,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionSelectAll, &QAction::triggered, this, &LaserControllerWindow::onActionSelectAll);
     connect(m_ui->actionInvertSelection, &QAction::triggered, this, &LaserControllerWindow::onActionInvertSelect);
     //shapes weld/ two shapes unite
-    connect(m_ui->actionUnitTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
+    connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
     //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -1359,12 +1359,12 @@ void LaserControllerWindow::setAlignTargetState(bool isAlignTarget)
     }
 }
 
-void LaserControllerWindow::changeShapesWeldButtonsEnable()
+/*void LaserControllerWindow::changeShapesWeldButtonsEnable()
 {
     LaserPrimitiveGroup*g = m_viewer->group();
     QList<QGraphicsItem*> items = m_viewer->group()->childItems();
     if (items.size() < 2) {
-        m_ui->actionUnitTwoShapes->setEnabled(false);
+        m_ui->actionUniteTwoShapes->setEnabled(false);
     }
     else {
         //int 
@@ -1376,7 +1376,7 @@ void LaserControllerWindow::changeShapesWeldButtonsEnable()
         }
         //m_ui->actionUnitTwoShapes->setEnabled(false);
     }
-}
+}*/
 
 LaserPath* LaserControllerWindow::uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
     LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup)
@@ -4739,55 +4739,49 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         m_ui->actionMirrorVertical->setEnabled(false);
     }
     //joinedGroupButtonsChanged
-    if (items.length() > 1) {
-        
-        //group,ungroup
-        bool hasJoined = false;
-        bool hasNotJoined = false;
-        m_scene->
-        /*for (QGraphicsItem* item : items) {
-            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-            //group,ungroup
-            if (p->isJoinedGroup()) {
-                hasJoined = true;
+    //group,ungroup
+    bool hasJoined = false;
+    //计算选中的图元中，有多少个组和单个图元
+    int count = 0;
+    QList<QSet<LaserPrimitive*>*> countedJoinedList;
+    for (QGraphicsItem* item : items) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        if (p->isJoinedGroup()) {
+            hasJoined = true;
+            if (!countedJoinedList.contains(p->joinedGroupList())) {
+                countedJoinedList.append(p->joinedGroupList());
+                count++;
             }
-            else {
-                hasNotJoined = true;
-            }
-            if (hasJoined && hasNotJoined) {
-                break;
-            }
-        }
-        if (hasJoined) {
-            m_ui->actionUngroup->setEnabled(true);
-            if (hasNotJoined) {
-                m_ui->actionGroup->setEnabled(true);
-                
-            }
-            else {
-                m_ui->actionGroup->setEnabled(false);
-            }
-
         }
         else {
-            m_ui->actionUngroup->setEnabled(false);
-            if (hasNotJoined) {
-                m_ui->actionGroup->setEnabled(true);                
-            }
-            else {
-                m_ui->actionGroup->setEnabled(false);
-            }
-        }*/
-
+            count++;
+        }
+    }
+    //unite 
+    if (count == 2) {
+        m_ui->actionUniteTwoShapes->setEnabled(true);
+    }
+    else {
+        m_ui->actionUniteTwoShapes->setEnabled(false);
+    }
+    if (count > 1) {
+        m_ui->actionGroup->setEnabled(true);
     }
     else {
         m_ui->actionGroup->setEnabled(false);
+    }
+
+    if (hasJoined) {
+        m_ui->actionUngroup->setEnabled(true);
+    }
+    else {
         m_ui->actionUngroup->setEnabled(false);
     }
+    
     //Align
     changeAlignButtonsEnable();
     //shapes weld/ two shapes unit
-    changeShapesWeldButtonsEnable();
+    //changeShapesWeldButtonsEnable();
 
 }
 void LaserControllerWindow::onJoinedGroupChanged()

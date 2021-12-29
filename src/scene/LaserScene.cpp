@@ -323,10 +323,13 @@ void LaserScene::findSelectedByLine(QRectF selection)
                             isIntersected = true;
                             if (!primitive->isSelected()) {
                                 primitive->setSelected(true);
-                                for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
-                                    p != primitive->joinedGroupList()->end(); p++) {
-                                    (*p)->setSelected(true);
+                                if(primitive->isJoinedGroup()){
+                                    for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                                        p != primitive->joinedGroupList()->end(); p++) {
+                                        (*p)->setSelected(true);
+                                    }
                                 }
+                                
                             }
                             break;
                         }
@@ -555,7 +558,7 @@ void LaserScene::updateTree()
     }
 }
 
-QList<QList<LaserPrimitive*>>& LaserScene::joinedGroupList()
+QList<QSet<LaserPrimitive*>*>& LaserScene::joinedGroupList()
 {
     return m_joinedGroupList;
 }

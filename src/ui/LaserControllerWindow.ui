@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -177,7 +177,7 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomToSelection"/>
    <addaction name="separator"/>
-   <addaction name="actionUnitTwoShapes"/>
+   <addaction name="actionUniteTwoShapes"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
@@ -1743,7 +1743,7 @@
     <string>Weld All Shapes</string>
    </property>
   </action>
-  <action name="actionUnitTwoShapes">
+  <action name="actionUniteTwoShapes">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
      <normaloff>:/ui/icons/images/unitTwoShapes.png</normaloff>:/ui/icons/images/unitTwoShapes.png</iconset>

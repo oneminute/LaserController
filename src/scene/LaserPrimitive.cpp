@@ -53,6 +53,8 @@ public:
         , exportable(true)
         , visible(true)
         , isJoinedGroup(false)
+        , joinedGroupList(nullptr)
+        , isAlignTarget(false)
     {}
 
     LaserDocument* doc;
@@ -94,7 +96,6 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     d->name = doc->newPrimitiveName(this);
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
-    d->isAlignTarget = false;
 }
 
 LaserPrimitive::~LaserPrimitive()
@@ -671,6 +672,7 @@ void LaserPrimitive::setJoinedGroup(QSet<LaserPrimitive*>* joinedGroup)
     }
     else {
         d->isJoinedGroup = false;
+        d->joinedGroupList = nullptr;
     }
 }
 

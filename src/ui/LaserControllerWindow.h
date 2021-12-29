@@ -98,7 +98,7 @@ public:
     void tabAlignTarget();
     void setAlignTargetState(bool isAlignTarget);
     //shapes weld / tow shapes unite
-    void changeShapesWeldButtonsEnable();
+    //void changeShapesWeldButtonsEnable();
     LaserPath* uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
         LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup);
     //selection property
