@@ -17,6 +17,7 @@
 #include "widget/LaserFontComboBox.h"
 #include "widget/LaserToolButton.h"
 #include "ui/LaserMeuu.h"
+#include "scene/LaserPrimitive.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }
@@ -96,6 +97,10 @@ public:
     void changeAlignButtonsEnable();
     void tabAlignTarget();
     void setAlignTargetState(bool isAlignTarget);
+    //shapes weld / tow shapes unite
+    void changeShapesWeldButtonsEnable();
+    LaserPath* uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
+        LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup);
     //selection property
     bool unitIsMM();
     QLabel* labelPercentage();
@@ -353,6 +358,7 @@ protected slots:
     void onActionMovePageToRight();
     void onActionSelectAll();
     void onActionInvertSelect();
+    void onActionTwoShapesUnite();
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit

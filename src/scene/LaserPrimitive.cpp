@@ -75,7 +75,7 @@ public:
     bool visible;
     bool isJoinedGroup;
     bool isAlignTarget;
-    QList<LaserPrimitive*> joinedGroupList;
+    QSet<LaserPrimitive*>* joinedGroupList;
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
@@ -649,10 +649,10 @@ bool LaserPrimitive::isLocked()
     return d->isLocked;
 }
 
-void LaserPrimitive::setJoinedGroup(bool isJoinedGroup)
+void LaserPrimitive::setJoinedGroup(QSet<LaserPrimitive*>* joinedGroup)
 {
     Q_D(LaserPrimitive);
-    d->isJoinedGroup = isJoinedGroup;
+    /*d->isJoinedGroup = isJoinedGroup;
     if (!isJoinedGroup) {
         d->joinedGroupList.clear();
     }
@@ -662,6 +662,15 @@ void LaserPrimitive::setJoinedGroup(bool isJoinedGroup)
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
             d->joinedGroupList.append(primitive);
         }
+    }*/
+    //QSet 唯一性 uniqueness
+    if (joinedGroup) {
+        joinedGroup->insert(this);
+        d->joinedGroupList = joinedGroup;
+        d->isJoinedGroup = true;
+    }
+    else {
+        d->isJoinedGroup = false;
     }
 }
 
@@ -671,7 +680,7 @@ bool LaserPrimitive::isJoinedGroup()
     return d->isJoinedGroup;
 }
 
-QList<LaserPrimitive*>& LaserPrimitive::joinedGroupList()
+QSet<LaserPrimitive*>* LaserPrimitive::joinedGroupList()
 {
     Q_D(LaserPrimitive);
     return d->joinedGroupList;

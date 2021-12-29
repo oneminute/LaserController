@@ -323,8 +323,9 @@ void LaserScene::findSelectedByLine(QRectF selection)
                             isIntersected = true;
                             if (!primitive->isSelected()) {
                                 primitive->setSelected(true);
-                                for (LaserPrimitive* p : primitive->joinedGroupList()) {
-                                    p->setSelected(true);
+                                for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                                    p != primitive->joinedGroupList()->end(); p++) {
+                                    (*p)->setSelected(true);
                                 }
                             }
                             break;
@@ -427,10 +428,11 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
                 QRect bounds;
-                if (!primitive->joinedGroupList().isEmpty()) {
-                    utils::boundingRect(primitive->joinedGroupList(), bounds, QRect(), false);
-                    for (LaserPrimitive* primitive : primitive->joinedGroupList()) {
-                        selectedByBounds(bounds, selection, primitive);
+                if (!primitive->joinedGroupList()->isEmpty()) {
+                    utils::boundingRect(*(primitive->joinedGroupList()), bounds, QRect(), false);
+                    for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                                    p != primitive->joinedGroupList()->end(); p++) {
+                        selectedByBounds(bounds, selection, *p);
                     }
                 }
                 else {
@@ -551,6 +553,11 @@ void LaserScene::updateTree()
             m_quadTree->createPrimitiveTreeNode(p);
         }
     }
+}
+
+QList<QList<LaserPrimitive*>>& LaserScene::joinedGroupList()
+{
+    return m_joinedGroupList;
 }
 
 

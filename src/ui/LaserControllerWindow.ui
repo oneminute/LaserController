@@ -177,6 +177,7 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomToSelection"/>
    <addaction name="separator"/>
+   <addaction name="actionUnitTwoShapes"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
@@ -1730,16 +1731,40 @@
     <string>Distribute H-Spaced</string>
    </property>
   </action>
-  <action name="actionPrimitiveWeld">
+  <action name="actionWeldAllShapes">
    <property name="icon">
-    <iconset>
-     <normaloff>:/ui/icons/images/primitive_weld.png</normaloff>:/ui/icons/images/primitive_weld.png</iconset>
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/weldAllShapes.png</normaloff>:/ui/icons/images/weldAllShapes.png</iconset>
    </property>
    <property name="text">
-    <string>Primitive Weld</string>
+    <string>Weld All Shapes</string>
    </property>
    <property name="toolTip">
-    <string>Primitive Weld</string>
+    <string>Weld All Shapes</string>
+   </property>
+  </action>
+  <action name="actionUnitTwoShapes">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/unitTwoShapes.png</normaloff>:/ui/icons/images/unitTwoShapes.png</iconset>
+   </property>
+   <property name="text">
+    <string>unitTwoShapes</string>
+   </property>
+   <property name="toolTip">
+    <string>Unit Two Shapes</string>
+   </property>
+  </action>
+  <action name="actionIntersectionTwoShapes">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/intersectionTwoShapes.png</normaloff>:/ui/icons/images/intersectionTwoShapes.png</iconset>
+   </property>
+   <property name="text">
+    <string>intersectionTwoShapes</string>
+   </property>
+   <property name="toolTip">
+    <string>Intersection Two Shapes</string>
    </property>
   </action>
   <action name="actionCameraCalibration">

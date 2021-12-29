@@ -126,5 +126,10 @@
         <file>images/adjust_focal.png</file>
         <file>images/calibration_chessboard.png</file>
         <file>images/calibration_guide.png</file>
+        <file>images/weldAllShapes.png</file>
+        <file>images/differentTowShapes.png</file>
+        <file>images/restoreTwoShapes.png</file>
+        <file>images/unitTwoShapes.png</file>
+        <file>images/intersectionTwoShapes.png</file>        
     </qresource>
 </RCC>

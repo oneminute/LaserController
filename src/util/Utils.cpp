@@ -214,6 +214,22 @@ void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& boundi
     }
 }
 
+void utils::boundingRect(const QSet<LaserPrimitive*>& primitives, QRect & bounding, QRect & boundingAcc, bool exludeUnexport)
+{
+    int count = 0;
+    bounding = QRect();
+    boundingAcc = QRect();
+    for (QSet<LaserPrimitive*>::const_iterator p = primitives.begin();
+                                    p != primitives.end(); p++)
+    {
+        if (exludeUnexport && !(*p)->exportable())
+            continue;
+        if (computeBoundingRect(*p, bounding, count, boundingAcc, exludeUnexport)) {
+            continue;
+        }
+    }
+}
+
 bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, int& count, QRect& boundingAcc, bool exludeUnexport)
 {
     QRect rect = primitive->sceneBoundingRect();

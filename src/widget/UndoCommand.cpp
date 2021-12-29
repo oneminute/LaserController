@@ -234,9 +234,10 @@ void AddDelUndoCommand::redo()
 			emit m_viewer->idleToSelected();
 		}
 	}
-    m_scene->document()->updateDocumentBounding();
-	m_viewer->viewport()->repaint();
+    //m_scene->document()->updateDocumentBounding();
+	
     emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
 }
 
 void AddDelUndoCommand::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)

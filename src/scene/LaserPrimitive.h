@@ -109,9 +109,9 @@ public:
 
     void setLocked(bool isLocked);
     bool isLocked();
-    void setJoinedGroup(bool isJoinedGroup);
+    void setJoinedGroup(QSet<LaserPrimitive*>* joinedGroup);
     bool isJoinedGroup();
-    QList<LaserPrimitive*>& joinedGroupList();
+    QSet<LaserPrimitive*>* joinedGroupList();
     QList<QuadTreeNode*>& treeNodesList();
     void addTreeNode(QuadTreeNode* node);
     void removeAllTreeNode();

@@ -102,7 +102,14 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
 
 void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
 {
-    item->layer()->removePrimitive(item);
+    Q_D(LaserDocument);
+    if (item->layer()) {
+        item->layer()->removePrimitive(item);
+    }
+    //not in d->primitives
+    else {
+        d->primitives.insert(item->id(), item);
+    }
     layer->addPrimitive(item);
     updateLayersStructure();
 }

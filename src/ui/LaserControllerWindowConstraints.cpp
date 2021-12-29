@@ -1040,10 +1040,10 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
     // end m_ui->actionMirrorVertical
 
-    // begin m_ui->actionPrimitiveWeld
-    BIND_PROP_TO_STATE(m_ui->actionPrimitiveWeld, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionPrimitiveWeld, "enabled", false, documentEmptyState);
-    // end m_ui->actionPrimitiveWeld
+    // begin m_ui->actionUnitTwoShapes
+    BIND_PROP_TO_STATE(m_ui->actionUnitTwoShapes, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitTwoShapes, "enabled", false, documentEmptyState);
+    // end m_ui->actionUnitTwoShapes
 
     // begin m_ui->actionGroup
     BIND_PROP_TO_STATE(m_ui->actionGroup, "enabled", false, initState);
