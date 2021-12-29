@@ -156,6 +156,11 @@ void LaserPrimitiveGroup::removeAllFromGroup(bool resetSelected)
         }
     }
 }
+void LaserPrimitiveGroup::reset(bool resetSelected)
+{
+    removeAllFromGroup(resetSelected);
+    setTransform(QTransform());
+}
 QRectF LaserPrimitiveGroup::sceneBoundingRect() const
 {
     return this->mapRectToScene(boundingRect());

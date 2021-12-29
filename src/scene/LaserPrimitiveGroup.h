@@ -23,6 +23,7 @@ public:
     QRectF sceneBoundingRect() const;
     bool isEmpty() const;
     void removeAllFromGroup(bool resetSelected = false);
+    void reset(bool resetSelected);
 public: signals:
     void childrenChanged();
 };

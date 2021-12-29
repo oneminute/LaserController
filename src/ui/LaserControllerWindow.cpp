@@ -3580,10 +3580,9 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
         return;
     }
     
-    //view->clearGroupSelection();
-    //清空group
+    //清空group并将transform设为单位transform
     if (m_viewer->group()) {
-        m_viewer->group()->removeAllFromGroup(true);
+        m_viewer->group()->reset(true);
     }
     else {
         m_viewer->createGroup();
