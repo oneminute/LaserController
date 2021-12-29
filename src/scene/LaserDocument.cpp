@@ -312,6 +312,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 if (!enablePrintAndCut())
                 {
                     QRectF boundingRect = primitive->sceneBoundingRect();
+                    QPoint boundingPoint = boundingRect.topLeft().toPoint();
+                    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+                        QPoint boundingPoint = boundingPoint - lastPoint;
+                    itemObj["X"] = boundingPoint.x();
+                    itemObj["Y"] = boundingPoint.y();
                     itemObj["Width"] = boundingRect.width();
                     itemObj["Height"] = boundingRect.height();
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
@@ -376,6 +381,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                         if (!data.isEmpty())
                         {
                             QRectF boundingRect = primitive->sceneBoundingRect();
+                            QPoint boundingPoint = boundingRect.topLeft().toPoint();
+                            if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+                                QPoint boundingPoint = boundingPoint - lastPoint;
+                            itemObj["X"] = boundingPoint.x();
+                            itemObj["Y"] = boundingPoint.y();
                             itemObj["Width"] = boundingRect.width();
                             itemObj["Height"] = boundingRect.height();
                             itemObj["Type"] = "Bitmap";

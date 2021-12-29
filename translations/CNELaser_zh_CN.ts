@@ -18,8 +18,8 @@
     </message>
     <message>
         <location line="+57"/>
-        <location filename="../src/ui/ActivationDialog.cpp" line="+40"/>
-        <location line="+51"/>
+        <location filename="../src/ui/ActivationDialog.cpp" line="+41"/>
+        <location line="+48"/>
         <source>Activated</source>
         <translation>已激活</translation>
     </message>
@@ -42,7 +42,7 @@
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../src/ui/ActivationDialog.cpp" line="+134"/>
+        <location filename="../src/ui/ActivationDialog.cpp" line="+137"/>
         <source>Send</source>
         <translation>发送验证码</translation>
     </message>
@@ -52,47 +52,39 @@
         <translation>用户名:</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Telephone:</source>
-        <translation>电话:</translation>
+        <translation type="vanished">电话:</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Address:</source>
-        <translation>地址:</translation>
+        <translation type="vanished">地址:</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>QQ:</source>
-        <translation>QQ:</translation>
+        <translation type="vanished">QQ:</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Wechat:</source>
-        <translation>微信:</translation>
+        <translation type="vanished">微信:</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Country:</source>
-        <translation>国家:</translation>
+        <translation type="vanished">国家:</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Distributor:</source>
-        <translation>经销商:</translation>
+        <translation type="vanished">经销商:</translation>
     </message>
     <message>
-        <location line="+14"/>
         <source>Brand:</source>
-        <translation>品牌:</translation>
+        <translation type="vanished">品牌:</translation>
     </message>
     <message>
-        <location line="+14"/>
         <source>Model:</source>
-        <translation>型号:</translation>
+        <translation type="vanished">型号:</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+39"/>
         <source>Activate</source>
         <translation>在线激活</translation>
     </message>
@@ -102,33 +94,32 @@
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../src/ui/ActivationDialog.cpp" line="-133"/>
+        <location filename="../src/ui/ActivationDialog.cpp" line="-136"/>
         <source>Your main board is already activated</source>
         <translation>您的板卡已经激活</translation>
     </message>
     <message>
-        <location line="-44"/>
-        <location line="+52"/>
+        <location line="-41"/>
+        <location line="+49"/>
         <source>Inactivated</source>
         <translation>未激活</translation>
     </message>
     <message>
-        <location line="-59"/>
+        <location line="-56"/>
         <source>Your main board is already activated at %1</source>
         <translation>您的板卡已经激活，激活日期为%1</translation>
     </message>
     <message>
         <location line="+8"/>
-        <location line="+52"/>
+        <location line="+49"/>
         <source>1. Networking is required to activate the board, please confirm that you have a vlid connection;
 2. To continue activation, please click the &quot;Activate&quot; button below.</source>
         <translation>1. 激活板卡需要联网，请确认网络正常；
 2. 继续激活请点击下方的”在线激活“按钮！</translation>
     </message>
     <message>
-        <location line="-30"/>
         <source>Sent successfully</source>
-        <translation>发送成功</translation>
+        <translation type="vanished">发送成功</translation>
     </message>
     <message>
         <source>Sent successfully. Please check your mail box to receive the activation code.</source>
@@ -151,19 +142,28 @@
         <translation type="vanished">您需要使用邮箱接收和激活码在线激活您的板卡。</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Please check your mail box to receive the activation code.</source>
-        <translation>请检查您的邮箱地址以接收验证码。</translation>
+        <translation type="vanished">请检查您的邮箱地址以接收验证码。</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Sent Failure</source>
-        <translation>发送失败</translation>
+        <translation type="vanished">发送失败</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Please check your email address or network connection.</source>
-        <translation>请确认您的邮箱地址正确且有网络连接。</translation>
+        <translation type="vanished">请确认您的邮箱地址正确且有网络连接。</translation>
+    </message>
+    <message>
+        <location line="-27"/>
+        <source>Sent successfully!
+Please check your mail box to receive the activation code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Sent Failure!
+Please check your email address or network connection.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+36"/>
@@ -181,12 +181,12 @@
         <translation>激活成功！</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Activation failure!</source>
         <translation>激活失败！</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+54"/>
         <source>Invalid email!
 </source>
         <translation>无效的邮箱地址！
@@ -200,6 +200,36 @@
 </translation>
     </message>
     <message>
+        <location line="+42"/>
+        <source>Send Email Failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invalid email address!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invalid email account!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Active code expired!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invalid validation code!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invalid emailbox name!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Invalid email!</source>
         <translation type="vanished">非法的邮箱！</translation>
     </message>
@@ -208,13 +238,13 @@
         <translation type="vanished">非法的激活码！</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-52"/>
         <source>Invalid User Name!</source>
         <translation>无效的用户名！用户名至少6位有效字符！
 </translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+28"/>
         <source>Send(%1)</source>
         <translation>发送(%1)</translation>
     </message>
@@ -324,20 +354,120 @@
     </message>
 </context>
 <context>
+    <name>CalibrationDialog</name>
+    <message>
+        <location filename="../src/ui/CalibrationDialog.cpp" line="+21"/>
+        <source>Disconnected</source>
+        <translation type="unfinished">未连接</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Introduce</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;ol&gt;&lt;li&gt;Please find the usb cable on the machine and plug it into the usb slot of the computer;&lt;/li&gt;&lt;li&gt;Confirm that the fill light can work normally;&lt;/li&gt;&lt;li&gt;If it is the first time to use, you may need to manually adjust the focal length of the lens, the next page will guide you to do so;&lt;/li&gt;&lt;li&gt;This wizard will guide you through the lens distortion correction operation, please do not disconnect the camera during the operation.&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Ajust Focal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&lt;h1&gt;Adjust Focal&lt;/h1&gt;&lt;ol&gt;&lt;li&gt;Please place the attached lens calibration board (shown in the left 1 figure below) in front of the lens.&lt;/li&gt;&lt;li&gt;Rotate the camera lens as shown in the figure on the left 2 below, and after seeing a clear picture in the figure below on the right, the focus adjustment is completed.&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <location line="+33"/>
+        <source>Capture</source>
+        <translation type="unfinished">抓取</translation>
+    </message>
+    <message>
+        <location line="-29"/>
+        <source>&lt;h1&gt;Capture Images&lt;/h1&gt;&lt;ol&gt;&lt;li&gt;Please follow the picture requirements to ensure that the calibration plate faces the camera lens as vertically as possible, and keep a distance of about 15 to 20 cm between the calibration plate and the lens;&lt;/li&gt;&lt;li&gt;If you check the automatic capture, the user needs to hold the calibration plate and move it smoothly in front of the camera lens, as far as possible to cover the entire camera viewing area;&lt;/li&gt;&lt;li&gt;In the frame list below, there is a list of captured calibration pictures with corresponding quality scores. You can independently consider whether to adopt a certain calibration picture;&lt;/li&gt;&lt;li&gt;When you are ready, click the start capture button below.&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Converage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Start</source>
+        <translation type="unfinished">启动</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stop</source>
+        <translation type="unfinished">停止</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&lt;h1&gt;Calibration&lt;/h1&gt;&lt;ol&gt;&lt;li&gt;Click the &quot;calibrate&quot; button to do calibration;&lt;/li&gt;&lt;li&gt;When it has been done, you will see the undistorted image below;&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Calibrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <location line="+84"/>
+        <source>Connected</source>
+        <translation type="unfinished">已连接</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Disonnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>%1/%2</source>
+        <translation>%1/%2</translation>
+    </message>
+</context>
+<context>
     <name>CameraToolsWindow</name>
     <message>
-        <location filename="../src/ui/CameraToolsWindow.cpp" line="+40"/>
+        <location filename="../src/ui/CameraToolsWindow.cpp" line="+41"/>
         <source>Refresh</source>
         <translation>刷新</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+276"/>
+        <location line="+275"/>
         <source>Connect</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location line="-272"/>
+        <location line="-271"/>
         <source>Capture</source>
         <translation>抓取</translation>
     </message>
@@ -347,7 +477,7 @@
         <translation>应用</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+98"/>
         <source>camera</source>
         <translation>相机</translation>
     </message>
@@ -372,9 +502,8 @@
         <translation>像素格式</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Resolution</source>
-        <translation>分辨率</translation>
+        <translation type="vanished">分辨率</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -469,7 +598,7 @@
         <translation type="obsolete">自定义</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+32"/>
         <source>Disconnect</source>
         <translation type="unfinished">断开</translation>
     </message>
@@ -544,12 +673,12 @@
 <context>
     <name>Config</name>
     <message>
-        <location filename="../src/common/Config.cpp" line="+127"/>
+        <location filename="../src/common/Config.cpp" line="+129"/>
         <source>Save config file error.</source>
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+2342"/>
+        <location line="+2395"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -559,7 +688,7 @@
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
     <message>
-        <location line="-2224"/>
+        <location line="-2277"/>
         <source>English</source>
         <translation>英文</translation>
     </message>
@@ -569,7 +698,7 @@
         <translation>中文</translation>
     </message>
     <message>
-        <location line="+2226"/>
+        <location line="+2279"/>
         <source>Unit</source>
         <translation>单位</translation>
     </message>
@@ -578,7 +707,7 @@
         <translation type="vanished">全局单位</translation>
     </message>
     <message>
-        <location line="-2208"/>
+        <location line="-2261"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
@@ -587,7 +716,7 @@
         <translation type="vanished">加工单位</translation>
     </message>
     <message>
-        <location line="+2212"/>
+        <location line="+2265"/>
         <location line="+1"/>
         <source>Max Layers Count</source>
         <translation>最大图层数</translation>
@@ -621,7 +750,7 @@
         <translation type="vanished">操作按钮的高度。</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+43"/>
         <source>Show Operation Button Text</source>
         <translation>显示操作按钮的文字</translation>
     </message>
@@ -2051,7 +2180,7 @@
         <translation>加速模式</translation>
     </message>
     <message>
-        <location line="-1586"/>
+        <location line="-1635"/>
         <source>T</source>
         <translation>T</translation>
     </message>
@@ -2093,7 +2222,7 @@
         <translation type="vanished">最大激光功率(%)</translation>
     </message>
     <message>
-        <location line="+1557"/>
+        <location line="+1606"/>
         <source>Selected user origin</source>
         <translation>所选用户原点</translation>
     </message>
@@ -2402,7 +2531,7 @@
         <translation type="vanished">2</translation>
     </message>
     <message>
-        <location line="-2293"/>
+        <location line="-2283"/>
         <source>Line</source>
         <translation>直线填充</translation>
     </message>
@@ -2416,7 +2545,7 @@
         <translation type="vanished">3</translation>
     </message>
     <message>
-        <location line="+1808"/>
+        <location line="+1770"/>
         <source>Unit for user interface.</source>
         <translation>界面显示单位。</translation>
     </message>
@@ -2429,7 +2558,7 @@
         <translation type="vanished">最大有效区域的宽高</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+95"/>
         <source>Show Document Bounding Rect</source>
         <translation>显示文档有效外包框</translation>
     </message>
@@ -2633,7 +2762,7 @@
         <translation type="vanished">Z轴急停加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+180"/>
+        <location line="+192"/>
         <location line="+1"/>
         <source>User</source>
         <translation>用户</translation>
@@ -2645,12 +2774,12 @@
         <translation>系统</translation>
     </message>
     <message>
-        <location line="-168"/>
+        <location line="-180"/>
         <source>Y motor current</source>
         <translation>Y轴电机驱动电流</translation>
     </message>
     <message>
-        <location line="-1269"/>
+        <location line="-1309"/>
         <location line="+20"/>
         <location line="+173"/>
         <location line="+20"/>
@@ -2700,7 +2829,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+280"/>
+        <location line="+320"/>
         <source>Valid Max Region(mm)</source>
         <translation>最大有效区域(mm)</translation>
     </message>
@@ -2751,7 +2880,49 @@
         <translation>校正块厚度(mm)</translation>
     </message>
     <message>
+        <location line="-280"/>
         <location line="+1"/>
+        <source>Resolution</source>
+        <translation>分辨率</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Horizontal Corners Count</source>
+        <translation>水平角点数量</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Vertical Corners Count</source>
+        <translation>垂直角点数量</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Squre Size</source>
+        <translation>方格尺寸</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Calibration pattern</source>
+        <translation>校准板样式</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Min calibration frames</source>
+        <translation>最小校准帧数</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Calibration Auto Capture</source>
+        <translation>自动采集校准帧</translation>
+    </message>
+    <message>
+        <location line="+256"/>
         <source>Calibration block thickness</source>
         <translation>校正块厚度</translation>
     </message>
@@ -2788,7 +2959,19 @@
     <message>
         <location line="+55"/>
         <location line="+1"/>
-        <location filename="../src/common/Config.h" line="+78"/>
+        <source>Reverse Engraving Bits</source>
+        <translation>反转雕刻位排列</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Skip Engraving Blank Rows</source>
+        <translation>跳过雕刻空行</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <location filename="../src/common/Config.h" line="+79"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
@@ -2803,6 +2986,13 @@
         <location line="+3"/>
         <location line="+1"/>
         <location filename="../src/common/Config.h" line="+15"/>
+        <source>Camera</source>
+        <translation>相机</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <location filename="../src/common/Config.h" line="+21"/>
         <source>UI</source>
         <translation>界面</translation>
     </message>
@@ -2980,8 +3170,8 @@
         <translation type="vanished">PLT输出</translation>
     </message>
     <message>
-        <location filename="../src/ui/ConfigDialog.cpp" line="+110"/>
-        <location line="+664"/>
+        <location filename="../src/ui/ConfigDialog.cpp" line="+111"/>
+        <location line="+665"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
@@ -3010,38 +3200,36 @@
         <translation type="vanished">您选择的语言&quot;%1&quot;无法识别，请检查你的配置文件。</translation>
     </message>
     <message>
-        <location line="-659"/>
-        <location line="+660"/>
+        <location line="-660"/>
+        <location line="+661"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location line="-655"/>
-        <location line="+656"/>
+        <location line="-656"/>
+        <location line="+657"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <location line="-651"/>
-        <location line="+652"/>
+        <location line="-652"/>
+        <location line="+653"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location line="-612"/>
-        <location line="+429"/>
+        <location line="-184"/>
         <source>Manufacture Password</source>
         <translation>厂商密码</translation>
     </message>
     <message>
-        <location line="-428"/>
-        <location line="+429"/>
-        <location line="+184"/>
+        <location line="+1"/>
+        <location line="+185"/>
         <source>Password</source>
         <translation>密码</translation>
     </message>
     <message>
-        <location line="-396"/>
+        <location line="-397"/>
         <source>Need restart</source>
         <translation>需要重新启动</translation>
     </message>
@@ -3121,25 +3309,25 @@
         <translation>如果已经修改了配置值，点击“OK”按钮将丢弃这些修改。是否确认重置？</translation>
     </message>
     <message>
-        <location line="+80"/>
+        <location line="+81"/>
         <source>The new password dose not match the confirmed password!</source>
         <translation>新密码与确认密码不匹配！</translation>
     </message>
     <message>
-        <location line="-249"/>
+        <location line="-250"/>
         <source>Wrong password</source>
         <translation>密码错误</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+223"/>
+        <location line="+224"/>
         <location line="+48"/>
         <location line="+14"/>
         <source>Ok</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location line="-282"/>
+        <location line="-283"/>
         <source>Wrong password! You have %1 chances to check password.</source>
         <translation>密码错误！您还有%1次尝试的机会。</translation>
     </message>
@@ -3149,7 +3337,7 @@
         <translation>密码错误次数过多，请重新启动软件再尝试。</translation>
     </message>
     <message>
-        <location line="+215"/>
+        <location line="+216"/>
         <location line="+62"/>
         <source>Failed</source>
         <translation>失败</translation>
@@ -3689,7 +3877,7 @@ Would you like to overwrite it?</source>
         <translation>系统启动失败。</translation>
     </message>
     <message>
-        <location line="+212"/>
+        <location line="+213"/>
         <source>Absolute Coords</source>
         <translation>绝对坐标</translation>
     </message>
@@ -3702,6 +3890,11 @@ Would you like to overwrite it?</source>
         <location line="+1"/>
         <source>Align Y</source>
         <translation>垂直对齐</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Asymmetric Circles Grid</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3722,6 +3915,21 @@ Would you like to overwrite it?</source>
         <location line="+1"/>
         <source>Bottom Right</source>
         <translation>右下</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Chessboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Charuco Board</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Circles Grid</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4192,7 +4400,7 @@ Would you like to overwrite it?</source>
         <translation>高级(&amp;A)</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>&amp;Edit</source>
         <translation>编辑(&amp;E)</translation>
     </message>
@@ -4226,7 +4434,7 @@ Would you like to overwrite it?</source>
         <translation>工具栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1915"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+2037"/>
         <source>Layers</source>
         <translation>图层</translation>
     </message>
@@ -4271,7 +4479,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">值</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.ui" line="+40"/>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="+41"/>
         <location line="+63"/>
         <location line="+11"/>
         <location line="+17"/>
@@ -4280,7 +4488,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="+188"/>
-        <location line="+2536"/>
+        <location line="+2581"/>
         <source>Operations</source>
         <translation>操作</translation>
     </message>
@@ -4322,8 +4530,8 @@ Would you like to overwrite it?</source>
         <translation type="vanished">优化</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2266"/>
-        <location line="+2267"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2311"/>
+        <location line="+2312"/>
         <source>Laser Power</source>
         <translation>激光功率</translation>
     </message>
@@ -4373,7 +4581,7 @@ Would you like to overwrite it?</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2308"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2353"/>
         <location line="+295"/>
         <source>Movement</source>
         <translation>运动控制</translation>
@@ -4495,12 +4703,12 @@ Would you like to overwrite it?</source>
         <translation>选点切割</translation>
     </message>
     <message>
-        <location line="+1352"/>
+        <location line="+1362"/>
         <source>Do you want to save current document?</source>
         <translation>是否保存当前文档？</translation>
     </message>
     <message>
-        <location line="+823"/>
+        <location line="+858"/>
         <source>Pos X</source>
         <translation>水平坐标</translation>
     </message>
@@ -4514,7 +4722,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">页面尺寸(mm)： %1x%2</translation>
     </message>
     <message>
-        <location line="-4211"/>
+        <location line="-4374"/>
         <source>X Pos</source>
         <translation>水平坐标</translation>
     </message>
@@ -4525,80 +4733,80 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location line="+113"/>
-        <location line="+4100"/>
+        <location line="+4263"/>
         <source>Rotate</source>
         <translation>旋转</translation>
     </message>
     <message>
-        <location line="-4060"/>
+        <location line="-4213"/>
         <location line="+4"/>
-        <location line="+4058"/>
+        <location line="+4211"/>
         <location line="+3"/>
         <source>Middle</source>
         <translation>中间对齐</translation>
     </message>
     <message>
-        <location line="-4062"/>
-        <location line="+4061"/>
+        <location line="-4215"/>
+        <location line="+4214"/>
         <source>Top</source>
         <translation>顶部对齐</translation>
     </message>
     <message>
-        <location line="-4059"/>
-        <location line="+4061"/>
+        <location line="-4212"/>
+        <location line="+4214"/>
         <source>Bottom</source>
         <translation>底部对齐</translation>
     </message>
     <message>
-        <location line="-4051"/>
-        <location line="+4052"/>
+        <location line="-4200"/>
+        <location line="+4201"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location line="-4048"/>
-        <location line="+4050"/>
+        <location line="-4197"/>
+        <location line="+4199"/>
         <source>Align X</source>
         <translation>水平对齐</translation>
     </message>
     <message>
-        <location line="-4048"/>
-        <location line="+4049"/>
+        <location line="-4197"/>
+        <location line="+4198"/>
         <source>Align Y</source>
         <translation>垂直对齐</translation>
     </message>
     <message>
-        <location line="-4047"/>
-        <location line="+4048"/>
+        <location line="-4196"/>
+        <location line="+4197"/>
         <source>Spacing X</source>
         <translation>水平间隔</translation>
     </message>
     <message>
-        <location line="-4046"/>
-        <location line="+4047"/>
+        <location line="-4195"/>
+        <location line="+4196"/>
         <source>Spacing Y</source>
         <translation>垂直间隔</translation>
     </message>
     <message>
-        <location line="-4045"/>
-        <location line="+4046"/>
+        <location line="-4194"/>
+        <location line="+4195"/>
         <source>Bold</source>
         <translation>粗体</translation>
     </message>
     <message>
-        <location line="-4044"/>
-        <location line="+4045"/>
+        <location line="-4193"/>
+        <location line="+4194"/>
         <source>Italic</source>
         <translation>斜体</translation>
     </message>
     <message>
-        <location line="-4043"/>
-        <location line="+4044"/>
+        <location line="-4192"/>
+        <location line="+4193"/>
         <source>Upper Case</source>
         <translation>大写</translation>
     </message>
     <message>
-        <location line="-3019"/>
+        <location line="-3056"/>
         <location line="+39"/>
         <source>Recent Files</source>
         <translation>最近的文件</translation>
@@ -4620,7 +4828,7 @@ Would you like to overwrite it?</source>
         <translation>路径不存在，系统将会删该文件记录。</translation>
     </message>
     <message>
-        <location line="+550"/>
+        <location line="+542"/>
         <source>User Origin 1</source>
         <translation>用户原点1</translation>
     </message>
@@ -4668,18 +4876,18 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+461"/>
+        <location line="+460"/>
         <source>Importing</source>
         <translation>导入</translation>
     </message>
     <message>
         <location line="+80"/>
-        <location line="+307"/>
+        <location line="+318"/>
         <source>Open File</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location line="-255"/>
+        <location line="-266"/>
         <source>You are about deleting selected layer. Do you want to delete all primitives belonged to this layer?</source>
         <translation>您当前正要删除图层。是否要删除该图层中的所有图元？</translation>
     </message>
@@ -4691,12 +4899,13 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 如果点击“取消”按钮，则放弃当前操作。</translation>
     </message>
     <message>
-        <location line="+498"/>
+        <location line="+509"/>
+        <location line="+606"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location line="+167"/>
+        <location line="-439"/>
         <source>Outlining</source>
         <translation>建立拓扑结构</translation>
     </message>
@@ -4713,17 +4922,27 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+141"/>
+        <location line="+69"/>
+        <source>Close softeware?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Do you want to save current document,before close softeware?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+103"/>
         <source>Selection: %1</source>
         <translation>当前选中：%1</translation>
     </message>
     <message>
-        <location line="+238"/>
+        <location line="+242"/>
         <source>Layout(mm): %1x%2</source>
         <translation>幅面(mm):%1x%2</translation>
     </message>
     <message>
-        <location line="+513"/>
+        <location line="+517"/>
         <source>A document is opened.</source>
         <translation>当前已经有一个打开中的文档。</translation>
     </message>
@@ -4750,7 +4969,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">Z轴使能</translation>
     </message>
     <message>
-        <location line="-1659"/>
+        <location line="-1698"/>
         <source>Unload motor</source>
         <translation>卸载电机</translation>
     </message>
@@ -4791,7 +5010,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">继电器3</translation>
     </message>
     <message>
-        <location line="-1464"/>
+        <location line="-1474"/>
         <source>Outline</source>
         <translation>大纲</translation>
     </message>
@@ -4810,17 +5029,17 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">从SVG导入</translation>
     </message>
     <message>
-        <location line="-282"/>
+        <location line="-284"/>
         <source>CNE Laser</source>
         <translation>CNE Laser</translation>
     </message>
     <message>
-        <location line="+90"/>
+        <location line="+91"/>
         <source>&amp;Window</source>
         <translation>窗口(&amp;W)</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+205"/>
         <source>Import Document</source>
         <translation>导入文档</translation>
     </message>
@@ -4836,7 +5055,8 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1694"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1704"/>
+        <location line="+606"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
@@ -4859,7 +5079,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <location line="+15"/>
         <location line="+3"/>
         <location line="+929"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1430"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+863"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
@@ -4876,7 +5096,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1929"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-1979"/>
         <source>Remove Layer</source>
         <translation>删除图层</translation>
     </message>
@@ -4980,7 +5200,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+120"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+131"/>
         <source>Load Json</source>
         <translation>加载Json文件</translation>
     </message>
@@ -5075,12 +5295,12 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>在线帮助</translation>
     </message>
     <message>
-        <location line="-630"/>
+        <location line="-631"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location line="+635"/>
+        <location line="+636"/>
         <source>Official Website</source>
         <translation>官方网站</translation>
     </message>
@@ -5129,8 +5349,8 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2857"/>
-        <location line="+4062"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-2975"/>
+        <location line="+4215"/>
         <source>Left</source>
         <translation>左</translation>
     </message>
@@ -5141,8 +5361,8 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-4060"/>
-        <location line="+4062"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-4213"/>
+        <location line="+4215"/>
         <source>Right</source>
         <translation>右</translation>
     </message>
@@ -5571,11 +5791,22 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>水平间隔分布</translation>
     </message>
     <message>
+        <location line="+9"/>
+        <location line="+3"/>
+        <source>Primitive Weld</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Camera Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Z Reset</source>
         <translation type="vanished">Z轴重置</translation>
     </message>
     <message>
-        <location line="-208"/>
+        <location line="-225"/>
         <source>SameWidth</source>
         <translation>使宽度相等</translation>
     </message>
@@ -5847,7 +6078,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">保存原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-4460"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-4624"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
@@ -5856,7 +6087,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">提示</translation>
     </message>
     <message>
-        <location line="+4207"/>
+        <location line="+4342"/>
         <source>Unregistered</source>
         <translation>未注册</translation>
     </message>
@@ -5890,7 +6121,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">读取寄存器失败！</translation>
     </message>
     <message>
-        <location line="-2540"/>
+        <location line="-2556"/>
         <source>work space</source>
         <translation>工作区</translation>
     </message>
@@ -5911,28 +6142,28 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-1463"/>
-        <location line="+1464"/>
-        <location line="+2708"/>
+        <location line="-1581"/>
+        <location line="+1582"/>
+        <location line="+2753"/>
         <source>Width</source>
         <translation>宽度</translation>
     </message>
     <message>
-        <location line="-4244"/>
+        <location line="-4407"/>
         <source>Selection: 0</source>
         <translation>当前选中：0</translation>
     </message>
     <message>
         <location line="+73"/>
-        <location line="+130"/>
-        <location line="+1337"/>
-        <location line="+2705"/>
+        <location line="+144"/>
+        <location line="+1441"/>
+        <location line="+2750"/>
         <location line="+9"/>
         <source>Height</source>
         <translation>高度</translation>
     </message>
     <message>
-        <location line="-2709"/>
+        <location line="-2754"/>
         <source>Show</source>
         <translation>显示</translation>
     </message>
@@ -5964,7 +6195,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">打开SVG文件</translation>
     </message>
     <message>
-        <location line="+1142"/>
+        <location line="+1141"/>
         <source>SVG (*.svg);;CAD (*.dxf)</source>
         <translation>SVG (*.svg);;CAD (*.dxf)</translation>
     </message>
@@ -6001,12 +6232,13 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+496"/>
+        <location line="+507"/>
+        <location line="+606"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location line="-410"/>
+        <location line="-1016"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
@@ -6090,7 +6322,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>%1 度</translation>
     </message>
     <message>
-        <location line="+117"/>
+        <location line="+123"/>
         <source>Connected</source>
         <translation>已连接</translation>
     </message>
@@ -6110,7 +6342,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>已激活</translation>
     </message>
     <message>
-        <location line="-583"/>
+        <location line="-589"/>
         <source>Close document?</source>
         <translation>关闭文档？</translation>
     </message>
@@ -6138,7 +6370,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDevice</name>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="+1279"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="+1278"/>
         <source>Laser device fatal error</source>
         <translation>设备致命错误</translation>
     </message>
@@ -6504,7 +6736,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>升级固件超时</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+66"/>
         <source>Main card info incomplete.</source>
         <translation>主板信息不完整。</translation>
     </message>
@@ -6538,7 +6770,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>导出JSON文件</translation>
     </message>
     <message>
-        <location line="+205"/>
+        <location line="+215"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
@@ -6553,7 +6785,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>按层建立拓扑</translation>
     </message>
     <message>
-        <location line="+335"/>
+        <location line="+336"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
@@ -7282,7 +7514,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+1812"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+1813"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -10709,7 +10941,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3082"/>
+        <location filename="../src/common/Config.cpp" line="-3175"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
@@ -10813,7 +11045,7 @@ Do you want to delete it anyway?</source>
         <translation>关闭标签页</translation>
     </message>
     <message>
-        <location filename="../src/LaserApplication.cpp" line="-239"/>
+        <location filename="../src/LaserApplication.cpp" line="-244"/>
         <source>CNE Laser</source>
         <translation>CNE Laser</translation>
     </message>
@@ -10888,7 +11120,7 @@ Do you want to delete it anyway?</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-964"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-970"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>
@@ -10903,7 +11135,7 @@ Do you want to delete it anyway?</source>
         <translation>%1生成Plt线</translation>
     </message>
     <message>
-        <location filename="../src/widget/UndoCommand.cpp" line="+767"/>
+        <location filename="../src/widget/UndoCommand.cpp" line="+769"/>
         <source>multi</source>
         <translation></translation>
     </message>
@@ -14551,7 +14783,7 @@ Please choose a different file name.</source>
 <context>
     <name>Vector2DWidget</name>
     <message>
-        <location filename="../src/widget/Vector2DWidget.cpp" line="+212"/>
+        <location filename="../src/widget/Vector2DWidget.cpp" line="+225"/>
         <source> X:</source>
         <translation></translation>
     </message>
@@ -14625,6 +14857,19 @@ Please choose a different file name.</source>
     <message>
         <source>Scroll down</source>
         <translation type="obsolete">向下滚动</translation>
+    </message>
+</context>
+<context>
+    <name>WizardDialog</name>
+    <message>
+        <location filename="../src/ui/WizardDialog.cpp" line="+83"/>
+        <source>Prev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Next</source>
+        <translation type="unfinished">下一步</translation>
     </message>
 </context>
 <context>

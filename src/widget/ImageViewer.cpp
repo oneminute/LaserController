@@ -79,15 +79,36 @@ void ImageViewer::scaleImage(qreal factor)
     adjustScrollBar(verticalScrollBar(), factor);
 }
 
-void ImageViewer::fixSize()
+void ImageViewer::fit()
 {
-    m_scaleFactor = 1.0;
-    m_labelImage->adjustSize();
+    if (m_image.isNull())
+        return;
+
+    QSize imageSize = m_image.size();
+    fitBy(imageSize);
+}
+
+void ImageViewer::fitBy(const QSize& size)
+{
+    QSize bounding = this->geometry().size();
+    qreal scaleH = bounding.width() * 1.0 / size.width();
+    qreal scaleV = bounding.height() * 1.0 / size.height();
+    m_scaleFactor = qMin(scaleH, scaleV);
+    m_scaleFactor = qBound(m_minScaleFactor, m_scaleFactor, m_maxScaleFactor);
+    m_labelImage->resize(m_scaleFactor * size);
+
+    adjustScrollBar(horizontalScrollBar(), m_scaleFactor);
+    adjustScrollBar(verticalScrollBar(), m_scaleFactor);
 }
 
 qreal ImageViewer::scaleFactor() const
 {
     return m_scaleFactor;
+}
+
+void ImageViewer::setScaleFactor(qreal value)
+{
+    m_scaleFactor = value;
 }
 
 void ImageViewer::adjustScrollBar(QScrollBar* scrollBar, double factor)

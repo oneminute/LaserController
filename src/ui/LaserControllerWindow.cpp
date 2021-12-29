@@ -48,6 +48,7 @@
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
+#include "camera/DistortionCalibrator.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "import/Importer.h"
@@ -797,6 +798,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
     connect(m_ui->actionCameraCalibration, &QAction::triggered, this, &LaserControllerWindow::onActionCameraCalibration);
+    connect(m_ui->actionGenerateCalibrationBoard, &QAction::triggered, this, &LaserControllerWindow::onActionGenerateCalibrationBoard);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -4509,6 +4511,11 @@ void LaserControllerWindow::onActionCameraCalibration()
 {
     CalibrationDialog dlg;
     dlg.exec();
+}
+
+void LaserControllerWindow::onActionGenerateCalibrationBoard()
+{
+    DistortionCalibrator::generateCalibrationBoard();
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)

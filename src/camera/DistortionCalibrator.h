@@ -16,18 +16,28 @@ struct CalibratorItem
     cv::Mat sample;
     qreal confidence;
     cv::Mat3f transform;
+    std::vector<cv::Point2f> points;
 };
 
 class DistortionCalibrator : public QObject, public ImageProcessor
 {
     Q_OBJECT
 public:
+    enum Role
+    {
+        Role_Idle,
+        Role_Capture,
+        Role_Undistortion
+    };
+
     explicit DistortionCalibrator(QObject* parent = nullptr);
     ~DistortionCalibrator();
 
     bool validate();
 
     virtual bool process(cv::Mat& mat) override;
+
+    bool captureSample(cv::Mat& mat);
 
     bool undistortImage(cv::Mat& inMat);
 
@@ -43,6 +53,19 @@ public:
         CalibrationPattern patternType /*= Settings::CHESSBOARD*/);
 
     void requestCalibration();
+    void requestCapture();
+
+    QList<CalibratorItem> calibrationSamples() const;
+    int calibrationSamplesCount() const;
+
+    void setRole(Role role);
+    bool isCaptureRole() const;
+    bool isUndistortionRole() const;
+
+    void saveSamples();
+    void loadSamples();
+
+    static void generateCalibrationBoard();
 
 protected:
     bool runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
@@ -50,7 +73,13 @@ protected:
         std::vector<float>& reprojErrs, double& totalAvgErr, std::vector<cv::Point3f>& newObjPoints,
         float grid_width, bool release_object);
 
+    static void generateCirclesBoard();
+    static void generateACirclesBoard();
+    static void generateChessBoard();
 
+signals:
+    void sampleCaptured();
+    void calibrated();
 
 private:
     float aspectRatio;           // The aspect ratio
@@ -61,7 +90,6 @@ private:
     bool calibZeroTangentDist;   // Assume zero tangential distortion
     bool calibFixPrincipalPoint; // Fix the principal point at the center
     bool flipVertical;           // Flip the captured images around the horizontal axis
-    bool showUndistorted;        // Show undistorted images after calibration
     bool useFisheye;             // use fisheye camera model for calibration
     bool fixK1;                  // fix K1 distortion coefficient
     bool fixK2;                  // fix K2 distortion coefficient
@@ -73,7 +101,9 @@ private:
     cv::Mat cameraMatrix;
     cv::Mat distCoeffs;
 
+    Role m_role;
     bool m_requestCalibration;
+    bool m_requestCapture;
     QList<CalibratorItem> m_samples;
     std::vector<std::vector<cv::Point2f>> m_imagePoints;
 };
