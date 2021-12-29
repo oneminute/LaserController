@@ -41,7 +41,7 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
     progress->setMaximum(gridCols * gridRows);
     for (int c = 0; c < gridCols; c++)
     {
-        qLogD << "col: " << c << "/" << gridCols;
+        //qLogD << "col: " << c << "/" << gridCols;
         for (int r = 0; r <= gridRows; r++)
         {
             int x = c * gridSize;
@@ -111,7 +111,8 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
     rot = cv::getRotationMatrix2D(center, -degrees, 1.);
     bbox = cv::RotatedRect(cv::Point2f(), dst.size(), 0).boundingRect2f();
     cv::Mat antiRotated;
-    cv::warpAffine(dst, antiRotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(0));
+    cv::warpAffine(dst, antiRotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
+    cv::threshold(antiRotated, antiRotated, 127.5, 255, cv::THRESH_BINARY);
     cv::imwrite("tmp/h6_antiRotated.bmp", dst);
 
 	int roix = (antiRotated.cols - src.cols - 1) / 2;
@@ -124,9 +125,17 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
 
 	}
     cv::Rect roi(roix, roiy, roiCols, roiRows);
+    cv::Rect roi2(0, 0, roix, roiy);
+    //qLogD << antiRotated.ptr<quint8>(roiy)[roix];
+    //qLogD << antiRotated.ptr<quint8>(roiy)[roix + 1];
     cv::Mat outMat = antiRotated(roi);
+    cv::Mat topLeftMat = antiRotated(roi2);
+    outMat.ptr<quint8>(0)[0] = 255;
+    //qLogD << outMat.ptr<quint8>(0)[0];
+    //qLogD << topLeftMat.ptr<quint8>(0)[1];
     //outMat = 255 - outMat;
-    cv::imwrite("tmp/h6_outMat.bmp", outMat);
+    cv::imwrite("tmp/h6_outMat.tiff", outMat);
+    cv::imwrite("tmp/h6_topleft.tiff", topLeftMat);
 
 #ifdef _DEBUG
     //cv::imshow("halftone6_processed", outMat);
@@ -253,6 +262,9 @@ void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int i
 QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
     const QRect& boundingRect, int rowInterval, QPoint& lastPoint, int accLength)
 {
+    //cv::Mat element = cv::getStructuringElement(0, cv::Size(3, 3), cv::Point(1, 1));
+    //cv::morphologyEx(mat, mat, cv::MORPH_OPEN, element);
+    cv::threshold(mat, mat, 127.5, 255, cv::THRESH_BINARY);
     cv::imwrite("tmp/engraving.bmp", mat);
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
@@ -269,6 +281,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
     fspc.setSame(false);
     bool forward = true;
     bool abosulte = Config::Device::startFrom() == SFT_AbsoluteCoords;
+    bool firstLine = true;
     progress->setMaximum(mat.rows);
     for (int r = 0; r < mat.rows; r++)
     {
@@ -305,25 +318,36 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
 #if _DEBUG
         //QString rowString;
 #endif
-        bool same = true;
         for (int c = 0; c < mat.cols; c++)
         {
             quint8 pixel = forward ? mat.ptr<quint8>(r)[c] : mat.ptr<quint8>(r)[mat.cols - c - 1];
-            //quint8 bin = pixel >= 128 ? 0 : 0x01;
-            quint8 bin = pixel >= 128 ? 0 : 0x80;
+            quint8 bin;
+            if (Config::Debug::reverseEngravingBits())
+            {
+                bin = pixel >= 128 ? 0 : 0x01;
+            }
+            else
+            {
+                bin = pixel == 255 ? 0 : 0x80;
+            }
             if (c == 0)
                 lastBin = bin;
             else
             {
-                same = same && (lastBin == bin);
                 lastBin = bin;
             }
 #if _DEBUG
             //rowString.append(QString::number(mat.ptr<quint8>(r)[c] >= 128 ? 0 : 1));
 #endif
             binCheck |= bin;
-            //byte = byte | (bin << (c % 8));
-            byte = byte | (bin >> (c % 8));
+            if (Config::Debug::reverseEngravingBits())
+            {
+                byte = byte | (bin << (c % 8));
+            }
+            else
+            {
+                byte = byte | (bin >> (c % 8));
+            }
             bitCount++;
             if (bitCount == 8)
             {
@@ -342,7 +366,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             rowBytes.append(byte);
             //stream << byte;
 
-        if (binCheck)
+        if (Config::Debug::skipEngravingBlankRows() && binCheck)
         {
             //fspc.setSame(same);
             if (forward)

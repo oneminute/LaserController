@@ -98,6 +98,7 @@ void CameraController::run()
     cv::Mat frame;
     m_status = CS_STARTED;
     int errorCount = 0;
+    m_lastTime = QDateTime::currentDateTime();
     while (m_status == CS_STARTED)
     {
         if (m_videoCapture->isOpened())
@@ -105,6 +106,10 @@ void CameraController::run()
             while (m_status == CS_STARTED)
             {
                 bool ok = m_videoCapture->read(frame);
+                QDateTime currTime = QDateTime::currentDateTime();
+                qint64 duration = m_lastTime.msecsTo(currTime);
+                m_lastTime = currTime;
+                qLogD << duration << "ms";
                 if (!ok || frame.empty())
                 {
                     emit error();
@@ -122,6 +127,9 @@ void CameraController::run()
                 bool done = true;
                 for (ImageProcessor* processor : m_processors)
                 {
+                    if (!processor->enabled())
+                        continue;
+
                     if (!processor->process(frame))
                     {
                         done = false;

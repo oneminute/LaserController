@@ -16,15 +16,30 @@ public:
     ~CalibrationDialog();
 
 protected slots:
+    void onPage1Entered();
+    void onPage1Exited();
     void onPage2Entered();
     void onPage2Exited();
+    void onPage3Entered();
+    void onPage3Exited();
+    void onPage4Entered();
+    void onPage4Exited();
 
     void onCameraConnected();
     void onCameraDisconnected();
 
     void onFrameCaptured();
+    void onCalibrationSampleCaptured();
+    void onCalibrated();
+
+    void onButtonCaptureClicked();
 
     void updatePage3Buttons(const QVariant& autoCapture);
+    void loadSamples();
+    void saveSamples();
+
+    void onButtonCalibrateClicked(bool checked = false);
+    void onButtonSaveCalibrationClicked(bool checked = false);
 
 private:
     QLabel* m_labelStatus;
@@ -48,6 +63,14 @@ private:
     QPushButton* m_page3ButtonStart;
     QPushButton* m_page3ButtonStop;
     QPushButton* m_page3ButtonDelete;
+#ifdef _DEBUG
+    QPushButton* m_page3ButtonLoadSamples;
+    QPushButton* m_page3ButtonSaveSamples;
+#endif
+    QLabel* m_page4Introduction;
+    QPushButton* m_page4ButtonCalibrate;
+    QPushButton* m_page4ButtonSave;
+    ImageViewer* m_page4ImageViewer;
 
     CameraController* m_cameraController;
     DistortionCalibrator* m_calibrator;

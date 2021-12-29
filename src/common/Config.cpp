@@ -340,6 +340,14 @@ void Config::loadCameraItems()
     squareSize->setInputWidgetProperty("minimum", 2);
     squareSize->setInputWidgetProperty("maximum", 50);
 
+    ConfigItem* radiusRate = group->addConfigItem(
+        "radiusRate"
+        , 0.5
+        , DT_REAL
+    );
+    radiusRate->setInputWidgetProperty("minimum", 0.1);
+    radiusRate->setInputWidgetProperty("maximum", 1.0);
+
     ConfigItem* calibrationPattern = group->addConfigItem(
         "calibrationPattern"
         , CP_CHESSBOARD
@@ -2492,7 +2500,19 @@ void Config::loadDebug()
 
     ConfigItem* enableOptimizeInteraction = group->addConfigItem(
         "enableOptimizeInteraction",
+        true,
+        DT_BOOL
+    );
+
+    ConfigItem* reverseEngravingBits = group->addConfigItem(
+        "reverseEngravingBits",
         false,
+        DT_BOOL
+    );
+
+    ConfigItem* skipEngravingBlankRows = group->addConfigItem(
+        "skipEngravingBlankRows",
+        true,
         DT_BOOL
     );
 }
@@ -2535,6 +2555,10 @@ void Config::updateTitlesAndDescriptions()
     Camera::squareSizeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Squre Size", nullptr), 
         QCoreApplication::translate("Config", "Squre Size", nullptr));
+
+    Camera::radiusRateItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Radius Rate", nullptr), 
+        QCoreApplication::translate("Config", "Radius Rate", nullptr));
 
     Camera::calibrationPatternItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Calibration pattern", nullptr), 
@@ -3223,6 +3247,14 @@ void Config::updateTitlesAndDescriptions()
     Debug::enableOptimizeInteractionItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr),
         QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr));
+
+    Debug::reverseEngravingBitsItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Reverse Engraving Bits", nullptr),
+        QCoreApplication::translate("Config", "Reverse Engraving Bits", nullptr));
+
+    Debug::skipEngravingBlankRowsItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Skip Engraving Blank Rows", nullptr),
+        QCoreApplication::translate("Config", "Skip Engraving Blank Rows", nullptr));
 
     groupsMap["general"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "General", nullptr),

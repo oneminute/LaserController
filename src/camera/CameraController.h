@@ -1,6 +1,7 @@
 #ifndef CAMERACONTROLLER_H
 #define CAMERACONTROLLER_H
 
+#include <QDateTime>
 #include <QObject>
 #include <QThread>
 #include <QQueue>
@@ -72,6 +73,7 @@ private:
     CameraStatus m_status;
     QList<ImageProcessor*> m_processors;
     bool m_autoLoading;
+    QDateTime m_lastTime;
 };
 
 #endif // CAMERACONTROLLER_H

@@ -118,6 +118,7 @@ public:
         CONFIG_ITEM(camera, hCornersCount, int, toInt)
         CONFIG_ITEM(camera, vCornersCount, int, toInt)
         CONFIG_ITEM(camera, squareSize, int, toInt)
+        CONFIG_ITEM(camera, radiusRate, qreal, toReal)
         CONFIG_ITEM_T(camera, calibrationPattern, CalibrationPattern)
         CONFIG_ITEM(camera, minCalibrationFrames, int, toInt)
         CONFIG_ITEM(camera, calibrationAutoCapture, bool, toBool)
@@ -435,6 +436,8 @@ public:
         CONFIG_ITEM(debug, generatePathImage, bool, toBool)
         CONFIG_ITEM(debug, generateMachiningImage, bool, toBool)
         CONFIG_ITEM(debug, enableOptimizeInteraction, bool, toBool)
+        CONFIG_ITEM(debug, reverseEngravingBits, bool, toBool)
+        CONFIG_ITEM(debug, skipEngravingBlankRows, bool, toBool)
 
     private:
         friend class Config;

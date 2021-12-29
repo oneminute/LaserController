@@ -52,11 +52,10 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         << Config::PathOptimization::group
         << Config::Export::group
         << Config::Device::group
-#ifdef _DEBUG
+//#ifdef _DEBUG
         << Config::Debug::group
-#endif
+//#endif
         << Config::UserRegister::group
-        //<< Config::SystemRegister::group
         ;
 
     for (ConfigItemGroup* group : groups)
