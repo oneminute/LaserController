@@ -53,6 +53,7 @@ public:
     void updateValidMaxRegionRect();
     void updataValidMaxRegion();
     void updateTree();
+    QList<QSet<LaserPrimitive*>*>& joinedGroupList();
 
 private:
     LaserDocument* m_doc;
@@ -62,6 +63,7 @@ private:
 	LaserBitmap* m_detectedBitmap = nullptr;
     QuadTreeNode* m_quadTree;
     QRect m_maxRegion;
+    QList<QSet<LaserPrimitive*>*> m_joinedGroupList;
 };
 
 #endif // LASERSCENE_H

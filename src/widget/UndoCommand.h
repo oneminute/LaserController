@@ -219,13 +219,20 @@ public:
     virtual void undo() override;
     virtual void redo() override;
 private:
+    LaserScene * m_scene;
     LaserViewer * m_viewer;
     QList<QGraphicsItem*> m_list;
+    QList<QSet<LaserPrimitive*>> m_groupUndoJoinedList;
+    QList<QSet<LaserPrimitive*>> m_ungroupUndoJoinedList;
+    QSet<LaserPrimitive*>* m_groupJoinedSet;
     bool m_isUngroup;
     QAction* m_joinedGroupAction;
     QAction* m_joinedUngroupAction;
     void handleGroup();
     void handleUnGroup();
+    void undoGroup();
+    void undoUnGroup();
+    void restoreJoinedGroup();
 };
 //arrange align
 class ArrangeAlignCommand : public QUndoCommand {

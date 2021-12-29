@@ -234,9 +234,10 @@ void AddDelUndoCommand::redo()
 			emit m_viewer->idleToSelected();
 		}
 	}
-    m_scene->document()->updateDocumentBounding();
-	m_viewer->viewport()->repaint();
+    //m_scene->document()->updateDocumentBounding();
+	
     emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
 }
 
 void AddDelUndoCommand::sceneTransformToItemTransform(QTransform sceneTransform, QGraphicsItem * item)
@@ -959,6 +960,13 @@ JoinedGroupCommand::JoinedGroupCommand(LaserViewer * viewer, QAction* _joinedGro
 {
     m_list = m_viewer->group()->childItems();
     int i = m_list.size();
+    m_scene = m_viewer->scene();
+    if (m_isUngroup) {
+
+    }
+    else {
+        m_groupJoinedSet = nullptr;
+    }
 }
 
 JoinedGroupCommand::~JoinedGroupCommand()
@@ -969,12 +977,13 @@ JoinedGroupCommand::~JoinedGroupCommand()
 void JoinedGroupCommand::undo()
 {
     if (!m_isUngroup) {
-        handleUnGroup();
+        undoGroup();
         
     }
     else {
-        handleGroup();
+        undoUnGroup();
     }
+    m_viewer->viewport()->repaint();
     emit LaserApplication::mainWindow->joinedGroupChanged();
 }
 
@@ -994,11 +1003,32 @@ void JoinedGroupCommand::handleGroup()
 {
     //QRect sceneBoundingRect;
     //utils::boundingRect(m_list, sceneBoundingRect, QRect(), false);
+    m_groupJoinedSet = new QSet<LaserPrimitive*>();
     for (QGraphicsItem* item : m_list) {
-        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-        primitive->setJoinedGroup(true);
-        //primitive->setJoinedGroupSceneBoundingRect(sceneBoundingRect);
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);      
+        if (primitive->isJoinedGroup()) {
+            QSet<LaserPrimitive*>* joinedSet = primitive->joinedGroupList();
+            for (QSet<LaserPrimitive*>::iterator p = joinedSet->begin();
+                p != joinedSet->end(); p++) {
+                (*p)->setJoinedGroup(nullptr);
+            }
+            //befor clear save and copy the set
+            m_groupUndoJoinedList.append(*joinedSet);
+            //clear original set
+            joinedSet->clear();
+            m_scene->joinedGroupList().removeOne(joinedSet);
+            delete joinedSet;
+        }
+        primitive->setJoinedGroup(m_groupJoinedSet);
     }
+    if (!m_groupJoinedSet->isEmpty()) {
+        m_scene->joinedGroupList().append(m_groupJoinedSet);
+    }
+    else {
+        delete m_groupJoinedSet;
+        m_groupJoinedSet = nullptr;
+    }
+    
     m_viewer->viewport()->repaint();
     m_joinedGroupAction->setEnabled(false);
     m_joinedUngroupAction->setEnabled(true);
@@ -1008,11 +1038,64 @@ void JoinedGroupCommand::handleUnGroup()
 {
     for (QGraphicsItem* item : m_list) {
         LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-        primitive->setJoinedGroup(false);
+        if (primitive->isJoinedGroup()) {
+            QSet<LaserPrimitive*> set = *(primitive->joinedGroupList());
+            m_ungroupUndoJoinedList.append(set);
+            for (QSet<LaserPrimitive*>::iterator p = set.begin(); p != set.end(); p++) {
+                (*p)->setJoinedGroup(nullptr);
+            }
+        }
+        
     }
     m_viewer->viewport()->repaint();
     m_joinedGroupAction->setEnabled(true);
     m_joinedUngroupAction->setEnabled(false);
+}
+
+void JoinedGroupCommand::undoGroup()
+{
+    //clear the joined group
+    if (m_groupJoinedSet) {
+        m_scene->joinedGroupList().removeOne(m_groupJoinedSet);
+        m_groupJoinedSet->clear();
+        delete m_groupJoinedSet;
+        m_groupJoinedSet = nullptr;
+    }
+    restoreJoinedGroup();  
+}
+    
+
+void JoinedGroupCommand::undoUnGroup()
+{
+    restoreJoinedGroup();
+}
+
+void JoinedGroupCommand::restoreJoinedGroup()
+{
+    QList<QSet<LaserPrimitive*>>* restoreList;
+    if (!m_isUngroup) {
+        restoreList = &m_groupUndoJoinedList;
+    }
+    else {
+        restoreList = &m_ungroupUndoJoinedList;
+    }
+    //first, all ungroup
+    for (QGraphicsItem* item : m_list) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        p->setJoinedGroup(nullptr);
+    }
+    //second, restore joined before
+    for (QSet<LaserPrimitive*> pSet : *restoreList) {
+        if (pSet.empty()) {
+            continue;
+        }
+        QSet<LaserPrimitive*>* joinedSet = new QSet<LaserPrimitive*>();
+        for (QSet<LaserPrimitive*>::iterator p = pSet.begin();
+            p != pSet.end(); p++) {
+            (*p)->setJoinedGroup(joinedSet);
+        }
+        m_scene->joinedGroupList().append(joinedSet);
+    }
 }
 
 ArrangeAlignCommand::ArrangeAlignCommand(LaserViewer * viewer, int type)
@@ -1079,10 +1162,10 @@ void ArrangeAlignCommand::redo()
             }
         }
         else {
-            QList<LaserPrimitive*> alignTargetList = m_alignTarget->joinedGroupList();           
-            if (!alignTargetList.contains(p)) {
+            QSet<LaserPrimitive*>* alignTargetList = m_alignTarget->joinedGroupList();           
+            if (!alignTargetList->contains(p)) {
                 QRect targetBounds;
-                utils::boundingRect(alignTargetList, targetBounds, QRect(), false);
+                utils::boundingRect(*alignTargetList, targetBounds, QRect(), false);
                 QRect scrBound;
                 if (!p->isJoinedGroup()) {
                     scrBound = p->sceneBoundingRect();
@@ -1197,11 +1280,11 @@ QRect ArrangeAlignCommand::joinedGroupSceneBounds(LaserPrimitive * p)
 {
     QRect bounds;
     for (QMap<LaserPrimitive*, QRect>::Iterator i = joinedGroupBoundsMap.begin(); i != joinedGroupBoundsMap.end(); i++) {
-        if (p->joinedGroupList().contains(i.key())) {
+        if (p->joinedGroupList()->contains(i.key())) {
             return i.value();
         }
     }
-    utils::boundingRect(p->joinedGroupList(), bounds, QRect(), false);
+    utils::boundingRect(*(p->joinedGroupList()), bounds, QRect(), false);
     joinedGroupBoundsMap.insert(p, bounds);
     return bounds;
 }

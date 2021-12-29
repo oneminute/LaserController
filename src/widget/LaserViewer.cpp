@@ -1437,8 +1437,17 @@ return;
     qreal scale = adapterViewScale();
     QRect bgRect = backgroundItem->rect();
     QPoint center(bgRect.left() + bgRect.width(), bgRect.top() + bgRect.height());
-    zoomBy(scale / zoomValue(), mapTo(this, mapFromScene(center)), true);
-    viewport()->repaint();
+    center = this->rect().center();
+    //zoomBy(1, mapToScene(0, 0));
+
+    //setZoomValue(scale);
+    //backgroundItem->setPos(0, 0);
+    qDebug() << mapFrom(this, QPoint(0, 0));
+    qDebug() << mapFromScene(0, 0);
+    QPoint diff = (mapFrom(this, QPoint(0, 0)) - mapFromScene(0, 0))/zoomValue();
+    //this->translate(diff.x(), diff.y());
+    //this->scale(scale / zoomValue(), scale / zoomValue());
+    resetZoom();
 }
 
 void LaserViewer::leaveEvent(QEvent* event)
@@ -1486,9 +1495,13 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 
                 //clearGroupSelection();
                 m_detectedPrimitive->setSelected(true);
-                for (LaserPrimitive* p : m_detectedPrimitive->joinedGroupList()) {
-                    p->setSelected(true);
+                if (m_detectedPrimitive->isJoinedGroup()) {
+                    for (QSet<LaserPrimitive*>::iterator p = m_detectedPrimitive->joinedGroupList()->begin();
+                        p != m_detectedPrimitive->joinedGroupList()->end(); p++) {
+                        (*p)->setSelected(true);
+                    }
                 }
+                
                 if (onSelectedFillGroup()) {
                     m_curSelectedHandleIndex = 13;
                     emit beginIdelEditing();
@@ -1511,9 +1524,13 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                     selectionUndoStackPushBefore();
                     //transformUndoStackPushBefore();
                     m_detectedBitmap->setSelected(true);
-                    for (LaserPrimitive* p : m_detectedBitmap->joinedGroupList()) {
-                        p->setSelected(true);
+                    if (m_detectedBitmap->isJoinedGroup()) {
+                        for (QSet<LaserPrimitive*>::iterator p = m_detectedBitmap->joinedGroupList()->begin();
+                            p != m_detectedBitmap->joinedGroupList()->end(); p++) {
+                            (*p)->setSelected(true);
+                        }
                     }
+                    
                     if (onSelectedFillGroup()) {
                         m_curSelectedHandleIndex = 14;
                         emit beginIdelEditing();
@@ -3536,9 +3553,13 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 				}
 
 				bitmap->setSelected(true);
-                for (LaserPrimitive* p : bitmap->joinedGroupList()) {
-                    p->setSelected(true);
+                if (bitmap->isJoinedGroup()) {
+                    for (QSet<LaserPrimitive*>::iterator p = bitmap->joinedGroupList()->begin();
+                        p != bitmap->joinedGroupList()->end(); p++) {
+                        (*p)->setSelected(true);
+                    }
                 }
+                
 				if (!onSelectedFillGroup()) {
 					emit selectionToIdle();
 				}
@@ -3556,8 +3577,11 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 						m_curSelectedHandleIndex = handleIndex;//点选
 					}
 					bitmap->setSelected(false);
-                    for (LaserPrimitive* p : bitmap->joinedGroupList()) {
-                        p->setSelected(false);
+                    if (bitmap->isJoinedGroup()) {
+                        for (QSet<LaserPrimitive*>::iterator p = bitmap->joinedGroupList()->begin();
+                            p != bitmap->joinedGroupList()->end(); p++) {
+                            (*p)->setSelected(false);
+                        }
                     }
 					if (!onSelectedFillGroup()) {
 						this->viewport()->repaint();
@@ -3582,9 +3606,13 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 				clearGroupSelection();
 			}
 			primitive->setSelected(true);
-            for (LaserPrimitive* p : primitive->joinedGroupList()) {
-                p->setSelected(true);
+            if (primitive->isJoinedGroup()) {
+                for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                    p != primitive->joinedGroupList()->end(); p++) {
+                    (*p)->setSelected(true);
+                }
             }
+            
 			if (!onSelectedFillGroup()) {
 				emit selectionToIdle();
 			}
@@ -3603,9 +3631,13 @@ void LaserViewer::pointSelectWhenSelectedState(int handleIndex, LaserPrimitive *
 					m_curSelectedHandleIndex = handleIndex;//点选
 				}
 				primitive->setSelected(false);
-                for (LaserPrimitive* p : primitive->joinedGroupList()) {
-                    p->setSelected(false);
+                if (primitive->isJoinedGroup()) {
+                    for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                        p != primitive->joinedGroupList()->end(); p++) {
+                        (*p)->setSelected(false);
+                    }
                 }
+                
 				if (!onSelectedFillGroup()) {
 					this->viewport()->repaint();
 					return;

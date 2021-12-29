@@ -1009,7 +1009,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMoveToPageRight, &QAction::triggered, this, &LaserControllerWindow::onActionMovePageToRight);
     connect(m_ui->actionSelectAll, &QAction::triggered, this, &LaserControllerWindow::onActionSelectAll);
     connect(m_ui->actionInvertSelection, &QAction::triggered, this, &LaserControllerWindow::onActionInvertSelect);
-    //connect(m_arrangeButtonAlignHorinzontal, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignHorinzontal);
+    //shapes weld/ two shapes unite
+    connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
     //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -1276,7 +1277,7 @@ void LaserControllerWindow::changeAlignButtonsEnable()
             }
             else {
                 //exist joined group
-                if (p->joinedGroupList().size() == items.size()) {
+                if (p->joinedGroupList()->size() == items.size()) {
                     m_arrangeButtonAlignCenter->setEnabled(false);
                     m_arrangeButtonAlignHorinzontal->setEnabled(false);
                     m_arrangeButtonAlignVertical->setEnabled(false);
@@ -1350,13 +1351,66 @@ void LaserControllerWindow::setAlignTargetState(bool isAlignTarget)
         return;
     }
     if (m_alignTarget->isJoinedGroup()) {
-        for (LaserPrimitive* p : m_alignTarget->joinedGroupList()) {
-            p->setAlignTarget(isAlignTarget);
+        for (QSet<LaserPrimitive*>::iterator p = m_alignTarget->joinedGroupList()->begin();
+            p != m_alignTarget->joinedGroupList()->end(); p ++){
+            (*p)->setAlignTarget(isAlignTarget);
         }
     }
     else {
         m_alignTarget->setAlignTarget(isAlignTarget);
     }
+}
+
+/*void LaserControllerWindow::changeShapesWeldButtonsEnable()
+{
+    LaserPrimitiveGroup*g = m_viewer->group();
+    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
+    if (items.size() < 2) {
+        m_ui->actionUniteTwoShapes->setEnabled(false);
+    }
+    else {
+        //int 
+        for (QGraphicsItem* item : m_viewer->group()->childItems()) {
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+            if (primitive->isJoinedGroup()) {
+
+            }
+        }
+        //m_ui->actionUnitTwoShapes->setEnabled(false);
+    }
+}*/
+
+LaserPath* LaserControllerWindow::uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
+    LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup)
+{   
+    QPainterPath path1 = p1->getScenePath();
+    QPainterPath path2 = p2->getScenePath();
+    //not interset
+    if (!path1.intersects(path2)) {
+        //if()交集部分剪掉
+        p1->setJoinedGroup(joinedGroup);
+        //joinedGroup->append(p2);
+        m_scene->addLaserPrimitive(p1, layer, false);
+        p2->setJoinedGroup(joinedGroup);
+        //joinedGroup->append(p1);
+        m_scene->addLaserPrimitive(p2, layer, false);
+        return nullptr;
+    }
+    //interset
+    QPainterPath path;
+    path.addPath(path1 + path2);
+    
+    LaserPath* lPath = new LaserPath(path, m_scene->document(), QTransform(), layer->index());
+    m_scene->addLaserPrimitive(lPath, false);
+    m_viewer->group()->removeAllFromGroup();
+    m_scene->removeLaserPrimitive(p1, true);
+    m_scene->removeLaserPrimitive(p2, true);
+    lPath->setSelected(true);
+    m_viewer->group()->addToGroup(lPath);
+    if (!joinedGroup) {
+        joinedGroup->insert(lPath);
+    }
+    return lPath;
 }
 
 bool LaserControllerWindow::unitIsMM()
@@ -3528,10 +3582,9 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
         return;
     }
     
-    //view->clearGroupSelection();
-    //清空group
+    //清空group并将transform设为单位transform
     if (m_viewer->group()) {
-        m_viewer->group()->removeAllFromGroup(true);
+        m_viewer->group()->reset(true);
     }
     else {
         m_viewer->createGroup();
@@ -4692,53 +4745,50 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         m_ui->actionMirrorVertical->setEnabled(false);
     }
     //joinedGroupButtonsChanged
-    if (items.length() > 1) {
-        
-        //group,ungroup
-        bool hasJoined = false;
-        bool hasNotJoined = false;
-        for (QGraphicsItem* item : items) {
-            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-            //group,ungroup
-            if (p->isJoinedGroup()) {
-                hasJoined = true;
+    //group,ungroup
+    bool hasJoined = false;
+    //计算选中的图元中，有多少个组和单个图元
+    int count = 0;
+    QList<QSet<LaserPrimitive*>*> countedJoinedList;
+    for (QGraphicsItem* item : items) {
+        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+        if (p->isJoinedGroup()) {
+            hasJoined = true;
+            if (!countedJoinedList.contains(p->joinedGroupList())) {
+                countedJoinedList.append(p->joinedGroupList());
+                count++;
             }
-            else {
-                hasNotJoined = true;
-            }
-            if (hasJoined && hasNotJoined) {
-                break;
-            }
-        }
-        if (hasJoined) {
-            if (hasNotJoined) {
-                m_ui->actionGroup->setEnabled(true);
-                m_ui->actionUngroup->setEnabled(true);
-            }
-            else {
-                m_ui->actionGroup->setEnabled(false);
-                m_ui->actionUngroup->setEnabled(true);
-            }
-
         }
         else {
-            if (hasNotJoined) {
-                m_ui->actionGroup->setEnabled(true);
-                m_ui->actionUngroup->setEnabled(false);
-            }
-            else {
-                m_ui->actionGroup->setEnabled(false);
-                m_ui->actionUngroup->setEnabled(false);
-            }
+            count++;
         }
-
+    }
+    //unite 
+    if (count == 2) {
+        m_ui->actionUniteTwoShapes->setEnabled(true);
+    }
+    else {
+        m_ui->actionUniteTwoShapes->setEnabled(false);
+    }
+    if (count > 1) {
+        m_ui->actionGroup->setEnabled(true);
     }
     else {
         m_ui->actionGroup->setEnabled(false);
+    }
+
+    if (hasJoined) {
+        m_ui->actionUngroup->setEnabled(true);
+    }
+    else {
         m_ui->actionUngroup->setEnabled(false);
     }
+    
     //Align
     changeAlignButtonsEnable();
+    //shapes weld/ two shapes unit
+    //changeShapesWeldButtonsEnable();
+
 }
 void LaserControllerWindow::onJoinedGroupChanged()
 {
@@ -5632,6 +5682,20 @@ void LaserControllerWindow::onActionInvertSelect()
 {
     CommonSelectionCommand* cmd = new CommonSelectionCommand(m_viewer, true);
     m_viewer->undoStack()->push(cmd);
+}
+
+void LaserControllerWindow::onActionTwoShapesUnite()
+{
+    LaserPrimitiveGroup*g = m_viewer->group();
+    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
+    LaserPrimitive* p1 = qgraphicsitem_cast<LaserPrimitive*>(items[0]);
+    LaserPrimitive* p2 = qgraphicsitem_cast<LaserPrimitive*>(items[1]);
+    LaserLayer* layer = p1->layer();
+    if (p1->layer()->index() > p2->layer()->index()) {
+        layer = p2->layer();
+    }
+    uniteTwoShapes(p1, p2, layer, nullptr);
+    m_viewer->viewport()->repaint();
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)
