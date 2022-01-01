@@ -328,13 +328,12 @@ void CameraToolsWindow::onActionCapture(bool checked)
 
 void CameraToolsWindow::onActionApplyCameraSettings(bool checked)
 {
-    m_cameraController->load(m_comboBoxCameras->currentIndex());
+    //m_cameraController->load(m_comboBoxCameras->currentIndex());
 }
 
-void CameraToolsWindow::onFrameCaptured()
+void CameraToolsWindow::onFrameCaptured(cv::Mat processed, cv::Mat origin)
 {
-    cv::Mat mat = m_cameraController->image();
-    QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+    QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
     m_labelImageSize->setText(QString("%1 x %2").arg(image.width()).arg(image.height()));
     m_imageViewerCamera->setImage(image);
 }
@@ -348,5 +347,4 @@ void CameraToolsWindow::onComboBoxCamerasIndexChanged(int index)
 {
     QCameraInfo& info = m_comboBoxCameras->currentData().value<QCameraInfo>();
     qLogD << info.description() << ", " << info.deviceName();
-    m_cameraController->load(m_comboBoxCameras->currentIndex());
 }

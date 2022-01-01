@@ -210,7 +210,7 @@ bool ConfigItemGroup::load()
     return true;
 }
 
-bool ConfigItemGroup::save(bool force, bool ignorePreSaveHook)
+bool ConfigItemGroup::save(bool force, bool ignorePreSaveHook, bool ignoreApply)
 {
     Q_D(ConfigItemGroup);
     if (!ignorePreSaveHook && d->preSaveHook)
@@ -233,10 +233,13 @@ bool ConfigItemGroup::save(bool force, bool ignorePreSaveHook)
         QJsonDocument doc(json);
         configFile.write(doc.toJson(QJsonDocument::JsonFormat::Indented));
         configFile.close();
-        for (ConfigItem* item : d->items)
+        if (!ignoreApply)
         {
-            item->apply();
-            item->clearModified();
+            for (ConfigItem* item : d->items)
+            {
+                item->apply();
+                item->clearModified();
+            }
         }
         return true;
     }

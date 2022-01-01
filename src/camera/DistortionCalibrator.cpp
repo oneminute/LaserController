@@ -25,7 +25,7 @@ DistortionCalibrator::DistortionCalibrator(QObject* parent)
     , fixK4(false)
     , fixK5(false)
 {
-
+    loadCoeffs();
 }
 
 DistortionCalibrator::~DistortionCalibrator()
@@ -36,7 +36,6 @@ bool DistortionCalibrator::validate()
 {
     bool goodInput = true;
     QSize resolution = Config::Camera::resolution();
-    aspectRatio = resolution.width() * 1.0 / resolution.height();
 
     flag = 0;
     if (calibFixPrincipalPoint) flag |= cv::CALIB_FIX_PRINCIPAL_POINT;
@@ -47,8 +46,6 @@ bool DistortionCalibrator::validate()
     if (fixK3)                  flag |= cv::CALIB_FIX_K3;
     if (fixK4)                  flag |= cv::CALIB_FIX_K4;
     if (fixK5)                  flag |= cv::CALIB_FIX_K5;
-
-    //flag |= cv::CALIB_USE_INTRINSIC_GUESS;
 
     if (useFisheye) {
         // the fisheye model has its own enum, so overwrite the flags
@@ -63,7 +60,7 @@ bool DistortionCalibrator::validate()
     return goodInput;
 }
 
-bool DistortionCalibrator::process(cv::Mat& mat)
+bool DistortionCalibrator::process(cv::Mat& processing, cv::Mat origin)
 {
     validate();
     bool result = false;
@@ -73,30 +70,27 @@ bool DistortionCalibrator::process(cv::Mat& mat)
         result = true;
         break;
     case Role_Capture:
-        result = captureSample(mat);
+        result = captureSample(processing, origin);
         break;
     case Role_Undistortion:
-        result = undistortImage(mat);
+        result = undistortImage(processing);
         break;
     }
 
     if (m_requestCalibration)
     {
-        calibration();
+        calibrate();
     }
 
     return result;
 }
 
-bool DistortionCalibrator::captureSample(cv::Mat& mat)
+bool DistortionCalibrator::captureSample(cv::Mat& processing, cv::Mat origin)
 {
-    cv::Mat view;
-    bool blinkOutput = false;
-
-    if (mat.empty())
+    if (processing.empty())
         return false;
 
-    view = mat;
+    cv::Mat undistortedMat = origin.clone();
 
     //! [find_pattern]
     std::vector<cv::Point2f> pointBuf;
@@ -114,20 +108,19 @@ bool DistortionCalibrator::captureSample(cv::Mat& mat)
     switch (Config::Camera::calibrationPattern()) // Find feature points on the input format
     {
     case CP_CHESSBOARD:
-        found = cv::findChessboardCorners(view, boardSize, pointBuf, chessBoardFlags);
+        found = cv::findChessboardCorners(processing, boardSize, pointBuf, chessBoardFlags);
         break;
     case CP_CIRCLES_GRID:
-        found = cv::findCirclesGrid(view, boardSize, pointBuf);
+        found = cv::findCirclesGrid(processing, boardSize, pointBuf);
         break;
     case CP_ASYMMETRIC_CIRCLES_GRID:
-        found = cv::findCirclesGrid(view, boardSize, pointBuf, cv::CALIB_CB_ASYMMETRIC_GRID);
+        found = cv::findCirclesGrid(processing, boardSize, pointBuf, cv::CALIB_CB_ASYMMETRIC_GRID);
         break;
     case CP_CHARUCO_BOARD:
     default:
         found = false;
         break;
     }
-    //qLogD << "point buf size: " << pointBuf.size();
 
     if (found)                // If done with success,
     {
@@ -135,49 +128,50 @@ bool DistortionCalibrator::captureSample(cv::Mat& mat)
         if (Config::Camera::calibrationPattern() == CP_CHESSBOARD)
         {
             cv::Mat viewGray;
-            cvtColor(view, viewGray, cv::COLOR_BGR2GRAY);
+            cvtColor(processing, viewGray, cv::COLOR_BGR2GRAY);
             cornerSubPix(viewGray, pointBuf, cv::Size(winSize, winSize),
                 cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.0001));
         }
 
         // Draw the corners.
-        drawChessboardCorners(view, boardSize, cv::Mat(pointBuf), found);
+        drawChessboardCorners(processing, boardSize, cv::Mat(pointBuf), found);
 
         if (m_requestCapture)
         {
             //m_imagePoints.push_back(pointBuf);
             CalibratorItem item;
-            item.sample = view;
-            item.confidence = 1.0;
             item.points = pointBuf;
             m_samples.append(item);
+            qreal error = this->calibrate();
+            m_samples.last().confidence = error;
             m_requestCapture = false;
-            emit sampleCaptured();
+            undistortImage(undistortedMat);
+            emit sampleCaptured(undistortedMat, error);
         }
     }
 
     return true;
 }
 
-bool DistortionCalibrator::undistortImage(cv::Mat& inMat)
+bool DistortionCalibrator::undistortImage(cv::Mat& processing)
 {
-    cv::Mat temp = inMat.clone();
+    cv::Mat temp = processing.clone();
     if (cameraMatrix.empty() || distCoeffs.empty())
         return false;
     if (useFisheye)
     {
         cv::Mat newCamMat;
-        cv::fisheye::estimateNewCameraMatrixForUndistortRectify(cameraMatrix, distCoeffs, inMat.size(),
+        cv::fisheye::estimateNewCameraMatrixForUndistortRectify(cameraMatrix, distCoeffs, processing.size(),
             cv::Matx33d::eye(), newCamMat, 1);
-        cv::fisheye::undistortImage(temp, inMat, cameraMatrix, distCoeffs, newCamMat);
+        cv::fisheye::undistortImage(temp, processing, cameraMatrix, distCoeffs, newCamMat);
         return true;
     }
     else
-        undistort(temp, inMat, cameraMatrix, distCoeffs);
+        undistort(temp, processing, cameraMatrix, distCoeffs);
     return true;
 }
 
-bool DistortionCalibrator::calibration()
+qreal DistortionCalibrator::calibrate()
 {
     QSize resolution = Config::Camera::resolution();
     cv::Size imageSize(resolution.width(), resolution.height());
@@ -206,15 +200,11 @@ bool DistortionCalibrator::calibration()
     std::cout << cameraMatrix << std::endl;
     std::cout << "dist coeffs: " << std::endl;
     std::cout << distCoeffs << std::endl;
-    /*if (ok)
-        saveCameraParams(s, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, reprojErrs, imagePoints,
-            totalAvgErr, newObjPoints);*/
-    if (ok)
-        emit calibrated();
-
     m_requestCalibration = false;
 
-    return ok;
+    if (!ok)
+        return -1;
+    return totalAvgErr;
 }
 
 bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
@@ -265,7 +255,8 @@ bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMa
         std::cout << cameraMatrix << std::endl;
         rms = calibrateCameraRO(objectPoints, imagePoints, imageSize, iFixedPoint,
             cameraMatrix, distCoeffs, rvecs, tvecs, newObjPoints,
-            flag | cv::CALIB_USE_LU);
+            //flag | cv::CALIB_USE_LU);
+            flag);
     }
 
     qLogD << "Re-projection error reported by calibrateCamera: " << rms;
@@ -276,6 +267,8 @@ bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMa
     objectPoints.resize(imagePoints.size(), newObjPoints);
     totalAvgErr = computeReprojectionErrors(objectPoints, imagePoints, rvecs, tvecs, cameraMatrix,
         distCoeffs, reprojErrs, useFisheye);
+
+    qLogD << "totalAvgErr: " << totalAvgErr;
 
     return ok;
 }
@@ -355,6 +348,16 @@ QList<CalibratorItem> DistortionCalibrator::calibrationSamples() const
     return m_samples;
 }
 
+const CalibratorItem& DistortionCalibrator::currentItem() const
+{
+    return m_samples.last();
+}
+
+void DistortionCalibrator::removeCurrentItem()
+{
+    m_samples.removeLast();
+}
+
 int DistortionCalibrator::calibrationSamplesCount() const
 {
     return m_samples.size();
@@ -401,6 +404,7 @@ void DistortionCalibrator::loadSamples()
     int count;
     s["samples_size"] >> count;
     cv::FileNode samplesNode = s["samples"];
+    qreal error = 0;
     for (cv::FileNodeIterator it = samplesNode.begin(); it != samplesNode.end(); it++)
     {
         CalibratorItem item;
@@ -409,9 +413,47 @@ void DistortionCalibrator::loadSamples()
         (*it)["confidence"] >> item.confidence;
         (*it)["transform"] >> item.transform;
         m_samples.append(item);
+        error = item.confidence;
     }
-    emit sampleCaptured();
+    emit sampleCaptured(cv::Mat(), error);
     s.release();
+}
+
+bool DistortionCalibrator::saveCoeffs()
+{
+    QList<QVariant> coeffs;
+    coeffs
+        << cameraMatrix.at<double>(0, 0)
+        << cameraMatrix.at<double>(1, 1)
+        << cameraMatrix.at<double>(0, 2)
+        << cameraMatrix.at<double>(1, 2)
+        << distCoeffs.at<double>(0)
+        << distCoeffs.at<double>(1)
+        << distCoeffs.at<double>(2)
+        << distCoeffs.at<double>(3)
+        << distCoeffs.at<double>(4)
+        ;
+    qLogD << coeffs;
+    Config::Camera::undistortionCoeffsItem()->setValue(coeffs, SS_DIRECTLY, this);
+    return true;
+}
+
+bool DistortionCalibrator::loadCoeffs()
+{
+    QList<QVariant> coeffs = Config::Camera::undistortionCoeffs();
+    qLogD << coeffs;
+    cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+    distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+    cameraMatrix.at<double>(0, 0) = coeffs.at(0).toReal();
+    cameraMatrix.at<double>(1, 1) = coeffs.at(1).toReal();
+    cameraMatrix.at<double>(0, 2) = coeffs.at(2).toReal();
+    cameraMatrix.at<double>(1, 2) = coeffs.at(3).toReal();
+    distCoeffs.at<double>(0) = coeffs.at(4).toReal();
+    distCoeffs.at<double>(1) = coeffs.at(5).toReal();
+    distCoeffs.at<double>(2) = coeffs.at(6).toReal();
+    distCoeffs.at<double>(3) = coeffs.at(7).toReal();
+    distCoeffs.at<double>(4) = coeffs.at(8).toReal();
+    return true;
 }
 
 void DistortionCalibrator::generateCalibrationBoard()
@@ -437,11 +479,11 @@ void DistortionCalibrator::generateACirclesBoard()
 {
     int rows = Config::Camera::vCornersCount();
     int cols = Config::Camera::hCornersCount() * 2;
-    int squreSize = Config::Camera::squareSize() * 10;
-    qreal halfSqureSize = squreSize * 1.0 / 2;
-    qreal radius = squreSize * Config::Camera::radiusRate() / 2;
-    int pageWidth = cols * squreSize + squreSize * 2;
-    int pageHeight = rows * squreSize + squreSize * 2;
+    int squareSize = Config::Camera::squareSize() * 10;
+    qreal halfSqureSize = squareSize * 1.0 / 2;
+    qreal radius = squareSize * Config::Camera::radiusRate() / 2;
+    int pageWidth = cols * squareSize + squareSize * 2;
+    int pageHeight = rows * squareSize + squareSize * 2;
 
     QImage image(pageWidth, pageHeight, QImage::Format_Grayscale8);
     image.setDotsPerMeterX(10000);
@@ -458,7 +500,7 @@ void DistortionCalibrator::generateACirclesBoard()
             bool draw = (r + c) % 2 == 0;
             if (!draw)
                 continue;
-            QPointF center(c * squreSize + halfSqureSize + squreSize, r * squreSize + halfSqureSize + squreSize);
+            QPointF center(c * squareSize + halfSqureSize + squareSize, r * squareSize + halfSqureSize + squareSize);
             painter.drawEllipse(center, radius, radius);
         }
     }
@@ -473,9 +515,9 @@ void DistortionCalibrator::generateChessBoard()
 {
     int rows = Config::Camera::vCornersCount() + 1;
     int cols = Config::Camera::hCornersCount() + 1;
-    int squreSize = Config::Camera::squareSize() * 10;
+    int squareSize = Config::Camera::squareSize() * 10;
 
-    QImage image(cols * squreSize, rows * squreSize, QImage::Format_Grayscale8);
+    QImage image(cols * squareSize, rows * squareSize, QImage::Format_Grayscale8);
     image.setDotsPerMeterX(10000);
     image.setDotsPerMeterY(10000);
     image.fill(Qt::white);
@@ -491,7 +533,7 @@ void DistortionCalibrator::generateChessBoard()
                 painter.setBrush(QBrush(Qt::black));
             else
                 painter.setBrush(QBrush(Qt::white));
-            QRect rect(c * squreSize, r * squreSize, squreSize, squreSize);
+            QRect rect(c * squareSize, r * squareSize, squareSize, squareSize);
             painter.drawRect(rect);
         }
     }
