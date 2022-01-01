@@ -35,13 +35,13 @@ public:
 
     bool validate();
 
-    virtual bool process(cv::Mat& mat) override;
+    virtual bool process(cv::Mat& processing, cv::Mat origin) override;
 
-    bool captureSample(cv::Mat& mat);
+    bool captureSample(cv::Mat& processing, cv::Mat origin);
 
-    bool undistortImage(cv::Mat& inMat);
+    bool undistortImage(cv::Mat& processing);
 
-    bool calibration();
+    qreal calibrate();
 
     double computeReprojectionErrors(const std::vector<std::vector<cv::Point3f> >& objectPoints,
         const std::vector<std::vector<cv::Point2f> >& imagePoints,
@@ -56,6 +56,8 @@ public:
     void requestCapture();
 
     QList<CalibratorItem> calibrationSamples() const;
+    const CalibratorItem& currentItem() const;
+    void removeCurrentItem();
     int calibrationSamplesCount() const;
 
     void setRole(Role role);
@@ -64,6 +66,9 @@ public:
 
     void saveSamples();
     void loadSamples();
+
+    bool saveCoeffs();
+    bool loadCoeffs();
 
     static void generateCalibrationBoard();
 
@@ -78,8 +83,7 @@ protected:
     static void generateChessBoard();
 
 signals:
-    void sampleCaptured();
-    void calibrated();
+    void sampleCaptured(cv::Mat mat, qreal error);
 
 private:
     float aspectRatio;           // The aspect ratio
@@ -90,7 +94,7 @@ private:
     bool calibZeroTangentDist;   // Assume zero tangential distortion
     bool calibFixPrincipalPoint; // Fix the principal point at the center
     bool flipVertical;           // Flip the captured images around the horizontal axis
-    bool useFisheye;             // use fisheye camera model for calibration
+    bool useFisheye;             // use fisheye camera model for calibrate
     bool fixK1;                  // fix K1 distortion coefficient
     bool fixK2;                  // fix K2 distortion coefficient
     bool fixK3;                  // fix K3 distortion coefficient

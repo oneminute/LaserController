@@ -188,6 +188,8 @@ enum StoreStrategy
     /// </summary>
     SS_DIRECTLY,
 
+    SS_REGISTER,
+
     SS_NORMAL,
 
     /// <summary>
@@ -228,6 +230,7 @@ enum DataType
     DT_RECT,
     DT_POINT,
     DT_SIZE,
+    DT_LIST,
     DT_CUSTOM
 };
 

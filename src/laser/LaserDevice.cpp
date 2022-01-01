@@ -70,6 +70,7 @@ public:
     bool mainCardActivated;
     bool mainCardRegistered;
     DeviceState lastState;
+    QString password;
 };
 
 void LaserDevicePrivate::updateDeviceOriginAndTransform()
@@ -299,6 +300,18 @@ void LaserDevice::setPrinterDrawUnit(int unit, bool toCard)
 {
     Q_D(LaserDevice);
     d->printerDrawUnit = unit;
+}
+
+QString LaserDevice::password() const
+{
+    Q_D(const LaserDevice);
+    return d->password;
+}
+
+void LaserDevice::setPassword(const QString& value)
+{
+    Q_D(LaserDevice);
+    d->password = value;
 }
 
 QString LaserDevice::requestHardwareId() const

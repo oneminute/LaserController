@@ -771,7 +771,18 @@ void ConfigItem::setValue(const QVariant& value, StoreStrategy strategy_, void* 
             emit this->valueChanged(value, senderPtr);
             emit modifiedChanged(true);
         }
-        group()->save(true, true);
+        group()->save(true, true, true);
+        break;
+    case SS_REGISTER:
+        d->dirtyValue = value;
+        if (dirtyChanged)
+            emit dirtyValueChanged(value, senderPtr);
+        //if (valueChanged)
+        //{
+            //emit this->valueChanged(value, senderPtr);
+            //emit modifiedChanged(true);
+        //}
+        group()->save(true, false);
         break;
     case SS_NORMAL:
         d->dirtyValue = value;

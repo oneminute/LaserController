@@ -9,7 +9,7 @@ public:
     ImageProcessor();
     ~ImageProcessor();
 
-    virtual bool process(cv::Mat& mat) = 0;
+    virtual bool process(cv::Mat& processing, cv::Mat origin) = 0;
 
     bool enabled() const;
     void setEnabled(bool value);

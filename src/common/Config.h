@@ -122,6 +122,7 @@ public:
         CONFIG_ITEM_T(camera, calibrationPattern, CalibrationPattern)
         CONFIG_ITEM(camera, minCalibrationFrames, int, toInt)
         CONFIG_ITEM(camera, calibrationAutoCapture, bool, toBool)
+        CONFIG_ITEM_T(camera, undistortionCoeffs, QList<QVariant>)
 
         friend class Config;
     };

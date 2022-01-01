@@ -2,6 +2,8 @@
 #include "LaserApplication.h"
 #include "laser/LaserDriver.h"
 
+#include <opencv2/opencv.hpp>
+
 #ifdef _MSC_VER
 #    ifdef NDEBUG
 #        pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
@@ -17,6 +19,7 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<QPainterPath>("QPainterPath");
     qRegisterMetaType<QList<QPointF>>("QList<QPointF>");
+    qRegisterMetaType<cv::Mat>("cv::Mat");
 
     if (!app->initialize())
     {

@@ -148,32 +148,6 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         m_ui->treeWidgetCatalogue->addTopLevelItem(treeItem);
     }
 
-    Config::UserRegister::group->setPreSaveHook(
-        [=]() {
-            if (Config::UserRegister::group->isModified())
-                return LaserApplication::device->writeUserRegisters();
-            return false;
-        }
-    );
-    Config::SystemRegister::group->setPreSaveHook(
-        [=]() {
-            if (Config::SystemRegister::group->isModified())
-            {
-                // show password input dialog
-                /*QString password = QInputDialog::getText(
-                    this,
-                    tr("Manufacture Password"),
-                    tr("Password"),
-                    QLineEdit::Normal
-                );
-                if (password.isEmpty())
-                    return false;*/
-                return LaserApplication::device->writeSystemRegisters(m_password);
-            }
-            return false;
-        }
-    );
-
     m_ui->stackedWidgetPanels->setCurrentIndex(0);
     m_ui->treeWidgetCatalogue->setCurrentItem(m_ui->treeWidgetCatalogue->topLevelItem(0));
 
@@ -663,7 +637,7 @@ void ConfigDialog::onButtonPasswordClicked(bool checked)
     {
         // 验证成功
         m_passwordTimer.start(10000);
-        m_password = m_editPassword->text();
+        LaserApplication::device->setPassword(m_editPassword->text());
         m_ui->stackedWidgetPanels->setCurrentWidget(m_systemPage);
         m_editPassword->clear();
         m_errorCount = 0;

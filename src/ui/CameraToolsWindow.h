@@ -57,7 +57,7 @@ protected slots:
     void onActionCapture(bool checked);
     void onActionApplyCameraSettings(bool checked);
 
-    void onFrameCaptured();
+    void onFrameCaptured(cv::Mat processed, cv::Mat origin);
 
 signals:
 

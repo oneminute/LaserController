@@ -50,7 +50,7 @@ public:
     void updateTitleAndDesc(const QString& title, const QString& desc);
 
     bool load();
-    bool save(bool force, bool ignorePreSaveHook);
+    bool save(bool force, bool ignorePreSaveHook, bool ignoreApply = false);
 
     void setPreSaveHook(PreSaveHook hook);
 
