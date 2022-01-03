@@ -961,12 +961,12 @@ JoinedGroupCommand::JoinedGroupCommand(LaserViewer * viewer, QAction* _joinedGro
     m_list = m_viewer->group()->childItems();
     int i = m_list.size();
     m_scene = m_viewer->scene();
-    if (m_isUngroup) {
+    /*if (m_isUngroup) {
 
     }
     else {
         m_groupJoinedSet = nullptr;
-    }
+    }*/
 }
 
 JoinedGroupCommand::~JoinedGroupCommand()
@@ -1005,7 +1005,7 @@ void JoinedGroupCommand::handleGroup()
 {
     //QRect sceneBoundingRect;
     //utils::boundingRect(m_list, sceneBoundingRect, QRect(), false);
-    m_groupJoinedSet = new QSet<LaserPrimitive*>();
+    QSet<LaserPrimitive*>* groupJoinedSet = new QSet<LaserPrimitive*>();
     for (QGraphicsItem* item : m_list) {
         LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);      
         if (primitive->isJoinedGroup()) {
@@ -1021,14 +1021,14 @@ void JoinedGroupCommand::handleGroup()
             m_scene->joinedGroupList().removeOne(joinedSet);
             delete joinedSet;
         }
-        primitive->setJoinedGroup(m_groupJoinedSet);
+        primitive->setJoinedGroup(groupJoinedSet);
     }
-    if (!m_groupJoinedSet->isEmpty()) {
-        m_scene->joinedGroupList().append(m_groupJoinedSet);
+    if (!groupJoinedSet->isEmpty()) {
+        m_scene->joinedGroupList().append(groupJoinedSet);
     }
     else {
-        delete m_groupJoinedSet;
-        m_groupJoinedSet = nullptr;
+        delete groupJoinedSet;
+        groupJoinedSet = nullptr;
     }
     
     m_viewer->viewport()->repaint();
@@ -1050,18 +1050,14 @@ void JoinedGroupCommand::handleUnGroup()
         
     }
     m_viewer->viewport()->repaint();
-    //m_joinedGroupAction->setEnabled(true);
-    //m_joinedUngroupAction->setEnabled(false);
 }
 
 void JoinedGroupCommand::undoGroup()
 {
-    //clear the joined group
-    if (m_groupJoinedSet) {
-        m_scene->joinedGroupList().removeOne(m_groupJoinedSet);
-        m_groupJoinedSet->clear();
-        delete m_groupJoinedSet;
-        m_groupJoinedSet = nullptr;
+    LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(m_viewer->group()->childItems()[0]);
+    if (p->isJoinedGroup()) {
+        m_scene->joinedGroupList().removeOne(p->joinedGroupList());
+        delete p->joinedGroupList();
     }
     restoreJoinedGroup();  
 

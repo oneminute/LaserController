@@ -97,13 +97,6 @@ public:
     //void changeAlignButtonsEnable();
     void tabAlignTarget();
     void setAlignTargetState(bool isAlignTarget);
-    //shapes weld / tow shapes unite
-    //void changeShapesWeldButtonsEnable();
-    LaserPath* uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
-        LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup);
-    void uniteOrWeldShapes(bool isWeld, LaserLayer* layer);
-    void weldShapes(LaserLayer* layer, int type);
-    void uniteTwoShapes(LaserLayer* layer, int type);
     //selection property
     bool unitIsMM();
     QLabel* labelPercentage();

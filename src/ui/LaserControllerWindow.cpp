@@ -1380,196 +1380,6 @@ void LaserControllerWindow::setAlignTargetState(bool isAlignTarget)
     }
 }*/
 
-LaserPath* LaserControllerWindow::uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
-    LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup)
-{   
-    QPainterPath path1 = p1->getScenePath();
-    QPainterPath path2 = p2->getScenePath();
-    //not interset
-    if (!path1.intersects(path2)) {
-        //if()交集部分剪掉
-        p1->setJoinedGroup(joinedGroup);
-        //joinedGroup->append(p2);
-        m_scene->addLaserPrimitive(p1, layer, false);
-        p2->setJoinedGroup(joinedGroup);
-        //joinedGroup->append(p1);
-        m_scene->addLaserPrimitive(p2, layer, false);
-        return nullptr;
-    }
-    //interset
-    QPainterPath path;
-    path.addPath(path1 + path2);
-    
-    LaserPath* lPath = new LaserPath(path, m_scene->document(), QTransform(), layer->index());
-    m_scene->addLaserPrimitive(lPath, false);
-    m_viewer->group()->removeAllFromGroup();
-    m_scene->removeLaserPrimitive(p1, true);
-    m_scene->removeLaserPrimitive(p2, true);
-    lPath->setSelected(true);
-    m_viewer->group()->addToGroup(lPath);
-    if (!joinedGroup) {
-        joinedGroup->insert(lPath);
-    }
-    return lPath;
-}
-
-void LaserControllerWindow::uniteOrWeldShapes(bool isWeld, LaserLayer* layer)
-{
-    QList<QSet<LaserPrimitive*>*> traversedList;
-    QMap<QList<LaserPrimitive*>, QPainterPath> neatenedMap;
-    //QPainterPath allPath;
-    //重新整理选中的图元
-    for (QGraphicsItem* item : m_viewer->group()->childItems()) {
-        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-        if (primitive->isJoinedGroup()) {
-            //所属的joined group是否被遍历过
-            if (!traversedList.contains(primitive->joinedGroupList())) {
-                traversedList.append(primitive->joinedGroupList());
-                QList<LaserPrimitive*> gList;
-                QPainterPath path = primitive->getScenePath();
-                gList.append(primitive);
-                //整理这一个joined grouo中的图元，需要嵌套两个循环
-                for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
-                    p != primitive->joinedGroupList()->end(); p++) {
-                    //排除掉自身图元
-                    if ((*p) != primitive) {
-                        QPainterPath curPath = (*p)->getScenePath();
-                        if (path.intersects(curPath)) {
-                            if (isWeld) {
-                                path.united(curPath); 
-                            }
-                            else {
-                                path.addPath(curPath);
-                            }
-                            gList.append(*p);
-                        }
-                        else {
-                            //如果不相交就把joined group中当前判断的图元加到map中
-                            QList<LaserPrimitive*> signalList;
-                            signalList.append(*p);
-                            neatenedMap.insert(signalList, curPath);
-                        }
-                        
-                    }
-                }
-                //遍历完所在的joined group
-                neatenedMap.insert(gList, path);
-            }
-            
-        }
-    }
-    
-    for (QGraphicsItem* item : m_viewer->group()->childItems()) {
-        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-        QPainterPath path;
-        //确定primitive的path，分是否为joined group, 如果不相交则不加到path
-        /*if (primitive->isJoinedGroup()) {
-            for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
-                p != primitive->joinedGroupList()->end(); p++) {
-                if (isWeld) {
-
-                    path.united((*p)->getScenePath());
-                }
-                else {
-                    path.addPath((*p)->getScenePath());
-                }
-            }
-            //重置JoinedGroup属性
-            primitive->setJoinedGroup(nullptr);
-        }
-        else {
-            traversedList.append(primitive);
-            path = primitive->getScenePath();
-        }
-        
-        for (QGraphicsItem* item_1 : m_viewer->group()->childItems()) {
-            LaserPrimitive* primitive_1 = qgraphicsitem_cast<LaserPrimitive*>(item_1);
-            if (traversedList.contains(primitive_1)) {
-                continue;
-            }
-            if()
-            primitive->setLayer(layer);
-        }*/
-        
-        
-
-    }
-}
-
-void LaserControllerWindow::weldShapes(LaserLayer * layer, int type)
-{
-    QList<QGraphicsItem*>groupList = m_viewer->group()->childItems();
-    for (QGraphicsItem* item : groupList) {
-        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-        groupList.removeOne(primitive);
-        QPainterPath path = primitive->getScenePath();
-        if (primitive->isJoinedGroup()) {    
-            for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
-                p != primitive->joinedGroupList()->end(); p++) {
-                QPainterPath path_0 = (*p)->getScenePath();
-                if (path.intersects(path_0)) {
-                    switch (type) {
-                        case WeldShapes_TwoUnite: {
-                            path += path_0;
-                            break;
-                        }
-                        case WeldShapes_WeldAll: {
-                            path.addPath(path_0);
-                            break;
-                        }
-                        case WeldShapes_DiffTwoUnite: {
-                            break;
-                        }
-                    }
-                }
-                
-                
-            }
-            if (m_scene->joinedGroupList().contains(primitive->joinedGroupList())) {
-                QSet<LaserPrimitive*>* joinedSet = primitive->joinedGroupList();              
-                joinedSet->clear();
-                m_scene->joinedGroupList().removeOne(joinedSet);
-                delete joinedSet;
-            }
-            primitive->setJoinedGroup(nullptr);                     
-        }
-        
-        for (QGraphicsItem* item : groupList) {
-            LaserPrimitive* primitive_1 = qgraphicsitem_cast<LaserPrimitive*>(item);
-            QPainterPath path_1 = primitive_1->getScenePath();
-            if (path.intersects(path_1)) {
-                switch (type) {
-                    case WeldShapes_TwoUnite: {
-                        path += path_1;
-                        break;
-                    }
-                    case WeldShapes_WeldAll: {
-                        path.addPath(path_1);
-                        break;
-                    }
-                    case WeldShapes_DiffTwoUnite: {
-                        break;
-                    }
-                }
-                groupList.removeOne(primitive_1);
-            }
-            
-            
-        }
-    }
-}
-
-void LaserControllerWindow::uniteTwoShapes(LaserLayer * layer, int type)
-{
-    QList<QGraphicsItem*>groupList = m_viewer->group()->childItems();
-    for (QGraphicsItem* item : groupList) {
-        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-        QPainterPath path = primitive->getScenePath();
-        if (primitive->isJoinedGroup()) { 
-            
-        }
-    }
-}
 
 bool LaserControllerWindow::unitIsMM()
 {
@@ -3749,6 +3559,9 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     }
     for (LaserPrimitive* primitive : layer->primitives())
     {
+        if (!m_scene->document()->primitives().contains(primitive->id())) {
+            continue;
+        }
         primitive->setSelected(true);
         m_viewer->group()->addToGroup(primitive);
     }
@@ -5848,14 +5661,6 @@ void LaserControllerWindow::onActionInvertSelect()
 
 void LaserControllerWindow::onActionTwoShapesUnite()
 {
-    /*LaserPrimitiveGroup*g = m_viewer->group();
-    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
-    LaserPrimitive* p1 = qgraphicsitem_cast<LaserPrimitive*>(items[0]);
-    LaserPrimitive* p2 = qgraphicsitem_cast<LaserPrimitive*>(items[1]);
-    LaserLayer* layer = p1->layer();
-    if (p1->layer()->index() > p2->layer()->index()) {
-        layer = p2->layer();
-    }*/
     WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_TwoUnite);
     m_viewer->undoStack()->push(cmd);
     m_viewer->viewport()->repaint();

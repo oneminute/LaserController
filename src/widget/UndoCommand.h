@@ -224,7 +224,7 @@ private:
     QList<QGraphicsItem*> m_list;
     QList<QSet<LaserPrimitive*>> m_groupUndoJoinedList;
     QList<QSet<LaserPrimitive*>> m_ungroupUndoJoinedList;
-    QSet<LaserPrimitive*>* m_groupJoinedSet;
+    //QSet<LaserPrimitive*>* m_groupJoinedSet;
     bool m_isUngroup;
     QAction* m_joinedGroupAction;
     QAction* m_joinedUngroupAction;
