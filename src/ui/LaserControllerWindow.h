@@ -272,6 +272,7 @@ protected slots:
 
     void onActionCameraTools(bool checked = false);
     void onActionCameraCalibration();
+    void onActionGenerateCalibrationBoard();
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();

@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QPainter>
 
 #include "common/Config.h"
 #include "camera/DistortionCalibrator.h"
@@ -19,9 +20,11 @@ CalibrationDialog::CalibrationDialog(QWidget* parent)
 {
     m_labelStatus = new QLabel;
     m_labelStatus->setText(tr("Disconnected"));
+    m_frameStatus = new QLabel;
     QHBoxLayout* layout = buttonsLayout();
     layout->insertStretch(0);
     layout->insertWidget(0, m_labelStatus);
+    layout->insertWidget(1, m_frameStatus);
 
     m_page1 = new WizardDialogPage(tr("Introduce"));
     m_page1Introduction = new QLabel();
@@ -89,52 +92,93 @@ CalibrationDialog::CalibrationDialog(QWidget* parent)
     ));
     QLabel* page3GuideImage = new QLabel;
     page3GuideImage->setPixmap(QPixmap(":/ui/icons/images/calibration_guide.png").scaled(QSize(200, 200), Qt::KeepAspectRatio));
-    QHBoxLayout* page3GuideLayout = new QHBoxLayout;
-    page3GuideLayout->addWidget(page3GuideImage);
-    page3GuideLayout->addWidget(page3Guide);
-    page3GuideLayout->setStretch(0, 0);
-    page3GuideLayout->setStretch(1, 1);
-    m_page3ImageViewer = new ImageViewer;
-    m_page3ImageViewerSample = new ImageViewer;
-    QHBoxLayout* imagesLayout = new QHBoxLayout;
-    imagesLayout->addWidget(m_page3ImageViewer);
-    imagesLayout->addWidget(m_page3ImageViewerSample);
     QFormLayout* page3FormLayout = new QFormLayout;
-    m_page3SamplesCount = new QLabel;
-    m_page3Coverage = new QLabel;
+    m_page3SamplesCount = new QLabel(tr("0/%1").arg(Config::Camera::minCalibrationFrames()));
+    m_page3Coverage = new QLabel(tr("0%"));
+    m_page3Scores = new QLabel(tr("0"));
     page3FormLayout->addRow(tr("Samples"), m_page3SamplesCount);
     page3FormLayout->addRow(tr("Converage"), m_page3Coverage);
-    m_page3SamplesTable = new QTableWidget;
+    page3FormLayout->addRow(tr("Scores"), m_page3Scores);
+    //m_page3SamplesTable = new QTableWidget;
     //m_page3AutoCapture = new QCheckBox(tr("Auto Capture"));
     QCheckBox* page3AutoCapture = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Camera::calibrationAutoCaptureItem());
     m_page3ButtonCapture = new QPushButton(tr("Capture"));
+    connect(m_page3ButtonCapture, &QPushButton::clicked, this, &CalibrationDialog::onButtonCaptureClicked);
     m_page3ButtonStart = new QPushButton(tr("Start"));
     m_page3ButtonStop = new QPushButton(tr("Stop"));
     m_page3ButtonDelete = new QPushButton(tr("Delete"));
+    connect(m_page3ButtonDelete, &QPushButton::clicked, this, &CalibrationDialog::removeCurrentSample);
+#ifdef _DEBUG
+    m_page3ButtonLoadSamples = new QPushButton(tr("Load"));
+    connect(m_page3ButtonLoadSamples, &QPushButton::clicked, this, &CalibrationDialog::loadSamples);
+    m_page3ButtonSaveSamples = new QPushButton(tr("Save"));
+    connect(m_page3ButtonSaveSamples, &QPushButton::clicked, this, &CalibrationDialog::saveSamples);
+#endif
     QVBoxLayout* page3ButtonsLayout = new QVBoxLayout;
-    page3ButtonsLayout->addWidget(page3AutoCapture);
+    page3ButtonsLayout->addLayout(page3FormLayout);
+    //page3ButtonsLayout->addWidget(page3AutoCapture);
     page3ButtonsLayout->addWidget(m_page3ButtonCapture);
-    page3ButtonsLayout->addWidget(m_page3ButtonStart);
-    page3ButtonsLayout->addWidget(m_page3ButtonStop);
+    //page3ButtonsLayout->addWidget(m_page3ButtonStart);
+    //page3ButtonsLayout->addWidget(m_page3ButtonStop);
     page3ButtonsLayout->addWidget(m_page3ButtonDelete);
-    QHBoxLayout* page3ConfigLayout = new QHBoxLayout;
-    page3ConfigLayout->addLayout(page3FormLayout);
-    page3ConfigLayout->addWidget(m_page3SamplesTable);
-    page3ConfigLayout->addLayout(page3ButtonsLayout);
-    page3ConfigLayout->setStretch(0, 1);
-    page3ConfigLayout->setStretch(1, 1);
-    page3ConfigLayout->setStretch(2, 1);
+#ifdef _DEBUG
+    page3ButtonsLayout->addWidget(m_page3ButtonLoadSamples);
+    page3ButtonsLayout->addWidget(m_page3ButtonSaveSamples);
+#endif
+    //imagesLayout->addLayout(page3ButtonsLayout, 0, 1, 2, 1);
+    QHBoxLayout* page3GuideLayout = new QHBoxLayout;
+    page3GuideLayout->addWidget(page3GuideImage);
+    page3GuideLayout->addWidget(page3Guide);
+    page3GuideLayout->addLayout(page3ButtonsLayout);
+    page3GuideLayout->setStretch(0, 0);
+    page3GuideLayout->setStretch(1, 1);
+    page3GuideLayout->setStretch(2, 0);
+    m_page3ImageViewer = new ImageViewer;
+    m_page3ImageViewerSample = new ImageViewer;
+    QGridLayout* imagesLayout = new QGridLayout;
+    imagesLayout->addWidget(m_page3ImageViewer, 0, 0);
+    imagesLayout->addWidget(m_page3ImageViewerSample, 0, 1);
+    imagesLayout->setColumnStretch(0, 1);
+    imagesLayout->setColumnStretch(1, 1);
     page3Layout->addLayout(page3GuideLayout);
     page3Layout->addLayout(imagesLayout);
-    page3Layout->addLayout(page3ConfigLayout);
+    //page3Layout->addLayout(page3ConfigLayout);
     page3Layout->setStretch(0, 0);
     page3Layout->setStretch(1, 1);
     page3Layout->setStretch(2, 0);
     m_page3->setLayout(page3Layout);
     appendPage(m_page3);
 
-    m_page4 = new WizardDialogPage(tr("Verify"));
+    m_page4 = new WizardDialogPage(tr("Calibration"));
+    QVBoxLayout* page4Layout = new QVBoxLayout;
+    m_page4Introduction = new QLabel;
+    m_page4Introduction->setText(tr(
+        "<h1>Calibration</h1>"
+        "<ol>"
+        "<li>Click the \"calibrate\" button to do calibration;</li>"
+        "<li>When it has been done, you will see the undistorted image below;</li>"
+        "</ol>"
+    ));
+    m_page4ImageViewer = new ImageViewer;
+    QHBoxLayout* page4ButtonsLayout = new QHBoxLayout;
+    m_page4ButtonSave = new QPushButton;
+    m_page4ButtonSave->setText(tr("Save"));
+    page4ButtonsLayout->addWidget(m_page4ButtonSave);
+    connect(m_page4ButtonSave, &QPushButton::clicked, this, &CalibrationDialog::onButtonSaveCalibrationClicked);
+    page4Layout->addWidget(m_page4Introduction);
+    page4Layout->addWidget(m_page4ImageViewer);
+    page4Layout->addLayout(page4ButtonsLayout);
+    m_page4->setLayout(page4Layout);
     appendPage(m_page4);
+
+    connect(m_page1, &WizardDialogPage::entered, this, &CalibrationDialog::onPage1Entered);
+    connect(m_page1, &WizardDialogPage::exited, this, &CalibrationDialog::onPage1Exited);
+    connect(m_page2, &WizardDialogPage::entered, this, &CalibrationDialog::onPage2Entered);
+    connect(m_page2, &WizardDialogPage::exited, this, &CalibrationDialog::onPage2Exited);
+    connect(m_page3, &WizardDialogPage::entered, this, &CalibrationDialog::onPage3Entered);
+    connect(m_page3, &WizardDialogPage::exited, this, &CalibrationDialog::onPage3Exited);
+    connect(m_page4, &WizardDialogPage::entered, this, &CalibrationDialog::onPage4Entered);
+    connect(m_page4, &WizardDialogPage::exited, this, &CalibrationDialog::onPage4Exited);
 
     setLeftLayoutWidth(120);
 
@@ -144,6 +188,7 @@ CalibrationDialog::CalibrationDialog(QWidget* parent)
     connect(m_cameraController, &CameraController::connected, this, &CalibrationDialog::onCameraConnected);
     connect(m_cameraController, &CameraController::disconnected, this, &CalibrationDialog::onCameraDisconnected);
     connect(m_cameraController, &CameraController::frameCaptured, this, &CalibrationDialog::onFrameCaptured);
+    connect(m_calibrator, &DistortionCalibrator::sampleCaptured, this, &CalibrationDialog::onCalibrationSampleCaptured);
     m_cameraController->start();
 
     updatePage();
@@ -158,11 +203,46 @@ CalibrationDialog::~CalibrationDialog()
     SAFE_DELETE(m_calibrator);
 }
 
-void CalibrationDialog::onPage2Entered()
+void CalibrationDialog::onPage1Entered()
+{
+    m_calibrator->setEnabled(false);
+}
+
+void CalibrationDialog::onPage1Exited()
 {
 }
 
+void CalibrationDialog::onPage2Entered()
+{
+    m_calibrator->setEnabled(true);
+    m_calibrator->setRole(DistortionCalibrator::Role_Idle);
+    m_page2ImageViewer->fitBy(Config::Camera::resolution());
+}
+
 void CalibrationDialog::onPage2Exited()
+{
+}
+
+void CalibrationDialog::onPage3Entered()
+{
+    m_calibrator->setEnabled(true);
+    m_calibrator->setRole(DistortionCalibrator::Role_Capture);
+    m_page3ImageViewer->fitBy(Config::Camera::resolution());
+    m_page3ImageViewerSample->fitBy(Config::Camera::resolution());
+}
+
+void CalibrationDialog::onPage3Exited()
+{
+}
+
+void CalibrationDialog::onPage4Entered()
+{
+    m_calibrator->setEnabled(true);
+    m_calibrator->setRole(DistortionCalibrator::Role_Undistortion);
+    m_page4ImageViewer->fitBy(Config::Camera::resolution());
+}
+
+void CalibrationDialog::onPage4Exited()
 {
 }
 
@@ -178,18 +258,81 @@ void CalibrationDialog::onCameraDisconnected()
     m_labelStatus->setStyleSheet("color: rgb(255, 0, 0)");
 }
 
-void CalibrationDialog::onFrameCaptured()
+void CalibrationDialog::onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args)
 {
-    cv::Mat mat = m_cameraController->image();
-    QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+    QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
+    m_frameStatus->setText(tr("fps: %1, duration: %2").arg(1000.0 / args.duration, 0, 'f', 3).arg(args.duration));
     if (currentIndex() == 1)
     {
+        QSize imageSize = image.size();
+        QPainter painter;
+        painter.begin(&image);
+        painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+        QPoint center((imageSize.width() - 1) / 2, (imageSize.height() - 1) / 2);
+        int radius = 50;
+        painter.drawLine(center + QPoint(-radius, 0), center + QPoint(radius, 0));
+        painter.drawLine(center + QPoint(0, -radius), center + QPoint(0, radius));
+        painter.end();
         m_page2ImageViewer->setImage(image);
     }
     else if (currentIndex() == 2)
     {
+        QSize imageSize = image.size();
+        QPainter painter;
+        painter.begin(&image);
+        painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+        for (int r = 1; r < 3; r++)
+        {
+            int y = imageSize.height() * r / 3;
+            painter.drawLine(QPoint(0, y), QPoint(imageSize.width(), y));
+        }
+        for (int c = 1; c < 3; c++)
+        {
+            int x = imageSize.width() * c / 3;
+            painter.drawLine(QPoint(x, 0), QPoint(x, imageSize.height()));
+        }
+        painter.end();
         m_page3ImageViewer->setImage(image);
+
     }
+    else if (currentIndex() == 3)
+    {
+        QSize imageSize = image.size();
+        QPainter painter;
+        painter.begin(&image);
+        painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+        for (int r = 1; r < 4; r++)
+        {
+            int y = imageSize.height() * r / 4;
+            painter.drawLine(QPoint(0, y), QPoint(imageSize.width(), y));
+        }
+        for (int c = 1; c < 8; c++)
+        {
+            int x = imageSize.width() * c / 8;
+            painter.drawLine(QPoint(x, 0), QPoint(x, imageSize.height()));
+        }
+        painter.end();
+        m_page4ImageViewer->setImage(image);
+    }
+}
+
+void CalibrationDialog::onCalibrationSampleCaptured(cv::Mat mat, qreal error)
+{
+    m_page3SamplesCount->setText(tr("%1/%2").arg(m_calibrator->calibrationSamplesCount())
+        .arg(Config::Camera::minCalibrationFrames()));
+
+    m_page3Scores->setText(tr("%1").arg(error));
+
+    if (!mat.empty())
+    {
+        QImage originImage(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+        m_page3ImageViewerSample->setImage(originImage);
+    }
+}
+
+void CalibrationDialog::onButtonCaptureClicked()
+{
+    m_calibrator->requestCapture();
 }
 
 void CalibrationDialog::updatePage3Buttons(const QVariant& autoCapture)
@@ -206,4 +349,26 @@ void CalibrationDialog::updatePage3Buttons(const QVariant& autoCapture)
         m_page3ButtonStart->setEnabled(false);
         m_page3ButtonStop->setEnabled(false);
     }
+}
+
+void CalibrationDialog::loadSamples()
+{
+    m_calibrator->loadSamples();
+}
+
+void CalibrationDialog::saveSamples()
+{
+    m_calibrator->saveSamples();
+}
+
+void CalibrationDialog::removeCurrentSample()
+{
+    m_calibrator->removeCurrentItem();
+    m_page3SamplesCount->setText(tr("%1/%2").arg(m_calibrator->calibrationSamplesCount())
+        .arg(Config::Camera::minCalibrationFrames()));
+}
+
+void CalibrationDialog::onButtonSaveCalibrationClicked(bool checked)
+{
+    m_calibrator->saveCoeffs();
 }

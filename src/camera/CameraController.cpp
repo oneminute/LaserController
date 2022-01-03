@@ -15,22 +15,12 @@ CameraController::CameraController(QObject* parent)
     , m_status(CS_IDLE)
     , m_maxQueueLength(10)
 {
+    qRegisterMetaType<FrameArgs>("FrameArgs");
 }
 
 CameraController::~CameraController()
 {
     stop();
-}
-
-cv::Mat CameraController::image() const
-{
-    QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
-    if (m_images.empty())
-        return cv::Mat();
-    else
-    {
-        return m_images.last();
-    }
 }
 
 bool CameraController::setResolution(const QSize& size)
@@ -84,7 +74,8 @@ QList<int> CameraController::supportedCameras()
     int index = 0;
     for (const QCameraInfo& cameraInfo : cameras)
     {
-        if (cameraInfo.description().toLower().contains("lightburn"))
+        if (cameraInfo.description().toLower().contains("lightburn") ||
+            cameraInfo.description().toLower().contains("wn"))
         {
             supportedCameraIndices.append(index);
         }
@@ -96,8 +87,12 @@ QList<int> CameraController::supportedCameras()
 void CameraController::run()
 {
     cv::Mat frame;
+    cv::Mat origin;
+    cv::Mat processed;
     m_status = CS_STARTED;
     int errorCount = 0;
+    m_lastTime = QDateTime::currentDateTime();
+    int index = -1;
     while (m_status == CS_STARTED)
     {
         if (m_videoCapture->isOpened())
@@ -105,9 +100,13 @@ void CameraController::run()
             while (m_status == CS_STARTED)
             {
                 bool ok = m_videoCapture->read(frame);
+                QDateTime currTime = QDateTime::currentDateTime();
+                qint64 duration = m_lastTime.msecsTo(currTime);
+                m_lastTime = currTime;
+                //qLogD << duration << "ms";
                 if (!ok || frame.empty())
                 {
-                    emit error();
+                    emit error(Error_No_Data);
                     errorCount++;
                     if (errorCount >= 1)
                     {
@@ -118,22 +117,31 @@ void CameraController::run()
                     }
                     continue;
                 }
+                cv::cvtColor(frame, origin, cv::COLOR_RGB2BGR);
+                processed = origin.clone();
+                index++;
 
                 bool done = true;
                 for (ImageProcessor* processor : m_processors)
                 {
-                    if (!processor->process(frame))
+                    if (!processor->enabled())
+                        continue;
+
+                    if (!processor->process(processed, origin))
                     {
                         done = false;
-                        emit error();
+                        emit error(Error_Processing);
                         break;
                     }
                 }
 
                 if (done)
                 {
-                    addImage(frame);
-                    emit frameCaptured();
+                    FrameArgs args;
+                    args.duration = duration;
+                    args.frameIndex = index;
+                    args.timestamp = currTime;
+                    emit frameCaptured(processed, origin, args);
                 }
             }
         }
@@ -148,21 +156,10 @@ void CameraController::run()
                     emit connected();
                 }
             }
+            index = -1;
         }
 
         QThread::currentThread()->msleep(500);
-    }
-}
-
-void CameraController::addImage(const cv::Mat& mat)
-{
-    QMutexLocker locker(&m_mutex);
-    cv::Mat out;
-    cv::cvtColor(mat, out, cv::COLOR_RGB2BGR);
-    m_images.enqueue(out);
-    if (m_images.length() > m_maxQueueLength)
-    {
-        m_images.dequeue();
     }
 }
 
@@ -171,7 +168,7 @@ bool CameraController::start()
     if (m_status != CS_IDLE)
         return true;
 
-    m_status = CS_STARTING;
+    m_status = CS_STARTED;
     QThread::start();
     return true;
 }
@@ -185,26 +182,5 @@ void CameraController::stop()
     m_videoCapture->release();
     this->wait();
     m_status = CS_IDLE;
-}
-
-bool CameraController::load(int cameraIndex)
-{
-    if (m_status != CS_IDLE)
-        return true;
-
-    /*m_cameraIndex = cameraIndex;
-
-    m_videoCapture->open(m_cameraIndex, cv::CAP_ANY);
-    if (!m_videoCapture->isOpened())
-    {
-        qLogW << "Cannot open camera " << m_cameraIndex;
-        m_status = CS_IDLE;
-        return false;
-    }*/
-
-    //setResolution(Config::Camera::resolution());
-    m_status = CS_LOADED;
-
-    return true;
 }
 

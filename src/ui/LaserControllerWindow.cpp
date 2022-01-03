@@ -48,6 +48,7 @@
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
+#include "camera/DistortionCalibrator.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "import/Importer.h"
@@ -797,6 +798,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
     connect(m_ui->actionCameraCalibration, &QAction::triggered, this, &LaserControllerWindow::onActionCameraCalibration);
+    connect(m_ui->actionGenerateCalibrationBoard, &QAction::triggered, this, &LaserControllerWindow::onActionGenerateCalibrationBoard);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -2675,22 +2677,22 @@ void LaserControllerWindow::createMovementDockPanel()
 void LaserControllerWindow::createLaserPowerDockPanel()
 {
     m_floatEditSliderScanLaserPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::scanLaserPowerItem());
-    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower, SS_DIRECTLY);
+    Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower, SS_REGISTER);
 
     m_editSliderScanMaxGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::maxScanGrayRatioItem());
-    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray, SS_DIRECTLY);
+    Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray, SS_REGISTER);
 
     m_editSliderScanMinGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::minScanGrayRatioItem());
-    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray, SS_DIRECTLY);
+    Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray, SS_REGISTER);
 
     m_floatEditSliderCuttingMaxPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMaxCuttingPowerItem());
-    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower, SS_DIRECTLY);
+    Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower, SS_REGISTER);
 
     m_floatEditSliderCuttingMinPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMinCuttingPowerItem());
-    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower, SS_DIRECTLY);
+    Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower, SS_REGISTER);
 
     m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
-    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower, SS_DIRECTLY);
+    Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower, SS_REGISTER);
     QFormLayout* layout = new QFormLayout;
     layout->setMargin(3);
     layout->addRow(Config::UserRegister::scanLaserPowerItem()->title(), m_floatEditSliderScanLaserPower);
@@ -4624,18 +4626,6 @@ void LaserControllerWindow::onActionPrintAndCutAlign(bool checked)
         emit startPrintAndCutAligning();
     }
 
-    /*QRectF bounding = m_scene->document()->docBoundingRectInScene();
-    QTransform rotation(t.m11(), t.m12(), t.m21(), t.m22(), 0, 0);
-    QTransform translate = QTransform::fromTranslate(
-        Global::mechToSceneHF(t.dx()),
-        Global::mechToSceneVF(t.dy()));
-    QTransform pacTransform = translate * rotation;
-    QTransform transform = QTransform::fromTranslate(-bounding.center().x(), -bounding.center().y());
-    transform = transform * rotation;
-    transform = transform * QTransform::fromTranslate(bounding.center().x(), bounding.center().y());
-    transform = transform * translate;
-    m_scene->document()->transform(transform);*/
-
     m_scene->document()->setEnablePrintAndCut(true);
     m_scene->document()->setTransform(t);
     m_scene->document()->setPrintAndCutPointPairs(pointPairs);
@@ -4720,6 +4710,11 @@ void LaserControllerWindow::onActionCameraCalibration()
 {
     CalibrationDialog dlg;
     dlg.exec();
+}
+
+void LaserControllerWindow::onActionGenerateCalibrationBoard()
+{
+    DistortionCalibrator::generateCalibrationBoard();
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)

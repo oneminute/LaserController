@@ -16,6 +16,7 @@
 #include "LaserApplication.h"
 #include "exception/LaserException.h"
 #include "laser/LaserRegister.h"
+#include "laser/LaserDevice.h"
 #include "util/WidgetUtils.h"
 #include "util/TypeUtils.h"
 #include "widget/InputWidgetWrapper.h"
@@ -328,7 +329,7 @@ void Config::loadCameraItems()
 
     ConfigItem* vCornersCount = group->addConfigItem(
         "vCornersCount"
-        , 8
+        , 6
     );
     vCornersCount->setInputWidgetProperty("minimum", 2);
     vCornersCount->setInputWidgetProperty("maximum", 40);
@@ -339,6 +340,14 @@ void Config::loadCameraItems()
     );
     squareSize->setInputWidgetProperty("minimum", 2);
     squareSize->setInputWidgetProperty("maximum", 50);
+
+    ConfigItem* radiusRate = group->addConfigItem(
+        "radiusRate"
+        , 0.5
+        , DT_REAL
+    );
+    radiusRate->setInputWidgetProperty("minimum", 0.1);
+    radiusRate->setInputWidgetProperty("maximum", 1.0);
 
     ConfigItem* calibrationPattern = group->addConfigItem(
         "calibrationPattern"
@@ -365,9 +374,9 @@ void Config::loadCameraItems()
 
     ConfigItem* minCalibrationFrames = group->addConfigItem(
         "minCalibrationFrames"
-        , 20
+        , 9
     );
-    minCalibrationFrames->setInputWidgetProperty("minimum", 10);
+    minCalibrationFrames->setInputWidgetProperty("minimum", 9);
     minCalibrationFrames->setInputWidgetProperty("maximum", 100);
 
     ConfigItem* calibrationAutoCapture = group->addConfigItem(
@@ -376,6 +385,15 @@ void Config::loadCameraItems()
         DT_BOOL
     );
     calibrationAutoCapture->setInputWidgetType(IWT_CheckBox);
+
+    QList<QVariant> coeffs;
+    coeffs << 1 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0;
+    ConfigItem* undistortionCoeffs = group->addConfigItem(
+        "undistortionCoeffs",
+         coeffs,
+        DT_LIST
+    );
+    undistortionCoeffs->setVisible(false);
 }
 
 void Config::loadUiItems()
@@ -1168,6 +1186,15 @@ void Config::loadUserReigsters()
     ConfigItemGroup* group = new Config::UserRegister;
     group->setLazy(true);
     Config::UserRegister::group = group;
+    group->setPreSaveHook(
+        [=]() {
+            if (Config::UserRegister::group->isModified())
+            {
+                return LaserApplication::device->writeUserRegisters();
+            }
+            return false;
+        }
+    );
 
     ConfigItem* head = group->addConfigItem(
         "head",
@@ -1671,6 +1698,16 @@ void Config::loadSystemRegisters()
     ConfigItemGroup* group = new Config::SystemRegister;
     group->setLazy(true);
     Config::SystemRegister::group = group;
+    group->setPreSaveHook(
+        [=]() {
+            if (Config::SystemRegister::group->isModified())
+            {
+                return LaserApplication::device->writeSystemRegisters(
+                LaserApplication::device->password());
+            }
+            return false;
+        }
+    );
 
     ConfigItem* head = group->addConfigItem(
         "head",
@@ -2492,7 +2529,19 @@ void Config::loadDebug()
 
     ConfigItem* enableOptimizeInteraction = group->addConfigItem(
         "enableOptimizeInteraction",
+        true,
+        DT_BOOL
+    );
+
+    ConfigItem* reverseEngravingBits = group->addConfigItem(
+        "reverseEngravingBits",
         false,
+        DT_BOOL
+    );
+
+    ConfigItem* skipEngravingBlankRows = group->addConfigItem(
+        "skipEngravingBlankRows",
+        true,
         DT_BOOL
     );
 }
@@ -2535,6 +2584,10 @@ void Config::updateTitlesAndDescriptions()
     Camera::squareSizeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Squre Size", nullptr), 
         QCoreApplication::translate("Config", "Squre Size", nullptr));
+
+    Camera::radiusRateItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Radius Rate", nullptr), 
+        QCoreApplication::translate("Config", "Radius Rate", nullptr));
 
     Camera::calibrationPatternItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Calibration pattern", nullptr), 
@@ -3223,6 +3276,14 @@ void Config::updateTitlesAndDescriptions()
     Debug::enableOptimizeInteractionItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr),
         QCoreApplication::translate("Config", "Enable Optimize Interaction", nullptr));
+
+    Debug::reverseEngravingBitsItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Reverse Engraving Bits", nullptr),
+        QCoreApplication::translate("Config", "Reverse Engraving Bits", nullptr));
+
+    Debug::skipEngravingBlankRowsItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Skip Engraving Blank Rows", nullptr),
+        QCoreApplication::translate("Config", "Skip Engraving Blank Rows", nullptr));
 
     groupsMap["general"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "General", nullptr),

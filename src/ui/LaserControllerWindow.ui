@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -59,8 +59,8 @@
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
     <addaction name="actionRemoteAssistance"/>
-    <addaction name="actionCameraTools"/>
     <addaction name="actionCameraCalibration"/>
+    <addaction name="actionGenerateCalibrationBoard"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -1770,6 +1770,11 @@
   <action name="actionCameraCalibration">
    <property name="text">
     <string>Camera Calibration</string>
+   </property>
+  </action>
+  <action name="actionGenerateCalibrationBoard">
+   <property name="text">
+    <string>Generate Calibration Board</string>
    </property>
   </action>
  </widget>

@@ -32,6 +32,9 @@ public:
     int printerDrawUnit() const;
     void setPrinterDrawUnit(int unit, bool toCard = true);
 
+    QString password() const;
+    void setPassword(const QString& value);
+
     QString requestHardwareId() const;
     QString requestMainCardId() const;
     QString requestRegisteId() const;

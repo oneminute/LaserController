@@ -20,9 +20,11 @@ public:
     void zoomIn();
     void zoomOut();
     void scaleImage(qreal factor);
-    void fixSize();
+    void fit();
+    void fitBy(const QSize& size);
 
     qreal scaleFactor() const;
+    void setScaleFactor(qreal value);
 
 protected:
     void adjustScrollBar(QScrollBar* scrollBar, double factor);

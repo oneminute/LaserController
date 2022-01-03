@@ -1,6 +1,7 @@
 #ifndef CAMERACONTROLLER_H
 #define CAMERACONTROLLER_H
 
+#include <QDateTime>
 #include <QObject>
 #include <QThread>
 #include <QQueue>
@@ -11,6 +12,14 @@
 #include <opencv2/opencv.hpp>
 
 class ImageProcessor;
+
+struct FrameArgs
+{
+    int duration;
+    int frameIndex;
+    QDateTime timestamp;
+};
+Q_DECLARE_METATYPE(FrameArgs)
 
 namespace cv
 {
@@ -24,16 +33,20 @@ public:
     enum CameraStatus
     {
         CS_IDLE,
-        CS_LOADED,
-        CS_STARTING,
         CS_STARTED,
         CS_STOPPING
     };
 
+    enum ErrorCode
+    {
+        Error_No_Cameras,
+        Error_No_Data,
+        Error_Processing,
+        Error_Unknown
+    };
+
     explicit CameraController(QObject* parent = nullptr);
     ~CameraController();
-
-    cv::Mat image() const;
 
     bool setResolution(const QSize& size);
     QSize resolution() const;
@@ -48,30 +61,29 @@ public:
 
 protected:
     void run() override;
-    void addImage(const cv::Mat& mat);
+    //void addImage(const cv::Mat& mat, const cv::Mat& origin);
 
 public slots:
     bool start();
     void stop();
-    bool load(int cameraIndex);
 
 protected slots:
 
 signals:
     void connected();
     void disconnected();
-    void frameCaptured();
-    void error();
+    void frameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args);
+    void error(int code);
 
 private:
     QScopedPointer<cv::VideoCapture> m_videoCapture;
     int m_cameraIndex;
     QMutex m_mutex;
-    QQueue<cv::Mat> m_images;
     int m_maxQueueLength;
     CameraStatus m_status;
     QList<ImageProcessor*> m_processors;
     bool m_autoLoading;
+    QDateTime m_lastTime;
 };
 
 #endif // CAMERACONTROLLER_H

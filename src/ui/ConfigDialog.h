@@ -112,7 +112,6 @@ private:
     int m_errorCount;
     bool m_changingPassword;
 
-    QString m_password;
     QTimer m_passwordTimer;
 };
 
