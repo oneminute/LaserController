@@ -300,4 +300,32 @@ private:
     LaserPrimitive* m_frontestPrimitive;
     LaserPrimitive* m_backestPrimitive;
 };
+class WeldShapesUndoCommand : public QUndoCommand {
+public:
+    WeldShapesUndoCommand(LaserViewer* viewer, int type);
+    ~WeldShapesUndoCommand();
+private:
+    LaserViewer * m_viewer;
+    LaserScene* m_scene;
+    bool m_isRedo;
+    int m_type;
+    LaserLayer* m_minLayer;
+    QMap<LaserPrimitive*, bool> m_traversedMap;
+    QMap<QList<LaserPrimitive*>, QPainterPath> m_weldShapesMap;
+    QMap<LaserPrimitive*, LaserLayer*> m_layerMap;
+    QSet<LaserPrimitive*>* m_weldJoinedGroup;
+    QMap<LaserPrimitive*, QList<LaserPrimitive*>>m_weldAndOriginalsMap;
+    QList<QSet<LaserPrimitive*>> m_originalJoinedGroupList;//if have traversed,the boolean value is true
+
+    void initeTranversedMap();
+    void comuptePath();
+    void createNewPath();
+    void handleRedo();
+    void deleteJoinedGroup(QSet<LaserPrimitive*>* joinedGroup);
+
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+    
+};
 #endif // UNDOCOMMAND_H

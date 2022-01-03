@@ -984,7 +984,8 @@ void JoinedGroupCommand::undo()
         undoUnGroup();
     }
     m_viewer->viewport()->repaint();
-    emit LaserApplication::mainWindow->joinedGroupChanged();
+    //emit LaserApplication::mainWindow->joinedGroupChanged();
+    emit m_viewer->group()->childrenChanged();
 }
 
 void JoinedGroupCommand::redo()
@@ -996,7 +997,8 @@ void JoinedGroupCommand::redo()
     else {
         handleUnGroup();
     }
-    emit LaserApplication::mainWindow->joinedGroupChanged();
+    //emit LaserApplication::mainWindow->joinedGroupChanged();
+    emit m_viewer->group()->childrenChanged();
 }
 
 void JoinedGroupCommand::handleGroup()
@@ -1048,8 +1050,8 @@ void JoinedGroupCommand::handleUnGroup()
         
     }
     m_viewer->viewport()->repaint();
-    m_joinedGroupAction->setEnabled(true);
-    m_joinedUngroupAction->setEnabled(false);
+    //m_joinedGroupAction->setEnabled(true);
+    //m_joinedUngroupAction->setEnabled(false);
 }
 
 void JoinedGroupCommand::undoGroup()
@@ -1062,6 +1064,7 @@ void JoinedGroupCommand::undoGroup()
         m_groupJoinedSet = nullptr;
     }
     restoreJoinedGroup();  
+
 }
     
 
@@ -1725,3 +1728,286 @@ void DistributeUndoCommand::redo()
         undo();
     }
 }
+
+WeldShapesUndoCommand::WeldShapesUndoCommand(LaserViewer * viewer, int type)
+    :m_isRedo(false), m_type(type), m_viewer(viewer)
+{
+    m_scene = m_viewer->scene();
+    //m_weldJoinedGroup = nullptr;
+}
+
+WeldShapesUndoCommand::~WeldShapesUndoCommand()
+{
+}
+
+void WeldShapesUndoCommand::initeTranversedMap()
+{
+    QList<QGraphicsItem*>groupList = m_viewer->group()->childItems();
+    int minLayerIndex;
+    
+    int index = 0;
+    //layerIndex min value，
+    //set groupList to map，create layer index map
+    for (QGraphicsItem* item : m_viewer->group()->childItems()) {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
+        m_viewer->group()->removeFromGroup(primitive);
+        m_traversedMap.insert(primitive, false);
+        m_layerMap.insert(primitive, primitive->layer());
+        int layerIndex = primitive->layerIndex();
+        if (index == 0) {
+            minLayerIndex = layerIndex;
+            m_minLayer = primitive->layer();
+        }
+        else {
+            if (minLayerIndex > layerIndex) {
+                minLayerIndex = layerIndex;
+                m_minLayer = primitive->layer();
+            }
+        }
+        index++;
+    }
+    m_viewer->group()->setTransform(QTransform());
+}
+
+void WeldShapesUndoCommand::comuptePath()
+{
+    for (QMap<LaserPrimitive*, bool>::iterator i = m_traversedMap.begin();
+        i != m_traversedMap.end(); i++) {
+        if (i.value()) {
+            continue;
+        }
+        LaserPrimitive* primitive = i.key();
+        i.value() = true;
+        QPainterPath path = primitive->getScenePath();
+        QList<LaserPrimitive*> weldList;
+        weldList.append(primitive);
+        if (primitive->isJoinedGroup()) {
+            for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                p != primitive->joinedGroupList()->end(); p++) {
+                QPainterPath path_0 = (*p)->getScenePath();
+                if (m_traversedMap[*p]) {
+                    continue;
+                }
+                if (path.intersects(path_0)) {
+                    switch (m_type) {
+                    case WeldShapes_TwoUnite: {
+                        path.addPath(path_0);
+                        break;
+                    }
+                    case WeldShapes_WeldAll: {
+                        path += path_0;
+                        break;
+                    }
+                    case WeldShapes_DiffTwoUnite: {
+                        break;
+                    }
+                    }
+                    m_traversedMap[*p] = true;
+                    weldList.append(*p);
+                }
+
+            }
+        }
+
+        for (QMap<LaserPrimitive*, bool>::iterator i_1 = m_traversedMap.begin();
+            i_1 != m_traversedMap.end(); i_1++) {
+            //已经在joinedGroup中遍历过或为true
+            if (i_1.value()) {
+                continue;
+            }
+            if (i_1.key()->isJoinedGroup()) {
+                if (i_1.key()->joinedGroupList()->contains(primitive)) {
+                    continue;
+                }
+
+            }
+            LaserPrimitive* primitive_1 = i_1.key();
+
+            QPainterPath path_1 = primitive_1->getScenePath();
+            if (path.intersects(path_1)) {
+                switch (m_type) {
+                case WeldShapes_TwoUnite: {
+                    //path.addPath(path_1);
+                    path += path_1;
+                    break;
+                }
+                case WeldShapes_WeldAll: {
+                    path += path_1;
+
+                    break;
+                }
+                case WeldShapes_DiffTwoUnite: {
+                    break;
+                }
+                }
+                bool bl = m_traversedMap[primitive_1];
+                i_1.value() = true;
+                weldList.append(primitive_1);
+            }
+
+        }
+        if (!weldList.isEmpty()) {
+            m_weldShapesMap.insert(weldList, path);
+        }
+
+
+    }
+}
+
+void WeldShapesUndoCommand::createNewPath()
+{
+    for (QMap<QList<LaserPrimitive*>, QPainterPath>::iterator i = m_weldShapesMap.begin();
+        i != m_weldShapesMap.end(); i++) {
+        QList<LaserPrimitive*> list = i.key();
+        QPainterPath path = i.value();
+        if (list.size() == 1) {
+            LaserPrimitive* sP = list[0];
+            if (sP->isJoinedGroup()) {
+                //save
+                m_originalJoinedGroupList.append(*(sP->joinedGroupList()));
+                //delete
+                deleteJoinedGroup(sP->joinedGroupList());
+
+            }
+            sP->setLayer(m_minLayer);
+            sP->setJoinedGroup(m_weldJoinedGroup);
+            m_weldJoinedGroup->insert(sP);
+            m_viewer->group()->addToGroup(sP);
+
+        }
+        else if (list.size() > 1) {
+
+            for (LaserPrimitive* dP : list) {
+                if (dP->isJoinedGroup()) {
+                    //save
+                    m_originalJoinedGroupList.append(*(dP->joinedGroupList()));
+                    //delete original joined group
+                    deleteJoinedGroup(dP->joinedGroupList());
+                }
+                m_scene->removeLaserPrimitive(dP, true);
+            }
+
+            //create new primitive
+            LaserPath* newPath = new LaserPath(path, m_scene->document(), QTransform(), m_minLayer->index());
+            m_scene->addLaserPrimitive(newPath, true);
+            newPath->setJoinedGroup(m_weldJoinedGroup);
+            m_weldJoinedGroup->insert(newPath);
+            newPath->setSelected(true);
+            m_viewer->group()->addToGroup(newPath);
+            //save the weld and the originals
+            m_weldAndOriginalsMap.insert(newPath, list);
+        }
+    }
+}
+
+void WeldShapesUndoCommand::handleRedo()
+{
+    //m_viewer->group()->reset(false);
+    //clear joined group,remove from selection group
+    for (QMap<LaserPrimitive*, bool>::iterator pMap = m_traversedMap.begin();
+        pMap != m_traversedMap.end(); pMap++) {
+        pMap.key()->setLayer(m_minLayer);
+        if (pMap.key()->isJoinedGroup()) {
+            deleteJoinedGroup(pMap.key()->joinedGroupList());
+        }
+    }
+    //restore original primitives
+    for (QMap<LaserPrimitive*, QList<LaserPrimitive*>>::iterator i = m_weldAndOriginalsMap.begin();
+        i != m_weldAndOriginalsMap.end(); i ++) {
+        m_scene->removeLaserPrimitive(i.key(), true);
+        for (LaserPrimitive* p : i.value()) {
+            m_scene->addLaserPrimitive(p, true);
+            m_viewer->group()->addToGroup(p);
+        }
+    }
+    //if selected primitive size >= 2 ,all primitive will grouped
+    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
+    if (items.size() >= 2) {
+        for (QGraphicsItem* item : items) {
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            m_weldJoinedGroup->insert(p);
+            p->setJoinedGroup(m_weldJoinedGroup);
+        }
+    }
+    
+}
+
+void WeldShapesUndoCommand::deleteJoinedGroup(QSet<LaserPrimitive*>* joinedGroup)
+{
+    //delete
+    for (QSet<LaserPrimitive*>::iterator i = joinedGroup->begin();
+        i != joinedGroup->end(); i++) {        
+        (*i)->setJoinedGroup(nullptr);       
+    }
+    m_scene->joinedGroupList().removeOne(joinedGroup);
+    delete joinedGroup;
+    
+}
+
+void WeldShapesUndoCommand::undo()
+{
+    m_viewer->group()->reset(false);
+    //restore original primitives
+    for (QMap<LaserPrimitive*, QList<LaserPrimitive*>>::iterator i = m_weldAndOriginalsMap.begin();
+        i != m_weldAndOriginalsMap.end(); i++) {
+        m_scene->removeLaserPrimitive(i.key(), true);
+        for (LaserPrimitive* p : i.value()) {
+            m_scene->addLaserPrimitive(p, true);
+        }
+    }
+    //delete current joined group
+    deleteJoinedGroup(m_weldJoinedGroup);
+    //restore original joined group
+    for (QSet<LaserPrimitive*>pSet : m_originalJoinedGroupList) {
+        if (pSet.isEmpty()) {
+            continue;
+        }
+        QSet<LaserPrimitive*>* originalJoinedGroup = new QSet<LaserPrimitive*>();
+        for (QSet<LaserPrimitive*>::iterator p = pSet.begin();
+            p != pSet.end(); p++) {
+            originalJoinedGroup->insert(*p);
+            (*p)->setJoinedGroup(originalJoinedGroup);
+        }
+        m_scene->joinedGroupList().append(originalJoinedGroup);
+    }
+    //restore layer
+    for (QMap<LaserPrimitive*, LaserLayer*>::iterator lMap = m_layerMap.begin();
+        lMap != m_layerMap.end(); lMap++) {
+        lMap.key()->setLayer(lMap.value());
+        m_viewer->group()->addToGroup(lMap.key());
+    }
+    
+    m_viewer->viewport()->repaint();
+}
+
+void WeldShapesUndoCommand::redo()
+{
+    //weld primitive,include signal primitive(not intersects others)
+    m_weldJoinedGroup = new QSet<LaserPrimitive*>();
+    //first perform
+    if (!m_isRedo) {
+        //init traversed map
+        initeTranversedMap();
+        //comupte path
+        comuptePath();
+        //delete primitive，create new weld primitive
+        createNewPath();
+        m_isRedo = true;
+    }
+    //redo perform
+    else {
+        //delete primitive，create new weld primitive
+        handleRedo();
+    }
+
+    //append new weld joined group;
+    if (m_weldJoinedGroup->isEmpty()) {
+        delete m_weldJoinedGroup;
+    }
+    else {
+        m_scene->joinedGroupList().append(m_weldJoinedGroup);
+    }
+    m_viewer->viewport()->repaint();
+}
+
+

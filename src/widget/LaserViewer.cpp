@@ -1438,12 +1438,6 @@ return;
     QRect bgRect = backgroundItem->rect();
     QPoint center(bgRect.left() + bgRect.width(), bgRect.top() + bgRect.height());
     center = this->rect().center();
-    //zoomBy(1, mapToScene(0, 0));
-
-    //setZoomValue(scale);
-    //backgroundItem->setPos(0, 0);
-    qDebug() << mapFrom(this, QPoint(0, 0));
-    qDebug() << mapFromScene(0, 0);
     QPoint diff = (mapFrom(this, QPoint(0, 0)) - mapFromScene(0, 0))/zoomValue();
     //this->translate(diff.x(), diff.y());
     //this->scale(scale / zoomValue(), scale / zoomValue());
@@ -1471,16 +1465,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
     
     // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
-        //qDebug() << mapFromGlobal(QCursor::pos());
-        //qDebug() << mapToScene(mapFromGlobal(QCursor::pos()));
-        //附近的图元交点
-        /*if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
-            bool isEdgeSpecailPoint = false;
-            if (detectIntersectionByMouse(intersePoint, point, isEdgeSpecailPoint)) {
-                point = intersePoint;
-            }
-        }*/
-
+        
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
@@ -1490,7 +1475,6 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             //点击选中图元
             if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
                 //undo
-                //qDebug()<<m_group->childItems();
                 selectionUndoStackPushBefore();
 
                 //clearGroupSelection();

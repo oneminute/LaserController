@@ -94,13 +94,16 @@ public:
     LaserDoubleSpinBox* textSpaceYSpinBox();
     //align
     void initAlignTarget();
-    void changeAlignButtonsEnable();
+    //void changeAlignButtonsEnable();
     void tabAlignTarget();
     void setAlignTargetState(bool isAlignTarget);
     //shapes weld / tow shapes unite
     //void changeShapesWeldButtonsEnable();
     LaserPath* uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
         LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup);
+    void uniteOrWeldShapes(bool isWeld, LaserLayer* layer);
+    void weldShapes(LaserLayer* layer, int type);
+    void uniteTwoShapes(LaserLayer* layer, int type);
     //selection property
     bool unitIsMM();
     QLabel* labelPercentage();
@@ -362,7 +365,7 @@ protected slots:
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
-    void onJoinedGroupChanged();
+    //void onJoinedGroupChanged();
     void onLaserToolButtonShowMenu();
     void onClickedMmOrInch();
 
@@ -389,7 +392,7 @@ signals:
     void finishPrintAndCutSelecting();
     void startPrintAndCutAligning();
     void finishPrintAndCutAligning();
-    void joinedGroupChanged();
+    //void joinedGroupChanged();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;

@@ -129,7 +129,11 @@ enum PropertyEditor
     PE_LineEdit = 0,
     PE_FinishRunWidget
 };
-
+enum WeldShapes {
+    WeldShapes_TwoUnite = 0,
+    WeldShapes_WeldAll = 1,
+    WeldShapes_DiffTwoUnite = 2
+};
 enum WidgetUserData
 {
     WUD_PropertyValue = Qt::UserRole + 1, 

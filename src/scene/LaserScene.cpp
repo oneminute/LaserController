@@ -431,7 +431,7 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
         for (LaserPrimitive* primitive : node->primitiveList()) {
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
                 QRect bounds;
-                if (!primitive->joinedGroupList()->isEmpty()) {
+                if (primitive->isJoinedGroup()) {
                     utils::boundingRect(*(primitive->joinedGroupList()), bounds, QRect(), false);
                     for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
                                     p != primitive->joinedGroupList()->end(); p++) {
