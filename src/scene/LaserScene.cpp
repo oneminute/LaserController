@@ -134,7 +134,7 @@ void LaserScene::addGroupItemsToTreeNode()
 
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive, bool ignoreUpdateDocBounding)
 {
-	m_doc->removePrimitive(primitive);
+	m_doc->removePrimitive(primitive, true);
     primitive->removeAllTreeNode();
 	removeItem(primitive);
     if (!ignoreUpdateDocBounding)

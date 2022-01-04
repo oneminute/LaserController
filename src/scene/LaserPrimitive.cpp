@@ -552,17 +552,26 @@ LaserLayer* LaserPrimitive::layer() const
     return d->layer; 
 }
 
-void LaserPrimitive::setLayer(LaserLayer* layer) 
+void LaserPrimitive::setLayer(LaserLayer* layer, bool whenNullLayerKeepIndex) 
 {
     Q_D(LaserPrimitive);
+    if (d->layer) {
+        d->layer->primitives().removeOne(this);
+    }
     d->layer = layer;
 	if (layer) {
+        
 		d->layerIndex = layer->index();
+        d->layer->primitives().append(this);
 	}
 	else {
-		d->layerIndex = -1;
+        //如果保留原有的layerIndex，删除后可以再恢复回来
+        //如果重置为-1，则删除后需要重新添加到层中
+        if (!whenNullLayerKeepIndex) {
+            d->layerIndex = -1;
+        }
 	}
-	
+    d->doc->updateLayersStructure();
 }
 
 QString LaserPrimitive::toString() const

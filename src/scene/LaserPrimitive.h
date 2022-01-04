@@ -85,7 +85,7 @@ public:
     void setAlignTarget(bool value);
 
     LaserLayer* layer() const;
-    void setLayer(LaserLayer* layer);
+    void setLayer(LaserLayer* layer, bool whenNullLayerKeepIndex = true);
 
     QString toString() const;
 

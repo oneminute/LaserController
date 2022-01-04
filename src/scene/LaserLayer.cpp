@@ -435,10 +435,7 @@ void LaserLayer::setErrorX(int errorX)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
-    int i = this->index();
     item->setLayer(this);
-    d->primitives.append(item);
-    d->doc->updateLayersStructure();
 }
 
 QList<LaserPrimitive*>& LaserLayer::primitives()
@@ -447,14 +444,15 @@ QList<LaserPrimitive*>& LaserLayer::primitives()
     return d->primitives;
 }
 
-void LaserLayer::removePrimitive(LaserPrimitive * item)
+void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
 {
     Q_D(LaserLayer);
-    if (!d->primitives.contains(item))
-        return;
-
-    //item->setLayer(nullptr);
-    d->primitives.removeOne(item);
+    if (itemKeepLayer) {
+        d->primitives.removeOne(item);
+    }
+    else {
+        item->setLayer(nullptr);
+    }
     d->doc->updateLayersStructure();
 }
 

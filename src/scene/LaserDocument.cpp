@@ -84,7 +84,13 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
 {
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
-    LaserLayer* layer = d->layers[item->layerIndex()];
+    LaserLayer* layer = nullptr;
+    if (item->layerIndex() >= 0 && item->layerIndex() < d->layers.size()) {
+        layer = d->layers[item->layerIndex()];
+    }
+    else {
+        return;
+    }
     if (layer->isEmpty())
     {
         if (item->isShape())
@@ -114,10 +120,16 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
     updateLayersStructure();
 }
 
-void LaserDocument::removePrimitive(LaserPrimitive* item)
+void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer)
 {
     Q_D(LaserDocument);
-    item->layer()->removePrimitive(item);
+    if (keepLayer) {
+        item->layer()->removePrimitive(item, true);
+    }
+    else {
+        item->layer()->removePrimitive(item, false);
+    }
+    
     d->primitives.remove(item->id());
 }
 
