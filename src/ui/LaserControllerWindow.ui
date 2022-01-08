@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -177,6 +177,7 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomToSelection"/>
    <addaction name="separator"/>
+   <addaction name="actionWeldAll"/>
    <addaction name="actionUniteTwoShapes"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
@@ -1775,6 +1776,50 @@
   <action name="actionGenerateCalibrationBoard">
    <property name="text">
     <string>Generate Calibration Board</string>
+   </property>
+  </action>
+  <action name="actionWeldAll">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/weldAllShapes.png</normaloff>:/ui/icons/images/weldAllShapes.png</iconset>
+   </property>
+   <property name="text">
+    <string>Weld All Shapes</string>
+   </property>
+   <property name="toolTip">
+    <string>Weld All shapes</string>
+   </property>
+  </action>
+  <action name="actionNameStamp">
+   <property name="text">
+    <string>NameStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>NameStamp</string>
+   </property>
+  </action>
+  <action name="actionStripStamp">
+   <property name="text">
+    <string>StripStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Strip Stamp</string>
+   </property>
+  </action>
+  <action name="actionCircleStamp">
+   <property name="text">
+    <string>CircleStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Circle Stamp</string>
+   </property>
+  </action>
+  <action name="actionEllipseStamp">
+   <property name="text">
+    <string>EllipseStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Ellipse Stamp</string>
    </property>
   </action>
  </widget>

@@ -860,15 +860,24 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 	
 	return true;
 }
-QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint, float scop)
+QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint, float scop, bool ignoreFillSolid)
 {
-
 	QLine line;
 	QList <LaserPrimitive*> list = m_scene->document()->primitives().values();
 	//先遍历新添加的
 	for(QList<LaserPrimitive*>::Iterator i = list.end()-1; i != list.begin()-1; i--){
 	//for each(LaserPrimitive* primitive in list) {
 		LaserPrimitive* primitive = *i;
+        //如果是实心填充的图元，则不做判断
+        if (ignoreFillSolid) {
+            int type = primitive->primitiveType();
+            if (type == LPT_BITMAP || type == LPT_STAR || 
+                type == LPT_RING || type == LPT_FRAME) {
+                result = nullptr;
+                return QLineF();
+            }
+        }
+        
 		QVector<QLineF> edgeList = primitive->edges();
 		//先判断边框
 		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(scop));
@@ -919,29 +928,46 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 }
 bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
 {
-	
 	qreal delta = Config::Ui::clickSelectionTolerance() * (1 / zoomValue());
 	if (delta <= 0) {
-		return false;
+		return true;
 	}
 	result = nullptr;
-	detectItemEdge(result, mousePoint, delta);
+	detectItemEdge(result, mousePoint, delta, true);
 	if (result != nullptr) {
 		return true;
 	}
 	return false;
 }
-bool LaserViewer::detectBitmapByMouse(LaserBitmap *& result, QPointF mousePoint)
+bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mousePoint)
 {
-	QList<QGraphicsItem*> items = m_scene->items(mapToScene(mousePoint.toPoint()));
+    QPointF sceneMousePoint = mapToScene(mousePoint.toPoint());
+	QList<QGraphicsItem*> items = m_scene->items(sceneMousePoint);
 	for each(QGraphicsItem* item in items) {
 		LaserPrimitive* primitive = qobject_cast<LaserPrimitive*> (item->toGraphicsObject());
 		if (primitive != nullptr) {
-			LaserBitmap* bitmap = qobject_cast<LaserBitmap*> (primitive);
-			if (bitmap) {
+			if (LaserBitmap* bitmap = qobject_cast<LaserBitmap*> (primitive)) {
 				result = bitmap;
 				return true;
-			}
+            }
+            else if(LaserStar* star = qobject_cast<LaserStar*> (primitive)) {
+                if (star->getScenePath().contains(sceneMousePoint)) {
+                    result = star;
+                    return true;
+                }
+            }
+            else if (LaserRing* ring = qobject_cast<LaserRing*> (primitive)) {
+                if (ring->getScenePath().contains(sceneMousePoint)) {
+                    result = ring;
+                    return true;
+                }
+            }
+            else if (LaserFrame* frame = qobject_cast<LaserFrame*> (primitive)) {
+                if (frame->getScenePath().contains(sceneMousePoint)) {
+                    result = frame;
+                    return true;
+                }
+            }
 		}
 	}
 	
@@ -1272,6 +1298,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     painter.drawRect(m_selectedHandleList[0]);
     QPointF leftTop(mapFromScene(left, top));
     QPointF rightBottom(mapFromScene(right, bottom));
+    QPointF center(mapFromScene(rect.center()));
 	//m_selectedRect = QRectF(leftTop, rightBottom);
     leftTop.setX(leftTop.x() - 2);
     leftTop.setY(leftTop.y() - 2);
@@ -1335,6 +1362,103 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
     m_selectedHandleList.append(QRectF(leftTop.x() - m_handleRectPixel, leftTop.y() + (rightBottom.y() - leftTop.y()) * 0.5 - m_handleRectPixel * 0.5, m_handleRectPixel, m_handleRectPixel));
     painter.drawRect(m_selectedHandleList[12]);
+    //印章中使用的文字(13)
+    if (m_group->childItems().size() == 1) {
+        LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+        if(!primitive->isJoinedGroup()){
+            painter.setPen(QPen(Qt::darkGray, 2, Qt::SolidLine));
+            painter.setBrush(QBrush(Qt::darkGray, Qt::BrushStyle::SolidPattern));
+            qreal vZoomValue = zoomValueNormal();
+            if (primitive->primitiveType() == LPT_CIRCLETEXT ||
+                primitive->primitiveType() == LPT_HORIZONTALTEXT) {
+                //outer left 13
+                QPointF oLeft_1 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().topLeft().x() - 3800 / vZoomValue,
+                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5 - 1300 / vZoomValue));
+                QPointF oLeft_2 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().topLeft().x() - 3800 / vZoomValue,
+                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5 + 1300 / vZoomValue));
+                QPointF oLeft_3 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().topLeft().x()-6000 / vZoomValue,
+                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5));
+                
+                QPainterPath path;
+                path.moveTo(oLeft_1);
+                path.lineTo(oLeft_2);
+                path.lineTo(oLeft_3);
+                path.closeSubpath();
+                
+                painter.drawPath(path);
+                m_selectedHandleList.append(path.boundingRect());
+            }
+            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                //outer top 14
+                QPointF oTop_1 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5 - 1300 / vZoomValue,
+                    primitive->boundingRect().topLeft().y() - 3800 / vZoomValue));
+                QPointF oTop_2 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5 + 1300 / vZoomValue,
+                    primitive->boundingRect().topLeft().y() - 3800 / vZoomValue));
+                QPointF oTop_3 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5,
+                    primitive->boundingRect().topLeft().y() - 6000 / vZoomValue));
+
+                QPainterPath path;
+                path.moveTo(oTop_1);
+                path.lineTo(oTop_2);
+                path.lineTo(oTop_3);
+                path.closeSubpath();
+
+                painter.drawPath(path);
+                m_selectedHandleList.append(path.boundingRect());
+            }
+            if (primitive->primitiveType() == LPT_CIRCLETEXT ||
+                primitive->primitiveType() == LPT_HORIZONTALTEXT) {
+                //outer right 15
+                QPointF oRight_1 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().bottomRight().x() + 3800 / vZoomValue,
+                    primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5 - 1300 / vZoomValue));
+                QPointF oRight_2 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().bottomRight().x() + 3800 / vZoomValue,
+                    primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5 + 1300 / vZoomValue));
+                QPointF oRight_3 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().bottomRight().x() + 6000 / vZoomValue,
+                    primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5));
+
+                QPainterPath path;
+                path.moveTo(oRight_1);
+                path.lineTo(oRight_2);
+                path.lineTo(oRight_3);
+                path.closeSubpath();
+
+                painter.drawPath(path);
+                m_selectedHandleList.append(path.boundingRect());
+            }
+            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                //outer bottom 16
+                QPointF oBottom_1 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5 - 1300 / vZoomValue,
+                    primitive->boundingRect().bottomRight().y() + 3800 / vZoomValue));
+                QPointF oBottom_2 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5 + 1300 / vZoomValue,
+                    primitive->boundingRect().bottomRight().y() + 3800 / vZoomValue));
+                QPointF oBottom_3 = mapFromScene(primitive->mapToScene(
+                    primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5,
+                    primitive->boundingRect().bottomRight().y() + 6000 / vZoomValue));
+
+                QPainterPath path;
+                path.moveTo(oBottom_1);
+                path.lineTo(oBottom_2);
+                path.lineTo(oBottom_3);
+                path.closeSubpath();
+
+                painter.drawPath(path);
+                m_selectedHandleList.append(path.boundingRect());
+            }
+        }
+        
+    }
+    
 }
 
 int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint)
@@ -1471,7 +1595,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         {
             m_mousePressState = StateControllerInst.documentIdleState();
             m_detectedPrimitive = nullptr;
-            m_detectedBitmap = nullptr;
+            m_detectedFillSolid = nullptr;
             //点击选中图元
             if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
                 //undo
@@ -1499,24 +1623,24 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 return;
             }
             else {
-                //detectBitmapByMouse(m_detectedBitmap, event->pos());
+                //detectFillSolidByMouse(m_detectedFillSolid, event->pos());
                 //QGraphicsView::mousePressEvent(event);
-                //点击选中图片
-                if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+                //点击选中图片,星形等被填充的图元
+                if (detectFillSolidByMouse(m_detectedFillSolid, event->pos())) {
                     //clearGroupSelection();
                     //undo
                     selectionUndoStackPushBefore();
                     //transformUndoStackPushBefore();
-                    m_detectedBitmap->setSelected(true);
-                    if (m_detectedBitmap->isJoinedGroup()) {
-                        for (QSet<LaserPrimitive*>::iterator p = m_detectedBitmap->joinedGroupList()->begin();
-                            p != m_detectedBitmap->joinedGroupList()->end(); p++) {
+                    m_detectedFillSolid->setSelected(true);
+                    if (m_detectedFillSolid->isJoinedGroup()) {
+                        for (QSet<LaserPrimitive*>::iterator p = m_detectedFillSolid->joinedGroupList()->begin();
+                            p != m_detectedFillSolid->joinedGroupList()->end(); p++) {
                             (*p)->setSelected(true);
                         }
                     }
                     
                     if (onSelectedFillGroup()) {
-                        m_curSelectedHandleIndex = 14;
+                        m_curSelectedHandleIndex = 31;
                         emit beginIdelEditing();
                     }
                     //undo before
@@ -1548,7 +1672,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 
             //
             m_detectedPrimitive = nullptr;
-            m_detectedBitmap = nullptr;
+            m_detectedFillSolid = nullptr;
             // 判断是鼠标是否按在选框控制柄上了
             int handlerIndex;
             if (isOnControllHandlers(event->pos(), handlerIndex))
@@ -1611,16 +1735,18 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                     break;
                 }
 
+
                 }
                 //undo
                 //m_undoTransform = m_group->sceneTransform();
                 transformUndoStackPushBefore();
+
                 emit beginSelectedEditing();
             }
             else if (detectItemByMouse(m_detectedPrimitive, event->pos())) {
                 //undo before
                 selectionUndoStackPushBefore();
-                pointSelectWhenSelectedState(13, m_detectedPrimitive);
+                pointSelectWhenSelectedState(30, m_detectedPrimitive);
                 //undo redo
                 selectionUndoStackPush();
                 //undo before
@@ -1634,22 +1760,22 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 
             else
             {
-                m_detectedBitmap = nullptr;
+                m_detectedFillSolid = nullptr;
 
                 //QGraphicsView::mousePressEvent(event);
                 //事件被Item截断 图片点选
-                if (detectBitmapByMouse(m_detectedBitmap, event->pos())) {
+                if (detectFillSolidByMouse(m_detectedFillSolid, event->pos())) {
                     //undo before
                     selectionUndoStackPushBefore();
-                    pointSelectWhenSelectedState(14, m_detectedBitmap);
+                    pointSelectWhenSelectedState(31, m_detectedFillSolid);
                     //undo redo
                     selectionUndoStackPush();
                     //undo before
-                    if (m_group->isAncestorOf(m_detectedBitmap)) {
+                    if (m_group->isAncestorOf(m_detectedFillSolid)) {
                         transformUndoStackPushBefore();
                     }
                     else {
-                        transformUndoStackPushBefore(m_detectedBitmap);
+                        transformUndoStackPushBefore(m_detectedFillSolid);
                     }
                     return;
                 }
@@ -1898,6 +2024,26 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     this->setCursor(cMap.scaled(16, 16, Qt::KeepAspectRatio).transformed(matrix));
                     break;
                 }
+                case 13: {
+                    QPixmap cMap(":/ui/icons/images/direct_left.png");
+                    this->setCursor(cMap);
+                    break;
+                }
+                case 14: {
+                    QPixmap cMap(":/ui/icons/images/direct_top.png");
+                    this->setCursor(cMap);
+                    break;
+                }
+                case 15: {
+                    QPixmap cMap(":/ui/icons/images/direct_right.png");
+                    this->setCursor(cMap);
+                    break;
+                }
+                case 16: {
+                    QPixmap cMap(":/ui/icons/images/direct_bottom.png");
+                    this->setCursor(cMap);
+                    break;
+                }
                 default:
                     break;
                 }
@@ -1930,14 +2076,20 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			case 5:
 			case 8:
 			case 11:
-			case 13://点选
-			case 14://点选图片
+            case 13://text left
+            case 14://text top
+            case 15://text right
+            case 16://text bottom
+			case 30://点选
+			case 31://点选图片
+            
 			{
 				selectedHandleScale();
 				emit selectedChangedFromMouse();
 				this->viewport()->repaint();
 				return;
 			}
+             
 			
 		}
 		//QGraphicsView::mouseReleaseEvent(event);
@@ -2065,6 +2217,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
     emit mouseMoved(pos);
 }
 
+
 void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 {
 	//QGraphicsView::mouseReleaseEvent(event);
@@ -2172,12 +2325,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				transformUndoStackPush(m_detectedPrimitive);
 			}
 		}
-		else if (m_detectedBitmap != nullptr) {
-			if (m_group->isAncestorOf(m_detectedBitmap)) {
+		else if (m_detectedFillSolid != nullptr) {
+			if (m_group->isAncestorOf(m_detectedFillSolid)) {
 				transformUndoStackPush();
 			}
 			else {
-				transformUndoStackPush(m_detectedBitmap);
+				transformUndoStackPush(m_detectedFillSolid);
 			}
 		}
 		else {
@@ -3714,13 +3867,20 @@ void LaserViewer::selectionUndoStackPush()
 
 void LaserViewer::transformUndoStackPushBefore(LaserPrimitive* item)
 {
-	
-    if (item) {
-        m_singleLastTransform = item->sceneTransform();
+    //30是点选，31是点选图片
+    if (m_curSelectedHandleIndex < 12 || m_curSelectedHandleIndex >= 30) {
+        if (item) {
+            m_singleLastTransform = item->sceneTransform();
+        }
+        else {
+            m_groupLastTransform = m_group->transform();
+        }
     }
+    //文字
     else {
-        m_groupLastTransform = m_group->transform();
+
     }
+    
     
 }
 
@@ -3849,6 +4009,11 @@ bool LaserViewer::detectBoundsInMaxRegion(QRectF bounds)
 qreal LaserViewer::zoomValue() const
 {
     return transform().m11();
+}
+
+qreal LaserViewer::zoomValueNormal()
+{
+    return zoomValue() / adapterViewScale();
 }
 
 void LaserViewer::setZoomValue(qreal zoomValue)
@@ -4286,6 +4451,51 @@ void LaserViewer::selectedHandleScale()
 
 			break;
 		}
+        //text
+        case 13: {
+            qreal diff = (m_lastPos.x() - m_mousePoint.x()) * 380/zoomValueNormal();
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+            
+            qreal w = primitive->variableBounds().width() + diff;
+            if (w < 1) {
+                w = 1;
+            }
+            primitive->setBoundingRectWidth(w);
+            break;
+        }
+        case 15: {
+            qreal diff = (m_mousePoint.x() - m_lastPos.x()) * 380 / zoomValueNormal();
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+
+            qreal w = primitive->boundingRect().width() + diff;
+            if (w < 1) {
+                w = 1;
+            }
+            primitive->setBoundingRectWidth(w);
+            break;
+        }
+        case 14: {
+            qreal diff = (m_lastPos.y() - m_mousePoint.y()) * 380 / zoomValueNormal();
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+
+            qreal h = primitive->boundingRect().height() + diff;
+            if (h < 1) {
+                h = 1;
+            }
+            primitive->setBoundingRectHeight(h);
+            break;
+        }
+        case 16: {
+            qreal diff = (m_mousePoint.y() - m_lastPos.y()) * 380 / zoomValueNormal();
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+
+            qreal h = primitive->boundingRect().height() + diff;
+            if (h < 1) {
+                h = 1;
+            }
+            primitive->setBoundingRectHeight(h);
+            break;
+        }
 	}
 	QTransform t;
 	//qDebug() << " rate: "<< rate;
@@ -4301,7 +4511,7 @@ void LaserViewer::selectedHandleScale()
             
 			break;
 		}
-		case 13://点选
+		case 30://点选
 		{
 			QPointF diff = (m_mousePoint - m_lastPos);
 			if (m_group->isAncestorOf(m_detectedPrimitive)) {
@@ -4323,21 +4533,21 @@ void LaserViewer::selectedHandleScale()
 			
 			break;
 		}
-		case 14://点选图片
+		case 31://点选图片
 		{
 			QPointF diff = (m_mousePoint - m_lastPos);
-			if (m_group->isAncestorOf(m_detectedBitmap)) {
+			if (m_group->isAncestorOf(m_detectedFillSolid)) {
 				t = m_group->transform();
 				QTransform t1;
 				t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
 				m_group->setTransform(t * t1);
 			}
 			else {
-                if (!m_detectedBitmap->isLocked()) {
-                    t = m_detectedBitmap->transform();
+                if (!m_detectedFillSolid->isLocked()) {
+                    t = m_detectedFillSolid->transform();
                     QTransform t1;
                     t1.translate(diff.x() / zoomValue(), diff.y() / zoomValue());
-                    m_detectedBitmap->setTransform(t * t1);
+                    m_detectedFillSolid->setTransform(t * t1);
                 }
 				
 

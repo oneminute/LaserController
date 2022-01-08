@@ -3,6 +3,7 @@
 #include "widget/UndoCommand.h"
 #include "util/Utils.h"
 #include "widget/OverstepMessageBoxWarn.h"
+#include "scene/LaserPrimitive.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -224,6 +225,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonSameWidth = new LaserToolButton(this);
     m_arrangeButtonSameHeight = new LaserToolButton(this);
     m_arrangeMoveToPage = new LaserToolButton(this);
+    m_createStampTb = new LaserToolButton(this);
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -236,6 +238,19 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
     //toolButtonSplineTool->setDisabled(true);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
+    //stamp
+    m_createStampTb->setPopupMode(QToolButton::InstantPopup);
+    m_createStampTb->setIcon(QIcon(":/ui/icons/images/createStamp.png"));
+    LaserMenu* createStampMenu = new LaserMenu(m_createStampTb);
+    createStampMenu->addAction(m_ui->actionNameStamp);
+    createStampMenu->addAction(m_ui->actionStripStamp);
+    createStampMenu->addAction(m_ui->actionCircleStamp);
+    createStampMenu->addAction(m_ui->actionEllipseStamp);
+    m_createStampTb->setMenu(createStampMenu);
+    connect(m_ui->actionNameStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateNameStamp);
+    connect(m_ui->actionStripStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateStripStamp);
+    connect(m_ui->actionCircleStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateCircleStamp);
+    connect(m_ui->actionEllipseStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateEllipseStamp);
     //arrange align
     //center align
     m_arrangeButtonAlignCenter->setPopupMode(QToolButton::InstantPopup);
@@ -340,6 +355,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
 
+    m_ui->toolBar->addWidget(m_createStampTb);
 
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignCenter);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignHorinzontal);
@@ -1011,7 +1027,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionInvertSelection, &QAction::triggered, this, &LaserControllerWindow::onActionInvertSelect);
     //shapes weld/ two shapes unite
     connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
-    //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
+    connect(m_ui->actionWeldAll, &QAction::triggered, this, &LaserControllerWindow::onActionWeldAll);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     ADD_TRANSITION(deviceIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
@@ -4726,6 +4742,7 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         m_ui->actionUniteTwoShapes->setEnabled(false);
     }
     if (count > 1) {
+        m_ui->actionWeldAll->setEnabled(true);
         m_ui->actionGroup->setEnabled(true);
         m_arrangeButtonAlignCenter->setEnabled(true);
         m_arrangeButtonAlignHorinzontal->setEnabled(true);
@@ -4742,6 +4759,7 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         }
     }
     else {
+        m_ui->actionWeldAll->setEnabled(false);
         m_ui->actionGroup->setEnabled(false);
         m_arrangeButtonAlignCenter->setEnabled(false);
         m_arrangeButtonAlignHorinzontal->setEnabled(false);
@@ -5515,6 +5533,36 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
     m_viewer->viewport()->update();
 }
 
+void LaserControllerWindow::onActionCreateNameStamp()      
+{
+    /*LaserRing* star = new LaserRing(m_scene->document(), QRectF(QPointF(0, 0), QPointF(50 * 1000, 50 * 1000)), 5 * 1000,  QTransform(),
+        m_viewer->curLayerIndex());
+    m_scene->addLaserPrimitive(star, false);
+    LaserFrame* star = new LaserFrame(m_scene->document(), QRect(QPoint(0, 0), QPoint(50 * 1000, 50 * 1000)), 5 * 1000, 5 * 1000, QTransform(),
+        m_viewer->curLayerIndex(), CRT_Line);
+    m_scene->addLaserPrimitive(star, false);*/
+    QString s("PKL");
+    /*LaserCircleText* text = new LaserCircleText(m_scene->document(),
+        s, QRect(0, 0, 90 * 1000, 50 * 1000),
+        QSize(), 0);
+        m_scene->addLaserPrimitive(text, false);*/
+    LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(),
+        s, QSize(90*1000, 60*1000));
+    m_scene->addLaserPrimitive(text, false);
+}
+
+void LaserControllerWindow::onActionCreateStripStamp()
+{
+}
+
+void LaserControllerWindow::onActionCreateCircleStamp()
+{
+}
+
+void LaserControllerWindow::onActionCreateEllipseStamp()
+{
+}
+
 void LaserControllerWindow::onActionAlignCenter()
 {
     ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignCenter);
@@ -5662,6 +5710,13 @@ void LaserControllerWindow::onActionInvertSelect()
 void LaserControllerWindow::onActionTwoShapesUnite()
 {
     WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_TwoUnite);
+    m_viewer->undoStack()->push(cmd);
+    m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onActionWeldAll()
+{
+    WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_WeldAll);
     m_viewer->undoStack()->push(cmd);
     m_viewer->viewport()->repaint();
 }

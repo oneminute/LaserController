@@ -60,7 +60,7 @@ private:
 	LaserBackgroundItem* m_background;
 	bool m_mousePressBlock = false;
 	bool m_mouseMoveBlock = false;
-	LaserBitmap* m_detectedBitmap = nullptr;
+	LaserBitmap* m_detectedFillSolid = nullptr;
     QuadTreeNode* m_quadTree;
     QRect m_maxRegion;
     QList<QSet<LaserPrimitive*>*> m_joinedGroupList;

@@ -762,14 +762,14 @@ void CornerRadiusCommand::undo()
             if (rect->cornerRadius() == m_lastRadius) {
                 return;
             }
-            rect->setCornerRadius(m_lastRadius);
+            rect->setCornerRadius(m_lastRadius, CRT_Round);
         }
     }
     else {
         m_cornerRadius->setValue(0.0);
         m_cornerRadius->setPrefix(QObject::tr("multi"));
         for (QMap<LaserRect*, qreal>::Iterator i = m_lastMultiRadiusMap.begin(); i != m_lastMultiRadiusMap.end(); i++) {
-            i.key()->setCornerRadius(i.value());
+            i.key()->setCornerRadius(i.value(), CRT_Round);
         }
 
     }
@@ -808,7 +808,7 @@ void CornerRadiusCommand::redo()
     m_cornerRadius->setPrefix("");
     for (LaserPrimitive* primitive : m_rectList) {
         LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
-        rect->setCornerRadius(m_curRadius);
+        rect->setCornerRadius(m_curRadius, CRT_Round);
     }
     m_view->viewport()->repaint();
 }
@@ -1399,10 +1399,18 @@ CommonSelectionCommand::CommonSelectionCommand(LaserViewer* viewer, bool isInver
 {
     m_viewer = viewer;
     m_group = m_viewer->group();
-    for (QGraphicsItem* item : m_group->childItems()) {
-        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-        m_undoList.append(p);
+    if (m_group) {
+        for (QGraphicsItem* item : m_group->childItems()) {
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            m_undoList.append(p);
+        }
     }
+    else {
+        m_viewer->createGroup();
+        m_group = m_viewer->group();
+
+    }
+    
     m_isInvert = isInvert;
 }
 
@@ -1423,8 +1431,10 @@ void CommonSelectionCommand::undo()
 
 void CommonSelectionCommand::redo()
 {
-    m_group->removeAllFromGroup();
-    m_group->setTransform(QTransform());
+    if (m_group) {
+        m_group->removeAllFromGroup();
+        m_group->setTransform(QTransform());
+    }
     for (LaserPrimitive* p : m_viewer->scene()->document()->primitives()) {
         if (m_isInvert) {
             if (p->isSelected()) {
@@ -1439,6 +1449,7 @@ void CommonSelectionCommand::redo()
         else {
             p->setSelected(true);
             m_group->addToGroup(p);
+            
         }
         
     }
@@ -1780,10 +1791,10 @@ void WeldShapesUndoCommand::comuptePath()
         if (primitive->isJoinedGroup()) {
             for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
                 p != primitive->joinedGroupList()->end(); p++) {
-                QPainterPath path_0 = (*p)->getScenePath();
                 if (m_traversedMap[*p]) {
                     continue;
                 }
+                QPainterPath path_0 = (*p)->getScenePath();
                 if (path.intersects(path_0)) {
                     switch (m_type) {
                     case WeldShapes_TwoUnite: {
@@ -1818,7 +1829,6 @@ void WeldShapesUndoCommand::comuptePath()
 
             }
             LaserPrimitive* primitive_1 = i_1.key();
-
             QPainterPath path_1 = primitive_1->getScenePath();
             if (path.intersects(path_1)) {
                 switch (m_type) {
@@ -1894,6 +1904,14 @@ void WeldShapesUndoCommand::createNewPath()
             m_weldAndOriginalsMap.insert(newPath, list);
         }
     }
+    //if only one, the primitive will not joined group
+    if (m_weldJoinedGroup->size() == 1) {
+        for (QSet<LaserPrimitive*>::iterator p = m_weldJoinedGroup->begin();
+            p != m_weldJoinedGroup->end(); p ++) {
+
+            (*p)->setJoinedGroup(nullptr);
+        }
+    }
 }
 
 void WeldShapesUndoCommand::handleRedo()
@@ -1910,10 +1928,11 @@ void WeldShapesUndoCommand::handleRedo()
     //restore original primitives
     for (QMap<LaserPrimitive*, QList<LaserPrimitive*>>::iterator i = m_weldAndOriginalsMap.begin();
         i != m_weldAndOriginalsMap.end(); i ++) {
-        m_scene->removeLaserPrimitive(i.key(), true);
+        m_scene->addLaserPrimitive(i.key(), true);
+        m_viewer->group()->addToGroup(i.key());
         for (LaserPrimitive* p : i.value()) {
-            m_scene->addLaserPrimitive(p, true);
-            m_viewer->group()->addToGroup(p);
+            m_scene->removeLaserPrimitive(p, true);
+            
         }
     }
     //if selected primitive size >= 2 ,all primitive will grouped
@@ -1930,6 +1949,9 @@ void WeldShapesUndoCommand::handleRedo()
 
 void WeldShapesUndoCommand::deleteJoinedGroup(QSet<LaserPrimitive*>* joinedGroup)
 {
+    if (joinedGroup == nullptr) {
+        return;
+    }
     //delete
     for (QSet<LaserPrimitive*>::iterator i = joinedGroup->begin();
         i != joinedGroup->end(); i++) {        
@@ -1997,8 +2019,9 @@ void WeldShapesUndoCommand::redo()
     }
 
     //append new weld joined group;
-    if (m_weldJoinedGroup->isEmpty()) {
+    if (m_weldJoinedGroup->size() <= 1) {
         delete m_weldJoinedGroup;
+        m_weldJoinedGroup = nullptr;
     }
     else {
         m_scene->joinedGroupList().append(m_weldJoinedGroup);

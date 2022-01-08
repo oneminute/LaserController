@@ -1225,6 +1225,18 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 stream >> path;
                 primitive = new LaserPath(path, this, saveTransform, layerIndex);
             }
+            else if (className == "LaserStar") {
+                QJsonArray cArray = primitiveJson["center"].toArray();
+                qreal radius = primitiveJson["radius"].toDouble();
+                QPoint center(cArray[0].toInt(), cArray[1].toInt());
+                primitive = new LaserStar(this, center, radius, saveTransform, layerIndex);
+            }
+            else if (className == "LaserRing") {
+                QJsonArray boundsArray = primitiveJson["bounds"].toArray();
+                qreal width = primitiveJson["width"].toDouble();
+                QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toInt(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
+                primitive = new LaserRing(this, bounds, width, saveTransform, layerIndex);
+            }
             
             if (primitive)
             {

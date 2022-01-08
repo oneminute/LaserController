@@ -218,7 +218,7 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 	
 	m_mousePressBlock = false;
 	m_mouseMoveBlock = false;
-	m_detectedBitmap = nullptr;
+	m_detectedFillSolid = nullptr;
 	QString name = watched->metaObject()->className();
 	//qDebug() << name;
 	qDebug() << event->type();
@@ -230,7 +230,7 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 			if (name == "LaserBitmap") {
 				LaserBitmap* map = qobject_cast<LaserBitmap*>(watched);
 				m_mousePressBlock = true;
-				m_detectedBitmap = map;
+				m_detectedFillSolid = map;
 				return false;
 			}
 		}
@@ -258,7 +258,7 @@ bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 
 bool LaserScene::mousePressDetectBitmap(LaserBitmap* & detected)
 {
-	detected = m_detectedBitmap;
+	detected = m_detectedFillSolid;
 	return m_mousePressBlock;
 }
 bool LaserScene::mouseMoveBlock()

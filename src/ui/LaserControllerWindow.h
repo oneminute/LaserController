@@ -52,6 +52,7 @@ class RadioButtonGroup;
 class PointPairTableWidget;
 class UpdateDialog;
 class LaserMenu;
+class LaserStar;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -330,6 +331,11 @@ protected slots:
     void askMergeOrNew();
 
     void applyJobOriginToDocument(const QVariant& value);
+    //create stamp
+    void onActionCreateNameStamp();
+    void onActionCreateStripStamp();
+    void onActionCreateCircleStamp();
+    void onActionCreateEllipseStamp();
     //arrange align
     void onActionAlignCenter();
     void onActionAlignHorinzontalMiddle();
@@ -356,6 +362,7 @@ protected slots:
     void onActionSelectAll();
     void onActionInvertSelect();
     void onActionTwoShapesUnite();
+    void onActionWeldAll();
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
@@ -677,6 +684,7 @@ private:
     LaserToolButton* m_arrangeButtonSameWidth;
     LaserToolButton* m_arrangeButtonSameHeight;
     LaserToolButton* m_arrangeMoveToPage;
+    LaserToolButton* m_createStampTb;
     int m_alignTargetIndex;
     LaserPrimitive* m_alignTarget;
     friend class LaserApplication;

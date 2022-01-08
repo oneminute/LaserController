@@ -662,6 +662,14 @@ QJsonObject LaserLayer::toJson(QWidget* window)
             LaserPath* path = qobject_cast<LaserPath*>(primitive);
             array.append(path->toJson());
         }
+        else if (className == "LaserStar") {
+            LaserStar* star = qobject_cast<LaserStar*>(primitive);
+            array.append(star->toJson());
+        }
+        else if (className == "LaserRing") {
+            LaserRing* ring = qobject_cast<LaserRing*>(primitive);
+            array.append(ring->toJson());
+        }
 		else {
 			QMessageBox::critical(window, "critical", "can't save, "+className+" can't to json.");
             break;
