@@ -1214,6 +1214,22 @@ void LaserDevice::debugPrintRegisters() const
 #endif
 }
 
+QPoint LaserDevice::mapFromQuadToCurrent(const QPoint& pt, const QPoint& topLeftFrom)
+{
+    QRect layout = this->layoutRect();
+    QPoint topLeftCurr = layout.topLeft();
+    QPoint trans = topLeftCurr - topLeftFrom;
+    return pt + trans;
+}
+
+QPoint LaserDevice::mapFromCurrentToQuad(const QPoint& pt, const QPoint& topLeftTo)
+{
+    QRect layout = this->layoutRect();
+    QPoint topLeftCurr = layout.topLeft();
+    QPoint trans = topLeftTo - topLeftCurr;
+    return pt + trans;
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);

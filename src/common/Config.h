@@ -115,6 +115,7 @@ public:
         static ConfigItemGroup* group;
 
         CONFIG_ITEM(camera, resolution, QSize, toSize)
+        CONFIG_ITEM(camera, fisheye, bool, toBool)
         CONFIG_ITEM(camera, hCornersCount, int, toInt)
         CONFIG_ITEM(camera, vCornersCount, int, toInt)
         CONFIG_ITEM(camera, squareSize, int, toInt)
@@ -122,7 +123,8 @@ public:
         CONFIG_ITEM_T(camera, calibrationPattern, CalibrationPattern)
         CONFIG_ITEM(camera, minCalibrationFrames, int, toInt)
         CONFIG_ITEM(camera, calibrationAutoCapture, bool, toBool)
-        CONFIG_ITEM_T(camera, undistortionCoeffs, QList<QVariant>)
+        CONFIG_ITEM_T(camera, undistortionCoeffs, QVariantList)
+        CONFIG_ITEM_T(camera, homography, QVariantList)
 
         friend class Config;
     };
@@ -254,6 +256,7 @@ public:
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
         CONFIG_ITEM(export, curveFlatteningThreshold, qreal, toReal)
         CONFIG_ITEM(export, gaussianFactorA, qreal, toReal)
+        CONFIG_ITEM(export, imageQuality, int, toInt)
 
     private:
         friend class Config;

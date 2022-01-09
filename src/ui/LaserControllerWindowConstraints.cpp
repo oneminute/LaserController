@@ -845,28 +845,38 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionMoveLayerUp
 
     // begin m_ui->actionMoveLayerDown
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentEmptyState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionMoveLayerDown
 
     // begin m_ui->actionAnalysisDocument

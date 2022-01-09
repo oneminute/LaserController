@@ -94,7 +94,6 @@ private:
     bool calibZeroTangentDist;   // Assume zero tangential distortion
     bool calibFixPrincipalPoint; // Fix the principal point at the center
     bool flipVertical;           // Flip the captured images around the horizontal axis
-    bool useFisheye;             // use fisheye camera model for calibrate
     bool fixK1;                  // fix K1 distortion coefficient
     bool fixK2;                  // fix K2 distortion coefficient
     bool fixK3;                  // fix K3 distortion coefficient

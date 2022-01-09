@@ -75,7 +75,8 @@ QList<int> CameraController::supportedCameras()
     for (const QCameraInfo& cameraInfo : cameras)
     {
         if (cameraInfo.description().toLower().contains("lightburn") ||
-            cameraInfo.description().toLower().contains("wn"))
+            cameraInfo.description().toLower().contains("wn") ||
+            cameraInfo.description().toLower().contains("bba"))
         {
             supportedCameraIndices.append(index);
         }

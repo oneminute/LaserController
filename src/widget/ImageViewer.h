@@ -31,6 +31,7 @@ protected:
 
     virtual bool event(QEvent* e) override;
     virtual void wheelEvent(QWheelEvent* e) override;
+    virtual void mouseMoveEvent(QMouseEvent* e) override;
 
 protected slots:
 

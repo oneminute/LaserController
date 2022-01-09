@@ -73,6 +73,7 @@
 #include "ui/MultiDuplicationDialog.h"
 #include "ui/CameraToolsWindow.h"
 #include "ui/CalibrationDialog.h"
+#include "ui/CameraAlignmentDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
@@ -686,13 +687,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
-    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
+    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::startMachining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
     connect(m_ui->actionBounding, &QAction::triggered, this, &LaserControllerWindow::onActionBounding);
     connect(m_ui->actionLaserSpotShot, &QAction::triggered, this, &LaserControllerWindow::onActionLaserSpotShot);
     connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
-	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::onActionNew);
+	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::newDocument);
 	connect(m_ui->actionSave, &QAction::triggered, this, &LaserControllerWindow::onActionSave);
 	connect(m_ui->actionSaveAs, &QAction::triggered, this, &LaserControllerWindow::onActionSaveAs);
 	connect(m_ui->actionOpen, &QAction::triggered, this, &LaserControllerWindow::onActionOpen);
@@ -799,6 +800,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
     connect(m_ui->actionCameraCalibration, &QAction::triggered, this, &LaserControllerWindow::onActionCameraCalibration);
     connect(m_ui->actionGenerateCalibrationBoard, &QAction::triggered, this, &LaserControllerWindow::onActionGenerateCalibrationBoard);
+    connect(m_ui->actionCameraAlignment, &QAction::triggered, this, &LaserControllerWindow::onActionCameraAlignment);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -1928,7 +1930,7 @@ void LaserControllerWindow::updataRecentFilesActions()
             m_fileDirection = path;
             setWindowTitle(getCurrentFileName() + " - ");
             //创建document
-            createNewDocument();
+            LaserApplication::createDocument();
             m_scene->document()->load(m_fileDirection, this);
             addRecentFile(m_fileDirection);
         });
@@ -3397,7 +3399,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     
 }
 
-void LaserControllerWindow::onActionNew(bool checked)
+void LaserControllerWindow::newDocument()
 {
     LaserApplication::device->debugPrintSystemRegisters();
 	LaserDocument* doc = m_scene->document();
@@ -3407,7 +3409,7 @@ void LaserControllerWindow::onActionNew(bool checked)
 		}
 	}
 	this->setWindowTitle(tr("Untitled - "));
-	createNewDocument();
+	LaserApplication::createDocument();
 }
 
 bool LaserControllerWindow::onActionSave(bool checked)
@@ -3459,7 +3461,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 		return;
 	}
 	//创建document
-	createNewDocument();
+	LaserApplication::createDocument();
 	m_scene->document()->load(name, this);
     addRecentFile(name);
     setWindowTitle(getCurrentFileName() + " - ");
@@ -3647,7 +3649,7 @@ void LaserControllerWindow::onActionLoadJson(bool checked)
     }
 }
 
-void LaserControllerWindow::onActionMachining(bool checked)
+void LaserControllerWindow::startMachining()
 {
     if (m_useLoadedJson)
     {
@@ -3691,6 +3693,11 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //}
     }
     m_useLoadedJson = false;
+}
+
+void LaserControllerWindow::updateLayers()
+{
+    m_tableWidgetLayers->updateItems();
 }
 
 void LaserControllerWindow::onActionPauseMechining(bool checked)
@@ -4022,11 +4029,11 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 			if (!onActionSave()) {
 				return false;
 			}
-			documentClose();
+			closeDocument();
 			return true;
 		}
 		case QMessageBox::StandardButton::Close: {
-			documentClose();
+			closeDocument();
 			return true;
 		}
 		default:
@@ -4557,6 +4564,12 @@ void LaserControllerWindow::onActionCameraCalibration()
 void LaserControllerWindow::onActionGenerateCalibrationBoard()
 {
     DistortionCalibrator::generateCalibrationBoard();
+}
+
+void LaserControllerWindow::onActionCameraAlignment()
+{
+    CameraAlignmentDialog dlg;
+    dlg.exec();
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -5166,39 +5179,38 @@ void LaserControllerWindow::updateOutlineTree()
 
 void LaserControllerWindow::initDocument(LaserDocument* doc)
 {
-    if (doc)
-    {
-        connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
-        connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
+    if (!doc)
+        return;
+    connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
+    connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
 
-        doc->bindLayerButtons(m_layerButtons);
-		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
-        m_tableWidgetLayers->setDocument(doc);
-        m_tableWidgetLayers->updateItems();
-        setWindowTitle(doc->name());
-        //undo
-        m_viewer->undoStack()->clear();
-        LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
-        if (m_viewer) {
-            QRect rect = LaserApplication::device->layoutRect();
+    doc->bindLayerButtons(m_layerButtons);
+    m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
+    m_tableWidgetLayers->setDocument(doc);
+    m_tableWidgetLayers->updateItems();
+    setWindowTitle(doc->name());
+    //undo
+    m_viewer->undoStack()->clear();
+    LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+    if (m_viewer) {
+        QRect rect = LaserApplication::device->layoutRect();
 
-            m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
-            m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
-            m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点进行变换
-            LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-            if (backgroundItem) {
-                backgroundItem->onChangeGrids();
-            }
-            m_comboBoxScale->setCurrentText("100");
-            //初始化缩放输入
-            qreal scale = m_viewer->adapterViewScale();
-            m_viewer->setZoomValue(scale);
-            qreal zoomValuePerc = scale * 100;
-            QString str = QString("%1").arg(zoomValuePerc, 0, 'f', 3);
-            m_comboBoxScale->blockSignals(true);
-            m_comboBoxScale->setCurrentText(str);
-            m_comboBoxScale->blockSignals(false);
+        m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+        m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
+        m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点进行变换
+        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+        if (backgroundItem) {
+            backgroundItem->onChangeGrids();
         }
+        //m_comboBoxScale->setCurrentText("100");
+        //初始化缩放输入
+        qreal scale = m_viewer->adapterViewScale();
+        m_viewer->setZoomValue(scale);
+        qreal zoomValuePerc = scale * 100;
+        QString str = QString("%1").arg(zoomValuePerc, 0, 'f', 3);
+        m_comboBoxScale->blockSignals(true);
+        m_comboBoxScale->setCurrentText(str);
+        m_comboBoxScale->blockSignals(false);
     }
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
@@ -5406,13 +5418,6 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     }
 }
 
-void LaserControllerWindow::createNewDocument()
-{
-	LaserDocument* doc = new LaserDocument(m_scene);
-	initDocument(doc);
-    doc->open();
-}
-
 QString LaserControllerWindow::getCurrentFileName()
 {
 	QString name = "";
@@ -5424,7 +5429,7 @@ QString LaserControllerWindow::getCurrentFileName()
 	return name;
 }
 
-void LaserControllerWindow::documentClose()
+void LaserControllerWindow::closeDocument()
 {
 	m_scene->clearDocument(true);
 	m_tableWidgetLayers->updateItems();
@@ -5479,13 +5484,13 @@ void LaserControllerWindow::askMergeOrNew()
         if (ret == 1)
         {
             if (onActionCloseDocument()) {
-                createNewDocument();
+                LaserApplication::createDocument();
             }
         }
 	}
     else
     {
-        createNewDocument();
+        LaserApplication::createDocument();
     }
 }
 

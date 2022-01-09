@@ -440,7 +440,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
             return;
         }
         qint64 writtenBytes = saveFile.write(rawJson);
-        qDebug() << "written bytes:" << writtenBytes;
+        //qDebug() << "written bytes:" << writtenBytes;
         saveFile.close();
     }
     else
@@ -643,7 +643,7 @@ void LaserDocument::exportBoundingJSON()
 
     saveFile.close();
     //emit exportFinished(filename);
-    qLogD << "rawJson: " << rawJson;
+    //qLogD << "rawJson: " << rawJson;
     emit exportFinished(rawJson);
 }
 

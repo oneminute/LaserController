@@ -249,14 +249,12 @@ enum StartFromType
     SFT_AbsoluteCoords
 };
 
-//enum ModifiedBy
-//{
-//    MB_Manual,
-//    MB_ConfigFile,
-//    MB_Widget,
-//    MB_Register,
-//    MB_RegisterConfirmed
-//};
+enum ImageQuality
+{
+    IQ_Normal,
+    IQ_High,
+    IQ_Perfect
+};
 
 enum PrimitiveProperty
 {

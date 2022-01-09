@@ -1378,7 +1378,7 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 	if (!m_scene->document()) {
 		return;
 	}
-    qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
+    qreal wheelZoomValue = 1 + event->delta() / 1200.0;
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {
 		return;

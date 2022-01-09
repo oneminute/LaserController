@@ -95,6 +95,9 @@ public:
 
     void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
 
+    void push();
+    void pop();
+
 protected:
     InputWidgetWrapper* bindWidget(QWidget* widget, StoreStrategy ss);
     void setNeedRelaunch(bool needRelaunch);

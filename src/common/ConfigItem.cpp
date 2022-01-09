@@ -3,6 +3,7 @@
 #include "widget/InputWidgetWrapper.h"
 
 #include <QDateTime>
+#include <QStack>
 
 class ConfigItemPrivate
 {
@@ -131,6 +132,8 @@ public:
     QMap<QString, QVariant> extraProperties;
 
     QList<QWidget*> widgets;
+
+    QStack<QVariant> stack;
 
     QDateTime lastValueModifiedTime;
     QDateTime lastDirtyModifiedTime;
@@ -794,6 +797,18 @@ void ConfigItem::setValue(const QVariant& value, StoreStrategy strategy_, void* 
             emit dirtyValueChanged(value, senderPtr);
         break;
     }
+}
+
+void ConfigItem::push()
+{
+    Q_D(ConfigItem);
+    d->stack.push(d->value);
+}
+
+void ConfigItem::pop()
+{
+    Q_D(ConfigItem);
+    d->value = d->stack.pop();
 }
 
 void ConfigItem::reset()

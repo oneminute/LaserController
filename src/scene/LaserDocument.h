@@ -34,8 +34,6 @@ public:
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
-	//LaserLayer* defaultCuttingLayer() const;
-	//LaserLayer* defaultEngravingLayer() const;
 
     QString newLayerName() const;
 

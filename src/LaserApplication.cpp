@@ -12,6 +12,7 @@
 #include "exception/LaserException.h"
 #include "laser/LaserDevice.h"
 #include "laser/LaserDriver.h"
+#include "scene/LaserDocument.h"
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"
 #include "ui/PreviewWindow.h"
@@ -273,6 +274,7 @@ void LaserApplication::retranslate()
     stringMap["Filling"] = tr("Filling");
     stringMap["Font"] = tr("Font");
     stringMap["Height"] = tr("Height");
+    stringMap["High Quality"] = tr("Hig Qualityh");
     stringMap["High Contrast"] = tr("High Contrast");
     stringMap["Horizontal"] = tr("Horizontal");
     stringMap["Inactivated"] = tr("Inactivated");
@@ -283,8 +285,10 @@ void LaserApplication::retranslate()
     stringMap["Medium Contrast"] = tr("Medium Contrast");
     stringMap["Middle"] = tr("Middle");
     stringMap["Movement"] = tr("Movement");
+    stringMap["Norma Qualityl"] = tr("Norma Qualityl");
     stringMap["Off"] = tr("Off");
     stringMap["PageSize"] = tr("Page Size(mm): %1x%2");
+    stringMap["Perfect Qualityl"] = tr("Perfect Qualityl");
     stringMap["Power"] = tr("Power");
     stringMap["Right"] = tr("Right");
     stringMap["Rotate"] = tr("Rotate");
@@ -389,6 +393,15 @@ void LaserApplication::restart()
     mainWindow->close();
     LaserApplication::quit();
     QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
+}
+
+LaserDocument* LaserApplication::createDocument()
+{
+    LaserScene* scene = mainWindow->scene();
+	LaserDocument* doc = new LaserDocument(scene);
+	mainWindow->initDocument(doc);
+    doc->open();
+    return doc;
 }
 
 void LaserApplication::initLog()

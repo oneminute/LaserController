@@ -59,8 +59,6 @@
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
     <addaction name="actionRemoteAssistance"/>
-    <addaction name="actionCameraCalibration"/>
-    <addaction name="actionGenerateCalibrationBoard"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -130,11 +128,20 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuCamera">
+    <property name="title">
+     <string>Camera</string>
+    </property>
+    <addaction name="actionCameraCalibration"/>
+    <addaction name="actionGenerateCalibrationBoard"/>
+    <addaction name="actionCameraAlignment"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuDraw"/>
    <addaction name="menuOptions"/>
    <addaction name="menuAdvance"/>
+   <addaction name="menuCamera"/>
    <addaction name="menuMainboard"/>
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
@@ -1775,6 +1782,11 @@
   <action name="actionGenerateCalibrationBoard">
    <property name="text">
     <string>Generate Calibration Board</string>
+   </property>
+  </action>
+  <action name="actionCameraAlignment">
+   <property name="text">
+    <string>Camera Alignment</string>
    </property>
   </action>
  </widget>

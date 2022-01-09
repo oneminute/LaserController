@@ -121,6 +121,11 @@ public slots:
     void onFontSpaceYEnterOrLostFocus();
     void onLaserPrimitiveGroupItemTransformChanged();
 
+	void newDocument();
+	void closeDocument();
+    void startMachining();
+    void updateLayers();
+
     void retranslate();
 	
 protected:
@@ -174,7 +179,6 @@ protected slots:
     void onTableWidgetItemSelectionChanged();
     void onActionExportJson(bool checked = false);
     void onActionLoadJson(bool checked = false);
-    void onActionMachining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
     void onActionBounding(bool checked = false);
@@ -187,7 +191,6 @@ protected slots:
     void onActionLoadMotor(bool checked = false);
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
-	void onActionNew(bool checked = false);
 	bool onActionSave(bool checked = false);
 	bool onActionSaveAs(bool checked = false);
 	void onActionOpen(bool checked = false);
@@ -270,6 +273,7 @@ protected slots:
     void onActionCameraTools(bool checked = false);
     void onActionCameraCalibration();
     void onActionGenerateCalibrationBoard();
+    void onActionCameraAlignment();
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -371,9 +375,7 @@ private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
-	void createNewDocument();
 	QString getCurrentFileName();
-	void documentClose();
 
 signals:
     void windowCreated();

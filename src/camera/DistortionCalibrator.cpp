@@ -16,7 +16,6 @@ DistortionCalibrator::DistortionCalibrator(QObject* parent)
     , m_requestCalibration(false)
     , m_requestCapture(false)
     , aspectRatio(0)
-    , useFisheye(false)
     , calibFixPrincipalPoint(false)
     , calibZeroTangentDist(false)
     , fixK1(false)
@@ -47,9 +46,11 @@ bool DistortionCalibrator::validate()
     if (fixK4)                  flag |= cv::CALIB_FIX_K4;
     if (fixK5)                  flag |= cv::CALIB_FIX_K5;
 
-    if (useFisheye) {
+    if (Config::Camera::fisheye()) {
+        fixK4 = true;
         // the fisheye model has its own enum, so overwrite the flags
         flag = cv::fisheye::CALIB_FIX_SKEW | cv::fisheye::CALIB_RECOMPUTE_EXTRINSIC;
+                                           //| cv::fisheye::CALIB_CHECK_COND;
         if (fixK1)                    flag |= cv::fisheye::CALIB_FIX_K1;
         if (fixK2)                    flag |= cv::fisheye::CALIB_FIX_K2;
         if (fixK3)                    flag |= cv::fisheye::CALIB_FIX_K3;
@@ -99,7 +100,7 @@ bool DistortionCalibrator::captureSample(cv::Mat& processing, cv::Mat origin)
 
     int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE;
 
-    if (!useFisheye) {
+    if (!Config::Camera::fisheye()) {
         // fast check erroneously fails with high distortions like fisheye
         chessBoardFlags |= cv::CALIB_CB_FAST_CHECK;
     }
@@ -158,16 +159,17 @@ bool DistortionCalibrator::undistortImage(cv::Mat& processing)
     cv::Mat temp = processing.clone();
     if (cameraMatrix.empty() || distCoeffs.empty())
         return false;
-    if (useFisheye)
+    if (Config::Camera::fisheye())
     {
         cv::Mat newCamMat;
         cv::fisheye::estimateNewCameraMatrixForUndistortRectify(cameraMatrix, distCoeffs, processing.size(),
             cv::Matx33d::eye(), newCamMat, 1);
         cv::fisheye::undistortImage(temp, processing, cameraMatrix, distCoeffs, newCamMat);
-        return true;
     }
     else
+    {
         undistort(temp, processing, cameraMatrix, distCoeffs);
+    }
     return true;
 }
 
@@ -215,10 +217,10 @@ bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMa
     bool ok = false;
     //! [fixed_aspect]
     cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
-    if (!useFisheye && flag & cv::CALIB_FIX_ASPECT_RATIO)
+    if (!Config::Camera::fisheye() && flag & cv::CALIB_FIX_ASPECT_RATIO)
         cameraMatrix.at<double>(0, 0) = aspectRatio;
     //! [fixed_aspect]
-    if (useFisheye) {
+    if (Config::Camera::fisheye()) {
         distCoeffs = cv::Mat::zeros(4, 1, CV_64F);
     }
     else {
@@ -236,7 +238,7 @@ bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMa
     //Find intrinsic and extrinsic camera parameters
     double rms;
 
-    if (useFisheye) {
+    if (Config::Camera::fisheye()) {
         cv::Mat _rvecs, _tvecs;
         rms = cv::fisheye::calibrate(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, _rvecs,
             _tvecs, flag);
@@ -266,7 +268,7 @@ bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMa
     objectPoints.clear();
     objectPoints.resize(imagePoints.size(), newObjPoints);
     totalAvgErr = computeReprojectionErrors(objectPoints, imagePoints, rvecs, tvecs, cameraMatrix,
-        distCoeffs, reprojErrs, useFisheye);
+        distCoeffs, reprojErrs, Config::Camera::fisheye());
 
     qLogD << "totalAvgErr: " << totalAvgErr;
 
@@ -355,6 +357,9 @@ const CalibratorItem& DistortionCalibrator::currentItem() const
 
 void DistortionCalibrator::removeCurrentItem()
 {
+    if (m_samples.empty())
+        return;
+
     m_samples.removeLast();
 }
 
@@ -430,9 +435,11 @@ bool DistortionCalibrator::saveCoeffs()
         << distCoeffs.at<double>(0)
         << distCoeffs.at<double>(1)
         << distCoeffs.at<double>(2)
-        << distCoeffs.at<double>(3)
-        << distCoeffs.at<double>(4)
-        ;
+        << distCoeffs.at<double>(3);
+    if (!Config::Camera::fisheye())
+    {
+        coeffs << distCoeffs.at<double>(4);
+    }
     qLogD << coeffs;
     Config::Camera::undistortionCoeffsItem()->setValue(coeffs, SS_DIRECTLY, this);
     return true;
@@ -443,7 +450,12 @@ bool DistortionCalibrator::loadCoeffs()
     QList<QVariant> coeffs = Config::Camera::undistortionCoeffs();
     qLogD << coeffs;
     cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
-    distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+    if (Config::Camera::fisheye()) {
+        distCoeffs = cv::Mat::zeros(4, 1, CV_64F);
+    }
+    else {
+        distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+    }
     cameraMatrix.at<double>(0, 0) = coeffs.at(0).toReal();
     cameraMatrix.at<double>(1, 1) = coeffs.at(1).toReal();
     cameraMatrix.at<double>(0, 2) = coeffs.at(2).toReal();
@@ -452,7 +464,10 @@ bool DistortionCalibrator::loadCoeffs()
     distCoeffs.at<double>(1) = coeffs.at(5).toReal();
     distCoeffs.at<double>(2) = coeffs.at(6).toReal();
     distCoeffs.at<double>(3) = coeffs.at(7).toReal();
-    distCoeffs.at<double>(4) = coeffs.at(8).toReal();
+    if (!Config::Camera::fisheye())
+    {
+        distCoeffs.at<double>(4) = coeffs.at(8).toReal();
+    }
     return true;
 }
 

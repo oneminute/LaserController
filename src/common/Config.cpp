@@ -320,6 +320,13 @@ void Config::loadCameraItems()
     resolution->setToJsonHook(qSizeItemToJson);
     resolution->setFromJsonHook(parseQSizeItemFromJson);
 
+    ConfigItem* fisheye = group->addConfigItem(
+        "fisheye",
+        true,
+        DT_BOOL
+    );
+    fisheye->setInputWidgetType(IWT_CheckBox);
+
     ConfigItem* hCornersCount = group->addConfigItem(
         "hCornersCount"
         , 8
@@ -386,7 +393,7 @@ void Config::loadCameraItems()
     );
     calibrationAutoCapture->setInputWidgetType(IWT_CheckBox);
 
-    QList<QVariant> coeffs;
+    QVariantList coeffs;
     coeffs << 1 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0;
     ConfigItem* undistortionCoeffs = group->addConfigItem(
         "undistortionCoeffs",
@@ -394,6 +401,15 @@ void Config::loadCameraItems()
         DT_LIST
     );
     undistortionCoeffs->setVisible(false);
+
+    QVariantList homographyCoeffs;
+    homographyCoeffs << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0;
+    ConfigItem* homography = group->addConfigItem(
+        "homography",
+         homographyCoeffs,
+        DT_LIST
+    );
+    homography->setVisible(false);
 }
 
 void Config::loadUiItems()
@@ -938,6 +954,28 @@ void Config::loadExportItems()
     gaussianFactorA->setInputWidgetProperty("minimum", 0);
     gaussianFactorA->setInputWidgetProperty("maximum", 1000);
     gaussianFactorA->setInputWidgetProperty("decimals", 3);
+
+    ConfigItem* imageQuality = group->addConfigItem(
+        "imageQuality",
+        IQ_Perfect,
+        DT_INT
+    );
+    imageQuality->setInputWidgetType(IWT_ComboBox);
+    imageQuality->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("Normal Quality"), IQ_Normal);
+            comboBox->addItem(ltr("High Quality"), IQ_High);
+            comboBox->addItem(ltr("Perfect Quality"), IQ_Perfect);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
 }
 
 void Config::loadDeviceItems()
@@ -2572,6 +2610,10 @@ void Config::updateTitlesAndDescriptions()
     Camera::resolutionItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Resolution", nullptr), 
         QCoreApplication::translate("Config", "Resolution", nullptr));
+
+    Camera::fisheyeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Fisheye", nullptr), 
+        QCoreApplication::translate("Config", "Fisheye", nullptr));
 
     Camera::hCornersCountItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Horizontal Corners Count", nullptr), 

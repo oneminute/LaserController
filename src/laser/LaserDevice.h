@@ -166,6 +166,9 @@ public:
     void debugPrintSystemRegisters() const;
     void debugPrintRegisters() const;
 
+    QPoint mapFromQuadToCurrent(const QPoint& pt, const QPoint& topLeftFrom = QPoint(0, 0));
+    QPoint mapFromCurrentToQuad(const QPoint& pt, const QPoint& topLeftTo = QPoint(0, 0));
+
 public slots:
     void load();
     void unload();

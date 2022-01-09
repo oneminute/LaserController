@@ -151,6 +151,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     if (!visible())
         return;
 
+    painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
 
     QRectF bounds = boundingRect();
@@ -207,21 +208,29 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(pen);
     }
 
+    if (layer()->type() == LLT_FILLING)
+    {
+        QBrush brush(color, Qt::SolidPattern);
+        painter->setBrush(brush);
+    }
+
     if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
     {
-        QPointF center = d->boundingRect.center();
-        QTransform sceneInverted = sceneTransform().inverted();
-        QTransform transformInverted = transform().inverted();
-        QTransform t;
+        //QPointF center = d->boundingRect.center();
+        //QTransform sceneInverted = sceneTransform().inverted();
+        //QTransform transformInverted = transform().inverted();
+        //QTransform t;
         //t *= QTransform::fromTranslate(-center.x(), -center.y());
-        t *= document()->transform();
+        //t *= document()->transform();
         //t *= sceneInverted;
         //t *= transformInverted;
         //t *= QTransform::fromTranslate(center.x(), center.y());
-        t *= painter->transform();
+        //t *= painter->transform();
         //painter->setTransform(t);
     }
+
     draw(painter); 
+    painter->restore();
 }
 
 int LaserPrimitive::layerIndex()
@@ -2306,11 +2315,24 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     QPainterPath path = sceneTransform().map(d->path);
     QRect boundingRectInDevice = path.boundingRect().toRect();
     qreal ratio = boundingRectInDevice.width() * 1.0 / boundingRectInDevice.height();
-    int canvasWidth = qMin(boundingRectInDevice.width(), 8192);
+    int maxImageSize;
+    switch (Config::Export::imageQuality())
+    {
+    case IQ_Normal:
+        maxImageSize = 1024;
+        break;
+    case IQ_High:
+        maxImageSize = 4096;
+        break;
+    case IQ_Perfect:
+        maxImageSize = 8192;
+        break;
+    }
+    int canvasWidth = qMin(boundingRectInDevice.width(), maxImageSize);
     int canvasHeight = qRound(canvasWidth / ratio);
     if (ratio < 1)
     {
-        canvasHeight = qMin(boundingRectInDevice.height(), 8192);
+        canvasHeight = qMin(boundingRectInDevice.height(), maxImageSize);
         canvasWidth = qRound(canvasHeight * ratio);
     }
 
