@@ -106,10 +106,6 @@ CameraToolsWindow::CameraToolsWindow(QWidget* parent)
 
 CameraToolsWindow::~CameraToolsWindow()
 {
-    if (!m_calibrator)
-    {
-        m_cameraController->uninstallProcessor(m_calibrator);
-    }
 }
 
 void CameraToolsWindow::updateCameras()
@@ -306,7 +302,6 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
     {
         m_calibrator = new DistortionCalibrator;
         m_calibrator->validate();
-        m_cameraController->installProcessor(m_calibrator);
         m_cameraController->start();
         m_actionConnectCamera->setText(tr("Disconnect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/disconnect.png")));
@@ -314,7 +309,6 @@ void CameraToolsWindow::onActionConnectCamera(bool checked)
     else
     {
         m_cameraController->stop();
-        m_cameraController->uninstallProcessor(m_calibrator);
         SAFE_DELETE(m_calibrator);
         m_actionConnectCamera->setText(tr("Connect"));
         m_actionConnectCamera->setIcon(QIcon(QStringLiteral(":/ui/icons/images/connect.png")));

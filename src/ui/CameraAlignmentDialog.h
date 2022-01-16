@@ -29,7 +29,7 @@ class CameraAlignmentDialog : public WizardDialog
 {
     Q_OBJECT
 public:
-    explicit CameraAlignmentDialog(QWidget* parent = nullptr);
+    explicit CameraAlignmentDialog(CameraController* cameraController, DistortionCalibrator* calibrator, QWidget* parent = nullptr);
     ~CameraAlignmentDialog();
 
 protected:
@@ -107,7 +107,6 @@ private:
     bool m_waitingForImage;
     int m_currentMarkIndex;
     QMap<int, QGraphicsItem*> m_items;
-    cv::Mat m_homography;
 };
 
 #endif // CAMERAALIGNMENTDIALOG_H

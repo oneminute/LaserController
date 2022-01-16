@@ -1789,6 +1789,39 @@
     <string>Camera Alignment</string>
    </property>
   </action>
+  <action name="actionStartCamera">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/start.png</normaloff>:/ui/icons/images/start.png</iconset>
+   </property>
+   <property name="text">
+    <string>Start Camera</string>
+   </property>
+  </action>
+  <action name="actionStopCamera">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/stop.png</normaloff>:/ui/icons/images/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop Camera</string>
+   </property>
+  </action>
+  <action name="actionMoveForward">
+   <property name="text">
+    <string>Move Forward</string>
+   </property>
+  </action>
+  <action name="actionMoveBackward">
+   <property name="text">
+    <string>Move Backward</string>
+   </property>
+  </action>
+  <action name="actionMoveToUOrigin">
+   <property name="text">
+    <string>U</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

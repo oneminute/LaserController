@@ -210,6 +210,10 @@ QJsonObject qPointItemToJson(const ConfigItem* configItem);
 void parseQPointItemFromJson(QVariant& value, QVariant& defaultValue,
     const QJsonObject& json, ConfigItem* item);
 
+QJsonObject qVector3DItemToJson(const ConfigItem* configItem);
+void parseQVector3DItemFromJson(QVariant& value, QVariant& defaultValue,
+    const QJsonObject& json, ConfigItem* item);
+
 QDebug operator<<(QDebug debug, const ConfigItem & item);
 
 #endif // CONFIGITEM_H

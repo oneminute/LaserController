@@ -114,9 +114,17 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
         break;
     }
     case IWT_Vector2DWidget:
+    {
         Vector2DWidget* vector2DWidget = qobject_cast<Vector2DWidget*>(widget);
         connect(vector2DWidget, &Vector2DWidget::valueChanged, this, QOverload<qreal, qreal>::of(&InputWidgetWrapper::onVector2DChanged));
         break;
+    }
+    case IWT_Vector3DWidget:
+    {
+        Vector3DWidget* vector3DWidget = qobject_cast<Vector3DWidget*>(widget);
+        connect(vector3DWidget, &Vector3DWidget::valueChanged, this, QOverload<qreal, qreal, qreal>::of(&InputWidgetWrapper::onVector3DChanged));
+        break;
+    }
     }
     //configItem->blockSignals(true);
     if (d->configItem->name() == "xStepLength")
@@ -267,6 +275,12 @@ void InputWidgetWrapper::updateWidgetValue(const QVariant& newValue, void* sende
         {
             Vector2DWidget* vector2DWidget = qobject_cast<Vector2DWidget*>(widget);
             vector2DWidget->setValue(newValue.toPointF());
+            break;
+        }
+        case IWT_Vector3DWidget:
+        {
+            Vector3DWidget* vector3DWidget = qobject_cast<Vector3DWidget*>(widget);
+            vector3DWidget->setValue(newValue.value<QVector3D>());
             break;
         }
         }
@@ -442,6 +456,11 @@ void InputWidgetWrapper::onDateTimeChanged(const QDateTime & dateTime)
 void InputWidgetWrapper::onVector2DChanged(qreal x, qreal y)
 {
     modifyConfigItemValue(QPointF(x, y));
+}
+
+void InputWidgetWrapper::onVector3DChanged(qreal x, qreal y, qreal z)
+{
+    modifyConfigItemValue(QVariant::fromValue<QVector3D>(QVector3D(x, y, z)));
 }
 
 void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)

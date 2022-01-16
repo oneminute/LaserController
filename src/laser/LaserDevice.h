@@ -8,6 +8,7 @@
 #include <QMutex>
 #include <QTransform>
 #include <QWaitCondition>
+#include <QVector4D>
 
 class ConfigItem;
 class LaserDriver;
@@ -88,9 +89,12 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
-    void moveTo(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
-    void moveBy(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
+    void moveTo(const QVector4D& pos, bool xEnabled = true, 
+        bool yEnabled = true, bool zEnabled = true, bool uEnabled = true);
+    void moveBy(const QVector4D& pos, bool xEnabled = true, 
+        bool yEnabled = true, bool zEnabled = true, bool uEnabled = true);
     void moveToZOrigin();
+    void moveToUOrigin();
     void moveToXYOrigin();
 
     bool isAvailable() const;

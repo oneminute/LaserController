@@ -89,6 +89,7 @@ QVariant typeUtils::stringToVariant(const QString& src, DataType dataType)
     }
     case DT_RECT:
     case DT_POINT:
+    case DT_VECTOR3D:
     case DT_SIZE:
     {
         break;
@@ -139,6 +140,7 @@ QString typeUtils::variantToString(const QVariant& src, DataType dataType)
     }
     case DT_RECT:
     case DT_POINT:
+    case DT_VECTOR3D:
     case DT_SIZE:
     {
         break;
@@ -202,6 +204,38 @@ QPointF typeUtils::json2PointF(const QJsonValue& json)
 QPoint typeUtils::json2Point(const QJsonValue& json)
 {
     return json2Point(json.toObject());
+}
+
+QJsonObject typeUtils::vector3D2Json(const QVector3D& point)
+{
+    QJsonObject json;
+    json["x"] = point.x();
+    json["y"] = point.y();
+    json["z"] = point.z();
+    return json;
+}
+
+QVector3D typeUtils::json2Vector3D(const QJsonValue& json)
+{
+    return json2Vector3D(json.toObject());
+}
+
+QVector3D typeUtils::json2Vector3D(const QJsonObject& json)
+{
+    QVector3D point(0, 0, 0);
+    if (json.contains("x"))
+    {
+        point.setX(json["x"].toInt());
+    }
+    if (json.contains("y"))
+    {
+        point.setY(json["y"].toInt());
+    }
+    if (json.contains("z"))
+    {
+        point.setZ(json["z"].toInt());
+    }
+    return point;
 }
 
 QJsonObject typeUtils::size2Json(const QSize& size)

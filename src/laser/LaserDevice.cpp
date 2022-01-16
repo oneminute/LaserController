@@ -218,6 +218,15 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->systemRegisters.insert(59, new LaserRegister(59, Config::SystemRegister::zPhaseEnabledItem(), true));
     d->systemRegisters.insert(60, new LaserRegister(60, Config::SystemRegister::deviceOriginItem(), true));
     d->systemRegisters.insert(61, new LaserRegister(61, Config::SystemRegister::zResetSpeedItem(), true));
+    d->systemRegisters.insert(63, new LaserRegister(63, Config::SystemRegister::uDirPhaseItem(), true));
+    d->systemRegisters.insert(66, new LaserRegister(66, Config::SystemRegister::uStepLengthItem(), true));
+    d->systemRegisters.insert(69, new LaserRegister(69, Config::SystemRegister::uMotorNumItem(), true));
+    d->systemRegisters.insert(70, new LaserRegister(70, Config::SystemRegister::uMotorCurrentItem(), true));
+    d->systemRegisters.insert(71, new LaserRegister(71, Config::SystemRegister::uStartSpeedItem(), true));
+    d->systemRegisters.insert(72, new LaserRegister(72, Config::SystemRegister::uMaxSpeedItem(), true));
+    d->systemRegisters.insert(73, new LaserRegister(73, Config::SystemRegister::uMaxAccelerationItem(), true));
+    d->systemRegisters.insert(74, new LaserRegister(74, Config::SystemRegister::uUrgentAccelerationItem(), true));
+    d->systemRegisters.insert(75, new LaserRegister(75, Config::SystemRegister::uPhaseEnabledItem(), true));
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
@@ -734,39 +743,43 @@ void LaserDevice::checkVersionUpdate(bool hardware, const QString& flag, int cur
     d->driver->checkVersionUpdate(hardware, flag, 0, versionNoteToJsonFile);
 }
 
-void LaserDevice::moveTo(const QVector3D& pos, bool xEnabled, bool yEnabled, bool zEnabled)
+void LaserDevice::moveTo(const QVector4D& pos, bool xEnabled, bool yEnabled, bool zEnabled, bool uEnabled)
 {
     if (!checkLayoutForMoving(pos.toPoint()))
         return;
 
     //QVector3D dest = utils::limitToLayout(pos, Config::SystemRegister::deviceOrigin(), layoutWidth, layoutHeight);
-    QVector3D dest = pos;
-    char xyzStyle = 0;
+    QVector4D dest = pos;
     int xPos = qRound(dest.x());
     int yPos = qRound(dest.y());
     int zPos = qRound(dest.z());
+    int uPos = qRound(dest.w());
     LaserApplication::driver->lPenQuickMoveTo(
         xEnabled, true, xPos,
         yEnabled, true, yPos,
-        zEnabled, true, zPos
+        zEnabled, true, zPos,
+        uEnabled, true, uPos
     );
 }
 
-void LaserDevice::moveBy(const QVector3D& pos, bool xEnabled, bool yEnabled, bool zEnabled)
+void LaserDevice::moveBy(const QVector4D& pos, bool xEnabled, bool yEnabled, bool zEnabled, bool uEnabled)
 {
     //QVector3D dest = utils::limitToLayout(pos, quad, layoutWidth, layoutHeight);
     int xPos = qRound(pos.x() * 1000);
     int yPos = qRound(pos.y() * 1000);
     int zPos = qRound(pos.z() * 1000);
+    int uPos = qRound(pos.w() * 1000);
     // 相对移动要根据传入的pos判断哪个轴enabled
     xEnabled = xEnabled && !qFuzzyIsNull(pos.x());
     yEnabled = yEnabled && !qFuzzyIsNull(pos.y());
     zEnabled = zEnabled && !qFuzzyIsNull(pos.z());
+    uEnabled = uEnabled && !qFuzzyIsNull(pos.w());
     LaserApplication::driver->checkMoveLaserMotors(
         Config::Ui::autoRepeatDelay(),
         xEnabled, false, xPos,
         yEnabled, false, yPos,
-        zEnabled, false, zPos
+        zEnabled, false, zPos,
+        uEnabled, false, uPos
     );
 }
 
@@ -779,6 +792,15 @@ void LaserDevice::moveToZOrigin()
         target = qBound(0, target, Config::Device::zFocalLength());
         d->driver->lPenMoveToOriginalPointZ(target);
     }
+}
+
+void LaserDevice::moveToUOrigin()
+{
+    Q_D(LaserDevice);
+    if (!d->driver)
+        return;
+
+    LaserApplication::device->laserPosition();
 }
 
 void LaserDevice::moveToXYOrigin()
@@ -1002,13 +1024,13 @@ QPoint LaserDevice::userOrigin() const
     switch (Config::Device::userOriginSelected())
     {
     case 0:
-        origin = Config::Device::userOrigin1();
+        origin = Config::Device::userOrigin1().toPoint();
         break;
     case 1:
-        origin = Config::Device::userOrigin2();
+        origin = Config::Device::userOrigin2().toPoint();
         break;
     case 2:
-        origin = Config::Device::userOrigin3();
+        origin = Config::Device::userOrigin3().toPoint();
         break;
     }
     return origin;

@@ -199,6 +199,9 @@ ConfigItem::ConfigItem(
     case DT_POINT:
         d->inputWidgetType = IWT_Vector2DWidget;
         break;
+    case DT_VECTOR3D:
+        d->inputWidgetType = IWT_Vector3DWidget;
+        break;
     default:
         d->inputWidgetType = IWT_Custom;
     }
@@ -456,10 +459,6 @@ QJsonObject ConfigItem::toJson() const
     else
     {
         QJsonObject item;
-        if (this == Config::Camera::resolutionItem())
-        {
-            qLogD << "break point: " << value().toString();
-        }
         item["value"] = QJsonValue::fromVariant(value());
         item["defaultValue"] = QJsonValue::fromVariant(defaultValue());
         return item;
@@ -942,6 +941,29 @@ void parseQPointItemFromJson(QVariant& value, QVariant& defaultValue, const QJso
     if (json.contains("defaultValue"))
     {
         defaultValue = typeUtils::json2Point(json["defaultValue"]);
+    }
+}
+
+QJsonObject qVector3DItemToJson(const ConfigItem* configItem)
+{
+    QVector3D pt = configItem->value().value<QVector3D>();
+    QVector3D defPt = configItem->defaultValue().value<QVector3D>();
+    QJsonObject jsonObj;
+    jsonObj["value"] = typeUtils::vector3D2Json(pt);
+    jsonObj["defaultValue"] = typeUtils::vector3D2Json(defPt);
+    return jsonObj;
+}
+
+void parseQVector3DItemFromJson(QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item)
+{
+    if (json.contains("value"))
+    {
+        value = typeUtils::json2Vector3D(json["value"]);
+        qLogD << value;
+    }
+    if (json.contains("defaultValue"))
+    {
+        defaultValue = typeUtils::json2Vector3D(json["defaultValue"]);
     }
 }
 

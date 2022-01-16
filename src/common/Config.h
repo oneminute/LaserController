@@ -7,10 +7,11 @@
 #include "laser/LaserRegister.h"
 #include "scene/SmallDiagonalLimitation.h"
 
+#include <QMap>
 #include <QObject>
 #include <QString>
 #include <QVariant>
-#include <QMap>
+#include <QVector3D>
 
 #define CONFIG_ITEM(groupName, itemName, returnType, convertionMethod) \
     static ConfigItem* itemName##Item() \
@@ -114,6 +115,7 @@ public:
     public:
         static ConfigItemGroup* group;
 
+        CONFIG_ITEM(camera, autoConnect, bool, toBool)
         CONFIG_ITEM(camera, resolution, QSize, toSize)
         CONFIG_ITEM(camera, fisheye, bool, toBool)
         CONFIG_ITEM(camera, hCornersCount, int, toInt)
@@ -277,9 +279,9 @@ public:
         CONFIG_ITEM(device, xEnabled, bool, toBool)
         CONFIG_ITEM(device, yEnabled, bool, toBool)
         CONFIG_ITEM(device, zEnabled, bool, toBool)
-        CONFIG_ITEM(device, userOrigin1, QPoint, toPoint)
-        CONFIG_ITEM(device, userOrigin2, QPoint, toPoint)
-        CONFIG_ITEM(device, userOrigin3, QPoint, toPoint)
+        CONFIG_ITEM_T(device, userOrigin1, QVector3D)
+        CONFIG_ITEM_T(device, userOrigin2, QVector3D)
+        CONFIG_ITEM_T(device, userOrigin3, QVector3D)
         CONFIG_ITEM(device, userOriginSelected, int, toInt)
         CONFIG_ITEM(device, redLightOffset, QPointF, toPointF)
         CONFIG_ITEM(device, zReverseDirection, bool, toBool)
@@ -419,8 +421,18 @@ public:
         CONFIG_ITEM(systemRegister, xPhaseEnabled, int, toInt)
         CONFIG_ITEM(systemRegister, yPhaseEnabled, int, toInt)
         CONFIG_ITEM(systemRegister, zPhaseEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, uPhaseEnabled, int, toInt)
         CONFIG_ITEM(systemRegister, deviceOrigin, int, toInt)
         CONFIG_ITEM(systemRegister, zResetSpeed, int, toInt)
+
+        CONFIG_ITEM(systemRegister, uDirPhase, int, toInt)
+        CONFIG_ITEM(systemRegister, uStepLength, int, toInt)
+        CONFIG_ITEM(systemRegister, uMotorNum, int, toInt)
+        CONFIG_ITEM(systemRegister, uMotorCurrent, int, toInt)
+        CONFIG_ITEM(systemRegister, uStartSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, uMaxSpeed, int, toInt)
+        CONFIG_ITEM(systemRegister, uMaxAcceleration, int, toInt)
+        CONFIG_ITEM(systemRegister, uUrgentAcceleration, int, toInt)
 
     private:
         friend class Config;

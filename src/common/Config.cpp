@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QVector3D>
 
 #include "ConfigItem.h"
 #include "LaserApplication.h"
@@ -22,6 +23,7 @@
 #include "widget/InputWidgetWrapper.h"
 #include "widget/RadioButtonGroup.h"
 #include "widget/SmallDiagonalLimitationWidget.h"
+#include "widget/Vector3DWidget.h"
 
 QList<ConfigItemGroup*> Config::groups;
 QMap<QString, ConfigItemGroup*> Config::groupsMap;
@@ -292,6 +294,13 @@ void Config::loadCameraItems()
 {
     ConfigItemGroup* group = new Config::Camera;
     Config::Camera::group = group;
+
+    ConfigItem* autoConnect = group->addConfigItem(
+        "autoConnect",
+        false,
+        DT_BOOL
+    );
+    autoConnect->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* resolution = group->addConfigItem(
         "resolution"
@@ -1076,8 +1085,8 @@ void Config::loadDeviceItems()
 
     ConfigItem* userOrigin1 = group->addConfigItem(
         "userOrigin1",
-        QPoint(0, 0),
-        DT_POINT
+        QVector3D(0, 0, 0),
+        DT_VECTOR3D
     );
     userOrigin1->setInputWidgetProperty("minimum", -1000000);
     userOrigin1->setInputWidgetProperty("maximum", 1000000);
@@ -1085,26 +1094,27 @@ void Config::loadDeviceItems()
     userOrigin1->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
-            return QVariant(QPoint(qRound(pt.x() * 1000), qRound(pt.y() * 1000)));
+            QVector3D pt = value.value<QVector3D>();
+            return QVariant::fromValue<QVector3D>(pt);
         }
     );
     userOrigin1->setUpdateWidgetValueHook(
         [](QWidget* widget, const QVariant& value)
         {
-            Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
-            QPoint pt = value.toPoint();
-            v2w->setValue(QPointF(pt.x() * 0.001, pt.y() * 0.001));
-            return v2w->toPointF();
+            Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
+            QVector3D pt = value.value<QVector3D>();
+            v2w->setValue(pt);
+            return QVariant::fromValue<QVector3D>(pt);
         }
     );
-    userOrigin1->setToJsonHook(qPointItemToJson);
-    userOrigin1->setFromJsonHook(parseQPointItemFromJson);
+    userOrigin1->setToJsonHook(qVector3DItemToJson);
+    userOrigin1->setFromJsonHook(parseQVector3DItemFromJson);
+    userOrigin1->setInputWidgetProperty("zTitle", "U");
 
     ConfigItem* userOrigin2 = group->addConfigItem(
         "userOrigin2",
-        QPoint(0, 0),
-        DT_POINT
+        QVector3D(0, 0, 0),
+        DT_VECTOR3D
     );
     userOrigin2->setInputWidgetProperty("minimum", -1000000);
     userOrigin2->setInputWidgetProperty("maximum", 1000000);
@@ -1112,26 +1122,27 @@ void Config::loadDeviceItems()
     userOrigin2->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
-            return QVariant(QPoint(qRound(pt.x() * 1000), qRound(pt.y() * 1000)));
+            QVector3D pt = value.value<QVector3D>();
+            return QVariant::fromValue<QVector3D>(pt);
         }
     );
     userOrigin2->setUpdateWidgetValueHook(
         [](QWidget* widget, const QVariant& value)
         {
-            Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
-            QPoint pt = value.toPoint();
-            v2w->setValue(QPointF(pt.x() * 0.001, pt.y() * 0.001));
-            return v2w->toPointF();
+            Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
+            QVector3D pt = value.value<QVector3D>();
+            v2w->setValue(pt);
+            return QVariant::fromValue<QVector3D>(pt);
         }
     );
-    userOrigin2->setToJsonHook(qPointItemToJson);
-    userOrigin2->setFromJsonHook(parseQPointItemFromJson);
+    userOrigin2->setToJsonHook(qVector3DItemToJson);
+    userOrigin2->setFromJsonHook(parseQVector3DItemFromJson);
+    userOrigin2->setInputWidgetProperty("zTitle", "U");
 
     ConfigItem* userOrigin3 = group->addConfigItem(
         "userOrigin3",
-        QPoint(0, 0),
-        DT_POINT
+        QVector3D(0, 0, 0),
+        DT_VECTOR3D
     );
     userOrigin3->setInputWidgetProperty("minimum", -1000000);
     userOrigin3->setInputWidgetProperty("maximum", 1000000);
@@ -1139,21 +1150,22 @@ void Config::loadDeviceItems()
     userOrigin3->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QPointF pt = value.toPointF();
-            return QVariant(QPoint(qRound(pt.x() * 1000), qRound(pt.y() * 1000)));
+            QVector3D pt = value.value<QVector3D>();
+            return QVariant::fromValue<QVector3D>(pt);
         }
     );
     userOrigin3->setUpdateWidgetValueHook(
         [](QWidget* widget, const QVariant& value)
         {
-            Vector2DWidget* v2w = qobject_cast<Vector2DWidget*>(widget);
-            QPoint pt = value.toPoint();
-            v2w->setValue(QPointF(pt.x() * 0.001, pt.y() * 0.001));
-            return v2w->toPointF();
+            Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
+            QVector3D pt = value.value<QVector3D>();
+            v2w->setValue(pt);
+            return QVariant::fromValue<QVector3D>(pt);
         }
     );
-    userOrigin3->setToJsonHook(qPointItemToJson);
-    userOrigin3->setFromJsonHook(parseQPointItemFromJson);
+    userOrigin3->setToJsonHook(qVector3DItemToJson);
+    userOrigin3->setFromJsonHook(parseQVector3DItemFromJson);
+    userOrigin3->setInputWidgetProperty("zTitle", "U");
 
     ConfigItem* userOriginSelected = group->addConfigItem(
         "userOriginSelected",
@@ -2169,7 +2181,7 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
-            comboBox->addItem(tr("z"), 1);
+            comboBox->addItem(tr("z"), 2);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2534,6 +2546,130 @@ void Config::loadSystemRegisters()
     zResetSpeed->setInputWidgetProperty("page", 10);
     zResetSpeed->setInputWidgetProperty("minimum", 1);
     zResetSpeed->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* uDirPhase = group->addConfigItem(
+        "uDirPhase",
+        1,
+        DT_INT
+    );
+    uDirPhase->setInputWidgetType(IWT_ComboBox);
+    uDirPhase->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("-"), 0);
+            comboBox->addItem(tr("+"), 1);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
+    ConfigItem* uStepLength = group->addConfigItem(
+        "uStepLength",
+        6329114,
+        DT_INT
+    );
+    uStepLength->setInputWidgetType(IWT_FloatEditSlider);
+    uStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    uStepLength->setInputWidgetProperty("step", 0.000001);
+    uStepLength->setInputWidgetProperty("page", 0.001);
+    uStepLength->setInputWidgetProperty("minimum", 0.000001);
+    uStepLength->setInputWidgetProperty("maximum", 100);
+    uStepLength->setInputWidgetProperty("decimals", 6);
+
+    ConfigItem* uMotorNum = group->addConfigItem(
+        "uMotorNum",
+        0,
+        DT_INT
+    );
+    uMotorNum->setInputWidgetType(IWT_ComboBox);
+    uMotorNum->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("x"), 0);
+            comboBox->addItem(tr("y"), 1);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
+    ConfigItem* uMotorCurrent = group->addConfigItem(
+        "uMotorCurrent",
+        60,
+        DT_INT
+    );
+    uMotorCurrent->setInputWidgetProperty("textTemplate", "%1%");
+    uMotorCurrent->setInputWidgetProperty("maximumLineEditWidth", 75);
+    uMotorCurrent->setInputWidgetProperty("step", 1);
+    uMotorCurrent->setInputWidgetProperty("page", 10);
+    uMotorCurrent->setInputWidgetProperty("minimum", 20);
+    uMotorCurrent->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* uStartSpeed = group->addConfigItem(
+        "uStartSpeed",
+        15000,
+        DT_INT
+    );
+    uStartSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    uStartSpeed->setInputWidgetProperty("step", 0.001);
+    uStartSpeed->setInputWidgetProperty("decimals", 3);
+    uStartSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    uStartSpeed->setInputWidgetProperty("page", 10);
+    uStartSpeed->setInputWidgetProperty("minimum", 1);
+    uStartSpeed->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* uMaxSpeed = group->addConfigItem(
+        "uMaxSpeed",
+        500000,
+        DT_INT
+    );
+    uMaxSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    uMaxSpeed->setInputWidgetProperty("step", 0.001);
+    uMaxSpeed->setInputWidgetProperty("decimals", 3);
+    uMaxSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    uMaxSpeed->setInputWidgetProperty("page", 10);
+    uMaxSpeed->setInputWidgetProperty("minimum", 1);
+    uMaxSpeed->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* uMaxAcceleration = group->addConfigItem(
+        "uMaxAcceleration",
+        4000000,
+        DT_INT
+    );
+    uMaxAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    uMaxAcceleration->setInputWidgetProperty("step", 0.001);
+    uMaxAcceleration->setInputWidgetProperty("decimals", 3);
+    uMaxAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    uMaxAcceleration->setInputWidgetProperty("page", 10);
+    uMaxAcceleration->setInputWidgetProperty("minimum", 1);
+    uMaxAcceleration->setInputWidgetProperty("maximum", 20000);
+
+    ConfigItem* uUrgentAcceleration = group->addConfigItem(
+        "uUrgentAcceleration",
+        3000000,
+        DT_INT
+    );
+    uUrgentAcceleration->setInputWidgetType(IWT_FloatEditSlider);
+    uUrgentAcceleration->setInputWidgetProperty("step", 0.001);
+    uUrgentAcceleration->setInputWidgetProperty("decimals", 3);
+    uUrgentAcceleration->setInputWidgetProperty("maximumLineEditWidth", 75);
+    uUrgentAcceleration->setInputWidgetProperty("page", 10);
+    uUrgentAcceleration->setInputWidgetProperty("minimum", 1);
+    uUrgentAcceleration->setInputWidgetProperty("maximum", 20000);
+
+    ConfigItem* uPhaseEnabled = group->addConfigItem(
+        "uPhaseEnabled",
+        true,
+        DT_INT
+    );
+    uPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 }
 
 void Config::loadDebug()
@@ -3217,7 +3353,7 @@ void Config::updateTitlesAndDescriptions()
 
     SystemRegister::zMaxLengthItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Z Max Length(mm)", nullptr), 
-        QCoreApplication::translate("Config", "Y max length", nullptr));
+        QCoreApplication::translate("Config", "Z max length", nullptr));
 
     SystemRegister::zDirPhaseItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Z Dir Phase", nullptr), 
@@ -3326,6 +3462,42 @@ void Config::updateTitlesAndDescriptions()
     Debug::skipEngravingBlankRowsItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Skip Engraving Blank Rows", nullptr),
         QCoreApplication::translate("Config", "Skip Engraving Blank Rows", nullptr));
+    
+    SystemRegister::uDirPhaseItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Dir Phase", nullptr), 
+        QCoreApplication::translate("Config", "U dir phase", nullptr));
+
+    SystemRegister::uStepLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Step Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "U Zero Dev", nullptr));
+
+    SystemRegister::uMotorNumItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Motor Num", nullptr), 
+        QCoreApplication::translate("Config", "U motor num", nullptr));
+
+    SystemRegister::uMotorCurrentItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Motor current(%)", nullptr), 
+        QCoreApplication::translate("Config", "U motor current", nullptr));
+
+    SystemRegister::uStartSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Start Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "U Start Speed", nullptr));
+
+    SystemRegister::uMaxSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Max Speed(mm/s)", nullptr), 
+        QCoreApplication::translate("Config", "U Max Speed", nullptr));
+
+    SystemRegister::uMaxAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Max Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "U max acceleration", nullptr));
+
+    SystemRegister::uUrgentAccelerationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Urgent Acceleration(mm/s<sup>2</sup>)", nullptr), 
+        QCoreApplication::translate("Config", "U urgent acceleration", nullptr));
+
+    SystemRegister::uPhaseEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Phase Enabled", nullptr),
+        QCoreApplication::translate("Config", "Enabled U phase", nullptr));
 
     groupsMap["general"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "General", nullptr),

@@ -1324,6 +1324,42 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", true, documentPrintAndCutAligningState);
     // end m_ui->actionMoveDown
 
+    // begin m_ui->actionMoveForward
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveForward
+
+    // begin m_ui->actionMoveToUOrigin
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveToUOrigin
+
+    // begin m_ui->actionMoveBackward
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveBackward
+
     // begin m_ui->actionMachining
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, deviceUnconnectedState);
@@ -1786,6 +1822,18 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, documentPrintAndCutSelectingState);
     BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, documentPrintAndCutAligningState);
     // end m_doubleSpinBoxDistanceZ
+
+    // begin m_doubleSpinBoxDistanceU
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, documentPrintAndCutAligningState);
+    // end m_doubleSpinBoxDistanceU
 
 
 }

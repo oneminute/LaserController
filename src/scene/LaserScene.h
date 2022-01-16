@@ -55,9 +55,12 @@ public:
     void updateTree();
     QList<QSet<LaserPrimitive*>*>& joinedGroupList();
 
+    void setImage(const QImage& image);
+
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;
+    QGraphicsPixmapItem* m_imageBackground;
 	bool m_mousePressBlock = false;
 	bool m_mouseMoveBlock = false;
 	LaserBitmap* m_detectedBitmap = nullptr;

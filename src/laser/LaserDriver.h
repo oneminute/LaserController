@@ -52,7 +52,11 @@ private:
         int yPos,
         bool zMoveEnable,
         bool zMoveStyle,
-        int zPos);
+        int zPos,
+        bool uMoveEnable,
+        bool uMoveStyle,
+        int uPos
+        );
     typedef void(__stdcall *FNCheckMoveLaserMotors)(
         quint16 delay,
         bool xMoveEnable,
@@ -63,7 +67,11 @@ private:
         int yPos,
         bool zMoveEnable,
         bool zMoveStyle,
-        int zPos);
+        int zPos,
+        bool uMoveEnable,
+        bool uMoveStyle,
+        int uPos
+        );
     typedef void(__stdcall *FNSmallScaleMovement)(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
 
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
@@ -141,7 +149,11 @@ public:
         int yPos,
         bool zMoveEnable,
         bool zMoveStyle,
-        int zPos);
+        int zPos,
+        bool uMoveEnable,
+        bool uMoveStyle,
+        int uPos
+    );
     void checkMoveLaserMotors(
         quint16 delay,
         bool xMoveEnable,
@@ -152,7 +164,11 @@ public:
         int yPos,
         bool zMoveEnable,
         bool zMoveStyle,
-        int zPos);
+        int zPos,
+        bool uMoveEnable,
+        bool uMoveStyle,
+        int uPos
+        );
     void startMoveLaserMotors();
     void controlHDAction(int action);
 

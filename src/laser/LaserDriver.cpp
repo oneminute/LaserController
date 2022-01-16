@@ -663,16 +663,24 @@ void LaserDriver::lPenQuickMoveTo(
         int yPos,
         bool zMoveEnable,
         bool zMoveStyle,
-        int zPos)
+        int zPos,
+        bool uMoveEnable,
+        bool uMoveStyle,
+        int uPos)
 {
     m_fnLPenQuickMoveTo(
         xMoveEnable, xMoveStyle, xPos,
         yMoveEnable, yMoveStyle, yPos,
-        zMoveEnable, zMoveStyle, zPos
+        zMoveEnable, zMoveStyle, zPos,
+        uMoveEnable, uMoveStyle, uPos
         );
 }
 
-void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMoveStyle, int xPos, bool yMoveEnable, bool yMoveStyle, int yPos, bool zMoveEnable, bool zMoveStyle, int zPos)
+void LaserDriver::checkMoveLaserMotors(quint16 delay,
+    bool xMoveEnable, bool xMoveStyle, int xPos, 
+    bool yMoveEnable, bool yMoveStyle, int yPos, 
+    bool zMoveEnable, bool zMoveStyle, int zPos,
+    bool uMoveEnable, bool uMoveStyle, int uPos)
 {
     qLogD << "move " << xPos << ", " << yPos << ", " << zPos;
     qLogD << "enabled " << xMoveEnable << ", " << yMoveEnable << ", " << zMoveEnable;
@@ -680,7 +688,8 @@ void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMo
         delay,
         xMoveEnable, xMoveStyle, xPos,
         yMoveEnable, yMoveStyle, yPos,
-        zMoveEnable, zMoveStyle, zPos
+        zMoveEnable, zMoveStyle, zPos,
+        uMoveEnable, uMoveStyle, uPos
         );
 }
 

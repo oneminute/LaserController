@@ -7,12 +7,13 @@ class ImageViewer;
 class DistortionCalibrator;
 class QCheckBox;
 class QTableWidget;
+class DistortionCalibrator;
 
 class CalibrationDialog : public WizardDialog
 {
     Q_OBJECT
 public:
-    explicit CalibrationDialog(QWidget* parent = nullptr);
+    explicit CalibrationDialog(CameraController* cameraController, DistortionCalibrator* calibrator, QWidget* parent = nullptr);
     ~CalibrationDialog();
 
 protected slots:
@@ -29,7 +30,7 @@ protected slots:
     void onCameraDisconnected();
 
     void onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args);
-    void onCalibrationSampleCaptured(cv::Mat mat, qreal error);
+    //void onCalibrationSampleCaptured(cv::Mat mat, qreal error);
 
     void onButtonCaptureClicked();
 
@@ -39,6 +40,7 @@ protected slots:
     void removeCurrentSample();
 
     void onButtonSaveCalibrationClicked(bool checked = false);
+    void onButtonVerifyCalibrationClicked(bool checked = false);
 
 private:
     QLabel* m_labelStatus;
@@ -69,11 +71,14 @@ private:
     QPushButton* m_page3ButtonSaveSamples;
 #endif
     QLabel* m_page4Introduction;
+    QPushButton* m_page4ButtonVerify;
     QPushButton* m_page4ButtonSave;
     ImageViewer* m_page4ImageViewer;
 
     CameraController* m_cameraController;
     DistortionCalibrator* m_calibrator;
+
+    bool m_requestCalibration;
 };
 
 #endif // CALIBRATIONDIALOG_H

@@ -2,8 +2,8 @@
 #define DISTORTIONCALIBRATOR_H
 
 #include <QObject>
+#include <QMutex>
 #include "common/common.h"
-#include "ImageProcessor.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/core/utility.hpp>
@@ -11,35 +11,30 @@
 #include <opencv2/calib3d.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+class QGraphicsScene;
+class QGraphicsPixmapItem;
+
 struct CalibratorItem
 {
-    cv::Mat sample;
     qreal confidence;
     cv::Mat3f transform;
     std::vector<cv::Point2f> points;
 };
 
-class DistortionCalibrator : public QObject, public ImageProcessor
+class DistortionCalibrator : public QObject
 {
     Q_OBJECT
 public:
-    enum Role
-    {
-        Role_Idle,
-        Role_Capture,
-        Role_Undistortion
-    };
-
     explicit DistortionCalibrator(QObject* parent = nullptr);
     ~DistortionCalibrator();
 
     bool validate();
 
-    virtual bool process(cv::Mat& processing, cv::Mat origin) override;
-
-    bool captureSample(cv::Mat& processing, cv::Mat origin);
+    qreal captureSample(cv::Mat inMat, bool drawLines = false);
 
     bool undistortImage(cv::Mat& processing);
+    bool perspective(const cv::Mat& inMat, cv::Mat& outMat);
+    QGraphicsPixmapItem* alignToCanvas(const cv::Mat perspected, QGraphicsScene* scene);
 
     qreal calibrate();
 
@@ -52,17 +47,13 @@ public:
     void calcBoardCornerPositions(cv::Size boardSize, float squareSize, std::vector<cv::Point3f>& corners,
         CalibrationPattern patternType /*= Settings::CHESSBOARD*/);
 
-    void requestCalibration();
-    void requestCapture();
-
     QList<CalibratorItem> calibrationSamples() const;
     const CalibratorItem& currentItem() const;
     void removeCurrentItem();
     int calibrationSamplesCount() const;
-
-    void setRole(Role role);
-    bool isCaptureRole() const;
-    bool isUndistortionRole() const;
+    bool calculateHomography(const std::vector<cv::Point2f>& srcPoints,
+        const std::vector<cv::Point2f>& dstPoints);
+    bool isHomographyValid() const;
 
     void saveSamples();
     void loadSamples();
@@ -83,7 +74,7 @@ protected:
     static void generateChessBoard();
 
 signals:
-    void sampleCaptured(cv::Mat mat, qreal error);
+    //void sampleCaptured(cv::Mat mat, qreal error);
 
 private:
     float aspectRatio;           // The aspect ratio
@@ -94,19 +85,12 @@ private:
     bool calibZeroTangentDist;   // Assume zero tangential distortion
     bool calibFixPrincipalPoint; // Fix the principal point at the center
     bool flipVertical;           // Flip the captured images around the horizontal axis
-    bool fixK1;                  // fix K1 distortion coefficient
-    bool fixK2;                  // fix K2 distortion coefficient
-    bool fixK3;                  // fix K3 distortion coefficient
-    bool fixK4;                  // fix K4 distortion coefficient
-    bool fixK5;                  // fix K5 distortion coefficient
     int winSize;
     int flag;
     cv::Mat cameraMatrix;
     cv::Mat distCoeffs;
+    cv::Mat m_homography;
 
-    Role m_role;
-    bool m_requestCalibration;
-    bool m_requestCapture;
     QList<CalibratorItem> m_samples;
     std::vector<std::vector<cv::Point2f>> m_imagePoints;
 };

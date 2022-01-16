@@ -27,9 +27,11 @@
 #include "widget/GraphicsViewEx.h"
 #include "ui/LaserControllerWindow.h"
 
-CameraAlignmentDialog::CameraAlignmentDialog(QWidget* parent)
+CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController, DistortionCalibrator* calibrator, QWidget* parent)
     : WizardDialog(parent)
     , m_doc(nullptr)
+    , m_cameraController(cameraController)
+    , m_calibrator(calibrator)
     , m_waitingForImage(false)
 {
     Config::Device::startFromItem()->push();
@@ -231,11 +233,6 @@ CameraAlignmentDialog::CameraAlignmentDialog(QWidget* parent)
     page3Layout->setStretch(1, 1);
     m_page3->setLayout(page3Layout);
 
-    m_cameraController = new CameraController;
-    m_calibrator = new DistortionCalibrator;
-    m_calibrator->setEnabled(false);
-    m_calibrator->setRole(DistortionCalibrator::Role_Undistortion);
-    m_cameraController->installProcessor(m_calibrator);
     connect(m_cameraController, &CameraController::connected, this, &CameraAlignmentDialog::onCameraConnected);
     connect(m_cameraController, &CameraController::disconnected, this, &CameraAlignmentDialog::onCameraDisconnected);
     connect(m_cameraController, &CameraController::frameCaptured, this, &CameraAlignmentDialog::onFrameCaptured);
@@ -250,13 +247,7 @@ CameraAlignmentDialog::CameraAlignmentDialog(QWidget* parent)
 
     page2RadioButton1->setChecked(true);
     connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &CameraAlignmentDialog::onDeviceStateChanged);
-
-    QVariantList homographyList = Config::Camera::homography();
-    m_homography = cv::Mat(3, 3, CV_64F);
-    for (int i = 0; i < 9; i++)
-    {
-        m_homography.at<double>(i) = homographyList.at(i).toReal();
-    }
+    onCameraConnected();
 }
 
 CameraAlignmentDialog::~CameraAlignmentDialog()
@@ -265,8 +256,8 @@ CameraAlignmentDialog::~CameraAlignmentDialog()
 
 void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
-    //if (m_doc)
-        //LaserApplication::mainWindow->closeDocument();
+    if (m_doc)
+        LaserApplication::mainWindow->closeDocument();
     Config::Device::startFromItem()->pop();
     Config::Export::imageQualityItem()->pop();
 }
@@ -398,8 +389,6 @@ void CameraAlignmentDialog::stop()
 void CameraAlignmentDialog::capture()
 {
     m_waitingForImage = true;
-    m_calibrator->setEnabled(true);
-    m_calibrator->requestCapture();
 }
 
 void CameraAlignmentDialog::calculate()
@@ -410,18 +399,26 @@ void CameraAlignmentDialog::calculate()
     std::vector<cv::Point2f> markPoints;
     std::vector<cv::Point2f> imagePoints;
 
-    QRect layoutRect = LaserApplication::device->layoutRect();
-    QPoint mark0 = LaserApplication::device->mapFromCurrentToQuad(m_mark0);
-    QPoint mark1 = LaserApplication::device->mapFromCurrentToQuad(m_mark1);
-    QPoint mark2 = LaserApplication::device->mapFromCurrentToQuad(m_mark2);
-    QPoint mark3 = LaserApplication::device->mapFromCurrentToQuad(m_mark3);
-    QPoint mark4 = LaserApplication::device->mapFromCurrentToQuad(m_mark4);
+    QPoint mark0 = LaserApplication::device->mapFromCurrentToQuad(m_mark0) / 1000;
+    QPoint mark1 = LaserApplication::device->mapFromCurrentToQuad(m_mark1) / 1000;
+    QPoint mark2 = LaserApplication::device->mapFromCurrentToQuad(m_mark2) / 1000;
+    QPoint mark3 = LaserApplication::device->mapFromCurrentToQuad(m_mark3) / 1000;
+    QPoint mark4 = LaserApplication::device->mapFromCurrentToQuad(m_mark4) / 1000;
 
-    markPoints.push_back(cv::Point2f(mark0.x() / 1000, mark0.y() / 1000));
+    QRect layoutRect = LaserApplication::device->layoutRect();
+    QSize resol = Config::Camera::resolution();
+    qreal hFactor = resol.width() * 1000.0 / layoutRect.width();
+    qreal vFactor = resol.height() * 1000.0 / layoutRect.height();
+    /*markPoints.push_back(cv::Point2f(mark0.x() / 1000, mark0.y() / 1000));
     markPoints.push_back(cv::Point2f(mark1.x() / 1000, mark1.y() / 1000));
     markPoints.push_back(cv::Point2f(mark2.x() / 1000, mark2.y() / 1000));
     markPoints.push_back(cv::Point2f(mark3.x() / 1000, mark3.y() / 1000));
-    markPoints.push_back(cv::Point2f(mark4.x() / 1000, mark4.y() / 1000));
+    markPoints.push_back(cv::Point2f(mark4.x() / 1000, mark4.y() / 1000));*/
+    markPoints.push_back(cv::Point2f(mark0.x() * hFactor, mark0.y() * vFactor));
+    markPoints.push_back(cv::Point2f(mark1.x() * hFactor, mark1.y() * vFactor));
+    markPoints.push_back(cv::Point2f(mark2.x() * hFactor, mark2.y() * vFactor));
+    markPoints.push_back(cv::Point2f(mark3.x() * hFactor, mark3.y() * vFactor));
+    markPoints.push_back(cv::Point2f(mark4.x() * hFactor, mark4.y() * vFactor));
 
     imagePoints.push_back(cv::Point2f(m_items[0]->pos().x(), m_items[0]->pos().y()));
     imagePoints.push_back(cv::Point2f(m_items[1]->pos().x(), m_items[1]->pos().y()));
@@ -429,29 +426,20 @@ void CameraAlignmentDialog::calculate()
     imagePoints.push_back(cv::Point2f(m_items[3]->pos().x(), m_items[3]->pos().y()));
     imagePoints.push_back(cv::Point2f(m_items[4]->pos().x(), m_items[4]->pos().y()));
 
-    m_homography = cv::findHomography(imagePoints, markPoints, 0);
-    //m_homography = cv::findHomography(markPoints, imagePoints, 0);
-    std::cout << "homography:\n" << m_homography << std::endl;
+    m_calibrator->calculateHomography(imagePoints, markPoints);
 }
 
 void CameraAlignmentDialog::verify()
 {
-    if (m_homography.empty() || cv::countNonZero(m_homography) < 1)
+    if (!m_calibrator->isHomographyValid())
         return;
 
     m_waitingForImage = true;
-    m_calibrator->setEnabled(true);
-    m_calibrator->requestCapture();
 }
 
 void CameraAlignmentDialog::save()
 {
-    QVariantList homographyList;
-    for (int i = 0; i < 9; i++)
-    {
-        homographyList << m_homography.at<double>(i);
-    }
-    Config::Camera::homographyItem()->setValue(homographyList, SS_DIRECTLY, this);
+    m_calibrator->saveCoeffs();
 }
 
 void CameraAlignmentDialog::setMarkPos(const QPointF& pos)
@@ -501,17 +489,13 @@ void CameraAlignmentDialog::onFrameCaptured(cv::Mat processed, cv::Mat origin, F
         return;
 
     m_waitingForImage = false;
-    m_calibrator->setEnabled(false);
+    m_calibrator->undistortImage(processed);
 
     if (currentIndex() == 1)
     {
         QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
         QGraphicsPixmapItem* pixmapItem = m_page2Scene->addPixmap(QPixmap::fromImage(image));
         m_page2Viewer->fitInView(pixmapItem, Qt::KeepAspectRatio);
-
-        cv::Mat binMat;
-        cv::cvtColor(processed, binMat, cv::COLOR_BGR2GRAY);
-        cv::imwrite("tmp/bin_mat.tiff", binMat);
     }
     else if (currentIndex() == 2)
     {
@@ -521,15 +505,11 @@ void CameraAlignmentDialog::onFrameCaptured(cv::Mat processed, cv::Mat origin, F
         pen.setCosmetic(true);
         m_page3Scene->clear();
         m_page3Scene->addRect(LaserApplication::device->layoutRect())->setPen(pen);
-
-        cv::Mat mat;
-        cv::warpPerspective(processed, mat, m_homography, processed.size());
-        QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
-        QGraphicsPixmapItem* pixmapItem = m_page3Scene->addPixmap(QPixmap::fromImage(image));
-        QPoint imagePos = LaserApplication::device->mapFromQuadToCurrent(QPoint(0, 0));
-        pixmapItem->setScale(1000);
-        pixmapItem->setPos(imagePos);
-        //m_page3Viewer->fitInView(pixmapItem, Qt::KeepAspectRatio);
+        
+        
+        cv::Mat perspected;
+        m_calibrator->perspective(processed, perspected);
+        m_calibrator->alignToCanvas(perspected, m_page3Scene);
 
         int markSize = m_page1SpinBoxMarkSize->value() * 1000;
         int halfMarkSize = markSize / 2;

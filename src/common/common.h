@@ -215,6 +215,7 @@ enum InputWidgetType
     IWT_EditSlider,
     IWT_FloatEditSlider,
     IWT_Vector2DWidget,
+    IWT_Vector3DWidget,
     //IWT_LimitationWidget
 };
 
@@ -229,6 +230,7 @@ enum DataType
     DT_DATETIME,
     DT_RECT,
     DT_POINT,
+    DT_VECTOR3D,
     DT_SIZE,
     DT_LIST,
     DT_CUSTOM
