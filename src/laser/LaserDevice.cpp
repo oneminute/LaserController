@@ -595,6 +595,14 @@ bool LaserDevice::changeManufacturePassword(const QString& password, const QStri
     return false;
 }
 
+QString LaserDevice::showManufacturePasswordDialog(QWidget* parentWnd)
+{
+    Q_D(LaserDevice);
+    parentWnd = parentWnd ? parentWnd : LaserApplication::mainWindow;
+    QString password = QInputDialog::getText(parentWnd, tr("Manufacture Password"), tr("Password"));
+    return password;
+}
+
 MainCardActivateResult LaserDevice::autoActivateMainCard()
 {
     Q_D(LaserDevice);

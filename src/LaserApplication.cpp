@@ -264,6 +264,7 @@ void LaserApplication::retranslate()
     stringMap["Bottom Right"] = tr("Bottom Right");
     stringMap["Chessboard"] = tr("Chessboard");
     stringMap["Charuco Board"] = tr("Charuco Board");
+    stringMap["Chuck Rotary"] = tr("Chuck Rotary");
     stringMap["Circles Grid"] = tr("Circles Grid");
     stringMap["Config Dialog"] = tr("Config Dialog");
     stringMap["Current Position"] = tr("Current Position");
@@ -274,7 +275,7 @@ void LaserApplication::retranslate()
     stringMap["Filling"] = tr("Filling");
     stringMap["Font"] = tr("Font");
     stringMap["Height"] = tr("Height");
-    stringMap["High Quality"] = tr("Hig Qualityh");
+    stringMap["High Quality"] = tr("High Quality");
     stringMap["High Contrast"] = tr("High Contrast");
     stringMap["Horizontal"] = tr("Horizontal");
     stringMap["Inactivated"] = tr("Inactivated");
@@ -285,12 +286,13 @@ void LaserApplication::retranslate()
     stringMap["Medium Contrast"] = tr("Medium Contrast");
     stringMap["Middle"] = tr("Middle");
     stringMap["Movement"] = tr("Movement");
-    stringMap["Norma Qualityl"] = tr("Norma Qualityl");
+    stringMap["Normal Quality"] = tr("Normal Quality");
     stringMap["Off"] = tr("Off");
     stringMap["PageSize"] = tr("Page Size(mm): %1x%2");
-    stringMap["Perfect Qualityl"] = tr("Perfect Qualityl");
+    stringMap["Perfect Quality"] = tr("Perfect Quality");
     stringMap["Power"] = tr("Power");
     stringMap["Right"] = tr("Right");
+    stringMap["Roller Rotary"] = tr("Roller Rotary");
     stringMap["Rotate"] = tr("Rotate");
     stringMap["Size"] = tr("Size");
     stringMap["Spacing X"] = tr("Spacing X");

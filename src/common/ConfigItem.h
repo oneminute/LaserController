@@ -177,6 +177,7 @@ protected:
     bool confirm(const QVariant& value);
     void loadValue(const QVariant& value);
     void clearModified();
+    void emitValueChanged();
 
 signals:
     void visibleChanged(bool value);

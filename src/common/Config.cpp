@@ -1083,6 +1083,31 @@ void Config::loadDeviceItems()
         DT_BOOL
     );
 
+    ConfigItem* uEnabled = group->addConfigItem(
+        "uEnabled",
+        true,
+        DT_BOOL
+    );
+    connect(uEnabled, &ConfigItem::valueChanged, [=](const QVariant& value, void* senderPtr) 
+        {
+            if (value.toBool())
+            {
+                Config::Device::uFixtureTypeItem()->setEnabled(true);
+                Config::Device::circumferencePulseNumberItem()->setEnabled(true);
+                Config::Device::workpieceDiameterItem()->setEnabled(true);
+                Config::Device::rollerRotaryStepLengthItem()->setEnabled(true);
+                Config::Device::uFixtureTypeItem()->emitValueChanged();
+            }
+            else
+            {
+                Config::Device::uFixtureTypeItem()->setEnabled(false);
+                Config::Device::circumferencePulseNumberItem()->setEnabled(false);
+                Config::Device::workpieceDiameterItem()->setEnabled(false);
+                Config::Device::rollerRotaryStepLengthItem()->setEnabled(false);
+            }
+        }
+    );
+
     ConfigItem* userOrigin1 = group->addConfigItem(
         "userOrigin1",
         QVector3D(0, 0, 0),
@@ -1229,6 +1254,75 @@ void Config::loadDeviceItems()
     calibrationBlockThickness->setInputWidgetProperty("page", 1);
     calibrationBlockThickness->setInputWidgetProperty("minimum", 0);
     calibrationBlockThickness->setInputWidgetProperty("maximum", 10);
+
+    ConfigItem* uFixtureType = group->addConfigItem(
+        "uFixtureType",
+        0,
+        DT_INT
+    );
+    uFixtureType->setInputWidgetType(IWT_ComboBox);
+    uFixtureType->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("Chuck Rotary"), 0);
+            comboBox->addItem(ltr("Roller Rotary"), 1);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+    connect(uFixtureType, &ConfigItem::valueChanged, [=](const QVariant& value, void* senderPtr) 
+        {
+            int type = value.toInt();
+            if (type == 0)
+            {
+                Config::Device::circumferencePulseNumberItem()->setEnabled(true);
+                Config::Device::workpieceDiameterItem()->setEnabled(true);
+                Config::Device::rollerRotaryStepLengthItem()->setEnabled(false);
+            }
+            else if (type == 1)
+            {
+                Config::Device::circumferencePulseNumberItem()->setEnabled(false);
+                Config::Device::workpieceDiameterItem()->setEnabled(false);
+                Config::Device::rollerRotaryStepLengthItem()->setEnabled(true);
+            }
+        }
+    );
+
+    ConfigItem* circumferencePulseNumber = group->addConfigItem(
+        "circumferencePulseNumber",
+        10000,
+        DT_INT
+    );
+    circumferencePulseNumber->setInputWidgetType(IWT_EditSlider);
+    circumferencePulseNumber->setInputWidgetProperty("minimum", 1);
+    circumferencePulseNumber->setInputWidgetProperty("maximum", 100000);
+
+    ConfigItem* workpieceDiameter = group->addConfigItem(
+        "workpieceDiameter",
+        1000,
+        DT_INT
+    );
+    workpieceDiameter->setInputWidgetType(IWT_FloatEditSlider);
+    workpieceDiameter->setInputWidgetProperty("step", 0.001);
+    workpieceDiameter->setInputWidgetProperty("decimals", 3);
+    workpieceDiameter->setInputWidgetProperty("maximumLineEditWidth", 75);
+    workpieceDiameter->setInputWidgetProperty("page", 10);
+    workpieceDiameter->setInputWidgetProperty("minimum", 1);
+    workpieceDiameter->setInputWidgetProperty("maximum", 100);
+
+    ConfigItem* rollerRotaryStepLength = group->addConfigItem(
+        "rollerRotaryStepLength",
+        10000,
+        DT_INT
+    );
+    rollerRotaryStepLength->setInputWidgetType(IWT_EditSlider);
+    rollerRotaryStepLength->setInputWidgetProperty("minimum", 1);
+    rollerRotaryStepLength->setInputWidgetProperty("maximum", 100000);
 }
 
 void Config::loadUserReigsters()
@@ -1960,7 +2054,7 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
-            comboBox->addItem(tr("z"), 1);
+            comboBox->addItem(tr("z"), 2);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -1988,7 +2082,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
-            comboBox->addItem(tr("z"), 1);
+            comboBox->addItem(tr("z"), 2);
+            comboBox->addItem(tr("u"), 3);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2153,7 +2248,7 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
-            comboBox->addItem(tr("z"), 1);
+            comboBox->addItem(tr("z"), 2);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2182,6 +2277,7 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
             comboBox->addItem(tr("z"), 2);
+            comboBox->addItem(tr("u"), 3);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2377,6 +2473,7 @@ void Config::loadSystemRegisters()
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
             comboBox->addItem(tr("z"), 2);
+            comboBox->addItem(tr("u"), 3);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2595,6 +2692,8 @@ void Config::loadSystemRegisters()
 
             comboBox->addItem(tr("x"), 0);
             comboBox->addItem(tr("y"), 1);
+            comboBox->addItem(tr("z"), 2);
+            comboBox->addItem(tr("u"), 3);
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
@@ -2742,6 +2841,10 @@ void Config::updateTitlesAndDescriptions()
     Layers::maxLayersCountItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Layers Count", nullptr), 
         QCoreApplication::translate("Config", "Max Layers Count", nullptr));
+
+    Camera::autoConnectItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Auto Connect", nullptr), 
+        QCoreApplication::translate("Config", "Auto Connect", nullptr));
 
     Camera::resolutionItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Resolution", nullptr), 
@@ -3007,6 +3110,10 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Z Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enabled z axis movement", nullptr));
 
+    Device::uEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "U Enabled", nullptr), 
+        QCoreApplication::translate("Config", "Enabled u axis movement", nullptr));
+
     Device::userOrigin1Item()->setTitleAndDesc(
         QCoreApplication::translate("Config", "User Origin 1", nullptr), 
         QCoreApplication::translate("Config", "User Origin 1", nullptr));
@@ -3030,6 +3137,22 @@ void Config::updateTitlesAndDescriptions()
     Device::zFocalLengthItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Z Focal Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "Z Focal Length", nullptr));
+
+    Device::uFixtureTypeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Fixture Type", nullptr), 
+        QCoreApplication::translate("Config", "Fixture Type", nullptr));
+
+    Device::circumferencePulseNumberItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Circumference Pulse Number", nullptr), 
+        QCoreApplication::translate("Config", "Circumference Pulse Number", nullptr));
+
+    Device::workpieceDiameterItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Workpiece Diameter(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Workpiece Diameter", nullptr));
+
+    Device::rollerRotaryStepLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Roller Rotary Step Length(um)", nullptr), 
+        QCoreApplication::translate("Config", "Roller Rotary Step Length", nullptr));
 
     Device::calibrationBlockThicknessItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Calibration block thickness(mm)", nullptr), 

@@ -136,6 +136,7 @@ InputWidgetWrapper::InputWidgetWrapper(QWidget* widget, ConfigItem* configItem)
     connect(d->configItem, &ConfigItem::valueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
     connect(d->configItem, &ConfigItem::dirtyValueChanged, this, &InputWidgetWrapper::onConfigItemDirtyValueChanged);
     connect(d->configItem, &ConfigItem::lazyValueChanged, this, &InputWidgetWrapper::onConfigItemValueChanged);
+    connect(d->configItem, &ConfigItem::enabledChanged, this, &InputWidgetWrapper::onConfigItemEnabledChanged);
 }
 
 InputWidgetWrapper::~InputWidgetWrapper()
@@ -488,6 +489,13 @@ void InputWidgetWrapper::onConfigItemLazyValueChanged(const QVariant& value, voi
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
     emit updated();
+}
+
+void InputWidgetWrapper::onConfigItemEnabledChanged(bool enabled)
+{
+    Q_D(InputWidgetWrapper);
+    QWidget* widget = qobject_cast<QWidget*>(parent());
+    widget->setEnabled(enabled);
 }
 
 

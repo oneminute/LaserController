@@ -69,6 +69,7 @@ public:
 
     bool verifyManufacturePassword(const QString& password, int errorCount);
     bool changeManufacturePassword(const QString& password, const QString& newPassword);
+    QString showManufacturePasswordDialog(QWidget* parentWnd = nullptr);
 
     MainCardActivateResult autoActivateMainCard();
     bool sendAuthenticationEmail(const QString& email);

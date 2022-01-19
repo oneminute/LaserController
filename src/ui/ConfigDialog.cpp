@@ -232,6 +232,9 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     m_errorCount = 0;
     retranslate();
+
+    // initialize widgets' state
+    Config::Device::uFixtureTypeItem()->emitValueChanged();
 }
 
 ConfigDialog::~ConfigDialog()

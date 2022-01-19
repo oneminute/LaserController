@@ -138,6 +138,7 @@ public slots:
     void onConfigItemValueChanged(const QVariant& value, void* senderPtr);
     void onConfigItemDirtyValueChanged(const QVariant& value, void* senderPtr);
     void onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr);
+    void onConfigItemEnabledChanged(bool enabled);
 
 signals:
     void updated();

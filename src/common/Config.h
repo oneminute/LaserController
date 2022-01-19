@@ -279,6 +279,7 @@ public:
         CONFIG_ITEM(device, xEnabled, bool, toBool)
         CONFIG_ITEM(device, yEnabled, bool, toBool)
         CONFIG_ITEM(device, zEnabled, bool, toBool)
+        CONFIG_ITEM(device, uEnabled, bool, toBool)
         CONFIG_ITEM_T(device, userOrigin1, QVector3D)
         CONFIG_ITEM_T(device, userOrigin2, QVector3D)
         CONFIG_ITEM_T(device, userOrigin3, QVector3D)
@@ -287,6 +288,10 @@ public:
         CONFIG_ITEM(device, zReverseDirection, bool, toBool)
         CONFIG_ITEM(device, zFocalLength, int, toInt)
         CONFIG_ITEM(device, calibrationBlockThickness, int, toInt)
+        CONFIG_ITEM(device, uFixtureType, int, toInt)
+        CONFIG_ITEM(device, circumferencePulseNumber, int, toInt)
+        CONFIG_ITEM(device, workpieceDiameter, int, toInt)
+        CONFIG_ITEM(device, rollerRotaryStepLength, int, toInt)
 
     private:
         friend class Config;

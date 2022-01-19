@@ -150,6 +150,7 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+    void createUAxisDockPanel();
     void createLaserPowerDockPanel();
     void createPrintAndCutPanel();
     //shape properties panel / dock panel
@@ -176,6 +177,7 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 	virtual void contextMenuEvent(QContextMenuEvent *event) override;
+
 protected slots:
 	void onActionUndo(bool checked = false);
 	void onActionRedo(bool checked);
@@ -282,6 +284,10 @@ protected slots:
     void onActionGenerateCalibrationBoard();
     void onActionCameraAlignment();
     void onActionCameraUpdateOverlay();
+    void onActionStartCamera(bool checked = false);
+    void onActionStopCamera(bool checked = false);
+
+    void onActionSaveUStep();
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -507,6 +513,10 @@ private:
     QToolButton* m_buttonMoveToUserOrigin;
     ads::CDockWidget* m_dockMovement;
     ads::CDockAreaWidget* m_dockAreaMovement;
+
+    // U Axis panel
+    ads::CDockWidget* m_dockUAxis;
+    ads::CDockAreaWidget* m_dockAreaUAxis;
 
     // Property panel
     LaserDoubleSpinBox* m_cutOrderPriority;

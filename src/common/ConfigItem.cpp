@@ -438,6 +438,11 @@ void ConfigItem::clearModified()
     emit modifiedChanged(false);
 }
 
+void ConfigItem::emitValueChanged()
+{
+    emit valueChanged(value(), nullptr);
+}
+
 QString ConfigItem::toString() const
 {
     QString msg = QString("[group=%1, name=%2, title=%3, description=%4, value=%5]")
