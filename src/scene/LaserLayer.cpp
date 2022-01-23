@@ -670,6 +670,18 @@ QJsonObject LaserLayer::toJson(QWidget* window)
             LaserRing* ring = qobject_cast<LaserRing*>(primitive);
             array.append(ring->toJson());
         }
+        else if (className == "LaserFrame") {
+            LaserFrame* frame = qobject_cast<LaserFrame*>(primitive);
+            array.append(frame->toJson());
+        }
+        else if (className == "LaserHorizontalText") {
+            LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*>(primitive);
+            array.append(hText->toJson());
+        }
+        else if (className == "LaserCircleText") {
+            LaserCircleText* cText = qobject_cast<LaserCircleText*>(primitive);
+            array.append(cText->toJson());
+        }
 		else {
 			QMessageBox::critical(window, "critical", "can't save, "+className+" can't to json.");
             break;

@@ -47,7 +47,10 @@ public:
     QSet<LaserPrimitive*> findPrimitivesByRect(const QRectF& rect);
 	void findSelectedByLine(QRectF rect);
 	void findSelectedByBoundingRect(QRectF rect);
+    void findSelectedByRegion(QRectF rect);
     void selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive);
+    void selectedByLine(QList<QLineF> selectionEdges, QRectF selection, LaserPrimitive* primitive);
+    void selectedByRegion(QRectF selection, LaserPrimitive* primitive);
     QRect maxRegion();
     QuadTreeNode* quadTreeNode();
     void updateValidMaxRegionRect();

@@ -5537,18 +5537,22 @@ void LaserControllerWindow::onActionCreateNameStamp()
 {
     /*LaserRing* star = new LaserRing(m_scene->document(), QRectF(QPointF(0, 0), QPointF(50 * 1000, 50 * 1000)), 5 * 1000,  QTransform(),
         m_viewer->curLayerIndex());
-    m_scene->addLaserPrimitive(star, false);
-    LaserFrame* star = new LaserFrame(m_scene->document(), QRect(QPoint(0, 0), QPoint(50 * 1000, 50 * 1000)), 5 * 1000, 5 * 1000, QTransform(),
-        m_viewer->curLayerIndex(), CRT_Line);
     m_scene->addLaserPrimitive(star, false);*/
+    /*LaserFrame* star = new LaserFrame(m_scene->document(), QRect(QPoint(0, 0), QPoint(50 * 1000, 50 * 1000)), 5 * 1000, 5 * 1000, QTransform(),
+        m_viewer->curLayerIndex(), CRT_Line);
+    m_scene->addLaserPrimitive(star, false);
     QString s("PKL");
-    /*LaserCircleText* text = new LaserCircleText(m_scene->document(),
+    LaserCircleText* text = new LaserCircleText(m_scene->document(),
         s, QRect(0, 0, 90 * 1000, 50 * 1000),
         QSize(), 0);
-        m_scene->addLaserPrimitive(text, false);*/
+        m_scene->addLaserPrimitive(text, false); 
     LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(),
-        s, QSize(90*1000, 60*1000));
+        "llrg", QSize(90*1000, 60*1000));
+    m_scene->addLaserPrimitive(text, false);*/
+    LaserCircleText* text = new LaserCircleText(m_scene->document(),
+        "12345678901g12345678901g12345678901g12345678901g", QRect(50*1000, 20 * 1000, 250 * 1000, 100 * 1000), 330);
     m_scene->addLaserPrimitive(text, false);
+    
 }
 
 void LaserControllerWindow::onActionCreateStripStamp()

@@ -552,16 +552,34 @@ class LaserCircleTextPrivate;
 class LaserCircleText : public LaserShape {
     Q_OBJECT
 public:
-    LaserCircleText(LaserDocument* doc, QString content, QRect bounds,
-        QSize size, qreal angle,
+    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
         QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
-    void computeTextPath();
+    void computeTextPath(qreal angle);
+    QPointF computeEllipsePoint(qreal rRadian);
+    void translateText(QPointF& lastPoint, QPointF& curPoint, qreal interval, qreal index);
+    qreal computeArcLengthByLineIntersect(qreal circleRadius);
+    bool computeIntersectPoint(QPainterPath path, QPointF lastPoint,
+        qreal averageLength, QPointF & intersection);
+    bool eaqualDivideEllipseArc(qreal unitArcLength, QPointF lastPoint, QPointF & curPoint, int index);
+    QTransform scaleText(QPainterPath path);
+    QTransform rotateText(int i,QPointF textPos);
+    void transformText(QPainterPath path, QPointF textPos, int i);
+    void transformTextByCenter(QPainterPath path, QPointF textPos, int i);
+    QRectF textArcRect();
+    void setAngle(qreal angle);
+    qreal mapToAffineCircleAngle(qreal radian);
+    void moveTextToEllipse(qreal lengthByPercent);
+    void computeTextByPercent(int intervalCount);
+    void computeTextByLineIntersect(qreal circleRadius);
+    void computeArc(QPointF lastP, QPointF curP, QPainterPath& forwardPath, QPainterPath& backwardPath);
+    qreal computeTextByAffineCircle(int size);
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
     virtual QString typeName() { return tr("CircleText"); }
     LaserPrimitive * clone(QTransform t);
     virtual QJsonObject toJson();
+    QVector<QLineF> edges();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;
@@ -585,6 +603,7 @@ public:
     virtual QString typeName() { return tr("HorizontalText"); }
     LaserPrimitive * clone(QTransform t);
     virtual QJsonObject toJson();
+    QVector<QLineF> edges();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

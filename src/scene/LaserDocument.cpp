@@ -1234,8 +1234,26 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             else if (className == "LaserRing") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 qreal width = primitiveJson["width"].toDouble();
-                QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toInt(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
+                QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
                 primitive = new LaserRing(this, bounds, width, saveTransform, layerIndex);
+            }
+            else if (className == "LaserFrame") {
+                QJsonArray boundsArray = primitiveJson["bounds"].toArray();
+                qreal width = primitiveJson["width"].toDouble();
+                QRect bounds(boundsArray[0].toInt(), boundsArray[1].toInt(), boundsArray[2].toInt(), boundsArray[3].toInt());
+                int cornerType = primitiveJson["cornerType"].toInt();
+                qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
+                primitive = new LaserFrame(this, bounds, width, cornerRadius, saveTransform, layerIndex, cornerType);
+            }
+            else if (className == "LaserHorizontalText") {
+                QJsonArray sizeArray = primitiveJson["size"].toArray();
+                QSize size(sizeArray[0].toInt(), sizeArray[1].toInt());
+                QString content = primitiveJson["content"].toString();
+                qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
+                primitive = new LaserHorizontalText(this, content, size,saveTransform, layerIndex);
+            }
+            else if (className == "LaserCircleText") {
+
             }
             
             if (primitive)

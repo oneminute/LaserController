@@ -216,70 +216,70 @@ void LaserScene::destroyItemGroup(LaserPrimitiveGroup * group)
 bool LaserScene::eventFilter(QObject * watched, QEvent * event)
 {
 	
-	m_mousePressBlock = false;
-	m_mouseMoveBlock = false;
-	m_detectedFillSolid = nullptr;
-	QString name = watched->metaObject()->className();
-	//qDebug() << name;
-	qDebug() << event->type();
-	if (event->type() == QEvent::GraphicsSceneMousePress) {
-		
-		LaserViewer* viewer = qobject_cast<LaserViewer*>( views()[0]);
-		if (viewer) {
-			
-			if (name == "LaserBitmap") {
-				LaserBitmap* map = qobject_cast<LaserBitmap*>(watched);
-				m_mousePressBlock = true;
-				m_detectedFillSolid = map;
-				return false;
-			}
-		}
-			
-		
-		
-	}
-	else if (event->type() == QEvent::GraphicsSceneMouseMove) {
-		if (name == "LaserBitmap") {
-			m_mouseMoveBlock = true;
-			return false;//scene û�й��˵���¼���������item���ݣ� true����˵���
-		}
-    }
-    else if (event->type() == QEvent::InputMethod) {
-        QInputMethodEvent* e = reinterpret_cast<QInputMethodEvent*>(event);
-        if (!e->commitString().isEmpty()) {
-            qDebug() << e->commitString();
+m_mousePressBlock = false;
+m_mouseMoveBlock = false;
+m_detectedFillSolid = nullptr;
+QString name = watched->metaObject()->className();
+//qDebug() << name;
+qDebug() << event->type();
+if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+    LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
+    if (viewer) {
+
+        if (name == "LaserBitmap") {
+            LaserBitmap* map = qobject_cast<LaserBitmap*>(watched);
+            m_mousePressBlock = true;
+            m_detectedFillSolid = map;
+            return false;
         }
-        
     }
-	
-	
-	return QGraphicsScene::eventFilter(watched, event);
+
+
+
+}
+else if (event->type() == QEvent::GraphicsSceneMouseMove) {
+    if (name == "LaserBitmap") {
+        m_mouseMoveBlock = true;
+        return false;//scene û�й��˵���¼���������item���ݣ� true����˵���
+    }
+}
+else if (event->type() == QEvent::InputMethod) {
+    QInputMethodEvent* e = reinterpret_cast<QInputMethodEvent*>(event);
+    if (!e->commitString().isEmpty()) {
+        qDebug() << e->commitString();
+    }
+
+}
+
+
+return QGraphicsScene::eventFilter(watched, event);
 }
 
 bool LaserScene::mousePressDetectBitmap(LaserBitmap* & detected)
 {
-	detected = m_detectedFillSolid;
-	return m_mousePressBlock;
+    detected = m_detectedFillSolid;
+    return m_mousePressBlock;
 }
 bool LaserScene::mouseMoveBlock()
 {
-	return m_mouseMoveBlock;
+    return m_mouseMoveBlock;
 }
 //rewrite mouse event
 void LaserScene::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
-	QGraphicsScene::mousePressEvent(event);
+    QGraphicsScene::mousePressEvent(event);
 }
 
 void LaserScene::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
-	QGraphicsScene::mouseMoveEvent(event);
-	
+    QGraphicsScene::mouseMoveEvent(event);
+
 }
 
 void LaserScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
-	QGraphicsScene::mouseReleaseEvent(event);
+    QGraphicsScene::mouseReleaseEvent(event);
 }
 
 QSet<LaserPrimitive*> LaserScene::findPrimitivesByRect(const QRectF& rect)
@@ -312,35 +312,22 @@ void LaserScene::findSelectedByLine(QRectF selection)
             if (primitive->flags() & QGraphicsItem::ItemIsSelectable) {
                 QRectF bounds = primitive->sceneBoundingRect();
                 //图元外包框整个被selection包裹
-                selectedByBounds(bounds, selection, primitive);
-                //图元的边与selection的边交叉
-                bool isIntersected = false;
-                QVector<QLineF> edges = primitive->edges();
-                for (QLineF selectionEdge : selectionEdges) {
-                    for (QLineF edge : edges) {
-                        QPointF p;
-                        if (selectionEdge.intersect(edge, &p) == QLineF::BoundedIntersection) {
-                            isIntersected = true;
-                            if (!primitive->isSelected()) {
-                                primitive->setSelected(true);
-                                if(primitive->isJoinedGroup()){
-                                    for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
-                                        p != primitive->joinedGroupList()->end(); p++) {
-                                        (*p)->setSelected(true);
-                                    }
-                                }
-                                
-                            }
-                            break;
-                        }
-                        
-                    }
-                    if (isIntersected) {
-                        isIntersected = false;
-                        break;
-                    }
+                selectedByBounds(bounds, selection, primitive);   
+                int type = primitive->primitiveType();
+                if (type == LPT_BITMAP ||
+                    type == LPT_STAR ||
+                    type == LPT_FRAME ||
+                    type == LPT_RING ||
+                    type == LPT_CIRCLETEXT ||
+                    type == LPT_HORIZONTALTEXT ||
+                    type == LPT_VERTICALTEXT){
+                    //图元的path与selection的边交叉
+                    selectedByRegion(selection, primitive);
                 }
-                
+                else {
+                    //图元的边与selection的边交叉
+                    selectedByLine(selectionEdges, selection, primitive);
+                }
             }
 
         }
@@ -449,6 +436,10 @@ void LaserScene::findSelectedByBoundingRect(QRectF selection)
     }
     
 }
+void LaserScene::findSelectedByRegion(QRectF selection)
+{
+    
+}
 void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive)
 {
     if (selection.contains(bounds)) {
@@ -474,6 +465,49 @@ void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitiv
                 primitive->setSelected(true);
             }
         }
+    }
+}
+void LaserScene::selectedByLine(QList<QLineF> selectionEdges, QRectF selection, LaserPrimitive* primitive)
+{
+    bool isIntersected = false;
+    QVector<QLineF> edges = primitive->edges();
+    for (QLineF selectionEdge : selectionEdges) {
+        for (QLineF edge : edges) {
+            QPointF p;
+            if (selectionEdge.intersect(edge, &p) == QLineF::BoundedIntersection) {
+                isIntersected = true;
+                if (!primitive->isSelected()) {
+                    primitive->setSelected(true);
+                    if (primitive->isJoinedGroup()) {
+                        for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                            p != primitive->joinedGroupList()->end(); p++) {
+                            (*p)->setSelected(true);
+                        }
+                    }
+
+                }
+                break;
+            }
+
+        }
+        if (isIntersected) {
+            isIntersected = false;
+            break;
+        }
+    }
+}
+void LaserScene::selectedByRegion(QRectF selection, LaserPrimitive * primitive)
+{
+    bool isIntersected = primitive->getScenePath().intersects(selection);
+    if (isIntersected) {
+        primitive->setSelected(true);
+        if (primitive->isJoinedGroup()) {
+            for (QSet<LaserPrimitive*>::iterator p = primitive->joinedGroupList()->begin();
+                p != primitive->joinedGroupList()->end(); p++) {
+                (*p)->setSelected(true);
+            }
+        }
+
     }
 }
 QRect LaserScene::maxRegion()

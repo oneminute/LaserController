@@ -968,6 +968,18 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
                     return true;
                 }
             }
+            else if (LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*> (primitive)) {
+                if (hText->getScenePath().contains(sceneMousePoint)) {
+                    result = hText;
+                    return true;
+                }
+            }
+            else if (LaserCircleText* cText = qobject_cast<LaserCircleText*> (primitive)) {
+                if (cText->getScenePath().contains(sceneMousePoint)) {
+                    result = cText;
+                    return true;
+                }
+            }
 		}
 	}
 	
@@ -1369,92 +1381,57 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             painter.setPen(QPen(Qt::darkGray, 2, Qt::SolidLine));
             painter.setBrush(QBrush(Qt::darkGray, Qt::BrushStyle::SolidPattern));
             qreal vZoomValue = zoomValueNormal();
+            //outer left 13
+            QRect leftRect;
             if (primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT) {
-                //outer left 13
-                QPointF oLeft_1 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x() - 3800 / vZoomValue,
-                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5 - 1300 / vZoomValue));
-                QPointF oLeft_2 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x() - 3800 / vZoomValue,
-                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5 + 1300 / vZoomValue));
                 QPointF oLeft_3 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x()-6000 / vZoomValue,
-                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5));
-                
-                QPainterPath path;
-                path.moveTo(oLeft_1);
-                path.lineTo(oLeft_2);
-                path.lineTo(oLeft_3);
-                path.closeSubpath();
-                
-                painter.drawPath(path);
-                m_selectedHandleList.append(path.boundingRect());
+                    primitive->boundingRect().topLeft().x(),
+                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5)); 
+                oLeft_3 = QPointF(oLeft_3.x() - 35, oLeft_3.y());
+                leftRect = QRect(oLeft_3.x() - 6, oLeft_3.y()- 6, 12, 12);
+                painter.drawEllipse(leftRect);
+                //painter.drawPath(pathLeft);
+                //painter.drawPixmap(oLeft_3, QPixmap(":/ui/icons/images/direct_left_1.png"));
             }
+            m_selectedHandleList.append(leftRect);
+            //outer top 14
+            QRect topRect;
             if (primitive->primitiveType() == LPT_CIRCLETEXT) {
-                //outer top 14
-                QPointF oTop_1 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5 - 1300 / vZoomValue,
-                    primitive->boundingRect().topLeft().y() - 3800 / vZoomValue));
-                QPointF oTop_2 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5 + 1300 / vZoomValue,
-                    primitive->boundingRect().topLeft().y() - 3800 / vZoomValue));
+                
                 QPointF oTop_3 = mapFromScene(primitive->mapToScene(
                     primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5,
-                    primitive->boundingRect().topLeft().y() - 6000 / vZoomValue));
-
-                QPainterPath path;
-                path.moveTo(oTop_1);
-                path.lineTo(oTop_2);
-                path.lineTo(oTop_3);
-                path.closeSubpath();
-
-                painter.drawPath(path);
-                m_selectedHandleList.append(path.boundingRect());
+                    primitive->boundingRect().topLeft().y()));
+                oTop_3 = QPointF(oTop_3.x(), oTop_3.y() - 35);
+                topRect = QRect(oTop_3.x() - 6, oTop_3.y() - 6, 12, 12);
+                painter.drawEllipse(topRect);
             }
+            m_selectedHandleList.append(topRect);
+            //outer right 15
+            QRect rightRect;
             if (primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT) {
-                //outer right 15
-                QPointF oRight_1 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().bottomRight().x() + 3800 / vZoomValue,
-                    primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5 - 1300 / vZoomValue));
-                QPointF oRight_2 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().bottomRight().x() + 3800 / vZoomValue,
-                    primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5 + 1300 / vZoomValue));
+                
                 QPointF oRight_3 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().bottomRight().x() + 6000 / vZoomValue,
+                    primitive->boundingRect().bottomRight().x(),
                     primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5));
-
-                QPainterPath path;
-                path.moveTo(oRight_1);
-                path.lineTo(oRight_2);
-                path.lineTo(oRight_3);
-                path.closeSubpath();
-
-                painter.drawPath(path);
-                m_selectedHandleList.append(path.boundingRect());
+                oRight_3 = QPointF(oRight_3.x() + 35, oRight_3.y());
+                rightRect = QRect(oRight_3.x() - 3, oRight_3.y() - 3, 6, 6);
+                painter.drawEllipse(oRight_3, 6, 6);
             }
+            m_selectedHandleList.append(rightRect);
+            //outer bottom 16
+            QRect bottomRect;
             if (primitive->primitiveType() == LPT_CIRCLETEXT) {
-                //outer bottom 16
-                QPointF oBottom_1 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5 - 1300 / vZoomValue,
-                    primitive->boundingRect().bottomRight().y() + 3800 / vZoomValue));
-                QPointF oBottom_2 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5 + 1300 / vZoomValue,
-                    primitive->boundingRect().bottomRight().y() + 3800 / vZoomValue));
+                
                 QPointF oBottom_3 = mapFromScene(primitive->mapToScene(
                     primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5,
-                    primitive->boundingRect().bottomRight().y() + 6000 / vZoomValue));
-
-                QPainterPath path;
-                path.moveTo(oBottom_1);
-                path.lineTo(oBottom_2);
-                path.lineTo(oBottom_3);
-                path.closeSubpath();
-
-                painter.drawPath(path);
-                m_selectedHandleList.append(path.boundingRect());
+                    primitive->boundingRect().bottomRight().y()));
+                oBottom_3 = QPointF(oBottom_3.x(), oBottom_3.y() + 35);
+                bottomRect = QRect(oBottom_3.x() - 6, oBottom_3.y() - 6, 12, 12);
+                painter.drawEllipse(bottomRect);
             }
+            m_selectedHandleList.append(bottomRect);
         }
         
     }
@@ -2025,22 +2002,26 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     break;
                 }
                 case 13: {
-                    QPixmap cMap(":/ui/icons/images/direct_left.png");
+                    QPixmap cMap(":/ui/icons/images/direction_h.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
                     this->setCursor(cMap);
                     break;
                 }
                 case 14: {
-                    QPixmap cMap(":/ui/icons/images/direct_top.png");
+                    QPixmap cMap(":/ui/icons/images/direction_v.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
                     this->setCursor(cMap);
                     break;
                 }
                 case 15: {
-                    QPixmap cMap(":/ui/icons/images/direct_right.png");
+                    QPixmap cMap(":/ui/icons/images/direction_h.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
                     this->setCursor(cMap);
                     break;
                 }
                 case 16: {
-                    QPixmap cMap(":/ui/icons/images/direct_bottom.png");
+                    QPixmap cMap(":/ui/icons/images/direction_v.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
                     this->setCursor(cMap);
                     break;
                 }
@@ -3477,6 +3458,7 @@ bool LaserViewer::isOnControllHandlers(const QPoint& point, int& handlerIndex, Q
 {
     bool isIn = false;
     for (int i = 0; i < m_selectedHandleList.size(); i++) {
+
         if (m_selectedHandleList[i].contains(point)) {
             handlerIndex = i;
             handlerRect = m_selectedHandleList[i];
@@ -4452,6 +4434,7 @@ void LaserViewer::selectedHandleScale()
 			break;
 		}
         //text
+        //left
         case 13: {
             qreal diff = (m_lastPos.x() - m_mousePoint.x()) * 380/zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
@@ -4463,6 +4446,7 @@ void LaserViewer::selectedHandleScale()
             primitive->setBoundingRectWidth(w);
             break;
         }
+        //right
         case 15: {
             qreal diff = (m_mousePoint.x() - m_lastPos.x()) * 380 / zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
@@ -4474,7 +4458,7 @@ void LaserViewer::selectedHandleScale()
             primitive->setBoundingRectWidth(w);
             break;
         }
-        case 14: {
+        case 14: {//top
             qreal diff = (m_lastPos.y() - m_mousePoint.y()) * 380 / zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
 
@@ -4485,7 +4469,7 @@ void LaserViewer::selectedHandleScale()
             primitive->setBoundingRectHeight(h);
             break;
         }
-        case 16: {
+        case 16: {//bottom
             qreal diff = (m_mousePoint.y() - m_lastPos.y()) * 380 / zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
 

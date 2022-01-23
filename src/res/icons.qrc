@@ -132,9 +132,7 @@
         <file>images/unitTwoShapes.png</file>
         <file>images/intersectionTwoShapes.png</file>
         <file>images/createStamp.png</file>
-        <file>images/direct_top.png</file>
-        <file>images/direct_bottom.png</file>
-        <file>images/direct_left.png</file>
-        <file>images/direct_right.png</file>
+        <file>images/direction_h.png</file>
+        <file>images/direction_v.png</file>
     </qresource>
 </RCC>
