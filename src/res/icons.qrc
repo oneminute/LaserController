@@ -134,5 +134,16 @@
         <file>images/createStamp.png</file>
         <file>images/direction_h.png</file>
         <file>images/direction_v.png</file>
+        <file>images/moveByPath.png</file>
+        <file>images/changeAngle.png</file>
+        <file>images/stretchVertical.png</file>
+        <file>images/start.png</file>
+        <file>images/frame.png</file>
+        <file>images/ring.png</file>
+        <file>images/ringEllipse.png</file>
+        <file>images/verticalText.png</file>
+        <file>images/horizontalText.png</file>
+        <file>images/arcText.png</file>
+        <file>images/stamp.png</file>
     </qresource>
 </RCC>

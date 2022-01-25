@@ -1290,7 +1290,6 @@ void LaserViewer::paintSelectedState(QPainter& painter)
 	
     qreal left, right, top, bottom;
 	QRectF rect = selectedItemsSceneBoundingRect();
-	qDebug() << "paintSelectedState: "<<rect;
 	if (rect.width() == 0 && rect.height() == 0) {
 		return;
 	}
@@ -1430,8 +1429,45 @@ void LaserViewer::paintSelectedState(QPainter& painter)
                 oBottom_3 = QPointF(oBottom_3.x(), oBottom_3.y() + 35);
                 bottomRect = QRect(oBottom_3.x() - 6, oBottom_3.y() - 6, 12, 12);
                 painter.drawEllipse(bottomRect);
+                m_selectedHandleList.append(bottomRect);
             }
-            m_selectedHandleList.append(bottomRect);
+            //circle text move by circle path 17
+            //circle text change arc angle 18
+            //change circle text height 19
+            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                
+                LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+                QSize tSize = text->textSize();
+                /*QPointF startPoint = text->startPoint();
+                QPointF endPoint = text->endPoint();
+                QPointF centerPoint = text->centerPoint();
+                QPointF sP = mapFromScene(text->mapToScene(QPointF(
+                    startPoint.x(), startPoint.y())));
+                QPointF eP = mapFromScene(text->mapToScene(QPointF(
+                    endPoint.x(), endPoint.y())));
+                QPointF cP = mapFromScene(text->mapToScene(QPointF(
+                    centerPoint.x(), centerPoint.y())));*/
+                QPointF sP  = QPointF(centerPoint.x() - 52, centerPoint.y() - 13);
+                QPointF eP = QPointF(centerPoint.x() + 26, centerPoint.y() - 13);
+                QPointF cP = QPointF(centerPoint.x() - 13, centerPoint.y() - 52);
+                QPixmap moveMap(":/ui/icons/images/moveByPath.png");
+                moveMap = moveMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                QPixmap angleMap(":/ui/icons/images/changeAngle.png");
+                angleMap = angleMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                QPixmap svMap(":/ui/icons/images/stretchVertical.png");
+                svMap = svMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                painter.drawPixmap(sP, moveMap);
+                painter.drawPixmap(eP, angleMap);
+                painter.drawPixmap(cP, svMap);
+                m_selectedHandleList.append(QRectF(sP.x(), sP.y(), moveMap.width(), moveMap.height()));
+                m_selectedHandleList.append(QRectF(eP.x(), eP.y(), angleMap.width(), angleMap.height()));
+                m_selectedHandleList.append(QRectF(cP.x(), cP.y(), svMap.width(), svMap.height()));
+            }
+            
+
+            
+
+            
         }
         
     }
@@ -2025,6 +2061,24 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     this->setCursor(cMap);
                     break;
                 }
+                case 17: {
+                    QPixmap cMap(":/ui/icons/images/moveByPath.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
+                    this->setCursor(cMap);
+                    break;
+                }
+                case 18: {
+                    QPixmap cMap(":/ui/icons/images/changeAngle.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
+                    this->setCursor(cMap);
+                    break;
+                }
+                case 19: {
+                    QPixmap cMap(":/ui/icons/images/stretchVertical.png");
+                    cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
+                    this->setCursor(cMap);
+                    break;
+                }
                 default:
                     break;
                 }
@@ -2061,6 +2115,9 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
             case 14://text top
             case 15://text right
             case 16://text bottom
+            case 17://circle text move path
+            case 18://circle text change angle
+            case 19://circle text change size height
 			case 30://点选
 			case 31://点选图片
             
@@ -4439,7 +4496,7 @@ void LaserViewer::selectedHandleScale()
             qreal diff = (m_lastPos.x() - m_mousePoint.x()) * 380/zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
             
-            qreal w = primitive->variableBounds().width() + diff;
+            qreal w = primitive->boundingRect().width() + diff;
             if (w < 1) {
                 w = 1;
             }
@@ -4480,9 +4537,32 @@ void LaserViewer::selectedHandleScale()
             primitive->setBoundingRectHeight(h);
             break;
         }
+        case 17://circle text move path
+        {
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+            qreal diff = (m_mousePoint.x() - m_lastPos.x()) / 8.0;
+            text->computeMoveTextPath(diff);
+            break;
+        }
+        case 18://circle text change angle
+        {
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+            qreal diff = (m_mousePoint.x() - m_lastPos.x())/8.0;
+            text->computeChangeAngle(-diff);
+            break;
+        }
+        case 19://circle text change size height
+        {
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+            qreal diff = (m_mousePoint.y() - m_lastPos.y()) * 80.0;
+            text->computeChangeTextHeight(diff);
+            break;
+        }
 	}
 	QTransform t;
-	//qDebug() << " rate: "<< rate;
 	switch (m_curSelectedHandleIndex) {
 		case 0: 
 		{

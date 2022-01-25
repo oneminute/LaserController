@@ -4697,9 +4697,6 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionDeletePrimitive->setEnabled(true);
 		
 	}
-    //判断显示哪个属性面板，shape properties panel
-    showShapePropertyPanel();
-
     m_statusSelectionCount->setText(tr("Selection: %1").arg(items.length()));
 }
 void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
@@ -4781,7 +4778,8 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
     //changeAlignButtonsEnable();
     //shapes weld/ two shapes unit
     //changeShapesWeldButtonsEnable();
-
+    //判断显示哪个属性面板，shape properties panel
+    showShapePropertyPanel();
 }
 /*void LaserControllerWindow::onJoinedGroupChanged()
 {
@@ -5550,7 +5548,7 @@ void LaserControllerWindow::onActionCreateNameStamp()
         "llrg", QSize(90*1000, 60*1000));
     m_scene->addLaserPrimitive(text, false);*/
     LaserCircleText* text = new LaserCircleText(m_scene->document(),
-        "12345678901g12345678901g12345678901g12345678901g", QRect(50*1000, 20 * 1000, 250 * 1000, 100 * 1000), 330);
+        "123g566", QRect(50*1000, 20 * 1000, 250 * 1000, 100 * 1000), 260);
     m_scene->addLaserPrimitive(text, false);
     
 }

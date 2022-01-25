@@ -552,28 +552,32 @@ class LaserCircleTextPrivate;
 class LaserCircleText : public LaserShape {
     Q_OBJECT
 public:
-    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-        QTransform transform = QTransform(), int layerIndex = 0);
+    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle, 
+        bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
-    void computeTextPath(qreal angle);
+    void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
     QPointF computeEllipsePoint(qreal rRadian);
     void translateText(QPointF& lastPoint, QPointF& curPoint, qreal interval, qreal index);
-    qreal computeArcLengthByLineIntersect(qreal circleRadius);
-    bool computeIntersectPoint(QPainterPath path, QPointF lastPoint,
-        qreal averageLength, QPointF & intersection);
-    bool eaqualDivideEllipseArc(qreal unitArcLength, QPointF lastPoint, QPointF & curPoint, int index);
     QTransform scaleText(QPainterPath path);
     QTransform rotateText(int i,QPointF textPos);
     void transformText(QPainterPath path, QPointF textPos, int i);
     void transformTextByCenter(QPainterPath path, QPointF textPos, int i);
     QRectF textArcRect();
-    void setAngle(qreal angle);
+    void initAngle();
+    void setAngle(qreal angle, bool needInit = true);
+    void setTextSize(QSize size, bool needInit = true);
     qreal mapToAffineCircleAngle(qreal radian);
     void moveTextToEllipse(qreal lengthByPercent);
     void computeTextByPercent(int intervalCount);
-    void computeTextByLineIntersect(qreal circleRadius);
-    void computeArc(QPointF lastP, QPointF curP, QPainterPath& forwardPath, QPainterPath& backwardPath);
-    qreal computeTextByAffineCircle(int size);
+    void computeMoveTextPath(qreal diffAngle);
+    void computeChangeAngle(qreal diffAngle);
+    void computeChangeTextHeight(qreal diffHeight);
+    void resizeRadian();
+    QPainterPath* textArc();
+    //QPointF startPoint();
+    //QPointF endPoint();
+    //QPointF centerPoint();
+    QSize textSize();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
     virtual QString typeName() { return tr("CircleText"); }
@@ -599,7 +603,7 @@ public:
     void initTextPath();
     void computeTextPath();
     virtual void draw(QPainter* painter);
-    virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
+    virtual LaserPrimitiveType type() { return LPT_HORIZONTALTEXT; }
     virtual QString typeName() { return tr("HorizontalText"); }
     LaserPrimitive * clone(QTransform t);
     virtual QJsonObject toJson();
@@ -608,9 +612,34 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
         Q_DISABLE_COPY(LaserHorizontalText)
+};
+class LaserVerticalTextPrivate;
+class LaserVerticalText : public LaserShape {
+    Q_OBJECT
+public:
+    LaserVerticalText(LaserDocument* doc, QString content, QSize size,
+        QTransform transform = QTransform(), int layerIndex = 0);
+    virtual ~LaserVerticalText();
+    void initTextPath();
+    void computeTextPath();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_VERTICALTEXT; }
+    virtual QString typeName() { return tr("VerticalText"); }
+    LaserPrimitive * clone(QTransform t);
+    virtual QJsonObject toJson();
+    QVector<QLineF> edges();
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
+        Q_DISABLE_COPY(LaserVerticalText)
 };
 
 QDebug operator<<(QDebug debug, const QRect& rect);

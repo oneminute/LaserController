@@ -3357,54 +3357,41 @@ public:
     QList<QTransform> textTransformList;
     QPainterPath textPath;
     QPainterPath arcPath;
-    QPainterPath intersectPath;
-    QPainterPath intersectPath0;
-    QPointF testP;
     qreal minRadian, maxRadian;
-    qreal minAngle_affine, maxAngle_affine, angle_affine;//画圆弧的时候需要用到仿射圆artTo
-    QList<QPainterPath> testCircles;
-    QList<QPainterPath> testArc;
-    QPainterPath testCPath;
-    QPainterPath testPath;
-    qreal totalLastedRadian;
-    QRectF testBounds;
-    QLineF testLine0;
-    QLineF testLine1;
-    QLineF testLine2;
-    QLineF testLine3;
+    //qreal minAngle_affine, maxAngle_affine, angle_affine;
 };
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    QTransform transform, int layerIndex) 
+    bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
     :LaserShape(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, layerIndex, transform)
 {
     Q_D(LaserCircleText);
     d->content = content;
     d->boundingRect = bounds.toRect();
-    d->testBounds = bounds;
+    if (!isInit) {
+        d->maxRadian = maxRadian;
+        d->minRadian = minRadian;
+    }
     setTransform(transform);
-    d->originalBoundingRect = d->boundingRect;
-    
-    computeTextPath(angle);
+    d->originalBoundingRect = d->boundingRect;    
+    d->angle = angle;
+    computeTextPath(d->angle, size, isInit);
     d->path.addRect(d->boundingRect);
 }
 
 LaserCircleText::~LaserCircleText()
 {
 }
-
-void LaserCircleText::computeTextPath(qreal angle)
+//needInite 为true，会自动计算textSize， maxRadian，minRadian
+void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit)
 {
     Q_D(LaserCircleText);
     if (d->boundingRect.width() <= 0 || d->boundingRect.height() <= 0) {
         return;
     }
     //text height
-    qreal shorterLine = d->boundingRect.width();
-    if (shorterLine > d->boundingRect.height()) {
-        shorterLine = d->boundingRect.height();
-    }
-    d->size.setHeight(shorterLine * 0.25);
-    setAngle(angle);
+    setTextSize(textSize, needInit);
+    //angle
+    setAngle(angle, needInit);
     //text width
     qreal lengthByPercent = 0;
     QPointF lastP = d->arcPath.pointAtPercent(0);
@@ -3415,7 +3402,6 @@ void LaserCircleText::computeTextPath(qreal angle)
     }
     QPointF p = d->arcPath.pointAtPercent(0) - d->arcPath.pointAtPercent(1.0/(d->content.size() - 1));
     qreal distance = lengthByPercent / d->content.size()*0.5;
-    //qreal radius = shorterLine * 0.5; //内接椭圆的最短半径
     d->size.setWidth(distance);
     //font
     QFont font;
@@ -3520,118 +3506,6 @@ void LaserCircleText::translateText(QPointF& lastPoint, QPointF& curPoint, qreal
         //totalDistance += distance;
     }
 }
-
-qreal LaserCircleText::computeArcLengthByLineIntersect(qreal averageLength)
-{
-    Q_D(LaserCircleText);
-    d->totalLastedRadian = 0;
-    qreal totalDistance = 0;
-    QPointF lastPoint;
-    QPointF curPoint;
-    QVector<QLineF> arcList = LaserPrimitive::edges(d->arcPath, true);
-    QPainterPath forwardPath;
-    QPainterPath backPath;
-    for (int j = 0; j < d->content.size(); j++) {
-        QPointF curPoint;
-        if (j == 0) {
-            lastPoint = d->arcPath.pointAtPercent(0.0);
-            forwardPath = d->arcPath;
-            continue;
-        }
-        else {
-            bool isIntersect = computeIntersectPoint(forwardPath, lastPoint, averageLength, curPoint);            
-            if (j == 1) {
-                if (isIntersect) {
-                    totalDistance += averageLength;                 
-                }
-                else {
-                    return 0;
-                }                  
-            }
-            else {
-                if (isIntersect) {
-                    totalDistance += averageLength;
-                    if (j == d->content.size() - 1) {
-                        qreal l = QVector2D(lastPoint - d->arcPath.pointAtPercent(1.0)).length();
-                        totalDistance += l;
-                    }
-                    
-                }
-                else {
-                    qreal lastLength = QVector2D(d->arcPath.pointAtPercent(1.0) - lastPoint).length();
-                    return totalDistance += lastLength;
-                }
-            }
-            computeArc(lastPoint, curPoint, forwardPath, backPath);
-            lastPoint = curPoint;
-        }
-    }
-    return totalDistance;
-}
-
-bool LaserCircleText::computeIntersectPoint(QPainterPath path, QPointF lastPoint, 
-    qreal averageLength, QPointF & intersection)
-{
-    //获取圆
-    QPainterPath circlePath;
-    circlePath.addEllipse(QRectF(
-        QPointF(lastPoint.x() - averageLength, lastPoint.y() - averageLength),
-        QPointF(lastPoint.x() + averageLength, lastPoint.y() + averageLength)));
-    QVector<QLineF> circleList = LaserPrimitive::edges(circlePath);
-    QVector<QLineF> arcList = LaserPrimitive::edges(path, true);
-    int h = arcList.size();
-    bool isIntersect = false;
-    for (QLineF line : arcList) {
-        QPainterPath lPath;
-        QPolygonF linePoly;
-        linePoly.append(line.p1());
-        linePoly.append(line.p2());
-        lPath.addPolygon(linePoly);
-        circlePath.contains(lPath);
-        if (circlePath.intersects(lPath)) {
-            //需要遍历circle的所有线找交点
-            //找到第一个交点返回
-            for (QLineF cLine : circleList) {
-                if (cLine.intersect(line, &intersection) == QLineF::IntersectType::BoundedIntersection) {
-                    isIntersect = true;
-                    break;
-                }
-            }
-        }
-        if (isIntersect) {
-            break;
-        }
-    }
-    return isIntersect;
-}
-
-bool LaserCircleText::eaqualDivideEllipseArc(qreal unitArcLength, QPointF lastPoint, QPointF& curPoint, int index)
-{
-    Q_D(LaserCircleText);
-    
-    if (index == 0) {
-        d->intersectPath = d->arcPath;
-        curPoint = d->arcPath.pointAtPercent(0.0);
-        return true;
-    }
-    else if (index == d->content.size() - 1) {
-        curPoint = d->arcPath.pointAtPercent(1.0);
-        return true;
-    }
-    //获取圆
-    QPainterPath path;
-    path.addEllipse(QRectF(QPointF(lastPoint.x() - unitArcLength, lastPoint.y() - unitArcLength),
-        QPointF(lastPoint.x() + unitArcLength, lastPoint.y() + unitArcLength)));
-    d->intersectPath = d->intersectPath - path;
-    if (!d->intersectPath.isEmpty()) {
-        curPoint = d->intersectPath.pointAtPercent(0.0);
-    }
-    else {
-        return false;
-    }
-    return true;
-}
-
 QTransform LaserCircleText::scaleText(QPainterPath path)
 {
     Q_D(LaserCircleText);
@@ -3647,7 +3521,7 @@ QTransform LaserCircleText::rotateText(int i, QPointF textPos)
     //Rotate
     qreal rRadian;
     QTransform t2;
-    qreal intervalRadian = (d->minRadian - d->maxRadian) / (d->content.size() + 1);
+    /*qreal intervalRadian = (d->minRadian - d->maxRadian) / (d->content.size() + 1);
     if (d->angle == 360) {
         intervalRadian = (d->minRadian - d->maxRadian) / d->content.size();
     }
@@ -3662,7 +3536,7 @@ QTransform LaserCircleText::rotateText(int i, QPointF textPos)
             rRadian = d->maxRadian + intervalRadian * i;
         }
 
-    }
+    }*/
     /*qreal rotateAngle;
     if (d->angle == 360) {
         rotateAngle = ((d->angle / d->content.size()) * i - 180);
@@ -3697,8 +3571,8 @@ QTransform LaserCircleText::rotateText(int i, QPointF textPos)
     }
     qreal x = textPos.x() - d->boundingRect.center().x();
     qreal y = -textPos.y() + d->boundingRect.center().y();
-    qreal tan = -(b * b * x) / (a * a * y);
-    qreal rotateAngle = qAtan(tan) / M_PI * 180;
+    qreal slope = -(b * b * x) / (a * a * y);
+    qreal rotateAngle = qAtan(slope) / M_PI * 180;
     if (y < 0) {
         rotateAngle = 180 - rotateAngle;
     }
@@ -3784,10 +3658,9 @@ QRectF LaserCircleText::textArcRect()
     return rect;
 }
 
-void LaserCircleText::setAngle(qreal angle)
+void LaserCircleText::initAngle()
 {
     Q_D(LaserCircleText);
-    d->angle = angle;
     if (d->angle > 180) {
         qreal diff = (d->angle - 180) * 0.5;
         d->maxRadian = (diff + 180) / 180 * M_PI;
@@ -3806,22 +3679,48 @@ void LaserCircleText::setAngle(qreal angle)
         d->minRadian = M_PI * 0.5;
         d->maxRadian = M_PI * 0.5;
     }
+}
+
+void LaserCircleText::setAngle(qreal angle, bool needInit)
+{
+    Q_D(LaserCircleText);
+    if (angle > 360) {
+        angle = 360;
+    }
+    else if (angle < 0) {
+        angle = 0;
+    }
+    qreal diffAngle = angle - d->angle;
+    d->angle = angle;
+    if (needInit) {
+        initAngle();
+    }
+    else {
+        qreal halfDiffRadian = qDegreesToRadians( diffAngle * 0.5);
+        d->maxRadian += halfDiffRadian;
+        d->minRadian -= halfDiffRadian;
+    }
     //需要的圆弧
     QRectF textRect = textArcRect();
-    QPainterPath tempPath;
-    qreal minR = qAsin(computeEllipsePoint(d->minRadian).x() / d->textEllipse_a);
-    qreal maxR = qAsin(computeEllipsePoint(d->maxRadian).x() / d->textEllipse_a);
-    QPointF point = computeEllipsePoint(0);
-    QPointF point0 = computeEllipsePoint(M_PI * 0.5);
     computeEllipsePoint(d->maxRadian);
-    d->arcPath = tempPath;
-    qreal min = qRadiansToDegrees(minR);
-    qreal max = qRadiansToDegrees(maxR);
-    d->minAngle_affine = mapToAffineCircleAngle(d->minRadian);
-    d->maxAngle_affine = mapToAffineCircleAngle(d->maxRadian);
-    d->angle_affine = d->maxAngle_affine - d->minAngle_affine;
-    d->arcPath.arcMoveTo(textArcRect(), d->maxAngle_affine);
-    d->arcPath.arcTo(textArcRect(), d->maxAngle_affine, -d->angle_affine);
+    d->arcPath = QPainterPath();
+    d->arcPath.arcMoveTo(textArcRect(), qRadiansToDegrees( d->maxRadian) );
+    d->arcPath.arcTo(textArcRect(), qRadiansToDegrees(d->maxRadian), -d->angle);
+}
+void LaserCircleText::setTextSize(QSize size, bool needInit)
+{
+    Q_D(LaserCircleText);
+   
+    if (needInit) {
+        qreal shorterLine = d->boundingRect.width();
+        if (shorterLine > d->boundingRect.height()) {
+            shorterLine = d->boundingRect.height();
+        }
+        d->size.setHeight(shorterLine * 0.25);
+    }
+    else {
+        d->size = size;
+    }
 }
 //radian 的范围在-PI到+PI（-360到360),一次计算中最好只使用一次，不然后加大误差
 qreal LaserCircleText::mapToAffineCircleAngle(qreal radian)
@@ -3886,298 +3785,129 @@ void LaserCircleText::moveTextToEllipse(qreal lengthByPercent)
     QPointF endPoint = d->arcPath.pointAtPercent(1.0);
     qreal chordLength = QVector2D(startPoint - endPoint).length();
     qreal l = d->size.width() * 1.2;
-    //近似圆形,个数小于等于5，等距取位置圆半径大于最小椭圆直径
-    //按椭圆的平均长度分配 || averageLength > 1.8*shorterDiameter
-    if ((a / b) >= 0.8 && (a / b) <= 1.2 || averageLength > 2.8*shorterDiameter) {
-        int intervalCount;
-        if (d->angle == 360) {
-            //setAngle(360);
-            intervalCount = d->content.size();
-        }
-        else {
-            intervalCount = d->content.size() - 1;
-        }
-        computeTextByPercent(intervalCount);
+    qreal ratio = shorter / bigger;
+    if (d->angle != 360) {
+        computeTextByPercent(d->content.size() - 1);
     }
     else {
-        
-        //按计量圆取出位置后再重新算一遍长度，再计算计量圆半径，再次取出位置
-        if (d->angle != 360) {
-            averageLength = (lengthByPercent) / (d->content.size() - 1);
-            //按计量圆取出位置后再重新算一遍长度，再计算计量圆半径，再次取出位置
+        computeTextByPercent(d->content.size());
 
-            qreal ratio = shorter / bigger;
-            if (d->angle > 250 && (ratio) < 0.35) {
-                computeTextByAffineCircle(d->content.size() - 1);
-            }
-            else{
-                averageLength = computeArcLengthByLineIntersect(averageLength) / (d->content.size() - 1);
-                averageLength = computeArcLengthByLineIntersect(averageLength) / (d->content.size() - 1);
-                computeTextByLineIntersect(averageLength);                
-            }
-            
-            //computeTextByPercent(d->content.size() - 1);
-        }
-        else {
-            /*averageLength = (lengthByPercent*0.5 + P * 0.5) / (d->content.size());
-            averageLength = computeArcLengthByLineIntersect(averageLength) / d->content.size();
-            computeTextByLineIntersect(averageLength);*/
-            computeTextByAffineCircle(d->content.size());
-        }
     }
-    
-    
 }
 
 void LaserCircleText::computeTextByPercent(int intervalCount)
 {
     Q_D(LaserCircleText);
-    qreal interval = 1.0 / intervalCount;
     d->textTransformList.clear();
+    qreal interval = d->arcPath.length() / intervalCount;
     int i = 0;
     for (QPainterPath path : d->originalTextPathList) {
-        QPointF textPos = d->arcPath.pointAtPercent(i * interval);
-        transformTextByCenter(path, textPos, i);
+        qreal length = i * interval;
+        qreal percent = d->arcPath.percentAtLength(length);
+        QPointF textPos = d->arcPath.pointAtPercent(percent);
+        if (d->angle == 360) {
+            transformTextByCenter(path, textPos, i);
+        }
+        else {
+            transformText(path, textPos, i);
+        }        
         i++;
     }
 }
 
-void LaserCircleText::computeTextByLineIntersect(qreal circleRadius)
+void LaserCircleText::computeMoveTextPath(qreal diffAngle)
 {
     Q_D(LaserCircleText);
-    QPointF lastPoint;
-    QPainterPath forwardPath = d->arcPath;
-    QPainterPath backwardPath;
-    QVector<QLineF> arcList;
-    QList<QPointF> lastPointList;
-    d->totalLastedRadian = 0;
-    int i = 0;
-    for (QPainterPath path : d->originalTextPathList) {
-        QPointF curPoint;
-        QPolygonF arcPolygon = forwardPath.toFillPolygon();
-        arcList = LaserPrimitive::edges(forwardPath, true);
-        int h = arcList.size();
-        if (i == 0) {
-            curPoint = d->arcPath.pointAtPercent(0.0);
-            lastPointList.append(d->arcPath.pointAtPercent(0.99));
-        }
-        else{
-            bool isIntersect = false;
-            QPainterPath circlePath;
-            circlePath.addEllipse(QRectF(
-                QPointF(lastPoint.x() - circleRadius, lastPoint.y() - circleRadius),
-                QPointF(lastPoint.x() + circleRadius, lastPoint.y() + circleRadius)));
-            QVector<QLineF> circleList = LaserPrimitive::edges(circlePath);
-            for (QLineF line : arcList) {
-                QPainterPath lPath;
-                QPolygonF linePoly;
-                linePoly.append(line.p1());
-                linePoly.append(line.p2());
-                lPath.addPolygon(linePoly);
-                circlePath.contains(lPath);
-                if(circlePath.intersects(lPath)) {
-                    //需要遍历circle的所有线找交点
-                    for (QLineF cLine : circleList) {
-                        if (cLine.intersect(line, &curPoint)==QLineF::IntersectType::BoundedIntersection) {
-                            isIntersect = true;
-                            break;
-                        }
-                    }
-                }
-                if (isIntersect) {
-                    break;
-                }
-            }
-            if (i == 1) {
-                d->testCPath = circlePath;
-            }
-            if (!isIntersect) {
-                curPoint = QPointF();
-                forwardPath = QPainterPath();
-                backwardPath = QPainterPath();
-                if (i == d->content.size() - 1 && d->angle != 360) {
-                    curPoint = d->arcPath.pointAtPercent(1.0);
-                }
-            }
-            else {
-                computeArc(lastPoint, curPoint, forwardPath, backwardPath);
-            }
-        }
-        if (i == 20) {
-            d->intersectPath = forwardPath;
-            d->testP = curPoint;
-        }
-        transformTextByCenter(path, curPoint, i);
-        if (i > 0) {
-            lastPointList.append(lastPoint);
-        }
-        lastPoint = curPoint;
-        i++;
-    }
-}
-//isBackward,true：从后面也就是minRadian开始计算，false则是从前面也就是maxRadian开始计算
-void LaserCircleText::computeArc(QPointF lastP, QPointF curP, 
-    QPainterPath& forwardPath, QPainterPath& backwardPath)
-{
-    Q_D(LaserCircleText);
-    //QPointF endP = lastP;
-    QPointF c = d->testBounds.center();
-    c = QPointF(c.x() , c.y());
-    QVector2D endV(lastP - c);
-    QVector2D startV(curP - c);    
-    d->testLine0 = QLineF(QPointF(endV.x(), endV.y()), c);
-    d->testLine1 = QLineF(QPointF(startV.x(), startV.y()), c);
-    d->testLine2 = QLineF(lastP, c);
-    d->testLine3 = QLineF(curP, c);
-    endV = QVector2D(endV.x() / 1000.0, endV.y() / 1000.0);
-    startV = QVector2D(startV.x() / 1000.0, startV.y() / 1000.0);
-    endV.normalize();
-    startV.normalize();
-    //qreal w = qRadiansToDegrees( qAtan2(startV.y(), startV.x()));
-    //QVector3D startV3(startV);
-    //QVector3D endV3(endV);
-    //startV3 = startV3.normalized();
-    //endV3 = endV3.normalized();
-    //QVector3D crossV3 = QVector3D::crossProduct(startV3, endV3);
-    //endV = QVector2D(0, 0.99);
-    //startV = QVector2D(-0.36, 0.93);
-    qreal r = endV.length();
-    qreal r1 = startV.length();
-    //qreal l1 = QVector2D::dotProduct(endV, startV);
-    qreal l1 = endV.x() * startV.x() + endV.y() * startV.y();
-    //l1 = QVector2D::dotProduct(QVector2D(0, 1), QVector2D(0, -1));
-    qreal radian = acosf(l1);
-    d->totalLastedRadian += radian;
-    qreal bStartAngle = mapToAffineCircleAngle(d->minRadian);
-    qreal fStartAngle = mapToAffineCircleAngle(d->maxRadian - d->totalLastedRadian);
-    forwardPath = QPainterPath();
-    backwardPath = QPainterPath();
-    if (forwardPath.isEmpty()) {
-        qDebug() << "";
-    }
-    //forwardPath = d->arcPath;
-    forwardPath.moveTo(curP);
-    forwardPath.arcTo(textArcRect(), fStartAngle, -(fStartAngle - d->minAngle_affine));
-    backwardPath.moveTo(d->arcPath.pointAtPercent(1.0));
-    backwardPath.arcTo(textArcRect(), bStartAngle, fStartAngle - d->minAngle_affine);
+    qreal radian = qDegreesToRadians(diffAngle);
+    d->maxRadian += radian;
+    d->minRadian += radian;
+    computeTextPath(d->angle,d->size, false);
 }
 
-qreal LaserCircleText::computeTextByAffineCircle(int size)
+void LaserCircleText::computeChangeAngle(qreal diffAngle)
 {
     Q_D(LaserCircleText);
-    qreal interval = 1.0 / size;
-    int i = 0;
-    QRectF rect = textArcRect();
-    qreal wR = rect.width();
-    qreal hR = rect.height();
-    qreal shorter = wR;
-    qreal bigger = hR;
-    if (wR > hR) {
-        shorter = hR;
-        bigger = wR;
-    }
-    QPainterPath circlePath;
-    QPointF leftTop = QPointF(d->boundingRect.center().x() - shorter * 0.5, d->boundingRect.center().y() - shorter * 0.5);
-    QRectF cRect = QRectF(leftTop.x(), leftTop.y(), shorter, shorter);
-    circlePath.addEllipse(cRect);
-    QPainterPath arc;
-    //arc.arcMoveTo(cRect, qRadiansToDegrees( d->maxRadian));
-    //arc.arcTo(cRect, qRadiansToDegrees(d->maxRadian), -d->angle);
-    arc.arcMoveTo(cRect, d->maxAngle_affine);
-    arc.arcTo(cRect, d->maxAngle_affine, -d->angle_affine);
-    d->intersectPath = arc;
-    QVector<QLineF> arcEdges = LaserPrimitive::edges(d->arcPath, true);
-    for (QPainterPath path : d->originalTextPathList) {
-        QPointF ePoint = d->arcPath.pointAtPercent(interval * i);
-        QPointF pointCircle = arc.pointAtPercent(interval * i);
-        QVector2D vec = QVector2D(pointCircle - d->boundingRect.center()).normalized();
-        vec = vec * bigger;
-        QPointF point(d->boundingRect.center().x() + vec.x(), d->boundingRect.center().y() + vec.y());
-        QLineF line(d->boundingRect.center(), point);
-        
-        QPolygonF poly;
-        QPainterPath linePath;
-        poly.append(d->boundingRect.center());
-        poly.append(point);
-        linePath.addPolygon(poly);
-        QPointF curPoint;
-        if (i == d->content.size() - 1) {
-            d->intersectPath = linePath;
-        }
-        if (d->arcPath.intersects(linePath)) {
-            
-            for (QLineF arcLine : arcEdges) {
-                if (i == 0 || i == d->content.size() - 1) {
-                    curPoint = ePoint;
-                }
-                else {
-                    if (arcLine.intersect(line, &curPoint) == QLineF::IntersectType::BoundedIntersection) {
-                        break;
-                    }
-                }
-                
-            }
-        }
-        QPointF pos = ePoint * (1 - shorter / bigger) + curPoint * (shorter / bigger);
-        //QPointF pos = ePoint * 0.65 + curPoint * 0.35;
-        //QPointF pos = ePoint;
-        transformTextByCenter(path, pos, i);
-        i++;
-    }
-    return qreal();
+    computeTextPath(d->angle + diffAngle, d->size, false);
 }
 
+void LaserCircleText::computeChangeTextHeight(qreal diffHeight)
+{
+    Q_D(LaserCircleText);
+    qreal height = d->size.height();
+    height += diffHeight;
+    computeTextPath(d->angle, QSize(d->size.width(), height), false);
+}
+
+void LaserCircleText::resizeRadian()
+{
+    Q_D(LaserCircleText);
+    qreal range = M_PI * 2;
+    if (d->maxRadian > range) {
+        d->maxRadian -= range;
+        d->minRadian -= range;
+    }
+    else if (d->minRadian < range || d->maxRadian < 0) {
+        d->maxRadian += range;
+        d->minRadian += range;
+    }
+}
+
+QPainterPath * LaserCircleText::textArc()
+{
+    Q_D(LaserCircleText);
+    return &d->arcPath;
+}
+/*
+QPointF LaserCircleText::startPoint()
+{
+    Q_D(LaserCircleText);
+    QPainterPath textEllipse;
+    textEllipse.addEllipse(textArcRect());
+    QPointF point = textEllipse.pointAtPercent(0.5);
+    point = QPointF(point.x() + d->size.height(), point.y());
+    return point;
+}
+
+QPointF LaserCircleText::endPoint()
+{
+    Q_D(LaserCircleText);
+    QPainterPath textEllipse;
+    textEllipse.addEllipse(textArcRect());
+    QPointF oP = textEllipse.pointAtPercent(0);
+    oP = QPointF(oP.x() - d->size.height(), oP.y());
+    return oP;
+}
+
+QPointF LaserCircleText::centerPoint()
+{
+    Q_D(LaserCircleText);
+    QPainterPath textEllipse;
+    textEllipse.addEllipse(textArcRect());
+    QPointF point = textEllipse.pointAtPercent(0.75);
+    point = QPointF(point.x(), point.y() + d->size.height());
+    return point;
+}*/
+
+QSize LaserCircleText::textSize()
+{
+    Q_D(LaserCircleText);
+    return d->size;
+}
 
 void LaserCircleText::draw(QPainter * painter)
 {
     Q_D(LaserCircleText);
-    //painter->drawRect(d->boundingRect);
-    int i = 0; 
-    for (QPainterPath path : d->originalTextPathList) {
-        //painter->drawPolygon(d->textTransformList[i].map(path.boundingRect()));
-        i++;
-    }
     QPainterPath ellipse;
     ellipse.addEllipse(d->boundingRect);
-    //painter->drawPath(ellipse);
+    painter->setBrush(QBrush(this->layer()->color()));
     painter->drawPath(d->textPath);
-   
-    //painter->drawPath(d->arcPath);
-    //painter->drawPath(computeArc(d->arcPath.pointAtPercent(0.0), d->arcPath.pointAtPercent(0.5)));
-    int j = 0;
-    for (QPainterPath cPath : d->testCircles) {
-        if (j == 1) {
-            //painter->drawPath(cPath);
-        }
-        
-        j++;
-    }
-    painter->drawPath(d->intersectPath);
-    painter->drawPath(d->arcPath);
-    //painter->drawLine(QLineF(d->arcPath.pointAtPercent(0), d->boundingRect.center()));
-    //painter->drawLine(QLineF(d->testP, d->boundingRect.center()));
-    //painter->drawLine(QLineF(d->arcPath.pointAtPercent(1), d->boundingRect.center()));
-    //painter->drawPath(d->testCPath);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPath(d->path);
     
-    
-    painter->drawLine(d->testLine0);
-    //painter->drawLine(d->testLine1);
-    //painter->drawLine(d->testLine2);
-    //painter->drawLine(d->testLine3);
-    QPen pen;
-    pen.setColor(Qt::red);
-    pen.setWidth(300);
-    
-    painter->setPen(pen);
-    painter->drawPoint(d->testP);
-    //painter->drawPoint(d->boundingRect.center());
-    //painter->drawPath(d->testPath);
-    //QPainterPath path;
-    QPen pen0;
-    pen0.setColor(Qt::yellow);
-    pen0.setWidth(5000);
-    painter->setPen(pen0);
-    painter->drawPath(d->intersectPath0);
+    /*QPainterPath textEllipse;
+    textEllipse.addEllipse(textArcRect());
+    painter->drawPath(textEllipse);
+    QPointF oP = textEllipse.pointAtPercent(0);*/
 }
 
 LaserPrimitive * LaserCircleText::clone(QTransform t)
@@ -4206,8 +3936,12 @@ QJsonObject LaserCircleText::toJson()
     object.insert("angle", d->angle);
     object.insert("layerIndex", layerIndex());
     object.insert("content", d->content);
-    //object.insert("size", d->size);
-    //未完
+    QJsonArray size = {d->size.width(), d->size.height()};
+    object.insert("size", size);
+    object.insert("maxRadian", d->maxRadian);
+    object.insert("minRadian", d->minRadian);
+    QJsonArray bounds = { d->boundingRect.x(), d->boundingRect.y(),d->boundingRect.width(), d->boundingRect.height() };
+    object.insert("bounds", bounds);
     return object;
 }
 
@@ -4236,6 +3970,7 @@ void LaserCircleText::setBoundingRectWidth(qreal width)
     QPainterPath p;
     p.addRect(d->boundingRect);
     d->path = p;
+    computeTextPath(d->angle, d->size, false);
 }
 
 void LaserCircleText::setBoundingRectHeight(qreal height)
@@ -4247,6 +3982,7 @@ void LaserCircleText::setBoundingRectHeight(qreal height)
     QPainterPath p;
     p.addRect(d->boundingRect);
     d->path = p;
+    computeTextPath(d->angle, d->size, false);
 }
 
 class LaserHorizontalTextPrivate : public LaserShapePrivate
@@ -4314,7 +4050,6 @@ void LaserHorizontalText::computeTextPath()
     for (QPainterPath& path : d->textPathList) {
         qreal spaceX = (d->variableBounds.width() - d->size.width() * d->textPathList.size()) / (d->textPathList.size() - 1);
         qreal posX = d->variableBounds.left() + index * (d->size.width() + spaceX) ;
-        //qreal posX = d->variableBounds.left();
         qreal lastPosX = path.boundingRect().left();
         QTransform t;
         t.translate(posX - lastPosX, 0);
@@ -4390,4 +4125,80 @@ void LaserHorizontalText::setBoundingRectWidth(qreal width)
         width, d->variableBounds.height());
    
     computeTextPath();
+}
+
+void LaserHorizontalText::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserHorizontalText);
+    qreal diff = d->variableBounds.height() - height;
+    d->variableBounds = QRect(d->variableBounds.x(), d->variableBounds.y() + diff * 0.5,
+        d->variableBounds.width(), height);
+
+    computeTextPath();
+}
+
+class LaserVerticalTextPrivate : public LaserShapePrivate
+{
+    Q_DECLARE_PUBLIC(LaserVerticalText)
+public:
+    LaserVerticalTextPrivate(LaserVerticalText* ptr)
+        : LaserShapePrivate(ptr)
+    {
+    }
+    QString content;
+    QSize size;
+    QList<QPainterPath> textPathList;
+};
+LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size,
+    QTransform transform, int layerIndex)
+    :LaserShape(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT, layerIndex, transform)
+{
+}
+LaserVerticalText::~LaserVerticalText()
+{
+}
+
+void LaserVerticalText::initTextPath()
+{
+}
+
+void LaserVerticalText::computeTextPath()
+{
+}
+
+void LaserVerticalText::draw(QPainter * painter)
+{
+}
+
+LaserPrimitive * LaserVerticalText::clone(QTransform t)
+{
+    return nullptr;
+}
+
+QJsonObject LaserVerticalText::toJson()
+{
+    return QJsonObject();
+}
+
+QVector<QLineF> LaserVerticalText::edges()
+{
+    return QVector<QLineF>();
+}
+
+bool LaserVerticalText::isClosed() const
+{
+    return false;
+}
+
+QPointF LaserVerticalText::position() const
+{
+    return QPointF();
+}
+
+void LaserVerticalText::setBoundingRectWidth(qreal width)
+{
+}
+
+void LaserVerticalText::setBoundingRectHeight(qreal height)
+{
 }
