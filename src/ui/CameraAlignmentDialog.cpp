@@ -34,6 +34,7 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
     , m_calibrator(calibrator)
     , m_waitingForImage(false)
 {
+    installEventFilter(this);
     Config::Device::startFromItem()->push();
     Config::Export::imageQualityItem()->push();
 
@@ -235,8 +236,8 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
 
     connect(m_cameraController, &CameraController::connected, this, &CameraAlignmentDialog::onCameraConnected);
     connect(m_cameraController, &CameraController::disconnected, this, &CameraAlignmentDialog::onCameraDisconnected);
-    connect(m_cameraController, &CameraController::frameCaptured, this, &CameraAlignmentDialog::onFrameCaptured);
     m_cameraController->start();
+    m_cameraController->registerSubscriber(this);
 
     setLeftLayoutWidth(120);
     appendPage(m_page1);
@@ -252,8 +253,72 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
 
 CameraAlignmentDialog::~CameraAlignmentDialog()
 {
+    m_cameraController->unregisterSubscriber(this);
 }
 
+bool CameraAlignmentDialog::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == Event_CameraFrame) {
+        CameraFrameEvent* frameEvent = static_cast<CameraFrameEvent*>(event);
+        m_frameStatus->setText(tr("fps: %1, duration: %2").arg(1000.0 / frameEvent->duration(), 0, 'f', 3).arg(frameEvent->duration()));
+
+        if (!m_waitingForImage)
+            return true;
+
+        m_waitingForImage = false;
+        m_calibrator->undistortImage(frameEvent->processedImage());
+
+        if (currentIndex() == 1)
+        {
+            QImage image(frameEvent->processedImage().data, frameEvent->processedImage().cols, frameEvent->processedImage().rows, frameEvent->processedImage().step, QImage::Format_RGB888);
+            QGraphicsPixmapItem* pixmapItem = m_page2Scene->addPixmap(QPixmap::fromImage(image));
+            m_page2Viewer->fitInView(pixmapItem, Qt::KeepAspectRatio);
+        }
+        else if (currentIndex() == 2)
+        {
+            m_page3Scene->clear();
+
+            QPen pen(Qt::gray, 2);
+            pen.setCosmetic(true);
+            m_page3Scene->clear();
+            m_page3Scene->addRect(LaserApplication::device->layoutRect())->setPen(pen);
+
+
+            cv::Mat perspected;
+            m_calibrator->perspective(frameEvent->processedImage(), perspected);
+            m_calibrator->alignToCanvas(perspected, m_page3Scene);
+
+            int markSize = m_page1SpinBoxMarkSize->value() * 1000;
+            int halfMarkSize = markSize / 2;
+
+            pen.setColor(Qt::blue);
+            pen.setWidth(1);
+            QRect rect;
+            QPainterPath painterPath;
+
+            // draw top left
+            addMarkToScene(halfMarkSize, m_mark0, pen, m_page3Scene, rect, painterPath);
+
+            // draw top right
+            addMarkToScene(halfMarkSize, m_mark1, pen, m_page3Scene, rect, painterPath);
+
+            // draw bottom left
+            addMarkToScene(halfMarkSize, m_mark2, pen, m_page3Scene, rect, painterPath);
+
+            // draw bottom right
+            addMarkToScene(halfMarkSize, m_mark3, pen, m_page3Scene, rect, painterPath);
+
+            // draw center
+            addMarkToScene(halfMarkSize, m_mark4, pen, m_page3Scene, rect, painterPath);
+            m_page3Viewer->fitInView(m_page3Scene->sceneRect(), Qt::KeepAspectRatio);
+        }        
+        return true;
+    }
+    else {
+        // standard event processing
+        return QObject::eventFilter(obj, event);
+    }
+}
 void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
     if (m_doc)
@@ -481,62 +546,6 @@ void CameraAlignmentDialog::onCameraDisconnected()
     m_labelStatus->setStyleSheet("color: rgb(255, 0, 0)");
 }
 
-void CameraAlignmentDialog::onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args)
-{
-    m_frameStatus->setText(tr("fps: %1, duration: %2").arg(1000.0 / args.duration, 0, 'f', 3).arg(args.duration));
-
-    if (!m_waitingForImage)
-        return;
-
-    m_waitingForImage = false;
-    m_calibrator->undistortImage(processed);
-
-    if (currentIndex() == 1)
-    {
-        QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
-        QGraphicsPixmapItem* pixmapItem = m_page2Scene->addPixmap(QPixmap::fromImage(image));
-        m_page2Viewer->fitInView(pixmapItem, Qt::KeepAspectRatio);
-    }
-    else if (currentIndex() == 2)
-    {
-        m_page3Scene->clear();
-
-        QPen pen(Qt::gray, 2);
-        pen.setCosmetic(true);
-        m_page3Scene->clear();
-        m_page3Scene->addRect(LaserApplication::device->layoutRect())->setPen(pen);
-        
-        
-        cv::Mat perspected;
-        m_calibrator->perspective(processed, perspected);
-        m_calibrator->alignToCanvas(perspected, m_page3Scene);
-
-        int markSize = m_page1SpinBoxMarkSize->value() * 1000;
-        int halfMarkSize = markSize / 2;
-
-        pen.setColor(Qt::blue);
-        pen.setWidth(1);
-        QRect rect;
-        QPainterPath painterPath;
-
-        // draw top left
-        addMarkToScene(halfMarkSize, m_mark0, pen, m_page3Scene, rect, painterPath);
-
-        // draw top right
-        addMarkToScene(halfMarkSize, m_mark1, pen, m_page3Scene, rect, painterPath);
-
-        // draw bottom left
-        addMarkToScene(halfMarkSize, m_mark2, pen, m_page3Scene, rect, painterPath);
-
-        // draw bottom right
-        addMarkToScene(halfMarkSize, m_mark3, pen, m_page3Scene, rect, painterPath);
-
-        // draw center
-        addMarkToScene(halfMarkSize, m_mark4, pen, m_page3Scene, rect, painterPath);
-        m_page3Viewer->fitInView(m_page3Scene->sceneRect(), Qt::KeepAspectRatio);
-    }
-}
-
 void CameraAlignmentDialog::onMarkIndexChanged(bool checked)
 {
     if (!checked)
@@ -554,9 +563,9 @@ void CameraAlignmentDialog::onDeviceStateChanged(DeviceState state)
 {
     if (state.workingMode == LaserWorkMode::LWM_STOP)
     {
-        QPointF userOrigin = LaserApplication::device->userOrigin();
+        QVector3D userOrigin = LaserApplication::device->userOrigin();
         qLogD << "user origin: " << userOrigin;
-        LaserApplication::device->moveTo(QVector3D(userOrigin.x(), userOrigin.y(),
-            LaserApplication::device->currentZ()));
+        LaserApplication::device->moveTo(QVector4D(userOrigin.x(), userOrigin.y(),
+            LaserApplication::device->currentZ(), userOrigin.z()));
     }
 }

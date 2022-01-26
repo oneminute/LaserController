@@ -35,10 +35,6 @@ private:
     typedef int(__stdcall *FN_INT_INT_INT)(int, int);
     typedef int(*FN_INT_VOID)();
 
-    typedef void(__stdcall *FNSetSoftwareInitialization)(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
-    //typedef void(__stdcall *FNSetRotateDeviceParam)(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
-    typedef void(__stdcall *FNSetHardwareInitialization)(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
-
     typedef int(__stdcall *FN_INT_WCHART_WCHART)(wchar_t* address, wchar_t* data);
     typedef int(__stdcall *FN_INT_WCHART)(wchar_t* address);
 
@@ -72,7 +68,6 @@ private:
         bool uMoveStyle,
         int uPos
         );
-    typedef void(__stdcall *FNSmallScaleMovement)(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
 
     typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
     typedef int(__stdcall *FN_INT_BOOL)(bool pause);
@@ -119,9 +114,6 @@ public:
     bool initComPort(const QString& name);
     bool uninitComPort();
     void setTransTimeOutInterval(int interval);
-    void setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight);
-    //void setRotateDeviceParam(int type, int perimeterPulse, int materialPerimeter, int deviceDPI, bool autoScaleDimensions);
-    void setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates);
 
     bool writeSysParamToCard(const LaserRegister::RegistersMap& values);
     bool readSysParamFromCard(QList<int> addresses);
@@ -200,7 +192,7 @@ public:
 
     QVector3D getCurrentLaserPos();
     void smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed);
-    void startMachining(int packIndex);
+    void startMachining(int packIndex = 0);
     int pauseContinueMachining(bool pause);
     void stopMachining();
     int controlMotor(bool open);
@@ -209,7 +201,6 @@ public:
     int importData(const char* data, int length);
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
-    int getUpdatePanelHandle(int version, int wndId);
     void startSoftUpdateWizard();
     void startFirmwareUpdateWizard();
 
@@ -281,9 +272,6 @@ private:
     FN_INT_VOID m_fnUnInitComPort;
 
     FN_VOID_INT m_fnSetTransTimeOutInterval;
-    FNSetSoftwareInitialization m_fnSetSoftwareInitialization;
-    //FNSetRotateDeviceParam m_fnSetRotateDeviceParam;
-    FNSetHardwareInitialization m_fnSetHardwareInitialization;
 
     FN_INT_WCHART_WCHART m_fnWriteSysParamToCard;
     FN_INT_WCHART m_fnReadSysParamFromCard;
@@ -303,7 +291,6 @@ private:
     FNLPenQuickMoveTo m_fnLPenQuickMoveTo;
     FNCheckMoveLaserMotors m_fnCheckMoveLaserMotors;
     FN_VOID_VOID m_fnStartMoveLaserMotors;
-    FN_VOID_INT m_fnControlHDAction;
 
     FN_WCHART_VOID m_fnGetMainHardVersion;
     FN_WCHART_VOID m_fnGetHardwareIdentID;
@@ -319,7 +306,6 @@ private:
     FN_WCHART_VOID m_fnGetMainHardModal;
 
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
-    FNSmallScaleMovement m_fnSmallScaleMovement;
     FN_VOID_INT m_fnStartMachining;
     FN_INT_BOOL m_fnPauseContinueMachining;
     FN_VOID_VOID m_fnStopMachining;
@@ -330,10 +316,7 @@ private:
 
     FN_VOID_VOID m_fnGetDeviceWorkState;
 
-    FN_INT_DOUBLE_BOOL m_fnMillimeter2MicroStep;
-
     FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
-    FN_INT_INT_INT m_fnGetUpdatePanelHandle;
 
     FN_INT_WCHART m_fnActivationMainCardEx;
     FN_WCHART_WCHART_WCHART m_fnRegisterMainCard;

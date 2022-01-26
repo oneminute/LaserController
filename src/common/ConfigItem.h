@@ -98,8 +98,9 @@ public:
     void push();
     void pop();
 
-protected:
     InputWidgetWrapper* bindWidget(QWidget* widget, StoreStrategy ss);
+
+protected:
     void setNeedRelaunch(bool needRelaunch);
 
     /// <summary>

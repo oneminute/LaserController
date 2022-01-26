@@ -125,6 +125,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 {
     m_ui->setupUi(this);
     loadRecentFilesMenu();
+    installEventFilter(this);
     
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
@@ -1127,7 +1128,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_calibrator = new DistortionCalibrator;
     connect(m_cameraController, &CameraController::connected, this, &LaserControllerWindow::onCameraConnected);
     connect(m_cameraController, &CameraController::disconnected, this, &LaserControllerWindow::onCameraDisconnected);
-    connect(m_cameraController, &CameraController::frameCaptured, this, &LaserControllerWindow::onFrameCaptured);
+    m_cameraController->registerSubscriber(this);
     if (Config::Camera::autoConnect())
         m_cameraController->start();
 
@@ -2388,29 +2389,9 @@ void LaserControllerWindow::createMovementDockPanel()
     m_lineEditCoordinatesU->setReadOnly(true);
     m_lineEditCoordinatesU->setText(QString::number(0.0, 'f', 2));
 
-    m_doubleSpinBoxDistanceX = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceX->setDecimals(2);
-    m_doubleSpinBoxDistanceX->setValue(10.0);
-    m_doubleSpinBoxDistanceX->setMinimum(0);
-    m_doubleSpinBoxDistanceX->setMaximum(1000);
-
-    m_doubleSpinBoxDistanceY = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceY->setDecimals(2);
-    m_doubleSpinBoxDistanceY->setValue(10.0);
-    m_doubleSpinBoxDistanceY->setMinimum(0);
-    m_doubleSpinBoxDistanceY->setMaximum(1000);
-
-    m_doubleSpinBoxDistanceZ = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceZ->setDecimals(2);
-    m_doubleSpinBoxDistanceZ->setValue(10.0);
-    m_doubleSpinBoxDistanceZ->setMinimum(0);
-    m_doubleSpinBoxDistanceZ->setMaximum(1000);
-
-    m_doubleSpinBoxDistanceU = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceU->setDecimals(2);
-    m_doubleSpinBoxDistanceU->setValue(10.0);
-    m_doubleSpinBoxDistanceU->setMinimum(0);
-    m_doubleSpinBoxDistanceU->setMaximum(1000);
+    FloatEditSlider* stepLength = InputWidgetWrapper::createWidget<FloatEditSlider*>(
+        Config::UserRegister::movementStepLengthItem());
+    Config::UserRegister::movementStepLengthItem()->bindWidget(stepLength, SS_REGISTER);
 
     QGridLayout* firstRow = new QGridLayout;
     firstRow->setMargin(0);
@@ -2424,14 +2405,8 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->addWidget(new QLabel(tr("U")), 0, 7);
     firstRow->addWidget(m_lineEditCoordinatesU, 0, 8);
     firstRow->addWidget(new QLabel(tr("Distance(mm)")), 1, 0);
-    firstRow->addWidget(new QLabel(tr("X")), 1, 1);
-    firstRow->addWidget(m_doubleSpinBoxDistanceX, 1, 2);
-    firstRow->addWidget(new QLabel(tr("Y")), 1, 3);
-    firstRow->addWidget(m_doubleSpinBoxDistanceY, 1, 4);
-    firstRow->addWidget(new QLabel(tr("Z")), 1, 5);
-    firstRow->addWidget(m_doubleSpinBoxDistanceZ, 1, 6);
-    firstRow->addWidget(new QLabel(tr("U")), 1, 7);
-    firstRow->addWidget(m_doubleSpinBoxDistanceU, 1, 8);
+    firstRow->addWidget(new QLabel(tr("Step Length(mm)")), 1, 1);
+    firstRow->addWidget(stepLength, 1, 2, 1, 6);
     firstRow->setColumnStretch(0, 1);
     firstRow->setColumnStretch(1, 0);
     firstRow->setColumnStretch(2, 1);
@@ -3963,57 +3938,57 @@ void LaserControllerWindow::onActionWorkState(bool checked)
 
 void LaserControllerWindow::onActionMoveTop()
 {
-    QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, -Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottom()
 {
-    QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveLeft()
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), 0, 0);
+    QVector3D delta(-Config::UserRegister::movementStepLength(), 0, 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveRight()
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), 0, 0);
+    QVector3D delta(Config::UserRegister::movementStepLength(), 0, 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopLeft()
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-Config::UserRegister::movementStepLength(), -Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopRight()
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(Config::UserRegister::movementStepLength(), -Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomLeft()
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-Config::UserRegister::movementStepLength(), Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomRight()
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(Config::UserRegister::movementStepLength(), Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveUp()
 {
     int z = Config::Device::zReverseDirection() ?
-        m_doubleSpinBoxDistanceZ->value() :
-        -m_doubleSpinBoxDistanceZ->value();
+        Config::UserRegister::movementStepLength() :
+        -Config::UserRegister::movementStepLength();
     QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
@@ -4021,8 +3996,8 @@ void LaserControllerWindow::onActionMoveUp()
 void LaserControllerWindow::onActionMoveDown()
 {
     int z = Config::Device::zReverseDirection() ?
-        -m_doubleSpinBoxDistanceZ->value() :
-        m_doubleSpinBoxDistanceZ->value();
+        -Config::UserRegister::movementStepLength() :
+        Config::UserRegister::movementStepLength();
     QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
@@ -4376,10 +4351,10 @@ void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 
 void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 {
-    QPointF userOrigin = LaserApplication::device->userOrigin();
+    QVector3D userOrigin = LaserApplication::device->userOrigin();
     qLogD << "user origin: " << userOrigin;
-    LaserApplication::device->moveTo(QVector3D(userOrigin.x(), userOrigin.y(), 
-        LaserApplication::device->currentZ()));
+    LaserApplication::device->moveTo(QVector4D(userOrigin.x(), userOrigin.y(), 
+        LaserApplication::device->currentZ(), userOrigin.z()));
 }
 
 void LaserControllerWindow::onActionBitmap(bool checked)
@@ -4715,11 +4690,11 @@ void LaserControllerWindow::onActionCameraTools(bool checked)
 
 void LaserControllerWindow::onActionCameraCalibration()
 {
-    disconnect(m_cameraController, &CameraController::frameCaptured, this, &LaserControllerWindow::onFrameCaptured);
+    m_cameraController->unregisterSubscriber(this);
     CalibrationDialog dlg(m_cameraController, m_calibrator);
     dlg.exec();
     m_calibrator->loadCoeffs();
-    connect(m_cameraController, &CameraController::frameCaptured, this, &LaserControllerWindow::onFrameCaptured);
+    m_cameraController->registerSubscriber(this);
 }
 
 void LaserControllerWindow::onActionGenerateCalibrationBoard()
@@ -4729,11 +4704,11 @@ void LaserControllerWindow::onActionGenerateCalibrationBoard()
 
 void LaserControllerWindow::onActionCameraAlignment()
 {
-    disconnect(m_cameraController, &CameraController::frameCaptured, this, &LaserControllerWindow::onFrameCaptured);
+    m_cameraController->unregisterSubscriber(this);
     CameraAlignmentDialog dlg(m_cameraController, m_calibrator);
     dlg.exec();
     m_calibrator->loadCoeffs();
-    connect(m_cameraController, &CameraController::frameCaptured, this, &LaserControllerWindow::onFrameCaptured);
+    m_cameraController->registerSubscriber(this);
 }
 
 void LaserControllerWindow::onActionCameraUpdateOverlay()
@@ -5085,6 +5060,33 @@ void LaserControllerWindow::retranslate()
     qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 6)->widget())->setText(tr("Upper Case"));
 }
 
+bool LaserControllerWindow::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == Event_CameraFrame) {
+        CameraFrameEvent* frameEvent = static_cast<CameraFrameEvent*>(event);
+        QImage image(frameEvent->thumbImage().data, frameEvent->thumbImage().cols, frameEvent->thumbImage().rows, frameEvent->thumbImage().step, QImage::Format_RGB888);
+        m_cameraViewer->setImage(image);
+        m_cameraViewer->fit();
+
+        if (m_requestOverlayImage && m_scene && m_scene->document())
+        {
+            m_requestOverlayImage = false;
+            cv::Mat perspected;
+            m_calibrator->undistortImage(frameEvent->processedImage());
+            m_calibrator->perspective(frameEvent->processedImage(), perspected);
+            QImage persImage(perspected.data, perspected.cols, perspected.rows, perspected.step, QImage::Format_RGB888);
+            m_scene->setImage(persImage);
+            m_scene->update();
+            m_viewer->viewport()->update();
+        }
+        return true;
+    }
+    else {
+        // standard event processing
+        return QObject::eventFilter(obj, event);
+    }
+}
+
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
     qreal mmX = pos.x() * 0.001;
@@ -5203,6 +5205,7 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
     qLogD << "json data: ";
     qLogD << data;
     LaserApplication::driver->importData(data.data(), data.size());
+    LaserApplication::driver->startMachining();
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
@@ -5887,6 +5890,7 @@ void LaserControllerWindow::onActionTwoShapesUnite()
 
 void LaserControllerWindow::onCameraConnected()
 {
+    m_buttonCameraStart->removeAction(m_ui->actionStartCamera);
     m_buttonCameraStart->setDefaultAction(m_ui->actionStopCamera);
     m_statusBarCameraState->setText(tr("Camera Connected"));
     m_statusBarCameraState->setStyleSheet("color: rgb(0, 255, 0)");
@@ -5894,29 +5898,10 @@ void LaserControllerWindow::onCameraConnected()
 
 void LaserControllerWindow::onCameraDisconnected()
 {
+    m_buttonCameraStart->removeAction(m_ui->actionStopCamera);
     m_buttonCameraStart->setDefaultAction(m_ui->actionStartCamera);
     m_statusBarCameraState->setText(tr("Camera Disonnected"));
     m_statusBarCameraState->setStyleSheet("color: rgb(255, 0, 0)");
-}
-
-void LaserControllerWindow::onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args)
-{
-    //m_frameStatus->setText(tr("fps: %1, duration: %2").arg(1000.0 / args.duration, 0, 'f', 3).arg(args.duration));
-    QImage image(origin.data, origin.cols, origin.rows, origin.step, QImage::Format_RGB888);
-    m_cameraViewer->setImage(image);
-    m_cameraViewer->fit();
-
-    if (m_requestOverlayImage && m_scene && m_scene->document())
-    {
-        m_requestOverlayImage = false;
-        cv::Mat perspected;
-        m_calibrator->undistortImage(processed);
-        m_calibrator->perspective(processed, perspected);
-        QImage persImage(perspected.data, perspected.cols, perspected.rows, perspected.step, QImage::Format_RGB888);
-        m_scene->setImage(persImage);
-        m_scene->update();
-        m_viewer->viewport()->update();
-    }
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)

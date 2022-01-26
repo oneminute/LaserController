@@ -229,7 +229,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         docOrigin = QPoint(0, 0);
         break;
     case SFT_UserOrigin:
-        docOrigin = LaserApplication::device->userOrigin();
+        docOrigin = LaserApplication::device->userOrigin().toPoint();
         break;
     }
 
@@ -472,7 +472,7 @@ void LaserDocument::exportBoundingJSON()
         docOrigin = QPoint(0, 0);
         break;
     case SFT_UserOrigin:
-        docOrigin = LaserApplication::device->userOrigin();
+        docOrigin = LaserApplication::device->userOrigin().toPoint();
         break;
     }
     QJsonObject laserDocumentInfo;
@@ -775,7 +775,7 @@ QRect LaserDocument::currentDocBoundingRect(bool includingAccSpan) const
     QRect bounding = absoluteDocBoundingRect(includingAccSpan);
     if (Config::Device::startFrom() == SFT_UserOrigin)
     {
-        QPoint userOrigin = LaserApplication::device->userOrigin();
+        QPoint userOrigin = LaserApplication::device->userOrigin().toPoint();
         QPoint jobOrigin = this->jobOriginOnDocBoundingRect();
         QPoint offset = userOrigin - jobOrigin;
         QPoint target = bounding.topLeft() + offset;
@@ -809,7 +809,7 @@ QTransform LaserDocument::transformToReletiveOrigin() const
     QTransform transform;
     QPointF origin;
     if (Config::Device::startFrom() == SFT_UserOrigin)
-        origin = LaserApplication::device->userOrigin();
+        origin = LaserApplication::device->userOrigin().toPoint();
     else if (Config::Device::startFrom() == SFT_CurrentPosition)
         origin = LaserApplication::device->laserPosition();
     QPointF jobOrigin = jobOriginOnDocBoundingRect();

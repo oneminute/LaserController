@@ -134,7 +134,3 @@ Config::UserRegister::minScanGrayRatioItem(),enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-
 Config::UserRegister::defaultMaxCuttingPowerItem(),enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1
 Config::UserRegister::defaultMinCuttingPowerItem(),enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1
 Config::UserRegister::spotShotPowerItem(),enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1
-m_doubleSpinBoxDistanceX,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1
-m_doubleSpinBoxDistanceY,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1
-m_doubleSpinBoxDistanceZ,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1
-m_doubleSpinBoxDistanceU,enabled,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,1,1,1,1,1,1,1

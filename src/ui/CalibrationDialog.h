@@ -16,6 +16,9 @@ public:
     explicit CalibrationDialog(CameraController* cameraController, DistortionCalibrator* calibrator, QWidget* parent = nullptr);
     ~CalibrationDialog();
 
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
 protected slots:
     void onPage1Entered();
     void onPage1Exited();
@@ -28,9 +31,6 @@ protected slots:
 
     void onCameraConnected();
     void onCameraDisconnected();
-
-    void onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args);
-    //void onCalibrationSampleCaptured(cv::Mat mat, qreal error);
 
     void onButtonCaptureClicked();
 

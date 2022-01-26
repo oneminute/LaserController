@@ -1,21 +1,21 @@
 #include "CameraController.h"
 
-#include "common/common.h"
 #include "common/Config.h"
 #include "LaserApplication.h"
 #include "util/ImageUtils.h"
 #include "ImageProcessor.h"
+#include <QtMath>
 
 #include <opencv2/videoio/videoio.hpp>
-//#include <QCamera>
 
 CameraController::CameraController(QObject* parent)
     : QThread(parent)
+    , d_ptr(new CameraControllerPrivate(this))
     , m_videoCapture(new cv::VideoCapture)
     , m_status(CS_IDLE)
     , m_maxQueueLength(10)
 {
-    qRegisterMetaType<FrameArgs>("FrameArgs");
+    connect(d_ptr.data(), &CameraControllerPrivate::frameCaptured, this, &CameraController::onFrameCaptured);
 }
 
 CameraController::~CameraController()
@@ -67,6 +67,27 @@ void CameraController::setAutoLoading(bool value)
 {
 }
 
+void CameraController::registerSubscriber(QObject* subscriber)
+{
+    Q_D(CameraController);
+    if (!d->subscribers.contains(subscriber))
+    {
+        d->subscribers.append(subscriber);
+    }
+}
+
+void CameraController::unregisterSubscriber(QObject* subscriber)
+{
+    Q_D(CameraController);
+    d->subscribers.removeOne(subscriber);
+}
+
+void CameraController::clearFrameCache()
+{
+    Q_D(CameraController);
+    d->frameEvent = nullptr;
+}
+
 QList<int> CameraController::supportedCameras()
 {
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
@@ -87,24 +108,37 @@ QList<int> CameraController::supportedCameras()
 
 void CameraController::run()
 {
+    Q_D(CameraController);
     cv::Mat frame;
     cv::Mat origin;
     cv::Mat processed;
+    cv::Mat thumb;
     m_status = CS_STARTED;
     int errorCount = 0;
     m_lastTime = QDateTime::currentDateTime();
+    QSize thumbSize = Config::Camera::thumbResolution();
+    QSize originSize = Config::Camera::resolution();
     int index = -1;
+    int idleCount = 0;
     while (m_status == CS_STARTED)
     {
         if (m_videoCapture->isOpened())
         {
             while (m_status == CS_STARTED)
             {
+                QMutexLocker locker(&m_mutex);
+                if (d->processing)
+                {
+                    idleCount++;
+                    QThread::currentThread()->msleep(10);
+                    continue;
+                }
                 bool ok = m_videoCapture->read(frame);
                 QDateTime currTime = QDateTime::currentDateTime();
                 qint64 duration = m_lastTime.msecsTo(currTime);
                 m_lastTime = currTime;
-                //qLogD << duration << "ms";
+                //qLogD << duration << "ms, idle count: " << idleCount;
+                idleCount = 0;
                 if (!ok || frame.empty())
                 {
                     emit error(Error_No_Data);
@@ -119,6 +153,10 @@ void CameraController::run()
                     continue;
                 }
                 cv::cvtColor(frame, origin, cv::COLOR_RGB2BGR);
+                qreal xScale = thumbSize.width() * 1.0 / originSize.width();
+                qreal yScale = thumbSize.height() * 1.0 / originSize.height();
+                qreal scale = qMin(1.0, qMax(xScale, yScale));
+                cv::resize(origin, thumb, cv::Size(), scale, scale);
                 processed = origin.clone();
                 index++;
 
@@ -138,11 +176,21 @@ void CameraController::run()
 
                 if (done)
                 {
-                    FrameArgs args;
-                    args.duration = duration;
-                    args.frameIndex = index;
-                    args.timestamp = currTime;
-                    emit frameCaptured(processed, origin, args);
+                    d->frameEvent = new CameraFrameEvent(this);
+                    d->frameEvent->setDuration(duration);
+                    d->frameEvent->setFrameIndex(index);
+                    d->frameEvent->setTimestamp(currTime);
+                    d->frameEvent->setOriginImage(origin);
+                    d->frameEvent->setThumbImage(thumb);
+                    d->frameEvent->setProcessedImage(processed);
+                    d->processing = true;
+                    emit d->frameCaptured();
+                }
+
+                if (m_status != CS_STARTED)
+                {
+                    m_videoCapture->release();
+                    emit disconnected();
                 }
             }
         }
@@ -164,6 +212,30 @@ void CameraController::run()
     }
 }
 
+void CameraController::onFrameCaptured()
+{
+    Q_D(CameraController);
+    QMutexLocker locker(&m_mutex);
+    QDateTime currTime = QDateTime::currentDateTime();
+    for (QObject* subscriber : d->subscribers)
+    {
+        LaserApplication::sendEvent(subscriber, d->frameEvent);
+    }
+    SAFE_DELETE(d->frameEvent);
+    d->processing = false;
+    qint64 duration = m_lastTime.msecsTo(currTime);
+    //qLogD << "sending events duration: " << duration;
+}
+
+void CameraController::postFrameCapturedEvents()
+{
+    Q_D(CameraController);
+    for (QObject* subscriber : d->subscribers)
+    {
+        LaserApplication::postEvent(subscriber, d->frameEvent);
+    }
+}
+
 bool CameraController::start()
 {
     if (m_status != CS_IDLE)
@@ -180,8 +252,23 @@ void CameraController::stop()
         return;
 
     m_status = CS_STOPPING;
-    m_videoCapture->release();
     this->wait();
     m_status = CS_IDLE;
 }
 
+bool CameraController::restart()
+{
+    stop();
+    return start();
+}
+
+CameraFrameEvent::CameraFrameEvent(CameraController* controller)
+    : QEvent(static_cast<QEvent::Type>(Event_CameraFrame))
+    , m_controller(controller)
+{
+}
+
+CameraFrameEvent::~CameraFrameEvent()
+{
+    //m_controller->clearFrameCache();
+}

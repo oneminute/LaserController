@@ -329,6 +329,34 @@ void Config::loadCameraItems()
     resolution->setToJsonHook(qSizeItemToJson);
     resolution->setFromJsonHook(parseQSizeItemFromJson);
 
+    ConfigItem* thumbResolution = group->addConfigItem(
+        "thumbResolution"
+        , QSize(800, 600)
+        , DT_SIZE
+    );
+    thumbResolution->setInputWidgetType(IWT_ComboBox);
+    thumbResolution->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem("320x240", QSize(320, 240));
+            comboBox->addItem("640x480", QSize(600, 480));
+            comboBox->addItem("800x600", QSize(800, 600));
+            comboBox->addItem("1280x720", QSize(1280, 720));
+            comboBox->addItem("1920x1080", QSize(1920, 1080));
+            comboBox->addItem("2048x1536", QSize(2048, 1536));
+            comboBox->addItem("2952x1944", QSize(2952, 1944));
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+    thumbResolution->setToJsonHook(qSizeItemToJson);
+    thumbResolution->setFromJsonHook(parseQSizeItemFromJson);
+
     ConfigItem* fisheye = group->addConfigItem(
         "fisheye",
         true,
@@ -1119,7 +1147,7 @@ void Config::loadDeviceItems()
     userOrigin1->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QVector3D pt = value.value<QVector3D>();
+            QVector3D pt = value.value<QVector3D>() * 1000;
             return QVariant::fromValue<QVector3D>(pt);
         }
     );
@@ -1127,7 +1155,7 @@ void Config::loadDeviceItems()
         [](QWidget* widget, const QVariant& value)
         {
             Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
-            QVector3D pt = value.value<QVector3D>();
+            QVector3D pt = value.value<QVector3D>() * 0.001;
             v2w->setValue(pt);
             return QVariant::fromValue<QVector3D>(pt);
         }
@@ -1147,7 +1175,7 @@ void Config::loadDeviceItems()
     userOrigin2->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QVector3D pt = value.value<QVector3D>();
+            QVector3D pt = value.value<QVector3D>() * 1000;
             return QVariant::fromValue<QVector3D>(pt);
         }
     );
@@ -1155,7 +1183,7 @@ void Config::loadDeviceItems()
         [](QWidget* widget, const QVariant& value)
         {
             Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
-            QVector3D pt = value.value<QVector3D>();
+            QVector3D pt = value.value<QVector3D>() * 0.001;
             v2w->setValue(pt);
             return QVariant::fromValue<QVector3D>(pt);
         }
@@ -1175,7 +1203,7 @@ void Config::loadDeviceItems()
     userOrigin3->setValueFromWidgetHook(
         [](QWidget* widget, const QVariant& value)
         {
-            QVector3D pt = value.value<QVector3D>();
+            QVector3D pt = value.value<QVector3D>() * 1000;
             return QVariant::fromValue<QVector3D>(pt);
         }
     );
@@ -1183,7 +1211,7 @@ void Config::loadDeviceItems()
         [](QWidget* widget, const QVariant& value)
         {
             Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
-            QVector3D pt = value.value<QVector3D>();
+            QVector3D pt = value.value<QVector3D>() * 0.001;
             v2w->setValue(pt);
             return QVariant::fromValue<QVector3D>(pt);
         }
@@ -1835,6 +1863,46 @@ void Config::loadUserReigsters()
     fillingAccRatio->setInputWidgetProperty("maximumLineEditWidth", 75);
     fillingAccRatio->setInputWidgetProperty("minimum", 1);
     fillingAccRatio->setInputWidgetProperty("maximum", 200);
+
+    ConfigItem* zSpeed = group->addConfigItem(
+        "zSpeed",
+        10000,
+        DT_INT
+    );
+    zSpeed->setInputWidgetType(IWT_FloatEditSlider);
+    zSpeed->setInputWidgetProperty("step", 0.001);
+    zSpeed->setInputWidgetProperty("decimals", 3);
+    zSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
+    zSpeed->setInputWidgetProperty("textTemplate", "%1");
+    zSpeed->setInputWidgetProperty("page", 10);
+    zSpeed->setInputWidgetProperty("minimum", 1);
+    zSpeed->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* materialThickness = group->addConfigItem(
+        "materialThickness",
+        1000,
+        DT_INT
+    );
+    materialThickness->setInputWidgetType(IWT_FloatEditSlider);
+    materialThickness->setInputWidgetProperty("step", 0.001);
+    materialThickness->setInputWidgetProperty("decimals", 3);
+    materialThickness->setInputWidgetProperty("maximumLineEditWidth", 75);
+    materialThickness->setInputWidgetProperty("page", 10);
+    materialThickness->setInputWidgetProperty("minimum", 1);
+    materialThickness->setInputWidgetProperty("maximum", 200);
+
+    ConfigItem* movementStepLength = group->addConfigItem(
+        "movementStepLength",
+        10000,
+        DT_INT
+    );
+    movementStepLength->setInputWidgetType(IWT_FloatEditSlider);
+    movementStepLength->setInputWidgetProperty("step", 0.001);
+    movementStepLength->setInputWidgetProperty("decimals", 3);
+    movementStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    movementStepLength->setInputWidgetProperty("page", 10);
+    movementStepLength->setInputWidgetProperty("minimum", 1);
+    movementStepLength->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadSystemRegisters()
@@ -2850,6 +2918,10 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Resolution", nullptr), 
         QCoreApplication::translate("Config", "Resolution", nullptr));
 
+    Camera::thumbResolutionItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Thumb Resolution", nullptr), 
+        QCoreApplication::translate("Config", "Thumb Resolution", nullptr));
+
     Camera::fisheyeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Fisheye", nullptr), 
         QCoreApplication::translate("Config", "Fisheye", nullptr));
@@ -3321,6 +3393,18 @@ void Config::updateTitlesAndDescriptions()
     UserRegister::fillingAccRatioItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Filling Acceleration Ratio", nullptr), 
         QCoreApplication::translate("Config", "Filling acceleration ratio", nullptr));
+
+    UserRegister::zSpeedItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Z Speed", nullptr), 
+        QCoreApplication::translate("Config", "Z Speed", nullptr));
+
+    UserRegister::materialThicknessItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Material Thickness", nullptr), 
+        QCoreApplication::translate("Config", "Material Thickness", nullptr));
+
+    UserRegister::movementStepLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Movement Step Length", nullptr), 
+        QCoreApplication::translate("Config", "Movement Step Length", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

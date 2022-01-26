@@ -158,6 +158,9 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(38, new LaserRegister(38, Config::UserRegister::maxFillingPowerItem(), false));
     d->userRegisters.insert(39, new LaserRegister(39, Config::UserRegister::minFillingPowerItem(), false));
     d->userRegisters.insert(40, new LaserRegister(40, Config::UserRegister::fillingAccRatioItem(), false));
+    d->userRegisters.insert(41, new LaserRegister(41, Config::UserRegister::zSpeedItem(), false));
+    d->userRegisters.insert(42, new LaserRegister(42, Config::UserRegister::materialThicknessItem(), false));
+    d->userRegisters.insert(43, new LaserRegister(43, Config::UserRegister::movementStepLengthItem(), false));
 
     d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
     d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));
@@ -773,10 +776,10 @@ void LaserDevice::moveTo(const QVector4D& pos, bool xEnabled, bool yEnabled, boo
 void LaserDevice::moveBy(const QVector4D& pos, bool xEnabled, bool yEnabled, bool zEnabled, bool uEnabled)
 {
     //QVector3D dest = utils::limitToLayout(pos, quad, layoutWidth, layoutHeight);
-    int xPos = qRound(pos.x() * 1000);
-    int yPos = qRound(pos.y() * 1000);
-    int zPos = qRound(pos.z() * 1000);
-    int uPos = qRound(pos.w() * 1000);
+    int xPos = qRound(pos.x());
+    int yPos = qRound(pos.y());
+    int zPos = qRound(pos.z());
+    int uPos = qRound(pos.w());
     // 相对移动要根据传入的pos判断哪个轴enabled
     xEnabled = xEnabled && !qFuzzyIsNull(pos.x());
     yEnabled = yEnabled && !qFuzzyIsNull(pos.y());
@@ -854,8 +857,9 @@ int LaserDevice::showUpdateDialog()
     int month = compileDate.month();
     int day = compileDate.day();
     int version = year * 10000 + month * 100 + day;
-    return d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
+    //return d->driver->getUpdatePanelHandle(version, LaserApplication::mainWindow->winId());
     //LaserApplication::mainWindow->createUpdateDockPanel(winId);
+    return 0;
 }
 
 void LaserDevice::showSoftwareUpdateWizard()
@@ -1026,19 +1030,19 @@ QPoint LaserDevice::laserPosition() const
     return d->lastState.pos.toPoint();
 }
 
-QPoint LaserDevice::userOrigin() const
+QVector3D LaserDevice::userOrigin() const
 {
-    QPoint origin;
+    QVector3D origin;
     switch (Config::Device::userOriginSelected())
     {
     case 0:
-        origin = Config::Device::userOrigin1().toPoint();
+        origin = Config::Device::userOrigin1();
         break;
     case 1:
-        origin = Config::Device::userOrigin2().toPoint();
+        origin = Config::Device::userOrigin2();
         break;
     case 2:
-        origin = Config::Device::userOrigin3().toPoint();
+        origin = Config::Device::userOrigin3();
         break;
     }
     return origin;
@@ -1055,16 +1059,16 @@ QSize LaserDevice::layoutSize() const
     return QSize(Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength());
 }
 
-QPointF LaserDevice::currentOrigin() const
+QPoint LaserDevice::currentOrigin() const
 {
-    QPointF origin;
+    QPoint origin;
     switch (Config::Device::startFrom())
     {
     case SFT_AbsoluteCoords:
         origin = this->origin();
         break;
     case SFT_UserOrigin:
-        origin = userOrigin();
+        origin = userOrigin().toPoint();
         break;
     case SFT_CurrentPosition:
         origin = laserPosition();

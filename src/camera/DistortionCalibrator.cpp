@@ -42,6 +42,7 @@ bool DistortionCalibrator::validate()
         flag = cv::fisheye::CALIB_FIX_SKEW | cv::fisheye::CALIB_RECOMPUTE_EXTRINSIC;
                                            //| cv::fisheye::CALIB_CHECK_COND;
         if (calibFixPrincipalPoint)   flag |= cv::fisheye::CALIB_FIX_PRINCIPAL_POINT;
+        flag |= cv::fisheye::CALIB_FIX_K4;
     }
 
     return goodInput;
@@ -110,22 +111,31 @@ qreal DistortionCalibrator::captureSample(cv::Mat inMat, bool drawLines)
 
 bool DistortionCalibrator::undistortImage(cv::Mat& processing)
 {
-    cv::Mat temp = processing.clone();
+    //cv::Mat temp;
     if (cameraMatrix.empty() || distCoeffs.empty())
         return false;
     if (Config::Camera::fisheye())
     {
-        cv::Mat newCamMat;
+        cv::Mat newCamMat, mapX, mapY;
+        cv::Size newSize;
+        cv::Mat scaledK = cameraMatrix * 0.8;
+        scaledK.at<double>(2, 2) = 1.0;
         std::cout << cameraMatrix << std::endl;
         std::cout << distCoeffs << std::endl;
-        cv::fisheye::estimateNewCameraMatrixForUndistortRectify(cameraMatrix, distCoeffs, processing.size(),
-            cv::Matx33d::eye(), newCamMat, 1);
-        cv::fisheye::undistortImage(temp, processing, cameraMatrix, distCoeffs, newCamMat);
+        cv::fisheye::estimateNewCameraMatrixForUndistortRectify(cameraMatrix, 
+            distCoeffs, processing.size(), cv::Matx33d::eye(), newCamMat, 0.0);
+        cv::fisheye::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), 
+            newCamMat, processing.size(), CV_16SC2, mapX, mapY);
+        //cv::fisheye::undistortImage(temp, processing, cameraMatrix, distCoeffs, newCamMat);
+        cv::remap(processing, processing, mapX, mapY, cv::INTER_LINEAR);
+        //std::cout << "mapX:" << std::endl << mapX << std::endl << "mapY:" << std::endl << mapY;
+        //cv::imwrite("tmp/undistorted.tiff", temp);
     }
     else
     {
-        undistort(temp, processing, cameraMatrix, distCoeffs);
+        undistort(processing, processing, cameraMatrix, distCoeffs);
     }
+    //processing = temp;
     return true;
 }
 

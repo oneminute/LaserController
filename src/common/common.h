@@ -4,6 +4,7 @@
 #include <Qt>
 #include <QDebug>
 #include <QTransform>
+#include <QEvent>
 
 #define qLogD qDebug().noquote().nospace()
 #define qsLogD qDebug().nospace()
@@ -296,6 +297,11 @@ enum ArrangeType
     AT_VCentered = 13,
     AT_HSpaced = 14,
     AT_HCentered = 15
+};
+
+enum LaserEvent
+{
+    Event_CameraFrame = QEvent::User + 1,
 };
 
 enum CalibrationPattern

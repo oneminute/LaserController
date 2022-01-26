@@ -136,6 +136,8 @@ public slots:
     void retranslate();
 	
 protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
     //recent files
     void loadRecentFilesMenu();
     void addRecentFile(QString path);
@@ -382,7 +384,6 @@ protected slots:
     // cameras slots
     void onCameraConnected();
     void onCameraDisconnected();
-    void onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args);
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
@@ -478,10 +479,6 @@ private:
     QLineEdit* m_lineEditCoordinatesY;
     QLineEdit* m_lineEditCoordinatesZ;
     QLineEdit* m_lineEditCoordinatesU;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceX;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceY;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceZ;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceU;
 
     PressedToolButton* m_buttonMoveTopLeft;
     PressedToolButton* m_buttonMoveTop;

@@ -62,8 +62,34 @@ CalibrationDialog::CalibrationDialog(CameraController* cameraController, Distort
             "</ol>"
         )
     );
-    page2Layout->addWidget(m_page2Introduction);
+    QFormLayout* page2SettingsLayout = new QFormLayout;
+    QCheckBox* page2Fisheye = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Camera::fisheyeItem());
+    Config::Camera::fisheyeItem()->bindWidget(page2Fisheye, SS_DIRECTLY);
+    QComboBox* page2Resolutions = InputWidgetWrapper::createWidget<QComboBox*>(Config::Camera::resolutionItem());
+    Config::Camera::resolutionItem()->bindWidget(page2Resolutions, SS_DIRECTLY);
+    QPushButton* page2ButtonRestart = new QPushButton(tr("Restart"));
+    connect(page2ButtonRestart, &QPushButton::clicked, [=]()
+        {
+            m_cameraController->restart();
+        }
+    );
+    page2SettingsLayout->addRow(
+        Config::Camera::fisheyeItem()->title(),
+        page2Fisheye
+    );
+    page2SettingsLayout->addRow(
+        Config::Camera::resolutionItem()->title(),
+        page2Resolutions
+    );
+    page2SettingsLayout->addWidget(page2ButtonRestart);
+    QHBoxLayout* page2TitleLayout = new QHBoxLayout;
+    page2TitleLayout->addWidget(m_page2Introduction);
+    page2TitleLayout->addLayout(page2SettingsLayout);
+    page2TitleLayout->setStretch(0, 1);
+    page2TitleLayout->setStretch(1, 0);
+    page2Layout->addLayout(page2TitleLayout);
     QGridLayout* page2ImagesLayout = new QGridLayout;
+    
     QLabel* page2AdjustFocal = new QLabel;
     page2AdjustFocal->setPixmap(QPixmap(":/ui/icons/images/adjust_focal.png").scaled(200, 200, Qt::KeepAspectRatio));
     QLabel* page2CalibrationBoard = new QLabel;
@@ -74,6 +100,8 @@ CalibrationDialog::CalibrationDialog(CameraController* cameraController, Distort
     page2ImagesLayout->addWidget(m_page2ImageViewer, 0, 1, 2, 1);
     page2ImagesLayout->setColumnStretch(0, 0);
     page2ImagesLayout->setColumnStretch(1, 1);
+    page2ImagesLayout->setRowStretch(0, 1);
+    page2ImagesLayout->setRowStretch(1, 1);
     page2Layout->addLayout(page2ImagesLayout);
     page2Layout->setStretch(0, 0);
     page2Layout->setStretch(1, 1);
@@ -96,7 +124,7 @@ CalibrationDialog::CalibrationDialog(CameraController* cameraController, Distort
     QLabel* page3GuideImage = new QLabel;
     page3GuideImage->setPixmap(QPixmap(":/ui/icons/images/calibration_guide.png").scaled(QSize(200, 200), Qt::KeepAspectRatio));
     QFormLayout* page3FormLayout = new QFormLayout;
-    m_page3SamplesCount = new QLabel(tr("0/%1").arg(Config::Camera::minCalibrationFrames()));
+    m_page3SamplesCount = new QLabel(tr("0"));
     m_page3Coverage = new QLabel(tr("0%"));
     m_page3Scores = new QLabel(tr("0"));
     page3FormLayout->addRow(tr("Samples"), m_page3SamplesCount);
@@ -191,17 +219,105 @@ CalibrationDialog::CalibrationDialog(CameraController* cameraController, Distort
 
     connect(m_cameraController, &CameraController::connected, this, &CalibrationDialog::onCameraConnected);
     connect(m_cameraController, &CameraController::disconnected, this, &CalibrationDialog::onCameraDisconnected);
-    connect(m_cameraController, &CameraController::frameCaptured, this, &CalibrationDialog::onFrameCaptured);
     m_cameraController->start();
 
     updatePage();
 
     resize(1200, 800);
     onCameraConnected();
+
+    installEventFilter(this);
+    m_cameraController->registerSubscriber(this);
 }
 
 CalibrationDialog::~CalibrationDialog()
 {
+    m_cameraController->unregisterSubscriber(this);
+}
+
+bool CalibrationDialog::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == Event_CameraFrame) {
+        CameraFrameEvent* frameEvent = static_cast<CameraFrameEvent*>(event);
+        m_frameStatus->setText(tr("fps: %1, duration: %2").arg(1000.0 / frameEvent->duration(), 0, 'f', 3).arg(frameEvent->duration()));
+        if (currentIndex() == 1)
+        {
+            QImage image(frameEvent->thumbImage().data, frameEvent->thumbImage().cols, frameEvent->thumbImage().rows, frameEvent->thumbImage().step, QImage::Format_RGB888);
+            QSize imageSize = image.size();
+            QPainter painter;
+            painter.begin(&image);
+            painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+            QPoint center((imageSize.width() - 1) / 2, (imageSize.height() - 1) / 2);
+            int radius = 50;
+            painter.drawLine(center + QPoint(-radius, 0), center + QPoint(radius, 0));
+            painter.drawLine(center + QPoint(0, -radius), center + QPoint(0, radius));
+            painter.end();
+            m_page2ImageViewer->setImage(image);
+        }
+        else if (currentIndex() == 2)
+        {
+            QImage image(frameEvent->thumbImage().data, frameEvent->thumbImage().cols, frameEvent->thumbImage().rows, frameEvent->thumbImage().step, QImage::Format_RGB888);
+            QSize imageSize = image.size();
+            QPainter painter;
+            painter.begin(&image);
+            painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+            for (int r = 1; r < 3; r++)
+            {
+                int y = imageSize.height() * r / 3;
+                painter.drawLine(QPoint(0, y), QPoint(imageSize.width(), y));
+            }
+            for (int c = 1; c < 3; c++)
+            {
+                int x = imageSize.width() * c / 3;
+                painter.drawLine(QPoint(x, 0), QPoint(x, imageSize.height()));
+            }
+            painter.end();
+            m_page3ImageViewer->setImage(image);
+
+            if (m_requestCalibration)
+            {
+                m_requestCalibration = false;
+
+                qreal error = m_calibrator->captureSample(frameEvent->originImage(), true);
+                m_page3Scores->setText(tr("%1").arg(error));
+                QImage originImage(frameEvent->originImage().data, frameEvent->originImage().cols, frameEvent->originImage().rows, frameEvent->originImage().step, QImage::Format_RGB888);
+                m_page3ImageViewerSample->setImage(originImage);
+                m_page3SamplesCount->setText(tr("%1").arg(m_calibrator->calibrationSamplesCount()));
+            }
+        }
+        else if (currentIndex() == 3)
+        {
+            if (m_requestCalibration)
+            {
+                m_requestCalibration = false;
+
+                qreal error = m_calibrator->undistortImage(frameEvent->originImage());
+                QImage image(frameEvent->originImage().data, frameEvent->originImage().cols, frameEvent->originImage().rows, frameEvent->originImage().step, QImage::Format_RGB888);
+
+                QSize imageSize = image.size();
+                QPainter painter;
+                painter.begin(&image);
+                painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+                for (int r = 1; r < 4; r++)
+                {
+                    int y = imageSize.height() * r / 4;
+                    painter.drawLine(QPoint(0, y), QPoint(imageSize.width(), y));
+                }
+                for (int c = 1; c < 8; c++)
+                {
+                    int x = imageSize.width() * c / 8;
+                    painter.drawLine(QPoint(x, 0), QPoint(x, imageSize.height()));
+                }
+                painter.end();
+                m_page4ImageViewer->setImage(image);
+            }
+        }
+        return true;
+    }
+    else {
+        // standard event processing
+        return QObject::eventFilter(obj, event);
+    }
 }
 
 void CalibrationDialog::onPage1Entered()
@@ -214,7 +330,7 @@ void CalibrationDialog::onPage1Exited()
 
 void CalibrationDialog::onPage2Entered()
 {
-    m_page2ImageViewer->fitBy(Config::Camera::resolution());
+    m_page2ImageViewer->fitBy(Config::Camera::thumbResolution());
 }
 
 void CalibrationDialog::onPage2Exited()
@@ -223,7 +339,7 @@ void CalibrationDialog::onPage2Exited()
 
 void CalibrationDialog::onPage3Entered()
 {
-    m_page3ImageViewer->fitBy(Config::Camera::resolution());
+    m_page3ImageViewer->fitBy(Config::Camera::thumbResolution());
     m_page3ImageViewerSample->fitBy(Config::Camera::resolution());
 }
 
@@ -250,84 +366,6 @@ void CalibrationDialog::onCameraDisconnected()
 {
     m_labelStatus->setText(tr("Disonnected"));
     m_labelStatus->setStyleSheet("color: rgb(255, 0, 0)");
-}
-
-void CalibrationDialog::onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args)
-{
-    m_frameStatus->setText(tr("fps: %1, duration: %2").arg(1000.0 / args.duration, 0, 'f', 3).arg(args.duration));
-    if (currentIndex() == 1)
-    {
-        QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
-        QSize imageSize = image.size();
-        QPainter painter;
-        painter.begin(&image);
-        painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
-        QPoint center((imageSize.width() - 1) / 2, (imageSize.height() - 1) / 2);
-        int radius = 50;
-        painter.drawLine(center + QPoint(-radius, 0), center + QPoint(radius, 0));
-        painter.drawLine(center + QPoint(0, -radius), center + QPoint(0, radius));
-        painter.end();
-        m_page2ImageViewer->setImage(image);
-    }
-    else if (currentIndex() == 2)
-    {
-        QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
-        QSize imageSize = image.size();
-        QPainter painter;
-        painter.begin(&image);
-        painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
-        for (int r = 1; r < 3; r++)
-        {
-            int y = imageSize.height() * r / 3;
-            painter.drawLine(QPoint(0, y), QPoint(imageSize.width(), y));
-        }
-        for (int c = 1; c < 3; c++)
-        {
-            int x = imageSize.width() * c / 3;
-            painter.drawLine(QPoint(x, 0), QPoint(x, imageSize.height()));
-        }
-        painter.end();
-        m_page3ImageViewer->setImage(image);
-
-        if (m_requestCalibration)
-        {
-            m_requestCalibration = false;
-            m_page3SamplesCount->setText(tr("%1/%2").arg(m_calibrator->calibrationSamplesCount())
-                .arg(Config::Camera::minCalibrationFrames()));
-
-            qreal error = m_calibrator->captureSample(processed, true);
-            m_page3Scores->setText(tr("%1").arg(error));
-            QImage originImage(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
-            m_page3ImageViewerSample->setImage(originImage);
-        }
-    }
-    else if (currentIndex() == 3)
-    {
-        if (m_requestCalibration)
-        {
-            m_requestCalibration = false;
-
-            qreal error = m_calibrator->undistortImage(processed);
-            QImage image(processed.data, processed.cols, processed.rows, processed.step, QImage::Format_RGB888);
-
-            QSize imageSize = image.size();
-            QPainter painter;
-            painter.begin(&image);
-            painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
-            for (int r = 1; r < 4; r++)
-            {
-                int y = imageSize.height() * r / 4;
-                painter.drawLine(QPoint(0, y), QPoint(imageSize.width(), y));
-            }
-            for (int c = 1; c < 8; c++)
-            {
-                int x = imageSize.width() * c / 8;
-                painter.drawLine(QPoint(x, 0), QPoint(x, imageSize.height()));
-            }
-            painter.end();
-            m_page4ImageViewer->setImage(image);
-        }
-    }
 }
 
 void CalibrationDialog::onButtonCaptureClicked()
@@ -364,8 +402,7 @@ void CalibrationDialog::saveSamples()
 void CalibrationDialog::removeCurrentSample()
 {
     m_calibrator->removeCurrentItem();
-    m_page3SamplesCount->setText(tr("%1/%2").arg(m_calibrator->calibrationSamplesCount())
-        .arg(Config::Camera::minCalibrationFrames()));
+    m_page3SamplesCount->setText(tr("%1").arg(m_calibrator->calibrationSamplesCount()));
 }
 
 void CalibrationDialog::onButtonSaveCalibrationClicked(bool checked)

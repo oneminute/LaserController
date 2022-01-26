@@ -14,8 +14,9 @@
 
 #include "laser/LaserDefines.h"
 
-class QSpinBox;
 class QDoubleSpinBox;
+class QSpinBox;
+
 class ImageViewer;
 class LaserDocument;
 class LaserLayer;
@@ -33,6 +34,7 @@ public:
     ~CameraAlignmentDialog();
 
 protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
     virtual void closeEvent(QCloseEvent* e) override;
 
     QPainterPath quarterCircle(const QPoint& center, int radius);
@@ -55,7 +57,6 @@ protected slots:
 
     void onCameraConnected();
     void onCameraDisconnected();
-    void onFrameCaptured(cv::Mat processed, cv::Mat origin, FrameArgs args);
     void onMarkIndexChanged(bool checked);
     void onDeviceStateChanged(DeviceState state);
 

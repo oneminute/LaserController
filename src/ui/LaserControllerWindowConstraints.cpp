@@ -1787,53 +1787,5 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, documentPrintAndCutAligningState);
     // end Config::UserRegister::spotShotPowerItem()
 
-    // begin m_doubleSpinBoxDistanceX
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, devicePausedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, deviceErrorState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceX, "enabled", true, documentPrintAndCutAligningState);
-    // end m_doubleSpinBoxDistanceX
-
-    // begin m_doubleSpinBoxDistanceY
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, devicePausedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, deviceErrorState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceY, "enabled", true, documentPrintAndCutAligningState);
-    // end m_doubleSpinBoxDistanceY
-
-    // begin m_doubleSpinBoxDistanceZ
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, devicePausedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, deviceErrorState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceZ, "enabled", true, documentPrintAndCutAligningState);
-    // end m_doubleSpinBoxDistanceZ
-
-    // begin m_doubleSpinBoxDistanceU
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", false, deviceUnconnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceConnectedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceIdleState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceMachiningState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, devicePausedState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, deviceErrorState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, documentPrintAndCutSelectingState);
-    BIND_PROP_TO_STATE(m_doubleSpinBoxDistanceU, "enabled", true, documentPrintAndCutAligningState);
-    // end m_doubleSpinBoxDistanceU
-
 
 }

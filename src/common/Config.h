@@ -117,6 +117,7 @@ public:
 
         CONFIG_ITEM(camera, autoConnect, bool, toBool)
         CONFIG_ITEM(camera, resolution, QSize, toSize)
+        CONFIG_ITEM(camera, thumbResolution, QSize, toSize)
         CONFIG_ITEM(camera, fisheye, bool, toBool)
         CONFIG_ITEM(camera, hCornersCount, int, toInt)
         CONFIG_ITEM(camera, vCornersCount, int, toInt)
@@ -349,6 +350,10 @@ public:
         CONFIG_ITEM(userRegister, maxFillingPower, qreal, toReal)
         CONFIG_ITEM(userRegister, minFillingPower, qreal, toReal)
         CONFIG_ITEM(userRegister, fillingAccRatio, qreal, toReal)
+
+        CONFIG_ITEM(userRegister, zSpeed, qreal, toReal)
+        CONFIG_ITEM(userRegister, materialThickness, qreal, toReal)
+        CONFIG_ITEM(userRegister, movementStepLength, qreal, toReal)
 
     private:
         friend class Config;

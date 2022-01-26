@@ -9,6 +9,7 @@
 #include <QTransform>
 #include <QWaitCondition>
 #include <QVector4D>
+#include <QVector3D>
 
 class ConfigItem;
 class LaserDriver;
@@ -136,7 +137,7 @@ public:
     /// 坐标即该值。
     /// </summary>
     /// <returns></returns>
-    QPoint userOrigin() const;
+    QVector3D userOrigin() const;
 
     /// <summary>
     /// 加工幅面矩形，以设备坐标系下的坐标值表示。
@@ -152,7 +153,7 @@ public:
     /// 光点的当前位置。
     /// </summary>
     /// <returns></returns>
-    QPointF currentOrigin() const;
+    QPoint currentOrigin() const;
 
     int currentZ() const;
 

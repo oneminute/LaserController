@@ -141,7 +141,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (Config::Device::startFrom() == SFT_UserOrigin)
         {
             painter.setPen(QPen(Qt::darkYellow));
-            QPoint userOrigin = mapFromScene(LaserApplication::device->userOrigin());
+            QPoint userOrigin = mapFromScene(LaserApplication::device->userOrigin().toPoint());
             QRect originRect(userOrigin - QPoint(2, 2), userOrigin + QPoint(2, 2));
             painter.drawEllipse(originRect);
             int lineLength = 5;
