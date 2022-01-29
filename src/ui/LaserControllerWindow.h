@@ -331,6 +331,14 @@ protected slots:
     void askMergeOrNew();
 
     void applyJobOriginToDocument(const QVariant& value);
+    //stamp shapes
+    void onActionStar(bool checked = false);
+    void onActionRing(bool checked = false);
+    void onActionRingEllipse(bool checked = false);
+    void onActionFrame(bool checked = false);
+    void onActionHorizontalText(bool checked = false);
+    void onActionVerticalText(bool checked = false);
+    void onActionArcText(bool checked = false);
     //create stamp
     void onActionCreateNameStamp();
     void onActionCreateStripStamp();
@@ -393,6 +401,13 @@ signals:
     void finishPrintAndCutSelecting();
     void startPrintAndCutAligning();
     void finishPrintAndCutAligning();
+    void readyStar();
+    void readyFrame();
+    void readyRing();
+    void readyRingEllipse();
+    void readyHorizontalText();
+    void readyVerticalText();
+    void readyArcText();
     //void joinedGroupChanged();
 
 private:
@@ -685,6 +700,7 @@ private:
     LaserToolButton* m_arrangeButtonSameHeight;
     LaserToolButton* m_arrangeMoveToPage;
     LaserToolButton* m_createStampTb;
+    LaserToolButton* m_toolButtonStampShapes;
     int m_alignTargetIndex;
     LaserPrimitive* m_alignTarget;
     friend class LaserApplication;

@@ -78,7 +78,7 @@ public:
     bool isJoinedGroup;
     bool isAlignTarget;
     QSet<LaserPrimitive*>* joinedGroupList;
-    QRect variableBounds;//circleText，horizontalText，verticalText中使用，方便改变外包框
+    //QRect variableBounds;//circleText，horizontalText，verticalText中使用，方便改变外包框
 };
 
 LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
@@ -856,11 +856,11 @@ void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     //update();
 }
 
-QRect LaserPrimitive::variableBounds()
+/*QRect LaserPrimitive::variableBounds()
 {
     Q_D(LaserPrimitive);
     return d->variableBounds;
-}
+}*/
 
 class LaserShapePrivate : public LaserPrimitivePrivate
 {
@@ -3261,7 +3261,7 @@ void LaserFrame::draw(QPainter * painter)
     painter->drawLine(vLine);
     QPainterPath p; 
     p.addRect(d->innerRect);
-    //painter->drawPath(p);
+    painter->drawPath(p);
 
     
 }
@@ -3995,21 +3995,26 @@ public:
     }
     QString content;
     QSize size;
-    QList<QPainterPath> textPathList;
+    QList<QPainterPath> originalTextPathList;
+    QPointF bottomLeft;
+    qreal space;
 };
 
 LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QSize size,
-    QTransform transform, int layerIndex) 
+    QPointF bottomLeft, qreal space, QTransform transform, int layerIndex)
     :LaserShape(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT, layerIndex, transform)
 {
     Q_D(LaserHorizontalText);
     d->content = content;
     setTransform(transform);
     d->size = size;
+    d->bottomLeft = bottomLeft;
+    d->space = space;
     initTextPath();
     d->boundingRect = d->path.boundingRect().toRect();
     d->originalBoundingRect = d->boundingRect;
-    d->variableBounds = d->boundingRect;
+    //d->variableBounds = d->boundingRect;
+    
 }
 
 LaserHorizontalText::~LaserHorizontalText()
@@ -4023,48 +4028,66 @@ void LaserHorizontalText::initTextPath()
     font.setWordSpacing(0);
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
-    
     d->path = QPainterPath();
+    d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
         QPainterPath path;
-        path.addText(0, 0, font, QString(QChar(d->content[i])));
+        QString c = QString(QChar(d->content[i]));
+        //scale
+        path.addText(0, 0, font, c);
         QTransform t;
-        t.scale(d->size.width() / path.boundingRect().width(), 1);
+        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
         path = t.map(path);
+        d->originalTextPathList.append(path);
+        //translate
         QTransform t1;
-        qreal diffX = i * d->size.width();
-        t1.translate(diffX, 0);
+        //QPointF diff;
+        qreal x = i* (d->size.width() + d->space);
+        QPointF pos = QPointF(x, 0);
+        qreal diff = x - path.boundingRect().left();
+        t1.translate(diff, 0);
         path = t1.map(path);
-        d->textPathList.append(path);
         d->path.addPath(path);
     }
-    
+    toBottomLeft();
 }
-
+//在(0, 0)点调整好间距后(init的时候，单个字的path没有移动位置，最终位置是在all path后移动的)，再移动到位置
 void LaserHorizontalText::computeTextPath()
 {
     Q_D(LaserHorizontalText);
     
     QPainterPath allPath;
     int index = 0;
-    for (QPainterPath& path : d->textPathList) {
-        qreal spaceX = (d->variableBounds.width() - d->size.width() * d->textPathList.size()) / (d->textPathList.size() - 1);
-        qreal posX = d->variableBounds.left() + index * (d->size.width() + spaceX) ;
-        qreal lastPosX = path.boundingRect().left();
+    for (QPainterPath& path : d->originalTextPathList) {
         QTransform t;
-        t.translate(posX - lastPosX, 0);
+        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
         path = t.map(path);
+        qreal posX = index * (d->size.width() + d->space) ;
+        qreal lastPosX = path.boundingRect().left();
+        QTransform t1;
+        t1.translate(posX - lastPosX, 0);
+        path = t1.map(path);
         allPath.addPath(path);
         index++;
     }
     d->path = allPath;
-    d->boundingRect = d->path.boundingRect().toRect();
+    toBottomLeft();
+    d->boundingRect = d->path.boundingRect().toRect();   
+}
+
+void LaserHorizontalText::toBottomLeft()
+{
+    Q_D(LaserHorizontalText);
+    QTransform t;
+    QPointF diff = d->bottomLeft - d->path.boundingRect().bottomLeft();
+    t.translate(diff.x(), diff.y());
+    d->path = t.map(d->path);
 }
 
 void LaserHorizontalText::draw(QPainter * painter)
 {
     Q_D(LaserHorizontalText);
-    painter->drawRect(d->variableBounds);
+    //painter->drawRect(d->variableBounds);
     painter->setBrush(QBrush(this->layer()->color()));
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
@@ -4073,7 +4096,7 @@ void LaserHorizontalText::draw(QPainter * painter)
 LaserPrimitive * LaserHorizontalText::clone(QTransform t)
 {
     Q_D(LaserHorizontalText);
-    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, t, d->layerIndex);
+    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->bottomLeft, d->space, t, d->layerIndex);
     return hText;
 }
 
@@ -4097,6 +4120,9 @@ QJsonObject LaserHorizontalText::toJson()
     object.insert("size", size);
     object.insert("layerIndex", layerIndex());
     object.insert("content", d->content);
+    QJsonArray bL = { d->bottomLeft.x(), d->bottomLeft.y() };
+    object.insert("bottomLeft", bL);
+    object.insert("space", d->space);
     return object;
 }
 
@@ -4120,21 +4146,39 @@ QPointF LaserHorizontalText::position() const
 void LaserHorizontalText::setBoundingRectWidth(qreal width)
 {
     Q_D(LaserHorizontalText);
-    qreal diff = d->variableBounds.width() - width;
-    d->variableBounds = QRect(d->variableBounds.x() + diff * 0.5, d->variableBounds.y(),
-        width, d->variableBounds.height());
-   
+    qreal diff = width - d->boundingRect.width();
+    d->space = (width - d->size.width() * d->content.size()) / (d->content.size() - 1);
+    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
     computeTextPath();
 }
 
-void LaserHorizontalText::setBoundingRectHeight(qreal height)
+void LaserHorizontalText::setTextHeight(qreal diff)
 {
     Q_D(LaserHorizontalText);
-    qreal diff = d->variableBounds.height() - height;
-    d->variableBounds = QRect(d->variableBounds.x(), d->variableBounds.y() + diff * 0.5,
-        d->variableBounds.width(), height);
-
+    qreal height = diff + d->size.height();
+    if (height < 1) {
+        height = 1;
+        diff = height - d->size.height();
+    }
+    d->size = QSize(d->size.width(), height);    
+    d->bottomLeft = QPointF(d->bottomLeft.x(), d->bottomLeft.y() + diff * 0.5);
     computeTextPath();
+}
+
+void LaserHorizontalText::setTextWidth(qreal width)
+{
+    Q_D(LaserHorizontalText);  
+    qreal diff = width - d->boundingRect.width();
+    qreal textWidth = (width - d->space * (d->content.size() - 1))/ d->content.size();
+    d->size = QSize(textWidth, d->size.height());
+    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+    computeTextPath();
+}
+
+QSize LaserHorizontalText::textSize()
+{
+    Q_D(LaserHorizontalText);
+    return d->size;
 }
 
 class LaserVerticalTextPrivate : public LaserShapePrivate
@@ -4147,12 +4191,22 @@ public:
     }
     QString content;
     QSize size;
-    QList<QPainterPath> textPathList;
+    QList<QPainterPath> originalTextPathList;
+    QPointF topLeft;
+    qreal space;
 };
-LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size,
-    QTransform transform, int layerIndex)
+LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size, 
+    QPointF topLeft, qreal space, QTransform transform, int layerIndex)
     :LaserShape(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT, layerIndex, transform)
 {
+    Q_D(LaserVerticalText);
+    d->content = content;
+    d->space = space;
+    d->size = size;
+    d->topLeft = topLeft;
+    initTextPath();
+    d->boundingRect = d->path.boundingRect().toRect();
+    d->originalBoundingRect = d->boundingRect;
 }
 LaserVerticalText::~LaserVerticalText()
 {
@@ -4160,14 +4214,77 @@ LaserVerticalText::~LaserVerticalText()
 
 void LaserVerticalText::initTextPath()
 {
+    Q_D(LaserVerticalText);
+    QFont font;
+    font.setWordSpacing(0);
+    font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
+    font.setPixelSize(d->size.height());
+    d->path = QPainterPath();
+    d->originalTextPathList.clear();
+    for (int i = 0; i < d->content.size(); i++) {
+        QPainterPath path;
+        QString c = QString(QChar(d->content[i]));
+        //scale
+        path.addText(0, 0, font, c);
+        QTransform t;
+        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
+        path = t.map(path);
+        d->originalTextPathList.append(path);
+        //translate
+        QTransform t1;
+        //QPointF diff;
+        qreal y = i * (d->size.height() + d->space);
+        QPointF pos = QPointF(d->originalTextPathList[0].boundingRect().left(), y);
+        QPointF diff = pos - path.boundingRect().topLeft();
+        t1.translate(diff.x(), diff.y());
+        path = t1.map(path);
+        d->path.addPath(path);
+    }
+    toTopLeft();
 }
 
 void LaserVerticalText::computeTextPath()
 {
+    Q_D(LaserVerticalText);
+    QPainterPath allPath;
+    int index = 0;
+    for (QPainterPath path : d->originalTextPathList) {
+        //scale
+        QTransform t;
+        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
+        path = t.map(path);
+        //translate
+        QTransform t1;
+        //QPointF diff;
+        qreal y = index * (d->size.height() + d->space);
+        QPointF pos = QPointF(d->originalTextPathList[0].boundingRect().left(), y);
+        QPointF diff = pos - path.boundingRect().topLeft();
+        t1.translate(diff.x(), diff.y());
+        path = t1.map(path);
+        allPath.addPath(path);
+        index++;
+    }
+    d->path = allPath;
+    toTopLeft();
+    d->boundingRect = d->path.boundingRect().toRect();
+}
+
+void LaserVerticalText::toTopLeft()
+{
+    Q_D(LaserVerticalText);
+    QPointF pos = d->path.boundingRect().topLeft();
+    QPointF diff = d->topLeft - pos;
+    QTransform t;
+    t.translate(diff.x(), diff.y());
+    d->path = t.map(d->path);
 }
 
 void LaserVerticalText::draw(QPainter * painter)
 {
+    Q_D(LaserVerticalText);
+    painter->setBrush(QBrush(this->layer()->color()));
+    painter->drawPath(d->path);
+    painter->setBrush(Qt::NoBrush);
 }
 
 LaserPrimitive * LaserVerticalText::clone(QTransform t)
@@ -4194,11 +4311,30 @@ QPointF LaserVerticalText::position() const
 {
     return QPointF();
 }
-
-void LaserVerticalText::setBoundingRectWidth(qreal width)
-{
-}
-
 void LaserVerticalText::setBoundingRectHeight(qreal height)
 {
+    Q_D(LaserVerticalText);
+    d->space = (height - d->content.size() * d->size.height()) / (d->content.size() - 1);
+    qreal diff = height - d->boundingRect.height();
+    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+    computeTextPath();
+}
+
+void LaserVerticalText::setTextHeight(qreal height)
+{
+    Q_D(LaserVerticalText);
+    qreal h = (height - d->space * (d->content.size() - 1)) / d->content.size();
+    d->size = QSize(d->size.width(), h);
+    qreal diff = height - d->boundingRect.height();
+    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+    computeTextPath();
+}
+
+void LaserVerticalText::setTextWidth(qreal width)
+{
+    Q_D(LaserVerticalText);
+    d->size = QSize(width, d->size.height());
+    qreal diff = width - d->boundingRect.width();
+    d->topLeft = QPointF(d->topLeft.x() - diff * 0.5, d->topLeft.y());
+    computeTextPath();
 }

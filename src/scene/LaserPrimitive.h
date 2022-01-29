@@ -122,7 +122,7 @@ public:
     QPainterPath computeCornerRadius(QRect rect, int cornerRadius, int type);
     virtual bool isAvailable() const;
     //circleText，horizontalText，verticalText中使用，方便改变外包框
-    QRect variableBounds();
+    //QRect variableBounds();
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
@@ -598,10 +598,11 @@ class LaserHorizontalText : public LaserShape {
     Q_OBJECT
 public:
     LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
-        QTransform transform = QTransform(), int layerIndex = 0);
+        QPointF bottomLeft, qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserHorizontalText();
     void initTextPath();
     void computeTextPath();
+    void toBottomLeft();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_HORIZONTALTEXT; }
     virtual QString typeName() { return tr("HorizontalText"); }
@@ -612,7 +613,9 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
-    virtual void setBoundingRectHeight(qreal height);
+    void setTextHeight(qreal diff);
+    void setTextWidth(qreal width);
+    QSize textSize();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
         Q_DISABLE_COPY(LaserHorizontalText)
@@ -622,10 +625,11 @@ class LaserVerticalText : public LaserShape {
     Q_OBJECT
 public:
     LaserVerticalText(LaserDocument* doc, QString content, QSize size,
-        QTransform transform = QTransform(), int layerIndex = 0);
+        QPointF topLeft, qreal space, QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserVerticalText();
     void initTextPath();
     void computeTextPath();
+    void toTopLeft();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_VERTICALTEXT; }
     virtual QString typeName() { return tr("VerticalText"); }
@@ -635,8 +639,9 @@ public:
 
     virtual bool isClosed() const;
     virtual QPointF position() const;
-    virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
+    void setTextHeight(qreal width);
+    void setTextWidth(qreal width);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
         Q_DISABLE_COPY(LaserVerticalText)

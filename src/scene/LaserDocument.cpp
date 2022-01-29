@@ -1250,7 +1250,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QSize size(sizeArray[0].toInt(), sizeArray[1].toInt());
                 QString content = primitiveJson["content"].toString();
                 qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
-                primitive = new LaserHorizontalText(this, content, size, saveTransform, layerIndex);
+                QJsonArray bLArray = primitiveJson["bottomLeft"].toArray();
+                QPointF bL(bLArray[0].toDouble(), bLArray[1].toDouble());
+                qreal space = primitiveJson["space"].toDouble();
+                primitive = new LaserHorizontalText(this, content, size, bL, space, saveTransform, layerIndex);
             }
             else if (className == "LaserCircleText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();

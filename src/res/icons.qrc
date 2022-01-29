@@ -145,5 +145,8 @@
         <file>images/horizontalText.png</file>
         <file>images/arcText.png</file>
         <file>images/stamp.png</file>
+        <file>images/posCursor.png</file>
+        <file>images/textIcon.png</file>
+
     </qresource>
 </RCC>

@@ -54,6 +54,14 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveText, documentPrimitiveTextReady);
 	DEFINE_CHILD_STATE(documentPrimitiveText, documentPrimitiveTextCreating);
 
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveStar);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveFrame);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRing);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRingEllipse);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveHorizontalText);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveVerticalText);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveArcText);
+
 	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveSpline);
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveSpline, documentPrimitiveSplineReady);
 	DEFINE_CHILD_STATE(documentPrimitiveSpline, documentPrimitiveSplineCreating);
