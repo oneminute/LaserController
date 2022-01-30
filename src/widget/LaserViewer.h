@@ -43,6 +43,7 @@ public:
     //输入的点zoomAnchor是view的widget为坐标系
     bool zoomBy(qreal factor, QPointF zoomAnchor = QPointF(0, 0), bool zoomAnchorCenter = false);
     qreal zoomValue() const;
+    qreal zoomValueNormal();
 	void setZoomValue(qreal zoomScale);
     qreal adapterViewScale();
     LaserPrimitive* mirrorLine();
@@ -55,15 +56,16 @@ public:
     RulerWidget* horizontalRuler();
     RulerWidget* verticalRuler();
 	LaserPrimitiveGroup* group();
+    LaserPrimitive* cursorInLaserPrimitive(QPointF mousePosInScene);
 	QRect selectedItemsSceneBoundingRect();
     QRect AllItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate,
         int _state, int _transformType, int _pp, bool _unitIsMM);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
 	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);//draw
-	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop);//selection
+	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop, bool ignoreFillSolid = false);//selection
 	bool detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint);
-	bool detectBitmapByMouse(LaserBitmap*& result, QPointF mousePoint);//selection
+	bool detectFillSolidByMouse(LaserPrimitive*& result, QPointF mousePoint);//selection
     bool detectTextInsertPosition(QPointF insertPoint, LaserText*& text);//被找到的text
 	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
@@ -129,6 +131,7 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
+    void addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
     
 public slots:
     void zoomIn();
@@ -305,7 +308,7 @@ private:
 	LaserPrimitive* m_detectedPrimitive;
 	//QPolygonF testRect;
 	//QPolygonF testBoundinRect;
-	LaserBitmap* m_detectedBitmap;
+	LaserPrimitive* m_detectedFillSolid;
 	//undo stack
 	QUndoStack* m_undoStack;
 	QMap<QGraphicsItem*, QTransform> m_undoSelectionList;

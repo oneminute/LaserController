@@ -197,6 +197,13 @@ public:
 	DECL_STATE(documentPrimitiveText)
 	DECL_STATE(documentPrimitiveTextReady)
 	DECL_STATE(documentPrimitiveTextCreating)
+    DECL_STATE(documentPrimitiveStar)
+    DECL_STATE(documentPrimitiveFrame)
+    DECL_STATE(documentPrimitiveRing)
+    DECL_STATE(documentPrimitiveRingEllipse)
+    DECL_STATE(documentPrimitiveHorizontalText)
+    DECL_STATE(documentPrimitiveVerticalText)
+    DECL_STATE(documentPrimitiveArcText)
 #pragma endregion documentWorking state
 #pragma region document state
 

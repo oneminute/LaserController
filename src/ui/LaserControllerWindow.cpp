@@ -3,6 +3,7 @@
 #include "widget/UndoCommand.h"
 #include "util/Utils.h"
 #include "widget/OverstepMessageBoxWarn.h"
+#include "scene/LaserPrimitive.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -121,6 +122,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_maxRecentFilesSize(10)
     , m_alignTarget(nullptr)
     , m_hasMessageBox(false)
+    , m_textContent(nullptr)
     , m_requestOverlayImage(false)
 {
     m_ui->setupUi(this);
@@ -233,6 +235,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonSameWidth = new LaserToolButton(this);
     m_arrangeButtonSameHeight = new LaserToolButton(this);
     m_arrangeMoveToPage = new LaserToolButton(this);
+    m_createStampTb = new LaserToolButton(this);
+    m_toolButtonStampShapes = new LaserToolButton(this);
 	
     toolButtonSelectionTool->setDefaultAction(m_ui->actionSelectionTool);
 	//toolButtonViewDragTool->setDefaultAction(m_ui->actionDragView);
@@ -245,6 +249,47 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//toolButtonSplineTool->addAction(m_ui->actionEditSplineTool);
     //toolButtonSplineTool->setDisabled(true);
     toolButtonBitmapTool->setDefaultAction(m_ui->actionBitmapTool);
+    //stamp tool button
+    m_toolButtonStampShapes->setPopupMode(QToolButton::InstantPopup);
+    m_toolButtonStampShapes->setIcon(QIcon(":/ui/icons/images/stamp.png"));
+    LaserMenu* stampMenu = new LaserMenu(m_toolButtonStampShapes);
+    m_toolButtonStampShapes->setCheckable(true);
+    m_ui->actionStar->setCheckable(true);
+    m_ui->actionFrame->setCheckable(true);
+    m_ui->actionRing->setCheckable(true);
+    m_ui->actionRingEllipse->setCheckable(true);
+    m_ui->actionHorizontalText->setCheckable(true);
+    m_ui->actionVerticalText->setCheckable(true);
+    m_ui->actionArcText->setCheckable(true);
+    stampMenu->addAction(m_ui->actionStar);
+    stampMenu->addAction(m_ui->actionFrame);
+    stampMenu->addAction(m_ui->actionRing);
+    stampMenu->addAction(m_ui->actionRingEllipse);
+    stampMenu->addAction(m_ui->actionHorizontalText);
+    stampMenu->addAction(m_ui->actionVerticalText);
+    stampMenu->addAction(m_ui->actionArcText);
+    m_toolButtonStampShapes->setMenu(stampMenu);
+    
+    connect(m_ui->actionStar, &QAction::triggered, this, &LaserControllerWindow::onActionStar);
+    connect(m_ui->actionFrame, &QAction::triggered, this, &LaserControllerWindow::onActionFrame);
+    connect(m_ui->actionRing, &QAction::triggered, this, &LaserControllerWindow::onActionRing);
+    connect(m_ui->actionRingEllipse, &QAction::triggered, this, &LaserControllerWindow::onActionRingEllipse);
+    connect(m_ui->actionHorizontalText, &QAction::triggered, this, &LaserControllerWindow::onActionHorizontalText);
+    connect(m_ui->actionVerticalText, &QAction::triggered, this, &LaserControllerWindow::onActionVerticalText);
+    connect(m_ui->actionArcText, &QAction::triggered, this, &LaserControllerWindow::onActionArcText);
+    //stamp
+    m_createStampTb->setPopupMode(QToolButton::InstantPopup);
+    m_createStampTb->setIcon(QIcon(":/ui/icons/images/createStamp.png"));
+    LaserMenu* createStampMenu = new LaserMenu(m_createStampTb);
+    createStampMenu->addAction(m_ui->actionNameStamp);
+    createStampMenu->addAction(m_ui->actionStripStamp);
+    createStampMenu->addAction(m_ui->actionCircleStamp);
+    createStampMenu->addAction(m_ui->actionEllipseStamp);
+    m_createStampTb->setMenu(createStampMenu);
+    connect(m_ui->actionNameStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateNameStamp);
+    connect(m_ui->actionStripStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateStripStamp);
+    connect(m_ui->actionCircleStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateCircleStamp);
+    connect(m_ui->actionEllipseStamp, &QAction::triggered, this, &LaserControllerWindow::onActionCreateEllipseStamp);
     //arrange align
     //center align
     m_arrangeButtonAlignCenter->setPopupMode(QToolButton::InstantPopup);
@@ -348,7 +393,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->toolBarTools->addWidget(toolButtonLineTool);
     //m_ui->toolBarTools->addWidget(toolButtonSplineTool);
     m_ui->toolBarTools->addWidget(toolButtonBitmapTool);
-
+    m_ui->toolBarTools->addWidget(m_toolButtonStampShapes);
+    m_ui->toolBar->addWidget(m_createStampTb);
 
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignCenter);
     m_ui->arrangeBar->addWidget(m_arrangeButtonAlignHorinzontal);
@@ -366,6 +412,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_arrangeButtonSameWidth->setEnabled(false);
     m_arrangeButtonSameHeight->setEnabled(false);
     m_arrangeMoveToPage->setEnabled(false);
+
     // init status bar
     m_statusBarDeviceStatus = new QLabel;
     m_statusBarDeviceStatus->setText(ltr("Tips"));
@@ -452,6 +499,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->actionEditSplineTool->setCheckable(true);
 	m_ui->actionTextTool->setCheckable(true);
 	m_ui->actionDragView->setCheckable(true);
+
 	//init selected items properties
 	m_propertyLayout = new QGridLayout(m_ui->properties);
 	m_propertyLayout->setMargin(0);
@@ -732,7 +780,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionMultiDuplication, &QAction::triggered, this, &LaserControllerWindow::onActionMultiDuplication);
 	connect(m_ui->actionGroup, &QAction::triggered, this, &LaserControllerWindow::onActionGroup);
 	connect(m_ui->actionUngroup, &QAction::triggered, this, &LaserControllerWindow::onActionUngroup);
-    connect(this, &LaserControllerWindow::joinedGroupChanged, this, &LaserControllerWindow::onJoinedGroupChanged);
+    //connect(this, &LaserControllerWindow::joinedGroupChanged, this, &LaserControllerWindow::onJoinedGroupChanged);
 	
     connect(m_ui->actionCloseDocument, &QAction::triggered, this, &LaserControllerWindow::onActionCloseDocument);
     connect(m_ui->actionMoveLayerUp, &QAction::triggered, this, &LaserControllerWindow::onActionMoveLayerUp);
@@ -1032,7 +1080,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionInvertSelection, &QAction::triggered, this, &LaserControllerWindow::onActionInvertSelect);
     //shapes weld/ two shapes unite
     connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
-    //connect(m_arrangeButtonAlignVertical, &QToolButton::toggle, this, &LaserControllerWindow::onActionAlignVertical);
+    connect(m_ui->actionWeldAll, &QAction::triggered, this, &LaserControllerWindow::onActionWeldAll);
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     ADD_TRANSITION(deviceIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
@@ -1049,6 +1097,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
@@ -1059,6 +1114,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
@@ -1069,6 +1131,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
@@ -1079,6 +1148,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
@@ -1089,6 +1165,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
@@ -1099,6 +1182,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveTextState, this, SIGNAL(readyText()));
@@ -1109,6 +1199,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentViewDragState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 
 	ADD_TRANSITION(documentIdleState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 	ADD_TRANSITION(documentSelectionState, documentViewDragState, this, SIGNAL(readyViewDrag()));
@@ -1119,6 +1216,149 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	ADD_TRANSITION(documentPrimitiveSplineState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 	ADD_TRANSITION(documentPrimitiveSplineEditState, documentViewDragState, this, SIGNAL(readyViewDrag()));
     ADD_TRANSITION(documentPrimitiveTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveArcTextState, this, SIGNAL(readyVertireadyArcTextcalText()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
 
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 	ADD_TRANSITION(documentViewDragState, documentIdleState, this, SIGNAL(isIdle()));
@@ -1288,7 +1528,7 @@ void LaserControllerWindow::initAlignTarget()
     
 }
 
-void LaserControllerWindow::changeAlignButtonsEnable()
+/*void LaserControllerWindow::changeAlignButtonsEnable()
 {
     LaserPrimitiveGroup*g = m_viewer->group();
     QList<QGraphicsItem*> items = m_viewer->group()->childItems();
@@ -1343,7 +1583,7 @@ void LaserControllerWindow::changeAlignButtonsEnable()
         m_arrangeButtonDistributeVertical->setEnabled(false);
     }
     
-}
+}*/
 
 void LaserControllerWindow::tabAlignTarget()
 {
@@ -1413,38 +1653,6 @@ void LaserControllerWindow::setAlignTargetState(bool isAlignTarget)
     }
 }*/
 
-LaserPath* LaserControllerWindow::uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
-    LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup)
-{   
-    QPainterPath path1 = p1->getScenePath();
-    QPainterPath path2 = p2->getScenePath();
-    //not interset
-    if (!path1.intersects(path2)) {
-        //if()交集部分剪掉
-        p1->setJoinedGroup(joinedGroup);
-        //joinedGroup->append(p2);
-        m_scene->addLaserPrimitive(p1, layer, false);
-        p2->setJoinedGroup(joinedGroup);
-        //joinedGroup->append(p1);
-        m_scene->addLaserPrimitive(p2, layer, false);
-        return nullptr;
-    }
-    //interset
-    QPainterPath path;
-    path.addPath(path1 + path2);
-    
-    LaserPath* lPath = new LaserPath(path, m_scene->document(), QTransform(), layer->index());
-    m_scene->addLaserPrimitive(lPath, false);
-    m_viewer->group()->removeAllFromGroup();
-    m_scene->removeLaserPrimitive(p1, true);
-    m_scene->removeLaserPrimitive(p2, true);
-    lPath->setSelected(true);
-    m_viewer->group()->addToGroup(lPath);
-    if (!joinedGroup) {
-        joinedGroup->insert(lPath);
-    }
-    return lPath;
-}
 
 bool LaserControllerWindow::unitIsMM()
 {
@@ -1454,6 +1662,11 @@ bool LaserControllerWindow::unitIsMM()
 QLabel * LaserControllerWindow::labelPercentage()
 {
     return m_labelPercentage;
+}
+
+QLineEdit * LaserControllerWindow::textContentEdit()
+{
+    return m_textContent;
 }
 
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
@@ -2813,11 +3026,17 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
     m_lockedLabel = new QLabel("Locked");
+    m_textContentLabel = new QLabel("content");
+    m_textContent = new QLineEdit(this);
+    //textContentEdit(QString::fromLocal8Bit("属性面板中修改文字"));
+    m_textContent->setText(QString::fromLocal8Bit("属性面板中修改文字"));
+    m_textContent->setVisible(false);
     //暂时不做
     m_widthLabel->setVisible(false);
     m_heightLabel->setVisible(false);
     m_width->setVisible(false);
     m_height->setVisible(false);
+    
     //width
     /*m_width->connect(m_width, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
@@ -2867,13 +3086,17 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_cornerRadius->connect(m_cornerRadius, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        LaserPrimitive* firstPrimitive = nullptr;
+        if (!list.isEmpty()) {
+            firstPrimitive = list[0];
+        }
         bool isMulti = false;
         if(m_cornerRadius->prefix() == "multi"){
             isMulti = true;
         }
         //if repeate input
         if (!isMulti) {
-            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(list[0]);
+            LaserRect* rect = qgraphicsitem_cast<LaserRect*>(firstPrimitive);
             if (rect->cornerRadius() == m_cornerRadius->value()) {
                 return;
             }
@@ -2919,9 +3142,12 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     });
     //Locked
     m_locked->connect(m_locked, &QCheckBox::clicked, this, [=] {
-        qDebug() << "state:" << m_locked->checkState();
         LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
         QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        LaserPrimitive* firstPrimitive = nullptr;
+        if (!list.isEmpty()) {
+            firstPrimitive = list[0];
+        }
         QList<LaserPrimitive*>lockedList;
         for (LaserPrimitive* p : list) {
             if (p->isLocked()) {
@@ -2936,6 +3162,26 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     });
     m_locked->connect(m_locked, &QCheckBox::toggled, this, [=] {
         //qDebug() << "state:" << m_locked->checkState();
+    });
+    m_textContent->connect(m_textContent, &QLineEdit::textChanged, this, [=] {
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        LaserPrimitive* firstPrimitive = nullptr;
+        if (!list.isEmpty()) {
+            firstPrimitive = list[0];
+        }
+        int type = firstPrimitive->primitiveType();
+        if (type == LPT_HORIZONTALTEXT) {
+            LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(firstPrimitive);
+            text->setContent(m_textContent->text());
+        }else if (type == LPT_VERTICALTEXT) {
+            LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(firstPrimitive);
+            text->setContent(m_textContent->text());
+        }else if (type == LPT_CIRCLETEXT) {
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(firstPrimitive);
+            text->setContent(m_textContent->text());
+        }
+        view->viewport()->repaint();
     });
 
     m_propertyPanelWidget = new QWidget();
@@ -2952,11 +3198,12 @@ void LaserControllerWindow::showShapePropertyPanel()
 {
     LaserPrimitiveType type = LaserPrimitiveType::LPT_NULL;
     QList<LaserPrimitive*> list = m_scene->selectedPrimitives();
+    LaserPrimitive* primitive = list[0];
     bool isLocked = false;
     for (int i = 0; i < list.length(); i ++) {
         if (i == 0) {
-            type = list[0]->primitiveType();
-            isLocked = list[0]->isLocked();
+            type = primitive->primitiveType();
+            isLocked = primitive->isLocked();
             if (isLocked) {
                 m_locked->setCheckState(Qt::Checked);
             }
@@ -3174,6 +3421,48 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_pathPropertyWidget->setLayout(m_pathPropertyLayout);
             m_propertyDockWidget->setWidget(m_pathPropertyWidget);
         }
+        case LPT_VERTICALTEXT: {
+            LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
+            m_verticalTextPropertyLayout->setMargin(10);
+            m_verticalTextPropertyLayout->setSpacing(10);
+            m_verticalTextPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            m_verticalTextPropertyLayout->addWidget(m_textContentLabel, 0, 0);
+            m_verticalTextPropertyLayout->addWidget(m_textContent, 0, 1);
+            
+
+            m_verticalTextWidget->setLayout(m_verticalTextPropertyLayout);
+            m_propertyDockWidget->setWidget(m_verticalTextWidget);
+            if (m_textContent) {
+                m_textContent->setVisible(true);
+                m_textContent->setText(text->getContent());
+            }
+        }
+        case LPT_HORIZONTALTEXT: {
+            LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
+            m_horizontalTextPropertyLayout->setMargin(10);
+            m_horizontalTextPropertyLayout->setSpacing(10);
+            m_horizontalTextPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            m_horizontalTextPropertyLayout->addWidget(m_textContentLabel, 0, 0);
+            m_horizontalTextPropertyLayout->addWidget(m_textContent, 0, 1);
+            if (m_textContent) {
+                m_textContent->setVisible(true);
+            }
+            m_horizontalTextWidget->setLayout(m_horizontalTextPropertyLayout);
+            m_propertyDockWidget->setWidget(m_horizontalTextWidget);
+        }
+        case LPT_CIRCLETEXT: {
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+            m_circleTextPropertyLayout->setMargin(10);
+            m_circleTextPropertyLayout->setSpacing(10);
+            m_circleTextPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            m_circleTextPropertyLayout->addWidget(m_textContentLabel, 0, 0);
+            m_circleTextPropertyLayout->addWidget(m_textContent, 0, 1);
+            if (m_textContent) {
+                m_textContent->setVisible(true);
+            }
+            m_circleTextWidget->setLayout(m_circleTextPropertyLayout);
+            m_propertyDockWidget->setWidget(m_circleTextWidget);
+        }
     }
     
 
@@ -3219,6 +3508,15 @@ void LaserControllerWindow::createPrimitivePropertiesPanel()
     //path
     m_pathPropertyLayout = new QGridLayout();
     m_pathPropertyWidget = new QWidget();
+    //horizontal text
+    m_horizontalTextPropertyLayout = new QGridLayout(this);
+    m_horizontalTextWidget = new QWidget(this);
+    //vertical text
+    m_verticalTextPropertyLayout = new QGridLayout(this);
+    m_verticalTextWidget = new QWidget(this);
+    //arc text
+    m_circleTextPropertyLayout = new QGridLayout(this);
+    m_circleTextWidget = new QWidget(this);
 }
 
 void LaserControllerWindow::createPrimitiveLinePropertyPanel()
@@ -3434,8 +3732,29 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
 				else if (m_lastState == StateControllerInst.documentIdleState()) {
 					emit isIdle();
 				}
-				else if (m_lastState == StateControllerInst.documentIdleState()) {
-					emit isIdle();
+                else if (StateControllerInst.isInState(StateControllerInst.documentSelectionState())) {
+                    emit isIdle();
+                }
+				else if (m_lastState == StateControllerInst.documentPrimitiveStarState()) {
+					emit readyStar();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveFrameState()) {
+                    emit readyFrame();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveRingState()) {
+                    emit readyRing();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveRingEllipseState()) {
+                    emit readyRingEllipse();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveHorizontalTextState()) {
+                    emit readyHorizontalText();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveVerticalTextState()) {
+                    emit readyVerticalText();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveArcTextState()) {
+                    emit readyArcText();
                 }
 				m_lastState = nullptr;
 				m_viewer->viewport()->repaint();
@@ -3728,6 +4047,9 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     }
     for (LaserPrimitive* primitive : layer->primitives())
     {
+        if (!m_scene->document()->primitives().contains(primitive->id())) {
+            continue;
+        }
         primitive->setSelected(true);
         m_viewer->group()->addToGroup(primitive);
     }
@@ -4183,7 +4505,6 @@ void LaserControllerWindow::onActionSettings(bool checked)
 
 void LaserControllerWindow::onActionSelectionTool(bool checked)
 {
-    qDebug()<<"";
     if (checked)
     {
         emit isIdle();
@@ -4889,9 +5210,6 @@ void LaserControllerWindow::onLaserSceneSelectedChanged()
 		m_ui->actionDeletePrimitive->setEnabled(true);
 		
 	}
-    //判断显示哪个属性面板，shape properties panel
-    showShapePropertyPanel();
-
     m_statusSelectionCount->setText(tr("Selection: %1").arg(items.length()));
 }
 void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
@@ -4911,25 +5229,21 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         m_ui->actionMirrorHorizontal->setEnabled(false);
         m_ui->actionMirrorVertical->setEnabled(false);
     }
-    //joinedGroupButtonsChanged
-    //group,ungroup
-    bool hasJoined = false;
-    //计算选中的图元中，有多少个组和单个图元
-    int count = 0;
-    QList<QSet<LaserPrimitive*>*> countedJoinedList;
-    for (QGraphicsItem* item : items) {
-        LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
-        if (p->isJoinedGroup()) {
-            hasJoined = true;
-            if (!countedJoinedList.contains(p->joinedGroupList())) {
-                countedJoinedList.append(p->joinedGroupList());
+    //joinedGroupButtonsChanged  
+    //最多2个图元,即可做出判断
+    int count = m_scene->joinedGroupList().size();
+    if (count < 2) {
+        for (QGraphicsItem* item : items) {
+            LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(item);
+            if (!p->isJoinedGroup()) {
                 count++;
+                if (count == 2) {
+                    break;
+                }
             }
         }
-        else {
-            count++;
-        }
     }
+    
     //unite 
     if (count == 2) {
         m_ui->actionUniteTwoShapes->setEnabled(true);
@@ -4938,13 +5252,35 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
         m_ui->actionUniteTwoShapes->setEnabled(false);
     }
     if (count > 1) {
+        m_ui->actionWeldAll->setEnabled(true);
         m_ui->actionGroup->setEnabled(true);
+        m_arrangeButtonAlignCenter->setEnabled(true);
+        m_arrangeButtonAlignHorinzontal->setEnabled(true);
+        m_arrangeButtonAlignVertical->setEnabled(true);
+        m_arrangeButtonSameWidth->setEnabled(true);
+        m_arrangeButtonSameHeight->setEnabled(true);
+        if (count == 2) {
+            m_arrangeButtonDistributeHorinzontal->setEnabled(false);
+            m_arrangeButtonDistributeVertical->setEnabled(false);
+        }
+        else {
+            m_arrangeButtonDistributeHorinzontal->setEnabled(true);
+            m_arrangeButtonDistributeVertical->setEnabled(true);
+        }
     }
     else {
+        m_ui->actionWeldAll->setEnabled(false);
         m_ui->actionGroup->setEnabled(false);
+        m_arrangeButtonAlignCenter->setEnabled(false);
+        m_arrangeButtonAlignHorinzontal->setEnabled(false);
+        m_arrangeButtonAlignVertical->setEnabled(false);
+        m_arrangeButtonSameWidth->setEnabled(false);
+        m_arrangeButtonSameHeight->setEnabled(false);
+        m_arrangeButtonDistributeHorinzontal->setEnabled(false);
+        m_arrangeButtonDistributeVertical->setEnabled(false);
     }
 
-    if (hasJoined) {
+    if (!m_scene->joinedGroupList().isEmpty()) {
         m_ui->actionUngroup->setEnabled(true);
     }
     else {
@@ -4952,16 +5288,17 @@ void LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged()
     }
     
     //Align
-    changeAlignButtonsEnable();
+    //changeAlignButtonsEnable();
     //shapes weld/ two shapes unit
     //changeShapesWeldButtonsEnable();
-
+    //判断显示哪个属性面板，shape properties panel
+    showShapePropertyPanel();
 }
-void LaserControllerWindow::onJoinedGroupChanged()
+/*void LaserControllerWindow::onJoinedGroupChanged()
 {
     //Align
     changeAlignButtonsEnable();
-}
+}*/
 void LaserControllerWindow::onLaserToolButtonShowMenu()
 {
     if (!viewer()) {
@@ -5730,6 +6067,132 @@ void LaserControllerWindow::applyJobOriginToDocument(const QVariant& /*value*/)
     m_viewer->viewport()->update();
 }
 
+void LaserControllerWindow::onActionStar(bool checked)
+{
+    if (checked)
+    {
+        emit readyStar();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionStar->setChecked(true);
+        
+    }
+}
+
+void LaserControllerWindow::onActionRing(bool checked)
+{
+    if (checked)
+    {
+        emit readyRing();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionRing->setChecked(true);
+    }
+}
+
+void LaserControllerWindow::onActionRingEllipse(bool checked)
+{
+    if (checked)
+    {
+        emit readyRingEllipse();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionRingEllipse->setChecked(true);
+    }
+}
+
+void LaserControllerWindow::onActionFrame(bool checked)
+{
+    if (checked)
+    {
+        emit readyFrame();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionRingEllipse->setChecked(true);
+    }
+}
+
+void LaserControllerWindow::onActionHorizontalText(bool checked)
+{
+    if (checked)
+    {
+        emit readyHorizontalText();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionHorizontalText->setChecked(true);
+    }
+}
+
+void LaserControllerWindow::onActionVerticalText(bool checked)
+{
+    if (checked)
+    {
+        emit readyVerticalText();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionVerticalText->setChecked(true);
+    }
+}
+
+void LaserControllerWindow::onActionArcText(bool checked)
+{
+    if (checked)
+    {
+        emit readyArcText();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionArcText->setChecked(true);
+    }
+}
+
+void LaserControllerWindow::onActionCreateNameStamp()      
+{
+    /*LaserRing* star = new LaserRing(m_scene->document(), QRectF(QPointF(0, 0), QPointF(50 * 1000, 50 * 1000)), 5 * 1000,  QTransform(),
+        m_viewer->curLayerIndex());
+    m_scene->addLaserPrimitive(star, false);*/
+    /*LaserFrame* star = new LaserFrame(m_scene->document(), QRect(QPoint(0, 0), QPoint(50 * 1000, 50 * 1000)), 5 * 1000, 5 * 1000, QTransform(),
+        m_viewer->curLayerIndex(), CRT_Line);
+    m_scene->addLaserPrimitive(star, false);
+    QString s("PKL");
+    LaserCircleText* text = new LaserCircleText(m_scene->document(),
+        s, QRect(0, 0, 90 * 1000, 50 * 1000),
+        QSize(), 0);
+        m_scene->addLaserPrimitive(text, false); 
+    LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(),
+        "llrg", QSize(90*1000, 60*1000));
+    m_scene->addLaserPrimitive(text, false);*/
+    LaserCircleText* text = new LaserCircleText(m_scene->document(),
+        "123gj566", QRect(50*1000, 20 * 1000, 250 * 1000, 100 * 1000), 260);
+    m_scene->addLaserPrimitive(text, false);
+    
+}
+
+void LaserControllerWindow::onActionCreateStripStamp()
+{
+}
+
+void LaserControllerWindow::onActionCreateCircleStamp()
+{
+}
+
+void LaserControllerWindow::onActionCreateEllipseStamp()
+{
+}
+
 void LaserControllerWindow::onActionAlignCenter()
 {
     ArrangeAlignCommand* cmd = new ArrangeAlignCommand(m_viewer, Qt::AlignCenter);
@@ -5876,15 +6339,15 @@ void LaserControllerWindow::onActionInvertSelect()
 
 void LaserControllerWindow::onActionTwoShapesUnite()
 {
-    LaserPrimitiveGroup*g = m_viewer->group();
-    QList<QGraphicsItem*> items = m_viewer->group()->childItems();
-    LaserPrimitive* p1 = qgraphicsitem_cast<LaserPrimitive*>(items[0]);
-    LaserPrimitive* p2 = qgraphicsitem_cast<LaserPrimitive*>(items[1]);
-    LaserLayer* layer = p1->layer();
-    if (p1->layer()->index() > p2->layer()->index()) {
-        layer = p2->layer();
-    }
-    uniteTwoShapes(p1, p2, layer, nullptr);
+    WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_TwoUnite);
+    m_viewer->undoStack()->push(cmd);
+    m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onActionWeldAll()
+{
+    WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_WeldAll);
+    m_viewer->undoStack()->push(cmd);
     m_viewer->viewport()->repaint();
 }
 

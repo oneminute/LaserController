@@ -435,10 +435,7 @@ void LaserLayer::setErrorX(int errorX)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
-    int i = this->index();
     item->setLayer(this);
-    d->primitives.append(item);
-    d->doc->updateLayersStructure();
 }
 
 QList<LaserPrimitive*>& LaserLayer::primitives()
@@ -447,14 +444,15 @@ QList<LaserPrimitive*>& LaserLayer::primitives()
     return d->primitives;
 }
 
-void LaserLayer::removePrimitive(LaserPrimitive * item)
+void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
 {
     Q_D(LaserLayer);
-    if (!d->primitives.contains(item))
-        return;
-
-    //item->setLayer(nullptr);
-    d->primitives.removeOne(item);
+    if (itemKeepLayer) {
+        d->primitives.removeOne(item);
+    }
+    else {
+        item->setLayer(nullptr);
+    }
     d->doc->updateLayersStructure();
 }
 
@@ -663,6 +661,30 @@ QJsonObject LaserLayer::toJson(QWidget* window)
         else if (className == "LaserPath") {
             LaserPath* path = qobject_cast<LaserPath*>(primitive);
             array.append(path->toJson());
+        }
+        else if (className == "LaserStar") {
+            LaserStar* star = qobject_cast<LaserStar*>(primitive);
+            array.append(star->toJson());
+        }
+        else if (className == "LaserRing") {
+            LaserRing* ring = qobject_cast<LaserRing*>(primitive);
+            array.append(ring->toJson());
+        }
+        else if (className == "LaserFrame") {
+            LaserFrame* frame = qobject_cast<LaserFrame*>(primitive);
+            array.append(frame->toJson());
+        }
+        else if (className == "LaserHorizontalText") {
+            LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*>(primitive);
+            array.append(hText->toJson());
+        }
+        else if (className == "LaserVerticalText") {
+            LaserVerticalText* text = qobject_cast<LaserVerticalText*>(primitive);
+            array.append(text->toJson());
+        }
+        else if (className == "LaserCircleText") {
+            LaserCircleText* cText = qobject_cast<LaserCircleText*>(primitive);
+            array.append(cText->toJson());
         }
 		else {
 			QMessageBox::critical(window, "critical", "can't save, "+className+" can't to json.");

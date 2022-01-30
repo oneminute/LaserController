@@ -113,7 +113,7 @@ public:
 protected:
     void addPrimitive(LaserPrimitive* item);
     void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
-    void removePrimitive(LaserPrimitive* item);
+    void removePrimitive(LaserPrimitive* item, bool keepLayer = true);
 
 public slots:
     void exportJSON(const QString& filename, ProgressItem* parentProgress, bool exportJson = false);

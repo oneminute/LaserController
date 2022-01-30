@@ -59,6 +59,7 @@ class CameraController;
 class ImageViewer;
 class Vector2DWidget;
 class Vector3DWidget;
+class LaserStar;
 
 class LaserControllerWindow : public QMainWindow
 {
@@ -101,16 +102,13 @@ public:
     LaserDoubleSpinBox* textSpaceYSpinBox();
     //align
     void initAlignTarget();
-    void changeAlignButtonsEnable();
+    //void changeAlignButtonsEnable();
     void tabAlignTarget();
     void setAlignTargetState(bool isAlignTarget);
-    //shapes weld / tow shapes unite
-    //void changeShapesWeldButtonsEnable();
-    LaserPath* uniteTwoShapes(LaserPrimitive* p1, LaserPrimitive* p2, 
-        LaserLayer* layer, QSet<LaserPrimitive*>* joinedGroup);
     //selection property
     bool unitIsMM();
     QLabel* labelPercentage();
+    QLineEdit* textContentEdit();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -354,6 +352,19 @@ protected slots:
     void askMergeOrNew();
 
     void applyJobOriginToDocument(const QVariant& value);
+    //stamp shapes
+    void onActionStar(bool checked = false);
+    void onActionRing(bool checked = false);
+    void onActionRingEllipse(bool checked = false);
+    void onActionFrame(bool checked = false);
+    void onActionHorizontalText(bool checked = false);
+    void onActionVerticalText(bool checked = false);
+    void onActionArcText(bool checked = false);
+    //create stamp
+    void onActionCreateNameStamp();
+    void onActionCreateStripStamp();
+    void onActionCreateCircleStamp();
+    void onActionCreateEllipseStamp();
     //arrange align
     void onActionAlignCenter();
     void onActionAlignHorinzontalMiddle();
@@ -380,6 +391,7 @@ protected slots:
     void onActionSelectAll();
     void onActionInvertSelect();
     void onActionTwoShapesUnite();
+    void onActionWeldAll();
 
     // cameras slots
     void onCameraConnected();
@@ -387,7 +399,7 @@ protected slots:
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
-    void onJoinedGroupChanged();
+    //void onJoinedGroupChanged();
     void onLaserToolButtonShowMenu();
     void onClickedMmOrInch();
 
@@ -412,7 +424,14 @@ signals:
     void finishPrintAndCutSelecting();
     void startPrintAndCutAligning();
     void finishPrintAndCutAligning();
-    void joinedGroupChanged();
+    void readyStar();
+    void readyFrame();
+    void readyRing();
+    void readyRingEllipse();
+    void readyHorizontalText();
+    void readyVerticalText();
+    void readyArcText();
+    //void joinedGroupChanged();
 
 private:
     QScopedPointer<Ui::LaserControllerWindow> m_ui;
@@ -544,6 +563,8 @@ private:
     LaserDoubleSpinBox* m_enhanceAmout;
     QLabel* m_enhanceAmoutLabel;
     LaserDoubleSpinBox* m_enhanceDenoise;
+    QLabel* m_textContentLabel;
+    QLineEdit* m_textContent;
     QLabel* m_enhanceDenoiseLabel;
     QGridLayout* m_rectPropertyLayout;
     QGridLayout* m_linePropertyLayout;
@@ -556,6 +577,9 @@ private:
     QGridLayout* m_mixturePropertyLayout;
     QGridLayout* m_nullPropertyLayout;
     QGridLayout* m_pathPropertyLayout;
+    QGridLayout* m_horizontalTextPropertyLayout;
+    QGridLayout* m_verticalTextPropertyLayout;
+    QGridLayout* m_circleTextPropertyLayout;
     QWidget* m_propertyPanelWidget;
     QWidget* m_rectPropertyWidget;
     QWidget* m_linePropertyWidget;
@@ -568,6 +592,10 @@ private:
     QWidget* m_mixturePropertyWidget;
     QWidget* m_nullPropertyWidget;
     QWidget* m_pathPropertyWidget;
+    QWidget* m_horizontalTextWidget;
+    QWidget* m_verticalTextWidget;
+    QWidget* m_circleTextWidget;
+    
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;
     ads::CDockAreaWidget* m_dockAreaProperty;
@@ -708,6 +736,8 @@ private:
     LaserToolButton* m_arrangeButtonSameWidth;
     LaserToolButton* m_arrangeButtonSameHeight;
     LaserToolButton* m_arrangeMoveToPage;
+    LaserToolButton* m_createStampTb;
+    LaserToolButton* m_toolButtonStampShapes;
     int m_alignTargetIndex;
     LaserPrimitive* m_alignTarget;
     friend class LaserApplication;

@@ -153,6 +153,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionOpen, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionOpen
 
@@ -173,6 +180,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCloseDocument, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionCloseDocument
 
@@ -193,6 +207,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionImport, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionImport
 
@@ -213,6 +234,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionExportJSON, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionExportJSON
 
@@ -233,6 +261,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSave, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionSave
 
@@ -253,6 +288,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSaveAs, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionSaveAs
 
@@ -267,6 +309,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionNew, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionNew
 
@@ -281,6 +330,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionAddEngravingLayer, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionAddEngravingLayer
 
@@ -295,6 +351,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionAddCuttingLayer, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionAddCuttingLayer
 
@@ -315,6 +378,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionRemoveLayer, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionRemoveLayer
 
@@ -329,6 +399,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionAreaSelection, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionAreaSelection
 
@@ -343,6 +420,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCancelSelection, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCancelSelection
 
@@ -357,6 +441,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionSelectionTool
 
@@ -371,6 +462,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionRectangleTool
 
@@ -385,6 +483,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionEllipseTool
 
@@ -399,6 +504,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionPolygonTool
 
@@ -413,6 +525,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionTextTool
 
@@ -427,6 +546,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionLineTool
 
@@ -441,6 +567,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionBitmapTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionBitmapTool
 
@@ -455,6 +588,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionSplineTool
 
@@ -469,6 +609,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionEditSplineTool
 
@@ -485,6 +632,27 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveState);
     // end m_ui->actionDragView
 
+    // begin m_toolButtonStampShapes
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", true, documentPrimitiveSplineState);
+    // end m_toolButtonStampShapes
+
     // begin m_ui->actionSelectionTool
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentEmptyState);
@@ -500,6 +668,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSelectionTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionSelectionTool
 
@@ -518,6 +693,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionRectangleTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionRectangleTool
 
@@ -536,6 +718,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionEllipseTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionEllipseTool
 
@@ -554,6 +743,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionPolygonTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionPolygonTool
 
@@ -572,6 +768,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionTextTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionTextTool
 
@@ -590,6 +793,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionLineTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionLineTool
 
@@ -608,6 +818,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSplineTool, "checked", true, documentPrimitiveSplineState);
     // end m_ui->actionSplineTool
 
@@ -626,6 +843,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionEditSplineTool, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionEditSplineTool
 
@@ -644,8 +868,213 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionDragView, "checked", false, documentPrimitiveSplineState);
     // end m_ui->actionDragView
+
+    // begin m_toolButtonStampShapes
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", true, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_toolButtonStampShapes, "checked", false, documentPrimitiveSplineState);
+    // end m_toolButtonStampShapes
+
+    // begin m_ui->actionStar
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", true, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionStar, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionStar
+
+    // begin m_ui->actionFrame
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionFrame, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionFrame
+
+    // begin m_ui->actionRing
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionRing, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionRing
+
+    // begin m_ui->actionRingEllipse
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionRingEllipse, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionRingEllipse
+
+    // begin m_ui->actionHorizontalText
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionHorizontalText, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionHorizontalText
+
+    // begin m_ui->actionVerticalText
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionVerticalText, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionVerticalText
+
+    // begin m_ui->actionArcText
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentSelectedEditingState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionArcText, "checked", false, documentPrimitiveSplineState);
+    // end m_ui->actionArcText
 
     // begin m_ui->actionImportCorelDraw
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);
@@ -658,6 +1087,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionImportCorelDraw
 
@@ -672,6 +1108,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionLoadJson, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionLoadJson
 
@@ -686,6 +1129,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionHalfTone, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionHalfTone
 
@@ -705,6 +1155,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveSplineState);
     BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", true, documentPrimitiveRectReadyState);
     BIND_PROP_TO_STATE(m_ui->actionSelectAll, "enabled", false, documentPrimitiveRectCreatingState);
@@ -738,6 +1195,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveSplineState);
     BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", true, documentPrimitiveRectReadyState);
     BIND_PROP_TO_STATE(m_ui->actionInvertSelection, "enabled", false, documentPrimitiveRectCreatingState);
@@ -767,6 +1231,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCut, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCut
 
@@ -782,6 +1253,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCopy, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCopy
 
@@ -796,6 +1274,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionPaste, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionPaste
 
@@ -809,6 +1294,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionPasteInPlace, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionPasteInPlace
 
@@ -823,6 +1315,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionPathOptimization, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionPathOptimization
 
@@ -838,6 +1337,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionDeletePrimitive, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionDeletePrimitive
 
@@ -849,6 +1355,20 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentSelectedState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", false, documentPrimitiveSplineState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerUp, "enabled", true, documentPrimitiveState);
@@ -868,6 +1388,20 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentSelectedState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", false, documentPrimitiveSplineState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentViewDragReadyState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveLayerDown, "enabled", true, documentPrimitiveState);
@@ -890,6 +1424,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionAnalysisDocument, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionAnalysisDocument
 
@@ -910,6 +1451,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionUnitChange, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionUnitChange
 
@@ -924,6 +1472,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCameraUpdateOverlay
 
@@ -938,6 +1493,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCameraTrace, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCameraTrace
 
@@ -952,6 +1514,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionCameraSaveSettings, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionCameraSaveSettings
 
@@ -966,6 +1535,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionRefresh, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionRefresh
 
@@ -979,6 +1555,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionZoomIn, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionZoomIn
 
@@ -992,6 +1575,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionZoomOut, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionZoomOut
 
@@ -1005,6 +1595,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionZoomToPage, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionZoomToPage
 
@@ -1018,6 +1615,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionZoomToSelection
 
@@ -1037,6 +1641,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionRedo
 
@@ -1049,6 +1660,11 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
     // end m_ui->actionMirrorVertical
+
+    // begin m_ui->actionWeldAllShapes
+    BIND_PROP_TO_STATE(m_ui->actionWeldAllShapes, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionWeldAllShapes, "enabled", false, documentEmptyState);
+    // end m_ui->actionWeldAllShapes
 
     // begin m_ui->actionUniteTwoShapes
     BIND_PROP_TO_STATE(m_ui->actionUniteTwoShapes, "enabled", false, initState);
@@ -1077,6 +1693,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionDuplication, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionDuplication
 
@@ -1092,6 +1715,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionMultiDuplication, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMultiDuplication
 
@@ -1105,6 +1735,13 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveLineState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitivePolygonState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveStarState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorAcrossLine, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionMirrorAcrossLine
 

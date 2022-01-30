@@ -99,7 +99,13 @@ enum LaserPrimitiveType
     LPT_SHAPE,
     LPT_BITMAP,
 	LPT_TEXT,
-    LPT_NURBS
+    LPT_NURBS,
+    LPT_STAR,
+    LPT_FRAME,
+    LPT_RING,
+    LPT_CIRCLETEXT,
+    LPT_HORIZONTALTEXT,
+    LPT_VERTICALTEXT,
 };
 
 enum LaserLayerType
@@ -130,7 +136,11 @@ enum PropertyEditor
     PE_LineEdit = 0,
     PE_FinishRunWidget
 };
-
+enum WeldShapes {
+    WeldShapes_TwoUnite = 0,
+    WeldShapes_WeldAll = 1,
+    WeldShapes_DiffTwoUnite = 2
+};
 enum WidgetUserData
 {
     WUD_PropertyValue = Qt::UserRole + 1, 
@@ -312,6 +322,13 @@ enum CalibrationPattern
     CP_CHARUCO_BOARD
 };
 Q_DECLARE_METATYPE(CalibrationPattern)
+
+enum CornerRadiusType{
+    CRT_Round,
+    CRT_Line,
+    CRT_Arc,
+
+};
 
 struct FillStyleAndPixelsCount
 {

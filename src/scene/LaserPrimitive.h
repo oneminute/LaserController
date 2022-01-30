@@ -69,7 +69,8 @@ public:
     virtual QByteArray engravingImage(ProgressItem* parentProgress, QPoint& lastPoint) { return QByteArray(); }
     virtual QByteArray filling(ProgressItem* parentProgress, QPoint& lastPoint) { return QByteArray(); }
     virtual bool isClosed() const = 0;
-
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
     LaserPrimitiveType primitiveType() const;
     QString typeName() const;
     QString typeLatinName() const;
@@ -85,7 +86,7 @@ public:
     void setAlignTarget(bool value);
 
     LaserLayer* layer() const;
-    void setLayer(LaserLayer* layer);
+    void setLayer(LaserLayer* layer, bool whenNullLayerKeepIndex = true);
 
     QString toString() const;
 
@@ -116,14 +117,19 @@ public:
     void addTreeNode(QuadTreeNode* node);
     void removeAllTreeNode();
     void removeOneTreeNode(QuadTreeNode* node);
-
+    //计算矩形的内切角
+    void concaveRect(QRect rect, QPainterPath& path, qreal cornerRadius, int type);
+    QPainterPath computeCornerRadius(QRect rect, int cornerRadius, int type);
     virtual bool isAvailable() const;
+    //circleText，horizontalText，verticalText中使用，方便改变外包框
+    //QRect variableBounds();
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    
 private:
     QRect m_joinedGroupSceneBoundingRect;
 	
@@ -186,16 +192,15 @@ class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
-    LaserRect(const QRect rect, int cornerRadius, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
+    LaserRect(const QRect rect, int cornerRadius, LaserDocument* doc, 
+        QTransform transform = QTransform(), int layerIndex = 1, int cornerRadiusType = CRT_Round);
     virtual ~LaserRect() {}
 
     QRect rect() const;
     void setRect(const QRect& rect);
 
     int cornerRadius() const;
-    void setCornerRadius(int cornerRadius);
-    void concaveRect(QRect rect, QPainterPath& path, qreal cornerRadius);
-
+    void setCornerRadius(int cornerRadius, int type);
     bool isRoundedRect() const;
 
     virtual void draw(QPainter* painter);
@@ -464,6 +469,190 @@ public:
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)
+};
+
+class LaserStarPrivate;
+class LaserStar : public LaserShape {
+    Q_OBJECT
+public:
+    LaserStar(LaserDocument* doc, QPoint centerPos, qreal radius, QTransform transform = QTransform(),
+        int layerIndex = 0);
+    virtual ~LaserStar();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_STAR; }
+    virtual QString typeName() { return tr("Star"); }
+    virtual QJsonObject toJson();
+    LaserPrimitive * clone(QTransform t);
+    QVector<QLineF> edges();
+    void updatePoints();
+    QPoint* points();
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
+    //virtual LaserLineListList generateFillData(QPointF& lastPoint);
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStar)
+    Q_DISABLE_COPY(LaserStar)
+};
+class LaserRingPrivate;
+class LaserRing : public LaserShape {
+    Q_OBJECT
+public:
+    LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransform transform = QTransform(),
+        int layerIndex = 0);
+    virtual ~LaserRing();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_RING; }
+    virtual QString typeName() { return tr("Ring"); }
+    virtual QJsonObject toJson();
+    LaserPrimitive * clone(QTransform t);
+    QVector<QLineF> edges();
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    qreal width() const;
+    QRectF innerRect();
+    //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
+    //virtual LaserLineListList generateFillData(QPointF& lastPoint);
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserRing)
+    Q_DISABLE_COPY(LaserRing)
+};
+class LaserFramePrivate;
+class LaserFrame : public LaserShape {
+    Q_OBJECT
+public:
+    //cornnerRadilus 为正是圆角，为副是内角
+    //内角分用圆形且和用正方形切
+    LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornerRadilus,
+        QTransform transform = QTransform(),int layerIndex = 0, int cornerType = CRT_Round);
+    virtual~LaserFrame();
+
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_FRAME; }
+    virtual QString typeName() { return tr("Frame"); }
+    virtual QJsonObject toJson();
+    LaserPrimitive * clone(QTransform t);
+    QVector<QLineF> edges();
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    void setCornerRadius(int cornerRadius, int type);
+    QRectF innerRect();
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
+    Q_DISABLE_COPY(LaserFrame)
+};
+class LaserCircleTextPrivate;
+class LaserCircleText : public LaserShape {
+    Q_OBJECT
+public:
+    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle, 
+        bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
+    virtual ~LaserCircleText();
+    void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
+    QPointF computeEllipsePoint(qreal rRadian);
+    void translateText(QPointF& lastPoint, QPointF& curPoint, qreal interval, qreal index);
+    QTransform scaleText(QPainterPath path);
+    QTransform rotateText(int i,QPointF textPos);
+    void transformText(QPainterPath path, QPointF textPos, int i);
+    void transformTextByCenter(QPainterPath path, QPointF textPos, int i);
+    QRectF textArcRect();
+    void initAngle();
+    void setAngle(qreal angle, bool needInit = true);
+    void setTextSize(QSize size, bool needInit = true);
+    qreal mapToAffineCircleAngle(qreal radian);
+    void moveTextToEllipse(qreal lengthByPercent);
+    void computeTextByPercent(int intervalCount);
+    void computeMoveTextPath(qreal diffAngle);
+    void computeChangeAngle(qreal diffAngle);
+    void computeChangeTextHeight(qreal diffHeight);
+    void resizeRadian();
+    QPainterPath* textArc();
+    //QPointF startPoint();
+    //QPointF endPoint();
+    //QPointF centerPoint();
+    QSize textSize();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
+    virtual QString typeName() { return tr("CircleText"); }
+    LaserPrimitive * clone(QTransform t);
+    virtual QJsonObject toJson();
+    QVector<QLineF> edges();
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
+    void setContent(QString content);
+    QString getContent();
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
+        Q_DISABLE_COPY(LaserCircleText)
+};
+class LaserHorizontalTextPrivate;
+class LaserHorizontalText : public LaserShape {
+    Q_OBJECT
+public:
+    LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
+        QPointF bottomLeft, qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
+    virtual ~LaserHorizontalText();
+    void initTextPath();
+    void computeTextPath();
+    void toBottomLeft();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_HORIZONTALTEXT; }
+    virtual QString typeName() { return tr("HorizontalText"); }
+    LaserPrimitive * clone(QTransform t);
+    virtual QJsonObject toJson();
+    QVector<QLineF> edges();
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    virtual void setBoundingRectWidth(qreal width);
+    void setTextHeight(qreal diff);
+    void setTextWidth(qreal width);
+    void setContent(QString content);
+    QString getContent();
+    QSize textSize();
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
+        Q_DISABLE_COPY(LaserHorizontalText)
+};
+class LaserVerticalTextPrivate;
+class LaserVerticalText : public LaserShape {
+    Q_OBJECT
+public:
+    LaserVerticalText(LaserDocument* doc, QString content, QSize size,
+        QPointF topLeft, qreal space, QTransform transform = QTransform(), int layerIndex = 0);
+    virtual ~LaserVerticalText();
+    void initTextPath();
+    void computeTextPath();
+    void toTopLeft();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_VERTICALTEXT; }
+    virtual QString typeName() { return tr("VerticalText"); }
+    LaserPrimitive * clone(QTransform t);
+    virtual QJsonObject toJson();
+    QVector<QLineF> edges();
+
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    virtual void setBoundingRectHeight(qreal height);
+    void setTextHeight(qreal diff);
+    void setTextWidth(qreal width);
+    void setContent(QString content);
+    QString getContent();
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
+        Q_DISABLE_COPY(LaserVerticalText)
 };
 
 QDebug operator<<(QDebug debug, const QRect& rect);

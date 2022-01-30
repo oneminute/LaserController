@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -184,6 +184,7 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomToSelection"/>
    <addaction name="separator"/>
+   <addaction name="actionWeldAll"/>
    <addaction name="actionUniteTwoShapes"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
@@ -1782,6 +1783,134 @@
   <action name="actionGenerateCalibrationBoard">
    <property name="text">
     <string>Generate Calibration Board</string>
+   </property>
+  </action>
+  <action name="actionWeldAll">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/weldAllShapes.png</normaloff>:/ui/icons/images/weldAllShapes.png</iconset>
+   </property>
+   <property name="text">
+    <string>Weld All Shapes</string>
+   </property>
+   <property name="toolTip">
+    <string>Weld All shapes</string>
+   </property>
+  </action>
+  <action name="actionNameStamp">
+   <property name="text">
+    <string>NameStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>NameStamp</string>
+   </property>
+  </action>
+  <action name="actionStripStamp">
+   <property name="text">
+    <string>StripStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Strip Stamp</string>
+   </property>
+  </action>
+  <action name="actionCircleStamp">
+   <property name="text">
+    <string>CircleStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Circle Stamp</string>
+   </property>
+  </action>
+  <action name="actionEllipseStamp">
+   <property name="text">
+    <string>EllipseStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Ellipse Stamp</string>
+   </property>
+  </action>
+  <action name="actionStar">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/start.png</normaloff>:/ui/icons/images/start.png</iconset>
+   </property>
+   <property name="text">
+    <string>star</string>
+   </property>
+   <property name="toolTip">
+    <string>star</string>
+   </property>
+  </action>
+  <action name="actionFrame">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/frame.png</normaloff>:/ui/icons/images/frame.png</iconset>
+   </property>
+   <property name="text">
+    <string>Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>frame</string>
+   </property>
+  </action>
+  <action name="actionRing">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/ring.png</normaloff>:/ui/icons/images/ring.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ring</string>
+   </property>
+   <property name="toolTip">
+    <string>ring</string>
+   </property>
+  </action>
+  <action name="actionRingEllipse">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/ringEllipse.png</normaloff>:/ui/icons/images/ringEllipse.png</iconset>
+   </property>
+   <property name="text">
+    <string>RingEllipse</string>
+   </property>
+   <property name="toolTip">
+    <string>ellipse</string>
+   </property>
+  </action>
+  <action name="actionVerticalText">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/verticalText.png</normaloff>:/ui/icons/images/verticalText.png</iconset>
+   </property>
+   <property name="text">
+    <string>VerticalText</string>
+   </property>
+   <property name="toolTip">
+    <string>vertical text</string>
+   </property>
+  </action>
+  <action name="actionHorizontalText">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/horizontalText.png</normaloff>:/ui/icons/images/horizontalText.png</iconset>
+   </property>
+   <property name="text">
+    <string>HorizontalText</string>
+   </property>
+   <property name="toolTip">
+    <string>horizontal Text</string>
+   </property>
+  </action>
+  <action name="actionArcText">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/arcText.png</normaloff>:/ui/icons/images/arcText.png</iconset>
+   </property>
+   <property name="text">
+    <string>ArcText</string>
+   </property>
+   <property name="toolTip">
+    <string>Arc Text</string>
    </property>
   </action>
   <action name="actionCameraAlignment">
