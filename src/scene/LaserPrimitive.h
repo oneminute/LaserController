@@ -516,6 +516,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     qreal width() const;
+    QRectF innerRect();
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -544,6 +545,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     void setCornerRadius(int cornerRadius, int type);
+    QRectF innerRect();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)
@@ -589,6 +591,8 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
+    void setContent(QString content);
+    QString getContent();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
         Q_DISABLE_COPY(LaserCircleText)
@@ -615,6 +619,8 @@ public:
     virtual void setBoundingRectWidth(qreal width);
     void setTextHeight(qreal diff);
     void setTextWidth(qreal width);
+    void setContent(QString content);
+    QString getContent();
     QSize textSize();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
@@ -640,8 +646,10 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectHeight(qreal height);
-    void setTextHeight(qreal width);
+    void setTextHeight(qreal diff);
     void setTextWidth(qreal width);
+    void setContent(QString content);
+    QString getContent();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
         Q_DISABLE_COPY(LaserVerticalText)

@@ -678,6 +678,10 @@ QJsonObject LaserLayer::toJson(QWidget* window)
             LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*>(primitive);
             array.append(hText->toJson());
         }
+        else if (className == "LaserVerticalText") {
+            LaserVerticalText* text = qobject_cast<LaserVerticalText*>(primitive);
+            array.append(text->toJson());
+        }
         else if (className == "LaserCircleText") {
             LaserCircleText* cText = qobject_cast<LaserCircleText*>(primitive);
             array.append(cText->toJson());

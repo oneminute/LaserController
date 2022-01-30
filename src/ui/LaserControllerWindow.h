@@ -101,6 +101,7 @@ public:
     //selection property
     bool unitIsMM();
     QLabel* labelPercentage();
+    QLineEdit* textContentEdit();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -536,6 +537,8 @@ private:
     LaserDoubleSpinBox* m_enhanceAmout;
     QLabel* m_enhanceAmoutLabel;
     LaserDoubleSpinBox* m_enhanceDenoise;
+    QLabel* m_textContentLabel;
+    QLineEdit* m_textContent;
     QLabel* m_enhanceDenoiseLabel;
     QGridLayout* m_rectPropertyLayout;
     QGridLayout* m_linePropertyLayout;
@@ -548,6 +551,9 @@ private:
     QGridLayout* m_mixturePropertyLayout;
     QGridLayout* m_nullPropertyLayout;
     QGridLayout* m_pathPropertyLayout;
+    QGridLayout* m_horizontalTextPropertyLayout;
+    QGridLayout* m_verticalTextPropertyLayout;
+    QGridLayout* m_circleTextPropertyLayout;
     QWidget* m_propertyPanelWidget;
     QWidget* m_rectPropertyWidget;
     QWidget* m_linePropertyWidget;
@@ -560,6 +566,10 @@ private:
     QWidget* m_mixturePropertyWidget;
     QWidget* m_nullPropertyWidget;
     QWidget* m_pathPropertyWidget;
+    QWidget* m_horizontalTextWidget;
+    QWidget* m_verticalTextWidget;
+    QWidget* m_circleTextWidget;
+    
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;
     ads::CDockAreaWidget* m_dockAreaProperty;

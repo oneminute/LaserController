@@ -56,6 +56,7 @@ public:
     RulerWidget* horizontalRuler();
     RulerWidget* verticalRuler();
 	LaserPrimitiveGroup* group();
+    LaserPrimitive* cursorInLaserPrimitive(QPointF mousePosInScene);
 	QRect selectedItemsSceneBoundingRect();
     QRect AllItemsSceneBoundingRect();
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate,
@@ -130,6 +131,7 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
+    void addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
     
 public slots:
     void zoomIn();

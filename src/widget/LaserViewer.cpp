@@ -16,6 +16,7 @@
 #include <QUndoStack>
 #include <QGLWidget>
 #include <QMessageBox>
+#include <QLineEdit>
 
 #include <LaserApplication.h>
 #include "laser/LaserDevice.h"
@@ -1397,38 +1398,41 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             qreal vZoomValue = zoomValueNormal();
             //outer left 13
             QRect leftRect;
-            if (primitive->primitiveType() == LPT_CIRCLETEXT ||
+            QPointF oLeft_3 = mapFromScene(primitive->mapToScene(
+                primitive->boundingRect().topLeft().x(),
+                primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5));
+            oLeft_3 = QPointF(oLeft_3.x() - 35, oLeft_3.y());
+            leftRect = QRect(oLeft_3.x() - 6, oLeft_3.y() - 6, 12, 12);
+            if (//primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT ||
                 primitive->primitiveType() == LPT_VERTICALTEXT) {
-                QPointF oLeft_3 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x(),
-                    primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5)); 
-                oLeft_3 = QPointF(oLeft_3.x() - 35, oLeft_3.y());
-                leftRect = QRect(oLeft_3.x() - 6, oLeft_3.y()- 6, 12, 12);
-                //painter.drawEllipse(leftRect);
-                //painter.drawPath(pathLeft);
                 oLeft_3 = QPointF(oLeft_3.x()-10, oLeft_3.y() - 10);
                 QPixmap pixmap(":/ui/icons/images/textIcon.png");
                 pixmap = pixmap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(oLeft_3, pixmap);
             }
+            else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                painter.drawEllipse(leftRect);
+                //painter.drawPath(pathLeft);
+            }
             m_selectedHandleList.append(leftRect);
             //outer top 14
             QRect topRect;
-            if (primitive->primitiveType() == LPT_CIRCLETEXT ||
+            QPointF oTop_3 = mapFromScene(primitive->mapToScene(
+                primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5,
+                primitive->boundingRect().topLeft().y()));
+            oTop_3 = QPointF(oTop_3.x(), oTop_3.y() - 35);
+            topRect = QRect(oTop_3.x() - 6, oTop_3.y() - 6, 12, 12);
+            if (//primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_VERTICALTEXT||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT) {
-                
-                QPointF oTop_3 = mapFromScene(primitive->mapToScene(
-                    primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5,
-                    primitive->boundingRect().topLeft().y()));
-                oTop_3 = QPointF(oTop_3.x(), oTop_3.y() - 35);
-                topRect = QRect(oTop_3.x() - 6, oTop_3.y() - 6, 12, 12);
-                //painter.drawEllipse(topRect);
                 oTop_3 = QPointF(oTop_3.x() - 10, oTop_3.y() - 10);
                 QPixmap pixmap(":/ui/icons/images/textIcon.png");
                 pixmap = pixmap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(oTop_3, pixmap);
+            }
+            else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                painter.drawEllipse(topRect);
             }
             m_selectedHandleList.append(topRect);
             //outer right 15
@@ -1481,7 +1485,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
                 moveMap = moveMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 QPixmap angleMap(":/ui/icons/images/changeAngle.png");
                 angleMap = angleMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                QPixmap svMap(":/ui/icons/images/stretchVertical.png");
+                QPixmap svMap(":/ui/icons/images/textIcon.png");
                 svMap = svMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(sP, moveMap);
                 painter.drawPixmap(eP, angleMap);
@@ -2687,56 +2691,120 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveStarState())) {
         if (event->button() == Qt::LeftButton) {
-            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 8000, QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(star, true);
+            //查找鼠标在印章里
+            LaserPrimitive* cursorIn = nullptr;
+            cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
+            //create
+            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, QTransform(), m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(star);
+            emit LaserApplication::mainWindow->isIdle();
+            //移动到印章里
+            if (cursorIn) {
+                QPointF diff = cursorIn->sceneBoundingRect().center() - star->sceneBoundingRect().center();
+                star->moveBy(diff.x(), diff.y());
+            }
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveFrameState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRect rect(point.x(), point.y(), 80 * 1000, 80 * 1000);
-            LaserFrame* frame = new LaserFrame(m_scene->document(), rect,5000,3000 , QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(frame, true);
+            //create
+            QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
+            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000,3000 , QTransform(), m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(frame);
+            emit LaserApplication::mainWindow->isIdle();
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRingState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRect rect(point.x(), point.y(), 100 * 1000, 100 * 1000);
-            LaserRing* ring = new LaserRing(m_scene->document(), rect, 5000, QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(ring, true);
+            QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
+            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(ring);
+            emit LaserApplication::mainWindow->isIdle();
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRingEllipseState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRect rect(point.x(), point.y(), 120 * 1000, 80 * 1000);
-            LaserRing* ring = new LaserRing(m_scene->document(), rect, 5000, QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(ring, true);
+            QRect rect(point.x(), point.y(), 400 * 1000, 250 * 1000);
+            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(ring);
+            emit LaserApplication::mainWindow->isIdle();
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveArcTextState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRectF rect(point.x(), point.y(), 120 * 1000, 80 * 1000);
-            LaserCircleText* ring = new LaserCircleText(m_scene->document(),"123456", rect,160,true, 0, 0,QSize(),  QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(ring, true);
+            QRectF rect(point.x(), point.y(), (40 - 2 * 2) * 1000, (40 - 2 * 2) * 1000);
+            QTransform transform;
+            //查找鼠标在印章里
+            LaserPrimitive* cursorIn = nullptr;
+            cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
+            if (cursorIn) {
+                if (cursorIn->primitiveType() == LPT_RING) {
+                    LaserRing* ring = qgraphicsitem_cast<LaserRing*>(cursorIn);
+                    rect = ring->innerRect();
+                    
+                }
+                else if (cursorIn->primitiveType() == LPT_FRAME) {
+                    LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(cursorIn);
+                    rect = frame->innerRect();
+                }
+                transform = cursorIn->sceneTransform();
+            }
+            //create
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160,true, 0, 0,QSize(), transform, m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(text);
+            emit LaserApplication::mainWindow->isIdle();
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveHorizontalTextState())) {
         if (event->button() == Qt::LeftButton) {
+            
             QPointF point = mapToScene(event->pos());
-            QRectF rect(point.x(), point.y(), 120 * 1000, 80 * 1000);
-            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), "12345j6g", QSize(55*1000, 55*1000), point, 2000, QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(text, true);
+            QTransform transform;
+            //查找鼠标在印章里
+            LaserPrimitive* cursorIn = nullptr;
+            cursorIn = cursorInLaserPrimitive(point);
+            if (cursorIn) {
+                transform = cursorIn->sceneTransform();
+            }
+            //create
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, 550, transform, m_curLayerIndex);            
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(text);
+            emit LaserApplication::mainWindow->isIdle();
+            if (cursorIn) {
+               QPointF diff = cursorIn->sceneBoundingRect().center() - text->sceneBoundingRect().center();
+               text->moveBy(diff.x(), diff.y());
+            }
+            
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveVerticalTextState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRectF rect(point.x(), point.y(), 120 * 1000, 80 * 1000);
-            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), "12345j6g", QSize(55 * 1000, 55 * 1000), point, 2000, QTransform(), m_curLayerIndex);
-            m_scene->addLaserPrimitive(text, true);
+            QTransform transform;
+            //查找鼠标在印章里
+            LaserPrimitive* cursorIn = nullptr;
+            cursorIn = cursorInLaserPrimitive(point);
+            if (cursorIn) {
+                transform = cursorIn->sceneTransform();
+            }
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, 550, transform, m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(text);
+            emit LaserApplication::mainWindow->isIdle();
+            if (cursorIn) {
+                QPointF diff = cursorIn->sceneBoundingRect().center() - text->sceneBoundingRect().center();
+                text->moveBy(diff.x(), diff.y());
+            }
         }
     }
     //Spline
@@ -4070,6 +4138,22 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
     
 }
 
+void LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
+{
+    //判断是否在4叉树的有效区域内
+    if (m_scene->maxRegion().contains(primitive->sceneBoundingRect())) {
+        //undo 创建完后会执行redo
+        QList<QGraphicsItem*> list;
+        list.append(primitive);
+        AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+        m_undoStack->push(addCmd);
+        onReplaceGroup(primitive);
+    }
+    else {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+    }
+}
+
 bool LaserViewer::showLaserPos() const
 {
     return false;
@@ -4619,7 +4703,7 @@ void LaserViewer::selectedHandleScale()
                 text->setTextWidth(w);
             }
             else {
-            
+                primitive->setBoundingRectWidth(w);
             }
             
             break;
@@ -4652,7 +4736,7 @@ void LaserViewer::selectedHandleScale()
             }
             else if (primitive->primitiveType() == LPT_VERTICALTEXT) {
                 LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
-                text->setTextHeight(h);
+                text->setTextHeight(diff);
             }
             else {
                 primitive->setBoundingRectHeight(h);
@@ -4872,6 +4956,20 @@ RulerWidget * LaserViewer::verticalRuler()
 LaserPrimitiveGroup* LaserViewer::group()
 {
 	return m_group;
+}
+LaserPrimitive * LaserViewer::cursorInLaserPrimitive(QPointF mousePosInScene)
+{
+    for (LaserPrimitive* primitive : m_scene->document()->primitives()) {
+        int type = primitive->primitiveType();
+        if (type == LPT_RING || type == LPT_FRAME) {
+            if (QRectF(primitive->sceneBoundingRect()).contains(mousePosInScene)) {
+                return primitive;
+            }
+        }
+        
+        
+    }
+    return nullptr;
 }
 // by center
 void LaserViewer::zoomIn()
