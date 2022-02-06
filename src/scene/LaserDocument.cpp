@@ -241,7 +241,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         docOrigin = QPoint(0, 0);
         break;
     case SFT_UserOrigin:
-        docOrigin = LaserApplication::device->userOrigin();
+        docOrigin = LaserApplication::device->userOrigin().toPoint();
         break;
     }
 
@@ -452,7 +452,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
             return;
         }
         qint64 writtenBytes = saveFile.write(rawJson);
-        qDebug() << "written bytes:" << writtenBytes;
+        //qDebug() << "written bytes:" << writtenBytes;
         saveFile.close();
     }
     else
@@ -484,7 +484,7 @@ void LaserDocument::exportBoundingJSON()
         docOrigin = QPoint(0, 0);
         break;
     case SFT_UserOrigin:
-        docOrigin = LaserApplication::device->userOrigin();
+        docOrigin = LaserApplication::device->userOrigin().toPoint();
         break;
     }
     QJsonObject laserDocumentInfo;
@@ -497,6 +497,7 @@ void LaserDocument::exportBoundingJSON()
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect());
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true));
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -655,7 +656,7 @@ void LaserDocument::exportBoundingJSON()
 
     saveFile.close();
     //emit exportFinished(filename);
-    qLogD << "rawJson: " << rawJson;
+    //qLogD << "rawJson: " << rawJson;
     emit exportFinished(rawJson);
 }
 
@@ -787,7 +788,7 @@ QRect LaserDocument::currentDocBoundingRect(bool includingAccSpan) const
     QRect bounding = absoluteDocBoundingRect(includingAccSpan);
     if (Config::Device::startFrom() == SFT_UserOrigin)
     {
-        QPoint userOrigin = LaserApplication::device->userOrigin();
+        QPoint userOrigin = LaserApplication::device->userOrigin().toPoint();
         QPoint jobOrigin = this->jobOriginOnDocBoundingRect();
         QPoint offset = userOrigin - jobOrigin;
         QPoint target = bounding.topLeft() + offset;
@@ -821,7 +822,7 @@ QTransform LaserDocument::transformToReletiveOrigin() const
     QTransform transform;
     QPointF origin;
     if (Config::Device::startFrom() == SFT_UserOrigin)
-        origin = LaserApplication::device->userOrigin();
+        origin = LaserApplication::device->userOrigin().toPoint();
     else if (Config::Device::startFrom() == SFT_CurrentPosition)
         origin = LaserApplication::device->laserPosition();
     QPointF jobOrigin = jobOriginOnDocBoundingRect();

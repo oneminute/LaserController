@@ -124,6 +124,11 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         zPanel->setLayout(zLayout);
         m_systemPage->addTab(zPanel, tr("Z"));
 
+        QWidget* uPanel = new QWidget(m_systemPage);
+        QFormLayout* uLayout = new QFormLayout(uPanel);
+        uPanel->setLayout(uLayout);
+        m_systemPage->addTab(uPanel, tr("U"));
+
         for (ConfigItem* item : Config::SystemRegister::group->items())
         {
             if (!item->isVisible())
@@ -135,6 +140,8 @@ ConfigDialog::ConfigDialog(QWidget* parent)
                 addConfigItem(item, yPanel);
             else if (item->name().startsWith("z"))
                 addConfigItem(item, zPanel);
+            else if (item->name().startsWith("u"))
+                addConfigItem(item, uPanel);
             else
                 addConfigItem(item, generalPanel);
         }
@@ -225,6 +232,9 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     m_errorCount = 0;
     retranslate();
+
+    // initialize widgets' state
+    Config::Device::uFixtureTypeItem()->emitValueChanged();
 }
 
 ConfigDialog::~ConfigDialog()

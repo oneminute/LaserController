@@ -22,6 +22,7 @@
 #include "widget/FloatEditSlider.h"
 #include "widget/SmallDiagonalLimitationWidget.h"
 #include "widget/Vector2DWidget.h"
+#include "widget/Vector3DWidget.h"
 
 class QComboBox;
 class QLineEdit;
@@ -105,6 +106,9 @@ public:
         case IWT_Vector2DWidget:
             widget = new Vector2DWidget;
             break;
+        case IWT_Vector3DWidget:
+            widget = new Vector3DWidget;
+            break;
         default:
             widget = item->doCreateWidgetHook();
             break;
@@ -128,11 +132,13 @@ public slots:
     void onDateChanged(const QDate& date);
     void onDateTimeChanged(const QDateTime& dateTime);
     void onVector2DChanged(qreal x, qreal y);
+    void onVector3DChanged(qreal x, qreal y, qreal z);
 
     void onConfigItemModifiedChanged(bool modified);
     void onConfigItemValueChanged(const QVariant& value, void* senderPtr);
     void onConfigItemDirtyValueChanged(const QVariant& value, void* senderPtr);
     void onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr);
+    void onConfigItemEnabledChanged(bool enabled);
 
 signals:
     void updated();

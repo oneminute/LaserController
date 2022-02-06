@@ -22,6 +22,7 @@ LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
     , m_doc(nullptr)
 	, m_background(nullptr)
+	, m_imageBackground(nullptr)
     , m_quadTree(nullptr)
 {
 }
@@ -53,6 +54,7 @@ void LaserScene::setDocument(LaserDocument * doc)
     
 	QRect rect = LaserApplication::device->layoutRect();
     m_background = new LaserBackgroundItem();
+    m_background->setZValue(0);
 	addItem(dynamic_cast<QGraphicsItemGroup*>(m_background));
 	//setSceneRect(m_doc->pageBounds());
 	//setSceneRect(QRectF(0, 0, 2000, 2000));
@@ -595,6 +597,28 @@ void LaserScene::updateTree()
 QList<QSet<LaserPrimitive*>*>& LaserScene::joinedGroupList()
 {
     return m_joinedGroupList;
+}
+
+void LaserScene::setImage(const QImage& image)
+{
+    if (m_imageBackground)
+    {
+        m_imageBackground->setPixmap(QPixmap::fromImage(image));
+    }
+    else
+    {
+        QRect layoutRect = LaserApplication::device->layoutRect();
+        QSize resol = Config::Camera::resolution();
+        qreal hFactor = layoutRect.width() * 1.0 / resol.width();
+        qreal vFactor = layoutRect.height() * 1.0 / resol.height();
+        m_imageBackground = addPixmap(QPixmap::fromImage(image));
+        QPoint imagePos = LaserApplication::device->mapFromQuadToCurrent(QPoint(0, 0));
+        QTransform ts = QTransform::fromScale(hFactor, vFactor);
+        m_imageBackground->setTransform(ts);
+        m_imageBackground->setPos(imagePos);
+	    m_imageBackground->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        m_imageBackground->setZValue(-1);
+    }
 }
 
 

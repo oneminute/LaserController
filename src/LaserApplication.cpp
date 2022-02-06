@@ -12,6 +12,7 @@
 #include "exception/LaserException.h"
 #include "laser/LaserDevice.h"
 #include "laser/LaserDriver.h"
+#include "scene/LaserDocument.h"
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"
 #include "ui/PreviewWindow.h"
@@ -263,6 +264,7 @@ void LaserApplication::retranslate()
     stringMap["Bottom Right"] = tr("Bottom Right");
     stringMap["Chessboard"] = tr("Chessboard");
     stringMap["Charuco Board"] = tr("Charuco Board");
+    stringMap["Chuck Rotary"] = tr("Chuck Rotary");
     stringMap["Circles Grid"] = tr("Circles Grid");
     stringMap["Config Dialog"] = tr("Config Dialog");
     stringMap["Current Position"] = tr("Current Position");
@@ -273,6 +275,7 @@ void LaserApplication::retranslate()
     stringMap["Filling"] = tr("Filling");
     stringMap["Font"] = tr("Font");
     stringMap["Height"] = tr("Height");
+    stringMap["High Quality"] = tr("High Quality");
     stringMap["High Contrast"] = tr("High Contrast");
     stringMap["Horizontal"] = tr("Horizontal");
     stringMap["Inactivated"] = tr("Inactivated");
@@ -283,10 +286,13 @@ void LaserApplication::retranslate()
     stringMap["Medium Contrast"] = tr("Medium Contrast");
     stringMap["Middle"] = tr("Middle");
     stringMap["Movement"] = tr("Movement");
+    stringMap["Normal Quality"] = tr("Normal Quality");
     stringMap["Off"] = tr("Off");
     stringMap["PageSize"] = tr("Page Size(mm): %1x%2");
+    stringMap["Perfect Quality"] = tr("Perfect Quality");
     stringMap["Power"] = tr("Power");
     stringMap["Right"] = tr("Right");
+    stringMap["Roller Rotary"] = tr("Roller Rotary");
     stringMap["Rotate"] = tr("Rotate");
     stringMap["Size"] = tr("Size");
     stringMap["Spacing X"] = tr("Spacing X");
@@ -318,26 +324,33 @@ void LaserApplication::retranslate()
     stringMap["documentEmptyState"] = tr("Empty Document");
     stringMap["documentIdleState"] = tr("Document Idle");
     stringMap["documentPrimitiveState"] = tr("Primitive State");
+    stringMap["documentPrimitiveArcTextState"] = tr("Arc Text State");
     stringMap["documentPrimitiveEllipseState"] = tr("Ellipse State");
     stringMap["documentPrimitiveEllipseCreatingState"] = tr("Creating Ellipse");
     stringMap["documentPrimitiveEllipseReadyState"] = tr("Ellipse Ready");
+    stringMap["documentPrimitiveFrameState"] = tr("Frame State");
+    stringMap["documentPrimitiveHorizontalTextState"] = tr("Horizontal Text");
     stringMap["documentPrimitiveLineState"] = tr("Line State");
     stringMap["documentPrimitiveLineCreatingState"] = tr("Creating Line");
     stringMap["documentPrimitiveLineReadyState"] = tr("Line Ready");
     stringMap["documentPrimitivePolygonState"] = tr("Polygon State");
     stringMap["documentPrimitivePolygonCreatingState"] = tr("Creating Polygon");
     stringMap["documentPrimitivePolygonReadyState"] = tr("Polygon Ready");
-    stringMap["documentPrimitivePolygonStartRectState"] = tr("");
+    stringMap["documentPrimitivePolygonStartRectState"] = tr("Polygon Start Rect");
     stringMap["documentPrimitiveRectState"] = tr("Rect State");
     stringMap["documentPrimitiveRectCreatingState"] = tr("Creaing Rect");
     stringMap["documentPrimitiveRectReadyState"] = tr("Rect Ready");
+    stringMap["documentPrimitiveRingState"] = tr("Ring State");
+    stringMap["documentPrimitiveRingEllipseState"] = tr("Ring Ellipse State");
     stringMap["documentPrimitiveSplineState"] = tr("Spline State");
     stringMap["documentPrimitiveSplineCreatingState"] = tr("Creating Spline");
     stringMap["documentPrimitiveSplineEditState"] = tr("Editing Spline");
     stringMap["documentPrimitiveSplineReadyState"] = tr("Spline Ready");
+    stringMap["documentPrimitiveStarState"] = tr("Star State");
     stringMap["documentPrimitiveTextState"] = tr("Text State");
     stringMap["documentPrimitiveTextCreatingState"] = tr("Creating Text");
     stringMap["documentPrimitiveTextReadyState"] = tr("Text Ready");
+    stringMap["documentPrimitiveVerticalTextState"] = tr("Vertical Text State");
     stringMap["documentPrintAndCutSelectingState"] = tr("Selecting In Canvas");
     stringMap["documentPrintAndCutAligningState"] = tr("Aligning");
     stringMap["documentSelectedState"] = tr("Selected");
@@ -389,6 +402,15 @@ void LaserApplication::restart()
     mainWindow->close();
     LaserApplication::quit();
     QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
+}
+
+LaserDocument* LaserApplication::createDocument()
+{
+    LaserScene* scene = mainWindow->scene();
+	LaserDocument* doc = new LaserDocument(scene);
+	mainWindow->initDocument(doc);
+    doc->open();
+    return doc;
 }
 
 void LaserApplication::initLog()

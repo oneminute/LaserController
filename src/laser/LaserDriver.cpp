@@ -136,15 +136,6 @@ bool LaserDriver::load()
     m_fnSetTransTimeOutInterval = (FN_VOID_INT)m_library.resolve("SetTransTimeOutInterval");
     CHECK_FN(m_fnSetTransTimeOutInterval)
 
-    m_fnSetSoftwareInitialization = (FNSetSoftwareInitialization)m_library.resolve("SetSoftwareInitialization");
-    CHECK_FN(m_fnSetSoftwareInitialization)
-
-    //m_fnSetRotateDeviceParam = (FNSetRotateDeviceParam)m_library.resolve("SetRotateDeviceParam");
-    //CHECK_FN(m_fnSetRotateDeviceParam)
-
-    m_fnSetHardwareInitialization = (FNSetHardwareInitialization)m_library.resolve("SetHardwareInitialization");
-    CHECK_FN(m_fnSetHardwareInitialization)
-
     m_fnWriteSysParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteSysParamToCard");
     CHECK_FN(m_fnWriteSysParamToCard)
 
@@ -193,9 +184,6 @@ bool LaserDriver::load()
     m_fnStartMoveLaserMotors = (FN_VOID_VOID)m_library.resolve("StartMoveLaserMotors");
     CHECK_FN(m_fnStartMoveLaserMotors)
 
-    m_fnControlHDAction = (FN_VOID_INT)m_library.resolve("ControlHDAction");
-    CHECK_FN(m_fnControlHDAction)
-
     m_fnGetMainHardVersion = (FN_WCHART_VOID)m_library.resolve("GetMainHardVersion");
     CHECK_FN(m_fnGetMainHardVersion);
 
@@ -229,9 +217,6 @@ bool LaserDriver::load()
     m_fnGetCurrentLaserPos = (FN_WCHART_VOID)m_library.resolve("GetCurrentLaserPos");
     CHECK_FN(m_fnGetCurrentLaserPos)
 
-    m_fnSmallScaleMovement = (FNSmallScaleMovement)m_library.resolve("SmallScaleMovement");
-    CHECK_FN(m_fnSmallScaleMovement)
-
     m_fnStartMachining = (FN_VOID_INT)m_library.resolve("StartMachining");
     CHECK_FN(m_fnStartMachining)
 
@@ -253,14 +238,8 @@ bool LaserDriver::load()
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
     CHECK_FN(m_fnGetDeviceWorkState)
 
-    m_fnMillimeter2MicroStep = (FN_INT_DOUBLE_BOOL)m_library.resolve("Millimeter2MicroStep");
-    CHECK_FN(m_fnMillimeter2MicroStep)
-
     m_fnCheckVersionUpdate = (FN_BOOL_WCHART_INT_WCHART)m_library.resolve("CheckVersionUpdate");
     CHECK_FN(m_fnCheckVersionUpdate)
-
-    m_fnGetUpdatePanelHandle = (FN_INT_INT_INT)m_library.resolve("GetUpdatePanelHandle");
-    CHECK_FN(m_fnGetUpdatePanelHandle)
 
     m_fnStartSoftUpdateWizard = (FN_VOID_VOID)m_library.resolve("StartSoftUpdateWizard");
     CHECK_FN(m_fnStartSoftUpdateWizard)
@@ -393,16 +372,6 @@ bool LaserDriver::uninitComPort()
 void LaserDriver::setTransTimeOutInterval(int interval)
 {
     m_fnSetTransTimeOutInterval(interval);
-}
-
-void LaserDriver::setSoftwareInitialization(int printerDrawUnit, double pageZeroX, double pageZeroY, double pageWidth, double pageHeight)
-{
-    m_fnSetSoftwareInitialization(printerDrawUnit, pageZeroX, pageZeroY, pageWidth, pageHeight);
-}
-
-void LaserDriver::setHardwareInitialization(double curveToSpeedRatio, int logicalResolution, int maxSpeed, char zeroCoordinates)
-{
-    m_fnSetHardwareInitialization(curveToSpeedRatio, logicalResolution, maxSpeed, zeroCoordinates);
 }
 
 bool LaserDriver::writeSysParamToCard(const LaserRegister::RegistersMap& values)
@@ -663,16 +632,24 @@ void LaserDriver::lPenQuickMoveTo(
         int yPos,
         bool zMoveEnable,
         bool zMoveStyle,
-        int zPos)
+        int zPos,
+        bool uMoveEnable,
+        bool uMoveStyle,
+        int uPos)
 {
     m_fnLPenQuickMoveTo(
         xMoveEnable, xMoveStyle, xPos,
         yMoveEnable, yMoveStyle, yPos,
-        zMoveEnable, zMoveStyle, zPos
+        zMoveEnable, zMoveStyle, zPos,
+        uMoveEnable, uMoveStyle, uPos
         );
 }
 
-void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMoveStyle, int xPos, bool yMoveEnable, bool yMoveStyle, int yPos, bool zMoveEnable, bool zMoveStyle, int zPos)
+void LaserDriver::checkMoveLaserMotors(quint16 delay,
+    bool xMoveEnable, bool xMoveStyle, int xPos, 
+    bool yMoveEnable, bool yMoveStyle, int yPos, 
+    bool zMoveEnable, bool zMoveStyle, int zPos,
+    bool uMoveEnable, bool uMoveStyle, int uPos)
 {
     qLogD << "move " << xPos << ", " << yPos << ", " << zPos;
     qLogD << "enabled " << xMoveEnable << ", " << yMoveEnable << ", " << zMoveEnable;
@@ -680,18 +657,14 @@ void LaserDriver::checkMoveLaserMotors(quint16 delay, bool xMoveEnable, bool xMo
         delay,
         xMoveEnable, xMoveStyle, xPos,
         yMoveEnable, yMoveStyle, yPos,
-        zMoveEnable, zMoveStyle, zPos
+        zMoveEnable, zMoveStyle, zPos,
+        uMoveEnable, uMoveStyle, uPos
         );
 }
 
 void LaserDriver::startMoveLaserMotors()
 {
     m_fnStartMoveLaserMotors();
-}
-
-void LaserDriver::controlHDAction(int action)
-{
-    m_fnControlHDAction(action);
 }
 
 QString LaserDriver::firmwareVersion()
@@ -837,11 +810,6 @@ QVector3D LaserDriver::getCurrentLaserPos()
     return pos;
 }
 
-void LaserDriver::smallScaleMovement(bool fromZeroPoint, bool laserOn, char motorAxis, int deviation, int laserPower, int moveSpeed)
-{
-    m_fnSmallScaleMovement(fromZeroPoint, laserOn, motorAxis, deviation, laserPower, moveSpeed);
-}
-
 void LaserDriver::startMachining(int packIndex)
 {
     m_fnStartMachining(packIndex);
@@ -899,11 +867,6 @@ void LaserDriver::checkVersionUpdate(bool hardware, const QString& flag, int cur
     m_fnCheckVersionUpdate(hardware, flagBuf, currentVersion, vntjfBuf);
     delete[] flagBuf;
     delete[] vntjfBuf;
-}
-
-int LaserDriver::getUpdatePanelHandle(int version, int wndId)
-{
-    return m_fnGetUpdatePanelHandle(version, wndId);
 }
 
 void LaserDriver::startSoftUpdateWizard()

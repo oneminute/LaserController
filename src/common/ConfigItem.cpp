@@ -3,6 +3,7 @@
 #include "widget/InputWidgetWrapper.h"
 
 #include <QDateTime>
+#include <QStack>
 
 class ConfigItemPrivate
 {
@@ -132,6 +133,8 @@ public:
 
     QList<QWidget*> widgets;
 
+    QStack<QVariant> stack;
+
     QDateTime lastValueModifiedTime;
     QDateTime lastDirtyModifiedTime;
 
@@ -195,6 +198,9 @@ ConfigItem::ConfigItem(
         break;
     case DT_POINT:
         d->inputWidgetType = IWT_Vector2DWidget;
+        break;
+    case DT_VECTOR3D:
+        d->inputWidgetType = IWT_Vector3DWidget;
         break;
     default:
         d->inputWidgetType = IWT_Custom;
@@ -432,6 +438,11 @@ void ConfigItem::clearModified()
     emit modifiedChanged(false);
 }
 
+void ConfigItem::emitValueChanged()
+{
+    emit valueChanged(value(), nullptr);
+}
+
 QString ConfigItem::toString() const
 {
     QString msg = QString("[group=%1, name=%2, title=%3, description=%4, value=%5]")
@@ -453,10 +464,6 @@ QJsonObject ConfigItem::toJson() const
     else
     {
         QJsonObject item;
-        if (this == Config::Camera::resolutionItem())
-        {
-            qLogD << "break point: " << value().toString();
-        }
         item["value"] = QJsonValue::fromVariant(value());
         item["defaultValue"] = QJsonValue::fromVariant(defaultValue());
         return item;
@@ -796,6 +803,18 @@ void ConfigItem::setValue(const QVariant& value, StoreStrategy strategy_, void* 
     }
 }
 
+void ConfigItem::push()
+{
+    Q_D(ConfigItem);
+    d->stack.push(d->value);
+}
+
+void ConfigItem::pop()
+{
+    Q_D(ConfigItem);
+    d->value = d->stack.pop();
+}
+
 void ConfigItem::reset()
 {
     Q_D(ConfigItem);
@@ -927,6 +946,29 @@ void parseQPointItemFromJson(QVariant& value, QVariant& defaultValue, const QJso
     if (json.contains("defaultValue"))
     {
         defaultValue = typeUtils::json2Point(json["defaultValue"]);
+    }
+}
+
+QJsonObject qVector3DItemToJson(const ConfigItem* configItem)
+{
+    QVector3D pt = configItem->value().value<QVector3D>();
+    QVector3D defPt = configItem->defaultValue().value<QVector3D>();
+    QJsonObject jsonObj;
+    jsonObj["value"] = typeUtils::vector3D2Json(pt);
+    jsonObj["defaultValue"] = typeUtils::vector3D2Json(defPt);
+    return jsonObj;
+}
+
+void parseQVector3DItemFromJson(QVariant& value, QVariant& defaultValue, const QJsonObject& json, ConfigItem* item)
+{
+    if (json.contains("value"))
+    {
+        value = typeUtils::json2Vector3D(json["value"]);
+        qLogD << value;
+    }
+    if (json.contains("defaultValue"))
+    {
+        defaultValue = typeUtils::json2Vector3D(json["defaultValue"]);
     }
 }
 

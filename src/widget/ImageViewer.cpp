@@ -146,3 +146,8 @@ void ImageViewer::wheelEvent(QWheelEvent* e)
     }
 }
 
+void ImageViewer::mouseMoveEvent(QMouseEvent* e)
+{
+    this->setFocus();
+}
+

@@ -164,6 +164,115 @@ void subPathPolygonsTest2()
     }
 }
 
+qreal percentAtLengthPercent(const QPainterPath& curve, qreal curveLength, qreal lengthPercent)
+{
+    if (lengthPercent < 0)
+        lengthPercent += 1;
+    if (lengthPercent > 1)
+        lengthPercent -= 1;
+    qreal length = curveLength * lengthPercent;
+    qreal percent = curve.percentAtLength(length);
+    return percent;
+}
+
+void testCurveTrace()
+{
+    QGraphicsScene* scene = new QGraphicsScene;
+    //scene->setSceneRect(-5, -5, 10, 10);
+    QGraphicsView* view = new QGraphicsView(scene);
+    view->resize(800, 600);
+    view->show();
+
+    qreal a = 500;
+    qreal b = 100;
+    qreal a2 = a * a;
+    qreal b2 = b * b;
+    qreal a4 = a2 * a2;
+    qreal b4 = b2 * b2;
+    qreal a8 = a4 * a4;
+    qreal b8 = b4 * b4;
+    QPainterPath curve;
+    curve.addEllipse(QPointF(0, 0), a, b);
+
+    QPen pen(Qt::black, 1);
+    pen.setCosmetic(true);
+    QPen pen2(Qt::blue, 1);
+    pen2.setCosmetic(true);
+    QGraphicsPathItem* item = scene->addPath(curve);
+    item->setPen(pen);
+    view->fitInView(item, Qt::KeepAspectRatio);
+
+    int count = 32;
+    qreal delta = 1.0 / count;
+    qreal smallPercent = 0.001;
+    qreal curveLength = curve.length();
+    for (qreal i = 0; i <= count; i++)
+    {
+        qreal lengthPercent = i * delta;
+        qreal percent = percentAtLengthPercent(curve, curveLength, lengthPercent);
+        qreal diffPercent = lengthPercent - percent;
+        QPointF pt = curve.pointAtPercent(percent);
+        qreal angle = curve.angleAtPercent(percent);
+        qreal slope = curve.slopeAtPercent(percent);
+        //qreal angle2 = qAtan2(pt.y(), pt.x());
+        qreal angle2 = qRadiansToDegrees(qAtan(slope));
+        //qreal angle2 = angle + 0;
+        QGraphicsRectItem* ptItem = scene->addRect(QRectF(QPointF(-20, -20), QPointF(20, 20)));
+        QGraphicsLineItem* ptLine = scene->addLine(QLineF(QPointF(), QPointF(30, 0)));
+        QGraphicsTextItem* textItem = scene->addText(QString::number(i));
+        ptItem->setBrush(Qt::NoBrush);
+        ptItem->setPen(pen2);
+        ptLine->setPen(pen2);
+        textItem->setPos(pt);
+        //QTransform t;
+        //t.rotate(angle2);
+        //ptItem->setTransform(t * QTransform::fromTranslate(pt.x(), pt.y()));
+        ptItem->setPos(pt);
+        //ptItem->setTransformOriginPoint(pt);
+        ptItem->setRotation(angle2);
+
+        //QTransform t2;
+        //t2.rotate(angle2);
+        //ptLine->setTransform(t2);
+        ptLine->setPos(pt);
+        ptLine->setRotation(angle2 + 90);
+        QGraphicsRectItem* lineEnd = scene->addRect(QRectF(QPointF(-5, -5), QPointF(5, 5)));
+        lineEnd->setPen(pen2);
+        lineEnd->setPos(ptLine->sceneTransform().map(ptLine->line().p2()));
+
+        qreal percentPrev = percentAtLengthPercent(curve, curveLength, lengthPercent - smallPercent);
+        qreal percentNext = percentAtLengthPercent(curve, curveLength, lengthPercent + smallPercent);
+        qreal deltaPercent = qAbs(percent - percentPrev);
+        QPointF ptPrev = curve.pointAtPercent(percentPrev);
+        QPointF ptNext = curve.pointAtPercent(percentNext);
+        qreal anglePrev = curve.angleAtPercent(percentPrev);
+        qreal angleNext = curve.angleAtPercent(percentNext);
+        qreal angleDeltaPrev = qAbs(angle - anglePrev);
+        qreal angleDeltaNext = qAbs(angleNext - angle);
+        qreal deltaAngle = qAbs(angleDeltaNext - angleDeltaPrev);
+        //qreal deltaAngle = qAbs(angleNext - anglePrev);
+        qreal x = pt.x();
+        qreal y = pt.y();
+        qreal x2 = x * x;
+        qreal y2 = y * y;
+        qreal y4 = y2 * y2;
+        qreal d1 = -b2 * x / (a2 * y);
+        qreal d2 = -b2 / (a4 * y * y2);
+        qreal rho = -qPow((1 + d1 * d1), 1.5) / d2;
+        qreal curvature = 1 / rho;
+        qreal w = qLn(curvature);
+        qDebug().nospace() << qSetFieldWidth(11)
+            << "lengthPercent: " << lengthPercent
+            << ", percent: " << percent
+            << ", diffPercent: " << diffPercent
+            //<< ", deltaPercent: " << deltaPercent
+            //<< ", pos: " << pt
+            << ", angle: " << angle
+            << ", angle2: " << angle2
+            ;
+    }
+}
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
@@ -171,7 +280,8 @@ int main(int argc, char** argv)
     //PathTest();
     //interactionTest();
     //paintTest();
-    subPathPolygonsTest2();
+    //subPathPolygonsTest2();
+    testCurveTrace();
 
     return app.exec();
 }

@@ -10,6 +10,7 @@ class PreviewWindow;
 class ProgressModel;
 class LaserDevice;
 class LaserDriver;
+class LaserDocument;
 
 class LaserApplication : public QApplication
 {
@@ -32,6 +33,8 @@ public:
     static QString str(const QString& key);
     static int exec();
     static void restart();
+
+    static LaserDocument* createDocument();
 
 protected:
     void initLog();

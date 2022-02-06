@@ -8,6 +8,8 @@
 #include <QMutex>
 #include <QTransform>
 #include <QWaitCondition>
+#include <QVector4D>
+#include <QVector3D>
 
 class ConfigItem;
 class LaserDriver;
@@ -68,6 +70,7 @@ public:
 
     bool verifyManufacturePassword(const QString& password, int errorCount);
     bool changeManufacturePassword(const QString& password, const QString& newPassword);
+    QString showManufacturePasswordDialog(QWidget* parentWnd = nullptr);
 
     MainCardActivateResult autoActivateMainCard();
     bool sendAuthenticationEmail(const QString& email);
@@ -88,9 +91,12 @@ public:
 
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
 
-    void moveTo(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
-    void moveBy(const QVector3D& pos, bool xEnabled = true, bool yEnabled = true, bool zEnabled = true);
+    void moveTo(const QVector4D& pos, bool xEnabled = true, 
+        bool yEnabled = true, bool zEnabled = true, bool uEnabled = true);
+    void moveBy(const QVector4D& pos, bool xEnabled = true, 
+        bool yEnabled = true, bool zEnabled = true, bool uEnabled = true);
     void moveToZOrigin();
+    void moveToUOrigin();
     void moveToXYOrigin();
 
     bool isAvailable() const;
@@ -131,7 +137,7 @@ public:
     /// 坐标即该值。
     /// </summary>
     /// <returns></returns>
-    QPoint userOrigin() const;
+    QVector3D userOrigin() const;
 
     /// <summary>
     /// 加工幅面矩形，以设备坐标系下的坐标值表示。
@@ -147,7 +153,7 @@ public:
     /// 光点的当前位置。
     /// </summary>
     /// <returns></returns>
-    QPointF currentOrigin() const;
+    QPoint currentOrigin() const;
 
     int currentZ() const;
 
@@ -165,6 +171,9 @@ public:
     void debugPrintUserRegisters() const;
     void debugPrintSystemRegisters() const;
     void debugPrintRegisters() const;
+
+    QPoint mapFromQuadToCurrent(const QPoint& pt, const QPoint& topLeftFrom = QPoint(0, 0));
+    QPoint mapFromCurrentToQuad(const QPoint& pt, const QPoint& topLeftTo = QPoint(0, 0));
 
 public slots:
     void load();

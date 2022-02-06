@@ -8,6 +8,7 @@
 #include <QPointF>
 #include <QRect>
 #include <QVariant>
+#include <QVector3D>
 
 #include "common/common.h"
 #include <comutil.h>
@@ -47,6 +48,10 @@ namespace typeUtils
 
     QPointF json2PointF(const QJsonValue& json);
     QPoint json2Point(const QJsonValue& json);
+
+    QJsonObject vector3D2Json(const QVector3D& point);
+    QVector3D json2Vector3D(const QJsonValue& json);
+    QVector3D json2Vector3D(const QJsonObject& json);
 
     QJsonObject size2Json(const QSize& size);
     QSize json2Size(const QJsonValue& json);

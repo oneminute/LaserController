@@ -142,7 +142,7 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (Config::Device::startFrom() == SFT_UserOrigin)
         {
             painter.setPen(QPen(Qt::darkYellow));
-            QPoint userOrigin = mapFromScene(LaserApplication::device->userOrigin());
+            QPoint userOrigin = mapFromScene(LaserApplication::device->userOrigin().toPoint());
             QRect originRect(userOrigin - QPoint(2, 2), userOrigin + QPoint(2, 2));
             painter.drawEllipse(originRect);
             int lineLength = 5;
@@ -1546,7 +1546,7 @@ void LaserViewer::wheelEvent(QWheelEvent* event)
 	if (!m_scene->document()) {
 		return;
 	}
-    qreal wheelZoomValue = 1 + event->delta() / 120.0 * 0.1;
+    qreal wheelZoomValue = 1 + event->delta() / 1200.0;
 	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 	if (!backgroundItem) {
 		return;

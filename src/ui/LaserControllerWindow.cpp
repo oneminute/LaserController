@@ -72,18 +72,20 @@
 #include "ui/RegisteDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
-#include "ui/CameraToolsWindow.h"
 #include "ui/CalibrationDialog.h"
+#include "ui/CameraAlignmentDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/FloatEditDualSlider.h"
 #include "widget/FloatEditSlider.h"
+#include "widget/ImageViewer.h"
 #include "widget/LaserLayerTableWidget.h"
 #include "widget/LaserViewer.h"
 #include "widget/LayerButton.h"
 #include "widget/RulerWidget.h"
 #include "widget/ProgressBar.h"
 #include "widget/Vector2DWidget.h"
+#include "widget/Vector3DWidget.h"
 #include "widget/PressedToolButton.h"
 #include "widget/RadioButtonGroup.h"
 #include "widget/PointPairTableWidget.h"
@@ -121,9 +123,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_alignTarget(nullptr)
     , m_hasMessageBox(false)
     , m_textContent(nullptr)
+    , m_requestOverlayImage(false)
 {
     m_ui->setupUi(this);
     loadRecentFilesMenu();
+    installEventFilter(this);
     
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
@@ -137,12 +141,17 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     createOperationsDockPanel();
     createOutlineDockPanel();
     createMovementDockPanel();
+    createUAxisDockPanel();
     createShapePropertyDockPanel();
     createLaserPowerDockPanel();
     createPrintAndCutPanel();
 
     m_dockAreaLayers->setCurrentIndex(0);
     m_dockAreaOperations->setCurrentIndex(0);
+    m_dockAreaLayers->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_dockAreaOperations->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_dockAreaLayers->resize(800, 300);
+    m_dockAreaOperations->resize(800, 300);
     // 更改分割条的粗细
     internal::findParent<QSplitter*>(m_centralDockArea)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaLayers)->setHandleWidth(Config::Ui::splitterHandleWidth());
@@ -468,6 +477,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addPermanentWidget(m_statusBarProgress);
     connect(m_statusBarProgress, &ProgressBar::clicked, this, &LaserControllerWindow::onProgressBarClicked);
 
+    m_statusBarCameraState = new QLabel;
+    m_statusBarCameraState->setText("");
+    m_statusBarCameraState->setMinimumWidth(80);
+    m_statusBarCameraState->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addPermanentWidget(m_statusBarCameraState);
+
     m_statusBarCopyright = new QLabel;
     m_statusBarCopyright->setText(LaserApplication::applicationName());
     m_statusBarCopyright->setMinimumWidth(80);
@@ -734,13 +749,13 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionRemoveLayer, &QAction::triggered, this, &LaserControllerWindow::onActionRemoveLayer);
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
-    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::onActionMachining);
+    connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::startMachining);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
     connect(m_ui->actionBounding, &QAction::triggered, this, &LaserControllerWindow::onActionBounding);
     connect(m_ui->actionLaserSpotShot, &QAction::triggered, this, &LaserControllerWindow::onActionLaserSpotShot);
     connect(m_ui->actionLaserMove, &QAction::triggered, this, &LaserControllerWindow::onActionLaserMove);
-	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::onActionNew);
+	connect(m_ui->actionNew, &QAction::triggered, this, &LaserControllerWindow::newDocument);
 	connect(m_ui->actionSave, &QAction::triggered, this, &LaserControllerWindow::onActionSave);
 	connect(m_ui->actionSaveAs, &QAction::triggered, this, &LaserControllerWindow::onActionSaveAs);
 	connect(m_ui->actionOpen, &QAction::triggered, this, &LaserControllerWindow::onActionOpen);
@@ -847,6 +862,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCameraTools, &QAction::triggered, this, &LaserControllerWindow::onActionCameraTools);
     connect(m_ui->actionCameraCalibration, &QAction::triggered, this, &LaserControllerWindow::onActionCameraCalibration);
     connect(m_ui->actionGenerateCalibrationBoard, &QAction::triggered, this, &LaserControllerWindow::onActionGenerateCalibrationBoard);
+    connect(m_ui->actionCameraAlignment, &QAction::triggered, this, &LaserControllerWindow::onActionCameraAlignment);
+    connect(m_ui->actionCameraUpdateOverlay, &QAction::triggered, this, &LaserControllerWindow::onActionCameraUpdateOverlay);
+    connect(m_ui->actionStartCamera, &QAction::triggered, this, &LaserControllerWindow::onActionStartCamera);
+    connect(m_ui->actionStopCamera, &QAction::triggered, this, &LaserControllerWindow::onActionStopCamera);
+
+    connect(m_ui->actionSaveUStep, &QAction::triggered, this, &LaserControllerWindow::onActionSaveUStep);
 
     connect(m_scene, &LaserScene::selectionChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -1342,6 +1363,15 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 	ADD_TRANSITION(documentViewDragState, documentIdleState, this, SIGNAL(isIdle()));
 
+    // camera
+    m_cameraController = new CameraController;
+    m_calibrator = new DistortionCalibrator;
+    connect(m_cameraController, &CameraController::connected, this, &LaserControllerWindow::onCameraConnected);
+    connect(m_cameraController, &CameraController::disconnected, this, &LaserControllerWindow::onCameraDisconnected);
+    m_cameraController->registerSubscriber(this);
+    if (Config::Camera::autoConnect())
+        m_cameraController->start();
+
     bindWidgetsProperties();
 
     // check tmp folder
@@ -1377,6 +1407,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
 LaserControllerWindow::~LaserControllerWindow()
 {
+    SAFE_DELETE(m_cameraController);
+    SAFE_DELETE(m_calibrator);
+
 	m_propertyWidget = nullptr;
     m_textFontWidget = nullptr;
     m_statusBarAppStatus = nullptr;
@@ -2141,7 +2174,7 @@ void LaserControllerWindow::updataRecentFilesActions()
             m_fileDirection = path;
             setWindowTitle(getCurrentFileName() + " - ");
             //创建document
-            createNewDocument();
+            LaserApplication::createDocument();
             m_scene->document()->load(m_fileDirection, this);
             addRecentFile(m_fileDirection);
         });
@@ -2311,13 +2344,19 @@ void LaserControllerWindow::createLayersDockPanel()
     m_dockAreaLayers = m_dockManager->addDockWidget(RightDockWidgetArea, dockWidget);
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/layer.png"), "Layers");
     m_dockAreaLayers->setMinimumWidth(350);
+    m_splitterLayers = ads::internal::findParent<ads::CDockSplitter*>(m_dockAreaLayers);
 }
 
 void LaserControllerWindow::createCameraDockPanel()
 {
-    QLabel* labelCameras = new QLabel(tr("Cameras"));
-    m_comboBoxCameras = new QComboBox;
-    m_comboBoxCameras->addItem(tr("None"));
+    m_labelCameraAutoConnect = new QLabel;
+    QCheckBox* autoConnect = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Camera::autoConnectItem());
+    m_labelCameraAutoConnect->setText(Config::Camera::autoConnectItem()->title());
+    Config::Camera::autoConnectItem()->bindWidget(autoConnect, SS_DIRECTLY);
+
+    m_buttonCameraStart = new QToolButton;
+    m_buttonCameraStart->setDefaultAction(m_ui->actionStartCamera);
+    m_buttonCameraStart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     m_buttonCameraUpdateOverlay = new QToolButton;
     m_buttonCameraUpdateOverlay->setDefaultAction(m_ui->actionCameraUpdateOverlay);
@@ -2351,10 +2390,14 @@ void LaserControllerWindow::createCameraDockPanel()
     m_doubleSpinBoxCameraYShift->setDecimals(1);
     m_doubleSpinBoxCameraYShift->setValue(0.0);
 
+    m_cameraViewer = new ImageViewer;
+    m_cameraViewer->fitBy(Config::Camera::resolution());
+
     QGridLayout* layout = new QGridLayout;
     layout->setMargin(3);
-    layout->addWidget(labelCameras, 0, 0);
-    layout->addWidget(m_comboBoxCameras, 0, 1, 1, 4);
+    layout->addWidget(m_labelCameraAutoConnect, 0, 0);
+    layout->addWidget(autoConnect, 0, 1);
+    layout->addWidget(m_buttonCameraStart, 0, 2, 1, 2);
     layout->addWidget(m_buttonCameraUpdateOverlay, 1, 0);
     layout->addWidget(m_buttonCameraTrace, 1, 1, 1, 2);
     layout->addWidget(m_buttonCameraSaveSettings, 1, 3, 1, 2);
@@ -2368,6 +2411,7 @@ void LaserControllerWindow::createCameraDockPanel()
     layout->addWidget(m_doubleSpinBoxCameraXShift, 3, 2);
     layout->addWidget(labelYShift, 3, 3);
     layout->addWidget(m_doubleSpinBoxCameraYShift, 3, 4);
+    layout->addWidget(m_cameraViewer, 4, 0, 1, 5);
     layout->setRowStretch(6, 1);
 
     QWidget* panelWidget = new QWidget;
@@ -2383,42 +2427,49 @@ void LaserControllerWindow::createCameraDockPanel()
 
 void LaserControllerWindow::createOperationsDockPanel()
 {
+    QSize iconSize(24, 24);
     m_buttonOperationStart = new QToolButton;
     m_buttonOperationStart->setDefaultAction(m_ui->actionMachining);
     m_buttonOperationStart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationStart->setIconSize(iconSize);
 
     m_buttonOperationPause = new QToolButton;
     m_buttonOperationPause->setDefaultAction(m_ui->actionPause);
     m_ui->actionPause->setCheckable(true);
     m_buttonOperationPause->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationPause->setIconSize(iconSize);
 
     m_buttonOperationStop = new QToolButton;
     m_buttonOperationStop->setDefaultAction(m_ui->actionStop);
     m_buttonOperationStop->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationStop->setIconSize(iconSize);
 
     m_buttonOperationBounding = new QToolButton;
     m_buttonOperationBounding->setDefaultAction(m_ui->actionBounding);
     m_buttonOperationBounding->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationBounding->setIconSize(iconSize);
 
     m_buttonOperationSpotShot = new QToolButton;
     m_buttonOperationSpotShot->setDefaultAction(m_ui->actionLaserSpotShot);
     m_buttonOperationSpotShot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationSpotShot->setIconSize(iconSize);
     connect(m_buttonOperationSpotShot, &QToolButton::pressed, this, &LaserControllerWindow::lightOnLaser);
     connect(m_buttonOperationSpotShot, &QToolButton::released, this, &LaserControllerWindow::lightOffLaser);
 
     m_buttonOperationReset = new QToolButton;
     m_buttonOperationReset->setDefaultAction(m_ui->actionReset);
     m_buttonOperationReset->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationReset->setIconSize(iconSize);
 
     m_buttonOperationOrigin = new QToolButton;
     m_buttonOperationOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
     m_buttonOperationOrigin->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationOrigin->setIconSize(iconSize);
 
     m_comboBoxStartPosition = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::startFromItem());
     Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition, SS_DIRECTLY);
 
     m_radioButtonGroupJobOrigin = InputWidgetWrapper::createWidget<RadioButtonGroup*>(Config::Device::jobOriginItem());
-    Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin, SS_DIRECTLY);
     int index = Config::Device::startFrom();
     switch (index)
     {
@@ -2431,6 +2482,7 @@ void LaserControllerWindow::createOperationsDockPanel()
         m_radioButtonGroupJobOrigin->setEnabled(false);
         break;
     }
+    Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin, SS_DIRECTLY);
 
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
@@ -2546,23 +2598,13 @@ void LaserControllerWindow::createMovementDockPanel()
     m_lineEditCoordinatesZ->setReadOnly(true);
     m_lineEditCoordinatesZ->setText(QString::number(0.0, 'f', 2));
 
-    m_doubleSpinBoxDistanceX = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceX->setDecimals(2);
-    m_doubleSpinBoxDistanceX->setValue(10.0);
-    m_doubleSpinBoxDistanceX->setMinimum(0);
-    m_doubleSpinBoxDistanceX->setMaximum(1000);
+    m_lineEditCoordinatesU = new QLineEdit;
+    m_lineEditCoordinatesU->setReadOnly(true);
+    m_lineEditCoordinatesU->setText(QString::number(0.0, 'f', 2));
 
-    m_doubleSpinBoxDistanceY = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceY->setDecimals(2);
-    m_doubleSpinBoxDistanceY->setValue(10.0);
-    m_doubleSpinBoxDistanceY->setMinimum(0);
-    m_doubleSpinBoxDistanceY->setMaximum(1000);
-
-    m_doubleSpinBoxDistanceZ = new QDoubleSpinBox;
-    m_doubleSpinBoxDistanceZ->setDecimals(2);
-    m_doubleSpinBoxDistanceZ->setValue(10.0);
-    m_doubleSpinBoxDistanceZ->setMinimum(0);
-    m_doubleSpinBoxDistanceZ->setMaximum(1000);
+    FloatEditSlider* stepLength = InputWidgetWrapper::createWidget<FloatEditSlider*>(
+        Config::UserRegister::movementStepLengthItem());
+    Config::UserRegister::movementStepLengthItem()->bindWidget(stepLength, SS_REGISTER);
 
     QGridLayout* firstRow = new QGridLayout;
     firstRow->setMargin(0);
@@ -2573,13 +2615,11 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->addWidget(m_lineEditCoordinatesY, 0, 4);
     firstRow->addWidget(new QLabel(tr("Z")), 0, 5);
     firstRow->addWidget(m_lineEditCoordinatesZ, 0, 6);
+    firstRow->addWidget(new QLabel(tr("U")), 0, 7);
+    firstRow->addWidget(m_lineEditCoordinatesU, 0, 8);
     firstRow->addWidget(new QLabel(tr("Distance(mm)")), 1, 0);
-    firstRow->addWidget(new QLabel(tr("X")), 1, 1);
-    firstRow->addWidget(m_doubleSpinBoxDistanceX, 1, 2);
-    firstRow->addWidget(new QLabel(tr("Y")), 1, 3);
-    firstRow->addWidget(m_doubleSpinBoxDistanceY, 1, 4);
-    firstRow->addWidget(new QLabel(tr("Z")), 1, 5);
-    firstRow->addWidget(m_doubleSpinBoxDistanceZ, 1, 6);
+    firstRow->addWidget(new QLabel(tr("Step Length(mm)")), 1, 1);
+    firstRow->addWidget(stepLength, 1, 2, 1, 6);
     firstRow->setColumnStretch(0, 1);
     firstRow->setColumnStretch(1, 0);
     firstRow->setColumnStretch(2, 1);
@@ -2587,74 +2627,107 @@ void LaserControllerWindow::createMovementDockPanel()
     firstRow->setColumnStretch(4, 1);
     firstRow->setColumnStretch(5, 0);
     firstRow->setColumnStretch(6, 1);
+    firstRow->setColumnStretch(7, 0);
+    firstRow->setColumnStretch(8, 1);
 
     int w = 40;
     int h = 40;
     QSize fixedSize(w, h);
+    QSize iconSize(50, 50);
     m_buttonMoveTopLeft = new PressedToolButton;
     m_buttonMoveTopLeft->setFixedSize(fixedSize);
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
+    m_buttonMoveTopLeft->setIconSize(iconSize);
 
     m_buttonMoveTop = new PressedToolButton;
     m_buttonMoveTop->setFixedSize(fixedSize);
     m_buttonMoveTop->setDefaultAction(m_ui->actionMoveTop);
+    m_buttonMoveTop->setIconSize(iconSize);
 
     m_buttonMoveTopRight = new PressedToolButton;
     m_buttonMoveTopRight->setFixedSize(fixedSize);
     m_buttonMoveTopRight->setDefaultAction(m_ui->actionMoveTopRight);
+    m_buttonMoveTopRight->setIconSize(iconSize);
 
     m_buttonMoveLeft = new PressedToolButton;
     m_buttonMoveLeft->setFixedSize(fixedSize);
     m_buttonMoveLeft->setDefaultAction(m_ui->actionMoveLeft);
+    m_buttonMoveLeft->setIconSize(iconSize);
 
     m_buttonMoveToOrigin = new QToolButton;
     m_buttonMoveToOrigin->setFixedSize(fixedSize);
     m_buttonMoveToOrigin->setDefaultAction(m_ui->actionMoveToOrigin);
+    m_buttonMoveToOrigin->setIconSize(iconSize);
 
     m_buttonMoveRight = new PressedToolButton;
     m_buttonMoveRight->setFixedSize(fixedSize);
     m_buttonMoveRight->setDefaultAction(m_ui->actionMoveRight);
+    m_buttonMoveRight->setIconSize(iconSize);
 
     m_buttonMoveBottomLeft = new PressedToolButton;
     m_buttonMoveBottomLeft->setFixedSize(fixedSize);
     m_buttonMoveBottomLeft->setDefaultAction(m_ui->actionMoveBottomLeft);
+    m_buttonMoveBottomLeft->setIconSize(iconSize);
 
     m_buttonMoveBottom = new PressedToolButton;
     m_buttonMoveBottom->setFixedSize(fixedSize);
     m_buttonMoveBottom->setDefaultAction(m_ui->actionMoveBottom);
+    m_buttonMoveBottom->setIconSize(iconSize);
 
     m_buttonMoveBottomRight = new PressedToolButton;
     m_buttonMoveBottomRight->setFixedSize(fixedSize);
     m_buttonMoveBottomRight->setDefaultAction(m_ui->actionMoveBottomRight);
+    m_buttonMoveBottomRight->setIconSize(iconSize);
+
+    m_buttonMoveForward = new PressedToolButton;
+    m_buttonMoveForward->setFixedSize(fixedSize);
+    m_buttonMoveForward->setDefaultAction(m_ui->actionMoveForward);
+    m_buttonMoveForward->setIconSize(iconSize);
+
+    m_buttonMoveToUOrigin = new QToolButton;
+    m_buttonMoveToUOrigin->setFixedSize(fixedSize);
+    m_buttonMoveToUOrigin->setDefaultAction(m_ui->actionMoveToUOrigin);
+    m_buttonMoveToUOrigin->setIconSize(iconSize);
+
+    m_buttonMoveBackward = new PressedToolButton;
+    m_buttonMoveBackward->setFixedSize(fixedSize);
+    m_buttonMoveBackward->setDefaultAction(m_ui->actionMoveBackward);
+    m_buttonMoveBackward->setIconSize(iconSize);
 
     m_buttonMoveUp = new PressedToolButton;
     m_buttonMoveUp->setFixedSize(fixedSize);
     m_buttonMoveUp->setDefaultAction(m_ui->actionMoveUp);
+    m_buttonMoveUp->setIconSize(iconSize);
 
     m_buttonMoveToZOrigin = new QToolButton;
     m_buttonMoveToZOrigin->setFixedSize(fixedSize);
     m_buttonMoveToZOrigin->setDefaultAction(m_ui->actionMoveToZOrigin);
+    m_buttonMoveToZOrigin->setIconSize(iconSize);
 
     m_buttonMoveDown = new PressedToolButton;
     m_buttonMoveDown->setFixedSize(fixedSize);
     m_buttonMoveDown->setDefaultAction(m_ui->actionMoveDown);
+    m_buttonMoveDown->setIconSize(iconSize);
 
     QGridLayout* secondRow = new QGridLayout;
     secondRow->setMargin(0);
     secondRow->addWidget(m_buttonMoveTopLeft, 0, 1);
     secondRow->addWidget(m_buttonMoveTop, 0, 2);
     secondRow->addWidget(m_buttonMoveTopRight, 0, 3);
-    secondRow->addWidget(m_buttonMoveUp, 0, 4);
+    secondRow->addWidget(m_buttonMoveForward, 0, 4);
+    secondRow->addWidget(m_buttonMoveUp, 0, 5);
     secondRow->addWidget(m_buttonMoveLeft, 1, 1);
     secondRow->addWidget(m_buttonMoveToOrigin, 1, 2);
     secondRow->addWidget(m_buttonMoveRight, 1, 3);
-    secondRow->addWidget(m_buttonMoveToZOrigin, 1, 4);
+    secondRow->addWidget(m_buttonMoveToUOrigin, 1, 4);
+    secondRow->addWidget(m_buttonMoveToZOrigin, 1, 5);
     secondRow->addWidget(m_buttonMoveBottomLeft, 2, 1);
     secondRow->addWidget(m_buttonMoveBottom, 2, 2);
     secondRow->addWidget(m_buttonMoveBottomRight, 2, 3);
-    secondRow->addWidget(m_buttonMoveDown, 2, 4);
+    secondRow->addWidget(m_buttonMoveBackward, 2, 4);
+    secondRow->addWidget(m_buttonMoveDown, 2, 5);
     secondRow->setColumnStretch(0, 1);
-    secondRow->setColumnStretch(5, 1);
+    secondRow->setColumnStretch(6, 1);
 
     m_buttonShowLaserPosition = new QToolButton;
     m_buttonShowLaserPosition->setDefaultAction(m_ui->actionShowLaserPosition);
@@ -2680,9 +2753,9 @@ void LaserControllerWindow::createMovementDockPanel()
 
     updateUserOriginSelection(Config::Device::userOriginSelected());
 
-    m_userOrigin1 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin1Item());
-    m_userOrigin2 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin2Item());
-    m_userOrigin3 = InputWidgetWrapper::createWidget<Vector2DWidget*>(Config::Device::userOrigin3Item());
+    m_userOrigin1 = InputWidgetWrapper::createWidget<Vector3DWidget*>(Config::Device::userOrigin1Item());
+    m_userOrigin2 = InputWidgetWrapper::createWidget<Vector3DWidget*>(Config::Device::userOrigin2Item());
+    m_userOrigin3 = InputWidgetWrapper::createWidget<Vector3DWidget*>(Config::Device::userOrigin3Item());
 
     Config::Device::userOrigin1Item()->bindWidget(m_userOrigin1, SS_DIRECTLY);
     Config::Device::userOrigin2Item()->bindWidget(m_userOrigin2, SS_DIRECTLY);
@@ -2727,6 +2800,70 @@ void LaserControllerWindow::createMovementDockPanel()
     m_dockMovement = dockWidget;
     m_dockAreaMovement = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
     dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/movement.png"), "Movement");
+}
+
+void LaserControllerWindow::createUAxisDockPanel()
+{
+    QCheckBox* checkBoxEnableUAxis = InputWidgetWrapper::createWidget<QCheckBox*>(
+        Config::Device::uEnabledItem());
+    Config::Device::uEnabledItem()->bindWidget(checkBoxEnableUAxis, SS_DIRECTLY);
+
+    QComboBox* comboBoxUFixtureType = InputWidgetWrapper::createWidget<QComboBox*>(
+        Config::Device::uFixtureTypeItem());
+    Config::Device::uFixtureTypeItem()->bindWidget(comboBoxUFixtureType, SS_DIRECTLY);
+
+    QGroupBox* groupBoxGeneral = new QGroupBox(ltr("U Axis"));
+    QFormLayout* layoutGeneral = new QFormLayout;
+    groupBoxGeneral->setLayout(layoutGeneral);
+    layoutGeneral->addRow(Config::Device::uEnabledItem()->title(), checkBoxEnableUAxis);
+    layoutGeneral->addRow(Config::Device::uFixtureTypeItem()->title(), comboBoxUFixtureType);
+
+    EditSlider* editSliderCircumferencePulseNumber = InputWidgetWrapper::createWidget<EditSlider*>(
+        Config::Device::circumferencePulseNumberItem());
+    Config::Device::circumferencePulseNumberItem()->bindWidget(editSliderCircumferencePulseNumber, SS_DIRECTLY);
+
+    FloatEditSlider* editSliderWorkpieceDiameter = InputWidgetWrapper::createWidget<FloatEditSlider*>(
+        Config::Device::workpieceDiameterItem());
+    Config::Device::workpieceDiameterItem()->bindWidget(editSliderWorkpieceDiameter, SS_DIRECTLY);
+
+    QGroupBox* groupBox1 = new QGroupBox(ltr("Chuck Rotary"));
+    QFormLayout* layout1 = new QFormLayout;
+    groupBox1->setLayout(layout1);
+    layout1->addRow(Config::Device::circumferencePulseNumberItem()->title(), editSliderCircumferencePulseNumber);
+    layout1->addRow(Config::Device::workpieceDiameterItem()->title(), editSliderWorkpieceDiameter);
+
+    EditSlider* editSliderRollerRotaryStepLength = InputWidgetWrapper::createWidget<EditSlider*>(
+        Config::Device::rollerRotaryStepLengthItem());
+    Config::Device::rollerRotaryStepLengthItem()->bindWidget(editSliderRollerRotaryStepLength, SS_DIRECTLY);
+
+    QGroupBox* groupBox2 = new QGroupBox(ltr("Roller Rotary"));
+    QFormLayout* layout2 = new QFormLayout;
+    groupBox2->setLayout(layout2);
+    layout2->addRow(Config::Device::rollerRotaryStepLengthItem()->title(), editSliderRollerRotaryStepLength);
+
+    QToolButton* buttonSave = new QToolButton;
+    buttonSave->setDefaultAction(m_ui->actionSaveUStep);
+
+    Config::Device::uFixtureTypeItem()->emitValueChanged();
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setMargin(3);
+    layout->addWidget(groupBoxGeneral);
+    layout->addWidget(groupBox1);
+    layout->addWidget(groupBox2);
+    layout->addWidget(buttonSave);
+    layout->addStretch(4);
+
+    QWidget* panelWidget = new QWidget;
+    panelWidget->setLayout(layout);
+
+    CDockWidget* dockWidget = new CDockWidget(tr("U Axis"));
+    dockWidget->setWidget(panelWidget);
+    m_ui->menuWindow->addAction(dockWidget->toggleViewAction());
+
+    m_dockUAxis = dockWidget;
+    m_dockAreaUAxis = m_dockManager->addDockWidget(CenterDockWidgetArea, dockWidget, m_dockAreaLayers);
+    dockPanelOnlyShowIcon(dockWidget, QPixmap(":/ui/icons/images/u_origin.png"), "U Axis");
 }
 
 void LaserControllerWindow::createLaserPowerDockPanel()
@@ -3716,7 +3853,7 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     
 }
 
-void LaserControllerWindow::onActionNew(bool checked)
+void LaserControllerWindow::newDocument()
 {
     LaserApplication::device->debugPrintSystemRegisters();
 	LaserDocument* doc = m_scene->document();
@@ -3726,7 +3863,7 @@ void LaserControllerWindow::onActionNew(bool checked)
 		}
 	}
 	this->setWindowTitle(tr("Untitled - "));
-	createNewDocument();
+	LaserApplication::createDocument();
 }
 
 bool LaserControllerWindow::onActionSave(bool checked)
@@ -3778,7 +3915,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 		return;
 	}
 	//创建document
-	createNewDocument();
+	LaserApplication::createDocument();
 	m_scene->document()->load(name, this);
     addRecentFile(name);
     setWindowTitle(getCurrentFileName() + " - ");
@@ -3969,7 +4106,7 @@ void LaserControllerWindow::onActionLoadJson(bool checked)
     }
 }
 
-void LaserControllerWindow::onActionMachining(bool checked)
+void LaserControllerWindow::startMachining()
 {
     if (m_useLoadedJson)
     {
@@ -4013,6 +4150,11 @@ void LaserControllerWindow::onActionMachining(bool checked)
         //}
     }
     m_useLoadedJson = false;
+}
+
+void LaserControllerWindow::updateLayers()
+{
+    m_tableWidgetLayers->updateItems();
 }
 
 void LaserControllerWindow::onActionPauseMechining(bool checked)
@@ -4118,57 +4260,57 @@ void LaserControllerWindow::onActionWorkState(bool checked)
 
 void LaserControllerWindow::onActionMoveTop()
 {
-    QVector3D delta(0, -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, -Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottom()
 {
-    QVector3D delta(0, m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(0, Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveLeft()
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), 0, 0);
+    QVector3D delta(-Config::UserRegister::movementStepLength(), 0, 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveRight()
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), 0, 0);
+    QVector3D delta(Config::UserRegister::movementStepLength(), 0, 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopLeft()
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-Config::UserRegister::movementStepLength(), -Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveTopRight()
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), -m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(Config::UserRegister::movementStepLength(), -Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomLeft()
 {
-    QVector3D delta(-m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(-Config::UserRegister::movementStepLength(), Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveBottomRight()
 {
-    QVector3D delta(m_doubleSpinBoxDistanceX->value(), m_doubleSpinBoxDistanceY->value(), 0);
+    QVector3D delta(Config::UserRegister::movementStepLength(), Config::UserRegister::movementStepLength(), 0);
     LaserApplication::device->moveBy(delta);
 }
 
 void LaserControllerWindow::onActionMoveUp()
 {
     int z = Config::Device::zReverseDirection() ?
-        m_doubleSpinBoxDistanceZ->value() :
-        -m_doubleSpinBoxDistanceZ->value();
+        Config::UserRegister::movementStepLength() :
+        -Config::UserRegister::movementStepLength();
     QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
@@ -4176,8 +4318,8 @@ void LaserControllerWindow::onActionMoveUp()
 void LaserControllerWindow::onActionMoveDown()
 {
     int z = Config::Device::zReverseDirection() ?
-        -m_doubleSpinBoxDistanceZ->value() :
-        m_doubleSpinBoxDistanceZ->value();
+        -Config::UserRegister::movementStepLength() :
+        Config::UserRegister::movementStepLength();
     QVector3D delta(0, 0, z);
     LaserApplication::device->moveBy(delta);
 }
@@ -4344,11 +4486,11 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 			if (!onActionSave()) {
 				return false;
 			}
-			documentClose();
+			closeDocument();
 			return true;
 		}
 		case QMessageBox::StandardButton::Close: {
-			documentClose();
+			closeDocument();
 			return true;
 		}
 		default:
@@ -4530,10 +4672,10 @@ void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 
 void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 {
-    QPointF userOrigin = LaserApplication::device->userOrigin();
+    QVector3D userOrigin = LaserApplication::device->userOrigin();
     qLogD << "user origin: " << userOrigin;
-    LaserApplication::device->moveTo(QVector3D(userOrigin.x(), userOrigin.y(), 
-        LaserApplication::device->currentZ()));
+    LaserApplication::device->moveTo(QVector4D(userOrigin.x(), userOrigin.y(), 
+        LaserApplication::device->currentZ(), userOrigin.z()));
 }
 
 void LaserControllerWindow::onActionBitmap(bool checked)
@@ -4865,19 +5007,56 @@ void LaserControllerWindow::onActionRedLightAlignmentFinish(bool checked)
 
 void LaserControllerWindow::onActionCameraTools(bool checked)
 {
-    CameraToolsWindow* ctWindow = new CameraToolsWindow(this);
-    ctWindow->show();
 }
 
 void LaserControllerWindow::onActionCameraCalibration()
 {
-    CalibrationDialog dlg;
+    m_cameraController->unregisterSubscriber(this);
+    CalibrationDialog dlg(m_cameraController, m_calibrator);
     dlg.exec();
+    m_calibrator->loadCoeffs();
+    m_cameraController->registerSubscriber(this);
 }
 
 void LaserControllerWindow::onActionGenerateCalibrationBoard()
 {
     DistortionCalibrator::generateCalibrationBoard();
+}
+
+void LaserControllerWindow::onActionCameraAlignment()
+{
+    m_cameraController->unregisterSubscriber(this);
+    CameraAlignmentDialog dlg(m_cameraController, m_calibrator);
+    dlg.exec();
+    m_calibrator->loadCoeffs();
+    m_cameraController->registerSubscriber(this);
+}
+
+void LaserControllerWindow::onActionCameraUpdateOverlay()
+{
+    m_requestOverlayImage = true;
+}
+
+void LaserControllerWindow::onActionStartCamera(bool checked)
+{
+    m_cameraController->start();
+}
+
+void LaserControllerWindow::onActionStopCamera(bool checked)
+{
+    m_cameraController->stop();
+}
+
+void LaserControllerWindow::onActionSaveUStep()
+{
+    QString password = LaserApplication::device->showManufacturePasswordDialog();
+    if (password.isEmpty())
+        return;
+
+    qreal c = M_PI * Config::Device::workpieceDiameter();
+    int stepLength = qRound(c / Config::Device::circumferencePulseNumber() * 1000000);
+    Config::SystemRegister::uStepLengthItem()->setValue(stepLength, SS_DIRECTLY, this);
+    Config::SystemRegister::group->save(true, false);
 }
 
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
@@ -5218,6 +5397,33 @@ void LaserControllerWindow::retranslate()
     qobject_cast<QLabel*>(m_textLayout->itemAtPosition(1, 6)->widget())->setText(tr("Upper Case"));
 }
 
+bool LaserControllerWindow::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == Event_CameraFrame) {
+        CameraFrameEvent* frameEvent = static_cast<CameraFrameEvent*>(event);
+        QImage image(frameEvent->thumbImage().data, frameEvent->thumbImage().cols, frameEvent->thumbImage().rows, frameEvent->thumbImage().step, QImage::Format_RGB888);
+        m_cameraViewer->setImage(image);
+        m_cameraViewer->fit();
+
+        if (m_requestOverlayImage && m_scene && m_scene->document())
+        {
+            m_requestOverlayImage = false;
+            cv::Mat perspected;
+            m_calibrator->undistortImage(frameEvent->processedImage());
+            m_calibrator->perspective(frameEvent->processedImage(), perspected);
+            QImage persImage(perspected.data, perspected.cols, perspected.rows, perspected.step, QImage::Format_RGB888);
+            m_scene->setImage(persImage);
+            m_scene->update();
+            m_viewer->viewport()->update();
+        }
+        return true;
+    }
+    else {
+        // standard event processing
+        return QObject::eventFilter(obj, event);
+    }
+}
+
 void LaserControllerWindow::onLaserViewerMouseMoved(const QPointF & pos)
 {
     qreal mmX = pos.x() * 0.001;
@@ -5336,6 +5542,7 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
     qLogD << "json data: ";
     qLogD << data;
     LaserApplication::driver->importData(data.data(), data.size());
+    LaserApplication::driver->startMachining();
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
@@ -5503,39 +5710,38 @@ void LaserControllerWindow::updateOutlineTree()
 
 void LaserControllerWindow::initDocument(LaserDocument* doc)
 {
-    if (doc)
-    {
-        connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
-        connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
+    if (!doc)
+        return;
+    connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
+    connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
 
-        doc->bindLayerButtons(m_layerButtons);
-		m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
-        m_tableWidgetLayers->setDocument(doc);
-        m_tableWidgetLayers->updateItems();
-        setWindowTitle(doc->name());
-        //undo
-        m_viewer->undoStack()->clear();
-        LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
-        if (m_viewer) {
-            QRect rect = LaserApplication::device->layoutRect();
+    doc->bindLayerButtons(m_layerButtons);
+    m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
+    m_tableWidgetLayers->setDocument(doc);
+    m_tableWidgetLayers->updateItems();
+    setWindowTitle(doc->name());
+    //undo
+    m_viewer->undoStack()->clear();
+    LaserViewer* viewer = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+    if (m_viewer) {
+        QRect rect = LaserApplication::device->layoutRect();
 
-            m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
-            m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
-            m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点进行变换
-            LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-            if (backgroundItem) {
-                backgroundItem->onChangeGrids();
-            }
-            m_comboBoxScale->setCurrentText("100");
-            //初始化缩放输入
-            qreal scale = m_viewer->adapterViewScale();
-            m_viewer->setZoomValue(scale);
-            qreal zoomValuePerc = scale * 100;
-            QString str = QString("%1").arg(zoomValuePerc, 0, 'f', 3);
-            m_comboBoxScale->blockSignals(true);
-            m_comboBoxScale->setCurrentText(str);
-            m_comboBoxScale->blockSignals(false);
+        m_scene->setSceneRect(QRectF(QPointF(-5000000, -5000000), QPointF(5000000, 5000000)));
+        m_viewer->setTransformationAnchor(QGraphicsView::NoAnchor);
+        m_viewer->setAnchorPoint(m_viewer->mapFromScene(QPointF(0, 0)));//NoAnchor以scene的(0, 0)点为坐标原点进行变换
+        LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+        if (backgroundItem) {
+            backgroundItem->onChangeGrids();
         }
+        //m_comboBoxScale->setCurrentText("100");
+        //初始化缩放输入
+        qreal scale = m_viewer->adapterViewScale();
+        m_viewer->setZoomValue(scale);
+        qreal zoomValuePerc = scale * 100;
+        QString str = QString("%1").arg(zoomValuePerc, 0, 'f', 3);
+        m_comboBoxScale->blockSignals(true);
+        m_comboBoxScale->setCurrentText(str);
+        m_comboBoxScale->blockSignals(false);
     }
 }
 void LaserControllerWindow::showConfigDialog(const QString& title)
@@ -5738,16 +5944,12 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     if (!m_created)
     {
         m_created = true;
-        QTimer::singleShot(100, this, &LaserControllerWindow::windowCreated);
-        //LaserApplication::device->closeAboutWindow();
+        QTimer::singleShot(100, this, [=]() {
+            emit windowCreated();
+            qLogD << "orientation: " << m_splitterLayers->orientation();
+            m_splitterLayers->setSizes({400, 450});
+        });
     }
-}
-
-void LaserControllerWindow::createNewDocument()
-{
-	LaserDocument* doc = new LaserDocument(m_scene);
-	initDocument(doc);
-    doc->open();
 }
 
 QString LaserControllerWindow::getCurrentFileName()
@@ -5761,7 +5963,7 @@ QString LaserControllerWindow::getCurrentFileName()
 	return name;
 }
 
-void LaserControllerWindow::documentClose()
+void LaserControllerWindow::closeDocument()
 {
 	m_scene->clearDocument(true);
 	m_tableWidgetLayers->updateItems();
@@ -5816,13 +6018,13 @@ void LaserControllerWindow::askMergeOrNew()
         if (ret == 1)
         {
             if (onActionCloseDocument()) {
-                createNewDocument();
+                LaserApplication::createDocument();
             }
         }
 	}
     else
     {
-        createNewDocument();
+        LaserApplication::createDocument();
     }
 }
 
@@ -6147,6 +6349,22 @@ void LaserControllerWindow::onActionWeldAll()
     WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_WeldAll);
     m_viewer->undoStack()->push(cmd);
     m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onCameraConnected()
+{
+    m_buttonCameraStart->removeAction(m_ui->actionStartCamera);
+    m_buttonCameraStart->setDefaultAction(m_ui->actionStopCamera);
+    m_statusBarCameraState->setText(tr("Camera Connected"));
+    m_statusBarCameraState->setStyleSheet("color: rgb(0, 255, 0)");
+}
+
+void LaserControllerWindow::onCameraDisconnected()
+{
+    m_buttonCameraStart->removeAction(m_ui->actionStopCamera);
+    m_buttonCameraStart->setDefaultAction(m_ui->actionStartCamera);
+    m_statusBarCameraState->setText(tr("Camera Disonnected"));
+    m_statusBarCameraState->setStyleSheet("color: rgb(255, 0, 0)");
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)

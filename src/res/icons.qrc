@@ -147,6 +147,8 @@
         <file>images/stamp.png</file>
         <file>images/posCursor.png</file>
         <file>images/textIcon.png</file>
-
+        <file>images/u_backward.png</file>
+        <file>images/u_forward.png</file>
+        <file>images/u_origin.png</file>
     </qresource>
 </RCC>

@@ -4,6 +4,7 @@
 #include <Qt>
 #include <QDebug>
 #include <QTransform>
+#include <QEvent>
 
 #define qLogD qDebug().noquote().nospace()
 #define qsLogD qDebug().nospace()
@@ -225,6 +226,7 @@ enum InputWidgetType
     IWT_EditSlider,
     IWT_FloatEditSlider,
     IWT_Vector2DWidget,
+    IWT_Vector3DWidget,
     //IWT_LimitationWidget
 };
 
@@ -239,6 +241,7 @@ enum DataType
     DT_DATETIME,
     DT_RECT,
     DT_POINT,
+    DT_VECTOR3D,
     DT_SIZE,
     DT_LIST,
     DT_CUSTOM
@@ -259,14 +262,12 @@ enum StartFromType
     SFT_AbsoluteCoords
 };
 
-//enum ModifiedBy
-//{
-//    MB_Manual,
-//    MB_ConfigFile,
-//    MB_Widget,
-//    MB_Register,
-//    MB_RegisterConfirmed
-//};
+enum ImageQuality
+{
+    IQ_Normal,
+    IQ_High,
+    IQ_Perfect
+};
 
 enum PrimitiveProperty
 {
@@ -306,6 +307,11 @@ enum ArrangeType
     AT_VCentered = 13,
     AT_HSpaced = 14,
     AT_HCentered = 15
+};
+
+enum LaserEvent
+{
+    Event_CameraFrame = QEvent::User + 1,
 };
 
 enum CalibrationPattern

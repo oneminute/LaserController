@@ -2,7 +2,6 @@
 #define LASERCONTROLLERWINDOW_H
 
 #include <DockManager.h>
-//#include <DockWidgetTab.h>
 #include <QtConcurrent>
 #include <QObject>
 #include <QMainWindow>
@@ -10,6 +9,10 @@
 #include <QDir>
 #include <QState>
 #include <QFontComboBox>
+
+#include <opencv2/opencv.hpp>
+
+#include "camera/CameraController.h"
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
 #include "laser/LaserDriver.h"
@@ -47,11 +50,15 @@ class QWidget;
 class RulerWidget;
 class ProgressBar;
 class PressedToolButton;
-class Vector2DWidget;
 class RadioButtonGroup;
 class PointPairTableWidget;
 class UpdateDialog;
 class LaserMenu;
+class DistortionCalibrator;
+class CameraController;
+class ImageViewer;
+class Vector2DWidget;
+class Vector3DWidget;
 class LaserStar;
 
 class LaserControllerWindow : public QMainWindow
@@ -119,9 +126,16 @@ public slots:
     void onFontSpaceYEnterOrLostFocus();
     void onLaserPrimitiveGroupItemTransformChanged();
 
+	void newDocument();
+	void closeDocument();
+    void startMachining();
+    void updateLayers();
+
     void retranslate();
 	
 protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
     //recent files
     void loadRecentFilesMenu();
     void addRecentFile(QString path);
@@ -136,6 +150,7 @@ protected:
     void createOperationsDockPanel();
     void createOutlineDockPanel();
     void createMovementDockPanel();
+    void createUAxisDockPanel();
     void createLaserPowerDockPanel();
     void createPrintAndCutPanel();
     //shape properties panel / dock panel
@@ -162,6 +177,7 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 	virtual void contextMenuEvent(QContextMenuEvent *event) override;
+
 protected slots:
 	void onActionUndo(bool checked = false);
 	void onActionRedo(bool checked);
@@ -172,7 +188,6 @@ protected slots:
     void onTableWidgetItemSelectionChanged();
     void onActionExportJson(bool checked = false);
     void onActionLoadJson(bool checked = false);
-    void onActionMachining(bool checked = false);
     void onActionPauseMechining(bool checked = false);
     void onActionStopMechining(bool checked = false);
     void onActionBounding(bool checked = false);
@@ -185,7 +200,6 @@ protected slots:
     void onActionLoadMotor(bool checked = false);
     void onActionUnloadMotor(bool checked = false);
     void onActionWorkState(bool checked = false);
-	void onActionNew(bool checked = false);
 	bool onActionSave(bool checked = false);
 	bool onActionSaveAs(bool checked = false);
 	void onActionOpen(bool checked = false);
@@ -268,6 +282,12 @@ protected slots:
     void onActionCameraTools(bool checked = false);
     void onActionCameraCalibration();
     void onActionGenerateCalibrationBoard();
+    void onActionCameraAlignment();
+    void onActionCameraUpdateOverlay();
+    void onActionStartCamera(bool checked = false);
+    void onActionStopCamera(bool checked = false);
+
+    void onActionSaveUStep();
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();
@@ -373,6 +393,10 @@ protected slots:
     void onActionTwoShapesUnite();
     void onActionWeldAll();
 
+    // cameras slots
+    void onCameraConnected();
+    void onCameraDisconnected();
+
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit
     //void onJoinedGroupChanged();
@@ -383,9 +407,7 @@ private:
     QString getFilename(const QString& title, const QString& filters = "");
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
-	void createNewDocument();
 	QString getCurrentFileName();
-	void documentClose();
 
 signals:
     void windowCreated();
@@ -432,9 +454,11 @@ private:
     QToolButton* m_buttonRemoveLayer;
     ads::CDockWidget* m_dockLayers;
     ads::CDockAreaWidget* m_dockAreaLayers;
+    ads::CDockSplitter* m_splitterLayers;
 
     // Camera Panel widgets
-    QComboBox* m_comboBoxCameras;
+    QLabel* m_labelCameraAutoConnect;
+    QToolButton* m_buttonCameraStart;
     QToolButton* m_buttonCameraUpdateOverlay;
     QToolButton* m_buttonCameraTrace;
     QToolButton* m_buttonCameraSaveSettings;
@@ -444,6 +468,7 @@ private:
     QCheckBox* m_checkBoxCameraShow;
     QDoubleSpinBox* m_doubleSpinBoxCameraXShift;
     QDoubleSpinBox* m_doubleSpinBoxCameraYShift;
+    ImageViewer* m_cameraViewer;
     ads::CDockWidget* m_dockCameras;
     ads::CDockAreaWidget* m_dockAreaCameras;
 
@@ -472,9 +497,7 @@ private:
     QLineEdit* m_lineEditCoordinatesX;
     QLineEdit* m_lineEditCoordinatesY;
     QLineEdit* m_lineEditCoordinatesZ;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceX;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceY;
-    QDoubleSpinBox* m_doubleSpinBoxDistanceZ;
+    QLineEdit* m_lineEditCoordinatesU;
 
     PressedToolButton* m_buttonMoveTopLeft;
     PressedToolButton* m_buttonMoveTop;
@@ -485,13 +508,12 @@ private:
     PressedToolButton* m_buttonMoveBottomLeft;
     PressedToolButton* m_buttonMoveBottom;
     PressedToolButton* m_buttonMoveBottomRight;
+    PressedToolButton* m_buttonMoveForward;
+    QToolButton* m_buttonMoveToUOrigin;
+    PressedToolButton* m_buttonMoveBackward;
     PressedToolButton* m_buttonMoveUp;
     QToolButton* m_buttonMoveToZOrigin;
     PressedToolButton* m_buttonMoveDown;
-
-    //QCheckBox* m_checkBoxXEnabled;
-    //QCheckBox* m_checkBoxYEnabled;
-    //QCheckBox* m_checkBoxZEnabled;
 
     QToolButton* m_buttonShowLaserPosition;
     QToolButton* m_buttonHideLaserPosition;
@@ -500,13 +522,17 @@ private:
     QRadioButton* m_radioButtonUserOrigin1;
     QRadioButton* m_radioButtonUserOrigin2;
     QRadioButton* m_radioButtonUserOrigin3;
-    Vector2DWidget* m_userOrigin1;
-    Vector2DWidget* m_userOrigin2;
-    Vector2DWidget* m_userOrigin3;
+    Vector3DWidget* m_userOrigin1;
+    Vector3DWidget* m_userOrigin2;
+    Vector3DWidget* m_userOrigin3;
     QToolButton* m_buttonFetchToUserOrigin;
     QToolButton* m_buttonMoveToUserOrigin;
     ads::CDockWidget* m_dockMovement;
     ads::CDockAreaWidget* m_dockAreaMovement;
+
+    // U Axis panel
+    ads::CDockWidget* m_dockUAxis;
+    ads::CDockAreaWidget* m_dockAreaUAxis;
 
     // Property panel
     LaserDoubleSpinBox* m_cutOrderPriority;
@@ -623,6 +649,7 @@ private:
     QLabel* m_statusBarCoordinate;
     QLabel* m_statusBarLocation;
     QLabel* m_statusBarPageInfo;
+    QLabel* m_statusBarCameraState;
     QLabel* m_statusBarCopyright;
 
     QList<LayerButton*> m_layerButtons;
@@ -714,6 +741,11 @@ private:
     int m_alignTargetIndex;
     LaserPrimitive* m_alignTarget;
     friend class LaserApplication;
+
+    // camera viariables
+    CameraController* m_cameraController;
+    DistortionCalibrator* m_calibrator;
+    bool m_requestOverlayImage;
 };
 
 #endif // LASERCONTROLLERWINDOW_H

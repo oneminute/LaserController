@@ -95,8 +95,12 @@ public:
 
     void setValue(const QVariant& value, StoreStrategy strategy, void* senderPtr);
 
-protected:
+    void push();
+    void pop();
+
     InputWidgetWrapper* bindWidget(QWidget* widget, StoreStrategy ss);
+
+protected:
     void setNeedRelaunch(bool needRelaunch);
 
     /// <summary>
@@ -174,6 +178,7 @@ protected:
     bool confirm(const QVariant& value);
     void loadValue(const QVariant& value);
     void clearModified();
+    void emitValueChanged();
 
 signals:
     void visibleChanged(bool value);
@@ -205,6 +210,10 @@ void parseQSizeItemFromJson(QVariant& value, QVariant& defaultValue,
 
 QJsonObject qPointItemToJson(const ConfigItem* configItem);
 void parseQPointItemFromJson(QVariant& value, QVariant& defaultValue,
+    const QJsonObject& json, ConfigItem* item);
+
+QJsonObject qVector3DItemToJson(const ConfigItem* configItem);
+void parseQVector3DItemFromJson(QVariant& value, QVariant& defaultValue,
     const QJsonObject& json, ConfigItem* item);
 
 QDebug operator<<(QDebug debug, const ConfigItem & item);
