@@ -3935,7 +3935,7 @@ void LaserCircleText::draw(QPainter * painter)
     painter->setBrush(QBrush(this->layer()->color()));
     painter->drawPath(d->textPath);
     painter->setBrush(Qt::NoBrush);
-    painter->drawPath(d->path);
+    //painter->drawPath(d->path);
     
     /*QPainterPath textEllipse;
     textEllipse.addEllipse(textArcRect());
@@ -3981,7 +3981,7 @@ QJsonObject LaserCircleText::toJson()
 QVector<QLineF> LaserCircleText::edges()
 {
     Q_D(LaserCircleText);
-    return LaserPrimitive::edges(sceneTransform().map(d->path));
+    return LaserPrimitive::edges(sceneTransform().map(d->textPath));
 }
 
 bool LaserCircleText::isClosed() const

@@ -969,7 +969,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
                     return true;
                 }
             }
-            else if (LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*> (primitive)) {
+            /*else if (LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*> (primitive)) {
                 if (hText->getScenePath().contains(sceneMousePoint)) {
                     result = hText;
                     return true;
@@ -980,7 +980,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
                     result = cText;
                     return true;
                 }
-            }
+            }*/
 		}
 	}
 	

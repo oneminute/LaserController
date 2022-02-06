@@ -8182,7 +8182,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <location line="+18"/>
         <location line="+21"/>
         <source>stampContent</source>
-        <translation>印章内容</translation>
+        <translation type="unfinished">属性面板中修改文字</translation>
     </message>
 </context>
 <context>
