@@ -2766,7 +2766,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160,true, 0, 0,QSize(), transform, m_curLayerIndex);
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, true, 0, 0,QSize(), transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2784,7 +2784,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, 550, transform, m_curLayerIndex);            
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, 550, transform, m_curLayerIndex);            
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2805,7 +2805,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             if (cursorIn) {
                 transform = cursorIn->sceneTransform();
             }
-            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, 550, transform, m_curLayerIndex);
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false,550, transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();

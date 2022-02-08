@@ -1253,7 +1253,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QJsonArray bLArray = primitiveJson["bottomLeft"].toArray();
                 QPointF bL(bLArray[0].toDouble(), bLArray[1].toDouble());
                 qreal space = primitiveJson["space"].toDouble();
-                primitive = new LaserHorizontalText(this, content, size, bL, space, saveTransform, layerIndex);
+                bool bold = primitiveJson["bold"].toBool();
+                primitive = new LaserHorizontalText(this, content, size, bL, bold, space, saveTransform, layerIndex);
             }
             else if (className == "LaserVerticalText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1262,7 +1263,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QJsonArray bLArray = primitiveJson["topLeft"].toArray();
                 QPointF bL(bLArray[0].toDouble(), bLArray[1].toDouble());
                 qreal space = primitiveJson["space"].toDouble();
-                primitive = new LaserVerticalText(this, content, size, bL, space, saveTransform, layerIndex);
+                bool bold = primitiveJson["bold"].toBool();
+                primitive = new LaserVerticalText(this, content, size, bL, bold, space, saveTransform, layerIndex);
             }
             else if (className == "LaserCircleText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1273,7 +1275,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 qreal minRadian = primitiveJson["minRadian"].toDouble();
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
-                primitive = new LaserCircleText(this, content, bounds, angle, false, maxRadian, minRadian,size, saveTransform, layerIndex);
+                bool bold = primitiveJson["bold"].toBool();
+                primitive = new LaserCircleText(this, content, bounds, angle, bold, false, maxRadian, minRadian,size, saveTransform, layerIndex);
             }
             
             if (primitive)

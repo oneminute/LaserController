@@ -3443,9 +3443,10 @@ public:
     QPainterPath arcPath;
     qreal minRadian, maxRadian;
     QRectF circleBounds;
+    bool bold;
 };
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
+    bool bold, bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
     :LaserShape(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, layerIndex, transform)
 {
     Q_D(LaserCircleText);
@@ -3456,6 +3457,7 @@ LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bou
         d->maxRadian = maxRadian;
         d->minRadian = minRadian;
     }
+    d->bold = bold;
     setTransform(transform);
     //d->originalBoundingRect = d->boundingRect;    
     d->angle = angle;
@@ -3493,6 +3495,7 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     font.setWordSpacing(0);
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
+    font.setBold(d->bold);
 
     d->textTransformList.clear();
     d->originalTextPathList.clear();
@@ -4029,6 +4032,7 @@ QJsonObject LaserCircleText::toJson()
     object.insert("minRadian", d->minRadian);
     QJsonArray bounds = { d->circleBounds.x(), d->circleBounds.y(),d->circleBounds.width(), d->circleBounds.height() };
     object.insert("bounds", bounds);
+    object.insert("bold", d->bold);
     return object;
 }
 
@@ -4091,6 +4095,18 @@ QRectF LaserCircleText::circleBounds()
     return d->circleBounds;
 }
 
+void LaserCircleText::setBold(bool bold)
+{
+    Q_D(LaserCircleText);
+    d->bold = bold;
+    computeTextPath(d->angle, d->size, false);
+}
+
+bool LaserCircleText::bold()
+{
+    return false;
+}
+
 class LaserHorizontalTextPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserHorizontalText)
@@ -4104,10 +4120,11 @@ public:
     QList<QPainterPath> originalTextPathList;
     QPointF bottomLeft;
     qreal space;
+    bool bold;
 };
 
 LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QSize size,
-    QPointF bottomLeft, qreal space, QTransform transform, int layerIndex)
+    QPointF bottomLeft, bool bold, qreal space, QTransform transform, int layerIndex)
     :LaserShape(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT, layerIndex, transform)
 {
     Q_D(LaserHorizontalText);
@@ -4116,6 +4133,7 @@ LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QS
     d->size = size;
     d->bottomLeft = bottomLeft;
     d->space = space;
+    d->bold = bold;
     initTextPath();
     d->boundingRect = d->path.boundingRect().toRect();
     //d->originalBoundingRect = d->boundingRect;
@@ -4134,6 +4152,7 @@ void LaserHorizontalText::initTextPath()
     font.setWordSpacing(0);
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
+    font.setBold(d->bold);
     d->path = QPainterPath();
     d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
@@ -4203,7 +4222,7 @@ void LaserHorizontalText::draw(QPainter * painter)
 LaserPrimitive * LaserHorizontalText::clone(QTransform t)
 {
     Q_D(LaserHorizontalText);
-    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->bottomLeft, d->space, t, d->layerIndex);
+    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->bottomLeft,d->bold, d->space, t, d->layerIndex);
     return hText;
 }
 
@@ -4230,6 +4249,7 @@ QJsonObject LaserHorizontalText::toJson()
     QJsonArray bL = { d->bottomLeft.x(), d->bottomLeft.y() };
     object.insert("bottomLeft", bL);
     object.insert("space", d->space);
+    object.insert("bold", d->bold);
     return object;
 }
 
@@ -4308,6 +4328,19 @@ QSize LaserHorizontalText::textSize()
     return d->size;
 }
 
+void LaserHorizontalText::setBold(bool bold)
+{
+    Q_D(LaserHorizontalText);
+    d->bold = bold;
+    initTextPath();
+}
+
+bool LaserHorizontalText::bold()
+{
+    Q_D(LaserHorizontalText);
+    return d->bold;
+}
+
 class LaserVerticalTextPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserVerticalText)
@@ -4321,9 +4354,10 @@ public:
     QList<QPainterPath> originalTextPathList;
     QPointF topLeft;
     qreal space;
+    bool bold;
 };
 LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size, 
-    QPointF topLeft, qreal space, QTransform transform, int layerIndex)
+    QPointF topLeft, bool bold, qreal space, QTransform transform, int layerIndex)
     :LaserShape(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT, layerIndex, transform)
 {
     Q_D(LaserVerticalText);
@@ -4331,9 +4365,10 @@ LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize 
     d->space = space;
     d->size = size;
     d->topLeft = topLeft;
+    d->bold = bold;
     setTransform(transform);
     initTextPath();
-    d->boundingRect = d->path.boundingRect().toRect();
+    //d->boundingRect = d->path.boundingRect().toRect();
     //d->originalBoundingRect = d->boundingRect;
 }
 LaserVerticalText::~LaserVerticalText()
@@ -4347,6 +4382,7 @@ void LaserVerticalText::initTextPath()
     font.setWordSpacing(0);
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
+    font.setBold(d->bold);
     d->path = QPainterPath();
     d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
@@ -4369,6 +4405,7 @@ void LaserVerticalText::initTextPath()
         d->path.addPath(path);
     }
     toTopLeft();
+    d->boundingRect = d->path.boundingRect().toRect();
 }
 
 void LaserVerticalText::computeTextPath()
@@ -4418,7 +4455,7 @@ void LaserVerticalText::draw(QPainter * painter)
 LaserPrimitive * LaserVerticalText::clone(QTransform t)
 {
     Q_D(LaserVerticalText);
-    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->topLeft, d->space, t, d->layerIndex);
+    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->topLeft,d->bold, d->space, t, d->layerIndex);
     return text;
 }
 
@@ -4445,6 +4482,7 @@ QJsonObject LaserVerticalText::toJson()
     QJsonArray bL = { d->topLeft.x(), d->topLeft.y() };
     object.insert("topLeft", bL);
     object.insert("space", d->space);
+    object.insert("bold", d->bold);
     return object;
 }
 
@@ -4511,4 +4549,17 @@ QString LaserVerticalText::getContent()
 {
     Q_D(LaserVerticalText);
     return d->content;
+}
+
+void LaserVerticalText::setBold(bool bold)
+{
+    Q_D(LaserVerticalText);
+    d->bold = bold;
+    initTextPath();
+}
+
+bool LaserVerticalText::bold()
+{
+    Q_D(LaserVerticalText);
+    return d->bold;
 }
