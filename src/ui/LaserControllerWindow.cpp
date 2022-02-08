@@ -3034,6 +3034,16 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_borderWidth = new LaserDoubleSpinBox();
     m_borderWidth->setMaximum(DBL_MAX);
     m_borderWidth->setDecimals(3);
+    m_commonCornerRadiusLabel = new QLabel(tr("Corner Radius"));
+    m_commonCornerRadius = new LaserDoubleSpinBox();
+    m_commonCornerRadius->setMaximum(DBL_MAX);
+    m_commonCornerRadius->setMinimum(0);
+    m_commonCornerRadius->setDecimals(3);
+    m_cornerRadiusTypeLabel = new QLabel(tr("Corner Type"));
+    m_cornerRadiusType = new QComboBox();
+    m_cornerRadiusType->addItem(tr("Round Corner"));
+    m_cornerRadiusType->addItem(tr("Cutted Corner"));
+    m_cornerRadiusType->addItem(tr("Inner Corner"));
     //暂时不做
     m_widthLabel->setVisible(false);
     m_heightLabel->setVisible(false);
@@ -3229,13 +3239,74 @@ void LaserControllerWindow::createShapePropertyDockPanel()
             LaserRing* ring = qgraphicsitem_cast<LaserRing*>(firstPrimitive);
             ring->setBorderWidth(w);
         }
-        /*/else if (type == LPT_CIRCLETEXT) {
-            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(firstPrimitive);
-        }*/
-
         view->viewport()->repaint();
     });
-
+    m_commonCornerRadius->connect(m_commonCornerRadius, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        LaserPrimitive* firstPrimitive = nullptr;
+        if (!list.isEmpty()) {
+            firstPrimitive = list[0];
+        }
+        else {
+            return;
+        }
+        qreal value = m_commonCornerRadius->value();
+        if (m_unitIsMM) {
+            value *= 1000;
+        }
+       
+        int type = firstPrimitive->primitiveType();
+        if (type == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(firstPrimitive);
+            QRectF rect = frame->boundingRect();
+            qreal shorter = rect.width();
+            if (shorter > rect.height()) {
+                shorter = rect.height();
+            }
+            if (value > shorter * 0.5) {
+                value = shorter * 0.5;
+                m_commonCornerRadius->setValue(value * 0.001);
+            }
+            frame->setCornerRadius(value, frame->cornerRadiusType());
+        }
+        view->viewport()->repaint();
+    });
+    m_cornerRadiusType->connect(m_cornerRadiusType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        [=](int index) {
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        LaserPrimitive* firstPrimitive = nullptr;
+        if (!list.isEmpty()) {
+            firstPrimitive = list[0];
+        }
+        else {
+            return;
+        }
+        int type = firstPrimitive->primitiveType();
+        if (type == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(firstPrimitive);
+            frame->setCornerRadius(frame->cornerRadius(), index);
+            /*switch (index)
+            {
+            case 0: {
+                
+                break;
+            }
+            case 1: {
+                frame->setCornerRadius(frame->cornerRadius(), CRT_Arc);
+                break;
+            }
+            case 2: {
+                frame->setCornerRadius(frame->cornerRadius(), CRT_Line);
+                break;
+            }
+            default:
+                break;
+            }*/
+        }
+        view->viewport()->repaint();
+    });
     m_propertyPanelWidget = new QWidget();
     m_propertyDockWidget = new CDockWidget(tr("Movement"));
     
@@ -3533,13 +3604,21 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_framePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             m_framePropertyLayout->addWidget(m_borderWidthLabel, 0, 0);
             m_framePropertyLayout->addWidget(m_borderWidth, 0, 1);
+            m_framePropertyLayout->addWidget(m_commonCornerRadiusLabel, 1, 0);
+            m_framePropertyLayout->addWidget(m_commonCornerRadius, 1, 1);
+            m_framePropertyLayout->addWidget(m_cornerRadiusTypeLabel, 2, 0);
+            m_framePropertyLayout->addWidget(m_cornerRadiusType, 2, 1);
 
             m_borderWidth->setVisible(true);
             qreal width = frame->borderWidth();
+            qreal cornerRadius = frame->cornerRadius();
             if (m_unitIsMM) {
                 width *= 0.001;
+                cornerRadius *= 0.001;
             }
             m_borderWidth->setValue(width);
+            m_commonCornerRadius->setValue(cornerRadius);
+            m_cornerRadiusType->setCurrentIndex(frame->cornerRadiusType());
 
             m_frameWidget->setLayout(m_framePropertyLayout);
             m_propertyDockWidget->setWidget(m_frameWidget);
