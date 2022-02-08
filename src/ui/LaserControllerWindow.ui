@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1832,7 +1832,7 @@
   <action name="actionStar">
    <property name="icon">
     <iconset resource="../res/icons.qrc">
-     <normaloff>:/ui/icons/images/start.png</normaloff>:/ui/icons/images/start.png</iconset>
+     <normaloff>:/ui/icons/images/star.png</normaloff>:/ui/icons/images/star.png</iconset>
    </property>
    <property name="text">
     <string>star</string>
