@@ -150,5 +150,6 @@
         <file>images/u_backward.png</file>
         <file>images/u_forward.png</file>
         <file>images/u_origin.png</file>
+        <file>images/star.png</file>
     </qresource>
 </RCC>
