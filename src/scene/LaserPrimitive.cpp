@@ -3306,9 +3306,9 @@ void LaserFrame::draw(QPainter * painter)
         QPoint(d->innerRect.center().x(), d->innerRect.center().y() + halfH));
     painter->drawLine(hLine);
     painter->drawLine(vLine);
-    QPainterPath p; 
+    /*QPainterPath p;
     p.addRect(d->innerRect);
-    painter->drawPath(p);
+    painter->drawPath(p);*/
 
     
 }
@@ -3372,13 +3372,24 @@ QPointF LaserFrame::position() const
     Q_D(const LaserFrame);
     return sceneTransform().map(d->path.pointAtPercent(0));
 }
-void LaserFrame::setCornerRadius(int cornerRadius, int type)
+void LaserFrame::setCornerRadius(qreal cornerRadius, int type)
 {
     Q_D(LaserFrame);
     d->cornerRadius = qAbs(cornerRadius);
+    d->cornerType = type;
     d->outerPath = computeCornerRadius(d->outerRect, d->cornerRadius, type);
     d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, type);
     computePath();
+}
+qreal LaserFrame::cornerRadius()
+{
+    Q_D(LaserFrame);
+    return d->cornerRadius;
+}
+int LaserFrame::cornerRadiusType()
+{
+    Q_D(LaserFrame);
+    return d->cornerType;
 }
 QRectF LaserFrame::innerRect()
 {

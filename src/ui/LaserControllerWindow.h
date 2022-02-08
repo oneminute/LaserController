@@ -567,6 +567,10 @@ private:
     QLineEdit* m_textContent;
     QLabel* m_borderWidthLabel;
     LaserDoubleSpinBox* m_borderWidth;
+    QLabel* m_commonCornerRadiusLabel;
+    LaserDoubleSpinBox* m_commonCornerRadius;
+    QLabel* m_cornerRadiusTypeLabel;
+    QComboBox* m_cornerRadiusType;
     QLabel* m_enhanceDenoiseLabel;
     QGridLayout* m_rectPropertyLayout;
     QGridLayout* m_linePropertyLayout;

@@ -4782,8 +4782,17 @@ void LaserViewer::selectedHandleScale()
         {
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
             LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
-            qreal diff = (m_mousePoint.x() - m_lastPos.x()) / 8.0;
-            text->computeMoveTextPath(diff);
+            //qreal diff = (m_mousePoint.x() - m_lastPos.x()) / 8.0;
+            QVector2D lastV(mapToScene(m_lastPos) - primitive->sceneBoundingRect().center());
+            QVector2D curV(mapToScene(m_mousePoint) - primitive->sceneBoundingRect().center());
+            lastV.normalize();
+            curV.normalize();
+            qreal diff = QVector2D::dotProduct(lastV, curV);
+            diff = qAcos(diff);
+            if (QVector3D::crossProduct(QVector3D(lastV, 0), QVector3D(curV, 0)).z() > 0) {
+                diff = -diff;
+            }
+            text->computeMoveTextPath(qRadiansToDegrees(diff));
             break;
         }
         case 18://circle text change angle

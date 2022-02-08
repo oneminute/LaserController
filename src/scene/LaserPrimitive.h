@@ -546,7 +546,9 @@ public:
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     virtual bool isClosed() const;
     virtual QPointF position() const;
-    void setCornerRadius(int cornerRadius, int type);
+    void setCornerRadius(qreal cornerRadius, int type);
+    qreal cornerRadius();
+    int cornerRadiusType();
     QRectF innerRect();
     void setBorderWidth(qreal w);
     qreal borderWidth();
