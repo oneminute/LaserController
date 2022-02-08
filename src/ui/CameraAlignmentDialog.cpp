@@ -321,8 +321,8 @@ bool CameraAlignmentDialog::eventFilter(QObject* obj, QEvent* event)
 }
 void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
-    if (m_doc)
-        LaserApplication::mainWindow->closeDocument();
+    //if (m_doc)
+        //LaserApplication::mainWindow->closeDocument();
     Config::Device::startFromItem()->pop();
     Config::Export::imageQualityItem()->pop();
 }
