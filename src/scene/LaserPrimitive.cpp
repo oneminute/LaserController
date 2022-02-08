@@ -69,7 +69,7 @@ public:
     QPoint machiningCenter;
     QList<int> startingIndices;
 	QTransform allTransform;
-	QRect originalBoundingRect;
+	//QRect originalBoundingRect;
 	QPainterPath path;
     bool isLocked;
     QList<QuadTreeNode*> treeNodes;
@@ -903,7 +903,7 @@ LaserEllipse::LaserEllipse(const QRect bounds, LaserDocument * doc, QTransform s
 	
     Q_D(LaserEllipse);
     d->boundingRect = bounds;
-	d->originalBoundingRect = bounds;
+	//d->originalBoundingRect = bounds;
 	sceneTransformToItemTransform(saveTransform);
 	d->path.addEllipse(bounds);
 	d->boundingRect = d->path.boundingRect().toRect();
@@ -920,7 +920,7 @@ void LaserEllipse::setBounds(const QRect& bounds)
 {
     Q_D(LaserEllipse);
     d->boundingRect = bounds; 
-	d->originalBoundingRect = bounds;
+	//d->originalBoundingRect = bounds;
     d->path = QPainterPath();
 	d->path.addEllipse(d->boundingRect);
     d->outline = QPainterPath();
@@ -1044,7 +1044,7 @@ LaserRect::LaserRect(const QRect rect, int cornerRadius, LaserDocument * doc,
 {
     Q_D(LaserRect);
     d->boundingRect = rect;
-	d->originalBoundingRect = rect;
+	//d->originalBoundingRect = rect;
     setCornerRadius(qAbs(cornerRadius), cornerRadiusType);
 	sceneTransformToItemTransform(saveTransform);
     d->outline.addRect(rect);
@@ -1060,7 +1060,7 @@ void LaserRect::setRect(const QRect& rect)
 {
     Q_D(LaserRect);
     d->boundingRect = rect; 
-	d->originalBoundingRect = rect;
+	//d->originalBoundingRect = rect;
 	d->path = QPainterPath();
 	d->path.addRect(d->boundingRect);
     d->outline = QPainterPath();
@@ -1226,7 +1226,7 @@ LaserLine::LaserLine(const QLine & line, LaserDocument * doc, QTransform saveTra
     d->path.moveTo(d->line.p1());
     d->path.lineTo(d->line.p2());
     d->boundingRect = d->path.boundingRect().toRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
 }
@@ -1246,7 +1246,7 @@ void LaserLine::setLine(const QLine& line)
     d->path.moveTo(d->line.p1());
     d->path.lineTo(d->line.p2());
     d->boundingRect = d->path.boundingRect().toRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->outline = QPainterPath();
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
@@ -1363,7 +1363,7 @@ LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, QTransform 
     d->path = path;
 	sceneTransformToItemTransform(saveTransform);
     d->boundingRect = path.boundingRect().toRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->outline.addPath(path);
 }
 
@@ -1378,7 +1378,7 @@ void LaserPath::setPath(const QPainterPath& path)
     Q_D(LaserPath);
     d->path = path; 
     d->boundingRect = path.boundingRect().toRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->outline.addPath(path);
 }
 
@@ -1509,7 +1509,7 @@ LaserPolyline::LaserPolyline(const QPolygon & poly, LaserDocument * doc, QTransf
 	d->path.addPolygon(d->poly);
 	sceneTransformToItemTransform(saveTransform);
     d->boundingRect = d->poly.boundingRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->outline.moveTo(*d->poly.begin());
     for (int i = 1; i < d->poly.count(); i++)
     {
@@ -1530,7 +1530,7 @@ void LaserPolyline::setPolyline(const QPolygon& poly)
     d->path = QPainterPath();
 	d->path.addPolygon(d->poly);
     d->boundingRect = d->poly.boundingRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->outline = QPainterPath();
     d->outline.moveTo(*d->poly.begin());
     for (int i = 1; i < d->poly.count(); i++)
@@ -1670,7 +1670,7 @@ LaserPolygon::LaserPolygon(const QPolygon & poly, LaserDocument * doc, QTransfor
 	d->poly = poly;
 	sceneTransformToItemTransform(saveTransform);
     d->boundingRect = d->poly.boundingRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->path.addPolygon(d->poly);
     d->outline.addPolygon(d->poly);
 }
@@ -1686,7 +1686,7 @@ void LaserPolygon::setPolyline(const QPolygon& poly)
     Q_D(LaserPolygon);
     d->poly = poly; 
     d->boundingRect = d->poly.boundingRect();
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->path = QPainterPath();
     d->path.addPolygon(d->poly);
     d->outline = QPainterPath();
@@ -2034,7 +2034,7 @@ LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> kn
     d->controlPoints = controlPoints;
     d->knots = knots;
     d->weights = weights;
-    d->originalBoundingRect = d->boundingRect;
+    //d->originalBoundingRect = d->boundingRect;
 	utils::sceneTransformToItemTransform(transform, this);
     updateCurve();
 }
@@ -2114,7 +2114,7 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRect& bounds, LaserDocumen
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
     d->path.addRect(bounds);
-	d->originalBoundingRect = d->boundingRect;
+	//d->originalBoundingRect = d->boundingRect;
     d->primitiveType = LPT_BITMAP;
     d->outline.addRect(bounds);
 	sceneTransformToItemTransform(saveTransform);
@@ -3022,7 +3022,7 @@ LaserStar::LaserStar(LaserDocument * doc, QPoint centerPos, qreal radius, QTrans
     d->path.closeSubpath();
 
     d->boundingRect = d->path.boundingRect().toRect();
-    d->originalBoundingRect = d->boundingRect;
+    //d->originalBoundingRect = d->boundingRect;
     setTransform(transform);
 }
 
@@ -3148,9 +3148,7 @@ LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransfo
         QPointF(outerRect.bottomRight().x() - d->width, outerRect.bottomRight().y() - d->width));
     d->outerPath.addEllipse(d->outerBounds);
     d->innerPath.addEllipse(d->innerBounds);
-    d->path = d->outerPath - d->innerPath;
-    d->boundingRect = d->path.boundingRect().toRect();
-    d->originalBoundingRect = d->boundingRect;
+    computePath();
     setTransform(transform);
 }
 LaserRing::~LaserRing()
@@ -3222,16 +3220,36 @@ QPointF LaserRing::position() const
     Q_D(const LaserRing);
     return sceneTransform().map(d->path.pointAtPercent(0));
 }
-qreal LaserRing::width() const
-{
-    Q_D(const LaserRing);
-    return d->width;
-}
 
 QRectF LaserRing::innerRect()
 {
     Q_D(const LaserRing);
     return d->innerBounds;
+}
+
+void LaserRing::setBorderWidth(qreal w)
+{
+    Q_D(LaserRing);
+    d->width = w;
+    d->innerBounds = QRectF(QPointF(d->outerBounds.topLeft().x() + w, d->outerBounds.topLeft().y() + w),
+        QPointF(d->outerBounds.bottomRight().x() - w, d->outerBounds.bottomRight().y() - w));
+    d->innerPath = QPainterPath();
+    d->innerPath.addEllipse(d->innerBounds);
+    computePath();
+
+}
+
+qreal LaserRing::borderWidth()
+{
+    Q_D(const LaserRing);
+    return d->width;
+}
+
+void LaserRing::computePath()
+{
+    Q_D(LaserRing);
+    d->path = d->outerPath - d->innerPath;
+    d->boundingRect = d->path.boundingRect().toRect();
 }
 
 class LaserFramePrivate : public LaserShapePrivate
@@ -3263,8 +3281,8 @@ LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal c
         QPoint(outerRect.bottomRight().x() - width, outerRect.bottomRight().y() - width));
     d->cornerType = cornerType;
     setCornerRadius(d->cornerRadius, cornerType);
-    d->boundingRect = d->path.boundingRect().toRect();
-    d->originalBoundingRect = d->boundingRect;
+    
+    //d->originalBoundingRect = d->boundingRect;
     setTransform(transform);
 }
 
@@ -3277,8 +3295,9 @@ void LaserFrame::draw(QPainter * painter)
     painter->setBrush(QBrush(this->layer()->color()));
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
+    
     //绘制辅助线
-    /*painter->setPen(QPen(Qt::black, 280, Qt::DotLine));
+    painter->setPen(QPen(Qt::black, 280, Qt::DotLine));
     qreal halfW = d->innerRect.width() * 0.5;
     qreal halfH = d->innerRect.height() * 0.5;
     QLine hLine(QPoint(d->innerRect.center().x() - halfW, d->innerRect.center().y()),
@@ -3289,7 +3308,7 @@ void LaserFrame::draw(QPainter * painter)
     painter->drawLine(vLine);
     QPainterPath p; 
     p.addRect(d->innerRect);
-    painter->drawPath(p);*/
+    painter->drawPath(p);
 
     
 }
@@ -3359,12 +3378,33 @@ void LaserFrame::setCornerRadius(int cornerRadius, int type)
     d->cornerRadius = qAbs(cornerRadius);
     d->outerPath = computeCornerRadius(d->outerRect, d->cornerRadius, type);
     d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, type);
-    d->path = d->outerPath - d->innerPath;
+    computePath();
 }
 QRectF LaserFrame::innerRect()
 {
     Q_D(LaserFrame);
     return d->innerRect;
+}
+void LaserFrame::setBorderWidth(qreal w)
+{
+    Q_D(LaserFrame);
+    d->width = w;
+    d->innerRect = QRect(QPoint(d->outerRect.topLeft().x() + w, d->outerRect.topLeft().y() + w),
+        QPoint(d->outerRect.bottomRight().x() - w, d->outerRect.bottomRight().y() - w));
+    d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, d->cornerType);
+    computePath();
+    
+}
+qreal LaserFrame::borderWidth()
+{
+    Q_D(LaserFrame);
+    return d->width;
+}
+void LaserFrame::computePath()
+{
+    Q_D(LaserFrame);
+    d->path = d->outerPath - d->innerPath;
+    d->boundingRect = d->path.boundingRect().toRect();
 }
 QDebug operator<<(QDebug debug, const QRect& rect)
 {
@@ -3388,10 +3428,10 @@ public:
     qreal textEllipse_b;
     QList<QPainterPath> originalTextPathList;
     QList<QTransform> textTransformList;
-    QPainterPath textPath;
+    //QPainterPath textPath;
     QPainterPath arcPath;
     qreal minRadian, maxRadian;
-    //qreal minAngle_affine, maxAngle_affine, angle_affine;
+    QRectF circleBounds;
 };
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
     bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
@@ -3399,16 +3439,17 @@ LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bou
 {
     Q_D(LaserCircleText);
     d->content = content;
-    d->boundingRect = bounds.toRect();
+    d->circleBounds = bounds.toRect();
+    //d->boundingRect = bounds.toRect();
     if (!isInit) {
         d->maxRadian = maxRadian;
         d->minRadian = minRadian;
     }
     setTransform(transform);
-    d->originalBoundingRect = d->boundingRect;    
+    //d->originalBoundingRect = d->boundingRect;    
     d->angle = angle;
     computeTextPath(d->angle, size, isInit);
-    d->path.addRect(d->boundingRect);
+    //d->path.addRect(d->boundingRect);
 }
 
 LaserCircleText::~LaserCircleText()
@@ -3418,7 +3459,7 @@ LaserCircleText::~LaserCircleText()
 void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit)
 {
     Q_D(LaserCircleText);
-    if (d->boundingRect.width() <= 0 || d->boundingRect.height() <= 0) {
+    if (d->circleBounds.width() <= 0 || d->circleBounds.height() <= 0) {
         return;
     }
     //text height
@@ -3454,12 +3495,13 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     moveTextToEllipse(lengthByPercent);
     //变换结束后，加到path中
     int index = 0; 
-    d->textPath = QPainterPath();
+    d->path = QPainterPath();
     for (QPainterPath path : d->originalTextPathList) {
         QTransform t = d->textTransformList[index];
-        d->textPath.addPath(t.map(path));
+        d->path.addPath(t.map(path));
         index++;
     }
+    d->boundingRect = d->path.boundingRect().toRect();
 }
 
 QPointF LaserCircleText::computeEllipsePoint(qreal rRadian)
@@ -3467,8 +3509,8 @@ QPointF LaserCircleText::computeEllipsePoint(qreal rRadian)
     Q_D(LaserCircleText);
     QPointF(0, 0);
     qreal x, y;
-    qreal a = (d->boundingRect.width() - d->size.height()) * 0.5;
-    qreal b = (d->boundingRect.height() - d->size.height()) * 0.5;
+    qreal a = (d->circleBounds.width() - d->size.height()) * 0.5;
+    qreal b = (d->circleBounds.height() - d->size.height()) * 0.5;
     //x = qCos(rRadian) * (shorterLine - d->size.height()) * 0.5;
     //y = -qSin(rRadian) * (shorterLine - d->size.height())* 0.5;
 
@@ -3508,7 +3550,7 @@ void LaserCircleText::translateText(QPointF& lastPoint, QPointF& curPoint, qreal
         curPoint = d->arcPath.pointAtPercent(curInterval);
 
         //cos
-        QPointF p = curPoint - d->boundingRect.center();
+        QPointF p = curPoint - d->circleBounds.center();
         QTransform t;
         t.rotate(90);
         p = t.map(p);
@@ -3602,8 +3644,8 @@ QTransform LaserCircleText::rotateText(int i, QPointF textPos)
             point = d->originalTextPathList[0].boundingRect().center();
         }
     }
-    qreal x = textPos.x() - d->boundingRect.center().x();
-    qreal y = -textPos.y() + d->boundingRect.center().y();
+    qreal x = textPos.x() - d->circleBounds.center().x();
+    qreal y = -textPos.y() + d->circleBounds.center().y();
     qreal slope = -(b * b * x) / (a * a * y);
     qreal rotateAngle = qAtan(slope) / M_PI * 180;
     if (y < 0) {
@@ -3674,10 +3716,10 @@ void LaserCircleText::transformTextByCenter(QPainterPath path, QPointF textPos, 
 QRectF LaserCircleText::textArcRect()
 {
     Q_D(LaserCircleText);
-    QRectF rect(d->boundingRect.x() + d->size.height()*0.6,
-        d->boundingRect.y() + d->size.height()*0.6,
-        d->boundingRect.width() - d->size.height()*1.2,
-        d->boundingRect.height() - d->size.height()*1.2);
+    QRectF rect(d->circleBounds.x() + d->size.height()*0.6,
+        d->circleBounds.y() + d->size.height()*0.6,
+        d->circleBounds.width() - d->size.height()*1.2,
+        d->circleBounds.height() - d->size.height()*1.2);
     /*if (rect.width() > rect.height()) {
         d->textEllipse_a = rect.width() * 0.5;
         d->textEllipse_b = rect.height() * 0.5;
@@ -3745,9 +3787,9 @@ void LaserCircleText::setTextSize(QSize size, bool needInit)
     Q_D(LaserCircleText);
    
     if (needInit) {
-        qreal shorterLine = d->boundingRect.width();
-        if (shorterLine > d->boundingRect.height()) {
-            shorterLine = d->boundingRect.height();
+        qreal shorterLine = d->circleBounds.width();
+        if (shorterLine > d->circleBounds.height()) {
+            shorterLine = d->circleBounds.height();
         }
         d->size.setHeight(shorterLine * 0.25);
     }
@@ -3801,11 +3843,11 @@ void LaserCircleText::moveTextToEllipse(qreal lengthByPercent)
     bool isCircle = false;
     int textCount = d->content.size();
     qreal averageLength = P / ((360.0 / d->angle) * (d->content.size() - 1));
-    qreal shorter = d->boundingRect.width();
-    qreal bigger = d->boundingRect.height();
-    if (d->boundingRect.width() > d->boundingRect.height()) {
-        shorter = d->boundingRect.height();
-        bigger = d->boundingRect.width();
+    qreal shorter = d->circleBounds.width();
+    qreal bigger = d->circleBounds.height();
+    if (d->circleBounds.width() > d->circleBounds.height()) {
+        shorter = d->circleBounds.height();
+        bigger = d->circleBounds.width();
     }
 
     //取最小椭圆直接
@@ -3842,7 +3884,8 @@ void LaserCircleText::computeTextByPercent(int intervalCount)
             transformTextByCenter(path, textPos, i);
         }
         else {
-            transformText(path, textPos, i);
+            //transformText(path, textPos, i);
+            transformTextByCenter(path, textPos, i);
         }        
         i++;
     }
@@ -3931,9 +3974,9 @@ void LaserCircleText::draw(QPainter * painter)
 {
     Q_D(LaserCircleText);
     QPainterPath ellipse;
-    ellipse.addEllipse(d->boundingRect);
+    ellipse.addEllipse(d->circleBounds);
     painter->setBrush(QBrush(this->layer()->color()));
-    painter->drawPath(d->textPath);
+    painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
     //painter->drawPath(d->path);
     
@@ -3973,7 +4016,7 @@ QJsonObject LaserCircleText::toJson()
     object.insert("size", size);
     object.insert("maxRadian", d->maxRadian);
     object.insert("minRadian", d->minRadian);
-    QJsonArray bounds = { d->boundingRect.x(), d->boundingRect.y(),d->boundingRect.width(), d->boundingRect.height() };
+    QJsonArray bounds = { d->circleBounds.x(), d->circleBounds.y(),d->circleBounds.width(), d->circleBounds.height() };
     object.insert("bounds", bounds);
     return object;
 }
@@ -3981,7 +4024,7 @@ QJsonObject LaserCircleText::toJson()
 QVector<QLineF> LaserCircleText::edges()
 {
     Q_D(LaserCircleText);
-    return LaserPrimitive::edges(sceneTransform().map(d->textPath));
+    return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
 bool LaserCircleText::isClosed() const
@@ -3993,28 +4036,28 @@ QPointF LaserCircleText::position() const
 {
     return QPointF();
 }
-
+//设置space
 void LaserCircleText::setBoundingRectWidth(qreal width)
 {
     Q_D(LaserCircleText);
-    qreal diff = d->boundingRect.width() - width;
-    d->boundingRect = QRect(d->boundingRect.x() + diff * 0.5, d->boundingRect.y(), 
-        width, d->boundingRect.height());
+    qreal diff = d->circleBounds.width() - width;
+    d->circleBounds = QRect(d->circleBounds.x() + diff * 0.5, d->circleBounds.y(),
+        width, d->circleBounds.height());
     QPainterPath p;
-    p.addRect(d->boundingRect);
-    d->path = p;
+    p.addRect(d->circleBounds);
+    //d->path = p;
     computeTextPath(d->angle, d->size, false);
 }
 
 void LaserCircleText::setBoundingRectHeight(qreal height)
 {
     Q_D(LaserCircleText);
-    qreal diff = d->boundingRect.height() - height;
-    d->boundingRect = QRect(d->boundingRect.x(), d->boundingRect.y() + diff * 0.5,
-        d->boundingRect.width(), height);
+    qreal diff = d->circleBounds.height() - height;
+    d->circleBounds = QRect(d->circleBounds.x(), d->circleBounds.y() + diff * 0.5,
+        d->circleBounds.width(), height);
     QPainterPath p;
-    p.addRect(d->boundingRect);
-    d->path = p;
+    p.addRect(d->circleBounds);
+    //d->path = p;
     computeTextPath(d->angle, d->size, false);
 }
 
@@ -4029,6 +4072,12 @@ QString LaserCircleText::getContent()
 {
     Q_D(LaserCircleText);
     return d->content;
+}
+
+QRectF LaserCircleText::circleBounds()
+{
+    Q_D(LaserCircleText);
+    return d->circleBounds;
 }
 
 class LaserHorizontalTextPrivate : public LaserShapePrivate
@@ -4058,7 +4107,7 @@ LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QS
     d->space = space;
     initTextPath();
     d->boundingRect = d->path.boundingRect().toRect();
-    d->originalBoundingRect = d->boundingRect;
+    //d->originalBoundingRect = d->boundingRect;
     //d->variableBounds = d->boundingRect;
     
 }
@@ -4082,16 +4131,16 @@ void LaserHorizontalText::initTextPath()
         //scale
         path.addText(0, 0, font, c);
         QTransform t;
-        t.scale(d->size.width() / path.boundingRect().width(), 1);
+        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
         path = t.map(path);
         d->originalTextPathList.append(path);
         //translate
         QTransform t1;
         //QPointF diff;
         qreal x = i* (d->size.width() + d->space);
-        QPointF pos = QPointF(x, 0);
-        qreal diff = x - path.boundingRect().left();
-        t1.translate(diff, 0);
+        qreal diffX = x - path.boundingRect().left();
+        qreal diffY = 0 - path.boundingRect().bottom();
+        t1.translate(diffX, diffY);
         path = t1.map(path);
         d->path.addPath(path);
     }
@@ -4111,14 +4160,15 @@ void LaserHorizontalText::computeTextPath()
         qreal posX = index * (d->size.width() + d->space) ;
         qreal lastPosX = path.boundingRect().left();
         QTransform t1;
-        t1.translate(posX - lastPosX, 0);
+        t1.translate(posX - lastPosX, 0 - path.boundingRect().bottom());
         path = t1.map(path);
         allPath.addPath(path);
         index++;
     }
     d->path = allPath;
     toBottomLeft();
-    d->boundingRect = d->path.boundingRect().toRect();   
+    d->boundingRect = d->path.boundingRect().toRect();  
+    //d->originalBoundingRect = d->boundingRect;
 }
 
 void LaserHorizontalText::toBottomLeft()
@@ -4188,14 +4238,19 @@ QPointF LaserHorizontalText::position() const
     Q_D(const LaserHorizontalText);
     return QPointF();
 }
-
+//设置space
 void LaserHorizontalText::setBoundingRectWidth(qreal width)
 {
     Q_D(LaserHorizontalText);
-    qreal diff = width - d->boundingRect.width();
-    d->space = (width - d->size.width() * d->content.size()) / (d->content.size() - 1);
-    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
-    computeTextPath();
+    
+    if (d->content.size() > 1) {
+        qreal diff = width - d->boundingRect.width();
+        d->space = (width - d->size.width() * d->content.size()) / (d->content.size() - 1);
+        d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+        computeTextPath();
+    }
+    
+    
 }
 
 void LaserHorizontalText::setTextHeight(qreal diff)
@@ -4225,8 +4280,9 @@ void LaserHorizontalText::setContent(QString content)
 {
     Q_D(LaserHorizontalText);
     d->content = content;
-    //computeTextPath();
     initTextPath();
+    d->boundingRect = d->path.boundingRect().toRect();
+    //d->originalBoundingRect = d->boundingRect;
 }
 
 QString LaserHorizontalText::getContent()
@@ -4267,7 +4323,7 @@ LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize 
     setTransform(transform);
     initTextPath();
     d->boundingRect = d->path.boundingRect().toRect();
-    d->originalBoundingRect = d->boundingRect;
+    //d->originalBoundingRect = d->boundingRect;
 }
 LaserVerticalText::~LaserVerticalText()
 {
@@ -4396,13 +4452,17 @@ QPointF LaserVerticalText::position() const
 {
     return QPointF();
 }
+//设置space
 void LaserVerticalText::setBoundingRectHeight(qreal height)
 {
     Q_D(LaserVerticalText);
-    d->space = (height - d->content.size() * d->size.height()) / (d->content.size() - 1);
-    qreal diff = height - d->boundingRect.height();
-    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
-    computeTextPath();
+    if (d->content.size() > 1) {
+        d->space = (height - d->content.size() * d->size.height()) / (d->content.size() - 1);
+        qreal diff = height - d->boundingRect.height();
+        d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+        computeTextPath();
+    }
+    
 }
 
 void LaserVerticalText::setTextHeight(qreal diff)
@@ -4433,6 +4493,7 @@ void LaserVerticalText::setContent(QString content)
     Q_D(LaserVerticalText);
     d->content = content;
     initTextPath();
+    d->boundingRect = d->path.boundingRect().toRect();
 }
 
 QString LaserVerticalText::getContent()

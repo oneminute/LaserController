@@ -515,8 +515,10 @@ public:
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     virtual bool isClosed() const;
     virtual QPointF position() const;
-    qreal width() const;
     QRectF innerRect();
+    void setBorderWidth(qreal w);
+    qreal borderWidth();
+    void computePath();
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -546,6 +548,9 @@ public:
     virtual QPointF position() const;
     void setCornerRadius(int cornerRadius, int type);
     QRectF innerRect();
+    void setBorderWidth(qreal w);
+    qreal borderWidth();
+    void computePath();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)
@@ -593,6 +598,7 @@ public:
     virtual void setBoundingRectHeight(qreal height);
     void setContent(QString content);
     QString getContent();
+    QRectF circleBounds();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
         Q_DISABLE_COPY(LaserCircleText)

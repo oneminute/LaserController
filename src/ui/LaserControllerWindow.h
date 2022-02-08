@@ -565,6 +565,8 @@ private:
     LaserDoubleSpinBox* m_enhanceDenoise;
     QLabel* m_textContentLabel;
     QLineEdit* m_textContent;
+    QLabel* m_borderWidthLabel;
+    LaserDoubleSpinBox* m_borderWidth;
     QLabel* m_enhanceDenoiseLabel;
     QGridLayout* m_rectPropertyLayout;
     QGridLayout* m_linePropertyLayout;
@@ -580,6 +582,8 @@ private:
     QGridLayout* m_horizontalTextPropertyLayout;
     QGridLayout* m_verticalTextPropertyLayout;
     QGridLayout* m_circleTextPropertyLayout;
+    QGridLayout* m_framePropertyLayout;
+    QGridLayout* m_ringPropertyLayout;
     QWidget* m_propertyPanelWidget;
     QWidget* m_rectPropertyWidget;
     QWidget* m_linePropertyWidget;
@@ -595,6 +599,8 @@ private:
     QWidget* m_horizontalTextWidget;
     QWidget* m_verticalTextWidget;
     QWidget* m_circleTextWidget;
+    QWidget* m_frameWidget;
+    QWidget* m_ringWidget;
     
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;
