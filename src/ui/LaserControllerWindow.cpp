@@ -3025,12 +3025,15 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_cornerRadius->setMaximum(DBL_MAX);
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
-    m_lockedLabel = new QLabel("Locked");
-    m_textContentLabel = new QLabel("content");
+    m_lockedLabel = new QLabel(tr("Locked"));
+    m_textContentLabel = new QLabel(tr("content"));
     m_textContent = new QLineEdit(this);
-    //textContentEdit(QString::fromLocal8Bit("属性面板中修改文字"));
     m_textContent->setText(QString::fromLocal8Bit("属性面板中修改文字"));
     m_textContent->setVisible(false);
+    m_borderWidthLabel = new QLabel(tr("Border Width"));
+    m_borderWidth = new LaserDoubleSpinBox();
+    m_borderWidth->setMaximum(DBL_MAX);
+    m_borderWidth->setDecimals(3);
     //暂时不做
     m_widthLabel->setVisible(false);
     m_heightLabel->setVisible(false);
@@ -3170,17 +3173,66 @@ void LaserControllerWindow::createShapePropertyDockPanel()
         if (!list.isEmpty()) {
             firstPrimitive = list[0];
         }
+        else {
+            return;
+        }
+        QString content = m_textContent->text();
         int type = firstPrimitive->primitiveType();
         if (type == LPT_HORIZONTALTEXT) {
             LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(firstPrimitive);
-            text->setContent(m_textContent->text());
+            text->setContent(content);
         }else if (type == LPT_VERTICALTEXT) {
             LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(firstPrimitive);
-            text->setContent(m_textContent->text());
+            text->setContent(content);
         }else if (type == LPT_CIRCLETEXT) {
             LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(firstPrimitive);
-            text->setContent(m_textContent->text());
+            text->setContent(content);
         }
+        
+        view->viewport()->repaint();
+    });
+    m_borderWidth->connect(m_borderWidth, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        qreal value = m_borderWidth->value();
+        //内框的最大尺寸1微米
+        if (value < 0.001) {
+            value = 0.001;
+            m_borderWidth->setValue(value);
+        }
+        qreal w = value * 1000;
+        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+        LaserPrimitive* firstPrimitive = nullptr;
+        if (!list.isEmpty()) {
+            firstPrimitive = list[0];
+        }
+        else {
+            return;
+        }
+        QRectF rect = firstPrimitive->boundingRect();
+        //内框的最大尺寸
+        if (w >= rect.width() * 0.5) {
+            w = rect.width() * 0.5;
+            m_borderWidth->setValue(w * 0.001);
+        }
+        else if (w >= rect.height() * 0.5) {
+            w = rect.height() * 0.5;
+            m_borderWidth->setValue(w * 0.001);
+        }
+        
+
+        int type = firstPrimitive->primitiveType();
+        if (type == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(firstPrimitive);
+            frame->setBorderWidth(w);
+        }
+        else if (type == LPT_RING) {
+            LaserRing* ring = qgraphicsitem_cast<LaserRing*>(firstPrimitive);
+            ring->setBorderWidth(w);
+        }
+        /*/else if (type == LPT_CIRCLETEXT) {
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(firstPrimitive);
+        }*/
+
         view->viewport()->repaint();
     });
 
@@ -3197,8 +3249,11 @@ void LaserControllerWindow::createShapePropertyDockPanel()
 void LaserControllerWindow::showShapePropertyPanel()
 {
     LaserPrimitiveType type = LaserPrimitiveType::LPT_NULL;
-    QList<LaserPrimitive*> list = m_scene->selectedPrimitives();
-    LaserPrimitive* primitive = list[0];
+    QList<QGraphicsItem*> list = m_viewer->group()->childItems();
+    LaserPrimitive* primitive = nullptr;
+    if (!list.isEmpty()) {
+        primitive = qgraphicsitem_cast<LaserPrimitive*>(list[0]);
+    }
     bool isLocked = false;
     for (int i = 0; i < list.length(); i ++) {
         if (i == 0) {
@@ -3212,8 +3267,9 @@ void LaserControllerWindow::showShapePropertyPanel()
             }
         }
         else {
-            LaserPrimitiveType curType = list[i]->primitiveType();
-            bool curIsLocked = list[i]->isLocked();
+            LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(list[i]);
+            LaserPrimitiveType curType = primitive->primitiveType();
+            bool curIsLocked = primitive->isLocked();
             if (curType != type) {
                 type = LaserPrimitiveType::LPT_UNKNOWN;
             }
@@ -3287,7 +3343,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_propertyDockWidget->setWidget(m_rectPropertyWidget);
             qreal firstCornerRadius = qgraphicsitem_cast<LaserRect*>(list[0])->cornerRadius();
             bool isMulti = false;
-            for (LaserPrimitive* primitive : list) {
+            for (QGraphicsItem* primitive : list) {
                 LaserRect* rect = qgraphicsitem_cast<LaserRect*>(primitive);
                 qreal cornerRadius = rect->cornerRadius();
                 if (cornerRadius != firstCornerRadius) {
@@ -3420,6 +3476,7 @@ void LaserControllerWindow::showShapePropertyPanel()
 
             m_pathPropertyWidget->setLayout(m_pathPropertyLayout);
             m_propertyDockWidget->setWidget(m_pathPropertyWidget);
+            break;
         }
         case LPT_VERTICALTEXT: {
             LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
@@ -3436,6 +3493,7 @@ void LaserControllerWindow::showShapePropertyPanel()
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
             }
+            break;
         }
         case LPT_HORIZONTALTEXT: {
             LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
@@ -3446,9 +3504,12 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_horizontalTextPropertyLayout->addWidget(m_textContent, 0, 1);
             if (m_textContent) {
                 m_textContent->setVisible(true);
+                m_textContent->setText(text->getContent());
             }
+
             m_horizontalTextWidget->setLayout(m_horizontalTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_horizontalTextWidget);
+            break;
         }
         case LPT_CIRCLETEXT: {
             LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
@@ -3459,9 +3520,49 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_circleTextPropertyLayout->addWidget(m_textContent, 0, 1);
             if (m_textContent) {
                 m_textContent->setVisible(true);
+                m_textContent->setText(text->getContent());
             }
             m_circleTextWidget->setLayout(m_circleTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_circleTextWidget);
+            break;
+        }
+        case LPT_FRAME: {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(primitive);
+            m_framePropertyLayout->setMargin(10);
+            m_framePropertyLayout->setSpacing(10);
+            m_framePropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            m_framePropertyLayout->addWidget(m_borderWidthLabel, 0, 0);
+            m_framePropertyLayout->addWidget(m_borderWidth, 0, 1);
+
+            m_borderWidth->setVisible(true);
+            qreal width = frame->borderWidth();
+            if (m_unitIsMM) {
+                width *= 0.001;
+            }
+            m_borderWidth->setValue(width);
+
+            m_frameWidget->setLayout(m_framePropertyLayout);
+            m_propertyDockWidget->setWidget(m_frameWidget);
+            break;
+        }
+        case LPT_RING: {
+            LaserRing* ring = qgraphicsitem_cast<LaserRing*>(primitive);
+            m_ringPropertyLayout->setMargin(10);
+            m_ringPropertyLayout->setSpacing(10);
+            m_ringPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            m_ringPropertyLayout->addWidget(m_borderWidthLabel, 0, 0);
+            m_ringPropertyLayout->addWidget(m_borderWidth, 0, 1);
+
+            m_borderWidth->setVisible(true);
+            qreal width = ring->borderWidth();
+            if (m_unitIsMM) {
+                width *= 0.001;
+            }
+            m_borderWidth->setValue(width);
+
+            m_ringWidget->setLayout(m_ringPropertyLayout);
+            m_propertyDockWidget->setWidget(m_ringWidget);
+            break;
         }
     }
     
@@ -3517,6 +3618,12 @@ void LaserControllerWindow::createPrimitivePropertiesPanel()
     //arc text
     m_circleTextPropertyLayout = new QGridLayout(this);
     m_circleTextWidget = new QWidget(this);
+    //frame
+    m_framePropertyLayout = new QGridLayout(this);
+    m_frameWidget = new QWidget(this);
+    //ring
+    m_ringPropertyLayout = new QGridLayout(this);
+    m_ringWidget = new QWidget(this);
 }
 
 void LaserControllerWindow::createPrimitiveLinePropertyPanel()

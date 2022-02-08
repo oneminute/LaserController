@@ -969,7 +969,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
                     return true;
                 }
             }
-            else if (LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*> (primitive)) {
+            /*else if (LaserHorizontalText* hText = qobject_cast<LaserHorizontalText*> (primitive)) {
                 if (hText->getScenePath().contains(sceneMousePoint)) {
                     result = hText;
                     return true;
@@ -980,7 +980,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
                     result = cText;
                     return true;
                 }
-            }
+            }*/
 		}
 	}
 	
@@ -1318,6 +1318,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
     painter.setBrush(QBrush(Qt::gray));
     QPointF centerPoint(mapFromScene((right - left) * 0.5 + left, (bottom - top) * 0.5 + top));
+   
     qreal halfSize = m_handleRectPixel * 0.5;
     //center(0)
     m_selectedHandleList.clear();
@@ -1326,6 +1327,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     QPointF leftTop(mapFromScene(left, top));
     QPointF rightBottom(mapFromScene(right, bottom));
     QPointF center(mapFromScene(rect.center()));
+    QPointF bottomCenter(leftTop.x() + (rightBottom.x() - leftTop.x()) * 0.5, rightBottom.y());
 	//m_selectedRect = QRectF(leftTop, rightBottom);
     leftTop.setX(leftTop.x() - 2);
     leftTop.setY(leftTop.y() - 2);
@@ -1372,7 +1374,7 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     painter.drawLine(QPointF(rightBottom.x() + 18, rightBottom.y() + 1), QPointF(rightBottom.x() + 19 + qSin(M_PI / 180 * 13) * 7, rightBottom.y() + 1 + qCos(M_PI / 180 * 13) * 7));
     //bottom_center(9)
     painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
-    m_selectedHandleList.append(QRectF(leftTop.x() + (rightBottom.x() - leftTop.x()) * 0.5 - m_handleRectPixel * 0.5, rightBottom.y(), m_handleRectPixel, m_handleRectPixel));
+    m_selectedHandleList.append(QRectF(bottomCenter.x() - m_handleRectPixel * 0.5, bottomCenter.y(), m_handleRectPixel, m_handleRectPixel));
     painter.drawRect(m_selectedHandleList[9]);
     //left_bottom(10,11)
     painter.setPen(QPen(Qt::gray, 0, Qt::SolidLine));
@@ -1396,19 +1398,21 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             painter.setPen(QPen(Qt::darkGray, 2, Qt::SolidLine));
             painter.setBrush(QBrush(Qt::darkGray, Qt::BrushStyle::SolidPattern));
             qreal vZoomValue = zoomValueNormal();
+            qreal pixmapSize = 20;
+            qreal pixDiff = (pixmapSize - m_handleRectPixel) * 0.5;
             //outer left 13
             QRect leftRect;
-            QPointF oLeft_3 = mapFromScene(primitive->mapToScene(
+            /*QPointF oLeft_3 = mapFromScene(primitive->mapToScene(
                 primitive->boundingRect().topLeft().x(),
-                primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5));
-            oLeft_3 = QPointF(oLeft_3.x() - 35, oLeft_3.y());
-            leftRect = QRect(oLeft_3.x() - 6, oLeft_3.y() - 6, 12, 12);
+                primitive->boundingRect().topLeft().y() + primitive->boundingRect().height() * 0.5));*/
+            QPointF oLeft_3 = QPointF(leftTop.x() - m_handleRectPixel*3, leftTop.y() + (rightBottom.y() - leftTop.y()) * 0.5 - m_handleRectPixel * 0.5);
+            leftRect = QRect(oLeft_3.x(), oLeft_3.y(), m_handleRectPixel, m_handleRectPixel);
             if (//primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT ||
                 primitive->primitiveType() == LPT_VERTICALTEXT) {
-                oLeft_3 = QPointF(oLeft_3.x()-10, oLeft_3.y() - 10);
+                oLeft_3 = QPointF(oLeft_3.x()- pixDiff, oLeft_3.y() - pixDiff);
                 QPixmap pixmap(":/ui/icons/images/textIcon.png");
-                pixmap = pixmap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                pixmap = pixmap.scaled(QSize(pixmapSize, pixmapSize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(oLeft_3, pixmap);
             }
             else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
@@ -1418,17 +1422,18 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             m_selectedHandleList.append(leftRect);
             //outer top 14
             QRect topRect;
-            QPointF oTop_3 = mapFromScene(primitive->mapToScene(
+            /*QPointF oTop_3 = mapFromScene(primitive->mapToScene(
                 primitive->boundingRect().topLeft().x() + primitive->boundingRect().width() * 0.5,
                 primitive->boundingRect().topLeft().y()));
-            oTop_3 = QPointF(oTop_3.x(), oTop_3.y() - 35);
-            topRect = QRect(oTop_3.x() - 6, oTop_3.y() - 6, 12, 12);
+            oTop_3 = QPointF(oTop_3.x(), oTop_3.y() - 35);*/
+            QPointF oTop_3 = QPointF(leftTop.x() + (rightBottom.x() - leftTop.x()) * 0.5 - m_handleRectPixel * 0.5, leftTop.y() - m_handleRectPixel * 3);
+            topRect = QRect(oTop_3.x(), oTop_3.y(), m_handleRectPixel, m_handleRectPixel);
             if (//primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_VERTICALTEXT||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT) {
-                oTop_3 = QPointF(oTop_3.x() - 10, oTop_3.y() - 10);
+                oTop_3 = QPointF(oTop_3.x() - pixDiff, oTop_3.y() - pixDiff);
                 QPixmap pixmap(":/ui/icons/images/textIcon.png");
-                pixmap = pixmap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                pixmap = pixmap.scaled(QSize(pixmapSize, pixmapSize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(oTop_3, pixmap);
             }
             else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
@@ -1440,12 +1445,13 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             if (primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_HORIZONTALTEXT) {
                 
-                QPointF oRight_3 = mapFromScene(primitive->mapToScene(
+                /*QPointF oRight_3 = mapFromScene(primitive->mapToScene(
                     primitive->boundingRect().bottomRight().x(),
                     primitive->boundingRect().bottomRight().y() - primitive->boundingRect().height() * 0.5));
-                oRight_3 = QPointF(oRight_3.x() + 35, oRight_3.y());
-                rightRect = QRect(oRight_3.x() - 3, oRight_3.y() - 3, 6, 6);
-                painter.drawEllipse(oRight_3, 6, 6);
+                oRight_3 = QPointF(oRight_3.x() + 35, oRight_3.y());*/
+                QPointF oRight_3 = QPointF(rightBottom.x() + m_handleRectPixel * 2, leftTop.y() + (rightBottom.y() - leftTop.y()) * 0.5 - m_handleRectPixel * 0.5);
+                rightRect = QRect(oRight_3.x(), oRight_3.y(), m_handleRectPixel, m_handleRectPixel);
+                painter.drawEllipse(rightRect);
             }
             m_selectedHandleList.append(rightRect);
             //outer bottom 16
@@ -1453,11 +1459,12 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             if (primitive->primitiveType() == LPT_CIRCLETEXT||
                 primitive->primitiveType() == LPT_VERTICALTEXT) {
                 
-                QPointF oBottom_3 = mapFromScene(primitive->mapToScene(
+                /*QPointF oBottom_3 = mapFromScene(primitive->mapToScene(
                     primitive->boundingRect().bottomRight().x() - primitive->boundingRect().width() * 0.5,
                     primitive->boundingRect().bottomRight().y()));
-                oBottom_3 = QPointF(oBottom_3.x(), oBottom_3.y() + 35);
-                bottomRect = QRect(oBottom_3.x() - 6, oBottom_3.y() - 6, 12, 12);
+                oBottom_3 = QPointF(oBottom_3.x(), oBottom_3.y() + 35);*/
+                QPointF oBottom_3 = QPointF(leftTop.x() + (rightBottom.x() - leftTop.x()) * 0.5 - m_handleRectPixel * 0.5, rightBottom.y()+2* m_handleRectPixel);
+                bottomRect = QRect(oBottom_3.x(), oBottom_3.y(), m_handleRectPixel, m_handleRectPixel);
                 painter.drawEllipse(bottomRect);
                 m_selectedHandleList.append(bottomRect);
             }
@@ -1478,15 +1485,16 @@ void LaserViewer::paintSelectedState(QPainter& painter)
                     endPoint.x(), endPoint.y())));
                 QPointF cP = mapFromScene(text->mapToScene(QPointF(
                     centerPoint.x(), centerPoint.y())));*/
-                QPointF sP  = QPointF(centerPoint.x() - 52, centerPoint.y() - 13);
-                QPointF eP = QPointF(centerPoint.x() + 26, centerPoint.y() - 13);
-                QPointF cP = QPointF(centerPoint.x() - 13, centerPoint.y() - 52);
+                QPointF point(bottomCenter.x(), bottomCenter.y() + 3 * m_handleRectPixel);
+                QPointF sP  = QPointF(point.x() - 40, point.y() - 10);
+                QPointF eP = QPointF(point.x() + 20, point.y() - 10);
+                QPointF cP = QPointF(point.x() - 10, point.y() + 10);
                 QPixmap moveMap(":/ui/icons/images/moveByPath.png");
-                moveMap = moveMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                moveMap = moveMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 QPixmap angleMap(":/ui/icons/images/changeAngle.png");
-                angleMap = angleMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                angleMap = angleMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 QPixmap svMap(":/ui/icons/images/textIcon.png");
-                svMap = svMap.scaled(QSize(26, 26), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                svMap = svMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(sP, moveMap);
                 painter.drawPixmap(eP, angleMap);
                 painter.drawPixmap(cP, svMap);
@@ -2730,7 +2738,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRingEllipseState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRect rect(point.x(), point.y(), 400 * 1000, 250 * 1000);
+            QRect rect(point.x(), point.y(), 40 * 1000, 25 * 1000);
             LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);
@@ -4691,6 +4699,10 @@ void LaserViewer::selectedHandleScale()
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
             
             qreal w = primitive->boundingRect().width() + diff;
+            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+                w = text->circleBounds().width() + diff;
+            }
             if (w < 1) {
                 w = 1;
             }
@@ -4703,6 +4715,7 @@ void LaserViewer::selectedHandleScale()
                 text->setTextWidth(w);
             }
             else {
+
                 primitive->setBoundingRectWidth(w);
             }
             
@@ -4714,6 +4727,10 @@ void LaserViewer::selectedHandleScale()
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
 
             qreal w = primitive->boundingRect().width() + diff;
+            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+                w = text->circleBounds().width() + diff;
+            }
             if (w < 1) {
                 w = 1;
             }
@@ -4726,10 +4743,7 @@ void LaserViewer::selectedHandleScale()
             qreal diff = (m_lastPos.y() - m_mousePoint.y()) * 380 / zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
 
-            qreal h = primitive->boundingRect().height() + diff;
-            if (h < 1) {
-                h = 1;
-            }
+            
             if (primitive->primitiveType() == LPT_HORIZONTALTEXT) {
                 LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
                 text->setTextHeight(diff);
@@ -4738,8 +4752,13 @@ void LaserViewer::selectedHandleScale()
                 LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
                 text->setTextHeight(diff);
             }
-            else {
-                primitive->setBoundingRectHeight(h);
+            else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+                qreal h = text->circleBounds().height() + diff;
+                if (h < 1) {
+                    h = 1;
+                }
+                text->setBoundingRectHeight(h);
             }
             
             break;
@@ -4749,6 +4768,10 @@ void LaserViewer::selectedHandleScale()
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
 
             qreal h = primitive->boundingRect().height() + diff;
+            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
+                h = text->circleBounds().height() + diff;
+            }
             if (h < 1) {
                 h = 1;
             }
