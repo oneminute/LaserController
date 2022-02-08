@@ -264,6 +264,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         outBounding.moveTopLeft(-outJobOrigin);
     }
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(outBounding);
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true));
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
