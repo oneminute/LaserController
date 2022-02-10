@@ -565,6 +565,8 @@ private:
     LaserDoubleSpinBox* m_enhanceDenoise;
     QLabel* m_textContentLabel;
     QLineEdit* m_textContent;
+    QLabel* m_textBoldLabel;
+    QCheckBox* m_textBold;
     QLabel* m_borderWidthLabel;
     LaserDoubleSpinBox* m_borderWidth;
     QLabel* m_commonCornerRadiusLabel;

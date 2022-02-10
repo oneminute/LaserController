@@ -561,7 +561,7 @@ class LaserCircleTextPrivate;
 class LaserCircleText : public LaserShape {
     Q_OBJECT
 public:
-    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle, 
+    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle, bool bold = false,
         bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
@@ -601,6 +601,8 @@ public:
     void setContent(QString content);
     QString getContent();
     QRectF circleBounds();
+    void setBold(bool bold);
+    bool bold();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
         Q_DISABLE_COPY(LaserCircleText)
@@ -610,7 +612,7 @@ class LaserHorizontalText : public LaserShape {
     Q_OBJECT
 public:
     LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
-        QPointF bottomLeft, qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
+        QPointF bottomLeft, bool bold = false, qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserHorizontalText();
     void initTextPath();
     void computeTextPath();
@@ -630,6 +632,8 @@ public:
     void setContent(QString content);
     QString getContent();
     QSize textSize();
+    void setBold(bool bold);
+    bool bold();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
         Q_DISABLE_COPY(LaserHorizontalText)
@@ -639,7 +643,7 @@ class LaserVerticalText : public LaserShape {
     Q_OBJECT
 public:
     LaserVerticalText(LaserDocument* doc, QString content, QSize size,
-        QPointF topLeft, qreal space, QTransform transform = QTransform(), int layerIndex = 0);
+        QPointF topLeft,bool bold = false, qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserVerticalText();
     void initTextPath();
     void computeTextPath();
@@ -658,6 +662,8 @@ public:
     void setTextWidth(qreal width);
     void setContent(QString content);
     QString getContent();
+    void setBold(bool bold);
+    bool bold();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
         Q_DISABLE_COPY(LaserVerticalText)
