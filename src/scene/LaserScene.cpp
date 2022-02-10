@@ -604,6 +604,7 @@ void LaserScene::setImage(const QImage& image)
     if (m_imageBackground)
     {
         m_imageBackground->setPixmap(QPixmap::fromImage(image));
+        m_imageBackground->show();
     }
     else
     {
@@ -619,6 +620,14 @@ void LaserScene::setImage(const QImage& image)
 	    m_imageBackground->setFlag(QGraphicsItem::ItemIsSelectable, true);
         m_imageBackground->setZValue(-1);
     }
+}
+
+void LaserScene::clearImage()
+{
+    if (!m_imageBackground)
+        return;
+
+    m_imageBackground->hide();
 }
 
 
