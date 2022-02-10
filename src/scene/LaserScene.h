@@ -59,6 +59,7 @@ public:
     QList<QSet<LaserPrimitive*>*>& joinedGroupList();
 
     void setImage(const QImage& image);
+    void clearImage();
 
 private:
     LaserDocument* m_doc;

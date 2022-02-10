@@ -283,7 +283,6 @@ bool CameraAlignmentDialog::eventFilter(QObject* obj, QEvent* event)
             m_page3Scene->clear();
             m_page3Scene->addRect(LaserApplication::device->layoutRect())->setPen(pen);
 
-
             cv::Mat perspected;
             m_calibrator->perspective(frameEvent->processedImage(), perspected);
             m_calibrator->alignToCanvas(perspected, m_page3Scene);
@@ -321,8 +320,8 @@ bool CameraAlignmentDialog::eventFilter(QObject* obj, QEvent* event)
 }
 void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
-    //if (m_doc)
-        //LaserApplication::mainWindow->closeDocument();
+    if (m_doc)
+        LaserApplication::mainWindow->closeDocument();
     Config::Device::startFromItem()->pop();
     Config::Export::imageQualityItem()->pop();
 }
@@ -474,11 +473,7 @@ void CameraAlignmentDialog::calculate()
     QSize resol = Config::Camera::resolution();
     qreal hFactor = resol.width() * 1000.0 / layoutRect.width();
     qreal vFactor = resol.height() * 1000.0 / layoutRect.height();
-    /*markPoints.push_back(cv::Point2f(mark0.x() / 1000, mark0.y() / 1000));
-    markPoints.push_back(cv::Point2f(mark1.x() / 1000, mark1.y() / 1000));
-    markPoints.push_back(cv::Point2f(mark2.x() / 1000, mark2.y() / 1000));
-    markPoints.push_back(cv::Point2f(mark3.x() / 1000, mark3.y() / 1000));
-    markPoints.push_back(cv::Point2f(mark4.x() / 1000, mark4.y() / 1000));*/
+
     markPoints.push_back(cv::Point2f(mark0.x() * hFactor, mark0.y() * vFactor));
     markPoints.push_back(cv::Point2f(mark1.x() * hFactor, mark1.y() * vFactor));
     markPoints.push_back(cv::Point2f(mark2.x() * hFactor, mark2.y() * vFactor));

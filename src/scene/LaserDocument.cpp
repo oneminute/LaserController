@@ -256,14 +256,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
 
-    QRect outBounding = absoluteDocBoundingRect(true);
-    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
-    {
-        outBounding.moveTopLeft(-outBounding.topLeft());
-        QPoint outJobOrigin = reletiveJobOrigin();
-        outBounding.moveTopLeft(-outJobOrigin);
-    }
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(outBounding);
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect());
     laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true));
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
