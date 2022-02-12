@@ -265,13 +265,21 @@ QSize typeUtils::json2Size(const QJsonValue& json)
     return json2Size(json.toObject());
 }
 
-QJsonObject typeUtils::rect2Json(const QRect& rect)
+QJsonObject typeUtils::rect2Json(const QRect& rect, bool relative, int xOffset)
 {
     QJsonObject json;
+    QRect rectOut = rect;
     int left = rect.left();
     int right = left + rect.width();
     int top = rect.top();
     int bottom = top + rect.height();
+    if (relative)
+    {
+        right = rect.width();
+        bottom = rect.height();
+        left = xOffset;
+        top = 0;
+    }
     json["x1"] = left;
     json["y1"] = top;
     json["x2"] = right;
