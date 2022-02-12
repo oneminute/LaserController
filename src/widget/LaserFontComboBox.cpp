@@ -1,7 +1,7 @@
 #include "LaserFontComboBox.h"
 #include <QDebug>
 LaserFontComboBox::LaserFontComboBox(QWidget * parent)
-    :QFontComboBox(parent), m_isChangedItem(false)
+    :QFontComboBox(parent), m_isShowPopup(false)
 {
    
 }
@@ -10,12 +10,21 @@ LaserFontComboBox::~LaserFontComboBox()
 {
 }
 
+void LaserFontComboBox::showPopup()
+{
+    QFontComboBox::showPopup();
+    m_isShowPopup = true;
+}
+
 
 
 void LaserFontComboBox::hidePopup()
 {
     QFontComboBox::hidePopup();
-    emit hidePopupSignal();
+    if (m_isShowPopup) {
+        emit hidePopupSignal();
+    } 
+    m_isShowPopup = false;
 }
 
 /*

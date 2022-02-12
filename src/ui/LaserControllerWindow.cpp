@@ -3026,10 +3026,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_cornerRadiusLabel = new QLabel("Corner Radius");
     m_locked = new QCheckBox();
     m_lockedLabel = new QLabel(tr("Locked"));
-    m_textContentLabel = new QLabel(tr("content"));
-    m_textContent = new QLineEdit(this);
+    m_textContentLabel = new QLabel(tr("Content"));
+    m_textContent = new QLineEdit();
     m_textContent->setText(QString::fromLocal8Bit("属性面板中修改文字"));
-    m_textContent->setVisible(false);
     m_borderWidthLabel = new QLabel(tr("Border Width"));
     m_borderWidth = new LaserDoubleSpinBox();
     m_borderWidth->setMaximum(DBL_MAX);
@@ -3044,8 +3043,19 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_cornerRadiusType->addItem(tr("Round Corner"));
     m_cornerRadiusType->addItem(tr("Cutted Corner"));
     m_cornerRadiusType->addItem(tr("Inner Corner"));
-    m_textBoldLabel = new QLabel(tr("Bold"));
-    m_textBold = new QCheckBox();
+    m_textBold = new QCheckBox(tr("Bold"));
+    
+    m_textItalic = new QCheckBox(tr("Italic"));
+    m_textUpperCase = new QCheckBox(tr("Upper Case"));
+    m_textFamilyLabel = new QLabel(tr("Font"));
+    m_textFamily = new LaserFontComboBox();
+    m_textFamily->setEditable(false);
+    m_widthLabel = new QLabel(tr("Width"));
+    m_heightLabel = new QLabel(tr("Height"));
+    m_spaceLabel = new QLabel(tr("Space"));
+    m_textWidth = new LaserDoubleSpinBox();
+    m_textHeight = new LaserDoubleSpinBox();
+    m_textSpace = new LaserDoubleSpinBox();
     //暂时不做
     m_widthLabel->setVisible(false);
     m_heightLabel->setVisible(false);
@@ -3293,30 +3303,48 @@ void LaserControllerWindow::createShapePropertyDockPanel()
         view->viewport()->repaint();
     });
     connect(m_textBold, &QCheckBox::stateChanged, this, [=] {
-        LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
-        QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
-        LaserPrimitive* firstPrimitive = nullptr;
-        if (!list.isEmpty()) {
-            firstPrimitive = list[0];
+        shapePropertyTextFont(1);
+    });
+    connect(m_textItalic, &QCheckBox::stateChanged, this, [=] {
+        shapePropertyTextFont(2);
+    });
+    connect(m_textUpperCase, &QCheckBox::stateChanged, this, [=] {
+        shapePropertyTextFont(3);
+    });
+    connect(m_textSpace, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {});
+    connect(m_textWidth, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {});
+    connect(m_textHeight, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {});
+    //预览字体
+    connect(m_textFamily, QOverload<int>::of(&QComboBox::highlighted), this, [=](int index) {
+        LaserStampText*  text = shapePropertyTextFont(4);
+        text->setFamily(m_textFamily->itemText(index));
+        m_viewer->viewport()->repaint();
+    });
+    //被选中字体
+    connect(m_textFamily, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
+        LaserStampText* text = shapePropertyTextFont(4);
+        QString lastFamily = text->family();
+        text->setFamily(m_textFamily->itemText(index));
+        //判断是否在4叉树的有效区域内
+        if (!m_scene->maxRegion().contains(text->sceneBoundingRect())) {
+            QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+            
+            text->setFamily(lastFamily);
+            m_textFamily->setCurrentText(lastFamily);
         }
         else {
-            return;
+            m_scene->quadTreeNode()->upDatePrimitive(text);
         }
-        int type = firstPrimitive->primitiveType();
-        if (type == LPT_HORIZONTALTEXT) {
-            LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(firstPrimitive);
-            text->setBold(m_textBold->isChecked());
-        }
-        else if (type == LPT_VERTICALTEXT) {
-            LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(firstPrimitive);
-            text->setBold(m_textBold->isChecked());
-        }
-        else if (type == LPT_CIRCLETEXT) {
-            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(firstPrimitive);
-            text->setBold(m_textBold->isChecked());
-        }
-        view->viewport()->repaint();
+        m_viewer->viewport()->repaint();
     });
+    //收起下拉框
+    connect(m_textFamily, &LaserFontComboBox::hidePopupSignal, this, [=] {
+        //还原到之前的family
+        LaserStampText* text = shapePropertyTextFont(4);
+        text->setFamily(m_textFamily->currentText());
+        m_viewer->viewport()->repaint();
+    });
+    
     m_propertyPanelWidget = new QWidget();
     m_propertyDockWidget = new CDockWidget(tr("Movement"));
     
@@ -3325,6 +3353,94 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_dockAreaProperty = m_dockManager->addDockWidget(CenterDockWidgetArea, m_propertyDockWidget, m_dockAreaLayers);
     dockPanelOnlyShowIcon(m_propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
     createPrimitivePropertiesPanel();
+}
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4
+LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
+{
+    LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
+    QList<LaserPrimitive*>list = view->scene()->selectedPrimitives();
+    LaserPrimitive* firstPrimitive = nullptr;
+    if (!list.isEmpty()) {
+        firstPrimitive = list[0];
+    }
+    else {
+        return nullptr;
+    }
+    int type = firstPrimitive->primitiveType();
+    if (type == LPT_HORIZONTALTEXT || type == LPT_VERTICALTEXT || type == LPT_CIRCLETEXT) {
+        LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(firstPrimitive);
+        switch (fontProperty) {
+            case 0: {
+                /*bool checked = m_textItalic->isChecked();
+                text->setItalic(checked);
+                //判断是否在4叉树的有效区域内
+                if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                    checked = !checked;
+                    m_textItalic->setChecked(checked);
+                    text->setItalic(checked);
+                }
+                else {
+                    m_scene->quadTreeNode()->upDatePrimitive(m_viewer->editingText());
+                }*/
+                break;
+            }
+            case 1: {
+                bool checked = m_textBold->isChecked();
+                text->setBold(checked);
+                //判断是否在4叉树的有效区域内
+                if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                    checked = !checked;
+                    m_textBold->setChecked(checked);
+                    text->setBold(checked);
+                }
+                else {
+                    m_scene->quadTreeNode()->upDatePrimitive(text);
+                }
+                break;
+            }
+            case 2: {
+                bool checked = m_textItalic->isChecked();
+                text->setItalic(checked);
+                //判断是否在4叉树的有效区域内
+                if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                    checked = !checked;
+                    m_textItalic->setChecked(checked);
+                    text->setItalic(checked);
+                }
+                else {
+                    m_scene->quadTreeNode()->upDatePrimitive(text);
+                }
+                break;
+            }
+            case 3: {
+                bool checked = m_textUpperCase->isChecked();
+                text->setUppercase(checked);
+                //判断是否在4叉树的有效区域内
+                if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                    checked = !checked;
+                    m_textUpperCase->setChecked(checked);
+                    text->setUppercase(checked);
+                }
+                else {
+                    m_scene->quadTreeNode()->upDatePrimitive(text);
+                }
+                break;
+            }
+            case 4: {
+                return text;
+            }
+        }
+        
+        view->viewport()->repaint();
+        return text;
+    }
+    else {
+        return nullptr;
+    }
 }
 
 void LaserControllerWindow::showShapePropertyPanel()
@@ -3566,9 +3682,14 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_verticalTextPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             m_verticalTextPropertyLayout->addWidget(m_textContentLabel, 0, 0);
             m_verticalTextPropertyLayout->addWidget(m_textContent, 0, 1);
-            m_verticalTextPropertyLayout->addWidget(m_textBoldLabel, 1, 0);
-            m_verticalTextPropertyLayout->addWidget(m_textBold, 1, 1);
+            m_verticalTextPropertyLayout->addWidget(m_textFamilyLabel, 1, 0);
+            m_verticalTextPropertyLayout->addWidget(m_textFamily, 1, 1);
 
+            QHBoxLayout* layout = new QHBoxLayout();
+            layout->addWidget(m_textBold, 0, Qt::AlignRight);
+            layout->addWidget(m_textItalic, 0, Qt::AlignCenter);
+            layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
+            m_verticalTextPropertyLayout->addLayout(layout, 2, 0, 1, 2);
             m_verticalTextWidget->setLayout(m_verticalTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_verticalTextWidget);
             if (m_textContent) {
@@ -3576,6 +3697,9 @@ void LaserControllerWindow::showShapePropertyPanel()
                 m_textContent->setText(text->getContent());
             }
             m_textBold->setChecked(text->bold());
+            m_textItalic->setChecked(text->italic());
+            m_textUpperCase->setChecked(text->uppercase());
+            m_textFamily->setCurrentText(text->family());
             break;
         }
         case LPT_HORIZONTALTEXT: {
@@ -3585,13 +3709,21 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_horizontalTextPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             m_horizontalTextPropertyLayout->addWidget(m_textContentLabel, 0, 0);
             m_horizontalTextPropertyLayout->addWidget(m_textContent, 0, 1);
-            m_horizontalTextPropertyLayout->addWidget(m_textBoldLabel, 1, 0);
-            m_horizontalTextPropertyLayout->addWidget(m_textBold, 1, 1);
+            m_horizontalTextPropertyLayout->addWidget(m_textFamilyLabel, 1, 0);
+            m_horizontalTextPropertyLayout->addWidget(m_textFamily, 1, 1);
+            QHBoxLayout* layout = new QHBoxLayout();
+            layout->addWidget(m_textBold, 0, Qt::AlignRight);
+            layout->addWidget(m_textItalic, 0, Qt::AlignCenter);
+            layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
+            m_horizontalTextPropertyLayout->addLayout(layout, 2, 0, 1, 2);
             if (m_textContent) {
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
             }
             m_textBold->setChecked(text->bold());
+            m_textItalic->setChecked(text->italic());
+            m_textUpperCase->setChecked(text->uppercase());
+            m_textFamily->setCurrentText(text->family());
             m_horizontalTextWidget->setLayout(m_horizontalTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_horizontalTextWidget);
             break;
@@ -3603,13 +3735,21 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_circleTextPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             m_circleTextPropertyLayout->addWidget(m_textContentLabel, 0, 0);
             m_circleTextPropertyLayout->addWidget(m_textContent, 0, 1);
-            m_circleTextPropertyLayout->addWidget(m_textBoldLabel, 1, 0);
-            m_circleTextPropertyLayout->addWidget(m_textBold, 1, 1);
+            m_circleTextPropertyLayout->addWidget(m_textFamilyLabel, 1, 0);
+            m_circleTextPropertyLayout->addWidget(m_textFamily, 1, 1);
+            QHBoxLayout* layout = new QHBoxLayout();
+            layout->addWidget(m_textBold, 0, Qt::AlignRight);
+            layout->addWidget(m_textItalic, 0, Qt::AlignCenter);
+            layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
+            m_circleTextPropertyLayout->addLayout(layout, 2, 0, 1, 2);
             if (m_textContent) {
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
             }
             m_textBold->setChecked(text->bold());
+            m_textItalic->setChecked(text->italic());
+            m_textUpperCase->setChecked(text->uppercase());
+            m_textFamily->setCurrentText(text->family());
             m_circleTextWidget->setLayout(m_circleTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_circleTextWidget);
             break;
@@ -3706,20 +3846,20 @@ void LaserControllerWindow::createPrimitivePropertiesPanel()
     m_pathPropertyLayout = new QGridLayout();
     m_pathPropertyWidget = new QWidget();
     //horizontal text
-    m_horizontalTextPropertyLayout = new QGridLayout(this);
-    m_horizontalTextWidget = new QWidget(this);
+    m_horizontalTextPropertyLayout = new QGridLayout();
+    m_horizontalTextWidget = new QWidget();
     //vertical text
-    m_verticalTextPropertyLayout = new QGridLayout(this);
-    m_verticalTextWidget = new QWidget(this);
+    m_verticalTextPropertyLayout = new QGridLayout();
+    m_verticalTextWidget = new QWidget();
     //arc text
-    m_circleTextPropertyLayout = new QGridLayout(this);
-    m_circleTextWidget = new QWidget(this);
+    m_circleTextPropertyLayout = new QGridLayout();
+    m_circleTextWidget = new QWidget();
     //frame
-    m_framePropertyLayout = new QGridLayout(this);
-    m_frameWidget = new QWidget(this);
+    m_framePropertyLayout = new QGridLayout();
+    m_frameWidget = new QWidget();
     //ring
-    m_ringPropertyLayout = new QGridLayout(this);
-    m_ringWidget = new QWidget(this);
+    m_ringPropertyLayout = new QGridLayout();
+    m_ringWidget = new QWidget();
 }
 
 void LaserControllerWindow::createPrimitiveLinePropertyPanel()

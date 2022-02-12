@@ -3424,16 +3424,114 @@ QDebug operator<<(QDebug debug, const QRect& rect)
         << ", " << rect.width() << "x" << rect.height() << "]";
     return debug;
 }
-class LaserCircleTextPrivate : public LaserShapePrivate
+class LaserStampTextPrivate : public LaserShapePrivate
+{
+    Q_DECLARE_PUBLIC(LaserStampText)
+public:
+    LaserStampTextPrivate(LaserStampText* ptr)
+        : LaserShapePrivate(ptr)
+    {
+    }
+    QString content;
+    QSize size;
+    qreal space;
+    bool bold;
+    bool italic;
+    bool uppercase;
+    QString family;
+};
+LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
+    QSize size, qreal space, bool bold, bool italic, bool uppercase, QString family)
+    :LaserShape(ptr, doc, type, layerIndex, transform)
+{
+    Q_D(LaserStampText);
+    d->content = content;
+    d->size = size;
+    d->space = space;
+    d->bold = bold;
+    d->italic = italic;
+    d->uppercase = uppercase;
+    d->family = family;
+}
+
+LaserStampText::~LaserStampText() {}
+
+void LaserStampText::setContent(QString content)
+{
+    Q_D(LaserStampText);
+    d->content = content;
+    recompute();
+}
+
+QString LaserStampText::getContent()
+{
+    Q_D(LaserStampText);
+    return d->content;
+}
+
+void LaserStampText::setBold(bool bold)
+{
+    Q_D(LaserStampText);
+    d->bold = bold;
+    recompute();
+}
+
+bool LaserStampText::bold()
+{
+    Q_D(LaserStampText);
+    return d->bold;
+}
+
+void LaserStampText::setItalic(bool italic)
+{
+    Q_D(LaserStampText);
+    d->italic = italic;
+    recompute();
+}
+
+bool LaserStampText::italic()
+{
+    Q_D(LaserStampText);
+    return d->italic;
+}
+
+void LaserStampText::setUppercase(bool uppercase)
+{
+    Q_D(LaserStampText);
+    d->uppercase = uppercase;
+    recompute();
+}
+
+bool LaserStampText::uppercase()
+{
+    Q_D(LaserStampText);
+    return d->uppercase;
+}
+
+void LaserStampText::setFamily(QString family)
+{
+    Q_D(LaserStampText);
+    d->family = family;
+    recompute();
+}
+
+QString LaserStampText::family()
+{
+    Q_D(LaserStampText);
+    return d->family;
+}
+
+
+class LaserCircleTextPrivate : public LaserStampTextPrivate
 {
     Q_DECLARE_PUBLIC(LaserCircleText)
 public:
     LaserCircleTextPrivate(LaserCircleText* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampTextPrivate(ptr)
     { 
     }
-    QString content;
-    QSize size;
+    //QString content;
+    //QSize size;
     qreal angle;
     qreal textEllipse_a;
     qreal textEllipse_b;
@@ -3443,21 +3541,27 @@ public:
     QPainterPath arcPath;
     qreal minRadian, maxRadian;
     QRectF circleBounds;
-    bool bold;
+    //bool bold;
+    //bool italic;
+    //bool uppercase;
 };
+
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    bool bold, bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
-    :LaserShape(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, layerIndex, transform)
+    bool bold, bool italic,bool uppercase, QString family,
+    bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, 0, bold, italic, uppercase,family)
 {
     Q_D(LaserCircleText);
-    d->content = content;
+    //d->content = content;
     d->circleBounds = bounds.toRect();
     //d->boundingRect = bounds.toRect();
     if (!isInit) {
         d->maxRadian = maxRadian;
         d->minRadian = minRadian;
     }
-    d->bold = bold;
+    //d->bold = bold;
+    //d->italic = italic;
+    //d->uppercase = uppercase;
     setTransform(transform);
     //d->originalBoundingRect = d->boundingRect;    
     d->angle = angle;
@@ -3496,7 +3600,14 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
     font.setBold(d->bold);
-
+    font.setItalic(d->italic);
+    font.setFamily(d->family);
+    if (d->uppercase) {
+        font.setCapitalization(QFont::AllUppercase);
+    }
+    else {
+        font.setCapitalization(QFont::MixedCase);
+    }
     d->textTransformList.clear();
     d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i ++) {
@@ -4003,7 +4114,7 @@ void LaserCircleText::draw(QPainter * painter)
 LaserPrimitive * LaserCircleText::clone(QTransform t)
 {
     Q_D(LaserCircleText);
-    //LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->bound)
+    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase,d->family, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
     return nullptr;
 }
 
@@ -4033,6 +4144,9 @@ QJsonObject LaserCircleText::toJson()
     QJsonArray bounds = { d->circleBounds.x(), d->circleBounds.y(),d->circleBounds.width(), d->circleBounds.height() };
     object.insert("bounds", bounds);
     object.insert("bold", d->bold);
+    object.insert("italic", d->italic);
+    object.insert("uppercase", d->uppercase);
+    object.insert("family", d->family);
     return object;
 }
 
@@ -4076,18 +4190,12 @@ void LaserCircleText::setBoundingRectHeight(qreal height)
     computeTextPath(d->angle, d->size, false);
 }
 
-void LaserCircleText::setContent(QString content)
+void LaserCircleText::recompute()
 {
     Q_D(LaserCircleText);
-    d->content = content;
     computeTextPath(d->angle, d->size, false);
 }
 
-QString LaserCircleText::getContent()
-{
-    Q_D(LaserCircleText);
-    return d->content;
-}
 
 QRectF LaserCircleText::circleBounds()
 {
@@ -4095,45 +4203,27 @@ QRectF LaserCircleText::circleBounds()
     return d->circleBounds;
 }
 
-void LaserCircleText::setBold(bool bold)
-{
-    Q_D(LaserCircleText);
-    d->bold = bold;
-    computeTextPath(d->angle, d->size, false);
-}
-
-bool LaserCircleText::bold()
-{
-    return false;
-}
-
-class LaserHorizontalTextPrivate : public LaserShapePrivate
+class LaserHorizontalTextPrivate : public LaserStampTextPrivate
 {
     Q_DECLARE_PUBLIC(LaserHorizontalText)
 public:
     LaserHorizontalTextPrivate(LaserHorizontalText* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampTextPrivate(ptr)
     {
     }
-    QString content;
-    QSize size;
     QList<QPainterPath> originalTextPathList;
     QPointF bottomLeft;
-    qreal space;
-    bool bold;
 };
 
 LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QSize size,
-    QPointF bottomLeft, bool bold, qreal space, QTransform transform, int layerIndex)
-    :LaserShape(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT, layerIndex, transform)
+    QPointF bottomLeft, bool bold, bool italic, bool uppercase, QString family,
+    qreal space, QTransform transform, int layerIndex)
+    :LaserStampText(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT,
+        content, transform, layerIndex, size, space, bold, italic, uppercase, family)
 {
     Q_D(LaserHorizontalText);
-    d->content = content;
     setTransform(transform);
-    d->size = size;
     d->bottomLeft = bottomLeft;
-    d->space = space;
-    d->bold = bold;
     initTextPath();
     d->boundingRect = d->path.boundingRect().toRect();
     //d->originalBoundingRect = d->boundingRect;
@@ -4153,6 +4243,14 @@ void LaserHorizontalText::initTextPath()
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
     font.setBold(d->bold);
+    font.setItalic(d->italic);
+    font.setFamily(d->family);
+    if (d->uppercase) {
+        font.setCapitalization(QFont::AllUppercase);
+    }
+    else {
+        font.setCapitalization(QFont::MixedCase);
+    }
     d->path = QPainterPath();
     d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
@@ -4175,6 +4273,7 @@ void LaserHorizontalText::initTextPath()
         d->path.addPath(path);
     }
     toBottomLeft();
+    d->boundingRect = d->path.boundingRect().toRect();
 }
 //在(0, 0)点调整好间距后(init的时候，单个字的path没有移动位置，最终位置是在all path后移动的)，再移动到位置
 void LaserHorizontalText::computeTextPath()
@@ -4222,7 +4321,7 @@ void LaserHorizontalText::draw(QPainter * painter)
 LaserPrimitive * LaserHorizontalText::clone(QTransform t)
 {
     Q_D(LaserHorizontalText);
-    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->bottomLeft,d->bold, d->space, t, d->layerIndex);
+    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->bottomLeft,d->bold,d->italic,d->uppercase,d->family, d->space, t, d->layerIndex);
     return hText;
 }
 
@@ -4250,6 +4349,8 @@ QJsonObject LaserHorizontalText::toJson()
     object.insert("bottomLeft", bL);
     object.insert("space", d->space);
     object.insert("bold", d->bold);
+    object.insert("italic", d->italic);
+    object.insert("family", d->family);
     return object;
 }
 
@@ -4257,6 +4358,12 @@ QVector<QLineF> LaserHorizontalText::edges()
 {
     Q_D(LaserHorizontalText);
     return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+
+void LaserHorizontalText::recompute()
+{
+    Q_D(const LaserHorizontalText);
+    initTextPath();
 }
 
 bool LaserHorizontalText::isClosed() const
@@ -4307,65 +4414,31 @@ void LaserHorizontalText::setTextWidth(qreal width)
     computeTextPath();
 }
 
-void LaserHorizontalText::setContent(QString content)
-{
-    Q_D(LaserHorizontalText);
-    d->content = content;
-    initTextPath();
-    d->boundingRect = d->path.boundingRect().toRect();
-    //d->originalBoundingRect = d->boundingRect;
-}
-
-QString LaserHorizontalText::getContent()
-{
-    Q_D(LaserHorizontalText);
-    return d->content;
-}
-
 QSize LaserHorizontalText::textSize()
 {
     Q_D(LaserHorizontalText);
     return d->size;
 }
 
-void LaserHorizontalText::setBold(bool bold)
-{
-    Q_D(LaserHorizontalText);
-    d->bold = bold;
-    initTextPath();
-}
-
-bool LaserHorizontalText::bold()
-{
-    Q_D(LaserHorizontalText);
-    return d->bold;
-}
-
-class LaserVerticalTextPrivate : public LaserShapePrivate
+class LaserVerticalTextPrivate : public LaserStampTextPrivate
 {
     Q_DECLARE_PUBLIC(LaserVerticalText)
 public:
     LaserVerticalTextPrivate(LaserVerticalText* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampTextPrivate(ptr)
     {
     }
-    QString content;
-    QSize size;
     QList<QPainterPath> originalTextPathList;
     QPointF topLeft;
-    qreal space;
-    bool bold;
 };
 LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size, 
-    QPointF topLeft, bool bold, qreal space, QTransform transform, int layerIndex)
-    :LaserShape(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT, layerIndex, transform)
+    QPointF topLeft, bool bold, bool italic,bool uppercase, QString family,
+    qreal space, QTransform transform, int layerIndex)
+    :LaserStampText(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT,content, transform, layerIndex,
+        size,space, bold, italic, uppercase, family)
 {
     Q_D(LaserVerticalText);
-    d->content = content;
-    d->space = space;
-    d->size = size;
     d->topLeft = topLeft;
-    d->bold = bold;
     setTransform(transform);
     initTextPath();
     //d->boundingRect = d->path.boundingRect().toRect();
@@ -4383,6 +4456,15 @@ void LaserVerticalText::initTextPath()
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
     font.setBold(d->bold);
+    font.setItalic(d->italic);
+    font.setFamily(d->family);
+    if (d->uppercase) {
+        font.setCapitalization(QFont::AllUppercase);
+    }
+    else {
+        font.setCapitalization(QFont::MixedCase);
+    }
+    
     d->path = QPainterPath();
     d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
@@ -4455,7 +4537,7 @@ void LaserVerticalText::draw(QPainter * painter)
 LaserPrimitive * LaserVerticalText::clone(QTransform t)
 {
     Q_D(LaserVerticalText);
-    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->topLeft,d->bold, d->space, t, d->layerIndex);
+    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->topLeft,d->bold, d->italic,d->uppercase,d->family, d->space, t, d->layerIndex);
     return text;
 }
 
@@ -4483,6 +4565,9 @@ QJsonObject LaserVerticalText::toJson()
     object.insert("topLeft", bL);
     object.insert("space", d->space);
     object.insert("bold", d->bold);
+    object.insert("italic", d->italic);
+    object.insert("uppercase", d->uppercase);
+    object.insert("family", d->family);
     return object;
 }
 
@@ -4490,6 +4575,12 @@ QVector<QLineF> LaserVerticalText::edges()
 {
     Q_D(LaserVerticalText);
     return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+
+void LaserVerticalText::recompute()
+{
+    Q_D(LaserVerticalText);
+    initTextPath();
 }
 
 bool LaserVerticalText::isClosed() const
@@ -4535,31 +4626,4 @@ void LaserVerticalText::setTextWidth(qreal width)
     qreal diff = width - d->boundingRect.width();
     d->topLeft = QPointF(d->topLeft.x() - diff * 0.5, d->topLeft.y());
     computeTextPath();
-}
-
-void LaserVerticalText::setContent(QString content)
-{
-    Q_D(LaserVerticalText);
-    d->content = content;
-    initTextPath();
-    d->boundingRect = d->path.boundingRect().toRect();
-}
-
-QString LaserVerticalText::getContent()
-{
-    Q_D(LaserVerticalText);
-    return d->content;
-}
-
-void LaserVerticalText::setBold(bool bold)
-{
-    Q_D(LaserVerticalText);
-    d->bold = bold;
-    initTextPath();
-}
-
-bool LaserVerticalText::bold()
-{
-    Q_D(LaserVerticalText);
-    return d->bold;
 }

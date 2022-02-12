@@ -1254,7 +1254,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QPointF bL(bLArray[0].toDouble(), bLArray[1].toDouble());
                 qreal space = primitiveJson["space"].toDouble();
                 bool bold = primitiveJson["bold"].toBool();
-                primitive = new LaserHorizontalText(this, content, size, bL, bold, space, saveTransform, layerIndex);
+                bool italic = primitiveJson["italic"].toBool();
+                bool uppercase = primitiveJson["uppercase"].toBool();
+                QString family = primitiveJson["family"].toString();
+                primitive = new LaserHorizontalText(this, content, size, bL, bold, italic, uppercase, family,space, saveTransform, layerIndex);
             }
             else if (className == "LaserVerticalText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1264,7 +1267,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QPointF bL(bLArray[0].toDouble(), bLArray[1].toDouble());
                 qreal space = primitiveJson["space"].toDouble();
                 bool bold = primitiveJson["bold"].toBool();
-                primitive = new LaserVerticalText(this, content, size, bL, bold, space, saveTransform, layerIndex);
+                bool italic = primitiveJson["italic"].toBool();
+                bool uppercase = primitiveJson["uppercase"].toBool();
+                QString family = primitiveJson["family"].toString();
+                primitive = new LaserVerticalText(this, content, size, bL, bold, italic, uppercase,family, space, saveTransform, layerIndex);
             }
             else if (className == "LaserCircleText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1276,7 +1282,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
                 bool bold = primitiveJson["bold"].toBool();
-                primitive = new LaserCircleText(this, content, bounds, angle, bold, false, maxRadian, minRadian,size, saveTransform, layerIndex);
+                bool italic = primitiveJson["italic"].toBool();
+                bool uppercase = primitiveJson["uppercase"].toBool();
+                QString family = primitiveJson["family"].toString();
+                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase,family, false, maxRadian, minRadian,size, saveTransform, layerIndex);
             }
             
             if (primitive)
