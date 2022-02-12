@@ -339,6 +339,7 @@ void CalibrationDialog::onPage2Exited()
 
 void CalibrationDialog::onPage3Entered()
 {
+    m_calibrator->validate();
     m_page3ImageViewer->fitBy(Config::Camera::thumbResolution());
     m_page3ImageViewerSample->fitBy(Config::Camera::resolution());
 }

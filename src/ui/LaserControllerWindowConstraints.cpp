@@ -1440,22 +1440,28 @@ void LaserControllerWindow::bindWidgetsProperties()
     // begin m_ui->actionCameraUpdateOverlay
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveArcTextState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveVerticalTextState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveHorizontalTextState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveRingEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveRingState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveFrameState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveStarState);
-    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", false, documentPrimitiveSplineState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentViewDragingState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_ui->actionCameraUpdateOverlay, "enabled", true, documentPrimitiveSplineState);
     // end m_ui->actionCameraUpdateOverlay
 
     // begin m_ui->actionCameraTrace
