@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QMutexLocker>
 #include <QGraphicsScene>
+#include <numeric>
 
 DistortionCalibrator::DistortionCalibrator(QObject* parent)
     : QObject(parent)
@@ -143,11 +144,8 @@ bool DistortionCalibrator::perspective(const cv::Mat& inMat, cv::Mat& outMat)
 {
     try
     {
-        QSize layoutSize = LaserApplication::device->layoutSize() / 1000;
         QSize resol = Config::Camera::resolution();
-        int factor = resol.width() * 1000 / layoutSize.width();
-        std::cout << m_homography << std::endl;
-        cv::warpPerspective(inMat, outMat, m_homography, inMat.size());
+        cv::warpPerspective(inMat, outMat, m_homography, cv::Size(resol.width(), resol.height()));
     }
     catch (cv::Exception& e)
     {

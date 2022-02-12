@@ -284,7 +284,7 @@ protected slots:
     void onActionCameraCalibration();
     void onActionGenerateCalibrationBoard();
     void onActionCameraAlignment();
-    void onActionCameraUpdateOverlay();
+    void onActionCameraUpdateOverlay(bool checked = false);
     void onActionStartCamera(bool checked = false);
     void onActionStopCamera(bool checked = false);
 

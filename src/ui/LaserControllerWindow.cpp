@@ -5375,9 +5375,16 @@ void LaserControllerWindow::onActionCameraAlignment()
     m_cameraController->registerSubscriber(this);
 }
 
-void LaserControllerWindow::onActionCameraUpdateOverlay()
+void LaserControllerWindow::onActionCameraUpdateOverlay(bool checked)
 {
-    m_requestOverlayImage = true;
+    if (checked)
+    {
+        m_requestOverlayImage = true;
+    }
+    else
+    {
+        m_scene->clearImage();
+    }
 }
 
 void LaserControllerWindow::onActionStartCamera(bool checked)
