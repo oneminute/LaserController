@@ -3521,6 +3521,11 @@ QString LaserStampText::family()
     return d->family;
 }
 
+qreal LaserStampText::space()
+{
+    Q_D(LaserStampText);
+    return d->space;
+}
 
 class LaserCircleTextPrivate : public LaserStampTextPrivate
 {
@@ -4196,6 +4201,11 @@ void LaserCircleText::recompute()
     computeTextPath(d->angle, d->size, false);
 }
 
+void LaserCircleText::setSpace(qreal space)
+{
+    
+}
+
 
 QRectF LaserCircleText::circleBounds()
 {
@@ -4389,6 +4399,16 @@ void LaserHorizontalText::setBoundingRectWidth(qreal width)
     }
     
     
+}
+
+void LaserHorizontalText::setSpace(qreal space)
+{
+    Q_D(LaserHorizontalText);
+    d->space = space;
+    qreal width = d->space * (d->content.size() - 1) + d->content.size() * d->size.width();
+    qreal diff = width - d->boundingRect.width();
+    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+    computeTextPath();
 }
 
 void LaserHorizontalText::setTextHeight(qreal diff)
@@ -4603,6 +4623,16 @@ void LaserVerticalText::setBoundingRectHeight(qreal height)
         computeTextPath();
     }
     
+}
+
+void LaserVerticalText::setSpace(qreal space)
+{
+    Q_D(LaserVerticalText);
+    d->space = space;
+    qreal height = d->space * (d->content.size() - 1) + d->content.size() * d->size.height();
+    qreal diff = height - d->boundingRect.height();
+    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+    computeTextPath();
 }
 
 void LaserVerticalText::setTextHeight(qreal diff)

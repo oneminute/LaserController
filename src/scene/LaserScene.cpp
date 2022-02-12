@@ -203,6 +203,12 @@ LaserPrimitiveGroup * LaserScene::createItemGroup(const QList<LaserPrimitive*>& 
             continue;
 		group->addToGroup(item);
 	}
+    
+    if (items.size() > 0) {
+        LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
+        emit viewer->selectedSizeChanged();
+    }
+    
 	return group;
 }
 

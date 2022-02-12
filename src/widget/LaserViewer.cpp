@@ -931,13 +931,14 @@ bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
 {
 	qreal delta = Config::Ui::clickSelectionTolerance() * (1 / zoomValue());
 	if (delta <= 0) {
-		return true;
+		return false;
 	}
 	result = nullptr;
 	detectItemEdge(result, mousePoint, delta, true);
 	if (result != nullptr) {
 		return true;
 	}
+    
 	return false;
 }
 bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mousePoint)
@@ -1539,8 +1540,8 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 		m_scene->findSelectedByBoundingRect(rect);
 	}
 	m_scene->blockSignals(false);
+    emit selectedSizeChanged();
 	viewport()->repaint();
-	emit m_scene->selectionChanged();
 	return m_scene->document()->selectedPrimitives().size();
 }
 
@@ -1673,6 +1674,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 selectionUndoStackPush();
                 //选取区域的属性面板
                 LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
+                emit selectedSizeChanged();
                 return;
             }
             else {
@@ -1702,12 +1704,13 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                     selectionUndoStackPush();
                     //选取区域的属性面板
                     LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
+                    emit selectedSizeChanged();
                     return;
                 }
                 // 获取选框起点
                 m_selectionStartPoint = event->pos();
                 m_selectionEndPoint = m_selectionStartPoint;
-                qDebug() << "begin to select";
+                emit selectedSizeChanged();
                 emit beginSelecting();
             }
         }
@@ -1814,7 +1817,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             else
             {
                 m_detectedFillSolid = nullptr;
-
+                
                 //QGraphicsView::mousePressEvent(event);
                 //事件被Item截断 图片点选
                 if (detectFillSolidByMouse(m_detectedFillSolid, event->pos())) {
@@ -1835,6 +1838,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 m_selectionStartPoint = event->pos();
                 m_selectionEndPoint = m_selectionStartPoint;
                 emit beginSelecting();
+                
             }
         }
         //View Drag Ready
@@ -2360,6 +2364,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			selectingReleaseInBlank();
             //选取区域的属性面板
             LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
+            emit selectedSizeChanged();
 			return;
         }
 		//undo before
@@ -2390,6 +2395,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			onEndSelectionFillGroup();
 			//undo redo
 			selectionUndoStackPush();
+            
 		}
 		else {
 			if (selectedList == newSelectedList) {
@@ -2405,6 +2411,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
+        emit selectedSizeChanged();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -2443,6 +2450,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
 		this->viewport()->repaint();
+        
 		return;
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
@@ -3742,7 +3750,6 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::clearGroupSelection()
     
 	m_scene->clearSelection();
     viewport()->repaint();
-	emit m_scene->selectionChanged();
 	return selectedList;
 }
 

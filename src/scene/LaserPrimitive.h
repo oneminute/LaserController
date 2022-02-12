@@ -577,6 +577,8 @@ public:
     bool uppercase();
     void setFamily(QString family);
     QString family();
+    qreal space();
+    virtual void setSpace(qreal space) = 0;
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampText)
     Q_DISABLE_COPY(LaserStampText)
@@ -624,6 +626,7 @@ public:
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
     virtual void recompute();
+    virtual void setSpace(qreal space);
     QRectF circleBounds();
     
 private:
@@ -652,6 +655,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
+    virtual void setSpace(qreal space);
     void setTextHeight(qreal diff);
     void setTextWidth(qreal width);
     QSize textSize();
@@ -680,6 +684,7 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectHeight(qreal height);
+    virtual void setSpace(qreal space);
     void setTextHeight(qreal diff);
     void setTextWidth(qreal width);
 private:

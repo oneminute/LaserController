@@ -190,6 +190,7 @@ void AddDelUndoCommand::undo()
     m_scene->document()->updateDocumentBounding();
 	m_viewer->viewport()->repaint();
     emit m_viewer->selectedChangedFromMouse();
+    emit m_viewer->selectedSizeChanged();
 }
 
 void AddDelUndoCommand::redo()
@@ -237,6 +238,7 @@ void AddDelUndoCommand::redo()
     //m_scene->document()->updateDocumentBounding();
 	
     emit m_viewer->selectedChangedFromMouse();
+    emit m_viewer->selectedSizeChanged();
     m_viewer->viewport()->repaint();
 }
 
