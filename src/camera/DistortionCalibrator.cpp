@@ -37,13 +37,13 @@ bool DistortionCalibrator::validate()
     if (calibFixPrincipalPoint) flag |= cv::CALIB_FIX_PRINCIPAL_POINT;
     if (calibZeroTangentDist)   flag |= cv::CALIB_ZERO_TANGENT_DIST;
     if (aspectRatio)            flag |= cv::CALIB_FIX_ASPECT_RATIO;
+    flag |= cv::fisheye::CALIB_FIX_K4;
 
     if (Config::Camera::fisheye()) {
         // the fisheye model has its own enum, so overwrite the flags
         flag = cv::fisheye::CALIB_FIX_SKEW | cv::fisheye::CALIB_RECOMPUTE_EXTRINSIC;
                                            //| cv::fisheye::CALIB_CHECK_COND;
         if (calibFixPrincipalPoint)   flag |= cv::fisheye::CALIB_FIX_PRINCIPAL_POINT;
-        flag |= cv::fisheye::CALIB_FIX_K4;
     }
 
     return goodInput;
@@ -127,14 +127,12 @@ bool DistortionCalibrator::undistortImage(cv::Mat& processing)
             distCoeffs, processing.size(), cv::Matx33d::eye(), newCamMat, 0.0);
         cv::fisheye::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), 
             newCamMat, processing.size(), CV_16SC2, mapX, mapY);
-        //cv::fisheye::undistortImage(temp, processing, cameraMatrix, distCoeffs, newCamMat);
         cv::remap(processing, processing, mapX, mapY, cv::INTER_LINEAR);
-        //std::cout << "mapX:" << std::endl << mapX << std::endl << "mapY:" << std::endl << mapY;
-        //cv::imwrite("tmp/undistorted.tiff", temp);
     }
     else
     {
-        undistort(processing, processing, cameraMatrix, distCoeffs);
+        cv::Mat tmp = processing.clone();
+        undistort(tmp, processing, cameraMatrix, distCoeffs);
     }
     //processing = temp;
     return true;
@@ -219,8 +217,8 @@ bool DistortionCalibrator::runCalibration(cv::Size& imageSize, cv::Mat& cameraMa
     bool ok = false;
     //! [fixed_aspect]
     cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
-    if (!Config::Camera::fisheye() && flag & cv::CALIB_FIX_ASPECT_RATIO)
-        cameraMatrix.at<double>(0, 0) = aspectRatio;
+    //if (!Config::Camera::fisheye() && flag & cv::CALIB_FIX_ASPECT_RATIO)
+        //cameraMatrix.at<double>(0, 0) = aspectRatio;
     //! [fixed_aspect]
     if (Config::Camera::fisheye()) {
         distCoeffs = cv::Mat::zeros(4, 1, CV_64F);
@@ -470,10 +468,10 @@ bool DistortionCalibrator::loadCoeffs()
     distCoeffs.at<double>(1) = coeffs.at(5).toReal();
     distCoeffs.at<double>(2) = coeffs.at(6).toReal();
     distCoeffs.at<double>(3) = coeffs.at(7).toReal();
-    if (!Config::Camera::fisheye())
+    /*if (!Config::Camera::fisheye())
     {
         distCoeffs.at<double>(4) = coeffs.at(8).toReal();
-    }
+    }*/
 
     QVariantList homographyList = Config::Camera::homography();
     m_homography = cv::Mat(3, 3, CV_64F);

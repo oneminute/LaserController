@@ -232,6 +232,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QJsonObject jsonObj;
 
+    bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
     QTransform transformPrintAndCut = enablePrintAndCut() ? transform() : QTransform();
     QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
@@ -252,12 +253,16 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     laserDocumentInfo["PrinterDrawUnit"] = 1016;
     laserDocumentInfo["FinishRun"] = d->finishRun;
     laserDocumentInfo["StartFrom"] = Config::Device::startFrom();
+    laserDocumentInfo["Absolute"] = absolute;
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
 
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect());
-    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true));
+    QRect docBounding = currentDocBoundingRect();
+    QRect docBoundingAcc = currentDocBoundingRect(true);
+    int xOffset = docBoundingAcc.x() - docBounding.x();
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, !absolute);
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, !absolute, xOffset);
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;

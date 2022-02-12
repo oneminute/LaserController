@@ -57,7 +57,7 @@ namespace typeUtils
     QSize json2Size(const QJsonValue& json);
     QSize json2Size(const QJsonObject& json);
 
-    QJsonObject rect2Json(const QRect& rect);
+    QJsonObject rect2Json(const QRect& rect, bool relative = false, int xOffset = 0);
 
     QImage cvMat2QImage(const cv::Mat& mat);
 }

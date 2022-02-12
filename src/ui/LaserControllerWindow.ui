@@ -1056,9 +1056,6 @@
    </property>
   </action>
   <action name="actionCameraUpdateOverlay">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Update Overlay</string>
    </property>

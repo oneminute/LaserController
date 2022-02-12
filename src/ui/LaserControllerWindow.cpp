@@ -5420,14 +5420,15 @@ void LaserControllerWindow::onActionCameraAlignment()
 
 void LaserControllerWindow::onActionCameraUpdateOverlay(bool checked)
 {
-    if (checked)
+    /*if (checked)
     {
         m_requestOverlayImage = true;
     }
     else
     {
         m_scene->clearImage();
-    }
+    }*/
+    m_requestOverlayImage = true;
 }
 
 void LaserControllerWindow::onActionStartCamera(bool checked)
