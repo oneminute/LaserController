@@ -557,11 +557,36 @@ private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)
 };
-class LaserCircleTextPrivate;
-class LaserCircleText : public LaserShape {
+//LaserCircleText, LaserHorizontalText, LaserVerticalText等印章文字的父类
+class LaserStampTextPrivate;
+class LaserStampText : public LaserShape {
     Q_OBJECT
 public:
-    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle, bool bold = false,
+    LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, 
+        QString content, QTransform transform = QTransform(), int layerIndex = 0, QSize size = QSize(), qreal space = 0, 
+        bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman");
+    virtual~LaserStampText();
+    virtual void recompute() = 0;
+    void setContent(QString content);
+    QString getContent();
+    void setBold(bool bold);
+    bool bold();
+    void setItalic(bool italic);
+    bool italic();
+    void setUppercase(bool uppercase);
+    bool uppercase();
+    void setFamily(QString family);
+    QString family();
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampText)
+    Q_DISABLE_COPY(LaserStampText)
+};
+class LaserCircleTextPrivate;
+class LaserCircleText : public LaserStampText {
+    Q_OBJECT
+public:
+    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
+        bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman",
         bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
@@ -598,21 +623,21 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
-    void setContent(QString content);
-    QString getContent();
+    virtual void recompute();
     QRectF circleBounds();
-    void setBold(bool bold);
-    bool bold();
+    
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
         Q_DISABLE_COPY(LaserCircleText)
 };
+
 class LaserHorizontalTextPrivate;
-class LaserHorizontalText : public LaserShape {
+class LaserHorizontalText : public LaserStampText {
     Q_OBJECT
 public:
     LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
-        QPointF bottomLeft, bool bold = false, qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
+        QPointF bottomLeft, bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman",
+        qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserHorizontalText();
     void initTextPath();
     void computeTextPath();
@@ -623,27 +648,24 @@ public:
     LaserPrimitive * clone(QTransform t);
     virtual QJsonObject toJson();
     QVector<QLineF> edges();
-
+    virtual void recompute();
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     void setTextHeight(qreal diff);
     void setTextWidth(qreal width);
-    void setContent(QString content);
-    QString getContent();
     QSize textSize();
-    void setBold(bool bold);
-    bool bold();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
         Q_DISABLE_COPY(LaserHorizontalText)
 };
 class LaserVerticalTextPrivate;
-class LaserVerticalText : public LaserShape {
+class LaserVerticalText : public LaserStampText {
     Q_OBJECT
 public:
     LaserVerticalText(LaserDocument* doc, QString content, QSize size,
-        QPointF topLeft,bool bold = false, qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0);
+        QPointF topLeft,bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman",
+        qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserVerticalText();
     void initTextPath();
     void computeTextPath();
@@ -654,16 +676,12 @@ public:
     LaserPrimitive * clone(QTransform t);
     virtual QJsonObject toJson();
     QVector<QLineF> edges();
-
+    virtual void recompute();
     virtual bool isClosed() const;
     virtual QPointF position() const;
     virtual void setBoundingRectHeight(qreal height);
     void setTextHeight(qreal diff);
     void setTextWidth(qreal width);
-    void setContent(QString content);
-    QString getContent();
-    void setBold(bool bold);
-    bool bold();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
         Q_DISABLE_COPY(LaserVerticalText)

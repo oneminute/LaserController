@@ -7,6 +7,7 @@ class LaserFontComboBox : public QFontComboBox {
     public:
         LaserFontComboBox(QWidget *parent = nullptr);
         virtual ~LaserFontComboBox();
+        virtual void showPopup() override;
         virtual void hidePopup() override;
         /*virtual void focusOutEvent(QFocusEvent *e) override;
         virtual void leaveEvent(QEvent *event) override;
@@ -21,6 +22,6 @@ class LaserFontComboBox : public QFontComboBox {
         void hidePopupSignal();
     
 private :
-    bool m_isChangedItem;
+    bool m_isShowPopup;
 };
 #endif

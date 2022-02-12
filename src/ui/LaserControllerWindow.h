@@ -155,6 +155,7 @@ protected:
     void createPrintAndCutPanel();
     //shape properties panel / dock panel
     void createShapePropertyDockPanel();
+    LaserStampText* shapePropertyTextFont(int fontProperty);
     //show shape properties
     void showShapePropertyPanel();
     void createPrimitivePropertiesPanel();
@@ -565,8 +566,17 @@ private:
     LaserDoubleSpinBox* m_enhanceDenoise;
     QLabel* m_textContentLabel;
     QLineEdit* m_textContent;
-    QLabel* m_textBoldLabel;
+    QLabel* m_textFamilyLabel;
+    LaserFontComboBox* m_textFamily;
+    //QLabel* m_widthLabel;
+    LaserDoubleSpinBox* m_textWidth;
+    //QLabel* m_heightLabel;
+    LaserDoubleSpinBox* m_textHeight;
+    QLabel* m_spaceLabel;
+    LaserDoubleSpinBox* m_textSpace;
     QCheckBox* m_textBold;
+    QCheckBox* m_textItalic;
+    QCheckBox* m_textUpperCase;
     QLabel* m_borderWidthLabel;
     LaserDoubleSpinBox* m_borderWidth;
     QLabel* m_commonCornerRadiusLabel;
