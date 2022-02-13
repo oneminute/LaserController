@@ -84,6 +84,7 @@ void LaserScene::clearDocument(bool delDoc)
 	if (delDoc && m_doc)
 	{
 		if (viewer) {
+            viewer->undoStack()->clear();
 			viewer->clearGroupSelection();
 			viewer->setGroupNull();
             viewer->setEditingText(nullptr);

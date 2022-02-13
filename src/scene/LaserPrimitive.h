@@ -578,6 +578,9 @@ public:
     void setFamily(QString family);
     QString family();
     qreal space();
+    virtual void setTextHeight(qreal diff) = 0;
+    virtual void setTextWidth(qreal diff) = 0;
+    QSize textSize();
     virtual void setSpace(qreal space) = 0;
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampText)
@@ -613,7 +616,6 @@ public:
     //QPointF startPoint();
     //QPointF endPoint();
     //QPointF centerPoint();
-    QSize textSize();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
     virtual QString typeName() { return tr("CircleText"); }
@@ -628,6 +630,8 @@ public:
     virtual void recompute();
     virtual void setSpace(qreal space);
     QRectF circleBounds();
+    void setTextHeight(qreal height);
+    void setTextWidth(qreal width);
     
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
@@ -643,7 +647,9 @@ public:
         qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserHorizontalText();
     void initTextPath();
+    void computeTextPathProcess();
     void computeTextPath();
+    
     void toBottomLeft();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_HORIZONTALTEXT; }
@@ -656,9 +662,10 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setSpace(qreal space);
-    void setTextHeight(qreal diff);
+    void setTextHeightByBounds(qreal diff);
+    void setTextWidthByBounds(qreal width);
+    void setTextHeight(qreal height);
     void setTextWidth(qreal width);
-    QSize textSize();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserHorizontalText)
         Q_DISABLE_COPY(LaserHorizontalText)
@@ -685,7 +692,9 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectHeight(qreal height);
     virtual void setSpace(qreal space);
-    void setTextHeight(qreal diff);
+    void setTextHeightByBounds(qreal diff);
+    void setTextWidthByBounds(qreal width);
+    void setTextHeight(qreal height);
     void setTextWidth(qreal width);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)

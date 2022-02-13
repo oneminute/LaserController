@@ -4713,11 +4713,11 @@ void LaserViewer::selectedHandleScale()
             }
             if (primitive->primitiveType() == LPT_HORIZONTALTEXT) {
                 LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
-                text->setTextWidth(w);
+                text->setTextWidthByBounds(w);
             }
             else if (primitive->primitiveType() == LPT_VERTICALTEXT) {
                 LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
-                text->setTextWidth(w);
+                text->setTextWidthByBounds(w);
             }
             else {
 
@@ -4751,11 +4751,11 @@ void LaserViewer::selectedHandleScale()
             
             if (primitive->primitiveType() == LPT_HORIZONTALTEXT) {
                 LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
-                text->setTextHeight(diff);
+                text->setTextHeightByBounds(diff);
             }
             else if (primitive->primitiveType() == LPT_VERTICALTEXT) {
                 LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
-                text->setTextHeight(diff);
+                text->setTextHeightByBounds(diff);
             }
             else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
                 LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
