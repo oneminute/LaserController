@@ -610,7 +610,6 @@ public:
     void computeTextByPercent(int intervalCount);
     void computeMoveTextPath(qreal diffAngle);
     void computeChangeAngle(qreal diffAngle);
-    void computeChangeTextHeight(qreal diffHeight);
     void resizeRadian();
     QPainterPath* textArc();
     //QPointF startPoint();
@@ -662,8 +661,6 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setSpace(qreal space);
-    void setTextHeightByBounds(qreal diff);
-    void setTextWidthByBounds(qreal width);
     void setTextHeight(qreal height);
     void setTextWidth(qreal width);
 private:
@@ -692,8 +689,6 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectHeight(qreal height);
     virtual void setSpace(qreal space);
-    void setTextHeightByBounds(qreal diff);
-    void setTextWidthByBounds(qreal width);
     void setTextHeight(qreal height);
     void setTextWidth(qreal width);
 private:
