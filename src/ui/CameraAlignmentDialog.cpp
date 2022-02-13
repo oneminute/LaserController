@@ -369,7 +369,6 @@ void CameraAlignmentDialog::addMarkToScene(int halfMarkSize,
 void CameraAlignmentDialog::addMarkToDocument(int index, const QRect& rect, const QPainterPath& painterPath)
 {
     LaserScene* scene = LaserApplication::mainWindow->scene();
-    m_doc = scene->document();
     LaserLayer* layer0 = m_doc->layers()[index * 2];
     LaserLayer* layer1 = m_doc->layers()[index * 2 + 1];
     LaserEllipse* circle = new LaserEllipse(rect, m_doc);
@@ -392,6 +391,9 @@ void CameraAlignmentDialog::generate()
     m_page1Scene->addRect(LaserApplication::device->layoutRect())->setPen(pen);
 
     LaserApplication::mainWindow->newDocument();
+    LaserScene* scene = LaserApplication::mainWindow->scene();
+    m_doc = scene->document();
+    m_doc->setFinishRun(FT_BackToOrigin);
     
     int hMargin = m_page1SpinBoxHMargin->value() * 1000;
     int vMargin = m_page1SpinBoxVMargin->value() * 1000;

@@ -1351,6 +1351,29 @@ void Config::loadDeviceItems()
     rollerRotaryStepLength->setInputWidgetType(IWT_EditSlider);
     rollerRotaryStepLength->setInputWidgetProperty("minimum", 1);
     rollerRotaryStepLength->setInputWidgetProperty("maximum", 100000);
+
+    ConfigItem* finishRun = group->addConfigItem(
+        "finishRun",
+        FT_BackToOrigin,
+        DT_INT
+    );
+    finishRun->setInputWidgetType(IWT_ComboBox);
+    finishRun->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("Current locaiton"), 0);
+            comboBox->addItem(ltr("Release motor"), 1);
+            comboBox->addItem(ltr("Back to origin"), 2);
+            comboBox->addItem(ltr("Back to user origin"), 3);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
 }
 
 void Config::loadUserReigsters()
@@ -3225,6 +3248,10 @@ void Config::updateTitlesAndDescriptions()
     Device::rollerRotaryStepLengthItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Roller Rotary Step Length(um)", nullptr), 
         QCoreApplication::translate("Config", "Roller Rotary Step Length", nullptr));
+
+    Device::finishRunItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Finish Run", nullptr), 
+        QCoreApplication::translate("Config", "Finish Run", nullptr));
 
     Device::calibrationBlockThicknessItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Calibration block thickness(mm)", nullptr), 

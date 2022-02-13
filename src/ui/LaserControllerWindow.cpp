@@ -1425,35 +1425,6 @@ LaserControllerWindow::~LaserControllerWindow()
     SAFE_DELETE(m_updateDialog)
 }
 
-FinishRunType LaserControllerWindow::finishRun()
-{
-    FinishRunType value = FinishRunType::FT_CurrentPos;
-    /*if (m_comboBoxPostEvent->currentIndex() < 3)
-    {
-        value.setAction(m_comboBoxPostEvent->currentIndex());
-    }
-    else
-    {
-        if (m_radioButtonUserOrigin1->isChecked())
-        {
-            value.setAction(3);
-        }
-        else if (m_radioButtonUserOrigin2->isChecked())
-        {
-            value.setAction(4);
-        }
-        else if (m_radioButtonUserOrigin3->isChecked())
-        {
-            value.setAction(5);
-        }
-    }*/
-    //value.setRelay(0, m_ui->checkBoxRelay1->isChecked());
-    //value.setRelay(1, m_ui->checkBoxRelay2->isChecked());
-    //value.setRelay(2, m_ui->checkBoxRelay3->isChecked());
-    qDebug() << value;
-    return value;
-}
-
 void LaserControllerWindow::handleSecurityException(int code, const QString& message)
 {
     switch (code)
@@ -2520,6 +2491,8 @@ void LaserControllerWindow::createOperationsDockPanel()
     //m_comboBoxPostEvent->addItem(tr("Stop at current position"));
     //m_comboBoxPostEvent->addItem(tr("Unload motor"));
     //m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
+    QComboBox* comboBoxFinishRun = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::finishRunItem());
+    Config::Device::finishRunItem()->bindWidget(comboBoxFinishRun, SS_DIRECTLY);
     QToolButton* buttonApplyToDoc = new QToolButton;
     buttonApplyToDoc->setDefaultAction(m_ui->actionApplyJobOriginToDocument);
 
@@ -2528,7 +2501,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow(Config::Device::startFromItem()->title(), m_comboBoxStartPosition);
     fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
     fifthRow->addRow("", buttonApplyToDoc);
-    //fifthRow->addRow(tr("Post Event"), m_comboBoxPostEvent);
+    fifthRow->addRow(Config::Device::finishRunItem()->title(), comboBoxFinishRun);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -4528,7 +4501,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
             QtConcurrent::run([=]()
                 {
                     m_scene->document()->outline(progress);
-                    m_scene->document()->setFinishRun(finishRun());
+                    m_scene->document()->setFinishRun(Config::Device::finishRun());
                     m_prepareMachining = false;
                     m_scene->document()->exportJSON(filename, progress, true);
                     progress->finish();
@@ -4585,7 +4558,7 @@ void LaserControllerWindow::startMachining()
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
-                m_scene->document()->setFinishRun(finishRun());
+                m_scene->document()->setFinishRun(Config::Device::finishRun());
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
                 qDebug() << "export temp json file for machining" << filename;
@@ -4699,7 +4672,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
     QtConcurrent::run([=]()
         {
             m_scene->document()->outline(progress);
-            m_scene->document()->setFinishRun(finishRun());
+            m_scene->document()->setFinishRun(Config::Device::finishRun());
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareDownloading = true;
             qDebug() << "export temp json file for machining" << filename;

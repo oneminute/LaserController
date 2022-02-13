@@ -293,6 +293,7 @@ public:
         CONFIG_ITEM(device, circumferencePulseNumber, int, toInt)
         CONFIG_ITEM(device, workpieceDiameter, int, toInt)
         CONFIG_ITEM(device, rollerRotaryStepLength, int, toInt)
+        CONFIG_ITEM_T(device, finishRun, FinishRunType)
 
     private:
         friend class Config;

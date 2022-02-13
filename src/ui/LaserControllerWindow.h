@@ -69,8 +69,6 @@ public:
     ~LaserControllerWindow();
     bool m_hasMessageBox;
 
-    FinishRunType finishRun();
-
     LaserDocument* currentDocument() const;
 
     bool lockEqualRatio();
@@ -520,7 +518,6 @@ private:
     QToolButton* m_buttonShowLaserPosition;
     QToolButton* m_buttonHideLaserPosition;
     QToolButton* m_buttonSaveZOrigin;
-    QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonUserOrigin1;
     QRadioButton* m_radioButtonUserOrigin2;
     QRadioButton* m_radioButtonUserOrigin3;

@@ -252,7 +252,6 @@ private:
     bool m_isMachining;
     bool m_isPaused;
     bool m_isWithMachining;
-    bool m_isDownloading;
     int m_packagesCount;
     QString m_portName;
     QWidget* m_parentWidget;
