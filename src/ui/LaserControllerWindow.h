@@ -569,11 +569,11 @@ private:
     QLineEdit* m_textContent;
     QLabel* m_textFamilyLabel;
     LaserFontComboBox* m_textFamily;
-    //QLabel* m_widthLabel;
+    QLabel* m_textWidthLabel;
     LaserDoubleSpinBox* m_textWidth;
-    //QLabel* m_heightLabel;
+    QLabel* m_textHeightLabel;
     LaserDoubleSpinBox* m_textHeight;
-    QLabel* m_spaceLabel;
+    QLabel* m_textSpaceLabel;
     LaserDoubleSpinBox* m_textSpace;
     QCheckBox* m_textBold;
     QCheckBox* m_textItalic;

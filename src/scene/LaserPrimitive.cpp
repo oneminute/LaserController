@@ -3526,6 +3526,17 @@ QString LaserStampText::family()
     return d->family;
 }
 
+qreal LaserStampText::space()
+{
+    Q_D(LaserStampText);
+    return d->space;
+}
+
+QSize LaserStampText::textSize()
+{
+    Q_D(LaserStampText);
+    return d->size;
+}
 
 class LaserCircleTextPrivate : public LaserStampTextPrivate
 {
@@ -4094,12 +4105,6 @@ QPointF LaserCircleText::centerPoint()
     return point;
 }*/
 
-QSize LaserCircleText::textSize()
-{
-    Q_D(LaserCircleText);
-    return d->size;
-}
-
 void LaserCircleText::draw(QPainter * painter)
 {
     Q_D(LaserCircleText);
@@ -4201,11 +4206,24 @@ void LaserCircleText::recompute()
     computeTextPath(d->angle, d->size, false);
 }
 
+void LaserCircleText::setSpace(qreal space)
+{
+    
+}
+
 
 QRectF LaserCircleText::circleBounds()
 {
     Q_D(LaserCircleText);
     return d->circleBounds;
+}
+
+void LaserCircleText::setTextHeight(qreal height)
+{
+}
+
+void LaserCircleText::setTextWidth(qreal width)
+{
 }
 
 class LaserHorizontalTextPrivate : public LaserStampTextPrivate
@@ -4280,18 +4298,16 @@ void LaserHorizontalText::initTextPath()
     toBottomLeft();
     d->boundingRect = d->path.boundingRect().toRect();
 }
-//在(0, 0)点调整好间距后(init的时候，单个字的path没有移动位置，最终位置是在all path后移动的)，再移动到位置
-void LaserHorizontalText::computeTextPath()
+void LaserHorizontalText::computeTextPathProcess()
 {
     Q_D(LaserHorizontalText);
-    
     QPainterPath allPath;
     int index = 0;
     for (QPainterPath& path : d->originalTextPathList) {
         QTransform t;
         t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
         path = t.map(path);
-        qreal posX = index * (d->size.width() + d->space) ;
+        qreal posX = index * (d->size.width() + d->space);
         qreal lastPosX = path.boundingRect().left();
         QTransform t1;
         t1.translate(posX - lastPosX, 0 - path.boundingRect().bottom());
@@ -4300,6 +4316,12 @@ void LaserHorizontalText::computeTextPath()
         index++;
     }
     d->path = allPath;
+}
+//在(0, 0)点调整好间距后(init的时候，单个字的path没有移动位置，最终位置是在all path后移动的)，再移动到位置
+void LaserHorizontalText::computeTextPath()
+{
+    Q_D(LaserHorizontalText);    
+    computeTextPathProcess();
     toBottomLeft();
     d->boundingRect = d->path.boundingRect().toRect();  
     //d->originalBoundingRect = d->boundingRect;
@@ -4396,7 +4418,17 @@ void LaserHorizontalText::setBoundingRectWidth(qreal width)
     
 }
 
-void LaserHorizontalText::setTextHeight(qreal diff)
+void LaserHorizontalText::setSpace(qreal space)
+{
+    Q_D(LaserHorizontalText);
+    d->space = space;
+    qreal width = d->space * (d->content.size() - 1) + d->content.size() * d->size.width();
+    qreal diff = width - d->boundingRect.width();
+    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+    computeTextPath();
+}
+
+void LaserHorizontalText::setTextHeightByBounds(qreal diff)
 {
     Q_D(LaserHorizontalText);
     qreal height = diff + d->size.height();
@@ -4409,20 +4441,34 @@ void LaserHorizontalText::setTextHeight(qreal diff)
     computeTextPath();
 }
 
-void LaserHorizontalText::setTextWidth(qreal width)
+void LaserHorizontalText::setTextWidthByBounds(qreal width)
 {
     Q_D(LaserHorizontalText);  
     qreal diff = width - d->boundingRect.width();
     qreal textWidth = (width - d->space * (d->content.size() - 1))/ d->content.size();
     d->size = QSize(textWidth, d->size.height());
     d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
-    computeTextPath();
 }
 
-QSize LaserHorizontalText::textSize()
+void LaserHorizontalText::setTextHeight(qreal height)
 {
     Q_D(LaserHorizontalText);
-    return d->size;
+    qreal lastHeight = d->boundingRect.height();
+    d->size = QSize(d->size.width(), height);
+    computeTextPathProcess();
+    qreal diff = d->boundingRect.height() - lastHeight;
+    d->bottomLeft = QPointF(d->bottomLeft.x(), d->bottomLeft.y() + diff * 0.5);
+    toBottomLeft();
+    d->boundingRect = d->path.boundingRect().toRect();
+}
+
+void LaserHorizontalText::setTextWidth(qreal width)
+{
+    Q_D(LaserHorizontalText);
+    qreal diff = d->content.size() * width + (d->content.size() - 1)*d->space - d->boundingRect.width();
+    d->size = QSize(width, d->size.height());
+    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+    computeTextPath();
 }
 
 class LaserVerticalTextPrivate : public LaserStampTextPrivate
@@ -4610,7 +4656,17 @@ void LaserVerticalText::setBoundingRectHeight(qreal height)
     
 }
 
-void LaserVerticalText::setTextHeight(qreal diff)
+void LaserVerticalText::setSpace(qreal space)
+{
+    Q_D(LaserVerticalText);
+    d->space = space;
+    qreal height = d->space * (d->content.size() - 1) + d->content.size() * d->size.height();
+    qreal diff = height - d->boundingRect.height();
+    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+    computeTextPath();
+}
+
+void LaserVerticalText::setTextHeightByBounds(qreal diff)
 {
     Q_D(LaserVerticalText);
 
@@ -4624,11 +4680,19 @@ void LaserVerticalText::setTextHeight(qreal diff)
     computeTextPath();
 }
 
-void LaserVerticalText::setTextWidth(qreal width)
+void LaserVerticalText::setTextWidthByBounds(qreal width)
 {
     Q_D(LaserVerticalText);
     d->size = QSize(width, d->size.height());
     qreal diff = width - d->boundingRect.width();
     d->topLeft = QPointF(d->topLeft.x() - diff * 0.5, d->topLeft.y());
     computeTextPath();
+}
+
+void LaserVerticalText::setTextHeight(qreal height)
+{
+}
+
+void LaserVerticalText::setTextWidth(qreal width)
+{
 }

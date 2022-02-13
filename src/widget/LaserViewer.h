@@ -179,6 +179,7 @@ signals:
     void selectedChangedFromToolBar();
 	void beginViewDraging();
 	void endViewDraging();
+	void selectedSizeChanged();//发生框选，点选时
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
