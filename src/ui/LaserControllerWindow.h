@@ -475,6 +475,7 @@ private:
 
     // Operations Panel widgets
     QToolButton* m_buttonOperationStart;
+    QToolButton* m_buttonOperationDownload;
     QToolButton* m_buttonOperationPause;
     QToolButton* m_buttonOperationStop;
     QToolButton* m_buttonOperationBounding;
@@ -659,6 +660,7 @@ private:
     QString m_currentJson;
     bool m_useLoadedJson;
     bool m_prepareMachining;
+    bool m_prepareDownloading;
 
     // widgets on status bar
     QLabel* m_statusBarDeviceStatus;

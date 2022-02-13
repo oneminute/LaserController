@@ -166,7 +166,7 @@ public:
     QMap<int, LaserRegister*> userRegisters(bool onlyModified = false) const;
     QMap<int, LaserRegister*> systemRegisters(bool onlyModified = false) const;
 
-    int engravingAccLength(qreal engravingRunSpeed) const;
+    int engravingAccLength(int engravingRunSpeed) const;
 
     void debugPrintUserRegisters() const;
     void debugPrintSystemRegisters() const;

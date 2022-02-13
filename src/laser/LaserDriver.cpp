@@ -235,6 +235,9 @@ bool LaserDriver::load()
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
     CHECK_FN(m_fnLoadDataFromFile)
 
+    m_fnStartDownLoadToCache = (FN_VOID_LONG)m_library.resolve("StartDownLoadToCache");
+    CHECK_FN(m_fnStartDownLoadToCache)
+
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
     CHECK_FN(m_fnGetDeviceWorkState)
 
@@ -848,6 +851,11 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
     m_isDownloading = false;
     //emit machiningStarted();
     return ret;
+}
+
+void LaserDriver::download(unsigned long index)
+{
+    m_fnStartDownLoadToCache(index);
 }
 
 int LaserDriver::importData(const char* data, int length)

@@ -124,6 +124,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_hasMessageBox(false)
     , m_textContent(nullptr)
     , m_requestOverlayImage(false)
+    , m_prepareMachining(false)
+    , m_prepareDownloading(false)
 {
     m_ui->setupUi(this);
     loadRecentFilesMenu();
@@ -2433,6 +2435,11 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationStart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_buttonOperationStart->setIconSize(iconSize);
 
+    m_buttonOperationDownload = new QToolButton;
+    m_buttonOperationDownload->setDefaultAction(m_ui->actionDownload);
+    m_buttonOperationDownload->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationDownload->setIconSize(iconSize);
+
     m_buttonOperationPause = new QToolButton;
     m_buttonOperationPause->setDefaultAction(m_ui->actionPause);
     m_ui->actionPause->setCheckable(true);
@@ -2497,6 +2504,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     QHBoxLayout* firstRow = new QHBoxLayout;
     firstRow->setMargin(0);
     firstRow->addWidget(m_buttonOperationStart);
+    firstRow->addWidget(m_buttonOperationDownload);
     firstRow->addWidget(m_buttonOperationPause);
     firstRow->addWidget(m_buttonOperationStop);
 
@@ -2844,7 +2852,7 @@ void LaserControllerWindow::createUAxisDockPanel()
     QToolButton* buttonSave = new QToolButton;
     buttonSave->setDefaultAction(m_ui->actionSaveUStep);
 
-    Config::Device::uFixtureTypeItem()->emitValueChanged();
+    Config::Device::uFixtureTypeItem()->emitValueChanged(this);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(3);
@@ -4464,10 +4472,6 @@ void LaserControllerWindow::startMachining()
             return;
         }
         QString filename = QDir::current().absoluteFilePath("tmp/export.json");
-        //QTemporaryFile file;
-        //if (file.load())
-        //{
-            //QString filename = file.fileName();
 
         if (!LaserApplication::device->checkLayoutForMachining(
             m_scene->document()->currentDocBoundingRect(),
@@ -4490,7 +4494,6 @@ void LaserControllerWindow::startMachining()
                 progress->finish();
             }
         );
-        //}
     }
     m_useLoadedJson = false;
 }
@@ -4577,10 +4580,34 @@ void LaserControllerWindow::onActionDisconnect(bool checked)
 
 void LaserControllerWindow::onActionDownload(bool checked)
 {
-	QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open File"), ".", "JSON (*.json)");
-    filename = m_tmpDir.absoluteFilePath(filename);
-    m_prepareMachining = false;
-    LaserApplication::driver->loadDataFromFile(filename);
+    if (m_scene->document() == nullptr)
+    {
+        QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
+        return;
+    }
+    QString filename = QDir::current().absoluteFilePath("tmp/export.json");
+
+    if (!LaserApplication::device->checkLayoutForMachining(
+        m_scene->document()->currentDocBoundingRect(),
+        m_scene->document()->currentDocBoundingRect(true)
+    ))
+        return;
+
+    LaserApplication::resetProgressWindow();
+    //LaserApplication::showProgressWindow();
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+    progress->setMaximum(5);
+    QtConcurrent::run([=]()
+        {
+            m_scene->document()->outline(progress);
+            m_scene->document()->setFinishRun(finishRun());
+            qDebug() << "exporting to temporary json file:" << filename;
+            m_prepareDownloading = true;
+            qDebug() << "export temp json file for machining" << filename;
+            m_scene->document()->exportJSON(filename, progress);
+            progress->finish();
+        }
+    );
 }
 
 void LaserControllerWindow::onActionLoadMotor(bool checked)
@@ -4998,7 +5025,7 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 {
-    QPointF laserPos = LaserApplication::device->laserPosition();
+    QVector3D laserPos(LaserApplication::device->laserPosition());
     switch (Config::Device::userOriginSelected())
     {
     case 0:
@@ -5883,17 +5910,23 @@ void LaserControllerWindow::onCreatSpline()
 	    m_viewer->createSpline();
 }
 
-//void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
 void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
     qLogD << "onDocumentExportFinished: " << m_prepareMachining;
-    if (!m_prepareMachining)
-        return;
-
     qLogD << "json data: ";
     qLogD << data;
     LaserApplication::driver->importData(data.data(), data.size());
-    LaserApplication::driver->startMachining();
+
+    if (m_prepareMachining)
+    {
+        LaserApplication::driver->startMachining();
+        m_prepareMachining = false;
+    }
+    else if (m_prepareDownloading)
+    {
+        LaserApplication::driver->download();
+        m_prepareDownloading = false;
+    }
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)

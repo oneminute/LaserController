@@ -1124,7 +1124,7 @@ void Config::loadDeviceItems()
                 Config::Device::circumferencePulseNumberItem()->setEnabled(true);
                 Config::Device::workpieceDiameterItem()->setEnabled(true);
                 Config::Device::rollerRotaryStepLengthItem()->setEnabled(true);
-                Config::Device::uFixtureTypeItem()->emitValueChanged();
+                Config::Device::uFixtureTypeItem()->emitValueChanged(senderPtr);
             }
             else
             {

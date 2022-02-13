@@ -234,7 +234,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     retranslate();
 
     // initialize widgets' state
-    Config::Device::uFixtureTypeItem()->emitValueChanged();
+    Config::Device::uFixtureTypeItem()->emitValueChanged(this);
 }
 
 ConfigDialog::~ConfigDialog()

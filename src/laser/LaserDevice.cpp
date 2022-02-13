@@ -1206,12 +1206,12 @@ QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
     }
 }
 
-int LaserDevice::engravingAccLength(qreal engravingRunSpeed) const
+int LaserDevice::engravingAccLength(int engravingRunSpeed) const
 {
-    qreal minSpeed = Config::UserRegister::scanXStartSpeed();
-    qreal acc = Config::UserRegister::scanXAcc();
-    qreal maxSpeed = qMax(engravingRunSpeed, minSpeed);
-    return qAbs(qRound((maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2)));
+    int minSpeed = Config::UserRegister::scanXStartSpeed();
+    int acc = Config::UserRegister::scanXAcc();
+    int maxSpeed = qMax(engravingRunSpeed, minSpeed);
+    return qAbs(qRound((maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2.0)));
 }
 
 void LaserDevice::debugPrintUserRegisters() const
