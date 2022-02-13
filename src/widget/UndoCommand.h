@@ -328,4 +328,22 @@ protected:
     virtual void redo() override;
     
 };
+
+class StampTextSpinBoxUndoCommand : public QUndoCommand {
+public:
+    StampTextSpinBoxUndoCommand(LaserViewer* viewer, LaserStampText* p, LaserDoubleSpinBox* spinBox,
+        qreal lastValue, qreal value, int type, bool isRedo = false);
+    ~StampTextSpinBoxUndoCommand();
+private:
+    LaserViewer* m_viewer;
+    LaserDoubleSpinBox* m_spinBox;
+    qreal m_redoValue;
+    qreal m_undoValue;
+    int m_type;
+    bool m_isRedo;
+    LaserStampText* m_stampTextPrimitive;
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+};
 #endif // UNDOCOMMAND_H

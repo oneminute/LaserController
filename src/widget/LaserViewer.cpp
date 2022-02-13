@@ -4700,30 +4700,29 @@ void LaserViewer::selectedHandleScale()
         //text
         //left
         case 13: {
-            qreal diff = (m_lastPos.x() - m_mousePoint.x()) * 380/zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
-            
-            qreal w = primitive->boundingRect().width() + diff;
-            if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+            QPointF center = primitive->sceneBoundingRect().center();
+            QPointF curP = mapToScene(m_mousePoint);
+            QPointF lastP = mapToScene(m_lastPos);
+            qreal diff = lastP.x() - curP.x();
+            if (primitive->primitiveType() == LPT_HORIZONTALTEXT || primitive->primitiveType() == LPT_VERTICALTEXT ) {
+                LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(primitive);
+                qreal w = text->textSize().width() + diff;
+                if (w <= 0) {
+                    w = 1;
+                }
+                text->setTextWidth(w);
+                LaserApplication::mainWindow->textWidth()->setValue(w * 0.001);
+            }
+            else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+                //qreal diff = (m_lastPos.x() - m_mousePoint.x()) * 380 / zoomValueNormal();
                 LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
-                w = text->circleBounds().width() + diff;
-            }
-            if (w < 1) {
-                w = 1;
-            }
-            if (primitive->primitiveType() == LPT_HORIZONTALTEXT) {
-                LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
-                text->setTextWidthByBounds(w);
-            }
-            else if (primitive->primitiveType() == LPT_VERTICALTEXT) {
-                LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
-                text->setTextWidthByBounds(w);
-            }
-            else {
-
+                qreal w = text->circleBounds().width() + diff;
+                if (w < 1) {
+                    w = 1;
+                }
                 primitive->setBoundingRectWidth(w);
             }
-            
             break;
         }
         //right
@@ -4745,27 +4744,34 @@ void LaserViewer::selectedHandleScale()
             break;
         }
         case 14: {//top
-            qreal diff = (m_lastPos.y() - m_mousePoint.y()) * 380 / zoomValueNormal();
+            //qreal diff = (m_lastPos.y() - m_mousePoint.y()) * 380 / zoomValueNormal();
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
-
-            
-            if (primitive->primitiveType() == LPT_HORIZONTALTEXT) {
-                LaserHorizontalText* text = qgraphicsitem_cast<LaserHorizontalText*>(primitive);
-                text->setTextHeightByBounds(diff);
-            }
-            else if (primitive->primitiveType() == LPT_VERTICALTEXT) {
-                LaserVerticalText* text = qgraphicsitem_cast<LaserVerticalText*>(primitive);
-                text->setTextHeightByBounds(diff);
+            QPointF center = primitive->sceneBoundingRect().center();
+            QPointF curP = mapToScene(m_mousePoint);
+            QPointF lastP = mapToScene(m_lastPos);
+            qreal diff = lastP.y() - curP.y();
+            if (primitive->primitiveType() == LPT_HORIZONTALTEXT || primitive->primitiveType() == LPT_VERTICALTEXT) {
+                LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(primitive);
+                
+                qreal h = text->textSize().height() + diff;
+                if (h <= 0) {
+                    h = 1;
+                }
+                text->setTextHeight(h);
+                LaserApplication::mainWindow->textHeight()->setValue(h * 0.001);
             }
             else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
                 LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
-                qreal h = text->circleBounds().height() + diff;
-                if (h < 1) {
+                qreal h = text->textSize().height() - diff;
+                if (h <= 0) {
                     h = 1;
                 }
-                text->setBoundingRectHeight(h);
+                else if (h > text->circleBounds().height() * 0.5) {
+                    h = text->circleBounds().height() * 0.5;
+                }
+                text->setTextHeight(h);
+                LaserApplication::mainWindow->textHeight()->setValue(h * 0.001);
             }
-            
             break;
         }
         case 16: {//bottom
@@ -4812,8 +4818,14 @@ void LaserViewer::selectedHandleScale()
         {
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
             LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
-            qreal diff = (m_mousePoint.y() - m_lastPos.y()) * 80.0;
-            text->computeChangeTextHeight(diff);
+            //qreal diff = (m_mousePoint.y() - m_lastPos.y()) * 80.0;
+            QPointF center = primitive->sceneBoundingRect().center();
+            QPointF curP = mapToScene(m_mousePoint);
+            QPointF lastP = mapToScene(m_lastPos);
+            qreal diff = lastP.y() - curP.y();
+            qreal h = text->textSize().height() + diff;
+            text->setTextHeight(h);
+            //text->computeChangeTextHeight(diff);
             break;
         }
 	}

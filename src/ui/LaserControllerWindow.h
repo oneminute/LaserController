@@ -107,6 +107,9 @@ public:
     bool unitIsMM();
     QLabel* labelPercentage();
     QLineEdit* textContentEdit();
+    LaserDoubleSpinBox* textSpace();
+    LaserDoubleSpinBox* textWidth();
+    LaserDoubleSpinBox* textHeight();
     
 public slots:
     void handleSecurityException(int code, const QString& message);

@@ -29,7 +29,7 @@ void SelectionUndoCommand::undo()
 {
 	
 	handle(m_undoSelectedList);
-    
+    emit m_viewer->selectedSizeChanged();
 }
 
 void SelectionUndoCommand::redo()
@@ -112,6 +112,7 @@ void SelectionUndoCommand::handle(QMap<QGraphicsItem*, QTransform> list)
 		emit m_viewer->idleToSelected();
 	}
     //emit m_viewer->selectedChangedFromMouse();
+    
 	m_viewer->viewport()->repaint();
 }
 
@@ -2030,5 +2031,63 @@ void WeldShapesUndoCommand::redo()
     }
     m_viewer->viewport()->repaint();
 }
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+StampTextSpinBoxUndoCommand::StampTextSpinBoxUndoCommand(LaserViewer* viewer, LaserStampText* p, LaserDoubleSpinBox* spinBox,
+    qreal lastValue, qreal value, int type, bool isRedo)
+    :m_viewer(viewer),
+    m_type(type),
+    m_spinBox(spinBox),
+    m_redoValue(value),
+    m_undoValue(lastValue),
+    m_isRedo(isRedo),
+    m_stampTextPrimitive(p)
+{
+}
 
-
+StampTextSpinBoxUndoCommand::~StampTextSpinBoxUndoCommand()
+{
+}
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+void StampTextSpinBoxUndoCommand::undo()
+{
+    switch (m_type) {
+        case 5: {
+            m_stampTextPrimitive->setSpace(m_undoValue);
+            break;
+        }
+        case 6: {
+            m_stampTextPrimitive->setTextWidth(m_undoValue);
+            break;
+        }
+        case 7: {
+            m_stampTextPrimitive->setTextHeight(m_undoValue);
+            break;
+        }
+    }
+    m_spinBox->setValue(m_undoValue * 0.001);
+    m_isRedo = true;
+    m_viewer->viewport()->repaint();
+}
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+void StampTextSpinBoxUndoCommand::redo()
+{
+    if (!m_isRedo) {
+        return;
+    }
+    switch (m_type) {
+    case 5: {
+        m_stampTextPrimitive->setSpace(m_redoValue);
+        break;
+    }
+    case 6: {
+        m_stampTextPrimitive->setTextWidth(m_redoValue);
+        break;
+    }
+    case 7: {
+        m_stampTextPrimitive->setTextHeight(m_redoValue);
+        break;
+    }
+    }
+    m_spinBox->setValue(m_redoValue*0.001);
+    m_viewer->viewport()->repaint();
+}

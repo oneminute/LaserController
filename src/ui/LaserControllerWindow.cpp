@@ -1643,6 +1643,21 @@ QLineEdit * LaserControllerWindow::textContentEdit()
     return m_textContent;
 }
 
+LaserDoubleSpinBox* LaserControllerWindow::textSpace()
+{
+    return m_textSpace;
+}
+
+LaserDoubleSpinBox* LaserControllerWindow::textWidth()
+{
+    return m_textWidth;
+}
+
+LaserDoubleSpinBox* LaserControllerWindow::textHeight()
+{
+    return m_textHeight;
+}
+
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
 {
     if (m_viewer) {
@@ -3433,7 +3448,8 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
             }
             case 5: {
                 qreal lastSpace = text->space();
-                text->setSpace(m_textSpace->value()*1000);
+                qreal space = m_textSpace->value() * 1000;
+                text->setSpace(space);
                 //判断是否在4叉树的有效区域内
                 if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
                     QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
@@ -3442,6 +3458,8 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                 }
                 else {
                     m_scene->quadTreeNode()->upDatePrimitive(text);
+                    StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textSpace, lastSpace, space, 5, false);
+                    m_viewer->undoStack()->push(cmd);
                 }
                 break;
             }
@@ -3461,11 +3479,13 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                 }
                 else {
                     m_scene->quadTreeNode()->upDatePrimitive(text);
+                    StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer,text, m_textWidth, lastWidth, width, 6, false);
+                    m_viewer->undoStack()->push(cmd);
                 }
                 break;
             }
             case 7: {
-                qreal lastHeight = text->textSize().width();
+                qreal lastHeight = text->textSize().height();
                 qreal height = m_textHeight->value() * 1000;
                 if (height <= 0) {
                     height = 1;
@@ -3480,6 +3500,8 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                 }
                 else {
                     m_scene->quadTreeNode()->upDatePrimitive(text);
+                    StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textHeight, lastHeight, height, 7, false);
+                    m_viewer->undoStack()->push(cmd);
                 }
                 break;
             }
@@ -3809,8 +3831,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_circleTextPropertyLayout->addWidget(m_textContent, 0, 1);
             m_circleTextPropertyLayout->addWidget(m_textFamilyLabel, 1, 0);
             m_circleTextPropertyLayout->addWidget(m_textFamily, 1, 1);
-            m_circleTextPropertyLayout->addWidget(m_textWidthLabel, 2, 0);
-            m_circleTextPropertyLayout->addWidget(m_textWidth, 2, 1);
+            //m_circleTextPropertyLayout->addWidget(m_textWidthLabel, 2, 0);
+            //m_circleTextPropertyLayout->addWidget(m_textWidth, 2, 1);
             m_circleTextPropertyLayout->addWidget(m_textHeightLabel, 3, 0);
             m_circleTextPropertyLayout->addWidget(m_textHeight, 3, 1);
             
@@ -3828,7 +3850,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_textItalic->setChecked(text->italic());
             m_textUpperCase->setChecked(text->uppercase());
             m_textFamily->setCurrentText(text->family());
-            m_textWidth->setValue(text->textSize().width() * 0.001);
+            //m_textWidth->setValue(text->textSize().width() * 0.001);
             m_textHeight->setValue(text->textSize().height() * 0.001);
             m_circleTextWidget->setLayout(m_circleTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_circleTextWidget);

@@ -4047,14 +4047,6 @@ void LaserCircleText::computeChangeAngle(qreal diffAngle)
     computeTextPath(d->angle + diffAngle, d->size, false);
 }
 
-void LaserCircleText::computeChangeTextHeight(qreal diffHeight)
-{
-    Q_D(LaserCircleText);
-    qreal height = d->size.height();
-    height += diffHeight;
-    computeTextPath(d->angle, QSize(d->size.width(), height), false);
-}
-
 void LaserCircleText::resizeRadian()
 {
     Q_D(LaserCircleText);
@@ -4220,6 +4212,8 @@ QRectF LaserCircleText::circleBounds()
 
 void LaserCircleText::setTextHeight(qreal height)
 {
+    Q_D(LaserCircleText);
+    computeTextPath(d->angle, QSize(d->size.width(), height), false);
 }
 
 void LaserCircleText::setTextWidth(qreal width)
@@ -4428,31 +4422,12 @@ void LaserHorizontalText::setSpace(qreal space)
     computeTextPath();
 }
 
-void LaserHorizontalText::setTextHeightByBounds(qreal diff)
-{
-    Q_D(LaserHorizontalText);
-    qreal height = diff + d->size.height();
-    if (height < 1) {
-        height = 1;
-        diff = height - d->size.height();
-    }
-    d->size = QSize(d->size.width(), height);    
-    d->bottomLeft = QPointF(d->bottomLeft.x(), d->bottomLeft.y() + diff * 0.5);
-    computeTextPath();
-}
-
-void LaserHorizontalText::setTextWidthByBounds(qreal width)
-{
-    Q_D(LaserHorizontalText);  
-    qreal diff = width - d->boundingRect.width();
-    qreal textWidth = (width - d->space * (d->content.size() - 1))/ d->content.size();
-    d->size = QSize(textWidth, d->size.height());
-    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
-}
-
 void LaserHorizontalText::setTextHeight(qreal height)
 {
     Q_D(LaserHorizontalText);
+    if (height <= 0) {
+        height = 1;
+    }
     qreal lastHeight = d->boundingRect.height();
     d->size = QSize(d->size.width(), height);
     computeTextPathProcess();
@@ -4465,6 +4440,9 @@ void LaserHorizontalText::setTextHeight(qreal height)
 void LaserHorizontalText::setTextWidth(qreal width)
 {
     Q_D(LaserHorizontalText);
+    if (width <= 0) {
+        width = 1;
+    }
     qreal diff = d->content.size() * width + (d->content.size() - 1)*d->space - d->boundingRect.width();
     d->size = QSize(width, d->size.height());
     d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
@@ -4666,33 +4644,20 @@ void LaserVerticalText::setSpace(qreal space)
     computeTextPath();
 }
 
-void LaserVerticalText::setTextHeightByBounds(qreal diff)
+void LaserVerticalText::setTextHeight(qreal height)
 {
     Q_D(LaserVerticalText);
-
-    qreal h = d->size.height() + diff;
-    if (h < 0) {
-        h = 1;
-        diff = 0;
-    }
-    d->size = QSize(d->size.width(), h);
+    d->size = QSize(d->size.width(), height);
+    qreal diff = height * d->content.size() + d->space * (d->content.size() - 1) - d->boundingRect.height();
     d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
     computeTextPath();
 }
 
-void LaserVerticalText::setTextWidthByBounds(qreal width)
+void LaserVerticalText::setTextWidth(qreal width)
 {
     Q_D(LaserVerticalText);
     d->size = QSize(width, d->size.height());
     qreal diff = width - d->boundingRect.width();
     d->topLeft = QPointF(d->topLeft.x() - diff * 0.5, d->topLeft.y());
     computeTextPath();
-}
-
-void LaserVerticalText::setTextHeight(qreal height)
-{
-}
-
-void LaserVerticalText::setTextWidth(qreal width)
-{
 }
