@@ -112,6 +112,7 @@ public:
     LaserDoubleSpinBox* textSpace();
     LaserDoubleSpinBox* textWidth();
     LaserDoubleSpinBox* textHeight();
+    LaserDoubleSpinBox* textAngle();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -586,6 +587,8 @@ private:
     LaserDoubleSpinBox* m_commonCornerRadius;
     QLabel* m_cornerRadiusTypeLabel;
     QComboBox* m_cornerRadiusType;
+    QLabel* m_textAngleLabel;
+    LaserDoubleSpinBox* m_textAngle;
     QLabel* m_enhanceDenoiseLabel;
     QGridLayout* m_rectPropertyLayout;
     QGridLayout* m_linePropertyLayout;

@@ -1432,15 +1432,16 @@ void LaserViewer::paintSelectedState(QPainter& painter)
             topRect = QRect(oTop_3.x(), oTop_3.y(), m_handleRectPixel, m_handleRectPixel);
             if (//primitive->primitiveType() == LPT_CIRCLETEXT ||
                 primitive->primitiveType() == LPT_VERTICALTEXT||
-                primitive->primitiveType() == LPT_HORIZONTALTEXT) {
+                primitive->primitiveType() == LPT_HORIZONTALTEXT||
+                primitive->primitiveType() == LPT_CIRCLETEXT) {
                 oTop_3 = QPointF(oTop_3.x() - pixDiff, oTop_3.y() - pixDiff);
                 QPixmap pixmap(":/ui/icons/images/textIcon.png");
                 pixmap = pixmap.scaled(QSize(pixmapSize, pixmapSize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(oTop_3, pixmap);
             }
-            else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
+           /*else if (primitive->primitiveType() == LPT_CIRCLETEXT) {
                 painter.drawEllipse(topRect);
-            }
+            }*/
             m_selectedHandleList.append(topRect);
             //outer right 15
             QRect rightRect;
@@ -1495,14 +1496,14 @@ void LaserViewer::paintSelectedState(QPainter& painter)
                 moveMap = moveMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 QPixmap angleMap(":/ui/icons/images/changeAngle.png");
                 angleMap = angleMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                QPixmap svMap(":/ui/icons/images/textIcon.png");
-                svMap = svMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                //QPixmap svMap(":/ui/icons/images/textIcon.png");
+                //svMap = svMap.scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 painter.drawPixmap(sP, moveMap);
                 painter.drawPixmap(eP, angleMap);
-                painter.drawPixmap(cP, svMap);
+                //painter.drawPixmap(cP, svMap);
                 m_selectedHandleList.append(QRectF(sP.x(), sP.y(), moveMap.width(), moveMap.height()));
                 m_selectedHandleList.append(QRectF(eP.x(), eP.y(), angleMap.width(), angleMap.height()));
-                m_selectedHandleList.append(QRectF(cP.x(), cP.y(), svMap.width(), svMap.height()));
+                //m_selectedHandleList.append(QRectF(cP.x(), cP.y(), svMap.width(), svMap.height()));
             }
             
 
@@ -2117,12 +2118,12 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
                     this->setCursor(cMap);
                     break;
                 }
-                case 19: {
+                /*case 19: {
                     QPixmap cMap(":/ui/icons/images/stretchVertical.png");
                     cMap = cMap.scaled(28, 28, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
                     this->setCursor(cMap);
                     break;
-                }
+                }*/
                 default:
                     break;
                 }
@@ -2161,7 +2162,7 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
             case 16://text bottom
             case 17://circle text move path
             case 18://circle text change angle
-            case 19://circle text change size height
+            //case 19://circle text change size height
 			case 30://点选
 			case 31://点选图片
 			{
@@ -2449,8 +2450,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
+        emit selectedSizeChanged();
 		this->viewport()->repaint();
-        
 		return;
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
@@ -4810,11 +4811,13 @@ void LaserViewer::selectedHandleScale()
         {
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
             LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
-            qreal diff = (m_mousePoint.x() - m_lastPos.x())/8.0;
-            text->computeChangeAngle(-diff);
+            qreal diff = (m_mousePoint.x() - m_lastPos.x())/2.0;
+            qreal angle = text->angle() - diff;
+            text->computeChangeAngle(angle);
+            LaserApplication::mainWindow->textAngle()->setValue(angle);
             break;
         }
-        case 19://circle text change size height
+        /*case 19://circle text change size height
         {
             LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(m_group->childItems()[0]);
             LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(primitive);
@@ -4827,7 +4830,7 @@ void LaserViewer::selectedHandleScale()
             text->setTextHeight(h);
             //text->computeChangeTextHeight(diff);
             break;
-        }
+        }*/
 	}
 	QTransform t;
 	switch (m_curSelectedHandleIndex) {

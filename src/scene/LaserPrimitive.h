@@ -609,9 +609,10 @@ public:
     void moveTextToEllipse(qreal lengthByPercent);
     void computeTextByPercent(int intervalCount);
     void computeMoveTextPath(qreal diffAngle);
-    void computeChangeAngle(qreal diffAngle);
+    void computeChangeAngle(qreal angle);
     void resizeRadian();
     QPainterPath* textArc();
+    qreal angle();
     //QPointF startPoint();
     //QPointF endPoint();
     //QPointF centerPoint();

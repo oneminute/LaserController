@@ -1685,6 +1685,11 @@ LaserDoubleSpinBox* LaserControllerWindow::textHeight()
     return m_textHeight;
 }
 
+LaserDoubleSpinBox* LaserControllerWindow::textAngle()
+{
+    return m_textAngle;
+}
+
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
 {
     if (m_viewer) {
@@ -3069,6 +3074,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_textWidthLabel = new QLabel(tr("Width"));
     m_textHeightLabel = new QLabel(tr("Height"));
     m_textSpaceLabel = new QLabel(tr("Spacing"));
+    m_textAngleLabel = new QLabel(tr("Angle"));
     m_textWidth = new LaserDoubleSpinBox();
     m_textWidth->setDecimals(3);
     m_textWidth->setMaximum(DBL_MAX);
@@ -3082,6 +3088,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_textSpace->setMinimum(0);
     m_textSpace->setDecimals(3);
     m_borderWidth->setDecimals(3);
+    m_textAngle = new LaserDoubleSpinBox();
+    m_textAngle->setMinimum(0);
+    m_textAngle->setMaximum(360);
     //暂时不做
     m_widthLabel->setVisible(false);
     m_heightLabel->setVisible(false);
@@ -3346,6 +3355,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     connect(m_textHeight, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         shapePropertyTextFont(7);
     });
+    connect(m_textAngle, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        shapePropertyTextFont(8);
+    });
     //预览字体
     connect(m_textFamily, QOverload<int>::of(&QComboBox::highlighted), this, [=](int index) {
         LaserStampText*  text = shapePropertyTextFont(4);
@@ -3386,7 +3398,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     dockPanelOnlyShowIcon(m_propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
     createPrimitivePropertiesPanel();
 }
-//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
 LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
 {
     LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
@@ -3522,6 +3534,27 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                     StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textHeight, lastHeight, height, 7, false);
                     m_viewer->undoStack()->push(cmd);
                 }
+                break;
+            }
+            case 8: {
+                if (type == LPT_CIRCLETEXT) {
+                    LaserCircleText* cText = qgraphicsitem_cast<LaserCircleText*>(text);
+                    qreal lastAngle = cText->angle();
+                    qreal angle = m_textAngle->value();
+                    cText->computeChangeAngle(angle);
+                    //判断是否在4叉树的有效区域内
+                    if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
+                        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                        cText->computeChangeAngle(lastAngle);
+                        m_textAngle->setValue(lastAngle);
+                    }
+                    else {
+                        m_scene->quadTreeNode()->upDatePrimitive(text);
+                        StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textAngle, lastAngle, angle, 8, false);
+                        m_viewer->undoStack()->push(cmd);
+                    }
+                }
+                
                 break;
             }
         }
@@ -3854,6 +3887,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             //m_circleTextPropertyLayout->addWidget(m_textWidth, 2, 1);
             m_circleTextPropertyLayout->addWidget(m_textHeightLabel, 3, 0);
             m_circleTextPropertyLayout->addWidget(m_textHeight, 3, 1);
+            m_circleTextPropertyLayout->addWidget(m_textAngleLabel, 4, 0);
+            m_circleTextPropertyLayout->addWidget(m_textAngle, 4, 1);
             
             QHBoxLayout* layout = new QHBoxLayout();
             layout->addWidget(m_textBold, 0, Qt::AlignLeft);
@@ -3869,6 +3904,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_textItalic->setChecked(text->italic());
             m_textUpperCase->setChecked(text->uppercase());
             m_textFamily->setCurrentText(text->family());
+            m_textAngle->setValue(text->angle());
             //m_textWidth->setValue(text->textSize().width() * 0.001);
             m_textHeight->setValue(text->textSize().height() * 0.001);
             m_circleTextWidget->setLayout(m_circleTextPropertyLayout);

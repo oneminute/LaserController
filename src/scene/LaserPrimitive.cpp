@@ -4036,10 +4036,10 @@ void LaserCircleText::computeMoveTextPath(qreal diffAngle)
     computeTextPath(d->angle,d->size, false);
 }
 
-void LaserCircleText::computeChangeAngle(qreal diffAngle)
+void LaserCircleText::computeChangeAngle(qreal angle)
 {
     Q_D(LaserCircleText);
-    computeTextPath(d->angle + diffAngle, d->size, false);
+    computeTextPath(angle, d->size, false);
 }
 
 void LaserCircleText::resizeRadian()
@@ -4060,6 +4060,11 @@ QPainterPath * LaserCircleText::textArc()
 {
     Q_D(LaserCircleText);
     return &d->arcPath;
+}
+qreal LaserCircleText::angle()
+{
+    Q_D(LaserCircleText);
+    return d->angle;
 }
 /*
 QPointF LaserCircleText::startPoint()
