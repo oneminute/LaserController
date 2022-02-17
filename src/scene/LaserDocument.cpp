@@ -1231,6 +1231,12 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
                 primitive = new LaserStar(this, center, radius, saveTransform, layerIndex);
             }
+            else if (className == "LaserPartyEmblem") {
+                QJsonArray cArray = primitiveJson["center"].toArray();
+                qreal radius = primitiveJson["radius"].toDouble();
+                QPoint center(cArray[0].toInt(), cArray[1].toInt());
+                primitive = new LaserPartyEmblem(this, center, radius, saveTransform, layerIndex);
+            }
             else if (className == "LaserRing") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 qreal width = primitiveJson["width"].toDouble();

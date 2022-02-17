@@ -101,6 +101,7 @@ enum LaserPrimitiveType
 	LPT_TEXT,
     LPT_NURBS,
     LPT_STAR,
+    LPT_PARTYEMBLEM,
     LPT_FRAME,
     LPT_RING,
     LPT_CIRCLETEXT,

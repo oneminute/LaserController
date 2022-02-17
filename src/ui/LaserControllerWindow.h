@@ -359,6 +359,7 @@ protected slots:
     void applyJobOriginToDocument(const QVariant& value);
     //stamp shapes
     void onActionStar(bool checked = false);
+    void onActionPartyEmblem(bool checked = false);
     void onActionRing(bool checked = false);
     void onActionRingEllipse(bool checked = false);
     void onActionFrame(bool checked = false);
@@ -432,6 +433,7 @@ signals:
     void readyStar();
     void readyFrame();
     void readyRing();
+    void readyPartyEmblem();
     void readyRingEllipse();
     void readyHorizontalText();
     void readyVerticalText();

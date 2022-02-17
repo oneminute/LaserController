@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1958,6 +1958,18 @@
   <action name="actionSaveUStep">
    <property name="text">
     <string>Save U Step Length</string>
+   </property>
+  </action>
+  <action name="actionPartyEmblem">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/partyEmblem.png</normaloff>:/ui/icons/images/partyEmblem.png</iconset>
+   </property>
+   <property name="text">
+    <string>PartyEmblem</string>
+   </property>
+   <property name="toolTip">
+    <string>PartyEmblem</string>
    </property>
   </action>
  </widget>

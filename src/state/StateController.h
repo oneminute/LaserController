@@ -198,6 +198,7 @@ public:
 	DECL_STATE(documentPrimitiveTextReady)
 	DECL_STATE(documentPrimitiveTextCreating)
     DECL_STATE(documentPrimitiveStar)
+    DECL_STATE(documentPrimitivePartyEmblem)
     DECL_STATE(documentPrimitiveFrame)
     DECL_STATE(documentPrimitiveRing)
     DECL_STATE(documentPrimitiveRingEllipse)

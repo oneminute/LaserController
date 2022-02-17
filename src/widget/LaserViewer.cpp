@@ -872,8 +872,8 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
         //如果是实心填充的图元，则不做判断
         if (ignoreFillSolid) {
             int type = primitive->primitiveType();
-            if (type == LPT_BITMAP || type == LPT_STAR || 
-                type == LPT_RING || type == LPT_FRAME) {
+            if (type == LPT_BITMAP || type == LPT_STAR || type == LPT_PARTYEMBLEM){
+                //|| type == LPT_RING || type == LPT_FRAME) {
                 result = nullptr;
                 return QLineF();
             }
@@ -955,6 +955,12 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
             else if(LaserStar* star = qobject_cast<LaserStar*> (primitive)) {
                 if (star->getScenePath().contains(sceneMousePoint)) {
                     result = star;
+                    return true;
+                }
+            }
+            else if (LaserPartyEmblem* pe = qobject_cast<LaserPartyEmblem*> (primitive)) {
+                if (pe->getScenePath().contains(sceneMousePoint)) {
+                    result = pe;
                     return true;
                 }
             }
@@ -2718,6 +2724,40 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             if (cursorIn) {
                 QPointF diff = cursorIn->sceneBoundingRect().center() - star->sceneBoundingRect().center();
                 star->moveBy(diff.x(), diff.y());
+            }
+        }
+    }
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveStarState())) {
+        if (event->button() == Qt::LeftButton) {
+            //查找鼠标在印章里
+            LaserPrimitive* cursorIn = nullptr;
+            cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
+            //create
+            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, QTransform(), m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(star);
+            emit LaserApplication::mainWindow->isIdle();
+            //移动到印章里
+            if (cursorIn) {
+                QPointF diff = cursorIn->sceneBoundingRect().center() - star->sceneBoundingRect().center();
+                star->moveBy(diff.x(), diff.y());
+            }
+        }
+    }
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePartyEmblemState())) {
+        if (event->button() == Qt::LeftButton) {
+            //查找鼠标在印章里
+            LaserPrimitive* cursorIn = nullptr;
+            cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
+            //create
+            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, QTransform(), m_curLayerIndex);
+            //判断是否在4叉树的有效区域内
+            addPrimitiveAndExamRegionByBounds(pe);
+            emit LaserApplication::mainWindow->isIdle();
+            //移动到印章里
+            if (cursorIn) {
+                QPointF diff = cursorIn->sceneBoundingRect().center() - pe->sceneBoundingRect().center();
+                pe->moveBy(diff.x(), diff.y());
             }
         }
     }
