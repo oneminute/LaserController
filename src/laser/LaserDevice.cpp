@@ -285,9 +285,12 @@ void LaserDevice::load()
 
     connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage/*, Qt::ConnectionType::QueuedConnection*/);
-    connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
     connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
-    d->driver->load();
+    if (d->driver->load())
+    {
+        d->isInit = false;
+        d->driver->init(LaserApplication::mainWindow->winId());
+    }
 }
 
 int LaserDevice::layoutWidth() const
@@ -385,6 +388,13 @@ void LaserDevice::updateWorkState()
     Q_D(LaserDevice);
     if (d->driver)
         d->driver->getDeviceWorkState();
+}
+
+void LaserDevice::changeState(const DeviceState& state)
+{
+    Q_D(LaserDevice);
+    d->lastState = state;
+    emit workStateUpdated(state);
 }
 
 void LaserDevice::requestMainCardInfo()
@@ -928,7 +938,7 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
             .arg((layoutLeft - docLeft) * 0.001, 0, 'f', 3));
         exceedLeft = true;
     }
-    if (docTop < layoutTop)
+    if (docTop < layoutTop && !Config::Device::switchToU())
     {
         ok1 = false;
         info1.append(tr("Top edge of current document bounding exceeds device layout: %1mm\n")
@@ -941,7 +951,7 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
             .arg((docRight - layoutRight) * 0.001, 0, 'f', 3));
         exceedRight = true;
     }
-    if (docBottom > layoutBottom)
+    if (docBottom > layoutBottom && !Config::Device::switchToU())
     {
         ok1 = false;
         info1.append(tr("Bottom edge of current document bounding exceeds device layout: %1mm\n")
@@ -1708,6 +1718,11 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_StopWorking:
     {
+        DeviceState state;
+        if (state.parse(message))
+        {
+            changeState(state);
+        }
         break;
     }
     case M_MachineWorking:
@@ -1715,8 +1730,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         DeviceState state;
         if (state.parse(message))
         {
-            d->lastState = state;
-            emit workStateUpdated(state);
+            changeState(state);
         }
         break;
     }
@@ -1852,19 +1866,6 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     }
 
-}
-
-void LaserDevice::onLibraryLoaded(bool success)
-{
-    Q_D(LaserDevice);
-    qLogD << "LaserDevice::onLibraryLoaded: success = " << success;
-    try {
-        d->isInit = false;
-        d->driver->init(LaserApplication::mainWindow->winId());
-    }
-    catch (...) {
-        d->isInit = false;
-    }
 }
 
 void LaserDevice::onLibraryInitialized()

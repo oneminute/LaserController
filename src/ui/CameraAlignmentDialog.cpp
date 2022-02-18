@@ -64,7 +64,8 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
     m_page1SpinBoxVMargin = new QSpinBox;
     m_page1SpinBoxMarkSize = new QSpinBox;
     m_page1DoubleSpinBoxCuttingSpeed = new QDoubleSpinBox;
-    m_page1DoubleSpinBoxCuttingPower = new QDoubleSpinBox;
+    m_page1DoubleSpinBoxCuttingMinPower = new QDoubleSpinBox;
+    m_page1DoubleSpinBoxCuttingRunPower = new QDoubleSpinBox;
     m_page1DoubleSpinBoxFillingSpeed = new QDoubleSpinBox;
     m_page1DoubleSpinBoxFillingPower = new QDoubleSpinBox;
     m_page1DoubleSpinBoxFillingInterval = new QDoubleSpinBox;
@@ -83,9 +84,13 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
     m_page1DoubleSpinBoxCuttingSpeed->setMaximum(2000);
     m_page1DoubleSpinBoxCuttingSpeed->setValue(100);
 
-    m_page1DoubleSpinBoxCuttingPower->setMinimum(0);
-    m_page1DoubleSpinBoxCuttingPower->setMaximum(100);
-    m_page1DoubleSpinBoxCuttingPower->setValue(12);
+    m_page1DoubleSpinBoxCuttingMinPower->setMinimum(0);
+    m_page1DoubleSpinBoxCuttingMinPower->setMaximum(100);
+    m_page1DoubleSpinBoxCuttingMinPower->setValue(5);
+
+    m_page1DoubleSpinBoxCuttingRunPower->setMinimum(0);
+    m_page1DoubleSpinBoxCuttingRunPower->setMaximum(100);
+    m_page1DoubleSpinBoxCuttingRunPower->setValue(12);
 
     m_page1DoubleSpinBoxFillingSpeed->setMinimum(1);
     m_page1DoubleSpinBoxFillingSpeed->setMaximum(2000);
@@ -104,9 +109,10 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
     page1ParamsLayout->addRow(tr("Vertical Margin"), m_page1SpinBoxVMargin);
     page1ParamsLayout->addRow(tr("Mark Size"), m_page1SpinBoxMarkSize);
     page1ParamsLayout->addRow(tr("Cutting Speed(mm/s)"), m_page1DoubleSpinBoxCuttingSpeed);
-    page1ParamsLayout->addRow(tr("Cutting Power(%)"), m_page1DoubleSpinBoxFillingPower);
+    page1ParamsLayout->addRow(tr("Cutting Min Power(%)"), m_page1DoubleSpinBoxCuttingMinPower);
+    page1ParamsLayout->addRow(tr("Cutting Run Power(%)"), m_page1DoubleSpinBoxCuttingRunPower);
     page1ParamsLayout->addRow(tr("Filling Speed(mm/s)"), m_page1DoubleSpinBoxFillingSpeed);
-    page1ParamsLayout->addRow(tr("Filling Power(%)"), m_page1DoubleSpinBoxFillingPower);
+    page1ParamsLayout->addRow(tr("Filling Run Power(%)"), m_page1DoubleSpinBoxFillingPower);
     page1ParamsLayout->addRow(tr("Filling Interval(um)"), m_page1DoubleSpinBoxFillingInterval);
 
     m_page1ButtonGenerate = new QPushButton(tr("Generate"));
@@ -320,8 +326,8 @@ bool CameraAlignmentDialog::eventFilter(QObject* obj, QEvent* event)
 }
 void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
-    if (m_doc)
-        LaserApplication::mainWindow->closeDocument();
+    //if (m_doc)
+        //LaserApplication::mainWindow->closeDocument();
     Config::Device::startFromItem()->pop();
     Config::Export::imageQualityItem()->pop();
 }
@@ -342,8 +348,8 @@ void CameraAlignmentDialog::setupLayers(LaserLayer* layer0, LaserLayer* layer1)
 {
     layer0->setType(LLT_CUTTING);
     layer0->setCuttingRunSpeed(m_page1DoubleSpinBoxCuttingSpeed->value() * 1000);
-    layer0->setCuttingMinSpeedPower(0);
-    layer0->setCuttingRunSpeedPower(m_page1DoubleSpinBoxCuttingPower->value() * 10);
+    layer0->setCuttingMinSpeedPower(m_page1DoubleSpinBoxCuttingMinPower->value() * 10);
+    layer0->setCuttingRunSpeedPower(m_page1DoubleSpinBoxCuttingRunPower->value() * 10);
 
     layer1->setType(LLT_FILLING);
     layer1->setEngravingEnableCutting(false);

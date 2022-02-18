@@ -2422,11 +2422,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationStart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_buttonOperationStart->setIconSize(iconSize);
 
-    m_buttonOperationDownload = new QToolButton;
-    m_buttonOperationDownload->setDefaultAction(m_ui->actionDownload);
-    m_buttonOperationDownload->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    m_buttonOperationDownload->setIconSize(iconSize);
-
     m_buttonOperationPause = new QToolButton;
     m_buttonOperationPause->setDefaultAction(m_ui->actionPause);
     m_ui->actionPause->setCheckable(true);
@@ -2460,6 +2455,11 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationOrigin->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_buttonOperationOrigin->setIconSize(iconSize);
 
+    m_buttonOperationDownload = new QToolButton;
+    m_buttonOperationDownload->setDefaultAction(m_ui->actionDownload);
+    m_buttonOperationDownload->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationDownload->setIconSize(iconSize);
+
     m_comboBoxStartPosition = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::startFromItem());
     Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition, SS_DIRECTLY);
 
@@ -2478,6 +2478,9 @@ void LaserControllerWindow::createOperationsDockPanel()
     }
     Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin, SS_DIRECTLY);
 
+    QCheckBox* comboBoxSwitchToU = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Device::switchToUItem());
+    Config::Device::switchToUItem()->bindWidget(comboBoxSwitchToU, SS_DIRECTLY);
+
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
     m_comboBoxDevices->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -2491,7 +2494,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     QHBoxLayout* firstRow = new QHBoxLayout;
     firstRow->setMargin(0);
     firstRow->addWidget(m_buttonOperationStart);
-    firstRow->addWidget(m_buttonOperationDownload);
     firstRow->addWidget(m_buttonOperationPause);
     firstRow->addWidget(m_buttonOperationStop);
 
@@ -2501,11 +2503,8 @@ void LaserControllerWindow::createOperationsDockPanel()
     secondRow->addWidget(m_buttonOperationSpotShot);
     secondRow->addWidget(m_buttonOperationReset);
     secondRow->addWidget(m_buttonOperationOrigin);
+    secondRow->addWidget(m_buttonOperationDownload);
 
-    //m_comboBoxPostEvent = new QComboBox;
-    //m_comboBoxPostEvent->addItem(tr("Stop at current position"));
-    //m_comboBoxPostEvent->addItem(tr("Unload motor"));
-    //m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
     QComboBox* comboBoxFinishRun = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::finishRunItem());
     Config::Device::finishRunItem()->bindWidget(comboBoxFinishRun, SS_DIRECTLY);
     QToolButton* buttonApplyToDoc = new QToolButton;
@@ -2517,6 +2516,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
     fifthRow->addRow("", buttonApplyToDoc);
     fifthRow->addRow(Config::Device::finishRunItem()->title(), comboBoxFinishRun);
+    fifthRow->addRow(Config::Device::switchToUItem()->title(), comboBoxSwitchToU);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);

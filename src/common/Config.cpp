@@ -1374,6 +1374,12 @@ void Config::loadDeviceItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+
+    ConfigItem* switchToU = group->addConfigItem(
+        "switchToU",
+        false,
+        DT_BOOL
+    );
 }
 
 void Config::loadUserReigsters()
@@ -3256,6 +3262,10 @@ void Config::updateTitlesAndDescriptions()
     Device::calibrationBlockThicknessItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Calibration block thickness(mm)", nullptr), 
         QCoreApplication::translate("Config", "Calibration block thickness", nullptr));
+
+    Device::switchToUItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Switch To U", nullptr), 
+        QCoreApplication::translate("Config", "Switch To U", nullptr));
 
     UserRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

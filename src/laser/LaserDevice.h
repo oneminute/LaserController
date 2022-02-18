@@ -42,6 +42,7 @@ public:
     QString requestRegisteId() const;
     QString requestDongleId() const;
     void updateWorkState();
+    void changeState(const DeviceState& state);
 
     void requestMainCardInfo();
     void requestMainCardRegInfo();
