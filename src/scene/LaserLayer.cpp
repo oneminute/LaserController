@@ -666,6 +666,10 @@ QJsonObject LaserLayer::toJson(QWidget* window)
             LaserStar* star = qobject_cast<LaserStar*>(primitive);
             array.append(star->toJson());
         }
+        else if (className == "LaserPartyEmblem") {
+            LaserPartyEmblem* star = qobject_cast<LaserPartyEmblem*>(primitive);
+            array.append(star->toJson());
+        }
         else if (className == "LaserRing") {
             LaserRing* ring = qobject_cast<LaserRing*>(primitive);
             array.append(ring->toJson());

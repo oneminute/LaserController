@@ -497,6 +497,31 @@ private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStar)
     Q_DISABLE_COPY(LaserStar)
 };
+class LaserPartyEmblemPrivate;
+class LaserPartyEmblem : public LaserShape {
+    Q_OBJECT
+public:
+    LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, QTransform transform = QTransform(),
+        int layerIndex = 0);
+    virtual ~LaserPartyEmblem();
+    virtual void draw(QPainter* painter);
+    virtual LaserPrimitiveType type() { return LPT_PARTYEMBLEM; }
+    virtual QString typeName() { return tr("PartyEmblem"); }
+    virtual QJsonObject toJson();
+    LaserPrimitive* clone(QTransform t);
+    QVector<QLineF> edges();
+    void computePath();
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual bool isClosed() const;
+    virtual QPointF position() const;
+    //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
+    //virtual LaserLineListList generateFillData(QPointF& lastPoint);
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPartyEmblem)
+        Q_DISABLE_COPY(LaserPartyEmblem)
+};
 class LaserRingPrivate;
 class LaserRing : public LaserShape {
     Q_OBJECT
@@ -609,9 +634,10 @@ public:
     void moveTextToEllipse(qreal lengthByPercent);
     void computeTextByPercent(int intervalCount);
     void computeMoveTextPath(qreal diffAngle);
-    void computeChangeAngle(qreal diffAngle);
+    void computeChangeAngle(qreal angle);
     void resizeRadian();
     QPainterPath* textArc();
+    qreal angle();
     //QPointF startPoint();
     //QPointF endPoint();
     //QPointF centerPoint();

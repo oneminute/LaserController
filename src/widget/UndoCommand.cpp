@@ -2031,7 +2031,7 @@ void WeldShapesUndoCommand::redo()
     }
     m_viewer->viewport()->repaint();
 }
-//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
 StampTextSpinBoxUndoCommand::StampTextSpinBoxUndoCommand(LaserViewer* viewer, LaserStampText* p, LaserDoubleSpinBox* spinBox,
     qreal lastValue, qreal value, int type, bool isRedo)
     :m_viewer(viewer),
@@ -2047,28 +2047,37 @@ StampTextSpinBoxUndoCommand::StampTextSpinBoxUndoCommand(LaserViewer* viewer, La
 StampTextSpinBoxUndoCommand::~StampTextSpinBoxUndoCommand()
 {
 }
-//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
 void StampTextSpinBoxUndoCommand::undo()
 {
     switch (m_type) {
         case 5: {
             m_stampTextPrimitive->setSpace(m_undoValue);
+            m_spinBox->setValue(m_undoValue * 0.001);
             break;
         }
         case 6: {
             m_stampTextPrimitive->setTextWidth(m_undoValue);
+            m_spinBox->setValue(m_undoValue * 0.001);
             break;
         }
         case 7: {
             m_stampTextPrimitive->setTextHeight(m_undoValue);
+            m_spinBox->setValue(m_undoValue * 0.001);
+            break;
+        }
+        case 8: {
+            LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(m_stampTextPrimitive);
+            text->computeChangeAngle(m_undoValue);
+            m_spinBox->setValue(m_undoValue);
             break;
         }
     }
-    m_spinBox->setValue(m_undoValue * 0.001);
+    
     m_isRedo = true;
     m_viewer->viewport()->repaint();
 }
-//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
 void StampTextSpinBoxUndoCommand::redo()
 {
     if (!m_isRedo) {
@@ -2077,17 +2086,26 @@ void StampTextSpinBoxUndoCommand::redo()
     switch (m_type) {
     case 5: {
         m_stampTextPrimitive->setSpace(m_redoValue);
+        m_spinBox->setValue(m_redoValue * 0.001);
         break;
     }
     case 6: {
         m_stampTextPrimitive->setTextWidth(m_redoValue);
+        m_spinBox->setValue(m_redoValue * 0.001);
         break;
     }
     case 7: {
         m_stampTextPrimitive->setTextHeight(m_redoValue);
+        m_spinBox->setValue(m_redoValue * 0.001);
+        break;
+    }
+    case 8: {
+        LaserCircleText* text = qgraphicsitem_cast<LaserCircleText*>(m_stampTextPrimitive);
+        text->computeChangeAngle(m_redoValue);
+        m_spinBox->setValue(m_redoValue);
         break;
     }
     }
-    m_spinBox->setValue(m_redoValue*0.001);
+    
     m_viewer->viewport()->repaint();
 }

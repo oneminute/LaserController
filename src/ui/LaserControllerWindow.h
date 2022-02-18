@@ -110,6 +110,7 @@ public:
     LaserDoubleSpinBox* textSpace();
     LaserDoubleSpinBox* textWidth();
     LaserDoubleSpinBox* textHeight();
+    LaserDoubleSpinBox* textAngle();
     
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -356,6 +357,7 @@ protected slots:
     void applyJobOriginToDocument(const QVariant& value);
     //stamp shapes
     void onActionStar(bool checked = false);
+    void onActionPartyEmblem(bool checked = false);
     void onActionRing(bool checked = false);
     void onActionRingEllipse(bool checked = false);
     void onActionFrame(bool checked = false);
@@ -429,6 +431,7 @@ signals:
     void readyStar();
     void readyFrame();
     void readyRing();
+    void readyPartyEmblem();
     void readyRingEllipse();
     void readyHorizontalText();
     void readyVerticalText();
@@ -584,6 +587,8 @@ private:
     LaserDoubleSpinBox* m_commonCornerRadius;
     QLabel* m_cornerRadiusTypeLabel;
     QComboBox* m_cornerRadiusType;
+    QLabel* m_textAngleLabel;
+    LaserDoubleSpinBox* m_textAngle;
     QLabel* m_enhanceDenoiseLabel;
     QGridLayout* m_rectPropertyLayout;
     QGridLayout* m_linePropertyLayout;

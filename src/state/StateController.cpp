@@ -55,6 +55,7 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_STATE(documentPrimitiveText, documentPrimitiveTextCreating);
 
     DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveStar);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitivePartyEmblem);
     DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveFrame);
     DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRing);
     DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRingEllipse);

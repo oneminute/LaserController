@@ -47,6 +47,7 @@
 #include <QDialogButtonBox>
 #include <QTextStream>
 #include <QPushButton>
+#include <QListWidget>
 
 #include "LaserApplication.h"
 #include "algorithm/OptimizeNode.h"
@@ -258,6 +259,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     LaserMenu* stampMenu = new LaserMenu(m_toolButtonStampShapes);
     m_toolButtonStampShapes->setCheckable(true);
     m_ui->actionStar->setCheckable(true);
+    m_ui->actionPartyEmblem->setCheckable(true);
     m_ui->actionFrame->setCheckable(true);
     m_ui->actionRing->setCheckable(true);
     m_ui->actionRingEllipse->setCheckable(true);
@@ -265,6 +267,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->actionVerticalText->setCheckable(true);
     m_ui->actionArcText->setCheckable(true);
     stampMenu->addAction(m_ui->actionStar);
+    stampMenu->addAction(m_ui->actionPartyEmblem);
     stampMenu->addAction(m_ui->actionFrame);
     stampMenu->addAction(m_ui->actionRing);
     stampMenu->addAction(m_ui->actionRingEllipse);
@@ -274,6 +277,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_toolButtonStampShapes->setMenu(stampMenu);
     
     connect(m_ui->actionStar, &QAction::triggered, this, &LaserControllerWindow::onActionStar);
+    connect(m_ui->actionPartyEmblem, &QAction::triggered, this, &LaserControllerWindow::onActionPartyEmblem);
     connect(m_ui->actionFrame, &QAction::triggered, this, &LaserControllerWindow::onActionFrame);
     connect(m_ui->actionRing, &QAction::triggered, this, &LaserControllerWindow::onActionRing);
     connect(m_ui->actionRingEllipse, &QAction::triggered, this, &LaserControllerWindow::onActionRingEllipse);
@@ -1107,6 +1111,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveRectState, this, SIGNAL(readyRectangle()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
@@ -1124,6 +1129,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveEllipseState, this, SIGNAL(readyEllipse()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
@@ -1141,6 +1147,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveLineState, this, SIGNAL(readyLine()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
@@ -1158,6 +1165,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitivePolygonState, this, SIGNAL(readyPolygon()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
@@ -1175,6 +1183,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveSplineState, this, SIGNAL(readySpline()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
@@ -1192,6 +1201,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveSplineEditState, this, SIGNAL(readySplineEdit()));
 
 	ADD_TRANSITION(documentIdleState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 	ADD_TRANSITION(documentSelectionState, documentPrimitiveTextState, this, SIGNAL(readyText()));
@@ -1209,6 +1219,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveTextState, this, SIGNAL(readyText()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveTextState, this, SIGNAL(readyText()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveTextState, this, SIGNAL(readyText()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveTextState, this, SIGNAL(readyText()));
 
 	ADD_TRANSITION(documentIdleState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 	ADD_TRANSITION(documentSelectionState, documentViewDragState, this, SIGNAL(readyViewDrag()));
@@ -1226,6 +1237,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentViewDragState, this, SIGNAL(readyViewDrag()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentViewDragState, this, SIGNAL(readyViewDrag()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
@@ -1243,6 +1255,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveStarState, this, SIGNAL(readyStar()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
@@ -1260,8 +1273,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
 
-    ADD_TRANSITION(documentIdleState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    /*ADD_TRANSITION(documentIdleState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentViewDragState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
@@ -1277,6 +1291,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));
+    ADD_TRANSITION(documentPrimitiveParyEmblemState, documentPrimitiveFrameState, this, SIGNAL(readyFrame()));*/
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
@@ -1294,6 +1309,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveRingState, this, SIGNAL(readyRing()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
@@ -1311,6 +1327,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveRingEllipseState, this, SIGNAL(readyRingEllipse()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
@@ -1328,6 +1345,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveHorizontalTextState, this, SIGNAL(readyHorizontalText()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
@@ -1345,6 +1363,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
     ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveVerticalTextState, this, SIGNAL(readyVerticalText()));
 
     ADD_TRANSITION(documentIdleState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentSelectionState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
@@ -1362,6 +1381,25 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+    ADD_TRANSITION(documentPrimitivePartyEmblemState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
+
+    ADD_TRANSITION(documentIdleState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentSelectionState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveTextState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentViewDragState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveStarState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveFrameState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveRingState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveRingEllipseState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveHorizontalTextState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveVerticalTextState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveArcTextState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
+    ADD_TRANSITION(documentPrimitiveRectState, documentPrimitivePartyEmblemState, this, SIGNAL(readyPartyEmblem()));
 
     ADD_TRANSITION(documentPrimitiveState, documentIdleState, this, SIGNAL(isIdle()));
 	ADD_TRANSITION(documentViewDragState, documentIdleState, this, SIGNAL(isIdle()));
@@ -1656,6 +1694,11 @@ LaserDoubleSpinBox* LaserControllerWindow::textWidth()
 LaserDoubleSpinBox* LaserControllerWindow::textHeight()
 {
     return m_textHeight;
+}
+
+LaserDoubleSpinBox* LaserControllerWindow::textAngle()
+{
+    return m_textAngle;
 }
 
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
@@ -3047,9 +3090,11 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_textFamilyLabel = new QLabel(tr("Font"));
     m_textFamily = new LaserFontComboBox();
     m_textFamily->setEditable(false);
+    m_textFamily->setWritingSystem(QFontDatabase::SimplifiedChinese);
     m_textWidthLabel = new QLabel(tr("Width"));
     m_textHeightLabel = new QLabel(tr("Height"));
     m_textSpaceLabel = new QLabel(tr("Spacing"));
+    m_textAngleLabel = new QLabel(tr("Angle"));
     m_textWidth = new LaserDoubleSpinBox();
     m_textWidth->setDecimals(3);
     m_textWidth->setMaximum(DBL_MAX);
@@ -3063,6 +3108,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_textSpace->setMinimum(0);
     m_textSpace->setDecimals(3);
     m_borderWidth->setDecimals(3);
+    m_textAngle = new LaserDoubleSpinBox();
+    m_textAngle->setMinimum(0);
+    m_textAngle->setMaximum(360);
     //暂时不做
     m_widthLabel->setVisible(false);
     m_heightLabel->setVisible(false);
@@ -3327,6 +3375,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     connect(m_textHeight, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         shapePropertyTextFont(7);
     });
+    connect(m_textAngle, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        shapePropertyTextFont(8);
+    });
     //预览字体
     connect(m_textFamily, QOverload<int>::of(&QComboBox::highlighted), this, [=](int index) {
         LaserStampText*  text = shapePropertyTextFont(4);
@@ -3367,7 +3418,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     dockPanelOnlyShowIcon(m_propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
     createPrimitivePropertiesPanel();
 }
-//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7;
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
 LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
 {
     LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
@@ -3503,6 +3554,27 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                     StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textHeight, lastHeight, height, 7, false);
                     m_viewer->undoStack()->push(cmd);
                 }
+                break;
+            }
+            case 8: {
+                if (type == LPT_CIRCLETEXT) {
+                    LaserCircleText* cText = qgraphicsitem_cast<LaserCircleText*>(text);
+                    qreal lastAngle = cText->angle();
+                    qreal angle = m_textAngle->value();
+                    cText->computeChangeAngle(angle);
+                    //判断是否在4叉树的有效区域内
+                    if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
+                        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                        cText->computeChangeAngle(lastAngle);
+                        m_textAngle->setValue(lastAngle);
+                    }
+                    else {
+                        m_scene->quadTreeNode()->upDatePrimitive(text);
+                        StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textAngle, lastAngle, angle, 8, false);
+                        m_viewer->undoStack()->push(cmd);
+                    }
+                }
+                
                 break;
             }
         }
@@ -3835,6 +3907,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             //m_circleTextPropertyLayout->addWidget(m_textWidth, 2, 1);
             m_circleTextPropertyLayout->addWidget(m_textHeightLabel, 3, 0);
             m_circleTextPropertyLayout->addWidget(m_textHeight, 3, 1);
+            m_circleTextPropertyLayout->addWidget(m_textAngleLabel, 4, 0);
+            m_circleTextPropertyLayout->addWidget(m_textAngle, 4, 1);
             
             QHBoxLayout* layout = new QHBoxLayout();
             layout->addWidget(m_textBold, 0, Qt::AlignLeft);
@@ -3850,6 +3924,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_textItalic->setChecked(text->italic());
             m_textUpperCase->setChecked(text->uppercase());
             m_textFamily->setCurrentText(text->family());
+            m_textAngle->setValue(text->angle());
             //m_textWidth->setValue(text->textSize().width() * 0.001);
             m_textHeight->setValue(text->textSize().height() * 0.001);
             m_circleTextWidget->setLayout(m_circleTextPropertyLayout);
@@ -4182,6 +4257,9 @@ void LaserControllerWindow::keyReleaseEvent(QKeyEvent * event)
                 }
 				else if (m_lastState == StateControllerInst.documentPrimitiveStarState()) {
 					emit readyStar();
+                }
+                else if (m_lastState == StateControllerInst.documentPrimitiveStarState()) {
+                    emit readyPartyEmblem();
                 }
                 else if (m_lastState == StateControllerInst.documentPrimitiveFrameState()) {
                     emit readyFrame();
@@ -6583,6 +6661,19 @@ void LaserControllerWindow::onActionStar(bool checked)
         m_toolButtonStampShapes->setChecked(true);
         m_ui->actionStar->setChecked(true);
         
+    }
+}
+
+void LaserControllerWindow::onActionPartyEmblem(bool checked)
+{
+    if (checked)
+    {
+        emit readyPartyEmblem();
+    }
+    else
+    {
+        m_toolButtonStampShapes->setChecked(true);
+        m_ui->actionPartyEmblem->setChecked(true);
     }
 }
 
