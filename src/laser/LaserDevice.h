@@ -77,8 +77,8 @@ public:
     bool sendAuthenticationEmail(const QString& email);
     bool registerMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 
-    bool writeUserRegisters();
-    bool writeSystemRegisters(const QString& password);
+    bool writeUserRegisters(bool onlyModified = true);
+    bool writeSystemRegisters(const QString& password, bool onlyModified = true);
     bool readUserRegisters();
     bool readSystemRegisters();
     bool readHostRegisters();
@@ -204,9 +204,6 @@ protected slots:
     void handleError(int code, const QString& message);
     void handleMessage(int code, const QString& message);
 
-    void onLibraryLoaded(bool success);
-    void onLibraryInitialized();
-    void onComPortsFetched(const QStringList& portNames);
     void onConnected();
     void onMainCardRegistrationChanged(bool registered);
     void onMainCardActivationChanged(bool activated);
@@ -223,6 +220,12 @@ signals:
     void comPortConnected(const QString& portName);
     void connected();
     void disconnected();
+    void machiningStarted();
+    void machiningPaused();
+    void continueWorking();
+    void machiningStopped();
+    void machiningCompleted();
+    void idle();
     void mainCardRegistrationChanged(bool registered);
     void mainCardActivationChanged(bool activated);
     void mainCardInfoFetched();

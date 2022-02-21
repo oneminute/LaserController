@@ -32,12 +32,6 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_packagesCount(0)
     , m_isClosed(false)
 {
-    ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
-    ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
-    ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
-    ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDriver::machiningStopped);
-    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
-    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
 }
 
 LaserDriver::~LaserDriver()
@@ -92,7 +86,6 @@ bool LaserDriver::load()
     if (!m_library.load())
     {
         qDebug() << "load LaserLib failure:" << m_library.errorString();
-        emit libraryLoaded(false);
         return false;
     }
 
@@ -103,7 +96,7 @@ bool LaserDriver::load()
     CHECK_FN(m_fnGetAPILibCompileInfo)
 
     // TODO: 修改为SetLanguage
-    m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguge");
+    m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguage");
     CHECK_FN(m_fnSetLanguage)
 
     m_fnInitLib = (FN_BOOL_INT)m_library.resolve("InitLib");
@@ -263,7 +256,6 @@ bool LaserDriver::load()
     Q_ASSERT(m_fnLoadDataFromFile);
 
     m_isLoaded = true;
-    emit libraryLoaded(true);
     return true;
 }
 
@@ -273,7 +265,6 @@ void LaserDriver::unload()
         m_fnUnInitLib();
     m_isLoaded = false;
     m_isClosed = true;
-    emit libraryUnloaded();
 }
 
 QString LaserDriver::getVersion()
@@ -300,7 +291,6 @@ bool LaserDriver::init(int winId)
     try 
     {
         m_fnInitLib(winId);
-        emit libraryInitialized();
     }
     catch (...)
     {
@@ -319,7 +309,6 @@ void LaserDriver::unInit()
 {
     m_fnUnInitLib();
     m_isLoaded = false;
-    emit libraryUninitialized();
 }
 
 QStringList LaserDriver::getPortList()
@@ -819,11 +808,9 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
     int ret = 0;
     m_isWithMachining = withMachining;
     wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
-    //wchar_t* filenameBuf = L"D:\\LaserController\\LaserController\\export.json";
     m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
     qDebug() << "packages of transformed data:" << m_packagesCount;
     delete[] filenameBuf;
-    //emit machiningStarted();
     return ret;
 }
 

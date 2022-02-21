@@ -5335,7 +5335,7 @@ void LaserControllerWindow::onActionSaveZOrigin(bool checked)
 
 void LaserControllerWindow::onProgressBarClicked()
 {
-    LaserApplication::showProgressWindow();
+    //LaserApplication::showProgressWindow();
 }
 
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
@@ -6525,6 +6525,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
 {
     if (!m_created)
     {
+        //LaserApplication::device->updateDriverLanguage();
         m_created = true;
         QTimer::singleShot(100, this, [=]() {
             emit windowCreated();

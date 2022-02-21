@@ -219,30 +219,8 @@ public:
 protected slots:
 
 signals:
-    void libraryLoaded(bool success = true);
-    void libraryUnloaded();
-    void libraryInitialized();
-    void libraryUninitialized();
-
-    void comPortError(const QString& errorMsg);
-    void comPortsFetchError();
-    void machiningStarted();
-    void machiningPaused();
-    void continueWorking();
-    void machiningStopped();
-    void machiningCompleted();
     void downloading(int current, int total, float progress);
     void downloaded();
-    void idle();
-    void sysParamFromCardArrived(const QString& data);
-    void registersFectched(const LaserRegister::RegistersMap& data);
-    void sysParamFromCardError();
-    void unknownError();
-    void workingCanceled();
-    void rightManufacturerPassword();
-    void wrongManufacturerPassword();
-    void changeManufacturerPasswordOk();
-    void changeManufacturerPasswordFailure();
     void raiseError(int code, const QString& message);
     void sendMessage(int code, const QString& message);
 

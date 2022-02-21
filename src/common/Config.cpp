@@ -95,6 +95,7 @@ void Config::importFrom(const QString& filename)
             if (groupsMap.contains(g.key()))
             {
                 ConfigItemGroup* group = groupsMap[g.key()];
+                qLogD << "importing group " << g.key();
                 group->fromJson(g.value().toObject());
             }
         }
@@ -1067,8 +1068,10 @@ void Config::loadDeviceItems()
     );
     jobOrigin->setUpdateWidgetValueHook(
         [=](QWidget* widget, const QVariant& value) {
+            widget->blockSignals(true);
             RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
             radioGroup->setValue(value.toInt());
+            widget->blockSignals(false);
             return value;
         }
     );
@@ -1154,9 +1157,11 @@ void Config::loadDeviceItems()
     userOrigin1->setUpdateWidgetValueHook(
         [](QWidget* widget, const QVariant& value)
         {
+            widget->blockSignals(true);
             Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
             QVector3D pt = value.value<QVector3D>() * 0.001;
             v2w->setValue(pt);
+            widget->blockSignals(false);
             return QVariant::fromValue<QVector3D>(pt);
         }
     );
@@ -1182,9 +1187,11 @@ void Config::loadDeviceItems()
     userOrigin2->setUpdateWidgetValueHook(
         [](QWidget* widget, const QVariant& value)
         {
+            widget->blockSignals(true);
             Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
             QVector3D pt = value.value<QVector3D>() * 0.001;
             v2w->setValue(pt);
+            widget->blockSignals(false);
             return QVariant::fromValue<QVector3D>(pt);
         }
     );
@@ -1210,9 +1217,11 @@ void Config::loadDeviceItems()
     userOrigin3->setUpdateWidgetValueHook(
         [](QWidget* widget, const QVariant& value)
         {
+            widget->blockSignals(true);
             Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
             QVector3D pt = value.value<QVector3D>() * 0.001;
             v2w->setValue(pt);
+            widget->blockSignals(false);
             return QVariant::fromValue<QVector3D>(pt);
         }
     );
@@ -1365,7 +1374,7 @@ void Config::loadDeviceItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(ltr("Current locaiton"), 0);
+            comboBox->addItem(ltr("Current location"), 0);
             comboBox->addItem(ltr("Release motor"), 1);
             comboBox->addItem(ltr("Back to origin"), 2);
             comboBox->addItem(ltr("Back to user origin"), 3);
@@ -1932,6 +1941,16 @@ void Config::loadUserReigsters()
     movementStepLength->setInputWidgetProperty("page", 10);
     movementStepLength->setInputWidgetProperty("minimum", 1);
     movementStepLength->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* focusPointCompensationUnit = group->addConfigItem(
+        "focusPointCompensationUnit",
+        0,
+        DT_INT
+    );
+    focusPointCompensationUnit->setInputWidgetProperty("maximumLineEditWidth", 75);
+    focusPointCompensationUnit->setInputWidgetProperty("page", 10);
+    focusPointCompensationUnit->setInputWidgetProperty("minimum", -1000);
+    focusPointCompensationUnit->setInputWidgetProperty("maximum", 1000);
 }
 
 void Config::loadSystemRegisters()
@@ -2681,23 +2700,23 @@ void Config::loadSystemRegisters()
     ConfigItem* xPhaseEnabled = group->addConfigItem(
         "xPhaseEnabled",
         true,
-        DT_INT
+        DT_BOOL
     );
-    xPhaseEnabled->setInputWidgetType(IWT_CheckBox);
+    //xPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* yPhaseEnabled = group->addConfigItem(
         "yPhaseEnabled",
         true,
-        DT_INT
+        DT_BOOL
     );
-    yPhaseEnabled->setInputWidgetType(IWT_CheckBox);
+    //yPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* zPhaseEnabled = group->addConfigItem(
         "zPhaseEnabled",
         true,
-        DT_INT
+        DT_BOOL
     );
-    zPhaseEnabled->setInputWidgetType(IWT_CheckBox);
+    //zPhaseEnabled->setInputWidgetType(IWT_CheckBox);
 
     ConfigItem* deviceOrigin = group->addConfigItem(
         "deviceOrigin",
@@ -2720,8 +2739,10 @@ void Config::loadSystemRegisters()
     );
     deviceOrigin->setUpdateWidgetValueHook(
         [=](QWidget* widget, const QVariant& value) {
+            widget->blockSignals(true);
             RadioButtonGroup* radioGroup = qobject_cast<RadioButtonGroup*>(widget);
             radioGroup->setValue(value.toInt());
+            widget->blockSignals(false);
             return value;
         }
     );
@@ -3442,6 +3463,10 @@ void Config::updateTitlesAndDescriptions()
     UserRegister::movementStepLengthItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Movement Step Length", nullptr), 
         QCoreApplication::translate("Config", "Movement Step Length", nullptr));
+
+    UserRegister::focusPointCompensationUnitItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Focus Point Compensation Unit(um)", nullptr), 
+        QCoreApplication::translate("Config", "Focus Point Compensation Unit(um)", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

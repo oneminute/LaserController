@@ -356,6 +356,7 @@ public:
         CONFIG_ITEM(userRegister, zSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, materialThickness, qreal, toReal)
         CONFIG_ITEM(userRegister, movementStepLength, qreal, toReal)
+        CONFIG_ITEM(userRegister, focusPointCompensationUnit, int, toInt)
 
     private:
         friend class Config;
