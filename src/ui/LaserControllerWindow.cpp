@@ -126,6 +126,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_hasMessageBox(false)
     , m_textContent(nullptr)
     , m_requestOverlayImage(false)
+    , m_prepareMachining(false)
+    , m_prepareDownloading(false)
 {
     m_ui->setupUi(this);
     loadRecentFilesMenu();
@@ -1461,35 +1463,6 @@ LaserControllerWindow::~LaserControllerWindow()
     SAFE_DELETE(m_updateDialog)
 }
 
-FinishRunType LaserControllerWindow::finishRun()
-{
-    FinishRunType value = FinishRunType::FT_CurrentPos;
-    /*if (m_comboBoxPostEvent->currentIndex() < 3)
-    {
-        value.setAction(m_comboBoxPostEvent->currentIndex());
-    }
-    else
-    {
-        if (m_radioButtonUserOrigin1->isChecked())
-        {
-            value.setAction(3);
-        }
-        else if (m_radioButtonUserOrigin2->isChecked())
-        {
-            value.setAction(4);
-        }
-        else if (m_radioButtonUserOrigin3->isChecked())
-        {
-            value.setAction(5);
-        }
-    }*/
-    //value.setRelay(0, m_ui->checkBoxRelay1->isChecked());
-    //value.setRelay(1, m_ui->checkBoxRelay2->isChecked());
-    //value.setRelay(2, m_ui->checkBoxRelay3->isChecked());
-    qDebug() << value;
-    return value;
-}
-
 void LaserControllerWindow::handleSecurityException(int code, const QString& message)
 {
     switch (code)
@@ -2525,6 +2498,11 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationOrigin->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_buttonOperationOrigin->setIconSize(iconSize);
 
+    m_buttonOperationDownload = new QToolButton;
+    m_buttonOperationDownload->setDefaultAction(m_ui->actionDownload);
+    m_buttonOperationDownload->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_buttonOperationDownload->setIconSize(iconSize);
+
     m_comboBoxStartPosition = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::startFromItem());
     Config::Device::startFromItem()->bindWidget(m_comboBoxStartPosition, SS_DIRECTLY);
 
@@ -2542,6 +2520,9 @@ void LaserControllerWindow::createOperationsDockPanel()
         break;
     }
     Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin, SS_DIRECTLY);
+
+    QCheckBox* comboBoxSwitchToU = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Device::switchToUItem());
+    Config::Device::switchToUItem()->bindWidget(comboBoxSwitchToU, SS_DIRECTLY);
 
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
@@ -2565,11 +2546,10 @@ void LaserControllerWindow::createOperationsDockPanel()
     secondRow->addWidget(m_buttonOperationSpotShot);
     secondRow->addWidget(m_buttonOperationReset);
     secondRow->addWidget(m_buttonOperationOrigin);
+    secondRow->addWidget(m_buttonOperationDownload);
 
-    //m_comboBoxPostEvent = new QComboBox;
-    //m_comboBoxPostEvent->addItem(tr("Stop at current position"));
-    //m_comboBoxPostEvent->addItem(tr("Unload motor"));
-    //m_comboBoxPostEvent->addItem(tr("Back to mechnical origin"));
+    QComboBox* comboBoxFinishRun = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::finishRunItem());
+    Config::Device::finishRunItem()->bindWidget(comboBoxFinishRun, SS_DIRECTLY);
     QToolButton* buttonApplyToDoc = new QToolButton;
     buttonApplyToDoc->setDefaultAction(m_ui->actionApplyJobOriginToDocument);
 
@@ -2578,7 +2558,8 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow(Config::Device::startFromItem()->title(), m_comboBoxStartPosition);
     fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
     fifthRow->addRow("", buttonApplyToDoc);
-    //fifthRow->addRow(tr("Post Event"), m_comboBoxPostEvent);
+    fifthRow->addRow(Config::Device::finishRunItem()->title(), comboBoxFinishRun);
+    fifthRow->addRow(Config::Device::switchToUItem()->title(), comboBoxSwitchToU);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -2903,7 +2884,7 @@ void LaserControllerWindow::createUAxisDockPanel()
     QToolButton* buttonSave = new QToolButton;
     buttonSave->setDefaultAction(m_ui->actionSaveUStep);
 
-    Config::Device::uFixtureTypeItem()->emitValueChanged();
+    Config::Device::uFixtureTypeItem()->emitValueChanged(this);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->setMargin(3);
@@ -4620,7 +4601,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
             QtConcurrent::run([=]()
                 {
                     m_scene->document()->outline(progress);
-                    m_scene->document()->setFinishRun(finishRun());
+                    m_scene->document()->setFinishRun(Config::Device::finishRun());
                     m_prepareMachining = false;
                     m_scene->document()->exportJSON(filename, progress, true);
                     progress->finish();
@@ -4663,10 +4644,6 @@ void LaserControllerWindow::startMachining()
             return;
         }
         QString filename = QDir::current().absoluteFilePath("tmp/export.json");
-        //QTemporaryFile file;
-        //if (file.load())
-        //{
-            //QString filename = file.fileName();
 
         if (!LaserApplication::device->checkLayoutForMachining(
             m_scene->document()->currentDocBoundingRect(),
@@ -4681,7 +4658,7 @@ void LaserControllerWindow::startMachining()
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
-                m_scene->document()->setFinishRun(finishRun());
+                m_scene->document()->setFinishRun(Config::Device::finishRun());
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
                 qDebug() << "export temp json file for machining" << filename;
@@ -4689,7 +4666,6 @@ void LaserControllerWindow::startMachining()
                 progress->finish();
             }
         );
-        //}
     }
     m_useLoadedJson = false;
 }
@@ -4776,10 +4752,34 @@ void LaserControllerWindow::onActionDisconnect(bool checked)
 
 void LaserControllerWindow::onActionDownload(bool checked)
 {
-	QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open File"), ".", "JSON (*.json)");
-    filename = m_tmpDir.absoluteFilePath(filename);
-    m_prepareMachining = false;
-    LaserApplication::driver->loadDataFromFile(filename);
+    if (m_scene->document() == nullptr)
+    {
+        QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
+        return;
+    }
+    QString filename = QDir::current().absoluteFilePath("tmp/export.json");
+
+    if (!LaserApplication::device->checkLayoutForMachining(
+        m_scene->document()->currentDocBoundingRect(),
+        m_scene->document()->currentDocBoundingRect(true)
+    ))
+        return;
+
+    LaserApplication::resetProgressWindow();
+    //LaserApplication::showProgressWindow();
+    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+    progress->setMaximum(5);
+    QtConcurrent::run([=]()
+        {
+            m_scene->document()->outline(progress);
+            m_scene->document()->setFinishRun(Config::Device::finishRun());
+            qDebug() << "exporting to temporary json file:" << filename;
+            m_prepareDownloading = true;
+            qDebug() << "export temp json file for machining" << filename;
+            m_scene->document()->exportJSON(filename, progress);
+            progress->finish();
+        }
+    );
 }
 
 void LaserControllerWindow::onActionLoadMotor(bool checked)
@@ -5197,7 +5197,7 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 {
-    QPointF laserPos = LaserApplication::device->laserPosition();
+    QVector3D laserPos(LaserApplication::device->laserPosition());
     switch (Config::Device::userOriginSelected())
     {
     case 0:
@@ -5335,7 +5335,7 @@ void LaserControllerWindow::onActionSaveZOrigin(bool checked)
 
 void LaserControllerWindow::onProgressBarClicked()
 {
-    LaserApplication::showProgressWindow();
+    //LaserApplication::showProgressWindow();
 }
 
 void LaserControllerWindow::onActionMirrorHorizontal(bool checked)
@@ -6108,17 +6108,23 @@ void LaserControllerWindow::onCreatSpline()
 	    m_viewer->createSpline();
 }
 
-//void LaserControllerWindow::onDocumentExportFinished(const QString& filename)
 void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
     qLogD << "onDocumentExportFinished: " << m_prepareMachining;
-    if (!m_prepareMachining)
-        return;
-
     qLogD << "json data: ";
     qLogD << data;
     LaserApplication::driver->importData(data.data(), data.size());
-    LaserApplication::driver->startMachining();
+
+    if (m_prepareMachining)
+    {
+        LaserApplication::driver->startMachining();
+        m_prepareMachining = false;
+    }
+    else if (m_prepareDownloading)
+    {
+        LaserApplication::driver->download();
+        m_prepareDownloading = false;
+    }
 }
 
 void LaserControllerWindow::onPreviewWindowProgressUpdated(qreal progress)
@@ -6519,6 +6525,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
 {
     if (!m_created)
     {
+        //LaserApplication::device->updateDriverLanguage();
         m_created = true;
         QTimer::singleShot(100, this, [=]() {
             emit windowCreated();

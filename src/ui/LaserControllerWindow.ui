@@ -641,6 +641,10 @@
    </property>
   </action>
   <action name="actionDownload">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/download.png</normaloff>:/ui/icons/images/download.png</iconset>
+   </property>
    <property name="text">
     <string>Download</string>
    </property>

@@ -294,6 +294,7 @@ enum FinishRunType
     FT_BackToOrigin,
     FT_BackToUserOrigin
 };
+Q_DECLARE_METATYPE(FinishRunType)
 
 enum ArrangeType
 {

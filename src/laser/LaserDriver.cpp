@@ -29,16 +29,9 @@ LaserDriver::LaserDriver(QObject* parent)
     , m_isPaused(false)
     , m_portName("")
     , m_parentWidget(nullptr)
-    , m_isDownloading(false)
     , m_packagesCount(0)
     , m_isClosed(false)
 {
-    ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDriver::machiningStarted);
-    ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDriver::machiningPaused);
-    ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDriver::continueWorking);
-    ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDriver::machiningStopped);
-    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningStopped);
-    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDriver::machiningCompleted);
 }
 
 LaserDriver::~LaserDriver()
@@ -52,12 +45,8 @@ void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCoun
         return;
 
     float progress = position * 1.0f / totalCount;
-    qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4)
-        ;
-    if (LaserApplication::driver->m_isDownloading)
-    {
-        emit LaserApplication::driver->downloading(position, totalCount, progress);
-    }
+    qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
+    emit LaserApplication::driver->downloading(position, totalCount, progress);
 }
 
 void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
@@ -97,7 +86,6 @@ bool LaserDriver::load()
     if (!m_library.load())
     {
         qDebug() << "load LaserLib failure:" << m_library.errorString();
-        emit libraryLoaded(false);
         return false;
     }
 
@@ -108,7 +96,7 @@ bool LaserDriver::load()
     CHECK_FN(m_fnGetAPILibCompileInfo)
 
     // TODO: 修改为SetLanguage
-    m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguge");
+    m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguage");
     CHECK_FN(m_fnSetLanguage)
 
     m_fnInitLib = (FN_BOOL_INT)m_library.resolve("InitLib");
@@ -235,6 +223,9 @@ bool LaserDriver::load()
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
     CHECK_FN(m_fnLoadDataFromFile)
 
+    m_fnStartDownLoadToCache = (FN_VOID_LONG)m_library.resolve("StartDownLoadToCache");
+    CHECK_FN(m_fnStartDownLoadToCache)
+
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
     CHECK_FN(m_fnGetDeviceWorkState)
 
@@ -265,7 +256,6 @@ bool LaserDriver::load()
     Q_ASSERT(m_fnLoadDataFromFile);
 
     m_isLoaded = true;
-    emit libraryLoaded(true);
     return true;
 }
 
@@ -275,7 +265,6 @@ void LaserDriver::unload()
         m_fnUnInitLib();
     m_isLoaded = false;
     m_isClosed = true;
-    emit libraryUnloaded();
 }
 
 QString LaserDriver::getVersion()
@@ -302,7 +291,6 @@ bool LaserDriver::init(int winId)
     try 
     {
         m_fnInitLib(winId);
-        emit libraryInitialized();
     }
     catch (...)
     {
@@ -315,32 +303,12 @@ void LaserDriver::setupCallbacks()
 {
     m_fnProgressCallBack(LaserDriver::ProgressCallBackHandler);
     m_fnSysMessageCallBack(LaserDriver::SysMessageCallBackHandler);
-    //m_fnSysMessageCallBack(
-    //    [=](void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData) {
-    //        if (LaserApplication::driver->m_isClosed)
-    //            return;
-
-    //        QString eventData = QString::fromWCharArray(sysEventData);
-    //        qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
-    //        if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
-    //        {
-    //            //emit LaserApplication::driver->raiseError(sysMsgCode, eventData);
-    //            LaserApplication::device->handleError(sysMsgCode, eventData);
-    //        }
-    //        else if (sysMsgCode >= M_Base)
-    //        {
-    //            //emit LaserApplication::driver->sendMessage(sysMsgCode, eventData);
-    //            LaserApplication::device->handleMessage(sysMsgCode, eventData);
-    //        }
-    //    }
-    //);
 }
 
 void LaserDriver::unInit()
 {
     m_fnUnInitLib();
     m_isLoaded = false;
-    emit libraryUninitialized();
 }
 
 QStringList LaserDriver::getPortList()
@@ -840,14 +808,15 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
     int ret = 0;
     m_isWithMachining = withMachining;
     wchar_t* filenameBuf = typeUtils::qStringToWCharPtr(filename);
-    //wchar_t* filenameBuf = L"D:\\LaserController\\LaserController\\export.json";
-    m_isDownloading = true;
     m_packagesCount = m_fnLoadDataFromFile(filenameBuf);
     qDebug() << "packages of transformed data:" << m_packagesCount;
     delete[] filenameBuf;
-    m_isDownloading = false;
-    //emit machiningStarted();
     return ret;
+}
+
+void LaserDriver::download(unsigned long index)
+{
+    m_fnStartDownLoadToCache(index);
 }
 
 int LaserDriver::importData(const char* data, int length)

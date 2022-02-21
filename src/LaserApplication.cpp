@@ -258,6 +258,8 @@ void LaserApplication::retranslate()
     stringMap["Align X"] = tr("Align X");
     stringMap["Align Y"] = tr("Align Y");
     stringMap["Asymmetric Circles Grid"] = tr("Asymmetric Circles Grid");
+    stringMap["Back to origin"] = tr("Back to origin");
+    stringMap["Back to user origin"] = tr("Back to user origin");
     stringMap["Bold"] = tr("Bold");
     stringMap["Bottom"] = tr("Bottom");
     stringMap["Bottom Left"] = tr("Bottom Left");
@@ -268,6 +270,7 @@ void LaserApplication::retranslate()
     stringMap["Circles Grid"] = tr("Circles Grid");
     stringMap["Config Dialog"] = tr("Config Dialog");
     stringMap["Current Position"] = tr("Current Position");
+    stringMap["Current location"] = tr("Current location");
     stringMap["Cutting"] = tr("Cutting");
     stringMap["Chinese"] = tr("Chinese");
     stringMap["English"] = tr("English");
@@ -291,6 +294,7 @@ void LaserApplication::retranslate()
     stringMap["PageSize"] = tr("Page Size(mm): %1x%2");
     stringMap["Perfect Quality"] = tr("Perfect Quality");
     stringMap["Power"] = tr("Power");
+    stringMap["Release motor"] = tr("Release motor");
     stringMap["Right"] = tr("Right");
     stringMap["Roller Rotary"] = tr("Roller Rotary");
     stringMap["Rotate"] = tr("Rotate");

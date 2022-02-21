@@ -164,9 +164,14 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
     QPainterPath outline = this->outline();
     QPointF startPos = outline.pointAtPercent(0);
-    painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
+    QPen greenPen(Qt::green, 1, Qt::SolidLine);
+    greenPen.setCosmetic(true);
+    painter->setPen(greenPen);
     if (Config::Debug::showPrimitiveName())
     {
+        QFont font = painter->font();
+        font.setPointSize(5000);
+        painter->setFont(font);
         painter->drawText(startPos, name());
         QColor color = Qt::blue;
         QPen pen(color, 1, Qt::DashLine);

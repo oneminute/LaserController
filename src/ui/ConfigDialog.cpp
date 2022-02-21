@@ -234,7 +234,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
     retranslate();
 
     // initialize widgets' state
-    Config::Device::uFixtureTypeItem()->emitValueChanged();
+    Config::Device::uFixtureTypeItem()->emitValueChanged(this);
 }
 
 ConfigDialog::~ConfigDialog()
@@ -579,8 +579,8 @@ void ConfigDialog::onButtonImport(bool checked)
         tr("Password"),
         QLineEdit::Normal
     );
-    LaserApplication::device->writeSystemRegisters(password);
-    LaserApplication::device->writeUserRegisters();
+    LaserApplication::device->writeSystemRegisters(password, false);
+    LaserApplication::device->writeUserRegisters(false);
 }
 
 void ConfigDialog::onButtonExport(bool checked)

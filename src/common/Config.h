@@ -293,6 +293,8 @@ public:
         CONFIG_ITEM(device, circumferencePulseNumber, int, toInt)
         CONFIG_ITEM(device, workpieceDiameter, int, toInt)
         CONFIG_ITEM(device, rollerRotaryStepLength, int, toInt)
+        CONFIG_ITEM_T(device, finishRun, FinishRunType)
+        CONFIG_ITEM(device, switchToU, bool, toBool)
 
     private:
         friend class Config;
@@ -354,6 +356,7 @@ public:
         CONFIG_ITEM(userRegister, zSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, materialThickness, qreal, toReal)
         CONFIG_ITEM(userRegister, movementStepLength, qreal, toReal)
+        CONFIG_ITEM(userRegister, focusPointCompensationUnit, int, toInt)
 
     private:
         friend class Config;

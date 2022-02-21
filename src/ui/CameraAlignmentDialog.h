@@ -73,7 +73,8 @@ private:
     QSpinBox* m_page1SpinBoxVMargin;
     QSpinBox* m_page1SpinBoxMarkSize;
     QDoubleSpinBox* m_page1DoubleSpinBoxCuttingSpeed;
-    QDoubleSpinBox* m_page1DoubleSpinBoxCuttingPower;
+    QDoubleSpinBox* m_page1DoubleSpinBoxCuttingMinPower;
+    QDoubleSpinBox* m_page1DoubleSpinBoxCuttingRunPower;
     QDoubleSpinBox* m_page1DoubleSpinBoxFillingSpeed;
     QDoubleSpinBox* m_page1DoubleSpinBoxFillingPower;
     QDoubleSpinBox* m_page1DoubleSpinBoxFillingInterval;

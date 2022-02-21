@@ -472,6 +472,8 @@ void InputWidgetWrapper::onConfigItemModifiedChanged(bool modified)
 
 void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, void* senderPtr)
 {
+    if (senderPtr == this)
+        return;
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
     emit updated();
@@ -479,6 +481,8 @@ void InputWidgetWrapper::onConfigItemValueChanged(const QVariant& value, void* s
 
 void InputWidgetWrapper::onConfigItemDirtyValueChanged(const QVariant& value, void* senderPtr)
 {
+    if (senderPtr == this)
+        return;
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
     emit updated();
@@ -486,6 +490,8 @@ void InputWidgetWrapper::onConfigItemDirtyValueChanged(const QVariant& value, vo
 
 void InputWidgetWrapper::onConfigItemLazyValueChanged(const QVariant& value, void* senderPtr)
 {
+    if (senderPtr == this)
+        return;
     updateLabelColor();
     updateWidgetValue(value, senderPtr);
     emit updated();
