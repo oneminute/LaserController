@@ -98,7 +98,9 @@
 #include "opencv2/xfeatures2d.hpp"
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-
+#include <ui/StampFrameDialog.h>
+#include <ui/StampCircleDialog.h>
+#include <ui/StampStripDialog.h>
 using namespace ads;
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
@@ -3103,6 +3105,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_cornerRadiusType->addItem(tr("Cutted Corner"));
     m_cornerRadiusType->addItem(tr("Inner Corner"));
     m_textBold = new QCheckBox(tr("Bold"));
+    m_textFill = new QCheckBox(tr("Fill"));
     
     m_textItalic = new QCheckBox(tr("Italic"));
     m_textUpperCase = new QCheckBox(tr("Upper Case"));
@@ -3376,6 +3379,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
         }
         view->viewport()->repaint();
     });
+    
     connect(m_textBold, &QCheckBox::stateChanged, this, [=] {
         shapePropertyTextFont(1);
     });
@@ -3396,6 +3400,9 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     });
     connect(m_textAngle, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         shapePropertyTextFont(8);
+    });
+    connect(m_textFill, &QCheckBox::stateChanged, this, [=] {
+        shapePropertyTextFont(9);
     });
     //预览字体
     connect(m_textFamily, QOverload<int>::of(&QComboBox::highlighted), this, [=](int index) {
@@ -3437,7 +3444,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     dockPanelOnlyShowIcon(m_propertyDockWidget, QPixmap(":/ui/icons/images/shape.png"), "Shape Properties");
     createPrimitivePropertiesPanel();
 }
-//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
+//content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8, fill = 9;
 LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
 {
     LaserViewer* view = qobject_cast<LaserViewer*>(m_scene->views()[0]);
@@ -3517,6 +3524,7 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                 return text;
             }
             case 5: {
+                
                 qreal lastSpace = text->space();
                 qreal space = m_textSpace->value() * 1000;
                 text->setSpace(space);
@@ -3530,6 +3538,7 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                     m_scene->quadTreeNode()->upDatePrimitive(text);
                     StampTextSpinBoxUndoCommand* cmd = new StampTextSpinBoxUndoCommand(m_viewer, text, m_textSpace, lastSpace, space, 5, false);
                     m_viewer->undoStack()->push(cmd);
+                    
                 }
                 break;
             }
@@ -3594,6 +3603,10 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                     }
                 }
                 
+                break;
+            }
+            case 9: {
+                text->setFill(m_textFill->isChecked());
                 break;
             }
         }
@@ -3856,6 +3869,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_verticalTextPropertyLayout->addWidget(m_textSpace, 4, 1);
 
             QHBoxLayout* layout = new QHBoxLayout();
+            layout->addWidget(m_textFill, 0, Qt::AlignLeft);
             layout->addWidget(m_textBold, 0, Qt::AlignLeft);
             layout->addWidget(m_textItalic, 0, Qt::AlignLeft);
             layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
@@ -3867,6 +3881,7 @@ void LaserControllerWindow::showShapePropertyPanel()
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
             }
+            m_textFill->setChecked(text->isFill());
             m_textBold->setChecked(text->bold());
             m_textItalic->setChecked(text->italic());
             m_textUpperCase->setChecked(text->uppercase());
@@ -3892,6 +3907,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_horizontalTextPropertyLayout->addWidget(m_textSpaceLabel, 4, 0);
             m_horizontalTextPropertyLayout->addWidget(m_textSpace, 4, 1);
             QHBoxLayout* layout = new QHBoxLayout();
+            layout->addWidget(m_textFill, 0, Qt::AlignLeft);
             layout->addWidget(m_textBold, 0, Qt::AlignLeft);
             layout->addWidget(m_textItalic, 0, Qt::AlignLeft);
             layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
@@ -3901,6 +3917,7 @@ void LaserControllerWindow::showShapePropertyPanel()
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
             }
+            m_textFill->setChecked(text->isFill());
             m_textBold->setChecked(text->bold());
             m_textItalic->setChecked(text->italic());
             m_textUpperCase->setChecked(text->uppercase());
@@ -3930,6 +3947,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_circleTextPropertyLayout->addWidget(m_textAngle, 4, 1);
             
             QHBoxLayout* layout = new QHBoxLayout();
+            layout->addWidget(m_textFill, 0, Qt::AlignLeft);
             layout->addWidget(m_textBold, 0, Qt::AlignLeft);
             layout->addWidget(m_textItalic, 0, Qt::AlignLeft);
             layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
@@ -3939,6 +3957,7 @@ void LaserControllerWindow::showShapePropertyPanel()
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
             }
+            m_textFill->setChecked(text->isFill());
             m_textBold->setChecked(text->bold());
             m_textItalic->setChecked(text->italic());
             m_textUpperCase->setChecked(text->uppercase());
@@ -6751,36 +6770,29 @@ void LaserControllerWindow::onActionArcText(bool checked)
 
 void LaserControllerWindow::onActionCreateNameStamp()      
 {
-    /*LaserRing* star = new LaserRing(m_scene->document(), QRectF(QPointF(0, 0), QPointF(50 * 1000, 50 * 1000)), 5 * 1000,  QTransform(),
-        m_viewer->curLayerIndex());
-    m_scene->addLaserPrimitive(star, false);*/
-    /*LaserFrame* star = new LaserFrame(m_scene->document(), QRect(QPoint(0, 0), QPoint(50 * 1000, 50 * 1000)), 5 * 1000, 5 * 1000, QTransform(),
-        m_viewer->curLayerIndex(), CRT_Line);
-    m_scene->addLaserPrimitive(star, false);
-    QString s("PKL");
-    LaserCircleText* text = new LaserCircleText(m_scene->document(),
-        s, QRect(0, 0, 90 * 1000, 50 * 1000),
-        QSize(), 0);
-        m_scene->addLaserPrimitive(text, false); 
-    LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(),
-        "llrg", QSize(90*1000, 60*1000));
-    m_scene->addLaserPrimitive(text, false);*/
-    LaserCircleText* text = new LaserCircleText(m_scene->document(),
-        "123gj566", QRect(50*1000, 20 * 1000, 250 * 1000, 100 * 1000), 260);
-    m_scene->addLaserPrimitive(text, false);
-    
+    StampFrameDialog dialog(m_scene);
+  
+    dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateStripStamp()
 {
+    StampStripDialog dialog(m_scene);
+
+    dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateCircleStamp()
 {
+    StampCircleDialog dialog(m_scene);
+
+    dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateEllipseStamp()
 {
+    
+    
 }
 
 void LaserControllerWindow::onActionAlignCenter()

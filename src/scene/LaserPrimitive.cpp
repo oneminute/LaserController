@@ -3455,6 +3455,7 @@ public:
     QPainterPath outerPath;
     QPainterPath innerPath;
     int cornerType;
+    bool needAuxiliaryLine;
 };
 
 LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornnerRadilus,
@@ -3462,6 +3463,7 @@ LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal c
     :LaserShape(new LaserFramePrivate(this), doc, LPT_FRAME, layerIndex, transform)
 {
     Q_D(LaserFrame);
+    d->needAuxiliaryLine = true;
     d->outerRect = outerRect;
     d->width = width;
     d->cornerRadius = qAbs(cornnerRadilus);
@@ -3485,15 +3487,18 @@ void LaserFrame::draw(QPainter * painter)
     painter->setBrush(Qt::NoBrush);
     
     //绘制辅助线
-    painter->setPen(QPen(Qt::black, 280, Qt::DotLine));
-    qreal halfW = d->innerRect.width() * 0.5;
-    qreal halfH = d->innerRect.height() * 0.5;
-    QLine hLine(QPoint(d->innerRect.center().x() - halfW, d->innerRect.center().y()),
-        QPoint(d->innerRect.center().x() + halfW, d->innerRect.center().y()));
-    QLine vLine(QPoint(d->innerRect.center().x(), d->innerRect.center().y() - halfH),
-        QPoint(d->innerRect.center().x(), d->innerRect.center().y() + halfH));
-    painter->drawLine(hLine);
-    painter->drawLine(vLine);
+    if (d->needAuxiliaryLine) {
+        painter->setPen(QPen(Qt::black, 280, Qt::DotLine));
+        qreal halfW = d->innerRect.width() * 0.5;
+        qreal halfH = d->innerRect.height() * 0.5;
+        QLine hLine(QPoint(d->innerRect.center().x() - halfW, d->innerRect.center().y()),
+            QPoint(d->innerRect.center().x() + halfW, d->innerRect.center().y()));
+        QLine vLine(QPoint(d->innerRect.center().x(), d->innerRect.center().y() - halfH),
+            QPoint(d->innerRect.center().x(), d->innerRect.center().y() + halfH));
+        painter->drawLine(hLine);
+        painter->drawLine(vLine);
+    }
+    
     /*QPainterPath p;
     p.addRect(d->innerRect);
     painter->drawPath(p);*/
@@ -3605,6 +3610,16 @@ void LaserFrame::computePath()
     d->path = d->outerPath - d->innerPath;
     d->boundingRect = d->path.boundingRect().toRect();
 }
+bool LaserFrame::needAuxiliaryLine()
+{
+    Q_D(LaserFrame);
+    return d->needAuxiliaryLine;
+}
+void LaserFrame::setNeedAuxiliaryLine(bool bl)
+{
+    Q_D(LaserFrame);
+    d->needAuxiliaryLine = bl;
+}
 QDebug operator<<(QDebug debug, const QRect& rect)
 {
     QDebugStateSaver saver(debug);
@@ -3627,9 +3642,11 @@ public:
     bool italic;
     bool uppercase;
     QString family;
+    qreal fontPiexlSize;
+    bool isFill;
 };
 LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
-    QSize size, qreal space, bool bold, bool italic, bool uppercase, QString family)
+    QSize size, qreal space, bool bold, bool italic, bool uppercase, bool isFill, QString family)
     :LaserShape(ptr, doc, type, layerIndex, transform)
 {
     Q_D(LaserStampText);
@@ -3640,6 +3657,9 @@ LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,La
     d->italic = italic;
     d->uppercase = uppercase;
     d->family = family;
+    d->fontPiexlSize = size.height();
+    d->isFill = isFill;
+
 }
 
 LaserStampText::~LaserStampText() {}
@@ -3681,6 +3701,18 @@ bool LaserStampText::italic()
 {
     Q_D(LaserStampText);
     return d->italic;
+}
+
+bool LaserStampText::isFill()
+{
+    Q_D(LaserStampText);
+    return d->isFill;
+}
+
+void LaserStampText::setFill(bool bl)
+{
+    Q_D(LaserStampText);
+    d->isFill = bl;
 }
 
 void LaserStampText::setUppercase(bool uppercase)
@@ -3746,12 +3778,13 @@ public:
 };
 
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    bool bold, bool italic,bool uppercase, QString family,
+    bool bold, bool italic,bool uppercase, bool isFill, QString family,
     bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
-    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, 0, bold, italic, uppercase,family)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, 0, bold, italic, uppercase, isFill, family)
 {
     Q_D(LaserCircleText);
     //d->content = content;
+    d->isFill = isFill;
     d->circleBounds = bounds.toRect();
     //d->boundingRect = bounds.toRect();
     if (!isInit) {
@@ -4290,21 +4323,22 @@ void LaserCircleText::draw(QPainter * painter)
     Q_D(LaserCircleText);
     QPainterPath ellipse;
     ellipse.addEllipse(d->circleBounds);
-    painter->setBrush(QBrush(this->layer()->color()));
-    painter->drawPath(d->path);
-    painter->setBrush(Qt::NoBrush);
-    //painter->drawPath(d->path);
     
-    /*QPainterPath textEllipse;
-    textEllipse.addEllipse(textArcRect());
-    painter->drawPath(textEllipse);
-    QPointF oP = textEllipse.pointAtPercent(0);*/
+    if (d->isFill) {
+        painter->setBrush(QBrush(this->layer()->color()));
+        painter->drawPath(d->path);
+        painter->setBrush(Qt::NoBrush);
+    }
+    else {
+        //painter->setPen(QPen(this->layer()->color()));
+        painter->drawPath(d->path);
+    }
 }
 
 LaserPrimitive * LaserCircleText::clone(QTransform t)
 {
     Q_D(LaserCircleText);
-    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase,d->family, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
+    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->isFill, d->family, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
     return nullptr;
 }
 
@@ -4337,6 +4371,7 @@ QJsonObject LaserCircleText::toJson()
     object.insert("italic", d->italic);
     object.insert("uppercase", d->uppercase);
     object.insert("family", d->family);
+    object.insert("fill", d->isFill);
     return object;
 }
 
@@ -4416,20 +4451,21 @@ public:
         : LaserStampTextPrivate(ptr)
     {
     }
-    QList<QPainterPath> originalTextPathList;
-    QPointF bottomLeft;
+    //QList<QPainterPath> originalTextPathList;
+    QPointF center;
 };
 
 LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QSize size,
-    QPointF bottomLeft, bool bold, bool italic, bool uppercase, QString family,
+    QPointF center, bool bold, bool italic, bool uppercase, bool isFill, QString family,
     qreal space, QTransform transform, int layerIndex)
     :LaserStampText(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT,
-        content, transform, layerIndex, size, space, bold, italic, uppercase, family)
+        content, transform, layerIndex, size, space, bold, italic, uppercase,isFill, family)
 {
     Q_D(LaserHorizontalText);
+    d->isFill = isFill;
     setTransform(transform);
-    d->bottomLeft = bottomLeft;
-    initTextPath();
+    d->center = center;
+    computeTextPath();
     d->boundingRect = d->path.boundingRect().toRect();
     //d->originalBoundingRect = d->boundingRect;
     //d->variableBounds = d->boundingRect;
@@ -4440,16 +4476,26 @@ LaserHorizontalText::~LaserHorizontalText()
 {
 }
 
-void LaserHorizontalText::initTextPath()
+/*void LaserHorizontalText::initTextPath()
+{
+    Q_D(LaserHorizontalText);
+    computeTextPathProcess();
+    toBottomLeft();
+    d->boundingRect = d->path.boundingRect().toRect();
+}*/
+void LaserHorizontalText::computeTextPathProcess()
 {
     Q_D(LaserHorizontalText);
     QFont font;
     font.setWordSpacing(0);
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
+    qreal h = d->size.height();
     font.setPixelSize(d->size.height());
     font.setBold(d->bold);
     font.setItalic(d->italic);
     font.setFamily(d->family);
+    QFontMetrics fm(font);
+    
     if (d->uppercase) {
         font.setCapitalization(QFont::AllUppercase);
     }
@@ -4457,63 +4503,49 @@ void LaserHorizontalText::initTextPath()
         font.setCapitalization(QFont::MixedCase);
     }
     d->path = QPainterPath();
-    d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
         QPainterPath path;
-        QString c = QString(QChar(d->content[i]));
+        QString c(d->content[i]);
         //scale
         path.addText(0, 0, font, c);
         QTransform t;
-        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
+        //t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
+        qreal baseWidth = path.boundingRect().width();
+        if (baseWidth < fm.averageCharWidth()) {
+            baseWidth = fm.averageCharWidth();
+        }
+        
+        qreal w = d->size.width();
+        qreal sX = d->size.width() / baseWidth;
+        t.scale(sX, 1);
         path = t.map(path);
-        d->originalTextPathList.append(path);
         //translate
         QTransform t1;
-        //QPointF diff;
-        qreal x = i* (d->size.width() + d->space);
+        //qreal x = i * (d->size.width() + d->space);
+        qreal space = d->path.boundingRect().right();
+        qreal x = d->path.boundingRect().right() + d->space;
         qreal diffX = x - path.boundingRect().left();
-        qreal diffY = 0 - path.boundingRect().bottom();
+        qreal diffY = 0 - d->size.height();
         t1.translate(diffX, diffY);
         path = t1.map(path);
         d->path.addPath(path);
     }
-    toBottomLeft();
-    d->boundingRect = d->path.boundingRect().toRect();
-}
-void LaserHorizontalText::computeTextPathProcess()
-{
-    Q_D(LaserHorizontalText);
-    QPainterPath allPath;
-    int index = 0;
-    for (QPainterPath& path : d->originalTextPathList) {
-        QTransform t;
-        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
-        path = t.map(path);
-        qreal posX = index * (d->size.width() + d->space);
-        qreal lastPosX = path.boundingRect().left();
-        QTransform t1;
-        t1.translate(posX - lastPosX, 0 - path.boundingRect().bottom());
-        path = t1.map(path);
-        allPath.addPath(path);
-        index++;
-    }
-    d->path = allPath;
 }
 //在(0, 0)点调整好间距后(init的时候，单个字的path没有移动位置，最终位置是在all path后移动的)，再移动到位置
 void LaserHorizontalText::computeTextPath()
 {
     Q_D(LaserHorizontalText);    
     computeTextPathProcess();
-    toBottomLeft();
+    toCenter();
     d->boundingRect = d->path.boundingRect().toRect();  
     //d->originalBoundingRect = d->boundingRect;
 }
 
-void LaserHorizontalText::toBottomLeft()
+void LaserHorizontalText::toCenter()
 {
     Q_D(LaserHorizontalText);
     QTransform t;
-    QPointF diff = d->bottomLeft - d->path.boundingRect().bottomLeft();
+    QPointF diff = d->center - d->path.boundingRect().center();
     t.translate(diff.x(), diff.y());
     d->path = t.map(d->path);
 }
@@ -4521,16 +4553,21 @@ void LaserHorizontalText::toBottomLeft()
 void LaserHorizontalText::draw(QPainter * painter)
 {
     Q_D(LaserHorizontalText);
-    //painter->drawRect(d->variableBounds);
-    painter->setBrush(QBrush(this->layer()->color()));
-    painter->drawPath(d->path);
-    painter->setBrush(Qt::NoBrush);
+    if (d->isFill) {
+        painter->setBrush(QBrush(this->layer()->color()));
+        painter->drawPath(d->path);
+        painter->setBrush(Qt::NoBrush);
+    }
+    else {
+        //painter->setPen(QPen(this->layer()->color()));
+        painter->drawPath(d->path);
+    }
 }
 
 LaserPrimitive * LaserHorizontalText::clone(QTransform t)
 {
     Q_D(LaserHorizontalText);
-    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->bottomLeft,d->bold,d->italic,d->uppercase,d->family, d->space, t, d->layerIndex);
+    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->center,d->bold,d->italic,d->uppercase,d->isFill,d->family, d->space, t, d->layerIndex);
     return hText;
 }
 
@@ -4554,12 +4591,13 @@ QJsonObject LaserHorizontalText::toJson()
     object.insert("size", size);
     object.insert("layerIndex", layerIndex());
     object.insert("content", d->content);
-    QJsonArray bL = { d->bottomLeft.x(), d->bottomLeft.y() };
+    QJsonArray bL = { d->center.x(), d->center.y() };
     object.insert("bottomLeft", bL);
     object.insert("space", d->space);
     object.insert("bold", d->bold);
     object.insert("italic", d->italic);
     object.insert("family", d->family);
+    object.insert("fill", d->isFill);
     return object;
 }
 
@@ -4572,7 +4610,7 @@ QVector<QLineF> LaserHorizontalText::edges()
 void LaserHorizontalText::recompute()
 {
     Q_D(const LaserHorizontalText);
-    initTextPath();
+    computeTextPath();
 }
 
 bool LaserHorizontalText::isClosed() const
@@ -4592,22 +4630,31 @@ void LaserHorizontalText::setBoundingRectWidth(qreal width)
     
     if (d->content.size() > 1) {
         qreal diff = width - d->boundingRect.width();
-        d->space = (width - d->size.width() * d->content.size()) / (d->content.size() - 1);
-        d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+        //d->space = (width - d->size.width() * d->content.size()) / (d->content.size() - 1);
+        d->space = (width - d->path.boundingRect().width()) / (d->content.size() - 1) + d->space;
+        if (d->space < 0) {
+            d->space = 0;
+            diff = 0;
+        }
+        LaserApplication::mainWindow->textSpace()->setValue(d->space * 0.001);
+        d->center = QPointF(d->center.x(), d->center.y());
         computeTextPath();
     }
-    
-    
 }
 
 void LaserHorizontalText::setSpace(qreal space)
 {
     Q_D(LaserHorizontalText);
     d->space = space;
-    qreal width = d->space * (d->content.size() - 1) + d->content.size() * d->size.width();
-    qreal diff = width - d->boundingRect.width();
-    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
+    if (d->space < 0) {
+        d->space = 0;
+    }
+    qreal lastPathWidth = d->path.boundingRect().width();
     computeTextPath();
+    //qreal diff = d->path.boundingRect().width() - lastPathWidth;
+    //d->center = QPointF(d->center.x(), d->center.y());
+    //toCenter();
+    //d->boundingRect = d->path.boundingRect().toRect();
 }
 
 void LaserHorizontalText::setTextHeight(qreal height)
@@ -4618,11 +4665,11 @@ void LaserHorizontalText::setTextHeight(qreal height)
     }
     qreal lastHeight = d->boundingRect.height();
     d->size = QSize(d->size.width(), height);
-    computeTextPathProcess();
-    qreal diff = d->boundingRect.height() - lastHeight;
-    d->bottomLeft = QPointF(d->bottomLeft.x(), d->bottomLeft.y() + diff * 0.5);
-    toBottomLeft();
-    d->boundingRect = d->path.boundingRect().toRect();
+    computeTextPath();
+    //qreal diff = d->boundingRect.height() - lastHeight;
+    //d->center = QPointF(d->center.x(), d->center.y() + diff * 0.5);
+    //toCenter();
+    //d->boundingRect = d->path.boundingRect().toRect();
 }
 
 void LaserHorizontalText::setTextWidth(qreal width)
@@ -4631,10 +4678,14 @@ void LaserHorizontalText::setTextWidth(qreal width)
     if (width <= 0) {
         width = 1;
     }
-    qreal diff = d->content.size() * width + (d->content.size() - 1)*d->space - d->boundingRect.width();
+    //qreal diff = d->content.size() * width + (d->content.size() - 1)*d->space - d->boundingRect.width();
+    qreal lasPathWidth = d->path.boundingRect().width();
     d->size = QSize(width, d->size.height());
-    d->bottomLeft = QPointF(d->bottomLeft.x() - diff * 0.5, d->bottomLeft.y());
     computeTextPath();
+    //qreal diff = d->path.boundingRect().width() - lasPathWidth;
+    //d->center = QPointF(d->center.x() - diff * 0.5, d->center.y());
+    //toCenter();
+    //d->boundingRect = d->path.boundingRect().toRect();
 }
 
 class LaserVerticalTextPrivate : public LaserStampTextPrivate
@@ -4645,19 +4696,19 @@ public:
         : LaserStampTextPrivate(ptr)
     {
     }
-    QList<QPainterPath> originalTextPathList;
-    QPointF topLeft;
+    //QList<QPainterPath> originalTextPathList;
+    QPointF center;
 };
 LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size, 
-    QPointF topLeft, bool bold, bool italic,bool uppercase, QString family,
+    QPointF center, bool bold, bool italic,bool uppercase, bool isFill, QString family,
     qreal space, QTransform transform, int layerIndex)
     :LaserStampText(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT,content, transform, layerIndex,
-        size,space, bold, italic, uppercase, family)
+        size,space, bold, italic, uppercase, isFill, family)
 {
     Q_D(LaserVerticalText);
-    d->topLeft = topLeft;
+    d->center = center;
     setTransform(transform);
-    initTextPath();
+    computeTextPath();
     //d->boundingRect = d->path.boundingRect().toRect();
     //d->originalBoundingRect = d->boundingRect;
 }
@@ -4665,79 +4716,66 @@ LaserVerticalText::~LaserVerticalText()
 {
 }
 
-void LaserVerticalText::initTextPath()
+void LaserVerticalText::computeTextPathProcess()
 {
     Q_D(LaserVerticalText);
     QFont font;
     font.setWordSpacing(0);
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
+    
     font.setPixelSize(d->size.height());
     font.setBold(d->bold);
     font.setItalic(d->italic);
     font.setFamily(d->family);
+    QFontMetrics fm(font);
     if (d->uppercase) {
         font.setCapitalization(QFont::AllUppercase);
     }
     else {
         font.setCapitalization(QFont::MixedCase);
     }
-    
+
     d->path = QPainterPath();
-    d->originalTextPathList.clear();
+    //d->originalTextPathList.clear();
     for (int i = 0; i < d->content.size(); i++) {
         QPainterPath path;
         QString c = QString(QChar(d->content[i]));
+        qreal baseWidth = fm.width(c);
+        if (baseWidth < fm.averageCharWidth()) {
+            baseWidth = fm.averageCharWidth();
+        }
         //scale
         path.addText(0, 0, font, c);
         QTransform t;
-        t.scale(d->size.width() / path.boundingRect().width(), 1);
+        t.scale(d->size.width() / baseWidth, 1);
         path = t.map(path);
-        d->originalTextPathList.append(path);
+        //d->originalTextPathList.append(path);
         //translate
         QTransform t1;
         //QPointF diff;
-        qreal y = i * (d->size.height() + d->space);
-        QPointF pos = QPointF(d->originalTextPathList[0].boundingRect().left(), y);
-        QPointF diff = pos - path.boundingRect().topLeft();
+        qreal y = d->path.boundingRect().bottom() + d->space;
+        //QPointF pos = QPointF(d->originalTextPathList[0].boundingRect().left(), y);
+        QPointF pos = QPointF(d->path.boundingRect().center().x(), y);
+        QPointF diff = pos - QPointF(path.boundingRect().center().x(), path.boundingRect().top());
         t1.translate(diff.x(), diff.y());
         path = t1.map(path);
         d->path.addPath(path);
     }
-    toTopLeft();
-    d->boundingRect = d->path.boundingRect().toRect();
 }
 
 void LaserVerticalText::computeTextPath()
 {
     Q_D(LaserVerticalText);
-    QPainterPath allPath;
-    int index = 0;
-    for (QPainterPath path : d->originalTextPathList) {
-        //scale
-        QTransform t;
-        t.scale(d->size.width() / path.boundingRect().width(), d->size.height() / path.boundingRect().height());
-        path = t.map(path);
-        //translate
-        QTransform t1;
-        //QPointF diff;
-        qreal y = index * (d->size.height() + d->space);
-        QPointF pos = QPointF(d->originalTextPathList[0].boundingRect().left(), y);
-        QPointF diff = pos - path.boundingRect().topLeft();
-        t1.translate(diff.x(), diff.y());
-        path = t1.map(path);
-        allPath.addPath(path);
-        index++;
-    }
-    d->path = allPath;
-    toTopLeft();
+    computeTextPathProcess();
+    toCenter();
     d->boundingRect = d->path.boundingRect().toRect();
 }
 
-void LaserVerticalText::toTopLeft()
+void LaserVerticalText::toCenter()
 {
     Q_D(LaserVerticalText);
-    QPointF pos = d->path.boundingRect().topLeft();
-    QPointF diff = d->topLeft - pos;
+    QPointF pos = d->path.boundingRect().center();
+    QPointF diff = d->center - pos;
     QTransform t;
     t.translate(diff.x(), diff.y());
     d->path = t.map(d->path);
@@ -4746,15 +4784,22 @@ void LaserVerticalText::toTopLeft()
 void LaserVerticalText::draw(QPainter * painter)
 {
     Q_D(LaserVerticalText);
-    painter->setBrush(QBrush(this->layer()->color()));
-    painter->drawPath(d->path);
-    painter->setBrush(Qt::NoBrush);
+    if (d->isFill) {
+        painter->setBrush(QBrush(this->layer()->color()));
+        painter->drawPath(d->path);
+        painter->setBrush(Qt::NoBrush);
+    }
+    else {
+        //painter->setPen(QPen(this->layer()->color()));
+        painter->drawPath(d->path);
+    }
+    
 }
 
 LaserPrimitive * LaserVerticalText::clone(QTransform t)
 {
     Q_D(LaserVerticalText);
-    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->topLeft,d->bold, d->italic,d->uppercase,d->family, d->space, t, d->layerIndex);
+    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->center,d->bold, d->italic,d->uppercase, d->isFill, d->family, d->space, t, d->layerIndex);
     return text;
 }
 
@@ -4778,13 +4823,14 @@ QJsonObject LaserVerticalText::toJson()
     object.insert("size", size);
     object.insert("layerIndex", layerIndex());
     object.insert("content", d->content);
-    QJsonArray bL = { d->topLeft.x(), d->topLeft.y() };
+    QJsonArray bL = { d->center.x(), d->center.y() };
     object.insert("topLeft", bL);
     object.insert("space", d->space);
     object.insert("bold", d->bold);
     object.insert("italic", d->italic);
     object.insert("uppercase", d->uppercase);
     object.insert("family", d->family);
+    object.insert("fill", d->isFill);
     return object;
 }
 
@@ -4797,7 +4843,7 @@ QVector<QLineF> LaserVerticalText::edges()
 void LaserVerticalText::recompute()
 {
     Q_D(LaserVerticalText);
-    initTextPath();
+    computeTextPath();
 }
 
 bool LaserVerticalText::isClosed() const
@@ -4814,9 +4860,14 @@ void LaserVerticalText::setBoundingRectHeight(qreal height)
 {
     Q_D(LaserVerticalText);
     if (d->content.size() > 1) {
-        d->space = (height - d->content.size() * d->size.height()) / (d->content.size() - 1);
         qreal diff = height - d->boundingRect.height();
-        d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+        d->space = diff / (d->content.size() - 1) + d->space;
+        if (d->space < 0) {
+            d->space = 0;
+            diff = 0;
+        }
+        LaserApplication::mainWindow->textSpace()->setValue(d->space * 0.001);
+        //d->center = QPointF(d->center.x(), d->center.y());
         computeTextPath();
     }
     
@@ -4826,27 +4877,37 @@ void LaserVerticalText::setSpace(qreal space)
 {
     Q_D(LaserVerticalText);
     d->space = space;
-    qreal height = d->space * (d->content.size() - 1) + d->content.size() * d->size.height();
-    qreal diff = height - d->boundingRect.height();
-    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
+    if (d->space < 0) {
+        d->space = 0;
+    }
+    qreal lastPathHeight = d->path.boundingRect().height();
     computeTextPath();
+    //qreal diff = d->path.boundingRect().height() - lastPathHeight;
+    //d->center = QPointF(d->center.x(), d->center.y());
+    //toCenter();
+    //d->boundingRect = d->path.boundingRect().toRect();
 }
 
 void LaserVerticalText::setTextHeight(qreal height)
 {
     Q_D(LaserVerticalText);
+    qreal lastPathHeight = d->path.boundingRect().height();
     d->size = QSize(d->size.width(), height);
-    qreal diff = height * d->content.size() + d->space * (d->content.size() - 1) - d->boundingRect.height();
-    d->topLeft = QPointF(d->topLeft.x(), d->topLeft.y() - diff * 0.5);
     computeTextPath();
+    //qreal diff = d->path.boundingRect().height() - lastPathHeight;
+    //d->center = QPointF(d->center.x(), d->center.y());
+    //toCenter();
+    //d->boundingRect = d->path.boundingRect().toRect();
 }
 
 void LaserVerticalText::setTextWidth(qreal width)
 {
     Q_D(LaserVerticalText);
     d->size = QSize(width, d->size.height());
-    qreal diff = width - d->boundingRect.width();
-    d->topLeft = QPointF(d->topLeft.x() - diff * 0.5, d->topLeft.y());
+    qreal lastPathWidth = d->path.boundingRect().width();
+    //computeTextPathProcess();
+    //qreal diff = d->path.boundingRect().width() - lastPathWidth;
+    //d->center = QPointF(d->center.x() - diff * 0.5, d->center.y());
     computeTextPath();
 }
 

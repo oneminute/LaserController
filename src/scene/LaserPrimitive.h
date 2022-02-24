@@ -578,6 +578,8 @@ public:
     void setBorderWidth(qreal w);
     qreal borderWidth();
     void computePath();
+    bool needAuxiliaryLine();
+    void setNeedAuxiliaryLine(bool bl);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)
@@ -589,7 +591,7 @@ class LaserStampText : public LaserShape {
 public:
     LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, 
         QString content, QTransform transform = QTransform(), int layerIndex = 0, QSize size = QSize(), qreal space = 0, 
-        bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman");
+        bool bold = false, bool italic = false, bool uppercase = false, bool isFill = true, QString family = "Times New Roman");
     virtual~LaserStampText();
     virtual void recompute() = 0;
     void setContent(QString content);
@@ -598,6 +600,8 @@ public:
     bool bold();
     void setItalic(bool italic);
     bool italic();
+    bool isFill();
+    void setFill(bool bl);
     void setUppercase(bool uppercase);
     bool uppercase();
     void setFamily(QString family);
@@ -616,7 +620,7 @@ class LaserCircleText : public LaserStampText {
     Q_OBJECT
 public:
     LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-        bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman",
+        bool bold = false, bool italic = false, bool uppercase = false, bool isFill = true, QString family = "Times New Roman",
         bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
@@ -668,14 +672,14 @@ class LaserHorizontalText : public LaserStampText {
     Q_OBJECT
 public:
     LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
-        QPointF bottomLeft, bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman",
+        QPointF center, bool bold = false, bool italic = false, bool uppercase = false,bool isFill = true, QString family = "Times New Roman",
         qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserHorizontalText();
-    void initTextPath();
+    //void initTextPath();
     void computeTextPathProcess();
     void computeTextPath();
     
-    void toBottomLeft();
+    void toCenter();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_HORIZONTALTEXT; }
     virtual QString typeName() { return tr("HorizontalText"); }
@@ -698,12 +702,12 @@ class LaserVerticalText : public LaserStampText {
     Q_OBJECT
 public:
     LaserVerticalText(LaserDocument* doc, QString content, QSize size,
-        QPointF topLeft,bool bold = false, bool italic = false, bool uppercase = false, QString family = "Times New Roman",
+        QPointF center,bool bold = false, bool italic = false, bool uppercase = false,bool isFill = true, QString family = "Times New Roman",
         qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserVerticalText();
-    void initTextPath();
+    void computeTextPathProcess();
     void computeTextPath();
-    void toTopLeft();
+    void toCenter();
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_VERTICALTEXT; }
     virtual QString typeName() { return tr("VerticalText"); }

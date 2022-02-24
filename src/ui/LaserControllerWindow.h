@@ -580,6 +580,7 @@ private:
     LaserDoubleSpinBox* m_textHeight;
     QLabel* m_textSpaceLabel;
     LaserDoubleSpinBox* m_textSpace;
+    QCheckBox* m_textFill;
     QCheckBox* m_textBold;
     QCheckBox* m_textItalic;
     QCheckBox* m_textUpperCase;

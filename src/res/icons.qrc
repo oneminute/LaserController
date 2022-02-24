@@ -152,5 +152,18 @@
         <file>images/u_origin.png</file>
         <file>images/star.png</file>
         <file>images/partyEmblem.png</file>
+		<file>images/bold.png</file>
+		<file>images/itatic.png</file>
+		<file>images/frameFour.png</file>
+		<file>images/frameThreeL.png</file>
+		<file>images/frameThreeR.png</file>
+		<file>images/frameTwo.png</file>
+		<file>images/fill.png</file>
+		<file>images/toRightArrow.png</file>
+		<file>images/blank.png</file>
+		<file>images/straight.png</file>
+		<file>images/bold1.png</file>
+		<file>images/add_1.png</file>
+		<file>images/delete_1.png</file>
     </qresource>
 </RCC>

@@ -6,15 +6,7 @@
 LaserDoubleSpinBox::LaserDoubleSpinBox(QWidget * parent)
 	:QDoubleSpinBox(parent), m_isPressEnterKey(false), m_isValueChanged(false)
 {
-    /*connect(this, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [=](double _val) {
-        if (_val != m_lastValue) {
-            m_isValueChanged = true;
-        }
-        else {
-            m_isValueChanged = false;
-        }
-        
-    });*/
+    
 }
 
 LaserDoubleSpinBox::~LaserDoubleSpinBox()
