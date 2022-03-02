@@ -15,9 +15,9 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
     //LayoutComboBox
-    QPixmap fourPm(":/ui/icons/images/frameFour.png");
-    QPixmap threePm(":/ui/icons/images/frameThreeL.png");
-    QPixmap threeRPm(":/ui/icons/images/frameThreeR.png");
+    QPixmap fourPm(":/ui/icons/images/signalLine.png");
+    QPixmap threePm(":/ui/icons/images/multiLine.png");
+    QPixmap threeRPm(":/ui/icons/images/multiCol.png");
     m_ui->frameStampLayoutComboBox->addItem(QIcon(fourPm), tr("Signal Row"));
     m_ui->frameStampLayoutComboBox->addItem(QIcon(threePm), tr("Multi Row"));
     m_ui->frameStampLayoutComboBox->addItem(QIcon(threeRPm), tr("Multi Column"));
@@ -106,7 +106,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     m_ui->hMarginSpinBox->setValue(0.5);
     m_ui->hMarginSpinBox->setMinimum(-DBL_MAX);
     m_ui->hMarginSpinBox->setMaximum(DBL_MAX);
-    m_ui->vMarginSpinBox->setValue(0.0);
+    m_ui->vMarginSpinBox->setValue(0.5);
     m_ui->vMarginSpinBox->setMinimum(-DBL_MAX);
     m_ui->vMarginSpinBox->setMaximum(DBL_MAX);
     m_ui->hSpaceSpinBox->setValue(0.5);
@@ -164,7 +164,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
         }
     });
     //isToRightButton
-    connect(m_ui->isToLeftBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
+    /*connect(m_ui->isToLeftBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
         QPixmap icon(":/ui/icons/images/toRightArrow.png");
         if (checked) {
             
@@ -176,7 +176,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
         else {
             m_ui->isToLeftBtn->setIcon(QIcon(icon));
         }
-    });
+    });*/
     //itatic
     connect(m_ui->itaticBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
         
@@ -260,6 +260,34 @@ StampStripDialog::~StampStripDialog()
 {
 }
 
+void StampStripDialog::rectifyTextSize(qreal w, qreal h, LaserHorizontalText* text)
+{
+    QRectF pathBounds = text->getPath().boundingRect();
+    qreal diffW = w - pathBounds.width();
+    qreal diffH = h - pathBounds.height();
+    QSize textSize = text->textSize();
+    if (diffW != 0) {
+        text->setTextWidth(textSize.width() + (diffW / text->getContent().size()));
+    }
+    if (diffH != 0) {
+        text->setTextHeight(textSize.height() + diffH);
+    }
+}
+
+void StampStripDialog::rectifyTextSize(qreal w, qreal h, LaserVerticalText* text)
+{
+    QRectF pathBounds = text->getPath().boundingRect();
+    qreal diffW = w - pathBounds.width();
+    qreal diffH = h - pathBounds.height();
+    QSize textSize = text->textSize();
+    if (diffW != 0) {
+        text->setTextWidth(textSize.width() + diffW);
+    }
+    if (diffH != 0) {
+        text->setTextHeight(textSize.height() + diffH / text->getContent().size());
+    }
+}
+
 void StampStripDialog::accept()
 {
     QDialog::accept();
@@ -296,12 +324,13 @@ void StampStripDialog::accept()
     bool bold = m_ui->boldBtn->isChecked();
     bool itatic = m_ui->itaticBtn->isChecked();
     bool fill = !m_ui->fillBtn->isChecked();
-    bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
+    //bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
     //text size
     qreal textHMargin = m_ui->hMarginSpinBox->value() * 1000;
     qreal textVMargin = m_ui->vMarginSpinBox->value() * 1000;
     qreal textHSpace = m_ui->hSpaceSpinBox->value() * 1000;
     qreal textVSpace = m_ui->vSpaceSpinBox->value() * 1000;
+    int rowCount = m_viewItemModel->rowCount();
     QPointF center = rect.center();
     QRect textRect;
     if (innerFrame) {
@@ -316,44 +345,44 @@ void StampStripDialog::accept()
             rect.width() - 2*(frameBorder + textHMargin), 
             rect.height() - 2 * (frameBorder + textHMargin));
     }
-
-    for (int r = 0; r < m_viewItemModel->rowCount(); r++) {
+    qreal textH = (textRect.height() - textVSpace * (rowCount - 1)) / rowCount;
+    for (int r = 0; r < rowCount; r++) {
         QStandardItem* item1 = m_viewItemModel->item(r, 0);
         QString content = item1->text();
+        int contentSize = content.size();
         QStandardItem* item2 = m_viewItemModel->item(r, 1);
         QString family = item2->text();
         QSize textSize;
         if (layoutIndex == 0) {
-            textSize = QSize((textRect.width() - (content.size() - 1) * textHSpace) / content.size(),
-                textRect.height());
+            textSize = QSize((textRect.width() - (contentSize - 1) * textHSpace) / contentSize,textH);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
                 bold, itatic, false, fill, family, textHSpace, QTransform(), m_viewer->curLayerIndex());
-            QRectF pathBounds = text->getPath().boundingRect();
-            qreal diffW = textRect.width() - pathBounds.width();
-            qreal diffH = textRect.height() - pathBounds.height();
-            if (diffW != 0) {
-                text->setTextWidth(textSize.width() + (diffW / content.size()));
-            }
-            if (diffH != 0) {
-                text->setTextHeight(textSize.height() + diffH * 0.5);
-            }
-
+            
+            rectifyTextSize(textRect.width(), textRect.height(), text);
             stampList.append(text);
         }
         else if (layoutIndex == 1) {
+            textSize = QSize((textRect.width() - textHSpace * (contentSize - 1)) / contentSize, textH);
+            center = QPointF(center.x(), (textH+textVSpace) * r + textH*0.5 + textRect.top());
+            
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, fill, family, 0.0, QTransform(), m_viewer->curLayerIndex());
+                bold, itatic, false, fill, family, textHSpace, QTransform(), m_viewer->curLayerIndex());
+            rectifyTextSize(textRect.width(), textH, text);
             stampList.append(text);
         }
         else if (layoutIndex == 2) {
+            qreal textW = (textRect.width() - textHSpace * r) / rowCount;
+            textH = (textRect.height() - textVSpace * (contentSize - 1)) / contentSize;
+            textSize = QSize(textW,textH);
+            center = QPointF(textRect.left() + textSize.width()*0.5 + textSize.width() *r, center.y());
 
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), content, textSize, center,
+                bold, itatic, false, fill, family, textVSpace, QTransform(), m_viewer->curLayerIndex());
+            rectifyTextSize(textW, textRect.height(), text);
+            stampList.append(text);
         }
         
     }
-    
-    
-        
-    
 
     m_viewer->addPrimitiveAndExamRegionByBounds(stampList);
 }

@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>602</height>
+    <width>580</width>
+    <height>835</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>422</width>
+    <width>580</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>422</width>
+    <width>580</width>
     <height>16777215</height>
    </size>
   </property>
@@ -74,7 +74,7 @@
     <widget class="QGroupBox" name="CircleGroupBox">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -118,9 +118,9 @@
          <number>5</number>
         </property>
         <item row="0" column="0">
-         <widget class="QLabel" name="circleWidthLabel">
+         <widget class="QLabel" name="circleDiameterLabel">
           <property name="text">
-           <string>Width</string>
+           <string>Diameter</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -128,30 +128,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="LaserDoubleSpinBox" name="circleWidthSpinBox">
-          <property name="minimumSize">
-           <size>
-            <width>70</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="suffix">
-           <string>mm</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="circleHeightLabel">
-          <property name="text">
-           <string>Height</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="LaserDoubleSpinBox" name="circleHeightSpinBox">
+         <widget class="LaserDoubleSpinBox" name="circleDiameterSpinBox">
           <property name="minimumSize">
            <size>
             <width>70</width>
@@ -184,29 +161,30 @@
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="circleCornerTypeLabel">
+         <widget class="QLabel" name="angleLabel">
           <property name="text">
-           <string>Corner Type</string>
+           <string>Angle</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QComboBox" name="circleCornerTypeComboBox"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="circleCornerSizeLabel">
-          <property name="text">
-           <string>Corner Size</string>
+         <widget class="QDoubleSpinBox" name="angleSpinBox">
+          <property name="maximum">
+           <double>360.000000000000000</double>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
-         <widget class="LaserDoubleSpinBox" name="circleCornerSizeSpinBox">
-          <property name="minimumSize">
-           <size>
-            <width>70</width>
-            <height>0</height>
-           </size>
+        <item row="1" column="0">
+         <widget class="QLabel" name="circleHeightLabel">
+          <property name="text">
+           <string>Height</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="circleHeightSpinBox">
+          <property name="prefix">
+           <string/>
           </property>
           <property name="suffix">
            <string>mm</string>
@@ -284,7 +262,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -313,8 +291,73 @@
       <property name="verticalSpacing">
        <number>5</number>
       </property>
+      <item row="10" column="0">
+       <layout class="QFormLayout" name="formLayout_3">
+        <property name="labelAlignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="formAlignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="horizontalSpacing">
+         <number>10</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>11</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <item row="2" column="0">
+         <widget class="QLabel" name="marginLabel">
+          <property name="text">
+           <string>Text Margins</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="LaserDoubleSpinBox" name="marginSpinBox">
+          <property name="suffix">
+           <string>mm</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="maximum">
+           <double>98.989999999999995</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="hSpacelabel">
+          <property name="text">
+           <string>Text Spacing</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="LaserDoubleSpinBox" name="hSpaceSpinBox">
+          <property name="suffix">
+           <string>mm</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
       <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -339,7 +382,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="itaticBtn">
+         <widget class="QToolButton" name="italicBtn">
           <property name="text">
            <string>...</string>
           </property>
@@ -367,21 +410,13 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="isToLeftBtn">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../res/icons.qrc">
-            <normaloff>:/ui/icons/images/toRightArrow.png</normaloff>:/ui/icons/images/toRightArrow.png</iconset>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QFontComboBox" name="fontComboBox">
+          <property name="maximumSize">
+           <size>
+            <width>160</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -406,126 +441,139 @@
        <widget class="QLineEdit" name="lineEdit">
         <property name="maximumSize">
          <size>
-          <width>400</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="maxLength">
-         <number>4</number>
+         <number>1000</number>
         </property>
        </widget>
       </item>
       <item row="9" column="0">
-       <layout class="QFormLayout" name="formLayout_3">
+       <widget class="QTableView" name="tableView">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>188</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>188</height>
+         </size>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="AdditionGroupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox#AdditionGroupBox{border: 1px solid rgb(180, 180, 180)}</string>
+     </property>
+     <property name="title">
+      <string>Addition Mark</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QFormLayout" name="formLayout_2">
         <property name="labelAlignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
-        <property name="formAlignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="horizontalSpacing">
-         <number>10</number>
-        </property>
-        <property name="verticalSpacing">
-         <number>11</number>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <item row="1" column="0">
-         <widget class="QLabel" name="HMarginLabel">
+        <item row="0" column="0">
+         <widget class="QLabel" name="emblemLabel">
           <property name="text">
-           <string>Horinzontal Margins</string>
+           <string>Emblem</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="emblemComboBox"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="emblemSizeLabel">
+          <property name="text">
+           <string>Emblem Size</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="LaserDoubleSpinBox" name="hMarginSpinBox">
+         <widget class="QDoubleSpinBox" name="embleSizeSpinBox">
           <property name="suffix">
            <string>mm</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="maximum">
-           <double>98.989999999999995</double>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="VMarginlabel">
-          <property name="text">
-           <string>Vertical Margins</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="LaserDoubleSpinBox" name="vMarginSpinBox">
-          <property name="suffix">
-           <string>mm</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="hSpacelabel">
-          <property name="text">
-           <string>Horinzontal Spacing</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="LaserDoubleSpinBox" name="hSpaceSpinBox">
-          <property name="suffix">
-           <string>mm</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="vSpacelabellabel">
-          <property name="text">
-           <string>Vertical Spacing</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="LaserDoubleSpinBox" name="vSpaceSpinBox">
-          <property name="suffix">
-           <string>mm</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
           </property>
          </widget>
         </item>
        </layout>
       </item>
-      <item row="10" column="0">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+      <item>
+       <widget class="QGroupBox" name="lineGroupBox">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-        <property name="sizeHint" stdset="0">
+        <property name="minimumSize">
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
-       </spacer>
+        <property name="title">
+         <string>Mark Line</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QFormLayout" name="formLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lineWidthlabel">
+             <property name="text">
+              <string>Line Border</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="lineWidthSpinBox"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

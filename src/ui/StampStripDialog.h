@@ -14,6 +14,8 @@ class StampStripDialog : public QDialog {
 public:
     StampStripDialog(LaserScene* scene, QWidget* parent = nullptr);
     virtual ~StampStripDialog();
+    void rectifyTextSize(qreal w, qreal h, LaserHorizontalText* text);
+    void rectifyTextSize(qreal w, qreal h, LaserVerticalText* text);
 private:
     QScopedPointer<Ui::StampStripDialog> m_ui;
     LaserScene* m_scene;

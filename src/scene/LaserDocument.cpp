@@ -1293,7 +1293,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool uppercase = primitiveJson["uppercase"].toBool();
                 QString family = primitiveJson["family"].toString();
                 bool fill = primitiveJson["fill"].toBool();
-                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase,fill,family, false, maxRadian, minRadian,size, saveTransform, layerIndex);
+                qreal space = primitiveJson["space"].toDouble();
+                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase,fill,family, space, false, maxRadian, minRadian,size, saveTransform, layerIndex);
             }
             
             if (primitive)

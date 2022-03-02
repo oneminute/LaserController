@@ -3939,12 +3939,16 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_circleTextPropertyLayout->addWidget(m_textContent, 0, 1);
             m_circleTextPropertyLayout->addWidget(m_textFamilyLabel, 1, 0);
             m_circleTextPropertyLayout->addWidget(m_textFamily, 1, 1);
-            //m_circleTextPropertyLayout->addWidget(m_textWidthLabel, 2, 0);
-            //m_circleTextPropertyLayout->addWidget(m_textWidth, 2, 1);
-            m_circleTextPropertyLayout->addWidget(m_textHeightLabel, 3, 0);
-            m_circleTextPropertyLayout->addWidget(m_textHeight, 3, 1);
-            m_circleTextPropertyLayout->addWidget(m_textAngleLabel, 4, 0);
-            m_circleTextPropertyLayout->addWidget(m_textAngle, 4, 1);
+            m_circleTextPropertyLayout->addWidget(m_textSpaceLabel, 2, 0);
+            m_circleTextPropertyLayout->addWidget(m_textSpace, 2, 1);
+            m_circleTextPropertyLayout->addWidget(m_textWidthLabel, 3, 0);
+            m_circleTextPropertyLayout->addWidget(m_textWidth, 3, 1);
+            //width is auto compute, through the space to change(通过space来修改text的宽度)
+            m_textWidth->setEnabled(false);
+            m_circleTextPropertyLayout->addWidget(m_textHeightLabel, 4, 0);
+            m_circleTextPropertyLayout->addWidget(m_textHeight, 4, 1);
+            m_circleTextPropertyLayout->addWidget(m_textAngleLabel, 5, 0);
+            m_circleTextPropertyLayout->addWidget(m_textAngle, 5, 1);
             
             QHBoxLayout* layout = new QHBoxLayout();
             layout->addWidget(m_textFill, 0, Qt::AlignLeft);
@@ -3952,7 +3956,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             layout->addWidget(m_textItalic, 0, Qt::AlignLeft);
             layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
             layout->addWidget(m_locked, 0, Qt::AlignLeft);
-            m_circleTextPropertyLayout->addLayout(layout, 5, 0, 1, 2);
+            m_circleTextPropertyLayout->addLayout(layout, 6, 0, 1, 2);
             if (m_textContent) {
                 m_textContent->setVisible(true);
                 m_textContent->setText(text->getContent());
@@ -3963,10 +3967,12 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_textUpperCase->setChecked(text->uppercase());
             m_textFamily->setCurrentText(text->family());
             m_textAngle->setValue(text->angle());
-            //m_textWidth->setValue(text->textSize().width() * 0.001);
+            m_textWidth->setValue(text->textSize().width() * 0.001);
             m_textHeight->setValue(text->textSize().height() * 0.001);
+            m_textSpace->setValue(text->space() * 0.001);
             m_circleTextWidget->setLayout(m_circleTextPropertyLayout);
             m_propertyDockWidget->setWidget(m_circleTextWidget);
+            
             break;
         }
         case LPT_FRAME: {
@@ -6791,7 +6797,9 @@ void LaserControllerWindow::onActionCreateCircleStamp()
 
 void LaserControllerWindow::onActionCreateEllipseStamp()
 {
-    
+    StampCircleDialog dialog(m_scene, true);
+
+    dialog.exec();
     
 }
 

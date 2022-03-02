@@ -2813,7 +2813,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false,true,"Times New Roman", true, 0, 0, QSize(), transform, m_curLayerIndex);
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false,true,"Times New Roman",0, true, 0, 0, QSize(), transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();

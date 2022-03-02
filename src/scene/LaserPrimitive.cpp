@@ -3772,15 +3772,16 @@ public:
     QPainterPath arcPath;
     qreal minRadian, maxRadian;
     QRectF circleBounds;
+    qreal horizontalPathHeight;
     //bool bold;
     //bool italic;
     //bool uppercase;
 };
 
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    bool bold, bool italic,bool uppercase, bool isFill, QString family,
+    bool bold, bool italic,bool uppercase, bool isFill, QString family, qreal sapce, 
     bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
-    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, 0, bold, italic, uppercase, isFill, family)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, sapce, bold, italic, uppercase, isFill, family)
 {
     Q_D(LaserCircleText);
     //d->content = content;
@@ -3813,19 +3814,6 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     }
     //text height
     setTextSize(textSize, needInit);
-    //angle
-    setAngle(angle, needInit);
-    //text width
-    qreal lengthByPercent = 0;
-    QPointF lastP = d->arcPath.pointAtPercent(0);
-    for (int i = 0; i < d->content.size(); i++) {
-        QPointF p = d->arcPath.pointAtPercent(i * (1.0 / d->content.size()));
-        lengthByPercent += QVector2D(p - lastP).length();
-        lastP = p;
-    }
-    QPointF p = d->arcPath.pointAtPercent(0) - d->arcPath.pointAtPercent(1.0/(d->content.size() - 1));
-    qreal distance = lengthByPercent / d->content.size()*0.5;
-    d->size.setWidth(distance);
     //font
     QFont font;
     font.setWordSpacing(0);
@@ -3842,16 +3830,40 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     }
     d->textTransformList.clear();
     d->originalTextPathList.clear();
-    for (int i = 0; i < d->content.size(); i ++) {
+    QPainterPath allpath;
+    for (int i = 0; i < d->content.size(); i++) {
         QPainterPath path;
         QChar c = d->content[i];
         path.addText(0, 0, font, c);
-        d->originalTextPathList.append(path);    
+        d->originalTextPathList.append(path);
+        allpath.addPath(path);
     }
+    d->horizontalPathHeight = allpath.boundingRect().height();
+    //d->horizontalPathHeight = d->size.height();
+    //angle
+    setAngle(angle, needInit);
+    //text width
+    qreal lengthByPercent = 0;
+    QPointF lastP = d->arcPath.pointAtPercent(0);
+    for (int i = 0; i < d->content.size(); i++) {
+        QPointF p = d->arcPath.pointAtPercent((i+1) * (1.0 / d->content.size()));
+        lengthByPercent += QVector2D(p - lastP).length();
+        lastP = p;
+    }
+    QPointF p = d->arcPath.pointAtPercent(0) - d->arcPath.pointAtPercent(1.0/(d->content.size() - 1));
+    qreal distance = lengthByPercent / d->content.size();
+    distance = distance - distance * 0.198;
+    qreal w = distance - d->space;
+    if (w < 1) {
+        w = 1;
+        d->space = distance - w;
+    }
+    d->size.setWidth(w);
+    
     //位移变换
-    moveTextToEllipse(lengthByPercent);
+    moveTextToEllipse();
     //变换结束后，加到path中
-    int index = 0; 
+    int index = 0;
     d->path = QPainterPath();
     for (QPainterPath path : d->originalTextPathList) {
         QTransform t = d->textTransformList[index];
@@ -4062,7 +4074,7 @@ void LaserCircleText::transformTextByCenter(QPainterPath path, QPointF textPos, 
 {
     Q_D(LaserCircleText);
     QTransform t = scaleText(path) * rotateText(i, textPos);
-    QPointF point = t.map(QPointF(d->originalTextPathList[0].boundingRect().center().x(), d->originalTextPathList[0].boundingRect().center().y()));
+    QPointF point = t.map(path.boundingRect().center());
     QPointF pos = QPointF(textPos.x() - point.x(), textPos.y() - point.y());
     QTransform t3;
     t3.translate(pos.x(), pos.y());
@@ -4073,10 +4085,10 @@ void LaserCircleText::transformTextByCenter(QPainterPath path, QPointF textPos, 
 QRectF LaserCircleText::textArcRect()
 {
     Q_D(LaserCircleText);
-    QRectF rect(d->circleBounds.x() + d->size.height()*0.6,
-        d->circleBounds.y() + d->size.height()*0.6,
-        d->circleBounds.width() - d->size.height()*1.2,
-        d->circleBounds.height() - d->size.height()*1.2);
+    QRectF rect(d->circleBounds.left() + d->horizontalPathHeight *0.5,
+        d->circleBounds.top() + d->horizontalPathHeight *0.5,
+        d->circleBounds.width() - d->horizontalPathHeight,
+        d->circleBounds.height() - d->horizontalPathHeight);
     /*if (rect.width() > rect.height()) {
         d->textEllipse_a = rect.width() * 0.5;
         d->textEllipse_b = rect.height() * 0.5;
@@ -4148,7 +4160,7 @@ void LaserCircleText::setTextSize(QSize size, bool needInit)
         if (shorterLine > d->circleBounds.height()) {
             shorterLine = d->circleBounds.height();
         }
-        d->size.setHeight(shorterLine * 0.25);
+        d->size.setHeight(shorterLine * 0.22);
     }
     else {
         d->size = size;
@@ -4190,7 +4202,7 @@ qreal LaserCircleText::mapToAffineCircleAngle(qreal radian)
     return angle;
 }
 
-void LaserCircleText::moveTextToEllipse(qreal lengthByPercent)
+void LaserCircleText::moveTextToEllipse()
 {
     Q_D(LaserCircleText);
     qreal a = d->textEllipse_a;
@@ -4338,7 +4350,7 @@ void LaserCircleText::draw(QPainter * painter)
 LaserPrimitive * LaserCircleText::clone(QTransform t)
 {
     Q_D(LaserCircleText);
-    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->isFill, d->family, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
+    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->isFill, d->family,d->space, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
     return nullptr;
 }
 
@@ -4372,6 +4384,7 @@ QJsonObject LaserCircleText::toJson()
     object.insert("uppercase", d->uppercase);
     object.insert("family", d->family);
     object.insert("fill", d->isFill);
+    object.insert("space", d->space);
     return object;
 }
 
@@ -4423,7 +4436,9 @@ void LaserCircleText::recompute()
 
 void LaserCircleText::setSpace(qreal space)
 {
-    
+    Q_D(LaserCircleText);
+    d->space = space;
+    computeTextPath(d->angle, d->size, false);
 }
 
 
@@ -4441,6 +4456,9 @@ void LaserCircleText::setTextHeight(qreal height)
 
 void LaserCircleText::setTextWidth(qreal width)
 {
+    //width is auto compute, through the space to change(通过space来修改text的宽度)
+    //Q_D(LaserCircleText);
+    //computeTextPath(d->angle, QSize(width, d->size.height()), false);
 }
 
 class LaserHorizontalTextPrivate : public LaserStampTextPrivate

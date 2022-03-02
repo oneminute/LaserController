@@ -4,84 +4,79 @@
 #include<QListView>
 #include<QStyledItemDelegate>
 #include<QComboBox>
+#include<QHeaderView>
+#include<QCheckBox>
 #include"scene/LaserPrimitive.h"
 
-StampCircleDialog::StampCircleDialog(LaserScene* scene, QWidget* parent) 
+StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* parent) 
    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
-    m_ui(new Ui::StampCircleDialog), m_scene(scene)
+    m_ui(new Ui::StampCircleDialog), m_scene(scene), m_isEllipse(isEllipse)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
+
+    //text margins
+    m_ui->marginSpinBox->setMinimum(-DBL_MAX);
+    m_ui->marginSpinBox->setMaximum(DBL_MAX);
+    //
+    //text space
+    m_ui->hSpaceSpinBox->setMinimum(-DBL_MAX);
+    m_ui->hSpaceSpinBox->setMaximum(DBL_MAX);
+    m_ui->hSpaceSpinBox->setValue(0);
     //LayoutComboBox
-    QPixmap fourPm(":/ui/icons/images/frameFour.png");
-    QPixmap threePm(":/ui/icons/images/frameThreeL.png");
-    QPixmap threeRPm(":/ui/icons/images/frameThreeR.png");
-    QPixmap threeLPm(":/ui/icons/images/frameTwo.png");
-    m_ui->circleStampLayoutComboBox->addItem(QIcon(fourPm), tr("Four Character"));
-    m_ui->circleStampLayoutComboBox->addItem(QIcon(threePm), tr("Three Character Left"));
-    m_ui->circleStampLayoutComboBox->addItem(QIcon(threeRPm), tr("Three Character Right"));
-    m_ui->circleStampLayoutComboBox->addItem(QIcon(threeLPm), tr("Two Character"));
-    m_ui->circleStampLayoutComboBox->setItemDelegate(new QStyledItemDelegate());
-    connect(m_ui->circleStampLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-        switch (index) {
-        case 0: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(fourPm);
-            m_ui->lineEdit->setMaxLength(4);
-            break;
-        }
-        case 1: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(threePm);
-            m_ui->lineEdit->setMaxLength(3);
-            break;
-        }
-        case 2: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(threeRPm);
-            m_ui->lineEdit->setMaxLength(3);
-            break;
-        }
-        case 3: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(threeLPm);
-            m_ui->lineEdit->setMaxLength(2);
-            break;
-        }
-        }
-    });
-    //corner type
-    m_ui->circleCornerTypeComboBox->addItem(tr("Round Corner"));
-    m_ui->circleCornerTypeComboBox->addItem(tr("Cutted Corner"));
-    m_ui->circleCornerTypeComboBox->addItem(tr("Inner Corner"));
-    connect(m_ui->circleCornerTypeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-        switch (index) {
-        case 0: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(fourPm);
-            break;
-        }
-        case 1: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(threePm);
-            break;
-        }
-        case 2: {
-            //m_ui->frameStampLayoutLabelIcon->setPixmap(threePm);
-            break;
-        }
-        
-        }
-    });
-    //frame width
-    m_ui->circleWidthSpinBox->setValue(40);
-    m_ui->circleWidthSpinBox->setMaximum(DBL_MAX);
-    //frame height
-    m_ui->circleHeightSpinBox->setValue(40);
-    m_ui->circleHeightSpinBox->setMaximum(DBL_MAX);
-    //frame border
+    if (m_isEllipse) {
+        m_ui->circleHeightLabel->setVisible(true);
+        m_ui->circleHeightSpinBox->setVisible(true);
+        m_ui->lineGroupBox->setVisible(false);
+        m_ui->AdditionGroupBox->setCheckable(true);
+        m_ui->AdditionGroupBox->setChecked(false);
+        m_ui->circleDiameterSpinBox->setValue(50);
+        m_ui->circleHeightSpinBox->setValue(35);
+        m_ui->embleSizeSpinBox->setValue(6);
+        m_ui->marginSpinBox->setValue(1);
+        m_ui->hSpaceSpinBox->setValue(0.5);
+        //angle
+        m_ui->angleSpinBox->setValue(200);
+        QPixmap normal(":/ui/icons/images/normalCircleStamp.png");
+        QPixmap horizontalText(":/ui/icons/images/HTextCircleStamp.png");
+        QPixmap emblemEllipse(":/ui/icons/images/bottomTextCircleStamp.png");
+        QPixmap newA(":/ui/icons/images/CCYLStamp.png");
+        QPixmap newB(":/ui/icons/images/CCYLStamp.png");
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(normal), tr("Normal Ellipse Stamp"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(horizontalText), tr("Horizontal Text Ellipse Stamp"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(emblemEllipse), tr("Emblem Ellipse Stamp"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(newA), tr("New Invoice Stamp A"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(newB), tr("New Invoice Stamp B"));
+        m_ui->circleStampLayoutComboBox->setItemDelegate(new QStyledItemDelegate());
+    }
+    else {
+        m_ui->circleBorderLabel->setVisible(false);
+        m_ui->circleHeightSpinBox->setVisible(false);
+        m_ui->circleDiameterSpinBox->setValue(40);
+        m_ui->embleSizeSpinBox->setValue(13);
+        m_ui->marginSpinBox->setValue(1);
+        //angle
+        m_ui->angleSpinBox->setValue(225);
+        QPixmap normal(":/ui/icons/images/normalCircleStamp.png");
+        QPixmap horizontalText(":/ui/icons/images/HTextCircleStamp.png");
+        QPixmap bottomText(":/ui/icons/images/bottomTextCircleStamp.png");
+        QPixmap CCYL(":/ui/icons/images/CCYLStamp.png");
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(normal), tr("Normal Circle Stamp"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(horizontalText), tr("Horizontal Text Circle Stamp"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(bottomText), tr("Bottom Text Circle Stamp"));
+        m_ui->circleStampLayoutComboBox->addItem(QIcon(CCYL), tr("CCYL Circle Stamp"));
+        m_ui->circleStampLayoutComboBox->setItemDelegate(new QStyledItemDelegate());
+    }
+    
+    
+    //diameter
+    m_ui->circleDiameterSpinBox->setMaximum(DBL_MAX);
+    
+    //border
     m_ui->circleBorderSpinBox->setValue(1);
-    m_ui->circleBorderSpinBox->setMaximum(DBL_MAX);
-    //frame CornerSize
-    m_ui->circleCornerSizeSpinBox->setValue(2);
-    m_ui->circleCornerSizeSpinBox->setMaximum(DBL_MAX);
-    //frame CornerType
-    m_ui->circleCornerTypeComboBox->setCurrentIndex(0);
-    //inner frame
+    m_ui->circleBorderSpinBox->setMaximum(DBL_MAX);    
+    
+    //inner circle
     m_ui->innerCircleGroupBox->setChecked(false);
     connect(m_ui->innerCircleGroupBox, QOverload<bool>::of(&QGroupBox::toggled), [=](bool checked) {
         m_ui->innerCircleLayout->setEnabled(checked);
@@ -91,17 +86,6 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene, QWidget* parent)
     m_ui->InnerCircleMarginDoubleSpinBox->setMaximum(DBL_MAX);
     m_ui->InnerCircleBorderDoubleSpinBox->setValue(0.5);
     m_ui->InnerCircleBorderDoubleSpinBox->setMaximum(DBL_MAX);
-
-    //text content
-    connect(m_ui->lineEdit, QOverload<const QString&>::of(&QLineEdit::textChanged), [=](const QString& text) {
-        bool b = text.contains(QRegExp("[\\x4e00-\\x9fa5]+"));
-        if (b) {
-            m_ui->fontComboBox->setWritingSystem(QFontDatabase::SimplifiedChinese);
-        }
-        else {
-            m_ui->fontComboBox->setWritingSystem(QFontDatabase::Any);
-        }
-    });
     //fill
     connect(m_ui->fillBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
         
@@ -115,7 +99,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene, QWidget* parent)
         }
     });
     //isToRightButton
-    connect(m_ui->isToLeftBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
+    /*connect(m_ui->isToLeftBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
         QPixmap icon(":/ui/icons/images/toRightArrow.png");
         if (checked) {
             
@@ -127,17 +111,17 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene, QWidget* parent)
         else {
             m_ui->isToLeftBtn->setIcon(QIcon(icon));
         }
-    });
+    });*/
     //itatic
-    connect(m_ui->itaticBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
+    connect(m_ui->italicBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
         
         if (checked) {
             QPixmap icon(":/ui/icons/images/itatic.png");
-            m_ui->itaticBtn->setIcon(QIcon(icon));
+            m_ui->italicBtn->setIcon(QIcon(icon));
         }
         else {
             QPixmap icon(":/ui/icons/images/straight.png");
-            m_ui->itaticBtn->setIcon(QIcon(icon));
+            m_ui->italicBtn->setIcon(QIcon(icon));
         }
     });
     //bold
@@ -152,15 +136,330 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene, QWidget* parent)
         m_ui->boldBtn->setIcon(QIcon(icon));
     }
     });
-    //text margins
-    m_ui->hMarginSpinBox->setMaximum(DBL_MAX);
-    m_ui->vMarginSpinBox->setMaximum(DBL_MAX);
-    //text space
-    m_ui->hSpaceSpinBox->setMaximum(DBL_MAX);
-    m_ui->vSpaceSpinBox->setMaximum(DBL_MAX);
+    //list
+    m_viewItemModel = new QStandardItemModel();
+    QHeaderView* head = new QHeaderView(Qt::Horizontal);
+    //head->setStyleSheet("QHeaderView{color:rgb(128, 128, 128)}");
+    //head->setStyleSheet("QHeaderView::section {background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 #00007f, stop: 0.5 #00007f,stop: 0.6 #00007f, stop:1 #00007f);color: white;}");
+
+    QStringList hearderLabels;
+    hearderLabels.append(QString(tr("content")));
+    hearderLabels.append(QString(tr("font")));
+    //iStandardItemModel->setHorizontalHeaderLabels(hearderLabels);
+    m_viewItemModel->setHorizontalHeaderItem(0, new QStandardItem(tr("content")));
+    m_viewItemModel->setHorizontalHeaderItem(1, new QStandardItem(tr("font")));
+    m_viewItemModel->setHorizontalHeaderItem(2, new QStandardItem(tr("property")));
+    m_viewItemModel->setHorizontalHeaderItem(3, new QStandardItem(tr("text spacing")));
+    //m_ui->tableView->setHorizontalHeader(head);
+    m_ui->tableView->setModel(m_viewItemModel);
+    QString headViewStr("QHeaderView::section{background-color:rgb(245, 245, 245);color:rgb(18, 18, 18);bold:true;}");
+    m_ui->tableView->horizontalHeader()->setStyleSheet(headViewStr);
+    //m_ui->tableView->verticalHeader()->setStyleSheet(headViewStr);
+    m_checkedItemStyle = QString("QTableView::indicator:checked {color:rgb(85, 85, 85);}");
+    m_uncheckedItemStyle = QString("QTableView::indicator:unchecked {color:rgb(185, 185, 185);}");
+    m_ui->tableView->setStyleSheet("QTableView::item {color:rgb(85, 85, 85);}QTableView QTableCornerButton::section {background-color:rgb(145, 145, 145);}");
+    m_ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    //add
+    /*connect(m_ui->addToolButton, QOverload<bool>::of(&QToolButton::clicked), [=](bool checked) {
+        QString contentStr = m_ui->lineEdit->text().trimmed();
+        if (contentStr.isEmpty()) {
+            return;
+        }
+        int index = m_ui->circleStampLayoutComboBox->currentIndex();
+        int row = m_viewItemModel->rowCount();
+        //signal row
+        if (index == 0 && row > 0) {
+            return;
+        }
+        else if (index == 1 && row > 1) {
+            return;
+        }
+        else if (index == 2 && row > 2) {
+            return;
+        }
+        QString propertyStr;
+        propertyStr = m_textRowProperty[row];
+        
+        //addTableViewRow(row, contentStr, m_ui->fontComboBox->currentText(), propertyStr);
+    });*/
+    // delete
+    /*connect(m_ui->delToolButton, QOverload<bool>::of(&QToolButton::clicked), [=](bool checked) {
+        QModelIndexList list = m_ui->tableView->selectionModel()->selectedRows();
+        m_viewItemModel->removeRows(list[0].row(), list.size());
+
+    });*/
+    //selection change
+    connect(m_ui->tableView->selectionModel(), QOverload<const QModelIndex&, const QModelIndex&>::of(&QItemSelectionModel::currentChanged), [=](const QModelIndex& current, const QModelIndex& previous) {
+        if (!current.isValid()) {
+            return;
+        }
+        QStandardItem* item0 = m_viewItemModel->item(current.row(), 0);
+        QStandardItem* item1 = m_viewItemModel->item(current.row(), 1);
+        QStandardItem* item3 = m_viewItemModel->item(current.row(), 3);
+        m_ui->fontComboBox->blockSignals(true);
+        m_ui->fontComboBox->setCurrentText(item1->text());
+        m_ui->fontComboBox->blockSignals(false);
+        m_ui->lineEdit->blockSignals(true);
+        m_ui->lineEdit->setText(item0->text());
+        m_ui->lineEdit->blockSignals(false);
+        m_ui->hSpaceSpinBox->blockSignals(true);
+        m_ui->hSpaceSpinBox->setValue(item3->text().toDouble());
+        m_ui->hSpaceSpinBox->blockSignals(false);
+    });
+    //text content
+    connect(m_ui->lineEdit, QOverload<const QString&>::of(&QLineEdit::textChanged), [=](const QString& text) {
+        if (m_ui->tableView->selectionModel()->selectedRows().size() == 1) {
+            QModelIndex index = m_ui->tableView->selectionModel()->currentIndex();
+            QStandardItem* item = m_viewItemModel->item(index.row(), 0);
+            item->setText(text);
+        }
+    });
+    //font family
+    connect(m_ui->fontComboBox, QOverload<const QString&>::of(&QComboBox::currentTextChanged), [=](const QString& text) {
+        QModelIndexList list = m_ui->tableView->selectionModel()->selectedRows();
+        if (list.size() == 1) {
+            QStandardItem* item = m_viewItemModel->item(list[0].row(), 1);
+            item->setText(text);
+        }
+    });
+    //spacing
+    connect(m_ui->hSpaceSpinBox, QOverload<double>::of(&LaserDoubleSpinBox::valueChanged), [=](double v) {
+        QModelIndexList list = m_ui->tableView->selectionModel()->selectedRows();
+        if (list.size() == 1) {
+            QStandardItem* item = m_viewItemModel->item(list[0].row(), 3);
+            item->setText(QString::number(v));
+        }
+    });
+    m_preLayoutIndex = 0;
+    for (int i = 0; i < m_ui->circleStampLayoutComboBox->count(); i++) {
+        m_tablesModelList.append(QMap<QModelIndex, itemStruct>());
+    }
+    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(),
+        m_textRowProperty[0], Qt::Checked, m_ui->hSpaceSpinBox->value());
+    connect(m_ui->circleStampLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+        if (m_isEllipse) {
+            
+            if (index == 0) {
+                m_ui->circleDiameterSpinBox->setValue(50);
+                m_ui->circleHeightSpinBox->setValue(35);
+                m_ui->marginSpinBox->setValue(1);
+                m_ui->AdditionGroupBox->setChecked(false);
+            }
+            else if (index == 1) {
+                m_ui->circleDiameterSpinBox->setValue(50);
+                m_ui->circleHeightSpinBox->setValue(35);
+                m_ui->marginSpinBox->setValue(1);
+                m_ui->AdditionGroupBox->setChecked(false);
+            }
+            else if (index == 2) {
+                m_ui->circleDiameterSpinBox->setValue(50);
+                m_ui->circleHeightSpinBox->setValue(35);
+                m_ui->marginSpinBox->setValue(1);
+                m_ui->AdditionGroupBox->setChecked(true);
+            }
+            else if (index == 3) {
+                m_ui->circleDiameterSpinBox->setValue(40);
+                m_ui->circleHeightSpinBox->setValue(30);
+                m_ui->marginSpinBox->setValue(0.75);
+                m_ui->AdditionGroupBox->setChecked(false);
+            }
+            else if (index == 4) {
+                m_ui->circleDiameterSpinBox->setValue(40);
+                m_ui->circleHeightSpinBox->setValue(30);
+                m_ui->marginSpinBox->setValue(0.75);
+                m_ui->AdditionGroupBox->setChecked(false);
+            }
+        }
+        else {
+            m_ui->circleDiameterSpinBox->setValue(40);
+            if (index == 0) {
+                m_ui->angleSpinBox->setValue(210);
+                m_ui->circleBorderSpinBox->setValue(1.0);
+                m_ui->embleSizeSpinBox->setValue(13);
+                m_ui->lineWidthSpinBox->setValue(0);
+                m_ui->lineGroupBox->setChecked(false);
+            }
+            else if (index == 1) {
+                m_ui->angleSpinBox->setValue(210);
+                m_ui->circleBorderSpinBox->setValue(1.0);
+                m_ui->embleSizeSpinBox->setValue(13);
+                m_ui->lineWidthSpinBox->setValue(0);
+                m_ui->lineGroupBox->setChecked(false);
+            }
+            else if (index == 2) {
+                m_ui->angleSpinBox->setValue(225);
+                m_ui->circleBorderSpinBox->setValue(1.0);
+                m_ui->embleSizeSpinBox->setValue(13);
+                m_ui->lineWidthSpinBox->setValue(0);
+                m_ui->lineGroupBox->setChecked(false);
+            }
+            else if (index == 3) {
+                m_ui->angleSpinBox->setValue(145);
+                m_ui->circleBorderSpinBox->setValue(1.5);
+                m_ui->embleSizeSpinBox->setValue(6);
+                m_ui->lineWidthSpinBox->setValue(1.8);
+                m_ui->lineGroupBox->setChecked(true);
+            }
+        }
+        
+        int count = m_viewItemModel->rowCount();
+        //存储上一个
+        QMap<QModelIndex, itemStruct> itemModelMap;
+        for (int i = 0; i < m_viewItemModel->rowCount(); i++) {
+            QStandardItem* item0 = m_viewItemModel->item(i, 0);
+            QStandardItem* item1 = m_viewItemModel->item(i, 1);
+            QStandardItem* item2 = m_viewItemModel->item(i, 2);
+            QStandardItem* item3 = m_viewItemModel->item(i, 3);
+            itemModelMap.insert(item0->index(), itemStruct(item0->text(), item0->checkState()));
+            itemModelMap.insert(item1->index(), itemStruct(item1->text(), item0->checkState()));
+            itemModelMap.insert(item2->index(), itemStruct(item2->text(), item0->checkState()));
+            itemModelMap.insert(item3->index(), itemStruct(item3->text(), item0->checkState()));
+        }
+        m_tablesModelList[m_preLayoutIndex] = itemModelMap;
+        //修改
+        QMap<QModelIndex, itemStruct> preModelList = m_tablesModelList[m_preLayoutIndex];
+        QMap<QModelIndex, itemStruct> curModelList = m_tablesModelList[index];
+        if (!curModelList.isEmpty()) {
+            m_viewItemModel->removeRows(0, m_viewItemModel->rowCount());
+            for (QMap<QModelIndex, itemStruct>::iterator i = curModelList.begin(); i != curModelList.end(); i++) {
+                QStandardItem* item = new QStandardItem(i.value().getStr());
+                item->setTextAlignment(Qt::AlignCenter);
+                if (i.key().column() == 0) {
+                    item->setCheckable(true);
+                    item->setCheckState(i.value().getCheckState());
+                }
+                
+                m_viewItemModel->setItem(i.key().row(), i.key().column(), item);
+            }
+        }
+        //init
+        else {
+            qreal initSpacing = m_ui->hSpaceSpinBox->value();
+            qreal initLineSpacing = 0.5;
+            if (count > 1) {
+                m_viewItemModel->removeRows(1, m_viewItemModel->rowCount() - 1);
+            }
+            if (m_isEllipse) {
+                if (index == 1 || index == 2) {
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
+                    addTableViewRow(1, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
+                }
+                else if (index == 3) {
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
+                    addTableViewRow(1, m_textInitRowContent[3], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
+                    addTableViewRow(2, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[3], Qt::Checked, initLineSpacing);
+                }
+                else if (index == 4) {
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
+                    addTableViewRow(1, m_textInitRowContent[3], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
+                    addTableViewRow(2, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[3], Qt::Checked, initLineSpacing);
+                    addTableViewRow(3, m_textInitRowContent[4], m_ui->fontComboBox->currentText(), m_textRowProperty[4], Qt::Checked, initLineSpacing);
+                }
+               
+            }
+            else {
+                if (index == 1 || index == 3) {
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
+                    addTableViewRow(1, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
+                    addTableViewRow(2, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[2], Qt::Unchecked, initSpacing);
+                }
+                else if (index == 2) {
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
+                    addTableViewRow(1, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[2], Qt::Checked, initLineSpacing);
+                    addTableViewRow(2, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Unchecked, initSpacing);
+                }
+            }
+            
+
+        }
+
+        m_preLayoutIndex = index;
+        
+
+    });
+    //item change
+    connect(m_viewItemModel, QOverload<QStandardItem*>::of(&QStandardItemModel::itemChanged), [=](QStandardItem* item) {       
+        Qt::CheckState state = Qt::Unchecked;
+        int r = item->index().row();
+        QStandardItem* content = m_viewItemModel->item(r, 0);
+        QStandardItem* font = m_viewItemModel->item(r, 1);
+        QStandardItem* property = m_viewItemModel->item(r, 2);
+        QStandardItem* spacing = m_viewItemModel->item(r, 3);
+        if (content) {
+            state = content->checkState();
+        }
+        if (state == Qt::Checked) {
+            item->setBackground(Qt::white);
+            if (font) {
+                font->setBackground(Qt::white);
+            }
+            if (property) {
+                property->setBackground(Qt::white);
+            }
+            if (spacing) {
+                spacing->setBackground(Qt::white);
+            }
+        }
+        else if (state == Qt::Unchecked) {
+            //QColor color = QColor(238, 238, 238);
+            QColor color = QColor(253, 253, 212);
+            item->setBackground(color);
+            if (font) {
+                font->setBackground(color);
+            }
+            if (property) {
+                property->setBackground(color);
+            }
+            if (spacing) {
+                spacing->setBackground(color);
+            }
+        }
+        
+    });
+    //Embelm ComboBox
+    QPixmap starEmblem(":/ui/icons/images/star.png");
+    QPixmap partyEmblem(":/ui/icons/images/partyEmblem.png");
+    m_ui->emblemComboBox->addItem(QIcon(starEmblem), tr("Star Emblem"));
+    m_ui->emblemComboBox->addItem(QIcon(partyEmblem), tr("Party Emblem"));
+    m_ui->emblemComboBox->setItemDelegate(new QStyledItemDelegate());
+    //Embelm size
+    m_ui->embleSizeSpinBox->setMaximum(DBL_MAX);
+    m_ui->embleSizeSpinBox->setMinimum(0);
+    
+    connect(m_ui->embleSizeSpinBox, QOverload<double>::of(&LaserDoubleSpinBox::valueChanged), [=](double v) {
+        qreal maxVal = m_ui->circleDiameterSpinBox->value();
+        if (v > maxVal) {
+            m_ui->embleSizeSpinBox->blockSignals(true);
+            m_ui->embleSizeSpinBox->setValue(maxVal);
+            m_ui->embleSizeSpinBox->blockSignals(false);
+        }
+    });
 }
 StampCircleDialog::~StampCircleDialog()
 {
+}
+
+void StampCircleDialog::addTableViewRow(int row, QString contentStr, QString fontStr, QString propertyStr, Qt::CheckState checkState, qreal textSpacing)
+{
+    
+    QStandardItem* content = new QStandardItem(contentStr);
+    QStandardItem* font = new QStandardItem(fontStr);
+    QStandardItem* property = new QStandardItem(propertyStr);
+    QStandardItem* spacing = new QStandardItem(QString::number(textSpacing));
+
+    content->setTextAlignment(Qt::AlignCenter);
+    font->setTextAlignment(Qt::AlignCenter);
+    property->setTextAlignment(Qt::AlignCenter);
+    spacing->setTextAlignment(Qt::AlignCenter);
+    content->setCheckable(true);
+    
+
+    m_viewItemModel->setItem(row, 0, content);
+    m_viewItemModel->setItem(row, 1, font);
+    m_viewItemModel->setItem(row, 2, property);
+    m_viewItemModel->setItem(row, 3, spacing);
+
+    content->setCheckState(checkState);
 }
 
 void StampCircleDialog::accept()
@@ -169,24 +468,41 @@ void StampCircleDialog::accept()
     QDialog::accept();
     QList<LaserPrimitive*> stampList;
     //create frame
-    qreal circleW = m_ui->circleWidthSpinBox->value() * 1000;
+    qreal circleW = m_ui->circleDiameterSpinBox->value() * 1000;
     qreal circleH = m_ui->circleHeightSpinBox->value() * 1000;
     //qreal cornerRadius = m_ui->circleCornerSizeSpinBox->value() * 1000;
     qreal circleBorder = m_ui->circleBorderSpinBox->value() * 1000;
     //int circleType = m_ui->circleCornerTypeComboBox->currentIndex();
     QPointF point = m_viewer->mapToScene(m_viewer->rect().center());
-    point = QPointF(point.x() - circleW * 0.5, point.y() - circleH * 0.5);
-    QRect rect(point.x(), point.y(), circleW, circleH);
+    point = QPointF(point.x() - circleW * 0.5, point.y() - circleW * 0.5);
+    QRect rect;
+    
+    if (m_isEllipse) {
+        rect = QRect(point.x(), point.y(), circleW, circleH);
+    }
+    else {
+        rect = QRect(point.x(), point.y(), circleW, circleW);
+    }
     LaserRing* circle = new LaserRing(m_scene->document(), rect, circleBorder, QTransform(), m_viewer->curLayerIndex());
     stampList.append(circle);
     LaserRing* innerCircle = nullptr;;
     QRect innerRect;
     qreal innerBorder;
+    qreal innderMargin;
     if (m_ui->innerCircleGroupBox->isChecked()) {
-        qreal innderMargin = m_ui->InnerCircleMarginDoubleSpinBox->value() * 1000;
+        innderMargin = m_ui->InnerCircleMarginDoubleSpinBox->value() * 1000;
         innerBorder = m_ui->InnerCircleBorderDoubleSpinBox->value() * 1000;
-        qreal innerW = circleW - innderMargin*2 - circleBorder*2;
-        qreal innerH = circleH - innderMargin*2 - circleBorder*2;
+        qreal innerW, innerH;
+        if (m_isEllipse) {
+            innerW = circleW - innderMargin * 2 - circleBorder * 2;
+            innerH = circleH - innderMargin * 2 - circleBorder * 2;
+        }
+        else {
+            innerW = circleW - innderMargin * 2 - circleBorder * 2;
+            innerH = circleW - innderMargin * 2 - circleBorder * 2;
+        }
+        
+        
         innerRect = QRect (point.x() + innderMargin + circleBorder, point.y() + innderMargin + circleBorder, innerW, innerH);
         innerCircle = new LaserRing(m_scene->document(), innerRect, innerBorder, QTransform(), m_viewer->curLayerIndex());
         stampList.append(innerCircle);
@@ -196,200 +512,164 @@ void StampCircleDialog::accept()
     //int layoutIndex = m_ui->frameStampLayoutComboBox->currentIndex();
     QSize signalSize;
     QSize doubleVerticalSize;
-    qreal textHMargin = m_ui->hMarginSpinBox->value() * 1000;
-    qreal textVMargin = m_ui->vMarginSpinBox->value() * 1000;
-    qreal textHSpace = m_ui->hSpaceSpinBox->value() * 1000;
-    qreal textVSpace = m_ui->vSpaceSpinBox->value() * 1000;
-    qreal textBoundsTop, textBoundsBottom, textBoundsLeft, textBoundsRight;
+    qreal textMargin = m_ui->marginSpinBox->value() * 1000;
+    qreal angle = m_ui->angleSpinBox->value();
+    QRect textBounds;
+    qreal diff;
     if (innerCircle) {
-        qreal vOffset = innerBorder + textVMargin;
-        qreal hOffset = innerBorder + textHMargin;
-        textBoundsTop = innerRect.top() + vOffset;
-        textBoundsBottom = innerRect.bottom() - vOffset;
-        textBoundsLeft = innerRect.left() + hOffset;
-        textBoundsRight = innerRect.right() - hOffset;
-        qreal width = (innerRect.width() - 2 * hOffset - textHSpace) * 0.5;
-        qreal height = innerRect.height() - 2 * vOffset;
-        signalSize = QSize(width,(height - textVSpace) * 0.5);
-        doubleVerticalSize = QSize(width, height);
+        qreal diff = innerBorder + textMargin;
+        textBounds = QRect(innerRect.left() + diff, innerRect.top() + diff, innerRect.width() - 2 * diff, innerRect.height() - 2 * diff);
     }
     else {
-        qreal vOffset = circleBorder + textVMargin;
-        qreal hOffset = circleBorder + textHMargin;
-        textBoundsTop = rect.top() + vOffset;
-        textBoundsBottom = rect.bottom() - vOffset;
-        textBoundsLeft = rect.left() + hOffset;
-        textBoundsRight = rect.right() - hOffset;
-        qreal width = (circleW - 2 * hOffset - textHSpace) * 0.5;
-        qreal height = circleH - 2 * vOffset;
-        signalSize = QSize(width, (height - textVSpace) * 0.5);
-        doubleVerticalSize = QSize(width, height);
+        diff = circleBorder + textMargin;
+        textBounds = QRect(rect.left() + diff, rect.top() + diff, rect.width() - 2 * diff, rect.height() - 2 * diff);
     }
+    
     QString content = m_ui->lineEdit->text().trimmed();
     bool bold = m_ui->boldBtn->isChecked();
-    bool itatic = m_ui->itaticBtn->isChecked();
+    bool italic = m_ui->italicBtn->isChecked();
     bool fill = !m_ui->fillBtn->isChecked();
-    bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
+    //bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
     QString family = m_ui->fontComboBox->currentText();
     bool containsDoubleText = false;
     
     int textLength = content.size();
     int layoutType = m_ui->circleStampLayoutComboBox->currentIndex();
     QSize textSize;
-    for (int i = 0; i < textLength; i++) {
-        QString signalText(content[i]);
-        QPointF center;
-        if (layoutType == 0) {
-            textSize = signalSize;
-            switch (i) {
-            case 0: {
-                
-                if (isRightToLeft) {
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            case 1: {
-                if (isRightToLeft) {
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                else {
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                break;
-            }
-            case 2: {
-                if (isRightToLeft) {
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            case 3: {
-                
-                if (isRightToLeft) {
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                else {
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                break;
-            }
-            }
+    for (int i = 0; i < m_viewItemModel->rowCount(); i++) {
+        QStandardItem* content = m_viewItemModel->item(i, 0);
+        QStandardItem* property = m_viewItemModel->item(i, 2);
+        QString contentStr = content->text();
+        int textSize = contentStr.size();
+        qreal textSpace = m_viewItemModel->item(i, 3)->text().toDouble() * 1000;
+        if (content->checkState() == Qt::Unchecked) {
+            continue;
         }
-        else if (layoutType == 1) {
-            switch (i) {
-            case 0: {
-                
-                if (isRightToLeft) {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    textSize = doubleVerticalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            case 1: {
-                
-                if (isRightToLeft) {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                else {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            case 2: {
-                if (isRightToLeft) {
-                    textSize = doubleVerticalSize;
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                    break;
-                }
-                else {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                    break;
-                }
-                
-            }
-            }
+        //Top Circle Text
+        if (property->text() == m_textRowProperty[0]) {
+            LaserCircleText* topCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, angle,
+                bold, italic, false, fill, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
+            stampList.append(topCircleText);
         }
-        else if (layoutType == 2) {
-            switch (i) {
-            case 0: {
-                if (isRightToLeft) {
-                    textSize = doubleVerticalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
+        //Horizontal Text
+        else if (property->text() == m_textRowProperty[1]) {
+            
+            qreal h, w, centerX, centerY;
+            if (m_isEllipse) {
+                h = 4700;
+                w = textBounds.width() * 0.5;
+                centerY = textBounds.top() + textBounds.height() * 0.738;
+                centerX = textBounds.left() + textBounds.width() * 0.5;
             }
-            case 1: {
-                if (isRightToLeft) {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                
-                break;
+            else {
+                h = textBounds.height() * (1.0 / 6);
+                w = textBounds.width() * 0.63;
+                centerY = textBounds.top() + textBounds.height() * 0.788;
+                centerX = textBounds.left() + textBounds.width() * 0.5;
             }
-            case 2: {
-                
-                if (isRightToLeft) {
-                    textSize = signalSize;
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
-                }
-                else {
-                    textSize = doubleVerticalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            }
+            
+            
+            QSize lineTextSize((w- textSpace*(textSize - 1))/ textSize,h);
+
+            LaserHorizontalText* lineText = new LaserHorizontalText(m_scene->document(), content->text(), lineTextSize, 
+                QPointF(centerX, centerY),bold, italic, false, fill, family, textSpace, QTransform(), m_viewer->curLayerIndex());
+            stampList.append(lineText);
         }
-        else if (layoutType == 3) {
-            switch (i) {
-            case 0: {
-                textSize = doubleVerticalSize;
-                if (isRightToLeft) {
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            case 1: {
-                textSize = doubleVerticalSize;
-                
-                if (isRightToLeft) {
-                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                else {
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
-                }
-                break;
-            }
-            }
+        //Bottom Circle Text
+        else if (property->text() == m_textRowProperty[2]) {
+            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, 320-angle,
+                bold, italic, false, fill, family, textSpace, true,0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
+            
+            qreal hsize = bottomCircleText->textSize().height() * 0.5;
+            bottomCircleText->setTextSize(QSize(hsize, hsize), false);
+            //bottomCircleText->computeTextPath(bottomCircleText->angle(), bottomCircleText->textSize(), false);
+
+            bottomCircleText->computeMoveTextPath(180);
+            bottomCircleText->recompute();
+            stampList.append(bottomCircleText);
         }
-        LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), signalText, textSize, center,
-            bold, itatic, false, fill, family, 0.0, QTransform(), m_viewer->curLayerIndex());
-        stampList.append(text);
+        //Horizontal Invoice Number
+        else if (property->text() == m_textRowProperty[3]) {
+            qreal h = 5600;
+            qreal w = rect.width() * (2.0 / 3.0);
+            QSize size((w - (textSize - 1) * textSpace) / textSize, h);
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, rect.center(),
+                bold, italic, false, fill, family, textSpace, QTransform(), m_viewer->curLayerIndex());
+            stampList.append(text);
+        }
+        //Horizontal Bottom Number
+        else if (property->text() == m_textRowProperty[4]) {
+            qreal h = 3400;
+            qreal w = 3400 * 1.5;
+            qreal centerY;
+            
+            QSize size((w - (textSize - 1) * textSpace) / textSize, h);
+            if (m_ui->innerCircleGroupBox->isChecked()) {
+                centerY = rect.bottom() - size.height() - innerBorder;
+            }
+            else {
+                centerY = rect.bottom() - size.height();
+            }
+            QPoint center(rect.center().x(), centerY);
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, center,
+                bold, italic, false, fill, family, textSpace, QTransform(), m_viewer->curLayerIndex());
+            stampList.append(text);
+        }
+        
+    }
+    //create emblem
+    qreal radius = m_ui->embleSizeSpinBox->value() * 1000 * 0.5;
+    int emblemIndex = m_ui->emblemComboBox->currentIndex();
+    bool drawEmble = false;
+    if (m_isEllipse) {
+        if (m_ui->AdditionGroupBox->isChecked()) {
+            drawEmble = true;
+        }
+        else {
+            drawEmble = false;
+        }
+        
+    }
+    else {
+        drawEmble = true;
+    }
+    if (drawEmble) {
+        if (emblemIndex == 0) {
+            LaserStar* star = new LaserStar(m_scene->document(), rect.center(), radius, QTransform(), m_viewer->curLayerIndex());
+            stampList.append(star);
+        }
+        else if (emblemIndex == 1) {
+            LaserPartyEmblem* party = new LaserPartyEmblem(m_scene->document(), rect.center(), radius, QTransform(), m_viewer->curLayerIndex());
+            stampList.append(party);
+        }
+    }
+    
+    //create line
+    if (m_ui->lineGroupBox->isChecked()) {
+        qreal circleBorder = m_ui->circleBorderSpinBox->value() * 1000;
+        qreal innerBorder = m_ui->InnerCircleBorderDoubleSpinBox->value() * 1000;
+        qreal innerMargin = m_ui->InnerCircleMarginDoubleSpinBox->value() * 1000;
+        bool needInner = m_ui->innerCircleGroupBox->isChecked();
+        qreal w = rect.width() * 0.25;
+        qreal h = m_ui->lineWidthSpinBox->value()*1000;
+        qreal top = rect.center().y() - h * 0.5;
+        qreal diff, left1, left2;
+        if (!needInner) {
+            diff = circleBorder;
+        }
+        else {
+            diff = circleBorder + innerBorder + innerMargin;
+        }
+        left1 = rect.left() + diff - 500;
+        left2 = rect.right() - diff + 500 - w;
+        QRect lineRect1(left1, top, w, h);
+        QRect lineRect2(left2, top, w, h);
+        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, h * 0.5, 0);
+        line1->setNeedAuxiliaryLine(false);
+        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, h * 0.5, 0);
+        line2->setNeedAuxiliaryLine(false);
+        stampList.append(line1);
+        stampList.append(line2);
     }
     m_viewer->addPrimitiveAndExamRegionByBounds(stampList);
 }

@@ -620,7 +620,7 @@ class LaserCircleText : public LaserStampText {
     Q_OBJECT
 public:
     LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-        bool bold = false, bool italic = false, bool uppercase = false, bool isFill = true, QString family = "Times New Roman",
+        bool bold = false, bool italic = false, bool uppercase = false, bool isFill = true, QString family = "Times New Roman",qreal space = 0,
         bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
@@ -635,7 +635,7 @@ public:
     void setAngle(qreal angle, bool needInit = true);
     void setTextSize(QSize size, bool needInit = true);
     qreal mapToAffineCircleAngle(qreal radian);
-    void moveTextToEllipse(qreal lengthByPercent);
+    void moveTextToEllipse();
     void computeTextByPercent(int intervalCount);
     void computeMoveTextPath(qreal diffAngle);
     void computeChangeAngle(qreal angle);

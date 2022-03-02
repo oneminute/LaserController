@@ -165,5 +165,12 @@
 		<file>images/bold1.png</file>
 		<file>images/add_1.png</file>
 		<file>images/delete_1.png</file>
+		<file>images/multiLine.png</file>
+		<file>images/signalLine.png</file>
+		<file>images/multiCol.png</file>
+		<file>images/normalCircleStamp.png</file>
+		<file>images/HTextCircleStamp.png</file>
+		<file>images/CCYLStamp.png</file>
+		<file>images/bottomTextCircleStamp.png</file>
     </qresource>
 </RCC>
