@@ -64,6 +64,7 @@ public:
     QString hardwareActivatedDate;
     QString hardwareMaintainingTimes;
 
+    QMap<int, LaserRegister*> externalRegisters;
     QMap<int, LaserRegister*> userRegisters;
     QMap<int, LaserRegister*> systemRegisters;
 
@@ -123,6 +124,19 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningCompleted);
 
+    d->externalRegisters.insert(11, new LaserRegister(11, Config::ExternalRegister::x1Item(), false));
+    d->externalRegisters.insert(12, new LaserRegister(12, Config::ExternalRegister::y1Item(), false));
+    d->externalRegisters.insert(13, new LaserRegister(13, Config::ExternalRegister::z1Item(), false));
+    d->externalRegisters.insert(14, new LaserRegister(14, Config::ExternalRegister::u1Item(), false));
+    d->externalRegisters.insert(15, new LaserRegister(15, Config::ExternalRegister::x2Item(), false));
+    d->externalRegisters.insert(16, new LaserRegister(16, Config::ExternalRegister::y2Item(), false));
+    d->externalRegisters.insert(17, new LaserRegister(17, Config::ExternalRegister::z2Item(), false));
+    d->externalRegisters.insert(18, new LaserRegister(18, Config::ExternalRegister::u2Item(), false));
+    d->externalRegisters.insert(19, new LaserRegister(19, Config::ExternalRegister::x3Item(), false));
+    d->externalRegisters.insert(20, new LaserRegister(20, Config::ExternalRegister::y3Item(), false));
+    d->externalRegisters.insert(21, new LaserRegister(21, Config::ExternalRegister::z3Item(), false));
+    d->externalRegisters.insert(22, new LaserRegister(22, Config::ExternalRegister::u3Item(), false));
+
     d->userRegisters.insert(0, new LaserRegister(0, Config::UserRegister::headItem(), false));
     d->userRegisters.insert(1, new LaserRegister(1, Config::UserRegister::accModeItem(), false));
     d->userRegisters.insert(2, new LaserRegister(2, Config::UserRegister::cuttingMoveSpeedItem(), false));
@@ -167,7 +181,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(41, new LaserRegister(41, Config::UserRegister::zSpeedItem(), false));
     d->userRegisters.insert(42, new LaserRegister(42, Config::UserRegister::materialThicknessItem(), false));
     d->userRegisters.insert(43, new LaserRegister(43, Config::UserRegister::movementStepLengthItem(), false));
-    d->userRegisters.insert(44, new LaserRegister(44, Config::UserRegister::focusPointCompensationUnitItem(), false));
+    d->userRegisters.insert(44, new LaserRegister(44, Config::UserRegister::focalLengthItem(), false));
 
     d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
     d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));
@@ -301,6 +315,9 @@ void LaserDevice::load()
             d->isInit = true;
             d->driver->getPortList();
             updateDriverLanguage();
+            QString dongleId = d->driver->getDongleId();
+            if (!dongleId.isEmpty() && !dongleId.isNull())
+                emit dongleConnected();
         }
     }
 }
@@ -678,6 +695,14 @@ bool LaserDevice::registerMainCard(const QString& registeCode, QWidget* parentWi
     return false;
 }
 
+bool LaserDevice::writeExternalRegisters(bool onlyModified)
+{
+    Q_D(LaserDevice);
+    if (!isConnected())
+        return false;
+    return d->driver->writeExternalParamToCard(externalRegisterValues(onlyModified));
+}
+
 bool LaserDevice::writeUserRegisters(bool onlyModified)
 {
     Q_D(LaserDevice);
@@ -717,7 +742,7 @@ bool LaserDevice::readHostRegisters()
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->readAllHostParamFromCard();
+    return d->driver->readAllExternalParamFromCard();
 }
 
 bool LaserDevice::readUserRegister(int address)
@@ -830,8 +855,8 @@ void LaserDevice::moveToZOrigin()
     Q_D(LaserDevice);
     if (d->driver)
     {
-        int target = Config::Device::zFocalLength() - Config::Device::calibrationBlockThickness();
-        target = qBound(0, target, Config::Device::zFocalLength());
+        int target = Config::UserRegister::focalLength() - Config::Device::calibrationBlockThickness();
+        target = qBound(0, target, Config::UserRegister::focalLength());
         d->driver->lPenMoveToOriginalPointZ(target);
     }
 }
@@ -1061,19 +1086,40 @@ QPoint LaserDevice::laserPosition() const
     return d->lastState.pos.toPoint();
 }
 
-QVector3D LaserDevice::userOrigin() const
+const DeviceState& LaserDevice::deviceState() const
 {
-    QVector3D origin;
+    Q_D(const LaserDevice);
+    return d->lastState;
+}
+
+QVector4D LaserDevice::userOrigin() const
+{
+    QVector4D origin;
     switch (Config::Device::userOriginSelected())
     {
     case 0:
-        origin = Config::Device::userOrigin1();
+        origin = QVector4D(
+            Config::ExternalRegister::x1(),
+            Config::ExternalRegister::y1(),
+            Config::ExternalRegister::z1(),
+            Config::ExternalRegister::u1()
+        );
         break;
     case 1:
-        origin = Config::Device::userOrigin2();
+        origin = QVector4D(
+            Config::ExternalRegister::x2(),
+            Config::ExternalRegister::y2(),
+            Config::ExternalRegister::z2(),
+            Config::ExternalRegister::u2()
+        );
         break;
     case 2:
-        origin = Config::Device::userOrigin3();
+        origin = QVector4D(
+            Config::ExternalRegister::x3(),
+            Config::ExternalRegister::y3(),
+            Config::ExternalRegister::z3(),
+            Config::ExternalRegister::u3()
+        );
         break;
     }
     return origin;
@@ -1122,119 +1168,40 @@ bool LaserDevice::isAbsolute() const
     return false;
 }
 
-void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed)
+LaserRegister::RegistersMap LaserDevice::externalRegisterValues(bool onlyModified) const
 {
-    Q_D(LaserDevice);
-    QStringList segments = raw.split(";");
-    for (QString seg : segments)
-    {
-        QStringList segItem = seg.split(",");
-        if (segItem.length() != 2)
-        {
-            continue;
-        }
-        bool ok;
-        int addr = segItem[0].toInt(&ok);
-        if (!ok)
-        {
-            continue;
-        }
-        QString value = segItem[1];
-        if (isSystem)
-        {
-            if (d->systemRegisters.contains(addr))
-            {
-                d->systemRegisters[addr]->parse(value);
-                //if (!isConfirmed)
-                    d->systemRegisters[addr]->configItem()->loadValue(value);
-            }
-        }
-        else
-        {
-            if (d->userRegisters.contains(addr))
-            {
-                d->userRegisters[addr]->parse(value);
-                //if (!isConfirmed)
-                    d->userRegisters[addr]->configItem()->loadValue(value);
-            }
-        }
-    }
+    Q_D(const LaserDevice);
+    return registerValues(d->externalRegisters, onlyModified);
 }
 
 LaserRegister::RegistersMap LaserDevice::userRegisterValues(bool onlyModified) const
 {
     Q_D(const LaserDevice);
-    LaserRegister::RegistersMap map;
-    for (LaserRegister* item : d->userRegisters.values())
-    {
-        if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
-            continue;
-
-        LaserRegister::RegisterPair pair(item->address(), item->configItem()->value());
-        if (!pair.second.isValid())
-            continue;
-        map.insert(pair.first, pair.second);
-    }
-    return map;
+    return registerValues(d->userRegisters, onlyModified);
 }
 
 LaserRegister::RegistersMap LaserDevice::systemRegisterValues(bool onlyModified) const
 {
     Q_D(const LaserDevice);
-    LaserRegister::RegistersMap map;
-    for (LaserRegister* item : d->systemRegisters.values())
-    {
-        if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
-            continue;
+    return registerValues(d->systemRegisters, onlyModified);
+}
 
-        LaserRegister::RegisterPair pair(item->address(), item->configItem()->value());
-        if (!pair.second.isValid())
-            continue;
-        map.insert(pair.first, pair.second);
-    }
-    return map;
+QMap<int, LaserRegister*> LaserDevice::externalRegisters(bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    return getRegisters(d->externalRegisters, onlyModified);
 }
 
 QMap<int, LaserRegister*> LaserDevice::userRegisters(bool onlyModified) const
 {
     Q_D(const LaserDevice);
-    if (onlyModified)
-    {
-        QMap<int, LaserRegister*> map;
-        for (LaserRegister* item : d->userRegisters.values())
-        {
-            if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
-                continue;
-
-            map.insert(item->address(), item);
-        }
-        return map;
-    }
-    else
-    {
-        return d->userRegisters;
-    }
+    return getRegisters(d->userRegisters, onlyModified);
 }
 
 QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
 {
     Q_D(const LaserDevice);
-    if (onlyModified)
-    {
-        QMap<int, LaserRegister*> map;
-        for (LaserRegister* item : d->systemRegisters.values())
-        {
-            if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
-                continue;
-
-            map.insert(item->address(), item);
-        }
-        return map;
-    }
-    else
-    {
-        return d->systemRegisters;
-    }
+    return getRegisters(d->systemRegisters, onlyModified);
 }
 
 int LaserDevice::engravingAccLength(int engravingRunSpeed) const
@@ -1362,6 +1329,91 @@ void LaserDevice::updateDeviceOriginAndTransform()
     d->updateDeviceOriginAndTransform();
 }
 
+LaserRegister::RegistersMap LaserDevice::registerValues(const QMap<int, LaserRegister*>& registers, bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    LaserRegister::RegistersMap map;
+    for (LaserRegister* item : registers.values())
+    {
+        if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
+            continue;
+
+        LaserRegister::RegisterPair pair(item->address(), item->configItem()->value());
+        if (!pair.second.isValid())
+            continue;
+        map.insert(pair.first, pair.second);
+    }
+    return map;
+}
+
+QMap<int, LaserRegister*> LaserDevice::getRegisters(const QMap<int, LaserRegister*>& registers, bool onlyModified) const
+{
+    Q_D(const LaserDevice);
+    if (onlyModified)
+    {
+        QMap<int, LaserRegister*> map;
+        for (LaserRegister* item : registers.values())
+        {
+            if (onlyModified && !item->configItem()->isModified() && !item->configItem()->isDirty())
+                continue;
+
+            map.insert(item->address(), item);
+        }
+        return map;
+    }
+    else
+    {
+        return registers;
+    }
+}
+
+void LaserDevice::parseSystemRegisters(const QString& raw)
+{
+    Q_D(LaserDevice);
+    batchParse(raw, d->systemRegisters);
+}
+
+void LaserDevice::parseUserRegisters(const QString& raw)
+{
+    Q_D(LaserDevice);
+    batchParse(raw, d->userRegisters);
+}
+
+void LaserDevice::parseExternalRegisters(const QString& raw)
+{
+    Q_D(LaserDevice);
+    batchParse(raw, d->externalRegisters);
+}
+
+void LaserDevice::batchParse(const QString& raw, const QMap<int, LaserRegister*>& registers)
+{
+    if (raw.isEmpty())
+    {
+        throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
+    }
+    QStringList segments = raw.split(";");
+    for (QString seg : segments)
+    {
+        QStringList segItem = seg.split(",");
+        if (segItem.length() != 2)
+        {
+            continue;
+        }
+        bool ok;
+        int addr = segItem[0].toInt(&ok);
+        if (!ok)
+        {
+            continue;
+        }
+        QString value = segItem[1];
+        if (registers.contains(addr))
+        {
+            registers[addr]->parse(value);
+            registers[addr]->configItem()->loadValue(value);
+        }
+    }
+}
+
 void LaserDevice::handleError(int code, const QString& message)
 {
     Q_D(LaserDevice);
@@ -1388,7 +1440,7 @@ void LaserDevice::handleError(int code, const QString& message)
         throw new LaserDeviceConnectionException(code, tr("Failed to get COM port list"));
         break;
     case E_DongleNotExists:
-        throw new LaserDeviceSecurityException(code, tr("Dongle does not exist"));
+        emit dongleRemoved();
         break;
     case E_DongleActiveDisabled:
         throw new LaserDeviceSecurityException(code, tr("Dongle activation is disabled"));
@@ -1558,6 +1610,11 @@ void LaserDevice::handleMessage(int code, const QString& message)
     case M_ComPortOpened:
     {
         d->connected = true;
+        QString id = d->driver->getHardwareIdentID();
+        if (!id.isEmpty() && !id.isNull())
+        {
+            emit dongleConnected();
+        }
         emit comPortConnected(portName());
         emit connected();
         break;
@@ -1571,6 +1628,12 @@ void LaserDevice::handleMessage(int code, const QString& message)
     case M_USBArrival:
         break;
     case M_USBRemove:
+        break;
+    case M_DongleConnected:
+        emit dongleConnected();
+        break;
+    case M_DongleDisconnected:
+        emit dongleDisconnected();
         break;
     case M_MainCardRegisterOK:
     {
@@ -1609,6 +1672,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
         d->hardwareActivatedDate = items[12];
         d->hardwareMaintainingTimes = items[13];
         emit mainCardInfoFetched();
+        emit dongleConnected();
         break;
     }
     case M_CardDongleBindOK:
@@ -1621,50 +1685,37 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_ReadSysParamFromCardOK:
     {
-        if (message.isEmpty())
-        {
-            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
-        }
-        batchParse(message, true, false);
-        debugPrintSystemRegisters();
+        parseSystemRegisters(message);
+        //debugPrintSystemRegisters();
         break;
     }
     case M_WriteSysParamToCardOK:
     {
-        if (message.isEmpty())
-        {
-            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
-        }
-        batchParse(message, true, true);
+        //debugPrintSystemRegisters();
+        parseSystemRegisters(message);
         emit systemRegistersConfirmed();
         break;
     }
     case M_ReadUserParamFromCardOK:
     {
-        if (message.isEmpty())
-        {
-            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
-        }
-        batchParse(message, false, false);
-        debugPrintUserRegisters();
+        parseUserRegisters(message);
+        //debugPrintUserRegisters();
         break;
     }
     case M_WriteUserParamToCardOK:
     {
-        if (message.isEmpty())
-        {
-            throw new LaserDeviceDataException(E_TransferDataError, tr("Registers data incomplete."));
-        }
-        batchParse(message, false, true);
+        parseUserRegisters(message);
         emit userRegistersConfirmed();
         break;
     }
     case M_ReadComputerParamFromCardOK:
     {
+        parseExternalRegisters(message);
         break;
     }
     case M_WriteComputerParamToCardOK:
     {
+        parseExternalRegisters(message);
         break;
     }
     case M_FactoryPasswordValid:

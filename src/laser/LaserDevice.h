@@ -77,6 +77,7 @@ public:
     bool sendAuthenticationEmail(const QString& email);
     bool registerMainCard(const QString& registeCode, QWidget* parentWidget = nullptr);
 
+    bool writeExternalRegisters(bool onlyModified = true);
     bool writeUserRegisters(bool onlyModified = true);
     bool writeSystemRegisters(const QString& password, bool onlyModified = true);
     bool readUserRegisters();
@@ -133,12 +134,14 @@ public:
     /// <returns></returns>
     QPoint laserPosition() const;
 
+    const DeviceState& deviceState() const;
+
     /// <summary>
     /// 用户原点在设备坐标系下的坐标值。注意，直接从机器读取的激光
     /// 坐标即该值。
     /// </summary>
     /// <returns></returns>
-    QVector3D userOrigin() const;
+    QVector4D userOrigin() const;
 
     /// <summary>
     /// 加工幅面矩形，以设备坐标系下的坐标值表示。
@@ -160,10 +163,10 @@ public:
 
     bool isAbsolute() const;
 
-    void batchParse(const QString& raw, bool isSystem, bool isConfirmed);
-
+    LaserRegister::RegistersMap externalRegisterValues(bool onlyModified = false) const;
     LaserRegister::RegistersMap userRegisterValues(bool onlyModified = false) const;
     LaserRegister::RegistersMap systemRegisterValues(bool onlyModified = false) const;
+    QMap<int, LaserRegister*> externalRegisters(bool onlyModified = false) const;
     QMap<int, LaserRegister*> userRegisters(bool onlyModified = false) const;
     QMap<int, LaserRegister*> systemRegisters(bool onlyModified = false) const;
 
@@ -199,6 +202,12 @@ public slots:
     void updateDeviceOriginAndTransform();
 
 protected:
+    LaserRegister::RegistersMap registerValues(const QMap<int, LaserRegister*>& registers, bool onlyModified = false) const;
+    QMap<int, LaserRegister*> getRegisters(const QMap<int, LaserRegister*>& registers, bool onlyModified = false) const;
+    void parseSystemRegisters(const QString& raw);
+    void parseUserRegisters(const QString& raw);
+    void parseExternalRegisters(const QString& raw);
+    void batchParse(const QString& raw, const QMap<int, LaserRegister*>& registers);
 
 protected slots:
     void handleError(int code, const QString& message);
@@ -237,6 +246,9 @@ signals:
     void systemRegistersConfirmed();
     void userRegistersConfirmed();
     void activeFailed(int reason);
+    void dongleConnected();
+    void dongleDisconnected();
+    void dongleRemoved();
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

@@ -4,6 +4,7 @@
 #include <QString>
 #include <QStringList>
 #include <QVector3D>
+#include <QVector4D>
 
 enum LaserErrorCode
 {
@@ -109,8 +110,8 @@ enum LaserEventType
     M_USBArrival = 2003,
     M_USBRemove,
 
-    M_DongleArrival,
-    M_DongleRemove,
+    M_DongleConnected,
+    M_DongleDisconnected,
 
     M_MainCardRegisterOK,
     M_MainCardIsGenuine,
@@ -232,12 +233,13 @@ public:
         : operation(0)
         , packageNo(0)
         , workingMode(LaserWorkMode::LWM_STOP)
+        , pos(0, 0, 0, 0)
     {}
     int operation;
     int packageNo;
     LaserWorkMode workingMode;
     int operationId;
-    QVector3D pos;
+    QVector4D pos;
 
     bool parse(const QString& data)
     {
@@ -255,6 +257,11 @@ public:
         pos.setZ(values.at(6).toDouble(&ok));
         return true;
     }
+
+    qreal x() { return pos.x(); }
+    qreal y() { return pos.y(); }
+    qreal z() { return pos.z(); }
+    qreal u() { return pos.w(); }
 };
 Q_DECLARE_METATYPE(DeviceState)
 

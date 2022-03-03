@@ -269,7 +269,7 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
             command = "CM%1 %2;";
         }
 
-        if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+        if (Config::Device::fullRelative() || Config::Device::startFrom() != SFT_AbsoluteCoords)
         {
             command = command.toLower();
             buffer.append(command.arg(pt.x() - lastPoint.x()).arg(pt.y() - lastPoint.y()));
@@ -374,7 +374,7 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress,
                 }
                 count++;
             }
-            if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+            if (Config::Device::fullRelative() || Config::Device::startFrom() != SFT_AbsoluteCoords)
             {
                 command1 = command1.toLower();
                 command2 = command2.toLower();
