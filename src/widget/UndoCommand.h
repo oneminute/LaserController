@@ -346,4 +346,22 @@ protected:
     virtual void undo() override;
     virtual void redo() override;
 };
+
+class LaserPrimitiveSpinBoxUndoCommand :public QUndoCommand {
+public:
+    LaserPrimitiveSpinBoxUndoCommand(LaserViewer* viewer, LaserPrimitive* p, LaserDoubleSpinBox* spinBox,
+        qreal lastValue, qreal value, int type, bool isRedo = false);
+    ~LaserPrimitiveSpinBoxUndoCommand();
+private:
+    LaserViewer* m_viewer;
+    LaserDoubleSpinBox* m_spinBox;
+    qreal m_redoValue;
+    qreal m_undoValue;
+    int m_type;
+    bool m_isRedo;
+    LaserPrimitive* m_primitive;
+protected:
+    virtual void undo() override;
+    virtual void redo() override;
+};
 #endif // UNDOCOMMAND_H

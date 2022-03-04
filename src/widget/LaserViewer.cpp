@@ -2785,7 +2785,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRingEllipseState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRect rect(point.x(), point.y(), 40 * 1000, 25 * 1000);
+            QRect rect(point.x(), point.y(), 50 * 1000, 35 * 1000);
             LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);
@@ -2813,7 +2813,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false,"Times New Roman", true, 0, 0, QSize(), transform, m_curLayerIndex);
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false,true,"Times New Roman",0, true, 0, 0, QSize(), transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2831,7 +2831,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,"Times New Roman", 550, transform, m_curLayerIndex);
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,true, "Times New Roman", 550, transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2852,7 +2852,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             if (cursorIn) {
                 transform = cursorIn->sceneTransform();
             }
-            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false, "Times New Roman", 550, transform, m_curLayerIndex);
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false,true, "Times New Roman", 550, transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -4192,6 +4192,18 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
     
 }
 
+
+
+bool LaserViewer::showLaserPos() const
+{
+    return false;
+}
+
+void LaserViewer::setShowLaserPos(bool laserPos)
+{
+    m_showLaserPos = laserPos;
+    viewport()->update();
+}
 void LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
 {
     //判断是否在4叉树的有效区域内
@@ -4207,18 +4219,33 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
         QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
     }
 }
-
-bool LaserViewer::showLaserPos() const
+void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives)
 {
-    return false;
+    if (primitives.isEmpty()) {
+        return;
+    }
+    bool outRegion = false;
+    for (LaserPrimitive* primitive : primitives) {
+        //判断是否在4叉树的有效区域内
+        if (!m_scene->maxRegion().contains(primitive->sceneBoundingRect())) {
+            outRegion = true;
+            break;
+        }
+    }
+    if (outRegion) {
+        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+    }
+    else {
+        QList<QGraphicsItem*> list;
+        for (LaserPrimitive* primitive : primitives) {
+            list.append(primitive);
+        }
+        AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+        m_undoStack->push(addCmd);
+        onReplaceGroup(primitives);
+    }
+    
 }
-
-void LaserViewer::setShowLaserPos(bool laserPos)
-{
-    m_showLaserPos = laserPos;
-    viewport()->update();
-}
-
 int LaserViewer::textAlignH()
 {
     return m_textAlighH;
@@ -4584,6 +4611,15 @@ QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* ite
 	item->setSelected(true);
 	onEndSelectionFillGroup();
 	return selectedListBeforeReplace;
+}
+
+void LaserViewer::onReplaceGroup(QList<LaserPrimitive*> primitives)
+{
+    onCancelSelected();
+    for (LaserPrimitive* primitive : primitives) {
+        primitive->setSelected(true);
+    }
+    onEndSelectionFillGroup();
 }
 
 void LaserViewer::onEndText()

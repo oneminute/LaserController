@@ -1802,22 +1802,22 @@
    </property>
   </action>
   <action name="actionNameStamp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/frameFour.png</normaloff>:/ui/icons/images/frameFour.png</iconset>
+   </property>
    <property name="text">
     <string>NameStamp</string>
    </property>
    <property name="toolTip">
     <string>NameStamp</string>
-   </property>
-  </action>
-  <action name="actionStripStamp">
-   <property name="text">
-    <string>StripStamp</string>
-   </property>
-   <property name="toolTip">
-    <string>Strip Stamp</string>
    </property>
   </action>
   <action name="actionCircleStamp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/HTextCircleStamp.png</normaloff>:/ui/icons/images/HTextCircleStamp.png</iconset>
+   </property>
    <property name="text">
     <string>CircleStamp</string>
    </property>
@@ -1826,6 +1826,10 @@
    </property>
   </action>
   <action name="actionEllipseStamp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/newInvoiceA.png</normaloff>:/ui/icons/images/newInvoiceA.png</iconset>
+   </property>
    <property name="text">
     <string>EllipseStamp</string>
    </property>
@@ -1974,6 +1978,18 @@
    </property>
    <property name="toolTip">
     <string>PartyEmblem</string>
+   </property>
+  </action>
+  <action name="actionStripStamp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/signalLine.png</normaloff>:/ui/icons/images/signalLine.png</iconset>
+   </property>
+   <property name="text">
+    <string>StripStamp</string>
+   </property>
+   <property name="toolTip">
+    <string>Strip Stamp</string>
    </property>
   </action>
  </widget>

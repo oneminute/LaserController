@@ -153,5 +153,30 @@
         <file>images/star.png</file>
         <file>images/download.png</file>
         <file>images/partyEmblem.png</file>
+		<file>images/bold.png</file>
+		<file>images/itatic.png</file>
+		<file>images/frameFour.png</file>
+		<file>images/frameThreeL.png</file>
+		<file>images/frameThreeR.png</file>
+		<file>images/frameTwo.png</file>
+		<file>images/fill.png</file>
+		<file>images/toRightArrow.png</file>
+		<file>images/blank.png</file>
+		<file>images/straight.png</file>
+		<file>images/bold1.png</file>
+		<file>images/add_1.png</file>
+		<file>images/delete_1.png</file>
+		<file>images/multiLine.png</file>
+		<file>images/signalLine.png</file>
+		<file>images/multiCol.png</file>
+		<file>images/normalCircleStamp.png</file>
+		<file>images/HTextCircleStamp.png</file>
+		<file>images/CCYLStamp.png</file>
+		<file>images/bottomTextCircleStamp.png</file>
+		<file>images/normalEliipseStamp.png</file>
+		<file>images/newInvoiceA.png</file>
+		<file>images/newInvoiceB.png</file>
+		<file>images/embleEllipseStamp.png</file>
+		<file>images/horizontalTextEllipseStamp.png</file>
     </qresource>
 </RCC>

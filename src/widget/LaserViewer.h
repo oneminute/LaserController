@@ -97,6 +97,9 @@ public:
 
 	bool showLaserPos() const;
 	void setShowLaserPos(bool laserPos);
+
+	void addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
+	void addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives);
 	
 private:
     void init();
@@ -131,7 +134,7 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
-    void addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
+    
     
 public slots:
     void zoomIn();
@@ -147,6 +150,7 @@ public slots:
 	bool onSelectedFillGroup();
     void createGroup();
 	QMap<QGraphicsItem*, QTransform> onReplaceGroup(LaserPrimitive* item);
+	void onReplaceGroup(QList<LaserPrimitive*> primitives);
     //text
     void onEndText();
 signals:

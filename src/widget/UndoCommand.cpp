@@ -2075,12 +2075,14 @@ void StampTextSpinBoxUndoCommand::undo()
     }
     
     m_isRedo = true;
+    emit m_viewer->selectedChangedFromMouse();
     m_viewer->viewport()->repaint();
 }
 //content=0, bold = 1, itatic = 2, uppercase = 3, family = 4, space = 5, width = 6，height = 7, angle = 8;
 void StampTextSpinBoxUndoCommand::redo()
 {
     if (!m_isRedo) {
+        emit m_viewer->selectedChangedFromMouse();
         return;
     }
     switch (m_type) {
@@ -2106,6 +2108,83 @@ void StampTextSpinBoxUndoCommand::redo()
         break;
     }
     }
-    
+    emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
+}
+
+LaserPrimitiveSpinBoxUndoCommand::LaserPrimitiveSpinBoxUndoCommand(LaserViewer* viewer, LaserPrimitive* p, LaserDoubleSpinBox* spinBox, qreal lastValue, qreal value, int type, bool isRedo)
+    :m_viewer(viewer), m_spinBox(spinBox), m_redoValue(value),m_undoValue(lastValue),m_isRedo(isRedo), m_type(type), m_primitive(p)
+{
+}
+
+LaserPrimitiveSpinBoxUndoCommand::~LaserPrimitiveSpinBoxUndoCommand()
+{
+}
+
+void LaserPrimitiveSpinBoxUndoCommand::undo()
+{
+    m_isRedo = true;
+    switch (m_type) {
+        
+    case 0: {//bounds width
+        m_primitive->setBoundingRectWidth(m_undoValue);
+        break;
+    }
+        
+    case 1: {//bounds height
+        m_primitive->setBoundingRectHeight(m_undoValue);
+        
+        break;
+    }
+    case 2: {
+        int pt = m_primitive->primitiveType();
+        if (pt == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(m_primitive);
+            frame->setBorderWidth(m_undoValue);
+        }
+        else if (pt == LPT_RING) {
+            LaserRing* ring = qgraphicsitem_cast<LaserRing*>(m_primitive);
+            ring->setBorderWidth(m_undoValue);
+        }
+        break;
+    }
+    }
+    m_spinBox->setValue(m_undoValue * 0.001);
+    emit m_viewer->selectedChangedFromMouse();
+    m_viewer->viewport()->repaint();
+}
+
+void LaserPrimitiveSpinBoxUndoCommand::redo()
+{
+    if (!m_isRedo) {
+        emit m_viewer->selectedChangedFromMouse();
+        return;
+    }
+    switch (m_type) {
+    case 0: {//bounds width
+        m_primitive->setBoundingRectWidth(m_redoValue);
+        break;
+    }
+    case 1: {//bounds height
+        m_primitive->setBoundingRectHeight(m_redoValue);
+        break;
+    }
+    case 2: {//border width
+        int pt = m_primitive->primitiveType();
+        if (pt == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(m_primitive);
+            frame->setBorderWidth(m_redoValue);
+        }
+        else if (pt == LPT_RING) {
+            LaserRing* ring = qgraphicsitem_cast<LaserRing*>(m_primitive);
+            ring->setBorderWidth(m_redoValue);
+        }
+        
+        
+        break;
+    }
+    }
+    m_spinBox->setValue(m_redoValue * 0.001);
+    emit m_viewer->selectedChangedFromMouse();
     m_viewer->viewport()->repaint();
 }
