@@ -97,7 +97,10 @@ enum LaserErrorCode
     E_MailboxAccountError,
     E_ActiveCodeInvalid,
     E_ValidateCodeInvalid,
-    E_MailboxNameInvalid
+    E_MailboxNameInvalid,
+
+    E_DeviceOriginDisaccord = 1060,
+    E_DataOutofCacheSize = 1061
 };
 
 enum LaserEventType

@@ -803,7 +803,7 @@ Please check your email address or network connection.</source>
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+2900"/>
+        <location line="+2899"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -813,7 +813,7 @@ Please check your email address or network connection.</source>
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
     <message>
-        <location line="-2782"/>
+        <location line="-2781"/>
         <source>English</source>
         <translation>英文</translation>
     </message>
@@ -823,7 +823,7 @@ Please check your email address or network connection.</source>
         <translation>中文</translation>
     </message>
     <message>
-        <location line="+2784"/>
+        <location line="+2783"/>
         <source>Unit</source>
         <translation>单位</translation>
     </message>
@@ -832,7 +832,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">全局单位</translation>
     </message>
     <message>
-        <location line="-2766"/>
+        <location line="-2765"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
@@ -841,7 +841,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">加工单位</translation>
     </message>
     <message>
-        <location line="+2770"/>
+        <location line="+2769"/>
         <location line="+1"/>
         <source>Max Layers Count</source>
         <translation>最大图层数</translation>
@@ -2656,7 +2656,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">2</translation>
     </message>
     <message>
-        <location line="-2768"/>
+        <location line="-2767"/>
         <source>Line</source>
         <translation>直线填充</translation>
     </message>
@@ -2670,7 +2670,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">3</translation>
     </message>
     <message>
-        <location line="+2207"/>
+        <location line="+2206"/>
         <source>Unit for user interface.</source>
         <translation>界面显示单位。</translation>
     </message>
@@ -4842,7 +4842,7 @@ Would you like to overwrite it?</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+2250"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+2249"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -7478,12 +7478,22 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>升级固件超时</translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+15"/>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Data cache is out of size.</source>
+        <translation>数据缓冲区溢出。</translation>
+    </message>
+    <message>
+        <location line="+67"/>
         <source>Main card info incomplete.</source>
         <translation>主板信息不完整。</translation>
     </message>
     <message>
-        <location line="-265"/>
+        <location line="-270"/>
         <source>Registers data incomplete.</source>
         <translation>寄存信息不完整。</translation>
     </message>
@@ -7889,7 +7899,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserEllipse</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="-1308"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="-1307"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -8308,7 +8318,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+1826"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+1824"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -11753,7 +11763,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3764"/>
+        <location filename="../src/common/Config.cpp" line="-3763"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
@@ -11950,6 +11960,11 @@ Do you want to delete it anyway?</source>
         <location filename="../src/widget/UndoCommand.cpp" line="+773"/>
         <source>multi</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/util/Utils.cpp" line="+677"/>
+        <source>Ok</source>
+        <translation type="unfinished">确定</translation>
     </message>
 </context>
 <context>

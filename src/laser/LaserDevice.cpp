@@ -1589,6 +1589,11 @@ void LaserDevice::handleError(int code, const QString& message)
     case E_MailboxNameInvalid:
         emit activeFailed(code);
         break;
+    case E_DeviceOriginDisaccord:
+        break;
+    case E_DataOutofCacheSize:
+        utils::warning(tr("Warning"), tr("Data cache is out of size."));
+        break;
     }
     /*if (exception)
     {
