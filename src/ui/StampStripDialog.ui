@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Strip Stamp Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -44,7 +44,7 @@
      <item>
       <widget class="QLabel" name="frameStampLayoutLabel">
        <property name="text">
-        <string>Frame Stamp Layout</string>
+        <string>Strip Stamp Layout</string>
        </property>
       </widget>
      </item>

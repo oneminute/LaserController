@@ -35,6 +35,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         m_ui->embleSizeSpinBox->setValue(6);
         m_ui->marginSpinBox->setValue(1);
         m_ui->hSpaceSpinBox->setValue(0.5);
+        this->setWindowTitle(tr("Ellipse Stamp Dialog"));
         //angle
         m_ui->angleSpinBox->setValue(200);
         QPixmap normal(":/ui/icons/images/normalEliipseStamp.png");
@@ -55,6 +56,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         m_ui->circleDiameterSpinBox->setValue(40);
         m_ui->embleSizeSpinBox->setValue(13);
         m_ui->marginSpinBox->setValue(1);
+        this->setWindowTitle(tr("Circle Stamp Dialog"));
         //angle
         m_ui->angleSpinBox->setValue(225);
         QPixmap normal(":/ui/icons/images/normalCircleStamp.png");
