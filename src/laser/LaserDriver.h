@@ -120,12 +120,14 @@ public:
     bool writeSysParamToCard(const LaserRegister::RegistersMap& values);
     bool readSysParamFromCard(QList<int> addresses);
     bool readAllSysParamFromCard();
+
     bool writeUserParamToCard(const LaserRegister::RegistersMap& values);
     bool readUserParamFromCard(QList<int> addresses);
     bool readAllUserParamFromCard();
-    bool writeHostParamToCard(const LaserRegister::RegistersMap& values);
-    bool readHostParamFromCard(QList<int> addresses);
-    bool readAllHostParamFromCard();
+
+    bool writeExternalParamToCard(const LaserRegister::RegistersMap& values);
+    bool readExternalParamFromCard(QList<int> addresses);
+    bool readAllExternalParamFromCard();
 
     int showAboutWindow(int interval = 0, bool modal = true);
     void closeAboutWindow();

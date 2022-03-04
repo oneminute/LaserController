@@ -2190,10 +2190,9 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
     cv::Mat resized;
     cv::resize(halfToneMat, resized, cv::Size(outWidth, outHeight), cv::INTER_NEAREST);
     
-    qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed());
+    //qreal accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed());
     
-    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingRect, pixelInterval, 
-        lastPoint, accLength);
+    ba = imageUtils::image2EngravingData(parentProgress, resized, boundingRect, pixelInterval, lastPoint);
 
     parentProgress->finish();
     return ba; 
@@ -2428,9 +2427,8 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
     qDebug() << "out width:" << outWidth;
     qDebug() << "out height:" << outHeight;
     
-    int accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed());
-    bytes = imageUtils::image2EngravingData(progress, resized, 
-        boundingRectInDevice, pixelInterval, lastPoint, accLength);
+    //int accLength = LaserApplication::device->engravingAccLength(layer()->engravingRunSpeed());
+    bytes = imageUtils::image2EngravingData(progress, resized, boundingRectInDevice, pixelInterval, lastPoint);
 
     return bytes;
 }

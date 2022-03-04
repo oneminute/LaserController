@@ -68,6 +68,7 @@ protected:
     static void loadPathOptimizationItems();
     static void loadExportItems();
     static void loadDeviceItems();
+    static void loadExternalRegisters();
     static void loadUserReigsters();
     static void loadSystemRegisters();
     static void loadDebug();
@@ -281,13 +282,9 @@ public:
         CONFIG_ITEM(device, yEnabled, bool, toBool)
         CONFIG_ITEM(device, zEnabled, bool, toBool)
         CONFIG_ITEM(device, uEnabled, bool, toBool)
-        CONFIG_ITEM_T(device, userOrigin1, QVector3D)
-        CONFIG_ITEM_T(device, userOrigin2, QVector3D)
-        CONFIG_ITEM_T(device, userOrigin3, QVector3D)
         CONFIG_ITEM(device, userOriginSelected, int, toInt)
         CONFIG_ITEM(device, redLightOffset, QPointF, toPointF)
         CONFIG_ITEM(device, zReverseDirection, bool, toBool)
-        CONFIG_ITEM(device, zFocalLength, int, toInt)
         CONFIG_ITEM(device, calibrationBlockThickness, int, toInt)
         CONFIG_ITEM(device, uFixtureType, int, toInt)
         CONFIG_ITEM(device, circumferencePulseNumber, int, toInt)
@@ -295,6 +292,33 @@ public:
         CONFIG_ITEM(device, rollerRotaryStepLength, int, toInt)
         CONFIG_ITEM_T(device, finishRun, FinishRunType)
         CONFIG_ITEM(device, switchToU, bool, toBool)
+        CONFIG_ITEM(device, fullRelative, bool, toBool)
+
+    private:
+        friend class Config;
+    };
+
+    class ExternalRegister : public ConfigItemGroup
+    {
+    protected:
+        ExternalRegister(QObject* parent = nullptr)
+            : ConfigItemGroup("externalRegister", tr("External Registers"), tr("External registers"), parent)
+        {}
+
+    public:
+        static ConfigItemGroup* group;
+        CONFIG_ITEM(externalRegister, x1, int, toInt)
+        CONFIG_ITEM(externalRegister, y1, int, toInt)
+        CONFIG_ITEM(externalRegister, z1, int, toInt)
+        CONFIG_ITEM(externalRegister, u1, int, toInt)
+        CONFIG_ITEM(externalRegister, x2, int, toInt)
+        CONFIG_ITEM(externalRegister, y2, int, toInt)
+        CONFIG_ITEM(externalRegister, z2, int, toInt)
+        CONFIG_ITEM(externalRegister, u2, int, toInt)
+        CONFIG_ITEM(externalRegister, x3, int, toInt)
+        CONFIG_ITEM(externalRegister, y3, int, toInt)
+        CONFIG_ITEM(externalRegister, z3, int, toInt)
+        CONFIG_ITEM(externalRegister, u3, int, toInt)
 
     private:
         friend class Config;
@@ -356,7 +380,7 @@ public:
         CONFIG_ITEM(userRegister, zSpeed, qreal, toReal)
         CONFIG_ITEM(userRegister, materialThickness, qreal, toReal)
         CONFIG_ITEM(userRegister, movementStepLength, qreal, toReal)
-        CONFIG_ITEM(userRegister, focusPointCompensationUnit, int, toInt)
+        CONFIG_ITEM(userRegister, focalLength, int, toInt)
 
     private:
         friend class Config;

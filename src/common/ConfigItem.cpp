@@ -874,7 +874,10 @@ bool ConfigItem::confirm(const QVariant& value)
     if (d->dirtyValue == value)
         success = true;
     else
+    {
+        qLogD << this->name() << ": expected: " << value << ", actual: " << d->dirtyValue;
         success = false;
+    }
 
     if (success)
     {
@@ -891,7 +894,7 @@ void ConfigItem::loadValue(const QVariant& value)
     if (!value.isValid())
         return;
 
-    if (d->name == "yMaxLength")
+    if (d->name == "xMaxLength")
     {
         qLogD << "debug " << d->name;
     }

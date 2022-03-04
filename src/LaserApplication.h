@@ -33,6 +33,8 @@ public:
     static QString str(const QString& key);
     static int exec();
     static void restart();
+    static bool antiDebugger();
+    static void closeParent();
 
     static LaserDocument* createDocument();
 

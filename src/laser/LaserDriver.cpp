@@ -482,7 +482,7 @@ bool LaserDriver::readAllUserParamFromCard()
 
 }
 
-bool LaserDriver::writeHostParamToCard(const LaserRegister::RegistersMap& values)
+bool LaserDriver::writeExternalParamToCard(const LaserRegister::RegistersMap& values)
 {
     if (values.count() == 0)
         return false;
@@ -513,7 +513,7 @@ bool LaserDriver::writeHostParamToCard(const LaserRegister::RegistersMap& values
     return success;
 }
 
-bool LaserDriver::readHostParamFromCard(QList<int> addresses)
+bool LaserDriver::readExternalParamFromCard(QList<int> addresses)
 {
     if (addresses.length() == 0)
         return false;
@@ -531,14 +531,14 @@ bool LaserDriver::readHostParamFromCard(QList<int> addresses)
     return success;
 }
 
-bool LaserDriver::readAllHostParamFromCard()
+bool LaserDriver::readAllExternalParamFromCard()
 {
     QList<int> params;
     for (int i = 0; i <= 49; i++)
     {
         params << i;
     }
-    return readHostParamFromCard(params);
+    return readExternalParamFromCard(params);
 
 }
 

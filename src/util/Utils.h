@@ -66,6 +66,8 @@ namespace utils
     QTransform transformFrom2Points(const PointPairList& pointPairs);
 
     void rectEdges(QRectF rect, QList<QLineF>& edges);
+
+    void warning(const QString& title, const QString& msg, QWidget* parent = nullptr);
 }
 
 #endif // UTILS_H
