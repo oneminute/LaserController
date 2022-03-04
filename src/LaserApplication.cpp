@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QDir>
+#include <QMessageBox>
 #include <QStyleFactory>
 #include <QTranslator>
 
@@ -18,8 +19,11 @@
 #include "ui/PreviewWindow.h"
 #include "task/ProgressModel.h"
 
+#ifdef _WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tlhelp32.h>
+#endif // _WINDOWS
 #include <glog/logging.h>
 #include <glog/log_severity.h>
 #include <iostream>
@@ -44,6 +48,12 @@ LaserApplication::LaserApplication(int argc, char** argv)
         throw LaserFatalException(tr("Application startup failure."));
     }
     app = this;
+
+    if (!antiDebugger())
+    {
+        //QMessageBox::warning(nullptr, tr("Debugging"), tr("Debugging"));
+        //closeParent();
+    }
 }
 
 LaserApplication::~LaserApplication()
@@ -406,6 +416,43 @@ void LaserApplication::restart()
     mainWindow->close();
     LaserApplication::quit();
     QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
+}
+
+bool LaserApplication::antiDebugger()
+{
+#if _WINDOWS
+    STARTUPINFO info;
+    GetStartupInfo(&info);
+    if (info.dwX || info.dwY || info.dwXCountChars || info.dwYCountChars ||
+        info.dwFillAttribute || info.dwXSize || info.dwYSize ||
+        info.dwFlags & STARTF_FORCEOFFFEEDBACK)
+        return false;
+    else
+        return true;
+#endif
+}
+
+void LaserApplication::closeParent()
+{
+#if _WINDOWS
+    int pid = -1;
+    HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 pe = { 0 };
+    pe.dwSize = sizeof(PROCESSENTRY32);
+
+    //assume first arg is the PID to get the PPID for, or use own PID
+    pid = GetCurrentProcessId();
+
+    if (Process32First(h, &pe)) {
+        do {
+            if (pe.th32ProcessID == pid) {
+                printf("PID: %i; PPID: %i\n", pid, pe.th32ParentProcessID);
+            }
+        } while (Process32Next(h, &pe));
+    }
+
+    CloseHandle(h);
+#endif
 }
 
 LaserDocument* LaserApplication::createDocument()

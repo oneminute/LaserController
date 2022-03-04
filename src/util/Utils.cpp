@@ -1,12 +1,14 @@
 #include "Utils.h"
 #include <QUuid>
 #include <QtMath>
+#include <QMessageBox>
 #include "Eigen/Core"
 #include "Eigen/Dense"
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
 
 #include "LaserApplication.h"
+#include "ui/LaserControllerWindow.h"
 #include "laser/LaserDevice.h"
 #include "scene/LaserPrimitive.h"
 #include "scene/LaserLayer.h"
@@ -666,6 +668,15 @@ void utils::rectEdges(QRectF rect, QList<QLineF>& edges)
     edges.append(QLineF(rect.topRight(), rect.bottomRight()));
     edges.append(QLineF(rect.bottomLeft(), rect.bottomRight()));
     edges.append(QLineF(rect.topLeft(), rect.bottomLeft()));
+}
+
+void utils::warning(const QString& title, const QString& msg, QWidget* parent)
+{
+    QWidget* parentWnd = parent ? parent : LaserApplication::mainWindow;
+    QMessageBox dlg(QMessageBox::Warning, title, msg, QMessageBox::Ok);
+    dlg.setButtonText(QMessageBox::Ok, QObject::tr("Ok"));
+    dlg.setParent(parent);
+    int result = dlg.exec();
 }
 
 

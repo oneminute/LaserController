@@ -39,7 +39,7 @@ find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
 find_package(FLANN REQUIRED QUIET)
-find_package(TBB REQUIRED QUIET)
+#find_package(TBB REQUIRED QUIET)
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -122,8 +122,8 @@ LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 set(OTHER_FILES
     README.md
     ReleaseNotes.md
-    cmake_install_debug.txt
-    cmake_install_release.txt
+    cmake_install_debug.cmake
+    cmake_install_release.cmake
     cmake_install_relwithdebinfo.txt
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
@@ -284,6 +284,6 @@ add_custom_target (GenerateTranslations
     Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts
 )
 
-include(cmake_install_Debug.txt)
-include(cmake_install_Release.txt)
+include(cmake_install_Debug.cmake)
+include(cmake_install_Release.cmake)
 #include(cmake_install_RelWithDebInfo.txt)

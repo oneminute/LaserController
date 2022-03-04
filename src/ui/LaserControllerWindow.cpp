@@ -474,6 +474,12 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_statusBarAppStatus->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarAppStatus);
     
+    m_statusBarDongle = new QLabel;
+    m_statusBarDongle->setText("");
+    m_statusBarDongle->setMinimumWidth(120);
+    m_statusBarDongle->setAlignment(Qt::AlignHCenter);
+    m_ui->statusbar->addWidget(m_statusBarDongle);
+    
     m_statusSelectionCount = new QLabel;
     m_statusSelectionCount->setText(tr("Selection: 0"));
     m_statusSelectionCount->setMinimumWidth(90);
@@ -889,6 +895,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::disconnected, this, &LaserControllerWindow::onDeviceDisconnected);
     connect(LaserApplication::device, &LaserDevice::mainCardRegistrationChanged, this, &LaserControllerWindow::onMainCardRegistrationChanged);
     connect(LaserApplication::device, &LaserDevice::mainCardActivationChanged, this, &LaserControllerWindow::onMainCardActivationChanged);
+    connect(LaserApplication::device, &LaserDevice::dongleConnected, this, &LaserControllerWindow::onDongleConnected);
+    connect(LaserApplication::device, &LaserDevice::dongleDisconnected, this, &LaserControllerWindow::onDongleDisconnected);
+    connect(LaserApplication::device, &LaserDevice::dongleRemoved, this, &LaserControllerWindow::onDongleRemoved);
     connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
     connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &LaserControllerWindow::onLayoutChanged);
 
@@ -1051,9 +1060,18 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(Config::SystemRegister::deviceOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::deviceOriginChanged);
     connect(Config::Device::jobOriginItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::jobOriginChanged);
     connect(Config::Device::startFromItem(), &ConfigItem::valueChanged, this, &LaserControllerWindow::startFromChanged);
-    connect(Config::Device::userOrigin1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
-    connect(Config::Device::userOrigin2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
-    connect(Config::Device::userOrigin3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::x1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::y1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::z1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::u1Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::x2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::y2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::z2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::u2Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::x3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::y3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::z3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
+    connect(Config::ExternalRegister::u3Item(), &ConfigItem::valueChanged, this, &LaserControllerWindow::userOriginChanged);
     connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
         //updata region
         m_scene->updataValidMaxRegion();
@@ -2810,24 +2828,70 @@ void LaserControllerWindow::createMovementDockPanel()
 
     updateUserOriginSelection(Config::Device::userOriginSelected());
 
-    m_userOrigin1 = InputWidgetWrapper::createWidget<Vector3DWidget*>(Config::Device::userOrigin1Item());
-    m_userOrigin2 = InputWidgetWrapper::createWidget<Vector3DWidget*>(Config::Device::userOrigin2Item());
-    m_userOrigin3 = InputWidgetWrapper::createWidget<Vector3DWidget*>(Config::Device::userOrigin3Item());
+    QDoubleSpinBox* x1 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::x1Item());
+    QDoubleSpinBox* y1 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::y1Item());
+    QDoubleSpinBox* z1 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::z1Item());
+    QDoubleSpinBox* u1 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::u1Item());
+    QDoubleSpinBox* x2 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::x2Item());
+    QDoubleSpinBox* y2 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::y2Item());
+    QDoubleSpinBox* z2 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::z2Item());
+    QDoubleSpinBox* u2 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::u2Item());
+    QDoubleSpinBox* x3 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::x3Item());
+    QDoubleSpinBox* y3 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::y3Item());
+    QDoubleSpinBox* z3 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::z3Item());
+    QDoubleSpinBox* u3 = InputWidgetWrapper::createWidget<QDoubleSpinBox*>(Config::ExternalRegister::u3Item());
 
-    Config::Device::userOrigin1Item()->bindWidget(m_userOrigin1, SS_DIRECTLY);
-    Config::Device::userOrigin2Item()->bindWidget(m_userOrigin2, SS_DIRECTLY);
-    Config::Device::userOrigin3Item()->bindWidget(m_userOrigin3, SS_DIRECTLY);
+    Config::ExternalRegister::x1Item()->bindWidget(x1, SS_REGISTER);
+    Config::ExternalRegister::y1Item()->bindWidget(y1, SS_REGISTER);
+    Config::ExternalRegister::z1Item()->bindWidget(z1, SS_REGISTER);
+    Config::ExternalRegister::u1Item()->bindWidget(u1, SS_REGISTER);
+    Config::ExternalRegister::x2Item()->bindWidget(x2, SS_REGISTER);
+    Config::ExternalRegister::y2Item()->bindWidget(y2, SS_REGISTER);
+    Config::ExternalRegister::z2Item()->bindWidget(z2, SS_REGISTER);
+    Config::ExternalRegister::u2Item()->bindWidget(u2, SS_REGISTER);
+    Config::ExternalRegister::x3Item()->bindWidget(x3, SS_REGISTER);
+    Config::ExternalRegister::y3Item()->bindWidget(y3, SS_REGISTER);
+    Config::ExternalRegister::z3Item()->bindWidget(z3, SS_REGISTER);
+    Config::ExternalRegister::u3Item()->bindWidget(u3, SS_REGISTER);
 
     QGridLayout* thirdRow = new QGridLayout;
     thirdRow->setMargin(0);
     thirdRow->addWidget(m_radioButtonUserOrigin1, 0, 0);
+    thirdRow->addWidget(new QLabel(" x:"), 0, 1);
+    thirdRow->addWidget(x1, 0, 2);
+    thirdRow->addWidget(new QLabel(" y:"), 0, 3);
+    thirdRow->addWidget(y1, 0, 4);
+    thirdRow->addWidget(new QLabel(" z:"), 0, 5);
+    thirdRow->addWidget(z1, 0, 6);
+    thirdRow->addWidget(new QLabel(" u:"), 0, 7);
+    thirdRow->addWidget(u1, 0, 8);
     thirdRow->addWidget(m_radioButtonUserOrigin2, 1, 0);
+    thirdRow->addWidget(new QLabel(" x:"), 1, 1);
+    thirdRow->addWidget(x2, 1, 2);
+    thirdRow->addWidget(new QLabel(" y:"), 1, 3);
+    thirdRow->addWidget(y2, 1, 4);
+    thirdRow->addWidget(new QLabel(" z:"), 1, 5);
+    thirdRow->addWidget(z2, 1, 6);
+    thirdRow->addWidget(new QLabel(" u:"), 1, 7);
+    thirdRow->addWidget(u2, 1, 8);
     thirdRow->addWidget(m_radioButtonUserOrigin3, 2, 0);
-    thirdRow->addWidget(m_userOrigin1, 0, 1);
-    thirdRow->addWidget(m_userOrigin2, 1, 1);
-    thirdRow->addWidget(m_userOrigin3, 2, 1);
+    thirdRow->addWidget(new QLabel(" x:"), 2, 1);
+    thirdRow->addWidget(x3, 2, 2);
+    thirdRow->addWidget(new QLabel(" y:"), 2, 3);
+    thirdRow->addWidget(y3, 2, 4);
+    thirdRow->addWidget(new QLabel(" z:"), 2, 5);
+    thirdRow->addWidget(z3, 2, 6);
+    thirdRow->addWidget(new QLabel(" u:"), 2, 7);
+    thirdRow->addWidget(u3, 2, 8);
     thirdRow->setColumnStretch(0, 0);
+    thirdRow->setColumnStretch(1, 0);
     thirdRow->setColumnStretch(2, 1);
+    thirdRow->setColumnStretch(3, 0);
+    thirdRow->setColumnStretch(4, 1);
+    thirdRow->setColumnStretch(5, 0);
+    thirdRow->setColumnStretch(6, 1);
+    thirdRow->setColumnStretch(7, 0);
+    thirdRow->setColumnStretch(8, 1);
 
     m_buttonFetchToUserOrigin = new QToolButton;
     m_buttonFetchToUserOrigin->setDefaultAction(m_ui->actionFetchToUserOrigin);
@@ -5342,27 +5406,35 @@ void LaserControllerWindow::onActionUpdateOutline(bool checked)
 
 void LaserControllerWindow::onActionFetchToUserOrigin(bool checked)
 {
-    QVector3D laserPos(LaserApplication::device->laserPosition());
+    DeviceState state = LaserApplication::device->deviceState();
     switch (Config::Device::userOriginSelected())
     {
     case 0:
-        Config::Device::userOrigin1Item()->setValue(laserPos, SS_DIRECTLY, this);
+        Config::ExternalRegister::x1Item()->setValue(state.x(), SS_REGISTER, this);
+        Config::ExternalRegister::y1Item()->setValue(state.y(), SS_REGISTER, this);
+        Config::ExternalRegister::z1Item()->setValue(state.z(), SS_REGISTER, this);
+        Config::ExternalRegister::u1Item()->setValue(state.u(), SS_REGISTER, this);
         break;
     case 1:
-        Config::Device::userOrigin2Item()->setValue(laserPos, SS_DIRECTLY, this);
+        Config::ExternalRegister::x2Item()->setValue(state.x(), SS_REGISTER, this);
+        Config::ExternalRegister::y2Item()->setValue(state.y(), SS_REGISTER, this);
+        Config::ExternalRegister::z2Item()->setValue(state.z(), SS_REGISTER, this);
+        Config::ExternalRegister::u2Item()->setValue(state.u(), SS_REGISTER, this);
         break;
     case 2:
-        Config::Device::userOrigin3Item()->setValue(laserPos, SS_DIRECTLY, this);
+        Config::ExternalRegister::x3Item()->setValue(state.x(), SS_REGISTER, this);
+        Config::ExternalRegister::y3Item()->setValue(state.y(), SS_REGISTER, this);
+        Config::ExternalRegister::z3Item()->setValue(state.z(), SS_REGISTER, this);
+        Config::ExternalRegister::u3Item()->setValue(state.u(), SS_REGISTER, this);
         break;
     }
 }
 
 void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 {
-    QVector3D userOrigin = LaserApplication::device->userOrigin();
+    QVector4D userOrigin = LaserApplication::device->userOrigin();
     qLogD << "user origin: " << userOrigin;
-    LaserApplication::device->moveTo(QVector4D(userOrigin.x(), userOrigin.y(), 
-        LaserApplication::device->currentZ(), userOrigin.z()));
+    LaserApplication::device->moveTo(userOrigin);
 }
 
 void LaserControllerWindow::onActionBitmap(bool checked)
@@ -5472,9 +5544,9 @@ void LaserControllerWindow::onActionHideLaserPosition(bool checked)
 
 void LaserControllerWindow::onActionSaveZOrigin(bool checked)
 {
-    Config::Device::zFocalLengthItem()->setValue(
+    Config::UserRegister::focalLengthItem()->setValue(
         LaserApplication::device->currentZ(),
-        SS_DIRECTLY, this
+        SS_REGISTER, this
     );
 }
 
@@ -5816,6 +5888,24 @@ void LaserControllerWindow::onMainCardActivationChanged(bool activated)
         m_statusBarActivation->setText(tr("Activated"));
     else
         m_statusBarActivation->setText(tr("Inactivated"));
+}
+
+void LaserControllerWindow::onDongleConnected()
+{
+    m_statusBarDongle->setText(tr("Dongle Connected"));
+    m_statusBarDongle->setStyleSheet("color: rgb(20, 192, 20)");
+}
+
+void LaserControllerWindow::onDongleDisconnected()
+{
+    m_statusBarDongle->setText(tr("Dongle Disonnected"));
+    m_statusBarDongle->setStyleSheet("color: rgb(255, 0, 0)");
+}
+
+void LaserControllerWindow::onDongleRemoved()
+{
+    m_statusBarDongle->setText(tr("Dongle Removed"));
+    m_statusBarDongle->setStyleSheet("color: rgb(255, 0, 0)");
 }
 
 void LaserControllerWindow::onWindowCreated()
@@ -7103,7 +7193,7 @@ void LaserControllerWindow::onCameraConnected()
     m_buttonCameraStart->removeAction(m_ui->actionStartCamera);
     m_buttonCameraStart->setDefaultAction(m_ui->actionStopCamera);
     m_statusBarCameraState->setText(tr("Camera Connected"));
-    m_statusBarCameraState->setStyleSheet("color: rgb(0, 255, 0)");
+    m_statusBarCameraState->setStyleSheet("color: rgb(20, 192, 20)");
 }
 
 void LaserControllerWindow::onCameraDisconnected()

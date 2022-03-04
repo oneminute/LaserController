@@ -300,6 +300,9 @@ protected slots:
     void onDeviceDisconnected();
     void onMainCardRegistrationChanged(bool registered);
     void onMainCardActivationChanged(bool activated);
+    void onDongleConnected();
+    void onDongleDisconnected();
+    void onDongleRemoved();
 
     void onWindowCreated();
     virtual void closeEvent(QCloseEvent* event) override;
@@ -531,9 +534,6 @@ private:
     QRadioButton* m_radioButtonUserOrigin1;
     QRadioButton* m_radioButtonUserOrigin2;
     QRadioButton* m_radioButtonUserOrigin3;
-    Vector3DWidget* m_userOrigin1;
-    Vector3DWidget* m_userOrigin2;
-    Vector3DWidget* m_userOrigin3;
     QToolButton* m_buttonFetchToUserOrigin;
     QToolButton* m_buttonMoveToUserOrigin;
     ads::CDockWidget* m_dockMovement;
@@ -681,6 +681,7 @@ private:
     // widgets on status bar
     QLabel* m_statusBarDeviceStatus;
     QLabel* m_statusBarAppStatus;
+    QLabel* m_statusBarDongle;
     Label* m_statusBarRegister;
     Label* m_statusBarActivation;
     QLabel* m_statusBarTips;

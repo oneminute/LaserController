@@ -326,8 +326,8 @@ bool CameraAlignmentDialog::eventFilter(QObject* obj, QEvent* event)
 }
 void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
-    //if (m_doc)
-        //LaserApplication::mainWindow->closeDocument();
+    if (m_doc)
+        LaserApplication::mainWindow->closeDocument();
     Config::Device::startFromItem()->pop();
     Config::Export::imageQualityItem()->pop();
 }
@@ -399,7 +399,8 @@ void CameraAlignmentDialog::generate()
     LaserApplication::mainWindow->newDocument();
     LaserScene* scene = LaserApplication::mainWindow->scene();
     m_doc = scene->document();
-    m_doc->setFinishRun(FT_BackToOrigin);
+    //m_doc->setFinishRun(FT_BackToOrigin);
+    m_doc->setFinishRun(FT_CurrentPos);
     
     int hMargin = m_page1SpinBoxHMargin->value() * 1000;
     int vMargin = m_page1SpinBoxVMargin->value() * 1000;
@@ -566,9 +567,8 @@ void CameraAlignmentDialog::onDeviceStateChanged(DeviceState state)
 {
     if (state.workingMode == LaserWorkMode::LWM_STOP)
     {
-        QVector3D userOrigin = LaserApplication::device->userOrigin();
+        QVector4D userOrigin = LaserApplication::device->userOrigin();
         qLogD << "user origin: " << userOrigin;
-        LaserApplication::device->moveTo(QVector4D(userOrigin.x(), userOrigin.y(),
-            LaserApplication::device->currentZ(), userOrigin.z()));
+        LaserApplication::device->moveTo(userOrigin);
     }
 }

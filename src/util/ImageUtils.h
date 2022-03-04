@@ -19,7 +19,7 @@ namespace imageUtils
     void generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int initAngle = 90, int rotationAngle = -90, int stepAngle = 45);
 
     QByteArray image2EngravingData(ProgressItem* parentProgress, cv::Mat mat, 
-        const QRect& boundingRect, int rowInterval, QPoint& lastPoint, int accLength);
+        const QRect& boundingRect, int rowInterval, QPoint& lastPoint);
 
     QPointF closestPointTo(const QPointF &target, const QPainterPath &sourcePath);
     bool hit(const QLineF& ray, const QPainterPath& target, QPointF& hitPos);

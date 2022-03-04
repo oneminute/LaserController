@@ -260,10 +260,8 @@ void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int i
 }
 
 QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
-    const QRect& boundingRect, int rowInterval, QPoint& lastPoint, int accLength)
+    const QRect& boundingRect, int rowInterval, QPoint& lastPoint)
 {
-    //cv::Mat element = cv::getStructuringElement(0, cv::Size(3, 3), cv::Point(1, 1));
-    //cv::morphologyEx(mat, mat, cv::MORPH_OPEN, element);
     cv::threshold(mat, mat, 127.5, 255, cv::THRESH_BINARY);
     cv::imwrite("tmp/engraving.bmp", mat);
     QByteArray bytes;
@@ -371,13 +369,15 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             //fspc.setSame(same);
             if (forward)
             {
-                lastPoint = QPoint(boundingRight + accLength, boundingTop + r * rowInterval);
+                //lastPoint = QPoint(boundingRight + accLength, boundingTop + r * rowInterval);
+                lastPoint = QPoint(boundingRight, boundingTop + r * rowInterval);
                 stream << yStart << xStart << xEnd << fspc.code;
                 //qLogD << yStart << ", " << xStart << ", " << xEnd;
             }
             else
             {
-                lastPoint = QPoint(boundingLeft - accLength, boundingTop + r * rowInterval);
+                //lastPoint = QPoint(boundingLeft - accLength, boundingTop + r * rowInterval);
+                lastPoint = QPoint(boundingLeft, boundingTop + r * rowInterval);
                 stream << yStart << xEnd << xStart << fspc.code;
                 //qLogD << yStart << ", " << xEnd << ", " << xStart;
             }

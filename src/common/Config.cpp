@@ -38,6 +38,7 @@ ConfigItemGroup* Config::FillingLayer::group(nullptr);
 ConfigItemGroup* Config::PathOptimization::group(nullptr);
 ConfigItemGroup* Config::Export::group(nullptr);
 ConfigItemGroup* Config::Device::group(nullptr);
+ConfigItemGroup* Config::ExternalRegister::group(nullptr);
 ConfigItemGroup* Config::UserRegister::group(nullptr);
 ConfigItemGroup* Config::SystemRegister::group(nullptr);
 ConfigItemGroup* Config::Debug::group(nullptr);
@@ -67,6 +68,7 @@ void Config::init()
     loadPathOptimizationItems();
     loadExportItems();
     loadDeviceItems();
+    loadExternalRegisters();
     loadUserReigsters();
     loadSystemRegisters();
     loadDebug();
@@ -885,7 +887,6 @@ void Config::loadPathOptimizationItems()
     groupingGridInterval->setInputWidgetType(IWT_FloatEditSlider);
     groupingGridInterval->setInputWidgetProperty("step", 0.001);
     groupingGridInterval->setInputWidgetProperty("decimals", 0);
-    groupingGridInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     groupingGridInterval->setInputWidgetProperty("step", 10);
     groupingGridInterval->setInputWidgetProperty("page", 10);
     groupingGridInterval->setInputWidgetProperty("minimum", 1);
@@ -1139,96 +1140,6 @@ void Config::loadDeviceItems()
         }
     );
 
-    ConfigItem* userOrigin1 = group->addConfigItem(
-        "userOrigin1",
-        QVector3D(0, 0, 0),
-        DT_VECTOR3D
-    );
-    userOrigin1->setInputWidgetProperty("minimum", -1000000);
-    userOrigin1->setInputWidgetProperty("maximum", 1000000);
-    userOrigin1->setInputWidgetProperty("decimals", 3);
-    userOrigin1->setValueFromWidgetHook(
-        [](QWidget* widget, const QVariant& value)
-        {
-            QVector3D pt = value.value<QVector3D>() * 1000;
-            return QVariant::fromValue<QVector3D>(pt);
-        }
-    );
-    userOrigin1->setUpdateWidgetValueHook(
-        [](QWidget* widget, const QVariant& value)
-        {
-            widget->blockSignals(true);
-            Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
-            QVector3D pt = value.value<QVector3D>() * 0.001;
-            v2w->setValue(pt);
-            widget->blockSignals(false);
-            return QVariant::fromValue<QVector3D>(pt);
-        }
-    );
-    userOrigin1->setToJsonHook(qVector3DItemToJson);
-    userOrigin1->setFromJsonHook(parseQVector3DItemFromJson);
-    userOrigin1->setInputWidgetProperty("zTitle", "U");
-
-    ConfigItem* userOrigin2 = group->addConfigItem(
-        "userOrigin2",
-        QVector3D(0, 0, 0),
-        DT_VECTOR3D
-    );
-    userOrigin2->setInputWidgetProperty("minimum", -1000000);
-    userOrigin2->setInputWidgetProperty("maximum", 1000000);
-    userOrigin2->setInputWidgetProperty("decimals", 3);
-    userOrigin2->setValueFromWidgetHook(
-        [](QWidget* widget, const QVariant& value)
-        {
-            QVector3D pt = value.value<QVector3D>() * 1000;
-            return QVariant::fromValue<QVector3D>(pt);
-        }
-    );
-    userOrigin2->setUpdateWidgetValueHook(
-        [](QWidget* widget, const QVariant& value)
-        {
-            widget->blockSignals(true);
-            Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
-            QVector3D pt = value.value<QVector3D>() * 0.001;
-            v2w->setValue(pt);
-            widget->blockSignals(false);
-            return QVariant::fromValue<QVector3D>(pt);
-        }
-    );
-    userOrigin2->setToJsonHook(qVector3DItemToJson);
-    userOrigin2->setFromJsonHook(parseQVector3DItemFromJson);
-    userOrigin2->setInputWidgetProperty("zTitle", "U");
-
-    ConfigItem* userOrigin3 = group->addConfigItem(
-        "userOrigin3",
-        QVector3D(0, 0, 0),
-        DT_VECTOR3D
-    );
-    userOrigin3->setInputWidgetProperty("minimum", -1000000);
-    userOrigin3->setInputWidgetProperty("maximum", 1000000);
-    userOrigin3->setInputWidgetProperty("decimals", 3);
-    userOrigin3->setValueFromWidgetHook(
-        [](QWidget* widget, const QVariant& value)
-        {
-            QVector3D pt = value.value<QVector3D>() * 1000;
-            return QVariant::fromValue<QVector3D>(pt);
-        }
-    );
-    userOrigin3->setUpdateWidgetValueHook(
-        [](QWidget* widget, const QVariant& value)
-        {
-            widget->blockSignals(true);
-            Vector3DWidget* v2w = qobject_cast<Vector3DWidget*>(widget);
-            QVector3D pt = value.value<QVector3D>() * 0.001;
-            v2w->setValue(pt);
-            widget->blockSignals(false);
-            return QVariant::fromValue<QVector3D>(pt);
-        }
-    );
-    userOrigin3->setToJsonHook(qVector3DItemToJson);
-    userOrigin3->setFromJsonHook(parseQVector3DItemFromJson);
-    userOrigin3->setInputWidgetProperty("zTitle", "U");
-
     ConfigItem* userOriginSelected = group->addConfigItem(
         "userOriginSelected",
         0,
@@ -1263,20 +1174,6 @@ void Config::loadDeviceItems()
         false,
         DT_BOOL
     );
-
-    ConfigItem* zFocalLength = group->addConfigItem(
-        "zFocalLength",
-        200000,
-        DT_INT
-    );
-    zFocalLength->setInputWidgetType(IWT_FloatEditSlider);
-    zFocalLength->setInputWidgetProperty("step", 0.001);
-    zFocalLength->setInputWidgetProperty("decimals", 3);
-    zFocalLength->setInputWidgetProperty("maximumLineEditWidth", 75);
-    zFocalLength->setInputWidgetProperty("page", 10);
-    zFocalLength->setInputWidgetProperty("minimum", 1);
-    zFocalLength->setInputWidgetProperty("maximum", 2000);
-    zFocalLength->setNeedRelaunch(true);
 
     ConfigItem* calibrationBlockThickness = group->addConfigItem(
         "calibrationBlockThickness",
@@ -1389,6 +1286,186 @@ void Config::loadDeviceItems()
         false,
         DT_BOOL
     );
+
+    ConfigItem* fullRelative = group->addConfigItem(
+        "fullRelative",
+        false,
+        DT_BOOL
+    );
+}
+
+void Config::loadExternalRegisters()
+{
+    ConfigItemGroup* group = new Config::ExternalRegister;
+    Config::ExternalRegister::group = group;
+    group->setPreSaveHook(
+        [=]() {
+            if (Config::ExternalRegister::group->isModified())
+            {
+                return LaserApplication::device->writeExternalRegisters();
+            }
+            return false;
+        }
+    );
+
+    auto setValueFromWidgetHook = [](QWidget* widget, const QVariant& value)
+    {
+        int iValue = qRound(value.toReal() * 1000);
+        return iValue;
+    };
+    auto setUpdateWidgetValueHook = [](QWidget* widget, const QVariant& value)
+    {
+        widget->blockSignals(true);
+        QDoubleSpinBox* dsBox = qobject_cast<QDoubleSpinBox*>(widget);
+        qreal fValue = value.toInt() * 0.001;
+        dsBox->setValue(fValue);
+        widget->blockSignals(false);
+        return fValue;
+    };
+
+    ConfigItem* x1 = group->addConfigItem(
+        "x1",
+        0,
+        DT_INT
+    );
+    x1->setInputWidgetType(IWT_DoubleSpinBox);
+    x1->setInputWidgetProperty("decimals", 3);
+    x1->setInputWidgetProperty("minimum", -1000 * 10000);
+    x1->setInputWidgetProperty("maximum", 1000 * 10000);
+    x1->setValueFromWidgetHook(setValueFromWidgetHook);
+    x1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* y1 = group->addConfigItem(
+        "y1",
+        0,
+        DT_INT
+    );
+    y1->setInputWidgetType(IWT_DoubleSpinBox);
+    y1->setInputWidgetProperty("decimals", 3);
+    y1->setInputWidgetProperty("minimum", -1000 * 10000);
+    y1->setInputWidgetProperty("maximum", 1000 * 10000);
+    y1->setValueFromWidgetHook(setValueFromWidgetHook);
+    y1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* z1 = group->addConfigItem(
+        "z1",
+        0,
+        DT_INT
+    );
+    z1->setInputWidgetType(IWT_DoubleSpinBox);
+    z1->setInputWidgetProperty("decimals", 3);
+    z1->setInputWidgetProperty("minimum", -1000 * 10000);
+    z1->setInputWidgetProperty("maximum", 1000 * 10000);
+    z1->setValueFromWidgetHook(setValueFromWidgetHook);
+    z1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* u1 = group->addConfigItem(
+        "u1",
+        0,
+        DT_INT
+    );
+    u1->setInputWidgetType(IWT_DoubleSpinBox);
+    u1->setInputWidgetProperty("decimals", 3);
+    u1->setInputWidgetProperty("minimum", -1000 * 10000);
+    u1->setInputWidgetProperty("maximum", 1000 * 10000);
+    u1->setValueFromWidgetHook(setValueFromWidgetHook);
+    u1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* x2 = group->addConfigItem(
+        "x2",
+        0,
+        DT_INT
+    );
+    x2->setInputWidgetType(IWT_DoubleSpinBox);
+    x2->setInputWidgetProperty("decimals", 3);
+    x2->setInputWidgetProperty("minimum", -1000 * 10000);
+    x2->setInputWidgetProperty("maximum", 1000 * 10000);
+    x2->setValueFromWidgetHook(setValueFromWidgetHook);
+    x2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* y2 = group->addConfigItem(
+        "y2",
+        0,
+        DT_INT
+    );
+    y2->setInputWidgetType(IWT_DoubleSpinBox);
+    y2->setInputWidgetProperty("decimals", 3);
+    y2->setInputWidgetProperty("minimum", -1000 * 10000);
+    y2->setInputWidgetProperty("maximum", 1000 * 10000);
+    y2->setValueFromWidgetHook(setValueFromWidgetHook);
+    y2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* z2 = group->addConfigItem(
+        "z2",
+        0,
+        DT_INT
+    );
+    z2->setInputWidgetType(IWT_DoubleSpinBox);
+    z2->setInputWidgetProperty("decimals", 3);
+    z2->setInputWidgetProperty("minimum", -1000 * 10000);
+    z2->setInputWidgetProperty("maximum", 1000 * 10000);
+    z2->setValueFromWidgetHook(setValueFromWidgetHook);
+    z2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* u2 = group->addConfigItem(
+        "u2",
+        0,
+        DT_INT
+    );
+    u2->setInputWidgetType(IWT_DoubleSpinBox);
+    u2->setInputWidgetProperty("decimals", 3);
+    u2->setInputWidgetProperty("minimum", -1000 * 10000);
+    u2->setInputWidgetProperty("maximum", 1000 * 10000);
+    u2->setValueFromWidgetHook(setValueFromWidgetHook);
+    u2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* x3 = group->addConfigItem(
+        "x3",
+        0,
+        DT_INT
+    );
+    x3->setInputWidgetType(IWT_DoubleSpinBox);
+    x3->setInputWidgetProperty("decimals", 3);
+    x3->setInputWidgetProperty("minimum", -1000 * 10000);
+    x3->setInputWidgetProperty("maximum", 1000 * 10000);
+    x3->setValueFromWidgetHook(setValueFromWidgetHook);
+    x3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* y3 = group->addConfigItem(
+        "y3",
+        0,
+        DT_INT
+    );
+    y3->setInputWidgetType(IWT_DoubleSpinBox);
+    y3->setInputWidgetProperty("decimals", 3);
+    y3->setInputWidgetProperty("minimum", -1000 * 10000);
+    y3->setInputWidgetProperty("maximum", 1000 * 10000);
+    y3->setValueFromWidgetHook(setValueFromWidgetHook);
+    y3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* z3 = group->addConfigItem(
+        "z3",
+        0,
+        DT_INT
+    );
+    z3->setInputWidgetType(IWT_DoubleSpinBox);
+    z3->setInputWidgetProperty("decimals", 3);
+    z3->setInputWidgetProperty("minimum", -1000 * 10000);
+    z3->setInputWidgetProperty("maximum", 1000 * 10000);
+    z3->setValueFromWidgetHook(setValueFromWidgetHook);
+    z3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+
+    ConfigItem* u3 = group->addConfigItem(
+        "u3",
+        0,
+        DT_INT
+    );
+    u3->setInputWidgetType(IWT_DoubleSpinBox);
+    u3->setInputWidgetProperty("decimals", 3);
+    u3->setInputWidgetProperty("minimum", -1000 * 10000);
+    u3->setInputWidgetProperty("maximum", 1000 * 10000);
+    u3->setValueFromWidgetHook(setValueFromWidgetHook);
+    u3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
 }
 
 void Config::loadUserReigsters()
@@ -1942,15 +2019,20 @@ void Config::loadUserReigsters()
     movementStepLength->setInputWidgetProperty("minimum", 1);
     movementStepLength->setInputWidgetProperty("maximum", 1000);
 
-    ConfigItem* focusPointCompensationUnit = group->addConfigItem(
-        "focusPointCompensationUnit",
-        0,
+    ConfigItem* focalLength = group->addConfigItem(
+        "focalLength",
+        200000,
         DT_INT
     );
-    focusPointCompensationUnit->setInputWidgetProperty("maximumLineEditWidth", 75);
-    focusPointCompensationUnit->setInputWidgetProperty("page", 10);
-    focusPointCompensationUnit->setInputWidgetProperty("minimum", -1000);
-    focusPointCompensationUnit->setInputWidgetProperty("maximum", 1000);
+    focalLength->setInputWidgetType(IWT_FloatEditSlider);
+    focalLength->setInputWidgetProperty("step", 0.001);
+    focalLength->setInputWidgetProperty("decimals", 3);
+    focalLength->setInputWidgetProperty("maximumLineEditWidth", 75);
+    focalLength->setInputWidgetProperty("page", 10);
+    focalLength->setInputWidgetProperty("minimum", 1);
+    focalLength->setInputWidgetProperty("maximum", 2000);
+    focalLength->setNeedRelaunch(true);
+
 }
 
 void Config::loadSystemRegisters()
@@ -3236,18 +3318,6 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "U Enabled", nullptr), 
         QCoreApplication::translate("Config", "Enabled u axis movement", nullptr));
 
-    Device::userOrigin1Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "User Origin 1", nullptr), 
-        QCoreApplication::translate("Config", "User Origin 1", nullptr));
-
-    Device::userOrigin2Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "User Origin 2", nullptr), 
-        QCoreApplication::translate("Config", "User Origin 2", nullptr));
-
-    Device::userOrigin3Item()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "User Origin 3", nullptr), 
-        QCoreApplication::translate("Config", "User Origin 3", nullptr));
-
     Device::userOriginSelectedItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "User Origin", nullptr), 
         QCoreApplication::translate("Config", "Selected user origin", nullptr));
@@ -3255,10 +3325,6 @@ void Config::updateTitlesAndDescriptions()
     Device::zReverseDirectionItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Reverse Z Direction", nullptr), 
         QCoreApplication::translate("Config", "Reverse Z Direction", nullptr));
-
-    Device::zFocalLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Z Focal Length(mm)", nullptr), 
-        QCoreApplication::translate("Config", "Z Focal Length", nullptr));
 
     Device::uFixtureTypeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Fixture Type", nullptr), 
@@ -3287,6 +3353,10 @@ void Config::updateTitlesAndDescriptions()
     Device::switchToUItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Switch To U", nullptr), 
         QCoreApplication::translate("Config", "Switch To U", nullptr));
+
+    Device::fullRelativeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Full Relative", nullptr), 
+        QCoreApplication::translate("Config", "Full Relative", nullptr));
 
     UserRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 
@@ -3464,9 +3534,9 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Movement Step Length", nullptr), 
         QCoreApplication::translate("Config", "Movement Step Length", nullptr));
 
-    UserRegister::focusPointCompensationUnitItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Focus Point Compensation Unit(um)", nullptr), 
-        QCoreApplication::translate("Config", "Focus Point Compensation Unit(um)", nullptr));
+    UserRegister::focalLengthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Focal Length(um)", nullptr), 
+        QCoreApplication::translate("Config", "Focal Length(um)", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 
