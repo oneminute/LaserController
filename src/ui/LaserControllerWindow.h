@@ -69,8 +69,6 @@ public:
     ~LaserControllerWindow();
     bool m_hasMessageBox;
 
-    FinishRunType finishRun();
-
     LaserDocument* currentDocument() const;
 
     bool lockEqualRatio();
@@ -485,6 +483,7 @@ private:
 
     // Operations Panel widgets
     QToolButton* m_buttonOperationStart;
+    QToolButton* m_buttonOperationDownload;
     QToolButton* m_buttonOperationPause;
     QToolButton* m_buttonOperationStop;
     QToolButton* m_buttonOperationBounding;
@@ -529,7 +528,6 @@ private:
     QToolButton* m_buttonShowLaserPosition;
     QToolButton* m_buttonHideLaserPosition;
     QToolButton* m_buttonSaveZOrigin;
-    QComboBox* m_comboBoxPostEvent;
     QRadioButton* m_radioButtonUserOrigin1;
     QRadioButton* m_radioButtonUserOrigin2;
     QRadioButton* m_radioButtonUserOrigin3;
@@ -678,6 +676,7 @@ private:
     QString m_currentJson;
     bool m_useLoadedJson;
     bool m_prepareMachining;
+    bool m_prepareDownloading;
 
     // widgets on status bar
     QLabel* m_statusBarDeviceStatus;

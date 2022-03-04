@@ -119,18 +119,18 @@ QBezier QBezier::getSubRange(qreal t0, qreal t1) const
 void QBezier::addToPolygon(QPolygon *polygon, qreal bezier_flattening_threshold) const
 {
     QBezier beziers[10];
-    int levels[10];
+    qreal levels[10];
     beziers[0] = *this;
     levels[0] = 9;
     QBezier *b = beziers;
-    int *lvl = levels;
+    qreal *lvl = levels;
 
     while (b >= beziers) {
         // check if we can pop the top bezier curve from the stack
-        int y4y1 = b->y4 - b->y1;
-        int x4x1 = b->x4 - b->x1;
-        int l = qAbs(x4x1) + qAbs(y4y1);
-        int d;
+        qreal y4y1 = b->y4 - b->y1;
+        qreal x4x1 = b->x4 - b->x1;
+        qreal l = qAbs(x4x1) + qAbs(y4y1);
+        qreal d;
         if (l > 1.) {
             d = qAbs( (x4x1)*(b->y1 - b->y2) - (y4y1)*(b->x1 - b->x2) )
                 + qAbs( (x4x1)*(b->y1 - b->y3) - (y4y1)*(b->x1 - b->x3) );

@@ -438,9 +438,9 @@ void ConfigItem::clearModified()
     emit modifiedChanged(false);
 }
 
-void ConfigItem::emitValueChanged()
+void ConfigItem::emitValueChanged(void* senderPtr)
 {
-    emit valueChanged(value(), nullptr);
+    emit valueChanged(value(), senderPtr);
 }
 
 QString ConfigItem::toString() const
@@ -756,6 +756,9 @@ const QList<QWidget*>& ConfigItem::boundedWidgets() const
 void ConfigItem::setValue(const QVariant& value, StoreStrategy strategy_, void* senderPtr)
 {
     Q_D(ConfigItem);
+    if (senderPtr == this)
+        return;
+
     if (!value.isValid())
         return;
 

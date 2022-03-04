@@ -202,7 +202,12 @@ enum LaserEventType
 
     m_RequestProcessing = 2074, //面板通过板卡返回请求:开始加工
     m_RequestLensFocus = 2075, //面板通过板卡返回请求:镜头对焦
-    m_RequestDrawBounding = 2076 //面板通过板卡返回请求:走边框
+    m_RequestDrawBounding = 2076, //面板通过板卡返回请求:走边框
+    m_RequestCacheDataErr = 2077,
+    m_RequestCacheDataCRCErr = 2078,
+    m_RequestCacheDataOutOfSize = 2079,
+    m_DownToCacheRemainingTime = 2080,
+    m_StartDownToCache = 2081
 };
 
 enum LaserWorkMode

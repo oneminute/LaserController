@@ -93,6 +93,8 @@ private:
     typedef int(__stdcall* FN_INT_BYTEPTR_INT)(char*, int);
     typedef bool(__stdcall* FN_BOOL_WCHART_INTREF)(wchar_t*, int* errorCount);
 
+    typedef void(__stdcall* FN_VOID_LONG)(unsigned long);
+
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -198,6 +200,7 @@ public:
     int controlMotor(bool open);
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
+    void download(unsigned long index = 0);
     int importData(const char* data, int length);
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
@@ -216,30 +219,8 @@ public:
 protected slots:
 
 signals:
-    void libraryLoaded(bool success = true);
-    void libraryUnloaded();
-    void libraryInitialized();
-    void libraryUninitialized();
-
-    void comPortError(const QString& errorMsg);
-    void comPortsFetchError();
-    void machiningStarted();
-    void machiningPaused();
-    void continueWorking();
-    void machiningStopped();
-    void machiningCompleted();
     void downloading(int current, int total, float progress);
     void downloaded();
-    void idle();
-    void sysParamFromCardArrived(const QString& data);
-    void registersFectched(const LaserRegister::RegistersMap& data);
-    void sysParamFromCardError();
-    void unknownError();
-    void workingCanceled();
-    void rightManufacturerPassword();
-    void wrongManufacturerPassword();
-    void changeManufacturerPasswordOk();
-    void changeManufacturerPasswordFailure();
     void raiseError(int code, const QString& message);
     void sendMessage(int code, const QString& message);
 
@@ -249,7 +230,6 @@ private:
     bool m_isMachining;
     bool m_isPaused;
     bool m_isWithMachining;
-    bool m_isDownloading;
     int m_packagesCount;
     QString m_portName;
     QWidget* m_parentWidget;
@@ -313,6 +293,7 @@ private:
     FN_INT_BOOL m_fnTestLaserLight;
 
     FN_INT_WCHART m_fnLoadDataFromFile;
+    FN_VOID_LONG m_fnStartDownLoadToCache;
 
     FN_VOID_VOID m_fnGetDeviceWorkState;
 

@@ -116,6 +116,12 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
 
     ADD_TRANSITION(deviceUnconnectedState, deviceConnectedState, this, &LaserDevice::connected);
     ADD_TRANSITION(deviceConnectedState, deviceUnconnectedState, this, &LaserDevice::disconnected);
+    ADD_TRANSITION(deviceIdleState, deviceMachiningState, this, &LaserDevice::machiningStarted);
+    ADD_TRANSITION(deviceMachiningState, devicePausedState, this, &LaserDevice::machiningPaused);
+    ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDevice::continueWorking);
+    ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDevice::machiningStopped);
+    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningStopped);
+    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningCompleted);
 
     d->userRegisters.insert(0, new LaserRegister(0, Config::UserRegister::headItem(), false));
     d->userRegisters.insert(1, new LaserRegister(1, Config::UserRegister::accModeItem(), false));
@@ -161,6 +167,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->userRegisters.insert(41, new LaserRegister(41, Config::UserRegister::zSpeedItem(), false));
     d->userRegisters.insert(42, new LaserRegister(42, Config::UserRegister::materialThicknessItem(), false));
     d->userRegisters.insert(43, new LaserRegister(43, Config::UserRegister::movementStepLengthItem(), false));
+    d->userRegisters.insert(44, new LaserRegister(44, Config::UserRegister::focusPointCompensationUnitItem(), false));
 
     d->systemRegisters.insert(0, new LaserRegister(0, Config::SystemRegister::headItem(), true));
     d->systemRegisters.insert(1, new LaserRegister(1, Config::SystemRegister::passwordItem(), true, false, true));
@@ -233,7 +240,6 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
-    connect(this, &LaserDevice::comPortsFetched, this, &LaserDevice::onComPortsFetched);
     connect(this, &LaserDevice::connected, this, &LaserDevice::onConnected);
     connect(this, &LaserDevice::mainCardRegistrationChanged, this, &LaserDevice::onMainCardRegistrationChanged);
     connect(this, &LaserDevice::mainCardActivationChanged, this, &LaserDevice::onMainCardActivationChanged);
@@ -285,9 +291,18 @@ void LaserDevice::load()
 
     connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage/*, Qt::ConnectionType::QueuedConnection*/);
-    connect(d->driver, &LaserDriver::libraryLoaded, this, &LaserDevice::onLibraryLoaded);
-    connect(d->driver, &LaserDriver::libraryInitialized, this, &LaserDevice::onLibraryInitialized);
-    d->driver->load();
+    if (d->driver->load())
+    {
+        d->isInit = false;
+        if (d->driver->init(LaserApplication::mainWindow->winId()))
+        {
+            qLogD << "LaserDevice::onLibraryInitialized";
+            d->driver->setupCallbacks();
+            d->isInit = true;
+            d->driver->getPortList();
+            updateDriverLanguage();
+        }
+    }
 }
 
 int LaserDevice::layoutWidth() const
@@ -385,6 +400,22 @@ void LaserDevice::updateWorkState()
     Q_D(LaserDevice);
     if (d->driver)
         d->driver->getDeviceWorkState();
+}
+
+void LaserDevice::changeState(const DeviceState& state)
+{
+    Q_D(LaserDevice);
+    d->lastState = state;
+    /*switch (state.workingMode)
+    {
+    case LWM_WORKING:
+        break;
+    case LWM_PAUSE:
+        break;
+    case LWM_STOP:
+        break;
+    }*/
+    emit workStateUpdated(state);
 }
 
 void LaserDevice::requestMainCardInfo()
@@ -647,20 +678,20 @@ bool LaserDevice::registerMainCard(const QString& registeCode, QWidget* parentWi
     return false;
 }
 
-bool LaserDevice::writeUserRegisters()
+bool LaserDevice::writeUserRegisters(bool onlyModified)
 {
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    return d->driver->writeUserParamToCard(userRegisterValues(true));
+    return d->driver->writeUserParamToCard(userRegisterValues(onlyModified));
 }
 
-bool LaserDevice::writeSystemRegisters(const QString& password)
+bool LaserDevice::writeSystemRegisters(const QString& password, bool onlyModified)
 {
     Q_D(LaserDevice);
     if (!isConnected())
         return false;
-    LaserRegister::RegistersMap registers = systemRegisterValues(true);
+    LaserRegister::RegistersMap registers = systemRegisterValues(onlyModified);
     registers.insert(1, password);
     return d->driver->writeSysParamToCard(registers);
 }
@@ -928,7 +959,7 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
             .arg((layoutLeft - docLeft) * 0.001, 0, 'f', 3));
         exceedLeft = true;
     }
-    if (docTop < layoutTop)
+    if (docTop < layoutTop && !Config::Device::switchToU())
     {
         ok1 = false;
         info1.append(tr("Top edge of current document bounding exceeds device layout: %1mm\n")
@@ -941,7 +972,7 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
             .arg((docRight - layoutRight) * 0.001, 0, 'f', 3));
         exceedRight = true;
     }
-    if (docBottom > layoutBottom)
+    if (docBottom > layoutBottom && !Config::Device::switchToU())
     {
         ok1 = false;
         info1.append(tr("Bottom edge of current document bounding exceeds device layout: %1mm\n")
@@ -1114,7 +1145,7 @@ void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed
             if (d->systemRegisters.contains(addr))
             {
                 d->systemRegisters[addr]->parse(value);
-                if (!isConfirmed)
+                //if (!isConfirmed)
                     d->systemRegisters[addr]->configItem()->loadValue(value);
             }
         }
@@ -1123,7 +1154,7 @@ void LaserDevice::batchParse(const QString& raw, bool isSystem, bool isConfirmed
             if (d->userRegisters.contains(addr))
             {
                 d->userRegisters[addr]->parse(value);
-                if (!isConfirmed)
+                //if (!isConfirmed)
                     d->userRegisters[addr]->configItem()->loadValue(value);
             }
         }
@@ -1206,12 +1237,12 @@ QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
     }
 }
 
-int LaserDevice::engravingAccLength(qreal engravingRunSpeed) const
+int LaserDevice::engravingAccLength(int engravingRunSpeed) const
 {
-    qreal minSpeed = Config::UserRegister::scanXStartSpeed();
-    qreal acc = Config::UserRegister::scanXAcc();
-    qreal maxSpeed = qMax(engravingRunSpeed, minSpeed);
-    return qAbs(qRound((maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2)));
+    int minSpeed = Config::UserRegister::scanXStartSpeed();
+    int acc = Config::UserRegister::scanXAcc();
+    int maxSpeed = qMax(engravingRunSpeed, minSpeed);
+    return qAbs(qRound((maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2.0)));
 }
 
 void LaserDevice::debugPrintUserRegisters() const
@@ -1696,18 +1727,22 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_StartWorking:
     {
+        emit machiningStarted();
         break;
     }
     case M_PauseWorking:
     {
+        emit machiningPaused();
         break;
     }
     case M_ContinueWorking:
     {
+        emit continueWorking();
         break;
     }
     case M_StopWorking:
     {
+        emit machiningStopped();
         break;
     }
     case M_MachineWorking:
@@ -1715,14 +1750,17 @@ void LaserDevice::handleMessage(int code, const QString& message)
         DeviceState state;
         if (state.parse(message))
         {
-            d->lastState = state;
-            emit workStateUpdated(state);
+            changeState(state);
         }
         break;
     }
     case M_Idle:
-    //case M_WorkFinished:
     {
+        DeviceState state;
+        if (state.parse(message))
+        {
+            changeState(state);
+        }
         break;
     }
     case M_DeviceIdInfo:
@@ -1854,65 +1892,13 @@ void LaserDevice::handleMessage(int code, const QString& message)
 
 }
 
-void LaserDevice::onLibraryLoaded(bool success)
-{
-    Q_D(LaserDevice);
-    qLogD << "LaserDevice::onLibraryLoaded: success = " << success;
-    try {
-        d->isInit = false;
-        d->driver->init(LaserApplication::mainWindow->winId());
-    }
-    catch (...) {
-        d->isInit = false;
-    }
-}
-
-void LaserDevice::onLibraryInitialized()
-{
-    Q_D(LaserDevice);
-    qLogD << "LaserDevice::onLibraryInitialized";
-    d->driver->setupCallbacks();
-    d->isInit = true;
-    updateDriverLanguage();
-    d->driver->getPortList();
-}
-
-void LaserDevice::onComPortsFetched(const QStringList& portNames)
-{
-    Q_D(LaserDevice);
-    /*if (portNames.length() == 1)
-    {
-        connectDevice(portNames[0]);
-    }
-    else if (portNames.length() > 1)
-    {
-        if (Config::Device::autoConnectFirstCOM())
-        {
-            connectDevice(portNames[0]);
-        }
-    }*/
-}
-
 void LaserDevice::onConnected()
 {
     Q_D(LaserDevice);
     if (d->driver)
     {
         d->driver->setFactoryType("EFSLaserController");
-        //d->driver->stopMachining();
-        //d->driver->lPenMoveToOriginalPoint(Config::UserRegister::cuttingMoveSpeed());
         d->driver->getDeviceWorkState();
-        //d->driver->getMainCardRegisterState();
-        //QString compileInfo = d->driver->getCompileInfo();
-        //qLogD << "compile info: " << compileInfo;
-        //QString laserLibraryInfo = d->driver->getLaserLibraryInfo();
-        //qLogD << "laser library info: " << laserLibraryInfo;
-        //QString mainCardId = d->driver->getMainCardID();
-        //qLogD << "main card id: " << mainCardId;
-
-        //readSystemRegisters();
-        //readUserRegisters();
-        //readHostRegisters();
     }
 }
 

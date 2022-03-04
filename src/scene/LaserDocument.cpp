@@ -261,8 +261,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QRect docBounding = currentDocBoundingRect();
     QRect docBoundingAcc = currentDocBoundingRect(true);
     int xOffset = docBoundingAcc.x() - docBounding.x();
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, !absolute);
-    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, !absolute, xOffset);
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, Config::Device::switchToU(), !absolute);
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU(), !absolute, xOffset);
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -495,8 +495,8 @@ void LaserDocument::exportBoundingJSON()
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect());
-    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true));
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect(), Config::Device::switchToU());
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true), Config::Device::switchToU());
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
