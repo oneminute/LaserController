@@ -1262,6 +1262,13 @@ QPoint LaserDevice::mapFromCurrentToQuad(const QPoint& pt, const QPoint& topLeft
     return pt + trans;
 }
 
+QTransform LaserDevice::to1stQuad()
+{
+    QPoint offset = originOffset();
+    QTransform t = QTransform::fromTranslate(offset.x(), offset.y());
+    return t;
+}
+
 void LaserDevice::unload()
 {
     Q_D(LaserDevice);

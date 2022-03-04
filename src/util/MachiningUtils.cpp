@@ -235,7 +235,7 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
 
     QPoint pt = t.map(points.first().toPoint());
     QPoint diff = pt - lastPoint;
-    if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    if (Config::Device::fullRelative() || Config::Device::startFrom() != SFT_AbsoluteCoords)
     {
         //buffer.append(QString("pu%1 %2;").arg(rel.x()).arg(rel.y()));
         buffer.append(QString("pu%1 %2;").arg(pt.x() - lastPoint.x()).arg(pt.y() - lastPoint.y()));

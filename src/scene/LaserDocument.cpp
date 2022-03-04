@@ -185,18 +185,6 @@ void LaserDocument::removeLayer(LaserLayer* layer)
     updateLayersStructure();
 }
 
-//LaserLayer* LaserDocument::defaultCuttingLayer() const
-//{
-//    Q_D(const LaserDocument);
-//    return d->layers[1];
-//}
-//
-//LaserLayer* LaserDocument::defaultEngravingLayer() const
-//{
-//    Q_D(const LaserDocument);
-//    return d->layers[0];
-//}
-
 QString LaserDocument::newLayerName() const
 {
     Q_D(const LaserDocument);
@@ -233,7 +221,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QJsonObject jsonObj;
 
     bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
-    QTransform transformPrintAndCut = enablePrintAndCut() ? transform() : QTransform();
+    QTransform t = enablePrintAndCut() ? transform() : QTransform();
+    t = t * LaserApplication::device->to1stQuad();
     QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
     {
@@ -243,6 +232,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         break;
     case SFT_UserOrigin:
         docOrigin = LaserApplication::device->userOrigin().toPoint();
+        if (Config::Device::fullRelative())
+            docOrigin = t.map(docOrigin);
         break;
     }
 
@@ -260,6 +251,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     QRect docBounding = currentDocBoundingRect();
     QRect docBoundingAcc = currentDocBoundingRect(true);
+    if (absolute && Config::Device::fullRelative())
+    {
+        docBounding = t.mapRect(docBounding);
+        docBoundingAcc = t.mapRect(docBoundingAcc);
+    }
     int xOffset = docBoundingAcc.x() - docBounding.x();
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, Config::Device::switchToU(), !absolute);
     laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU(), !absolute, xOffset);
@@ -284,7 +280,11 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
     QJsonArray layers;
     QPoint lastPoint;
     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
+    {
         lastPoint = this->jobOriginOnDocBoundingRect();
+        if (Config::Device::fullRelative())
+            lastPoint = t.map(lastPoint);
+    }
     
     for (LaserLayer* layer : layerList)
     {
@@ -331,6 +331,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                 {
                     QRectF boundingRect = primitive->sceneBoundingRect();
                     QPoint boundingPoint = boundingRect.topLeft().toPoint();
+                    if (Config::Device::fullRelative())
+                        boundingPoint = t.map(boundingRect.topLeft().toPoint());
                     if (Config::Device::startFrom() != SFT_AbsoluteCoords)
                         QPoint boundingPoint = boundingPoint - lastPoint;
                     itemObj["X"] = boundingPoint.x();
@@ -358,7 +360,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, transformPrintAndCut));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, t));
                     items.append(itemObjCutting);
                 }
             }
@@ -370,7 +372,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObj["Type"] = primitive->typeLatinName();
                     itemObj["Style"] = LaserLayerType::LLT_CUTTING;
                     ProgressItem* progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("%1 Points to Plt").arg(primitive->name()), exportProgress);
-                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, transformPrintAndCut));
+                    itemObj["Data"] = QString(machiningUtils::pointListList2Plt(progress, points, lastPoint, t));
                     items.append(itemObj);
                 }
             }
@@ -400,6 +402,8 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                         {
                             QRectF boundingRect = primitive->sceneBoundingRect();
                             QPoint boundingPoint = boundingRect.topLeft().toPoint();
+                            if (Config::Device::fullRelative())
+                                boundingPoint = t.map(boundingRect.topLeft().toPoint());
                             if (Config::Device::startFrom() != SFT_AbsoluteCoords)
                                 QPoint boundingPoint = boundingPoint - lastPoint;
                             itemObj["X"] = boundingPoint.x();
@@ -423,7 +427,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
                     itemObjCutting["Style"] = LaserLayerType::LLT_CUTTING;
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
-                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, transformPrintAndCut));
+                    itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, t));
                     items.append(itemObjCutting);
                 }
             }
@@ -475,6 +479,9 @@ void LaserDocument::exportBoundingJSON()
     QJsonObject jsonObj;
 
     QTransform t = enablePrintAndCut() ? transform() : QTransform();
+    // 转换到第一象限的Transform
+    t = t * LaserApplication::device->to1stQuad();
+    // 确定文档原点，只在用户原点模式下按九宫格生成相对原点
     QPoint docOrigin(0, 0);
     switch (Config::Device::startFrom())
     {
@@ -484,6 +491,8 @@ void LaserDocument::exportBoundingJSON()
         break;
     case SFT_UserOrigin:
         docOrigin = LaserApplication::device->userOrigin().toPoint();
+        if (Config::Device::fullRelative())
+            docOrigin = t.map(docOrigin);
         break;
     }
     QJsonObject laserDocumentInfo;
@@ -495,8 +504,18 @@ void LaserDocument::exportBoundingJSON()
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(docOrigin);
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(currentDocBoundingRect(), Config::Device::switchToU());
-    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(currentDocBoundingRect(true), Config::Device::switchToU());
+    // 当前加工文档的外包矩形框
+    QRect docBounding = currentDocBoundingRect();
+    // 当前加工文档带有加减速区间的外包矩形框，用于判定是否超出限幅
+    QRect docBoundingAcc = currentDocBoundingRect(true);
+    bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
+    if (absolute && Config::Device::fullRelative())
+    {
+        docBounding = t.mapRect(docBounding);
+        docBoundingAcc = t.mapRect(docBoundingAcc);
+    }
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, Config::Device::switchToU());
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU());
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
@@ -650,12 +669,8 @@ void LaserDocument::exportBoundingJSON()
     }
 
     QByteArray rawJson = jsonDoc.toJson(QJsonDocument::Compact);
-    //qint64 writtenBytes = saveFile.write(rawJson);
-    //qDebug() << "written bytes:" << writtenBytes;
 
     saveFile.close();
-    //emit exportFinished(filename);
-    //qLogD << "rawJson: " << rawJson;
     emit exportFinished(rawJson);
 }
 
