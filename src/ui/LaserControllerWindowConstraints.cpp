@@ -653,6 +653,28 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionDragView, "enabled", true, documentPrimitiveState);
     // end m_ui->actionDragView
 
+    // begin m_createStampTb
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", true, documentViewDragState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveRectState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveEllipseState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveLineState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitivePolygonState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveTextState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveArcTextState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveVerticalTextState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveHorizontalTextState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveRingEllipseState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveRingState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveFrameState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitivePartyEmblemState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveStarState);
+    BIND_PROP_TO_STATE(m_createStampTb, "enabled", false, documentPrimitiveSplineState);
+    // end m_createStampTb
+
     // begin m_toolButtonStampShapes
     BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_toolButtonStampShapes, "enabled", false, documentEmptyState);
