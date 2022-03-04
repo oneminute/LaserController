@@ -37,11 +37,11 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         m_ui->hSpaceSpinBox->setValue(0.5);
         //angle
         m_ui->angleSpinBox->setValue(200);
-        QPixmap normal(":/ui/icons/images/normalCircleStamp.png");
-        QPixmap horizontalText(":/ui/icons/images/HTextCircleStamp.png");
-        QPixmap emblemEllipse(":/ui/icons/images/bottomTextCircleStamp.png");
-        QPixmap newA(":/ui/icons/images/CCYLStamp.png");
-        QPixmap newB(":/ui/icons/images/CCYLStamp.png");
+        QPixmap normal(":/ui/icons/images/normalEliipseStamp.png");
+        QPixmap horizontalText(":/ui/icons/images/horizontalTextEllipseStamp.png");
+        QPixmap emblemEllipse(":/ui/icons/images/embleEllipseStamp.png");
+        QPixmap newA(":/ui/icons/images/newInvoiceA.png");
+        QPixmap newB(":/ui/icons/images/newInvoiceB.png");
         m_ui->circleStampLayoutComboBox->addItem(QIcon(normal), tr("Normal Ellipse Stamp"));
         m_ui->circleStampLayoutComboBox->addItem(QIcon(horizontalText), tr("Horizontal Text Ellipse Stamp"));
         m_ui->circleStampLayoutComboBox->addItem(QIcon(emblemEllipse), tr("Emblem Ellipse Stamp"));
@@ -50,7 +50,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         m_ui->circleStampLayoutComboBox->setItemDelegate(new QStyledItemDelegate());
     }
     else {
-        m_ui->circleBorderLabel->setVisible(false);
+        m_ui->circleHeightLabel->setVisible(false);
         m_ui->circleHeightSpinBox->setVisible(false);
         m_ui->circleDiameterSpinBox->setValue(40);
         m_ui->embleSizeSpinBox->setValue(13);

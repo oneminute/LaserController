@@ -113,7 +113,10 @@ public:
     LaserDoubleSpinBox* textWidth();
     LaserDoubleSpinBox* textHeight();
     LaserDoubleSpinBox* textAngle();
-    
+    LaserDoubleSpinBox* originalBoundsHeight();
+    LaserDoubleSpinBox* originalBoundsWidth();
+    LaserDoubleSpinBox* originalBoundsDiameter();
+    LaserDoubleSpinBox* originalBoundsSize();
 public slots:
     void handleSecurityException(int code, const QString& message);
     void onFontComboBoxHighLighted(int index);
@@ -414,6 +417,7 @@ private:
     void bindWidgetsProperties();
     virtual void showEvent(QShowEvent *event);
 	QString getCurrentFileName();
+    LaserPrimitive* getFirstSelectedPrimitive();
 
 signals:
     void windowCreated();
@@ -546,10 +550,12 @@ private:
     QLabel* m_cutOrderPriorityLabel;
     LaserDoubleSpinBox* m_powerScale;
     QLabel* m_powerScaleLabel;
-    LaserDoubleSpinBox* m_width;
-    QLabel* m_widthLabel;
-    LaserDoubleSpinBox* m_height;
-    QLabel* m_heightLabel;
+    LaserDoubleSpinBox* m_originalBoundsSize;
+    QLabel* m_originalBoundsSizeLabel;
+    LaserDoubleSpinBox* m_originalBoundsWidth;
+    QLabel* m_originalBoundsWidthLabel;
+    LaserDoubleSpinBox* m_originalBoundsHeight;
+    QLabel* m_originalBoundsHeightLabel;
     LaserDoubleSpinBox* m_maxWidth;
     QLabel* m_maxWidthLabel;
     LaserDoubleSpinBox* m_cornerRadius;
@@ -609,6 +615,8 @@ private:
     QGridLayout* m_circleTextPropertyLayout;
     QGridLayout* m_framePropertyLayout;
     QGridLayout* m_ringPropertyLayout;
+    QGridLayout* m_starPropertyLayout;
+    QGridLayout* m_partyEmblePropertyLayout;
     QWidget* m_propertyPanelWidget;
     QWidget* m_rectPropertyWidget;
     QWidget* m_linePropertyWidget;
@@ -626,6 +634,8 @@ private:
     QWidget* m_circleTextWidget;
     QWidget* m_frameWidget;
     QWidget* m_ringWidget;
+    QWidget* m_starWidget;
+    QWidget* m_partyEmbleWidget;
     
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;

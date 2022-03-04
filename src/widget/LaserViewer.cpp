@@ -2785,7 +2785,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRingEllipseState())) {
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
-            QRect rect(point.x(), point.y(), 40 * 1000, 25 * 1000);
+            QRect rect(point.x(), point.y(), 50 * 1000, 35 * 1000);
             LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);

@@ -484,13 +484,17 @@ public:
     virtual QJsonObject toJson();
     LaserPrimitive * clone(QTransform t);
     QVector<QLineF> edges();
-    void updatePoints();
-    QPoint* points();
+    void computePath();
+    qreal radius();
+    //void updatePoints();
+    //QPoint* points();
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     virtual bool isClosed() const;
     virtual QPointF position() const;
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -511,11 +515,14 @@ public:
     LaserPrimitive* clone(QTransform t);
     QVector<QLineF> edges();
     void computePath();
+    qreal radius();
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     virtual bool isClosed() const;
     virtual QPointF position() const;
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -544,6 +551,8 @@ public:
     void setBorderWidth(qreal w);
     qreal borderWidth();
     void computePath();
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -580,6 +589,8 @@ public:
     void computePath();
     bool needAuxiliaryLine();
     void setNeedAuxiliaryLine(bool bl);
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)

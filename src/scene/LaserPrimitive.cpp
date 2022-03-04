@@ -3000,29 +3000,7 @@ LaserStar::LaserStar(LaserDocument * doc, QPoint centerPos, qreal radius, QTrans
     Q_D(LaserStar);
     d->radius = radius;
     d->centerPoint = centerPos;
-    //计算圆上5个点
-    qreal cos18 = qCos(M_PI/10);
-    qreal sin18 = qSin(M_PI/10);
-    qreal cos54 = qCos(M_PI*3 / 10);
-    qreal sin54 = qSin(M_PI*3 / 10);
-    d->points[0] = QPoint(d->centerPoint.x(), d->centerPoint.y() - d->radius);
-    d->points[1] = QPoint(d->centerPoint.x() + d->radius * cos18,
-        d->centerPoint.y() - d->radius * sin18);
-    d->points[2] = QPoint(d->centerPoint.x() + d->radius * cos54, 
-        d->centerPoint.y() + d->radius * sin54);
-    d->points[3] = QPoint(d->centerPoint.x() - d->radius * cos54,
-        d->centerPoint.y() + d->radius * sin54);
-    d->points[4] = QPoint(d->centerPoint.x() - d->radius * cos18,
-        d->centerPoint.y() - d->radius * sin18);
-    //计算路径
-    d->path.moveTo(d->points[0]);
-    d->path.lineTo(d->points[2]);
-    d->path.lineTo(d->points[4]);
-    d->path.lineTo(d->points[1]);
-    d->path.lineTo(d->points[3]);
-    d->path.closeSubpath();
-
-    d->boundingRect = d->path.boundingRect().toRect();
+    computePath();
     //d->originalBoundingRect = d->boundingRect;
     setTransform(transform);
 }
@@ -3076,7 +3054,42 @@ QVector<QLineF> LaserStar::edges()
     return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
-void LaserStar::updatePoints()
+void LaserStar::computePath()
+{
+    Q_D(LaserStar);
+    d->path = QPainterPath();
+    //计算圆上5个点
+    qreal cos18 = qCos(M_PI / 10);
+    qreal sin18 = qSin(M_PI / 10);
+    qreal cos54 = qCos(M_PI * 3 / 10);
+    qreal sin54 = qSin(M_PI * 3 / 10);
+    d->points[0] = QPoint(d->centerPoint.x(), d->centerPoint.y() - d->radius);
+    d->points[1] = QPoint(d->centerPoint.x() + d->radius * cos18,
+        d->centerPoint.y() - d->radius * sin18);
+    d->points[2] = QPoint(d->centerPoint.x() + d->radius * cos54,
+        d->centerPoint.y() + d->radius * sin54);
+    d->points[3] = QPoint(d->centerPoint.x() - d->radius * cos54,
+        d->centerPoint.y() + d->radius * sin54);
+    d->points[4] = QPoint(d->centerPoint.x() - d->radius * cos18,
+        d->centerPoint.y() - d->radius * sin18);
+    //计算路径
+    d->path.moveTo(d->points[0]);
+    d->path.lineTo(d->points[2]);
+    d->path.lineTo(d->points[4]);
+    d->path.lineTo(d->points[1]);
+    d->path.lineTo(d->points[3]);
+    d->path.closeSubpath();
+
+    d->boundingRect = d->path.boundingRect().toRect();
+}
+
+qreal LaserStar::radius()
+{
+    Q_D(const LaserStar);
+    return d->radius;
+}
+
+/*void LaserStar::updatePoints()
 {
     Q_D(LaserStar);
     QPolygonF pol = (sceneTransform().map(d->path)).toFillPolygon();
@@ -3092,7 +3105,7 @@ QPoint * LaserStar::points()
     Q_D(LaserStar);
     updatePoints();
     return d->points;
-}
+}*/
 
 void LaserStar::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
@@ -3121,6 +3134,20 @@ QPointF LaserStar::position() const
 {
     Q_D(const LaserStar);
     return sceneTransform().map(d->path.pointAtPercent(0));
+}
+
+void LaserStar::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserStar);
+    d->radius = width * 0.5;
+    computePath();
+}
+
+void LaserStar::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserStar);
+    d->radius = height * 0.5;
+    computePath();
 }
 
 class LaserPartyEmblemPrivate : public LaserShapePrivate
@@ -3285,6 +3312,12 @@ void LaserPartyEmblem::computePath()
     d->boundingRect = d->path.boundingRect().toRect();
 }
 
+qreal LaserPartyEmblem::radius()
+{
+    Q_D(const LaserPartyEmblem);
+    return d->radius;
+}
+
 void LaserPartyEmblem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -3308,6 +3341,20 @@ bool LaserPartyEmblem::isClosed() const
 QPointF LaserPartyEmblem::position() const
 {
     return QPointF();
+}
+
+void LaserPartyEmblem::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserPartyEmblem);
+    d->radius = width * 0.5;
+    computePath();
+}
+
+void LaserPartyEmblem::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserPartyEmblem);
+    d->radius = height * 0.5;
+    computePath();
 }
 
 class LaserRingPrivate : public LaserShapePrivate
@@ -3438,6 +3485,32 @@ void LaserRing::computePath()
     Q_D(LaserRing);
     d->path = d->outerPath - d->innerPath;
     d->boundingRect = d->path.boundingRect().toRect();
+}
+
+void LaserRing::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserRing);
+    qreal diff = d->outerBounds.width() - width;
+    d->outerBounds = QRect(d->outerBounds.left() + diff * 0.5, d->outerBounds.top(), width, d->outerBounds.height());
+    d->outerPath = QPainterPath();
+    d->outerPath.addEllipse(d->outerBounds);
+    d->innerBounds = QRect(d->innerBounds.left() + diff * 0.5, d->innerBounds.top(), d->innerBounds.width() - diff, d->innerBounds.height());
+    d->innerPath = QPainterPath();
+    d->innerPath.addEllipse(d->innerBounds);
+    computePath();
+}
+
+void LaserRing::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserRing);
+    qreal diff = d->outerBounds.height() - height;
+    d->outerBounds = QRect(d->outerBounds.left(), d->outerBounds.top()+diff*0.5, d->outerBounds.width(), height);
+    d->outerPath = QPainterPath();
+    d->outerPath.addEllipse(d->outerBounds);
+    d->innerBounds = QRect(d->innerBounds.left(), d->innerBounds.top() + diff * 0.5, d->innerBounds.width(), d->innerBounds.height() - diff);
+    d->innerPath = QPainterPath();
+    d->innerPath.addEllipse(d->innerBounds);
+    computePath();
 }
 
 class LaserFramePrivate : public LaserShapePrivate
@@ -3619,6 +3692,26 @@ void LaserFrame::setNeedAuxiliaryLine(bool bl)
 {
     Q_D(LaserFrame);
     d->needAuxiliaryLine = bl;
+}
+void LaserFrame::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserFrame);
+    qreal diff = d->outerRect.width() - width;
+    d->outerRect = QRect(d->outerRect.left() + diff * 0.5, d->outerRect.top(), width, d->outerRect.height());
+    d->outerPath = computeCornerRadius(d->outerRect, d->cornerRadius, d->cornerType);
+    d->innerRect = QRect(d->innerRect.left() + diff * 0.5, d->innerRect.top(), d->innerRect.width() - diff, d->innerRect.height());
+    d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, d->cornerType);
+    computePath();
+}
+void LaserFrame::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserFrame);
+    qreal diff = d->outerRect.height() - height;
+    d->outerRect = QRect(d->outerRect.left(), d->outerRect.top() + diff * 0.5, d->outerRect.width(), height);
+    d->outerPath = computeCornerRadius(d->outerRect, d->cornerRadius, d->cornerType);
+    d->innerRect = QRect(d->innerRect.left(), d->innerRect.top() + diff * 0.5, d->innerRect.width(), d->innerRect.height() - diff);
+    d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, d->cornerType);
+    computePath();
 }
 QDebug operator<<(QDebug debug, const QRect& rect)
 {
@@ -4414,6 +4507,7 @@ void LaserCircleText::setBoundingRectWidth(qreal width)
     p.addRect(d->circleBounds);
     //d->path = p;
     computeTextPath(d->angle, d->size, false);
+    LaserApplication::mainWindow->originalBoundsWidth()->setValue(d->circleBounds.width() * 0.001);
 }
 
 void LaserCircleText::setBoundingRectHeight(qreal height)
@@ -4426,6 +4520,7 @@ void LaserCircleText::setBoundingRectHeight(qreal height)
     p.addRect(d->circleBounds);
     //d->path = p;
     computeTextPath(d->angle, d->size, false);
+    LaserApplication::mainWindow->originalBoundsHeight()->setValue(d->circleBounds.height() * 0.001);
 }
 
 void LaserCircleText::recompute()
@@ -4667,12 +4762,9 @@ void LaserHorizontalText::setSpace(qreal space)
     if (d->space < 0) {
         d->space = 0;
     }
-    qreal lastPathWidth = d->path.boundingRect().width();
+    qreal lastPathWidth = d->path.boundingRect().width();    
     computeTextPath();
-    //qreal diff = d->path.boundingRect().width() - lastPathWidth;
-    //d->center = QPointF(d->center.x(), d->center.y());
-    //toCenter();
-    //d->boundingRect = d->path.boundingRect().toRect();
+    LaserApplication::mainWindow->originalBoundsWidth()->setValue(d->boundingRect.width() * 0.001);
 }
 
 void LaserHorizontalText::setTextHeight(qreal height)
@@ -4700,10 +4792,7 @@ void LaserHorizontalText::setTextWidth(qreal width)
     qreal lasPathWidth = d->path.boundingRect().width();
     d->size = QSize(width, d->size.height());
     computeTextPath();
-    //qreal diff = d->path.boundingRect().width() - lasPathWidth;
-    //d->center = QPointF(d->center.x() - diff * 0.5, d->center.y());
-    //toCenter();
-    //d->boundingRect = d->path.boundingRect().toRect();
+    LaserApplication::mainWindow->originalBoundsWidth()->setValue(d->boundingRect.width() * 0.001);
 }
 
 class LaserVerticalTextPrivate : public LaserStampTextPrivate
@@ -4900,10 +4989,7 @@ void LaserVerticalText::setSpace(qreal space)
     }
     qreal lastPathHeight = d->path.boundingRect().height();
     computeTextPath();
-    //qreal diff = d->path.boundingRect().height() - lastPathHeight;
-    //d->center = QPointF(d->center.x(), d->center.y());
-    //toCenter();
-    //d->boundingRect = d->path.boundingRect().toRect();
+    LaserApplication::mainWindow->originalBoundsHeight()->setValue(d->boundingRect.height() * 0.001);
 }
 
 void LaserVerticalText::setTextHeight(qreal height)
@@ -4912,10 +4998,7 @@ void LaserVerticalText::setTextHeight(qreal height)
     qreal lastPathHeight = d->path.boundingRect().height();
     d->size = QSize(d->size.width(), height);
     computeTextPath();
-    //qreal diff = d->path.boundingRect().height() - lastPathHeight;
-    //d->center = QPointF(d->center.x(), d->center.y());
-    //toCenter();
-    //d->boundingRect = d->path.boundingRect().toRect();
+    LaserApplication::mainWindow->originalBoundsHeight()->setValue(d->boundingRect.height() * 0.001);
 }
 
 void LaserVerticalText::setTextWidth(qreal width)

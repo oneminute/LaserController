@@ -172,5 +172,10 @@
 		<file>images/HTextCircleStamp.png</file>
 		<file>images/CCYLStamp.png</file>
 		<file>images/bottomTextCircleStamp.png</file>
+		<file>images/normalEliipseStamp.png</file>
+		<file>images/newInvoiceA.png</file>
+		<file>images/newInvoiceB.png</file>
+		<file>images/embleEllipseStamp.png</file>
+		<file>images/horizontalTextEllipseStamp.png</file>
     </qresource>
 </RCC>
