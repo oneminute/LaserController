@@ -4812,7 +4812,7 @@ void LaserControllerWindow::onActionExportJson(bool checked)
                     m_scene->document()->outline(progress);
                     m_scene->document()->setFinishRun(Config::Device::finishRun());
                     m_prepareMachining = false;
-                    m_scene->document()->exportJSON(filename, progress, true);
+                    m_scene->document()->exportJSON(filename, progress, true, true);
                     progress->finish();
                 }
             );
@@ -4871,7 +4871,7 @@ void LaserControllerWindow::startMachining()
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
                 qDebug() << "export temp json file for machining" << filename;
-                m_scene->document()->exportJSON(filename, progress);
+                m_scene->document()->exportJSON(filename, progress, true, true);
                 progress->finish();
             }
         );
@@ -4985,7 +4985,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareDownloading = true;
             qDebug() << "export temp json file for machining" << filename;
-            m_scene->document()->exportJSON(filename, progress);
+            m_scene->document()->exportJSON(filename, progress, true, true);
             progress->finish();
         }
     );
@@ -5605,7 +5605,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
 
     QRect bounding = laserRect->sceneBoundingRect();
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
-    m_scene->removeLaserPrimitive(rectPrimitive, false);
+    m_scene->document()->removePrimitive(rectPrimitive);
 
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     

@@ -100,30 +100,11 @@ void LaserScene::clearDocument(bool delDoc)
 	}
 }
 
-void LaserScene::addLaserPrimitive(LaserPrimitive * primitive, bool ignoreUpdateDocBounding)
+void LaserScene::addLaserPrimitive(LaserPrimitive * primitive, bool addToQuadTree)
 {
-    m_doc->addPrimitive(primitive);
 	addItem(primitive);
-    m_quadTree->createPrimitiveTreeNode(primitive);
-    if (!ignoreUpdateDocBounding)
-        m_doc->updateDocumentBounding();
-}
-
-void LaserScene::addLaserPrimitive(LaserPrimitive* primitive, LaserLayer* layer, bool ignoreUpdateDocBounding)
-{
-    m_doc->addPrimitive(primitive, layer);
-	addItem(primitive);
-    m_quadTree->createPrimitiveTreeNode(primitive);
-    if (!ignoreUpdateDocBounding)
-        m_doc->updateDocumentBounding();
-}
-
-void LaserScene::addLaserPrimitiveWithoutTreeNode(LaserPrimitive * primitive, bool ignoreUpdateDocBounding)
-{
-    m_doc->addPrimitive(primitive);
-    addItem(primitive);
-    if (!ignoreUpdateDocBounding)
-        m_doc->updateDocumentBounding();
+    if (addToQuadTree)
+        m_quadTree->createPrimitiveTreeNode(primitive);
 }
 
 void LaserScene::addGroupItemsToTreeNode()
@@ -135,13 +116,10 @@ void LaserScene::addGroupItemsToTreeNode()
     }
 }
 
-void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive, bool ignoreUpdateDocBounding)
+void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
-	m_doc->removePrimitive(primitive, true);
     primitive->removeAllTreeNode();
 	removeItem(primitive);
-    if (!ignoreUpdateDocBounding)
-        m_doc->updateDocumentBounding();
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const

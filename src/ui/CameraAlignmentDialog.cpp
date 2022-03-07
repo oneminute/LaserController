@@ -379,8 +379,8 @@ void CameraAlignmentDialog::addMarkToDocument(int index, const QRect& rect, cons
     LaserLayer* layer1 = m_doc->layers()[index * 2 + 1];
     LaserEllipse* circle = new LaserEllipse(rect, m_doc);
     LaserPath* path = new LaserPath(painterPath, m_doc);
-    scene->addLaserPrimitive(circle, layer0, false);
-    scene->addLaserPrimitive(path, layer1, false);
+    scene->document()->addPrimitive(circle, layer0, false, false);
+    scene->document()->addPrimitive(path, layer1, false, false);
     setupLayers(layer0, layer1);
 }
 
@@ -446,6 +446,7 @@ void CameraAlignmentDialog::generate()
     addMarkToScene(halfMarkSize, m_mark4, pen, m_page1Scene, rect, painterPath);
     addMarkToDocument(4, rect, painterPath);
 
+    m_doc->updateDocumentBounding();
     LaserApplication::mainWindow->updateLayers();
 }
 

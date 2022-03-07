@@ -743,7 +743,8 @@ void LaserLayer::onClicked()
         int bitmaps = 0;
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
         {
-            scene->addLaserPrimitive(primitive, this, false);
+            //scene->addLaserPrimitive(primitive, this, false);
+            scene->document()->addPrimitive(primitive, this);
             if (primitive->isShape())
             {
                 shapes++;

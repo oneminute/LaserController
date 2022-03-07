@@ -24,7 +24,7 @@ class LaserDocument : public QObject, public ILaserDocumentItem
 {
     Q_OBJECT
 public:
-    explicit LaserDocument(LaserScene* scene, QObject* parent = nullptr);
+    explicit LaserDocument(LaserScene* scene = nullptr, QObject* parent = nullptr);
     ~LaserDocument();
 
     QMap<QString, LaserPrimitive*> primitives() const;
@@ -110,14 +110,18 @@ public:
 
     LaserLayer* idleLayer() const;
 
+    LaserDocument* cloneWithoutContents();
+
+    void addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
+    void addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
+    void removePrimitive(LaserPrimitive* item, bool keepLayer = true, bool updateDocBounding = true);
+
 protected:
-    void addPrimitive(LaserPrimitive* item);
-    void addPrimitive(LaserPrimitive* item, LaserLayer* layer);
-    void removePrimitive(LaserPrimitive* item, bool keepLayer = true);
 
 public slots:
-    void exportJSON(const QString& filename, ProgressItem* parentProgress, bool exportJson = false);
+    void exportJSON(const QString& filename, ProgressItem* parentProgress, bool needOptimization, bool exportJson);
     void exportBoundingJSON();
+    void generateBoundingPrimitive();
     void updateLayersStructure();
     void destroy();
     void open();
