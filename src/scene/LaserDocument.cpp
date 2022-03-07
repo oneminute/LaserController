@@ -44,6 +44,7 @@ public:
     LaserDocumentPrivate(LaserDocument* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
         , isOpened(false)
+        , scene(nullptr)
         , enablePrintAndCut(false)
         //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
@@ -71,7 +72,8 @@ LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
 {
     Q_D(LaserDocument);
     d->scene = scene;
-    d->scene->setDocument(this);
+    if (d->scene)
+        d->scene->setDocument(this);
 	init();
 }
 
@@ -80,7 +82,7 @@ LaserDocument::~LaserDocument()
     close();
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive* item)
+void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool updateDocBounding)
 {
     Q_D(LaserDocument);
     d->primitives.insert(item->id(), item);
@@ -103,10 +105,11 @@ void LaserDocument::addPrimitive(LaserPrimitive* item)
         }
         layer->init();
     }
-	layer->addPrimitive(item);
+	//layer->addPrimitive(item);
+    addPrimitive(item, layer, addToQuadTree, updateDocBounding);
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
+void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree, bool updateDocBounding)
 {
     Q_D(LaserDocument);
     if (item->layer()) {
@@ -117,10 +120,14 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer)
         d->primitives.insert(item->id(), item);
     }
     layer->addPrimitive(item);
+    if (d->scene)
+        d->scene->addLaserPrimitive(item, addToQuadTree);
+    if (updateDocBounding)
+        updateDocumentBounding();
     updateLayersStructure();
 }
 
-void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer)
+void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool updateDocBounding)
 {
     Q_D(LaserDocument);
     if (keepLayer) {
@@ -131,6 +138,11 @@ void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer)
     }
     
     d->primitives.remove(item->id());
+    if (d->scene)
+        d->scene->removeLaserPrimitive(item);
+    if (updateDocBounding)
+        updateDocumentBounding();
+    updateLayersStructure();
 }
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
@@ -210,13 +222,44 @@ QString LaserDocument::newLayerName() const
     return name;
 }
 
-void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProgress, bool exportJson)
+void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProgress, bool needOptimization, bool exportJson)
 {
     Q_D(LaserDocument);
 
-    PathOptimizer optimizer(d->optimizeNode, primitives().count());
-    optimizer.optimize(parentProgress);
-    PathOptimizer::Path path = optimizer.optimizedPath();
+    QList<LaserLayer*> layerList;
+    QMap<LaserLayer*, QList<OptimizeNode*>> layersMap;
+
+    if (needOptimization)
+    {
+        PathOptimizer optimizer(d->optimizeNode, primitives().count());
+        optimizer.optimize(parentProgress);
+        PathOptimizer::Path path = optimizer.optimizedPath();
+        for (OptimizeNode* pathNode : path)
+        {
+            LaserPrimitive* primitive = pathNode->primitive();
+            LaserLayer* layer = primitive->layer();
+            layersMap[layer].append(pathNode);
+            if (!layerList.contains(layer))
+            {
+                layerList.append(layer);
+            }
+        }
+    }
+    else
+    {
+        layerList = d->layers;
+        for (LaserLayer* layer : layerList)
+        {
+            for (OptimizeNode* pathNode : layer->optimizeNode()->childNodes())
+            {
+                LaserPrimitive* primitive = pathNode->primitive();
+                layersMap[layer].append(pathNode);
+            }
+        }
+    }
+
+    ProgressItem* exportProgress = LaserApplication::progressModel->createComplexItem(tr("Export Json"), parentProgress);
+    exportProgress->setMaximum(layerList.count());
 
     QJsonObject jsonObj;
 
@@ -237,7 +280,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
         break;
     }
 
-    ProgressItem* exportProgress = LaserApplication::progressModel->createComplexItem(tr("Export Json"), parentProgress);
     QJsonObject laserDocumentInfo;
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
     laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
@@ -263,19 +305,7 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
-    QList<LaserLayer*> layerList;
-    QMap<LaserLayer*, QList<OptimizeNode*>> layersMap;
-    exportProgress->setMaximum(path.count());
-    for (OptimizeNode* pathNode : path)
-    {
-        LaserPrimitive* primitive = pathNode->primitive();
-        LaserLayer* layer = primitive->layer();
-        layersMap[layer].append(pathNode);
-        if (!layerList.contains(layer))
-        {
-            layerList.append(layer);
-        }
-    }
+    
 
     QJsonArray layers;
     QPoint lastPoint;
@@ -472,8 +502,6 @@ void LaserDocument::exportJSON(const QString& filename, ProgressItem* parentProg
 void LaserDocument::exportBoundingJSON()
 {
     Q_D(LaserDocument);
-
-    PathOptimizer optimizer(d->optimizeNode, primitives().count());
 
     QFile saveFile("tmp/bounding.json");
     QJsonObject jsonObj;
@@ -672,6 +700,10 @@ void LaserDocument::exportBoundingJSON()
 
     saveFile.close();
     emit exportFinished(rawJson);
+}
+
+void LaserDocument::generateBoundingPrimitive()
+{
 }
 
 bool LaserDocument::isOpened() const
@@ -911,6 +943,126 @@ LaserLayer* LaserDocument::idleLayer() const
     return idle;
 }
 
+LaserDocument* LaserDocument::cloneWithoutContents()
+{
+    Q_D(const LaserDocument);
+    LaserDocument* doc = new LaserDocument();
+    LaserLayer* layer = new LaserLayer("", LLT_CUTTING, doc);
+    LaserPath* laserPath = nullptr;
+    layer->setType(LLT_CUTTING);
+    layer->setCuttingRunSpeed(Config::UserRegister::cuttingMoveSpeed());
+    layer->setCuttingMinSpeedPower(0);
+    layer->setCuttingRunSpeedPower(0);
+
+    int index = 0;
+    bool isMiddle = false;  // 判断作业原点是否在外边框某一条边的中间位置
+    QPoint lastPoint = this->docOrigin();
+
+    // 分为绝对坐标和相对两种模式生成走边框加工点序列
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
+    {
+        switch (Config::SystemRegister::deviceOrigin())
+        {
+        case 0:
+            index = 0;
+            break;
+        case 3:
+            index = 1;
+            break;
+        case 2:
+            index = 2;
+            break;
+        case 1:
+            index = 3;
+            break;
+        }
+    }
+    else
+    {
+        switch (Config::Device::jobOrigin())
+        {
+        case 0:
+            index = 1;
+            break;
+        case 1:
+            index = 1;
+            isMiddle = true;
+            break;
+        case 2:
+            index = 2;
+            break;
+        case 3:
+            index = 0;
+            isMiddle = true;
+            break;
+        case 4:
+            index = 0;
+            isMiddle = true;
+            break;
+        case 5:
+            index = 2;
+            isMiddle = true;
+            break;
+        case 6:
+            index = 0;
+            break;
+        case 7:
+            index = 3;
+            isMiddle = true;
+            break;
+        case 8:
+            index = 3;
+            break;
+        }
+    }
+    
+    QRect docBoundingRect = absoluteDocBoundingRect();
+    int docLeft = docBoundingRect.left();
+    int docTop = docBoundingRect.top();
+    int docRight = docLeft + docBoundingRect.width();
+    int docBottom = docTop + docBoundingRect.height();
+    QList<QPoint> points;
+    points.append(QPoint(docLeft, docTop));
+    points.append(QPoint(docRight, docTop));
+    points.append(QPoint(docRight, docBottom));
+    points.append(QPoint(docLeft, docBottom));
+
+    QList<QPoint> points2;
+    for (int i = 0; i < 4; i++)
+    {
+        index = (index + 4) % 4;
+        points2.append(points.at(index));
+        index++;
+    }
+
+    if (Config::Device::startFrom() == SFT_AbsoluteCoords)
+    {
+        points2.append(points2.first());
+    }
+    else
+    {
+        if (Config::Device::jobOrigin() == 4)   // 如果作业原点在正在中心，外边框就需要所有的点都走一遍，再回到中心点
+        {
+            points2.append(points2.first());
+        }
+        points2.insert(0, lastPoint);
+        if (isMiddle)
+        {
+            points2.append(lastPoint);
+        }
+    }
+
+    QPainterPath path;
+    path.moveTo(points2.first());
+    for (int i = 1; i < points2.length(); i++)
+    {
+        path.lineTo(points2.at(i));
+    }
+    laserPath = new LaserPath(path, doc);
+    doc->updateDocumentBounding();
+    return doc;
+}
+
 void LaserDocument::updateLayersStructure()
 {
     Q_D(LaserDocument);
@@ -926,6 +1078,8 @@ void LaserDocument::open()
 {
     Q_D(LaserDocument);
     updateDocumentBounding();
+    if (d->scene)
+        d->scene->updateTree();
     d->isOpened = true;
     emit opened();
 }
@@ -1315,7 +1469,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
             if (primitive)
             {
                 if (primitive->isAvailable())
-                    this->scene()->addLaserPrimitive(primitive, true);
+                    if (d->scene)
+                        d->scene->addLaserPrimitive(primitive, true);
                 else
                     unavailables.append(primitive);
 

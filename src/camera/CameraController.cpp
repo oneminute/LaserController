@@ -100,7 +100,7 @@ QList<int> CameraController::supportedCameras()
         if (cameraInfo.description().toLower().contains("lightburn") ||
             cameraInfo.description().toLower().contains("wn") ||
             cameraInfo.description().toLower().contains("bba") ||
-            cameraInfo.description().toLower().contains("EFS Camera"))
+            cameraInfo.description().toLower().contains("efs"))
         {
             supportedCameraIndices.append(index);
         }
