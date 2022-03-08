@@ -142,13 +142,13 @@ void AddDelUndoCommand::undo()
         if (m_primitiveList.isEmpty()) {
             for each(QGraphicsItem* item in m_list) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-                m_scene->addLaserPrimitive(primitive, true);
+                m_scene->document()->addPrimitive(primitive, false, false);
                 primitive->setSelected(true);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
-                m_scene->addLaserPrimitive(primitive, true);
+                m_scene->document()->addPrimitive(primitive, false, false);
                 primitive->setSelected(true);
             }
         }
@@ -165,13 +165,13 @@ void AddDelUndoCommand::undo()
             for each(QGraphicsItem* item in m_list) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
                 sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->removeLaserPrimitive(primitive, true);
+                m_scene->document()->removePrimitive(primitive, false, false);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
                 sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->removeLaserPrimitive(primitive, true);
+                m_scene->document()->removePrimitive(primitive, false, false);
             }
         }
 		//�ָ�֮ǰ��group
@@ -189,6 +189,7 @@ void AddDelUndoCommand::undo()
 		}
 	}
     m_scene->document()->updateDocumentBounding();
+    m_scene->updateTree();
 	m_viewer->viewport()->repaint();
     emit m_viewer->selectedChangedFromMouse();
     emit m_viewer->selectedSizeChanged();
@@ -202,12 +203,12 @@ void AddDelUndoCommand::redo()
 		    for each(QGraphicsItem* item in m_list) {
 			    LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
 			    sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->removeLaserPrimitive(primitive, true);
+                m_scene->document()->removePrimitive(primitive, false, false);
 		    }
         }else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
                 sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
-                m_scene->removeLaserPrimitive(primitive, true);
+                m_scene->document()->removePrimitive(primitive, false, false);
             }
         }
 		if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
@@ -221,13 +222,14 @@ void AddDelUndoCommand::redo()
         if (m_primitiveList.isEmpty()) {
             for each(QGraphicsItem* item in m_list) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-                m_scene->addLaserPrimitive(primitive, true);
+                //m_scene->addLaserPrimitive(primitive, true);
+                m_scene->document()->addPrimitive(primitive, false, false);
                 primitive->setSelected(true);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
-                m_scene->addLaserPrimitive(primitive, true);
+                m_scene->document()->addPrimitive(primitive, false, false);
                 primitive->setSelected(true);
             }
         }
@@ -236,8 +238,8 @@ void AddDelUndoCommand::redo()
 			emit m_viewer->idleToSelected();
 		}
 	}
-    //m_scene->document()->updateDocumentBounding();
-	
+    m_scene->document()->updateDocumentBounding();
+    m_scene->updateTree();
     emit m_viewer->selectedChangedFromMouse();
     emit m_viewer->selectedSizeChanged();
     m_viewer->viewport()->repaint();
@@ -274,11 +276,11 @@ void PolygonUndoCommand::undo()
 		m_viewer->clearGroupSelection();
 		sceneTransformToItemTransform(m_curItem->sceneTransform(), m_curItem);
 		//m_scene->removeLaserPrimitive(m_curItem);
-        m_scene->removeLaserPrimitive(m_curItem, false);
+        m_scene->document()->removePrimitive(m_curItem);
 	}
 	if (m_lastItem) {
 
-		m_scene->addLaserPrimitive(m_lastItem, false);
+        m_scene->document()->addPrimitive(m_lastItem);
 		m_lastItem->setSelected(true);
 		m_viewer->onSelectedFillGroup();
 		/*if (m_curItem == nullptr) {
@@ -313,14 +315,13 @@ void PolygonUndoCommand::redo()
 	if (m_lastItem) {
 		m_viewer->clearGroupSelection();
 		sceneTransformToItemTransform(m_lastItem->sceneTransform(), m_lastItem);
-		//m_scene->removeLaserPrimitive(m_lastItem);
-        m_scene->removeLaserPrimitive(m_lastItem, false);
+        m_scene->document()->removePrimitive(m_lastItem);
 	}
 	else {
 		m_selectedBeforeAdd = m_viewer->clearGroupSelection();
 	}
 	if (m_curItem) {
-		m_scene->addLaserPrimitive(m_curItem, false);
+        m_scene->document()->addPrimitive(m_curItem);
 		m_curItem->setSelected(true);
 		m_viewer->onSelectedFillGroup();
 
@@ -410,7 +411,7 @@ void PasteCommand::undo()
 		utils::sceneTransformToItemTransform(primitive->sceneTransform(), primitive);
 		primitive->setSelected(false);
 		//m_scene->removeLaserPrimitive(primitive);
-        m_scene->removeLaserPrimitive(primitive, true);
+        m_scene->document()->removePrimitive(primitive);
 	}
 	m_viewer->clearGroupSelection();
 	//�ָ�֮ǰ��group
@@ -465,10 +466,10 @@ void PasteCommand::addImp(bool isAddToTreeNode)
 	m_viewer->clearGroupSelection();
 	for each(LaserPrimitive* primitive in m_pasteList) {
         if (isAddToTreeNode) {
-            m_scene->addLaserPrimitive(primitive, true);
+            m_scene->document()->addPrimitive(primitive, true);
         }
         else {
-            m_scene->addLaserPrimitiveWithoutTreeNode(primitive, true);
+            m_scene->document()->addPrimitive(primitive, false);
         }
         primitive->setSelected(true);
 	}
@@ -1893,12 +1894,12 @@ void WeldShapesUndoCommand::createNewPath()
                     //delete original joined group
                     deleteJoinedGroup(dP->joinedGroupList());
                 }
-                m_scene->removeLaserPrimitive(dP, true);
+                m_scene->document()->removePrimitive(dP, false, false);
             }
 
             //create new primitive
             LaserPath* newPath = new LaserPath(path, m_scene->document(), QTransform(), m_minLayer->index());
-            m_scene->addLaserPrimitive(newPath, true);
+            m_scene->document()->addPrimitive(newPath, false, false);
             newPath->setJoinedGroup(m_weldJoinedGroup);
             m_weldJoinedGroup->insert(newPath);
             newPath->setSelected(true);
@@ -1915,6 +1916,8 @@ void WeldShapesUndoCommand::createNewPath()
             (*p)->setJoinedGroup(nullptr);
         }
     }
+    m_scene->document()->updateDocumentBounding();
+    m_scene->updateTree();
 }
 
 void WeldShapesUndoCommand::handleRedo()
@@ -1931,11 +1934,10 @@ void WeldShapesUndoCommand::handleRedo()
     //restore original primitives
     for (QMap<LaserPrimitive*, QList<LaserPrimitive*>>::iterator i = m_weldAndOriginalsMap.begin();
         i != m_weldAndOriginalsMap.end(); i ++) {
-        m_scene->addLaserPrimitive(i.key(), true);
+        m_scene->document()->addPrimitive(i.key(), false, false);
         m_viewer->group()->addToGroup(i.key());
         for (LaserPrimitive* p : i.value()) {
-            m_scene->removeLaserPrimitive(p, true);
-            
+            m_scene->document()->removePrimitive(p, false, false);
         }
     }
     //if selected primitive size >= 2 ,all primitive will grouped
@@ -1948,6 +1950,8 @@ void WeldShapesUndoCommand::handleRedo()
         }
     }
     
+    m_scene->document()->updateDocumentBounding();
+    m_scene->updateTree();
 }
 
 void WeldShapesUndoCommand::deleteJoinedGroup(QSet<LaserPrimitive*>* joinedGroup)
@@ -1971,9 +1975,9 @@ void WeldShapesUndoCommand::undo()
     //restore original primitives
     for (QMap<LaserPrimitive*, QList<LaserPrimitive*>>::iterator i = m_weldAndOriginalsMap.begin();
         i != m_weldAndOriginalsMap.end(); i++) {
-        m_scene->removeLaserPrimitive(i.key(), true);
+        m_scene->document()->removePrimitive(i.key(), false, false);
         for (LaserPrimitive* p : i.value()) {
-            m_scene->addLaserPrimitive(p, true);
+            m_scene->document()->addPrimitive(p, false, false);
         }
     }
     //delete current joined group
@@ -1997,7 +2001,8 @@ void WeldShapesUndoCommand::undo()
         lMap.key()->setLayer(lMap.value());
         m_viewer->group()->addToGroup(lMap.key());
     }
-    
+    m_scene->document()->updateDocumentBounding();
+    m_scene->updateTree();
     m_viewer->viewport()->repaint();
 }
 

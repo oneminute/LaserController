@@ -236,7 +236,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             {
                 if (item->isAvailable())
                 {
-                    scene->addLaserPrimitive(item, true);
+                    doc->addPrimitive(item, false, false);
                 }
                 else
                     unavailables.append(item);

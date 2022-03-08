@@ -1016,7 +1016,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
         qDebug() << text->content().length();
         laserText = text;
         if (text->content().trimmed().isEmpty()) {
-            m_scene->removeLaserPrimitive(laserText, false);
+            m_scene->document()->removePrimitive(laserText, false, false);
             laserText = nullptr;
             m_insertIndex = -1;
             return false;
@@ -1165,6 +1165,8 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
     }
     m_insertIndex = -1;
 
+    m_scene->document()->updateDocumentBounding();
+    m_scene->updateTree();
     laserText = nullptr;
     return false;  
 }
@@ -4462,7 +4464,7 @@ void LaserViewer::addText(QString str)
         
         m_editingText->addPath(str, m_insertIndex);
         m_insertIndex += str.size();
-        m_scene->addLaserPrimitive(m_editingText, false);
+        m_scene->document()->addPrimitive(m_editingText);
     }
     else {
         
@@ -4498,7 +4500,7 @@ void LaserViewer::removeBackText()
         m_editingText->delPath(m_insertIndex);
         modifyTextCursor();
         if (m_editingText->path().isEmpty()) {
-            m_scene->removeLaserPrimitive(m_editingText, false);
+            m_scene->document()->removePrimitive(m_editingText);
             m_editingText = nullptr;
         }
         viewport()->repaint();
@@ -4518,7 +4520,7 @@ void LaserViewer::removeFrontText()
         m_insertIndex -= 1;
         modifyTextCursor();
         if (m_editingText->path().isEmpty()) {
-            m_scene->removeLaserPrimitive(m_editingText, false);
+            m_scene->document()->removePrimitive(m_editingText);
             m_editingText = nullptr;
         }
         viewport()->repaint();
@@ -5049,7 +5051,7 @@ void LaserViewer::createSpline()
     }
 
     LaserPath* laserPath = new LaserPath(path, m_scene->document(), QTransform(), m_curLayerIndex);
-    m_scene->addLaserPrimitive(laserPath, false);
+    m_scene->document()->addPrimitive(laserPath);
     m_handlingSpline.objectName = laserPath->objectName();
     m_splineList.append(m_handlingSpline);
     initSpline();

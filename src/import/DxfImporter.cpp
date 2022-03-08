@@ -84,7 +84,7 @@ void DxfImporter::importImpl(const QString& filename, LaserScene* scene, QList<L
         if (primitive)
         {
             if (primitive->isAvailable())
-                scene->addLaserPrimitive(primitive, true);
+                scene->document()->addPrimitive(primitive, false, false);
             else
                 unavailables.append(primitive);
         }
