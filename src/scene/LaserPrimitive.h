@@ -644,6 +644,7 @@ public:
     QRectF textArcRect();
     void initAngle();
     void setAngle(qreal angle, bool needInit = true);
+    void setOffsetRotateAngle(qreal offsetAngle);
     void setTextSize(QSize size, bool needInit = true);
     qreal mapToAffineCircleAngle(qreal radian);
     void moveTextToEllipse();

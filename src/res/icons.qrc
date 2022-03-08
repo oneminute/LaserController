@@ -178,5 +178,6 @@
 		<file>images/newInvoiceB.png</file>
 		<file>images/embleEllipseStamp.png</file>
 		<file>images/horizontalTextEllipseStamp.png</file>
+		<file>images/fingerprint.png</file>
     </qresource>
 </RCC>

@@ -3659,7 +3659,7 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2249"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2261"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -5333,6 +5333,16 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3142"/>
+        <source>Original Bounds Width</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3147"/>
+        <source>Original Bounds Height</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="3154"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="3155"/>
         <source>Locked</source>
@@ -5997,7 +6007,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserEllipse</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="942"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="943"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6217,7 +6227,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserLine</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1266"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1267"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6233,7 +6243,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPath</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1393"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1394"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6241,7 +6251,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPolygon</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1708"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1709"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6249,7 +6259,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPolyline</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1556"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1557"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6257,69 +6267,69 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="641"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="642"/>
         <source>Bitmap</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="642"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="643"/>
         <source>Circle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="643"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="644"/>
         <source>Ellipse</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="644"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="645"/>
         <source>Line</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="645"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="646"/>
         <source>Path</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="646"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="647"/>
         <source>Polygon</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="647"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="648"/>
         <source>Polyline</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="648"/>
-        <source>Rect</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/scene/LaserPrimitive.cpp" line="649"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="670"/>
-        <source>Text</source>
+        <source>Rect</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/scene/LaserPrimitive.cpp" line="650"/>
         <location filename="../src/scene/LaserPrimitive.cpp" line="671"/>
-        <source>Nurbs</source>
+        <source>Text</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/scene/LaserPrimitive.cpp" line="651"/>
-        <source>Star</source>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="672"/>
+        <source>Nurbs</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/scene/LaserPrimitive.cpp" line="652"/>
-        <source>Frame</source>
+        <source>Star</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/scene/LaserPrimitive.cpp" line="653"/>
+        <source>Frame</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="654"/>
         <source>Ring</source>
         <translation></translation>
     </message>
@@ -6327,7 +6337,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserRect</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1103"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1104"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6356,7 +6366,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2927"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2939"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -7125,6 +7135,11 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location filename="../src/ui/StampCircleDialog.h" line="41"/>
         <source>Horizontal Invoice Number</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampCircleDialog.h" line="41"/>
+        <source>Bottom Horizontal Number</source>
         <translation></translation>
     </message>
     <message>

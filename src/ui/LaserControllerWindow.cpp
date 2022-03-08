@@ -3139,12 +3139,12 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_originalBoundsWidth->setDecimals(3);
     m_originalBoundsWidth->setMaximum(DBL_MAX);
     m_originalBoundsWidth->setMinimum(0);
-    m_originalBoundsWidthLabel = new QLabel("Original Bounds Width");
+    m_originalBoundsWidthLabel = new QLabel(tr("Original Bounds Width"));
     m_originalBoundsHeight = new LaserDoubleSpinBox();
     m_originalBoundsHeight->setDecimals(3);
     m_originalBoundsHeight->setMaximum(DBL_MAX);
     m_originalBoundsHeight->setMinimum(0);
-    m_originalBoundsHeightLabel = new QLabel("Original Bounds Height");
+    m_originalBoundsHeightLabel = new QLabel(tr("Original Bounds Height"));
     m_maxWidth = new LaserDoubleSpinBox();
     m_maxWidthLabel = new QLabel("Max Width");
     m_cornerRadius = new LaserDoubleSpinBox();

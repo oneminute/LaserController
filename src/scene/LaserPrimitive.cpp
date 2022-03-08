@@ -15,6 +15,7 @@
 #include <QJsonObject>
 #include <QImageReader>
 #include <QStack>
+#include <QBitmap>
 
 #include "LaserApplication.h"
 #include "LaserScene.h"
@@ -2116,7 +2117,7 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRect& bounds, LaserDocumen
     : LaserPrimitive(new LaserBitmapPrivate(this), doc,  LPT_BITMAP, saveTransform, layerIndex)
 {
     Q_D(LaserBitmap);
-    d->image = image.convertToFormat(QImage::Format_Grayscale8);
+    d->image = image.convertToFormat(QImage::Format_ARGB32);
     d->boundingRect = bounds;
     d->path.addRect(bounds);
 	//d->originalBoundingRect = d->boundingRect;
@@ -2156,7 +2157,7 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
     parentProgress->setMaximum(2);
     QImage srcImage = d->image.copy();
     QImage rotated = srcImage.transformed(sceneTransform(), Qt::SmoothTransformation);
-    QImage outImage(rotated.size(), QImage::Format_ARGB32);;
+    QImage outImage(rotated.size(), QImage::Format_Grayscale8);;
     outImage.fill(Qt::white);
     QPainter p(&outImage);
     p.begin(&outImage);
@@ -2203,8 +2204,19 @@ void LaserBitmap::draw(QPainter * painter)
     Q_D(LaserBitmap);
 	
 	//QImage image = d->image.transformed(d->allTransform, Qt::TransformationMode::SmoothTransformation);
+    //painter->setBackgroundMode(Qt::TransparentMode);
+    //d->image.fill(Qt::transparent);
+    
+    
+    //d->image = d->image.createMaskFromColor(Qt::black);
+    //d->image.toImageFormat(QImage::Format_ARGB32);
+    //pixmap.fill(QColor(0, 0, 0, 125));
+    
 	painter->drawImage(d->boundingRect, d->image);
     //painter->drawRect(d->boundingRect);
+    
+    
+    //painter->drawImage()
 }
 
 QJsonObject LaserBitmap::toJson()
@@ -3375,6 +3387,7 @@ public:
     QRectF innerBounds;
     QPainterPath outerPath;
     QPainterPath innerPath;
+    QPixmap mask;
 };
 LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransform transform, int layerIndex) 
     :LaserShape(new LaserRingPrivate(this), doc, LPT_RING, layerIndex, transform)
@@ -3388,6 +3401,14 @@ LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransfo
     d->innerPath.addEllipse(d->innerBounds);
     computePath();
     setTransform(transform);
+    //mask
+    /*qreal w = d->boundingRect.width() * 0.28;
+    qreal h = d->boundingRect.height() * 0.28;
+    d->mask  = QPixmap (":/ui/icons/images/fingerprint.png");
+    QTransform t;
+    t.scale(w / d->mask.width(), h / d->mask.height());
+    d->mask = d->mask.transformed(t);
+    d->mask = d->mask.createMaskFromColor(Qt::transparent);*/
 }
 LaserRing::~LaserRing()
 {
@@ -3395,10 +3416,21 @@ LaserRing::~LaserRing()
 void LaserRing::draw(QPainter * painter)
 {
     Q_D(LaserRing);
-    painter->setBrush(QBrush(this->layer()->color()));
+    //QBrush brush(this->layer()->color(), d->mask);
+    QBrush brush(this->layer()->color());
+    painter->setBrush(brush);
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
-    
+
+    /*int len = image.width() * image.height();
+    for (int i = 0; i < image.width(); i++) {
+        for (int j = 0; j < image.height(); j++) {
+            QRgb rgb = image.pixel(i, j);
+            if (qGray(rgb) == 255) {
+                image.setPixel(i, j, QColor(0, 0, 0, 0).rgba());
+            }
+        }
+    }*/   
 }
 QJsonObject LaserRing::toJson()
 {
@@ -3869,6 +3901,7 @@ public:
     qreal minRadian, maxRadian;
     QRectF circleBounds;
     qreal horizontalPathHeight;
+    qreal offsetRotateAngle;
     //bool bold;
     //bool italic;
     //bool uppercase;
@@ -3881,6 +3914,7 @@ LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bou
 {
     Q_D(LaserCircleText);
     //d->content = content;
+    d->offsetRotateAngle = 0;
     d->isFill = isFill;
     d->circleBounds = bounds.toRect();
     //d->boundingRect = bounds.toRect();
@@ -4119,7 +4153,7 @@ QTransform LaserCircleText::rotateText(int i, QPointF textPos)
     else {
         rotateAngle = -rotateAngle;
     }
-    t2.rotate(rotateAngle);
+    t2.rotate(rotateAngle+d->offsetRotateAngle);
     return t2;
 }
 
@@ -4246,6 +4280,11 @@ void LaserCircleText::setAngle(qreal angle, bool needInit)
     d->arcPath = QPainterPath();
     d->arcPath.arcMoveTo(textArcRect(), qRadiansToDegrees( d->maxRadian) );
     d->arcPath.arcTo(textArcRect(), qRadiansToDegrees(d->maxRadian), -d->angle);
+}
+void LaserCircleText::setOffsetRotateAngle(qreal offsetAngle)
+{
+    Q_D(LaserCircleText);
+    d->offsetRotateAngle = offsetAngle;
 }
 void LaserCircleText::setTextSize(QSize size, bool needInit)
 {

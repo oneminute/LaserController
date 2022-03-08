@@ -4842,7 +4842,7 @@ Would you like to overwrite it?</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+2249"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+2261"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -5358,7 +5358,17 @@ Would you like to overwrite it?</source>
         <translation>U轴</translation>
     </message>
     <message>
-        <location line="+173"/>
+        <location line="+161"/>
+        <source>Original Bounds Width</source>
+        <translation>原始外框宽度</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Original Bounds Height</source>
+        <translation>原始外框高度</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <location line="+1"/>
         <source>Locked</source>
         <translation>已锁定</translation>
@@ -7917,7 +7927,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserEllipse</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="-1307"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="-1318"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -8336,7 +8346,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+1824"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+1835"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -15804,7 +15814,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/ui/StampCircleDialog.h" line="+40"/>
         <source>Top Circle Text</source>
-        <translation>顶部弧形文字</translation>
+        <translation>顶部环排文字</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -15815,12 +15825,17 @@ Please choose a different file name.</source>
     <message>
         <location line="-4"/>
         <source>Bottom Circle Text</source>
-        <translation>顶部弧形文字</translation>
+        <translation>底部环排文字</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Horizontal Invoice Number</source>
         <translation>发票横排数字</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Bottom Horizontal Number</source>
+        <translation>底部横排数字</translation>
     </message>
     <message>
         <location line="+3"/>

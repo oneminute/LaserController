@@ -547,14 +547,15 @@ void StampCircleDialog::accept()
         if (content->checkState() == Qt::Unchecked) {
             continue;
         }
+        QString propertyText = property->text();
         //Top Circle Text
-        if (property->text() == m_textRowProperty[0]) {
+        if (propertyText == m_textRowProperty[0]) {
             LaserCircleText* topCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, angle,
                 bold, italic, false, fill, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
             stampList.append(topCircleText);
         }
         //Horizontal Text
-        else if (property->text() == m_textRowProperty[1]) {
+        else if (propertyText == m_textRowProperty[1]) {
             
             qreal h, w, centerX, centerY;
             if (m_isEllipse) {
@@ -578,20 +579,25 @@ void StampCircleDialog::accept()
             stampList.append(lineText);
         }
         //Bottom Circle Text
-        else if (property->text() == m_textRowProperty[2]) {
-            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, 320-angle,
+        else if (propertyText == m_textRowProperty[2]) {
+            int contentStrSize = contentStr.size();
+            QString invertContentStr;
+            for (QChar c : contentStr) {
+                invertContentStr.prepend(c);
+            }
+            
+            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), invertContentStr, textBounds, 320-angle,
                 bold, italic, false, fill, family, textSpace, true,0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
             
             qreal hsize = bottomCircleText->textSize().height() * 0.5;
+            bottomCircleText->setOffsetRotateAngle(180);
             bottomCircleText->setTextSize(QSize(hsize, hsize), false);
-            //bottomCircleText->computeTextPath(bottomCircleText->angle(), bottomCircleText->textSize(), false);
-
             bottomCircleText->computeMoveTextPath(180);
             bottomCircleText->recompute();
             stampList.append(bottomCircleText);
         }
         //Horizontal Invoice Number
-        else if (property->text() == m_textRowProperty[3]) {
+        else if (propertyText == m_textRowProperty[3]) {
             qreal h = 5600;
             qreal w = rect.width() * (2.0 / 3.0);
             QSize size((w - (textSize - 1) * textSpace) / textSize, h);
@@ -600,7 +606,7 @@ void StampCircleDialog::accept()
             stampList.append(text);
         }
         //Horizontal Bottom Number
-        else if (property->text() == m_textRowProperty[4]) {
+        else if (propertyText == m_textRowProperty[4]) {
             qreal h = 3400;
             qreal w = 3400 * 1.5;
             qreal centerY;
