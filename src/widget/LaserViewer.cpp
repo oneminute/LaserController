@@ -1549,7 +1549,7 @@ int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _en
 		m_scene->findSelectedByBoundingRect(rect);
 	}
 	m_scene->blockSignals(false);
-    emit selectedSizeChanged();
+    //emit selectedSizeChanged();
 	viewport()->repaint();
 	return m_scene->document()->selectedPrimitives().size();
 }
@@ -1683,7 +1683,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 selectionUndoStackPush();
                 //选取区域的属性面板
                 LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
-                emit selectedSizeChanged();
+                //emit selectedSizeChanged();
                 return;
             }
             else {
@@ -1713,13 +1713,13 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                     selectionUndoStackPush();
                     //选取区域的属性面板
                     LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
-                    emit selectedSizeChanged();
+                    //emit selectedSizeChanged();
                     return;
                 }
                 // 获取选框起点
                 m_selectionStartPoint = event->pos();
                 m_selectionEndPoint = m_selectionStartPoint;
-                emit selectedSizeChanged();
+                //emit selectedSizeChanged();
                 emit beginSelecting();
             }
         }
@@ -2373,7 +2373,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			selectingReleaseInBlank();
             //选取区域的属性面板
             LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
-            emit selectedSizeChanged();
+            //emit selectedSizeChanged();
 			return;
         }
 		//undo before
@@ -2420,7 +2420,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
-        emit selectedSizeChanged();
+        //emit selectedSizeChanged();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
 		
@@ -2458,7 +2458,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		}
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
-        emit selectedSizeChanged();
+        //emit selectedSizeChanged();
 		this->viewport()->repaint();
 		return;
     }
@@ -2718,7 +2718,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, QTransform(), m_curLayerIndex);
+            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(star);
             emit LaserApplication::mainWindow->isIdle();
@@ -2735,7 +2735,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, QTransform(), m_curLayerIndex);
+            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(star);
             emit LaserApplication::mainWindow->isIdle();
@@ -2752,7 +2752,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, QTransform(), m_curLayerIndex);
+            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500,false,  QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(pe);
             emit LaserApplication::mainWindow->isIdle();
@@ -2768,7 +2768,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             QPointF point = mapToScene(event->pos());
             //create
             QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
-            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000,3000 , QTransform(), m_curLayerIndex);
+            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000,3000 ,false,  QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(frame);
             emit LaserApplication::mainWindow->isIdle();
@@ -2778,7 +2778,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
             QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
-            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
+            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, false, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);
             emit LaserApplication::mainWindow->isIdle();
@@ -2788,7 +2788,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
             QRect rect(point.x(), point.y(), 50 * 1000, 35 * 1000);
-            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, QTransform(), m_curLayerIndex);
+            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, false, QTransform(), m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);
             emit LaserApplication::mainWindow->isIdle();
@@ -2815,7 +2815,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false,true,"Times New Roman",0, true, 0, 0, QSize(), transform, m_curLayerIndex);
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false, false,"Times New Roman",0, true, 0, 0, QSize(), transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2833,7 +2833,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,true, "Times New Roman", 550, transform, m_curLayerIndex);
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,false, "Times New Roman", 550, transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2854,7 +2854,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             if (cursorIn) {
                 transform = cursorIn->sceneTransform();
             }
-            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false,true, "Times New Roman", 550, transform, m_curLayerIndex);
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false,false, "Times New Roman", 550, transform, m_curLayerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -4221,7 +4221,7 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
         QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
     }
 }
-void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives)
+void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent)
 {
     if (primitives.isEmpty()) {
         return;
@@ -4236,6 +4236,7 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& prim
     }
     if (outRegion) {
         QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        return;
     }
     else {
         QList<QGraphicsItem*> list;
@@ -4245,8 +4246,8 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& prim
         AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
         m_undoStack->push(addCmd);
         onReplaceGroup(primitives);
+
     }
-    
 }
 int LaserViewer::textAlignH()
 {
@@ -4601,7 +4602,7 @@ void LaserViewer::createGroup()
     connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
     m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
     m_group->setSelected(true);
-    m_group->setZValue(1);
+    m_group->setZValue(2);
 }
 //目前只在画完图元使用
 QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* item)

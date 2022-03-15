@@ -40,6 +40,7 @@ public:
 	int layerIndex();
 	QPainterPath getPath();
 	QPainterPath getScenePath();
+    
 	/// <summary>
 	/// [obsolete]
 	/// </summary>
@@ -121,8 +122,10 @@ public:
     void concaveRect(QRect rect, QPainterPath& path, qreal cornerRadius, int type);
     QPainterPath computeCornerRadius(QRect rect, int cornerRadius, int type);
     virtual bool isAvailable() const;
-    //circleText，horizontalText，verticalText中使用，方便改变外包框
-    //QRect variableBounds();
+    //stamp
+    bool stampIntaglio();
+    void setStampIntaglio(bool bl);
+    virtual bool isStamepPrimitive();
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
@@ -178,7 +181,8 @@ public:
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
-
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
     virtual bool isClosed() const;
     virtual QPointF position() const;
 
@@ -200,6 +204,7 @@ public:
     void setRect(const QRect& rect);
 
     int cornerRadius() const;
+    int cornerType() const;
     void setCornerRadius(int cornerRadius, int type);
     bool isRoundedRect() const;
 
@@ -211,7 +216,8 @@ public:
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
 	virtual LaserPrimitive* clone(QTransform t);
-
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
@@ -372,6 +378,7 @@ public:
     void setImage(const QImage& image);
 
     QRectF bounds() const;
+    void setRect(QRect rect);
 
     virtual QByteArray engravingImage(ProgressItem* parentProgress, QPoint& lastPoint);
     virtual void draw(QPainter* painter);
@@ -384,6 +391,8 @@ public:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
 
 	QVector<QLineF> edges();
 	LaserPrimitive * clone(QTransform t);
@@ -475,7 +484,7 @@ class LaserStarPrivate;
 class LaserStar : public LaserShape {
     Q_OBJECT
 public:
-    LaserStar(LaserDocument* doc, QPoint centerPos, qreal radius, QTransform transform = QTransform(),
+    LaserStar(LaserDocument* doc, QPoint centerPos, qreal radius, bool stampIntaglio = false, QTransform transform = QTransform(),
         int layerIndex = 0);
     virtual ~LaserStar();
     virtual void draw(QPainter* painter);
@@ -495,6 +504,7 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
+    virtual bool isStamepPrimitive();
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -505,7 +515,7 @@ class LaserPartyEmblemPrivate;
 class LaserPartyEmblem : public LaserShape {
     Q_OBJECT
 public:
-    LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, QTransform transform = QTransform(),
+    LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, bool stampIntaglio = false, QTransform transform = QTransform(),
         int layerIndex = 0);
     virtual ~LaserPartyEmblem();
     virtual void draw(QPainter* painter);
@@ -523,6 +533,7 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
+    virtual bool isStamepPrimitive();
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -533,7 +544,7 @@ class LaserRingPrivate;
 class LaserRing : public LaserShape {
     Q_OBJECT
 public:
-    LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransform transform = QTransform(),
+    LaserRing(LaserDocument* doc, QRectF outerRect, qreal width,bool stampIntaglio = false, QTransform transform = QTransform(),
         int layerIndex = 0);
     virtual ~LaserRing();
     virtual void draw(QPainter* painter);
@@ -548,11 +559,16 @@ public:
     virtual bool isClosed() const;
     virtual QPointF position() const;
     QRectF innerRect();
+    QPainterPath outerPath();
+    QPainterPath innerPath();
+    void setInner(bool bl);
+    bool isInner();
     void setBorderWidth(qreal w);
     qreal borderWidth();
     void computePath();
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
+    virtual bool isStamepPrimitive();
     //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
@@ -565,7 +581,7 @@ class LaserFrame : public LaserShape {
 public:
     //cornnerRadilus 为正是圆角，为副是内角
     //内角分用圆形且和用正方形切
-    LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornerRadilus,
+    LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornerRadilus, bool stampIntaglio = false,
         QTransform transform = QTransform(),int layerIndex = 0, int cornerType = CRT_Round);
     virtual~LaserFrame();
 
@@ -575,6 +591,10 @@ public:
     virtual QJsonObject toJson();
     LaserPrimitive * clone(QTransform t);
     QVector<QLineF> edges();
+    void setInner(bool bl);
+    bool isInner();
+    QPainterPath outerPath();
+    QPainterPath innerPath();
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
@@ -591,6 +611,8 @@ public:
     void setNeedAuxiliaryLine(bool bl);
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
+    virtual bool isStamepPrimitive();
+
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)
@@ -602,17 +624,17 @@ class LaserStampText : public LaserShape {
 public:
     LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, 
         QString content, QTransform transform = QTransform(), int layerIndex = 0, QSize size = QSize(), qreal space = 0, 
-        bool bold = false, bool italic = false, bool uppercase = false, bool isFill = true, QString family = "Times New Roman");
+        bool bold = false, bool italic = false, bool uppercase = false, bool stampIntaglio = false, QString family = "Times New Roman");
     virtual~LaserStampText();
     virtual void recompute() = 0;
+    virtual void draw(QPainter* painter);
     void setContent(QString content);
     QString getContent();
     void setBold(bool bold);
     bool bold();
     void setItalic(bool italic);
     bool italic();
-    bool isFill();
-    void setFill(bool bl);
+    
     void setUppercase(bool uppercase);
     bool uppercase();
     void setFamily(QString family);
@@ -622,6 +644,7 @@ public:
     virtual void setTextWidth(qreal diff) = 0;
     QSize textSize();
     virtual void setSpace(qreal space) = 0;
+    virtual bool isStamepPrimitive();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampText)
     Q_DISABLE_COPY(LaserStampText)
@@ -631,7 +654,7 @@ class LaserCircleText : public LaserStampText {
     Q_OBJECT
 public:
     LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-        bool bold = false, bool italic = false, bool uppercase = false, bool isFill = true, QString family = "Times New Roman",qreal space = 0,
+        bool bold = false, bool italic = false, bool uppercase = false, bool stampIntaglio = false, QString family = "Times New Roman",qreal space = 0,
         bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
@@ -684,7 +707,7 @@ class LaserHorizontalText : public LaserStampText {
     Q_OBJECT
 public:
     LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
-        QPointF center, bool bold = false, bool italic = false, bool uppercase = false,bool isFill = true, QString family = "Times New Roman",
+        QPointF center, bool bold = false, bool italic = false, bool uppercase = false,bool stampIntaglio = false, QString family = "Times New Roman",
         qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserHorizontalText();
     //void initTextPath();
@@ -714,7 +737,7 @@ class LaserVerticalText : public LaserStampText {
     Q_OBJECT
 public:
     LaserVerticalText(LaserDocument* doc, QString content, QSize size,
-        QPointF center,bool bold = false, bool italic = false, bool uppercase = false,bool isFill = true, QString family = "Times New Roman",
+        QPointF center,bool bold = false, bool italic = false, bool uppercase = false,bool stampIntaglio = false, QString family = "Times New Roman",
         qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserVerticalText();
     void computeTextPathProcess();

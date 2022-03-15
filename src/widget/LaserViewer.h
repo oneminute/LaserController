@@ -99,7 +99,7 @@ public:
 	void setShowLaserPos(bool laserPos);
 
 	void addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
-	void addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives);
+	void addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
 	
 private:
     void init();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>422</width>
-    <height>602</height>
+    <height>594</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -28,6 +28,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="bottomMargin">
+      <number>7</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -43,6 +49,9 @@
      </item>
      <item>
       <widget class="QLabel" name="frameStampLayoutLabel">
+       <property name="styleSheet">
+        <string notr="true">QLabel{color:rgb(1, 162, 254)}</string>
+       </property>
        <property name="text">
         <string>Frame Stamp Layout</string>
        </property>
@@ -56,7 +65,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -67,6 +76,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="stampIntaglioCheckBox">
+       <property name="text">
+        <string>Intaglio</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -79,7 +95,8 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QGroupBox#FrameGroupBox{border: 1px solid rgb(180, 180, 180)}</string>
+      <string notr="true">QGroupBox#FrameGroupBox{border: 1px solid rgb(180, 180, 180)}
+QGroupBox::title{color:rgb(25, 184, 250)}</string>
      </property>
      <property name="title">
       <string>Frame Property</string>
@@ -289,7 +306,8 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QGroupBox#textPropertyGroupBox{border: 1px solid rgb(180, 180, 180)}</string>
+      <string notr="true">QGroupBox#textPropertyGroupBox{border: 1px solid rgb(180, 180, 180)}
+QGroupBox::title{color:rgb(25, 184, 250)}</string>
      </property>
      <property name="title">
       <string>Text Property</string>
@@ -313,8 +331,24 @@
       <property name="verticalSpacing">
        <number>5</number>
       </property>
+      <item row="8" column="0">
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="maximumSize">
+         <size>
+          <width>400</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="maxLength">
+         <number>4</number>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -353,20 +387,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="fillBtn">
-          <property name="text">
-           <string>...</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../res/icons.qrc">
-            <normaloff>:/ui/icons/images/fill.png</normaloff>:/ui/icons/images/fill.png</iconset>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QToolButton" name="isToLeftBtn">
           <property name="text">
            <string/>
@@ -388,6 +408,19 @@
          </widget>
         </item>
         <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -401,19 +434,6 @@
          </spacer>
         </item>
        </layout>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="maximumSize">
-         <size>
-          <width>400</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="maxLength">
-         <number>4</number>
-        </property>
-       </widget>
       </item>
       <item row="9" column="0">
        <layout class="QFormLayout" name="formLayout_3">

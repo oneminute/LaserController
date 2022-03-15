@@ -360,8 +360,10 @@ private:
     int m_type;
     bool m_isRedo;
     LaserPrimitive* m_primitive;
+    int m_primitiveType;
 protected:
     virtual void undo() override;
     virtual void redo() override;
+    void handle(qreal _v);
 };
 #endif // UNDOCOMMAND_H
