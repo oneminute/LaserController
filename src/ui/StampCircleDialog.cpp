@@ -656,18 +656,21 @@ void StampCircleDialog::accept()
         else {
             diff = circleBorder + innerBorder + innerMargin;
         }
-        left1 = rect.left() + diff - 500;
-        left2 = rect.right() - diff + 500 - w;
+        qreal offset = 200;
+        if (innerCircle) {
+            offset = innerBorder * 0.3;
+        }
+        left1 = rect.left() + diff - offset;
+        left2 = rect.right() - diff + offset - w;
         QRect lineRect1(left1, top, w, h);
         QRect lineRect2(left2, top, w, h);
         qreal borderWidth = h * 0.5;
-        if (stampIntaglio) {
-            borderWidth = 1;
-        }
-        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, borderWidth, 0, false, QTransform(), m_viewer->curLayerIndex());
+        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, borderWidth, 0, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
+        line1->setInner(true);
         line1->setZValue(3);
         line1->setNeedAuxiliaryLine(false);
-        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, borderWidth, 0, false, QTransform(), m_viewer->curLayerIndex());
+        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, borderWidth, 0, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
+        line2->setInner(true);
         line2->setZValue(3);
         line2->setNeedAuxiliaryLine(false);
         stampList.append(line1);

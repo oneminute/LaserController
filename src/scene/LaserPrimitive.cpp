@@ -3805,6 +3805,7 @@ void LaserFrame::draw(QPainter * painter)
         }
     }
     else {
+        painter->setPen(Qt::NoPen);
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);

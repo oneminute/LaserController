@@ -1611,6 +1611,7 @@ QMap<LaserLayer*, QImage> LaserDocument::generateStampImages()
             QPainter painter(&image);
             //绘制印章外面的基准线
             computeStampBasePath(p, painter, offset, t1, t2);
+            painter.setPen(Qt::NoPen);
             if (p->stampIntaglio()) {
                 int type = p->primitiveType();
                 QPainterPath pPath = p->getPath();
@@ -1662,8 +1663,8 @@ QMap<LaserLayer*, QImage> LaserDocument::generateStampImages()
             }
             painter.setBrush(Qt::NoBrush);
         }
-        //QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
-        //image.save(fileName);
+        QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
+        image.save(fileName);
         /*cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
 
         int dpi = layer->dpi();
