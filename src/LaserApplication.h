@@ -7,7 +7,8 @@
 
 class LaserControllerWindow;
 class PreviewWindow;
-class ProgressModel;
+//class ProgressModel;
+class ProgressItem;
 class LaserDevice;
 class LaserDriver;
 class LaserDocument;
@@ -54,16 +55,18 @@ signals:
 public:
     static LaserApplication* app;
     static LaserControllerWindow* mainWindow;
-    static PreviewWindow* previewWindow;
-    static ProgressModel* progressModel;
+    //static PreviewWindow* previewWindow;
+    //static ProgressModel* progressModel;
+    static ProgressItem* globalProgress;
     static LaserDevice* device;
     static LaserDriver* driver;
     static QString appShortName;
     static QTranslator* currentTranslator;
 
-    static void closeProgressWindow();
-    static void showProgressWindow();
-    static void resetProgressWindow();
+    //static void closeProgressWindow();
+    //static void showProgressWindow();
+    //static void resetProgressWindow();
+    static ProgressItem* resetProcess();
 
     static QMap<QString, QString> stringMap;
     static QMap<QString, QTranslator*> translators;

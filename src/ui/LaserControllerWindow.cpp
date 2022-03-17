@@ -72,6 +72,7 @@
 #include "ui/UpdateDialog.h"
 #include "ui/ActivationDialog.h"
 #include "ui/RegisteDialog.h"
+#include "ui/SelectOriginDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
 #include "ui/CalibrationDialog.h"
@@ -881,6 +882,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCameraUpdateOverlay, &QAction::triggered, this, &LaserControllerWindow::onActionCameraUpdateOverlay);
     connect(m_ui->actionStartCamera, &QAction::triggered, this, &LaserControllerWindow::onActionStartCamera);
     connect(m_ui->actionStopCamera, &QAction::triggered, this, &LaserControllerWindow::onActionStopCamera);
+    connect(m_ui->actionCameraDefault, &QAction::triggered, this, &LaserControllerWindow::onActionCameraDefault);
 
     connect(m_ui->actionSaveUStep, &QAction::triggered, this, &LaserControllerWindow::onActionSaveUStep);
 
@@ -1075,10 +1077,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(Config::Ui::validMaxRegionItem(), &ConfigItem::valueChanged, [=] {
         //updata region
         m_scene->updataValidMaxRegion();
-
     });
 
-    connect(LaserApplication::progressModel, &ProgressModel::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
+    connect(LaserApplication::globalProgress, &ProgressItem::progressUpdated, m_statusBarProgress, QOverload<qreal>::of(&ProgressBar::setValue));
     connect(LaserApplication::app, &LaserApplication::languageChanged, this, &LaserControllerWindow::retranslate);
     //arrange align
     connect(m_ui->actionAlignCenter, &QAction::triggered, this, &LaserControllerWindow::onActionAlignCenter);
@@ -2361,9 +2362,9 @@ void LaserControllerWindow::createCentralDockPanel()
     centralWidget->setLayout(centralGridLayout);
 
     CDockWidget* centralDockWidget = new CDockWidget(tr("work space"));
-    centralDockWidget->setWidget(centralWidget);
-    m_centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
-    m_centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
+centralDockWidget->setWidget(centralWidget);
+m_centralDockArea = m_dockManager->setCentralWidget(centralDockWidget);
+m_centralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
 }
 
 void LaserControllerWindow::createLayersDockPanel()
@@ -2425,6 +2426,10 @@ void LaserControllerWindow::createCameraDockPanel()
     m_buttonCameraStart->setDefaultAction(m_ui->actionStartCamera);
     m_buttonCameraStart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
+    m_buttonCameraDefault = new QToolButton;
+    m_buttonCameraDefault->setDefaultAction(m_ui->actionCameraDefault);
+    m_buttonCameraDefault->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
     m_buttonCameraUpdateOverlay = new QToolButton;
     m_buttonCameraUpdateOverlay->setDefaultAction(m_ui->actionCameraUpdateOverlay);
     m_buttonCameraUpdateOverlay->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -2457,6 +2462,30 @@ void LaserControllerWindow::createCameraDockPanel()
     m_doubleSpinBoxCameraYShift->setDecimals(1);
     m_doubleSpinBoxCameraYShift->setValue(0.0);
 
+    EditSlider* sliderBrightness = InputWidgetWrapper::createWidget<EditSlider*>(Config::Camera::brightnessItem());
+    Config::Camera::brightnessItem()->bindWidget(sliderBrightness, SS_DIRECTLY);
+    connect(Config::Camera::brightnessItem(), &ConfigItem::valueChanged, [=](const QVariant& value) 
+        {
+            m_cameraController->setBrightness(value.toInt());
+        }
+    );
+
+    EditSlider* sliderContrast = InputWidgetWrapper::createWidget<EditSlider*>(Config::Camera::contrastItem());
+    Config::Camera::contrastItem()->bindWidget(sliderContrast, SS_DIRECTLY);
+    connect(Config::Camera::contrastItem(), &ConfigItem::valueChanged, [=](const QVariant& value) 
+        {
+            m_cameraController->setContrast(value.toInt());
+        }
+    );
+
+    /*EditSlider* sliderHue = InputWidgetWrapper::createWidget<EditSlider*>(Config::Camera::hueItem());
+    Config::Camera::hueItem()->bindWidget(sliderHue, SS_DIRECTLY);
+    connect(Config::Camera::hueItem(), &ConfigItem::valueChanged, [=](const QVariant& value) 
+        {
+            m_cameraController->setContrast(value.toInt());
+        }
+    );*/
+
     m_cameraViewer = new ImageViewer;
     m_cameraViewer->fitBy(Config::Camera::resolution());
 
@@ -2464,7 +2493,8 @@ void LaserControllerWindow::createCameraDockPanel()
     layout->setMargin(3);
     layout->addWidget(m_labelCameraAutoConnect, 0, 0);
     layout->addWidget(autoConnect, 0, 1);
-    layout->addWidget(m_buttonCameraStart, 0, 2, 1, 2);
+    layout->addWidget(m_buttonCameraStart, 0, 2);
+    layout->addWidget(m_buttonCameraDefault, 0, 3);
     layout->addWidget(m_buttonCameraUpdateOverlay, 1, 0);
     layout->addWidget(m_buttonCameraTrace, 1, 1, 1, 2);
     layout->addWidget(m_buttonCameraSaveSettings, 1, 3, 1, 2);
@@ -2478,7 +2508,13 @@ void LaserControllerWindow::createCameraDockPanel()
     layout->addWidget(m_doubleSpinBoxCameraXShift, 3, 2);
     layout->addWidget(labelYShift, 3, 3);
     layout->addWidget(m_doubleSpinBoxCameraYShift, 3, 4);
-    layout->addWidget(m_cameraViewer, 4, 0, 1, 5);
+    layout->addWidget(new QLabel(Config::Camera::brightnessItem()->title()), 4, 0, 1, 5);
+    layout->addWidget(sliderBrightness, 4, 1, 1, 5);
+    layout->addWidget(new QLabel(Config::Camera::contrastItem()->title()), 5, 0, 1, 5);
+    layout->addWidget(sliderContrast, 5, 1, 1, 5);
+    //layout->addWidget(new QLabel(Config::Camera::hueItem()->title()), 6, 0, 1, 5);
+    //layout->addWidget(sliderHue, 6, 1, 1, 5);
+    layout->addWidget(m_cameraViewer, 6, 0, 1, 5);
     layout->setRowStretch(6, 1);
 
     QWidget* panelWidget = new QWidget;
@@ -4559,9 +4595,9 @@ void LaserControllerWindow::onActionImport(bool checked)
     connect(importer.data(), &Importer::imported, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     if (!importer.isNull())
     {
-        LaserApplication::resetProgressWindow();
+        //LaserApplication::resetProgressWindow();
         //LaserApplication::showProgressWindow();
-        ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Importing"), nullptr);
+        ProgressItem* progress = LaserApplication::resetProcess();
         importer->import(filename, m_scene, progress);
         progress->finish();
     }
@@ -4577,9 +4613,9 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     QVariantMap params;
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
-    LaserApplication::resetProgressWindow();
+    //LaserApplication::resetProgressWindow();
     //LaserApplication::showProgressWindow();
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Importing", nullptr);
+    ProgressItem* progress = LaserApplication::resetProcess();
     importer->import("", m_scene, progress, params);
     progress->finish();
     
@@ -4803,16 +4839,20 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
         {
-            LaserApplication::resetProgressWindow();
+            //LaserApplication::resetProgressWindow();
             //LaserApplication::showProgressWindow();
-            ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+            ProgressItem* progress = LaserApplication::resetProcess();
             progress->setMaximum(5);
             QtConcurrent::run([=]()
                 {
                     m_scene->document()->outline(progress);
                     m_scene->document()->setFinishRun(Config::Device::finishRun());
+                    PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+                    optimizer.optimize(progress);
+                    PathOptimizer::Path path = optimizer.optimizedPath();
                     m_prepareMachining = false;
-                    m_scene->document()->exportJSON(filename, progress, true, true);
+                    m_prepareDownloading = false;
+                    m_scene->document()->exportJSON(filename, path, progress, true);
                     progress->finish();
                 }
             );
@@ -4854,24 +4894,43 @@ void LaserControllerWindow::startMachining()
         }
         QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
+        QRect boundingRect = m_scene->document()->currentDocBoundingRect();
+        QRect boundingRectAcc = m_scene->document()->currentEngravingBoundingRect(true);
+
+        switch (Config::Device::startFrom())
+        {
+        case SFT_CurrentPosition:
+            boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
+            boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->currentOrigin());
+            break;
+        case SFT_UserOrigin:
+            boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
+            boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->userOrigin().toPoint());
+            break;
+        }
+
         if (!LaserApplication::device->checkLayoutForMachining(
-            m_scene->document()->currentDocBoundingRect(),
-            m_scene->document()->currentDocBoundingRect(true)
+            boundingRect,
+            boundingRectAcc
         ))
             return;
 
-        LaserApplication::resetProgressWindow();
-        //LaserApplication::showProgressWindow();
-        ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+        //SelectOriginDialog soDlg(this);
+        //soDlg.exec();
+
+        //LaserApplication::resetProgressWindow();
+        ProgressItem* progress = LaserApplication::resetProcess();
         progress->setMaximum(5);
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
                 m_scene->document()->setFinishRun(Config::Device::finishRun());
+                PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+                optimizer.optimize(progress);
+                PathOptimizer::Path path = optimizer.optimizedPath();
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
-                qDebug() << "export temp json file for machining" << filename;
-                m_scene->document()->exportJSON(filename, progress, true, true);
+                m_scene->document()->exportJSON(filename, path, progress, true);
                 progress->finish();
             }
         );
@@ -4912,14 +4971,28 @@ void LaserControllerWindow::onActionBounding(bool checked)
     if (!m_scene->document())
         return;
 
+    LaserDocument* doc = m_scene->document();
+    QRect boundingRect = doc->currentDocBoundingRect();
+    QRect boundingRectAcc = doc->currentEngravingBoundingRect(true);
+
+    switch (Config::Device::startFrom())
+    {
+    case SFT_CurrentPosition:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
+        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->currentOrigin());
+        break;
+    case SFT_UserOrigin:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
+        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->userOrigin().toPoint());
+        break;
+    }
+
     if (!LaserApplication::device->checkLayoutForMachining(
-        m_scene->document()->currentDocBoundingRect(),
-        m_scene->document()->currentDocBoundingRect(true)
+        boundingRect,
+        boundingRectAcc
     ))
         return;
-
-    m_prepareMachining = true;
-    m_scene->document()->exportBoundingJSON();
+    LaserApplication::device->drawRectangularBorder(m_scene->document());
 }
 
 void LaserControllerWindow::onActionLaserSpotShot(bool checked)
@@ -4968,24 +5041,28 @@ void LaserControllerWindow::onActionDownload(bool checked)
     }
     QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
-    if (!LaserApplication::device->checkLayoutForMachining(
-        m_scene->document()->currentDocBoundingRect(),
-        m_scene->document()->currentDocBoundingRect(true)
-    ))
-        return;
+    QRect boundingRect = m_scene->document()->currentDocBoundingRect();
 
-    LaserApplication::resetProgressWindow();
-    //LaserApplication::showProgressWindow();
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+    SelectOriginDialog soDlg(this);
+    soDlg.exec();
+    QPoint origin;
+
+    m_scene->document()->setUseSpecifiedOrigin(true);
+    m_scene->document()->setSpecifiedOriginIndex(soDlg.origin());
+
+    //LaserApplication::resetProgressWindow();
+    ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(5);
     QtConcurrent::run([=]()
         {
             m_scene->document()->outline(progress);
             m_scene->document()->setFinishRun(Config::Device::finishRun());
+            PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+            optimizer.optimize(progress);
+            PathOptimizer::Path path = optimizer.optimizedPath();
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareDownloading = true;
-            qDebug() << "export temp json file for machining" << filename;
-            m_scene->document()->exportJSON(filename, progress, true, true);
+            m_scene->document()->exportJSON(filename, path, progress, true);
             progress->finish();
         }
     );
@@ -5083,9 +5160,10 @@ void LaserControllerWindow::onMovementButtonReleased()
 void LaserControllerWindow::onActionHalfTone(bool checked)
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"), QString(), tr("Images (*.png *.bmp *.jpg)"));
-    LaserApplication::resetProgressWindow();
-    LaserApplication::showProgressWindow();
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+    //LaserApplication::resetProgressWindow();
+    //LaserApplication::showProgressWindow();
+    //ProgressItem* progress = LaserApplication::progressModel->createComplexItem("Exporting", nullptr);
+    ProgressItem* progress = LaserApplication::globalProgress;
     if (!filename.isEmpty() && !filename.isNull())
     {
         QImage image(filename);
@@ -5393,9 +5471,9 @@ void LaserControllerWindow::onActionAbout(bool checked)
 
 void LaserControllerWindow::onActionUpdateOutline(bool checked)
 {
-    LaserApplication::resetProgressWindow();
-    LaserApplication::showProgressWindow();
-    ProgressItem* progress = LaserApplication::progressModel->createComplexItem(tr("Outlining"), nullptr);
+    //LaserApplication::resetProgressWindow();
+    //LaserApplication::showProgressWindow();
+    ProgressItem* progress = LaserApplication::resetProcess();
     QtConcurrent::run(
         [=]() {
             m_scene->document()->outline(progress);
@@ -5837,6 +5915,17 @@ void LaserControllerWindow::onActionStartCamera(bool checked)
 void LaserControllerWindow::onActionStopCamera(bool checked)
 {
     m_cameraController->stop();
+}
+
+void LaserControllerWindow::onActionCameraDefault()
+{
+    Config::Camera::brightnessItem()->restoreToDefault(SS_DIRECTLY, this);
+    Config::Camera::contrastItem()->restoreToDefault(SS_DIRECTLY, this);
+    Config::Camera::hueItem()->restoreToDefault(SS_DIRECTLY, this);
+    Config::Camera::saturationItem()->restoreToDefault(SS_DIRECTLY, this);
+    Config::Camera::sharpnessItem()->restoreToDefault(SS_DIRECTLY, this);
+    Config::Camera::gammaItem()->restoreToDefault(SS_DIRECTLY, this);
+    Config::Camera::backlightCompItem()->restoreToDefault(SS_DIRECTLY, this);
 }
 
 void LaserControllerWindow::onActionSaveUStep()
@@ -6347,16 +6436,17 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
 {
     qLogD << "onDocumentExportFinished: " << m_prepareMachining;
     qLogD << "json data: ";
-    qLogD << data;
-    LaserApplication::driver->importData(data.data(), data.size());
+    //qLogD << data;
 
     if (m_prepareMachining)
     {
+        LaserApplication::driver->importData(data.data(), data.size());
         LaserApplication::driver->startMachining();
         m_prepareMachining = false;
     }
     else if (m_prepareDownloading)
     {
+        LaserApplication::driver->importData(data.data(), data.size());
         LaserApplication::driver->download();
         m_prepareDownloading = false;
     }
@@ -6763,6 +6853,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
         //LaserApplication::device->updateDriverLanguage();
         m_created = true;
         QTimer::singleShot(100, this, [=]() {
+            //LaserApplication::device->updateDriverLanguage();
             emit windowCreated();
             qLogD << "orientation: " << m_splitterLayers->orientation();
             m_splitterLayers->setSizes({400, 450});

@@ -95,6 +95,10 @@ private:
 
     typedef void(__stdcall* FN_VOID_LONG)(unsigned long);
 
+    typedef void(__stdcall* FNDrawRectangularBorder)(
+        bool, int, int, bool, int, int
+    );
+
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -203,6 +207,7 @@ public:
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
     void download(unsigned long index = 0);
+    void drawRectangularBorder(bool xAbs, int x1, int x2, bool yAbs, int y1, int y2);
     int importData(const char* data, int length);
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
@@ -296,6 +301,7 @@ private:
 
     FN_INT_WCHART m_fnLoadDataFromFile;
     FN_VOID_LONG m_fnStartDownLoadToCache;
+    FNDrawRectangularBorder m_fnDrawRectangularBorder;
 
     FN_VOID_VOID m_fnGetDeviceWorkState;
 

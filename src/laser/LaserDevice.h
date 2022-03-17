@@ -14,6 +14,8 @@
 class ConfigItem;
 class LaserDriver;
 class LaserDevicePrivate;
+class LaserDocument;
+
 class LaserDevice : public QObject
 {
     Q_OBJECT
@@ -100,6 +102,7 @@ public:
     void moveToZOrigin();
     void moveToUOrigin();
     void moveToXYOrigin();
+    void drawRectangularBorder(LaserDocument* doc);
 
     bool isAvailable() const;
 
@@ -111,7 +114,7 @@ public:
     void updateDriverLanguage();
 
     bool checkLayoutForMoving(const QPoint& dest);
-    bool checkLayoutForMachining(const QRect& docBounding, const QRect& docBoundingAcc);
+    bool checkLayoutForMachining(const QRect& docBounding, const QRect& engravingBounding);
 
     LaserRegister* userRegister(int addr) const;
     LaserRegister* systemRegister(int addr) const;

@@ -36,11 +36,8 @@ ProgressItem::~ProgressItem()
 
 void ProgressItem::setMaximum(qreal value) 
 {
+    QMutexLocker locker(&m_childMutex);
     m_maximum = value; 
-    /*if (this->progressType() == PT_Complex)
-    {
-        updateWeights();
-    }*/
 }
 
 int ProgressItem::indexOfParent()
@@ -48,8 +45,9 @@ int ProgressItem::indexOfParent()
     QMutexLocker locker(&m_childMutex);
     if (parent())
         return parent()->childItems().indexOf(this);
-    else
-        return LaserApplication::progressModel->m_items.indexOf(this);
+    return -1;
+    //else
+        //return LaserApplication::progressModel->m_items.indexOf(this);
 }
 
 qreal ProgressItem::progress() const
@@ -208,29 +206,21 @@ void ProgressItem::setParent(ProgressItem* parent)
     m_parent = parent;
 }
 
-//void ProgressItem::updateWeights()
-//{
-//    m_sumWeights = 0;
-//    for (ProgressItem* item : m_childItems)
-//    {
-//        qreal weight = 1.0;
-//        if (m_weights.contains(item))
-//        {
-//            weight = m_weights[item];
-//        }
-//        else
-//        {
-//            m_weights.insert(item, 1.0);
-//        }
-//
-//        m_sumWeights += weight;
-//    }
-//
-//    if (m_childItems.length() < m_maximum)
-//    {
-//        m_sumWeights += (m_maximum - m_childItems.length());
-//    }
-//}
+void ProgressItem::clear()
+{
+    for (ProgressItem* item : m_childItems)
+    {
+        item->clear();
+        delete item;
+    }
+    m_childItems.clear();
+}
+
+void ProgressItem::reset()
+{
+    clear();
+    m_progress = 0;
+}
 
 void ProgressItem::notify()
 {
@@ -238,5 +228,9 @@ void ProgressItem::notify()
     {
         m_parent->notify();
     }
-    LaserApplication::progressModel->updateItem(this);
+    //LaserApplication::progressModel->updateItem(this);
+    else
+    {
+        emit progressUpdated(progress());
+    }
 }

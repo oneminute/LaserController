@@ -80,6 +80,27 @@ public:
     bool setResolution(const QSize& size);
     QSize resolution() const;
 
+    qreal brightness() const;
+    void setBrightness(qreal value);
+
+    qreal contrast() const;
+    void setContrast(qreal value);
+
+    qreal hue() const;
+    void setHue(qreal value);
+
+    qreal saturation() const;
+    void setSaturation(qreal value);
+
+    qreal sharpness() const;
+    void setSharpness(qreal value);
+
+    qreal gamma() const;
+    void setGamma(qreal value);
+
+    qreal backlightComp() const;
+    void setBacklightComp(qreal value);
+
     void installProcessor(ImageProcessor* processor);
     void uninstallProcessor(ImageProcessor* processor);
 

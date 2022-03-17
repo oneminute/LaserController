@@ -292,6 +292,7 @@ protected slots:
     void onActionCameraUpdateOverlay(bool checked = false);
     void onActionStartCamera(bool checked = false);
     void onActionStopCamera(bool checked = false);
+    void onActionCameraDefault();
 
     void onActionSaveUStep();
 
@@ -471,6 +472,7 @@ private:
     // Camera Panel widgets
     QLabel* m_labelCameraAutoConnect;
     QToolButton* m_buttonCameraStart;
+    QToolButton* m_buttonCameraDefault;
     QToolButton* m_buttonCameraUpdateOverlay;
     QToolButton* m_buttonCameraTrace;
     QToolButton* m_buttonCameraSaveSettings;

@@ -226,6 +226,9 @@ bool LaserDriver::load()
     m_fnStartDownLoadToCache = (FN_VOID_LONG)m_library.resolve("StartDownLoadToCache");
     CHECK_FN(m_fnStartDownLoadToCache)
 
+    m_fnDrawRectangularBorder = (FNDrawRectangularBorder)m_library.resolve("DrawRectangularBorder");
+    CHECK_FN(m_fnDrawRectangularBorder)
+
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
     CHECK_FN(m_fnGetDeviceWorkState)
 
@@ -817,6 +820,11 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
 void LaserDriver::download(unsigned long index)
 {
     m_fnStartDownLoadToCache(index);
+}
+
+void LaserDriver::drawRectangularBorder(bool xAbs, int x1, int x2, bool yAbs, int y1, int y2)
+{
+    m_fnDrawRectangularBorder(xAbs, x1, x2, yAbs, y1, y2);
 }
 
 int LaserDriver::importData(const char* data, int length)

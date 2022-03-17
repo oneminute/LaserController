@@ -188,6 +188,7 @@ LaserPoint utils::center(const LaserPointList& points)
 void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
+    int accCount = 0;
     bounding = QRect();
     boundingAcc = QRect();
     for (QGraphicsItem* item : primitives)
@@ -195,7 +196,7 @@ void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& boundin
         LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
         if (exludeUnexport && !primitive->exportable())
             continue;
-        if (computeBoundingRect(primitive, bounding, count, boundingAcc, exludeUnexport)) {
+        if (computeBoundingRect(primitive, bounding, boundingAcc, count, accCount, exludeUnexport)) {
             continue;
         }
     }
@@ -204,13 +205,14 @@ void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& boundin
 void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
+    int accCount = 0;
     bounding = QRect();
     boundingAcc = QRect();
     for (LaserPrimitive* primitive : primitives)
     {
         if (exludeUnexport && !primitive->exportable())
             continue;
-        if (computeBoundingRect(primitive, bounding, count, boundingAcc, exludeUnexport)) {
+        if (computeBoundingRect(primitive, bounding, boundingAcc, count, accCount, exludeUnexport)) {
             continue;
         }
     }
@@ -219,6 +221,7 @@ void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& boundi
 void utils::boundingRect(const QSet<LaserPrimitive*>& primitives, QRect & bounding, QRect & boundingAcc, bool exludeUnexport)
 {
     int count = 0;
+    int accCount = 0;
     bounding = QRect();
     boundingAcc = QRect();
     for (QSet<LaserPrimitive*>::const_iterator p = primitives.begin();
@@ -226,13 +229,13 @@ void utils::boundingRect(const QSet<LaserPrimitive*>& primitives, QRect & boundi
     {
         if (exludeUnexport && !(*p)->exportable())
             continue;
-        if (computeBoundingRect(*p, bounding, count, boundingAcc, exludeUnexport)) {
+        if (computeBoundingRect(*p, bounding, boundingAcc, count, accCount, exludeUnexport)) {
             continue;
         }
     }
 }
 
-bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, int& count, QRect& boundingAcc, bool exludeUnexport)
+bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, QRect& boundingAcc, int& count, int& accCount, bool exludeUnexport)
 {
     QRect rect = primitive->sceneBoundingRect();
     QRect rectAcc = rect;
@@ -241,15 +244,26 @@ bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, int&
         (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel &&
         (primitive->isShape() || primitive->isText())))
     {
-        qreal span = LaserApplication::device->engravingAccLength(layer->engravingRunSpeed());
-        rectAcc.setLeft(rect.left() - span);
-        rectAcc.setWidth(rect.width() + span * 2);
+        if (accCount++ == 0)
+        {
+            boundingAcc = rectAcc;
+        }
+        else
+        {
+            if (rectAcc.left() < boundingAcc.left())
+                boundingAcc.setLeft(rectAcc.left());
+            if (rectAcc.top() < boundingAcc.top())
+                boundingAcc.setTop(rectAcc.top());
+            if (rectAcc.right() > boundingAcc.right())
+                boundingAcc.setRight(rectAcc.right());
+            if (rectAcc.bottom() > boundingAcc.bottom())
+                boundingAcc.setBottom(rectAcc.bottom());
+        }
     }
 
     if (count++ == 0)
     {
         bounding = rect;
-        boundingAcc = rectAcc;
         return true;
     }
     if (rect.left() < bounding.left())
@@ -261,14 +275,6 @@ bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, int&
     if (rect.bottom() > bounding.bottom())
         bounding.setBottom(rect.bottom());
 
-    if (rectAcc.left() < boundingAcc.left())
-        boundingAcc.setLeft(rectAcc.left());
-    if (rectAcc.top() < boundingAcc.top())
-        boundingAcc.setTop(rectAcc.top());
-    if (rectAcc.right() > boundingAcc.right())
-        boundingAcc.setRight(rectAcc.right());
-    if (rectAcc.bottom() > boundingAcc.bottom())
-        boundingAcc.setBottom(rectAcc.bottom());
     return false;
 }
 

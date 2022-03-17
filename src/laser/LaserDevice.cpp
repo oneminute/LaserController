@@ -879,6 +879,28 @@ void LaserDevice::moveToXYOrigin()
     }
 }
 
+void LaserDevice::drawRectangularBorder(LaserDocument* doc)
+{
+    Q_D(LaserDevice);
+    if (!d->driver)
+        return;
+
+    QTransform t = this->to1stQuad();
+    QRect boundingRect = doc->currentDocBoundingRect();
+    switch (Config::Device::startFrom())
+    {
+    case SFT_CurrentPosition:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
+        break;
+    case SFT_UserOrigin:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
+        break;
+    }
+    QRect bounding = t.mapRect(boundingRect);
+    d->driver->drawRectangularBorder(true, bounding.x(), bounding.x() + bounding.width(),
+        true, bounding.y(), bounding.y() + bounding.height());
+}
+
 bool LaserDevice::isAvailable() const
 {
     Q_D(const LaserDevice);
@@ -952,7 +974,7 @@ bool LaserDevice::checkLayoutForMoving(const QPoint& dest)
     }
 }
 
-bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect& docBoundingAcc)
+bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect& engravingBounding)
 {
     QRect layoutRect = this->layoutRect();
     QString info1 = "";
@@ -960,7 +982,7 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
 
     bool ok1 = true;
     bool ok2 = true;
-    bool needCheckAcc = docBounding != docBoundingAcc;
+    bool needCheckAcc = docBounding != engravingBounding;
     bool exceedLeft = false;
     bool exceedRight = false;
 
@@ -968,9 +990,6 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
     int docRight = docLeft + docBounding.width();
     int docTop = docBounding.top();
     int docBottom = docTop + docBounding.height();
-
-    int accLeft = docBoundingAcc.left();
-    int accRight = accLeft + docBoundingAcc.width();
 
     int layoutLeft = layoutRect.left();
     int layoutRight = layoutLeft + layoutRect.width();
@@ -1009,6 +1028,10 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
 
     if (needCheckAcc)
     {
+        QRect boundingAcc = docBounding.united(engravingBounding);
+        int accLeft = boundingAcc.left();
+        int accRight = accLeft + boundingAcc.width();
+
         if (accLeft < layoutLeft)
         {
             ok2 = false;
@@ -1206,9 +1229,9 @@ QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
 
 int LaserDevice::engravingAccLength(int engravingRunSpeed) const
 {
-    int minSpeed = Config::UserRegister::scanXStartSpeed();
-    int acc = Config::UserRegister::scanXAcc();
-    int maxSpeed = qMax(engravingRunSpeed, minSpeed);
+    qreal minSpeed = Config::UserRegister::scanXStartSpeed();
+    qreal acc = Config::UserRegister::scanXAcc();
+    qreal maxSpeed = qMax(static_cast<qreal>(engravingRunSpeed), minSpeed);
     return qAbs(qRound((maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2.0)));
 }
 

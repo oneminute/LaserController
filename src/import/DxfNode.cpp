@@ -25,7 +25,7 @@ DxfStream::DxfStream(QIODevice* device, ProgressItem* parentProgress)
     : QTextStream(device)
     , m_lineNumber(0)
     , m_cached(false)
-    , m_progress(LaserApplication::progressModel->createSimpleItem(QObject::tr("Parse Dxf file"), parentProgress))
+    , m_progress(new ProgressItem(QObject::tr("Parse Dxf file"), ProgressItem::PT_Simple, parentProgress))
 {
     m_progress->setMaximum(device->bytesAvailable());
 }

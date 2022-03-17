@@ -109,8 +109,9 @@ void LaserViewer::paintEvent(QPaintEvent* event)
         if (scene()->document())
         {
             // 绘制填充和雕刻外包框
-            QRect accRect = scene()->document()->absoluteDocBoundingRect(true);
-            QRect rect = scene()->document()->absoluteDocBoundingRect();
+            QRect rect = scene()->document()->absoluteBoundingRect();
+            QRect accRect = scene()->document()->absoluteEngravingBoundingRect(true);
+            accRect = rect.united(accRect);
 
             if (accRect.isValid() && accRect != rect)
             {

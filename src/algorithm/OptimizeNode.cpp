@@ -80,23 +80,32 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
     else if (nodeType == LNT_DOCUMENT)
     {
         LaserDocument* document = static_cast<LaserDocument*>(documentItem);
-        QPoint origin = document->docOrigin();
+        QRect boundingRect = document->absoluteBoundingRect();
+        QPoint origin;
+        int originIndex = Config::SystemRegister::deviceOrigin();
+        if (document->useSpecifiedOrigin())
+            originIndex = document->specifiedOriginIndex();
         int angle = 0;
-        switch (Config::SystemRegister::deviceOrigin())
+        switch (originIndex)
         {
         case 0:
+            origin = boundingRect.topLeft();
             angle = 315;
             break;
         case 3:
+            origin = QPoint(boundingRect.left() + boundingRect.width(), boundingRect.top());
             angle = 225;
             break;
         case 2:
+            origin = QPoint(boundingRect.left() + boundingRect.width(), boundingRect.top() + boundingRect.height());
             angle = 135;
             break;
         case 1:
+            origin = QPoint(boundingRect.left(), boundingRect.top() + boundingRect.height());
             angle = 45;
             break;
         }
+        
         currentPoint = LaserPoint(origin, angle, angle);
     }
     else if (nodeType == LNT_VIRTUAL)

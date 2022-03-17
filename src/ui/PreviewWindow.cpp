@@ -75,7 +75,7 @@ PreviewWindow::PreviewWindow(QWidget* parent)
 
     // progress tree widget
     m_treeViewProgress = new QTreeView;
-    m_treeViewProgress->setModel(LaserApplication::progressModel);
+    //m_treeViewProgress->setModel(LaserApplication::progressModel);
     m_treeViewProgress->setColumnWidth(0, 200);
     m_treeViewProgress->setColumnWidth(1, 200);
     ProgressBarDelegate* progressBarDelegate = new ProgressBarDelegate(m_treeViewProgress);

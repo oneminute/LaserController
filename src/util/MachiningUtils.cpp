@@ -67,7 +67,7 @@ void machiningUtils::path2Points(
         }
         else if (parentProgress->progressType() == ProgressItem::PT_Complex)
         {
-            progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Path to points"), parentProgress);
+            progress = new ProgressItem(QObject::tr("Path to points"), ProgressItem::PT_Simple, parentProgress);
             progress->setMaximum(path.elementCount());
         }
     }
@@ -112,7 +112,7 @@ QList<QPolygon> machiningUtils::path2SubpathPolygons(
         }
         else if (parentProgress->progressType() == ProgressItem::PT_Complex)
         {
-            progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Bazier to polygons"), parentProgress);
+            progress = new ProgressItem(QObject::tr("Bazier to polygons"), ProgressItem::PT_Simple, parentProgress);
             progress->setMaximum(path.elementCount());
         }
     }
@@ -169,7 +169,7 @@ void machiningUtils::polygon2Points(
         }
         else if (parentProgress->progressType() == ProgressItem::PT_Complex)
         {
-            progress = LaserApplication::progressModel->createSimpleItem(QObject::tr("Polygon to Points"), parentProgress);
+            progress = new ProgressItem(QObject::tr("Polygon to Points"), ProgressItem::PT_Simple, parentProgress);
             progress->setMaximum(polygon.size());
         }
     }
@@ -235,49 +235,34 @@ QByteArray machiningUtils::pointList2Plt(ProgressItem* progress, const LaserPoin
 
     QPoint pt = t.map(points.first().toPoint());
     QPoint diff = pt - lastPoint;
-    if (Config::Device::fullRelative() || Config::Device::startFrom() != SFT_AbsoluteCoords)
-    {
-        //buffer.append(QString("pu%1 %2;").arg(rel.x()).arg(rel.y()));
-        buffer.append(QString("pu%1 %2;").arg(pt.x() - lastPoint.x()).arg(pt.y() - lastPoint.y()));
-    }
-    else
-    {
-        buffer.append(QString("PU%1 %2;").arg(pt.x()).arg(pt.y()));
-    }
+    buffer.append(QString("pu%1 %2;").arg(diff.x()).arg(diff.y()));
+    
     lastPoint = pt;
     for (size_t i = 1; i < points.size(); i++)
     {
         LaserPoint lPt = points.at(i);
         QPoint pt = t.map(lPt.toPoint());
         QPoint diff = pt - lastPoint;
-        QString command = "PD%1 %2;";
+        QString command = "pd%1 %2;";
 
         if (points.size() == 2)
         {
-            command = "CO%1 %2;";
+            command = "co%1 %2;";
         }
         else if (i == 1)
         {
-            command = "CS%1 %2;";
+            command = "cs%1 %2;";
         }
         else if (i == points.length() - 1)
         {
-            command = "CE%1 %2;";
+            command = "ce%1 %2;";
         }
         else
         {
-            command = "CM%1 %2;";
+            command = "cm%1 %2;";
         }
 
-        if (Config::Device::fullRelative() || Config::Device::startFrom() != SFT_AbsoluteCoords)
-        {
-            command = command.toLower();
-            buffer.append(command.arg(pt.x() - lastPoint.x()).arg(pt.y() - lastPoint.y()));
-        }
-        else
-        {
-            buffer.append(command.arg(pt.x()).arg(pt.y()));
-        }
+        buffer.append(command.arg(pt.x() - lastPoint.x()).arg(pt.y() - lastPoint.y()));
         lastPoint = pt;
         if (progress)
             progress->increaseProgress();
@@ -350,50 +335,35 @@ QByteArray machiningUtils::lineList2Plt(ProgressItem* progress,
 
             QPoint diff1 = pt1 - lastPoint;
             QPoint diff2 = pt2 - pt1;
-            QString command1 = "PU%1 %2;";
-            QString command2 = "CM%1 %2;";
+            QString command1 = "pu%1 %2;";
+            QString command2 = "cm%1 %2;";
 
             if (lines.length() == 1)
             {
-                command2 = "CO%1 %2;";
+                command2 = "co%1 %2;";
             }
             else
             {
                 if (count == 0)
                 {
-                    command2 = "CS%1 %2;";
+                    command2 = "cs%1 %2;";
                 }
                 else if (count == lines.length() - 1)
                 {
-                    command1 = "CU%1 %2;";
-                    command2 = "CE%1 %2;";
+                    command1 = "cu%1 %2;";
+                    command2 = "ce%1 %2;";
                 }
                 else
                 {
-                    command1 = "CU%1 %2;";
+                    command1 = "cu%1 %2;";
                 }
                 count++;
             }
-            if (Config::Device::fullRelative() || Config::Device::startFrom() != SFT_AbsoluteCoords)
-            {
-                command1 = command1.toLower();
-                command2 = command2.toLower();
-                //QPoint rel = calculateResidual(diff1, residual);
-                //buffer.append(command1.arg(rel.x()).arg(rel.y()));
-                //rel = calculateResidual(diff2, residual);
-                //buffer.append(command2.arg(rel.x()).arg(rel.y()));
 
-                buffer.append(command1.arg(pt1.x() - lastPoint.x()).arg(pt1.y() - lastPoint.y()));
-                lastPoint = pt1;
-                buffer.append(command2.arg(pt2.x() - lastPoint.x()).arg(pt2.y() - lastPoint.y()));
-                lastPoint = pt2;
-            }
-            else
-            {
-                buffer.append(command1.arg(pt1.x()).arg(pt1.y()));
-                buffer.append(command2.arg(pt2.x()).arg(pt2.y()));
-                lastPoint = pt2;
-            }
+            buffer.append(command1.arg(pt1.x() - lastPoint.x()).arg(pt1.y() - lastPoint.y()));
+            lastPoint = pt1;
+            buffer.append(command2.arg(pt2.x() - lastPoint.x()).arg(pt2.y() - lastPoint.y()));
+            lastPoint = pt2;
         }
         forward = !forward;
         progress->increaseProgress();

@@ -11,6 +11,8 @@
 
 #include "PageInformation.h"
 #include "scene/LaserDocumentItem.h"
+#include "algorithm/PathOptimizer.h"
+#include "algorithm/OptimizeNode.h"
 
 class LaserDocumentPrivate;
 class LaserPrimitive;
@@ -30,6 +32,12 @@ public:
     QMap<QString, LaserPrimitive*> primitives() const;
     LaserPrimitive* laserPrimitive(const QString& id) const;
 	QList<LaserPrimitive*> selectedPrimitives() const;
+
+    bool useSpecifiedOrigin() const;
+    void setUseSpecifiedOrigin(bool value);
+
+    int specifiedOriginIndex() const;
+    void setSpecifiedOriginIndex(int value);
 
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
@@ -51,6 +59,8 @@ public:
 	SizeUnit unit() const;
 	void setUnit(SizeUnit unit);
 
+    int maxEngravingSpeed() const;
+
     /// <summary>
     /// 返回作业原点。该点值在画布坐标系下，由当前有效图元列表形成
     /// 的外包矩形9宫格点决定，即，该原点值是相对于外包矩形左上角
@@ -68,7 +78,11 @@ public:
     /// <returns></returns>
     QPoint jobOriginOnDocBoundingRect() const;
 
-    QRect absoluteDocBoundingRect(bool includingAccSpan = false) const;
+    QRect absoluteBoundingRect() const;
+    QRect absoluteEngravingBoundingRect(bool withAcc) const;
+
+    QRect currentDocBoundingRect() const;
+    QRect currentEngravingBoundingRect(bool withAcc) const;
 
     /// <summary>
     /// 在当前原点下的文档外包框。如果开始方式为相对坐标，则该外包框
@@ -76,7 +90,7 @@ public:
     /// </summary>
     /// <param name="includingAccSpan"></param>
     /// <returns></returns>
-    QRect currentDocBoundingRect(bool includingAccSpan = false) const;
+    QRect currentBoundingRect(const QRect& rect) const;
 
     /// <summary>
     /// 若是绝对坐标系，则返回(0, 0)；若是相对坐标系，则返回在当前画
@@ -110,8 +124,6 @@ public:
 
     LaserLayer* idleLayer() const;
 
-    LaserDocument* cloneWithoutContents();
-
     void addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
     void addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
     void removePrimitive(LaserPrimitive* item, bool keepLayer = true, bool updateDocBounding = true);
@@ -119,8 +131,7 @@ public:
 protected:
 
 public slots:
-    void exportJSON(const QString& filename, ProgressItem* parentProgress, bool needOptimization, bool exportJson);
-    void exportBoundingJSON();
+    void exportJSON(const QString& filename, const PathOptimizer::Path& path, ProgressItem* parentProgress, bool exportJson);
     void generateBoundingPrimitive();
     void updateLayersStructure();
     void destroy();
