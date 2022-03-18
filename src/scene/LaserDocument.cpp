@@ -277,8 +277,8 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     
     QRect docBounding = currentDocBoundingRect();
     QRect docBoundingAcc = currentEngravingBoundingRect(false);
-    if (!docBoundingAcc.isValid())
-        docBoundingAcc = docBounding;
+    //if (!docBoundingAcc.isValid())
+        //docBoundingAcc = docBounding;
     QPoint startPos;
     int deviceOriginIndex = Config::SystemRegister::deviceOrigin();
     if (useSpecifiedOrigin())
@@ -360,7 +360,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     laserDocumentInfo["Origin"] = typeUtils::point2Json(startPos);
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, Config::Device::switchToU(), true);
     laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU(), true);
-    laserDocumentInfo["MaxEngravingPower"] = maxEngravingSpeed();
+    laserDocumentInfo["MaxEngravingSpeed"] = maxEngravingSpeed();
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
     laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
 

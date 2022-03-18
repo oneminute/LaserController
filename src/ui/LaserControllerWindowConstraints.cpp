@@ -104,6 +104,13 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionSettings
     BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, initState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", false, documentPrimitiveSplineEditState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, devicePausedState);
     // end m_ui->actionSettings
 
     // begin m_ui->actionAbout
