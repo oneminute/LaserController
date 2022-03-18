@@ -18,6 +18,7 @@
 #include "ui/LaserControllerWindow.h"
 #include "ui/PreviewWindow.h"
 #include "task/ProgressModel.h"
+#include "task/ProgressItem.h"
 
 #ifdef _WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -30,8 +31,9 @@
 
 LaserApplication* LaserApplication::app(nullptr);
 LaserControllerWindow* LaserApplication::mainWindow(nullptr);
-PreviewWindow* LaserApplication::previewWindow(nullptr);
-ProgressModel* LaserApplication::progressModel(nullptr);
+//PreviewWindow* LaserApplication::previewWindow(nullptr);
+//ProgressModel* LaserApplication::progressModel(nullptr);
+ProgressItem* LaserApplication::globalProgress(nullptr);
 LaserDevice* LaserApplication::device(nullptr);
 LaserDriver* LaserApplication::driver(nullptr);
 QString LaserApplication::appShortName("CNELaser");
@@ -112,9 +114,10 @@ bool LaserApplication::initialize()
 
     StateController::start();
 
-    progressModel = new ProgressModel;
+    //progressModel = new ProgressModel;
+    globalProgress = new ProgressItem(tr("Total Progress"), ProgressItem::PT_Complex);
     mainWindow = new LaserControllerWindow;
-    previewWindow = new PreviewWindow(mainWindow);
+    //previewWindow = new PreviewWindow(mainWindow);
     mainWindow->showMaximized();
 
     g_deviceThread.start();
@@ -139,7 +142,8 @@ void LaserApplication::destroy()
         delete device;
     }
     
-    SAFE_DELETE(progressModel)
+    //SAFE_DELETE(progressModel)
+    SAFE_DELETE(globalProgress)
 
     g_deviceThread.exit();
     g_deviceThread.wait();
@@ -556,26 +560,33 @@ void LaserApplication::onEnterDeviceUnconnectedState()
     }
 }
 
-void LaserApplication::closeProgressWindow()
-{
-}
+//void LaserApplication::closeProgressWindow()
+//{
+//}
+//
+//void LaserApplication::showProgressWindow()
+//{
+//    if (previewWindow->isVisible())
+//    {
+//        previewWindow->hide();
+//    }
+//    else
+//    {
+//        previewWindow->show();
+//        previewWindow->raise();
+//        previewWindow->activateWindow();
+//    }
+//}
+//
+//void LaserApplication::resetProgressWindow()
+//{
+//    previewWindow->reset();
+//    //progressModel->clear();
+//}
 
-void LaserApplication::showProgressWindow()
+ProgressItem* LaserApplication::resetProcess()
 {
-    if (previewWindow->isVisible())
-    {
-        previewWindow->hide();
-    }
-    else
-    {
-        previewWindow->show();
-        previewWindow->raise();
-        previewWindow->activateWindow();
-    }
-}
-
-void LaserApplication::resetProgressWindow()
-{
-    previewWindow->reset();
-    progressModel->clear();
+    globalProgress->reset();
+    device->clearProgress();
+    return globalProgress;
 }

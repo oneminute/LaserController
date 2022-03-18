@@ -48,6 +48,10 @@ namespace machiningUtils
     QByteArray image2Plt(const QImage& image);
 
     bool pointsEql(const QPointF& pt1, const QPointF& pt2);
+
+    QList<QPoint> boundingPoints(int originIndex, const QRect& bounding);
+
+    QList<QPoint> boundingPoints(int jobIndex, const QRect& bounding, const QPoint& startPos);
 }
 
 #endif // MACHININGUTILS_H

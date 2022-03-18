@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1990,6 +1990,14 @@
    </property>
    <property name="toolTip">
     <string>Strip Stamp</string>
+   </property>
+  </action>
+  <action name="actionCameraDefault">
+   <property name="text">
+    <string>Default</string>
+   </property>
+   <property name="toolTip">
+    <string>Default camera parameters</string>
    </property>
   </action>
  </widget>

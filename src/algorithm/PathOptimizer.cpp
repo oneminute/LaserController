@@ -81,7 +81,7 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
 {
     Q_D(PathOptimizer);
 
-    LaserApplication::previewWindow->setTitle(tr("Initializing optimizer..."));
+    //LaserApplication::previewWindow->setTitle(tr("Initializing optimizer..."));
 
     d->arrivedNodes = 0;
     d->currentNode = d->root;
@@ -89,8 +89,8 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
     d->currentNode->update(parentProgress);
     d->optimizedPath.clear();
 
-    ProgressItem* optimizeProgress = LaserApplication::progressModel->createComplexItem(tr("Optimize by layers"), parentProgress);
-    ProgressItem* arrangeProgress = LaserApplication::progressModel->createSimpleItem(tr("Arrange points"), parentProgress);
+    ProgressItem* optimizeProgress = new ProgressItem(tr("Optimize by layers"), ProgressItem::PT_Complex, parentProgress);
+    ProgressItem* arrangeProgress = new ProgressItem(tr("Arrange points"), ProgressItem::PT_Simple, parentProgress);
     optimizeProgress->setMaximum(d->root->childNodes().count() * 2);
     for (OptimizeNode* layerNode : d->root->childNodes())
     {
@@ -99,24 +99,24 @@ void PathOptimizer::optimize(ProgressItem* parentProgress)
     }
     optimizeProgress->finish();
 
-    LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
+    //LaserApplication::previewWindow->addMessage(tr("Optimizing ended."));
     arrangeProgress->setMaximum(d->optimizedPath.length());
     OptimizeNode* last = d->root;
     for (OptimizeNode* node : d->optimizedPath)
     {
         LaserPointListList pointsList = node->arrangeMachiningPoints();
-        LaserApplication::previewWindow->addPath(pointsList.toPainterPath(), QPen(Qt::red, 2));
+        //LaserApplication::previewWindow->addPath(pointsList.toPainterPath(), QPen(Qt::red, 2));
         //LaserApplication::previewWindow->addProgress(this, 1.0 * 0.1 / d->totalNodes, tr("Arranged machining points of node %1.").arg(node->nodeName()));
-        if (last)
-        {
-            QPoint from = last->arrangedEndingPoint().toPoint();
-            QPoint to = node->arrangedStartingPoint().toPoint();
-            /*qLogD << last->nodeName() << " --> " << node->nodeName() << ": "
-                << from << ", " << to;*/
-            LaserApplication::previewWindow->addLine(
-                QLineF(from, to),
-                QPen(Qt::blue, 2));
-        }
+        //if (last)
+        //{
+        //    QPoint from = last->arrangedEndingPoint().toPoint();
+        //    QPoint to = node->arrangedStartingPoint().toPoint();
+        //    /*qLogD << last->nodeName() << " --> " << node->nodeName() << ": "
+        //        << from << ", " << to;*/
+        //    /*LaserApplication::previewWindow->addLine(
+        //        QLineF(from, to),
+        //        QPen(Qt::blue, 2));*/
+        //}
         last = node;
         arrangeProgress->increaseProgress();
     }
@@ -134,8 +134,8 @@ PathOptimizer::Path PathOptimizer::optimizedPath() const
 void PathOptimizer::optimizeFrom(OptimizeNode* root, ProgressItem* parentProgress)
 {
     Q_D(PathOptimizer);
-    ProgressItem* buildProgress = LaserApplication::progressModel->createSimpleItem(tr("Update nodes"), parentProgress);
-    ProgressItem* optimizeProgress = LaserApplication::progressModel->createSimpleItem(tr("Optimize nodes"), parentProgress);
+    ProgressItem* buildProgress = new ProgressItem(tr("Update nodes"), ProgressItem::PT_Simple, parentProgress);
+    ProgressItem* optimizeProgress = new ProgressItem(tr("Optimize nodes"), ProgressItem::PT_Simple, parentProgress);
 
     // 计算泳道宽
     int laneInterval = Config::PathOptimization::groupingGridInterval();

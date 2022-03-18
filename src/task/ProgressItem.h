@@ -9,8 +9,9 @@
 #include <QMap>
 #include <QMutex>
 
-class ProgressItem
+class ProgressItem: public QObject
 {
+    Q_OBJECT
 public:
     enum ProgressState
     {
@@ -25,11 +26,10 @@ public:
         PT_Complex
     };
 
-protected:
+public:
     explicit ProgressItem(const QString& title, ProgressType progressType = PT_Simple, ProgressItem* parent = nullptr);
     ~ProgressItem();
 
-public:
     ProgressType progressType() const { return m_type; }
 
     qreal minimum() const { return m_minimum; }
@@ -78,9 +78,15 @@ public:
     ProgressItem* parent() const;
     void setParent(ProgressItem* parent);
 
+    void clear();
+    void reset();
+
 protected:
     //void updateWeights();
     void notify();
+
+signals:
+    void progressUpdated(qreal value);
 
 private:
     ProgressState m_state;

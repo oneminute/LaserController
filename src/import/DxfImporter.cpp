@@ -67,7 +67,7 @@ void DxfImporter::importImpl(const QString& filename, LaserScene* scene, QList<L
     //d->documentNode->debugPrint();
 #endif
 
-    ProgressItem* progress = LaserApplication::progressModel->createSimpleItem("Import Dxf", parentProgress);
+    ProgressItem* progress = new ProgressItem("Import Dxf", ProgressItem::PT_Simple, parentProgress);
     LaserDocument* laserDoc = scene->document();
     laserDoc->blockSignals(true);
 

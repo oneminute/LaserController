@@ -171,7 +171,9 @@ protected:
 
     void reset();
     void restoreToDefault();
+    void restoreToDefault(StoreStrategy strategy, void* senderPtr);
     void restoreToSystemDefault();
+    void restoreToSystemDefault(StoreStrategy strategy, void* senderPtr);
 
     void apply();
     void applyToDefault();

@@ -51,7 +51,7 @@ namespace utils
 
     void boundingRect(const QSet<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
-    bool computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, int& count, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    bool computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, QRect& boundingAcc, int& count, int& accCount, bool exludeUnexport = true);
 
     LaserLineListList interLines(const QPainterPath& path, qreal rowInterval = 1);
 
@@ -68,6 +68,10 @@ namespace utils
     void rectEdges(QRectF rect, QList<QLineF>& edges);
 
     void warning(const QString& title, const QString& msg, QWidget* parent = nullptr);
+
+    void makePointsRelative(QList<QPoint>& points, const QPoint& startPos);
+
+    QList<QPoint> makePointsRelative(const QList<QPoint>& points, const QPoint& startPos);
 }
 
 #endif // UTILS_H

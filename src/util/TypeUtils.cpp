@@ -1,5 +1,7 @@
 #include "TypeUtils.h"
+
 #include <QDateTime>
+#include <QJsonArray>
 
 cv::Point2f typeUtils::qtPointF2CVPoint2f(const QPointF & pt)
 {
@@ -265,7 +267,7 @@ QSize typeUtils::json2Size(const QJsonValue& json)
     return json2Size(json.toObject());
 }
 
-QJsonObject typeUtils::rect2Json(const QRect& rect, bool uEnabled, bool relative, int xOffset)
+QJsonObject typeUtils::rect2Json(const QRect& rect, bool uEnabled, bool relative)
 {
     QJsonObject json;
     QRect rectOut = rect;
@@ -277,8 +279,6 @@ QJsonObject typeUtils::rect2Json(const QRect& rect, bool uEnabled, bool relative
     {
         right = rect.width();
         bottom = rect.height();
-        left = xOffset;
-        top = 0;
     }
     json["x1"] = left;
     if (uEnabled)
@@ -291,6 +291,16 @@ QJsonObject typeUtils::rect2Json(const QRect& rect, bool uEnabled, bool relative
     else
         json["y2"] = bottom;
     return json;
+}
+
+QJsonArray typeUtils::pointsToJson(const QList<QPoint>& points)
+{
+    QJsonArray arrayObj;
+    for (const QPoint& point : points)
+    {
+        arrayObj.append(point2Json(point));
+    }
+    return arrayObj;
 }
 
 QImage typeUtils::cvMat2QImage(const cv::Mat& mat)

@@ -129,6 +129,15 @@ public:
         CONFIG_ITEM(camera, calibrationAutoCapture, bool, toBool)
         CONFIG_ITEM_T(camera, undistortionCoeffs, QVariantList)
         CONFIG_ITEM_T(camera, homography, QVariantList)
+        CONFIG_ITEM(camera, brightness, int, toInt)
+        CONFIG_ITEM(camera, contrast, int, toInt)
+        CONFIG_ITEM(camera, hue, int, toInt)
+        CONFIG_ITEM(camera, saturation, int, toInt)
+        CONFIG_ITEM(camera, sharpness, int, toInt)
+        CONFIG_ITEM(camera, gamma, int, toInt)
+        //CONFIG_ITEM(camera, whiteBalance, int, toInt)
+        CONFIG_ITEM(camera, backlightComp, int, toInt)
+        //CONFIG_ITEM(camera, exposure, int, toInt)
 
         friend class Config;
     };
@@ -292,7 +301,6 @@ public:
         CONFIG_ITEM(device, rollerRotaryStepLength, int, toInt)
         CONFIG_ITEM_T(device, finishRun, FinishRunType)
         CONFIG_ITEM(device, switchToU, bool, toBool)
-        CONFIG_ITEM(device, fullRelative, bool, toBool)
 
     private:
         friend class Config;

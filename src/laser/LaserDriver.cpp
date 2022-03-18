@@ -46,7 +46,7 @@ void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCoun
 
     float progress = position * 1.0f / totalCount;
     qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
-    emit LaserApplication::driver->downloading(position, totalCount, progress);
+    emit LaserApplication::driver->progress(position, totalCount, progress);
 }
 
 void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
@@ -225,6 +225,9 @@ bool LaserDriver::load()
 
     m_fnStartDownLoadToCache = (FN_VOID_LONG)m_library.resolve("StartDownLoadToCache");
     CHECK_FN(m_fnStartDownLoadToCache)
+
+    m_fnDrawRectangularBorder = (FNDrawRectangularBorder)m_library.resolve("DrawRectangularBorder");
+    CHECK_FN(m_fnDrawRectangularBorder)
 
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
     CHECK_FN(m_fnGetDeviceWorkState)
@@ -817,6 +820,11 @@ int LaserDriver::loadDataFromFile(const QString& filename, bool withMachining)
 void LaserDriver::download(unsigned long index)
 {
     m_fnStartDownLoadToCache(index);
+}
+
+void LaserDriver::drawRectangularBorder(bool xAbs, int x1, int x2, bool yAbs, int y1, int y2)
+{
+    m_fnDrawRectangularBorder(xAbs, x1, x2, yAbs, y1, y2);
 }
 
 int LaserDriver::importData(const char* data, int length)

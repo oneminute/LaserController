@@ -18,7 +18,7 @@
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
 
-cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees, int gridSize)
+cv::Mat imageUtils::halftone6(ProgressItem* parentProgress, cv::Mat src, float degrees, int gridSize)
 {
     //src = 255 - src;
     cv::Point2f center((src.cols - 1) / 2.f, (src.rows - 1) / 2.f);
@@ -38,6 +38,7 @@ cv::Mat imageUtils::halftone6(ProgressItem* progress, cv::Mat src, float degrees
     cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(255));
     int gridCols = qCeil(dst.cols * 1.0 / gridSize);
     int gridRows = qCeil(dst.rows * 1.0 / gridSize);
+    ProgressItem* progress = new ProgressItem(QObject::tr("halftone"), ProgressItem::PT_Simple, parentProgress);
     progress->setMaximum(gridCols * gridRows);
     for (int c = 0; c < gridCols; c++)
     {
@@ -259,7 +260,7 @@ void imageUtils::generatePattern(cv::Mat& dstRoi, int sum, QPoint& center, int i
     }
 }
 
-QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat, 
+QByteArray imageUtils::image2EngravingData(ProgressItem* parentProgress, cv::Mat mat, 
     const QRect& boundingRect, int rowInterval, QPoint& lastPoint, const QTransform& t)
 {
     cv::threshold(mat, mat, 127.5, 255, cv::THRESH_BINARY);
@@ -267,14 +268,14 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
     stream.setByteOrder(QDataStream::LittleEndian);
-    QPoint topLeft = t.map(boundingRect.topLeft());
+    QPoint topLeft = boundingRect.topLeft();
 
     int width = boundingRect.width();
     int height = boundingRect.height();
-    int left = topLeft.x();
-    int right = topLeft.x() + width;
-    int top = topLeft.y();
-    int bottom = topLeft.y() + height;
+    int left = 0;
+    int right = width;
+    int top = 0;
+    int bottom = height;
     int xStart = left;
     int xEnd = right;
     int yStart = top;
@@ -285,6 +286,7 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
     bool forward = true;
     bool abosulte = Config::Device::startFrom() == SFT_AbsoluteCoords;
     bool firstLine = true;
+    ProgressItem* progress = new ProgressItem(QObject::tr("Engraving Data"), ProgressItem::PT_Simple, parentProgress);
     progress->setMaximum(mat.rows);
     for (int r = 0; r < mat.rows; r++)
     {
@@ -293,22 +295,14 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
         {
             if (r == 0)
             {
-                xStart = left - lastPoint.x();
+                xStart = left;
                 xEnd = width;
-                yStart = top - lastPoint.y();
+                yStart = top;
             }
             else
             {
-                if (forward)
-                {
-                    xStart = 0;
-                    xEnd = width;
-                }
-                else
-                {
-                    xEnd = width;
-                    xStart = 0;
-                }
+                xStart = 0;
+                xEnd = width;
                 yStart = rowInterval * r;
             }
         }
@@ -374,17 +368,11 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
             //fspc.setSame(same);
             if (forward)
             {
-                //lastPoint = QPoint(right + accLength, top + r * rowInterval);
-                lastPoint = QPoint(right, top + r * rowInterval);
                 stream << yStart << xStart << xEnd << fspc.code;
-                //qLogD << yStart << ", " << xStart << ", " << xEnd;
             }
             else
             {
-                //lastPoint = QPoint(left - accLength, top + r * rowInterval);
-                lastPoint = QPoint(left, top + r * rowInterval);
                 stream << yStart << xEnd << xStart << fspc.code;
-                //qLogD << yStart << ", " << xEnd << ", " << xStart;
             }
 
             for (int i = 0; i < rowBytes.length(); i++)
@@ -396,9 +384,11 @@ QByteArray imageUtils::image2EngravingData(ProgressItem* progress, cv::Mat mat,
 
         progress->increaseProgress();
     }
+    //lastPoint = topLeft;
 
     progress->finish();
 
+    lastPoint = boundingRect.topLeft();
     //parseImageData(bytes, rowInterval);
 
     return bytes;
