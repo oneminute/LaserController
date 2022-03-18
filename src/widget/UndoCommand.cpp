@@ -45,6 +45,7 @@ void SelectionUndoCommand::redo()
     for (QGraphicsItem* primitive : m_redoSelectedList.keys()) {
         redoList.insert(primitive);
     }
+    emit m_viewer->selectedSizeChanged();
 	if(!m_viewer || !m_viewer->group()|| list == redoList){
 		return;
 	}
@@ -221,6 +222,7 @@ void AddDelUndoCommand::redo()
 		//����ӵ�scene
         if (m_primitiveList.isEmpty()) {
             for each(QGraphicsItem* item in m_list) {
+                
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
                 //m_scene->addLaserPrimitive(primitive, true);
                 m_scene->document()->addPrimitive(primitive, false, false);
@@ -1430,6 +1432,7 @@ void CommonSelectionCommand::undo()
         m_group->addToGroup(p);
         p->setSelected(true);
     }
+    emit m_viewer->selectedSizeChanged();
     m_viewer->viewport()->repaint();
 }
 
@@ -1460,6 +1463,7 @@ void CommonSelectionCommand::redo()
     if (!m_viewer->group()->isEmpty() && StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
         emit m_viewer->idleToSelected();
     }
+    emit m_viewer->selectedSizeChanged();
     m_viewer->viewport()->repaint();
 }
 
@@ -2120,6 +2124,7 @@ void StampTextSpinBoxUndoCommand::redo()
 LaserPrimitiveSpinBoxUndoCommand::LaserPrimitiveSpinBoxUndoCommand(LaserViewer* viewer, LaserPrimitive* p, LaserDoubleSpinBox* spinBox, qreal lastValue, qreal value, int type, bool isRedo)
     :m_viewer(viewer), m_spinBox(spinBox), m_redoValue(value),m_undoValue(lastValue),m_isRedo(isRedo), m_type(type), m_primitive(p)
 {
+    m_primitiveType = p->primitiveType();
 }
 
 LaserPrimitiveSpinBoxUndoCommand::~LaserPrimitiveSpinBoxUndoCommand()
@@ -2129,34 +2134,8 @@ LaserPrimitiveSpinBoxUndoCommand::~LaserPrimitiveSpinBoxUndoCommand()
 void LaserPrimitiveSpinBoxUndoCommand::undo()
 {
     m_isRedo = true;
-    switch (m_type) {
-        
-    case 0: {//bounds width
-        m_primitive->setBoundingRectWidth(m_undoValue);
-        break;
-    }
-        
-    case 1: {//bounds height
-        m_primitive->setBoundingRectHeight(m_undoValue);
-        
-        break;
-    }
-    case 2: {
-        int pt = m_primitive->primitiveType();
-        if (pt == LPT_FRAME) {
-            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(m_primitive);
-            frame->setBorderWidth(m_undoValue);
-        }
-        else if (pt == LPT_RING) {
-            LaserRing* ring = qgraphicsitem_cast<LaserRing*>(m_primitive);
-            ring->setBorderWidth(m_undoValue);
-        }
-        break;
-    }
-    }
-    m_spinBox->setValue(m_undoValue * 0.001);
-    emit m_viewer->selectedChangedFromMouse();
-    m_viewer->viewport()->repaint();
+    handle(m_undoValue);
+    
 }
 
 void LaserPrimitiveSpinBoxUndoCommand::redo()
@@ -2165,7 +2144,7 @@ void LaserPrimitiveSpinBoxUndoCommand::redo()
         emit m_viewer->selectedChangedFromMouse();
         return;
     }
-    switch (m_type) {
+    /*switch (m_type) {
     case 0: {//bounds width
         m_primitive->setBoundingRectWidth(m_redoValue);
         break;
@@ -2188,8 +2167,65 @@ void LaserPrimitiveSpinBoxUndoCommand::redo()
         
         break;
     }
+    }*/
+    handle(m_redoValue);
+}
+
+void LaserPrimitiveSpinBoxUndoCommand::handle(qreal _v)
+{
+    switch (m_type) {
+
+    case 0: {//bounds width
+        m_primitive->setBoundingRectWidth(_v);
+        break;
     }
-    m_spinBox->setValue(m_redoValue * 0.001);
+
+    case 1: {//bounds height
+        m_primitive->setBoundingRectHeight(_v);
+
+        break;
+    }
+    case 2: {//border width
+        if (m_primitiveType == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(m_primitive);
+            frame->setBorderWidth(_v);
+        }
+        else if (m_primitiveType == LPT_RING) {
+            LaserRing* ring = qgraphicsitem_cast<LaserRing*>(m_primitive);
+            ring->setBorderWidth(_v);
+        }
+        break;
+    }
+    case 3: {//corner radius
+        //LaserDoubleSpinBox* cornerRadiusSpinBox = LaserApplication::mainWindow->commonCornerRadius();
+        //qreal value = cornerRadiusSpinBox->value();
+        if (m_primitiveType == LPT_FRAME) {
+            LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(m_primitive);
+            QRectF rect = frame->boundingRect();
+            qreal shorter = rect.width();
+            if (shorter > rect.height()) {
+                shorter = rect.height();
+            }
+            if (_v > shorter * 0.5) {
+                _v = shorter * 0.5;
+            }
+            frame->setCornerRadius(_v, frame->cornerRadiusType());
+        }
+        else if (m_primitiveType == LPT_RECT) {
+            LaserRect* laserRect = qgraphicsitem_cast<LaserRect*>(m_primitive);
+            QRectF rect = laserRect->boundingRect();
+            qreal shorter = rect.width();
+            if (shorter > rect.height()) {
+                shorter = rect.height();
+            }
+            if (_v > shorter * 0.5) {
+                _v = shorter * 0.5;
+            }
+            laserRect->setCornerRadius(_v, laserRect->cornerType());
+        }
+    }
+    }
+    m_spinBox->setValue(_v * 0.001);
     emit m_viewer->selectedChangedFromMouse();
     m_viewer->viewport()->repaint();
 }

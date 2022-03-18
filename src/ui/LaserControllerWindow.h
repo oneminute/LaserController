@@ -113,7 +113,7 @@ public:
     LaserDoubleSpinBox* textAngle();
     LaserDoubleSpinBox* originalBoundsHeight();
     LaserDoubleSpinBox* originalBoundsWidth();
-    LaserDoubleSpinBox* originalBoundsDiameter();
+    LaserDoubleSpinBox* commonCornerRadius();
     LaserDoubleSpinBox* originalBoundsSize();
 public slots:
     void handleSecurityException(int code, const QString& message);
@@ -588,7 +588,7 @@ private:
     LaserDoubleSpinBox* m_textHeight;
     QLabel* m_textSpaceLabel;
     LaserDoubleSpinBox* m_textSpace;
-    QCheckBox* m_textFill;
+    QCheckBox* m_stampIntaglio;
     QCheckBox* m_textBold;
     QCheckBox* m_textItalic;
     QCheckBox* m_textUpperCase;

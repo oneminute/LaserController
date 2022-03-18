@@ -144,7 +144,8 @@ public slots:
     void load(const QString& filename, QWidget* window);
     int totalNodes();
     void updateDocumentBounding();
-
+    QMap<LaserLayer*, QImage> generateStampImages();
+    void computeStampBasePath(LaserPrimitive* primitive, QPainter& painter, qreal offset, QTransform t1, QTransform t2);
 protected:
 	void init();
     void outlineByLayers(OptimizeNode* node, ProgressItem* parentProgress);

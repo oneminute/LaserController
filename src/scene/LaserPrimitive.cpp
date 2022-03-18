@@ -15,6 +15,7 @@
 #include <QJsonObject>
 #include <QImageReader>
 #include <QStack>
+#include <QBitmap>
 
 #include "LaserApplication.h"
 #include "LaserScene.h"
@@ -78,6 +79,7 @@ public:
     bool isJoinedGroup;
     bool isAlignTarget;
     QSet<LaserPrimitive*>* joinedGroupList;
+    bool stampIntaglio;//和印章相关的属性 阴刻，凹下
     //QRect variableBounds;//circleText，horizontalText，verticalText中使用，方便改变外包框
 };
 
@@ -830,6 +832,22 @@ bool LaserPrimitive::isAvailable() const
     return true;
 }
 
+bool LaserPrimitive::stampIntaglio()
+{
+    Q_D(LaserPrimitive);
+    return d->stampIntaglio;
+}
+
+void LaserPrimitive::setStampIntaglio(bool bl)
+{
+    Q_D(LaserPrimitive);
+    d->stampIntaglio = bl;
+}
+
+bool LaserPrimitive::isStamepPrimitive()
+{
+    return false;
+}
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
@@ -1020,6 +1038,18 @@ LaserPrimitive * LaserEllipse::clone(QTransform t)
 	return ellipse;
 }
 
+void LaserEllipse::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserEllipse);
+    setBounds(QRect(d->boundingRect.left(), d->boundingRect.top(), width, d->boundingRect.height()));
+}
+
+void LaserEllipse::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserEllipse);
+    setBounds(QRect(d->boundingRect.left(), d->boundingRect.top(), d->boundingRect.width(), height));
+}
+
 bool LaserEllipse::isClosed() const
 {
     return true;
@@ -1039,7 +1069,7 @@ public:
         : LaserShapePrivate(ptr)
         , cornerRadius(0)
     {}
-
+    int cornerType;
     int cornerRadius;
 };
 
@@ -1078,9 +1108,16 @@ int LaserRect::cornerRadius() const
     return d->cornerRadius;
 }
 
+int LaserRect::cornerType() const
+{
+    Q_D(const LaserRect);
+    return d->cornerType;
+}
+
 void LaserRect::setCornerRadius(int cornerRadius, int type)
 {
     Q_D(LaserRect);
+    d->cornerType = type;
     d->cornerRadius = cornerRadius;
     d->path = computeCornerRadius(d->boundingRect, cornerRadius, type);
 }
@@ -1198,6 +1235,19 @@ LaserPrimitive * LaserRect::clone(QTransform t)
 	Q_D(const LaserRect);
 	LaserRect* cloneRect = new LaserRect(this->rect(), this->cornerRadius(), this->document(), t, d->layerIndex);
 	return cloneRect;
+}
+
+void LaserRect::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserRect);
+    //d->boundingRect = QRect(d->boundingRect.left(), d->boundingRect.top(), width, d->boundingRect.height());
+    setRect(QRect(d->boundingRect.left(), d->boundingRect.top(), width, d->boundingRect.height()));
+}
+
+void LaserRect::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserRect);
+    setRect(QRect(d->boundingRect.left(), d->boundingRect.top(), d->boundingRect.width(), height));
 }
 
 bool LaserRect::isClosed() const
@@ -2148,6 +2198,17 @@ QRectF LaserBitmap::bounds() const
     return d->boundingRect; 
 }
 
+void LaserBitmap::setRect(QRect rect)
+{
+    Q_D(LaserBitmap);
+    d->boundingRect = rect;
+    //d->originalBoundingRect = rect;
+    d->path = QPainterPath();
+    d->path.addRect(d->boundingRect);
+    d->outline = QPainterPath();
+    d->outline.addRect(rect);
+}
+
 QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& lastPoint)
 { 
     Q_D(LaserBitmap);
@@ -2156,7 +2217,7 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
     parentProgress->setMaximum(2);
     QImage srcImage = d->image.copy();
     QImage rotated = srcImage.transformed(sceneTransform(), Qt::SmoothTransformation);
-    QImage outImage(rotated.size(), QImage::Format_ARGB32);;
+    QImage outImage(rotated.size(), QImage::Format_Grayscale8);;
     outImage.fill(Qt::white);
     QPainter p(&outImage);
     p.begin(&outImage);
@@ -2201,8 +2262,19 @@ void LaserBitmap::draw(QPainter * painter)
     Q_D(LaserBitmap);
 	
 	//QImage image = d->image.transformed(d->allTransform, Qt::TransformationMode::SmoothTransformation);
+    //painter->setBackgroundMode(Qt::TransparentMode);
+    //d->image.fill(Qt::transparent);
+    
+    
+    //d->image = d->image.createMaskFromColor(Qt::black);
+    //d->image.toImageFormat(QImage::Format_ARGB32);
+    //pixmap.fill(QColor(0, 0, 0, 125));
+    
 	painter->drawImage(d->boundingRect, d->image);
     //painter->drawRect(d->boundingRect);
+    
+    
+    //painter->drawImage()
 }
 
 QJsonObject LaserBitmap::toJson()
@@ -2323,6 +2395,25 @@ void LaserBitmap::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	QList<QGraphicsView*> views = scene()->views();
 	LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
 	viewer->onEndSelecting();
+}
+
+void LaserBitmap::setBoundingRectWidth(qreal width)
+{
+    Q_D(LaserBitmap);
+    //d->boundingRect = QRect(d->boundingRect.left(), d->boundingRect.top(), width, d->boundingRect.height());
+    //d->outline = QPainterPath();
+    //d->outline.addRect(d->boundingRect);
+    setRect(QRect(d->boundingRect.left(), d->boundingRect.top(), width, d->boundingRect.height()));
+}
+
+void LaserBitmap::setBoundingRectHeight(qreal height)
+{
+    Q_D(LaserBitmap);
+    //d->boundingRect = QRect(d->boundingRect.left(), d->boundingRect.top(), d->boundingRect.width(), height);
+    //d->outline = QPainterPath();
+    //d->outline.addRect(d->boundingRect);
+    setRect(QRect(d->boundingRect.left(), d->boundingRect.top(), d->boundingRect.width(), height));
+
 }
 
 QVector<QLineF> LaserBitmap::edges()
@@ -2992,18 +3083,20 @@ public:
     }
     qreal radius;
     QPoint centerPoint;
-    QPoint points[5];
+    QPointF points[10];
 };
 
-LaserStar::LaserStar(LaserDocument * doc, QPoint centerPos, qreal radius, QTransform transform, int layerIndex)
+LaserStar::LaserStar(LaserDocument * doc, QPoint centerPos, qreal radius, bool stampIntaglio, QTransform transform, int layerIndex)
     : LaserShape(new LaserStarPrivate(this), doc, LPT_STAR, layerIndex, transform)
 {
     Q_D(LaserStar);
+    d->stampIntaglio = stampIntaglio;
     d->radius = radius;
     d->centerPoint = centerPos;
     computePath();
     //d->originalBoundingRect = d->boundingRect;
     setTransform(transform);
+    setZValue(3);
 }
 
 LaserStar::~LaserStar()
@@ -3013,10 +3106,23 @@ LaserStar::~LaserStar()
 void LaserStar::draw(QPainter * painter)
 {
     Q_D(LaserStar);
-    d->path.setFillRule(Qt::WindingFill);
+    /*d->path.setFillRule(Qt::WindingFill);
     painter->setBrush(QBrush(this->layer()->color()));
     painter->drawPath(d->path);
-    painter->setBrush(Qt::NoBrush);
+    painter->setBrush(Qt::NoBrush);*/
+    d->path.setFillRule(Qt::WindingFill);
+    if (!d->stampIntaglio) {
+        painter->setBrush(QBrush(this->layer()->color()));
+        painter->drawPath(d->path);
+        painter->setBrush(Qt::NoBrush);
+    }
+    else {
+        painter->setBrush(Qt::white);
+        painter->drawPath(d->path);
+        painter->setBrush(Qt::NoBrush);
+
+    }
+    
 }
 
 QJsonObject LaserStar::toJson()
@@ -3045,7 +3151,7 @@ QJsonObject LaserStar::toJson()
 LaserPrimitive * LaserStar::clone(QTransform t)
 {
     Q_D(LaserStar);
-    LaserStar* star = new LaserStar(document(),d->centerPoint, d->radius, t, d->layerIndex);
+    LaserStar* star = new LaserStar(document(),d->centerPoint, d->radius, d->stampIntaglio, t, d->layerIndex);
     return star;
 }
 
@@ -3073,14 +3179,30 @@ void LaserStar::computePath()
         d->centerPoint.y() + d->radius * sin54);
     d->points[4] = QPoint(d->centerPoint.x() - d->radius * cos18,
         d->centerPoint.y() - d->radius * sin18);
+    //计算交点
+    QLineF line0(d->points[0], d->points[2]);
+    QLineF line1(d->points[0], d->points[3]);
+    QLineF line2(d->points[1], d->points[3]);
+    QLineF line3(d->points[1], d->points[4]);
+    QLineF line4(d->points[4], d->points[2]);
+    QPointF p;
+    line0.intersect(line3, &(d->points[5]));
+    line0.intersect(line2, &(d->points[6]));
+    line4.intersect(line2, &(d->points[7]));
+    line4.intersect(line1, &(d->points[8]));
+    line3.intersect(line1, &(d->points[9]));
     //计算路径
     d->path.moveTo(d->points[0]);
-    d->path.lineTo(d->points[2]);
-    d->path.lineTo(d->points[4]);
+    d->path.lineTo(d->points[5]);
     d->path.lineTo(d->points[1]);
+    d->path.lineTo(d->points[6]);
+    d->path.lineTo(d->points[2]);
+    d->path.lineTo(d->points[7]);
     d->path.lineTo(d->points[3]);
+    d->path.lineTo(d->points[8]);
+    d->path.lineTo(d->points[4]);
+    d->path.lineTo(d->points[9]);
     d->path.closeSubpath();
-
     d->boundingRect = d->path.boundingRect().toRect();
 }
 
@@ -3151,6 +3273,11 @@ void LaserStar::setBoundingRectHeight(qreal height)
     computePath();
 }
 
+bool LaserStar::isStamepPrimitive()
+{
+    return true;
+}
+
 class LaserPartyEmblemPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserPartyEmblem)
@@ -3162,15 +3289,17 @@ public:
     qreal radius;
     QPoint centerPoint;
 };
-LaserPartyEmblem::LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, QTransform transform,
+LaserPartyEmblem::LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, bool stampIntaglio, QTransform transform,
     int layerIndex) 
     :LaserShape(new LaserPartyEmblemPrivate(this), doc, LPT_PARTYEMBLEM, layerIndex, transform)
 {
     Q_D(LaserPartyEmblem);
+    d->stampIntaglio = stampIntaglio;
     d->centerPoint = centerPos;
     d->radius = radius;
     setTransform(transform);
     computePath();
+    setZValue(3);
 }
 LaserPartyEmblem::~LaserPartyEmblem()
 {
@@ -3179,7 +3308,13 @@ LaserPartyEmblem::~LaserPartyEmblem()
 void LaserPartyEmblem::draw(QPainter* painter)
 {
     Q_D(const LaserPartyEmblem);
-    painter->setBrush(QBrush(this->layer()->color()));
+    if (!d->stampIntaglio) {
+        painter->setBrush(QBrush(Qt::white));
+    }
+    else {
+        painter->setBrush(QBrush(this->layer()->color()));
+        
+    }
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
 }
@@ -3210,7 +3345,7 @@ QJsonObject LaserPartyEmblem::toJson()
 LaserPrimitive* LaserPartyEmblem::clone(QTransform t)
 {
     Q_D(LaserPartyEmblem);
-    return new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, t, d->layerIndex);
+    return new LaserPartyEmblem(d->doc, d->centerPoint, d->radius,d->stampIntaglio, t, d->layerIndex);
 }
 
 QVector<QLineF> LaserPartyEmblem::edges()
@@ -3358,6 +3493,11 @@ void LaserPartyEmblem::setBoundingRectHeight(qreal height)
     computePath();
 }
 
+bool LaserPartyEmblem::isStamepPrimitive()
+{
+    return true;
+}
+
 class LaserRingPrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserRing)
@@ -3373,11 +3513,18 @@ public:
     QRectF innerBounds;
     QPainterPath outerPath;
     QPainterPath innerPath;
+    QPixmap mask;
+    bool isInner;//是否是内圈
 };
-LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransform transform, int layerIndex) 
+LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, bool stampIntaglio,QTransform transform, int layerIndex)
     :LaserShape(new LaserRingPrivate(this), doc, LPT_RING, layerIndex, transform)
 {
     Q_D(LaserRing);
+    if (width <= 0) {
+        width = 1;
+    }
+    d->isInner = false;
+    d->stampIntaglio = stampIntaglio;
     d->width = qAbs(width);
     d->outerBounds = outerRect;
     d->innerBounds = QRectF(QPointF(outerRect.topLeft().x() + d->width, outerRect.topLeft().y() + d->width), 
@@ -3386,6 +3533,15 @@ LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, QTransfo
     d->innerPath.addEllipse(d->innerBounds);
     computePath();
     setTransform(transform);
+    setZValue(1);
+    //mask
+    /*qreal w = d->boundingRect.width() * 0.28;
+    qreal h = d->boundingRect.height() * 0.28;
+    d->mask  = QPixmap (":/ui/icons/images/fingerprint.png");
+    QTransform t;
+    t.scale(w / d->mask.width(), h / d->mask.height());
+    d->mask = d->mask.transformed(t);
+    d->mask = d->mask.createMaskFromColor(Qt::transparent);*/
 }
 LaserRing::~LaserRing()
 {
@@ -3393,10 +3549,46 @@ LaserRing::~LaserRing()
 void LaserRing::draw(QPainter * painter)
 {
     Q_D(LaserRing);
-    painter->setBrush(QBrush(this->layer()->color()));
-    painter->drawPath(d->path);
+    if (!d->isInner) {
+        if (!d->stampIntaglio) {
+            painter->setBrush(Qt::white);
+            painter->drawPath(d->outerPath);
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->path);
+        }
+        else {
+            //painter->setBrush(Qt::white);
+            //painter->drawPath(d->outerPath);
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->outerPath);
+        }
+    }
+    else {
+        if (!d->stampIntaglio) {
+            painter->setBrush(Qt::white);
+            painter->drawPath(d->outerPath);
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->path);
+        }
+        else {
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->outerPath);
+            painter->setBrush(Qt::white);
+            painter->drawPath(d->path);
+        }
+    }
+    
     painter->setBrush(Qt::NoBrush);
     
+    /*int len = image.width() * image.height();
+    for (int i = 0; i < image.width(); i++) {
+        for (int j = 0; j < image.height(); j++) {
+            QRgb rgb = image.pixel(i, j);
+            if (qGray(rgb) == 255) {
+                image.setPixel(i, j, QColor(0, 0, 0, 0).rgba());
+            }
+        }
+    }*/   
 }
 QJsonObject LaserRing::toJson()
 {
@@ -3423,7 +3615,7 @@ QJsonObject LaserRing::toJson()
 LaserPrimitive * LaserRing::clone(QTransform t)
 {
     Q_D(LaserRing);
-    LaserRing* ring = new LaserRing(document(), d->outerBounds, d->width, t, d->layerIndex);
+    LaserRing* ring = new LaserRing(document(), d->outerBounds, d->width,d->stampIntaglio, t, d->layerIndex);
     return ring;
 }
 QVector<QLineF> LaserRing::edges()
@@ -3461,6 +3653,36 @@ QRectF LaserRing::innerRect()
 {
     Q_D(const LaserRing);
     return d->innerBounds;
+}
+
+QPainterPath LaserRing::outerPath()
+{
+    Q_D(const LaserRing);
+    return d->outerPath;
+}
+
+QPainterPath LaserRing::innerPath()
+{
+    Q_D(const LaserRing);
+    return d->innerPath;
+}
+
+void LaserRing::setInner(bool bl)
+{
+    Q_D(LaserRing);
+    d->isInner = bl;
+    if (bl) {
+        setZValue(2);
+    }
+    else {
+        setZValue(1);
+    }
+}
+
+bool LaserRing::isInner()
+{
+    Q_D(LaserRing);
+    return d->isInner;
 }
 
 void LaserRing::setBorderWidth(qreal w)
@@ -3514,6 +3736,11 @@ void LaserRing::setBoundingRectHeight(qreal height)
     computePath();
 }
 
+bool LaserRing::isStamepPrimitive()
+{
+    return true;
+}
+
 class LaserFramePrivate : public LaserShapePrivate
 {
     Q_DECLARE_PUBLIC(LaserFrame)
@@ -3530,13 +3757,19 @@ public:
     QPainterPath innerPath;
     int cornerType;
     bool needAuxiliaryLine;
+    bool isInner;//内框
 };
 
-LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornnerRadilus,
+LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornnerRadilus, bool stampIntaglio,
     QTransform transform, int layerIndex, int cornerType)
     :LaserShape(new LaserFramePrivate(this), doc, LPT_FRAME, layerIndex, transform)
 {
     Q_D(LaserFrame);
+    if (width <= 0) {
+        width = 1;
+    }
+    d->isInner = false;
+    d->stampIntaglio = stampIntaglio;
     d->needAuxiliaryLine = true;
     d->outerRect = outerRect;
     d->width = width;
@@ -3548,6 +3781,7 @@ LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal c
     
     //d->originalBoundingRect = d->boundingRect;
     setTransform(transform);
+    setZValue(1);
 }
 
 LaserFrame::~LaserFrame()
@@ -3556,10 +3790,35 @@ LaserFrame::~LaserFrame()
 void LaserFrame::draw(QPainter * painter)
 {
     Q_D(LaserFrame);
-    painter->setBrush(QBrush(this->layer()->color()));
-    painter->drawPath(d->path);
-    painter->setBrush(Qt::NoBrush);
+    if (!d->isInner) {
+        if (!d->stampIntaglio) {
+            painter->setBrush(Qt::white);
+            painter->drawPath(d->outerPath);
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->path);
+        }
+        else {
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->outerPath);
+        }
+    }
+    else {
+        painter->setPen(Qt::NoPen);
+        if (!d->stampIntaglio) {
+            painter->setBrush(Qt::white);
+            painter->drawPath(d->outerPath);
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->path);
+        }
+        else {
+            painter->setBrush(QBrush(this->layer()->color()));
+            painter->drawPath(d->innerPath);
+            painter->setBrush(Qt::white);
+            painter->drawPath(d->path);
+        }
+    }
     
+    painter->setBrush(Qt::NoBrush);
     //绘制辅助线
     if (d->needAuxiliaryLine) {
         painter->setPen(QPen(Qt::black, 280, Qt::DotLine));
@@ -3606,7 +3865,7 @@ QJsonObject LaserFrame::toJson()
 LaserPrimitive * LaserFrame::clone(QTransform t)
 {
     Q_D(LaserFrame);
-    LaserFrame* frame = new LaserFrame(document(), d->outerRect, d->width, d->cornerRadius, 
+    LaserFrame* frame = new LaserFrame(document(), d->outerRect, d->width, d->cornerRadius, d->stampIntaglio,
         t, d->layerIndex);
     return frame;
 }
@@ -3614,6 +3873,32 @@ QVector<QLineF> LaserFrame::edges()
 {
     Q_D(LaserFrame);
     return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+void LaserFrame::setInner(bool bl)
+{
+    Q_D(LaserFrame);
+    d->isInner = bl;
+    if (bl) {
+        setZValue(2);
+    }
+    else {
+        setZValue(1);
+    }
+}
+bool LaserFrame::isInner()
+{
+    Q_D(LaserFrame);
+    return d->isInner;
+}
+QPainterPath LaserFrame::outerPath()
+{
+    Q_D(LaserFrame);
+    return d->outerPath;
+}
+QPainterPath LaserFrame::innerPath()
+{
+    Q_D(LaserFrame);
+    return d->innerPath;
 }
 void LaserFrame::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
@@ -3666,6 +3951,9 @@ QRectF LaserFrame::innerRect()
 void LaserFrame::setBorderWidth(qreal w)
 {
     Q_D(LaserFrame);
+    if (w <= 0) {
+        w = 1;
+    }
     d->width = w;
     d->innerRect = QRect(QPoint(d->outerRect.topLeft().x() + w, d->outerRect.topLeft().y() + w),
         QPoint(d->outerRect.bottomRight().x() - w, d->outerRect.bottomRight().y() - w));
@@ -3681,6 +3969,7 @@ qreal LaserFrame::borderWidth()
 void LaserFrame::computePath()
 {
     Q_D(LaserFrame);
+    
     d->path = d->outerPath - d->innerPath;
     d->boundingRect = d->path.boundingRect().toRect();
 }
@@ -3714,6 +4003,12 @@ void LaserFrame::setBoundingRectHeight(qreal height)
     d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, d->cornerType);
     computePath();
 }
+
+bool LaserFrame::isStamepPrimitive()
+{
+    return true;
+}
+
 QDebug operator<<(QDebug debug, const QRect& rect)
 {
     QDebugStateSaver saver(debug);
@@ -3737,10 +4032,10 @@ public:
     bool uppercase;
     QString family;
     qreal fontPiexlSize;
-    bool isFill;
+    
 };
 LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
-    QSize size, qreal space, bool bold, bool italic, bool uppercase, bool isFill, QString family)
+    QSize size, qreal space, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family)
     :LaserShape(ptr, doc, type, layerIndex, transform)
 {
     Q_D(LaserStampText);
@@ -3752,11 +4047,25 @@ LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,La
     d->uppercase = uppercase;
     d->family = family;
     d->fontPiexlSize = size.height();
-    d->isFill = isFill;
-
+    d->stampIntaglio = stampIntaglio;
+    setZValue(3);
 }
 
 LaserStampText::~LaserStampText() {}
+
+void LaserStampText::draw(QPainter* painter)
+{
+    Q_D(LaserStampText);
+    if (!d->stampIntaglio) {
+        painter->setBrush(QBrush(this->layer()->color()));
+    }
+    else {
+        painter->setBrush(QBrush(Qt::white));
+        
+    }
+    painter->drawPath(d->path);
+    painter->setBrush(Qt::NoBrush);
+}
 
 void LaserStampText::setContent(QString content)
 {
@@ -3797,17 +4106,7 @@ bool LaserStampText::italic()
     return d->italic;
 }
 
-bool LaserStampText::isFill()
-{
-    Q_D(LaserStampText);
-    return d->isFill;
-}
 
-void LaserStampText::setFill(bool bl)
-{
-    Q_D(LaserStampText);
-    d->isFill = bl;
-}
 
 void LaserStampText::setUppercase(bool uppercase)
 {
@@ -3847,6 +4146,11 @@ QSize LaserStampText::textSize()
     return d->size;
 }
 
+bool LaserStampText::isStamepPrimitive()
+{
+    return true;
+}
+
 class LaserCircleTextPrivate : public LaserStampTextPrivate
 {
     Q_DECLARE_PUBLIC(LaserCircleText)
@@ -3867,19 +4171,21 @@ public:
     qreal minRadian, maxRadian;
     QRectF circleBounds;
     qreal horizontalPathHeight;
+    qreal offsetRotateAngle;
     //bool bold;
     //bool italic;
     //bool uppercase;
 };
 
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    bool bold, bool italic,bool uppercase, bool isFill, QString family, qreal sapce, 
+    bool bold, bool italic,bool uppercase, bool stampIntaglio, QString family, qreal sapce,
     bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
-    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, sapce, bold, italic, uppercase, isFill, family)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, sapce, bold, italic, uppercase, stampIntaglio, family)
 {
     Q_D(LaserCircleText);
     //d->content = content;
-    d->isFill = isFill;
+    d->offsetRotateAngle = 0;
+    d->stampIntaglio = stampIntaglio;
     d->circleBounds = bounds.toRect();
     //d->boundingRect = bounds.toRect();
     if (!isInit) {
@@ -3894,6 +4200,7 @@ LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bou
     d->angle = angle;
     computeTextPath(d->angle, size, isInit);
     //d->path.addRect(d->boundingRect);
+    
 }
 
 LaserCircleText::~LaserCircleText()
@@ -4117,7 +4424,7 @@ QTransform LaserCircleText::rotateText(int i, QPointF textPos)
     else {
         rotateAngle = -rotateAngle;
     }
-    t2.rotate(rotateAngle);
+    t2.rotate(rotateAngle+d->offsetRotateAngle);
     return t2;
 }
 
@@ -4244,6 +4551,11 @@ void LaserCircleText::setAngle(qreal angle, bool needInit)
     d->arcPath = QPainterPath();
     d->arcPath.arcMoveTo(textArcRect(), qRadiansToDegrees( d->maxRadian) );
     d->arcPath.arcTo(textArcRect(), qRadiansToDegrees(d->maxRadian), -d->angle);
+}
+void LaserCircleText::setOffsetRotateAngle(qreal offsetAngle)
+{
+    Q_D(LaserCircleText);
+    d->offsetRotateAngle = offsetAngle;
 }
 void LaserCircleText::setTextSize(QSize size, bool needInit)
 {
@@ -4426,25 +4738,13 @@ QPointF LaserCircleText::centerPoint()
 
 void LaserCircleText::draw(QPainter * painter)
 {
-    Q_D(LaserCircleText);
-    QPainterPath ellipse;
-    ellipse.addEllipse(d->circleBounds);
-    
-    if (d->isFill) {
-        painter->setBrush(QBrush(this->layer()->color()));
-        painter->drawPath(d->path);
-        painter->setBrush(Qt::NoBrush);
-    }
-    else {
-        //painter->setPen(QPen(this->layer()->color()));
-        painter->drawPath(d->path);
-    }
+    LaserStampText::draw(painter);
 }
 
 LaserPrimitive * LaserCircleText::clone(QTransform t)
 {
     Q_D(LaserCircleText);
-    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->isFill, d->family,d->space, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
+    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->stampIntaglio, d->family,d->space, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
     return nullptr;
 }
 
@@ -4477,7 +4777,7 @@ QJsonObject LaserCircleText::toJson()
     object.insert("italic", d->italic);
     object.insert("uppercase", d->uppercase);
     object.insert("family", d->family);
-    object.insert("fill", d->isFill);
+    object.insert("stampIntaglio", d->stampIntaglio);
     object.insert("space", d->space);
     return object;
 }
@@ -4570,13 +4870,13 @@ public:
 };
 
 LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QSize size,
-    QPointF center, bool bold, bool italic, bool uppercase, bool isFill, QString family,
+    QPointF center, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family,
     qreal space, QTransform transform, int layerIndex)
     :LaserStampText(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT,
-        content, transform, layerIndex, size, space, bold, italic, uppercase,isFill, family)
+        content, transform, layerIndex, size, space, bold, italic, uppercase, stampIntaglio, family)
 {
     Q_D(LaserHorizontalText);
-    d->isFill = isFill;
+    d->stampIntaglio = stampIntaglio;
     setTransform(transform);
     d->center = center;
     computeTextPath();
@@ -4666,22 +4966,13 @@ void LaserHorizontalText::toCenter()
 
 void LaserHorizontalText::draw(QPainter * painter)
 {
-    Q_D(LaserHorizontalText);
-    if (d->isFill) {
-        painter->setBrush(QBrush(this->layer()->color()));
-        painter->drawPath(d->path);
-        painter->setBrush(Qt::NoBrush);
-    }
-    else {
-        //painter->setPen(QPen(this->layer()->color()));
-        painter->drawPath(d->path);
-    }
+    LaserStampText::draw(painter);
 }
 
 LaserPrimitive * LaserHorizontalText::clone(QTransform t)
 {
     Q_D(LaserHorizontalText);
-    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->center,d->bold,d->italic,d->uppercase,d->isFill,d->family, d->space, t, d->layerIndex);
+    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->center,d->bold,d->italic,d->uppercase,d->stampIntaglio,d->family, d->space, t, d->layerIndex);
     return hText;
 }
 
@@ -4711,7 +5002,7 @@ QJsonObject LaserHorizontalText::toJson()
     object.insert("bold", d->bold);
     object.insert("italic", d->italic);
     object.insert("family", d->family);
-    object.insert("fill", d->isFill);
+    object.insert("stampIntaglio", d->stampIntaglio);
     return object;
 }
 
@@ -4754,6 +5045,7 @@ void LaserHorizontalText::setBoundingRectWidth(qreal width)
         d->center = QPointF(d->center.x(), d->center.y());
         computeTextPath();
     }
+    LaserApplication::mainWindow->originalBoundsWidth()->setValue(d->boundingRect.width() * 0.001);
 }
 
 void LaserHorizontalText::setSpace(qreal space)
@@ -4808,10 +5100,10 @@ public:
     QPointF center;
 };
 LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size, 
-    QPointF center, bool bold, bool italic,bool uppercase, bool isFill, QString family,
+    QPointF center, bool bold, bool italic,bool uppercase, bool stampIntaglio, QString family,
     qreal space, QTransform transform, int layerIndex)
     :LaserStampText(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT,content, transform, layerIndex,
-        size,space, bold, italic, uppercase, isFill, family)
+        size,space, bold, italic, uppercase, stampIntaglio, family)
 {
     Q_D(LaserVerticalText);
     d->center = center;
@@ -4891,23 +5183,14 @@ void LaserVerticalText::toCenter()
 
 void LaserVerticalText::draw(QPainter * painter)
 {
-    Q_D(LaserVerticalText);
-    if (d->isFill) {
-        painter->setBrush(QBrush(this->layer()->color()));
-        painter->drawPath(d->path);
-        painter->setBrush(Qt::NoBrush);
-    }
-    else {
-        //painter->setPen(QPen(this->layer()->color()));
-        painter->drawPath(d->path);
-    }
+    LaserStampText::draw(painter);
     
 }
 
 LaserPrimitive * LaserVerticalText::clone(QTransform t)
 {
     Q_D(LaserVerticalText);
-    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->center,d->bold, d->italic,d->uppercase, d->isFill, d->family, d->space, t, d->layerIndex);
+    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->center,d->bold, d->italic,d->uppercase, d->stampIntaglio, d->family, d->space, t, d->layerIndex);
     return text;
 }
 
@@ -4938,7 +5221,7 @@ QJsonObject LaserVerticalText::toJson()
     object.insert("italic", d->italic);
     object.insert("uppercase", d->uppercase);
     object.insert("family", d->family);
-    object.insert("fill", d->isFill);
+    object.insert("stampIntaglio", d->stampIntaglio);
     return object;
 }
 
@@ -4978,7 +5261,7 @@ void LaserVerticalText::setBoundingRectHeight(qreal height)
         //d->center = QPointF(d->center.x(), d->center.y());
         computeTextPath();
     }
-    
+    LaserApplication::mainWindow->originalBoundsHeight()->setValue(d->boundingRect.height() * 0.001);
 }
 
 void LaserVerticalText::setSpace(qreal space)

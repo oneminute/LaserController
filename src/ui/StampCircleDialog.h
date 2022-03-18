@@ -38,7 +38,7 @@ private:
     QList<QMap<QModelIndex, itemStruct>> m_tablesModelList;
     QString m_textRowProperty[5] = {
         QString(tr("Top Circle Text")), QString(tr("Horizontal Text")), QString(tr("Bottom Circle Text")),
-        QString(tr("Horizontal Invoice Number")), QString("Bottom Horizontal Number")
+        QString(tr("Horizontal Invoice Number")), QString(tr("Bottom Horizontal Number"))
     };
     QString m_textInitRowContent[5] = {
         QString(tr("Laser Test Seal")), QString(tr("Horizontal Text")), QString(tr("1234567890123")), 

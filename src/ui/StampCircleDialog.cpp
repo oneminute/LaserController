@@ -88,18 +88,6 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
     m_ui->InnerCircleMarginDoubleSpinBox->setMaximum(DBL_MAX);
     m_ui->InnerCircleBorderDoubleSpinBox->setValue(0.5);
     m_ui->InnerCircleBorderDoubleSpinBox->setMaximum(DBL_MAX);
-    //fill
-    connect(m_ui->fillBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
-        
-        if (checked) {
-            QPixmap icon(":/ui/icons/images/blank.png");
-            m_ui->fillBtn->setIcon(QIcon(icon));
-        }
-        else {
-            QPixmap icon(":/ui/icons/images/fill.png");
-            m_ui->fillBtn->setIcon(QIcon(icon));
-        }
-    });
     //isToRightButton
     /*connect(m_ui->isToLeftBtn, QOverload<bool>::of(&QToolButton::toggled), [=](bool checked) {
         QPixmap icon(":/ui/icons/images/toRightArrow.png");
@@ -466,8 +454,8 @@ void StampCircleDialog::addTableViewRow(int row, QString contentStr, QString fon
 
 void StampCircleDialog::accept()
 {
-    
     QDialog::accept();
+    bool stampIntaglio = m_ui->stampIntaglioCheckBox->isChecked();
     QList<LaserPrimitive*> stampList;
     //create frame
     qreal circleW = m_ui->circleDiameterSpinBox->value() * 1000;
@@ -485,7 +473,7 @@ void StampCircleDialog::accept()
     else {
         rect = QRect(point.x(), point.y(), circleW, circleW);
     }
-    LaserRing* circle = new LaserRing(m_scene->document(), rect, circleBorder, QTransform(), m_viewer->curLayerIndex());
+    LaserRing* circle = new LaserRing(m_scene->document(), rect, circleBorder, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
     stampList.append(circle);
     LaserRing* innerCircle = nullptr;;
     QRect innerRect;
@@ -506,7 +494,8 @@ void StampCircleDialog::accept()
         
         
         innerRect = QRect (point.x() + innderMargin + circleBorder, point.y() + innderMargin + circleBorder, innerW, innerH);
-        innerCircle = new LaserRing(m_scene->document(), innerRect, innerBorder, QTransform(), m_viewer->curLayerIndex());
+        innerCircle = new LaserRing(m_scene->document(), innerRect, innerBorder, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
+        innerCircle->setInner(true);
         stampList.append(innerCircle);
     }
     
@@ -530,7 +519,6 @@ void StampCircleDialog::accept()
     QString content = m_ui->lineEdit->text().trimmed();
     bool bold = m_ui->boldBtn->isChecked();
     bool italic = m_ui->italicBtn->isChecked();
-    bool fill = !m_ui->fillBtn->isChecked();
     //bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
     QString family = m_ui->fontComboBox->currentText();
     bool containsDoubleText = false;
@@ -547,14 +535,15 @@ void StampCircleDialog::accept()
         if (content->checkState() == Qt::Unchecked) {
             continue;
         }
+        QString propertyText = property->text();
         //Top Circle Text
-        if (property->text() == m_textRowProperty[0]) {
+        if (propertyText == m_textRowProperty[0]) {
             LaserCircleText* topCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, angle,
-                bold, italic, false, fill, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
+                bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
             stampList.append(topCircleText);
         }
         //Horizontal Text
-        else if (property->text() == m_textRowProperty[1]) {
+        else if (propertyText == m_textRowProperty[1]) {
             
             qreal h, w, centerX, centerY;
             if (m_isEllipse) {
@@ -574,33 +563,38 @@ void StampCircleDialog::accept()
             QSize lineTextSize((w- textSpace*(textSize - 1))/ textSize,h);
 
             LaserHorizontalText* lineText = new LaserHorizontalText(m_scene->document(), content->text(), lineTextSize, 
-                QPointF(centerX, centerY),bold, italic, false, fill, family, textSpace, QTransform(), m_viewer->curLayerIndex());
+                QPointF(centerX, centerY),bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_viewer->curLayerIndex());
             stampList.append(lineText);
         }
         //Bottom Circle Text
-        else if (property->text() == m_textRowProperty[2]) {
-            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, 320-angle,
-                bold, italic, false, fill, family, textSpace, true,0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
+        else if (propertyText == m_textRowProperty[2]) {
+            int contentStrSize = contentStr.size();
+            QString invertContentStr;
+            for (QChar c : contentStr) {
+                invertContentStr.prepend(c);
+            }
+            
+            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), invertContentStr, textBounds, 320-angle,
+                bold, italic, false, stampIntaglio, family, textSpace, true,0.0, 0.0, QSize(), QTransform(), m_viewer->curLayerIndex());
             
             qreal hsize = bottomCircleText->textSize().height() * 0.5;
+            bottomCircleText->setOffsetRotateAngle(180);
             bottomCircleText->setTextSize(QSize(hsize, hsize), false);
-            //bottomCircleText->computeTextPath(bottomCircleText->angle(), bottomCircleText->textSize(), false);
-
             bottomCircleText->computeMoveTextPath(180);
             bottomCircleText->recompute();
             stampList.append(bottomCircleText);
         }
         //Horizontal Invoice Number
-        else if (property->text() == m_textRowProperty[3]) {
+        else if (propertyText == m_textRowProperty[3]) {
             qreal h = 5600;
             qreal w = rect.width() * (2.0 / 3.0);
             QSize size((w - (textSize - 1) * textSpace) / textSize, h);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, rect.center(),
-                bold, italic, false, fill, family, textSpace, QTransform(), m_viewer->curLayerIndex());
+                bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_viewer->curLayerIndex());
             stampList.append(text);
         }
         //Horizontal Bottom Number
-        else if (property->text() == m_textRowProperty[4]) {
+        else if (propertyText == m_textRowProperty[4]) {
             qreal h = 3400;
             qreal w = 3400 * 1.5;
             qreal centerY;
@@ -614,7 +608,7 @@ void StampCircleDialog::accept()
             }
             QPoint center(rect.center().x(), centerY);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, center,
-                bold, italic, false, fill, family, textSpace, QTransform(), m_viewer->curLayerIndex());
+                bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_viewer->curLayerIndex());
             stampList.append(text);
         }
         
@@ -637,11 +631,11 @@ void StampCircleDialog::accept()
     }
     if (drawEmble) {
         if (emblemIndex == 0) {
-            LaserStar* star = new LaserStar(m_scene->document(), rect.center(), radius, QTransform(), m_viewer->curLayerIndex());
+            LaserStar* star = new LaserStar(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
             stampList.append(star);
         }
         else if (emblemIndex == 1) {
-            LaserPartyEmblem* party = new LaserPartyEmblem(m_scene->document(), rect.center(), radius, QTransform(), m_viewer->curLayerIndex());
+            LaserPartyEmblem* party = new LaserPartyEmblem(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
             stampList.append(party);
         }
     }
@@ -662,13 +656,22 @@ void StampCircleDialog::accept()
         else {
             diff = circleBorder + innerBorder + innerMargin;
         }
-        left1 = rect.left() + diff - 500;
-        left2 = rect.right() - diff + 500 - w;
+        qreal offset = 200;
+        if (innerCircle) {
+            offset = innerBorder * 0.3;
+        }
+        left1 = rect.left() + diff - offset;
+        left2 = rect.right() - diff + offset - w;
         QRect lineRect1(left1, top, w, h);
         QRect lineRect2(left2, top, w, h);
-        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, h * 0.5, 0);
+        qreal borderWidth = h * 0.5;
+        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, borderWidth, 0, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
+        line1->setInner(true);
+        line1->setZValue(3);
         line1->setNeedAuxiliaryLine(false);
-        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, h * 0.5, 0);
+        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, borderWidth, 0, stampIntaglio, QTransform(), m_viewer->curLayerIndex());
+        line2->setInner(true);
+        line2->setZValue(3);
         line2->setNeedAuxiliaryLine(false);
         stampList.append(line1);
         stampList.append(line2);

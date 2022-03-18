@@ -1135,19 +1135,22 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QJsonArray cArray = primitiveJson["center"].toArray();
                 qreal radius = primitiveJson["radius"].toDouble();
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
-                primitive = new LaserStar(this, center, radius, saveTransform, layerIndex);
+                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
+                primitive = new LaserStar(this, center, radius, stampIntaglio, saveTransform, layerIndex);
             }
             else if (className == "LaserPartyEmblem") {
                 QJsonArray cArray = primitiveJson["center"].toArray();
                 qreal radius = primitiveJson["radius"].toDouble();
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
-                primitive = new LaserPartyEmblem(this, center, radius, saveTransform, layerIndex);
+                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
+                primitive = new LaserPartyEmblem(this, center, radius, stampIntaglio, saveTransform, layerIndex);
             }
             else if (className == "LaserRing") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 qreal width = primitiveJson["width"].toDouble();
                 QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
-                primitive = new LaserRing(this, bounds, width, saveTransform, layerIndex);
+                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
+                primitive = new LaserRing(this, bounds, width, stampIntaglio, saveTransform, layerIndex);
             }
             else if (className == "LaserFrame") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
@@ -1155,7 +1158,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QRect bounds(boundsArray[0].toInt(), boundsArray[1].toInt(), boundsArray[2].toInt(), boundsArray[3].toInt());
                 int cornerType = primitiveJson["cornerType"].toInt();
                 qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
-                primitive = new LaserFrame(this, bounds, width, cornerRadius, saveTransform, layerIndex, cornerType);
+                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
+                primitive = new LaserFrame(this, bounds, width, cornerRadius, stampIntaglio, saveTransform, layerIndex, cornerType);
             }
             else if (className == "LaserHorizontalText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1167,9 +1171,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool bold = primitiveJson["bold"].toBool();
                 bool italic = primitiveJson["italic"].toBool();
                 bool uppercase = primitiveJson["uppercase"].toBool();
-                bool fill = primitiveJson["fill"].toBool();
+                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 QString family = primitiveJson["family"].toString();
-                primitive = new LaserHorizontalText(this, content, size, bL, bold, italic, uppercase, fill, family,space, saveTransform, layerIndex);
+                primitive = new LaserHorizontalText(this, content, size, bL, bold, italic, uppercase, stampIntaglio, family,space, saveTransform, layerIndex);
             }
             else if (className == "LaserVerticalText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1182,7 +1186,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool italic = primitiveJson["italic"].toBool();
                 bool uppercase = primitiveJson["uppercase"].toBool();
                 QString family = primitiveJson["family"].toString();
-                bool fill = primitiveJson["fill"].toBool();
+                bool fill = primitiveJson["stampIntaglio"].toBool();
                 primitive = new LaserVerticalText(this, content, size, bL, bold, italic, uppercase,fill,family, space, saveTransform, layerIndex);
             }
             else if (className == "LaserCircleText") {
@@ -1198,9 +1202,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool italic = primitiveJson["italic"].toBool();
                 bool uppercase = primitiveJson["uppercase"].toBool();
                 QString family = primitiveJson["family"].toString();
-                bool fill = primitiveJson["fill"].toBool();
+                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 qreal space = primitiveJson["space"].toDouble();
-                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase,fill,family, space, false, maxRadian, minRadian,size, saveTransform, layerIndex);
+                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase, stampIntaglio,family, space, false, maxRadian, minRadian,size, saveTransform, layerIndex);
             }
             
             if (primitive)
@@ -1282,6 +1286,180 @@ void LaserDocument::updateDocumentBounding()
 {
     Q_D(LaserDocument);
     utils::boundingRect(d->primitives.values(), d->bounding, d->engravingBounding);
+}
+
+QMap<LaserLayer*, QImage> LaserDocument::generateStampImages()
+{
+    QMap<LaserLayer*, QImage>images;
+    
+    
+    int i = 0;
+    for (LaserLayer* layer : layers()) {
+        if (layer->primitives().size() == 0) {
+            continue;
+        }
+        int maxImageSize;
+        switch (Config::Export::imageQuality())
+        {
+        case IQ_Normal:
+            maxImageSize = 1024;
+            break;
+        case IQ_High:
+            maxImageSize = 4096;
+            break;
+        case IQ_Perfect:
+            maxImageSize = 8192;
+            break;
+        }
+        
+        QRect boundingRectInDevice;
+        QList<LaserPrimitive*> pList = layer->primitives();
+        
+        utils::boundingRect(pList, boundingRectInDevice);
+        qreal offset = 2000;
+        boundingRectInDevice = QRect(boundingRectInDevice .left()-offset,  boundingRectInDevice.top() - offset, 
+            boundingRectInDevice.width() + 2*offset, boundingRectInDevice.height() + 2 * offset);
+        qreal ratio = boundingRectInDevice.width() * 1.0 / boundingRectInDevice.height();
+        
+        
+        int canvasWidth = qMin(boundingRectInDevice.width(), maxImageSize);
+        int canvasHeight = qRound(canvasWidth / ratio);
+        if (ratio < 1)
+        {
+            canvasHeight = qMin(boundingRectInDevice.height(), maxImageSize);
+            canvasWidth = qRound(canvasHeight * ratio);
+        }
+
+        QTransform t1 = QTransform::fromScale(
+            canvasWidth * 1.0 / boundingRectInDevice.width(),
+            canvasHeight * 1.0 / boundingRectInDevice.height()
+        );
+        boundingRectInDevice = t1.mapRect(boundingRectInDevice);
+        QTransform t2 = QTransform::fromTranslate(-boundingRectInDevice.x(), -boundingRectInDevice.y());
+        boundingRectInDevice = t2.mapRect(boundingRectInDevice);
+        
+        QImage image(boundingRectInDevice.width(), boundingRectInDevice.height(), QImage::Format_ARGB32);
+        image.fill(Qt::white);
+        for (LaserPrimitive* p : layer->primitives()) {
+            if(!p->isStamepPrimitive()){
+                continue;
+            }
+            QPainter painter(&image);
+            //绘制印章外面的基准线
+            computeStampBasePath(p, painter, offset, t1, t2);
+            painter.setPen(Qt::NoPen);
+            if (p->stampIntaglio()) {
+                int type = p->primitiveType();
+                QPainterPath pPath = p->getPath();
+                //QPainterPath innerPath;
+                painter.setBrush(Qt::white);
+                pPath = p->sceneTransform().map(pPath);
+                pPath = t1.map(pPath);
+                pPath = t2.map(pPath);
+                painter.drawPath(pPath);
+                if (type == LPT_FRAME) {
+                    LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(p);
+                    if (frame->isInner()) {
+                        pPath = frame->innerPath();
+                    }
+                    else {
+                        pPath = frame->outerPath();
+                    }
+                    painter.setBrush(Qt::black);
+                    pPath = p->sceneTransform().map(pPath);
+                    pPath = t1.map(pPath);
+                    pPath = t2.map(pPath);
+                    painter.drawPath(pPath);
+                }
+                else if (type == LPT_RING) {
+                    
+                    LaserRing* ring = qgraphicsitem_cast<LaserRing*>(p);
+                    if (ring->isInner()) {
+                        pPath = ring->innerPath();
+                    }
+                    else {
+                        pPath = ring->outerPath();
+                    }
+                    painter.setBrush(Qt::black);
+                    pPath = p->sceneTransform().map(pPath);
+                    pPath = t1.map(pPath);
+                    pPath = t2.map(pPath);
+                    painter.drawPath(pPath);
+                }
+                               
+            }
+            else {
+                painter.setBrush(Qt::black);
+                QPainterPath pPath = p->getPath();
+                pPath = p->sceneTransform().map(pPath);
+                pPath = t1.map(pPath);
+                pPath = t2.map(pPath);
+                painter.drawPath(pPath);
+                painter.setBrush(Qt::white);
+            }
+            painter.setBrush(Qt::NoBrush);
+        }
+        QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
+        image.save(fileName);
+        /*cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+
+        int dpi = layer->dpi();
+        int pixelWidth = boundingRectInDevice.width() * dpi / 25400.0;
+        int pixelHeight = boundingRectInDevice.height() * dpi / 25400.0;
+
+        int pixelInterval = layer->engravingRowInterval();
+        int outWidth = pixelWidth;
+        int outHeight = qCeil(boundingRectInDevice.height() * 1.0 / pixelInterval);
+        cv::Mat resized;
+        cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_CUBIC);
+
+        cv::imwrite("tmp/images/" + QString(i).toStdString() + "_resized.png", resized);*/
+
+        images.insert(layer, image);
+        i++;
+    }
+    return images;
+}
+
+void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& painter, qreal offset, QTransform t1, QTransform t2)
+{
+    int type = primitive->primitiveType();
+    QPen pen(Qt::black);
+    pen.setWidth(1);
+    painter.setPen(pen);
+    QPainterPath path;
+    if (type == LPT_FRAME) {
+        LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(primitive);
+        if (frame->isInner()) {
+            return;
+        }
+        path = frame->outerPath();
+    }
+    else if (type == LPT_RING) {
+        LaserRing* ring = qgraphicsitem_cast<LaserRing*>(primitive);
+        if (ring->isInner()) {
+            return;
+        }
+        path = ring->outerPath();
+    }
+    else {
+        return;
+    }
+    QRectF bounds = path.boundingRect();
+    qreal ratioX = (bounds.width() + 2 * offset) / bounds.width();
+    qreal ratioY = (bounds.height() + 2 * offset) / bounds.height();
+    path = primitive->sceneTransform().map(path);
+    path = t1.map(path);
+    path = t2.map(path);
+    QPointF originalCenter = path.boundingRect().center();
+    path = QTransform::fromScale(ratioX, ratioY).map(path);
+    QPointF center = path.boundingRect().center();
+    //qreal x = -path.boundingRect().left();
+    //qreal y = -path.boundingRect().top();
+    qreal x = originalCenter.x() - center.x();
+    qreal y = originalCenter.y() - center.y();
+    path = QTransform::fromTranslate(x, y).map(path);
+    painter.drawPath(path);
 }
 
 void LaserDocument::init()
