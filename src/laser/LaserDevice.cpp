@@ -12,6 +12,7 @@
 #include "common/Config.h"
 #include "exception/LaserException.h"
 #include "state/StateController.h"
+#include "task/ProgressItem.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/Utils.h"
 
@@ -32,7 +33,13 @@ public:
         , transformToDevice()
         , mainCardActivated(false)
         , mainCardRegistered(false)
+        , progress(nullptr)
     {}
+
+    ~LaserDevicePrivate()
+    {
+        delete progress;
+    }
 
     void updateDeviceOriginAndTransform();
 
@@ -72,6 +79,7 @@ public:
     bool mainCardRegistered;
     DeviceState lastState;
     QString password;
+    ProgressItem* progress;
 };
 
 void LaserDevicePrivate::updateDeviceOriginAndTransform()
@@ -122,7 +130,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDevice::continueWorking);
     ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDevice::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningStopped);
-    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningCompleted);
+    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningFinished);
 
     d->externalRegisters.insert(11, new LaserRegister(11, Config::ExternalRegister::x1Item(), false));
     d->externalRegisters.insert(12, new LaserRegister(12, Config::ExternalRegister::y1Item(), false));
@@ -303,6 +311,7 @@ void LaserDevice::load()
 {
     Q_D(LaserDevice);
 
+    connect(d->driver, &LaserDriver::progress, this, &LaserDevice::handleProgress/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage/*, Qt::ConnectionType::QueuedConnection*/);
     if (d->driver->load())
@@ -356,6 +365,24 @@ void LaserDevice::setPassword(const QString& value)
 {
     Q_D(LaserDevice);
     d->password = value;
+}
+
+ProgressItem* LaserDevice::progress()
+{
+    Q_D(LaserDevice);
+    return d->progress;
+}
+
+void LaserDevice::clearProgress()
+{
+    Q_D(LaserDevice);
+    d->progress = nullptr;
+}
+
+void LaserDevice::resetProgress(ProgressItem* parent)
+{
+    Q_D(LaserDevice);
+    d->progress = new ProgressItem(tr("Device"), ProgressItem::PT_Simple, parent);
 }
 
 QString LaserDevice::requestHardwareId() const
@@ -879,6 +906,28 @@ void LaserDevice::moveToXYOrigin()
     }
 }
 
+void LaserDevice::drawRectangularBorder(LaserDocument* doc)
+{
+    Q_D(LaserDevice);
+    if (!d->driver)
+        return;
+
+    QTransform t = this->to1stQuad();
+    QRect boundingRect = doc->currentDocBoundingRect();
+    switch (Config::Device::startFrom())
+    {
+    case SFT_CurrentPosition:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
+        break;
+    case SFT_UserOrigin:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
+        break;
+    }
+    QRect bounding = t.mapRect(boundingRect);
+    d->driver->drawRectangularBorder(true, bounding.x(), bounding.x() + bounding.width(),
+        true, bounding.y(), bounding.y() + bounding.height());
+}
+
 bool LaserDevice::isAvailable() const
 {
     Q_D(const LaserDevice);
@@ -952,7 +1001,7 @@ bool LaserDevice::checkLayoutForMoving(const QPoint& dest)
     }
 }
 
-bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect& docBoundingAcc)
+bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect& engravingBounding)
 {
     QRect layoutRect = this->layoutRect();
     QString info1 = "";
@@ -960,7 +1009,7 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
 
     bool ok1 = true;
     bool ok2 = true;
-    bool needCheckAcc = docBounding != docBoundingAcc;
+    bool needCheckAcc = docBounding != engravingBounding;
     bool exceedLeft = false;
     bool exceedRight = false;
 
@@ -968,9 +1017,6 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
     int docRight = docLeft + docBounding.width();
     int docTop = docBounding.top();
     int docBottom = docTop + docBounding.height();
-
-    int accLeft = docBoundingAcc.left();
-    int accRight = accLeft + docBoundingAcc.width();
 
     int layoutLeft = layoutRect.left();
     int layoutRight = layoutLeft + layoutRect.width();
@@ -1009,6 +1055,10 @@ bool LaserDevice::checkLayoutForMachining(const QRect& docBounding, const QRect&
 
     if (needCheckAcc)
     {
+        QRect boundingAcc = docBounding.united(engravingBounding);
+        int accLeft = boundingAcc.left();
+        int accRight = accLeft + boundingAcc.width();
+
         if (accLeft < layoutLeft)
         {
             ok2 = false;
@@ -1206,9 +1256,9 @@ QMap<int, LaserRegister*> LaserDevice::systemRegisters(bool onlyModified) const
 
 int LaserDevice::engravingAccLength(int engravingRunSpeed) const
 {
-    int minSpeed = Config::UserRegister::scanXStartSpeed();
-    int acc = Config::UserRegister::scanXAcc();
-    int maxSpeed = qMax(engravingRunSpeed, minSpeed);
+    qreal minSpeed = Config::UserRegister::scanXStartSpeed();
+    qreal acc = Config::UserRegister::scanXAcc();
+    qreal maxSpeed = qMax(static_cast<qreal>(engravingRunSpeed), minSpeed);
     return qAbs(qRound((maxSpeed * maxSpeed - minSpeed * minSpeed) / (acc * 2.0)));
 }
 
@@ -1418,6 +1468,18 @@ void LaserDevice::batchParse(const QString& raw, const QMap<int, LaserRegister*>
             registers[addr]->parse(value);
             registers[addr]->configItem()->loadValue(value);
         }
+    }
+}
+
+void LaserDevice::handleProgress(int position, int total, float progress)
+{
+    Q_D(LaserDevice);
+    if (d->progress)
+    {
+        d->progress->setMaximum(total);
+        d->progress->setProgress(position);
+        if (progress >= 1)
+            d->progress->finish();
     }
 }
 
@@ -1817,13 +1879,14 @@ void LaserDevice::handleMessage(int code, const QString& message)
         }
         break;
     }
-    case M_Idle:
+    case M_WorkFinished:
     {
         DeviceState state;
         if (state.parse(message))
         {
             changeState(state);
         }
+        emit machiningFinished();
         break;
     }
     case M_DeviceIdInfo:

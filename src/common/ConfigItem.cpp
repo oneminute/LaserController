@@ -839,6 +839,12 @@ void ConfigItem::restoreToDefault()
         emit dirtyValueChanged(d->dirtyValue, this);
 }
 
+void ConfigItem::restoreToDefault(StoreStrategy strategy, void* senderPtr)
+{
+    Q_D(ConfigItem);
+    setValue(d->defaultValue, strategy, senderPtr);
+}
+
 void ConfigItem::restoreToSystemDefault()
 {
     Q_D(ConfigItem);
@@ -846,6 +852,12 @@ void ConfigItem::restoreToSystemDefault()
     d->dirtyValue = d->systemDefaultValue;
     if (dirtyChanged)
         emit dirtyValueChanged(d->dirtyValue, this);
+}
+
+void ConfigItem::restoreToSystemDefault(StoreStrategy strategy, void* senderPtr)
+{
+    Q_D(ConfigItem);
+    setValue(d->systemDefaultValue, strategy, senderPtr);
 }
 
 void ConfigItem::apply()

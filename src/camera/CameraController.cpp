@@ -39,6 +39,84 @@ QSize CameraController::resolution() const
     return size;
 }
 
+qreal CameraController::brightness() const
+{
+    qreal brightness = m_videoCapture->get(cv::CAP_PROP_BRIGHTNESS);
+    return brightness;
+}
+
+void CameraController::setBrightness(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_BRIGHTNESS, value);
+}
+
+qreal CameraController::contrast() const
+{
+    return qreal();
+}
+
+void CameraController::setContrast(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_CONTRAST, value);
+}
+
+qreal CameraController::hue() const
+{
+    return qreal();
+}
+
+void CameraController::setHue(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_HUE, value);
+}
+
+qreal CameraController::saturation() const
+{
+    return qreal();
+}
+
+void CameraController::setSaturation(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_SATURATION, value);
+}
+
+qreal CameraController::sharpness() const
+{
+    return qreal();
+}
+
+void CameraController::setSharpness(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_SHARPNESS, value);
+}
+
+qreal CameraController::gamma() const
+{
+    return qreal();
+}
+
+void CameraController::setGamma(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_GAMMA, value);
+}
+
+qreal CameraController::backlightComp() const
+{
+    return qreal();
+}
+
+void CameraController::setBacklightComp(qreal value)
+{
+    QMutexLocker locker(&m_mutex);
+    m_videoCapture->set(cv::CAP_PROP_BACKLIGHT, value);
+}
+
 void CameraController::installProcessor(ImageProcessor* processor)
 {
     if (!processor)
@@ -202,9 +280,20 @@ void CameraController::run()
             QList<int> cameraIndices = supportedCameras();
             if (!cameraIndices.empty())
             {
+#ifdef _WINDOWS
+                if (m_videoCapture->open(cameraIndices.first(), cv::CAP_DSHOW))
+#else
                 if (m_videoCapture->open(cameraIndices.first(), cv::CAP_ANY))
+#endif
                 {
                     setResolution(Config::Camera::resolution());
+                    setBrightness(Config::Camera::brightness());
+                    setContrast(Config::Camera::contrast());
+                    setHue(Config::Camera::hue());
+                    setSaturation(Config::Camera::saturation());
+                    setSharpness(Config::Camera::sharpness());
+                    setGamma(Config::Camera::gamma());
+                    setBacklightComp(Config::Camera::backlightComp());
                     emit connected();
                 }
             }
@@ -275,3 +364,4 @@ CameraFrameEvent::~CameraFrameEvent()
 {
     //m_controller->clearFrameCache();
 }
+

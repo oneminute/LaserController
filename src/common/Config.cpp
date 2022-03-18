@@ -450,6 +450,62 @@ void Config::loadCameraItems()
         DT_LIST
     );
     homography->setVisible(false);
+
+    ConfigItem* brightness = group->addConfigItem(
+        "brightness"
+        , 0
+    );
+    brightness->setInputWidgetProperty("minimum", 0);
+    brightness->setInputWidgetProperty("maximum", 127);
+
+    ConfigItem* contrast = group->addConfigItem(
+        "contrast"
+        , 33
+    );
+    contrast->setInputWidgetProperty("minimum", 0);
+    contrast->setInputWidgetProperty("maximum", 255);
+
+    ConfigItem* hue = group->addConfigItem(
+        "hue"
+        , -6
+    );
+    hue->setInputWidgetProperty("minimum", -180);
+    hue->setInputWidgetProperty("maximum", 180);
+
+    ConfigItem* saturation = group->addConfigItem(
+        "saturation"
+        , 44
+    );
+    saturation->setInputWidgetProperty("minimum", 0);
+    saturation->setInputWidgetProperty("maximum", 255);
+
+    ConfigItem* sharpness = group->addConfigItem(
+        "sharpness"
+        , 100
+    );
+    sharpness->setInputWidgetProperty("minimum", 0);
+    sharpness->setInputWidgetProperty("maximum", 255);
+
+    ConfigItem* gamma = group->addConfigItem(
+        "gamma"
+        , 120
+    );
+    gamma->setInputWidgetProperty("minimum", 0);
+    gamma->setInputWidgetProperty("maximum", 255);
+
+    ConfigItem* backlightComp = group->addConfigItem(
+        "backlightComp"
+        , 0
+    );
+    backlightComp->setInputWidgetProperty("minimum", 0);
+    backlightComp->setInputWidgetProperty("maximum", 4);
+
+    /*ConfigItem* exposure = group->addConfigItem(
+        "exposure"
+        , 0
+    );
+    exposure->setInputWidgetProperty("minimum", -8);
+    exposure->setInputWidgetProperty("maximum", 0);*/
 }
 
 void Config::loadUiItems()
@@ -1271,10 +1327,12 @@ void Config::loadDeviceItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(ltr("Current location"), 0);
-            comboBox->addItem(ltr("Release motor"), 1);
-            comboBox->addItem(ltr("Back to origin"), 2);
-            comboBox->addItem(ltr("Back to user origin"), 3);
+            comboBox->addItem(ltr("Unload motor"), 0);
+            comboBox->addItem(ltr("Back to user origin 1"), 1);
+            comboBox->addItem(ltr("Back to user origin 2"), 2);
+            comboBox->addItem(ltr("Back to user origin 3"), 3);
+            comboBox->addItem(ltr("Back to origin"), 4);
+            comboBox->addItem(ltr("Current location"), 5);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
@@ -1283,12 +1341,6 @@ void Config::loadDeviceItems()
 
     ConfigItem* switchToU = group->addConfigItem(
         "switchToU",
-        false,
-        DT_BOOL
-    );
-
-    ConfigItem* fullRelative = group->addConfigItem(
-        "fullRelative",
         false,
         DT_BOOL
     );
@@ -3086,6 +3138,38 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Calibration Auto Capture", nullptr), 
         QCoreApplication::translate("Config", "Calibration Auto Capture", nullptr));
 
+    Camera::brightnessItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Brightness", nullptr), 
+        QCoreApplication::translate("Config", "Brightness", nullptr));
+
+    Camera::contrastItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Contrast", nullptr), 
+        QCoreApplication::translate("Config", "Contrast", nullptr));
+
+    Camera::hueItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Hue", nullptr), 
+        QCoreApplication::translate("Config", "Hue", nullptr));
+
+    Camera::saturationItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Saturation", nullptr), 
+        QCoreApplication::translate("Config", "Saturation", nullptr));
+
+    Camera::sharpnessItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Sharpness", nullptr), 
+        QCoreApplication::translate("Config", "Sharpness", nullptr));
+
+    Camera::gammaItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Gamma", nullptr), 
+        QCoreApplication::translate("Config", "Gamma", nullptr));
+
+    Camera::backlightCompItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Backlight Comp", nullptr), 
+        QCoreApplication::translate("Config", "Backlight Comp", nullptr));
+
+    /*Camera::exposureItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Exposure", nullptr), 
+        QCoreApplication::translate("Config", "Exposure", nullptr));*/
+
     Ui::operationButtonIconSizeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Operation Button Icon Size(px)", nullptr), 
         QCoreApplication::translate("Config", "Size of operation buttons' icons", nullptr));
@@ -3353,10 +3437,6 @@ void Config::updateTitlesAndDescriptions()
     Device::switchToUItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Switch To U", nullptr), 
         QCoreApplication::translate("Config", "Switch To U", nullptr));
-
-    Device::fullRelativeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Full Relative", nullptr), 
-        QCoreApplication::translate("Config", "Full Relative", nullptr));
 
     UserRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

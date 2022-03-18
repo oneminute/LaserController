@@ -161,7 +161,6 @@ enum LaserEventType
 
     M_MachineWorking = 2039,
     M_NotWorking,
-    M_Idle = 2041,
     M_WorkFinished = 2041,
 
     M_DeviceIdInfo,
