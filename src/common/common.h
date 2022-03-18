@@ -289,10 +289,12 @@ enum FillingType
 
 enum FinishRunType
 {
-    FT_CurrentPos,
     FT_Unload,
+    FT_BackToUserOrigin1,
+    FT_BackToUserOrigin2,
+    FT_BackToUserOrigin3,
     FT_BackToOrigin,
-    FT_BackToUserOrigin
+    FT_CurrentPos
 };
 Q_DECLARE_METATYPE(FinishRunType)
 

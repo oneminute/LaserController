@@ -59,6 +59,8 @@ namespace typeUtils
 
     QJsonObject rect2Json(const QRect& rect, bool uEnabled = false, bool relative = false);
 
+    QJsonArray pointsToJson(const QList<QPoint>& points);
+
     QImage cvMat2QImage(const cv::Mat& mat);
 }
 

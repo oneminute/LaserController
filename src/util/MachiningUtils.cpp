@@ -381,3 +381,87 @@ bool machiningUtils::pointsEql(const QPointF & pt1, const QPointF & pt2)
 {
     return qRound(pt1.x()) == qRound(pt2.x()) && qRound(pt1.y()) == qRound(pt2.y());
 }
+
+QList<QPoint> machiningUtils::boundingPoints(int originIndex, const QRect& bounding)
+{
+    int startIndex = originIndex;
+    int docLeft = bounding.left();
+    int docTop = bounding.top();
+    int docRight = docLeft + bounding.width();
+    int docBottom = docTop + bounding.height();
+    QList<QPoint> points;
+    points.append(QPoint(docLeft, docTop));
+    points.append(QPoint(docLeft, docBottom));
+    points.append(QPoint(docRight, docBottom));
+    points.append(QPoint(docRight, docTop));
+
+    QList<QPoint> pointsOut;
+    for (int i = 0; i < 4; i++)
+    {
+        int index = (startIndex + i) % 4;
+        pointsOut.append(points.at(index));
+    }
+    pointsOut.append(pointsOut.first());
+    return pointsOut;
+}
+
+QList<QPoint> machiningUtils::boundingPoints(int jobIndex, const QRect& bounding, const QPoint& startPos)
+{
+    int startIndex = jobIndex;
+    bool isMiddle = false;
+    switch (jobIndex)
+    {
+    case 0:
+        startIndex = 0;
+        break;
+    case 1:
+        startIndex = 0;
+        isMiddle = true;
+        break;
+    case 2:
+        startIndex = 3;
+        break;
+    case 3:
+        startIndex = 1;
+        isMiddle = true;
+        break;
+    case 4:
+        startIndex = 0;
+        isMiddle = true;
+        break;
+    case 5:
+        startIndex = 3;
+        isMiddle = true;
+        break;
+    case 6:
+        startIndex = 1;
+        break;
+    case 7:
+        startIndex = 2;
+        isMiddle = true;
+        break;
+    case 8:
+        startIndex = 2;
+        break;
+    }
+    int docLeft = bounding.left();
+    int docTop = bounding.top();
+    int docRight = docLeft + bounding.width();
+    int docBottom = docTop + bounding.height();
+    QList<QPoint> points;
+    points.append(QPoint(docLeft, docTop));
+    points.append(QPoint(docLeft, docBottom));
+    points.append(QPoint(docRight, docBottom));
+    points.append(QPoint(docRight, docTop));
+
+    QList<QPoint> pointsOut;
+    if (isMiddle)
+        pointsOut.append(startPos);
+    for (int i = 0; i < 4; i++)
+    {
+        int index = (startIndex + i) % 4;
+        pointsOut.append(points.at(index));
+    }
+    pointsOut.append(pointsOut.first());
+    return pointsOut;
+}

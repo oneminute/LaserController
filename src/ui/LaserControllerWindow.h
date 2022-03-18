@@ -304,6 +304,8 @@ protected slots:
     void onDongleConnected();
     void onDongleDisconnected();
     void onDongleRemoved();
+    void onMachiningFinished();
+    void onDownloadFinished();
 
     void onWindowCreated();
     virtual void closeEvent(QCloseEvent* event) override;

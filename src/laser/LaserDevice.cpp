@@ -12,6 +12,7 @@
 #include "common/Config.h"
 #include "exception/LaserException.h"
 #include "state/StateController.h"
+#include "task/ProgressItem.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/Utils.h"
 
@@ -32,7 +33,13 @@ public:
         , transformToDevice()
         , mainCardActivated(false)
         , mainCardRegistered(false)
+        , progress(nullptr)
     {}
+
+    ~LaserDevicePrivate()
+    {
+        delete progress;
+    }
 
     void updateDeviceOriginAndTransform();
 
@@ -72,6 +79,7 @@ public:
     bool mainCardRegistered;
     DeviceState lastState;
     QString password;
+    ProgressItem* progress;
 };
 
 void LaserDevicePrivate::updateDeviceOriginAndTransform()
@@ -122,7 +130,7 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     ADD_TRANSITION(devicePausedState, deviceMachiningState, this, &LaserDevice::continueWorking);
     ADD_TRANSITION(devicePausedState, deviceIdleState, this, &LaserDevice::machiningStopped);
     ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningStopped);
-    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningCompleted);
+    ADD_TRANSITION(deviceMachiningState, deviceIdleState, this, &LaserDevice::machiningFinished);
 
     d->externalRegisters.insert(11, new LaserRegister(11, Config::ExternalRegister::x1Item(), false));
     d->externalRegisters.insert(12, new LaserRegister(12, Config::ExternalRegister::y1Item(), false));
@@ -303,6 +311,7 @@ void LaserDevice::load()
 {
     Q_D(LaserDevice);
 
+    connect(d->driver, &LaserDriver::progress, this, &LaserDevice::handleProgress/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::raiseError, this, &LaserDevice::handleError/*, Qt::ConnectionType::QueuedConnection*/);
     connect(d->driver, &LaserDriver::sendMessage, this, &LaserDevice::handleMessage/*, Qt::ConnectionType::QueuedConnection*/);
     if (d->driver->load())
@@ -356,6 +365,24 @@ void LaserDevice::setPassword(const QString& value)
 {
     Q_D(LaserDevice);
     d->password = value;
+}
+
+ProgressItem* LaserDevice::progress()
+{
+    Q_D(LaserDevice);
+    return d->progress;
+}
+
+void LaserDevice::clearProgress()
+{
+    Q_D(LaserDevice);
+    d->progress = nullptr;
+}
+
+void LaserDevice::resetProgress(ProgressItem* parent)
+{
+    Q_D(LaserDevice);
+    d->progress = new ProgressItem(tr("Device"), ProgressItem::PT_Simple, parent);
 }
 
 QString LaserDevice::requestHardwareId() const
@@ -1444,6 +1471,18 @@ void LaserDevice::batchParse(const QString& raw, const QMap<int, LaserRegister*>
     }
 }
 
+void LaserDevice::handleProgress(int position, int total, float progress)
+{
+    Q_D(LaserDevice);
+    if (d->progress)
+    {
+        d->progress->setMaximum(total);
+        d->progress->setProgress(position);
+        if (progress >= 1)
+            d->progress->finish();
+    }
+}
+
 void LaserDevice::handleError(int code, const QString& message)
 {
     Q_D(LaserDevice);
@@ -1840,13 +1879,14 @@ void LaserDevice::handleMessage(int code, const QString& message)
         }
         break;
     }
-    case M_Idle:
+    case M_WorkFinished:
     {
         DeviceState state;
         if (state.parse(message))
         {
             changeState(state);
         }
+        emit machiningFinished();
         break;
     }
     case M_DeviceIdInfo:

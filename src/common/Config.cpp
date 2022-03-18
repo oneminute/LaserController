@@ -1327,10 +1327,12 @@ void Config::loadDeviceItems()
             if (!comboBox)
                 return;
 
-            comboBox->addItem(ltr("Current location"), 0);
-            comboBox->addItem(ltr("Release motor"), 1);
-            comboBox->addItem(ltr("Back to origin"), 2);
-            comboBox->addItem(ltr("Back to user origin"), 3);
+            comboBox->addItem(ltr("Unload motor"), 0);
+            comboBox->addItem(ltr("Back to user origin 1"), 1);
+            comboBox->addItem(ltr("Back to user origin 2"), 2);
+            comboBox->addItem(ltr("Back to user origin 3"), 3);
+            comboBox->addItem(ltr("Back to origin"), 4);
+            comboBox->addItem(ltr("Current location"), 5);
 
             int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);

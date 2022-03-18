@@ -46,7 +46,7 @@ void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCoun
 
     float progress = position * 1.0f / totalCount;
     qDebug() << "Progress callback handler: position = " << position << ", totalCount = " << totalCount << ", progress = " << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
-    emit LaserApplication::driver->downloading(position, totalCount, progress);
+    emit LaserApplication::driver->progress(position, totalCount, progress);
 }
 
 void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)

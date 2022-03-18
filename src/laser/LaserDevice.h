@@ -15,6 +15,7 @@ class ConfigItem;
 class LaserDriver;
 class LaserDevicePrivate;
 class LaserDocument;
+class ProgressItem;
 
 class LaserDevice : public QObject
 {
@@ -38,6 +39,10 @@ public:
 
     QString password() const;
     void setPassword(const QString& value);
+
+    ProgressItem* progress();
+    void clearProgress();
+    void resetProgress(ProgressItem* parent);
 
     QString requestHardwareId() const;
     QString requestMainCardId() const;
@@ -214,6 +219,7 @@ protected:
     void batchParse(const QString& raw, const QMap<int, LaserRegister*>& registers);
 
 protected slots:
+    void handleProgress(int position, int total, float progress);
     void handleError(int code, const QString& message);
     void handleMessage(int code, const QString& message);
 
@@ -237,8 +243,9 @@ signals:
     void machiningPaused();
     void continueWorking();
     void machiningStopped();
-    void machiningCompleted();
+    void machiningFinished();
     void idle();
+    void downloadFinished();
     void mainCardRegistrationChanged(bool registered);
     void mainCardActivationChanged(bool activated);
     void mainCardInfoFetched();

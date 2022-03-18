@@ -587,5 +587,6 @@ void LaserApplication::onEnterDeviceUnconnectedState()
 ProgressItem* LaserApplication::resetProcess()
 {
     globalProgress->reset();
+    device->clearProgress();
     return globalProgress;
 }

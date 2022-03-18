@@ -399,8 +399,8 @@ void CameraAlignmentDialog::generate()
     LaserApplication::mainWindow->newDocument();
     LaserScene* scene = LaserApplication::mainWindow->scene();
     m_doc = scene->document();
-    //m_doc->setFinishRun(FT_BackToOrigin);
-    m_doc->setFinishRun(FT_CurrentPos);
+    m_doc->setFinishRun(FT_BackToOrigin);
+    //m_doc->setFinishRun(FT_CurrentPos);
     
     int hMargin = m_page1SpinBoxHMargin->value() * 1000;
     int vMargin = m_page1SpinBoxVMargin->value() * 1000;

@@ -902,6 +902,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(LaserApplication::device, &LaserDevice::dongleRemoved, this, &LaserControllerWindow::onDongleRemoved);
     connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &LaserControllerWindow::onLaserReturnWorkState);
     connect(LaserApplication::device, &LaserDevice::layoutChanged, this, &LaserControllerWindow::onLayoutChanged);
+    connect(LaserApplication::device, &LaserDevice::machiningFinished, this, &LaserControllerWindow::onMachiningFinished);
+    connect(LaserApplication::device, &LaserDevice::downloadFinished, this, &LaserControllerWindow::onDownloadFinished);
 
     //connect(this, &LaserControllerWindow::windowCreated, this, &LaserControllerWindow::onWindowCreated);
     connect(&StateController::instance(), &StateController::stateEntered, this, &LaserControllerWindow::onStateEntered);
@@ -4839,8 +4841,6 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
         {
-            //LaserApplication::resetProgressWindow();
-            //LaserApplication::showProgressWindow();
             ProgressItem* progress = LaserApplication::resetProcess();
             progress->setMaximum(5);
             QtConcurrent::run([=]()
@@ -4853,7 +4853,6 @@ void LaserControllerWindow::onActionExportJson(bool checked)
                     m_prepareMachining = false;
                     m_prepareDownloading = false;
                     m_scene->document()->exportJSON(filename, path, progress, true);
-                    progress->finish();
                 }
             );
         }
@@ -4920,7 +4919,7 @@ void LaserControllerWindow::startMachining()
 
         //LaserApplication::resetProgressWindow();
         ProgressItem* progress = LaserApplication::resetProcess();
-        progress->setMaximum(5);
+        progress->setMaximum(6);
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
@@ -4931,7 +4930,6 @@ void LaserControllerWindow::startMachining()
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
                 m_scene->document()->exportJSON(filename, path, progress, true);
-                progress->finish();
             }
         );
     }
@@ -5052,7 +5050,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
 
     //LaserApplication::resetProgressWindow();
     ProgressItem* progress = LaserApplication::resetProcess();
-    progress->setMaximum(5);
+    progress->setMaximum(6);
     QtConcurrent::run([=]()
         {
             m_scene->document()->outline(progress);
@@ -5063,7 +5061,6 @@ void LaserControllerWindow::onActionDownload(bool checked)
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareDownloading = true;
             m_scene->document()->exportJSON(filename, path, progress, true);
-            progress->finish();
         }
     );
 }
@@ -5997,6 +5994,16 @@ void LaserControllerWindow::onDongleRemoved()
     m_statusBarDongle->setStyleSheet("color: rgb(255, 0, 0)");
 }
 
+void LaserControllerWindow::onMachiningFinished()
+{
+    LaserApplication::globalProgress->finish();
+}
+
+void LaserControllerWindow::onDownloadFinished()
+{
+    LaserApplication::globalProgress->finish();
+}
+
 void LaserControllerWindow::onWindowCreated()
 {
 }
@@ -6437,16 +6444,21 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
     qLogD << "onDocumentExportFinished: " << m_prepareMachining;
     qLogD << "json data: ";
     //qLogD << data;
+    if (!m_prepareDownloading && !m_prepareMachining)
+    {
+        LaserApplication::globalProgress->finish();
+        return;
+    }
 
+    LaserApplication::device->resetProgress(LaserApplication::globalProgress);
+    LaserApplication::driver->importData(data.data(), data.size());
     if (m_prepareMachining)
     {
-        LaserApplication::driver->importData(data.data(), data.size());
         LaserApplication::driver->startMachining();
         m_prepareMachining = false;
     }
     else if (m_prepareDownloading)
     {
-        LaserApplication::driver->importData(data.data(), data.size());
         LaserApplication::driver->download();
         m_prepareDownloading = false;
     }

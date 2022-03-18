@@ -685,4 +685,22 @@ void utils::warning(const QString& title, const QString& msg, QWidget* parent)
     int result = dlg.exec();
 }
 
+void utils::makePointsRelative(QList<QPoint>& points, const QPoint& startPos)
+{
+    for (int i = points.size() - 1; i > 0; i--)
+    {
+        points[i] = points.at(i) - points.at(i - 1);
+    }
+    points[0] = points[0] - startPos;
+}
 
+QList<QPoint> utils::makePointsRelative(const QList<QPoint>& points, const QPoint& startPos)
+{
+    QList<QPoint> pointsOut;
+    pointsOut.append(points.first() - startPos);
+    for (int i = 1; i < points.size(); i++)
+    {
+        pointsOut.append(points.at(i) - points.at(i - 1));
+    }
+    return pointsOut;
+}

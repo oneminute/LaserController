@@ -68,6 +68,10 @@ namespace utils
     void rectEdges(QRectF rect, QList<QLineF>& edges);
 
     void warning(const QString& title, const QString& msg, QWidget* parent = nullptr);
+
+    void makePointsRelative(QList<QPoint>& points, const QPoint& startPos);
+
+    QList<QPoint> makePointsRelative(const QList<QPoint>& points, const QPoint& startPos);
 }
 
 #endif // UTILS_H

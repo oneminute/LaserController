@@ -226,8 +226,7 @@ public:
 protected slots:
 
 signals:
-    void downloading(int current, int total, float progress);
-    void downloaded();
+    void progress(int current, int total, float progress);
     void raiseError(int code, const QString& message);
     void sendMessage(int code, const QString& message);
 

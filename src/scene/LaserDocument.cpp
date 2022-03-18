@@ -333,6 +333,19 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
         break;
     }
 
+    QList<QPoint> boundingPoints;
+    if (absolute)
+    {
+        boundingPoints = machiningUtils::boundingPoints(deviceOriginIndex, docBounding);
+    }
+    else
+    {
+        boundingPoints = machiningUtils::boundingPoints(
+            Config::Device::jobOrigin(), docBounding, startPos
+        );
+    }
+    utils::makePointsRelative(boundingPoints, QPoint(0, 0));
+
     QJsonObject jsonObj;
     QJsonObject laserDocumentInfo;
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
@@ -349,6 +362,8 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU(), true);
     laserDocumentInfo["MaxEngravingPower"] = maxEngravingSpeed();
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
+    laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
+
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
     QJsonArray layers;

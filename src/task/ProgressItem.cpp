@@ -55,11 +55,12 @@ qreal ProgressItem::progress() const
     if (m_isFinished)
         return 1.0;
 
+    qreal progress = 0;
     switch (m_type)
     {
     case PT_Simple:
     {
-        return qBound(0.0, (m_progress - m_minimum) / (m_maximum - m_minimum), 1.0); 
+        progress = qBound(0.0, (m_progress - m_minimum) / (m_maximum - m_minimum), 1.0); 
     }
     case PT_Complex:
     {
@@ -72,29 +73,33 @@ qreal ProgressItem::progress() const
             //qreal weight = m_weights[item];
             finalProgress += /*weight * */item->progress() / (maximum - m_minimum);
         }
-        return qBound(0.0, finalProgress, 1.0); 
+        progress = qBound(0.0, finalProgress, 1.0); 
     }
     }
+    return progress;
 }
 
-void ProgressItem::setProgress(qreal process)
+void ProgressItem::setProgress(qreal progress)
 {
-    //QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
+    QMutexLocker locker(&m_childMutex);
     if (m_type == PT_Simple)
-        m_progress = qBound(m_minimum, process, m_maximum); 
+        m_progress = qBound(m_minimum, progress, m_maximum); 
     notify();
 }
 
 void ProgressItem::increaseProgress(qreal delta)
 {
+    QMutexLocker locker(&m_childMutex);
     if (m_type == PT_Simple)
-        setProgress(m_progress + delta);
+        m_progress = qBound(m_minimum, m_progress + delta, m_maximum); 
+    notify();
 }
 
 void ProgressItem::finish()
 {
+    QMutexLocker locker(&m_childMutex);
     if (m_type == PT_Simple)
-        setProgress(m_maximum);
+        m_progress = m_maximum;
     else if (m_type == PT_Complex)
     {
         for (ProgressItem* item : childItems())
@@ -105,20 +110,24 @@ void ProgressItem::finish()
     m_durationNSecs = m_timer.nsecsElapsed();
     stopTimer();
     m_isFinished = true;
+    notify();
 }
 
 bool ProgressItem::isFinished() const
 {
+    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return progress() >= 1.0;
 }
 
 qreal ProgressItem::durationSecs() const
 {
+    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return durationNSecs() * 0.000001;
 }
 
 qreal ProgressItem::durationMSecs() const
 {
+    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return durationNSecs() * 0.000001;
 }
 
@@ -136,20 +145,17 @@ qint64 ProgressItem::durationNSecs() const
 
 void ProgressItem::addChildItem(ProgressItem* item)
 {
-    QMutexLocker locker(&m_childMutex);
     item->setParent(this);
     m_childItems.append(item);
 }
 
 QList<ProgressItem*> ProgressItem::childItems() const
 {
-    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return m_childItems;
 }
 
 ProgressItem* ProgressItem::child(int index) const
 {
-    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     if (index < m_childItems.length() && index >= 0)
         return m_childItems.at(index);
     return nullptr;
@@ -157,7 +163,6 @@ ProgressItem* ProgressItem::child(int index) const
 
 int ProgressItem::childCount() const
 {
-    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return m_childItems.count();
 }
 
@@ -214,12 +219,18 @@ void ProgressItem::clear()
         delete item;
     }
     m_childItems.clear();
+    m_isFinished = false;
 }
 
 void ProgressItem::reset()
 {
+    /*if (!m_isFinished)
+    {
+        qLogW << "previouse task is running.";
+    }*/
     clear();
     m_progress = 0;
+    emit progressUpdated(0);
 }
 
 void ProgressItem::notify()
@@ -228,9 +239,9 @@ void ProgressItem::notify()
     {
         m_parent->notify();
     }
-    //LaserApplication::progressModel->updateItem(this);
     else
     {
-        emit progressUpdated(progress());
+        qreal finalProgress = progress();
+        emit progressUpdated(finalProgress);
     }
 }
