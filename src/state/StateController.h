@@ -214,7 +214,7 @@ public:
 
     DECL_STATE(deviceConnected)
     DECL_STATE(deviceIdle)
-    //DECL_STATE(deviceDownloading)
+    DECL_STATE(deviceDownloading)
     //DECL_STATE(deviceDownloaded)
     DECL_STATE(deviceMachining)
     DECL_STATE(devicePaused)

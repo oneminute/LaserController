@@ -4966,6 +4966,7 @@ void LaserControllerWindow::startMachining()
         //LaserApplication::resetProgressWindow();
         ProgressItem* progress = LaserApplication::resetProcess();
         progress->setMaximum(6);
+        progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
@@ -5094,7 +5095,6 @@ void LaserControllerWindow::onActionDownload(bool checked)
     m_scene->document()->setUseSpecifiedOrigin(true);
     m_scene->document()->setSpecifiedOriginIndex(soDlg.origin());
 
-    //LaserApplication::resetProgressWindow();
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
     QtConcurrent::run([=]()
@@ -6500,12 +6500,12 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
     LaserApplication::driver->importData(data.data(), data.size());
     if (m_prepareMachining)
     {
-        LaserApplication::driver->startMachining();
+        LaserApplication::device->startMachining();
         m_prepareMachining = false;
     }
     else if (m_prepareDownloading)
     {
-        LaserApplication::driver->download();
+        LaserApplication::device->downloadToBoard();
         m_prepareDownloading = false;
     }
 }

@@ -73,6 +73,7 @@ StateController::StateController(QObject* parent)
     DEFINE_CHILD_STATE(device, deviceConnected);
     DEFINE_CHILD_INIT_STATE(deviceConnected, deviceIdle);
     DEFINE_CHILD_STATE(deviceConnected, deviceMachining);
+    DEFINE_CHILD_STATE(deviceConnected, deviceDownloading);
     DEFINE_CHILD_STATE(deviceConnected, devicePaused);
     DEFINE_CHILD_STATE(deviceConnected, deviceError);
 	DEFINE_CHILD_STATE(deviceConnected, documentPrintAndCutSelecting);

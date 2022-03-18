@@ -128,6 +128,7 @@ set(OTHER_FILES
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
     src/res/laser.rc
+    res/constraints.csv
     cmake/Compress.cmake
     cmake/GenerateConstraints.cmake
     .gitignore

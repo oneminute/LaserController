@@ -269,7 +269,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     }
 
     ProgressItem* exportProgress = new ProgressItem(tr("Export Json"), ProgressItem::PT_Complex, parentProgress);
-    exportProgress->setMaximum(layerList.count());
+    exportProgress->setMaximum(path.count());
 
     bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
     QTransform t = enablePrintAndCut() ? transform() : QTransform();
@@ -417,7 +417,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
                 {
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
 
-                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Engraving").arg(primitive->name()), ProgressItem::PT_Simple, exportProgress);
+                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Engraving").arg(primitive->name()), ProgressItem::PT_Complex, exportProgress);
                     QByteArray data = primitive->engravingImage(progress, QPoint());
                     if (!data.isEmpty())
                     {
@@ -461,7 +461,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
                 if (!enablePrintAndCut())
                 {
                     itemObj["Type"] = primitive->typeLatinName();
-                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), ProgressItem::PT_Simple, exportProgress);
+                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), ProgressItem::PT_Complex, exportProgress);
                     if (layer->fillingType() == FT_Line)
                     {
                         LaserLineListList lineList = primitive->generateFillData();
