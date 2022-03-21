@@ -615,4 +615,40 @@ void LaserScene::clearImage()
     m_imageBackground->hide();
 }
 
+QImage LaserScene::thumbnail()
+{
+    clearSelection();
+    QRectF layoutRect = LaserApplication::device->layoutRect();
+    int width = Config::Export::thumbnailWidth();
+    int height = Config::Export::thumbnailHeight();
+    qreal widthRatio = layoutRect.width() / width;
+    qreal heightRatio = layoutRect.height() / height;
+    QRectF imageSize(QPointF(0, 0), QSizeF(width, height));
+    if (widthRatio >= heightRatio)
+    {
+        int height2 = qRound(layoutRect.height() / widthRatio);
+        imageSize.moveTo(0, (height - height2) / 2);
+        imageSize.setHeight(height2);
+    }
+    else
+    {
+        int width2 = qRound(layoutRect.width() / heightRatio);
+        imageSize.moveTo((width - width2) / 2, 0);
+        imageSize.setWidth(width);
+    }
+    QImage image(width, height, QImage::Format_ARGB32);
+    QPainter painter(&image);
+    m_background->hide();
+    render(&painter, imageSize, layoutRect);
+    QPen pen(Qt::black, 0.2);
+    pen.setCosmetic(true);
+    painter.setPen(pen);
+    painter.drawRect(imageSize);
+    m_background->show();
+
+    image.save("tmp/thumbnail.png", "PNG");
+
+    return image;
+}
+
 

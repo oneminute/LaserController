@@ -72,6 +72,9 @@ public:
     QString hardwareMaintainingTimes() const;
     bool isMainCardActivated() const;
     bool isMainCardRegistered() const;
+    bool isDongleConnected();
+    bool availableForMachining();
+    int getHardwareKeyType(qint16 type = 0);
 
     QString apiLibVersion() const;
     QString apiLibCompileInfo() const;

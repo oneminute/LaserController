@@ -67,6 +67,7 @@ public:
 
     bool useSpecifiedOrigin;
     int specifiedOriginIndex;
+    QImage thumbnail;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -146,6 +147,18 @@ void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool u
     if (updateDocBounding)
         updateDocumentBounding();
     updateLayersStructure();
+}
+
+QImage LaserDocument::thumbnail() const
+{
+    Q_D(const LaserDocument);
+    return d->thumbnail;
+}
+
+void LaserDocument::setThumbnail(const QImage& image)
+{
+    Q_D(LaserDocument);
+    d->thumbnail = image;
 }
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
@@ -346,6 +359,16 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     }
     utils::makePointsRelative(boundingPoints, QPoint(0, 0));
 
+    QByteArray thumbnailData;
+    QBuffer thumbnailBuffer(&thumbnailData);
+    thumbnailBuffer.open(QIODevice::WriteOnly);
+    d->thumbnail.save(&thumbnailBuffer, "PNG");
+    QString thumbnail64 = QString::fromLatin1(thumbnailData.toBase64());
+
+    QByteArray ba = QByteArray::fromBase64(thumbnail64.toLatin1());
+    QImage thmb = QImage::fromData(ba);
+    thmb.save("tmp/thumbnail_restore.png", "PNG");
+
     QJsonObject jsonObj;
     QJsonObject laserDocumentInfo;
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
@@ -354,7 +377,6 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     laserDocumentInfo["FinishRun"] = d->finishRun;
     laserDocumentInfo["StartFrom"] = startFrom;
     laserDocumentInfo["StartFromPos"] = typeUtils::point2Json(startPos);
-    laserDocumentInfo["Absolute"] = absolute;
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(startPos);
@@ -363,6 +385,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     laserDocumentInfo["MaxEngravingSpeed"] = maxEngravingSpeed();
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
     laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
+    laserDocumentInfo["Thumbnail"] = thumbnail64;
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
@@ -609,6 +632,12 @@ int LaserDocument::maxEngravingSpeed() const
             maxSpeed = layer->engravingRunSpeed();
     }
     return maxSpeed;
+}
+
+bool LaserDocument::isEmpty() const
+{
+    Q_D(const LaserDocument);
+    return d->primitives.isEmpty();
 }
 
 QPoint LaserDocument::reletiveJobOrigin() const

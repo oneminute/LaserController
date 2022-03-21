@@ -270,6 +270,10 @@ public:
         CONFIG_ITEM(export, curveFlatteningThreshold, qreal, toReal)
         CONFIG_ITEM(export, gaussianFactorA, qreal, toReal)
         CONFIG_ITEM(export, imageQuality, int, toInt)
+        CONFIG_ITEM(export, thumbnailWidth, int, toInt)
+        CONFIG_ITEM(export, thumbnailHeight, int, toInt)
+        CONFIG_ITEM(export, thumbnailColorType, int, toInt)
+        CONFIG_ITEM(export, thumbnailImageType, QString, toString)
 
     private:
         friend class Config;

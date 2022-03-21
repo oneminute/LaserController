@@ -4642,8 +4642,6 @@ void LaserControllerWindow::onActionImport(bool checked)
     connect(importer.data(), &Importer::imported, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     if (!importer.isNull())
     {
-        //LaserApplication::resetProgressWindow();
-        //LaserApplication::showProgressWindow();
         ProgressItem* progress = LaserApplication::resetProcess();
         importer->import(filename, m_scene, progress);
         progress->finish();
@@ -4660,8 +4658,6 @@ void LaserControllerWindow::onActionImportCorelDraw(bool checked)
     QVariantMap params;
     params["parent_winid"] = winId();
     params["parent_win"] = QVariant::fromValue<QMainWindow*>(this);
-    //LaserApplication::resetProgressWindow();
-    //LaserApplication::showProgressWindow();
     ProgressItem* progress = LaserApplication::resetProcess();
     importer->import("", m_scene, progress, params);
     progress->finish();
@@ -4887,6 +4883,8 @@ void LaserControllerWindow::onActionExportJson(bool checked)
         QString filename = dialog.selectedFiles().constFirst();
         if (!filename.isEmpty() && !filename.isNull())
         {
+            QImage thumbnail = m_scene->thumbnail();
+            m_scene->document()->setThumbnail(thumbnail);
             ProgressItem* progress = LaserApplication::resetProcess();
             progress->setMaximum(5);
             QtConcurrent::run([=]()
@@ -4934,9 +4932,17 @@ void LaserControllerWindow::startMachining()
     {
         if (m_scene->document() == nullptr)
         {
-            QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
+            QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining."));
             return;
         }
+        if (m_scene->document()->isEmpty())
+        {
+            QMessageBox::warning(this, tr("Alert"), tr("No available primitives to machining."));
+            return;
+        }
+        if (!LaserApplication::device->availableForMachining())
+            return;
+
         QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
         QRect boundingRect = m_scene->document()->currentDocBoundingRect();
@@ -4960,13 +4966,11 @@ void LaserControllerWindow::startMachining()
         ))
             return;
 
-        //SelectOriginDialog soDlg(this);
-        //soDlg.exec();
-
-        //LaserApplication::resetProgressWindow();
         ProgressItem* progress = LaserApplication::resetProcess();
         progress->setMaximum(6);
         progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
+        QImage thumbnail = m_scene->thumbnail();
+        m_scene->document()->setThumbnail(thumbnail);
         QtConcurrent::run([=]()
             {
                 m_scene->document()->outline(progress);
@@ -5084,6 +5088,14 @@ void LaserControllerWindow::onActionDownload(bool checked)
         QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining"));
         return;
     }
+    if (m_scene->document()->isEmpty())
+    {
+        QMessageBox::warning(this, tr("Alert"), tr("No available primitives to machining."));
+        return;
+    }
+    if (!LaserApplication::device->availableForMachining())
+        return;
+    
     QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
     QRect boundingRect = m_scene->document()->currentDocBoundingRect();
@@ -5094,6 +5106,8 @@ void LaserControllerWindow::onActionDownload(bool checked)
 
     m_scene->document()->setUseSpecifiedOrigin(true);
     m_scene->document()->setSpecifiedOriginIndex(soDlg.origin());
+    QImage thumbnail = m_scene->thumbnail();
+    m_scene->document()->setThumbnail(thumbnail);
 
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
@@ -5514,8 +5528,6 @@ void LaserControllerWindow::onActionAbout(bool checked)
 
 void LaserControllerWindow::onActionUpdateOutline(bool checked)
 {
-    //LaserApplication::resetProgressWindow();
-    //LaserApplication::showProgressWindow();
     ProgressItem* progress = LaserApplication::resetProcess();
     QtConcurrent::run(
         [=]() {

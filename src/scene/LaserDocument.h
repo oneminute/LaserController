@@ -61,6 +61,8 @@ public:
 
     int maxEngravingSpeed() const;
 
+    bool isEmpty() const;
+
     /// <summary>
     /// 返回作业原点。该点值在画布坐标系下，由当前有效图元列表形成
     /// 的外包矩形9宫格点决定，即，该原点值是相对于外包矩形左上角
@@ -127,6 +129,9 @@ public:
     void addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
     void addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
     void removePrimitive(LaserPrimitive* item, bool keepLayer = true, bool updateDocBounding = true);
+
+    QImage thumbnail() const;
+    void setThumbnail(const QImage& image);
 
 protected:
 

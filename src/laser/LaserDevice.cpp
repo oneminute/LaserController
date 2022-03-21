@@ -638,6 +638,53 @@ bool LaserDevice::isMainCardRegistered() const
     return d->mainCardRegistered;
 }
 
+bool LaserDevice::isDongleConnected()
+{
+    Q_D(LaserDevice);
+    QString dongleId = d->driver->getDongleId();
+    if (!dongleId.isEmpty() && !dongleId.isNull())
+        return true;
+    return false;
+}
+
+bool LaserDevice::availableForMachining()
+{
+    if (!isDongleConnected())
+    {
+        QMessageBox::warning(LaserApplication::mainWindow, tr("Alert"), tr("No available dongle connected."));
+        return false;
+    }
+    int dongleType = getHardwareKeyType();
+    if (dongleType < 4)
+    {
+        return true;
+    }
+    else if (dongleType == 4)
+    {
+        if (!isMainCardActivated())
+        {
+            QMessageBox::warning(LaserApplication::mainWindow, tr("Alert"), tr("Main card is not activated."));
+            return false;
+        }
+        if (!isMainCardRegistered())
+        {
+            QMessageBox::warning(LaserApplication::mainWindow, tr("Alert"), tr("Main card is not registered."));
+            return false;
+        }
+        return true;
+    }
+    QMessageBox::warning(LaserApplication::mainWindow, tr("Alert"), tr("No available dongle connected."));
+    return false;
+}
+
+int LaserDevice::getHardwareKeyType(qint16 type)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        return d->driver->getHardwareKeyType(type);
+    return -1;
+}
+
 QString LaserDevice::apiLibVersion() const
 {
     Q_D(const LaserDevice);

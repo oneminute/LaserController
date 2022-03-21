@@ -1071,6 +1071,65 @@ void Config::loadExportItems()
             comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
         }
     );
+
+    ConfigItem* thumbnailWidth = group->addConfigItem(
+        "thumbnailWidth",
+        320,
+        DT_INT
+    );
+    thumbnailWidth->setInputWidgetProperty("minimum", 240);
+    thumbnailWidth->setInputWidgetProperty("maximum", 800);
+
+    ConfigItem* thumbnailHeight = group->addConfigItem(
+        "thumbnailHeight",
+        240,
+        DT_INT
+    );
+    thumbnailHeight->setInputWidgetProperty("minimum", 240);
+    thumbnailHeight->setInputWidgetProperty("maximum", 800);
+
+    ConfigItem* thumbnailColorType = group->addConfigItem(
+        "thumbnailColorType",
+        QImage::Format_RGB888,
+        DT_INT
+    );
+    thumbnailColorType->setInputWidgetType(IWT_ComboBox);
+    thumbnailColorType->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("ARGB"), QImage::Format_ARGB32);
+            comboBox->addItem(ltr("RGB"), QImage::Format_RGB888);
+            comboBox->addItem(ltr("Grayscale"), QImage::Format_Grayscale8);
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
+    ConfigItem* thumbnailImageType = group->addConfigItem(
+        "thumbnailImageType",
+        "JPG",
+        DT_STRING
+    );
+    thumbnailImageType->setInputWidgetType(IWT_ComboBox);
+    thumbnailImageType->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(ltr("JPG"), "JPG");
+            comboBox->addItem(ltr("PNG"), "PNG");
+
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
 }
 
 void Config::loadDeviceItems()

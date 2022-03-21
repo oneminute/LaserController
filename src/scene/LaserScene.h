@@ -59,6 +59,8 @@ public:
     void setImage(const QImage& image);
     void clearImage();
 
+    QImage thumbnail();
+
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;

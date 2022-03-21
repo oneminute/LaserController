@@ -199,6 +199,9 @@ bool LaserDriver::load()
     m_fnGetMainHardModal = (FN_WCHART_VOID)m_library.resolve("GetMainHardModal");
     CHECK_FN(m_fnGetMainHardModal)
 
+    m_fnGetHardWareKeyType = (FN_INT_INT16)m_library.resolve("GetHardWareKeyType");
+    CHECK_FN(m_fnGetHardWareKeyType)
+
     m_fnCreateLicenseFile = (FN_BOOL_WCHART)m_library.resolve("CreateLicenseFile");
     CHECK_FN(m_fnCreateLicenseFile)
 
@@ -543,6 +546,11 @@ bool LaserDriver::readAllExternalParamFromCard()
     }
     return readExternalParamFromCard(params);
 
+}
+
+int LaserDriver::getHardwareKeyType(qint16 type)
+{
+    return m_fnGetHardWareKeyType(type);
 }
 
 int LaserDriver::showAboutWindow(int interval, bool modal)

@@ -99,6 +99,8 @@ private:
         bool, int, int, bool, int, int
     );
 
+    typedef int(__stdcall* FN_INT_INT16)(qint16);
+
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
@@ -132,6 +134,7 @@ public:
     bool writeExternalParamToCard(const LaserRegister::RegistersMap& values);
     bool readExternalParamFromCard(QList<int> addresses);
     bool readAllExternalParamFromCard();
+    int getHardwareKeyType(qint16 type = 0);
 
     int showAboutWindow(int interval = 0, bool modal = true);
     void closeAboutWindow();
@@ -290,6 +293,7 @@ private:
     FN_VOID_VOID m_fnStartSoftUpdateWizard;
     FN_VOID_VOID m_fnStartFirmwareUpdateWizard;
     FN_WCHART_VOID m_fnGetMainHardModal;
+    FN_INT_INT16 m_fnGetHardWareKeyType;
 
     FN_WCHART_VOID m_fnGetCurrentLaserPos;
     FN_VOID_INT m_fnStartMachining;
