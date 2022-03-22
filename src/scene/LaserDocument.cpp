@@ -67,6 +67,7 @@ public:
 
     bool useSpecifiedOrigin;
     int specifiedOriginIndex;
+    QImage thumbnail;
 };
 
 LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
@@ -146,6 +147,18 @@ void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool u
     if (updateDocBounding)
         updateDocumentBounding();
     updateLayersStructure();
+}
+
+QImage LaserDocument::thumbnail() const
+{
+    Q_D(const LaserDocument);
+    return d->thumbnail;
+}
+
+void LaserDocument::setThumbnail(const QImage& image)
+{
+    Q_D(LaserDocument);
+    d->thumbnail = image;
 }
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
@@ -269,7 +282,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     }
 
     ProgressItem* exportProgress = new ProgressItem(tr("Export Json"), ProgressItem::PT_Complex, parentProgress);
-    exportProgress->setMaximum(layerList.count());
+    exportProgress->setMaximum(path.count());
 
     bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
     QTransform t = enablePrintAndCut() ? transform() : QTransform();
@@ -277,8 +290,8 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     
     QRect docBounding = currentDocBoundingRect();
     QRect docBoundingAcc = currentEngravingBoundingRect(false);
-    if (!docBoundingAcc.isValid())
-        docBoundingAcc = docBounding;
+    //if (!docBoundingAcc.isValid())
+        //docBoundingAcc = docBounding;
     QPoint startPos;
     int deviceOriginIndex = Config::SystemRegister::deviceOrigin();
     if (useSpecifiedOrigin())
@@ -346,6 +359,16 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     }
     utils::makePointsRelative(boundingPoints, QPoint(0, 0));
 
+    QByteArray thumbnailData;
+    QBuffer thumbnailBuffer(&thumbnailData);
+    thumbnailBuffer.open(QIODevice::WriteOnly);
+    d->thumbnail.save(&thumbnailBuffer, "PNG");
+    QString thumbnail64 = QString::fromLatin1(thumbnailData.toBase64());
+
+    QByteArray ba = QByteArray::fromBase64(thumbnail64.toLatin1());
+    QImage thmb = QImage::fromData(ba);
+    thmb.save("tmp/thumbnail_restore.png", "PNG");
+
     QJsonObject jsonObj;
     QJsonObject laserDocumentInfo;
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
@@ -354,15 +377,15 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     laserDocumentInfo["FinishRun"] = d->finishRun;
     laserDocumentInfo["StartFrom"] = startFrom;
     laserDocumentInfo["StartFromPos"] = typeUtils::point2Json(startPos);
-    laserDocumentInfo["Absolute"] = absolute;
     laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
     laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
     laserDocumentInfo["Origin"] = typeUtils::point2Json(startPos);
     laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, Config::Device::switchToU(), true);
     laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU(), true);
-    laserDocumentInfo["MaxEngravingPower"] = maxEngravingSpeed();
+    laserDocumentInfo["MaxEngravingSpeed"] = maxEngravingSpeed();
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
     laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
+    laserDocumentInfo["Thumbnail"] = thumbnail64;
 
     jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
 
@@ -417,7 +440,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
                 {
                     itemObj["Style"] = LaserLayerType::LLT_ENGRAVING;
 
-                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Engraving").arg(primitive->name()), ProgressItem::PT_Simple, exportProgress);
+                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Engraving").arg(primitive->name()), ProgressItem::PT_Complex, exportProgress);
                     QByteArray data = primitive->engravingImage(progress, QPoint());
                     if (!data.isEmpty())
                     {
@@ -461,7 +484,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
                 if (!enablePrintAndCut())
                 {
                     itemObj["Type"] = primitive->typeLatinName();
-                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), ProgressItem::PT_Simple, exportProgress);
+                    ProgressItem* progress = new ProgressItem(QObject::tr("%1 Lines to Plt").arg(primitive->name()), ProgressItem::PT_Complex, exportProgress);
                     if (layer->fillingType() == FT_Line)
                     {
                         LaserLineListList lineList = primitive->generateFillData();
@@ -609,6 +632,12 @@ int LaserDocument::maxEngravingSpeed() const
             maxSpeed = layer->engravingRunSpeed();
     }
     return maxSpeed;
+}
+
+bool LaserDocument::isEmpty() const
+{
+    Q_D(const LaserDocument);
+    return d->primitives.isEmpty();
 }
 
 QPoint LaserDocument::reletiveJobOrigin() const

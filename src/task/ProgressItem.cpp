@@ -38,6 +38,8 @@ void ProgressItem::setMaximum(qreal value)
 {
     QMutexLocker locker(&m_childMutex);
     m_maximum = value; 
+    if (m_type == PT_Complex)
+        updateWeights();
 }
 
 int ProgressItem::indexOfParent()
@@ -61,19 +63,30 @@ qreal ProgressItem::progress() const
     case PT_Simple:
     {
         progress = qBound(0.0, (m_progress - m_minimum) / (m_maximum - m_minimum), 1.0); 
+        break;
     }
     case PT_Complex:
     {
         //QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
         qreal finalProgress = 0.0;
         
-        qreal maximum = qMax(m_maximum, static_cast<qreal>(m_childItems.count()));
-        for (ProgressItem* item : m_childItems)
+        //qreal maximum = qMax(m_maximum, static_cast<qreal>(m_childItems.count()));
+        int maximum = m_weights.size();
+        for (int i = 0; i < maximum; i++)
         {
-            //qreal weight = m_weights[item];
-            finalProgress += /*weight * */item->progress() / (maximum - m_minimum);
+            ProgressItem* item = nullptr;
+            qreal weight = m_weights[i] / m_totalWeight;
+            qreal subProgress = 0;
+            if (i < m_childItems.size())
+            {
+                item = m_childItems.at(i);
+                subProgress = item->progress() * weight;
+            }
+            finalProgress += subProgress;
         }
         progress = qBound(0.0, finalProgress, 1.0); 
+        //qLogD << finalProgress << " " << progress;
+        break;
     }
     }
     return progress;
@@ -166,6 +179,27 @@ int ProgressItem::childCount() const
     return m_childItems.count();
 }
 
+QVector<qreal> ProgressItem::weights() const
+{
+    return m_weights;
+}
+
+void ProgressItem::setWeights(const QVector<qreal> weights)
+{
+    if (m_type == PT_Simple)
+        return;
+
+    m_weights.resize(qRound(m_maximum));
+    for (int i = 0; i < m_weights.size(); i++)
+    {
+        if (i < weights.size())
+            m_weights[i] = weights[i];
+        else
+            m_weights[i] = 1;
+    }
+    updateWeights();
+}
+
 void ProgressItem::startTimer()
 {
     m_timer.start();
@@ -231,6 +265,29 @@ void ProgressItem::reset()
     clear();
     m_progress = 0;
     emit progressUpdated(0);
+}
+
+void ProgressItem::updateWeights()
+{
+    int maximum = qRound(m_maximum);
+    if (m_weights.size() < maximum)
+    {
+        int i = m_weights.size();
+        m_weights.resize(maximum);
+        for (; i < m_weights.size(); i++)
+        {
+            m_weights[i] = 1.0;
+        }
+    }
+    else if (m_weights.size() > maximum)
+    {
+        m_weights.resize(maximum);
+    }
+    m_totalWeight = 0;
+    for (qreal weight : m_weights)
+    {
+        m_totalWeight += weight;
+    }
 }
 
 void ProgressItem::notify()

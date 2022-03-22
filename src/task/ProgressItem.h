@@ -63,7 +63,8 @@ public:
     int childCount() const;
     bool hasChildren() const { return !m_childItems.empty(); }
 
-    //void setWeight(ProgressItem* item, qreal weight);
+    QVector<qreal> weights() const;
+    void setWeights(const QVector<qreal> weights);
 
     virtual void startTimer();
     virtual void stopTimer();
@@ -82,7 +83,7 @@ public:
     void reset();
 
 protected:
-    //void updateWeights();
+    void updateWeights();
     void notify();
 
 signals:
@@ -100,8 +101,8 @@ private:
 
     qint64 m_durationNSecs;
     QList<ProgressItem*> m_childItems;
-    //QMap<ProgressItem*, qreal> m_weights;
-    //qreal m_sumWeights;
+    QVector<qreal> m_weights;
+    qreal m_totalWeight;
 
     ProgressItem* m_parent;
     bool m_isFinished;

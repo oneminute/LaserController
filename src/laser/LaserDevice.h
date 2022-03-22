@@ -72,6 +72,9 @@ public:
     QString hardwareMaintainingTimes() const;
     bool isMainCardActivated() const;
     bool isMainCardRegistered() const;
+    bool isDongleConnected();
+    bool availableForMachining();
+    int getHardwareKeyType(qint16 type = 0);
 
     QString apiLibVersion() const;
     QString apiLibCompileInfo() const;
@@ -209,6 +212,8 @@ public slots:
     bool requestTemporaryLicense();
     bool createLicenseFile(const QString& licenseCode);
     void updateDeviceOriginAndTransform();
+    void startMachining();
+    void downloadToBoard();
 
 protected:
     LaserRegister::RegistersMap registerValues(const QMap<int, LaserRegister*>& registers, bool onlyModified = false) const;
@@ -245,6 +250,7 @@ signals:
     void machiningStopped();
     void machiningFinished();
     void idle();
+    void downloadingToBoard();
     void downloadFinished();
     void mainCardRegistrationChanged(bool registered);
     void mainCardActivationChanged(bool activated);
