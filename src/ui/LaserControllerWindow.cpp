@@ -102,6 +102,8 @@
 #include <ui/StampFrameDialog.h>
 #include <ui/StampCircleDialog.h>
 #include <ui/StampStripDialog.h>
+#include <ui/SplashScreen.h>
+
 using namespace ads;
 
 LaserControllerWindow::LaserControllerWindow(QWidget* parent)
@@ -7008,12 +7010,15 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     if (!m_created)
     {
         //LaserApplication::device->updateDriverLanguage();
+        LaserApplication::splashScreen->setMessage(tr("Loading main window..."));
         m_created = true;
-        QTimer::singleShot(100, this, [=]() {
+        QTimer::singleShot(1000, this, [=]() {
             //LaserApplication::device->updateDriverLanguage();
             emit windowCreated();
             qLogD << "orientation: " << m_splitterLayers->orientation();
             m_splitterLayers->setSizes({400, 450});
+            LaserApplication::splashScreen->setProgress(100);
+            LaserApplication::splashScreen->hide();
         });
     }
 }
