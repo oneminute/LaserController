@@ -2000,6 +2000,15 @@
     <string>Default camera parameters</string>
    </property>
   </action>
+  <action name="actionMachiningStamp">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/start_stamp.png</normaloff>:/ui/icons/images/start_stamp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Machining Stamp</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../res/icons.qrc"/>

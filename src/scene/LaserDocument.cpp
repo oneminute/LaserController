@@ -161,6 +161,117 @@ void LaserDocument::setThumbnail(const QImage& image)
     d->thumbnail = image;
 }
 
+QJsonObject LaserDocument::jsonHeader(QRect bounding, QRect boundingAcc, int deviceOriginIndex, int startFrom, QPoint startPos, QPoint lastPoint, bool absolute, const QTransform& t, bool includeThumbnail)
+{
+    Q_D(LaserDocument);
+
+    QList<QPoint> boundingPoints;
+    if (absolute)
+    {
+        boundingPoints = machiningUtils::boundingPoints(deviceOriginIndex, bounding);
+        utils::makePointsRelative(boundingPoints, startPos);
+    }
+    else
+    {
+        boundingPoints = machiningUtils::boundingPoints(
+            Config::Device::jobOrigin(), bounding, startPos
+        );
+        utils::makePointsRelative(boundingPoints, startPos);
+    }
+
+    QJsonObject laserDocumentInfo;
+    laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
+    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    laserDocumentInfo["PrinterDrawUnit"] = 1016;
+    laserDocumentInfo["FinishRun"] = d->finishRun;
+    laserDocumentInfo["StartFrom"] = startFrom;
+    laserDocumentInfo["StartFromPos"] = typeUtils::point2Json(startPos);
+    laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
+    laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
+    laserDocumentInfo["Origin"] = typeUtils::point2Json(startPos);
+    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(bounding, Config::Device::switchToU(), true);
+    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(boundingAcc, Config::Device::switchToU(), true);
+    laserDocumentInfo["MaxEngravingSpeed"] = maxEngravingSpeed();
+    laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
+    laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
+    if (includeThumbnail)
+    {
+        QByteArray thumbnailData;
+        QBuffer thumbnailBuffer(&thumbnailData);
+        thumbnailBuffer.open(QIODevice::WriteOnly);
+        d->thumbnail.save(&thumbnailBuffer, "PNG");
+        QString thumbnail64 = QString::fromLatin1(thumbnailData.toBase64());
+
+        QByteArray ba = QByteArray::fromBase64(thumbnail64.toLatin1());
+        QImage thmb = QImage::fromData(ba);
+        thmb.save("tmp/thumbnail_restore.png", "PNG");
+
+        laserDocumentInfo["Thumbnail"] = thumbnail64;
+    }
+    return laserDocumentInfo;
+}
+
+void LaserDocument::jsonBounding(QRect& bounding, QRect& boundingAcc, int& deviceOriginIndex, int& startFrom, QPoint& startPos, QPoint& lastPoint, bool absolute, const QTransform& t)
+{
+    QRect docBounding = currentDocBoundingRect();
+    QRect docBoundingAcc = currentEngravingBoundingRect(false);
+    startPos;
+    deviceOriginIndex = Config::SystemRegister::deviceOrigin();
+    if (useSpecifiedOrigin())
+    {
+        deviceOriginIndex = specifiedOriginIndex();
+    }
+
+    lastPoint;
+    if (absolute)
+    {
+        docBounding = t.mapRect(docBounding);
+        docBoundingAcc = t.mapRect(docBoundingAcc);
+        switch (deviceOriginIndex)
+        {
+        case 0:
+            startPos = docBounding.topLeft();
+            break;
+        case 1:
+            startPos = QPoint(docBounding.left(), docBounding.top() + docBounding.height());
+            break;
+        case 2:
+            startPos = QPoint(docBounding.left() + docBounding.width(), docBounding.top() + docBounding.height());
+            break;
+        case 3:
+            startPos = QPoint(docBounding.left() + docBounding.width(), docBounding.top());
+            break;
+        }
+        lastPoint = startPos;
+    }
+    else
+    {
+        lastPoint = this->jobOriginOnDocBoundingRect();
+        lastPoint = t.map(lastPoint);
+        startPos = QPoint(0, 0);
+    }
+    bounding = docBounding;
+    boundingAcc = docBoundingAcc;
+
+    startFrom = 0;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_CurrentPosition:
+        startFrom = 0;
+        break;
+    case SFT_UserOrigin:
+        startFrom = Config::Device::userOriginSelected() + 1;
+        break;
+    case SFT_AbsoluteCoords:
+        startFrom = 4;
+        QPoint offset = docBounding.topLeft() - startPos;
+        docBounding.moveTo(offset);
+        offset = docBoundingAcc.topLeft() - startPos;
+        docBoundingAcc.moveTo(offset);
+        break;
+    }
+}
+
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
 {
     Q_D(const LaserDocument);
@@ -287,110 +398,19 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
     QTransform t = enablePrintAndCut() ? transform() : QTransform();
     t = t * LaserApplication::device->to1stQuad();
-    
-    QRect docBounding = currentDocBoundingRect();
-    QRect docBoundingAcc = currentEngravingBoundingRect(false);
-    //if (!docBoundingAcc.isValid())
-        //docBoundingAcc = docBounding;
+
+    QRect bounding;
+    QRect boundingAcc;
+    int deviceOriginIndex;
+    int startFrom;
     QPoint startPos;
-    int deviceOriginIndex = Config::SystemRegister::deviceOrigin();
-    if (useSpecifiedOrigin())
-    {
-        deviceOriginIndex = specifiedOriginIndex();
-    }
-
     QPoint lastPoint;
-    if (absolute)
-    {
-        docBounding = t.mapRect(docBounding);
-        docBoundingAcc = t.mapRect(docBoundingAcc);
-        switch (deviceOriginIndex)
-        {
-        case 0:
-            startPos = docBounding.topLeft();
-            break;
-        case 1:
-            startPos = QPoint(docBounding.left(), docBounding.top() + docBounding.height());
-            break;
-        case 2:
-            startPos = QPoint(docBounding.left() + docBounding.width(), docBounding.top() + docBounding.height());
-            break;
-        case 3:
-            startPos = QPoint(docBounding.left() + docBounding.width(), docBounding.top());
-            break;
-        }
-        lastPoint = startPos;
-    }
-    else
-    {
-        lastPoint = this->jobOriginOnDocBoundingRect();
-        lastPoint = t.map(lastPoint);
-        startPos = QPoint(0, 0);
-    }
-
-    int startFrom = 0;
-    switch (Config::Device::startFrom())
-    {
-    case SFT_CurrentPosition:
-        startFrom = 0;
-        break;
-    case SFT_UserOrigin:
-        startFrom = Config::Device::userOriginSelected() + 1;
-        break;
-    case SFT_AbsoluteCoords:
-        startFrom = 4;
-        QPoint offset = docBounding.topLeft() - startPos;
-        docBounding.moveTo(offset);
-        offset = docBoundingAcc.topLeft() - startPos;
-        docBoundingAcc.moveTo(offset);
-        break;
-    }
-
-    QList<QPoint> boundingPoints;
-    if (absolute)
-    {
-        boundingPoints = machiningUtils::boundingPoints(deviceOriginIndex, docBounding);
-    }
-    else
-    {
-        boundingPoints = machiningUtils::boundingPoints(
-            Config::Device::jobOrigin(), docBounding, startPos
-        );
-    }
-    utils::makePointsRelative(boundingPoints, QPoint(0, 0));
-
-    QByteArray thumbnailData;
-    QBuffer thumbnailBuffer(&thumbnailData);
-    thumbnailBuffer.open(QIODevice::WriteOnly);
-    d->thumbnail.save(&thumbnailBuffer, "PNG");
-    QString thumbnail64 = QString::fromLatin1(thumbnailData.toBase64());
-
-    QByteArray ba = QByteArray::fromBase64(thumbnail64.toLatin1());
-    QImage thmb = QImage::fromData(ba);
-    thmb.save("tmp/thumbnail_restore.png", "PNG");
-
+    jsonBounding(bounding, boundingAcc, deviceOriginIndex, startFrom, startPos, lastPoint, absolute, t);
     QJsonObject jsonObj;
-    QJsonObject laserDocumentInfo;
-    laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
-    laserDocumentInfo["CreateDate"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-    laserDocumentInfo["PrinterDrawUnit"] = 1016;
-    laserDocumentInfo["FinishRun"] = d->finishRun;
-    laserDocumentInfo["StartFrom"] = startFrom;
-    laserDocumentInfo["StartFromPos"] = typeUtils::point2Json(startPos);
-    laserDocumentInfo["JobOrigin"] = Config::Device::jobOrigin();
-    laserDocumentInfo["DeviceOrigin"] = Config::SystemRegister::deviceOrigin();
-    laserDocumentInfo["Origin"] = typeUtils::point2Json(startPos);
-    laserDocumentInfo["BoundingRect"] = typeUtils::rect2Json(docBounding, Config::Device::switchToU(), true);
-    laserDocumentInfo["BoundingRectAcc"] = typeUtils::rect2Json(docBoundingAcc, Config::Device::switchToU(), true);
-    laserDocumentInfo["MaxEngravingSpeed"] = maxEngravingSpeed();
-    laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
-    laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
-    laserDocumentInfo["Thumbnail"] = thumbnail64;
-
-    jsonObj["LaserDocumentInfo"] = laserDocumentInfo;
+    
+    jsonObj["LaserDocumentInfo"] = jsonHeader(bounding, boundingAcc, deviceOriginIndex, startFrom, startPos, lastPoint, absolute, t, true);
 
     QJsonArray layers;
-    
     
     for (LaserLayer* layer : layerList)
     {
@@ -562,6 +582,46 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
     emit exportFinished(rawJson);
 }
 
+QByteArray LaserDocument::exportBoundingJson(bool exportJson)
+{
+    Q_D(LaserDocument);
+
+    updateDocumentBounding();
+
+    bool absolute = Config::Device::startFrom() == SFT_AbsoluteCoords;
+    QTransform t = enablePrintAndCut() ? transform() : QTransform();
+    t = t * LaserApplication::device->to1stQuad();
+
+    QRect bounding;
+    QRect boundingAcc;
+    int deviceOriginIndex;
+    int startFrom;
+    QPoint startPos;
+    QPoint lastPoint;
+    jsonBounding(bounding, boundingAcc, deviceOriginIndex, startFrom, startPos, lastPoint, absolute, t);
+    QJsonObject jsonObj;
+    
+    jsonObj["LaserDocumentInfo"] = jsonHeader(bounding, boundingAcc, deviceOriginIndex, startFrom, startPos, lastPoint, absolute, t, false);
+
+    QJsonDocument jsonDoc(jsonObj);
+    QByteArray rawJson;
+    if (exportJson)
+    {
+        rawJson = jsonDoc.toJson(QJsonDocument::Indented);
+        QFile saveFile("tmp/bounding.json");
+        if (saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+        {
+            qint64 writtenBytes = saveFile.write(rawJson);
+            saveFile.close();
+        }
+    }
+    else
+    {
+        rawJson = jsonDoc.toJson(QJsonDocument::Compact);
+    }
+    return rawJson;
+}
+
 void LaserDocument::generateBoundingPrimitive()
 {
 }
@@ -593,7 +653,6 @@ void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
     for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
     {
         d->layers[i]->bindButton(layerButtons[i], i);
-
     }
     updateLayersStructure();
 }
@@ -1317,10 +1376,9 @@ void LaserDocument::updateDocumentBounding()
     utils::boundingRect(d->primitives.values(), d->bounding, d->engravingBounding);
 }
 
-QMap<LaserLayer*, QImage> LaserDocument::generateStampImages()
+QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
 {
-    QMap<LaserLayer*, QImage>images;
-    
+    QList<StampItem> images;
     
     int i = 0;
     for (LaserLayer* layer : layers()) {
@@ -1348,6 +1406,7 @@ QMap<LaserLayer*, QImage> LaserDocument::generateStampImages()
         qreal offset = 2000;
         boundingRectInDevice = QRect(boundingRectInDevice .left()-offset,  boundingRectInDevice.top() - offset, 
             boundingRectInDevice.width() + 2*offset, boundingRectInDevice.height() + 2 * offset);
+        QRect primitiveBounding = boundingRectInDevice;
         qreal ratio = boundingRectInDevice.width() * 1.0 / boundingRectInDevice.height();
         
         
@@ -1444,7 +1503,11 @@ QMap<LaserLayer*, QImage> LaserDocument::generateStampImages()
 
         cv::imwrite("tmp/images/" + QString(i).toStdString() + "_resized.png", resized);*/
 
-        images.insert(layer, image);
+        StampItem item;
+        item.layer = layer;
+        item.image = image;
+        item.bounding = primitiveBounding;
+        images.append(item);
         i++;
     }
     return images;

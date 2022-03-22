@@ -75,6 +75,8 @@ public:
     bool isDongleConnected();
     bool availableForMachining();
     int getHardwareKeyType(qint16 type = 0);
+    int importData(const QByteArray& data);
+    int drawBounding(const QByteArray& data);
 
     QString apiLibVersion() const;
     QString apiLibCompileInfo() const;
@@ -110,7 +112,6 @@ public:
     void moveToZOrigin();
     void moveToUOrigin();
     void moveToXYOrigin();
-    void drawRectangularBorder(LaserDocument* doc);
 
     bool isAvailable() const;
 

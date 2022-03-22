@@ -685,6 +685,20 @@ int LaserDevice::getHardwareKeyType(qint16 type)
     return -1;
 }
 
+int LaserDevice::importData(const QByteArray& data)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        return d->driver->importData(data.data(), data.length());
+}
+
+int LaserDevice::drawBounding(const QByteArray& data)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        return d->driver->drawBounding(data.data(), data.length());
+}
+
 QString LaserDevice::apiLibVersion() const
 {
     Q_D(const LaserDevice);
@@ -953,28 +967,6 @@ void LaserDevice::moveToXYOrigin()
     {
         d->driver->lPenMoveToOriginalPoint(0);
     }
-}
-
-void LaserDevice::drawRectangularBorder(LaserDocument* doc)
-{
-    Q_D(LaserDevice);
-    if (!d->driver)
-        return;
-
-    QTransform t = this->to1stQuad();
-    QRect boundingRect = doc->currentDocBoundingRect();
-    switch (Config::Device::startFrom())
-    {
-    case SFT_CurrentPosition:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
-        break;
-    case SFT_UserOrigin:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        break;
-    }
-    QRect bounding = t.mapRect(boundingRect);
-    d->driver->drawRectangularBorder(true, bounding.x(), bounding.x() + bounding.width(),
-        true, bounding.y(), bounding.y() + bounding.height());
 }
 
 bool LaserDevice::isAvailable() const

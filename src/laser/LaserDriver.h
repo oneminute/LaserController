@@ -95,10 +95,6 @@ private:
 
     typedef void(__stdcall* FN_VOID_LONG)(unsigned long);
 
-    typedef void(__stdcall* FNDrawRectangularBorder)(
-        bool, int, int, bool, int, int
-    );
-
     typedef int(__stdcall* FN_INT_INT16)(qint16);
 
 public:
@@ -210,8 +206,8 @@ public:
     int testLaserLight(bool open);
     int loadDataFromFile(const QString& filename, bool withMachining = true);
     void download(unsigned long index = 0);
-    void drawRectangularBorder(bool xAbs, int x1, int x2, bool yAbs, int y1, int y2);
     int importData(const char* data, int length);
+    int drawBounding(const char* data, int length);
     void getDeviceWorkState();
     void checkVersionUpdate(bool hardware, const QString& flag, int currentVersion, const QString& versionNoteToJsonFile);
     void startSoftUpdateWizard();
@@ -304,7 +300,6 @@ private:
 
     FN_INT_WCHART m_fnLoadDataFromFile;
     FN_VOID_LONG m_fnStartDownLoadToCache;
-    FNDrawRectangularBorder m_fnDrawRectangularBorder;
 
     FN_VOID_VOID m_fnGetDeviceWorkState;
 
@@ -315,6 +310,7 @@ private:
     FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
 
     FN_INT_BYTEPTR_INT m_fnImportData;
+    FN_INT_BYTEPTR_INT m_fnDrawRectangularBorder;
 
     FN_VOID_INT m_fnLPenMoveToOriginalPointZ;
 

@@ -1088,48 +1088,6 @@ void Config::loadExportItems()
     thumbnailHeight->setInputWidgetProperty("minimum", 240);
     thumbnailHeight->setInputWidgetProperty("maximum", 800);
 
-    ConfigItem* thumbnailColorType = group->addConfigItem(
-        "thumbnailColorType",
-        QImage::Format_RGB888,
-        DT_INT
-    );
-    thumbnailColorType->setInputWidgetType(IWT_ComboBox);
-    thumbnailColorType->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
-        {
-            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-            if (!comboBox)
-                return;
-
-            comboBox->addItem(ltr("ARGB"), QImage::Format_ARGB32);
-            comboBox->addItem(ltr("RGB"), QImage::Format_RGB888);
-            comboBox->addItem(ltr("Grayscale"), QImage::Format_Grayscale8);
-
-            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
-        }
-    );
-
-    ConfigItem* thumbnailImageType = group->addConfigItem(
-        "thumbnailImageType",
-        "JPG",
-        DT_STRING
-    );
-    thumbnailImageType->setInputWidgetType(IWT_ComboBox);
-    thumbnailImageType->setWidgetInitializeHook(
-        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
-        {
-            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-            if (!comboBox)
-                return;
-
-            comboBox->addItem(ltr("JPG"), "JPG");
-            comboBox->addItem(ltr("PNG"), "PNG");
-
-            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
-            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
-        }
-    );
 }
 
 void Config::loadDeviceItems()
@@ -3432,6 +3390,14 @@ void Config::updateTitlesAndDescriptions()
     Export::gaussianFactorAItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Gaussian Factor A", nullptr), 
         QCoreApplication::translate("Config", "Gaussian factor a", nullptr));
+
+    Export::thumbnailWidthItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Thumbnail width", nullptr), 
+        QCoreApplication::translate("Config", "Thumbnail width", nullptr));
+
+    Export::thumbnailHeightItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Thumbnail Height", nullptr), 
+        QCoreApplication::translate("Config", "Thumbnail Height", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Auto Connect First COM", nullptr), 
