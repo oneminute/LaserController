@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QPair>
 #include <QSharedPointer>
 #include <QSharedDataPointer>
 #include <QGraphicsItem>
@@ -26,6 +27,12 @@ class LaserDocument : public QObject, public ILaserDocumentItem
 {
     Q_OBJECT
 public:
+    struct StampItem
+    {
+        LaserLayer* layer;
+        QImage image;
+        QRect bounding;
+    };
     explicit LaserDocument(LaserScene* scene = nullptr, QObject* parent = nullptr);
     ~LaserDocument();
 
@@ -133,10 +140,14 @@ public:
     QImage thumbnail() const;
     void setThumbnail(const QImage& image);
 
+    QJsonObject jsonHeader(QRect bounding, QRect boundingAcc, int deviceOriginIndex, int startFrom, QPoint startPos, QPoint lastPoint, bool absolute, const QTransform& t, bool includeThumbnail);
+    void jsonBounding(QRect& bounding, QRect& boundingAcc, int& deviceOriginIndex, int& startFrom, QPoint& startPos, QPoint& lastPoint, bool absolute, const QTransform& t = QTransform());
+
 protected:
 
 public slots:
     void exportJSON(const QString& filename, const PathOptimizer::Path& path, ProgressItem* parentProgress, bool exportJson);
+    QByteArray exportBoundingJson(bool exportJson);
     void generateBoundingPrimitive();
     void updateLayersStructure();
     void destroy();
@@ -149,7 +160,7 @@ public slots:
     void load(const QString& filename, QWidget* window);
     int totalNodes();
     void updateDocumentBounding();
-    QMap<LaserLayer*, QImage> generateStampImages();
+    QList<StampItem> generateStampImages();
     void computeStampBasePath(LaserPrimitive* primitive, QPainter& painter, qreal offset, QTransform t1, QTransform t2);
 protected:
 	void init();
