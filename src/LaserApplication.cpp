@@ -284,6 +284,9 @@ void LaserApplication::retranslate()
     stringMap["Asymmetric Circles Grid"] = tr("Asymmetric Circles Grid");
     stringMap["Back to origin"] = tr("Back to origin");
     stringMap["Back to user origin"] = tr("Back to user origin");
+    stringMap["Back to user origin 1"] = tr("Back to user origin 1");
+    stringMap["Back to user origin 2"] = tr("Back to user origin 2");
+    stringMap["Back to user origin 3"] = tr("Back to user origin 3");
     stringMap["Bold"] = tr("Bold");
     stringMap["Bottom"] = tr("Bottom");
     stringMap["Bottom Left"] = tr("Bottom Left");
@@ -331,6 +334,7 @@ void LaserApplication::retranslate()
     stringMap["Top Left"] = tr("Top Left");
     stringMap["Top Right"] = tr("Top Right");
     stringMap["User Origin"] = tr("User Origin");
+    stringMap["Unload motor"] = tr("Unload motor");
     stringMap["Unregistered"] = tr("Unregistered");
     stringMap["Upper Case"] = tr("Upper Case");
     stringMap["Vertical"] = tr("Vertical");
