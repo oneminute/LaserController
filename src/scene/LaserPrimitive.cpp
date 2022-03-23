@@ -253,6 +253,22 @@ QPainterPath LaserPrimitive::getPath()
 	return d->path;
 }
 
+QPainterPath LaserPrimitive::getPathForStamp()
+{
+    Q_D(LaserPrimitive);
+    QPainterPath pathForStamp;
+    QPointF center = d->path.boundingRect().center();
+    QTransform t;
+    t.scale(-1, 1);
+    pathForStamp = t.map(d->path);
+    QPointF center1 = pathForStamp.boundingRect().center();
+    QTransform t1;
+    t1.translate(center.x() - center1.x(), center.y() - center1.y());
+    pathForStamp = t1.map(pathForStamp);
+
+    return pathForStamp;
+}
+
 QPainterPath LaserPrimitive::getScenePath()
 {
     Q_D(const LaserPrimitive);
@@ -3323,11 +3339,10 @@ void LaserPartyEmblem::draw(QPainter* painter)
 {
     Q_D(const LaserPartyEmblem);
     if (!d->stampIntaglio) {
-        painter->setBrush(QBrush(Qt::white));
+        painter->setBrush(QBrush(this->layer()->color()));
     }
     else {
-        painter->setBrush(QBrush(this->layer()->color()));
-        
+        painter->setBrush(QBrush(Qt::white));
     }
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
@@ -4046,7 +4061,7 @@ public:
     bool uppercase;
     QString family;
     qreal fontPiexlSize;
-    
+    QPainterPath stampPath;
 };
 LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
     QSize size, qreal space, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family)
@@ -4245,12 +4260,23 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     }
     d->textTransformList.clear();
     d->originalTextPathList.clear();
-    QPainterPath allpath;
+    QPainterPath allpath, allOppositePath;
+    QList<QPainterPath> originalOppositeTextPathList;
     for (int i = 0; i < d->content.size(); i++) {
-        QPainterPath path;
+        QPainterPath path, oppositePath;
         QChar c = d->content[i];
         path.addText(0, 0, font, c);
+        oppositePath.addText(0, 0, font, c);
+        QPointF center = oppositePath.boundingRect().center();
+        QTransform oppositeT1;
+        oppositeT1.scale(-1, 1);
+        oppositePath = oppositeT1.map(oppositePath);
+        QPointF center1 = oppositePath.boundingRect().center();
+        QTransform oppositeT2;
+        oppositeT2.translate(center.x() - center1.x(), center.y() - center1.y());
+        oppositePath = oppositeT2.map(oppositePath);
         d->originalTextPathList.append(path);
+        originalOppositeTextPathList.append(oppositePath);
         allpath.addPath(path);
     }
     d->horizontalPathHeight = allpath.boundingRect().height();
@@ -4282,6 +4308,7 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     d->path = QPainterPath();
     for (QPainterPath path : d->originalTextPathList) {
         QTransform t = d->textTransformList[index];
+        QPainterPath oppositePath = originalOppositeTextPathList[index];
         d->path.addPath(t.map(path));
         index++;
     }

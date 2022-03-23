@@ -1487,6 +1487,8 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             }
             painter.setBrush(Qt::NoBrush);
         }
+        image = image.mirrored(true, false);
+        image.invertPixels();
         QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
         image.save(fileName);
         /*cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
@@ -1517,7 +1519,10 @@ void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& pa
 {
     int type = primitive->primitiveType();
     QPen pen(Qt::black);
-    pen.setWidth(1);
+    //qreal lineW = 20 * scene()->views()[0]-> logicalDpiY() / 25.4;
+    //qreal lineW = Global::sceneToMechH(20);
+    pen.setWidth(20);
+    pen.setCosmetic(true);
     painter.setPen(pen);
     QPainterPath path;
     if (type == LPT_FRAME) {
@@ -1538,8 +1543,8 @@ void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& pa
         return;
     }
     QRectF bounds = path.boundingRect();
-    qreal ratioX = (bounds.width() + 2 * offset) / bounds.width();
-    qreal ratioY = (bounds.height() + 2 * offset) / bounds.height();
+    qreal ratioX = (bounds.width() + 2 * offset - 40) / bounds.width();
+    qreal ratioY = (bounds.height() + 2 * offset - 40) / bounds.height();
     path = primitive->sceneTransform().map(path);
     path = t1.map(path);
     path = t2.map(path);
