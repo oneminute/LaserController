@@ -3707,12 +3707,12 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="386"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="387"/>
         <source>Bitmap</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2319"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2335"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -3720,7 +3720,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserCircleText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="685"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="686"/>
         <source>CircleText</source>
         <translation></translation>
     </message>
@@ -3822,8 +3822,8 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="346"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5369"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6082"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5453"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6166"/>
         <source>Save</source>
         <translation></translation>
     </message>
@@ -3846,7 +3846,7 @@ Would you like to overwrite it?</source>
         <location filename="../src/ui/LaserControllerWindow.ui" line="379"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="382"/>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1315"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7007"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7091"/>
         <source>New</source>
         <translation></translation>
     </message>
@@ -3863,7 +3863,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="413"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4775"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4782"/>
         <source>Remove Layer</source>
         <translation></translation>
     </message>
@@ -3982,7 +3982,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="659"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4911"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4918"/>
         <source>Load Json</source>
         <translation></translation>
     </message>
@@ -4372,6 +4372,11 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/ui/LaserControllerWindow.ui" line="2009"/>
+        <source>Machining Stamp</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1822"/>
         <source>CircleStamp</source>
         <translation></translation>
@@ -4621,7 +4626,7 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="858"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="687"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6351"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6435"/>
         <source>Left</source>
         <translation></translation>
     </message>
@@ -4633,7 +4638,7 @@ Would you like to overwrite it?</source>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="870"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="689"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6353"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6437"/>
         <source>Right</source>
         <translation></translation>
     </message>
@@ -5035,124 +5040,124 @@ Would you like to overwrite it?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6037"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6121"/>
         <source>Inactivated</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6346"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6430"/>
         <source>Pos X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6347"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6431"/>
         <source>Pos Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2371"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2372"/>
         <source>work space</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2414"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2415"/>
         <source>Layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2529"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2530"/>
         <source>Cameras</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2452"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2453"/>
         <source>Fade</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="564"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2453"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6348"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2454"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6432"/>
         <source>Width</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="565"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="709"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2457"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6349"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6358"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2458"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6433"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6442"/>
         <source>Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2462"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2463"/>
         <source>Show</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2463"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2464"/>
         <source>X Shift</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2467"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2468"/>
         <source>Y Shift</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2605"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2611"/>
         <source>Devices</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2862"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2869"/>
         <source>User Origin 1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2863"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2870"/>
         <source>User Origin 2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2864"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2871"/>
         <source>User Origin 3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2664"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6335"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2671"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6419"/>
         <source>Operations</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2696"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2703"/>
         <source>Outline</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2729"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2736"/>
         <source>Coordinates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2730"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2737"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2732"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2739"/>
         <source>Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2734"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2741"/>
         <source>Z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2738"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2745"/>
         <source>Distance(mm)</source>
         <translation></translation>
     </message>
@@ -5168,131 +5173,131 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="638"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6350"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6434"/>
         <source>Rotate</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="688"/>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="692"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6352"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6355"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6436"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6439"/>
         <source>Middle</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="691"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6354"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6438"/>
         <source>Top</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="693"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6356"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6440"/>
         <source>Bottom</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="707"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3221"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6357"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3228"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6441"/>
         <source>Font</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="711"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6359"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6443"/>
         <source>Align X</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="713"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6360"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6444"/>
         <source>Align Y</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="715"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6361"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6445"/>
         <source>Spacing X</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="717"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6362"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6446"/>
         <source>Spacing Y</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="719"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3216"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6363"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3223"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6447"/>
         <source>Bold</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="721"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3219"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6364"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3226"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6448"/>
         <source>Italic</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="723"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3220"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6365"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3227"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6449"/>
         <source>Upper Case</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2739"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2746"/>
         <source>Step Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3024"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3031"/>
         <source>U Axis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3225"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3232"/>
         <source>Original Bounds Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3226"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3233"/>
         <source>Text Width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3227"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3234"/>
         <source>Text Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3228"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3235"/>
         <source>Text Spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4776"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4783"/>
         <source>You are about deleting selected layer. Do you want to delete all primitives belonged to this layer?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4777"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4784"/>
         <source>If you click &apos;Delete&apos;, all primitives in this layer will be deleted. 
 If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5138"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5222"/>
         <source>Unload motor</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2960"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3592"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2967"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3599"/>
         <source>Movement</source>
         <translation></translation>
     </message>
@@ -5302,384 +5307,388 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2157"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2196"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2158"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2197"/>
         <source>Recent Files</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2186"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2278"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2187"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2279"/>
         <source>Save config file error.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2237"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2238"/>
         <source>Warning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2237"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2238"/>
         <source>The path has not exists, system will delete the recent file record.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="1963"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="2736"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="2743"/>
         <source>U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3065"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6336"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3072"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6420"/>
         <source>Laser Power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3077"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3084"/>
         <source>Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3106"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3113"/>
         <source>Red Light Alignment</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3114"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3121"/>
         <source>1st Point</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3115"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3122"/>
         <source>2nd Point</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3116"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3123"/>
         <source>Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3130"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3137"/>
         <source>Result</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3133"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3140"/>
         <source>Translation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3134"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3141"/>
         <source>Rotation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3135"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3142"/>
         <source>0.000mm, 0.000mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3136"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3143"/>
         <source>0.00 degrees</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3167"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3174"/>
         <source>Print and Cut</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3185"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3192"/>
         <source>Original Bounds Width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3190"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3197"/>
         <source>Original Bounds Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3196"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3206"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3203"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3213"/>
         <source>Corner Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3197"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3198"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4063"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4105"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4156"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4193"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4223"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4245"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4260"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3204"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3205"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4070"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4112"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4163"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4200"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4230"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4252"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4267"/>
         <source>Locked</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3199"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3206"/>
         <source>Content</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3202"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3209"/>
         <source>Border Width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3211"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3218"/>
         <source>Corner Type</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3213"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3220"/>
         <source>Round Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3214"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3221"/>
         <source>Cutted Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3215"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3222"/>
         <source>Inner Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3229"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3236"/>
         <source>Angle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3890"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3897"/>
         <source>multi</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4634"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4641"/>
         <source>SVG (*.svg);;CAD (*.dxf)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4635"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4642"/>
         <source>Open Supported File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4676"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4683"/>
         <source>Untitled - </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4723"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4730"/>
         <source>Open File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4779"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4786"/>
         <source>Delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4780"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5371"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6084"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4787"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5455"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6168"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4879"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4886"/>
         <source>Export</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4935"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4940"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5091"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5096"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4942"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4947"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5001"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5006"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5175"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5180"/>
         <source>Alert</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5091"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5175"/>
         <source>No active document. Please open or import a document to mechining</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5071"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5155"/>
         <source>Path Optimization</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="3217"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="3224"/>
         <source>Intaglio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4935"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4942"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5001"/>
         <source>No active document. Please open or import a document to mechining.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="4940"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5096"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="4947"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5006"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5180"/>
         <source>No available primitives to machining.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5138"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5222"/>
         <source>Do you want to unload motor?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5222"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5306"/>
         <source>Open Image</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5222"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5306"/>
         <source>Images (*.png *.bmp *.jpg)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5367"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5451"/>
         <source>Close document?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5367"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5451"/>
         <source>Do you want to save current document?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5370"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6083"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5454"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6167"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5513"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5597"/>
         <source>Request successful</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5513"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5597"/>
         <source>Your application for temporary license is successful. Please restart your program.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5517"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5601"/>
         <source>Request failure</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5517"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5601"/>
         <source>Your application for temporary license is failure.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5844"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5928"/>
         <source>%1 degrees</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5845"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5929"/>
         <source>%1mm, %2mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5894"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5910"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="5922"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5978"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="5994"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6006"/>
         <source>x: %1, y: %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6016"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6100"/>
         <source>Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6021"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6105"/>
         <source>Disconnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6027"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6111"/>
         <source>Registered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6029"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6113"/>
         <source>Unregistered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6035"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6119"/>
         <source>Activated</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6042"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6126"/>
         <source>Dongle Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6048"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6132"/>
         <source>Dongle Disonnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6054"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6138"/>
         <source>Dongle Removed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6080"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6164"/>
         <source>Close softeware?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6080"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6164"/>
         <source>Do you want to save current document,before close softeware?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6180"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6264"/>
         <source>Selection: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="6466"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="6550"/>
         <source>Layout(mm): %1x%2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7004"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7088"/>
         <source>A document is opened.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7005"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7089"/>
         <source>Do you want to merge or create a new one?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7006"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7090"/>
         <source>Merge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7359"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7443"/>
         <source>Camera Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7367"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7451"/>
         <source>Camera Disonnected</source>
         <translation></translation>
     </message>
@@ -6096,7 +6105,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1556"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1565"/>
         <source>Untitled</source>
         <translation></translation>
     </message>
@@ -6104,7 +6113,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserEllipse</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="960"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="976"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6112,7 +6121,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserFrame</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="590"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="591"/>
         <source>Frame</source>
         <translation></translation>
     </message>
@@ -6120,7 +6129,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserHorizontalText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="720"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="721"/>
         <source>HorizontalText</source>
         <translation></translation>
     </message>
@@ -6324,7 +6333,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserLine</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1316"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1332"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6332,7 +6341,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPartyEmblem</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="523"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="524"/>
         <source>PartyEmblem</source>
         <translation></translation>
     </message>
@@ -6340,7 +6349,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPath</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1443"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1459"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6348,7 +6357,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPolygon</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1758"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1774"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6356,7 +6365,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPolyline</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1606"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1622"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6364,69 +6373,69 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="643"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="659"/>
         <source>Bitmap</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="644"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="660"/>
         <source>Circle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="645"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="661"/>
         <source>Ellipse</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="646"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="662"/>
         <source>Line</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="647"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="663"/>
         <source>Path</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="648"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="664"/>
         <source>Polygon</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="649"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="665"/>
         <source>Polyline</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="650"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="666"/>
         <source>Rect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="651"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="672"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="667"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="688"/>
         <source>Text</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="652"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="673"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="668"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="689"/>
         <source>Nurbs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="653"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="669"/>
         <source>Star</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="654"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="670"/>
         <source>Frame</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="655"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="671"/>
         <source>Ring</source>
         <translation></translation>
     </message>
@@ -6434,7 +6443,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserRect</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1140"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1156"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6442,7 +6451,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserRing</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="552"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="553"/>
         <source>Ring</source>
         <translation></translation>
     </message>
@@ -6450,7 +6459,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserStar</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="492"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="493"/>
         <source>Star</source>
         <translation></translation>
     </message>
@@ -6458,12 +6467,12 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="469"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="470"/>
         <source>Text</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="3016"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="3032"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6471,7 +6480,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserVerticalText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="748"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="749"/>
         <source>VerticalText</source>
         <translation></translation>
     </message>
@@ -7039,7 +7048,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location filename="../src/ui/StampCircleDialog.ui" line="80"/>
         <source>Intaglio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/StampCircleDialog.ui" line="99"/>
@@ -7282,7 +7291,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location filename="../src/ui/StampFrameDialog.ui" line="83"/>
         <source>Intaglio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/StampFrameDialog.ui" line="102"/>
@@ -7429,7 +7438,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location filename="../src/ui/StampStripDialog.ui" line="80"/>
         <source>Intaglio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/StampStripDialog.ui" line="99"/>
