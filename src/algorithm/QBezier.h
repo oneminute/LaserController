@@ -68,19 +68,19 @@ class QPolygonF;
 class QBezier
 {
 public:
-    static QBezier fromPoints(const QPoint &p1, const QPoint &p2,
-                              const QPoint &p3, const QPoint &p4);
+    static QBezier fromPoints(const QPointF &p1, const QPointF &p2,
+                              const QPointF &p3, const QPointF &p4);
 
     static void coefficients(qreal t, qreal &a, qreal &b, qreal &c, qreal &d);
 
-    inline QPoint pointAt(qreal t) const;
+    inline QPointF pointAt(qreal t) const;
     inline QPointF normalVector(qreal t) const;
 
     inline QPointF derivedAt(qreal t) const;
     inline QPointF secondDerivedAt(qreal t) const;
 
-    QPolygon toPolygon(qreal bezier_flattening_threshold = 0.5) const;
-    void addToPolygon(QPolygon *p, qreal bezier_flattening_threshold = 0.5) const;
+    QPolygonF toPolygon(qreal bezier_flattening_threshold = 0.5) const;
+    void addToPolygon(QPolygonF *p, qreal bezier_flattening_threshold = 0.5) const;
     //void addToPolygon(QDataBuffer<QPointF> &polygon, qreal bezier_flattening_threshold) const;
 
     QRectF bounds() const;
@@ -92,14 +92,14 @@ public:
     int stationaryYPoints(qreal &t0, qreal &t1) const;
     qreal tForY(qreal t0, qreal t1, qreal y) const;
 
-    QPoint pt1() const { return QPoint(x1, y1); }
-    QPoint pt2() const { return QPoint(x2, y2); }
-    QPoint pt3() const { return QPoint(x3, y3); }
-    QPoint pt4() const { return QPoint(x4, y4); }
+    QPointF pt1() const { return QPointF(x1, y1); }
+    QPointF pt2() const { return QPointF(x2, y2); }
+    QPointF pt3() const { return QPointF(x3, y3); }
+    QPointF pt4() const { return QPointF(x4, y4); }
 
     QBezier mapBy(const QTransform &transform) const;
 
-    inline QPoint midPoint() const;
+    inline QPointF midPoint() const;
     inline QLineF midTangent() const;
 
     inline QLineF startTangent() const;
@@ -117,9 +117,9 @@ public:
     qreal x1, y1, x2, y2, x3, y3, x4, y4;
 };
 
-inline QPoint QBezier::midPoint() const
+inline QPointF QBezier::midPoint() const
 {
-    return QPoint(qRound((x1 + x4 + 3*(x2 + x3))/8.), qRound((y1 + y4 + 3*(y2 + y3))/8.));
+    return QPointF(qRound((x1 + x4 + 3*(x2 + x3))/8.), qRound((y1 + y4 + 3*(y2 + y3))/8.));
 }
 
 inline QLineF QBezier::midTangent() const
@@ -161,7 +161,7 @@ inline void QBezier::coefficients(qreal t, qreal &a, qreal &b, qreal &c, qreal &
     c *= 3. * m_t;
 }
 
-inline QPoint QBezier::pointAt(qreal t) const
+inline QPointF QBezier::pointAt(qreal t) const
 {
     // numerically more stable:
     qreal x, y;

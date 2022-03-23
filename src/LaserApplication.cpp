@@ -16,7 +16,7 @@
 #include "scene/LaserDocument.h"
 #include "state/StateController.h"
 #include "ui/LaserControllerWindow.h"
-#include "ui/PreviewWindow.h"
+#include "ui/SplashScreen.h"
 #include "task/ProgressModel.h"
 #include "task/ProgressItem.h"
 
@@ -31,8 +31,7 @@
 
 LaserApplication* LaserApplication::app(nullptr);
 LaserControllerWindow* LaserApplication::mainWindow(nullptr);
-//PreviewWindow* LaserApplication::previewWindow(nullptr);
-//ProgressModel* LaserApplication::progressModel(nullptr);
+SplashScreen* LaserApplication::splashScreen(nullptr);
 ProgressItem* LaserApplication::globalProgress(nullptr);
 LaserDevice* LaserApplication::device(nullptr);
 LaserDriver* LaserApplication::driver(nullptr);
@@ -88,6 +87,10 @@ bool LaserApplication::initialize()
     qLogD << "Display languages: " << displayLocale << ", code: " << displayLocale.language();
 
     loadLanguages();
+    splashScreen = new SplashScreen();
+    splashScreen->setMessage(tr("Loading settings..."));
+    splashScreen->show();
+
     checkEnvironment();
     checkCrash();
     initLog();
@@ -105,20 +108,27 @@ bool LaserApplication::initialize()
         //QTextStream stream(&file);
         //setStyleSheet(stream.readAll());
     }
+    splashScreen->setProgress(10);
 
+    splashScreen->setMessage(tr("Loading laser library..."));
     driver = new LaserDriver;
     device = new LaserDevice(driver);
 
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
     connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
+    splashScreen->setProgress(40);
 
+    splashScreen->setMessage(tr("Loading state machine..."));
     StateController::start();
+    splashScreen->setProgress(50);
 
+    splashScreen->setMessage(tr("Loading main window..."));
     //progressModel = new ProgressModel;
     globalProgress = new ProgressItem(tr("Total Progress"), ProgressItem::PT_Complex);
     mainWindow = new LaserControllerWindow;
     //previewWindow = new PreviewWindow(mainWindow);
     mainWindow->showMaximized();
+    splashScreen->setProgress(85);
 
     g_deviceThread.start();
 
@@ -274,6 +284,9 @@ void LaserApplication::retranslate()
     stringMap["Asymmetric Circles Grid"] = tr("Asymmetric Circles Grid");
     stringMap["Back to origin"] = tr("Back to origin");
     stringMap["Back to user origin"] = tr("Back to user origin");
+    stringMap["Back to user origin 1"] = tr("Back to user origin 1");
+    stringMap["Back to user origin 2"] = tr("Back to user origin 2");
+    stringMap["Back to user origin 3"] = tr("Back to user origin 3");
     stringMap["Bold"] = tr("Bold");
     stringMap["Bottom"] = tr("Bottom");
     stringMap["Bottom Left"] = tr("Bottom Left");
@@ -321,6 +334,7 @@ void LaserApplication::retranslate()
     stringMap["Top Left"] = tr("Top Left");
     stringMap["Top Right"] = tr("Top Right");
     stringMap["User Origin"] = tr("User Origin");
+    stringMap["Unload motor"] = tr("Unload motor");
     stringMap["Unregistered"] = tr("Unregistered");
     stringMap["Upper Case"] = tr("Upper Case");
     stringMap["Vertical"] = tr("Vertical");

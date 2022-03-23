@@ -6,8 +6,7 @@
 #include "common/common.h"
 
 class LaserControllerWindow;
-class PreviewWindow;
-//class ProgressModel;
+class SplashScreen;
 class ProgressItem;
 class LaserDevice;
 class LaserDriver;
@@ -55,17 +54,13 @@ signals:
 public:
     static LaserApplication* app;
     static LaserControllerWindow* mainWindow;
-    //static PreviewWindow* previewWindow;
-    //static ProgressModel* progressModel;
+    static SplashScreen* splashScreen;
     static ProgressItem* globalProgress;
     static LaserDevice* device;
     static LaserDriver* driver;
     static QString appShortName;
     static QTranslator* currentTranslator;
 
-    //static void closeProgressWindow();
-    //static void showProgressWindow();
-    //static void resetProgressWindow();
     static ProgressItem* resetProcess();
 
     static QMap<QString, QString> stringMap;

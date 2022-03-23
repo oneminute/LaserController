@@ -116,27 +116,27 @@ QList<QPolygon> machiningUtils::path2SubpathPolygons(
             progress->setMaximum(path.elementCount());
         }
     }
-    QPolygon current;
+    QPolygonF current;
     for (int i = 0; i < path.elementCount(); ++i) {
         const QPainterPath::Element& e = path.elementAt(i);
         switch (e.type) {
         case QPainterPath::MoveToElement:
             if (current.size() > 1)
-                flatCurves += current;
+                flatCurves += current.toPolygon();
             current.clear();
             current.reserve(16);
-            current += QPoint(e.x, e.y) * matrix;
+            current += QPointF(e.x, e.y) * matrix;
             break;
         case QPainterPath::LineToElement:
-            current += QPoint(e.x, e.y) * matrix;
+            current += QPointF(e.x, e.y) * matrix;
             break;
         case QPainterPath::CurveToElement: {
             Q_ASSERT(path.elementAt(i + 1).type == QPainterPath::CurveToDataElement);
             Q_ASSERT(path.elementAt(i + 2).type == QPainterPath::CurveToDataElement);
-            QBezier bezier = QBezier::fromPoints(QPoint(path.elementAt(i - 1).x, path.elementAt(i - 1).y) * matrix,
-                QPoint(e.x, e.y) * matrix,
-                QPoint(path.elementAt(i + 1).x, path.elementAt(i + 1).y) * matrix,
-                QPoint(path.elementAt(i + 2).x, path.elementAt(i + 2).y) * matrix);
+            QBezier bezier = QBezier::fromPoints(QPointF(path.elementAt(i - 1).x, path.elementAt(i - 1).y) * matrix,
+                QPointF(e.x, e.y) * matrix,
+                QPointF(path.elementAt(i + 1).x, path.elementAt(i + 1).y) * matrix,
+                QPointF(path.elementAt(i + 2).x, path.elementAt(i + 2).y) * matrix);
             bezier.addToPolygon(&current, bezier_flattening_threshold);
             i += 2;
             break;
@@ -149,7 +149,7 @@ QList<QPolygon> machiningUtils::path2SubpathPolygons(
             progress->increaseProgress();
     }
     if (current.size() > 1)
-        flatCurves += current;
+        flatCurves += current.toPolygon();
     if (progress)
         progress->finish();
     return flatCurves;

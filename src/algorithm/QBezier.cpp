@@ -54,8 +54,8 @@ QT_BEGIN_NAMESPACE
 /*!
   \internal
 */
-QBezier QBezier::fromPoints(const QPoint &p1, const QPoint &p2,
-                            const QPoint &p3, const QPoint &p4)
+QBezier QBezier::fromPoints(const QPointF &p1, const QPointF &p2,
+                            const QPointF &p3, const QPointF &p4)
 {
     QBezier b;
     b.x1 = p1.x();
@@ -72,7 +72,7 @@ QBezier QBezier::fromPoints(const QPoint &p1, const QPoint &p2,
 /*!
   \internal
 */
-QPolygon QBezier::toPolygon(qreal bezier_flattening_threshold) const
+QPolygonF QBezier::toPolygon(qreal bezier_flattening_threshold) const
 {
     // flattening is done by splitting the bezier until we can replace the segment by a straight
     // line. We split further until the control points are close enough to the line connecting the
@@ -85,8 +85,8 @@ QPolygon QBezier::toPolygon(qreal bezier_flattening_threshold) const
     // We can stop splitting if both control points are close enough to the line.
     // To make the algorithm faster we use the manhattan length of the line.
 
-    QPolygon polygon;
-    polygon.append(QPoint(x1, y1));
+    QPolygonF polygon;
+    polygon.append(QPointF(x1, y1));
     addToPolygon(&polygon, bezier_flattening_threshold);
     return polygon;
 }
@@ -116,7 +116,7 @@ QBezier QBezier::getSubRange(qreal t0, qreal t1) const
     return result;
 }
 
-void QBezier::addToPolygon(QPolygon *polygon, qreal bezier_flattening_threshold) const
+void QBezier::addToPolygon(QPolygonF *polygon, qreal bezier_flattening_threshold) const
 {
     QBezier beziers[10];
     qreal levels[10];
@@ -141,7 +141,7 @@ void QBezier::addToPolygon(QPolygon *polygon, qreal bezier_flattening_threshold)
         }
         if (d < bezier_flattening_threshold*l || *lvl == 0) {
             // good enough, we pop it off and add the endpoint
-            polygon->append(QPoint(b->x4, b->y4));
+            polygon->append(QPointF(b->x4, b->y4));
             --b;
             --lvl;
         } else {
