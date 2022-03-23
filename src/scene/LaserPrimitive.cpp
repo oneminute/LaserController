@@ -972,7 +972,7 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
         pt = t.map(pt);
         painter.drawPoint(pt);
     }
-    image.save("tmp/circle.png", "PNG");
+    image.save("tmp/circle.tiff", "TIFF");
 
     if (indices.length() <= Config::PathOptimization::maxStartingPoints())
     {

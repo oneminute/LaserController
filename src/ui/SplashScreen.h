@@ -14,7 +14,7 @@ public:
     explicit SplashScreen(QWidget* parent = nullptr);
     ~SplashScreen();
 
-    void setProgress(qreal progress, bool immediate = false);
+    void setProgress(qreal progress, bool immediate = true);
     qreal progress() { return m_progress; }
 
     void setShowProgress(bool showProgress) { m_showProgress = showProgress; }

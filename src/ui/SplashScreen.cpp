@@ -11,18 +11,20 @@
 SplashScreen::SplashScreen(QWidget* parent)
     : QDialog(parent)
     , m_showProgress(true)
+    , m_progress(0)
     , m_targetProgress(100)
     , m_delay(10000)
     , m_progressTick(0.5)
     , m_close(false)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout;
-    mainLayout->setMargin(0);
+    mainLayout->setMargin(1);
 
     m_labelBanner = new QLabel;
     m_labelBanner->setPixmap(QPixmap(":/ui/icons/images/CNE_banner.png"));
 
     m_labelMessage = new QLabel;
+    //m_labelMessage->setAlignment(Qt::AlignRight);
 
     m_progressBar = new QProgressBar;
     m_progressBar->setMaximum(100);
@@ -45,7 +47,7 @@ SplashScreen::SplashScreen(QWidget* parent)
     move(x, y);
 
     m_progressTimer.setInterval(100);
-    connect(&m_progressTimer, &QTimer::timeout, this, &SplashScreen::progressTimerTimeout);
+    connect(&m_progressTimer, &QTimer::timeout, this, &SplashScreen::progressTimerTimeout, Qt::ConnectionType::DirectConnection);
     connect(&m_visualTimer, &QTimer::timeout, this, &SplashScreen::visualTimerTimeout);
 }
 
@@ -65,6 +67,7 @@ void SplashScreen::setProgress(qreal progress, bool immediate)
     else
     {
         m_targetProgress = progress;
+        if (!m_progressTimer.isActive())
         m_progressTimer.start();
     }
 }
@@ -72,7 +75,7 @@ void SplashScreen::setProgress(qreal progress, bool immediate)
 void SplashScreen::setMessage(const QString& message) 
 {
     m_message = message; 
-    m_labelMessage->setText(message);
+    m_labelMessage->setText(" " + message);
 }
 
 void SplashScreen::show(int milliseconds)
@@ -91,7 +94,6 @@ void SplashScreen::hide(bool immediate)
 void SplashScreen::progressTimerTimeout()
 {
     m_progress += m_progressTick;
-    qLogD << m_progress;
     m_progressBar->setValue(qRound(m_progress));
 }
 
