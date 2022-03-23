@@ -39,6 +39,7 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 	int layerIndex();
 	QPainterPath getPath();
+    virtual QPainterPath getPathForStamp();
 	QPainterPath getScenePath();
     
 	/// <summary>
