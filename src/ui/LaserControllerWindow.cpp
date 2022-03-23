@@ -5036,6 +5036,9 @@ void LaserControllerWindow::startMachiningStamp()
 
     QList<LaserDocument::StampItem> stampItems = m_scene->document()->generateStampImages();
     LaserDocument* stampDoc = new LaserDocument;
+    stampDoc->optimizeNode()->setNodeName("stamp doc");
+    stampDoc->setName("stamp doc");
+    stampDoc->open();
     connect(stampDoc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
     for (int i = 0; i < stampItems.length(); i++)
     {
@@ -5067,8 +5070,7 @@ void LaserControllerWindow::startMachiningStamp()
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareMachining = true;
             stampDoc->exportJSON(filename, path, progress, true);
-            stampDoc->close();
-            delete stampDoc;
+            stampDoc->deleteLater();
         }
     );
 }
