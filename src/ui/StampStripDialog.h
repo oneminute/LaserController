@@ -23,7 +23,7 @@ private:
     QStandardItemModel* m_viewItemModel;
     int m_preLayoutIndex;
     QList<QMap<QModelIndex, QString>> m_tablesModelList;
-    
+    int m_layerIndex;
 protected slots:
     virtual void accept();
 

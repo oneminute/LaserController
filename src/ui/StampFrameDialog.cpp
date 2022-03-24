@@ -6,6 +6,8 @@
 #include<QComboBox>
 #include"scene/LaserPrimitive.h"
 #include "scene/LaserDocument.h"
+#include"scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
 
 StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent) 
    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
@@ -13,6 +15,7 @@ StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
+    m_layerIndex = m_scene->document()->idleLayer()->index();
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/frameFour.png");
     QPixmap threePm(":/ui/icons/images/frameThreeL.png");
@@ -181,7 +184,7 @@ void StampFrameDialog::accept()
     point = QPointF(point.x() - frameW * 0.5, point.y() - frameH * 0.5);
     QRect rect(point.x(), point.y(), frameW, frameH);
     bool needAuxiliary = true;
-    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_viewer->curLayerIndex(), frameType);
+    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
     frame->setNeedAuxiliaryLine(needAuxiliary);
     stampList.append(frame);
     LaserFrame* innerFrame = nullptr;;
@@ -193,7 +196,7 @@ void StampFrameDialog::accept()
         qreal innerW = frameW - innderMargin*2 - frameBorder*2;
         qreal innerH = frameH - innderMargin*2 - frameBorder*2;
         innerRect = QRect (point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
-        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_viewer->curLayerIndex(), frameType);
+        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
         innerFrame->setNeedAuxiliaryLine(needAuxiliary);
         innerFrame->setInner(true);
         stampList.append(innerFrame);
@@ -395,7 +398,7 @@ void StampFrameDialog::accept()
             }
         }
         LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), signalText, textSize, center,
-            bold, itatic, false, stampIntaglio, family, 0.0, QTransform(), m_viewer->curLayerIndex());
+            bold, itatic, false, stampIntaglio, family, 0.0, QTransform(), m_layerIndex);
         stampList.append(text);
     }
     m_viewer->addPrimitiveAndExamRegionByBounds(stampList, frame);
