@@ -1436,10 +1436,11 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             //绘制印章外面的基准线
             computeStampBasePath(p, painter, offset, t1, t2);
             painter.setPen(Qt::NoPen);
-            if (p->stampIntaglio()) {
+            painter.setBrush(Qt::NoBrush);
+            if (!p->stampIntaglio()) {
                 int type = p->primitiveType();
                 QPainterPath pPath = p->getPath();
-                //QPainterPath innerPath;
+                painter.setPen(Qt::white);
                 painter.setBrush(Qt::white);
                 pPath = p->sceneTransform().map(pPath);
                 pPath = t1.map(pPath);
@@ -1447,12 +1448,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                 painter.drawPath(pPath);
                 if (type == LPT_FRAME) {
                     LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(p);
-                    if (frame->isInner()) {
-                        pPath = frame->innerPath();
-                    }
-                    else {
-                        pPath = frame->outerPath();
-                    }
+                    pPath = frame->innerPath();
                     painter.setBrush(Qt::black);
                     pPath = p->sceneTransform().map(pPath);
                     pPath = t1.map(pPath);
@@ -1462,12 +1458,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                 else if (type == LPT_RING) {
                     
                     LaserRing* ring = qgraphicsitem_cast<LaserRing*>(p);
-                    if (ring->isInner()) {
-                        pPath = ring->innerPath();
-                    }
-                    else {
-                        pPath = ring->outerPath();
-                    }
+                    pPath = ring->innerPath();
                     painter.setBrush(Qt::black);
                     pPath = p->sceneTransform().map(pPath);
                     pPath = t1.map(pPath);
@@ -1477,34 +1468,19 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                                
             }
             else {
+                painter.setPen(Qt::black);
                 painter.setBrush(Qt::black);
                 QPainterPath pPath = p->getPath();
                 pPath = p->sceneTransform().map(pPath);
                 pPath = t1.map(pPath);
                 pPath = t2.map(pPath);
                 painter.drawPath(pPath);
-                painter.setBrush(Qt::white);
             }
             painter.setBrush(Qt::NoBrush);
         }
         image = image.mirrored(true, false);
-        image.invertPixels();
         QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
         image.save(fileName);
-        /*cv::Mat src(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
-
-        int dpi = layer->dpi();
-        int pixelWidth = boundingRectInDevice.width() * dpi / 25400.0;
-        int pixelHeight = boundingRectInDevice.height() * dpi / 25400.0;
-
-        int pixelInterval = layer->engravingRowInterval();
-        int outWidth = pixelWidth;
-        int outHeight = qCeil(boundingRectInDevice.height() * 1.0 / pixelInterval);
-        cv::Mat resized;
-        cv::resize(src, resized, cv::Size(outWidth, outHeight), 0.0, 0.0, cv::INTER_CUBIC);
-
-        cv::imwrite("tmp/images/" + QString(i).toStdString() + "_resized.png", resized);*/
-
         StampItem item;
         item.layer = layer;
         item.image = image;
@@ -1518,12 +1494,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
 void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& painter, qreal offset, QTransform t1, QTransform t2)
 {
     int type = primitive->primitiveType();
-    QPen pen(Qt::black);
-    //qreal lineW = 20 * scene()->views()[0]-> logicalDpiY() / 25.4;
-    //qreal lineW = Global::sceneToMechH(20);
-    pen.setWidth(20);
-    pen.setCosmetic(true);
-    painter.setPen(pen);
+    
     QPainterPath path;
     if (type == LPT_FRAME) {
         LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(primitive);
@@ -1542,6 +1513,13 @@ void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& pa
     else {
         return;
     }
+    QPen pen;
+    pen.setColor(Qt::black);
+    pen.setWidth(20);
+    pen.setCosmetic(true);
+    painter.setPen(pen);
+    painter.setBrush(QBrush(Qt::black));
+    
     QRectF bounds = path.boundingRect();
     qreal ratioX = (bounds.width() + 2 * offset - 40) / bounds.width();
     qreal ratioY = (bounds.height() + 2 * offset - 40) / bounds.height();
@@ -1549,14 +1527,13 @@ void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& pa
     path = t1.map(path);
     path = t2.map(path);
     QPointF originalCenter = path.boundingRect().center();
-    path = QTransform::fromScale(ratioX, ratioY).map(path);
-    QPointF center = path.boundingRect().center();
-    //qreal x = -path.boundingRect().left();
-    //qreal y = -path.boundingRect().top();
+    QPainterPath outer = QTransform::fromScale(ratioX, ratioY).map(path);
+    QPointF center = outer.boundingRect().center();
     qreal x = originalCenter.x() - center.x();
     qreal y = originalCenter.y() - center.y();
-    path = QTransform::fromTranslate(x, y).map(path);
-    painter.drawPath(path);
+    outer = QTransform::fromTranslate(x, y).map(outer);
+    QPainterPath offsetPath = outer - path;
+    painter.drawPath(offsetPath);
 }
 
 void LaserDocument::init()
