@@ -519,7 +519,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	m_ui->actionDragView->setCheckable(true);
 
 	//init selected items properties
-	m_propertyLayout = new QGridLayout(m_ui->properties);
+	m_propertyLayout = new QGridLayout;
 	m_propertyLayout->setMargin(0);
 	m_propertyLayout->setSpacing(3);
 	//posx, posy, lock, unlcok

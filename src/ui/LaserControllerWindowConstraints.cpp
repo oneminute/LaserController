@@ -2096,6 +2096,19 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", true, documentPrintAndCutAligningState);
     // end m_ui->actionMachining
 
+    // begin m_ui->actionMachiningStamp
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMachiningStamp, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMachiningStamp
+
     // begin m_ui->actionPause
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionPause, "enabled", false, deviceUnconnectedState);

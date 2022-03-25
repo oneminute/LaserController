@@ -477,6 +477,8 @@ LaserDocument* LaserApplication::createDocument()
 {
     LaserScene* scene = mainWindow->scene();
 	LaserDocument* doc = new LaserDocument(scene);
+	ADD_TRANSITION(documentEmptyState, documentWorkingState, doc, SIGNAL(opened()));
+	ADD_TRANSITION(documentWorkingState, documentEmptyState, doc, SIGNAL(closed()));
 	mainWindow->initDocument(doc);
     doc->open();
     return doc;

@@ -1541,16 +1541,6 @@ void LaserDocument::init()
 	Q_D(LaserDocument);
 	d->name = tr("Untitled");
 
-	/*QString layerName = newLayerName();
-	LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this, true);
-    layer->setIndex(0);
-	addLayer(layer);
-    
-	layerName = newLayerName();
-	layer = new LaserLayer(layerName, LLT_CUTTING, this, true);
-    layer->setIndex(1);
-	addLayer(layer);*/
-
 	for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
 	{
 		QString layerName = newLayerName();
@@ -1558,9 +1548,6 @@ void LaserDocument::init()
         layer->setIndex(i);
 		addLayer(layer);
 	}
-
-	ADD_TRANSITION(documentEmptyState, documentWorkingState, this, SIGNAL(opened()));
-	ADD_TRANSITION(documentWorkingState, documentEmptyState, this, SIGNAL(closed()));
 
     connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromToolBar,
         this, &LaserDocument::updateDocumentBounding);
