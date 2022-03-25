@@ -29,6 +29,8 @@ public:
     void show(int milliseconds = 10000);
     void hide(bool immediate = false);
 
+    void delayedHide(int milliseconds = 1000);
+
 protected slots:
     void progressTimerTimeout();
     void visualTimerTimeout();

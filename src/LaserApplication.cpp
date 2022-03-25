@@ -350,6 +350,7 @@ void LaserApplication::retranslate()
     stringMap["deviceErrorState"] = tr("Device Error");
     stringMap["deviceIdleState"] = tr("Device Idle");
     stringMap["deviceMachiningState"] = tr("Machining");
+    stringMap["deviceDownloadingState"] = tr("Downloading");
     stringMap["devicePausedState"] = tr("Paused");
     stringMap["deviceUnconnectedState"] = tr("Unconnected");
     stringMap["documentState"] = tr("Document State");
@@ -365,6 +366,7 @@ void LaserApplication::retranslate()
     stringMap["documentPrimitiveLineState"] = tr("Line State");
     stringMap["documentPrimitiveLineCreatingState"] = tr("Creating Line");
     stringMap["documentPrimitiveLineReadyState"] = tr("Line Ready");
+    stringMap["documentPrimitivePartyEmblemState"] = tr("Party Emblem State");
     stringMap["documentPrimitivePolygonState"] = tr("Polygon State");
     stringMap["documentPrimitivePolygonCreatingState"] = tr("Creating Polygon");
     stringMap["documentPrimitivePolygonReadyState"] = tr("Polygon Ready");

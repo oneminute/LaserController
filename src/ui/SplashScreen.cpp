@@ -38,7 +38,7 @@ SplashScreen::SplashScreen(QWidget* parent)
     mainLayout->setStretch(2, 0);
 
     setLayout(mainLayout);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     resize(800, 600);
     QRect screenGeometry = LaserApplication::desktop()->screenGeometry();
@@ -87,8 +87,16 @@ void SplashScreen::show(int milliseconds)
 
 void SplashScreen::hide(bool immediate)
 {
-    if (!m_visualTimer.isActive())
-        QDialog::hide();
+    QDialog::hide();
+}
+
+void SplashScreen::delayedHide(int milliseconds)
+{
+    QTimer::singleShot(1000, [=] () 
+        {
+            hide();
+        }
+    );
 }
 
 void SplashScreen::progressTimerTimeout()
@@ -100,7 +108,6 @@ void SplashScreen::progressTimerTimeout()
 void SplashScreen::visualTimerTimeout()
 {
     m_visualTimer.stop();
-    if (m_close)
-        hide();
+    delayedHide();
 }
 

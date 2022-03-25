@@ -1455,6 +1455,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     onLayoutChanged(LaserApplication::device->layoutSize());
 
+    LaserApplication::splashScreen->setParent(this);
+    LaserApplication::splashScreen->raise();
+
 #ifdef _DEBUG
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
@@ -7020,7 +7023,7 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
             qLogD << "orientation: " << m_splitterLayers->orientation();
             m_splitterLayers->setSizes({400, 450});
             LaserApplication::splashScreen->setProgress(100);
-            LaserApplication::splashScreen->hide();
+            LaserApplication::splashScreen->delayedHide(1000);
         });
     }
 }
