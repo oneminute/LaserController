@@ -1395,7 +1395,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     ADD_TRANSITION(documentSelectionState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentViewDragState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
-    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveArcTextState, this, SIGNAL(readyVertireadyArcTextcalText()));
+    ADD_TRANSITION(documentPrimitiveLineState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentPrimitivePolygonState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentPrimitiveSplineState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));
     ADD_TRANSITION(documentPrimitiveSplineEditState, documentPrimitiveArcTextState, this, SIGNAL(readyArcText()));

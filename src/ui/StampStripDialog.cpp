@@ -7,6 +7,8 @@
 #include<QStringList>
 #include<QHeaderView>
 #include"scene/LaserPrimitive.h"
+#include"scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
 
 StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent) 
    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
@@ -14,6 +16,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
+    m_layerIndex = m_scene->document()->idleLayer()->index();
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/signalLine.png");
     QPixmap threePm(":/ui/icons/images/multiLine.png");
@@ -292,7 +295,7 @@ void StampStripDialog::accept()
     point = QPointF(point.x() - frameW * 0.5, point.y() - frameH * 0.5);
     QRect rect(point.x(), point.y(), frameW, frameH);
     bool needAuxiliary = false;
-    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_viewer->curLayerIndex(), frameType);
+    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
     frame->setNeedAuxiliaryLine(needAuxiliary);
     stampList.append(frame);
     LaserFrame* innerFrame = nullptr;;
@@ -304,7 +307,7 @@ void StampStripDialog::accept()
         qreal innerW = frameW - innderMargin*2 - frameBorder*2;
         qreal innerH = frameH - innderMargin*2 - frameBorder*2;
         innerRect = QRect (point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
-        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_viewer->curLayerIndex(), frameType);
+        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
         innerFrame->setNeedAuxiliaryLine(false);
         innerFrame->setInner(true);
         stampList.append(innerFrame);
@@ -346,7 +349,7 @@ void StampStripDialog::accept()
         if (layoutIndex == 0) {
             textSize = QSize((textRect.width() - (contentSize - 1) * textHSpace) / contentSize,textH);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_viewer->curLayerIndex());
+                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layerIndex);
             
             rectifyTextSize(textRect.width(), textRect.height(), text);
             stampList.append(text);
@@ -356,7 +359,7 @@ void StampStripDialog::accept()
             center = QPointF(center.x(), (textH+textVSpace) * r + textH*0.5 + textRect.top());
             
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_viewer->curLayerIndex());
+                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layerIndex);
             rectifyTextSize(textRect.width(), textH, text);
             stampList.append(text);
         }
@@ -367,7 +370,7 @@ void StampStripDialog::accept()
             center = QPointF(textRect.left() + textSize.width()*0.5 + textSize.width() *r, center.y());
 
             LaserVerticalText* text = new LaserVerticalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, stampIntaglio, family, textVSpace, QTransform(), m_viewer->curLayerIndex());
+                bold, itatic, false, stampIntaglio, family, textVSpace, QTransform(), m_layerIndex);
             rectifyTextSize(textW, textRect.height(), text);
             stampList.append(text);
         }

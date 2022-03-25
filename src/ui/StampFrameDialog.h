@@ -17,6 +17,7 @@ private:
     QScopedPointer<Ui::StampFrameDialog> m_ui;
     LaserScene* m_scene;
     LaserViewer* m_viewer;
+    int m_layerIndex;
 protected slots:
     virtual void accept();
 

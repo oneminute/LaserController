@@ -45,6 +45,7 @@ private:
         QString(tr("Invoice Seal")), QString("(0)")
     };
     bool m_isEllipse;
+    int m_layerIndex;
 protected slots:
     virtual void accept();
 
