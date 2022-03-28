@@ -604,6 +604,7 @@ void LaserPrimitive::setLayer(LaserLayer* layer, bool whenNullLayerKeepIndex)
         
 		d->layerIndex = layer->index();
         d->layer->primitives().append(this);
+        //qLogD << d->layer->primitives().count();
 	}
 	else {
         //如果保留原有的layerIndex，删除后可以再恢复回来

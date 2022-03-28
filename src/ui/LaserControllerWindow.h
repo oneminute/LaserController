@@ -185,7 +185,7 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 	virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
-    LaserDocument* getMachiningDocument();
+    LaserDocument* getMachiningDocument(bool& stamp);
 
 protected slots:
 	void onActionUndo(bool checked = false);

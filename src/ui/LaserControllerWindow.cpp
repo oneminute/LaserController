@@ -4621,7 +4621,7 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 	}
 }
 
-LaserDocument* LaserControllerWindow::getMachiningDocument()
+LaserDocument* LaserControllerWindow::getMachiningDocument(bool& stamp)
 {
     int availableLayersCount = 0;
     int stampLayersCount = 0;
@@ -4642,15 +4642,18 @@ LaserDocument* LaserControllerWindow::getMachiningDocument()
     }
 
     LaserDocument* doc = m_scene->document();
-    bool stamp = false;
-    if (stampLayersCount && stampLayersCount != availableLayersCount)
+    stamp = false;
+    if (stampLayersCount)
     {
-        QMessageBox msgBox(QMessageBox::Warning, tr("Warning"), tr("There are both stamp layers and other types of layers in the current document. If you choose to continue processing, only the stamp layer will be processed."),
-            QMessageBox::Yes | QMessageBox::No);
-        msgBox.setButtonText(QMessageBox::Yes, tr("Yes"));
-        msgBox.setButtonText(QMessageBox::No, tr("No"));
-        if (msgBox.exec() == QMessageBox::No)
-            return nullptr;
+        if (stampLayersCount != availableLayersCount)
+        {
+            QMessageBox msgBox(QMessageBox::Warning, tr("Warning"), tr("There are both stamp layers and other types of layers in the current document. If you choose to continue processing, only the stamp layer will be processed."),
+                QMessageBox::Yes | QMessageBox::No);
+            msgBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+            msgBox.setButtonText(QMessageBox::No, tr("No"));
+            if (msgBox.exec() == QMessageBox::No)
+                return nullptr;
+        }
         stamp = true;
     }
 
@@ -4662,6 +4665,7 @@ LaserDocument* LaserControllerWindow::getMachiningDocument()
         stampDoc->setName("stamp doc");
         stampDoc->open();
         connect(stampDoc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
+        //int layerIndex = 0;
         for (int i = 0; i < stampItems.length(); i++)
         {
             const LaserDocument::StampItem& item = stampItems[i];
@@ -4669,23 +4673,33 @@ LaserDocument* LaserControllerWindow::getMachiningDocument()
             if (!item.layer->isAvailable())
                 continue;
 
-            LaserLayer* layer = stampDoc->layers()[i];
+            LaserLayer* layer = stampDoc->idleLayer();
             layer->setType(LLT_ENGRAVING);
             layer->setEngravingLaserPower(item.layer->engravingLaserPower());
             layer->setEngravingMinSpeedPower(item.layer->engravingMinSpeedPower());
             layer->setEngravingRowInterval(item.layer->engravingRowInterval());
             layer->setEngravingRunSpeed(item.layer->engravingRunSpeed());
             layer->setEngravingRunSpeedPower(item.layer->engravingRunSpeedPower());
+            layer->setEngravingEnableCutting(false);
             layer->setUseHalftone(false);
             LaserBitmap* laserBitmap = new LaserBitmap(item.image, item.bounding, stampDoc);
-            layer->addPrimitive(laserBitmap);
+            //layer->addPrimitive(laserBitmap);
+            stampDoc->addPrimitive(laserBitmap, layer, false);
             if (item.layer->engravingEnableCutting())
             {
-
+                LaserLayer* cuttingLayer = stampDoc->idleLayer();
+                cuttingLayer->setType(LLT_CUTTING);
+                cuttingLayer->setCuttingMinSpeedPower(item.layer->cuttingMinSpeedPower());
+                cuttingLayer->setCuttingRunSpeed(item.layer->cuttingRunSpeed());
+                cuttingLayer->setCuttingRunSpeedPower(item.layer->cuttingRunSpeedPower());
+                LaserPath* boundingPath = new LaserPath(item.path, stampDoc);
+                //cuttingLayer->addPrimitive(laserBitmap);
+                stampDoc->addPrimitive(boundingPath, cuttingLayer, false);
             }
         }
         doc = stampDoc;
     }
+    return doc;
 }
 
 void LaserControllerWindow::onActionUndo(bool checked) {
@@ -4954,29 +4968,39 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     dialog.setMimeTypeFilters(QStringList() << "application/json");
     dialog.setWindowTitle(tr("Export"));
     dialog.selectFile(m_scene->document()->name());
-    if (dialog.exec() == QFileDialog::Accepted)
+    if (dialog.exec() != QFileDialog::Accepted)
     {
-        QString filename = dialog.selectedFiles().constFirst();
-        if (!filename.isEmpty() && !filename.isNull())
-        {
-            QImage thumbnail = m_scene->thumbnail();
-            m_scene->document()->setThumbnail(thumbnail);
-            ProgressItem* progress = LaserApplication::resetProcess();
-            progress->setMaximum(5);
-            QtConcurrent::run([=]()
-                {
-                    m_scene->document()->outline(progress);
-                    m_scene->document()->setFinishRun(Config::Device::finishRun());
-                    PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
-                    optimizer.optimize(progress);
-                    PathOptimizer::Path path = optimizer.optimizedPath();
-                    m_prepareMachining = false;
-                    m_prepareDownloading = false;
-                    m_scene->document()->exportJSON(filename, path, progress, true);
-                }
-            );
-        }
+        return;
     }
+    QString filename = dialog.selectedFiles().constFirst();
+    if (filename.isEmpty() || filename.isNull())
+    {
+        return;
+    }
+
+    bool stamp;
+    LaserDocument* doc = getMachiningDocument(stamp);
+    if (!doc)
+        return;
+
+    QImage thumbnail = m_scene->thumbnail();
+    doc->setThumbnail(thumbnail);
+    ProgressItem* progress = LaserApplication::resetProcess();
+    progress->setMaximum(5);
+    QtConcurrent::run([=]()
+        {
+            doc->outline(progress);
+            doc->setFinishRun(Config::Device::finishRun());
+            PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
+            optimizer.optimize(progress);
+            PathOptimizer::Path path = optimizer.optimizedPath();
+            m_prepareMachining = false;
+            m_prepareDownloading = false;
+            doc->exportJSON(filename, path, progress, true);
+            if (stamp)
+                doc->deleteLater();
+        }
+    );
 }
 
 void LaserControllerWindow::onActionLoadJson(bool checked)
@@ -5042,21 +5066,26 @@ void LaserControllerWindow::startMachining()
         ))
             return;
 
+        bool stamp;
+        LaserDocument* doc = getMachiningDocument(stamp);
+        if (!doc)
+            return;
+
         ProgressItem* progress = LaserApplication::resetProcess();
         progress->setMaximum(6);
         progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
         QImage thumbnail = m_scene->thumbnail();
-        m_scene->document()->setThumbnail(thumbnail);
+        doc->setThumbnail(thumbnail);
         QtConcurrent::run([=]()
             {
-                m_scene->document()->outline(progress);
-                m_scene->document()->setFinishRun(Config::Device::finishRun());
-                PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+                doc->outline(progress);
+                doc->setFinishRun(Config::Device::finishRun());
+                PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
                 optimizer.optimize(progress);
                 PathOptimizer::Path path = optimizer.optimizedPath();
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
-                m_scene->document()->exportJSON(filename, path, progress, true);
+                doc->exportJSON(filename, path, progress, true);
             }
         );
     }
@@ -5101,24 +5130,28 @@ void LaserControllerWindow::startMachiningStamp()
     ))
         return;
 
-    
+    bool stamp = false;
+    LaserDocument* doc = getMachiningDocument(stamp);
+    if (!doc)
+        return;
 
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
     progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
     QImage thumbnail = m_scene->thumbnail();
-    stampDoc->setThumbnail(thumbnail);
+    doc->setThumbnail(thumbnail);
     QtConcurrent::run([=]()
         {
-            stampDoc->outline(progress);
-            stampDoc->setFinishRun(Config::Device::finishRun());
-            PathOptimizer optimizer(stampDoc->optimizeNode(), stampDoc->primitives().count());
+            doc->outline(progress);
+            doc->setFinishRun(Config::Device::finishRun());
+            PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
             optimizer.optimize(progress);
             PathOptimizer::Path path = optimizer.optimizedPath();
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareMachining = true;
-            stampDoc->exportJSON(filename, path, progress, true);
-            stampDoc->deleteLater();
+            doc->exportJSON(filename, path, progress, true);
+            if (stamp)
+                doc->deleteLater();
         }
     );
 }
