@@ -24,6 +24,7 @@ private:
     int m_preLayoutIndex;
     QList<QMap<QModelIndex, QString>> m_tablesModelList;
     int m_layerIndex;
+    QString m_defaultTexts[3] = {tr("single-line"), tr("multi-row"), tr("multi-column")};
 protected slots:
     virtual void accept();
 

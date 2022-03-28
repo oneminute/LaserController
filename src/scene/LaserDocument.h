@@ -32,6 +32,7 @@ public:
         LaserLayer* layer;
         QImage image;
         QRect bounding;
+        QPainterPath path;
     };
     explicit LaserDocument(LaserScene* scene = nullptr, QObject* parent = nullptr);
     ~LaserDocument();

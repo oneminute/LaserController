@@ -7463,18 +7463,33 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="54"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="59"/>
         <source>Round Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="55"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="60"/>
         <source>Cutted Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="56"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="61"/>
         <source>Inner Corner</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.h" line="21"/>
+        <source>FSNS</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.h" line="21"/>
+        <source>FSN</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.h" line="21"/>
+        <source>NA</source>
         <translation></translation>
     </message>
 </context>
@@ -7617,30 +7632,45 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="64"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="58"/>
         <source>Round Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="65"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="59"/>
         <source>Cutted Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="66"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="60"/>
         <source>Inner Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="128"/>
-        <location filename="../src/ui/StampStripDialog.cpp" line="131"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="135"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="138"/>
         <source>content</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="129"/>
-        <location filename="../src/ui/StampStripDialog.cpp" line="132"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="136"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="139"/>
         <source>font</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.h" line="27"/>
+        <source>single-line</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.h" line="27"/>
+        <source>multi-row</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.h" line="27"/>
+        <source>multi-column</source>
         <translation></translation>
     </message>
 </context>

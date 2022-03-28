@@ -26,11 +26,10 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     m_ui->frameStampLayoutComboBox->addItem(QIcon(threeRPm), tr("Multi Column"));
     m_ui->frameStampLayoutComboBox->setItemDelegate(new QStyledItemDelegate());
     m_preLayoutIndex = 0;
-    for (int i = 0; i < m_ui->frameStampLayoutComboBox->count(); i++) {
-        m_tablesModelList.append(QMap<QModelIndex, QString>());
-    }
+    
     connect(m_ui->frameStampLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
         int count = m_viewItemModel->rowCount();
+        m_ui->lineEdit->setText(m_defaultTexts[index]);
         //存储上一个
         QMap<QModelIndex, QString> itemModelMap;
         for (int i = 0; i < m_viewItemModel->rowCount(); i++) {
@@ -43,20 +42,15 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
         //修改
         QMap<QModelIndex, QString> preModelList = m_tablesModelList[m_preLayoutIndex];
         QMap<QModelIndex, QString> curModelList = m_tablesModelList[index];
+        m_viewItemModel->clear();
         if (!curModelList.isEmpty()) {
-            m_viewItemModel->removeRows(0, m_viewItemModel->rowCount());
+            
             for (QMap<QModelIndex, QString>::iterator i = curModelList.begin(); i != curModelList.end(); i ++) {
                 QStandardItem* item = new QStandardItem(i.value());
                 item->setTextAlignment(Qt::AlignCenter);
                 m_viewItemModel->setItem(i.key().row(), i.key().column(), item);
             }
         }
-        else {
-            if (index == 0 && count > 1) {
-                m_viewItemModel->removeRows(1, m_viewItemModel->rowCount() - 1);
-            }
-        }
-        
         m_preLayoutIndex = index;
         
     });
@@ -121,9 +115,22 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     //list
     m_viewItemModel = new QStandardItemModel();
     QHeaderView* head = new QHeaderView(Qt::Horizontal);
-    //head->setStyleSheet("QHeaderView{color:rgb(128, 128, 128)}");
-    //head->setStyleSheet("QHeaderView::section {background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 #00007f, stop: 0.5 #00007f,stop: 0.6 #00007f, stop:1 #00007f);color: white;}");
-
+    //add defualt line
+    m_ui->lineEdit->setText(m_defaultTexts[0]);
+    QString curFontStr = m_ui->fontComboBox->currentText();
+    QStandardItem* content_0 = new QStandardItem(m_defaultTexts[0]);
+    QStandardItem* font_0 = new QStandardItem(curFontStr);
+    content_0->setTextAlignment(Qt::AlignCenter);
+    font_0->setTextAlignment(Qt::AlignCenter);
+    m_viewItemModel->setItem(0, 0, content_0);
+    m_viewItemModel->setItem(0, 1, font_0);
+    for (int i = 0; i < m_ui->frameStampLayoutComboBox->count(); i++) {
+        QMap<QModelIndex, QString> map;
+        map.insert(m_viewItemModel->index(0, 0), m_defaultTexts[i]);
+        map.insert(m_viewItemModel->index(0, 1), curFontStr);
+        m_tablesModelList.append(map);
+    }
+    
     QStringList hearderLabels;
     hearderLabels.append(QString(tr("content")));
     hearderLabels.append(QString(tr("font")));

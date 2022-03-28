@@ -26,26 +26,31 @@ StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent)
     m_ui->frameStampLayoutComboBox->addItem(QIcon(threeRPm), tr("Three Character Right"));
     m_ui->frameStampLayoutComboBox->addItem(QIcon(threeLPm), tr("Two Character"));
     m_ui->frameStampLayoutComboBox->setItemDelegate(new QStyledItemDelegate());
+    m_ui->lineEdit->setText(m_defaultTexts[0]);
     connect(m_ui->frameStampLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
         switch (index) {
         case 0: {
             //m_ui->frameStampLayoutLabelIcon->setPixmap(fourPm);
             m_ui->lineEdit->setMaxLength(4);
+            m_ui->lineEdit->setText(m_defaultTexts[0]);
             break;
         }
         case 1: {
             //m_ui->frameStampLayoutLabelIcon->setPixmap(threePm);
             m_ui->lineEdit->setMaxLength(3);
+            m_ui->lineEdit->setText(m_defaultTexts[1]);
             break;
         }
         case 2: {
             //m_ui->frameStampLayoutLabelIcon->setPixmap(threeRPm);
             m_ui->lineEdit->setMaxLength(3);
+            m_ui->lineEdit->setText(m_defaultTexts[1]);
             break;
         }
         case 3: {
             //m_ui->frameStampLayoutLabelIcon->setPixmap(threeLPm);
             m_ui->lineEdit->setMaxLength(2);
+            m_ui->lineEdit->setText(m_defaultTexts[2]);
             break;
         }
         }
@@ -302,7 +307,7 @@ void StampFrameDialog::accept()
                 }
                 else {
                     textSize = doubleVerticalSize;
-                    center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
+                    center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
                 }
                 break;
             }
