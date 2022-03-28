@@ -16231,7 +16231,7 @@ Please choose a different file name.</source>
         <translation>两字名章</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+32"/>
         <source>Round Corner</source>
         <translation>圆角</translation>
     </message>
@@ -16244,6 +16244,21 @@ Please choose a different file name.</source>
         <location line="+1"/>
         <source>Inner Corner</source>
         <translation>内圆角</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.h" line="+21"/>
+        <source>FSNS</source>
+        <translation>姓氏名印</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>FSN</source>
+        <translation>姓氏名</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>NA</source>
+        <translation>姓名</translation>
     </message>
 </context>
 <context>
@@ -16389,7 +16404,7 @@ Please choose a different file name.</source>
         <translation>多列文字条章</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+32"/>
         <source>Round Corner</source>
         <translation>圆角</translation>
     </message>
@@ -16404,7 +16419,7 @@ Please choose a different file name.</source>
         <translation>内圆角</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+75"/>
         <location line="+3"/>
         <source>content</source>
         <translation>文字内容</translation>
@@ -16414,6 +16429,21 @@ Please choose a different file name.</source>
         <location line="+3"/>
         <source>font</source>
         <translation>字体</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.h" line="+27"/>
+        <source>single-line</source>
+        <translation>单行文字</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>multi-row</source>
+        <translation>多行文字</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>multi-column</source>
+        <translation>多列文字</translation>
     </message>
 </context>
 <context>

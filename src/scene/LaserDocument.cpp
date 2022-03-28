@@ -1435,6 +1435,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
         
         QImage image(boundingRectInDevice.width(), boundingRectInDevice.height(), QImage::Format_ARGB32);
         image.fill(Qt::white);
+        StampItem item;
         for (LaserPrimitive* p : layer->primitives()) {
             if(!p->isStamepPrimitive()){
                 continue;
@@ -1442,6 +1443,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             QPainter painter(&image);
             //绘制印章外面的基准线
             computeStampBasePath(p, painter, offset, t1, t2);
+            computeBoundsPath(p, item, 500);
             painter.setPen(Qt::NoPen);
             painter.setBrush(Qt::NoBrush);
             if (!p->stampIntaglio()) {
@@ -1488,7 +1490,6 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
         image = image.mirrored(true, false);
         QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
         image.save(fileName);
-        StampItem item;
         item.layer = layer;
         item.image = image;
         item.bounding = primitiveBounding;
@@ -1542,7 +1543,33 @@ void LaserDocument::computeStampBasePath(LaserPrimitive* primitive, QPainter& pa
     QPainterPath offsetPath = outer - path;
     painter.drawPath(offsetPath);
 }
-
+void LaserDocument::computeBoundsPath(LaserPrimitive* primitive, StampItem& item, qreal distance)
+{
+    QPainterPath path;
+    int type = primitive->primitiveType();
+    if(type == LPT_FRAME){
+        LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(primitive);
+        if (!frame->isInner()) {
+            path = frame->outerPath();
+        }
+    }
+    else if (type == LPT_RING) {
+        LaserRing* ring = qgraphicsitem_cast<LaserRing*>(primitive);
+        if (!ring->isInner()) {
+            path = ring->outerPath();
+        }
+    }
+    if (!path.isEmpty()) {
+        QRectF bounds = primitive->boundingRect();
+        qreal sX = (bounds.width() +  2 * distance) / bounds.width();
+        qreal sY = (bounds.height() + 2 * distance) / bounds.height();
+        QTransform t;
+        t.scale(sX, sY);
+        path = t.map(path);
+        QRectF bs = path.boundingRect();
+        item.path = path;
+    }
+}
 void LaserDocument::init()
 {
 	Q_D(LaserDocument);

@@ -18,6 +18,7 @@ private:
     LaserScene* m_scene;
     LaserViewer* m_viewer;
     int m_layerIndex;
+    QString m_defaultTexts[3] = {tr("FSNS"), tr("FSN"), tr("NA") };//ĞÕÊÏÃûÓ¡£¬ĞÕÊÏÃû£¬ĞÕÃû
 protected slots:
     virtual void accept();
 

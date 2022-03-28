@@ -3959,7 +3959,17 @@ void LaserFrame::setCornerRadius(qreal cornerRadius, int type)
     d->cornerRadius = qAbs(cornerRadius);
     d->cornerType = type;
     d->outerPath = computeCornerRadius(d->outerRect, d->cornerRadius, type);
-    d->innerPath = computeCornerRadius(d->innerRect, d->cornerRadius, type);
+    qreal shorter = d->outerRect.width();
+    if (shorter > d->outerRect.height()) {
+        shorter = d->outerRect.height();
+    }
+    shorter *= 0.5;
+    qreal innerR;
+    innerR = d->cornerRadius - d->width*0.5;
+    if (innerR < 100) {
+        innerR = 100;
+    }
+    d->innerPath = computeCornerRadius(d->innerRect, innerR, type);
     computePath();
 }
 qreal LaserFrame::cornerRadius()
