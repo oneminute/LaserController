@@ -4879,8 +4879,18 @@ void LaserViewer::selectedHandleScale()
             QVector2D curV(mapToScene(m_mousePoint) - primitive->sceneBoundingRect().center());
             lastV.normalize();
             curV.normalize();
-            qreal diff = QVector2D::dotProduct(lastV, curV);
-            diff = qAcos(diff);
+            
+            qreal dot = QVector2D::dotProduct(lastV, curV);
+            if (dot > 1) {
+                dot = 1;
+            }
+            else if (dot < -1) {
+                dot = -1;
+            }
+            qreal diff = qAcos(dot);
+            if (std::isnan(diff)) {
+                break;
+            }
             if (QVector3D::crossProduct(QVector3D(lastV, 0), QVector3D(curV, 0)).z() > 0) {
                 diff = -diff;
             }
@@ -5005,6 +5015,12 @@ void LaserViewer::selectedHandleScale()
 			v1.normalize();
 			v2.normalize();
 			qreal cos = QVector2D::dotProduct(v1, v2);
+            if (cos < -1) {
+                cos = -1;
+            }
+            else if (cos > 1) {
+                cos = 1;
+            }
 			if (qAbs(cos) <= 1) {
 				radians = qAcos(cos);
 			}
