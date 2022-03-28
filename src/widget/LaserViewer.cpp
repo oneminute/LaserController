@@ -2923,10 +2923,11 @@ void LaserViewer::dropEvent(QDropEvent * event)
 void LaserViewer::keyPressEvent(QKeyEvent* event)
 {
     QGraphicsView::keyPressEvent(event);
-    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
-        this->setAttribute(Qt::WA_InputMethodEnabled, true);
-    }
     qDebug() << event->key();
+    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+        
+        
+    }
     switch (event->key())
     {
 		case Qt::Key_Shift: {
@@ -3548,6 +3549,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             if (event->modifiers() == Qt::ShiftModifier) {
                 if (m_isCapsLock) {
                     addTextByKeyInput("v");
+                    
                 }
                 else {
                     addTextByKeyInput("V");
@@ -3558,7 +3560,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
                 if (m_isCapsLock) {
                     addTextByKeyInput("V");
                 }
-                else {
+                else {                    
                     addTextByKeyInput("v");
                 }
             }
@@ -3645,7 +3647,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             break;
         }
     }
-    
+    qDebug() << "VVV";
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent* event)
@@ -3709,8 +3711,10 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
         }
         case Qt::Key_Space: {
             int v = event->type();
+            
             if (event->type() != QEvent::InputMethod) {
                 addTextByKeyInput(" ");
+                this->setAttribute(Qt::WA_InputMethodEnabled, true);
             }
             
             break;

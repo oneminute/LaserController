@@ -2774,8 +2774,8 @@ void LaserText::modifyPathList()
     QRectF lastBound;
     //QPainterPath allPath;
     //QPainterPath lastPath;
-    qDebug() << d->lastContent;
-    qDebug() << d->content;
+    //qDebug() << d->lastContent;
+    //qDebug() << d->content;
     //for (QChar c : d->content) {
     
     for (int i = 0; i < d->content.size(); i++) {

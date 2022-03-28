@@ -5589,6 +5589,7 @@ void LaserControllerWindow::onActionText(bool checked)
 	{
 		m_ui->actionTextTool->setChecked(true);
 	}
+    this->setAttribute(Qt::WA_InputMethodEnabled, true);
 }
 
 void LaserControllerWindow::onActionMainCardInfo(bool checked)
