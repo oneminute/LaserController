@@ -659,7 +659,7 @@ public:
         bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
-    QPointF computeEllipsePoint(qreal rRadian);
+    //QPointF computeEllipsePoint(qreal rRadian);
     void translateText(QPointF& lastPoint, QPointF& curPoint, qreal interval, qreal index);
     QTransform scaleText(QPainterPath path);
     QTransform rotateText(int i,QPointF textPos);

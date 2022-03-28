@@ -2923,10 +2923,11 @@ void LaserViewer::dropEvent(QDropEvent * event)
 void LaserViewer::keyPressEvent(QKeyEvent* event)
 {
     QGraphicsView::keyPressEvent(event);
-    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
-        this->setAttribute(Qt::WA_InputMethodEnabled, true);
-    }
     qDebug() << event->key();
+    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+        
+        
+    }
     switch (event->key())
     {
 		case Qt::Key_Shift: {
@@ -3548,6 +3549,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             if (event->modifiers() == Qt::ShiftModifier) {
                 if (m_isCapsLock) {
                     addTextByKeyInput("v");
+                    
                 }
                 else {
                     addTextByKeyInput("V");
@@ -3558,7 +3560,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
                 if (m_isCapsLock) {
                     addTextByKeyInput("V");
                 }
-                else {
+                else {                    
                     addTextByKeyInput("v");
                 }
             }
@@ -3645,7 +3647,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             break;
         }
     }
-    
+    qDebug() << "VVV";
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent* event)
@@ -3709,8 +3711,10 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
         }
         case Qt::Key_Space: {
             int v = event->type();
+            
             if (event->type() != QEvent::InputMethod) {
                 addTextByKeyInput(" ");
+                this->setAttribute(Qt::WA_InputMethodEnabled, true);
             }
             
             break;
@@ -4879,8 +4883,18 @@ void LaserViewer::selectedHandleScale()
             QVector2D curV(mapToScene(m_mousePoint) - primitive->sceneBoundingRect().center());
             lastV.normalize();
             curV.normalize();
-            qreal diff = QVector2D::dotProduct(lastV, curV);
-            diff = qAcos(diff);
+            
+            qreal dot = QVector2D::dotProduct(lastV, curV);
+            if (dot > 1) {
+                dot = 1;
+            }
+            else if (dot < -1) {
+                dot = -1;
+            }
+            qreal diff = qAcos(dot);
+            if (std::isnan(diff)) {
+                break;
+            }
             if (QVector3D::crossProduct(QVector3D(lastV, 0), QVector3D(curV, 0)).z() > 0) {
                 diff = -diff;
             }
@@ -5005,6 +5019,12 @@ void LaserViewer::selectedHandleScale()
 			v1.normalize();
 			v2.normalize();
 			qreal cos = QVector2D::dotProduct(v1, v2);
+            if (cos < -1) {
+                cos = -1;
+            }
+            else if (cos > 1) {
+                cos = 1;
+            }
 			if (qAbs(cos) <= 1) {
 				radians = qAcos(cos);
 			}
