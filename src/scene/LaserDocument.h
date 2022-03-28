@@ -163,6 +163,7 @@ public slots:
     void updateDocumentBounding();
     QList<StampItem> generateStampImages();
     void computeStampBasePath(LaserPrimitive* primitive, QPainter& painter, qreal offset, QTransform t1, QTransform t2);
+    void computeBoundsPath(LaserPrimitive* primitive, StampItem& item, qreal distance = 500);
 protected:
 	void init();
     void outlineByLayers(OptimizeNode* node, ProgressItem* parentProgress);
