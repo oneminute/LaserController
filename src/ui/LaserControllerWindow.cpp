@@ -1455,9 +1455,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 
     onLayoutChanged(LaserApplication::device->layoutSize());
 
-    LaserApplication::splashScreen->setParent(this);
-    LaserApplication::splashScreen->raise();
-
 #ifdef _DEBUG
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
@@ -2763,7 +2760,7 @@ void LaserControllerWindow::createMovementDockPanel()
     int w = 40;
     int h = 40;
     QSize fixedSize(w, h);
-    QSize iconSize(50, 50);
+    QSize iconSize(30, 30);
     m_buttonMoveTopLeft = new PressedToolButton;
     m_buttonMoveTopLeft->setFixedSize(fixedSize);
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
@@ -4624,6 +4621,73 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 	}
 }
 
+LaserDocument* LaserControllerWindow::getMachiningDocument()
+{
+    int availableLayersCount = 0;
+    int stampLayersCount = 0;
+    int stampItemsCount = 0;
+    for (LaserLayer* layer : m_scene->document()->layers())
+    {
+        if (!layer->isAvailable())
+            continue;
+
+        availableLayersCount++;
+        if (layer->type() == LLT_STAMP)
+        {
+            stampLayersCount++;
+            stampItemsCount++;
+            if (layer->engravingEnableCutting())
+                stampItemsCount++;
+        }
+    }
+
+    LaserDocument* doc = m_scene->document();
+    bool stamp = false;
+    if (stampLayersCount && stampLayersCount != availableLayersCount)
+    {
+        QMessageBox msgBox(QMessageBox::Warning, tr("Warning"), tr("There are both stamp layers and other types of layers in the current document. If you choose to continue processing, only the stamp layer will be processed."),
+            QMessageBox::Yes | QMessageBox::No);
+        msgBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+        msgBox.setButtonText(QMessageBox::No, tr("No"));
+        if (msgBox.exec() == QMessageBox::No)
+            return nullptr;
+        stamp = true;
+    }
+
+    if (stamp)
+    {
+        QList<LaserDocument::StampItem> stampItems = m_scene->document()->generateStampImages();
+        LaserDocument* stampDoc = new LaserDocument(nullptr, stampItemsCount, true);
+        stampDoc->optimizeNode()->setNodeName("stamp doc");
+        stampDoc->setName("stamp doc");
+        stampDoc->open();
+        connect(stampDoc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
+        for (int i = 0; i < stampItems.length(); i++)
+        {
+            const LaserDocument::StampItem& item = stampItems[i];
+
+            if (!item.layer->isAvailable())
+                continue;
+
+            LaserLayer* layer = stampDoc->layers()[i];
+            layer->setType(LLT_ENGRAVING);
+            layer->setEngravingLaserPower(item.layer->engravingLaserPower());
+            layer->setEngravingMinSpeedPower(item.layer->engravingMinSpeedPower());
+            layer->setEngravingRowInterval(item.layer->engravingRowInterval());
+            layer->setEngravingRunSpeed(item.layer->engravingRunSpeed());
+            layer->setEngravingRunSpeedPower(item.layer->engravingRunSpeedPower());
+            layer->setUseHalftone(false);
+            LaserBitmap* laserBitmap = new LaserBitmap(item.image, item.bounding, stampDoc);
+            layer->addPrimitive(laserBitmap);
+            if (item.layer->engravingEnableCutting())
+            {
+
+            }
+        }
+        doc = stampDoc;
+    }
+}
+
 void LaserControllerWindow::onActionUndo(bool checked) {
 	int index = m_viewer->undoStack()->index();
 	if (index <= 0) {
@@ -5037,26 +5101,7 @@ void LaserControllerWindow::startMachiningStamp()
     ))
         return;
 
-    QList<LaserDocument::StampItem> stampItems = m_scene->document()->generateStampImages();
-    LaserDocument* stampDoc = new LaserDocument;
-    stampDoc->optimizeNode()->setNodeName("stamp doc");
-    stampDoc->setName("stamp doc");
-    stampDoc->open();
-    connect(stampDoc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
-    for (int i = 0; i < stampItems.length(); i++)
-    {
-        const LaserDocument::StampItem& item = stampItems[i];
-        LaserLayer* layer = stampDoc->layers()[i];
-        layer->setType(LLT_ENGRAVING);
-        layer->setEngravingEnableCutting(false);
-        layer->setEngravingLaserPower(item.layer->engravingLaserPower());
-        layer->setEngravingMinSpeedPower(item.layer->engravingMinSpeedPower());
-        layer->setEngravingRowInterval(item.layer->engravingRowInterval());
-        layer->setEngravingRunSpeed(item.layer->engravingRunSpeed());
-        layer->setEngravingRunSpeedPower(item.layer->engravingRunSpeedPower());
-        LaserBitmap* laserBitmap = new LaserBitmap(item.image, item.bounding, stampDoc);
-        layer->addPrimitive(laserBitmap);
-    }
+    
 
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);

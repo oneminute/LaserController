@@ -37,6 +37,8 @@ void LaserLayerDialog::initUi()
         m_ui->radioButtonCutting->setChecked(true);
     else if (m_layer->type() == LLT_FILLING)
         m_ui->radioButtonFilling->setChecked(true);
+    else if (m_layer->type() == LLT_STAMP)
+        m_ui->radioButtonStamp->setChecked(true);
 
     m_ui->editSliderCuttingRunSpeed->setStep(0.001);
     m_ui->editSliderCuttingRunSpeed->setMinimum(1);
@@ -120,6 +122,7 @@ void LaserLayerDialog::initUi()
     connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
     connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
     connect(m_ui->radioButtonFilling, &QRadioButton::toggled, this, &LaserLayerDialog::onFillingToggled);
+    connect(m_ui->radioButtonStamp, &QRadioButton::toggled, this, &LaserLayerDialog::onStampToggled);
     connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, &LaserLayerDialog::onButtonClicked);
     connect(m_ui->checkBoxEngravingEnableCutting, &QCheckBox::toggled, this, &LaserLayerDialog::onEngravingEnableCuttingToggled);
     connect(m_ui->checkBoxFillingEnableCutting, &QCheckBox::toggled, this, &LaserLayerDialog::onFillingEnableCuttingToggled);
@@ -196,6 +199,15 @@ void LaserLayerDialog::onFillingToggled(bool checked)
     }
 }
 
+void LaserLayerDialog::onStampToggled(bool checked)
+{
+    if (checked)
+    {
+        m_type = LLT_STAMP;
+        updateControls();
+    }
+}
+
 void LaserLayerDialog::onEngravingEnableCuttingToggled(bool checked)
 {
     updateControls();
@@ -260,6 +272,7 @@ void LaserLayerDialog::updateControls()
         m_ui->groupBoxCutting->setEnabled(false);
         m_ui->groupBoxFilling->setEnabled(false);
         m_ui->checkBoxEngravingEnableCutting->setEnabled(true);
+        m_ui->checkBoxUseHalftone->setEnabled(true);
 
         if (m_ui->checkBoxEngravingEnableCutting->isChecked())
         {
@@ -280,6 +293,23 @@ void LaserLayerDialog::updateControls()
         m_ui->groupBoxCutting->setEnabled(false);
         m_ui->groupBoxFilling->setEnabled(true);
         m_ui->checkBoxEngravingEnableCutting->setEnabled(false);
+        m_ui->checkBoxUseHalftone->setEnabled(true);
+
+        if (m_ui->checkBoxFillingEnableCutting->isChecked())
+        {
+            m_ui->groupBoxCutting->setEnabled(true);
+        }
+
+        m_ui->groupBoxEngraving->setEnabled(true);
+    }
+    break;
+    case LLT_STAMP:
+    {
+        m_ui->groupBoxEngraving->setEnabled(true);
+        m_ui->groupBoxCutting->setEnabled(true);
+        m_ui->groupBoxFilling->setEnabled(false);
+        m_ui->checkBoxEngravingEnableCutting->setEnabled(true);
+        m_ui->checkBoxUseHalftone->setEnabled(false);
 
         if (m_ui->checkBoxFillingEnableCutting->isChecked())
         {

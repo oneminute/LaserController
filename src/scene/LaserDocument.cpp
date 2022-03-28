@@ -46,6 +46,8 @@ public:
         , enablePrintAndCut(false)
         , useSpecifiedOrigin(false)
         , specifiedOriginIndex(0)
+        , layersCount(16)
+        , backend(false)
         //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
@@ -68,9 +70,12 @@ public:
     bool useSpecifiedOrigin;
     int specifiedOriginIndex;
     QImage thumbnail;
+
+    int layersCount;
+    bool backend;
 };
 
-LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
+LaserDocument::LaserDocument(LaserScene* scene, int layersCount, bool backend, QObject* parent)
     : QObject(parent)
     , ILaserDocumentItem(LNT_DOCUMENT, new LaserDocumentPrivate(this))
 {
@@ -78,6 +83,8 @@ LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
     d->scene = scene;
     if (d->scene)
         d->scene->setDocument(this);
+    d->layersCount = layersCount;
+    d->backend = backend;
 	init();
 }
 
@@ -650,7 +657,7 @@ void LaserDocument::swapLayers(int i, int j)
 void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
 {
     Q_D(LaserDocument);
-    for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
+    for (int i = 0; i < d->layersCount; i++)
     {
         d->layers[i]->bindButton(layerButtons[i], i);
     }
@@ -1541,7 +1548,7 @@ void LaserDocument::init()
 	Q_D(LaserDocument);
 	d->name = tr("Untitled");
 
-	for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
+	for (int i = 0; i < d->layersCount; i++)
 	{
 		QString layerName = newLayerName();
 		LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
@@ -1549,10 +1556,13 @@ void LaserDocument::init()
 		addLayer(layer);
 	}
 
-    connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromToolBar,
-        this, &LaserDocument::updateDocumentBounding);
-    connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromMouse,
-        this, &LaserDocument::updateDocumentBounding);
+    if (!d->backend)
+    {
+        connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromToolBar,
+            this, &LaserDocument::updateDocumentBounding);
+        connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromMouse,
+            this, &LaserDocument::updateDocumentBounding);
+    }
 }
 
 void LaserDocument::outlineByLayers(OptimizeNode* node, ProgressItem* progress)

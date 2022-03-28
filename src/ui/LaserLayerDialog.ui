@@ -70,6 +70,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QRadioButton" name="radioButtonStamp">
+          <property name="text">
+           <string>Stamp</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -175,7 +182,26 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="2">
+   <item row="3" column="1">
+    <widget class="QGroupBox" name="groupBoxStamp">
+     <property name="title">
+      <string>Stamp</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QWidget" name="widget" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" rowspan="3">
     <widget class="QGroupBox" name="groupBoxEngraving">
      <property name="title">
       <string>Engraving</string>

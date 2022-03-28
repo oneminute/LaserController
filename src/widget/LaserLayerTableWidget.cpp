@@ -122,6 +122,11 @@ void LaserLayerTableWidget::updateItems()
                 type = tr("F");
                 fullType = tr("Filling");
             }
+            else if (laserType == LLT_STAMP)
+            {
+                type = tr("S");
+                fullType = tr("Stamp");
+            }
 
             QTableWidgetItem* itemColor = new QTableWidgetItem();
             Qt::ItemFlags flags = itemColor->flags();
@@ -157,6 +162,10 @@ void LaserLayerTableWidget::updateItems()
                     itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->fillingRunSpeed() * 0.001)).arg(layer->fillingRunSpeedPower()));
                 else if (layer->fillingType() == FT_Pixel)
                     itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->fillingRunSpeedPower()));
+            }
+            else if (layer->type() == LLT_STAMP)
+            {
+                itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower()));
             }
             itemSpeedPower->setTextAlignment(Qt::AlignCenter);
 

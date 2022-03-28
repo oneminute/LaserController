@@ -15,7 +15,9 @@ StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
-    m_layerIndex = m_scene->document()->idleLayer()->index();
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    layer->setType(LLT_STAMP);
+    m_layerIndex = layer->index();
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/frameFour.png");
     QPixmap threePm(":/ui/icons/images/frameThreeL.png");

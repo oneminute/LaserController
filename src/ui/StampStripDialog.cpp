@@ -16,7 +16,9 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
-    m_layerIndex = m_scene->document()->idleLayer()->index();
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    layer->setType(LLT_STAMP);
+    m_layerIndex = layer->index();
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/signalLine.png");
     QPixmap threePm(":/ui/icons/images/multiLine.png");
@@ -31,7 +33,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     }
     connect(m_ui->frameStampLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
         int count = m_viewItemModel->rowCount();
-        //´æ´¢ÉÏÒ»¸ö
+        //å­˜å‚¨ä¸Šä¸€ä¸ª
         QMap<QModelIndex, QString> itemModelMap;
         for (int i = 0; i < m_viewItemModel->rowCount(); i++) {
             QStandardItem* item0 = m_viewItemModel->item(i, 0);
@@ -40,7 +42,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
             itemModelMap.insert(item1->index(), item1->text());
         }
         m_tablesModelList[m_preLayoutIndex] = itemModelMap;
-        //ÐÞ¸Ä
+        //ä¿®æ”¹
         QMap<QModelIndex, QString> preModelList = m_tablesModelList[m_preLayoutIndex];
         QMap<QModelIndex, QString> curModelList = m_tablesModelList[index];
         if (!curModelList.isEmpty()) {
@@ -140,7 +142,7 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     //text content
     
     connect(m_ui->lineEdit, QOverload<const QString&>::of(&QLineEdit::textChanged), [=](const QString& text) {
-        /*ÓëºóÃæ¹¦ÄÜ³åÍ»
+        /*ä¸ŽåŽé¢åŠŸèƒ½å†²çª
         bool b = text.contains(QRegExp("[\\x4e00-\\x9fa5]+"));
         if (b) {
             m_ui->fontComboBox->setWritingSystem(QFontDatabase::SimplifiedChinese);

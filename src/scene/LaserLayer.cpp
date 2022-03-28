@@ -589,7 +589,7 @@ void LaserLayer::setHalftoneAngles(qreal angles)
 bool LaserLayer::isAvailable() const
 {
     Q_D(const LaserLayer);
-    return !d->primitives.isEmpty();
+    return !d->primitives.isEmpty() && exportable() && visible();
 }
 
 QJsonObject LaserLayer::toJson(QWidget* window)

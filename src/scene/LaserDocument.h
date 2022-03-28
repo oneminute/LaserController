@@ -33,7 +33,7 @@ public:
         QImage image;
         QRect bounding;
     };
-    explicit LaserDocument(LaserScene* scene = nullptr, QObject* parent = nullptr);
+    explicit LaserDocument(LaserScene* scene, int layersCount, bool backend, QObject* parent = nullptr);
     ~LaserDocument();
 
     QMap<QString, LaserPrimitive*> primitives() const;

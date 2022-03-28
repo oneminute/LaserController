@@ -38,7 +38,7 @@ SplashScreen::SplashScreen(QWidget* parent)
     mainLayout->setStretch(2, 0);
 
     setLayout(mainLayout);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
     resize(800, 600);
     QRect screenGeometry = LaserApplication::desktop()->screenGeometry();

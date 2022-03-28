@@ -113,7 +113,8 @@ enum LaserLayerType
 {
     LLT_ENGRAVING = 0,
     LLT_CUTTING = 1,
-    LLT_FILLING = 2
+    LLT_FILLING = 2,
+    LLT_STAMP = 3
 };
 
 enum RelayAction
