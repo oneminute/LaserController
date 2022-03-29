@@ -1384,7 +1384,7 @@ void LaserDocument::updateDocumentBounding()
     utils::boundingRect(d->primitives.values(), d->bounding, d->engravingBounding);
 }
 
-QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
+QList<LaserDocument::StampItem> LaserDocument::generateStampImages(qreal distance)
 {
     QList<StampItem> images;
     
@@ -1444,7 +1444,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             QPainter painter(&image);
             //绘制印章外面的基准线
             computeStampBasePath(p, painter, offset, t1, t2);
-            computeBoundsPath(p, item, 500);
+            computeBoundsPath(p, item, distance);
             painter.setPen(Qt::NoPen);
             painter.setBrush(Qt::NoBrush);
             if (!p->stampIntaglio()) {
@@ -1561,12 +1561,18 @@ void LaserDocument::computeBoundsPath(LaserPrimitive* primitive, StampItem& item
         }
     }
     if (!path.isEmpty()) {
-        QRectF bounds = primitive->boundingRect();
+        path = primitive->sceneTransform().map(path);
+        QRectF bounds = path.boundingRect();
+        QPointF c = bounds.center();
         qreal sX = (bounds.width() +  2 * distance) / bounds.width();
         qreal sY = (bounds.height() + 2 * distance) / bounds.height();
         QTransform t;
         t.scale(sX, sY);
         path = t.map(path);
+        QPointF c1 = path.boundingRect().center();
+        QTransform t1;
+        t1.translate(c.x() - c1.x(), c.y() - c1.y());
+        path = t1.map(path);
         QRectF bs = path.boundingRect();
         item.path = path;
     }

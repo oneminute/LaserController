@@ -161,7 +161,7 @@ public slots:
     void load(const QString& filename, QWidget* window);
     int totalNodes();
     void updateDocumentBounding();
-    QList<StampItem> generateStampImages();
+    QList<StampItem> generateStampImages(qreal distance = 500);
     void computeStampBasePath(LaserPrimitive* primitive, QPainter& painter, qreal offset, QTransform t1, QTransform t2);
     void computeBoundsPath(LaserPrimitive* primitive, StampItem& item, qreal distance = 500);
 protected:
