@@ -85,6 +85,9 @@ public:
     int fillingType() const;
     void setFillingType(int type);
 
+    int stampBoundingDistance() const;
+    void setStampBoundingDistance(int distance);
+
     QPoint startPos() const;
     void setStartPos(const QPoint& startPos);
 

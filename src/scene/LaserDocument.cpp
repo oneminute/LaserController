@@ -1127,6 +1127,10 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         {
             d->layers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
         }
+        if (layer.contains("stampBoundingDistance"))
+        {
+            d->layers[index]->setStampBoundingDistance(layer.value("stampBoundingDistance").toInt());
+        }
 
 		//primitive
 		for (int j = 0; j < array.size(); j++) {
@@ -1384,7 +1388,7 @@ void LaserDocument::updateDocumentBounding()
     utils::boundingRect(d->primitives.values(), d->bounding, d->engravingBounding);
 }
 
-QList<LaserDocument::StampItem> LaserDocument::generateStampImages(qreal distance)
+QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
 {
     QList<StampItem> images;
     
@@ -1444,7 +1448,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages(qreal distanc
             QPainter painter(&image);
             //绘制印章外面的基准线
             computeStampBasePath(p, painter, offset, t1, t2);
-            computeBoundsPath(p, item, distance);
+            computeBoundsPath(p, item, layer->stampBoundingDistance());
             painter.setPen(Qt::NoPen);
             painter.setBrush(Qt::NoBrush);
             if (!p->stampIntaglio()) {

@@ -49,6 +49,7 @@ ConfigDialog::ConfigDialog(QWidget* parent)
         << Config::CuttingLayer::group
         << Config::EngravingLayer::group
         << Config::FillingLayer::group
+        << Config::StampLayer::group
         << Config::PathOptimization::group
         << Config::Export::group
         << Config::Device::group

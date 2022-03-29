@@ -58,6 +58,7 @@
     <addaction name="actionHalfTone"/>
     <addaction name="actionLoadJson"/>
     <addaction name="actionPathOptimization"/>
+    <addaction name="actionParseJson"/>
     <addaction name="actionRemoteAssistance"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -2007,6 +2008,11 @@
    </property>
    <property name="text">
     <string>Machining Stamp</string>
+   </property>
+  </action>
+  <action name="actionParseJson">
+   <property name="text">
+    <string>Parse Json</string>
    </property>
   </action>
  </widget>

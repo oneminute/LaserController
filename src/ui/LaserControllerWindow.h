@@ -134,7 +134,6 @@ public slots:
 	void newDocument();
 	void closeDocument();
     void startMachining();
-    void startMachiningStamp();
     void updateLayers();
 
     void retranslate();
@@ -409,6 +408,8 @@ protected slots:
     void onActionTwoShapesUnite();
     void onActionWeldAll();
 
+    void onActionParseJson();
+
     // cameras slots
     void onCameraConnected();
     void onCameraDisconnected();
@@ -493,7 +494,6 @@ private:
 
     // Operations Panel widgets
     QToolButton* m_buttonOperationStart;
-    QToolButton* m_buttonOperationStartStamp;
     QToolButton* m_buttonOperationDownload;
     QToolButton* m_buttonOperationPause;
     QToolButton* m_buttonOperationStop;

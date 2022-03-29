@@ -94,6 +94,12 @@ void LaserLayerDialog::initUi()
     m_ui->editSliderLPI->setMaximum(1200);
     m_ui->editSliderLPI->setPageStep(10);
 
+    m_ui->editSliderStampBoundingDistance->setTextTemplate("%1%");
+    m_ui->editSliderStampBoundingDistance->setMaximum(50);
+    m_ui->editSliderStampBoundingDistance->setDecimals(0);
+    m_ui->editSliderStampBoundingDistance->setPage(1);
+    m_ui->editSliderStampBoundingDistance->setStep(0.001);
+
     m_ui->lineEditLayerName->setText(m_layer->name());
 
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
@@ -118,6 +124,7 @@ void LaserLayerDialog::initUi()
     m_ui->labelDPI->setText(Config::EngravingLayer::DPIItem()->title());
 
     m_ui->labelFillingEnableCutting->setText(Config::FillingLayer::enableCuttingItem()->title());
+    m_ui->labelStampBoundingDistance->setText(Config::StampLayer::boundingDistanceItem()->title());
 
     connect(m_ui->radioButtonCutting, &QRadioButton::toggled, this, &LaserLayerDialog::onCuttingToggled);
     connect(m_ui->radioButtonEngraving, &QRadioButton::toggled, this, &LaserLayerDialog::onEngravingToggled);
@@ -149,6 +156,8 @@ void LaserLayerDialog::resetParameters()
 
     m_ui->checkBoxFillingEnableCutting->setChecked(m_layer->fillingEnableCutting());
 
+    m_ui->editSliderStampBoundingDistance->setIntValue(m_layer->stampBoundingDistance());
+
     updateControls();
 }
 
@@ -170,6 +179,8 @@ void LaserLayerDialog::restoreParameters()
     m_ui->editSliderLPI->setValue(Config::EngravingLayer::LPI());
 
     m_ui->checkBoxFillingEnableCutting->setChecked(Config::FillingLayer::enableCutting());
+
+    m_ui->editSliderStampBoundingDistance->setIntValue(m_layer->stampBoundingDistance());
 }
 
 void LaserLayerDialog::onCuttingToggled(bool checked)
@@ -253,6 +264,8 @@ void LaserLayerDialog::onButtonClicked(QAbstractButton * button)
 
         Config::FillingLayer::enableCuttingItem()->setValue(m_ui->checkBoxFillingEnableCutting->isChecked(), SS_DIRECTLY, this);
 
+        Config::StampLayer::boundingDistanceItem()->setValue(m_ui->editSliderStampBoundingDistance->intValue(), SS_DIRECTLY, this);
+
 		if (Config::isModified())
 		{
             Config::FillingLayer::group->save(true, true);
@@ -271,6 +284,7 @@ void LaserLayerDialog::updateControls()
         m_ui->groupBoxEngraving->setEnabled(true);
         m_ui->groupBoxCutting->setEnabled(false);
         m_ui->groupBoxFilling->setEnabled(false);
+        m_ui->groupBoxStamp->setEnabled(false);
         m_ui->checkBoxEngravingEnableCutting->setEnabled(true);
         m_ui->checkBoxUseHalftone->setEnabled(true);
 
@@ -285,6 +299,7 @@ void LaserLayerDialog::updateControls()
         m_ui->groupBoxEngraving->setEnabled(false);
         m_ui->groupBoxCutting->setEnabled(true);
         m_ui->groupBoxFilling->setEnabled(false);
+        m_ui->groupBoxStamp->setEnabled(false);
     }
     break;
     case LLT_FILLING:
@@ -292,6 +307,7 @@ void LaserLayerDialog::updateControls()
         m_ui->groupBoxEngraving->setEnabled(false);
         m_ui->groupBoxCutting->setEnabled(false);
         m_ui->groupBoxFilling->setEnabled(true);
+        m_ui->groupBoxStamp->setEnabled(false);
         m_ui->checkBoxEngravingEnableCutting->setEnabled(false);
         m_ui->checkBoxUseHalftone->setEnabled(true);
 
@@ -308,6 +324,7 @@ void LaserLayerDialog::updateControls()
         m_ui->groupBoxEngraving->setEnabled(true);
         m_ui->groupBoxCutting->setEnabled(true);
         m_ui->groupBoxFilling->setEnabled(false);
+        m_ui->groupBoxStamp->setEnabled(true);
         m_ui->checkBoxEngravingEnableCutting->setEnabled(true);
         m_ui->checkBoxUseHalftone->setEnabled(false);
 

@@ -192,7 +192,7 @@ void machiningUtils::polygon2Points(
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        points.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        points.append(LaserPoint(pt.x(), pt.y()/*, angle1, angle2*/));
         center += pt;
         if (isClosed)
         {
@@ -476,15 +476,20 @@ QImage machiningUtils::parseJson(const QByteArray& jsonText,int imageWidth, int 
     QTransform t = QTransform::fromScale(imageWidth * 1.0 / layoutWidth, imageHeight * 1.0 / layoutHeight);
     //QTransform t;
 
-    QImage canvas(imageWidth, imageHeight, QImage::Format_RGB888);
+    QImage canvas(imageWidth, imageHeight, QImage::Format_ARGB32);
+    canvas.fill(Qt::white);
     QPainter painter(&canvas);
 
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonText);
     QJsonObject rootObj = jsonDoc.object();
     QJsonObject infoObj = rootObj["LaserDocumentInfo"].toObject();
+
     QJsonObject startPosObj = infoObj["StartFromPos"].toObject();
     QPoint startPos(startPosObj["x"].toInt(), startPosObj["y"].toInt());
     qLogD << "startPos: " << startPos;
+
+    QJsonObject startFromObj = infoObj["StartFrom"].toObject();
+
     QPoint lastPoint = startPos;
     QJsonArray layersObj = rootObj["Layers"].toArray();
 
@@ -522,23 +527,8 @@ QImage machiningUtils::parseJson(const QByteArray& jsonText,int imageWidth, int 
                 painter.setPen(pen);
                 lastPoint = current;
             }
-            /*int splitterIndex = data.indexOf(';');
-            int lastSplitterIndex = 0;
-            while (splitterIndex >= 0)
-            {
-                QString seg = data.mid(lastSplitterIndex + 2, splitterIndex - lastSplitterIndex - 2);
-                QStringList segs = seg.split(' ');
-                int x = segs[0].toInt();
-                int y = segs[1].toInt();
-                QPoint current(x, y);
-                current += lastPoint;
-                painter.drawLine(QLine(t.map(lastPoint), t.map(current)));
-                lastPoint = current;
-                lastSplitterIndex = splitterIndex;
-                splitterIndex = data.indexOf(';', lastSplitterIndex + 1);
-            }*/
         }
     }
-    canvas.save("tmp/canvas.tiff", "TIFF");
+    canvas.save("tmp/canvas.png");
     return canvas;
 }
