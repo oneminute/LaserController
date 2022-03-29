@@ -3,10 +3,14 @@
 
 #include <QDialog>
 #include <QTimer>
+#include <QScopedPointer>
 
 class QProgressBar;
 class QLabel;
-
+namespace Ui
+{
+    class SplashScreen;
+}
 class SplashScreen : public QDialog
 {
     Q_OBJECT
@@ -36,6 +40,7 @@ protected slots:
     void visualTimerTimeout();
 
 private:
+    QScopedPointer<Ui::SplashScreen> m_ui;
     bool m_showProgress;
     qreal m_progress;
     qreal m_targetProgress;
@@ -47,7 +52,7 @@ private:
     QTimer m_progressTimer;
     QLabel* m_labelBanner;
     QLabel* m_labelMessage;
-    QProgressBar* m_progressBar;
+    //QProgressBar* m_progressBar;
 
     Q_DISABLE_COPY(SplashScreen)
 };

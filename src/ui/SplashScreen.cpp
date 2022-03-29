@@ -1,5 +1,6 @@
 #include "SplashScreen.h"
-
+#include "ui_SplashScreen.h"
+#include"LaserControllerWindow.h"
 #include <QBoxLayout>
 #include <QDesktopWidget>
 #include <QProgressBar>
@@ -8,8 +9,10 @@
 
 #include "LaserApplication.h"
 
+
 SplashScreen::SplashScreen(QWidget* parent)
     : QDialog(parent)
+    , m_ui(new Ui::SplashScreen)
     , m_showProgress(true)
     , m_progress(0)
     , m_targetProgress(100)
@@ -17,7 +20,17 @@ SplashScreen::SplashScreen(QWidget* parent)
     , m_progressTick(0.5)
     , m_close(false)
 {
-    QVBoxLayout* mainLayout = new QVBoxLayout;
+    m_ui->setupUi(this);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    QRect screenGeometry = LaserApplication::desktop()->screenGeometry();
+    int w = screenGeometry.width();
+    int h = screenGeometry.height();
+    int x = (w - width()) / 2;
+    int y = (h - height()) / 2.5;
+    move(0, 0);
+    resize(w, h);
+    
+    /*QVBoxLayout* mainLayout = new QVBoxLayout;
     mainLayout->setMargin(1);
 
     m_labelBanner = new QLabel;
@@ -27,25 +40,23 @@ SplashScreen::SplashScreen(QWidget* parent)
     //m_labelMessage->setAlignment(Qt::AlignRight);
 
     m_progressBar = new QProgressBar;
-    m_progressBar->setMaximum(100);
 
-    mainLayout->addWidget(m_labelBanner);
-    mainLayout->addWidget(m_labelMessage);
-    mainLayout->addWidget(m_progressBar);
+    mainLayout->addWidget(m_labelBanner, Qt::AlignHCenter);
+    //mainLayout->addWidget(m_labelMessage);
+    QHBoxLayout* processLayout = new QHBoxLayout;
+    //mainLayout->addLayout(processLayout);
+    mainLayout->addWidget(m_progressBar, Qt::AlignLeft);
 
     mainLayout->setStretch(0, 1);
     mainLayout->setStretch(1, 0);
     mainLayout->setStretch(2, 0);
 
     setLayout(mainLayout);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    
 
-    resize(800, 600);
-    QRect screenGeometry = LaserApplication::desktop()->screenGeometry();
-    int x = (screenGeometry.width() - width()) / 2;
-    int y = (screenGeometry.height() - height()) / 2;
-    move(x, y);
-
+    
+    */
+    //m_progressBar = m_ui->progressBar;
     m_progressTimer.setInterval(100);
     connect(&m_progressTimer, &QTimer::timeout, this, &SplashScreen::progressTimerTimeout, Qt::ConnectionType::DirectConnection);
     connect(&m_visualTimer, &QTimer::timeout, this, &SplashScreen::visualTimerTimeout);
@@ -62,7 +73,7 @@ void SplashScreen::setProgress(qreal progress, bool immediate)
     if (immediate)
     {
         m_progress = qBound(0.0, progress, 100.0); 
-        m_progressBar->setValue(qRound(m_progress));
+        m_ui->progressBar->setValue(qRound(m_progress));
     }
     else
     {
@@ -75,19 +86,23 @@ void SplashScreen::setProgress(qreal progress, bool immediate)
 void SplashScreen::setMessage(const QString& message) 
 {
     m_message = message; 
-    m_labelMessage->setText(" " + message);
+    //m_labelMessage->setText(" " + message);
 }
 
 void SplashScreen::show(int milliseconds)
 {
     if (milliseconds > 0)
         m_progressTimer.start();
+    
     QDialog::show();
+    
 }
 
 void SplashScreen::hide(bool immediate)
 {
     QDialog::hide();
+    LaserApplication::mainWindow->setWindowFlags(Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+    LaserApplication::mainWindow->show();
 }
 
 void SplashScreen::delayedHide(int milliseconds)
@@ -102,11 +117,12 @@ void SplashScreen::delayedHide(int milliseconds)
 void SplashScreen::progressTimerTimeout()
 {
     m_progress += m_progressTick;
-    m_progressBar->setValue(qRound(m_progress));
+    m_ui->progressBar->setValue(qRound(m_progress));
 }
 
 void SplashScreen::visualTimerTimeout()
 {
+    
     m_visualTimer.stop();
     delayedHide();
 }
