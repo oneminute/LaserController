@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QDialog{
-background-color:#9a030303;
+background-color:#d8f8f8f8;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -88,7 +88,7 @@ background-color:#9a030303;
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color:#faffffff;</string>
+      <string notr="true">background-color:#f0f3f8;</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
