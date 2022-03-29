@@ -89,6 +89,7 @@ bool LaserApplication::initialize()
     loadLanguages();
     splashScreen = new SplashScreen();
     splashScreen->setMessage(tr("Loading settings..."));
+    splashScreen->setProgress(0);
     splashScreen->show();
 
     checkEnvironment();

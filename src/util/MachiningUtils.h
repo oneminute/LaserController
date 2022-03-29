@@ -52,8 +52,6 @@ namespace machiningUtils
     QList<QPoint> boundingPoints(int originIndex, const QRect& bounding);
 
     QList<QPoint> boundingPoints(int jobIndex, const QRect& bounding, const QPoint& startPos);
-
-    QImage parseJson(const QByteArray& jsonText, int imageWidth, int imageHeight, int layoutWidth, int layoutHeight);
 }
 
 #endif // MACHININGUTILS_H

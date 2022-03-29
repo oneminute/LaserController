@@ -138,6 +138,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->setupUi(this);
     loadRecentFilesMenu();
     installEventFilter(this);
+    setWindowFlags(Qt::FramelessWindowHint);
     
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
@@ -1114,6 +1115,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //shapes weld/ two shapes unite
     connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
     connect(m_ui->actionWeldAll, &QAction::triggered, this, &LaserControllerWindow::onActionWeldAll);
+    
+    connect(m_ui->actionParseJson, &QAction::triggered, this, &LaserControllerWindow::onActionParseJson);
+
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     ADD_TRANSITION(deviceIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
@@ -6627,9 +6631,6 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
     qLogD << "onDocumentExportFinished: " << m_prepareMachining;
     qLogD << "json data: ";
     //qLogD << data;
-    int layoutSize = Config::SystemRegister::xMaxLength() > Config::SystemRegister::yMaxLength() ?
-        Config::SystemRegister::xMaxLength() : Config::SystemRegister::yMaxLength();
-    machiningUtils::parseJson(data, 8192, 8192, layoutSize, layoutSize);
     if (!m_prepareDownloading && !m_prepareMachining)
     {
         LaserApplication::globalProgress->finish();
@@ -7482,6 +7483,118 @@ void LaserControllerWindow::onActionWeldAll()
 
 void LaserControllerWindow::onActionParseJson()
 {
+    ProgressItem* mainProgress = LaserApplication::resetProcess();
+    QString filters = tr("Json (*.json);;");
+    QString filename = getFilename(tr("Open Supported File"), filters);
+    qLogD << "importing filename is " << filename;
+    if (filename.isEmpty())
+    {
+        mainProgress->finish();
+        return;
+    }
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        mainProgress->finish();
+        return;
+    }
+
+    QByteArray data = file.readAll();
+
+    QtConcurrent::run([=]()
+        {
+            ProgressItem* progress = new ProgressItem(tr("Parse Json"), ProgressItem::PT_Simple, mainProgress);
+            progress->setMaximum(100);
+
+            progress->setProgress(0);
+            int layoutSize = Config::SystemRegister::xMaxLength() > Config::SystemRegister::yMaxLength() ?
+                Config::SystemRegister::xMaxLength() : Config::SystemRegister::yMaxLength();
+            //machiningUtils::parseJson(file.readAll(), 8192, 8192, layoutSize, layoutSize);
+            int imageWidth = 8192;
+            int imageHeight = 8192;
+            int layoutWidth = layoutSize;
+            int layoutHeight = layoutSize;
+            QTransform t = QTransform::fromScale(imageWidth * 1.0 / layoutWidth, imageHeight * 1.0 / layoutHeight);
+            //QTransform t;
+
+            QImage canvas(imageWidth, imageHeight, QImage::Format_ARGB32);
+            canvas.fill(Qt::white);
+            QPainter painter(&canvas);
+            progress->setProgress(20);
+
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+            QJsonObject rootObj = jsonDoc.object();
+            QJsonObject infoObj = rootObj["LaserDocumentInfo"].toObject();
+
+            QJsonObject startPosObj = infoObj["StartFromPos"].toObject();
+            QPoint startPos(startPosObj["x"].toInt(), startPosObj["y"].toInt());
+            qLogD << "startPos: " << startPos;
+
+            QTransform t1stQard = LaserApplication::device->to1stQuad();
+
+            int startFrom = infoObj["StartFrom"].toInt();
+            switch (startFrom)
+            {
+            case 0:
+                startPos = t1stQard.map(LaserApplication::device->deviceState().pos.toPoint());
+                break;
+            case 1:
+            case 2:
+            case 3:
+                startPos = t1stQard.map(LaserApplication::device->userOrigin().toPoint());
+                break;
+            case 4:
+                break;
+            }
+
+            QPoint lastPoint = startPos;
+            QJsonArray layersObj = rootObj["Layers"].toArray();
+
+            QPen pen(Qt::red);
+            pen.setCosmetic(true);
+            painter.setPen(pen);
+            painter.drawEllipse(t.map(lastPoint), 5, 5);
+
+            pen.setColor(Qt::blue);
+            painter.setPen(pen);
+            progress->setProgress(25);
+            for (int i = 0; i < layersObj.size(); i++)
+            {
+                QJsonObject layerObj = layersObj.at(i).toObject();
+                QJsonArray itemsObj = layerObj["Items"].toArray();
+                for (int j = 0; j < itemsObj.size(); j++)
+                {
+                    QJsonObject itemObj = itemsObj.at(j).toObject();
+                    QString data = itemObj["Data"].toString();
+                    QStringList segs = data.split(';');
+                    for (const QString& seg : segs)
+                    {
+                        QStringList xys = seg.split(' ');
+                        if (xys.size() != 2)
+                            continue;
+                        int x = xys[0].mid(2).toInt();
+                        int y = xys[1].toInt();
+                        QPoint current(x, y);
+                        current += lastPoint;
+                        painter.drawLine(QLine(t.map(lastPoint), t.map(current)));
+                        pen.setColor(Qt::red);
+                        painter.setPen(pen);
+                        painter.drawPoint(t.map(lastPoint));
+                        painter.drawPoint(t.map(current));
+                        pen.setColor(Qt::blue);
+                        painter.setPen(pen);
+                        lastPoint = current;
+                        progress->increaseProgress((80 - 25.0) / layersObj.size() / itemsObj.size() / (segs.size() - 1));
+                    }
+                }
+            }
+            progress->setProgress(80);
+            canvas.save("tmp/canvas.png");
+            progress->setProgress(100);
+            progress->finish();
+            mainProgress->finish();
+        }
+    );
 }
 
 void LaserControllerWindow::onCameraConnected()
