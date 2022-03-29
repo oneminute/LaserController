@@ -79,6 +79,7 @@
 #include "ui/CameraAlignmentDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
+#include "util/MachiningUtils.h"
 #include "widget/FloatEditDualSlider.h"
 #include "widget/FloatEditSlider.h"
 #include "widget/ImageViewer.h"
@@ -6675,6 +6676,9 @@ void LaserControllerWindow::onDocumentExportFinished(const QByteArray& data)
     qLogD << "onDocumentExportFinished: " << m_prepareMachining;
     qLogD << "json data: ";
     //qLogD << data;
+    int layoutSize = Config::SystemRegister::xMaxLength() > Config::SystemRegister::yMaxLength() ?
+        Config::SystemRegister::xMaxLength() : Config::SystemRegister::yMaxLength();
+    machiningUtils::parseJson(data, 8192, 8192, layoutSize, layoutSize);
     if (!m_prepareDownloading && !m_prepareMachining)
     {
         LaserApplication::globalProgress->finish();

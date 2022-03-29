@@ -1,9 +1,14 @@
 #include "MachiningUtils.h"
 
-#include <QtMath>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QDebug>
+#include <QPainter>
 #include <QQueue>
 #include <QStack>
+#include <QtMath>
 #include <QVector4D>
 
 #include "common/common.h"
@@ -464,4 +469,76 @@ QList<QPoint> machiningUtils::boundingPoints(int jobIndex, const QRect& bounding
     }
     pointsOut.append(pointsOut.first());
     return pointsOut;
+}
+
+QImage machiningUtils::parseJson(const QByteArray& jsonText,int imageWidth, int imageHeight, int layoutWidth, int layoutHeight)
+{
+    QTransform t = QTransform::fromScale(imageWidth * 1.0 / layoutWidth, imageHeight * 1.0 / layoutHeight);
+    //QTransform t;
+
+    QImage canvas(imageWidth, imageHeight, QImage::Format_RGB888);
+    QPainter painter(&canvas);
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonText);
+    QJsonObject rootObj = jsonDoc.object();
+    QJsonObject infoObj = rootObj["LaserDocumentInfo"].toObject();
+    QJsonObject startPosObj = infoObj["StartFromPos"].toObject();
+    QPoint startPos(startPosObj["x"].toInt(), startPosObj["y"].toInt());
+    qLogD << "startPos: " << startPos;
+    QPoint lastPoint = startPos;
+    QJsonArray layersObj = rootObj["Layers"].toArray();
+
+    QPen pen(Qt::red);
+    pen.setCosmetic(true);
+    painter.setPen(pen);
+    painter.drawEllipse(t.map(lastPoint), 5, 5);
+
+    pen.setColor(Qt::blue);
+    painter.setPen(pen);
+    for (int i = 0; i < layersObj.size(); i++)
+    {
+        QJsonObject layerObj = layersObj.at(i).toObject();
+        QJsonArray itemsObj = layerObj["Items"].toArray();
+        for (int j = 0; j < itemsObj.size(); j++)
+        {
+            QJsonObject itemObj = itemsObj.at(j).toObject();
+            QString data = itemObj["Data"].toString();
+            QStringList segs = data.split(';');
+            for (const QString& seg : segs)
+            {
+                QStringList xys = seg.split(' ');
+                if (xys.size() != 2)
+                    continue;
+                int x = xys[0].mid(2).toInt();
+                int y = xys[1].toInt();
+                QPoint current(x, y);
+                current += lastPoint;
+                painter.drawLine(QLine(t.map(lastPoint), t.map(current)));
+                pen.setColor(Qt::red);
+                painter.setPen(pen);
+                painter.drawPoint(t.map(lastPoint));
+                painter.drawPoint(t.map(current));
+                pen.setColor(Qt::blue);
+                painter.setPen(pen);
+                lastPoint = current;
+            }
+            /*int splitterIndex = data.indexOf(';');
+            int lastSplitterIndex = 0;
+            while (splitterIndex >= 0)
+            {
+                QString seg = data.mid(lastSplitterIndex + 2, splitterIndex - lastSplitterIndex - 2);
+                QStringList segs = seg.split(' ');
+                int x = segs[0].toInt();
+                int y = segs[1].toInt();
+                QPoint current(x, y);
+                current += lastPoint;
+                painter.drawLine(QLine(t.map(lastPoint), t.map(current)));
+                lastPoint = current;
+                lastSplitterIndex = splitterIndex;
+                splitterIndex = data.indexOf(';', lastSplitterIndex + 1);
+            }*/
+        }
+    }
+    canvas.save("tmp/canvas.tiff", "TIFF");
+    return canvas;
 }
