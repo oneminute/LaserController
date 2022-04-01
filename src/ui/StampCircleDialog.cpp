@@ -17,8 +17,12 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
-    m_layerIndex = m_scene->document()->idleLayer()->index();
-    m_ui->fontComboBox->setCurrentText(QStringLiteral("·ÂËÎ"));
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    layer->setType(LLT_STAMP);
+    m_layerIndex = layer->index();
+
+
+    m_ui->fontComboBox->setCurrentText(QStringLiteral("ï¿½ï¿½ï¿½ï¿½"));
     //text size
     m_ui->textSizeSpinBox->setValue(6);
     m_ui->textSizeSpinBox->setMinimum(0);
@@ -316,7 +320,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         }
         
         int count = m_viewItemModel->rowCount();
-        //´æ´¢ÉÏÒ»¸ö
+        //å­˜å‚¨ä¸Šä¸€ä¸ª
         QMap<QModelIndex, itemStruct> itemModelMap;
         for (int i = 0; i < m_viewItemModel->rowCount(); i++) {
             QStandardItem* item0 = m_viewItemModel->item(i, 0);
@@ -329,7 +333,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             itemModelMap.insert(item3->index(), itemStruct(item3->text(), item0->checkState()));
         }
         m_tablesModelList[m_preLayoutIndex] = itemModelMap;
-        //ÐÞ¸Ä
+        //ä¿®æ”¹
         QMap<QModelIndex, itemStruct> preModelList = m_tablesModelList[m_preLayoutIndex];
         QMap<QModelIndex, itemStruct> curModelList = m_tablesModelList[index];
         if (!curModelList.isEmpty()) {

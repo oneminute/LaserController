@@ -21,14 +21,15 @@ SplashScreen::SplashScreen(QWidget* parent)
     , m_close(false)
 {
     m_ui->setupUi(this);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    //setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     QRect screenGeometry = LaserApplication::desktop()->screenGeometry();
-    int w = screenGeometry.width();
-    int h = screenGeometry.height();
-    int x = (w - width()) / 2;
-    int y = (h - height()) / 2.5;
-    move(0, 0);
+    int w = screenGeometry.width() / 2;
+    int h = screenGeometry.height() / 2;
     resize(w, h);
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
     
     /*QVBoxLayout* mainLayout = new QVBoxLayout;
     mainLayout->setMargin(1);

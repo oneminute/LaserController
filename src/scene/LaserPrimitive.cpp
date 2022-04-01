@@ -359,15 +359,15 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
         {
             LaserPoint firstPoint = machiningPoints[pointIndex];
 
-            int step = 0;
-            if (fromPoint.angle1() >= 0)
+            int step = 1;
+            /*if (fromPoint.angle1() >= 0)
             {
                 step = -1;
             }
             else
             {
                 step = 1;
-            }
+            }*/
 
             int cursor = pointIndex;
             points.reserve(pointsCount);
@@ -604,6 +604,7 @@ void LaserPrimitive::setLayer(LaserLayer* layer, bool whenNullLayerKeepIndex)
         
 		d->layerIndex = layer->index();
         d->layer->primitives().append(this);
+        //qLogD << d->layer->primitives().count();
 	}
 	else {
         //如果保留原有的layerIndex，删除后可以再恢复回来
@@ -1203,10 +1204,10 @@ LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress
         qreal angle42 = line42.angle();
 
         LaserPointList points;
-        points.push_back(LaserPoint(pt1.x(), pt1.y(), qRound(angle11), qRound(angle12)));
-        points.push_back(LaserPoint(pt2.x(), pt2.y(), qRound(angle21), qRound(angle22)));
-        points.push_back(LaserPoint(pt3.x(), pt3.y(), qRound(angle31), qRound(angle32)));
-        points.push_back(LaserPoint(pt4.x(), pt4.y(), qRound(angle41), qRound(angle42)));
+        points.push_back(LaserPoint(pt1.x(), pt1.y()/*, qRound(angle11), qRound(angle12)*/));
+        points.push_back(LaserPoint(pt2.x(), pt2.y()/*, qRound(angle21), qRound(angle22)*/));
+        points.push_back(LaserPoint(pt3.x(), pt3.y()/*, qRound(angle31), qRound(angle32)*/));
+        points.push_back(LaserPoint(pt4.x(), pt4.y()/*, qRound(angle41), qRound(angle42)*/));
         d->machiningCenter = utils::center(points).toPoint();
         points.push_back(points.first());
         d->startingIndices.append(0);
@@ -1352,8 +1353,8 @@ LaserPointListList LaserLine::updateMachiningPoints(ProgressItem* parentProgress
     qreal angle1 = line1.angle();
     qreal angle2 = line2.angle();
     LaserPointList points;
-    points.append(LaserPoint(pt1.x(), pt1.y(), angle1, angle2));
-    points.append(LaserPoint(pt2.x(), pt2.y(), angle2, angle1));
+    points.append(LaserPoint(pt1.x(), pt1.y()/*, angle1, angle2*/));
+    points.append(LaserPoint(pt2.x(), pt2.y()/*, angle2, angle1*/));
     d->startingIndices.append(0);
     d->startingIndices.append(1);
     d->machiningPointsList.append(points);
@@ -1652,7 +1653,7 @@ LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProg
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        points.append(LaserPoint(pt.x(), pt.y(), qRound(angle1), qRound(angle2)));
+        points.append(LaserPoint(pt.x(), pt.y()/*, qRound(angle1), qRound(angle2)*/));
         if (isClosed)
         {
             d->startingIndices.append(i);
@@ -2378,10 +2379,10 @@ LaserPointListList LaserBitmap::updateMachiningPoints(ProgressItem* parentProgre
     qreal angle42 = line42.angle();
 
     LaserPointList points;
-    points.push_back(LaserPoint(pt1.x(), pt1.y(), qRound(angle11), qRound(angle12)));
-    points.push_back(LaserPoint(pt2.x(), pt2.y(), qRound(angle21), qRound(angle22)));
-    points.push_back(LaserPoint(pt3.x(), pt3.y(), qRound(angle31), qRound(angle32)));
-    points.push_back(LaserPoint(pt4.x(), pt4.y(), qRound(angle41), qRound(angle42)));
+    points.push_back(LaserPoint(pt1.x(), pt1.y()/*, qRound(angle11), qRound(angle12)*/));
+    points.push_back(LaserPoint(pt2.x(), pt2.y()/*, qRound(angle21), qRound(angle22)*/));
+    points.push_back(LaserPoint(pt3.x(), pt3.y()/*, qRound(angle31), qRound(angle32)*/));
+    points.push_back(LaserPoint(pt4.x(), pt4.y()/*, qRound(angle41), qRound(angle42)*/));
     d->machiningCenter = utils::center(points).toPoint();
     points.push_back(points.first());
     d->startingIndices.append(0);

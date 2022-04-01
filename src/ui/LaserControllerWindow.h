@@ -134,7 +134,6 @@ public slots:
 	void newDocument();
 	void closeDocument();
     void startMachining();
-    void startMachiningStamp();
     void updateLayers();
 
     void retranslate();
@@ -184,6 +183,8 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 	virtual void contextMenuEvent(QContextMenuEvent *event) override;
+
+    LaserDocument* getMachiningDocument(bool& stamp);
 
 protected slots:
 	void onActionUndo(bool checked = false);
@@ -407,6 +408,8 @@ protected slots:
     void onActionTwoShapesUnite();
     void onActionWeldAll();
 
+    void onActionParseJson();
+
     // cameras slots
     void onCameraConnected();
     void onCameraDisconnected();
@@ -491,7 +494,6 @@ private:
 
     // Operations Panel widgets
     QToolButton* m_buttonOperationStart;
-    QToolButton* m_buttonOperationStartStamp;
     QToolButton* m_buttonOperationDownload;
     QToolButton* m_buttonOperationPause;
     QToolButton* m_buttonOperationStop;

@@ -46,6 +46,7 @@ public:
         , dpi(Config::EngravingLayer::DPI())
         , useHalftone(Config::EngravingLayer::useHalftone())
         , halftoneAngles(Config::EngravingLayer::halftoneAngles())
+        , stampBoundingDistance(Config::StampLayer::boundingDistance())
         , button(nullptr)
         , exportable(true)
         , visible(true)
@@ -74,6 +75,7 @@ public:
     int fillingRowInterval;
     bool fillingEnableCutting;
     int fillingType;
+    int stampBoundingDistance;
 
     // engraving fields
     bool engravingForward;
@@ -383,6 +385,18 @@ void LaserLayer::setFillingType(int type)
     d->fillingType = type;
 }
 
+int LaserLayer::stampBoundingDistance() const
+{
+    Q_D(const LaserLayer);
+    return d->stampBoundingDistance;
+}
+
+void LaserLayer::setStampBoundingDistance(int distance)
+{
+    Q_D(LaserLayer);
+    d->stampBoundingDistance = distance;
+}
+
 QPoint LaserLayer::startPos() const
 { 
     Q_D(const LaserLayer);
@@ -589,7 +603,7 @@ void LaserLayer::setHalftoneAngles(qreal angles)
 bool LaserLayer::isAvailable() const
 {
     Q_D(const LaserLayer);
-    return !d->primitives.isEmpty();
+    return !d->primitives.isEmpty() && exportable() && visible();
 }
 
 QJsonObject LaserLayer::toJson(QWidget* window)
@@ -624,6 +638,7 @@ QJsonObject LaserLayer::toJson(QWidget* window)
     object.insert("lpi", this->lpi());
     object.insert("dpi", this->dpi());
     object.insert("halftoneAngles", this->halftoneAngles());
+    object.insert("stampBoundingDistance", this->stampBoundingDistance());
     //object.insert("halftoneGridSize", this->halftoneGridSize());
 	
 	for (int i = 0; i < primitives.size(); i++) {

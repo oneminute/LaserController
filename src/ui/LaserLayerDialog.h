@@ -40,6 +40,7 @@ protected slots:
     void onCuttingToggled(bool checked);
     void onEngravingToggled(bool checked);
     void onFillingToggled(bool checked);
+    void onStampToggled(bool checked);
     void onEngravingEnableCuttingToggled(bool checked);
     void onFillingEnableCuttingToggled(bool checked);
     void onFillingTypeChanged(int index);

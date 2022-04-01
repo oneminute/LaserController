@@ -78,6 +78,7 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         QSvgNode* node = stack.pop();
         QSvgRenderer* renderer = nullptr;
         LaserPrimitive* item = nullptr;
+        QList<LaserPrimitive*> items;
 
         QTransform t;
         t = node->getCascadeTransform();
@@ -142,7 +143,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
             path = t.map(path);
-            item = new LaserPath(path, doc, QTransform(), idleLayer->index());
+            QList<QPolygonF> subPaths = path.toSubpathPolygons();
+            for (const QPolygonF subPoly : subPaths)
+            {
+                QPainterPath subPath;
+                subPath.addPolygon(subPoly);
+                LaserPrimitive* subItem = new LaserPath(subPath, doc, QTransform(), idleLayer->index());
+                items.append(subItem);
+            }
         }
             break;
         case QSvgNode::POLYGON:
@@ -228,18 +236,25 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         if (item)
         {
             //item->setTransform(t);
+            items.append(item);
+        }
 
-            if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
-                item->setName(node->nodeId());
-
-            if (item)
+        if (!items.isEmpty())
+        {
+            for (LaserPrimitive* item : items)
             {
-                if (item->isAvailable())
+                if (!node->nodeId().isEmpty() && !node->nodeId().isNull())
+                    item->setName(node->nodeId());
+
+                if (item)
                 {
-                    doc->addPrimitive(item, false, false);
+                    if (item->isAvailable())
+                    {
+                        doc->addPrimitive(item, false, false);
+                    }
+                    else
+                        unavailables.append(item);
                 }
-                else
-                    unavailables.append(item);
             }
         }
         progress->increaseProgress();

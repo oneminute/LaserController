@@ -65,6 +65,7 @@ protected:
     static void loadCuttingLayerItems();
     static void loadEngravingLayerItems();
     static void loadFillingLayerItems();
+    static void loadStampLayerItems();
     static void loadPathOptimizationItems();
     static void loadExportItems();
     static void loadDeviceItems();
@@ -230,6 +231,21 @@ public:
         CONFIG_ITEM(fillingLayer, rowInterval, int, toInt)
         CONFIG_ITEM(fillingLayer, enableCutting, bool, toBool)
         CONFIG_ITEM(fillingLayer, fillingType, int, toInt)
+
+    private:
+        friend class Config;
+    };
+    
+    class StampLayer : public ConfigItemGroup
+    {
+    protected:
+        StampLayer(QObject* parent = nullptr)
+            : ConfigItemGroup("stampLayer", tr("Stamp Layer"), tr("Filling Layer"), parent)
+        {}
+        
+    public:
+        static ConfigItemGroup* group;
+        CONFIG_ITEM(stampLayer, boundingDistance, int, toInt)
 
     private:
         friend class Config;

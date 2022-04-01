@@ -35,6 +35,7 @@ ConfigItemGroup* Config::Ui::group(nullptr);
 ConfigItemGroup* Config::CuttingLayer::group(nullptr);
 ConfigItemGroup* Config::EngravingLayer::group(nullptr);
 ConfigItemGroup* Config::FillingLayer::group(nullptr);
+ConfigItemGroup* Config::StampLayer::group(nullptr);
 ConfigItemGroup* Config::PathOptimization::group(nullptr);
 ConfigItemGroup* Config::Export::group(nullptr);
 ConfigItemGroup* Config::Device::group(nullptr);
@@ -65,6 +66,7 @@ void Config::init()
     loadCuttingLayerItems();
     loadEngravingLayerItems();
     loadFillingLayerItems();
+    loadStampLayerItems();
     loadPathOptimizationItems();
     loadExportItems();
     loadDeviceItems();
@@ -895,6 +897,24 @@ void Config::loadFillingLayerItems()
     fillingType->setVisible(false);
 }
 
+void Config::loadStampLayerItems()
+{
+    ConfigItemGroup* group = new Config::StampLayer;
+    Config::StampLayer::group = group;
+
+    ConfigItem* boundingDistance = group->addConfigItem(
+        "boundingDistance",
+        500,
+        DT_INT
+    );
+    boundingDistance->setInputWidgetType(IWT_FloatEditSlider);
+    boundingDistance->setInputWidgetProperty("step", 1);
+    boundingDistance->setInputWidgetProperty("decimals", 3);
+    boundingDistance->setInputWidgetProperty("minimum", 0);
+    boundingDistance->setInputWidgetProperty("maximum", 50);
+    boundingDistance->setInputWidgetProperty("maximumLineEditWidth", 60);
+}
+
 void Config::loadPathOptimizationItems()
 {
     ConfigItemGroup* group = new Config::PathOptimization;
@@ -943,7 +963,6 @@ void Config::loadPathOptimizationItems()
     groupingGridInterval->setInputWidgetType(IWT_FloatEditSlider);
     groupingGridInterval->setInputWidgetProperty("step", 0.001);
     groupingGridInterval->setInputWidgetProperty("decimals", 0);
-    groupingGridInterval->setInputWidgetProperty("step", 10);
     groupingGridInterval->setInputWidgetProperty("page", 10);
     groupingGridInterval->setInputWidgetProperty("minimum", 1);
     groupingGridInterval->setInputWidgetProperty("maximum", 1000);
@@ -3338,6 +3357,10 @@ void Config::updateTitlesAndDescriptions()
     FillingLayer::fillingTypeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Filling Type", nullptr), 
         QCoreApplication::translate("Config", "Filling Type", nullptr));
+
+    StampLayer::boundingDistanceItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Bounding Distance", nullptr), 
+        QCoreApplication::translate("Config", "Bounding Distance", nullptr));
 
     PathOptimization::maxStartingPointsItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Starting Points", nullptr), 

@@ -173,7 +173,7 @@ QPointF utils::center(const QVector<QPointF>& points)
 
 LaserPoint utils::center(const LaserPointList& points)
 {
-    LaserPoint center(0, 0, 0, 0);
+    LaserPoint center(0, 0/*, 0, 0*/);
     if (points.isEmpty())
         return center;
 

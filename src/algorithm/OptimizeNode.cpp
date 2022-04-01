@@ -20,7 +20,7 @@ public:
         , parentNode(nullptr)
         , nodeType(LNT_VIRTUAL)
         , outEdge(nullptr)
-        , currentPoint(0, 0, 0, 0)
+        , currentPoint(0, 0/*, 0, 0*/)
         , index(0)
         , isClosed(false)
     {}
@@ -106,7 +106,7 @@ void OptimizeNodePrivate::update(ProgressItem* parentProgress)
             break;
         }
         
-        currentPoint = LaserPoint(origin, angle, angle);
+        currentPoint = LaserPoint(origin/*, angle, angle*/);
     }
     else if (nodeType == LNT_VIRTUAL)
     {

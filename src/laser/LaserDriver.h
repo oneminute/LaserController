@@ -29,7 +29,6 @@ private:
     typedef void(*FNSysMessageCallBack)(FNSysMessageCallBackHandler callback);
 
     typedef void(__cdecl *FNProcDataProgressCallBackHandler)(void* ptr, int position, int totalCount);
-    typedef void(*FNProcDataProgressCallBack)(FNProcDataProgressCallBackHandler callback);
 
     typedef int(__stdcall *FN_INT_INT)(int);
     typedef int(__stdcall *FN_INT_INT_INT)(int, int);
@@ -69,19 +68,20 @@ private:
         int uPos
         );
 
-    typedef void(__stdcall *FN_VOID_BOOL)(bool zeroPointStyle);
-    typedef int(__stdcall *FN_INT_BOOL)(bool pause);
+    typedef void(__stdcall *FN_VOID_BOOL)(bool);
+    typedef bool(__stdcall *FN_BOOL_BOOL)(bool);
+    typedef int(__stdcall *FN_INT_BOOL)(bool);
 
-    typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double millimeter, bool xaxis);
+    typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double, bool);
 
     typedef wchar_t* (__stdcall *FNActivationMainCard)(
         wchar_t*, wchar_t*, wchar_t*, wchar_t*,
         wchar_t*, wchar_t*, wchar_t*, wchar_t*, 
         wchar_t*, wchar_t*, wchar_t*, wchar_t*);
 
-    typedef wchar_t* (__stdcall* FN_WCHART_BOOL)(bool reload);
+    typedef wchar_t* (__stdcall* FN_WCHART_BOOL)(bool);
 
-    typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t* licenseCode);
+    typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t*);
 
     typedef void(__stdcall* FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
     typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
@@ -96,6 +96,8 @@ private:
     typedef void(__stdcall* FN_VOID_LONG)(unsigned long);
 
     typedef int(__stdcall* FN_INT_INT16)(qint16);
+
+    typedef void(__stdcall* FNStartVersionUpdate)(bool, wchar_t*, wchar_t*, int, int, wchar_t*, wchar_t*);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
@@ -244,75 +246,82 @@ private:
 
     FN_WCHART_VOID m_fnGetAPILibVersion;
     FN_WCHART_VOID m_fnGetAPILibCompileInfo;
+    FN_INT_VOID m_fnGetLanguage;
     FN_INT_INT m_fnSetLanguage;
     FN_BOOL_INT m_fnInitLib;
     FN_VOID_VOID m_fnUnInitLib;
 
     FNProgressCallBack m_fnProgressCallBack;
     FNSysMessageCallBack m_fnSysMessageCallBack;
-    FNProcDataProgressCallBack m_fnProcDataProgressCallBack;
 
     FN_WCHART_VOID m_fnGetComPortList;
     FN_INT_INT m_fnInitComPort;
     FN_INT_VOID m_fnUnInitComPort;
 
+    FN_INT_INT_BOOL m_fnShowAboutWindow;
+    FN_VOID_VOID m_fnCloseAboutWindow;
+    FN_VOID_WCHART m_fnShowLoaddingInfo;
+    FN_VOID_VOID m_fnGetLaserLibInfo;
+    FN_VOID_WCHART m_fnSetFactoryType;
     FN_VOID_INT m_fnSetTransTimeOutInterval;
+    FN_VOID_BOOL m_fnOpenDetailedLog;
+    FN_BOOL_BOOL m_fnDebugLogger;
 
     FN_INT_WCHART_WCHART m_fnWriteSysParamToCard;
     FN_INT_WCHART m_fnReadSysParamFromCard;
+    FN_VOID_VOID m_fnSaveMainBoardParamsToServer;
+    FN_VOID_VOID m_fnReadMainBoardParamsFromServer;
     FN_INT_WCHART_WCHART m_fnWriteUserParamToCard;
     FN_INT_WCHART m_fnReadUserParamFromCard;
     FN_INT_WCHART_WCHART m_fnWriteComputerParamToCard;
     FN_INT_WCHART m_fnReadComputerParamFromCard;
-
-    FN_INT_INT_BOOL m_fnShowAboutWindow;
-    FN_VOID_VOID m_fnCloseAboutWindow;
-    FN_VOID_VOID m_fnGetLaserLibInfo;
-    FN_VOID_WCHART m_fnSetFactoryType;
     FN_BOOL_WCHART_INTREF m_fnCheckFactoryPassword;
     FN_INT_WCHART_WCHART m_fnChangeFactoryPassword;
+    FN_VOID_INT m_fnSaveUStepLength;
 
-    FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;
-    FNLPenQuickMoveTo m_fnLPenQuickMoveTo;
-    FNCheckMoveLaserMotors m_fnCheckMoveLaserMotors;
-    FN_VOID_VOID m_fnStartMoveLaserMotors;
-
+    FN_WCHART_BOOL m_fnGetClientAddr;
+    FN_WCHART_BOOL m_fnGetDeviceId;
+    FN_WCHART_VOID m_fnGetHardwareKeyInfo;
+    FN_WCHART_VOID m_fnGetHardwareKeyID;
+    FN_WCHART_VOID m_fnGetMainCardID;
+    FN_VOID_VOID m_fnGetMainCardRegState;
+    FN_WCHART_WCHART_WCHART m_fnRegisterMainCard;
+    FN_BOOL_WCHART m_fnCreateLicenseFile;
+    FN_WCHART_VOID m_fnGetMainCardInfo;
     FN_WCHART_VOID m_fnGetMainHardVersion;
     FN_WCHART_VOID m_fnGetHardwareIdentID;
-    FN_WCHART_VOID m_fnGetMainCardID;
-    FNActivationMainCard m_fnActiveMainCard;
-    FN_WCHART_BOOL m_fnGetDeviceId;
-    FN_WCHART_VOID m_fnGetHardwareKeyID;
-    FN_VOID_VOID m_fnGetMainCardRegState;
-    FN_WCHART_VOID m_fnGetMainCardInfo;
-    FN_BOOL_WCHART m_fnCreateLicenseFile;
-    FN_VOID_VOID m_fnStartSoftUpdateWizard;
-    FN_VOID_VOID m_fnStartFirmwareUpdateWizard;
     FN_WCHART_VOID m_fnGetMainHardModal;
     FN_INT_INT16 m_fnGetHardWareKeyType;
 
-    FN_WCHART_VOID m_fnGetCurrentLaserPos;
+    FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
+    FNActivationMainCard m_fnActiveMainCard;
+    FN_INT_WCHART m_fnActivationMainCardEx;
+
+    FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
+    FNStartVersionUpdate m_fnStartVersionUpdate;
+    FN_INT_VOID m_fnAbortVersionUpdate;
+    FN_VOID_VOID m_fnStartSoftUpdateWizard;
+    FN_VOID_VOID m_fnStartFirmwareUpdateWizard;
+
+    FN_VOID_DOUBLE m_fnLPenMoveToOriginalPoint;
+    FN_VOID_INT m_fnLPenMoveToOriginalPointZ;
+    FNLPenQuickMoveTo m_fnLPenQuickMoveTo;
     FN_VOID_INT m_fnStartMachining;
     FN_INT_BOOL m_fnPauseContinueMachining;
     FN_VOID_VOID m_fnStopMachining;
     FN_INT_BOOL m_fnControlMotor;
     FN_INT_BOOL m_fnTestLaserLight;
-
+    FN_BOOL_BOOL m_fnLoadBreakPointData;
+    FNCheckMoveLaserMotors m_fnCheckMoveLaserMotors;
+    FN_VOID_VOID m_fnStartMoveLaserMotors;
     FN_INT_WCHART m_fnLoadDataFromFile;
-    FN_VOID_LONG m_fnStartDownLoadToCache;
-
-    FN_VOID_VOID m_fnGetDeviceWorkState;
-
-    FN_BOOL_WCHART_INT_WCHART m_fnCheckVersionUpdate;
-
-    FN_INT_WCHART m_fnActivationMainCardEx;
-    FN_WCHART_WCHART_WCHART m_fnRegisterMainCard;
-    FN_INT_WCHART_WCHART_INT m_fnSendAuthenticationEmail;
-
     FN_INT_BYTEPTR_INT m_fnImportData;
+    FN_VOID_VOID m_fnGetDeviceWorkState;
+    FN_VOID_BOOL m_fnChangeYorUaxis;
+    FN_VOID_LONG m_fnStartDownLoadToCache;
     FN_INT_BYTEPTR_INT m_fnDrawRectangularBorder;
 
-    FN_VOID_INT m_fnLPenMoveToOriginalPointZ;
+    FN_WCHART_VOID m_fnGetCurrentLaserPos;
 
     wchar_t m_wcharBuffer[2048];
 

@@ -95,7 +95,9 @@ bool LaserDriver::load()
     m_fnGetAPILibCompileInfo = (FN_WCHART_VOID)m_library.resolve("GetAPILibCompileInfo");
     CHECK_FN(m_fnGetAPILibCompileInfo)
 
-    // TODO: 修改为SetLanguage
+    m_fnGetLanguage = (FN_INT_VOID)m_library.resolve("GetLanguage");
+    CHECK_FN(m_fnGetLanguage)
+
     m_fnSetLanguage = (FN_INT_INT)m_library.resolve("SetLanguage");
     CHECK_FN(m_fnSetLanguage)
 
@@ -111,7 +113,6 @@ bool LaserDriver::load()
     m_fnSysMessageCallBack = (FNSysMessageCallBack)m_library.resolve("SysMessageCallBack");
     CHECK_FN(m_fnSysMessageCallBack)
 
-    //m_fnProcDataProgressCallBack = (FNProcDataProgressCallBack)m_library.resolve("ProcDataProgressCallBack");
     m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
     CHECK_FN(m_fnGetComPortList)
 
@@ -121,14 +122,17 @@ bool LaserDriver::load()
     m_fnUnInitComPort = (FN_INT_VOID)m_library.resolve("UnInitComPort");
     CHECK_FN(m_fnUnInitComPort)
 
-    m_fnSetTransTimeOutInterval = (FN_VOID_INT)m_library.resolve("SetTransTimeOutInterval");
-    CHECK_FN(m_fnSetTransTimeOutInterval)
-
     m_fnWriteSysParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteSysParamToCard");
     CHECK_FN(m_fnWriteSysParamToCard)
 
     m_fnReadSysParamFromCard = (FN_INT_WCHART)m_library.resolve("ReadSysParamFromCard");
     CHECK_FN(m_fnReadSysParamFromCard)
+
+    m_fnSaveMainBoardParamsToServer = (FN_VOID_VOID)m_library.resolve("SaveMainBoardParamsToServer");
+    CHECK_FN(m_fnSaveMainBoardParamsToServer)
+
+    m_fnReadMainBoardParamsFromServer = (FN_VOID_VOID)m_library.resolve("ReadMainBoardParamsFromServer");
+    CHECK_FN(m_fnReadMainBoardParamsFromServer)
 
     m_fnWriteUserParamToCard = (FN_INT_WCHART_WCHART)m_library.resolve("WriteUserParamToCard");
     CHECK_FN(m_fnWriteUserParamToCard)
@@ -151,14 +155,32 @@ bool LaserDriver::load()
     m_fnGetLaserLibInfo = (FN_VOID_VOID)m_library.resolve("GetLaserLibInfo");
     CHECK_FN(m_fnGetLaserLibInfo)
 
+    m_fnShowLoaddingInfo = (FN_VOID_WCHART)m_library.resolve("ShowLoaddingInfo");
+    CHECK_FN(m_fnShowLoaddingInfo)
+
     m_fnSetFactoryType = (FN_VOID_WCHART)m_library.resolve("SetFactoryType");
     CHECK_FN(m_fnSetFactoryType)
+
+    m_fnSetTransTimeOutInterval = (FN_VOID_INT)m_library.resolve("SetTransTimeOutInterval");
+    CHECK_FN(m_fnSetTransTimeOutInterval)
+
+    m_fnOpenDetailedLog = (FN_VOID_BOOL)m_library.resolve("OpenDetailedLog");
+    CHECK_FN(m_fnOpenDetailedLog)
+
+    m_fnDebugLogger = (FN_BOOL_BOOL)m_library.resolve("DebugLogger");
+    CHECK_FN(m_fnDebugLogger)
 
     m_fnCheckFactoryPassword = (FN_BOOL_WCHART_INTREF)m_library.resolve("CheckFactoryPassword");
     CHECK_FN(m_fnCheckFactoryPassword)
 
     m_fnChangeFactoryPassword = (FN_INT_WCHART_WCHART)m_library.resolve("ChangeFactoryPassword");
     CHECK_FN(m_fnChangeFactoryPassword)
+
+    m_fnSaveUStepLength = (FN_VOID_INT)m_library.resolve("SaveUstepLength");
+    CHECK_FN(m_fnSaveUStepLength)
+
+    m_fnGetClientAddr = (FN_WCHART_BOOL)m_library.resolve("GetClientAddr");
+    CHECK_FN(m_fnGetClientAddr)
 
     m_fnLPenMoveToOriginalPoint = (FN_VOID_DOUBLE)m_library.resolve("LPenMoveToOriginalPoint");
     CHECK_FN(m_fnLPenMoveToOriginalPoint)
@@ -186,6 +208,9 @@ bool LaserDriver::load()
 
     m_fnGetDeviceId = (FN_WCHART_BOOL)m_library.resolve("GetDeviceID");
     CHECK_FN(m_fnGetDeviceId)
+
+    m_fnGetHardwareKeyInfo = (FN_WCHART_VOID)m_library.resolve("GetHardwareKeyInfo");
+    CHECK_FN(m_fnGetHardwareKeyInfo)
 
     m_fnGetHardwareKeyID = (FN_WCHART_VOID)m_library.resolve("GetHardwareKeyID");
     CHECK_FN(m_fnGetHardwareKeyID)
@@ -223,6 +248,9 @@ bool LaserDriver::load()
     m_fnTestLaserLight = (FN_INT_BOOL)m_library.resolve("TestLaserLight");
     CHECK_FN(m_fnTestLaserLight)
 
+    m_fnLoadBreakPointData = (FN_BOOL_BOOL)m_library.resolve("LoadBreakPointData");
+    CHECK_FN(m_fnLoadBreakPointData)
+
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
     CHECK_FN(m_fnLoadDataFromFile)
 
@@ -232,8 +260,17 @@ bool LaserDriver::load()
     m_fnGetDeviceWorkState = (FN_VOID_VOID)m_library.resolve("GetDeviceWorkState");
     CHECK_FN(m_fnGetDeviceWorkState)
 
+    m_fnChangeYorUaxis = (FN_VOID_BOOL)m_library.resolve("ChangeYorUaxis");
+    CHECK_FN(m_fnChangeYorUaxis)
+
     m_fnCheckVersionUpdate = (FN_BOOL_WCHART_INT_WCHART)m_library.resolve("CheckVersionUpdate");
     CHECK_FN(m_fnCheckVersionUpdate)
+
+    m_fnStartVersionUpdate = (FNStartVersionUpdate)m_library.resolve("StartVersionUpdate");
+    CHECK_FN(m_fnStartVersionUpdate)
+
+    m_fnAbortVersionUpdate = (FN_INT_VOID)m_library.resolve("AbortVersionUpdate");
+    CHECK_FN(m_fnAbortVersionUpdate)
 
     m_fnStartSoftUpdateWizard = (FN_VOID_VOID)m_library.resolve("StartSoftUpdateWizard");
     CHECK_FN(m_fnStartSoftUpdateWizard)

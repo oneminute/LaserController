@@ -46,6 +46,8 @@ public:
         , enablePrintAndCut(false)
         , useSpecifiedOrigin(false)
         , specifiedOriginIndex(0)
+        , layersCount(16)
+        , backend(false)
         //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
@@ -68,9 +70,12 @@ public:
     bool useSpecifiedOrigin;
     int specifiedOriginIndex;
     QImage thumbnail;
+
+    int layersCount;
+    bool backend;
 };
 
-LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
+LaserDocument::LaserDocument(LaserScene* scene, int layersCount, bool backend, QObject* parent)
     : QObject(parent)
     , ILaserDocumentItem(LNT_DOCUMENT, new LaserDocumentPrivate(this))
 {
@@ -78,6 +83,8 @@ LaserDocument::LaserDocument(LaserScene* scene, QObject* parent)
     d->scene = scene;
     if (d->scene)
         d->scene->setDocument(this);
+    d->layersCount = layersCount;
+    d->backend = backend;
 	init();
 }
 
@@ -107,7 +114,7 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool 
         {
             layer->setType(LLT_ENGRAVING);
         }
-        layer->init();
+        //layer->init();
     }
 	//layer->addPrimitive(item);
     addPrimitive(item, layer, addToQuadTree, updateDocBounding);
@@ -650,7 +657,7 @@ void LaserDocument::swapLayers(int i, int j)
 void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
 {
     Q_D(LaserDocument);
-    for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
+    for (int i = 0; i < d->layersCount; i++)
     {
         d->layers[i]->bindButton(layerButtons[i], i);
     }
@@ -1016,7 +1023,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         layers = doc.object()["layers"].toArray();
     }
 
-	QList<LaserLayer*> laserLayers = this->layers();
+	//QList<LaserLayer*> laserLayers = this->layers();
     QList<LaserPrimitive*> unavailables;
     this->blockSignals(true);
 	for (int i = 0; i < layers.size(); i++) {
@@ -1030,94 +1037,99 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		//laserLayer.
 		this->addLayer(laserLayer);*/
 		int index = layer["index"].toInt();
-		if (index < 0 || index > laserLayers.size() - 1) {
+		if (index < 0 || index > d->layers.size() - 1) {
 			QMessageBox::critical(window, "critical", "your layer index have changed");
 			qLogD << "your layer index have changed";
 			return;
 		}
+        d->layers[index]->init();
         if (layer.contains("name")) {
-            laserLayers[index]->setName(layer.value("name").toString());
+            d->layers[index]->setName(layer.value("name").toString());
         }
         
         if (layer.contains("cuttingRunSpeed"))
         {
-            laserLayers[index]->setCuttingRunSpeed(layer.value("cuttingRunSpeed").toInt());
+            d->layers[index]->setCuttingRunSpeed(layer.value("cuttingRunSpeed").toInt());
         }
         if (layer.contains("cuttingMinSpeedPower"))
         {
-            laserLayers[index]->setCuttingMinSpeedPower(layer.value("cuttingMinSpeedPower").toDouble());
+            d->layers[index]->setCuttingMinSpeedPower(layer.value("cuttingMinSpeedPower").toDouble());
         }
         if (layer.contains("cuttingRunSpeedPower"))
         {
-            laserLayers[index]->setCuttingRunSpeedPower(layer.value("cuttingRunSpeedPower").toDouble());
+            d->layers[index]->setCuttingRunSpeedPower(layer.value("cuttingRunSpeedPower").toDouble());
         }
         if (layer.contains("engravingRunSpeed"))
         {
-            laserLayers[index]->setEngravingRunSpeed(layer.value("engravingRunSpeed").toInt());
+            d->layers[index]->setEngravingRunSpeed(layer.value("engravingRunSpeed").toInt());
         }
         if (layer.contains("engravingLaserPower"))
         {
-            laserLayers[index]->setEngravingLaserPower(layer.value("engravingLaserPower").toDouble());
+            d->layers[index]->setEngravingLaserPower(layer.value("engravingLaserPower").toDouble());
         }
         if (layer.contains("engravingMinSpeedPower"))
         {
-            laserLayers[index]->setEngravingMinSpeedPower(layer.value("engravingMinSpeedPower").toDouble());
+            d->layers[index]->setEngravingMinSpeedPower(layer.value("engravingMinSpeedPower").toDouble());
         }
         if (layer.contains("engravingRunSpeedPower"))
         {
-            laserLayers[index]->setEngravingRunSpeedPower(layer.value("engravingRunSpeedPower").toDouble());
+            d->layers[index]->setEngravingRunSpeedPower(layer.value("engravingRunSpeedPower").toDouble());
         }
         if (layer.contains("engravingRowInterval")) 
         {
-            laserLayers[index]->setEngravingRowInterval(layer.value("engravingRowInterval").toInt());
+            d->layers[index]->setEngravingRowInterval(layer.value("engravingRowInterval").toInt());
         }
         if (layer.contains("engravingEnableCutting")) 
         {
-            laserLayers[index]->setEngravingEnableCutting(layer.value("engravingEnableCutting").toBool());
+            d->layers[index]->setEngravingEnableCutting(layer.value("engravingEnableCutting").toBool());
         }
         if (layer.contains("fillingRunSpeed"))
         {
-            laserLayers[index]->setFillingRunSpeed(layer.value("fillingRunSpeed").toInt());
+            d->layers[index]->setFillingRunSpeed(layer.value("fillingRunSpeed").toInt());
         }
         if (layer.contains("fillingMinSpeedPower"))
         {
-            laserLayers[index]->setFillingMinSpeedPower(layer.value("fillingMinSpeedPower").toDouble());
+            d->layers[index]->setFillingMinSpeedPower(layer.value("fillingMinSpeedPower").toDouble());
         }
         if (layer.contains("fillingRunSpeedPower"))
         {
-            laserLayers[index]->setFillingRunSpeedPower(layer.value("fillingRunSpeedPower").toDouble());
+            d->layers[index]->setFillingRunSpeedPower(layer.value("fillingRunSpeedPower").toDouble());
         }
         if (layer.contains("fillingRowInterval")) 
         {
-            laserLayers[index]->setFillingRowInterval(layer.value("fillingRowInterval").toInt());
+            d->layers[index]->setFillingRowInterval(layer.value("fillingRowInterval").toInt());
         }
         if (layer.contains("fillingEnableCutting")) 
         {
-            laserLayers[index]->setFillingEnableCutting(layer.value("fillingEnableCutting").toBool());
+            d->layers[index]->setFillingEnableCutting(layer.value("fillingEnableCutting").toBool());
         }
         if (layer.contains("fillingType"))
         {
-            laserLayers[index]->setFillingType(layer.value("fillingType").toInt());
+            d->layers[index]->setFillingType(layer.value("fillingType").toInt());
         }
         if (layer.contains("errorX"))
         {
-            laserLayers[index]->setErrorX(layer.value("errorX").toInt());
+            d->layers[index]->setErrorX(layer.value("errorX").toInt());
         }
         if (layer.contains("useHalftone"))
         {
-            laserLayers[index]->setUseHalftone(layer.value("useHalftone").toBool());
+            d->layers[index]->setUseHalftone(layer.value("useHalftone").toBool());
         }
         if (layer.contains("lpi"))
         {
-            laserLayers[index]->setLpi(layer.value("lpi").toInt());
+            d->layers[index]->setLpi(layer.value("lpi").toInt());
         }
         if (layer.contains("dpi"))
         {
-            laserLayers[index]->setDpi(layer.value("dpi").toInt());
+            d->layers[index]->setDpi(layer.value("dpi").toInt());
         }
         if (layer.contains("halftoneAngles"))
         {
-            laserLayers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
+            d->layers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
+        }
+        if (layer.contains("stampBoundingDistance"))
+        {
+            d->layers[index]->setStampBoundingDistance(layer.value("stampBoundingDistance").toInt());
         }
 
 		//primitive
@@ -1325,14 +1337,14 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		}
         if (layer.contains("visible")) {
             bool bl = layer.value("visible").toBool();
-            laserLayers[index]->setVisible(bl);
+            d->layers[index]->setVisible(bl);
         }
         if (layer.contains("exportable")) {
             bool exportable = layer.value("exportable").toBool();
-            laserLayers[index]->setExportable(exportable);
+            d->layers[index]->setExportable(exportable);
         }
         if (layer.contains("type")) {
-            laserLayers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
+            d->layers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
         }
 	}
     if (!unavailables.isEmpty())
@@ -1376,7 +1388,7 @@ void LaserDocument::updateDocumentBounding()
     utils::boundingRect(d->primitives.values(), d->bounding, d->engravingBounding);
 }
 
-QList<LaserDocument::StampItem> LaserDocument::generateStampImages(qreal distance)
+QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
 {
     QList<StampItem> images;
     
@@ -1436,7 +1448,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages(qreal distanc
             QPainter painter(&image);
             //绘制印章外面的基准线
             computeStampBasePath(p, painter, offset, t1, t2);
-            computeBoundsPath(p, item, distance);
+            computeBoundsPath(p, item, layer->stampBoundingDistance());
             painter.setPen(Qt::NoPen);
             painter.setBrush(Qt::NoBrush);
             if (!p->stampIntaglio()) {
@@ -1574,7 +1586,7 @@ void LaserDocument::init()
 	Q_D(LaserDocument);
 	d->name = tr("Untitled");
 
-	for (int i = 0; i < Config::Layers::maxLayersCount(); i++)
+	for (int i = 0; i < d->layersCount; i++)
 	{
 		QString layerName = newLayerName();
 		LaserLayer* layer = new LaserLayer(layerName, LLT_ENGRAVING, this);
@@ -1582,10 +1594,13 @@ void LaserDocument::init()
 		addLayer(layer);
 	}
 
-    connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromToolBar,
-        this, &LaserDocument::updateDocumentBounding);
-    connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromMouse,
-        this, &LaserDocument::updateDocumentBounding);
+    if (!d->backend)
+    {
+        connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromToolBar,
+            this, &LaserDocument::updateDocumentBounding);
+        connect(LaserApplication::mainWindow->viewer(), &LaserViewer::selectedChangedFromMouse,
+            this, &LaserDocument::updateDocumentBounding);
+    }
 }
 
 void LaserDocument::outlineByLayers(OptimizeNode* node, ProgressItem* progress)

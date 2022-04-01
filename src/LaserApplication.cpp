@@ -89,6 +89,7 @@ bool LaserApplication::initialize()
     loadLanguages();
     splashScreen = new SplashScreen();
     splashScreen->setMessage(tr("Loading settings..."));
+    splashScreen->setProgress(0);
     splashScreen->show();
 
     checkEnvironment();
@@ -478,7 +479,7 @@ void LaserApplication::closeParent()
 LaserDocument* LaserApplication::createDocument()
 {
     LaserScene* scene = mainWindow->scene();
-	LaserDocument* doc = new LaserDocument(scene);
+	LaserDocument* doc = new LaserDocument(scene, Config::Layers::maxLayersCount(), false);
 	ADD_TRANSITION(documentEmptyState, documentWorkingState, doc, SIGNAL(opened()));
 	ADD_TRANSITION(documentWorkingState, documentEmptyState, doc, SIGNAL(closed()));
 	mainWindow->initDocument(doc);

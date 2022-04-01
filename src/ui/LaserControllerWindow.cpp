@@ -79,6 +79,7 @@
 #include "ui/CameraAlignmentDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
+#include "util/MachiningUtils.h"
 #include "widget/FloatEditDualSlider.h"
 #include "widget/FloatEditSlider.h"
 #include "widget/ImageViewer.h"
@@ -769,7 +770,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionExportJSON, &QAction::triggered, this, &LaserControllerWindow::onActionExportJson);
     connect(m_ui->actionLoadJson, &QAction::triggered, this, &LaserControllerWindow::onActionLoadJson);
     connect(m_ui->actionMachining, &QAction::triggered, this, &LaserControllerWindow::startMachining);
-    connect(m_ui->actionMachiningStamp, &QAction::triggered, this, &LaserControllerWindow::startMachiningStamp);
     connect(m_ui->actionPause, &QAction::triggered, this, &LaserControllerWindow::onActionPauseMechining);
     connect(m_ui->actionStop, &QAction::triggered, this, &LaserControllerWindow::onActionStopMechining);
     connect(m_ui->actionBounding, &QAction::triggered, this, &LaserControllerWindow::onActionBounding);
@@ -1115,6 +1115,9 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //shapes weld/ two shapes unite
     connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
     connect(m_ui->actionWeldAll, &QAction::triggered, this, &LaserControllerWindow::onActionWeldAll);
+    
+    connect(m_ui->actionParseJson, &QAction::triggered, this, &LaserControllerWindow::onActionParseJson);
+
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
     ADD_TRANSITION(deviceIdleState, documentPrintAndCutSelectingState, this, SIGNAL(startPrintAndCutSelecting()));
@@ -1455,9 +1458,6 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     qLogD << "main window initialized";
 
     onLayoutChanged(LaserApplication::device->layoutSize());
-
-    LaserApplication::splashScreen->setParent(this);
-    LaserApplication::splashScreen->raise();
 
 #ifdef _DEBUG
     m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
@@ -2550,11 +2550,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     m_buttonOperationStart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_buttonOperationStart->setIconSize(iconSize);
 
-    m_buttonOperationStartStamp = new QToolButton;
-    m_buttonOperationStartStamp->setDefaultAction(m_ui->actionMachiningStamp);
-    m_buttonOperationStartStamp->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    m_buttonOperationStartStamp->setIconSize(iconSize);
-
     m_buttonOperationPause = new QToolButton;
     m_buttonOperationPause->setDefaultAction(m_ui->actionPause);
     m_ui->actionPause->setCheckable(true);
@@ -2627,7 +2622,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     QHBoxLayout* firstRow = new QHBoxLayout;
     firstRow->setMargin(0);
     firstRow->addWidget(m_buttonOperationStart);
-    firstRow->addWidget(m_buttonOperationStartStamp);
     firstRow->addWidget(m_buttonOperationPause);
     firstRow->addWidget(m_buttonOperationStop);
 
@@ -2764,7 +2758,7 @@ void LaserControllerWindow::createMovementDockPanel()
     int w = 40;
     int h = 40;
     QSize fixedSize(w, h);
-    QSize iconSize(50, 50);
+    QSize iconSize(30, 30);
     m_buttonMoveTopLeft = new PressedToolButton;
     m_buttonMoveTopLeft->setFixedSize(fixedSize);
     m_buttonMoveTopLeft->setDefaultAction(m_ui->actionMoveTopLeft);
@@ -4625,6 +4619,87 @@ void LaserControllerWindow::contextMenuEvent(QContextMenuEvent * event)
 	}
 }
 
+LaserDocument* LaserControllerWindow::getMachiningDocument(bool& stamp)
+{
+    int availableLayersCount = 0;
+    int stampLayersCount = 0;
+    int stampItemsCount = 0;
+    for (LaserLayer* layer : m_scene->document()->layers())
+    {
+        if (!layer->isAvailable())
+            continue;
+
+        availableLayersCount++;
+        if (layer->type() == LLT_STAMP)
+        {
+            stampLayersCount++;
+            stampItemsCount++;
+            if (layer->engravingEnableCutting())
+                stampItemsCount++;
+        }
+    }
+
+    LaserDocument* doc = m_scene->document();
+    stamp = false;
+    if (stampLayersCount)
+    {
+        if (stampLayersCount != availableLayersCount)
+        {
+            QMessageBox msgBox(QMessageBox::Warning, tr("Warning"), tr("There are both stamp layers and other types of layers in the current document. If you choose to continue processing, only the stamp layer will be processed."),
+                QMessageBox::Yes | QMessageBox::No);
+            msgBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+            msgBox.setButtonText(QMessageBox::No, tr("No"));
+            if (msgBox.exec() == QMessageBox::No)
+                return nullptr;
+        }
+        stamp = true;
+    }
+
+    if (stamp)
+    {
+        QList<LaserDocument::StampItem> stampItems = m_scene->document()->generateStampImages();
+        LaserDocument* stampDoc = new LaserDocument(nullptr, stampItemsCount, true);
+        stampDoc->optimizeNode()->setNodeName("stamp doc");
+        stampDoc->setName("stamp doc");
+        stampDoc->open();
+        connect(stampDoc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
+        //int layerIndex = 0;
+        for (int i = 0; i < stampItems.length(); i++)
+        {
+            const LaserDocument::StampItem& item = stampItems[i];
+
+            if (!item.layer->isAvailable())
+                continue;
+
+            LaserLayer* layer = stampDoc->idleLayer();
+            layer->setType(LLT_ENGRAVING);
+            layer->setEngravingLaserPower(item.layer->engravingLaserPower());
+            layer->setEngravingMinSpeedPower(item.layer->engravingMinSpeedPower());
+            layer->setEngravingRowInterval(item.layer->engravingRowInterval());
+            layer->setEngravingRunSpeed(item.layer->engravingRunSpeed());
+            layer->setEngravingRunSpeedPower(item.layer->engravingRunSpeedPower());
+            layer->setEngravingEnableCutting(false);
+            layer->setUseHalftone(false);
+            LaserBitmap* laserBitmap = new LaserBitmap(item.image, item.bounding, stampDoc);
+            //layer->addPrimitive(laserBitmap);
+            stampDoc->addPrimitive(laserBitmap, layer, false);
+            if (item.layer->engravingEnableCutting())
+            {
+                LaserLayer* cuttingLayer = stampDoc->idleLayer();
+                cuttingLayer->setType(LLT_CUTTING);
+                cuttingLayer->setCuttingMinSpeedPower(item.layer->cuttingMinSpeedPower());
+                cuttingLayer->setCuttingRunSpeed(item.layer->cuttingRunSpeed());
+                cuttingLayer->setCuttingRunSpeedPower(item.layer->cuttingRunSpeedPower());
+                LaserPath* boundingPath = new LaserPath(item.path, stampDoc);
+                //cuttingLayer->addPrimitive(laserBitmap);
+                stampDoc->addPrimitive(boundingPath, cuttingLayer, false);
+            }
+        }
+        doc = stampDoc;
+    }
+    return doc;
+}
+
 void LaserControllerWindow::onActionUndo(bool checked) {
 	int index = m_viewer->undoStack()->index();
 	if (index <= 0) {
@@ -4891,29 +4966,39 @@ void LaserControllerWindow::onActionExportJson(bool checked)
     dialog.setMimeTypeFilters(QStringList() << "application/json");
     dialog.setWindowTitle(tr("Export"));
     dialog.selectFile(m_scene->document()->name());
-    if (dialog.exec() == QFileDialog::Accepted)
+    if (dialog.exec() != QFileDialog::Accepted)
     {
-        QString filename = dialog.selectedFiles().constFirst();
-        if (!filename.isEmpty() && !filename.isNull())
-        {
-            QImage thumbnail = m_scene->thumbnail();
-            m_scene->document()->setThumbnail(thumbnail);
-            ProgressItem* progress = LaserApplication::resetProcess();
-            progress->setMaximum(5);
-            QtConcurrent::run([=]()
-                {
-                    m_scene->document()->outline(progress);
-                    m_scene->document()->setFinishRun(Config::Device::finishRun());
-                    PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
-                    optimizer.optimize(progress);
-                    PathOptimizer::Path path = optimizer.optimizedPath();
-                    m_prepareMachining = false;
-                    m_prepareDownloading = false;
-                    m_scene->document()->exportJSON(filename, path, progress, true);
-                }
-            );
-        }
+        return;
     }
+    QString filename = dialog.selectedFiles().constFirst();
+    if (filename.isEmpty() || filename.isNull())
+    {
+        return;
+    }
+
+    bool stamp;
+    LaserDocument* doc = getMachiningDocument(stamp);
+    if (!doc)
+        return;
+
+    QImage thumbnail = m_scene->thumbnail();
+    doc->setThumbnail(thumbnail);
+    ProgressItem* progress = LaserApplication::resetProcess();
+    progress->setMaximum(5);
+    QtConcurrent::run([=]()
+        {
+            doc->outline(progress);
+            doc->setFinishRun(Config::Device::finishRun());
+            PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
+            optimizer.optimize(progress);
+            PathOptimizer::Path path = optimizer.optimizedPath();
+            m_prepareMachining = false;
+            m_prepareDownloading = false;
+            doc->exportJSON(filename, path, progress, true);
+            if (stamp)
+                doc->deleteLater();
+        }
+    );
 }
 
 void LaserControllerWindow::onActionLoadJson(bool checked)
@@ -4979,104 +5064,32 @@ void LaserControllerWindow::startMachining()
         ))
             return;
 
+        bool stamp;
+        LaserDocument* doc = getMachiningDocument(stamp);
+        if (!doc)
+            return;
+
         ProgressItem* progress = LaserApplication::resetProcess();
         progress->setMaximum(6);
         progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
         QImage thumbnail = m_scene->thumbnail();
-        m_scene->document()->setThumbnail(thumbnail);
+        doc->setThumbnail(thumbnail);
         QtConcurrent::run([=]()
             {
-                m_scene->document()->outline(progress);
-                m_scene->document()->setFinishRun(Config::Device::finishRun());
-                PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+                doc->outline(progress);
+                doc->setFinishRun(Config::Device::finishRun());
+                PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
                 optimizer.optimize(progress);
                 PathOptimizer::Path path = optimizer.optimizedPath();
                 qDebug() << "exporting to temporary json file:" << filename;
                 m_prepareMachining = true;
-                m_scene->document()->exportJSON(filename, path, progress, true);
+                doc->exportJSON(filename, path, progress, true);
+                if (stamp)
+                    doc->deleteLater();
             }
         );
     }
     m_useLoadedJson = false;
-}
-
-void LaserControllerWindow::startMachiningStamp()
-{
-    if (m_scene->document() == nullptr)
-    {
-        QMessageBox::warning(this, tr("Alert"), tr("No active document. Please open or import a document to mechining."));
-        return;
-    }
-    if (m_scene->document()->isEmpty())
-    {
-        QMessageBox::warning(this, tr("Alert"), tr("No available primitives to machining."));
-        return;
-    }
-    if (!LaserApplication::device->availableForMachining())
-        return;
-
-    QString filename = QDir::current().absoluteFilePath("tmp/export_stamp.json");
-
-    QRect boundingRect = m_scene->document()->currentDocBoundingRect();
-    QRect boundingRectAcc = m_scene->document()->currentEngravingBoundingRect(true);
-
-    switch (Config::Device::startFrom())
-    {
-    case SFT_CurrentPosition:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
-        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->currentOrigin());
-        break;
-    case SFT_UserOrigin:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        break;
-    }
-
-    if (!LaserApplication::device->checkLayoutForMachining(
-        boundingRect,
-        boundingRectAcc
-    ))
-        return;
-
-    QList<LaserDocument::StampItem> stampItems = m_scene->document()->generateStampImages();
-    LaserDocument* stampDoc = new LaserDocument;
-    stampDoc->optimizeNode()->setNodeName("stamp doc");
-    stampDoc->setName("stamp doc");
-    stampDoc->open();
-    connect(stampDoc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
-    for (int i = 0; i < stampItems.length(); i++)
-    {
-        const LaserDocument::StampItem& item = stampItems[i];
-        LaserLayer* layer = stampDoc->layers()[i];
-        layer->setType(LLT_ENGRAVING);
-        layer->setEngravingEnableCutting(false);
-        layer->setEngravingLaserPower(item.layer->engravingLaserPower());
-        layer->setEngravingMinSpeedPower(item.layer->engravingMinSpeedPower());
-        layer->setEngravingRowInterval(item.layer->engravingRowInterval());
-        layer->setEngravingRunSpeed(item.layer->engravingRunSpeed());
-        layer->setEngravingRunSpeedPower(item.layer->engravingRunSpeedPower());
-        LaserBitmap* laserBitmap = new LaserBitmap(item.image, item.bounding, stampDoc);
-        layer->addPrimitive(laserBitmap);
-    }
-
-    ProgressItem* progress = LaserApplication::resetProcess();
-    progress->setMaximum(6);
-    progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
-    QImage thumbnail = m_scene->thumbnail();
-    stampDoc->setThumbnail(thumbnail);
-    QtConcurrent::run([=]()
-        {
-            stampDoc->outline(progress);
-            stampDoc->setFinishRun(Config::Device::finishRun());
-            PathOptimizer optimizer(stampDoc->optimizeNode(), stampDoc->primitives().count());
-            optimizer.optimize(progress);
-            PathOptimizer::Path path = optimizer.optimizedPath();
-            qDebug() << "exporting to temporary json file:" << filename;
-            m_prepareMachining = true;
-            stampDoc->exportJSON(filename, path, progress, true);
-            stampDoc->deleteLater();
-        }
-    );
 }
 
 void LaserControllerWindow::updateLayers()
@@ -5190,32 +5203,52 @@ void LaserControllerWindow::onActionDownload(bool checked)
     }
     if (!LaserApplication::device->availableForMachining())
         return;
-    
+
     QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
     QRect boundingRect = m_scene->document()->currentDocBoundingRect();
+    QRect boundingRectAcc = m_scene->document()->currentEngravingBoundingRect(true);
 
-    SelectOriginDialog soDlg(this);
-    soDlg.exec();
-    QPoint origin;
+    switch (Config::Device::startFrom())
+    {
+    case SFT_CurrentPosition:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
+        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->currentOrigin());
+        break;
+    case SFT_UserOrigin:
+        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
+        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->userOrigin().toPoint());
+        break;
+    }
 
-    m_scene->document()->setUseSpecifiedOrigin(true);
-    m_scene->document()->setSpecifiedOriginIndex(soDlg.origin());
-    QImage thumbnail = m_scene->thumbnail();
-    m_scene->document()->setThumbnail(thumbnail);
+    if (!LaserApplication::device->checkLayoutForMachining(
+        boundingRect,
+        boundingRectAcc
+    ))
+        return;
+
+    bool stamp;
+    LaserDocument* doc = getMachiningDocument(stamp);
+    if (!doc)
+        return;
 
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
+    progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
+    QImage thumbnail = m_scene->thumbnail();
+    doc->setThumbnail(thumbnail);
     QtConcurrent::run([=]()
         {
-            m_scene->document()->outline(progress);
-            m_scene->document()->setFinishRun(Config::Device::finishRun());
+            doc->outline(progress);
+            doc->setFinishRun(Config::Device::finishRun());
             PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
             optimizer.optimize(progress);
             PathOptimizer::Path path = optimizer.optimizedPath();
             qDebug() << "exporting to temporary json file:" << filename;
             m_prepareDownloading = true;
-            m_scene->document()->exportJSON(filename, path, progress, true);
+            doc->exportJSON(filename, path, progress, true);
+            if (stamp)
+                doc->deleteLater();
         }
     );
 }
@@ -7446,6 +7479,122 @@ void LaserControllerWindow::onActionWeldAll()
     WeldShapesUndoCommand* cmd = new WeldShapesUndoCommand(m_viewer, WeldShapes_WeldAll);
     m_viewer->undoStack()->push(cmd);
     m_viewer->viewport()->repaint();
+}
+
+void LaserControllerWindow::onActionParseJson()
+{
+    ProgressItem* mainProgress = LaserApplication::resetProcess();
+    QString filters = tr("Json (*.json);;");
+    QString filename = getFilename(tr("Open Supported File"), filters);
+    qLogD << "importing filename is " << filename;
+    if (filename.isEmpty())
+    {
+        mainProgress->finish();
+        return;
+    }
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        mainProgress->finish();
+        return;
+    }
+
+    QByteArray data = file.readAll();
+
+    QtConcurrent::run([=]()
+        {
+            ProgressItem* progress = new ProgressItem(tr("Parse Json"), ProgressItem::PT_Simple, mainProgress);
+            progress->setMaximum(100);
+
+            progress->setProgress(0);
+            int layoutSize = Config::SystemRegister::xMaxLength() > Config::SystemRegister::yMaxLength() ?
+                Config::SystemRegister::xMaxLength() : Config::SystemRegister::yMaxLength();
+            //machiningUtils::parseJson(file.readAll(), 8192, 8192, layoutSize, layoutSize);
+            int imageWidth = 8192;
+            int imageHeight = 8192;
+            int layoutWidth = layoutSize;
+            int layoutHeight = layoutSize;
+            QTransform t = QTransform::fromScale(imageWidth * 1.0 / layoutWidth, imageHeight * 1.0 / layoutHeight);
+            //QTransform t;
+
+            QImage canvas(imageWidth, imageHeight, QImage::Format_ARGB32);
+            canvas.fill(Qt::white);
+            QPainter painter(&canvas);
+            progress->setProgress(20);
+
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+            QJsonObject rootObj = jsonDoc.object();
+            QJsonObject infoObj = rootObj["LaserDocumentInfo"].toObject();
+
+            QJsonObject startPosObj = infoObj["StartFromPos"].toObject();
+            QPoint startPos(startPosObj["x"].toInt(), startPosObj["y"].toInt());
+            qLogD << "startPos: " << startPos;
+
+            QTransform t1stQard = LaserApplication::device->to1stQuad();
+
+            int startFrom = infoObj["StartFrom"].toInt();
+            switch (startFrom)
+            {
+            case 0:
+                startPos = t1stQard.map(LaserApplication::device->deviceState().pos.toPoint());
+                break;
+            case 1:
+            case 2:
+            case 3:
+                startPos = t1stQard.map(LaserApplication::device->userOrigin().toPoint());
+                break;
+            case 4:
+                break;
+            }
+
+            QPoint lastPoint = startPos;
+            QJsonArray layersObj = rootObj["Layers"].toArray();
+
+            QPen pen(Qt::red);
+            pen.setCosmetic(true);
+            painter.setPen(pen);
+            painter.drawEllipse(t.map(lastPoint), 5, 5);
+
+            pen.setColor(Qt::blue);
+            painter.setPen(pen);
+            progress->setProgress(25);
+            for (int i = 0; i < layersObj.size(); i++)
+            {
+                QJsonObject layerObj = layersObj.at(i).toObject();
+                QJsonArray itemsObj = layerObj["Items"].toArray();
+                for (int j = 0; j < itemsObj.size(); j++)
+                {
+                    QJsonObject itemObj = itemsObj.at(j).toObject();
+                    QString data = itemObj["Data"].toString();
+                    QStringList segs = data.split(';');
+                    for (const QString& seg : segs)
+                    {
+                        QStringList xys = seg.split(' ');
+                        if (xys.size() != 2)
+                            continue;
+                        int x = xys[0].mid(2).toInt();
+                        int y = xys[1].toInt();
+                        QPoint current(x, y);
+                        current += lastPoint;
+                        painter.drawLine(QLine(t.map(lastPoint), t.map(current)));
+                        pen.setColor(Qt::red);
+                        painter.setPen(pen);
+                        painter.drawPoint(t.map(lastPoint));
+                        painter.drawPoint(t.map(current));
+                        pen.setColor(Qt::blue);
+                        painter.setPen(pen);
+                        lastPoint = current;
+                        progress->increaseProgress((80 - 25.0) / layersObj.size() / itemsObj.size() / (segs.size() - 1));
+                    }
+                }
+            }
+            progress->setProgress(80);
+            canvas.save("tmp/canvas.png");
+            progress->setProgress(100);
+            progress->finish();
+            mainProgress->finish();
+        }
+    );
 }
 
 void LaserControllerWindow::onCameraConnected()

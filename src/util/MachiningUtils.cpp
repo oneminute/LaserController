@@ -1,9 +1,14 @@
 #include "MachiningUtils.h"
 
-#include <QtMath>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QDebug>
+#include <QPainter>
 #include <QQueue>
 #include <QStack>
+#include <QtMath>
 #include <QVector4D>
 
 #include "common/common.h"
@@ -187,7 +192,7 @@ void machiningUtils::polygon2Points(
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
         qreal angle2 = line2.angle();
-        points.append(LaserPoint(pt.x(), pt.y(), angle1, angle2));
+        points.append(LaserPoint(pt.x(), pt.y()/*, angle1, angle2*/));
         center += pt;
         if (isClosed)
         {
@@ -465,3 +470,4 @@ QList<QPoint> machiningUtils::boundingPoints(int jobIndex, const QRect& bounding
     pointsOut.append(pointsOut.first());
     return pointsOut;
 }
+
