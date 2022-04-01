@@ -9,6 +9,7 @@
 #include"scene/LaserPrimitive.h"
 #include"scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
+#include "util/Utils.h"
 
 StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* parent) 
    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
@@ -20,6 +21,12 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
     layer->setType(LLT_STAMP);
     m_layerIndex = layer->index();
 
+
+    m_ui->fontComboBox->setCurrentText(tr("FangSong"));
+    //text size
+    m_ui->textSizeSpinBox->setValue(6);
+    m_ui->textSizeSpinBox->setMinimum(0);
+    m_ui->textSizeSpinBox->setMaximum(DBL_MAX);
     //text margins
     m_ui->marginSpinBox->setMinimum(-DBL_MAX);
     m_ui->marginSpinBox->setMaximum(DBL_MAX);
@@ -42,7 +49,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         m_ui->hSpaceSpinBox->setValue(0.5);
         this->setWindowTitle(tr("Ellipse Stamp Dialog"));
         //angle
-        m_ui->angleSpinBox->setValue(200);
+        m_ui->angleSpinBox->setValue(210);
         QPixmap normal(":/ui/icons/images/normalEliipseStamp.png");
         QPixmap horizontalText(":/ui/icons/images/horizontalTextEllipseStamp.png");
         QPixmap emblemEllipse(":/ui/icons/images/embleEllipseStamp.png");
@@ -145,6 +152,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
     m_viewItemModel->setHorizontalHeaderItem(1, new QStandardItem(tr("font")));
     m_viewItemModel->setHorizontalHeaderItem(2, new QStandardItem(tr("property")));
     m_viewItemModel->setHorizontalHeaderItem(3, new QStandardItem(tr("text spacing")));
+    m_viewItemModel->setHorizontalHeaderItem(4, new QStandardItem(tr("text height")));
     //m_ui->tableView->setHorizontalHeader(head);
     m_ui->tableView->setModel(m_viewItemModel);
     QString headViewStr("QHeaderView::section{background-color:rgb(245, 245, 245);color:rgb(18, 18, 18);bold:true;}");
@@ -191,6 +199,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         QStandardItem* item0 = m_viewItemModel->item(current.row(), 0);
         QStandardItem* item1 = m_viewItemModel->item(current.row(), 1);
         QStandardItem* item3 = m_viewItemModel->item(current.row(), 3);
+        QStandardItem* item4 = m_viewItemModel->item(current.row(), 4);
         m_ui->fontComboBox->blockSignals(true);
         m_ui->fontComboBox->setCurrentText(item1->text());
         m_ui->fontComboBox->blockSignals(false);
@@ -200,6 +209,9 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         m_ui->hSpaceSpinBox->blockSignals(true);
         m_ui->hSpaceSpinBox->setValue(item3->text().toDouble());
         m_ui->hSpaceSpinBox->blockSignals(false);
+        m_ui->textSizeSpinBox->blockSignals(true);
+        m_ui->textSizeSpinBox->setValue(item4->text().toDouble());
+        m_ui->textSizeSpinBox->blockSignals(false);
     });
     //text content
     connect(m_ui->lineEdit, QOverload<const QString&>::of(&QLineEdit::textChanged), [=](const QString& text) {
@@ -225,20 +237,30 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             item->setText(QString::number(v));
         }
     });
+    //text height
+    connect(m_ui->textSizeSpinBox, QOverload<double>::of(&LaserDoubleSpinBox::valueChanged), [=](double v) {
+        QModelIndexList list = m_ui->tableView->selectionModel()->selectedRows();
+        if (list.size() == 1) {
+            QStandardItem* item = m_viewItemModel->item(list[0].row(), 4);
+            item->setText(QString::number(v));
+        }
+    });
     m_preLayoutIndex = 0;
     for (int i = 0; i < m_ui->circleStampLayoutComboBox->count(); i++) {
         m_tablesModelList.append(QMap<QModelIndex, itemStruct>());
     }
+    m_ui->textSizeSpinBox->setValue(6);
     addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(),
-        m_textRowProperty[0], Qt::Checked, m_ui->hSpaceSpinBox->value());
+        m_textRowProperty[0], Qt::Checked, m_ui->hSpaceSpinBox->value(), m_ui->textSizeSpinBox->value());
     connect(m_ui->circleStampLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-        if (m_isEllipse) {
-            
+        
+        if (m_isEllipse)   {         
             if (index == 0) {
                 m_ui->circleDiameterSpinBox->setValue(50);
                 m_ui->circleHeightSpinBox->setValue(35);
                 m_ui->marginSpinBox->setValue(1);
                 m_ui->AdditionGroupBox->setChecked(false);
+                
             }
             else if (index == 1) {
                 m_ui->circleDiameterSpinBox->setValue(50);
@@ -255,13 +277,13 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             else if (index == 3) {
                 m_ui->circleDiameterSpinBox->setValue(40);
                 m_ui->circleHeightSpinBox->setValue(30);
-                m_ui->marginSpinBox->setValue(0.75);
+                m_ui->marginSpinBox->setValue(0.5);
                 m_ui->AdditionGroupBox->setChecked(false);
             }
             else if (index == 4) {
                 m_ui->circleDiameterSpinBox->setValue(40);
                 m_ui->circleHeightSpinBox->setValue(30);
-                m_ui->marginSpinBox->setValue(0.75);
+                m_ui->marginSpinBox->setValue(0.5);
                 m_ui->AdditionGroupBox->setChecked(false);
             }
         }
@@ -336,41 +358,35 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             }
             if (m_isEllipse) {
                 if (index == 1 || index == 2) {
-                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
-                    addTableViewRow(1, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing, 6.0);
+                    addTableViewRow(1, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing, 4.7);
                 }
                 else if (index == 3) {
-                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
-                    addTableViewRow(1, m_textInitRowContent[3], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
-                    addTableViewRow(2, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[3], Qt::Checked, initLineSpacing);
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing, 4.3);
+                    addTableViewRow(1, m_textInitRowContent[3], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing, 4.6);
+                    addTableViewRow(2, m_textInitRowContent[2], "Arial", m_textRowProperty[3], Qt::Checked, 0.477, 5.0);
                 }
                 else if (index == 4) {
-                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
-                    addTableViewRow(1, m_textInitRowContent[3], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
-                    addTableViewRow(2, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[3], Qt::Checked, initLineSpacing);
-                    addTableViewRow(3, m_textInitRowContent[4], m_ui->fontComboBox->currentText(), m_textRowProperty[4], Qt::Checked, initLineSpacing);
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing, 4.3);
+                    addTableViewRow(1, m_textInitRowContent[3], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing, 4.6);
+                    addTableViewRow(2, m_textInitRowContent[2], "Arial", m_textRowProperty[3], Qt::Checked, 0.477, 5.0);
+                    addTableViewRow(3, m_textInitRowContent[4], "Arial", m_textRowProperty[4], Qt::Checked, initLineSpacing, 3.1);
                 }
-               
             }
             else {
                 if (index == 1 || index == 3) {
-                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
-                    addTableViewRow(1, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing);
-                    addTableViewRow(2, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[2], Qt::Unchecked, initSpacing);
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing, 6);
+                    addTableViewRow(1, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Checked, initLineSpacing, 4.7);
+                    addTableViewRow(2, m_textInitRowContent[2], "Arial", m_textRowProperty[2], Qt::Unchecked, 0.477, 3.7);
                 }
                 else if (index == 2) {
-                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing);
-                    addTableViewRow(1, m_textInitRowContent[2], m_ui->fontComboBox->currentText(), m_textRowProperty[2], Qt::Checked, initLineSpacing);
-                    addTableViewRow(2, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Unchecked, initSpacing);
+                    addTableViewRow(0, m_textInitRowContent[0], m_ui->fontComboBox->currentText(), m_textRowProperty[0], Qt::Checked, initSpacing, 6);
+                    addTableViewRow(1, m_textInitRowContent[2], "Arial", m_textRowProperty[2], Qt::Checked, 0.477, 3.7);
+                    addTableViewRow(2, m_textInitRowContent[1], m_ui->fontComboBox->currentText(), m_textRowProperty[1], Qt::Unchecked, initSpacing, 4.7);
                 }
             }
-            
-
         }
-
         m_preLayoutIndex = index;
-        
-
     });
     //item change
     connect(m_viewItemModel, QOverload<QStandardItem*>::of(&QStandardItemModel::itemChanged), [=](QStandardItem* item) {       
@@ -380,6 +396,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
         QStandardItem* font = m_viewItemModel->item(r, 1);
         QStandardItem* property = m_viewItemModel->item(r, 2);
         QStandardItem* spacing = m_viewItemModel->item(r, 3);
+        QStandardItem* textH = m_viewItemModel->item(r, 4);
         if (content) {
             state = content->checkState();
         }
@@ -394,6 +411,9 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             if (spacing) {
                 spacing->setBackground(Qt::white);
             }
+            if (textH) {
+                textH->setBackground(Qt::white);
+            }
         }
         else if (state == Qt::Unchecked) {
             //QColor color = QColor(238, 238, 238);
@@ -407,6 +427,9 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             }
             if (spacing) {
                 spacing->setBackground(color);
+            }
+            if (textH) {
+                textH->setBackground(color);
             }
         }
         
@@ -434,25 +457,27 @@ StampCircleDialog::~StampCircleDialog()
 {
 }
 
-void StampCircleDialog::addTableViewRow(int row, QString contentStr, QString fontStr, QString propertyStr, Qt::CheckState checkState, qreal textSpacing)
+void StampCircleDialog::addTableViewRow(int row, QString contentStr, QString fontStr, QString propertyStr, Qt::CheckState checkState, qreal textSpacing, qreal textHeight)
 {
     
     QStandardItem* content = new QStandardItem(contentStr);
     QStandardItem* font = new QStandardItem(fontStr);
     QStandardItem* property = new QStandardItem(propertyStr);
     QStandardItem* spacing = new QStandardItem(QString::number(textSpacing));
+    QStandardItem* textH = new QStandardItem(QString::number(textHeight));
 
     content->setTextAlignment(Qt::AlignCenter);
     font->setTextAlignment(Qt::AlignCenter);
     property->setTextAlignment(Qt::AlignCenter);
     spacing->setTextAlignment(Qt::AlignCenter);
-    content->setCheckable(true);
-    
+    textH->setTextAlignment(Qt::AlignCenter);
+    content->setCheckable(true);   
 
     m_viewItemModel->setItem(row, 0, content);
     m_viewItemModel->setItem(row, 1, font);
     m_viewItemModel->setItem(row, 2, property);
     m_viewItemModel->setItem(row, 3, spacing);
+    m_viewItemModel->setItem(row, 4, textH);
 
     content->setCheckState(checkState);
 }
@@ -465,11 +490,11 @@ void StampCircleDialog::accept()
     //create frame
     qreal circleW = m_ui->circleDiameterSpinBox->value() * 1000;
     qreal circleH = m_ui->circleHeightSpinBox->value() * 1000;
-    //qreal cornerRadius = m_ui->circleCornerSizeSpinBox->value() * 1000;
     qreal circleBorder = m_ui->circleBorderSpinBox->value() * 1000;
-    //int circleType = m_ui->circleCornerTypeComboBox->currentIndex();
-    QPointF point = m_viewer->mapToScene(m_viewer->rect().center());
-    point = QPointF(point.x() - circleW * 0.5, point.y() - circleW * 0.5);
+    //QPointF point = m_viewer->mapToScene(m_viewer->rect().center());
+    QRectF allBounds = m_viewer->AllItemsSceneBoundingRect();
+    QPointF point = allBounds.topRight();
+    //point = QPointF(point.x() - circleW * 0.5, point.y() - circleW * 0.5);
     QRect rect;
     
     if (m_isEllipse) {
@@ -525,26 +550,31 @@ void StampCircleDialog::accept()
     bool bold = m_ui->boldBtn->isChecked();
     bool italic = m_ui->italicBtn->isChecked();
     //bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
-    QString family = m_ui->fontComboBox->currentText();
+    
     bool containsDoubleText = false;
     
     int textLength = content.size();
     int layoutType = m_ui->circleStampLayoutComboBox->currentIndex();
-    QSize textSize;
+    //
     for (int i = 0; i < m_viewItemModel->rowCount(); i++) {
         QStandardItem* content = m_viewItemModel->item(i, 0);
         QStandardItem* property = m_viewItemModel->item(i, 2);
+        QString family = m_viewItemModel->item(i, 1)->text();
         QString contentStr = content->text();
-        int textSize = contentStr.size();
+        int textLength = contentStr.size();
         qreal textSpace = m_viewItemModel->item(i, 3)->text().toDouble() * 1000;
+        qreal textHeight = m_viewItemModel->item(i, 4)->text().toDouble() * 1000;
         if (content->checkState() == Qt::Unchecked) {
             continue;
         }
         QString propertyText = property->text();
         //Top Circle Text
         if (propertyText == m_textRowProperty[0]) {
+            
             LaserCircleText* topCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, angle,
                 bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layerIndex);
+            QSize textSize(topCircleText->textSize().width(), textHeight);
+            topCircleText->computeTextPath(topCircleText->angle(), textSize, false);
             stampList.append(topCircleText);
         }
         //Horizontal Text
@@ -552,20 +582,22 @@ void StampCircleDialog::accept()
             
             qreal h, w, centerX, centerY;
             if (m_isEllipse) {
-                h = 4700;
+                //h = 4700;
+                h = textHeight;
                 w = textBounds.width() * 0.5;
-                centerY = textBounds.top() + textBounds.height() * 0.738;
+                centerY = rect.center().y() + 4200 + textHeight * 0.5;
                 centerX = textBounds.left() + textBounds.width() * 0.5;
             }
             else {
-                h = textBounds.height() * (1.0 / 6);
+                //h = textBounds.height() * (1.0 / 6);
+                h = textHeight;
                 w = textBounds.width() * 0.63;
                 centerY = textBounds.top() + textBounds.height() * 0.788;
                 centerX = textBounds.left() + textBounds.width() * 0.5;
             }
             
             
-            QSize lineTextSize((w- textSpace*(textSize - 1))/ textSize,h);
+            QSize lineTextSize((w- textSpace*(textLength - 1))/ textLength,h);
 
             LaserHorizontalText* lineText = new LaserHorizontalText(m_scene->document(), content->text(), lineTextSize, 
                 QPointF(centerX, centerY),bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
@@ -582,7 +614,8 @@ void StampCircleDialog::accept()
             LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), invertContentStr, textBounds, 320-angle,
                 bold, italic, false, stampIntaglio, family, textSpace, true,0.0, 0.0, QSize(), QTransform(), m_layerIndex);
             
-            qreal hsize = bottomCircleText->textSize().height() * 0.5;
+            //qreal hsize = bottomCircleText->textSize().height() * 0.5;
+            qreal hsize = textHeight;
             bottomCircleText->setOffsetRotateAngle(180);
             bottomCircleText->setTextSize(QSize(hsize, hsize), false);
             bottomCircleText->computeMoveTextPath(180);
@@ -591,29 +624,35 @@ void StampCircleDialog::accept()
         }
         //Horizontal Invoice Number
         else if (propertyText == m_textRowProperty[3]) {
-            qreal h = 5600;
-            qreal w = rect.width() * (2.0 / 3.0);
-            QSize size((w - (textSize - 1) * textSpace) / textSize, h);
+            //qreal h = 5600;
+            qreal h = textHeight;
+            //qreal w = rect.width() * (2.0 / 3.0);
+            qreal w = 26000;
+            QSize size((w - (textLength - 1) * textSpace) / textLength, h);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, rect.center(),
                 bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
+            text->setBoundingRectWidth(26000);
             stampList.append(text);
         }
         //Horizontal Bottom Number
         else if (propertyText == m_textRowProperty[4]) {
-            qreal h = 3400;
-            qreal w = 3400 * 1.5;
-            qreal centerY;
+            //qreal h = 3400;
+            qreal h = textHeight;
+            //qreal w = 3400 * 1.5;
+            qreal w = 1700;
+            qreal centerY = rect.center().y() + 10000 + textHeight*0.5;
             
-            QSize size((w - (textSize - 1) * textSpace) / textSize, h);
-            if (m_ui->innerCircleGroupBox->isChecked()) {
+            QSize size(w, h);
+            /*if (m_ui->innerCircleGroupBox->isChecked()) {
                 centerY = rect.bottom() - size.height() - innerBorder;
             }
             else {
                 centerY = rect.bottom() - size.height();
-            }
+            }*/
             QPoint center(rect.center().x(), centerY);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, center,
                 bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
+            text->setBoundingRectHeight(h);
             stampList.append(text);
         }
         
@@ -682,4 +721,5 @@ void StampCircleDialog::accept()
         stampList.append(line2);
     }
     m_viewer->addPrimitiveAndExamRegionByBounds(stampList);
+    m_viewer->zoomToSelection();
 }

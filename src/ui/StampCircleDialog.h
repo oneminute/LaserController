@@ -14,7 +14,8 @@ class StampCircleDialog : public QDialog {
 public:
     StampCircleDialog(LaserScene* scene, bool isEllipse = false,  QWidget* parent = nullptr);
     virtual ~StampCircleDialog();
-    void addTableViewRow(int row, QString contentStr, QString fontStr, QString propertyStr,Qt::CheckState checkState, qreal textSpacing);
+    void addTableViewRow(int row, QString contentStr, QString fontStr, 
+        QString propertyStr,Qt::CheckState checkState, qreal textSpacing, qreal textHeight);
 private:
     typedef struct itemStruct {
     private:
@@ -41,7 +42,7 @@ private:
         QString(tr("Horizontal Invoice Number")), QString(tr("Bottom Horizontal Number"))
     };
     QString m_textInitRowContent[5] = {
-        QString(tr("Laser Test Seal")), QString(tr("Horizontal Text")), QString(tr("1234567890123")), 
+        QString(tr("Laser Test Seal")), QString(tr("Horizontal Text")), QString(tr("123456789012345678")), 
         QString(tr("Invoice Seal")), QString("(0)")
     };
     bool m_isEllipse;

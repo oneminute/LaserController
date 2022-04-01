@@ -6,6 +6,7 @@
 #include <QProgressBar>
 #include <QLabel>
 #include <QtMath>
+#include <QPalette>
 
 #include "LaserApplication.h"
 
@@ -20,12 +21,11 @@ SplashScreen::SplashScreen(QWidget* parent)
     , m_progressTick(0.5)
     , m_close(false)
 {
-    m_ui->setupUi(this);
-    //setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    m_ui->setupUi(this);   
     QRect screenGeometry = LaserApplication::desktop()->screenGeometry();
-    int w = screenGeometry.width() / 2;
-    int h = screenGeometry.height() / 2;
+    int w = screenGeometry.width()*0.5;
+    int h = screenGeometry.height() * 0.5;
     resize(w, h);
     int x = (screenGeometry.width() - width()) / 2;
     int y = (screenGeometry.height() - height()) / 2;
@@ -102,8 +102,8 @@ void SplashScreen::show(int milliseconds)
 void SplashScreen::hide(bool immediate)
 {
     QDialog::hide();
-    LaserApplication::mainWindow->setWindowFlags(Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-    LaserApplication::mainWindow->show();
+    //LaserApplication::mainWindow->setWindowFlags(Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+    //LaserApplication::mainWindow->show();
 }
 
 void SplashScreen::delayedHide(int milliseconds)

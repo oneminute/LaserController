@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>835</height>
+    <width>630</width>
+    <height>887</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>580</width>
+    <width>630</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>580</width>
+    <width>630</width>
     <height>16777215</height>
    </size>
   </property>
@@ -329,14 +329,31 @@ QGroupBox::title{color:rgb(25, 184, 250)}</string>
         <property name="rightMargin">
          <number>0</number>
         </property>
-        <item row="2" column="0">
+        <item row="4" column="0">
+         <widget class="QLabel" name="hSpacelabel">
+          <property name="text">
+           <string>Text Spacing</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="LaserDoubleSpinBox" name="hSpaceSpinBox">
+          <property name="suffix">
+           <string>mm</string>
+          </property>
+          <property name="decimals">
+           <number>3</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
          <widget class="QLabel" name="marginLabel">
           <property name="text">
            <string>Text Margins</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="5" column="1">
          <widget class="LaserDoubleSpinBox" name="marginSpinBox">
           <property name="suffix">
            <string>mm</string>
@@ -349,20 +366,20 @@ QGroupBox::title{color:rgb(25, 184, 250)}</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="hSpacelabel">
+        <item row="3" column="0">
+         <widget class="QLabel" name="textSizeLable">
           <property name="text">
-           <string>Text Spacing</string>
+           <string>Text Height</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="LaserDoubleSpinBox" name="hSpaceSpinBox">
+        <item row="3" column="1">
+         <widget class="LaserDoubleSpinBox" name="textSizeSpinBox">
+          <property name="prefix">
+           <string/>
+          </property>
           <property name="suffix">
            <string>mm</string>
-          </property>
-          <property name="decimals">
-           <number>3</number>
           </property>
          </widget>
         </item>

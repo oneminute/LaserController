@@ -300,8 +300,10 @@ void StampStripDialog::accept()
     qreal cornerRadius = m_ui->frameCornerSizeSpinBox->value() * 1000;
     qreal frameBorder = m_ui->frameBorderSpinBox->value() * 1000;
     int frameType = m_ui->frameCornerTypeComboBox->currentIndex();
-    QPointF point = m_viewer->mapToScene(m_viewer->rect().center());
-    point = QPointF(point.x() - frameW * 0.5, point.y() - frameH * 0.5);
+    //QPointF point = m_viewer->mapToScene(m_viewer->rect().center());
+    //point = QPointF(point.x() - frameW * 0.5, point.y() - frameH * 0.5);
+    QRectF allBounds = m_viewer->AllItemsSceneBoundingRect();
+    QPointF point = allBounds.topRight();
     QRect rect(point.x(), point.y(), frameW, frameH);
     bool needAuxiliary = false;
     LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
@@ -387,4 +389,5 @@ void StampStripDialog::accept()
     }
 
     m_viewer->addPrimitiveAndExamRegionByBounds(stampList);
+    m_viewer->zoomToSelection();
 }
