@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>SplashScreen</class>
  <widget class="QDialog" name="SplashScreen">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,10 +16,14 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <property name="styleSheet">
-   <string notr="true">QDialog{
-background-color:#d8f8f8f8;
-}</string>
+   <string notr="true">QDialog{background-color:rgb(255, 255, 255, 255);}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -86,6 +93,9 @@ background-color:#d8f8f8f8;
        <width>790</width>
        <height>520</height>
       </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color:#f0f3f8;</string>

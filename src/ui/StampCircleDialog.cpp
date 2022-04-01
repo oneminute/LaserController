@@ -22,7 +22,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
     m_layerIndex = layer->index();
 
 
-    m_ui->fontComboBox->setCurrentText(QStringLiteral("����"));
+    m_ui->fontComboBox->setCurrentText(tr("FangSong"));
     //text size
     m_ui->textSizeSpinBox->setValue(6);
     m_ui->textSizeSpinBox->setMinimum(0);

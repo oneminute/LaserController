@@ -138,7 +138,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->setupUi(this);
     loadRecentFilesMenu();
     installEventFilter(this);
-    setWindowFlags(Qt::FramelessWindowHint);
+    //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     
     // initialize Dock Manager
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, false);
