@@ -15,6 +15,7 @@
 #include "task/ProgressItem.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/Utils.h"
+#include "util/WidgetUtils.h"
 
 class LaserDevicePrivate
 {
@@ -1548,165 +1549,162 @@ void LaserDevice::handleError(int code, const QString& message)
     switch (code)
     {
     case E_SystemFatalError:
-        throw new LaserDeviceFatalException(code, tr("Laser device fatal error"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Laser device fatal error"));
         break;
     case E_UnknownError:
-        throw new LaserDeviceUnknownException(code);
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("There's something wrong. If you receive this message repeatedly, please restart your laser device and this application."));
         break;
     case E_InitializeError:
         d->isInit = false;
-        throw new LaserDeviceConnectionException(code, tr("Failed to initialize laser device"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to initialize laser device"));
         break;
     case E_UninitializeError:
-        throw new LaserDeviceConnectionException(code, tr("Failed to uninitialize laser device normally"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to uninitialize laser device normally"));
         break;
     case E_ComPortNotAvailable:
-        throw new LaserDeviceConnectionException(code, tr("Com port not available"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Com port not available"));
         break;
     case E_GetComPortListError:
-        throw new LaserDeviceConnectionException(code, tr("Failed to get COM port list"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to get COM port list"));
         break;
     case E_DongleNotExists:
         emit dongleRemoved();
         break;
     case E_DongleActiveDisabled:
-        throw new LaserDeviceSecurityException(code, tr("Dongle activation is disabled"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Dongle activation is disabled"));
         break;
     case E_MainCardRegisterError:
-        //throw new LaserDeviceSecurityException(code, tr("Failed to register main card"));
         emit mainCardRegistrationChanged(false);
         break;
     case E_MainCardInactivated:
-        //throw new LaserDeviceSecurityException(code, tr("Main card inactivated"));
         emit mainCardActivationChanged(false);
         break;
     case E_InvalidMainCardId:
-        throw new LaserDeviceSecurityException(code, tr("Invalid main card ID"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Invalid main card ID"));
         break;
     case E_InvalidDongleId:
-        throw new LaserDeviceSecurityException(code, tr("Invalid dongle ID"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Invalid dongle ID"));
         break;
     case E_CardBindDongleError:
-        throw new LaserDeviceSecurityException(code, tr("Failed to bind card with dongle"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to bind card with dongle"));
         break;
     case E_CardBindDongleRepeatedly:
-        throw new LaserDeviceSecurityException(code, tr("The card is repeatedly bound to the dongle"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("The card is repeatedly bound to the dongle"));
         break;
     case E_CardDongleBoundExceedsTimes:
-        throw new LaserDeviceSecurityException(code, tr("The number of times the card is bound to the dongle exceeds the allowable range"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("The number of times the card is bound to the dongle exceeds the allowable range"));
         break;
     case E_CardDongleBoundIllegal:
-        throw new LaserDeviceSecurityException(code, tr("The card is illegally bound to the dongle"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("The card is illegally bound to the dongle"));
         break;
     case E_ClearLaserTubeDurationError:
-        throw new LaserDeviceException(code, tr("Failed to clear duration of laser tube"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to clear duration of laser tube"));
         break;
     case E_FactoryPasswordIncorrect:
-        throw new LaserDeviceSecurityException(code, tr("Incorrect factory password"));
-        //emit manufacturePasswordVerified(false);
-        QMessageBox::warning(LaserApplication::mainWindow, tr("Invalid password"), tr("Invalid Manufacture password"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Invalid password"), tr("Incorrect factory password"));
         break;
     case E_FactoryPasswordLengthError:
-        throw new LaserDeviceSecurityException(code, tr("Invalid length of factory password"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Invalid length of factory password"));
         break;
     case E_FactoryPasswordExpired:
-        throw new LaserDeviceSecurityException(code, tr("Factory password expired"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Factory password expired"));
         break;
     case E_PasswordIncorrectTooManyTimes:
-        throw new LaserDeviceSecurityException(code, tr("Input incorrect factory password too many times"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Input incorrect factory password too many times"));
         break;
     case E_ChangeFactoryPasswordError:
-        //throw new LaserDeviceSecurityException(code, tr("Failed to change factory password"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Change factory password failed"));
         emit manufacturePasswordChangeFailed();
         break;
     case E_ReadSysParamFromCardError:
-        throw new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to read parameters from device"));
         break;
     case E_WriteSysParamToCardError:
-        throw new LaserDeviceIOException(code, tr("Failed to write parameters to device"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to write parameters to device"));
         break;
     case E_ReadUserParamFromCardError:
-        throw new LaserDeviceIOException(code, tr("Failed to read parameters from device"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to read parameters from device"));
         break;
     case E_WriteUserParamToCardError:
-        throw new LaserDeviceIOException(code, tr("Failed to write parameters to device"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to write parameters to device"));
         break;
     case E_SaveParamsToServerError:
-        throw new LaserNetworkException(code, tr("Failed to save parameters to server"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to save parameters to server"));
         break;
     case E_LoadParamsFromServerError:
-        throw new LaserNetworkException(code, tr("Failed to load parameters from server"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to load parameters from server"));
         break;
     case E_FileNotExistsError:
-        throw new LaserDeviceDataException(code, tr("File does not exist"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("File does not exist"));
         break;
     case E_InvalidDataFormat:
-        throw new LaserDeviceDataException(code, tr("Invalid data format"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Invalid data format"));
         break;
     case E_DecryptCommandError:
-        throw new LaserDeviceDataException(code, tr("Failed to decrypt data"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to decrypt data"));
         break;
     case E_InvalidImageData:
-        throw new LaserDeviceDataException(code, tr("Invalid image data"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Invalid image data"));
         break;
     case E_ImageMinSizeTooSmall:
-        throw new LaserDeviceDataException(code, tr("Min size of image is too small"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Min size of image is too small"));
         break;
     case E_ImageMaxSizeTooLarge:
-        throw new LaserDeviceDataException(code, tr("Max size of image is too large"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Max size of image is too large"));
         break;
     case E_NoDataError:
-        throw new LaserDeviceIOException(code, tr("No data transfered"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("No data transfered"));
         break;
     case E_TransferDataTimeout:
-        throw new LaserDeviceIOException(code, tr("Transfering data timeout"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Transfering data timeout"));
         break;
     case E_RetransferAfterTimeout:
         //throw new LaserDeviceIOException(code, tr("Retransfer data after timeout"));
         break;
     case E_RetransferTooManyTimes:
-        throw new LaserDeviceIOException(code, tr("Retransfer data too many times"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Retransfer data too many times"));
         break;
     case E_TransferDataError:
-        throw new LaserDeviceIOException(code, tr("Failed to transfer data"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to transfer data"));
         break;
     case E_ReceiveInvalidDataTooManyTimes:
-        throw new LaserDeviceIOException(code, tr("Receive invalid data too many times"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Receive invalid data too many times"));
         break;
     case E_BreakpointDataError:
-        throw new LaserDeviceIOException(code, tr("Failed to transfer data with breakpoint"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to transfer data with breakpoint"));
         break;
     case E_CanNotDoOnWorking:
         //throw new LaserDeviceMachiningException(code, tr("This operation is not supported during machining"));
         break;
     case E_PingServerFail:
-        throw new LaserNetworkException(code, tr("Failed to connect to server"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to connect to server"));
         break;
     case E_ConnectServerError:
-        throw new LaserNetworkException(code, tr("Failed to log in to server"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to log in to server"));
         break;
     case E_ConnectFrequently:
-        throw new LaserNetworkException(code, tr("Login too frequently"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Login too frequently"));
         break;
     case E_SubmitToServerError:
-        throw new LaserNetworkException(code, tr("Failed to submit data"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to submit data"));
         break;
     case E_UpdateInfoFileNotExists:
-        throw new LaserNetworkException(code, tr("Updating info file does not exist"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Updating info file does not exist"));
         break;
     case E_UpdateFileNotExists:
-        throw new LaserNetworkException(code, tr("Updating file dose not exist"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Updating file dose not exist"));
         break;
     case E_UpdateFailed:
-        throw new LaserNetworkException(code, tr("Failed to update"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to update"));
         break;
     case E_DownloadFirmwareDataError:
-        throw new LaserNetworkException(code, tr("Failed to download firmware"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to download firmware"));
         break;
     case E_UpdateFirmwareTimeout:
-        throw new LaserNetworkException(code, tr("Update firmware timeout"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Update firmware timeout"));
         break;
     case E_InadequatePermissions:
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("The current operation requires higher privileges"));
         break;
     case E_SendEmailFailed:
     case E_MailboxInvalid:
@@ -1714,12 +1712,13 @@ void LaserDevice::handleError(int code, const QString& message)
     case E_ActiveCodeInvalid:
     case E_ValidateCodeInvalid:
     case E_MailboxNameInvalid:
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Active laser device failed."));
         emit activeFailed(code);
         break;
     case E_DeviceOriginDisaccord:
         break;
     case E_DataOutofCacheSize:
-        utils::warning(tr("Warning"), tr("Data cache is out of size."));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Data cache is out of size."));
         break;
     }
     /*if (exception)
@@ -1758,8 +1757,10 @@ void LaserDevice::handleMessage(int code, const QString& message)
         break;
     }
     case M_USBArrival:
+        qLogD << "usb arrived";
         break;
     case M_USBRemove:
+        qLogD << "usb removed";
         break;
     case M_DongleConnected:
         emit dongleConnected();
@@ -1809,10 +1810,12 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_CardDongleBindOK:
     {
+        qLogD << "bind card and dongle successfully";
         break;
     }
     case M_LaserTubeZeroClearingOK:
     {
+        qLogD << "clear laser tube ok";
         break;
     }
     case M_ReadSysParamFromCardOK:
@@ -1862,26 +1865,32 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_ReturnTextMsgFromCallback:
     {
+        qLogD << "return text msg from callback: " << message;
         break;
     }
     case M_ImportFromFile:
     {
+        qLogD << "import from file: " << message;
         break;
     }
     case M_CancelCurrentWork:
     {
+        qLogD << "cancel current work: " << message;
         break;
     }
     case M_TimeConsuming:
     {
+        qLogD << "actual machining time: " << message;
         break;
     }
     case M_EstimatedWorkTime:
     {
+        qLogD << "estimated machining time: " << message;
         break;
     }
     case M_StartProcData:
     {
+        qLogD << "start processing data: " << message;
         break;
     }
     case M_DataTransCompleted:
@@ -1891,22 +1900,27 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_RequestAndContinue:
     {
+        qLogD << "request and continue: " << message;
         break;
     }
     case M_MotorLock:
     {
+        qLogD << "motor lock: " << message;
         break;
     }
     case M_MotorUnlock:
     {
+        qLogD << "motor unlock: " << message;
         break;
     }
     case M_LaserLightOn:
     {
+        qLogD << "laser light on: " << message;
         break;
     }
     case M_LaserLightOff:
     {
+        qLogD << "laser light off: " << message;
         break;
     }
     case M_StartWorking:
@@ -1950,122 +1964,153 @@ void LaserDevice::handleMessage(int code, const QString& message)
     }
     case M_DeviceIdInfo:
     {
+        qLogD << "device id info: " << message;
         break;
     }
     case M_ClientAddressInfo:
     {
+        qLogD << "client address info: " << message;
         break;
     }
     case M_ConnectedServer:
     {
+        qLogD << "connected to server: " << message;
         break;
     }
     case M_DisconnectServer:
     {
+        qLogD << "disconnected to server: " << message;
         break;
     }
     case M_ConnectServerOK:
     {
+        qLogD << "connecte to server ok: " << message;
         break;
     }
     case M_SubmitToServerOK:
     {
+        qLogD << "submit to server ok: " << message;
         break;
     }
     case M_DownloadBegin:
     {
+        qLogD << "begin to download: " << message;
+        break;
         break;
     }
     case M_DownloadEnd:
     {
+        qLogD << "end to download: " << message;
         break;
     }
     case M_NewVersionChecking:
     {
+        qLogD << "checking new version: " << message;
         break;
     }
     case M_NewVersionCheckFinished:
     {
+        qLogD << "checking new version finished: " << message;
         break;
     }
     case M_IsLatestVersion:
     {
+        qLogD << "is latest version: " << message;
         break;
     }
     case M_ReadyToUpdateFile:
     {
+        qLogD << "ready to update file: " << message;
         break;
     }
     case M_DownloadUpdateInfoFile:
     {
+        qLogD << "download update info file: " << message;
         break;
     }
     case M_FoundSoftNewVersion:
     {
+        qLogD << "found softwre new version: " << message;
         break;
     }
     case M_DownloadFileCounts:
     {
+        qLogD << "Count of downloading files: " << message;
         break;
     }
     case M_DownloadFileIndex:
     {
+        qLogD << "Index of the downloading file: " << message;
         break;
     }
     case M_DownloadSoftDataStart:
     {
+        qLogD << "Start to download software: " << message;
         break;
     }
     case M_StartSoftUpdate:
     {
+        qLogD << "Start to update software: " << message;
         break;
     }
     case M_CancelSoftUpdate:
     {
+        qLogD << "Cancel software updating: " << message;
         break;
     }
     case M_SoftUpdateFinished:
     {
+        qLogD << "Downloading software finished: " << message;
         break;
     }
     case M_FoundFirmwareNewVersion:
     {
+        qLogD << "Found new firmware new version: " << message;
         break;
     }
     case M_DownloadFirmwareDataStart:
     {
+        qLogD << "Start to download firmware: " << message;
         break;
     }
     case M_DownloadFirmwareDataEnd:
     {
+        qLogD << "End to download firmware: " << message;
         break;
     }
     case M_SendFirmwareDataStart:
     {
+        qLogD << "Start to send firmware data: " << message;
         break;
     }
     case M_SendFirmwareDataEnd:
     {
+        qLogD << "End to send firmware data: " << message;
         break;
     }
     case M_UpdateFirmwareStart:
     {
+        qLogD << "Start to update firmware: " << message;
         break;
     }
     case M_UpdateFirmwareEnd:
     {
+        qLogD << "End to update firmware: " << message;
         break;
     }
     case M_UpdateFirmwareAbort:
     {
+        qLogD << "Abort updating firmware: " << message;
         break;
     }
     case M_SaveParamsToServerOK:
     {
+        qLogD << "Save params to server Ok: " << message;
         break;
     }
     case M_ReadParamsFromServerOK:
     {
+        qLogD << "Read params from server Ok: " << message;
         break;
     }
     case M_UpdateComplete:

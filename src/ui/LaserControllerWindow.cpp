@@ -1117,6 +1117,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionWeldAll, &QAction::triggered, this, &LaserControllerWindow::onActionWeldAll);
     
     connect(m_ui->actionParseJson, &QAction::triggered, this, &LaserControllerWindow::onActionParseJson);
+    connect(m_ui->actionCleanCacheFiles, &QAction::triggered, this, &LaserControllerWindow::onActionCleanCacheFiles);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -5100,9 +5101,9 @@ void LaserControllerWindow::updateLayers()
 void LaserControllerWindow::onActionPauseMechining(bool checked)
 {
     //LaserDriver::instance().pauseContinueMachining(!checked);
-    int result = LaserApplication::driver->pauseContinueMachining(!checked);
+    int result = LaserApplication::driver->pauseContinueMachining(checked);
     qDebug() << "pause result:" << result << ", checked state:" << checked;
-    m_ui->actionPause->blockSignals(true);
+    /*m_ui->actionPause->blockSignals(true);
     if (result == 1)
     {
         m_ui->actionPause->setChecked(true);
@@ -5111,7 +5112,7 @@ void LaserControllerWindow::onActionPauseMechining(bool checked)
     {
         m_ui->actionPause->setChecked(false);
     }
-    m_ui->actionPause->blockSignals(false);
+    m_ui->actionPause->blockSignals(false);*/
 }
 
 void LaserControllerWindow::onActionStopMechining(bool checked)
@@ -5206,7 +5207,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
 
     QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
-    QRect boundingRect = m_scene->document()->currentDocBoundingRect();
+    /*QRect boundingRect = m_scene->document()->currentDocBoundingRect();
     QRect boundingRectAcc = m_scene->document()->currentEngravingBoundingRect(true);
 
     switch (Config::Device::startFrom())
@@ -5225,13 +5226,22 @@ void LaserControllerWindow::onActionDownload(bool checked)
         boundingRect,
         boundingRectAcc
     ))
-        return;
+        return;*/
 
     bool stamp;
     LaserDocument* doc = getMachiningDocument(stamp);
     if (!doc)
         return;
 
+    SelectOriginDialog soDlg;
+    if (soDlg.exec() != QDialog::Accepted)
+    {
+        if (stamp)
+            doc->deleteLater();
+        return;
+    }
+
+    doc->setSpecifiedOriginIndex(soDlg.origin());
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
     progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
@@ -7595,6 +7605,10 @@ void LaserControllerWindow::onActionParseJson()
             mainProgress->finish();
         }
     );
+}
+
+void LaserControllerWindow::onActionCleanCacheFiles()
+{
 }
 
 void LaserControllerWindow::onCameraConnected()

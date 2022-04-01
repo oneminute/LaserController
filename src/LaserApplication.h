@@ -38,9 +38,12 @@ public:
 
     static LaserDocument* createDocument();
 
+    static void cleanLogFiles();
+    static void cleanCachedFiles();
+
 protected:
     void initLog();
-    void clearCrash();
+    void cleanCrash();
     void checkCrash();
     static void handleLogOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 

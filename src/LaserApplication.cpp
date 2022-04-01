@@ -99,6 +99,7 @@ bool LaserApplication::initialize()
 
     Config::init();
     Config::load();
+    cleanLogFiles();
 	Global::unit = static_cast<SizeUnit>(Config::General::unit());
 
     retranslate();
@@ -159,7 +160,7 @@ void LaserApplication::destroy()
     g_deviceThread.exit();
     g_deviceThread.wait();
 
-    clearCrash();
+    cleanCrash();
     Config::destroy();
 
     qDeleteAll(translators);
@@ -487,6 +488,37 @@ LaserDocument* LaserApplication::createDocument()
     return doc;
 }
 
+void LaserApplication::cleanLogFiles()
+{
+    if (!Config::General::enableLogCleaner())
+        return;
+
+    QDir logDir("./log");
+    QFileInfoList entries = logDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+    QDateTime now = QDateTime::currentDateTime();
+    for (const QFileInfo& entry : entries)
+    {
+        QDateTime lastModified = entry.lastModified();
+        int days = lastModified.daysTo(now);
+        int secs = lastModified.secsTo(now);
+        if (days >= Config::General::logOverdueDays() && secs >= 10)
+        {
+            qLogD << "overdue log file: " << entry.fileName();
+            logDir.remove(entry.fileName());
+        }
+    }
+}
+
+void LaserApplication::cleanCachedFiles()
+{
+    QDir tmpDir("./tmp");
+    QFileInfoList entries = tmpDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+    for (const QFileInfo& entry : entries)
+    {
+        tmpDir.remove(entry.fileName());
+    }
+}
+
 void LaserApplication::initLog()
 {
     google::InitGoogleLogging(this->arguments()[0].toStdString().c_str());
@@ -496,18 +528,21 @@ void LaserApplication::initLog()
     FLAGS_alsologtostderr = true; 
     FLAGS_colorlogtostderr = true; 
     FLAGS_max_log_size = 100;
-    FLAGS_logbufsecs = 0; 
+    FLAGS_logbufsecs = google::GLOG_FATAL; 
     FLAGS_stop_logging_if_full_disk = true; 
+    FLAGS_timestamp_in_logfile_name = true;
+    FLAGS_log_dir = ".\\log";
 
     //set log path;
-    google::SetLogDestination(google::GLOG_INFO,   "log/logs");
-    google::SetLogDestination(google::GLOG_WARNING,"log/logs");
-    google::SetLogDestination(google::GLOG_ERROR,  "log/logs");
-    google::SetLogDestination(google::GLOG_FATAL,  "log/logs");
-    google::SetLogFilenameExtension("lc_");
+    google::SetLogDestination(google::GLOG_INFO,   "log/log_info_");
+    google::SetLogDestination(google::GLOG_WARNING,"log/log_warn_");
+    google::SetLogDestination(google::GLOG_ERROR,  "log/log_eror_");
+    google::SetLogDestination(google::GLOG_FATAL,  "log/log_fatl_");
+    google::SetLogFilenameExtension(".log");
+    //google::EnableLogCleaner(0);
 }
 
-void LaserApplication::clearCrash()
+void LaserApplication::cleanCrash()
 {
 	QFile crash("crash.bin");
 	if (crash.exists())
@@ -529,7 +564,7 @@ void LaserApplication::checkCrash()
 		stream >> datetime;
 		qWarning() << "crashed launching at " << datetime;
 		crash.close();
-		clearCrash();
+		cleanCrash();
 	}
 	crash.open(QIODevice::WriteOnly);
 	QDataStream stream(&crash);

@@ -86,6 +86,8 @@ public:
         static ConfigItemGroup* group;
         CONFIG_ITEM(general, language, int, toInt)
         CONFIG_ITEM(general, unit, int, toInt)
+        CONFIG_ITEM(general, enableLogCleaner, bool, toBool)
+        CONFIG_ITEM(general, logOverdueDays, int, toInt)
         //CONFIG_ITEM(general, machiningUnit, qreal, toReal)
 
     private:
@@ -240,7 +242,7 @@ public:
     {
     protected:
         StampLayer(QObject* parent = nullptr)
-            : ConfigItemGroup("stampLayer", tr("Stamp Layer"), tr("Filling Layer"), parent)
+            : ConfigItemGroup("stampLayer", tr("Stamp Layer"), tr("Stamp Layer"), parent)
         {}
         
     public:

@@ -311,7 +311,6 @@ private:
     FN_VOID_VOID m_fnStopMachining;
     FN_INT_BOOL m_fnControlMotor;
     FN_INT_BOOL m_fnTestLaserLight;
-    FN_BOOL_BOOL m_fnLoadBreakPointData;
     FNCheckMoveLaserMotors m_fnCheckMoveLaserMotors;
     FN_VOID_VOID m_fnStartMoveLaserMotors;
     FN_INT_WCHART m_fnLoadDataFromFile;

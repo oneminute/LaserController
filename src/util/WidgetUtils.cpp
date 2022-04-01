@@ -1,6 +1,7 @@
 #include "WidgetUtils.h"
 
 #include <QComboBox>
+#include <QMessageBox>
 
 namespace widgetUtils
 {
@@ -29,4 +30,9 @@ namespace widgetUtils
         return "";
     }
 
+    void showWarningMessage(QWidget* parentWnd, const QString& title, const QString& msg)
+    {
+        QMessageBox dlg(QMessageBox::Icon::Warning, title, msg, QMessageBox::Ok, parentWnd);
+        dlg.setButtonText(QMessageBox::Ok, QObject::tr("Ok"));
+    }
 }

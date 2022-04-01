@@ -279,6 +279,21 @@ void Config::loadGeneralItems()
         }
     );
     unit->setVisible(false);
+
+    ConfigItem* enableLogCleaner = group->addConfigItem(
+        "enableLogCleaner",
+        true,
+        DT_BOOL
+    );
+    enableLogCleaner->setInputWidgetType(IWT_CheckBox);
+
+    ConfigItem* logOverdueDays = group->addConfigItem(
+        "logOverdueDays"
+        , 1
+    );
+    logOverdueDays->setInputWidgetType(IWT_EditSlider);
+    logOverdueDays->setInputWidgetProperty("minimum", 0);
+    logOverdueDays->setInputWidgetProperty("maximum", 365);
 }
 
 void Config::loadLayersItems()
@@ -3125,6 +3140,14 @@ void Config::updateTitlesAndDescriptions()
     General::unitItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Unit", nullptr), 
         QCoreApplication::translate("Config", "Unit for user interface.", nullptr));
+
+    General::enableLogCleanerItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Log Cleaner", nullptr), 
+        QCoreApplication::translate("Config", "Enable Log Cleaner.", nullptr));
+
+    General::logOverdueDaysItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Log overdue days", nullptr), 
+        QCoreApplication::translate("Config", "Log overdue days.", nullptr));
 
     Layers::maxLayersCountItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Max Layers Count", nullptr), 

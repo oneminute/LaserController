@@ -409,6 +409,7 @@ protected slots:
     void onActionWeldAll();
 
     void onActionParseJson();
+    void onActionCleanCacheFiles();
 
     // cameras slots
     void onCameraConnected();

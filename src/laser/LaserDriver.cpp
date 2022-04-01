@@ -248,9 +248,6 @@ bool LaserDriver::load()
     m_fnTestLaserLight = (FN_INT_BOOL)m_library.resolve("TestLaserLight");
     CHECK_FN(m_fnTestLaserLight)
 
-    m_fnLoadBreakPointData = (FN_BOOL_BOOL)m_library.resolve("LoadBreakPointData");
-    CHECK_FN(m_fnLoadBreakPointData)
-
     m_fnLoadDataFromFile = (FN_INT_WCHART)m_library.resolve("LoadDataFromFile");
     CHECK_FN(m_fnLoadDataFromFile)
 

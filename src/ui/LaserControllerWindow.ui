@@ -60,6 +60,7 @@
     <addaction name="actionPathOptimization"/>
     <addaction name="actionParseJson"/>
     <addaction name="actionRemoteAssistance"/>
+    <addaction name="actionCleanCacheFiles"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -2013,6 +2014,14 @@
   <action name="actionParseJson">
    <property name="text">
     <string>Parse Json</string>
+   </property>
+  </action>
+  <action name="actionCleanCacheFiles">
+   <property name="text">
+    <string>Clean Cache Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Clean Cache Files</string>
    </property>
   </action>
  </widget>
