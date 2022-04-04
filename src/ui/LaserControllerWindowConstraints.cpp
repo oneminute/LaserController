@@ -1173,10 +1173,15 @@ void LaserControllerWindow::bindWidgetsProperties()
 
     // begin m_ui->actionImportCorelDraw
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentEmptyState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentWorkingState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentSelectedState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentSelectedEditingState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentViewDragState);
-    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentViewDragReadyState);
+    BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", true, documentViewDragingState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveRectState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveEllipseState);
     BIND_PROP_TO_STATE(m_ui->actionImportCorelDraw, "enabled", false, documentPrimitiveLineState);

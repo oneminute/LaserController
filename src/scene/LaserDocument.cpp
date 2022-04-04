@@ -176,15 +176,14 @@ QJsonObject LaserDocument::jsonHeader(QRect bounding, QRect boundingAcc, int dev
     if (absolute)
     {
         boundingPoints = machiningUtils::boundingPoints(deviceOriginIndex, bounding);
-        utils::makePointsRelative(boundingPoints, startPos);
     }
     else
     {
         boundingPoints = machiningUtils::boundingPoints(
             Config::Device::jobOrigin(), bounding, startPos
         );
-        utils::makePointsRelative(boundingPoints, startPos);
     }
+    utils::makePointsRelative(boundingPoints, QPoint(0, 0));
 
     QJsonObject laserDocumentInfo;
     laserDocumentInfo["APIVersion"] = LaserApplication::driver->getVersion();
@@ -257,8 +256,6 @@ void LaserDocument::jsonBounding(QRect& bounding, QRect& boundingAcc, int& devic
         lastPoint = t.map(lastPoint);
         startPos = QPoint(0, 0);
     }
-    bounding = docBounding;
-    boundingAcc = docBoundingAcc;
 
     startFrom = 0;
     switch (Config::Device::startFrom())
@@ -277,6 +274,9 @@ void LaserDocument::jsonBounding(QRect& bounding, QRect& boundingAcc, int& devic
         docBoundingAcc.moveTo(offset);
         break;
     }
+
+    bounding = docBounding;
+    boundingAcc = docBoundingAcc;
 }
 
 QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
