@@ -151,8 +151,12 @@ void setSelectedInGroup(bool selected) {
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
-    if (!visible())
-        return;
+    QString className = this->scene()->metaObject()->className();
+    if (className == "LaserScene") {
+        if (!visible())
+            return;
+    }
+    
 
     painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
@@ -190,6 +194,9 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
             color = Qt::lightGray;
         }
     }
+    else {
+        color = Qt::red;
+    }
 
 	if (isSelected())
 	{
@@ -216,12 +223,15 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 		painter->setPen(pen);
     }
 
-    if (layer()->type() == LLT_FILLING)
+    if (layer() && layer()->type() == LLT_FILLING)
     {
         QBrush brush(color, Qt::SolidPattern);
         painter->setBrush(brush);
     }
-
+    if (className == "QGraphicsScene") {
+        QBrush brush(color, Qt::SolidPattern);
+        painter->setBrush(brush);
+    }
     if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutAligningState()))
     {
         //QPointF center = d->boundingRect.center();
@@ -561,6 +571,7 @@ void LaserPrimitive::setExportable(bool value)
 bool LaserPrimitive::visible() const
 {
     Q_D(const LaserPrimitive);
+    
     if (layer()->visible())
     {
         return d->visible;
@@ -3143,7 +3154,13 @@ void LaserStar::draw(QPainter * painter)
     painter->setBrush(Qt::NoBrush);*/
     d->path.setFillRule(Qt::WindingFill);
     if (!d->stampIntaglio) {
-        painter->setBrush(QBrush(this->layer()->color()));
+        //painter->setBrush(QBrush(this->layer()->color()));
+        if (layer()) {
+            painter->setBrush(QBrush(this->layer()->color()));
+        }
+        else {
+            painter->setBrush(QBrush(Qt::red));
+        }
         painter->drawPath(d->path);
         painter->setBrush(Qt::NoBrush);
     }
@@ -3340,7 +3357,13 @@ void LaserPartyEmblem::draw(QPainter* painter)
 {
     Q_D(const LaserPartyEmblem);
     if (!d->stampIntaglio) {
-        painter->setBrush(QBrush(this->layer()->color()));
+        //painter->setBrush(QBrush(this->layer()->color()));
+        if (layer()) {
+            painter->setBrush(QBrush(this->layer()->color()));
+        }
+        else {
+            painter->setBrush(QBrush(Qt::red));
+        }
     }
     else {
         painter->setBrush(QBrush(Qt::white));
@@ -3579,17 +3602,21 @@ LaserRing::~LaserRing()
 void LaserRing::draw(QPainter * painter)
 {
     Q_D(LaserRing);
+    QColor color = Qt::red;
+    if (layer()) {
+        color = this->layer()->color();
+    }
     if (!d->isInner) {
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
+            
             painter->drawPath(d->path);
         }
         else {
-            //painter->setBrush(Qt::white);
-            //painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(this->layer()->color()));
+            //painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->outerPath);
         }
     }
@@ -3597,11 +3624,11 @@ void LaserRing::draw(QPainter * painter)
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->path);
         }
         else {
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->outerPath);
             painter->setBrush(Qt::white);
             painter->drawPath(d->path);
@@ -3820,15 +3847,20 @@ LaserFrame::~LaserFrame()
 void LaserFrame::draw(QPainter * painter)
 {
     Q_D(LaserFrame);
+    QColor color = Qt::red;
+    if (layer()) {
+        color = this->layer()->color();
+    }
+    
     if (!d->isInner) {
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->path);
         }
         else {
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->outerPath);
         }
     }
@@ -3837,11 +3869,11 @@ void LaserFrame::draw(QPainter * painter)
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->path);
         }
         else {
-            painter->setBrush(QBrush(this->layer()->color()));
+            painter->setBrush(QBrush(color));
             painter->drawPath(d->innerPath);
             painter->setBrush(Qt::white);
             painter->drawPath(d->path);
@@ -4097,7 +4129,13 @@ void LaserStampText::draw(QPainter* painter)
 {
     Q_D(LaserStampText);
     if (!d->stampIntaglio) {
-        painter->setBrush(QBrush(this->layer()->color()));
+        //painter->setBrush(QBrush(this->layer()->color()));
+        if (layer()) {
+            painter->setBrush(QBrush(this->layer()->color()));
+        }
+        else {
+            painter->setBrush(QBrush(Qt::red));
+        }
     }
     else {
         painter->setBrush(QBrush(Qt::white));

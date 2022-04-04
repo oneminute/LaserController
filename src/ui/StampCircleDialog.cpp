@@ -6,21 +6,24 @@
 #include<QComboBox>
 #include<QHeaderView>
 #include<QCheckBox>
+#include<QPushButton>
+#include "ui/StampDialog.h"
+#include "scene/LaserPrimitiveGroup.h"
 #include"scene/LaserPrimitive.h"
 #include"scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "util/Utils.h"
 
 StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* parent) 
-   : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
-    m_ui(new Ui::StampCircleDialog), m_scene(scene), m_isEllipse(isEllipse)
+   : StampDialog(scene, parent),
+    m_ui(new Ui::StampCircleDialog), m_isEllipse(isEllipse)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
     LaserLayer* layer = m_scene->document()->idleLayer();
     layer->setType(LLT_STAMP);
     m_layerIndex = layer->index();
-
+    m_preview = m_ui->graphicsView;
 
     m_ui->fontComboBox->setCurrentText(tr("FangSong"));
     //text size
@@ -452,6 +455,14 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             m_ui->embleSizeSpinBox->blockSignals(false);
         }
     });
+    QPushButton* previewBtn = m_ui->buttonBox->button(QDialogButtonBox::Apply);
+    previewBtn->setText(tr("Preview"));
+    QPushButton* okBtn = m_ui->buttonBox->button(QDialogButtonBox::Ok);
+    okBtn->setText(tr("Ok"));
+    QPushButton* cancleBtn = m_ui->buttonBox->button(QDialogButtonBox::Cancel);
+    cancleBtn->setText(tr("Cancel"));
+    connect(okBtn, &QPushButton::clicked,this, &StampCircleDialog::okBtnAccept);
+    connect(previewBtn, &QPushButton::clicked, this, &StampCircleDialog::previewBtnAccept);
 }
 StampCircleDialog::~StampCircleDialog()
 {
@@ -482,9 +493,8 @@ void StampCircleDialog::addTableViewRow(int row, QString contentStr, QString fon
     content->setCheckState(checkState);
 }
 
-void StampCircleDialog::accept()
+QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
 {
-    QDialog::accept();
     bool stampIntaglio = m_ui->stampIntaglioCheckBox->isChecked();
     QList<LaserPrimitive*> stampList;
     //create frame
@@ -496,7 +506,7 @@ void StampCircleDialog::accept()
     QPointF point = allBounds.topRight();
     //point = QPointF(point.x() - circleW * 0.5, point.y() - circleW * 0.5);
     QRect rect;
-    
+
     if (m_isEllipse) {
         rect = QRect(point.x(), point.y(), circleW, circleH);
     }
@@ -521,14 +531,14 @@ void StampCircleDialog::accept()
             innerW = circleW - innderMargin * 2 - circleBorder * 2;
             innerH = circleW - innderMargin * 2 - circleBorder * 2;
         }
-        
-        
-        innerRect = QRect (point.x() + innderMargin + circleBorder, point.y() + innderMargin + circleBorder, innerW, innerH);
+
+
+        innerRect = QRect(point.x() + innderMargin + circleBorder, point.y() + innderMargin + circleBorder, innerW, innerH);
         innerCircle = new LaserRing(m_scene->document(), innerRect, innerBorder, stampIntaglio, QTransform(), m_layerIndex);
         innerCircle->setInner(true);
         stampList.append(innerCircle);
     }
-    
+
     //create text
     //int layoutIndex = m_ui->frameStampLayoutComboBox->currentIndex();
     QSize signalSize;
@@ -545,14 +555,14 @@ void StampCircleDialog::accept()
         diff = circleBorder + textMargin;
         textBounds = QRect(rect.left() + diff, rect.top() + diff, rect.width() - 2 * diff, rect.height() - 2 * diff);
     }
-    
+
     QString content = m_ui->lineEdit->text().trimmed();
     bool bold = m_ui->boldBtn->isChecked();
     bool italic = m_ui->italicBtn->isChecked();
     //bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
-    
+
     bool containsDoubleText = false;
-    
+
     int textLength = content.size();
     int layoutType = m_ui->circleStampLayoutComboBox->currentIndex();
     //
@@ -570,7 +580,7 @@ void StampCircleDialog::accept()
         QString propertyText = property->text();
         //Top Circle Text
         if (propertyText == m_textRowProperty[0]) {
-            
+
             LaserCircleText* topCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, angle,
                 bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layerIndex);
             QSize textSize(topCircleText->textSize().width(), textHeight);
@@ -579,7 +589,7 @@ void StampCircleDialog::accept()
         }
         //Horizontal Text
         else if (propertyText == m_textRowProperty[1]) {
-            
+
             qreal h, w, centerX, centerY;
             if (m_isEllipse) {
                 //h = 4700;
@@ -595,12 +605,12 @@ void StampCircleDialog::accept()
                 centerY = textBounds.top() + textBounds.height() * 0.788;
                 centerX = textBounds.left() + textBounds.width() * 0.5;
             }
-            
-            
-            QSize lineTextSize((w- textSpace*(textLength - 1))/ textLength,h);
 
-            LaserHorizontalText* lineText = new LaserHorizontalText(m_scene->document(), content->text(), lineTextSize, 
-                QPointF(centerX, centerY),bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
+
+            QSize lineTextSize((w - textSpace * (textLength - 1)) / textLength, h);
+
+            LaserHorizontalText* lineText = new LaserHorizontalText(m_scene->document(), content->text(), lineTextSize,
+                QPointF(centerX, centerY), bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
             stampList.append(lineText);
         }
         //Bottom Circle Text
@@ -610,10 +620,10 @@ void StampCircleDialog::accept()
             for (QChar c : contentStr) {
                 invertContentStr.prepend(c);
             }
-            
-            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), invertContentStr, textBounds, 320-angle,
-                bold, italic, false, stampIntaglio, family, textSpace, true,0.0, 0.0, QSize(), QTransform(), m_layerIndex);
-            
+
+            LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), invertContentStr, textBounds, 320 - angle,
+                bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layerIndex);
+
             //qreal hsize = bottomCircleText->textSize().height() * 0.5;
             qreal hsize = textHeight;
             bottomCircleText->setOffsetRotateAngle(180);
@@ -640,8 +650,8 @@ void StampCircleDialog::accept()
             qreal h = textHeight;
             //qreal w = 3400 * 1.5;
             qreal w = 1700;
-            qreal centerY = rect.center().y() + 10000 + textHeight*0.5;
-            
+            qreal centerY = rect.center().y() + 10000 + textHeight * 0.5;
+
             QSize size(w, h);
             /*if (m_ui->innerCircleGroupBox->isChecked()) {
                 centerY = rect.bottom() - size.height() - innerBorder;
@@ -655,7 +665,7 @@ void StampCircleDialog::accept()
             text->setBoundingRectHeight(h);
             stampList.append(text);
         }
-        
+
     }
     //create emblem
     qreal radius = m_ui->embleSizeSpinBox->value() * 1000 * 0.5;
@@ -668,7 +678,7 @@ void StampCircleDialog::accept()
         else {
             drawEmble = false;
         }
-        
+
     }
     else {
         drawEmble = true;
@@ -683,7 +693,7 @@ void StampCircleDialog::accept()
             stampList.append(party);
         }
     }
-    
+
     //create line
     if (m_ui->lineGroupBox->isChecked()) {
         qreal circleBorder = m_ui->circleBorderSpinBox->value() * 1000;
@@ -691,7 +701,7 @@ void StampCircleDialog::accept()
         qreal innerMargin = m_ui->InnerCircleMarginDoubleSpinBox->value() * 1000;
         bool needInner = m_ui->innerCircleGroupBox->isChecked();
         qreal w = rect.width() * 0.25;
-        qreal h = m_ui->lineWidthSpinBox->value()*1000;
+        qreal h = m_ui->lineWidthSpinBox->value() * 1000;
         qreal top = rect.center().y() - h * 0.5;
         qreal diff, left1, left2;
         if (!needInner) {
@@ -720,6 +730,10 @@ void StampCircleDialog::accept()
         stampList.append(line1);
         stampList.append(line2);
     }
-    m_viewer->addPrimitiveAndExamRegionByBounds(stampList);
-    m_viewer->zoomToSelection();
+    return stampList;
+}
+
+void StampCircleDialog::accept()
+{
+    QDialog::accept();
 }
