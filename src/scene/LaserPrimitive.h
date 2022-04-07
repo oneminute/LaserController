@@ -127,6 +127,9 @@ public:
     bool stampIntaglio();
     void setStampIntaglio(bool bl);
     virtual bool isStamepPrimitive();
+
+    virtual int smallCircleIndex() const;
+
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

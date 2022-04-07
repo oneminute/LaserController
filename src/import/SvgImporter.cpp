@@ -7,6 +7,7 @@
 #include <QStack>
 
 #include "LaserApplication.h"
+#include "common/Config.h"
 #include "laser/LaserDevice.h"
 #include "laser/LaserDriver.h"
 #include "scene/LaserDocument.h"
@@ -19,6 +20,7 @@
 #include "task/ProgressModel.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/UnitUtils.h"
+#include "util/MachiningUtils.h"
 
 SvgImporter::SvgImporter(QObject* parent)
     : Importer(parent)
@@ -143,8 +145,8 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QSvgPath* svgPathNode = reinterpret_cast<QSvgPath*>(node);
 			QPainterPath path = matrix.map(svgPathNode->path());
             path = t.map(path);
-            QList<QPolygonF> subPaths = path.toSubpathPolygons();
-            for (const QPolygonF subPoly : subPaths)
+            QList<QPolygon> subPaths = machiningUtils::path2SubpathPolygons(parentProgress, path, QTransform(), Config::Export::curveFlatteningThreshold());
+            for (const QPolygon subPoly : subPaths)
             {
                 QPainterPath subPath;
                 subPath.addPolygon(subPoly);

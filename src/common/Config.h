@@ -284,7 +284,7 @@ public:
         CONFIG_ITEM(export, maxAnglesDiff, qreal, toReal)
         CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
-        CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation, value<SmallDiagonalLimitation>);
+        CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation*, value<SmallDiagonalLimitation*>);
         CONFIG_ITEM(export, curveFlatteningThreshold, qreal, toReal)
         CONFIG_ITEM(export, gaussianFactorA, qreal, toReal)
         CONFIG_ITEM(export, imageQuality, int, toInt)

@@ -200,6 +200,11 @@ QJsonObject LaserDocument::jsonHeader(QRect bounding, QRect boundingAcc, int dev
     laserDocumentInfo["MaxEngravingSpeed"] = maxEngravingSpeed();
     laserDocumentInfo["SoftwareVersion"] = LaserApplication::softwareVersion();
     laserDocumentInfo["BoundingPoints"] = typeUtils::pointsToJson(boundingPoints);
+    laserDocumentInfo["EnableSmallCircleLimit"] = Config::Export::enableSmallDiagonal();
+    if (Config::Export::enableSmallDiagonal())
+    {
+        laserDocumentInfo["SmallCircleLimit"] = Config::Export::smallDiagonalLimitation()->toJson()["items"];
+    }
     if (includeThumbnail)
     {
         QByteArray thumbnailData;
@@ -461,6 +466,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
 
             QJsonObject itemObj;
             itemObj["Name"] = pathNode->nodeName();
+            itemObj["SmallCircleIndex"] = primitive->smallCircleIndex();
             if (layer->type() == LLT_ENGRAVING)
             {
                 if (!enablePrintAndCut())
@@ -491,6 +497,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
                     itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, t));
+                    itemObjCutting["SmallCircleIndex"] = primitive->smallCircleIndex();
                     items.append(itemObjCutting);
                 }
             }
@@ -555,6 +562,7 @@ void LaserDocument::exportJSON(const QString& filename, const PathOptimizer::Pat
                     pathNode->nearestPoint(LaserPoint(lastPoint));
                     LaserPointListList points = primitive->arrangedPoints();
                     itemObjCutting["Data"] = QString(machiningUtils::pointListList2Plt(nullptr, points, lastPoint, t));
+                    itemObjCutting["SmallCircleIndex"] = primitive->smallCircleIndex();
                     items.append(itemObjCutting);
                 }
             }
