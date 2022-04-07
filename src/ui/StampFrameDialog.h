@@ -4,23 +4,23 @@
 #include <QScopedPointer>
 #include<scene/LaserScene.h>
 #include <widget/LaserViewer.h>
+#include "ui/StampDialog.h"
 namespace Ui
 {
     class StampFrameDialog;
 }
-class StampFrameDialog : public QDialog {
+class StampFrameDialog : public StampDialog {
     Q_OBJECT
 public:
     StampFrameDialog(LaserScene* scene, QWidget* parent = nullptr);
     virtual ~StampFrameDialog();
+    QList<LaserPrimitive*> createStampPrimitive();
 private:
     QScopedPointer<Ui::StampFrameDialog> m_ui;
     LaserScene* m_scene;
     LaserViewer* m_viewer;
     int m_layerIndex;
     QString m_defaultTexts[3] = {tr("FSNS"), tr("FSN"), tr("NA") };//–’ œ√˚”°£¨–’ œ√˚£¨–’√˚
-protected slots:
-    virtual void accept();
 
 };
 #endif // STAMPDIALOG_H

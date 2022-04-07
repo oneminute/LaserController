@@ -6,19 +6,21 @@
 #include<QComboBox>
 #include<QStringList>
 #include<QHeaderView>
+#include<QPushButton>
+#include "ui/StampDialog.h"
 #include"scene/LaserPrimitive.h"
 #include"scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 
 StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent) 
-   : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
-    m_ui(new Ui::StampStripDialog), m_scene(scene)
+   : StampDialog(scene, parent),
+    m_ui(new Ui::StampStripDialog)
 {
-    m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
     LaserLayer* layer = m_scene->document()->idleLayer();
     layer->setType(LLT_STAMP);
     m_layerIndex = layer->index();
+    m_preview = m_ui->graphicsView;
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/signalLine.png");
     QPixmap threePm(":/ui/icons/images/multiLine.png");
@@ -226,8 +228,9 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     // delete
     connect(m_ui->delToolButton, QOverload<bool>::of(&QToolButton::clicked), [=](bool checked) {
         QModelIndexList list = m_ui->tableView->selectionModel()->selectedRows();
-        m_viewItemModel->removeRows(list[0].row(), list.size());
-        
+        if (!list.isEmpty()) {
+            m_viewItemModel->removeRows(list[0].row(), list.size());
+        }
     });
     //selection change
     connect(m_ui->tableView->selectionModel(), QOverload<const QModelIndex&, const QModelIndex&>::of(&QItemSelectionModel::currentChanged), [=](const QModelIndex& current, const QModelIndex& previous) {
@@ -256,6 +259,14 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     //text space
     m_ui->hSpaceSpinBox->setMaximum(DBL_MAX);
     m_ui->vSpaceSpinBox->setMaximum(DBL_MAX);
+    QPushButton* previewBtn = m_ui->buttonBox->button(QDialogButtonBox::Apply);
+    previewBtn->setText(tr("Preview"));
+    QPushButton* okBtn = m_ui->buttonBox->button(QDialogButtonBox::Ok);
+    okBtn->setText(tr("Ok"));
+    QPushButton* cancleBtn = m_ui->buttonBox->button(QDialogButtonBox::Cancel);
+    cancleBtn->setText(tr("Cancel"));
+    connect(okBtn, &QPushButton::clicked, this, &StampStripDialog::okBtnAccept);
+    connect(previewBtn, &QPushButton::clicked, this, &StampStripDialog::previewBtnAccept);
 }
 StampStripDialog::~StampStripDialog()
 {
@@ -289,9 +300,8 @@ void StampStripDialog::rectifyTextSize(qreal w, qreal h, LaserVerticalText* text
     }
 }
 
-void StampStripDialog::accept()
-{
-    QDialog::accept();
+QList<LaserPrimitive*> StampStripDialog::createStampPrimitive()
+{ 
     bool stampIntaglio = m_ui->stampIntaglioCheckBox->isChecked();
     QList<LaserPrimitive*> stampList;
     //create frame
@@ -315,15 +325,15 @@ void StampStripDialog::accept()
     if (m_ui->innerFrameGroupBox->isChecked()) {
         qreal innderMargin = m_ui->InnerFrameMarginDoubleSpinBox->value() * 1000;
         innerBorder = m_ui->InnerFrameBorderDoubleSpinBox->value() * 1000;
-        qreal innerW = frameW - innderMargin*2 - frameBorder*2;
-        qreal innerH = frameH - innderMargin*2 - frameBorder*2;
-        innerRect = QRect (point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
+        qreal innerW = frameW - innderMargin * 2 - frameBorder * 2;
+        qreal innerH = frameH - innderMargin * 2 - frameBorder * 2;
+        innerRect = QRect(point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
         innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
         innerFrame->setNeedAuxiliaryLine(false);
         innerFrame->setInner(true);
         stampList.append(innerFrame);
     }
-    
+
     //create text
     int layoutIndex = m_ui->frameStampLayoutComboBox->currentIndex();
     bool bold = m_ui->boldBtn->isChecked();
@@ -344,9 +354,9 @@ void StampStripDialog::accept()
             innerRect.height() - 2 * (innerBorder + textHMargin));
     }
     else {
-        textRect = QRect(rect.left() + frameBorder + textHMargin, 
-            rect.top() + frameBorder + textVMargin, 
-            rect.width() - 2*(frameBorder + textHMargin), 
+        textRect = QRect(rect.left() + frameBorder + textHMargin,
+            rect.top() + frameBorder + textVMargin,
+            rect.width() - 2 * (frameBorder + textHMargin),
             rect.height() - 2 * (frameBorder + textHMargin));
     }
     qreal textH = (textRect.height() - textVSpace * (rowCount - 1)) / rowCount;
@@ -358,17 +368,17 @@ void StampStripDialog::accept()
         QString family = item2->text();
         QSize textSize;
         if (layoutIndex == 0) {
-            textSize = QSize((textRect.width() - (contentSize - 1) * textHSpace) / contentSize,textH);
+            textSize = QSize((textRect.width() - (contentSize - 1) * textHSpace) / contentSize, textH);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
                 bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layerIndex);
-            
+
             rectifyTextSize(textRect.width(), textRect.height(), text);
             stampList.append(text);
         }
         else if (layoutIndex == 1) {
             textSize = QSize((textRect.width() - textHSpace * (contentSize - 1)) / contentSize, textH);
-            center = QPointF(center.x(), (textH+textVSpace) * r + textH*0.5 + textRect.top());
-            
+            center = QPointF(center.x(), (textH + textVSpace) * r + textH * 0.5 + textRect.top());
+
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
                 bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layerIndex);
             rectifyTextSize(textRect.width(), textH, text);
@@ -377,17 +387,15 @@ void StampStripDialog::accept()
         else if (layoutIndex == 2) {
             qreal textW = (textRect.width() - textHSpace * r) / rowCount;
             textH = (textRect.height() - textVSpace * (contentSize - 1)) / contentSize;
-            textSize = QSize(textW,textH);
-            center = QPointF(textRect.left() + textSize.width()*0.5 + textSize.width() *r, center.y());
+            textSize = QSize(textW, textH);
+            center = QPointF(textRect.left() + textSize.width() * 0.5 + textSize.width() * r, center.y());
 
             LaserVerticalText* text = new LaserVerticalText(m_scene->document(), content, textSize, center,
                 bold, itatic, false, stampIntaglio, family, textVSpace, QTransform(), m_layerIndex);
             rectifyTextSize(textW, textRect.height(), text);
             stampList.append(text);
         }
-        
-    }
 
-    m_viewer->addPrimitiveAndExamRegionByBounds(stampList);
-    m_viewer->zoomToSelection();
+    }
+    return stampList;
 }

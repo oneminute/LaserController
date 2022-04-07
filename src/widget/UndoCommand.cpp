@@ -1025,7 +1025,7 @@ void JoinedGroupCommand::handleGroup()
             //clear original set
             joinedSet->clear();
             m_scene->joinedGroupList().removeOne(joinedSet);
-            delete joinedSet;
+            //delete joinedSet;
         }
         primitive->setJoinedGroup(groupJoinedSet);
     }
@@ -1063,7 +1063,8 @@ void JoinedGroupCommand::undoGroup()
     LaserPrimitive* p = qgraphicsitem_cast<LaserPrimitive*>(m_viewer->group()->childItems()[0]);
     if (p->isJoinedGroup()) {
         m_scene->joinedGroupList().removeOne(p->joinedGroupList());
-        delete p->joinedGroupList();
+        p->setJoinedGroup(nullptr);
+        //delete p->joinedGroupList();
     }
     restoreJoinedGroup();  
 
@@ -1881,6 +1882,7 @@ void WeldShapesUndoCommand::createNewPath()
                 m_originalJoinedGroupList.append(*(sP->joinedGroupList()));
                 //delete
                 deleteJoinedGroup(sP->joinedGroupList());
+                sP->setJoinedGroup(nullptr);
 
             }
             sP->setLayer(m_minLayer);
@@ -1897,6 +1899,7 @@ void WeldShapesUndoCommand::createNewPath()
                     m_originalJoinedGroupList.append(*(dP->joinedGroupList()));
                     //delete original joined group
                     deleteJoinedGroup(dP->joinedGroupList());
+                    dP->setJoinedGroup(nullptr);
                 }
                 m_scene->document()->removePrimitive(dP, false, false);
             }
@@ -1933,6 +1936,7 @@ void WeldShapesUndoCommand::handleRedo()
         pMap.key()->setLayer(m_minLayer);
         if (pMap.key()->isJoinedGroup()) {
             deleteJoinedGroup(pMap.key()->joinedGroupList());
+            pMap.key()->setJoinedGroup(nullptr);
         }
     }
     //restore original primitives
@@ -1966,11 +1970,10 @@ void WeldShapesUndoCommand::deleteJoinedGroup(QSet<LaserPrimitive*>* joinedGroup
     //delete
     for (QSet<LaserPrimitive*>::iterator i = joinedGroup->begin();
         i != joinedGroup->end(); i++) {        
-        (*i)->setJoinedGroup(nullptr);       
+        (*i)->setJoinedGroup(nullptr);   
     }
     m_scene->joinedGroupList().removeOne(joinedGroup);
-    delete joinedGroup;
-    
+    //delete joinedGroup;
 }
 
 void WeldShapesUndoCommand::undo()
@@ -1986,6 +1989,7 @@ void WeldShapesUndoCommand::undo()
     }
     //delete current joined group
     deleteJoinedGroup(m_weldJoinedGroup);
+    m_weldJoinedGroup = nullptr;
     //restore original joined group
     for (QSet<LaserPrimitive*>pSet : m_originalJoinedGroupList) {
         if (pSet.isEmpty()) {

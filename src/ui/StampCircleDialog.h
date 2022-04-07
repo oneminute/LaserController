@@ -3,19 +3,21 @@
 #include <QDialog>
 #include<QStandardItem>
 #include <QScopedPointer>
+#include "ui/StampDialog.h"
 #include "scene/LaserScene.h"
 #include "widget/LaserViewer.h"
 namespace Ui
 {
     class StampCircleDialog;
 }
-class StampCircleDialog : public QDialog {
+class StampCircleDialog : public StampDialog {
     Q_OBJECT
 public:
     StampCircleDialog(LaserScene* scene, bool isEllipse = false,  QWidget* parent = nullptr);
     virtual ~StampCircleDialog();
     void addTableViewRow(int row, QString contentStr, QString fontStr, 
         QString propertyStr,Qt::CheckState checkState, qreal textSpacing, qreal textHeight);
+    QList<LaserPrimitive*> createStampPrimitive();
 private:
     typedef struct itemStruct {
     private:
@@ -30,8 +32,6 @@ private:
         Qt::CheckState getCheckState() { return checkState; }
     } _itemStruct;
     QScopedPointer<Ui::StampCircleDialog> m_ui;
-    LaserScene* m_scene;
-    LaserViewer* m_viewer;
     QStandardItemModel* m_viewItemModel;
     int m_preLayoutIndex;
     QString m_checkedItemStyle;
@@ -49,6 +49,5 @@ private:
     int m_layerIndex;
 protected slots:
     virtual void accept();
-
 };
 #endif // STAMPDIALOG_H

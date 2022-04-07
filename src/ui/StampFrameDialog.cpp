@@ -4,13 +4,15 @@
 #include<QListView>
 #include<QStyledItemDelegate>
 #include<QComboBox>
+#include<QPushButton>
 #include"scene/LaserPrimitive.h"
 #include "scene/LaserDocument.h"
 #include"scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
+#include "ui/StampDialog.h"
 
 StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent) 
-   : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
+   : StampDialog(scene, parent),
     m_ui(new Ui::StampFrameDialog), m_scene(scene)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
@@ -18,6 +20,7 @@ StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent)
     LaserLayer* layer = m_scene->document()->idleLayer();
     layer->setType(LLT_STAMP);
     m_layerIndex = layer->index();
+    m_preview = m_ui->graphicsView;
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/frameFour.png");
     QPixmap threePm(":/ui/icons/images/frameThreeL.png");
@@ -170,15 +173,20 @@ StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent)
     //text space
     m_ui->hSpaceSpinBox->setMaximum(DBL_MAX);
     m_ui->vSpaceSpinBox->setMaximum(DBL_MAX);
+    QPushButton* previewBtn = m_ui->buttonBox->button(QDialogButtonBox::Apply);
+    previewBtn->setText(tr("Preview"));
+    QPushButton* okBtn = m_ui->buttonBox->button(QDialogButtonBox::Ok);
+    okBtn->setText(tr("Ok"));
+    QPushButton* cancleBtn = m_ui->buttonBox->button(QDialogButtonBox::Cancel);
+    cancleBtn->setText(tr("Cancel"));
+    connect(okBtn, &QPushButton::clicked, this, &StampFrameDialog::okBtnAccept);
+    connect(previewBtn, &QPushButton::clicked, this, &StampFrameDialog::previewBtnAccept);
 }
 StampFrameDialog::~StampFrameDialog()
 {
 }
 
-void StampFrameDialog::accept()
-{
-    
-    QDialog::accept();
+QList<LaserPrimitive*> StampFrameDialog::createStampPrimitive() {
     bool stampIntaglio = m_ui->stampIntaglioCheckBox->isChecked();
     QList<LaserPrimitive*> stampList;
     //create frame
@@ -202,15 +210,15 @@ void StampFrameDialog::accept()
     if (m_ui->innerFrameGroupBox->isChecked()) {
         qreal innderMargin = m_ui->InnerFrameMarginDoubleSpinBox->value() * 1000;
         innerBorder = m_ui->InnerFrameBorderDoubleSpinBox->value() * 1000;
-        qreal innerW = frameW - innderMargin*2 - frameBorder*2;
-        qreal innerH = frameH - innderMargin*2 - frameBorder*2;
-        innerRect = QRect (point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
+        qreal innerW = frameW - innderMargin * 2 - frameBorder * 2;
+        qreal innerH = frameH - innderMargin * 2 - frameBorder * 2;
+        innerRect = QRect(point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
         innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
         innerFrame->setNeedAuxiliaryLine(needAuxiliary);
         innerFrame->setInner(true);
         stampList.append(innerFrame);
     }
-    
+
     //create text
     //int layoutIndex = m_ui->frameStampLayoutComboBox->currentIndex();
     QSize signalSize;
@@ -229,7 +237,7 @@ void StampFrameDialog::accept()
         textBoundsRight = innerRect.right() - hOffset;
         qreal width = (innerRect.width() - 2 * hOffset - textHSpace) * 0.5;
         qreal height = innerRect.height() - 2 * vOffset;
-        signalSize = QSize(width,(height - textVSpace) * 0.5);
+        signalSize = QSize(width, (height - textVSpace) * 0.5);
         doubleVerticalSize = QSize(width, height);
     }
     else {
@@ -247,11 +255,11 @@ void StampFrameDialog::accept()
     QString content = m_ui->lineEdit->text().trimmed();
     bool bold = m_ui->boldBtn->isChecked();
     bool itatic = m_ui->itaticBtn->isChecked();
-    
+
     bool isRightToLeft = m_ui->isToLeftBtn->isChecked();
     QString family = m_ui->fontComboBox->currentText();
     bool containsDoubleText = false;
-    
+
     int textLength = content.size();
     int layoutType = m_ui->frameStampLayoutComboBox->currentIndex();
     QSize textSize;
@@ -262,7 +270,7 @@ void StampFrameDialog::accept()
             textSize = signalSize;
             switch (i) {
             case 0: {
-                
+
                 if (isRightToLeft) {
                     center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
                 }
@@ -290,7 +298,7 @@ void StampFrameDialog::accept()
                 break;
             }
             case 3: {
-                
+
                 if (isRightToLeft) {
                     center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
                 }
@@ -304,7 +312,7 @@ void StampFrameDialog::accept()
         else if (layoutType == 1) {
             switch (i) {
             case 0: {
-                
+
                 if (isRightToLeft) {
                     textSize = signalSize;
                     center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
@@ -316,7 +324,7 @@ void StampFrameDialog::accept()
                 break;
             }
             case 1: {
-                
+
                 if (isRightToLeft) {
                     textSize = signalSize;
                     center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
@@ -338,7 +346,7 @@ void StampFrameDialog::accept()
                     center = QPointF(textBoundsRight - textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
                     break;
                 }
-                
+
             }
             }
         }
@@ -364,11 +372,11 @@ void StampFrameDialog::accept()
                     textSize = signalSize;
                     center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
                 }
-                
+
                 break;
             }
             case 2: {
-                
+
                 if (isRightToLeft) {
                     textSize = signalSize;
                     center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsBottom - textSize.height() * 0.5);
@@ -395,7 +403,7 @@ void StampFrameDialog::accept()
             }
             case 1: {
                 textSize = doubleVerticalSize;
-                
+
                 if (isRightToLeft) {
                     center = QPointF(textBoundsLeft + textSize.width() * 0.5, textBoundsTop + textSize.height() * 0.5);
                 }
@@ -410,6 +418,5 @@ void StampFrameDialog::accept()
             bold, itatic, false, stampIntaglio, family, 0.0, QTransform(), m_layerIndex);
         stampList.append(text);
     }
-    m_viewer->addPrimitiveAndExamRegionByBounds(stampList, frame);
-    m_viewer->zoomToSelection();
+    return stampList;
 }
