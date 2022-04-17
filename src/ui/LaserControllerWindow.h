@@ -115,6 +115,11 @@ public:
     LaserDoubleSpinBox* originalBoundsWidth();
     LaserDoubleSpinBox* commonCornerRadius();
     LaserDoubleSpinBox* originalBoundsSize();
+    void createAntifakeLineByBounds(LaserPrimitive* p);
+    QPainterPath createCurveLine(QRectF bounds, qreal a, QLineF line);
+    QPainterPath transformAntifakeLineByBounds(LaserPrimitive* p, QPainterPath basePath, qreal intervalRate, qreal start, qreal end);
+    void createAntifakeLineByArc(LaserPrimitive* p, qreal lineWidthRate);
+    QPainterPath createBasePathByArc(LaserPrimitive* p, qreal borderWidth, QLineF& baseLine);
 public slots:
     void handleSecurityException(int code, const QString& message);
     void onFontComboBoxHighLighted(int index);
@@ -561,6 +566,8 @@ private:
     QLabel* m_originalBoundsSizeLabel;
     LaserDoubleSpinBox* m_originalBoundsWidth;
     QLabel* m_originalBoundsWidthLabel;
+    QLabel* m_textWeightLabel;
+    LaserDoubleSpinBox* m_textWeight;
     LaserDoubleSpinBox* m_originalBoundsHeight;
     QLabel* m_originalBoundsHeightLabel;
     LaserDoubleSpinBox* m_maxWidth;
@@ -643,6 +650,18 @@ private:
     QWidget* m_ringWidget;
     QWidget* m_starWidget;
     QWidget* m_partyEmbleWidget;
+    //anti-fake
+    QLabel* m_aFLinesLabel;
+    LaserDoubleSpinBox* m_aFLines;
+    QLabel* m_aFWidthLabel;
+    LaserDoubleSpinBox* m_aFWidth;
+    QLabel* m_aFTypeLabel;
+    QComboBox* m_aFType;
+    QCheckBox* m_aFAverageCheckbox;
+    QCheckBox* m_aFRandomMoveCheckbox;
+    QCheckBox* m_aFSurpassOuterCheckbox;
+    QCheckBox* m_aFSurpassInnerCheckbox;
+    QPushButton* m_aFAntifakeBtn;
     
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;
@@ -686,6 +705,7 @@ private:
     bool m_useLoadedJson;
     bool m_prepareMachining;
     bool m_prepareDownloading;
+    int m_seed;
 
     // widgets on status bar
     QLabel* m_statusBarDeviceStatus;

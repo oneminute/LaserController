@@ -80,6 +80,7 @@ public:
     bool isAlignTarget;
     QSet<LaserPrimitive*>* joinedGroupList;
     bool stampIntaglio;//和印章相关的属性 阴刻，凹下
+    QPainterPath antiFakePath;
     //QRect variableBounds;//circleText，horizontalText，verticalText中使用，方便改变外包框
 };
 
@@ -156,7 +157,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         if (!visible())
             return;
     }
-    
+
 
     painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
@@ -165,7 +166,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     QPointF topLeft = bounds.topLeft() - QPointF(2, 2);
     QPointF bottomRight = QPoint(bounds.left() + bounds.width(), bounds.top() + bounds.height()) + QPointF(2, 2);
     QRectF selectionBounds = QRectF(topLeft, bottomRight);
-	QColor color = Qt::blue;
+    QColor color = Qt::blue;
     QPen pen(color, 1, Qt::DashLine);
 
     QPainterPath outline = this->outline();
@@ -198,16 +199,16 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         color = Qt::red;
     }
 
-	if (isSelected())
-	{
-		//isSelected();
-		QString name = this->metaObject()->className();
-        qreal penSize = 1.0;
+    if (isSelected())
+    {
+        //isSelected();
+        QString name = this->metaObject()->className();
+        qreal penSize = 1;
         if (d->isAlignTarget) {
             penSize = 3.0;
         }
-		QPen pen = QPen(color, penSize, Qt::DashLine);
-		pen.setCosmetic(true);		
+        QPen pen = QPen(color, penSize, Qt::DashLine);
+        pen.setCosmetic(true);
         if (isJoinedGroup()) {
             pen.setStyle(Qt::DashDotDotLine);
         }
@@ -215,12 +216,12 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         if (name == "LaserBitmap") {
             painter->drawRect(selectionBounds);
         }
-	}
+    }
     else
     {
-		QPen pen = QPen(color, 1.2f, Qt::SolidLine);
-		pen.setCosmetic(true);
-		painter->setPen(pen);
+        QPen pen = QPen(color, 1.2f, Qt::SolidLine);
+        pen.setCosmetic(true);
+        painter->setPen(pen);
     }
 
     if (layer() && layer()->type() == LLT_FILLING)
@@ -247,7 +248,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         //painter->setTransform(t);
     }
 
-    draw(painter); 
+    draw(painter);
     painter->restore();
 }
 
@@ -259,8 +260,8 @@ int LaserPrimitive::layerIndex()
 
 QPainterPath LaserPrimitive::getPath()
 {
-	Q_D(const LaserPrimitive);
-	return d->path;
+    Q_D(const LaserPrimitive);
+    return d->path;
 }
 
 QPainterPath LaserPrimitive::getPathForStamp()
@@ -860,6 +861,13 @@ bool LaserPrimitive::isAvailable() const
     return true;
 }
 
+void LaserPrimitive::setAntiFakePath(QPainterPath path)
+{
+    Q_D(LaserPrimitive);
+    d->antiFakePath = path;
+    d->path = d->path - d->antiFakePath;
+}
+
 bool LaserPrimitive::stampIntaglio()
 {
     Q_D(LaserPrimitive);
@@ -875,6 +883,10 @@ void LaserPrimitive::setStampIntaglio(bool bl)
 bool LaserPrimitive::isStamepPrimitive()
 {
     return false;
+}
+
+void LaserPrimitive::createAntifakeLine(bool isCurve)
+{
 }
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
@@ -3292,8 +3304,11 @@ void LaserStar::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
     QList<QGraphicsView*> views = scene()->views();
-    LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
-    viewer->onEndSelecting();
+    QGraphicsView* v = views[0];
+    if (v->metaObject()->className() == "LaserViewer") {
+        LaserViewer* viewer = qobject_cast<LaserViewer*> (v);
+        viewer->onEndSelecting();
+    }   
 }
 
 bool LaserStar::isClosed() const
@@ -3617,7 +3632,7 @@ void LaserRing::draw(QPainter * painter)
         else {
             //painter->setBrush(QBrush(this->layer()->color()));
             painter->setBrush(QBrush(color));
-            painter->drawPath(d->outerPath);
+            painter->drawPath(d->outerPath - d->antiFakePath);
         }
     }
     else {
@@ -3693,8 +3708,12 @@ void LaserRing::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
     QList<QGraphicsView*> views = scene()->views();
-    LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
-    viewer->onEndSelecting();
+    QGraphicsView* v = views[0];
+    if (v->metaObject()->className() == "LaserViewer") {
+        LaserViewer* viewer = qobject_cast<LaserViewer*> (v);
+        viewer->onEndSelecting();
+    }
+    
 }
 bool LaserRing::isClosed() const
 {
@@ -3861,7 +3880,7 @@ void LaserFrame::draw(QPainter * painter)
         }
         else {
             painter->setBrush(QBrush(color));
-            painter->drawPath(d->outerPath);
+            painter->drawPath(d->outerPath- d->antiFakePath);
         }
     }
     else {
@@ -3893,12 +3912,9 @@ void LaserFrame::draw(QPainter * painter)
         painter->drawLine(hLine);
         painter->drawLine(vLine);
     }
-    
-    /*QPainterPath p;
-    p.addRect(d->innerRect);
-    painter->drawPath(p);*/
-
-    
+    //painter->setBrush(QBrush(Qt::red));
+    //painter->setPen(QPen(Qt::red));
+    //painter->drawPath(d->antiFakePath);
 }
 QJsonObject LaserFrame::toJson()
 {
@@ -3974,8 +3990,12 @@ void LaserFrame::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
     QList<QGraphicsView*> views = scene()->views();
-    LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
-    viewer->onEndSelecting();
+    QGraphicsView* v = views[0];
+    if (v->metaObject()->className() == "LaserViewer") {
+        LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
+        viewer->onEndSelecting();
+    }
+    
 }
 bool LaserFrame::isClosed() const
 {
@@ -4102,12 +4122,13 @@ public:
     bool bold;
     bool italic;
     bool uppercase;
+    qreal weight;
     QString family;
     qreal fontPiexlSize;
     QPainterPath stampPath;
 };
 LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
-    QSize size, qreal space, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family)
+    QSize size, qreal space, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family, qreal weight)
     :LaserShape(ptr, doc, type, layerIndex, transform)
 {
     Q_D(LaserStampText);
@@ -4116,6 +4137,7 @@ LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,La
     d->space = space;
     d->bold = bold;
     d->italic = italic;
+    d->weight = weight;
     d->uppercase = uppercase;
     d->family = family;
     d->fontPiexlSize = size.height();
@@ -4128,21 +4150,33 @@ LaserStampText::~LaserStampText() {}
 void LaserStampText::draw(QPainter* painter)
 {
     Q_D(LaserStampText);
+    QColor color;
     if (!d->stampIntaglio) {
         //painter->setBrush(QBrush(this->layer()->color()));
         if (layer()) {
-            painter->setBrush(QBrush(this->layer()->color()));
+            color = layer()->color();
+            
         }
         else {
-            painter->setBrush(QBrush(Qt::red));
+            color = Qt::red;
         }
     }
     else {
-        painter->setBrush(QBrush(Qt::white));
-        
+        color = Qt::white;
     }
+    
+    painter->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
+    QPen pen(color, 1, Qt::SolidLine);
+    //pen.setCosmetic(true);
+    pen.setJoinStyle(Qt::RoundJoin);
+    pen.setCapStyle(Qt::RoundCap);
+    painter->setPen(pen);
+    painter->setBrush(QBrush(color));
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
+    //painter->setPen(QPen(Qt::red, 100));
+    //painter->setBrush(QBrush(Qt::red));
+    //painter->drawPath(d->antiFakePath);
 }
 
 void LaserStampText::setContent(QString content)
@@ -4169,6 +4203,19 @@ bool LaserStampText::bold()
 {
     Q_D(LaserStampText);
     return d->bold;
+}
+
+void LaserStampText::setWeight(qreal w)
+{
+    Q_D(LaserStampText);
+    d->weight = w;
+    recompute();
+}
+
+qreal LaserStampText::weight()
+{
+    Q_D(LaserStampText);
+    return d->weight;
 }
 
 void LaserStampText::setItalic(bool italic)
@@ -4257,8 +4304,8 @@ public:
 
 LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
     bool bold, bool italic,bool uppercase, bool stampIntaglio, QString family, qreal sapce,
-    bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex)
-    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, sapce, bold, italic, uppercase, stampIntaglio, family)
+    bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex, qreal weight)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, sapce, bold, italic, uppercase, stampIntaglio, family, weight)
 {
     Q_D(LaserCircleText);
     //d->content = content;
@@ -4299,8 +4346,11 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
     font.setLetterSpacing(QFont::SpacingType::PercentageSpacing, 0);
     font.setPixelSize(d->size.height());
     font.setBold(d->bold);
+    //font.setWeight(81);
     font.setItalic(d->italic);
     font.setFamily(d->family);
+    //font.setPointSizeF(d->weight);
+    //font.setWeight(d->weight);
     if (d->uppercase) {
         font.setCapitalization(QFont::AllUppercase);
     }
@@ -4934,9 +4984,9 @@ public:
 
 LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QSize size,
     QPointF center, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family,
-    qreal space, QTransform transform, int layerIndex)
+    qreal space, QTransform transform, int layerIndex, qreal weight)
     :LaserStampText(new LaserHorizontalTextPrivate(this), doc, LPT_HORIZONTALTEXT,
-        content, transform, layerIndex, size, space, bold, italic, uppercase, stampIntaglio, family)
+        content, transform, layerIndex, size, space, bold, italic, uppercase, stampIntaglio, family, weight)
 {
     Q_D(LaserHorizontalText);
     d->stampIntaglio = stampIntaglio;
@@ -4971,6 +5021,8 @@ void LaserHorizontalText::computeTextPathProcess()
     font.setBold(d->bold);
     font.setItalic(d->italic);
     font.setFamily(d->family);
+    //font.setPointSizeF(d->weight);
+    //font.setWeight(d->weight);
     QFontMetrics fm(font);
     
     if (d->uppercase) {
@@ -5164,9 +5216,9 @@ public:
 };
 LaserVerticalText::LaserVerticalText(LaserDocument* doc, QString content, QSize size, 
     QPointF center, bool bold, bool italic,bool uppercase, bool stampIntaglio, QString family,
-    qreal space, QTransform transform, int layerIndex)
+    qreal space, QTransform transform, int layerIndex, qreal weight)
     :LaserStampText(new LaserVerticalTextPrivate(this), doc, LPT_VERTICALTEXT,content, transform, layerIndex,
-        size,space, bold, italic, uppercase, stampIntaglio, family)
+        size,space, bold, italic, uppercase, stampIntaglio, family, weight)
 {
     Q_D(LaserVerticalText);
     d->center = center;
@@ -5190,6 +5242,8 @@ void LaserVerticalText::computeTextPathProcess()
     font.setBold(d->bold);
     font.setItalic(d->italic);
     font.setFamily(d->family);
+    //font.setPointSizeF(d->weight);
+    //font.setWeight(d->weight);
     QFontMetrics fm(font);
     if (d->uppercase) {
         font.setCapitalization(QFont::AllUppercase);

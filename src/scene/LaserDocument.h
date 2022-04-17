@@ -30,7 +30,7 @@ public:
     struct StampItem
     {
         LaserLayer* layer;
-        QImage image;
+        QString imagePath;
         QRect bounding;
         QPainterPath path;
     };
