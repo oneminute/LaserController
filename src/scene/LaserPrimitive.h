@@ -38,7 +38,7 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 	int layerIndex();
-	QPainterPath getPath();
+    QPainterPath getPath();
     virtual QPainterPath getPathForStamp();
 	QPainterPath getScenePath();
     
@@ -124,9 +124,13 @@ public:
     QPainterPath computeCornerRadius(QRect rect, int cornerRadius, int type);
     virtual bool isAvailable() const;
     //stamp
+    void setAntiFakePath(QPainterPath path);
     bool stampIntaglio();
     void setStampIntaglio(bool bl);
     virtual bool isStamepPrimitive();
+    virtual void createAntifakeLine(bool isCurve = false);
+
+
 
     virtual int smallCircleIndex() const;
 
@@ -565,6 +569,7 @@ public:
     QRectF innerRect();
     QPainterPath outerPath();
     QPainterPath innerPath();
+    
     void setInner(bool bl);
     bool isInner();
     void setBorderWidth(qreal w);
@@ -628,7 +633,7 @@ class LaserStampText : public LaserShape {
 public:
     LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, 
         QString content, QTransform transform = QTransform(), int layerIndex = 0, QSize size = QSize(), qreal space = 0, 
-        bool bold = false, bool italic = false, bool uppercase = false, bool stampIntaglio = false, QString family = "Times New Roman");
+        bool bold = false, bool italic = false, bool uppercase = false, bool stampIntaglio = false, QString family = "Times New Roman", qreal weight = 0);
     virtual~LaserStampText();
     virtual void recompute() = 0;
     virtual void draw(QPainter* painter);
@@ -636,6 +641,8 @@ public:
     QString getContent();
     void setBold(bool bold);
     bool bold();
+    void setWeight(qreal w);
+    qreal weight();
     void setItalic(bool italic);
     bool italic();
     
@@ -659,7 +666,7 @@ class LaserCircleText : public LaserStampText {
 public:
     LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
         bool bold = false, bool italic = false, bool uppercase = false, bool stampIntaglio = false, QString family = "Times New Roman",qreal space = 0,
-        bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0);
+        bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0, qreal weight = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
     //QPointF computeEllipsePoint(qreal rRadian);
@@ -712,7 +719,7 @@ class LaserHorizontalText : public LaserStampText {
 public:
     LaserHorizontalText(LaserDocument* doc, QString content,QSize size,
         QPointF center, bool bold = false, bool italic = false, bool uppercase = false,bool stampIntaglio = false, QString family = "Times New Roman",
-        qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0);
+        qreal space = 0,  QTransform transform = QTransform(), int layerIndex = 0, qreal weight = 0);
     virtual ~LaserHorizontalText();
     //void initTextPath();
     void computeTextPathProcess();
@@ -742,7 +749,7 @@ class LaserVerticalText : public LaserStampText {
 public:
     LaserVerticalText(LaserDocument* doc, QString content, QSize size,
         QPointF center,bool bold = false, bool italic = false, bool uppercase = false,bool stampIntaglio = false, QString family = "Times New Roman",
-        qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0);
+        qreal space = 0, QTransform transform = QTransform(), int layerIndex = 0, qreal weight = 0);
     virtual ~LaserVerticalText();
     void computeTextPathProcess();
     void computeTextPath();
@@ -767,4 +774,4 @@ private:
 
 QDebug operator<<(QDebug debug, const QRect& rect);
 
-#endif // LASERPRIMITIVE_H
+#endif // LASERPRIMITIVE
