@@ -803,7 +803,7 @@ Please check your email address or network connection.</source>
         <translation>保存配置选项时发生错误。</translation>
     </message>
     <message>
-        <location line="+3000"/>
+        <location line="+3059"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -813,7 +813,7 @@ Please check your email address or network connection.</source>
         <translation>界面和业务功能中使用的语言。</translation>
     </message>
     <message>
-        <location line="-2882"/>
+        <location line="-2941"/>
         <source>English</source>
         <translation>英文</translation>
     </message>
@@ -823,7 +823,7 @@ Please check your email address or network connection.</source>
         <translation>中文</translation>
     </message>
     <message>
-        <location line="+2884"/>
+        <location line="+2943"/>
         <source>Unit</source>
         <translation>单位</translation>
     </message>
@@ -832,7 +832,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">全局单位</translation>
     </message>
     <message>
-        <location line="-2866"/>
+        <location line="-2925"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
@@ -841,7 +841,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">加工单位</translation>
     </message>
     <message>
-        <location line="+2878"/>
+        <location line="+2937"/>
         <location line="+1"/>
         <source>Max Layers Count</source>
         <translation>最大图层数</translation>
@@ -1086,16 +1086,15 @@ Please check your email address or network connection.</source>
         <translation type="vanished">每一个图元的最大起刀点数。</translation>
     </message>
     <message>
-        <location line="+24"/>
         <source>Max Angles Diff</source>
-        <translation>最大角度差</translation>
+        <translation type="vanished">最大角度差</translation>
     </message>
     <message>
         <source>Max angles between starting points.</source>
         <translation type="vanished">两个相邻起刀点间的最大角度差。</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+4"/>
         <source>Grouping Orientation</source>
         <translation>分组方向</translation>
     </message>
@@ -1134,10 +1133,8 @@ Please check your email address or network connection.</source>
         <translation type="vanished">相邻两个点间的最大角度差。</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location line="+4"/>
         <source>Max Interval Distance</source>
-        <translation>最大间隔距离</translation>
+        <translation type="vanished">最大间隔距离</translation>
     </message>
     <message>
         <source>Max interval distance between tow points.</source>
@@ -1184,7 +1181,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">当前位置</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+64"/>
         <source>User Origin</source>
         <translation>用户原点</translation>
     </message>
@@ -1197,7 +1194,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">加工时用到的坐标</translation>
     </message>
     <message>
-        <location line="-244"/>
+        <location line="-240"/>
         <source>Operation Button Icon Size(px)</source>
         <translation>操作按钮图标尺寸(px)</translation>
     </message>
@@ -1471,15 +1468,12 @@ Please check your email address or network connection.</source>
         <translation>在使用Kdtree进行搜索时XY坐标相对于其它元素的权重值</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>The max angles diff bwteen tow anchor points</source>
-        <translation>两个锚点间的最大角度差</translation>
+        <translation type="vanished">两个锚点间的最大角度差</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+4"/>
         <source>The max interval distance between tow anchor points</source>
-        <translation>两个锚点间的最大间距</translation>
+        <translation type="vanished">两个锚点间的最大间距</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1522,7 +1516,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">在生成挂网图像时应用高斯函数</translation>
     </message>
     <message>
-        <location line="-93"/>
+        <location line="-81"/>
         <source>Halftone Angles</source>
         <translation>半调网屏角度</translation>
     </message>
@@ -1554,7 +1548,7 @@ Please check your email address or network connection.</source>
         <translation>切割外轮廓</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+67"/>
         <source>Auto Connect First COM</source>
         <translation>自动连接首个COM端口</translation>
     </message>
@@ -1617,11 +1611,13 @@ Please check your email address or network connection.</source>
     </message>
     <message>
         <location line="+3"/>
+        <location line="+524"/>
+        <location line="+1"/>
         <source>Z Enabled</source>
         <translation>Z轴使能</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-524"/>
         <source>Enabled z axis movement</source>
         <translation>是否启用Z轴运动</translation>
     </message>
@@ -2284,7 +2280,7 @@ Please check your email address or network connection.</source>
         <translation>启用优化交互</translation>
     </message>
     <message>
-        <location line="-669"/>
+        <location line="-665"/>
         <source>Visual Grid Spacing(mm)</source>
         <translation>可视网格间距(mm)</translation>
     </message>
@@ -2293,13 +2289,13 @@ Please check your email address or network connection.</source>
         <translation type="obsolete">分割条手柄宽度</translation>
     </message>
     <message>
-        <location line="+241"/>
+        <location line="+237"/>
         <location line="+4"/>
         <source>Acceleration mode</source>
         <translation>加速模式</translation>
     </message>
     <message>
-        <location line="-1911"/>
+        <location line="-1962"/>
         <source>T</source>
         <translation>T</translation>
     </message>
@@ -2341,7 +2337,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">最大激光功率(%)</translation>
     </message>
     <message>
-        <location line="+1862"/>
+        <location line="+1913"/>
         <source>Selected user origin</source>
         <translation>所选用户原点</translation>
     </message>
@@ -2440,7 +2436,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">1</translation>
     </message>
     <message>
-        <location line="-461"/>
+        <location line="-457"/>
         <source>Splitter Handle Width(px)</source>
         <translation>分割条手柄宽度(px)</translation>
     </message>
@@ -2460,7 +2456,7 @@ Please check your email address or network connection.</source>
         <translation>切割图层的最大功率百分比</translation>
     </message>
     <message>
-        <location line="+216"/>
+        <location line="+212"/>
         <source>Move acceleration for cutting movement</source>
         <translation>切割空移加速度</translation>
     </message>
@@ -2656,7 +2652,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">2</translation>
     </message>
     <message>
-        <location line="-2845"/>
+        <location line="-2900"/>
         <source>Line</source>
         <translation>直线填充</translation>
     </message>
@@ -2670,7 +2666,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">3</translation>
     </message>
     <message>
-        <location line="+2236"/>
+        <location line="+2295"/>
         <source>Unit for user interface.</source>
         <translation>界面显示单位。</translation>
     </message>
@@ -2744,12 +2740,12 @@ Please check your email address or network connection.</source>
     </message>
     <message>
         <location line="+36"/>
-        <location line="+292"/>
+        <location line="+288"/>
         <source>Filling Speed(mm/s)</source>
         <translation>填充线速度(mm/s)</translation>
     </message>
     <message>
-        <location line="-288"/>
+        <location line="-284"/>
         <source>Filling Min Power(%)</source>
         <translation>填充线最小功率(%)</translation>
     </message>
@@ -2773,13 +2769,13 @@ Please check your email address or network connection.</source>
         <translation type="vanished">高斯函数的系数</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+39"/>
         <location line="+1"/>
         <source>Curve Flattening Threshold</source>
         <translation>曲线平滑阈值</translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+135"/>
         <source>Scan X Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation>扫描X轴加速度(mm/s&lt;sup&gt;2&lt;/sup&gt;)</translation>
     </message>
@@ -2886,7 +2882,7 @@ Please check your email address or network connection.</source>
         <translation type="vanished">Z轴急停加速度(mm/s&lt;sub&gt;2&lt;/sub&gt;)</translation>
     </message>
     <message>
-        <location line="+228"/>
+        <location line="+248"/>
         <location line="+1"/>
         <source>User</source>
         <translation>用户</translation>
@@ -2898,12 +2894,12 @@ Please check your email address or network connection.</source>
         <translation>系统</translation>
     </message>
     <message>
-        <location line="-216"/>
+        <location line="-236"/>
         <source>Y motor current</source>
         <translation>Y轴电机驱动电流</translation>
     </message>
     <message>
-        <location line="-1536"/>
+        <location line="-1587"/>
         <location line="+20"/>
         <location line="+174"/>
         <location line="+20"/>
@@ -2958,7 +2954,7 @@ Please check your email address or network connection.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+283"/>
+        <location line="+338"/>
         <source>Valid Max Region(mm)</source>
         <translation>最大有效区域(mm)</translation>
     </message>
@@ -2968,7 +2964,7 @@ Please check your email address or network connection.</source>
         <translation>最大有效区域以mm为单位</translation>
     </message>
     <message>
-        <location line="+155"/>
+        <location line="+151"/>
         <source>Gaussian Factor A</source>
         <translation>高斯函数参数A</translation>
     </message>
@@ -3007,7 +3003,7 @@ Please check your email address or network connection.</source>
         <translation>校正块厚度(mm)</translation>
     </message>
     <message>
-        <location line="-1118"/>
+        <location line="-1169"/>
         <location line="+194"/>
         <location line="+196"/>
         <location line="+222"/>
@@ -3015,7 +3011,27 @@ Please check your email address or network connection.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+96"/>
+        <source>Up</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Down</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>LCD</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Digital Tube</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+75"/>
         <source>Enable Log Cleaner</source>
         <translation>启用日志自动清理</translation>
     </message>
@@ -3149,7 +3165,23 @@ Please check your email address or network connection.</source>
         <translation>外轮廓边距</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+39"/>
+        <source>Small Diagonal Curve Size</source>
+        <translation>小圆曲线尺寸阈值</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Size of small diagonal curve</source>
+        <translation>小圆曲线尺寸阈值</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Small Diagonal Curve Flattening Threshold</source>
+        <translation>小圆曲线平滑阈值</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <location line="+1"/>
         <source>Thumbnail width</source>
         <translation>缩略图宽</translation>
@@ -3220,11 +3252,21 @@ Please check your email address or network connection.</source>
         <translation>切换到U轴输出</translation>
     </message>
     <message>
+        <location line="+491"/>
+        <source>Scan return delay(us)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scan return delay</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Full Relative</source>
         <translation type="vanished">全相对坐标输出</translation>
     </message>
     <message>
-        <location line="+167"/>
+        <location line="-325"/>
         <location line="+1"/>
         <source>Z Speed</source>
         <translation>Z轴运行速度</translation>
@@ -3383,6 +3425,18 @@ Please check your email address or network connection.</source>
         <translation>U使能相位</translation>
     </message>
     <message>
+        <location line="+7"/>
+        <location line="+1"/>
+        <source>Z Reset Direction</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+1"/>
+        <source>Screen Type</source>
+        <translation></translation>
+    </message>
+    <message>
         <location line="+3"/>
         <location line="+1"/>
         <location filename="../src/common/Config.h" line="+82"/>
@@ -3432,7 +3486,7 @@ Please check your email address or network connection.</source>
         <translation>矢量填充图层</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+7"/>
         <location line="+1"/>
         <location filename="../src/common/Config.h" line="+35"/>
         <source>Path Optimization</source>
@@ -3453,12 +3507,14 @@ Please check your email address or network connection.</source>
         <translation>设备</translation>
     </message>
     <message>
+        <location line="-13"/>
+        <location line="+1"/>
         <location filename="../src/common/Config.h" line="-57"/>
         <source>Stamp Layer</source>
         <translation>印章图层</translation>
     </message>
     <message>
-        <location line="+88"/>
+        <location filename="../src/common/Config.h" line="+88"/>
         <source>External Registers</source>
         <translation>外部寄存器</translation>
     </message>
@@ -3488,9 +3544,9 @@ Please check your email address or network connection.</source>
         <translation>系统寄存器</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="+3"/>
+        <location filename="../src/common/Config.cpp" line="+15"/>
         <location line="+1"/>
-        <location filename="../src/common/Config.h" line="+89"/>
+        <location filename="../src/common/Config.h" line="+94"/>
         <source>Debug</source>
         <translation>调试</translation>
     </message>
@@ -4975,12 +5031,12 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="+387"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="+390"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="+2350"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="+2372"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -7353,7 +7409,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDevice</name>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="+1552"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="+1556"/>
         <source>Laser device fatal error</source>
         <translation>设备致命错误</translation>
     </message>
@@ -7842,7 +7898,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="+361"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="+366"/>
         <source>Layer</source>
         <translation>图层</translation>
     </message>
@@ -7864,7 +7920,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">完成</translation>
     </message>
     <message>
-        <location line="+533"/>
+        <location line="+536"/>
         <source>Clear tree</source>
         <translation>清空拓扑树</translation>
     </message>
@@ -8580,7 +8636,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location line="-977"/>
+        <location line="-987"/>
         <source>Bitmap</source>
         <translation>位图</translation>
     </message>
@@ -8650,7 +8706,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserRect</name>
     <message>
-        <location line="+499"/>
+        <location line="+509"/>
         <source>%1 update machining points</source>
         <translation>%1更新加工点</translation>
     </message>
@@ -12122,7 +12178,7 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">打开配置文件时发生错误！</translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="-3912"/>
+        <location filename="../src/common/Config.cpp" line="-3987"/>
         <source>Save Failure</source>
         <translation>保存失败</translation>
     </message>
@@ -12296,17 +12352,17 @@ Do you want to delete it anyway?</source>
         <translation type="vanished">贝赛尔转换为多边形</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+62"/>
         <source>Polygon to Points</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-1117"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-1119"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+35"/>
         <source>%1 Points to Plt</source>
         <translation>%1生成Plt点</translation>
     </message>
@@ -15975,12 +16031,12 @@ Please choose a different file name.</source>
     </message>
     <message>
         <location filename="../src/ui/StampCircleDialog.ui" line="+26"/>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="+71"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="+74"/>
         <source>Circle Stamp Dialog</source>
         <translation>圆章对话框</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+32"/>
         <source>Circle Stamp Layout</source>
         <translation>圆章分类</translation>
     </message>
@@ -16053,7 +16109,13 @@ Please choose a different file name.</source>
         <translation>文字边距</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="+246"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="+385"/>
+        <source>Preview</source>
+        <translation>预览预览</translation>
+    </message>
+    <message>
+        <location line="-263"/>
         <source>Text Spacing</source>
         <translation>文字间距</translation>
     </message>
@@ -16102,7 +16164,7 @@ Please choose a different file name.</source>
         <translation type="vanished">仿宋_GB2312</translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="-46"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="-431"/>
         <source>FangSong</source>
         <translation>仿宋</translation>
     </message>
@@ -16194,6 +16256,16 @@ Please choose a different file name.</source>
         <translation>党徽</translation>
     </message>
     <message>
+        <location line="+17"/>
+        <source>Ok</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
         <location filename="../src/ui/StampCircleDialog.h" line="+41"/>
         <source>Top Circle Text</source>
         <translation>顶部环排文字</translation>
@@ -16251,12 +16323,12 @@ Please choose a different file name.</source>
         <translation>方章对话框</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+38"/>
         <source>Frame Stamp Layout</source>
         <translation>方章分类</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+14"/>
         <source>Intaglio</source>
         <translation>阴刻</translation>
     </message>
@@ -16277,7 +16349,7 @@ Please choose a different file name.</source>
         <location line="+33"/>
         <location line="+33"/>
         <location line="+17"/>
-        <location line="+192"/>
+        <location line="+101"/>
         <location line="+20"/>
         <location line="+17"/>
         <location line="+17"/>
@@ -16285,7 +16357,7 @@ Please choose a different file name.</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location line="-359"/>
+        <location line="-268"/>
         <source>Height</source>
         <translation>高度</translation>
     </message>
@@ -16325,7 +16397,7 @@ Please choose a different file name.</source>
         <translation>文字属性</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+147"/>
         <source>Bold</source>
         <translation>粗体</translation>
     </message>
@@ -16335,7 +16407,13 @@ Please choose a different file name.</source>
         <translation>...</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="+91"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="+177"/>
+        <source>Preview</source>
+        <translation>预览预览</translation>
+    </message>
+    <message>
+        <location line="-192"/>
         <source>Horinzontal Margins</source>
         <translation>水平方向边距</translation>
     </message>
@@ -16355,7 +16433,7 @@ Please choose a different file name.</source>
         <translation>垂直方向间隔</translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="+26"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="-148"/>
         <source>Four Character</source>
         <translation>四字名章</translation>
     </message>
@@ -16390,7 +16468,17 @@ Please choose a different file name.</source>
         <translation>内圆角</translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.h" line="+21"/>
+        <location line="+113"/>
+        <source>Ok</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.h" line="+23"/>
         <source>FSNS</source>
         <translation>姓氏名印</translation>
     </message>
@@ -16417,17 +16505,17 @@ Please choose a different file name.</source>
         <translation>条章对话框</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+32"/>
         <source>Strip Stamp Layout</source>
         <translation>条章分类</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+14"/>
         <source>Intaglio</source>
         <translation>阴刻</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+294"/>
         <source>Frame Property</source>
         <translation>边框属性</translation>
     </message>
@@ -16437,21 +16525,21 @@ Please choose a different file name.</source>
         <translation>宽度</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="-142"/>
+        <location line="+20"/>
+        <location line="+17"/>
+        <location line="+17"/>
+        <location line="+104"/>
         <location line="+23"/>
         <location line="+17"/>
         <location line="+33"/>
         <location line="+33"/>
         <location line="+17"/>
-        <location line="+199"/>
-        <location line="+20"/>
-        <location line="+17"/>
-        <location line="+17"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location line="-366"/>
+        <location line="-113"/>
         <source>Height</source>
         <translation></translation>
     </message>
@@ -16486,7 +16574,7 @@ Please choose a different file name.</source>
         <translation>内框边宽</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="-439"/>
         <source>Text Property</source>
         <translation>文字属性</translation>
     </message>
@@ -16533,7 +16621,13 @@ Please choose a different file name.</source>
         <translation>垂直方向间隔</translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="+26"/>
+        <location line="+274"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="+263"/>
+        <source>Preview</source>
+        <translation>预览</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.cpp" line="-235"/>
         <source>Signal Row</source>
         <translation>单行文字条章</translation>
     </message>
@@ -16573,6 +16667,16 @@ Please choose a different file name.</source>
         <location line="+3"/>
         <source>font</source>
         <translation>字体</translation>
+    </message>
+    <message>
+        <location line="+122"/>
+        <source>Ok</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
     <message>
         <location filename="../src/ui/StampStripDialog.h" line="+27"/>

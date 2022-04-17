@@ -10,9 +10,8 @@
 struct SmallDiagonalLimitationItem
 {
 public:
-    SmallDiagonalLimitationItem(qreal _diagonal = 0, qreal _laserPower = 0, qreal _speed = 0)
+    SmallDiagonalLimitationItem(qreal _diagonal = 0, qreal _speed = 0)
         : diagonal(_diagonal)
-        , laserPower(_laserPower)
         , speed(_speed)
     {}
 
@@ -20,7 +19,6 @@ public:
     void fromJson(const QJsonObject& json);
 
     qreal diagonal;
-    qreal laserPower;
     qreal speed;
 };
 

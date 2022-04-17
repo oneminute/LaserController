@@ -606,1021 +606,1001 @@ Please check your email address or network connection.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1611"/>
+        <location filename="../src/common/Config.cpp" line="1615"/>
         <source>T</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1612"/>
+        <location filename="../src/common/Config.cpp" line="1616"/>
         <source>S1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1613"/>
+        <location filename="../src/common/Config.cpp" line="1617"/>
         <source>S2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1614"/>
+        <location filename="../src/common/Config.cpp" line="1618"/>
         <source>S3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1615"/>
+        <location filename="../src/common/Config.cpp" line="1619"/>
         <source>S4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="1616"/>
+        <location filename="../src/common/Config.cpp" line="1620"/>
         <source>S5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3137"/>
+        <location filename="../src/common/Config.cpp" line="3196"/>
         <source>Language</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3138"/>
+        <location filename="../src/common/Config.cpp" line="3197"/>
         <source>Language for both UI and Business.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3141"/>
+        <location filename="../src/common/Config.cpp" line="3200"/>
         <source>Unit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3142"/>
+        <location filename="../src/common/Config.cpp" line="3201"/>
         <source>Unit for user interface.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3153"/>
-        <location filename="../src/common/Config.cpp" line="3154"/>
+        <location filename="../src/common/Config.cpp" line="3212"/>
+        <location filename="../src/common/Config.cpp" line="3213"/>
         <source>Max Layers Count</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3201"/>
-        <location filename="../src/common/Config.cpp" line="3202"/>
+        <location filename="../src/common/Config.cpp" line="3260"/>
+        <location filename="../src/common/Config.cpp" line="3261"/>
         <source>Brightness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3205"/>
-        <location filename="../src/common/Config.cpp" line="3206"/>
+        <location filename="../src/common/Config.cpp" line="3264"/>
+        <location filename="../src/common/Config.cpp" line="3265"/>
         <source>Contrast</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3209"/>
-        <location filename="../src/common/Config.cpp" line="3210"/>
+        <location filename="../src/common/Config.cpp" line="3268"/>
+        <location filename="../src/common/Config.cpp" line="3269"/>
         <source>Hue</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3213"/>
-        <location filename="../src/common/Config.cpp" line="3214"/>
+        <location filename="../src/common/Config.cpp" line="3272"/>
+        <location filename="../src/common/Config.cpp" line="3273"/>
         <source>Saturation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3217"/>
-        <location filename="../src/common/Config.cpp" line="3218"/>
+        <location filename="../src/common/Config.cpp" line="3276"/>
+        <location filename="../src/common/Config.cpp" line="3277"/>
         <source>Sharpness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3221"/>
-        <location filename="../src/common/Config.cpp" line="3222"/>
+        <location filename="../src/common/Config.cpp" line="3280"/>
+        <location filename="../src/common/Config.cpp" line="3281"/>
         <source>Gamma</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3225"/>
-        <location filename="../src/common/Config.cpp" line="3226"/>
+        <location filename="../src/common/Config.cpp" line="3284"/>
+        <location filename="../src/common/Config.cpp" line="3285"/>
         <source>Backlight Comp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3233"/>
+        <location filename="../src/common/Config.cpp" line="3292"/>
         <source>Operation Button Icon Size(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3234"/>
+        <location filename="../src/common/Config.cpp" line="3293"/>
         <source>Size of operation buttons&apos; icons</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3237"/>
+        <location filename="../src/common/Config.cpp" line="3296"/>
         <source>Operation Button Width(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3238"/>
+        <location filename="../src/common/Config.cpp" line="3297"/>
         <source>Width of operation buttons</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3241"/>
+        <location filename="../src/common/Config.cpp" line="3300"/>
         <source>Operation Button Height(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3242"/>
+        <location filename="../src/common/Config.cpp" line="3301"/>
         <source>Height of operation buttons</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3245"/>
+        <location filename="../src/common/Config.cpp" line="3304"/>
         <source>Show Operation Button Text</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3246"/>
+        <location filename="../src/common/Config.cpp" line="3305"/>
         <source>Show text of operation button or not</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3249"/>
+        <location filename="../src/common/Config.cpp" line="3308"/>
         <source>Tool Button Size(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3250"/>
+        <location filename="../src/common/Config.cpp" line="3309"/>
         <source>Size of tool buttons</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3253"/>
+        <location filename="../src/common/Config.cpp" line="3312"/>
         <source>Color Button Width(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3254"/>
+        <location filename="../src/common/Config.cpp" line="3313"/>
         <source>Width of color buttons</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3257"/>
+        <location filename="../src/common/Config.cpp" line="3316"/>
         <source>Color Button Height(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3258"/>
+        <location filename="../src/common/Config.cpp" line="3317"/>
         <source>Height of color buttons</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3261"/>
+        <location filename="../src/common/Config.cpp" line="3320"/>
         <source>Grid Contrast</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3262"/>
+        <location filename="../src/common/Config.cpp" line="3321"/>
         <source>Contrast of grid lines</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3265"/>
+        <location filename="../src/common/Config.cpp" line="3324"/>
         <source>Grid Shape Distance(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3266"/>
+        <location filename="../src/common/Config.cpp" line="3325"/>
         <source>This distance is used for capturing a shape when cursor is moving closed to</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3269"/>
+        <location filename="../src/common/Config.cpp" line="3328"/>
         <source>Object Shape Distance(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3270"/>
+        <location filename="../src/common/Config.cpp" line="3329"/>
         <source>This distance is used for capturing an object when cursor is moving closed to</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3273"/>
+        <location filename="../src/common/Config.cpp" line="3332"/>
         <source>Click-selection Tolerance(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3274"/>
+        <location filename="../src/common/Config.cpp" line="3333"/>
         <source>Tolerance of Click-selection in px</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3277"/>
+        <location filename="../src/common/Config.cpp" line="3336"/>
         <source>Visual Grid Spacing(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3278"/>
+        <location filename="../src/common/Config.cpp" line="3337"/>
         <source>The visual grid spacing in mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3281"/>
+        <location filename="../src/common/Config.cpp" line="3340"/>
         <source>Valid Max Region(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3282"/>
+        <location filename="../src/common/Config.cpp" line="3341"/>
         <source>The Valid Max Region Width Or Height in mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3285"/>
+        <location filename="../src/common/Config.cpp" line="3344"/>
         <source>Splitter Handle Width(px)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3286"/>
+        <location filename="../src/common/Config.cpp" line="3345"/>
         <source>Width of splitter handle in px</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3289"/>
+        <location filename="../src/common/Config.cpp" line="3348"/>
         <source>Auto repeat delay(ms)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3290"/>
+        <location filename="../src/common/Config.cpp" line="3349"/>
         <source>The delay duration of auto repeat button</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3306"/>
+        <location filename="../src/common/Config.cpp" line="3365"/>
         <source>The min power percentage for cutting layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3310"/>
+        <location filename="../src/common/Config.cpp" line="3369"/>
         <source>The max power percentage for cutting layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3314"/>
+        <location filename="../src/common/Config.cpp" line="3373"/>
         <source>The run speed for engraving layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3318"/>
+        <location filename="../src/common/Config.cpp" line="3377"/>
         <source>The laser power for engraving layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3322"/>
+        <location filename="../src/common/Config.cpp" line="3381"/>
         <source>The min power percentage for engraving layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3326"/>
+        <location filename="../src/common/Config.cpp" line="3385"/>
         <source>The max power percentage for engraving layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3329"/>
-        <location filename="../src/common/Config.cpp" line="3373"/>
+        <location filename="../src/common/Config.cpp" line="3388"/>
+        <location filename="../src/common/Config.cpp" line="3432"/>
         <source>Row Interval(μm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3330"/>
+        <location filename="../src/common/Config.cpp" line="3389"/>
         <source>The row interval between lines of bitmap for engraving layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3333"/>
-        <location filename="../src/common/Config.cpp" line="3345"/>
+        <location filename="../src/common/Config.cpp" line="3392"/>
+        <location filename="../src/common/Config.cpp" line="3404"/>
         <source>Use Halftone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3334"/>
-        <location filename="../src/common/Config.cpp" line="3346"/>
+        <location filename="../src/common/Config.cpp" line="3393"/>
+        <location filename="../src/common/Config.cpp" line="3405"/>
         <source>Use halftone algorithm when generating bitmap datas</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3337"/>
+        <location filename="../src/common/Config.cpp" line="3396"/>
         <source>Halftone Angles</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3338"/>
+        <location filename="../src/common/Config.cpp" line="3397"/>
         <source>Angles of rotating grid for halftone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3341"/>
+        <location filename="../src/common/Config.cpp" line="3400"/>
         <source>Halftone Grid Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3342"/>
+        <location filename="../src/common/Config.cpp" line="3401"/>
         <source>Grid size of halftone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3349"/>
+        <location filename="../src/common/Config.cpp" line="3408"/>
         <source>LPI</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3350"/>
+        <location filename="../src/common/Config.cpp" line="3409"/>
         <source>Lines per inch</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3353"/>
+        <location filename="../src/common/Config.cpp" line="3412"/>
         <source>DPI</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3354"/>
+        <location filename="../src/common/Config.cpp" line="3413"/>
         <source>Dots per inch</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3362"/>
+        <location filename="../src/common/Config.cpp" line="3421"/>
         <source>The run speed for filling layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3366"/>
+        <location filename="../src/common/Config.cpp" line="3425"/>
         <source>The min power percentage for filling layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3370"/>
+        <location filename="../src/common/Config.cpp" line="3429"/>
         <source>The max power percentage for filling layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3374"/>
+        <location filename="../src/common/Config.cpp" line="3433"/>
         <source>The row interval between lines of bitmap for filling layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3389"/>
+        <location filename="../src/common/Config.cpp" line="3448"/>
         <source>Max Starting Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3390"/>
+        <location filename="../src/common/Config.cpp" line="3449"/>
         <source>Max starting points count of each primitive node</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3393"/>
+        <location filename="../src/common/Config.cpp" line="3452"/>
         <source>Grouping Orientation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3394"/>
+        <location filename="../src/common/Config.cpp" line="3453"/>
         <source>The orientation of grouping</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3397"/>
+        <location filename="../src/common/Config.cpp" line="3456"/>
         <source>Grouping Grid Interval</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3398"/>
+        <location filename="../src/common/Config.cpp" line="3457"/>
         <source>The grid interval</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3401"/>
+        <location filename="../src/common/Config.cpp" line="3460"/>
         <source>Max Group size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3402"/>
+        <location filename="../src/common/Config.cpp" line="3461"/>
         <source>Max nodes count of each group</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3405"/>
-        <location filename="../src/common/Config.cpp" line="3409"/>
+        <location filename="../src/common/Config.cpp" line="3464"/>
+        <location filename="../src/common/Config.cpp" line="3468"/>
         <source>Searching XY Weight</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3406"/>
-        <location filename="../src/common/Config.cpp" line="3410"/>
+        <location filename="../src/common/Config.cpp" line="3465"/>
+        <location filename="../src/common/Config.cpp" line="3469"/>
         <source>Weight of XY for searching using kdtree</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3413"/>
-        <source>Max Angles Diff</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3414"/>
-        <source>The max angles diff bwteen tow anchor points</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3417"/>
-        <location filename="../src/common/Config.cpp" line="3421"/>
-        <source>Max Interval Distance</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3418"/>
-        <location filename="../src/common/Config.cpp" line="3422"/>
-        <source>The max interval distance between tow anchor points</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3425"/>
+        <location filename="../src/common/Config.cpp" line="3472"/>
         <source>Enable Small Diagonal</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3426"/>
+        <location filename="../src/common/Config.cpp" line="3473"/>
         <source>Enable small diagonal limitation for small primitives</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3429"/>
+        <location filename="../src/common/Config.cpp" line="3476"/>
         <source>Small Diagonal Limitation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3430"/>
+        <location filename="../src/common/Config.cpp" line="3477"/>
         <source>Details of small diagonal limitation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3433"/>
-        <location filename="../src/common/Config.cpp" line="3434"/>
+        <location filename="../src/common/Config.cpp" line="3480"/>
+        <location filename="../src/common/Config.cpp" line="3481"/>
         <source>Curve Flattening Threshold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3449"/>
+        <location filename="../src/common/Config.cpp" line="3504"/>
         <source>Auto Connect First COM</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3450"/>
+        <location filename="../src/common/Config.cpp" line="3505"/>
         <source>Auto connect to first com port when found multiple laser devices</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3453"/>
+        <location filename="../src/common/Config.cpp" line="3508"/>
         <source>Start from</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3454"/>
+        <location filename="../src/common/Config.cpp" line="3509"/>
         <source>Choose the start point type of machining</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3457"/>
+        <location filename="../src/common/Config.cpp" line="3512"/>
         <source>Job Origin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3458"/>
+        <location filename="../src/common/Config.cpp" line="3513"/>
         <source>Job origin to start machining with</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3461"/>
+        <location filename="../src/common/Config.cpp" line="3516"/>
         <source>X Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3462"/>
+        <location filename="../src/common/Config.cpp" line="3517"/>
         <source>Enabled x axis movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3465"/>
+        <location filename="../src/common/Config.cpp" line="3520"/>
         <source>Y Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3466"/>
+        <location filename="../src/common/Config.cpp" line="3521"/>
         <source>Enabled y axis movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3605"/>
+        <location filename="../src/common/Config.cpp" line="3660"/>
         <source>Backlash X Interval(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3609"/>
+        <location filename="../src/common/Config.cpp" line="3664"/>
         <source>Backlash Y Interval(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3613"/>
+        <location filename="../src/common/Config.cpp" line="3668"/>
         <source>Backlash Z Interval(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3641"/>
+        <location filename="../src/common/Config.cpp" line="3696"/>
         <source>Cutting Turn On Delay(us)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3645"/>
+        <location filename="../src/common/Config.cpp" line="3700"/>
         <source>Cutting Turn Off Delay(us)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3469"/>
+        <location filename="../src/common/Config.cpp" line="3524"/>
+        <location filename="../src/common/Config.cpp" line="4048"/>
+        <location filename="../src/common/Config.cpp" line="4049"/>
         <source>Z Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2290"/>
-        <location filename="../src/common/Config.cpp" line="2310"/>
-        <location filename="../src/common/Config.cpp" line="2484"/>
-        <location filename="../src/common/Config.cpp" line="2504"/>
-        <location filename="../src/common/Config.cpp" line="2678"/>
-        <location filename="../src/common/Config.cpp" line="2699"/>
-        <location filename="../src/common/Config.cpp" line="2963"/>
+        <location filename="../src/common/Config.cpp" line="2294"/>
+        <location filename="../src/common/Config.cpp" line="2314"/>
+        <location filename="../src/common/Config.cpp" line="2488"/>
+        <location filename="../src/common/Config.cpp" line="2508"/>
+        <location filename="../src/common/Config.cpp" line="2682"/>
+        <location filename="../src/common/Config.cpp" line="2703"/>
+        <location filename="../src/common/Config.cpp" line="2967"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2291"/>
-        <location filename="../src/common/Config.cpp" line="2311"/>
-        <location filename="../src/common/Config.cpp" line="2485"/>
-        <location filename="../src/common/Config.cpp" line="2505"/>
-        <location filename="../src/common/Config.cpp" line="2679"/>
-        <location filename="../src/common/Config.cpp" line="2700"/>
-        <location filename="../src/common/Config.cpp" line="2964"/>
+        <location filename="../src/common/Config.cpp" line="2295"/>
+        <location filename="../src/common/Config.cpp" line="2315"/>
+        <location filename="../src/common/Config.cpp" line="2489"/>
+        <location filename="../src/common/Config.cpp" line="2509"/>
+        <location filename="../src/common/Config.cpp" line="2683"/>
+        <location filename="../src/common/Config.cpp" line="2704"/>
+        <location filename="../src/common/Config.cpp" line="2968"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2356"/>
-        <location filename="../src/common/Config.cpp" line="2384"/>
-        <location filename="../src/common/Config.cpp" line="2550"/>
-        <location filename="../src/common/Config.cpp" line="2578"/>
-        <location filename="../src/common/Config.cpp" line="2746"/>
-        <location filename="../src/common/Config.cpp" line="2774"/>
-        <location filename="../src/common/Config.cpp" line="2996"/>
+        <location filename="../src/common/Config.cpp" line="2360"/>
+        <location filename="../src/common/Config.cpp" line="2388"/>
+        <location filename="../src/common/Config.cpp" line="2554"/>
+        <location filename="../src/common/Config.cpp" line="2582"/>
+        <location filename="../src/common/Config.cpp" line="2750"/>
+        <location filename="../src/common/Config.cpp" line="2778"/>
+        <location filename="../src/common/Config.cpp" line="3000"/>
         <source>x</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2357"/>
-        <location filename="../src/common/Config.cpp" line="2385"/>
-        <location filename="../src/common/Config.cpp" line="2551"/>
-        <location filename="../src/common/Config.cpp" line="2579"/>
-        <location filename="../src/common/Config.cpp" line="2747"/>
-        <location filename="../src/common/Config.cpp" line="2775"/>
-        <location filename="../src/common/Config.cpp" line="2997"/>
+        <location filename="../src/common/Config.cpp" line="2361"/>
+        <location filename="../src/common/Config.cpp" line="2389"/>
+        <location filename="../src/common/Config.cpp" line="2555"/>
+        <location filename="../src/common/Config.cpp" line="2583"/>
+        <location filename="../src/common/Config.cpp" line="2751"/>
+        <location filename="../src/common/Config.cpp" line="2779"/>
+        <location filename="../src/common/Config.cpp" line="3001"/>
         <source>y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2358"/>
-        <location filename="../src/common/Config.cpp" line="2386"/>
-        <location filename="../src/common/Config.cpp" line="2552"/>
-        <location filename="../src/common/Config.cpp" line="2580"/>
-        <location filename="../src/common/Config.cpp" line="2748"/>
-        <location filename="../src/common/Config.cpp" line="2776"/>
-        <location filename="../src/common/Config.cpp" line="2998"/>
+        <location filename="../src/common/Config.cpp" line="2362"/>
+        <location filename="../src/common/Config.cpp" line="2390"/>
+        <location filename="../src/common/Config.cpp" line="2556"/>
+        <location filename="../src/common/Config.cpp" line="2584"/>
+        <location filename="../src/common/Config.cpp" line="2752"/>
+        <location filename="../src/common/Config.cpp" line="2780"/>
+        <location filename="../src/common/Config.cpp" line="3002"/>
         <source>z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3293"/>
+        <location filename="../src/common/Config.cpp" line="3352"/>
         <source>Show Document Bounding Rect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3294"/>
+        <location filename="../src/common/Config.cpp" line="3353"/>
         <source>Show document bounding rect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3301"/>
+        <location filename="../src/common/Config.cpp" line="3360"/>
         <source>Cutting Speed(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3302"/>
+        <location filename="../src/common/Config.cpp" line="3361"/>
         <source>Cutting speed for cutting layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3305"/>
+        <location filename="../src/common/Config.cpp" line="3364"/>
         <source>Cutting Min Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3309"/>
+        <location filename="../src/common/Config.cpp" line="3368"/>
         <source>Cutting Max Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3313"/>
+        <location filename="../src/common/Config.cpp" line="3372"/>
         <source>Engraving Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3317"/>
+        <location filename="../src/common/Config.cpp" line="3376"/>
         <source>Engraving Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3321"/>
+        <location filename="../src/common/Config.cpp" line="3380"/>
         <source>Engraving Min Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3325"/>
+        <location filename="../src/common/Config.cpp" line="3384"/>
         <source>Engraving Max Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3357"/>
-        <location filename="../src/common/Config.cpp" line="3358"/>
-        <location filename="../src/common/Config.cpp" line="3377"/>
-        <location filename="../src/common/Config.cpp" line="3378"/>
+        <location filename="../src/common/Config.cpp" line="3416"/>
+        <location filename="../src/common/Config.cpp" line="3417"/>
+        <location filename="../src/common/Config.cpp" line="3436"/>
+        <location filename="../src/common/Config.cpp" line="3437"/>
         <source>Enable Cutting Item</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3361"/>
-        <location filename="../src/common/Config.cpp" line="3653"/>
+        <location filename="../src/common/Config.cpp" line="3420"/>
+        <location filename="../src/common/Config.cpp" line="3708"/>
         <source>Filling Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3365"/>
+        <location filename="../src/common/Config.cpp" line="3424"/>
         <source>Filling Min Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3369"/>
+        <location filename="../src/common/Config.cpp" line="3428"/>
         <source>Filling Max Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3470"/>
+        <location filename="../src/common/Config.cpp" line="3525"/>
         <source>Enabled z axis movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3477"/>
+        <location filename="../src/common/Config.cpp" line="3532"/>
         <source>User Origin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3478"/>
+        <location filename="../src/common/Config.cpp" line="3533"/>
         <source>Selected user origin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3513"/>
-        <location filename="../src/common/Config.cpp" line="3693"/>
+        <location filename="../src/common/Config.cpp" line="3568"/>
+        <location filename="../src/common/Config.cpp" line="3748"/>
         <source>Head Data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3514"/>
-        <location filename="../src/common/Config.cpp" line="3694"/>
+        <location filename="../src/common/Config.cpp" line="3569"/>
+        <location filename="../src/common/Config.cpp" line="3749"/>
         <source>Read-only data used to test the quality of data transmission</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3517"/>
+        <location filename="../src/common/Config.cpp" line="3572"/>
         <source>Acceleration Mode</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3518"/>
-        <location filename="../src/common/Config.cpp" line="3522"/>
+        <location filename="../src/common/Config.cpp" line="3573"/>
+        <location filename="../src/common/Config.cpp" line="3577"/>
         <source>Acceleration mode</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3521"/>
+        <location filename="../src/common/Config.cpp" line="3576"/>
         <source>Cutting Move Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3526"/>
+        <location filename="../src/common/Config.cpp" line="3581"/>
         <source>Move acceleration for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3529"/>
+        <location filename="../src/common/Config.cpp" line="3584"/>
         <source>Cutting Turn Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3530"/>
+        <location filename="../src/common/Config.cpp" line="3585"/>
         <source>Turn speed for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3534"/>
+        <location filename="../src/common/Config.cpp" line="3589"/>
         <source>Turn acceleration for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3538"/>
+        <location filename="../src/common/Config.cpp" line="3593"/>
         <source>Work acceleration for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3541"/>
+        <location filename="../src/common/Config.cpp" line="3596"/>
         <source>Move Speed Factor</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3542"/>
+        <location filename="../src/common/Config.cpp" line="3597"/>
         <source>Move speed factor for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3545"/>
+        <location filename="../src/common/Config.cpp" line="3600"/>
         <source>Work Speed Factor</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3546"/>
+        <location filename="../src/common/Config.cpp" line="3601"/>
         <source>Work speed factor for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3549"/>
+        <location filename="../src/common/Config.cpp" line="3604"/>
         <source>Cutting Spot Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3550"/>
+        <location filename="../src/common/Config.cpp" line="3605"/>
         <source>Spot size for cutting movement</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3553"/>
+        <location filename="../src/common/Config.cpp" line="3608"/>
         <source>Scan X Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3554"/>
+        <location filename="../src/common/Config.cpp" line="3609"/>
         <source>Scan x start speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3557"/>
+        <location filename="../src/common/Config.cpp" line="3612"/>
         <source>Scan Y Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3558"/>
+        <location filename="../src/common/Config.cpp" line="3613"/>
         <source>Scan y start speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3562"/>
+        <location filename="../src/common/Config.cpp" line="3617"/>
         <source>Scan x acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3566"/>
+        <location filename="../src/common/Config.cpp" line="3621"/>
         <source>Scan y acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3569"/>
+        <location filename="../src/common/Config.cpp" line="3624"/>
         <source>Scan Row Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3570"/>
+        <location filename="../src/common/Config.cpp" line="3625"/>
         <source>Scan row speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3573"/>
-        <location filename="../src/common/Config.cpp" line="3574"/>
+        <location filename="../src/common/Config.cpp" line="3628"/>
+        <location filename="../src/common/Config.cpp" line="3629"/>
         <source>Laser Frequency</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3577"/>
+        <location filename="../src/common/Config.cpp" line="3632"/>
         <source>Scan Return Error(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3578"/>
+        <location filename="../src/common/Config.cpp" line="3633"/>
         <source>Scan return error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3581"/>
+        <location filename="../src/common/Config.cpp" line="3636"/>
         <source>Scan Laser Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3582"/>
+        <location filename="../src/common/Config.cpp" line="3637"/>
         <source>The percentage of scan laser power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3585"/>
+        <location filename="../src/common/Config.cpp" line="3640"/>
         <source>Scan X Reset Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3586"/>
+        <location filename="../src/common/Config.cpp" line="3641"/>
         <source>Enabled Scan X reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3589"/>
+        <location filename="../src/common/Config.cpp" line="3644"/>
         <source>Scan Y Reset Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3590"/>
+        <location filename="../src/common/Config.cpp" line="3645"/>
         <source>Enabled Scan Y reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3593"/>
+        <location filename="../src/common/Config.cpp" line="3648"/>
         <source>Scan Z Reset Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3594"/>
+        <location filename="../src/common/Config.cpp" line="3649"/>
         <source>Enabled Scan Z reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3597"/>
+        <location filename="../src/common/Config.cpp" line="3652"/>
         <source>Reset Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3598"/>
+        <location filename="../src/common/Config.cpp" line="3653"/>
         <source>Reset speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3601"/>
+        <location filename="../src/common/Config.cpp" line="3656"/>
         <source>Scan Return Pos</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3602"/>
+        <location filename="../src/common/Config.cpp" line="3657"/>
         <source>Scan return pos</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3606"/>
+        <location filename="../src/common/Config.cpp" line="3661"/>
         <source>Backlash X interval</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3610"/>
+        <location filename="../src/common/Config.cpp" line="3665"/>
         <source>Backlash Y interval</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3614"/>
+        <location filename="../src/common/Config.cpp" line="3669"/>
         <source>Backlash Z interval</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3617"/>
+        <location filename="../src/common/Config.cpp" line="3672"/>
         <source>Default Run Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3618"/>
+        <location filename="../src/common/Config.cpp" line="3673"/>
         <source>Default run speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3621"/>
+        <location filename="../src/common/Config.cpp" line="3676"/>
         <source>Default Max Cutting Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3622"/>
+        <location filename="../src/common/Config.cpp" line="3677"/>
         <source>Default max cutting power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3625"/>
+        <location filename="../src/common/Config.cpp" line="3680"/>
         <source>Default Min Cutting Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3626"/>
+        <location filename="../src/common/Config.cpp" line="3681"/>
         <source>Default min cutting power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3629"/>
+        <location filename="../src/common/Config.cpp" line="3684"/>
         <source>Default Scan Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3630"/>
+        <location filename="../src/common/Config.cpp" line="3685"/>
         <source>Default scan speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3633"/>
+        <location filename="../src/common/Config.cpp" line="3688"/>
         <source>Max Scan Gray Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3634"/>
+        <location filename="../src/common/Config.cpp" line="3689"/>
         <source>Max scan gray ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3637"/>
+        <location filename="../src/common/Config.cpp" line="3692"/>
         <source>Min Scan Gray Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3638"/>
+        <location filename="../src/common/Config.cpp" line="3693"/>
         <source>Min scan gray ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3642"/>
+        <location filename="../src/common/Config.cpp" line="3697"/>
         <source>Delay of turning on laser for cutting</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3646"/>
+        <location filename="../src/common/Config.cpp" line="3701"/>
         <source>Delay of turning off laser for cutting</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3649"/>
+        <location filename="../src/common/Config.cpp" line="3704"/>
         <source>Spot Shot Power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3650"/>
+        <location filename="../src/common/Config.cpp" line="3705"/>
         <source>Spot shot power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3654"/>
+        <location filename="../src/common/Config.cpp" line="3709"/>
         <source>Filling speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3657"/>
+        <location filename="../src/common/Config.cpp" line="3712"/>
         <source>Filling Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3658"/>
+        <location filename="../src/common/Config.cpp" line="3713"/>
         <source>Filling start speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3662"/>
+        <location filename="../src/common/Config.cpp" line="3717"/>
         <source>Filling acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3666"/>
+        <location filename="../src/common/Config.cpp" line="3721"/>
         <source>Max filling power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3670"/>
+        <location filename="../src/common/Config.cpp" line="3725"/>
         <source>Min filling power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3673"/>
+        <location filename="../src/common/Config.cpp" line="3728"/>
         <source>Filling Acceleration Ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3665"/>
+        <location filename="../src/common/Config.cpp" line="3720"/>
         <source>Max Filling Power(%)</source>
         <translation></translation>
     </message>
@@ -1635,1043 +1615,1103 @@ Please check your email address or network connection.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3297"/>
+        <location filename="../src/common/Config.cpp" line="3356"/>
         <source>Show Laser Cursor Timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3298"/>
+        <location filename="../src/common/Config.cpp" line="3357"/>
         <source>Show laser cursor timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3381"/>
-        <location filename="../src/common/Config.cpp" line="3382"/>
+        <location filename="../src/common/Config.cpp" line="3440"/>
+        <location filename="../src/common/Config.cpp" line="3441"/>
         <source>Filling Type</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3437"/>
+        <location filename="../src/common/Config.cpp" line="3492"/>
         <source>Gaussian Factor A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3438"/>
+        <location filename="../src/common/Config.cpp" line="3493"/>
         <source>Gaussian factor a</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3481"/>
-        <location filename="../src/common/Config.cpp" line="3482"/>
+        <location filename="../src/common/Config.cpp" line="3536"/>
+        <location filename="../src/common/Config.cpp" line="3537"/>
         <source>Reverse Z Direction</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3689"/>
-        <location filename="../src/common/Config.cpp" line="3690"/>
+        <location filename="../src/common/Config.cpp" line="3744"/>
+        <location filename="../src/common/Config.cpp" line="3745"/>
         <source>Focal Length(um)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3925"/>
+        <location filename="../src/common/Config.cpp" line="3980"/>
         <source>Z Reset Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3926"/>
+        <location filename="../src/common/Config.cpp" line="3981"/>
         <source>Z Reset Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3505"/>
+        <location filename="../src/common/Config.cpp" line="3560"/>
         <source>Calibration block thickness(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="2387"/>
-        <location filename="../src/common/Config.cpp" line="2581"/>
-        <location filename="../src/common/Config.cpp" line="2777"/>
-        <location filename="../src/common/Config.cpp" line="2999"/>
+        <location filename="../src/common/Config.cpp" line="2391"/>
+        <location filename="../src/common/Config.cpp" line="2585"/>
+        <location filename="../src/common/Config.cpp" line="2781"/>
+        <location filename="../src/common/Config.cpp" line="3003"/>
         <source>u</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3145"/>
+        <location filename="../src/common/Config.cpp" line="3099"/>
+        <source>Up</source>
+        <translation>向上</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3100"/>
+        <source>Down</source>
+        <translation>向下</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3128"/>
+        <source>LCD</source>
+        <translation>液晶屏</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3129"/>
+        <source>Digital Tube</source>
+        <translation>数码管</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3204"/>
         <source>Enable Log Cleaner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3146"/>
+        <location filename="../src/common/Config.cpp" line="3205"/>
         <source>Enable Log Cleaner.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3149"/>
+        <location filename="../src/common/Config.cpp" line="3208"/>
         <source>Log overdue days</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3150"/>
+        <location filename="../src/common/Config.cpp" line="3209"/>
         <source>Log overdue days.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3157"/>
-        <location filename="../src/common/Config.cpp" line="3158"/>
+        <location filename="../src/common/Config.cpp" line="3216"/>
+        <location filename="../src/common/Config.cpp" line="3217"/>
         <source>Auto Connect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3161"/>
-        <location filename="../src/common/Config.cpp" line="3162"/>
+        <location filename="../src/common/Config.cpp" line="3220"/>
+        <location filename="../src/common/Config.cpp" line="3221"/>
         <source>Resolution</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3165"/>
-        <location filename="../src/common/Config.cpp" line="3166"/>
+        <location filename="../src/common/Config.cpp" line="3224"/>
+        <location filename="../src/common/Config.cpp" line="3225"/>
         <source>Thumb Resolution</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3169"/>
-        <location filename="../src/common/Config.cpp" line="3170"/>
+        <location filename="../src/common/Config.cpp" line="3228"/>
+        <location filename="../src/common/Config.cpp" line="3229"/>
         <source>Fisheye</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3173"/>
-        <location filename="../src/common/Config.cpp" line="3174"/>
+        <location filename="../src/common/Config.cpp" line="3232"/>
+        <location filename="../src/common/Config.cpp" line="3233"/>
         <source>Horizontal Corners Count</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3177"/>
-        <location filename="../src/common/Config.cpp" line="3178"/>
+        <location filename="../src/common/Config.cpp" line="3236"/>
+        <location filename="../src/common/Config.cpp" line="3237"/>
         <source>Vertical Corners Count</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3181"/>
-        <location filename="../src/common/Config.cpp" line="3182"/>
+        <location filename="../src/common/Config.cpp" line="3240"/>
+        <location filename="../src/common/Config.cpp" line="3241"/>
         <source>Squre Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3185"/>
-        <location filename="../src/common/Config.cpp" line="3186"/>
+        <location filename="../src/common/Config.cpp" line="3244"/>
+        <location filename="../src/common/Config.cpp" line="3245"/>
         <source>Radius Rate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3189"/>
-        <location filename="../src/common/Config.cpp" line="3190"/>
+        <location filename="../src/common/Config.cpp" line="3248"/>
+        <location filename="../src/common/Config.cpp" line="3249"/>
         <source>Calibration pattern</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3193"/>
-        <location filename="../src/common/Config.cpp" line="3194"/>
+        <location filename="../src/common/Config.cpp" line="3252"/>
+        <location filename="../src/common/Config.cpp" line="3253"/>
         <source>Min calibration frames</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3197"/>
-        <location filename="../src/common/Config.cpp" line="3198"/>
+        <location filename="../src/common/Config.cpp" line="3256"/>
+        <location filename="../src/common/Config.cpp" line="3257"/>
         <source>Calibration Auto Capture</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3385"/>
-        <location filename="../src/common/Config.cpp" line="3386"/>
+        <location filename="../src/common/Config.cpp" line="3444"/>
+        <location filename="../src/common/Config.cpp" line="3445"/>
         <source>Bounding Distance</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3441"/>
-        <location filename="../src/common/Config.cpp" line="3442"/>
-        <source>Thumbnail width</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3445"/>
-        <location filename="../src/common/Config.cpp" line="3446"/>
-        <source>Thumbnail Height</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3473"/>
-        <source>U Enabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/common/Config.cpp" line="3474"/>
-        <source>Enabled u axis movement</source>
+        <location filename="../src/common/Config.cpp" line="3484"/>
+        <source>Small Diagonal Curve Size</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/common/Config.cpp" line="3485"/>
-        <location filename="../src/common/Config.cpp" line="3486"/>
+        <source>Size of small diagonal curve</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3488"/>
+        <location filename="../src/common/Config.cpp" line="3489"/>
+        <source>Small Diagonal Curve Flattening Threshold</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3496"/>
+        <location filename="../src/common/Config.cpp" line="3497"/>
+        <source>Thumbnail width</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3500"/>
+        <location filename="../src/common/Config.cpp" line="3501"/>
+        <source>Thumbnail Height</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3528"/>
+        <source>U Enabled</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3529"/>
+        <source>Enabled u axis movement</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="3540"/>
+        <location filename="../src/common/Config.cpp" line="3541"/>
         <source>Fixture Type</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3489"/>
-        <location filename="../src/common/Config.cpp" line="3490"/>
+        <location filename="../src/common/Config.cpp" line="3544"/>
+        <location filename="../src/common/Config.cpp" line="3545"/>
         <source>Circumference Pulse Number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3493"/>
+        <location filename="../src/common/Config.cpp" line="3548"/>
         <source>Workpiece Diameter(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3494"/>
+        <location filename="../src/common/Config.cpp" line="3549"/>
         <source>Workpiece Diameter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3497"/>
+        <location filename="../src/common/Config.cpp" line="3552"/>
         <source>Roller Rotary Step Length(um)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3498"/>
+        <location filename="../src/common/Config.cpp" line="3553"/>
         <source>Roller Rotary Step Length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3501"/>
-        <location filename="../src/common/Config.cpp" line="3502"/>
+        <location filename="../src/common/Config.cpp" line="3556"/>
+        <location filename="../src/common/Config.cpp" line="3557"/>
         <source>Finish Run</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3506"/>
+        <location filename="../src/common/Config.cpp" line="3561"/>
         <source>Calibration block thickness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3509"/>
-        <location filename="../src/common/Config.cpp" line="3510"/>
+        <location filename="../src/common/Config.cpp" line="3564"/>
+        <location filename="../src/common/Config.cpp" line="3565"/>
         <source>Switch To U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3525"/>
+        <location filename="../src/common/Config.cpp" line="3580"/>
         <source>Cutting Move Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3533"/>
+        <location filename="../src/common/Config.cpp" line="3588"/>
         <source>Cutting Turn Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3537"/>
+        <location filename="../src/common/Config.cpp" line="3592"/>
         <source>Cutting Work Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3561"/>
+        <location filename="../src/common/Config.cpp" line="3616"/>
         <source>Scan X Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3565"/>
+        <location filename="../src/common/Config.cpp" line="3620"/>
         <source>Scan Y Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3661"/>
+        <location filename="../src/common/Config.cpp" line="3716"/>
         <source>Filling Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3669"/>
+        <location filename="../src/common/Config.cpp" line="3724"/>
         <source>Min Filling Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3674"/>
+        <location filename="../src/common/Config.cpp" line="3729"/>
         <source>Filling acceleration ratio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3677"/>
-        <location filename="../src/common/Config.cpp" line="3678"/>
+        <location filename="../src/common/Config.cpp" line="3732"/>
+        <location filename="../src/common/Config.cpp" line="3733"/>
         <source>Z Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3681"/>
-        <location filename="../src/common/Config.cpp" line="3682"/>
+        <location filename="../src/common/Config.cpp" line="3736"/>
+        <location filename="../src/common/Config.cpp" line="3737"/>
         <source>Material Thickness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3685"/>
-        <location filename="../src/common/Config.cpp" line="3686"/>
+        <location filename="../src/common/Config.cpp" line="3740"/>
+        <location filename="../src/common/Config.cpp" line="3741"/>
         <source>Movement Step Length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3697"/>
+        <location filename="../src/common/Config.cpp" line="3752"/>
         <source>Password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3698"/>
+        <location filename="../src/common/Config.cpp" line="3753"/>
         <source>Manufacture password to modify system registers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3701"/>
+        <location filename="../src/common/Config.cpp" line="3756"/>
         <source>Stored Password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3702"/>
+        <location filename="../src/common/Config.cpp" line="3757"/>
         <source>Stored manufacture password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3705"/>
-        <location filename="../src/common/Config.cpp" line="3706"/>
+        <location filename="../src/common/Config.cpp" line="3760"/>
+        <location filename="../src/common/Config.cpp" line="3761"/>
         <source>Hardware ID1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3709"/>
-        <location filename="../src/common/Config.cpp" line="3710"/>
+        <location filename="../src/common/Config.cpp" line="3764"/>
+        <location filename="../src/common/Config.cpp" line="3765"/>
         <source>Hardware ID2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3713"/>
-        <location filename="../src/common/Config.cpp" line="3714"/>
+        <location filename="../src/common/Config.cpp" line="3768"/>
+        <location filename="../src/common/Config.cpp" line="3769"/>
         <source>Hardware ID3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3717"/>
-        <location filename="../src/common/Config.cpp" line="3718"/>
+        <location filename="../src/common/Config.cpp" line="3772"/>
+        <location filename="../src/common/Config.cpp" line="3773"/>
         <source>CDKey1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3721"/>
-        <location filename="../src/common/Config.cpp" line="3722"/>
+        <location filename="../src/common/Config.cpp" line="3776"/>
+        <location filename="../src/common/Config.cpp" line="3777"/>
         <source>CDKey2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3725"/>
-        <location filename="../src/common/Config.cpp" line="3726"/>
+        <location filename="../src/common/Config.cpp" line="3780"/>
+        <location filename="../src/common/Config.cpp" line="3781"/>
         <source>CDKey3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3729"/>
+        <location filename="../src/common/Config.cpp" line="3784"/>
         <source>System Run Time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3730"/>
+        <location filename="../src/common/Config.cpp" line="3785"/>
         <source>System run time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3733"/>
+        <location filename="../src/common/Config.cpp" line="3788"/>
         <source>Laser Run Time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3734"/>
+        <location filename="../src/common/Config.cpp" line="3789"/>
         <source>Laser run time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3737"/>
+        <location filename="../src/common/Config.cpp" line="3792"/>
         <source>System Run Times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3738"/>
+        <location filename="../src/common/Config.cpp" line="3793"/>
         <source>System run times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3741"/>
+        <location filename="../src/common/Config.cpp" line="3796"/>
         <source>X Max Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3742"/>
+        <location filename="../src/common/Config.cpp" line="3797"/>
         <source>X max length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3745"/>
+        <location filename="../src/common/Config.cpp" line="3800"/>
         <source>X Dir Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3746"/>
+        <location filename="../src/common/Config.cpp" line="3801"/>
         <source>X dir phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3749"/>
+        <location filename="../src/common/Config.cpp" line="3804"/>
         <source>X Limit Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3750"/>
+        <location filename="../src/common/Config.cpp" line="3805"/>
         <source>X limit phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3753"/>
+        <location filename="../src/common/Config.cpp" line="3808"/>
         <source>X Zero Dev(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3754"/>
-        <location filename="../src/common/Config.cpp" line="3758"/>
+        <location filename="../src/common/Config.cpp" line="3809"/>
+        <location filename="../src/common/Config.cpp" line="3813"/>
         <source>X Zero Dev</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3757"/>
+        <location filename="../src/common/Config.cpp" line="3812"/>
         <source>X Step Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3761"/>
+        <location filename="../src/common/Config.cpp" line="3816"/>
         <source>X Limit Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3762"/>
+        <location filename="../src/common/Config.cpp" line="3817"/>
         <source>X limit num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3765"/>
+        <location filename="../src/common/Config.cpp" line="3820"/>
         <source>X Reset Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3766"/>
+        <location filename="../src/common/Config.cpp" line="3821"/>
         <source>Enable x reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3769"/>
+        <location filename="../src/common/Config.cpp" line="3824"/>
         <source>X Motor Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3770"/>
+        <location filename="../src/common/Config.cpp" line="3825"/>
         <source>X motor num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3773"/>
+        <location filename="../src/common/Config.cpp" line="3828"/>
         <source>X Motor current(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3774"/>
+        <location filename="../src/common/Config.cpp" line="3829"/>
         <source>X motor current</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3777"/>
+        <location filename="../src/common/Config.cpp" line="3832"/>
         <source>X Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3778"/>
+        <location filename="../src/common/Config.cpp" line="3833"/>
         <source>X Start Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3781"/>
+        <location filename="../src/common/Config.cpp" line="3836"/>
         <source>X Max Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3782"/>
+        <location filename="../src/common/Config.cpp" line="3837"/>
         <source>X Max Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3785"/>
+        <location filename="../src/common/Config.cpp" line="3840"/>
         <source>X Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3786"/>
+        <location filename="../src/common/Config.cpp" line="3841"/>
         <source>X max acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3789"/>
+        <location filename="../src/common/Config.cpp" line="3844"/>
         <source>X Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3790"/>
+        <location filename="../src/common/Config.cpp" line="3845"/>
         <source>X urgent acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3793"/>
+        <location filename="../src/common/Config.cpp" line="3848"/>
         <source>Y Max Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3794"/>
+        <location filename="../src/common/Config.cpp" line="3849"/>
         <source>Y max length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3797"/>
+        <location filename="../src/common/Config.cpp" line="3852"/>
         <source>Y Dir Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3798"/>
+        <location filename="../src/common/Config.cpp" line="3853"/>
         <source>Y dir phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3801"/>
+        <location filename="../src/common/Config.cpp" line="3856"/>
         <source>Y Limit Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3802"/>
+        <location filename="../src/common/Config.cpp" line="3857"/>
         <source>Y limit phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3805"/>
+        <location filename="../src/common/Config.cpp" line="3860"/>
         <source>Y Zero Dev(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3806"/>
-        <location filename="../src/common/Config.cpp" line="3810"/>
+        <location filename="../src/common/Config.cpp" line="3861"/>
+        <location filename="../src/common/Config.cpp" line="3865"/>
         <source>Y Zero Dev</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3809"/>
+        <location filename="../src/common/Config.cpp" line="3864"/>
         <source>Y Step Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3813"/>
+        <location filename="../src/common/Config.cpp" line="3868"/>
         <source>Y Limit Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3814"/>
+        <location filename="../src/common/Config.cpp" line="3869"/>
         <source>Y limit num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3817"/>
+        <location filename="../src/common/Config.cpp" line="3872"/>
         <source>Y Reset Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3818"/>
+        <location filename="../src/common/Config.cpp" line="3873"/>
         <source>Enable y reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3821"/>
+        <location filename="../src/common/Config.cpp" line="3876"/>
         <source>Y Motor Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3822"/>
+        <location filename="../src/common/Config.cpp" line="3877"/>
         <source>Y motor num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3825"/>
+        <location filename="../src/common/Config.cpp" line="3880"/>
         <source>Y Motor current(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3826"/>
+        <location filename="../src/common/Config.cpp" line="3881"/>
         <source>Y motor current</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3829"/>
+        <location filename="../src/common/Config.cpp" line="3884"/>
         <source>Y Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3830"/>
+        <location filename="../src/common/Config.cpp" line="3885"/>
         <source>Y Start Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3833"/>
+        <location filename="../src/common/Config.cpp" line="3888"/>
         <source>Y Max Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3834"/>
+        <location filename="../src/common/Config.cpp" line="3889"/>
         <source>Y Max Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3837"/>
+        <location filename="../src/common/Config.cpp" line="3892"/>
         <source>Y Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3838"/>
+        <location filename="../src/common/Config.cpp" line="3893"/>
         <source>Y max acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3841"/>
+        <location filename="../src/common/Config.cpp" line="3896"/>
         <source>Y Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3842"/>
+        <location filename="../src/common/Config.cpp" line="3897"/>
         <source>Y urgent acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3845"/>
+        <location filename="../src/common/Config.cpp" line="3900"/>
         <source>Z Max Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3846"/>
+        <location filename="../src/common/Config.cpp" line="3901"/>
         <source>Z max length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3849"/>
+        <location filename="../src/common/Config.cpp" line="3904"/>
         <source>Z Dir Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3850"/>
+        <location filename="../src/common/Config.cpp" line="3905"/>
         <source>Z dir phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3853"/>
+        <location filename="../src/common/Config.cpp" line="3908"/>
         <source>Z Limit Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3854"/>
+        <location filename="../src/common/Config.cpp" line="3909"/>
         <source>Z limit phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3857"/>
+        <location filename="../src/common/Config.cpp" line="3912"/>
         <source>Z Zero Dev(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3858"/>
-        <location filename="../src/common/Config.cpp" line="3862"/>
+        <location filename="../src/common/Config.cpp" line="3913"/>
+        <location filename="../src/common/Config.cpp" line="3917"/>
         <source>Z Zero Dev</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3861"/>
+        <location filename="../src/common/Config.cpp" line="3916"/>
         <source>Z Step Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3865"/>
+        <location filename="../src/common/Config.cpp" line="3920"/>
         <source>Z Limit Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3866"/>
+        <location filename="../src/common/Config.cpp" line="3921"/>
         <source>Z limit num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3869"/>
+        <location filename="../src/common/Config.cpp" line="3924"/>
         <source>Z Reset Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3870"/>
+        <location filename="../src/common/Config.cpp" line="3925"/>
         <source>Enable z reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3873"/>
+        <location filename="../src/common/Config.cpp" line="3928"/>
         <source>Z Motor Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3874"/>
+        <location filename="../src/common/Config.cpp" line="3929"/>
         <source>Z motor num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3877"/>
+        <location filename="../src/common/Config.cpp" line="3932"/>
         <source>Z Motor current(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3878"/>
+        <location filename="../src/common/Config.cpp" line="3933"/>
         <source>Z motor current</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3881"/>
+        <location filename="../src/common/Config.cpp" line="3936"/>
         <source>Z Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3882"/>
+        <location filename="../src/common/Config.cpp" line="3937"/>
         <source>Z Start Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3885"/>
+        <location filename="../src/common/Config.cpp" line="3940"/>
         <source>Z Max Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3886"/>
+        <location filename="../src/common/Config.cpp" line="3941"/>
         <source>Z Max Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3889"/>
+        <location filename="../src/common/Config.cpp" line="3944"/>
         <source>Z Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3890"/>
+        <location filename="../src/common/Config.cpp" line="3945"/>
         <source>Z max acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3893"/>
+        <location filename="../src/common/Config.cpp" line="3948"/>
         <source>Z Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3894"/>
+        <location filename="../src/common/Config.cpp" line="3949"/>
         <source>Z urgent acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3897"/>
+        <location filename="../src/common/Config.cpp" line="3952"/>
         <source>Laser Max Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3898"/>
+        <location filename="../src/common/Config.cpp" line="3953"/>
         <source>Laser Max Power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3901"/>
+        <location filename="../src/common/Config.cpp" line="3956"/>
         <source>Laser Min Power(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3902"/>
+        <location filename="../src/common/Config.cpp" line="3957"/>
         <source>Laser Min Power</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3905"/>
-        <location filename="../src/common/Config.cpp" line="3906"/>
+        <location filename="../src/common/Config.cpp" line="3960"/>
+        <location filename="../src/common/Config.cpp" line="3961"/>
         <source>Laser Power Frequence</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3909"/>
+        <location filename="../src/common/Config.cpp" line="3964"/>
         <source>X Phase Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3910"/>
+        <location filename="../src/common/Config.cpp" line="3965"/>
         <source>Enabled X phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3913"/>
+        <location filename="../src/common/Config.cpp" line="3968"/>
         <source>Y Phase Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3914"/>
+        <location filename="../src/common/Config.cpp" line="3969"/>
         <source>Enabled Y phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3917"/>
+        <location filename="../src/common/Config.cpp" line="3972"/>
         <source>Z Phase Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3918"/>
+        <location filename="../src/common/Config.cpp" line="3973"/>
         <source>Enabled Z phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3921"/>
-        <location filename="../src/common/Config.cpp" line="3922"/>
+        <location filename="../src/common/Config.cpp" line="3976"/>
+        <location filename="../src/common/Config.cpp" line="3977"/>
         <source>Device Origin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3929"/>
-        <location filename="../src/common/Config.cpp" line="3930"/>
+        <location filename="../src/common/Config.cpp" line="3984"/>
+        <location filename="../src/common/Config.cpp" line="3985"/>
         <source>Show Primitive Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3933"/>
-        <location filename="../src/common/Config.cpp" line="3934"/>
+        <location filename="../src/common/Config.cpp" line="3988"/>
+        <location filename="../src/common/Config.cpp" line="3989"/>
         <source>Show Primitive First Point</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3937"/>
+        <location filename="../src/common/Config.cpp" line="3992"/>
         <source>Generate Path Image</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3938"/>
+        <location filename="../src/common/Config.cpp" line="3993"/>
         <source>Enabled generate path image</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3941"/>
+        <location filename="../src/common/Config.cpp" line="3996"/>
         <source>Generate Machining Image</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3942"/>
+        <location filename="../src/common/Config.cpp" line="3997"/>
         <source>Enabled generate machining image</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3945"/>
-        <location filename="../src/common/Config.cpp" line="3946"/>
+        <location filename="../src/common/Config.cpp" line="4000"/>
+        <location filename="../src/common/Config.cpp" line="4001"/>
         <source>Enable Optimize Interaction</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3949"/>
-        <location filename="../src/common/Config.cpp" line="3950"/>
+        <location filename="../src/common/Config.cpp" line="4004"/>
+        <location filename="../src/common/Config.cpp" line="4005"/>
         <source>Reverse Engraving Bits</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3953"/>
-        <location filename="../src/common/Config.cpp" line="3954"/>
+        <location filename="../src/common/Config.cpp" line="4008"/>
+        <location filename="../src/common/Config.cpp" line="4009"/>
         <source>Skip Engraving Blank Rows</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3957"/>
+        <location filename="../src/common/Config.cpp" line="4012"/>
         <source>U Dir Phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3958"/>
+        <location filename="../src/common/Config.cpp" line="4013"/>
         <source>U dir phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3961"/>
+        <location filename="../src/common/Config.cpp" line="4016"/>
         <source>U Step Length(mm)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3962"/>
+        <location filename="../src/common/Config.cpp" line="4017"/>
         <source>U Zero Dev</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3965"/>
+        <location filename="../src/common/Config.cpp" line="4020"/>
         <source>U Motor Num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3966"/>
+        <location filename="../src/common/Config.cpp" line="4021"/>
         <source>U motor num</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3969"/>
+        <location filename="../src/common/Config.cpp" line="4024"/>
         <source>U Motor current(%)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3970"/>
+        <location filename="../src/common/Config.cpp" line="4025"/>
         <source>U motor current</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3973"/>
+        <location filename="../src/common/Config.cpp" line="4028"/>
         <source>U Start Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3974"/>
+        <location filename="../src/common/Config.cpp" line="4029"/>
         <source>U Start Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3977"/>
+        <location filename="../src/common/Config.cpp" line="4032"/>
         <source>U Max Speed(mm/s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3978"/>
+        <location filename="../src/common/Config.cpp" line="4033"/>
         <source>U Max Speed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3981"/>
+        <location filename="../src/common/Config.cpp" line="4036"/>
         <source>U Max Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3982"/>
+        <location filename="../src/common/Config.cpp" line="4037"/>
         <source>U max acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3985"/>
+        <location filename="../src/common/Config.cpp" line="4040"/>
         <source>U Urgent Acceleration(mm/s&lt;sup&gt;2&lt;/sup&gt;)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3986"/>
+        <location filename="../src/common/Config.cpp" line="4041"/>
         <source>U urgent acceleration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3989"/>
+        <location filename="../src/common/Config.cpp" line="4044"/>
         <source>U Phase Enabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3990"/>
+        <location filename="../src/common/Config.cpp" line="4045"/>
         <source>Enabled U phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3993"/>
-        <location filename="../src/common/Config.cpp" line="3994"/>
+        <location filename="../src/common/Config.cpp" line="4052"/>
+        <location filename="../src/common/Config.cpp" line="4053"/>
+        <source>Z Reset Direction</source>
+        <translation>Z轴重置方向</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="4056"/>
+        <source>Scan return delay(us)</source>
+        <translation>扫描换行延时(us)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="4057"/>
+        <source>Scan return delay</source>
+        <translation>扫描换行延时</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="4060"/>
+        <location filename="../src/common/Config.cpp" line="4061"/>
+        <source>Screen Type</source>
+        <translation>屏幕类型</translation>
+    </message>
+    <message>
+        <location filename="../src/common/Config.cpp" line="4064"/>
+        <location filename="../src/common/Config.cpp" line="4065"/>
         <location filename="../src/common/Config.h" line="82"/>
         <source>General</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="3997"/>
-        <location filename="../src/common/Config.cpp" line="3998"/>
+        <location filename="../src/common/Config.cpp" line="4068"/>
+        <location filename="../src/common/Config.cpp" line="4069"/>
         <location filename="../src/common/Config.h" line="101"/>
         <source>Layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4001"/>
-        <location filename="../src/common/Config.cpp" line="4002"/>
+        <location filename="../src/common/Config.cpp" line="4072"/>
+        <location filename="../src/common/Config.cpp" line="4073"/>
         <location filename="../src/common/Config.h" line="116"/>
         <source>Camera</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4005"/>
-        <location filename="../src/common/Config.cpp" line="4006"/>
+        <location filename="../src/common/Config.cpp" line="4076"/>
+        <location filename="../src/common/Config.cpp" line="4077"/>
         <location filename="../src/common/Config.h" line="152"/>
         <source>UI</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4009"/>
-        <location filename="../src/common/Config.cpp" line="4010"/>
+        <location filename="../src/common/Config.cpp" line="4080"/>
+        <location filename="../src/common/Config.cpp" line="4081"/>
         <location filename="../src/common/Config.h" line="183"/>
         <source>Cutting Layer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4013"/>
-        <location filename="../src/common/Config.cpp" line="4014"/>
+        <location filename="../src/common/Config.cpp" line="4084"/>
+        <location filename="../src/common/Config.cpp" line="4085"/>
         <location filename="../src/common/Config.h" line="200"/>
         <source>Engraving Layer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4017"/>
-        <location filename="../src/common/Config.cpp" line="4018"/>
+        <location filename="../src/common/Config.cpp" line="4088"/>
+        <location filename="../src/common/Config.cpp" line="4089"/>
         <location filename="../src/common/Config.h" line="225"/>
         <source>Filling Layer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4021"/>
-        <location filename="../src/common/Config.cpp" line="4022"/>
+        <location filename="../src/common/Config.cpp" line="4096"/>
+        <location filename="../src/common/Config.cpp" line="4097"/>
         <location filename="../src/common/Config.h" line="260"/>
         <source>Path Optimization</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4025"/>
-        <location filename="../src/common/Config.cpp" line="4026"/>
+        <location filename="../src/common/Config.cpp" line="4100"/>
+        <location filename="../src/common/Config.cpp" line="4101"/>
         <location filename="../src/common/Config.h" line="279"/>
         <source>Export</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4029"/>
-        <location filename="../src/common/Config.cpp" line="4030"/>
+        <location filename="../src/common/Config.cpp" line="4104"/>
+        <location filename="../src/common/Config.cpp" line="4105"/>
         <location filename="../src/common/Config.h" line="302"/>
         <source>Device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4033"/>
-        <location filename="../src/common/Config.cpp" line="4034"/>
-        <location filename="../src/common/Config.h" line="510"/>
+        <location filename="../src/common/Config.cpp" line="4108"/>
+        <location filename="../src/common/Config.cpp" line="4109"/>
+        <location filename="../src/common/Config.h" line="515"/>
         <source>Debug</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4037"/>
-        <location filename="../src/common/Config.cpp" line="4038"/>
+        <location filename="../src/common/Config.cpp" line="4112"/>
+        <location filename="../src/common/Config.cpp" line="4113"/>
         <source>User</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/common/Config.cpp" line="4041"/>
-        <location filename="../src/common/Config.cpp" line="4042"/>
+        <location filename="../src/common/Config.cpp" line="4116"/>
+        <location filename="../src/common/Config.cpp" line="4117"/>
         <source>System</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../src/common/Config.cpp" line="4092"/>
+        <location filename="../src/common/Config.cpp" line="4093"/>
         <location filename="../src/common/Config.h" line="245"/>
         <source>Stamp Layer</source>
         <translation></translation>
@@ -3788,12 +3828,12 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserBitmap</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="387"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="390"/>
         <source>Bitmap</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="2350"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="2372"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -3801,7 +3841,7 @@ Would you like to overwrite it?</source>
 <context>
     <name>LaserCircleText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="686"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="689"/>
         <source>CircleText</source>
         <translation></translation>
     </message>
@@ -5812,440 +5852,440 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDevice</name>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1552"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1556"/>
         <source>Laser device fatal error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1559"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1563"/>
         <source>Failed to initialize laser device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1562"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1566"/>
         <source>Failed to uninitialize laser device normally</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1565"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1569"/>
         <source>Com port not available</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1568"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1572"/>
         <source>Failed to get COM port list</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1574"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1578"/>
         <source>Dongle activation is disabled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="782"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="786"/>
         <source>Registration success</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="388"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="392"/>
         <source>Device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="655"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="667"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="672"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="677"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="659"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="671"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="676"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="681"/>
         <source>Alert</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="655"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="677"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="659"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="681"/>
         <source>No available dongle connected.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="667"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="671"/>
         <source>Main card is not activated.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="672"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="676"/>
         <source>Main card is not registered.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="744"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="772"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="748"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="776"/>
         <source>Password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="744"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="748"/>
         <source>Manufacture Password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="773"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="777"/>
         <source>Please input vendor password.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="774"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="778"/>
         <source>Ok</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="775"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="779"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="782"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="786"/>
         <source>Registration success!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="785"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="789"/>
         <source>Registration failure</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="785"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="789"/>
         <source>Registration failure!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1040"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1142"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1044"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1146"/>
         <source>Exceed layout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1041"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1045"/>
         <source>The target point exceeds the device layout! Please check your target point.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1071"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1075"/>
         <source>Left edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1078"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1082"/>
         <source>Top edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1084"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1088"/>
         <source>Right edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1091"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1095"/>
         <source>Bottom edge of current document bounding exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1096"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1100"/>
         <source>Document bounding is OK.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1107"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1111"/>
         <source>Left edge of current document bounding with acc interval exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1113"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1117"/>
         <source>Right edge of current document bounding with acc interval exceeds device layout: %1mm
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1118"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1122"/>
         <source>Document bounding with acc interval is OK.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1555"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1559"/>
         <source>There&apos;s something wrong. If you receive this message repeatedly, please restart your laser device and this application.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1583"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1587"/>
         <source>Invalid main card ID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1586"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1590"/>
         <source>Invalid dongle ID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1589"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1593"/>
         <source>Failed to bind card with dongle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1592"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1596"/>
         <source>The card is repeatedly bound to the dongle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1595"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1599"/>
         <source>The number of times the card is bound to the dongle exceeds the allowable range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1598"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1602"/>
         <source>The card is illegally bound to the dongle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1601"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1605"/>
         <source>Failed to clear duration of laser tube</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1604"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1608"/>
         <source>Incorrect factory password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1604"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1608"/>
         <source>Invalid password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1607"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1611"/>
         <source>Invalid length of factory password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1610"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1614"/>
         <source>Factory password expired</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1613"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1617"/>
         <source>Input incorrect factory password too many times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1616"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1620"/>
         <source>Change factory password failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1620"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1626"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1624"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1630"/>
         <source>Failed to read parameters from device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1623"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1629"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1627"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1633"/>
         <source>Failed to write parameters to device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1632"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1636"/>
         <source>Failed to save parameters to server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1635"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1639"/>
         <source>Failed to load parameters from server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1638"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1642"/>
         <source>File does not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1641"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1645"/>
         <source>Invalid data format</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1644"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1648"/>
         <source>Failed to decrypt data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1647"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1651"/>
         <source>Invalid image data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1650"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1654"/>
         <source>Min size of image is too small</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1653"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1657"/>
         <source>Max size of image is too large</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1656"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1660"/>
         <source>No data transfered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1659"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1663"/>
         <source>Transfering data timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1665"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1669"/>
         <source>Retransfer data too many times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1668"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1672"/>
         <source>Failed to transfer data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1671"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1675"/>
         <source>Receive invalid data too many times</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1674"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1678"/>
         <source>Failed to transfer data with breakpoint</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1680"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1684"/>
         <source>Failed to connect to server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1683"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1687"/>
         <source>Failed to log in to server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1686"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1690"/>
         <source>Login too frequently</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1689"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1693"/>
         <source>Failed to submit data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1692"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1696"/>
         <source>Updating info file does not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1695"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1699"/>
         <source>Updating file dose not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1698"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1702"/>
         <source>Failed to update</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1701"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1705"/>
         <source>Failed to download firmware</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1704"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1708"/>
         <source>Update firmware timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1552"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1555"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1556"/>
         <location filename="../src/laser/LaserDevice.cpp" line="1559"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1562"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1565"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1568"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1574"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1583"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1586"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1589"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1592"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1595"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1598"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1601"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1607"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1610"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1613"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1616"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1563"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1566"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1569"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1572"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1578"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1587"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1590"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1593"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1596"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1599"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1602"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1605"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1611"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1614"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1617"/>
         <location filename="../src/laser/LaserDevice.cpp" line="1620"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1623"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1626"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1629"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1632"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1635"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1638"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1641"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1644"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1647"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1650"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1653"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1656"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1659"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1665"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1668"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1671"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1674"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1680"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1683"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1686"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1689"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1692"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1695"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1698"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1701"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1704"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1707"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1715"/>
-        <location filename="../src/laser/LaserDevice.cpp" line="1721"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1624"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1627"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1630"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1633"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1636"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1639"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1642"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1645"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1648"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1651"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1654"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1657"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1660"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1663"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1669"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1672"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1675"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1678"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1684"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1687"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1690"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1693"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1696"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1699"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1702"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1705"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1708"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1711"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1719"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1725"/>
         <source>Warning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1707"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1711"/>
         <source>The current operation requires higher privileges</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1715"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1719"/>
         <source>Active laser device failed.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1721"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1725"/>
         <source>Data cache is out of size.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1790"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1794"/>
         <source>Main card info incomplete.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/laser/LaserDevice.cpp" line="1508"/>
+        <location filename="../src/laser/LaserDevice.cpp" line="1512"/>
         <source>Registers data incomplete.</source>
         <translation></translation>
     </message>
@@ -6253,37 +6293,37 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserDocument</name>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="361"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="366"/>
         <source>Layer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="402"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="407"/>
         <source>Export Json</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="935"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="943"/>
         <source>Clear tree</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="936"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="944"/>
         <source>Outline by layers</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1352"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1360"/>
         <source>Warning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1353"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1361"/>
         <source>Found unavailable primitives, count is %1. These primitives will not be loaded.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1587"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1595"/>
         <source>Untitled</source>
         <translation></translation>
     </message>
@@ -6291,7 +6331,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserEllipse</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="977"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="999"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6299,7 +6339,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserFrame</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="591"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="594"/>
         <source>Frame</source>
         <translation></translation>
     </message>
@@ -6307,7 +6347,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserHorizontalText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="721"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="724"/>
         <source>HorizontalText</source>
         <translation></translation>
     </message>
@@ -6532,7 +6572,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserLine</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1347"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1369"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6540,7 +6580,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPartyEmblem</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="524"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="527"/>
         <source>PartyEmblem</source>
         <translation></translation>
     </message>
@@ -6548,7 +6588,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPath</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1474"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1496"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6556,7 +6596,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPolygon</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1789"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1811"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6564,7 +6604,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPolyline</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1637"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1659"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6572,69 +6612,69 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserPrimitive</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="660"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="672"/>
         <source>Bitmap</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="661"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="673"/>
         <source>Circle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="662"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="674"/>
         <source>Ellipse</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="663"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="675"/>
         <source>Line</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="664"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="676"/>
         <source>Path</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="665"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="677"/>
         <source>Polygon</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="666"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="678"/>
         <source>Polyline</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="667"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="679"/>
         <source>Rect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="668"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="689"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="680"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="701"/>
         <source>Text</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="669"/>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="690"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="681"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="702"/>
         <source>Nurbs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="670"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="682"/>
         <source>Star</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="671"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="683"/>
         <source>Frame</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="672"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="684"/>
         <source>Ring</source>
         <translation></translation>
     </message>
@@ -6642,7 +6682,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserRect</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="1171"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="1193"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6650,7 +6690,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserRing</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="553"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="556"/>
         <source>Ring</source>
         <translation></translation>
     </message>
@@ -6658,7 +6698,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserStar</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="493"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="496"/>
         <source>Star</source>
         <translation></translation>
     </message>
@@ -6666,12 +6706,12 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="470"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="473"/>
         <source>Text</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserPrimitive.cpp" line="3047"/>
+        <location filename="../src/scene/LaserPrimitive.cpp" line="3069"/>
         <source>%1 update machining points</source>
         <translation></translation>
     </message>
@@ -6679,7 +6719,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
 <context>
     <name>LaserVerticalText</name>
     <message>
-        <location filename="../src/scene/LaserPrimitive.h" line="749"/>
+        <location filename="../src/scene/LaserPrimitive.h" line="752"/>
         <source>VerticalText</source>
         <translation></translation>
     </message>
@@ -7058,22 +7098,22 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/util/MachiningUtils.cpp" line="177"/>
+        <location filename="../src/util/MachiningUtils.cpp" line="182"/>
         <source>Polygon to Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="470"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="476"/>
         <source>%1 Engraving</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="504"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="511"/>
         <source>%1 Points to Plt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="514"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="521"/>
         <source>%1 Lines to Plt</source>
         <translation></translation>
     </message>
@@ -7244,218 +7284,234 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <name>StampCircleDialog</name>
     <message>
         <location filename="../src/ui/StampCircleDialog.ui" line="26"/>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="71"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="74"/>
         <source>Circle Stamp Dialog</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="53"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="58"/>
         <source>Circle Stamp Layout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="80"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="85"/>
         <source>Intaglio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="99"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="104"/>
         <source>Circle Property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="137"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="142"/>
         <source>Diameter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="153"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="170"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="204"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="237"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="254"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="342"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="359"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="382"/>
-        <location filename="../src/ui/StampCircleDialog.ui" line="537"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="158"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="175"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="209"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="242"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="259"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="347"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="364"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="387"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="542"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="163"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="168"/>
         <source>Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="180"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="185"/>
         <source>Angle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="194"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="199"/>
         <source>Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="216"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="221"/>
         <source>Inner Circle</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="230"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="235"/>
         <source>Inner Circle Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="247"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="252"/>
         <source>Inner Circle Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="288"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="293"/>
         <source>Text Property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="352"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="357"/>
         <source>Text Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="335"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="603"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="459"/>
+        <source>Preview</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampCircleDialog.ui" line="340"/>
         <source>Text Spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="372"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="377"/>
         <source>Text Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="405"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="410"/>
         <source>Bold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="419"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="424"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="506"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="511"/>
         <source>Addition Mark</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="517"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="522"/>
         <source>Emblem</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="530"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="535"/>
         <source>Emblem Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="555"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="560"/>
         <source>Mark Line</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.ui" line="569"/>
+        <location filename="../src/ui/StampCircleDialog.ui" line="574"/>
         <source>Line Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="25"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="28"/>
         <source>FangSong</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="50"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="53"/>
         <source>Ellipse Stamp Dialog</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="58"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="61"/>
         <source>Normal Ellipse Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="59"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="62"/>
         <source>Horizontal Text Ellipse Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="60"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="63"/>
         <source>Emblem Ellipse Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="61"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="64"/>
         <source>New Invoice Stamp A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="62"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="65"/>
         <source>New Invoice Stamp B</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="78"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="81"/>
         <source>Normal Circle Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="79"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="82"/>
         <source>Horizontal Text Circle Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="80"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="83"/>
         <source>Bottom Text Circle Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="81"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="84"/>
         <source>CCYL Circle Stamp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="148"/>
         <location filename="../src/ui/StampCircleDialog.cpp" line="151"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="154"/>
         <source>content</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="149"/>
         <location filename="../src/ui/StampCircleDialog.cpp" line="152"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="155"/>
         <source>font</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="153"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="156"/>
         <source>property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="154"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="157"/>
         <source>text spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="155"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="158"/>
         <source>text height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="440"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="443"/>
         <source>Star Emblem</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampCircleDialog.cpp" line="441"/>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="444"/>
         <source>Party Emblem</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="461"/>
+        <source>Ok</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampCircleDialog.cpp" line="463"/>
+        <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
@@ -7508,156 +7564,172 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="56"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="64"/>
         <source>Frame Stamp Layout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="83"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="78"/>
         <source>Intaglio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="102"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="97"/>
         <source>Frame Property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="140"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="135"/>
         <source>Width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="156"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="179"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="196"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="229"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="262"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="279"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="471"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="491"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="508"/>
-        <location filename="../src/ui/StampFrameDialog.ui" line="525"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="151"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="174"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="191"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="224"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="257"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="274"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="375"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="395"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="412"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="429"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="166"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="161"/>
         <source>Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="189"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="184"/>
         <source>Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="206"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="201"/>
         <source>Corner Type</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="216"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="211"/>
         <source>Corner Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="241"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="236"/>
         <source>Inner Frame</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="255"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="250"/>
         <source>Inner Frame Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="272"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="267"/>
         <source>Inner Frame Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="313"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="308"/>
         <source>Text Property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="364"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="455"/>
         <source>Bold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="378"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="469"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="464"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="560"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="177"/>
+        <source>Preview</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.ui" line="368"/>
         <source>Horinzontal Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="484"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="388"/>
         <source>Vertical Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="501"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="405"/>
         <source>Horinzontal Spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.ui" line="518"/>
+        <location filename="../src/ui/StampFrameDialog.ui" line="422"/>
         <source>Vertical Spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="26"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="29"/>
         <source>Four Character</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="27"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="30"/>
         <source>Three Character Left</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="28"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="31"/>
         <source>Three Character Right</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="29"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="32"/>
         <source>Two Character</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="61"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="64"/>
         <source>Round Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="62"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="65"/>
         <source>Cutted Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.cpp" line="63"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="66"/>
         <source>Inner Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.h" line="21"/>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="179"/>
+        <source>Ok</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.cpp" line="181"/>
+        <source>Cancel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampFrameDialog.h" line="23"/>
         <source>FSNS</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.h" line="21"/>
+        <location filename="../src/ui/StampFrameDialog.h" line="23"/>
         <source>FSN</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampFrameDialog.h" line="21"/>
+        <location filename="../src/ui/StampFrameDialog.h" line="23"/>
         <source>NA</source>
         <translation></translation>
     </message>
@@ -7670,161 +7742,177 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="53"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="58"/>
         <source>Strip Stamp Layout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="80"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="72"/>
         <source>Intaglio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="99"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="366"/>
         <source>Frame Property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="137"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="404"/>
         <source>Width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="153"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="176"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="193"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="226"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="259"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="276"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="475"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="495"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="512"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="529"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="262"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="282"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="299"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="316"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="420"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="443"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="460"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="493"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="526"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="543"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="163"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="430"/>
         <source>Height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="186"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="453"/>
         <source>Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="203"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="470"/>
         <source>Corner Type</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="213"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="480"/>
         <source>Corner Size</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="238"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="505"/>
         <source>Inner Frame</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="252"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="519"/>
         <source>Inner Frame Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="269"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="536"/>
         <source>Inner Frame Border</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="310"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="97"/>
         <source>Text Property</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="348"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="135"/>
         <source>Bold</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="362"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="405"/>
-        <location filename="../src/ui/StampStripDialog.ui" line="419"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="149"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="192"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="206"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="402"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="189"/>
         <source>add</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="416"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="203"/>
         <source>delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="468"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="255"/>
         <source>Horinzontal Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="488"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="275"/>
         <source>Vertical Margins</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="505"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="292"/>
         <source>Horinzontal Spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.ui" line="522"/>
+        <location filename="../src/ui/StampStripDialog.ui" line="309"/>
         <source>Vertical Spacing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="26"/>
-        <source>Signal Row</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="27"/>
-        <source>Multi Row</source>
+        <location filename="../src/ui/StampStripDialog.ui" line="583"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="263"/>
+        <source>Preview</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/StampStripDialog.cpp" line="28"/>
+        <source>Signal Row</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.cpp" line="29"/>
+        <source>Multi Row</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.cpp" line="30"/>
         <source>Multi Column</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="60"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="62"/>
         <source>Round Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="61"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="63"/>
         <source>Cutted Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="62"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="64"/>
         <source>Inner Corner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="137"/>
-        <location filename="../src/ui/StampStripDialog.cpp" line="140"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="139"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="142"/>
         <source>content</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/StampStripDialog.cpp" line="138"/>
-        <location filename="../src/ui/StampStripDialog.cpp" line="141"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="140"/>
+        <location filename="../src/ui/StampStripDialog.cpp" line="143"/>
         <source>font</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.cpp" line="265"/>
+        <source>Ok</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/StampStripDialog.cpp" line="267"/>
+        <source>Cancel</source>
         <translation></translation>
     </message>
     <message>

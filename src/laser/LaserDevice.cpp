@@ -262,6 +262,10 @@ LaserDevice::LaserDevice(LaserDriver* driver, QObject* parent)
     d->systemRegisters.insert(73, new LaserRegister(73, Config::SystemRegister::uMaxAccelerationItem(), true));
     d->systemRegisters.insert(74, new LaserRegister(74, Config::SystemRegister::uUrgentAccelerationItem(), true));
     d->systemRegisters.insert(75, new LaserRegister(75, Config::SystemRegister::uPhaseEnabledItem(), true));
+    d->systemRegisters.insert(76, new LaserRegister(76, Config::SystemRegister::zEnabledItem(), true));
+    d->systemRegisters.insert(77, new LaserRegister(77, Config::SystemRegister::zResetDirectionItem(), true));
+    d->systemRegisters.insert(78, new LaserRegister(78, Config::SystemRegister::scanReturnDelayItem(), true));
+    d->systemRegisters.insert(79, new LaserRegister(79, Config::SystemRegister::screenTypeItem(), true));
 
     connect(Config::SystemRegister::xMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerWidthChanged);
     connect(Config::SystemRegister::yMaxLengthItem(), &ConfigItem::valueChanged, this, &LaserDevice::onLayerHeightChanged);
