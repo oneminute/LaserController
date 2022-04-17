@@ -45,6 +45,8 @@ public:
     void fromJson(const QJsonObject& json);
 
     SmallDiagonalLimitationItem& createNewItem();
+
+    int indexOf(qreal diagonal) const;
 };
 
 QDebug operator<<(QDebug dbg, const SmallDiagonalLimitation& limitation);

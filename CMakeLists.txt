@@ -129,7 +129,8 @@ set(OTHER_FILES
     src/res/icons.qrc
     src/res/laser.rc
     res/constraints.csv
-    cmake/Compress.cmake
+    cmake/Compress_debug.cmake
+    cmake/Compress_release.cmake
     cmake/GenerateConstraints.cmake
     .gitignore
     ${TRANSLATIONS}

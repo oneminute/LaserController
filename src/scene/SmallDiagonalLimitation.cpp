@@ -7,9 +7,9 @@
 QJsonObject SmallDiagonalLimitationItem::toJson() const
 {
     QJsonObject json;
-    json.insert("diagonal", diagonal);
-    json.insert("laserPower", laserPower);
-    json.insert("speed", speed);
+    json.insert("diagonal", qRound(diagonal * 1000));
+    json.insert("laserPower", qRound(laserPower * 10));
+    json.insert("speed", qRound(speed * 1000));
     return json;
 }
 
@@ -17,15 +17,15 @@ void SmallDiagonalLimitationItem::fromJson(const QJsonObject& json)
 {
     if (json.contains("diagonal"))
     {
-        diagonal = json["diagonal"].toDouble();
+        diagonal = json["diagonal"].toDouble() / 1000.0;
     }
     if (json.contains("laserPower"))
     {
-        laserPower = json["laserPower"].toDouble();
+        laserPower = json["laserPower"].toDouble() / 10.0;
     }
     if (json.contains("speed"))
     {
-        speed = json["speed"].toDouble();
+        speed = json["speed"].toDouble() / 1000.0;
     }
 }
 
@@ -119,6 +119,15 @@ SmallDiagonalLimitationItem& SmallDiagonalLimitation::createNewItem()
     SmallDiagonalLimitationItem item = { diagonal, power, speed };
     insert(diagonal, item);
     return last();
+}
+
+int SmallDiagonalLimitation::indexOf(qreal diagonal) const
+{
+    QList<qreal> keyList = keys();
+    LimitationMap::ConstIterator upperIt = upperBound(diagonal);
+    if (upperIt == constEnd())
+        return -1;
+    return keyList.indexOf(upperIt.key());
 }
 
 QDebug operator<<(QDebug dbg, const SmallDiagonalLimitation& limitation)

@@ -74,5 +74,5 @@ INSTALL(CODE "
 
 set(BASE_CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}_Release")
 
-INSTALL(SCRIPT "cmake/Compress.cmake"
+INSTALL(SCRIPT "cmake/Compress_release.cmake"
     CONFIGURATIONS Release)

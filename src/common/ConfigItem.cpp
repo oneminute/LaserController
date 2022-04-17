@@ -798,6 +798,7 @@ void ConfigItem::setValue(const QVariant& value, StoreStrategy strategy_, void* 
         d->dirtyValue = value;
         if (dirtyChanged)
             emit dirtyValueChanged(value, senderPtr);
+        break;
     case SS_LAZY:
         d->dirtyValue = value;
         if (dirtyChanged)

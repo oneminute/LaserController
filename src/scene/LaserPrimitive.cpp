@@ -388,11 +388,12 @@ LaserPointListList LaserPrimitive::arrangeMachiningPoints(LaserPoint& fromPoint,
             {
                 cursor = (cursor + step + machiningPoints.length()) % machiningPoints.length();
                 LaserPoint& currentPoint = machiningPoints[cursor];
-                if (!(lastPoint == currentPoint))
+                if (lastPoint != currentPoint)
                     points.push_back(currentPoint);
                 lastPoint = currentPoint;
             }
-            points.push_back(firstPoint);
+            if (lastPoint != firstPoint)
+                points.push_back(firstPoint);
 
             fromPoint = firstPoint;
         }
@@ -887,6 +888,16 @@ bool LaserPrimitive::isStamepPrimitive()
 
 void LaserPrimitive::createAntifakeLine(bool isCurve)
 {
+}
+
+int LaserPrimitive::smallCircleIndex() const
+{
+    if (!Config::Export::enableSmallDiagonal())
+        return -1;
+    QSize boundingSize = sceneBoundingRect().size();
+    int length = boundingSize.width() >= boundingSize.height() ? boundingSize.width() : boundingSize.height();
+    int index = Config::Export::smallDiagonalLimitation()->indexOf(length / 1000.0);
+    return index;
 }
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
@@ -2931,7 +2942,7 @@ void LaserText::modifyPathList()
             QPainterPath subPath = subRowPath[subIndex];
             QRectF subBound = subRowBound[subIndex];
 
-            qDebug() << diff;
+            //qDebug() << diff;
             subPath.translate(diff.x(), diff.y());
             subBound.translate(diff.x(), diff.y());
 
@@ -3693,7 +3704,7 @@ LaserPrimitive * LaserRing::clone(QTransform t)
 QVector<QLineF> LaserRing::edges()
 {
     Q_D(LaserRing);
-    qDebug()<<LaserPrimitive::edges(sceneTransform().map(d->path)).size();
+    //qDebug()<<LaserPrimitive::edges(sceneTransform().map(d->path)).size();
     return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 void LaserRing::mousePressEvent(QGraphicsSceneMouseEvent * event)

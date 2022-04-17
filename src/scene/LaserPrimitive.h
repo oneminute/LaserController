@@ -131,6 +131,9 @@ public:
     virtual void createAntifakeLine(bool isCurve = false);
 
 
+
+    virtual int smallCircleIndex() const;
+
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

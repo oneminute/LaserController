@@ -15,9 +15,9 @@ INSTALL(FILES
 	CONFIGURATIONS Debug)
 
 foreach(_lib IN LISTS OpenCV_LIBS)
-	get_target_property(${_lib}_location_Debug ${_lib} IMPORTED_LOCATION_DEBUG)
+	#get_target_property(${_lib}_location_Debug ${_lib} IMPORTED_LOCATION_DEBUG)
 	get_target_property(${_lib}_location_Release ${_lib} IMPORTED_LOCATION_RELEASE)
-	get_target_property(${_lib}_location_RelWithDebInfo ${_lib} IMPORTED_LOCATION_RELWITHDEUBINFO)
+	#get_target_property(${_lib}_location_RelWithDebInfo ${_lib} IMPORTED_LOCATION_RELWITHDEUBINFO)
 	INSTALL(FILES 
 		${${_lib}_location_Debug}
 		DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug
@@ -64,3 +64,6 @@ INSTALL(CODE "
 			--no-translations
 			${CMAKE_INSTALL_PREFIX}_Debug/${PROJECT_NAME}.exe)"
 	CONFIGURATIONS Debug)
+
+INSTALL(SCRIPT "cmake/Compress_debug.cmake"
+    CONFIGURATIONS Debug)

@@ -1024,7 +1024,7 @@ void Config::loadExportItems()
     QVariant smallDiagonalLimitationVar;
     SmallDiagonalLimitation* limitation = new SmallDiagonalLimitation;
     smallDiagonalLimitationVar.setValue(limitation);
-    qLogD << "small diagonal limitation type: " << smallDiagonalLimitationVar.userType();
+    //qLogD << "small diagonal limitation type: " << smallDiagonalLimitationVar.userType();
     ConfigItem* smallDiagonalLimitation = group->addConfigItem(
         "smallDiagonalLimitation",
         smallDiagonalLimitationVar,
@@ -1060,7 +1060,7 @@ void Config::loadExportItems()
             }
         }
     );
-    connect(enableSmallDiagonal, &ConfigItem::valueChanged,
+    connect(enableSmallDiagonal, &ConfigItem::dirtyValueChanged,
         [=](const QVariant& value, void* senderPtr) {
             bool enabled = value.toBool();
             smallDiagonalLimitation->setEnabled(enabled);
