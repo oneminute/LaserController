@@ -149,7 +149,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
 
     QStringList hearderLabels;
     hearderLabels.append(QString(tr("content")));
-    hearderLabels.append(QString(tr("font")));
+    //hearderLabels.append(QString(tr("font")));
     //iStandardItemModel->setHorizontalHeaderLabels(hearderLabels);
     m_viewItemModel->setHorizontalHeaderItem(0, new QStandardItem(tr("content")));
     m_viewItemModel->setHorizontalHeaderItem(1, new QStandardItem(tr("font")));
@@ -330,10 +330,12 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
             QStandardItem* item1 = m_viewItemModel->item(i, 1);
             QStandardItem* item2 = m_viewItemModel->item(i, 2);
             QStandardItem* item3 = m_viewItemModel->item(i, 3);
+            QStandardItem* item4 = m_viewItemModel->item(i, 4);
             itemModelMap.insert(item0->index(), itemStruct(item0->text(), item0->checkState()));
             itemModelMap.insert(item1->index(), itemStruct(item1->text(), item0->checkState()));
             itemModelMap.insert(item2->index(), itemStruct(item2->text(), item0->checkState()));
             itemModelMap.insert(item3->index(), itemStruct(item3->text(), item0->checkState()));
+            itemModelMap.insert(item4->index(), itemStruct(item4->text(), item0->checkState()));
         }
         m_tablesModelList[m_preLayoutIndex] = itemModelMap;
         //修改

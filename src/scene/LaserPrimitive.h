@@ -123,15 +123,6 @@ public:
     void concaveRect(QRect rect, QPainterPath& path, qreal cornerRadius, int type);
     QPainterPath computeCornerRadius(QRect rect, int cornerRadius, int type);
     virtual bool isAvailable() const;
-    //stamp
-    void setAntiFakePath(QPainterPath path);
-    bool stampIntaglio();
-    void setStampIntaglio(bool bl);
-    virtual bool isStamepPrimitive();
-    virtual void createAntifakeLine(bool isCurve = false);
-
-
-
     virtual int smallCircleIndex() const;
 
 protected:
@@ -487,9 +478,50 @@ private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)
 };
+class LaserStampBasePrivate;
+class LaserStampBase : public LaserShape {
+    Q_OBJECT
+public:
+    LaserStampBase(LaserStampBasePrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, bool stampIntaglio, QTransform transform,
+        int layerIndex, int antiFakeType = 0, int antiFakeLine = 0, bool isAverageDistribute = false, qreal lineWidth = 0,
+        bool surpassOuter = false, bool surpassInner = false, bool randomMove = false);
+    ~LaserStampBase();
+    void setAntiFakePath(QPainterPath path);
+    void setFingerPrintPath(QPainterPath path);
+    bool stampIntaglio();
+    void setStampIntaglio(bool bl);
+    int antiFakeType();
+    void setAntiFakeType(int type);
+    int antiFakeLine();
+    void setAntiFakeLine(int count);
+    bool isAverageDistribute();
+    void setIsAverageDistribute(bool bl);
+    qreal AntiFakeLineWidth();
+    void setAntiFakeLineWidth(qreal width);
+    bool surpassOuter();
+    void setSurpassOuter(bool bl);
+    bool surpassInner();
+    void setSurpassInner(bool bl);
+    bool randomMove();
+    void setRandomMove(bool bl);
+    void createAntiFakePath(int antiFakeType, int antiFakeLine, bool isAverageDistribute, qreal lineWidth,
+        bool surpassOuter = false, bool surpassInner = false, bool randomMove = false);
+    void createAntifakeLineByBounds();
+    void createAntifakeLineByArc(qreal lineWidthRate);
+    QPainterPath createBasePathByArc(qreal borderWidth, QLineF& baseLine);
+    QPainterPath createCurveLine(QRectF bounds, qreal a, QLineF line);
+    QPainterPath transformAntifakeLineByBounds(QPainterPath basePath, qreal intervalRate, qreal start, qreal end);
+protected:
+    void stampBaseClone(LaserStampBase* sp);
+    void stampBaseToJson(QJsonObject& object);
+
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampBase)
+        Q_DISABLE_COPY(LaserStampBase)
+};
 
 class LaserStarPrivate;
-class LaserStar : public LaserShape {
+class LaserStar : public LaserStampBase {
     Q_OBJECT
 public:
     LaserStar(LaserDocument* doc, QPoint centerPos, qreal radius, bool stampIntaglio = false, QTransform transform = QTransform(),
@@ -512,15 +544,12 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
-    virtual bool isStamepPrimitive();
-    //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
-    //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStar)
     Q_DISABLE_COPY(LaserStar)
 };
 class LaserPartyEmblemPrivate;
-class LaserPartyEmblem : public LaserShape {
+class LaserPartyEmblem : public LaserStampBase {
     Q_OBJECT
 public:
     LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, bool stampIntaglio = false, QTransform transform = QTransform(),
@@ -541,15 +570,12 @@ public:
     virtual QPointF position() const;
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
-    virtual bool isStamepPrimitive();
-    //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
-    //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPartyEmblem)
         Q_DISABLE_COPY(LaserPartyEmblem)
 };
 class LaserRingPrivate;
-class LaserRing : public LaserShape {
+class LaserRing : public LaserStampBase {
     Q_OBJECT
 public:
     LaserRing(LaserDocument* doc, QRectF outerRect, qreal width,bool stampIntaglio = false, QTransform transform = QTransform(),
@@ -577,15 +603,12 @@ public:
     void computePath();
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
-    virtual bool isStamepPrimitive();
-    //virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
-    //virtual LaserLineListList generateFillData(QPointF& lastPoint);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserRing)
     Q_DISABLE_COPY(LaserRing)
 };
 class LaserFramePrivate;
-class LaserFrame : public LaserShape {
+class LaserFrame : public LaserStampBase {
     Q_OBJECT
 public:
     //cornnerRadilus 为正是圆角，为副是内角
@@ -620,7 +643,6 @@ public:
     void setNeedAuxiliaryLine(bool bl);
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
-    virtual bool isStamepPrimitive();
 
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
@@ -628,7 +650,7 @@ private:
 };
 //LaserCircleText, LaserHorizontalText, LaserVerticalText等印章文字的父类
 class LaserStampTextPrivate;
-class LaserStampText : public LaserShape {
+class LaserStampText : public LaserStampBase {
     Q_OBJECT
 public:
     LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, 
@@ -655,7 +677,6 @@ public:
     virtual void setTextWidth(qreal diff) = 0;
     QSize textSize();
     virtual void setSpace(qreal space) = 0;
-    virtual bool isStamepPrimitive();
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampText)
     Q_DISABLE_COPY(LaserStampText)
@@ -769,8 +790,9 @@ public:
     void setTextWidth(qreal width);
 private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
-        Q_DISABLE_COPY(LaserVerticalText)
+    Q_DISABLE_COPY(LaserVerticalText)
 };
+
 
 QDebug operator<<(QDebug debug, const QRect& rect);
 

@@ -1752,436 +1752,6 @@ LaserDoubleSpinBox* LaserControllerWindow::originalBoundsSize()
     return m_originalBoundsSize;
 }
 
-void LaserControllerWindow::createAntifakeLineByBounds(LaserPrimitive* p)
-{
-    m_seed += 1;
-    
-    if (m_seed >= INT_MAX) {
-        m_seed = 0;
-    }
-    QRectF bounds = p->boundingRect();
-    int lineType = m_aFType->currentIndex();
-    qreal lineWidth = m_aFWidth->value()*1000;
-    int lineSize = m_aFLines->value();
-    QPainterPath path;
-    if (lineWidth == 0 || lineSize == 0) {
-        //return QPainterPath();
-        p->setAntiFakePath(path);
-        return;
-    }
-
-    switch (lineType) {
-    case 0: {
-        qreal length = (QLineF(bounds.topLeft(), bounds.bottomRight())).length();
-        
-        QRectF rect(bounds.topLeft(), QPointF(bounds.left() + length * 1, bounds.top()+ lineWidth));
-        QPainterPath lPath;
-        lPath.addRect(rect);
-        path = transformAntifakeLineByBounds(p, lPath, 1.5, 0.2, 0.8);
-        break;
-    }
-    case 1: {
-        QPainterPath sinPath;
-        sinPath = createCurveLine(bounds, bounds.width() * 0.25, QLineF(bounds.topLeft(), bounds.topRight()));
-        path = transformAntifakeLineByBounds(p, sinPath, 3, 0.2, 0.8);
-        break;
-    }
-    }
-    p->setAntiFakePath(path);
-    m_viewer->repaint();
-    //return path;
-}
-
-QPainterPath LaserControllerWindow::createCurveLine(QRectF bounds, qreal a, QLineF line)
-{
-    QPainterPath path;
-    QPainterPath lPath;
-    //lPath.moveTo(bounds.topLeft());
-    //lPath.lineTo(bounds.topRight());
-    lPath.moveTo(line.p1());
-    lPath.lineTo(line.p2());
-    int size = 50;
-    //qreal a = 1000;
-    qreal xInterval = bounds.width() / size;
-    qreal width = m_aFWidth->value() * 1000;
-    QPointF firstP = lPath.pointAtPercent(0.0);
-    QPointF endP = lPath.pointAtPercent(1.0);
-    path.moveTo(firstP);
-    for (int j = 0; j <= 1; j++) {
-        for (int i = 0; i <= size; i++) {
-            qreal rate = 1.0f / size * i;
-            if (j == 1) {
-                rate = 1.0 - 1.0f / size * i;
-            }
-            QPointF point = lPath.pointAtPercent(rate);
-            qreal x = i * xInterval;
-            qreal angle = rate * 2 * M_PI;
-            qreal y = a * qSin(angle) + width * j;
-            QPointF resultPoint(point.x(), y + point.y());
-
-            path.lineTo(resultPoint);
-        }
-        if (j == 0) {
-            path.lineTo(QPointF(endP.x(), endP.y() + width));
-        }
-    }
-    path.lineTo(firstP);
-    
-    return path;
-}
-
-QPainterPath LaserControllerWindow::transformAntifakeLineByBounds(LaserPrimitive* p, QPainterPath basePath, qreal intervalRate, qreal start, qreal end)
-{
-    QRectF bounds = p->boundingRect();
-    qreal lineWidth = m_aFWidth->value() * 1000;
-    int lineSize = m_aFLines->value();
-    bool isAverave = m_aFAverageCheckbox->isChecked();
-
-    QPainterPath path, tempL;
-    QLineF l1(bounds.topLeft(), bounds.topRight());
-    QLineF l2(bounds.bottomLeft(), bounds.bottomRight());
-    tempL.moveTo(bounds.topLeft());
-    tempL.lineTo(bounds.bottomRight());
-    QPainterPath centerLine;
-    QPointF cLineA = bounds.center();
-    centerLine.moveTo(tempL.pointAtPercent(start));
-    centerLine.lineTo(tempL.pointAtPercent(end));
-
-    QPointF c1 = bounds.center();
-    QPainterPath topLinePath;
-    
-    topLinePath.moveTo(bounds.topLeft());
-    topLinePath.lineTo(bounds.topRight());
-
-    //rotate
-    std::uniform_int_distribution<int> u1(1, 360);
-    std::default_random_engine e1;
-    e1.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()) + m_seed);
-    qreal rotateVal = u1(e1);
-
-    QTransform tr;
-    tr.rotate(rotateVal);
-    basePath = tr.map(basePath);
-    topLinePath = tr.map(topLinePath);
-
-    QTransform t;
-    QPointF cP = basePath.boundingRect().center();
-    t.translate(cLineA.x() - cP.x(), cLineA.y() - cP.y());
-    basePath = t.map(basePath);
-    topLinePath = t.map(topLinePath);
-    QVector2D vec(topLinePath.pointAtPercent(0.0) - topLinePath.pointAtPercent(1.0));
-    vec = QVector2D(vec.y(), -vec.x()).normalized();
-    //move
-    qreal shorter = bounds.width();
-    if (shorter > bounds.height()) {
-        shorter = bounds.height();
-    }
-    int maxLines = centerLine.length() / (lineWidth * intervalRate);
-    int halfLines = maxLines * 0.5;
-    if (maxLines < lineSize) {
-        halfLines = (lineSize * 0.5) + 1;
-    }
-    qreal xL = bounds.width();
-    qreal yL = bounds.height();
-    if (isAverave) {
-        qreal interval = centerLine.length() / (lineSize + 1);
-        bool isOdd = true;//奇数
-        if (lineSize % 2 == 0) {
-            isOdd = false;
-        }
-        for (int i = 0; i < lineSize; i++) {
-            QPainterPath tempPath = basePath;
-            qreal val;
-            qreal multi = 0;
-            if (isOdd) {
-                if (i == 0) {
-                    path = path.united(tempPath);
-                    continue;
-                }
-                
-                if (i % 2 == 0) {
-                    multi = -i / 2;
-                }
-                else {
-                    multi = i / 2 + 1;
-                }
-            }
-            else {
-                if (i == 0) {
-                    multi = -0.5;
-                }
-                else if (i == 1) {
-                    multi = 0.5;
-                }
-                else {
-                    if (i % 2 == 0) {
-                        multi = -(i / 2) - 0.5;
-                    }
-                    else {
-                        multi = (i / 2) + 0.5;
-                    }
-                    
-                }
-            }
-            val = multi * interval;
-            QPointF point(vec.x() * val , vec.y() * val);
-            QPointF c2 = tempPath.boundingRect().center();
-            QTransform tp;
-            tp.translate(point.x() - 0, point.y() - 0);
-
-            tempPath = tp.map(tempPath);
-            path = path.united(tempPath);
-        }
-    }
-    else {
-        QList<int> list;
-        std::uniform_int_distribution<int> u2(-halfLines, halfLines);
-        std::default_random_engine e2;
-        e2.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-        for (int i = 0; i < lineSize; i++) {
-            int rand = u2(e2);
-            for (int j = 0; j < list.size(); j++) {
-                int r = list[j];
-                while (r == rand) {
-                    rand = u2(e2);
-                }
-            }
-            list.append(rand);
-            qreal val = rand * lineWidth * intervalRate;
-            QPainterPath tempPath = basePath;
-
-            QPointF point(vec.x() * val, vec.y() * val);
-            QPointF c2 = tempPath.boundingRect().center();
-            QTransform tp;
-            tp.translate(point.x() - 0, point.y() - 0);
-            tempPath = tp.map(tempPath);
-            //path.addPath(tempPath);
-            path = path.united(tempPath);
-        }
-    }
-    
-    return path;
-}
-
-void LaserControllerWindow::createAntifakeLineByArc(LaserPrimitive* p, qreal lineWidthRate)
-{
-    QPainterPath outerPath, innerPath, centerPath, path;
-    QRectF outerRect, innerRect;
-    int type = p->primitiveType();
-    qreal width, halfWidth;
-    bool isAverage = m_aFAverageCheckbox->isChecked();
-    bool isSurpassOuter = m_aFSurpassOuterCheckbox->isChecked();
-    bool isSurpassInner = m_aFSurpassInnerCheckbox->isChecked();
-    bool isRandomMove = m_aFRandomMoveCheckbox->isChecked();
-    int lineSize = m_aFLines->value();
-    qreal lineWidth = m_aFWidth->value() * 1000;
-    
-    QRectF centerRect;
-    QPointF center;
-    
-    if (type == LPT_FRAME) {
-        LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(p);
-        innerPath = frame->innerPath();
-        innerRect = frame->innerRect();
-        width = frame->borderWidth();
-        outerPath = frame->outerPath();
-        center = innerRect.center();
-        halfWidth = width * 0.5;
-        centerRect = QRectF(QRectF(QPointF(innerRect.left() - halfWidth, innerRect.top() - halfWidth),
-            QPointF(innerRect.right() + halfWidth, innerRect.bottom() + halfWidth)));
-        //centerPath.addRect(centerRect);
-        centerPath = frame->computeCornerRadius(centerRect.toRect(), frame->cornerRadius(), frame->cornerRadiusType());
-    }
-    else if (type == LPT_RING) {
-        LaserRing* ring = qgraphicsitem_cast<LaserRing*>(p);
-        innerPath = ring->innerPath();
-        innerRect = ring->innerRect();
-        width = ring->borderWidth();
-        outerPath = ring->outerPath();
-        center = innerRect.center();
-        halfWidth = width * 0.5;
-        centerRect = QRectF(QRectF(QPointF(innerRect.left() - halfWidth, innerRect.top() - halfWidth),
-            QPointF(innerRect.right() + halfWidth, innerRect.bottom() + halfWidth)));
-        centerPath.addEllipse(centerRect);
-    }
-    else {
-        p->setAntiFakePath(path);
-        return;
-    }
-    
-    //points percent
-    QList<qreal> percentList;
-    qreal length = innerPath.length();
-    int maxLines = qFloor(length / (lineWidth * lineWidthRate));
-    if (maxLines < lineSize) {
-        maxLines = lineSize;
-    }
-    std::uniform_int_distribution<int> u1(0, 100);
-    std::default_random_engine e1;
-    e1.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-    qreal startPercent = u1(e1) / 100.0f;
-    qreal intervalPercent = 1.0 / lineSize;
-    percentList.append(startPercent);
-
-    std::uniform_int_distribution<int> u2(1, maxLines);
-    std::default_random_engine e2;
-    e2.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-    QPainterPath basePath;
-    QLineF baseLine;
-    basePath = createBasePathByArc(p, width, baseLine);   
-
-    if (isAverage) {
-        for (int i = 1; i < lineSize; i++) {
-            qreal val = startPercent + intervalPercent * i;
-            if (val > 1) {
-                val = val - 1;
-            }
-            percentList.append(val);
-        }
-    }
-    else {
-        for (int i = 1; i < lineSize; i ++) {
-            bool isRepeat = true;
-            qreal val;
-            while (isRepeat) {
-                qreal rVal = u2(e2);
-                val = rVal / maxLines;
-                for (qreal v : percentList) {
-                    if (v == val) {
-                        isRepeat = true;
-                        break;
-                    }
-                    else {
-                        isRepeat = false;
-                    }
-                }
-            }
-            if (!isRepeat) {
-                percentList.append(val);
-            }
-        }
-    }
-    //QList<QPainterPath> pathList;
-    QPainterPath targetPath;
-    if (isSurpassOuter && isSurpassInner) {
-        targetPath = centerPath;
-    }
-    else if (isSurpassOuter && !isSurpassInner) {
-        targetPath = outerPath;
-    }
-    else if (!isSurpassOuter && isSurpassInner) {
-        targetPath = innerPath;
-    }
-    else if (!isSurpassOuter && !isSurpassInner) {
-        targetPath = centerPath;
-    }
-    //rotate, translate
-    std::uniform_int_distribution<int> u3(0, 360);
-    std::default_random_engine e3;
-    for (int s = 0; s < lineSize; s++) {
-        QPainterPath bPath = basePath;
-        qreal percent = percentList[s];
-        QPointF tPoint = targetPath.pointAtPercent(percent);
-        //rotate
-        if (isRandomMove) {
-            e3.seed(QTime(0, 0, 0).secsTo(QTime::currentTime())+s);
-            qreal angle = u3(e3);
-            bool bl = true;
-            while (bl) {
-                if ((angle >= 30 && angle <= 60) || (angle >= 300 && angle <= 330)
-                    || (angle >= 120 && angle <= 150) || (angle <= 240 && angle >= 210)) {
-                    QTransform rt;
-                    rt.rotate(angle);
-                    bPath = rt.map(bPath);
-                    bl = false;
-                }
-                else {
-                    bl = true;
-                    angle = u3(e3);
-                }
-            }
-        }
-        else {
-            QVector2D arcVect(tPoint - center);
-            arcVect = arcVect.normalized();
-            QVector2D baseVect(baseLine.p1() - baseLine.p2());
-            baseVect = baseVect.normalized();
-            qreal radian = qAcos(QVector2D::dotProduct(baseVect, arcVect));
-            if (arcVect.y() > 0) {
-                radian = -radian;
-            }
-            QTransform rt;
-            rt.rotateRadians(radian);
-            bPath = rt.map(bPath);
-        }
-        //translate
-        
-        //QPointF tPoint = p->boundingRect().center();
-        QPointF diff = tPoint - bPath.boundingRect().center();
-        QTransform tt;
-        tt.translate(diff.x(), diff.y());
-        bPath = tt.map(bPath);
-        //path.addPath(bPath);
-        path = path.united(bPath);
-
-        //pathList.append(bPath);
-    }
-    p->setAntiFakePath(path);
-    //return path;
-}
-
-QPainterPath LaserControllerWindow::createBasePathByArc(LaserPrimitive* p, qreal borderWidth, QLineF& baseLine)
-{
-    QRectF bounds = p->boundingRect();
-    bool isSurpassOuter = m_aFSurpassOuterCheckbox->isChecked();
-    bool isSurpassInner = m_aFSurpassInnerCheckbox->isChecked();
-    
-    qreal height = m_aFWidth->value() * 1000;
-    qreal width, validHeight, validWidth, adpterWidth;
-    if (isSurpassOuter && isSurpassInner) {
-        width = borderWidth * 4;
-        validWidth = borderWidth;
-        validHeight = validWidth*0.25;
-        adpterWidth = validWidth;
-    }
-    else if (isSurpassOuter && !isSurpassInner) {
-        width = (borderWidth * 0.9) * 2;
-        validWidth = borderWidth * 0.9;
-        validHeight = validWidth * 0.25;
-        adpterWidth = validWidth;
-    }
-    else if (!isSurpassOuter && isSurpassInner) {
-        width = (borderWidth * 0.9) * 2;
-        validWidth = borderWidth * 0.9;
-        validHeight = validWidth*0.25;
-        adpterWidth = validWidth;
-    }
-    else if (!isSurpassOuter && !isSurpassInner) {
-        width = borderWidth * 0.8;
-        validWidth = borderWidth * 0.8;
-        validHeight = validWidth * 0.25;
-        adpterWidth = 0;
-    }
-    QRectF baseRect(bounds.left(), bounds.top(), width, height);
-    QLineF l1(baseRect.topLeft(), baseRect.bottomLeft());
-    QLineF l2(baseRect.topRight(), baseRect.bottomRight());
-    baseLine = QLineF(l1.center(), l2.center());
-    QPainterPath path;
-    int lineType = m_aFType->currentIndex();
-    switch (lineType) {
-    case 0: {
-        path.addRect(baseRect);
-        break;
-    }
-    case 1: {
-        path = createCurveLine(baseRect, validHeight, QLineF(QPointF(l1.center().x() - adpterWidth, l1.center().y()), QPointF(l1.center().x()+ validWidth, l1.center().y())));
-        break;
-    }
-    }
-    
-    return path;
-}
-
 void LaserControllerWindow::onFontComboBoxHighLighted(int index)
 {
     if (m_viewer) {
@@ -4081,6 +3651,7 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
     if (type == LPT_HORIZONTALTEXT || type == LPT_VERTICALTEXT || type == LPT_CIRCLETEXT 
         || type == LPT_FRAME || type == LPT_RING || type == LPT_STAR || type == LPT_PARTYEMBLEM) {
         LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(firstPrimitive);
+        LaserStampBase* stampBase = qgraphicsitem_cast<LaserStampBase*>(firstPrimitive);
         switch (fontProperty) {
             case 0: {
                 /*bool checked = m_textItalic->isChecked();
@@ -4237,21 +3808,21 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
                 break;
             }
             case 11:{
+                int antiFakeType = m_aFType->currentIndex();
+                int lines = m_aFLines->value();
+                qreal lineWidth = m_aFWidth->value() * 1000;
+                bool isAverage = m_aFAverageCheckbox->isChecked();
+                bool isSurpassOuter = m_aFSurpassOuterCheckbox->isChecked();
+                bool isSurpassInner = m_aFSurpassInnerCheckbox->isChecked();
+                bool randomMove = m_aFRandomMoveCheckbox->isChecked();
                 if (type == LPT_FRAME || type == LPT_RING) {
-                    qreal rate = 1.5;
-                    int lineType = m_aFType->currentIndex();
-                    switch (lineType) {
-                    case 1: {
-                        rate = 3.0;
-                        break;
-                    }
-                    }
-                    createAntifakeLineByArc(text, 1.5);
+                    stampBase->createAntiFakePath(antiFakeType, lines, isAverage, lineWidth,
+                        isSurpassOuter, isSurpassInner, randomMove);
                 }
                 else {
-                    createAntifakeLineByBounds(text);
+                    stampBase->createAntiFakePath(antiFakeType, lines, isAverage, lineWidth);
                 }
-                
+
                 break;
             }
             
@@ -4560,6 +4131,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             layout->addWidget(m_textItalic, 0, Qt::AlignLeft);
             layout->addWidget(m_textUpperCase, 0, Qt::AlignLeft);
             layout->addWidget(m_locked, 0, Qt::AlignLeft);
+            //set value
             m_locked->setText(tr("Locked"));
             m_verticalTextPropertyLayout->addLayout(layout, 7, 0, 1, 2);
             m_verticalTextWidget->setLayout(m_verticalTextPropertyLayout);
@@ -4588,6 +4160,9 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_verticalTextPropertyLayout->addWidget(antiFakeB, 8, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(text);
+            
             break;
         }
         case LPT_HORIZONTALTEXT: {
@@ -4644,6 +4219,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_horizontalTextPropertyLayout->addWidget(antiFakeB, 8, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(text);
 
             break;
         }
@@ -4710,6 +4287,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_circleTextPropertyLayout->addWidget(antiFakeB, 10, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(text);
             break;
         }
         case LPT_FRAME: {
@@ -4741,6 +4320,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFSurpassOuterCheckbox, m_aFSurpassInnerCheckbox);
             layoutAntiFake->addRow(nullptr, m_aFAntifakeBtn);
             m_framePropertyLayout->addWidget(antiFakeB, 6, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(frame);
 
             //value
             m_locked->setText(tr("Locked"));
@@ -4785,6 +4366,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFSurpassOuterCheckbox, m_aFSurpassInnerCheckbox);
             layoutAntiFake->addRow(nullptr, m_aFAntifakeBtn);
             m_ringPropertyLayout->addWidget(antiFakeB, 4, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(ring);
             //value
             m_locked->setText(tr("Locked"));
             m_borderWidth->setVisible(true);
@@ -4821,6 +4404,8 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_starPropertyLayout->addWidget(antiFakeB, 2, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(star);
 
             m_originalBoundsSize->setValue(star->radius() * 2 * 0.001);
             break;
@@ -4847,11 +4432,22 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_partyEmblePropertyLayout->addWidget(antiFakeB, 2, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(emblem);
             break;
         }
     }
-    
+}
 
+void LaserControllerWindow::setAntiFakePanelValue(LaserStampBase* p)
+{
+    m_aFType->setCurrentIndex(p->antiFakeType());
+    m_aFLines->setValue(p->antiFakeLine());
+    m_aFWidth->setValue(p->AntiFakeLineWidth() * 0.001);
+    m_aFAverageCheckbox->setChecked(p->isAverageDistribute());
+    m_aFSurpassOuterCheckbox->setChecked(p->surpassOuter());
+    m_aFSurpassInnerCheckbox->setChecked(p->surpassInner());
+    m_aFRandomMoveCheckbox->setChecked(p->randomMove());
 }
 
 void LaserControllerWindow::createPrimitivePropertiesPanel()
@@ -5403,7 +4999,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 void LaserControllerWindow::onActionZoomIn(bool checked)
 {
 	m_viewer->zoomIn();
-    m_scene->document()->generateStampImages();
+    //m_scene->document()->generateStampImages();
 }
 
 void LaserControllerWindow::onActionZoomOut(bool checked)
