@@ -8,7 +8,6 @@ QJsonObject SmallDiagonalLimitationItem::toJson() const
 {
     QJsonObject json;
     json.insert("diagonal", qRound(diagonal * 1000));
-    json.insert("laserPower", qRound(laserPower * 10));
     json.insert("speed", qRound(speed * 1000));
     return json;
 }
@@ -18,10 +17,6 @@ void SmallDiagonalLimitationItem::fromJson(const QJsonObject& json)
     if (json.contains("diagonal"))
     {
         diagonal = json["diagonal"].toDouble() / 1000.0;
-    }
-    if (json.contains("laserPower"))
-    {
-        laserPower = json["laserPower"].toDouble() / 10.0;
     }
     if (json.contains("speed"))
     {
@@ -37,14 +32,12 @@ bool operator<(const SmallDiagonalLimitationItem& v1, const SmallDiagonalLimitat
 bool operator==(const SmallDiagonalLimitationItem& v1, const SmallDiagonalLimitationItem& v2)
 {
     return qFuzzyCompare(v1.diagonal, v2.diagonal) &&
-        qFuzzyCompare(v1.laserPower, v2.laserPower) &&
         qFuzzyCompare(v1.speed, v2.speed);
 }
 
 QDebug operator<<(QDebug dbg, const SmallDiagonalLimitationItem& item)
 {
     dbg.nospace() << "[diagonal = " << item.diagonal <<
-        ", laserPower = " << item.laserPower <<
         ", speed = " << item.speed << "]";
     return dbg.maybeSpace();
 }
@@ -113,10 +106,9 @@ SmallDiagonalLimitationItem& SmallDiagonalLimitation::createNewItem()
     if (!isEmpty())
     {
         diagonal = last().diagonal + 1;
-        power = last().laserPower;
         speed = last().speed;
     }
-    SmallDiagonalLimitationItem item = { diagonal, power, speed };
+    SmallDiagonalLimitationItem item = { diagonal, speed };
     insert(diagonal, item);
     return last();
 }

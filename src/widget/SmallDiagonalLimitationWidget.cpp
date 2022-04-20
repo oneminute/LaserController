@@ -69,35 +69,20 @@ void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem*
     m_gridLayout->setAlignment(labelDiagonal, Qt::AlignmentFlag::AlignRight);
     m_gridLayout->addWidget(dsbDiagonal, row, 1);
 
-    QLabel* labelPower = new QLabel(ltr("Power"));
-    QDoubleSpinBox* dsbPower = new QDoubleSpinBox;
-    dsbPower->setMinimum(0);
-    dsbPower->setMaximum(100);
-    dsbPower->setDecimals(1);
-    dsbPower->setValue(item->laserPower);
-    connect(dsbPower, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-        [=](double value) {
-            item->laserPower = value;
-            emitValueChanged();
-        });
-    m_gridLayout->addWidget(labelPower, row, 2);
-    m_gridLayout->setAlignment(labelPower, Qt::AlignmentFlag::AlignRight);
-    m_gridLayout->addWidget(dsbPower, row, 3);
-
     QLabel* labelSpeed = new QLabel(ltr("Speed"));
     QDoubleSpinBox* dsbSpeed = new QDoubleSpinBox;
     dsbSpeed->setMinimum(0);
     dsbSpeed->setMaximum(1000);
-    dsbSpeed->setDecimals(5);
+    dsbSpeed->setDecimals(3);
     dsbSpeed->setValue(item->speed);
     connect(dsbSpeed, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         [=](double value) {
             item->speed = value;
             emitValueChanged();
         });
-    m_gridLayout->addWidget(labelSpeed, row, 4);
+    m_gridLayout->addWidget(labelSpeed, row, 2);
     m_gridLayout->setAlignment(labelSpeed, Qt::AlignmentFlag::AlignRight);
-    m_gridLayout->addWidget(dsbSpeed, row, 5);
+    m_gridLayout->addWidget(dsbSpeed, row, 3);
 
     QToolButton* removeButton = new QToolButton;
     removeButton->setText("-");
@@ -111,15 +96,14 @@ void SmallDiagonalLimitationWidget::addRow(int row, SmallDiagonalLimitationItem*
             m_limitation->remove(item->diagonal);
             emitValueChanged();
         });
-    m_gridLayout->addWidget(removeButton, row, 6);
+    m_gridLayout->addWidget(removeButton, row, 4);
 
     m_gridLayout->setColumnStretch(0, 1);
     m_gridLayout->setColumnStretch(1, 2);
     m_gridLayout->setColumnStretch(2, 1);
     m_gridLayout->setColumnStretch(3, 2);
-    m_gridLayout->setColumnStretch(4, 1);
-    m_gridLayout->setColumnStretch(5, 2);
-    m_gridLayout->setColumnStretch(6, 0);
+    m_gridLayout->setColumnStretch(4, 0);
+    m_gridLayout->setColumnStretch(5, 10);
 }
 
 void SmallDiagonalLimitationWidget::removeRow(int row)
@@ -127,6 +111,8 @@ void SmallDiagonalLimitationWidget::removeRow(int row)
     for (int i = 0; i < m_gridLayout->columnCount(); i++)
     {
         QLayoutItem* item = m_gridLayout->itemAtPosition(row, i);
+        if (!item)
+            continue;
         m_gridLayout->removeItem(item);
         item->widget()->deleteLater();
         delete item;

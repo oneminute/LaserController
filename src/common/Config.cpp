@@ -1000,21 +1000,6 @@ void Config::loadExportItems()
     ConfigItemGroup* group = new Config::Export;
     Config::Export::group = group;
 
-    ConfigItem* maxAnglesDiff = group->addConfigItem(
-        "maxAnglesDiff",
-        5.0,
-        DT_REAL
-    );
-    maxAnglesDiff->setInputWidgetProperty("minimum", 1.0);
-    maxAnglesDiff->setInputWidgetProperty("maximum", 90.0);
-
-    ConfigItem* maxIntervalDistance = group->addConfigItem(
-        "maxIntervalDistance",
-        40
-    );
-    maxIntervalDistance->setInputWidgetProperty("minimum", 1);
-    maxIntervalDistance->setInputWidgetProperty("maximum", 1000);
-
     ConfigItem* enableSmallDiagonal = group->addConfigItem(
         "enableSmallDiagonal",
         false,
@@ -1069,11 +1054,30 @@ void Config::loadExportItems()
 
     ConfigItem* curveFlatteningThreshold = group->addConfigItem(
         "curveFlatteningThreshold",
-        20,
+        100,
         DT_REAL
     );
     curveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
     curveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
+
+    ConfigItem* smallDiagonalCurveSize = group->addConfigItem(
+        "smallDiagonalCurveSize",
+        5000,
+        DT_INT
+    );
+    smallDiagonalCurveSize->setInputWidgetType(IWT_FloatEditSlider);
+    smallDiagonalCurveSize->setInputWidgetProperty("step", 0.001);
+    smallDiagonalCurveSize->setInputWidgetProperty("decimals", 3);
+    smallDiagonalCurveSize->setInputWidgetProperty("minimum", 0);
+    smallDiagonalCurveSize->setInputWidgetProperty("maximum", 10);
+
+    ConfigItem* smallDiagonalCurveFlatteningThreshold = group->addConfigItem(
+        "smallDiagonalCurveFlatteningThreshold",
+        20,
+        DT_REAL
+    );
+    smallDiagonalCurveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
+    smallDiagonalCurveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* gaussianFactorA = group->addConfigItem(
         "gaussianFactorA",
@@ -3072,6 +3076,61 @@ void Config::loadSystemRegisters()
         DT_INT
     );
     uPhaseEnabled->setInputWidgetType(IWT_CheckBox);
+
+    ConfigItem* zEnabled = group->addConfigItem(
+        "zEnabled",
+        true,
+        DT_BOOL
+    );
+    
+    ConfigItem* zResetDirection = group->addConfigItem(
+        "zResetDirection",
+        0,
+        DT_INT
+    );
+    zResetDirection->setInputWidgetType(IWT_ComboBox);
+    zResetDirection->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("Up"), 0);
+            comboBox->addItem(tr("Down"), 1);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
+
+    ConfigItem* scanReturnDelay = group->addConfigItem(
+        "scanReturnDelay",
+        100,
+        DT_INT
+    );
+    scanReturnDelay->setInputWidgetProperty("page", 10);
+    scanReturnDelay->setInputWidgetProperty("minimum", 1);
+    scanReturnDelay->setInputWidgetProperty("maximum", 20000);
+
+    ConfigItem* screenType = group->addConfigItem(
+        "screenType",
+        0,
+        DT_INT
+    );
+    screenType->setInputWidgetType(IWT_ComboBox);
+    screenType->setWidgetInitializeHook(
+        [](QWidget* widget, ConfigItem* item, InputWidgetWrapper* wrapper)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+            if (!comboBox)
+                return;
+
+            comboBox->addItem(tr("LCD"), 0);
+            comboBox->addItem(tr("Digital Tube"), 1);
+            int index = widgetUtils::findComboBoxIndexByValue(comboBox, item->value());
+            comboBox->setCurrentIndex(index < 0 ? widgetUtils::findComboBoxIndexByValue(comboBox, item->defaultValue()) : index);
+        }
+    );
 }
 
 void Config::loadDebug()
@@ -3409,18 +3468,6 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Searching XY Weight", nullptr), 
         QCoreApplication::translate("Config", "Weight of XY for searching using kdtree", nullptr));
 
-    Export::maxAnglesDiffItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Angles Diff", nullptr), 
-        QCoreApplication::translate("Config", "The max angles diff bwteen tow anchor points", nullptr));
-
-    Export::maxIntervalDistanceItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Interval Distance", nullptr), 
-        QCoreApplication::translate("Config", "The max interval distance between tow anchor points", nullptr));
-
-    Export::maxIntervalDistanceItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Max Interval Distance", nullptr), 
-        QCoreApplication::translate("Config", "The max interval distance between tow anchor points", nullptr));
-
     Export::enableSmallDiagonalItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Small Diagonal", nullptr), 
         QCoreApplication::translate("Config", "Enable small diagonal limitation for small primitives", nullptr));
@@ -3432,6 +3479,14 @@ void Config::updateTitlesAndDescriptions()
     Export::curveFlatteningThresholdItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr), 
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr));
+
+    Export::smallDiagonalCurveSizeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Small Diagonal Curve Size", nullptr), 
+        QCoreApplication::translate("Config", "Size of small diagonal curve", nullptr));
+
+    Export::smallDiagonalCurveFlatteningThresholdItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Small Diagonal Curve Flattening Threshold", nullptr), 
+        QCoreApplication::translate("Config", "Small Diagonal Curve Flattening Threshold", nullptr));
 
     Export::gaussianFactorAItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Gaussian Factor A", nullptr), 
@@ -3989,6 +4044,22 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "U Phase Enabled", nullptr),
         QCoreApplication::translate("Config", "Enabled U phase", nullptr));
 
+    SystemRegister::zEnabledItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Z Enabled", nullptr),
+        QCoreApplication::translate("Config", "Z Enabled", nullptr));
+
+    SystemRegister::zResetDirectionItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Z Reset Direction", nullptr),
+        QCoreApplication::translate("Config", "Z Reset Direction", nullptr));
+
+    SystemRegister::scanReturnDelayItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Scan return delay(us)", nullptr),
+        QCoreApplication::translate("Config", "Scan return delay", nullptr));
+
+    SystemRegister::screenTypeItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Screen Type", nullptr),
+        QCoreApplication::translate("Config", "Screen Type", nullptr));
+
     groupsMap["general"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "General", nullptr),
         QCoreApplication::translate("Config", "General", nullptr));
@@ -4016,6 +4087,10 @@ void Config::updateTitlesAndDescriptions()
     groupsMap["fillingLayer"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "Filling Layer", nullptr),
         QCoreApplication::translate("Config", "Filling Layer", nullptr));
+
+    groupsMap["stampLayer"]->updateTitleAndDesc(
+        QCoreApplication::translate("Config", "Stamp Layer", nullptr),
+        QCoreApplication::translate("Config", "Stamp Layer", nullptr));
 
     groupsMap["pathOptimization"]->updateTitleAndDesc(
         QCoreApplication::translate("Config", "Path Optimization", nullptr),

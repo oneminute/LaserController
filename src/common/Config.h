@@ -281,11 +281,11 @@ public:
 
     public:
         static ConfigItemGroup* group;
-        CONFIG_ITEM(export, maxAnglesDiff, qreal, toReal)
-        CONFIG_ITEM(export, maxIntervalDistance, int, toInt)
         CONFIG_ITEM(export, enableSmallDiagonal, bool, toBool)
         CONFIG_ITEM(export, smallDiagonalLimitation, SmallDiagonalLimitation*, value<SmallDiagonalLimitation*>);
         CONFIG_ITEM(export, curveFlatteningThreshold, qreal, toReal)
+        CONFIG_ITEM(export, smallDiagonalCurveSize, qreal, toReal)
+        CONFIG_ITEM(export, smallDiagonalCurveFlatteningThreshold, qreal, toReal)
         CONFIG_ITEM(export, gaussianFactorA, qreal, toReal)
         CONFIG_ITEM(export, imageQuality, int, toInt)
         CONFIG_ITEM(export, thumbnailWidth, int, toInt)
@@ -498,6 +498,11 @@ public:
         CONFIG_ITEM(systemRegister, uMaxSpeed, int, toInt)
         CONFIG_ITEM(systemRegister, uMaxAcceleration, int, toInt)
         CONFIG_ITEM(systemRegister, uUrgentAcceleration, int, toInt)
+
+        CONFIG_ITEM(systemRegister, zEnabled, int, toInt)
+        CONFIG_ITEM(systemRegister, zResetDirection, int, toInt)
+        CONFIG_ITEM(systemRegister, scanReturnDelay, int, toInt)
+        CONFIG_ITEM(systemRegister, screenType, int, toInt)
 
     private:
         friend class Config;

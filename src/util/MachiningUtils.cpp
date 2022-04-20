@@ -142,7 +142,12 @@ QList<QPolygon> machiningUtils::path2SubpathPolygons(
                 QPointF(e.x, e.y) * matrix,
                 QPointF(path.elementAt(i + 1).x, path.elementAt(i + 1).y) * matrix,
                 QPointF(path.elementAt(i + 2).x, path.elementAt(i + 2).y) * matrix);
-            bezier.addToPolygon(&current, bezier_flattening_threshold);
+            QSizeF size = bezier.bounds().size();
+            qreal length = size.width() >= size.height() ? size.width() : size.height();
+            qreal flatteningThreshold = length <= Config::Export::smallDiagonalCurveSize() ?
+                Config::Export::smallDiagonalCurveFlatteningThreshold() :
+                Config::Export::curveFlatteningThreshold();
+            bezier.addToPolygon(&current, flatteningThreshold);
             i += 2;
             break;
         }
