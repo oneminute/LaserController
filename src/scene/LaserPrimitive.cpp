@@ -90,7 +90,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     Q_D(LaserPrimitive);
     d->doc = doc;
     d->primitiveType = type;
-    Q_ASSERT(doc);
+    //Q_ASSERT(doc);
     QObject::setParent(doc);
 
     //this->setFlag(ItemIsMovable, true);
@@ -1008,7 +1008,9 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
     QPainterPath path = sceneTransform().map(d->path);
 
     QList<int> indices;
-    ProgressItem* progress = new ProgressItem(tr("%1 update machining points").arg(name()), ProgressItem::PT_Simple, parentProgress);
+    ProgressItem* progress = nullptr;
+    if (parentProgress) 
+        progress = new ProgressItem(tr("%1 update machining points").arg(name()), ProgressItem::PT_Simple, parentProgress);
     machiningUtils::path2Points(progress, path, d->machiningPointsList, indices, d->machiningCenter);
     QImage image(8192, 8192, QImage::Format_RGB888);
     QPainter painter(&image);

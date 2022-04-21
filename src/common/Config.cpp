@@ -606,7 +606,6 @@ void Config::loadUiItems()
 		"gridShapeDistance",
 		3
 	);
-    gridShapeDistance->setInputWidgetProperty("textTemplate", "%1px");
 	gridShapeDistance->setInputWidgetProperty("minimum", 0);
 	gridShapeDistance->setInputWidgetProperty("maximum", 10);
 
@@ -614,7 +613,6 @@ void Config::loadUiItems()
 		"objectShapeDistance",
 		5
 	);
-    objectShapeDistance->setInputWidgetProperty("textTemplate", "%1px");
 	objectShapeDistance->setInputWidgetProperty("minimum", 0);
 	objectShapeDistance->setInputWidgetProperty("maximum", 10);
 
@@ -622,7 +620,6 @@ void Config::loadUiItems()
 		"clickSelectionTolerance",
 		5
 	);
-    clickSelectionTolerance->setInputWidgetProperty("textTemplate", "%1px");
 	clickSelectionTolerance->setInputWidgetProperty("minimum", 0);
 	clickSelectionTolerance->setInputWidgetProperty("maximum", 10);
 
@@ -631,7 +628,6 @@ void Config::loadUiItems()
 		10,
         DT_INT
 	);
-    visualGridSpacing->setInputWidgetProperty("textTemplate", "%1mm");
 	visualGridSpacing->setInputWidgetProperty("minimum", 1);
 	visualGridSpacing->setInputWidgetProperty("maximum", 50);
 
@@ -641,7 +637,6 @@ void Config::loadUiItems()
         3000,
         DT_INT
     );
-    validMaxRegion->setInputWidgetProperty("textTemplate", "%1mm");
     validMaxRegion->setInputWidgetProperty("minimum", 0);
     validMaxRegion->setInputWidgetProperty("maximum", 10000);
 
@@ -649,7 +644,6 @@ void Config::loadUiItems()
         "splitterHandleWidth",
         1
     );
-    splitterHandleWidth->setInputWidgetProperty("textTemplate", "%1mm");
     splitterHandleWidth->setInputWidgetProperty("minimum", 1);
     splitterHandleWidth->setInputWidgetProperty("maximum", 20);
 
@@ -657,7 +651,6 @@ void Config::loadUiItems()
         "autoRepeatDelay",
         1000
     );
-    autoRepeatDelay->setInputWidgetProperty("textTemplate", "%1ms");
     autoRepeatDelay->setInputWidgetProperty("minimum", 0);
     autoRepeatDelay->setInputWidgetProperty("maximum", 2000);
 
@@ -673,7 +666,6 @@ void Config::loadUiItems()
         3000,
         DT_INT
     );
-    laserCursorTimeout->setInputWidgetProperty("textTemplate", "%1ms");
     laserCursorTimeout->setInputWidgetProperty("minimum", 0);
     laserCursorTimeout->setInputWidgetProperty("maximum", 10000);
 }
@@ -693,7 +685,7 @@ void Config::loadCuttingLayerItems()
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("step", 0.001);
-    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* minPower = group->addConfigItem(
         "minPower",
@@ -705,6 +697,7 @@ void Config::loadCuttingLayerItems()
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
     minPower->setInputWidgetProperty("step", 0.1);
+    minPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* maxPower = group->addConfigItem(
@@ -717,6 +710,7 @@ void Config::loadCuttingLayerItems()
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
     maxPower->setInputWidgetProperty("step", 0.1);
+    maxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
 }
 
@@ -735,7 +729,7 @@ void Config::loadEngravingLayerItems()
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
     runSpeed->setInputWidgetProperty("step", 0.001);
-    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* laserPower = group->addConfigItem(
         "laserPower",
@@ -747,6 +741,7 @@ void Config::loadEngravingLayerItems()
     laserPower->setInputWidgetProperty("minimum", 0);
     laserPower->setInputWidgetProperty("maximum", 100);
     laserPower->setInputWidgetProperty("step", 0.1);
+    laserPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     laserPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* minPower= group->addConfigItem(
@@ -759,6 +754,7 @@ void Config::loadEngravingLayerItems()
     minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
+    minPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* maxPower= group->addConfigItem(
@@ -771,6 +767,7 @@ void Config::loadEngravingLayerItems()
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
+    maxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
 
     ConfigItem* rowInterval = group->addConfigItem(
@@ -780,7 +777,7 @@ void Config::loadEngravingLayerItems()
     );
     rowInterval->setInputWidgetProperty("minimum", 0);
     rowInterval->setInputWidgetProperty("maximum", 1000);
-    rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
+    rowInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     group->addConfigItem(
         "useHalftone",
@@ -796,6 +793,7 @@ void Config::loadEngravingLayerItems()
     halftoneAngles->setInputWidgetType(IWT_DoubleSpinBox);
     halftoneAngles->setInputWidgetProperty("minimum", 0);
     halftoneAngles->setInputWidgetProperty("maximum", 90);
+    halftoneAngles->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* halftoneGridSize = group->addConfigItem(
         "halftoneGridSize",
@@ -805,6 +803,7 @@ void Config::loadEngravingLayerItems()
     halftoneGridSize->setInputWidgetType(IWT_EditSlider);
     halftoneGridSize->setInputWidgetProperty("minimum", 4);
     halftoneGridSize->setInputWidgetProperty("maximum", 100);
+    halftoneGridSize->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* lpi = group->addConfigItem(
         "LPI",
@@ -813,6 +812,7 @@ void Config::loadEngravingLayerItems()
     );
     lpi->setInputWidgetProperty("minimum", 1);
     lpi->setInputWidgetProperty("maximum", 1200);
+    lpi->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* dpi = group->addConfigItem(
         "DPI",
@@ -821,6 +821,7 @@ void Config::loadEngravingLayerItems()
     );
     dpi->setInputWidgetProperty("minimum", 1);
     dpi->setInputWidgetProperty("maximum", 1200);
+    dpi->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* enableCutting = group->addConfigItem(
         "enableCutting",
@@ -844,7 +845,7 @@ void Config::loadFillingLayerItems()
     runSpeed->setInputWidgetProperty("decimals", 3);
     runSpeed->setInputWidgetProperty("minimum", 1);
     runSpeed->setInputWidgetProperty("maximum", 1000);
-    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 60);
+    runSpeed->setInputWidgetProperty("maximumLineEditWidth", 75);
     runSpeed->setVisible(false);
 
     ConfigItem* minPower= group->addConfigItem(
@@ -857,6 +858,7 @@ void Config::loadFillingLayerItems()
     minPower->setInputWidgetProperty("decimals", 1);
     minPower->setInputWidgetProperty("minimum", 0);
     minPower->setInputWidgetProperty("maximum", 100);
+    minPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     minPower->setInputWidgetProperty("textTemplate", "%1%");
     minPower->setVisible(false);
 
@@ -870,6 +872,7 @@ void Config::loadFillingLayerItems()
     maxPower->setInputWidgetProperty("decimals", 1);
     maxPower->setInputWidgetProperty("minimum", 0);
     maxPower->setInputWidgetProperty("maximum", 100);
+    maxPower->setInputWidgetProperty("maximumLineEditWidth", 75);
     maxPower->setInputWidgetProperty("textTemplate", "%1%");
     maxPower->setVisible(false);
 
@@ -880,7 +883,7 @@ void Config::loadFillingLayerItems()
     );
     rowInterval->setInputWidgetProperty("minimum", 0);
     rowInterval->setInputWidgetProperty("maximum", 1000);
-    rowInterval->setInputWidgetProperty("textTemplate", "%1μm");
+    rowInterval->setInputWidgetProperty("maximumLineEditWidth", 75);
     rowInterval->setVisible(false);
 
     ConfigItem* enableCutting = group->addConfigItem(
@@ -927,7 +930,7 @@ void Config::loadStampLayerItems()
     boundingDistance->setInputWidgetProperty("decimals", 3);
     boundingDistance->setInputWidgetProperty("minimum", 0);
     boundingDistance->setInputWidgetProperty("maximum", 50);
-    boundingDistance->setInputWidgetProperty("maximumLineEditWidth", 60);
+    boundingDistance->setInputWidgetProperty("maximumLineEditWidth", 75);
 }
 
 void Config::loadPathOptimizationItems()
@@ -981,18 +984,6 @@ void Config::loadPathOptimizationItems()
     groupingGridInterval->setInputWidgetProperty("page", 10);
     groupingGridInterval->setInputWidgetProperty("minimum", 1);
     groupingGridInterval->setInputWidgetProperty("maximum", 1000);
-
-    ConfigItem* searchingXYWeight = group->addConfigItem(
-        "searchingXYWeight",
-        0.9,
-        DT_REAL
-    );
-    searchingXYWeight->setInputWidgetType(IWT_FloatEditSlider);
-    searchingXYWeight->setInputWidgetProperty("minimum", 0);
-    searchingXYWeight->setInputWidgetProperty("maximum", 1);
-    searchingXYWeight->setInputWidgetProperty("step", 0.01);
-    searchingXYWeight->setInputWidgetProperty("page", 0.1);
-    searchingXYWeight->setInputWidgetProperty("decimals", 2);
 }
 
 void Config::loadExportItems()
@@ -1009,7 +1000,6 @@ void Config::loadExportItems()
     QVariant smallDiagonalLimitationVar;
     SmallDiagonalLimitation* limitation = new SmallDiagonalLimitation;
     smallDiagonalLimitationVar.setValue(limitation);
-    //qLogD << "small diagonal limitation type: " << smallDiagonalLimitationVar.userType();
     ConfigItem* smallDiagonalLimitation = group->addConfigItem(
         "smallDiagonalLimitation",
         smallDiagonalLimitationVar,
@@ -1059,6 +1049,7 @@ void Config::loadExportItems()
     );
     curveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
     curveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
+    curveFlatteningThreshold->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* smallDiagonalCurveSize = group->addConfigItem(
         "smallDiagonalCurveSize",
@@ -1070,6 +1061,7 @@ void Config::loadExportItems()
     smallDiagonalCurveSize->setInputWidgetProperty("decimals", 3);
     smallDiagonalCurveSize->setInputWidgetProperty("minimum", 0);
     smallDiagonalCurveSize->setInputWidgetProperty("maximum", 10);
+    smallDiagonalCurveSize->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* smallDiagonalCurveFlatteningThreshold = group->addConfigItem(
         "smallDiagonalCurveFlatteningThreshold",
@@ -1078,6 +1070,7 @@ void Config::loadExportItems()
     );
     smallDiagonalCurveFlatteningThreshold->setInputWidgetProperty("minimum", 0);
     smallDiagonalCurveFlatteningThreshold->setInputWidgetProperty("maximum", 1000);
+    smallDiagonalCurveFlatteningThreshold->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* gaussianFactorA = group->addConfigItem(
         "gaussianFactorA",
@@ -1087,6 +1080,7 @@ void Config::loadExportItems()
     gaussianFactorA->setInputWidgetProperty("minimum", 0);
     gaussianFactorA->setInputWidgetProperty("maximum", 1000);
     gaussianFactorA->setInputWidgetProperty("decimals", 3);
+    gaussianFactorA->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* imageQuality = group->addConfigItem(
         "imageQuality",
@@ -1117,6 +1111,7 @@ void Config::loadExportItems()
     );
     thumbnailWidth->setInputWidgetProperty("minimum", 240);
     thumbnailWidth->setInputWidgetProperty("maximum", 800);
+    thumbnailWidth->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* thumbnailHeight = group->addConfigItem(
         "thumbnailHeight",
@@ -1125,7 +1120,7 @@ void Config::loadExportItems()
     );
     thumbnailHeight->setInputWidgetProperty("minimum", 240);
     thumbnailHeight->setInputWidgetProperty("maximum", 800);
-
+    thumbnailHeight->setInputWidgetProperty("maximumLineEditWidth", 75);
 }
 
 void Config::loadDeviceItems()
@@ -1295,7 +1290,6 @@ void Config::loadDeviceItems()
     calibrationBlockThickness->setInputWidgetProperty("step", 0.001);
     calibrationBlockThickness->setInputWidgetProperty("decimals", 3);
     calibrationBlockThickness->setInputWidgetProperty("maximumLineEditWidth", 75);
-    calibrationBlockThickness->setInputWidgetProperty("textTemplate", "%1");
     calibrationBlockThickness->setInputWidgetProperty("page", 1);
     calibrationBlockThickness->setInputWidgetProperty("minimum", 0);
     calibrationBlockThickness->setInputWidgetProperty("maximum", 10);
@@ -1337,6 +1331,7 @@ void Config::loadDeviceItems()
             }
         }
     );
+    uFixtureType->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* circumferencePulseNumber = group->addConfigItem(
         "circumferencePulseNumber",
@@ -1346,6 +1341,7 @@ void Config::loadDeviceItems()
     circumferencePulseNumber->setInputWidgetType(IWT_EditSlider);
     circumferencePulseNumber->setInputWidgetProperty("minimum", 1);
     circumferencePulseNumber->setInputWidgetProperty("maximum", 100000);
+    circumferencePulseNumber->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* workpieceDiameter = group->addConfigItem(
         "workpieceDiameter",
@@ -1368,6 +1364,7 @@ void Config::loadDeviceItems()
     rollerRotaryStepLength->setInputWidgetType(IWT_EditSlider);
     rollerRotaryStepLength->setInputWidgetProperty("minimum", 1);
     rollerRotaryStepLength->setInputWidgetProperty("maximum", 100000);
+    rollerRotaryStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* finishRun = group->addConfigItem(
         "finishRun",
@@ -1441,6 +1438,7 @@ void Config::loadExternalRegisters()
     x1->setInputWidgetProperty("maximum", 1000 * 10000);
     x1->setValueFromWidgetHook(setValueFromWidgetHook);
     x1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    x1->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* y1 = group->addConfigItem(
         "y1",
@@ -1453,6 +1451,7 @@ void Config::loadExternalRegisters()
     y1->setInputWidgetProperty("maximum", 1000 * 10000);
     y1->setValueFromWidgetHook(setValueFromWidgetHook);
     y1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    y1->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* z1 = group->addConfigItem(
         "z1",
@@ -1465,6 +1464,7 @@ void Config::loadExternalRegisters()
     z1->setInputWidgetProperty("maximum", 1000 * 10000);
     z1->setValueFromWidgetHook(setValueFromWidgetHook);
     z1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    z1->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* u1 = group->addConfigItem(
         "u1",
@@ -1477,6 +1477,7 @@ void Config::loadExternalRegisters()
     u1->setInputWidgetProperty("maximum", 1000 * 10000);
     u1->setValueFromWidgetHook(setValueFromWidgetHook);
     u1->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    u1->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* x2 = group->addConfigItem(
         "x2",
@@ -1489,6 +1490,7 @@ void Config::loadExternalRegisters()
     x2->setInputWidgetProperty("maximum", 1000 * 10000);
     x2->setValueFromWidgetHook(setValueFromWidgetHook);
     x2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    x2->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* y2 = group->addConfigItem(
         "y2",
@@ -1501,6 +1503,7 @@ void Config::loadExternalRegisters()
     y2->setInputWidgetProperty("maximum", 1000 * 10000);
     y2->setValueFromWidgetHook(setValueFromWidgetHook);
     y2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    y2->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* z2 = group->addConfigItem(
         "z2",
@@ -1513,6 +1516,7 @@ void Config::loadExternalRegisters()
     z2->setInputWidgetProperty("maximum", 1000 * 10000);
     z2->setValueFromWidgetHook(setValueFromWidgetHook);
     z2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    z2->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* u2 = group->addConfigItem(
         "u2",
@@ -1525,6 +1529,7 @@ void Config::loadExternalRegisters()
     u2->setInputWidgetProperty("maximum", 1000 * 10000);
     u2->setValueFromWidgetHook(setValueFromWidgetHook);
     u2->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    u2->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* x3 = group->addConfigItem(
         "x3",
@@ -1537,6 +1542,7 @@ void Config::loadExternalRegisters()
     x3->setInputWidgetProperty("maximum", 1000 * 10000);
     x3->setValueFromWidgetHook(setValueFromWidgetHook);
     x3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    x3->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* y3 = group->addConfigItem(
         "y3",
@@ -1549,6 +1555,7 @@ void Config::loadExternalRegisters()
     y3->setInputWidgetProperty("maximum", 1000 * 10000);
     y3->setValueFromWidgetHook(setValueFromWidgetHook);
     y3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    y3->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* z3 = group->addConfigItem(
         "z3",
@@ -1561,6 +1568,7 @@ void Config::loadExternalRegisters()
     z3->setInputWidgetProperty("maximum", 1000 * 10000);
     z3->setValueFromWidgetHook(setValueFromWidgetHook);
     z3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    z3->setInputWidgetProperty("maximumLineEditWidth", 75);
 
     ConfigItem* u3 = group->addConfigItem(
         "u3",
@@ -1573,6 +1581,7 @@ void Config::loadExternalRegisters()
     u3->setInputWidgetProperty("maximum", 1000 * 10000);
     u3->setValueFromWidgetHook(setValueFromWidgetHook);
     u3->setUpdateWidgetValueHook(setUpdateWidgetValueHook);
+    u3->setInputWidgetProperty("maximumLineEditWidth", 75);
 }
 
 void Config::loadUserReigsters()
@@ -1977,20 +1986,25 @@ void Config::loadUserReigsters()
 
     ConfigItem* cuttingTurnOnDelay = group->addConfigItem(
         "cuttingTurnOnDelay",
-        0.0,
-        DT_REAL
+        100,
+        DT_INT
     );
+    cuttingTurnOnDelay->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingTurnOnDelay->setInputWidgetProperty("step", 0.001);
     cuttingTurnOnDelay->setInputWidgetProperty("minimum", 0.0);
-    cuttingTurnOnDelay->setInputWidgetProperty("maximum", 10000.0);
+    cuttingTurnOnDelay->setInputWidgetProperty("maximum", 2000);
+    cuttingTurnOnDelay->setInputWidgetProperty("page", 10);
     cuttingTurnOnDelay->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* cuttingTurnOffDelay = group->addConfigItem(
         "cuttingTurnOffDelay",
-        0.0,
-        DT_REAL
+        100,
+        DT_INT
     );
-    cuttingTurnOffDelay->setInputWidgetProperty("minimum", 0.0);
-    cuttingTurnOffDelay->setInputWidgetProperty("maximum", 10000.0);
+    cuttingTurnOffDelay->setInputWidgetProperty("maximumLineEditWidth", 75);
+    cuttingTurnOffDelay->setInputWidgetProperty("minimum", 0.001);
+    cuttingTurnOffDelay->setInputWidgetProperty("maximum", 2000);
+    cuttingTurnOffDelay->setInputWidgetProperty("page", 10);
     cuttingTurnOffDelay->setInputWidgetProperty("decimals", 3);
 
     ConfigItem* spotShotPower = group->addConfigItem(
@@ -2110,7 +2124,7 @@ void Config::loadUserReigsters()
     materialThickness->setInputWidgetProperty("decimals", 3);
     materialThickness->setInputWidgetProperty("maximumLineEditWidth", 75);
     materialThickness->setInputWidgetProperty("page", 10);
-    materialThickness->setInputWidgetProperty("minimum", 1);
+    materialThickness->setInputWidgetProperty("minimum", -200);
     materialThickness->setInputWidgetProperty("maximum", 200);
 
     ConfigItem* movementStepLength = group->addConfigItem(
@@ -2123,7 +2137,7 @@ void Config::loadUserReigsters()
     movementStepLength->setInputWidgetProperty("decimals", 3);
     movementStepLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     movementStepLength->setInputWidgetProperty("page", 10);
-    movementStepLength->setInputWidgetProperty("minimum", 1);
+    movementStepLength->setInputWidgetProperty("minimum", 0);
     movementStepLength->setInputWidgetProperty("maximum", 1000);
 
     ConfigItem* focalLength = group->addConfigItem(
@@ -2136,10 +2150,9 @@ void Config::loadUserReigsters()
     focalLength->setInputWidgetProperty("decimals", 3);
     focalLength->setInputWidgetProperty("maximumLineEditWidth", 75);
     focalLength->setInputWidgetProperty("page", 10);
-    focalLength->setInputWidgetProperty("minimum", 1);
+    focalLength->setInputWidgetProperty("minimum", 0);
     focalLength->setInputWidgetProperty("maximum", 2000);
     focalLength->setNeedRelaunch(true);
-
 }
 
 void Config::loadSystemRegisters()
@@ -3237,8 +3250,8 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Vertical Corners Count", nullptr));
 
     Camera::squareSizeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Squre Size", nullptr), 
-        QCoreApplication::translate("Config", "Squre Size", nullptr));
+        QCoreApplication::translate("Config", "Square Size(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Square Size", nullptr));
 
     Camera::radiusRateItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Radius Rate", nullptr), 
@@ -3283,10 +3296,6 @@ void Config::updateTitlesAndDescriptions()
     Camera::backlightCompItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Backlight Comp", nullptr), 
         QCoreApplication::translate("Config", "Backlight Comp", nullptr));
-
-    /*Camera::exposureItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Exposure", nullptr), 
-        QCoreApplication::translate("Config", "Exposure", nullptr));*/
 
     Ui::operationButtonIconSizeItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Operation Button Icon Size(px)", nullptr), 
@@ -3397,7 +3406,7 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Angles of rotating grid for halftone", nullptr));
 
     EngravingLayer::halftoneGridSizeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Halftone Grid Size", nullptr), 
+        QCoreApplication::translate("Config", "Halftone Grid Size(px)", nullptr), 
         QCoreApplication::translate("Config", "Grid size of halftone", nullptr));
 
     EngravingLayer::useHalftoneItem()->setTitleAndDesc(
@@ -3441,7 +3450,7 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Filling Type", nullptr));
 
     StampLayer::boundingDistanceItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Bounding Distance", nullptr), 
+        QCoreApplication::translate("Config", "Bounding Distance(mm)", nullptr), 
         QCoreApplication::translate("Config", "Bounding Distance", nullptr));
 
     PathOptimization::maxStartingPointsItem()->setTitleAndDesc(
@@ -3460,20 +3469,12 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Max Group size", nullptr), 
         QCoreApplication::translate("Config", "Max nodes count of each group", nullptr));
 
-    PathOptimization::searchingXYWeightItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Searching XY Weight", nullptr), 
-        QCoreApplication::translate("Config", "Weight of XY for searching using kdtree", nullptr));
-
-    PathOptimization::searchingXYWeightItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Searching XY Weight", nullptr), 
-        QCoreApplication::translate("Config", "Weight of XY for searching using kdtree", nullptr));
-
     Export::enableSmallDiagonalItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Enable Small Diagonal", nullptr), 
         QCoreApplication::translate("Config", "Enable small diagonal limitation for small primitives", nullptr));
 
     Export::smallDiagonalLimitationItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Small Diagonal Limitation", nullptr), 
+        QCoreApplication::translate("Config", "Small Diagonal Limitation(mm)", nullptr), 
         QCoreApplication::translate("Config", "Details of small diagonal limitation", nullptr));
 
     Export::curveFlatteningThresholdItem()->setTitleAndDesc(
@@ -3481,7 +3482,7 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Curve Flattening Threshold", nullptr));
 
     Export::smallDiagonalCurveSizeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Small Diagonal Curve Size", nullptr), 
+        QCoreApplication::translate("Config", "Small Diagonal Curve Size(mm)", nullptr), 
         QCoreApplication::translate("Config", "Size of small diagonal curve", nullptr));
 
     Export::smallDiagonalCurveFlatteningThresholdItem()->setTitleAndDesc(
@@ -3493,11 +3494,11 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Gaussian factor a", nullptr));
 
     Export::thumbnailWidthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Thumbnail width", nullptr), 
+        QCoreApplication::translate("Config", "Thumbnail width(px)", nullptr), 
         QCoreApplication::translate("Config", "Thumbnail width", nullptr));
 
     Export::thumbnailHeightItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Thumbnail Height", nullptr), 
+        QCoreApplication::translate("Config", "Thumbnail Height(px)", nullptr), 
         QCoreApplication::translate("Config", "Thumbnail Height", nullptr));
 
     Device::autoConnectFirstCOMItem()->setTitleAndDesc(
@@ -3601,7 +3602,7 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Work speed factor for cutting movement", nullptr));
 
     UserRegister::cuttingSpotSizeItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Cutting Spot Size", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Spot Size(mm)", nullptr), 
         QCoreApplication::translate("Config", "Spot size for cutting movement", nullptr));
 
     UserRegister::scanXStartSpeedItem()->setTitleAndDesc(
@@ -3693,15 +3694,15 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Min scan gray ratio", nullptr));
 
     UserRegister::cuttingTurnOnDelayItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Cutting Turn On Delay(us)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Turn On Delay(ms)", nullptr), 
         QCoreApplication::translate("Config", "Delay of turning on laser for cutting", nullptr));
 
     UserRegister::cuttingTurnOffDelayItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Cutting Turn Off Delay(us)", nullptr), 
+        QCoreApplication::translate("Config", "Cutting Turn Off Delay(ms)", nullptr), 
         QCoreApplication::translate("Config", "Delay of turning off laser for cutting", nullptr));
 
     UserRegister::spotShotPowerItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Spot Shot Power", nullptr), 
+        QCoreApplication::translate("Config", "Spot Shot Power(%)", nullptr), 
         QCoreApplication::translate("Config", "Spot shot power", nullptr));
 
     UserRegister::fillingSpeedItem()->setTitleAndDesc(
@@ -3729,20 +3730,20 @@ void Config::updateTitlesAndDescriptions()
         QCoreApplication::translate("Config", "Filling acceleration ratio", nullptr));
 
     UserRegister::zSpeedItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Z Speed", nullptr), 
+        QCoreApplication::translate("Config", "Z Speed(mm/s)", nullptr), 
         QCoreApplication::translate("Config", "Z Speed", nullptr));
 
     UserRegister::materialThicknessItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Material Thickness", nullptr), 
+        QCoreApplication::translate("Config", "Material Thickness(mm)", nullptr), 
         QCoreApplication::translate("Config", "Material Thickness", nullptr));
 
     UserRegister::movementStepLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Movement Step Length", nullptr), 
+        QCoreApplication::translate("Config", "Movement Step Length(mm)", nullptr), 
         QCoreApplication::translate("Config", "Movement Step Length", nullptr));
 
     UserRegister::focalLengthItem()->setTitleAndDesc(
-        QCoreApplication::translate("Config", "Focal Length(um)", nullptr), 
-        QCoreApplication::translate("Config", "Focal Length(um)", nullptr));
+        QCoreApplication::translate("Config", "Focal Length(mm)", nullptr), 
+        QCoreApplication::translate("Config", "Focal Length", nullptr));
 
     SystemRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

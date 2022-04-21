@@ -61,6 +61,7 @@
     <addaction name="actionParseJson"/>
     <addaction name="actionRemoteAssistance"/>
     <addaction name="actionCleanCacheFiles"/>
+    <addaction name="actionBresenham"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -2022,6 +2023,11 @@
    </property>
    <property name="toolTip">
     <string>Clean Cache Files</string>
+   </property>
+  </action>
+  <action name="actionBresenham">
+   <property name="text">
+    <string>Bresenham</string>
    </property>
   </action>
  </widget>

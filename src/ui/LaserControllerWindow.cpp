@@ -1118,6 +1118,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     
     connect(m_ui->actionParseJson, &QAction::triggered, this, &LaserControllerWindow::onActionParseJson);
     connect(m_ui->actionCleanCacheFiles, &QAction::triggered, this, &LaserControllerWindow::onActionCleanCacheFiles);
+    connect(m_ui->actionBresenham, &QAction::triggered, this, &LaserControllerWindow::onActionBresenham);
 
     ADD_TRANSITION(initState, workingState, this, SIGNAL(windowCreated()));
 
@@ -8189,6 +8190,141 @@ void LaserControllerWindow::onActionParseJson()
 void LaserControllerWindow::onActionCleanCacheFiles()
 {
     LaserApplication::cleanCachedFiles();
+}
+
+void LaserControllerWindow::onActionBresenham()
+{
+    LaserDocument doc(nullptr, 1, true);
+    QRect layoutRect(0, 0, 10000, 10000);
+    QImage canvas(layoutRect.size(), QImage::Format_RGB32);
+    canvas.fill(Qt::white);
+
+    qreal xStepLength = Config::SystemRegister::xStepLength() / 1000000;
+    qreal yStepLength = Config::SystemRegister::yStepLength() / 1000000;
+    qLogD << "xStepLength: " << xStepLength;
+    qLogD << "yStepLength: " << yStepLength;
+
+    QRect boundingRect(500, 500, 9000, 9000);
+    LaserEllipse ellipse(boundingRect, &doc);
+
+    //int oldFlatten = Config::Export::curveFlatteningThreshold();
+    //Config::Export::curveFlatteningThresholdItem()->setValue(200, SS_AS_IS, nullptr);
+
+    QPoint origin(10000, 0);
+    ellipse.updateMachiningPoints(nullptr);
+    LaserPointListList pointsList = ellipse.arrangeMachiningPoints(LaserPoint(origin), 0);
+    LaserPointList points = pointsList.first();
+
+    QPainter painter(&canvas);
+
+    QPen bluePen(Qt::blue, 1);
+    bluePen.setCosmetic(true);
+    QPen redPen(Qt::red, 1);
+    redPen.setCosmetic(true);
+    QPen greenPen(Qt::darkGreen, 1);
+    redPen.setCosmetic(true);
+    QPen yellowPen(Qt::darkYellow, 1);
+    redPen.setCosmetic(true);
+    QPen cyanPen(Qt::cyan, 1);
+    redPen.setCosmetic(true);
+
+    LaserPoint lastPoint = points.first();
+    qLogD << 0 << ". " << lastPoint;
+    painter.setPen(redPen);
+    painter.drawPoint(lastPoint.toPoint());
+	qreal xError = 0;
+	qreal yError = 0;
+    int x = lastPoint.x();
+    int y = lastPoint.y();
+    for (int i = 1; i < points.length(); i++)
+    {
+        LaserPoint point = points.at(i);
+        painter.setPen(bluePen);
+        painter.drawLine(lastPoint.toPoint(), point.toPoint());
+        qLogD << i << ". " << point;
+
+        int xLength = point.x() - lastPoint.x();
+        int yLength = point.y() - lastPoint.y();
+        int xDir = xLength < 0 ? -1 : 1;
+        int yDir = yLength < 0 ? -1 : 1;
+        xLength = abs(xLength);
+        yLength = abs(yLength);
+        bool useX = xLength >= yLength;
+        int longDelta = useX ? xLength : yLength;
+        int steps = qRound(useX ? xLength / xStepLength : yLength / yStepLength);
+
+        qreal k;
+        if (xLength == 0 || yLength == 0)
+        {
+            k = 0;
+        }
+        else
+        {
+            k = yLength * 1.0 / xLength;
+        }
+
+        qreal xDeltaStep = useX ? xStepLength : yStepLength / k;
+        qreal yDeltaStep = useX ? xStepLength * k : yStepLength;
+        qLogD << "     xDelta: " << xLength;
+        qLogD << "     yDelta: " << yLength;
+        qLogD << "       useX: " << useX;
+        qLogD << "  longDelta: " << longDelta;
+        qLogD << "      steps: " << steps;
+        qLogD << "     xSteps: " << qRound(xLength / xStepLength);
+        qLogD << "     ySteps: " << qRound(yLength / yStepLength);
+        qLogD << "          k: " << k;
+        qLogD << " xDeltaStep: " << xDeltaStep;
+        qLogD << " yDeltaStep: " << yDeltaStep;
+        qLogD << "     xError: " << xError;
+        qLogD << "     yError: " << yError;
+
+        qreal xAcc = xError;
+        qreal yAcc = yError;
+        int xStep = 0;
+        int yStep = 0;
+		int x = lastPoint.x();
+		int y = lastPoint.y();
+        for (int s = 1; s < steps; s++)
+        {
+            xAcc += xDeltaStep;
+            yAcc += yDeltaStep;
+
+            bool xMoved = false;
+            bool yMoved = false;
+            if (xAcc >= xStepLength)
+            {
+                xMoved = true;
+                xAcc -= xStepLength;
+                xStep++;
+            }
+            if (yAcc >= yStepLength)
+            {
+                yMoved = true;
+                yAcc -= yStepLength;
+                yStep++;
+            }
+            
+            int oldX = x;
+            int oldY = y;
+            x = xMoved ? qRound(x + xStepLength * xDir) : x;
+            y = yMoved ? qRound(y + yStepLength * yDir) : y;
+
+            painter.setPen(yellowPen);
+            painter.drawLine(QPoint(oldX, oldY), QPoint(x, y));
+        }
+        qLogD << "      xStep: " << xStep;
+        qLogD << "      yStep: " << yStep;
+        xError = xAcc;
+        xError = yAcc;
+
+		painter.setPen(redPen);
+		//painter.drawPoint(lastPoint.toPoint());
+        painter.drawEllipse(lastPoint.toPoint(), 1, 1);
+        lastPoint = point;
+    }
+    //Config::Export::curveFlatteningThresholdItem()->setValue(oldFlatten, SS_AS_IS, nullptr);
+    canvas.save("tmp/bresenham.bmp");
+    QMessageBox::information(this, tr("Bresenham"), tr("Data has been drawn to the image stored in the \"tmp\" diretory with the name of \"bresenham.bmp\""));
 }
 
 void LaserControllerWindow::onCameraConnected()

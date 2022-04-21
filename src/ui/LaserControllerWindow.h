@@ -415,6 +415,7 @@ protected slots:
 
     void onActionParseJson();
     void onActionCleanCacheFiles();
+    void onActionBresenham();
 
     // cameras slots
     void onCameraConnected();

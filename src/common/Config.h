@@ -266,7 +266,6 @@ public:
         CONFIG_ITEM(pathOptimization, groupingOrientation, int, toInt)
         CONFIG_ITEM(pathOptimization, groupingGridInterval, int, toInt)
         CONFIG_ITEM(pathOptimization, maxGroupSize, int, toInt)
-        CONFIG_ITEM(pathOptimization, searchingXYWeight, qreal, toReal)
 
     private:
         friend class Config;
