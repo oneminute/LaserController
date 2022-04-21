@@ -79,8 +79,8 @@ public:
     bool isJoinedGroup;
     bool isAlignTarget;
     QSet<LaserPrimitive*>* joinedGroupList;
-    bool stampIntaglio;//和印章相关的属性 阴刻，凹下
-    QPainterPath antiFakePath;
+    //bool stampIntaglio;//和印章相关的属性 阴刻，凹下
+    //QPainterPath antiFakePath;
     //QRect variableBounds;//circleText，horizontalText，verticalText中使用，方便改变外包框
 };
 
@@ -860,34 +860,6 @@ bool LaserPrimitive::isAvailable() const
         qFuzzyCompare(d->boundingRect.height(), 0.0))
         return false;
     return true;
-}
-
-void LaserPrimitive::setAntiFakePath(QPainterPath path)
-{
-    Q_D(LaserPrimitive);
-    d->antiFakePath = path;
-    d->path = d->path - d->antiFakePath;
-}
-
-bool LaserPrimitive::stampIntaglio()
-{
-    Q_D(LaserPrimitive);
-    return d->stampIntaglio;
-}
-
-void LaserPrimitive::setStampIntaglio(bool bl)
-{
-    Q_D(LaserPrimitive);
-    d->stampIntaglio = bl;
-}
-
-bool LaserPrimitive::isStamepPrimitive()
-{
-    return false;
-}
-
-void LaserPrimitive::createAntifakeLine(bool isCurve)
-{
 }
 
 int LaserPrimitive::smallCircleIndex() const
@@ -3139,13 +3111,613 @@ LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
     LaserLineListList lineList = utils::interLines(path, layer()->fillingRowInterval());
     return lineList;
 }
+class LaserStampBasePrivate : public LaserShapePrivate
+{
+    Q_DECLARE_PUBLIC(LaserStampBase)
+public:
+    LaserStampBasePrivate(LaserStampBase* ptr)
+        : LaserShapePrivate(ptr)
+    {
+    }
+    bool stampIntaglio;
+    int antiFakeType;
+    int antiFakeLine;
+    bool isAverageDistribute;
+    qreal antiFakeLineWidth;
+    bool surpassOuter;
+    bool surpassInner;
+    bool randomMove;
+    int m_antiFakeLineSeed;
+    QPainterPath fingerPrintPath;
+    QPainterPath antiFakePath;
+    QPainterPath originalPath;
+};
 
-class LaserStarPrivate : public LaserShapePrivate
+LaserStampBase::LaserStampBase(LaserStampBasePrivate* ptr, LaserDocument* doc, LaserPrimitiveType type, bool stampIntaglio, QTransform transform,
+    int layerIndex, int antiFakeType, int antiFakeLine, bool isAverageDistribute, qreal lineWidth,
+    bool surpassOuter, bool surpassInner, bool randomMove)
+    :LaserShape(ptr, doc, type, layerIndex, transform)
+{
+    Q_D(LaserStampBase);
+    d->stampIntaglio = stampIntaglio;
+    d->antiFakeType = antiFakeType;
+    d->antiFakeLine = antiFakeLine;
+    d->isAverageDistribute = isAverageDistribute;
+    d->antiFakeLineWidth = lineWidth;
+    d->surpassOuter = surpassOuter;
+    d->surpassInner = surpassInner;
+    d->randomMove = randomMove;
+    d->m_antiFakeLineSeed = 0;
+}
+
+LaserStampBase::~LaserStampBase()
+{
+}
+
+void LaserStampBase::setAntiFakePath(QPainterPath path) {
+    Q_D(LaserStampBase);
+    d->antiFakePath = path;
+    d->path = d->originalPath - d->antiFakePath - d->fingerPrintPath;
+}
+
+void LaserStampBase::setFingerPrintPath(QPainterPath path)
+{
+    Q_D(LaserStampBase);
+    d->fingerPrintPath = path;
+    d->path = d->originalPath - d->antiFakePath - d->fingerPrintPath;
+}
+
+bool LaserStampBase::stampIntaglio() {
+    Q_D(LaserStampBase);
+    return d->stampIntaglio;
+}
+void LaserStampBase::setStampIntaglio(bool bl) {
+    Q_D(LaserStampBase);
+    d->stampIntaglio = bl;
+}
+int LaserStampBase::antiFakeType() {
+    Q_D(LaserStampBase);
+    return d->antiFakeType;
+}
+void LaserStampBase::setAntiFakeType(int type) {
+    Q_D(LaserStampBase);
+    d->antiFakeType = type;
+}
+int LaserStampBase::antiFakeLine() {
+    Q_D(LaserStampBase);
+    return d->antiFakeLine;
+}
+void LaserStampBase::setAntiFakeLine(int count) {
+    Q_D(LaserStampBase);
+    d->antiFakeLine = count;
+}
+bool LaserStampBase::isAverageDistribute() {
+    Q_D(LaserStampBase);
+    return d->isAverageDistribute;
+}
+void LaserStampBase::setIsAverageDistribute(bool bl) {
+    Q_D(LaserStampBase);
+    d->isAverageDistribute = bl;
+}
+qreal LaserStampBase::AntiFakeLineWidth() {
+    Q_D(LaserStampBase);
+    return d->antiFakeLineWidth;
+}
+void LaserStampBase::setAntiFakeLineWidth(qreal width) {
+    Q_D(LaserStampBase);
+    d->antiFakeLineWidth = width;
+}
+bool LaserStampBase::surpassOuter() {
+    Q_D(LaserStampBase);
+    return d->surpassOuter;
+}
+void LaserStampBase::setSurpassOuter(bool bl) {
+    Q_D(LaserStampBase);
+    d->surpassOuter = bl;
+}
+bool LaserStampBase::surpassInner() {
+    Q_D(LaserStampBase);
+    return d->surpassInner;
+
+}
+void LaserStampBase::setSurpassInner(bool bl) {
+    Q_D(LaserStampBase);
+    d->surpassInner = bl;
+}
+bool LaserStampBase::randomMove() {
+    Q_D(LaserStampBase);
+    return d->randomMove;
+}
+void LaserStampBase::setRandomMove(bool bl) {
+    Q_D(LaserStampBase);
+    d->randomMove = bl;
+}
+void LaserStampBase::createAntiFakePath(int antiFakeType, int antiFakeLine, bool isAverageDistribute, qreal lineWidth,
+    bool surpassOuter, bool surpassInner, bool randomMove)
+{
+    Q_D(LaserStampBase);
+    if (antiFakeLine <= 0 || lineWidth <= 0) {
+        return;
+    }
+    d->antiFakeType = antiFakeType;
+    d->antiFakeLine = antiFakeLine;
+    d->isAverageDistribute = isAverageDistribute;
+    d->antiFakeLineWidth = lineWidth;
+    d->surpassOuter = surpassOuter;
+    d->surpassInner = surpassInner;
+    d->randomMove = randomMove;
+
+    int type = primitiveType();
+    if (type == LPT_FRAME || type == LPT_RING) {
+        qreal lineWidthRate = 1.5;
+        if (d->antiFakeType == 1) {
+            lineWidthRate = 3.0;
+        }
+        createAntifakeLineByArc(lineWidthRate);
+    }
+    else if (type == LPT_STAR || type == LPT_PARTYEMBLEM ||
+        type == LPT_HORIZONTALTEXT || type == LPT_VERTICALTEXT || type == LPT_CIRCLETEXT) {
+        createAntifakeLineByBounds();
+    }
+
+}
+void LaserStampBase::createAntifakeLineByBounds()
+{
+    Q_D(LaserStampBase);
+    d->m_antiFakeLineSeed += 1;
+
+    if (d->m_antiFakeLineSeed >= INT_MAX) {
+        d->m_antiFakeLineSeed = 0;
+    }
+    QRectF bounds = boundingRect();
+    int lineType = d->antiFakeType;
+    //qreal lineWidth = m_aFWidth->value() * 1000;
+    //int lineSize = m_aFLines->value();
+    QPainterPath path;
+    if (d->antiFakeLineWidth == 0 || d->antiFakeLine == 0) {
+        //return QPainterPath();
+        setAntiFakePath(path);
+        return;
+    }
+
+    switch (lineType) {
+    case 0: {
+        qreal length = (QLineF(bounds.topLeft(), bounds.bottomRight())).length();
+
+        QRectF rect(bounds.topLeft(), QPointF(bounds.left() + length * 1, bounds.top() + d->antiFakeLineWidth));
+        QPainterPath lPath;
+        lPath.addRect(rect);
+        path = transformAntifakeLineByBounds(lPath, 1.5, 0.2, 0.8);
+        break;
+    }
+    case 1: {
+        QPainterPath sinPath;
+        sinPath = createCurveLine(bounds, bounds.width() * 0.25, QLineF(bounds.topLeft(), bounds.topRight()));
+        path = transformAntifakeLineByBounds(sinPath, 3, 0.2, 0.8);
+        break;
+    }
+    }
+    setAntiFakePath(path);
+}
+void LaserStampBase::createAntifakeLineByArc(qreal lineWidthRate)
+{
+    Q_D(LaserStampBase);
+    QPainterPath outerPath, innerPath, centerPath, path;
+    QRectF outerRect, innerRect;
+    int type = primitiveType();
+    qreal width, halfWidth;
+    //bool isAverage = m_aFAverageCheckbox->isChecked();
+    //bool isSurpassOuter = m_aFSurpassOuterCheckbox->isChecked();
+    //bool isSurpassInner = m_aFSurpassInnerCheckbox->isChecked();
+    //bool isRandomMove = m_aFRandomMoveCheckbox->isChecked();
+    //int lineSize = m_aFLines->value();
+    //qreal lineWidth = m_aFWidth->value() * 1000;
+
+    QRectF centerRect;
+    QPointF center;
+
+    if (type == LPT_FRAME) {
+        LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(this);
+        innerPath = frame->innerPath();
+        innerRect = frame->innerRect();
+        width = frame->borderWidth();
+        outerPath = frame->outerPath();
+        center = innerRect.center();
+        halfWidth = width * 0.5;
+        centerRect = QRectF(QRectF(QPointF(innerRect.left() - halfWidth, innerRect.top() - halfWidth),
+            QPointF(innerRect.right() + halfWidth, innerRect.bottom() + halfWidth)));
+        //centerPath.addRect(centerRect);
+        centerPath = frame->computeCornerRadius(centerRect.toRect(), frame->cornerRadius(), frame->cornerRadiusType());
+    }
+    else if (type == LPT_RING) {
+        LaserRing* ring = qgraphicsitem_cast<LaserRing*>(this);
+        innerPath = ring->innerPath();
+        innerRect = ring->innerRect();
+        width = ring->borderWidth();
+        outerPath = ring->outerPath();
+        center = innerRect.center();
+        halfWidth = width * 0.5;
+        centerRect = QRectF(QRectF(QPointF(innerRect.left() - halfWidth, innerRect.top() - halfWidth),
+            QPointF(innerRect.right() + halfWidth, innerRect.bottom() + halfWidth)));
+        centerPath.addEllipse(centerRect);
+    }
+    else {
+        setAntiFakePath(path);
+        return;
+    }
+
+    //points percent
+    QList<qreal> percentList;
+    qreal length = innerPath.length();
+    int maxLines = qFloor(length / (d->antiFakeLineWidth * lineWidthRate));
+    if (maxLines < d->antiFakeLine) {
+        maxLines = d->antiFakeLine;
+    }
+    std::uniform_int_distribution<int> u1(0, 100);
+    std::default_random_engine e1;
+    e1.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+    qreal startPercent = u1(e1) / 100.0f;
+    qreal intervalPercent = 1.0 / d->antiFakeLine;
+    percentList.append(startPercent);
+
+    std::uniform_int_distribution<int> u2(1, maxLines);
+    std::default_random_engine e2;
+    e2.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+    QPainterPath basePath;
+    QLineF baseLine;
+    basePath = createBasePathByArc(width, baseLine);
+
+    if (d->isAverageDistribute) {
+        for (int i = 1; i < d->antiFakeLine; i++) {
+            qreal val = startPercent + intervalPercent * i;
+            if (val > 1) {
+                val = val - 1;
+            }
+            percentList.append(val);
+        }
+    }
+    else {
+        for (int i = 1; i < d->antiFakeLine; i++) {
+            bool isRepeat = true;
+            qreal val;
+            while (isRepeat) {
+                qreal rVal = u2(e2);
+                val = rVal / maxLines;
+                for (qreal v : percentList) {
+                    if (v == val) {
+                        isRepeat = true;
+                        break;
+                    }
+                    else {
+                        isRepeat = false;
+                    }
+                }
+            }
+            if (!isRepeat) {
+                percentList.append(val);
+            }
+        }
+    }
+    //QList<QPainterPath> pathList;
+    QPainterPath targetPath;
+    if (d->surpassOuter && d->surpassInner) {
+        targetPath = centerPath;
+    }
+    else if (d->surpassOuter && !d->surpassInner) {
+        targetPath = outerPath;
+    }
+    else if (!d->surpassOuter && d->surpassInner) {
+        targetPath = innerPath;
+    }
+    else if (!d->surpassOuter && !d->surpassInner) {
+        targetPath = centerPath;
+    }
+    //rotate, translate
+    std::uniform_int_distribution<int> u3(0, 360);
+    std::default_random_engine e3;
+    for (int s = 0; s < d->antiFakeLine; s++) {
+        QPainterPath bPath = basePath;
+        qreal percent = percentList[s];
+        QPointF tPoint = targetPath.pointAtPercent(percent);
+        //rotate
+        if (d->randomMove) {
+            e3.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()) + s);
+            qreal angle = u3(e3);
+            bool bl = true;
+            while (bl) {
+                if ((angle >= 30 && angle <= 60) || (angle >= 300 && angle <= 330)
+                    || (angle >= 120 && angle <= 150) || (angle <= 240 && angle >= 210)) {
+                    QTransform rt;
+                    rt.rotate(angle);
+                    bPath = rt.map(bPath);
+                    bl = false;
+                }
+                else {
+                    bl = true;
+                    angle = u3(e3);
+                }
+            }
+        }
+        else {
+            QVector2D arcVect(tPoint - center);
+            arcVect = arcVect.normalized();
+            QVector2D baseVect(baseLine.p1() - baseLine.p2());
+            baseVect = baseVect.normalized();
+            qreal radian = qAcos(QVector2D::dotProduct(baseVect, arcVect));
+            if (arcVect.y() > 0) {
+                radian = -radian;
+            }
+            QTransform rt;
+            rt.rotateRadians(radian);
+            bPath = rt.map(bPath);
+        }
+        //translate
+
+        //QPointF tPoint = p->boundingRect().center();
+        QPointF diff = tPoint - bPath.boundingRect().center();
+        QTransform tt;
+        tt.translate(diff.x(), diff.y());
+        bPath = tt.map(bPath);
+        //path.addPath(bPath);
+        path = path.united(bPath);
+
+        //pathList.append(bPath);
+    }
+    setAntiFakePath(path);
+}
+QPainterPath LaserStampBase::createBasePathByArc(qreal borderWidth, QLineF& baseLine)
+{
+    Q_D(LaserStampBase);
+    QRectF bounds = boundingRect();
+    //bool isSurpassOuter = m_aFSurpassOuterCheckbox->isChecked();
+    //bool isSurpassInner = m_aFSurpassInnerCheckbox->isChecked();
+
+    qreal height = d->antiFakeLineWidth;
+    qreal width, validHeight, validWidth, adpterWidth;
+    if (d->surpassOuter && d->surpassInner) {
+        width = borderWidth * 4;
+        validWidth = borderWidth;
+        validHeight = validWidth * 0.25;
+        adpterWidth = validWidth;
+    }
+    else if (d->surpassOuter && !d->surpassInner) {
+        width = (borderWidth * 0.9) * 2;
+        validWidth = borderWidth * 0.9;
+        validHeight = validWidth * 0.25;
+        adpterWidth = validWidth;
+    }
+    else if (!d->surpassOuter && d->surpassInner) {
+        width = (borderWidth * 0.9) * 2;
+        validWidth = borderWidth * 0.9;
+        validHeight = validWidth * 0.25;
+        adpterWidth = validWidth;
+    }
+    else if (!d->surpassOuter && !d->surpassInner) {
+        width = borderWidth * 0.8;
+        validWidth = borderWidth * 0.8;
+        validHeight = validWidth * 0.25;
+        adpterWidth = 0;
+    }
+    QRectF baseRect(bounds.left(), bounds.top(), width, height);
+    QLineF l1(baseRect.topLeft(), baseRect.bottomLeft());
+    QLineF l2(baseRect.topRight(), baseRect.bottomRight());
+    baseLine = QLineF(l1.center(), l2.center());
+    QPainterPath path;
+    //int lineType = m_aFType->currentIndex();
+    switch (d->antiFakeType) {
+    case 0: {
+        path.addRect(baseRect);
+        break;
+    }
+    case 1: {
+        path = createCurveLine(baseRect, validHeight, QLineF(QPointF(l1.center().x() - adpterWidth, l1.center().y()), QPointF(l1.center().x() + validWidth, l1.center().y())));
+        break;
+    }
+    }
+
+    return path;
+}
+QPainterPath LaserStampBase::createCurveLine(QRectF bounds, qreal a, QLineF line)
+{
+    Q_D(LaserStampBase);
+    QPainterPath path;
+    QPainterPath lPath;
+    //lPath.moveTo(bounds.topLeft());
+    //lPath.lineTo(bounds.topRight());
+    lPath.moveTo(line.p1());
+    lPath.lineTo(line.p2());
+    int size = 50;
+    //qreal a = 1000;
+    qreal xInterval = bounds.width() / size;
+    //qreal width = m_aFWidth->value() * 1000;
+    QPointF firstP = lPath.pointAtPercent(0.0);
+    QPointF endP = lPath.pointAtPercent(1.0);
+    path.moveTo(firstP);
+    for (int j = 0; j <= 1; j++) {
+        for (int i = 0; i <= size; i++) {
+            qreal rate = 1.0f / size * i;
+            if (j == 1) {
+                rate = 1.0 - 1.0f / size * i;
+            }
+            QPointF point = lPath.pointAtPercent(rate);
+            qreal x = i * xInterval;
+            qreal angle = rate * 2 * M_PI;
+            qreal y = a * qSin(angle) + d->antiFakeLineWidth * j;
+            QPointF resultPoint(point.x(), y + point.y());
+
+            path.lineTo(resultPoint);
+        }
+        if (j == 0) {
+            path.lineTo(QPointF(endP.x(), endP.y() + d->antiFakeLineWidth));
+        }
+    }
+    path.lineTo(firstP);
+
+    return path;
+}
+QPainterPath LaserStampBase::transformAntifakeLineByBounds(QPainterPath basePath, qreal intervalRate, qreal start, qreal end)
+{
+    Q_D(LaserStampBase);
+    QRectF bounds = boundingRect();
+    //qreal lineWidth = m_aFWidth->value() * 1000;
+    //int lineSize = m_aFLines->value();
+    //bool isAverave = m_aFAverageCheckbox->isChecked();
+
+    QPainterPath path, tempL;
+    QLineF l1(bounds.topLeft(), bounds.topRight());
+    QLineF l2(bounds.bottomLeft(), bounds.bottomRight());
+    tempL.moveTo(bounds.topLeft());
+    tempL.lineTo(bounds.bottomRight());
+    QPainterPath centerLine;
+    QPointF cLineA = bounds.center();
+    centerLine.moveTo(tempL.pointAtPercent(start));
+    centerLine.lineTo(tempL.pointAtPercent(end));
+
+    QPointF c1 = bounds.center();
+    QPainterPath topLinePath;
+
+    topLinePath.moveTo(bounds.topLeft());
+    topLinePath.lineTo(bounds.topRight());
+
+    //rotate
+    std::uniform_int_distribution<int> u1(1, 360);
+    std::default_random_engine e1;
+    e1.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()) + d->m_antiFakeLineSeed);
+    qreal rotateVal = u1(e1);
+
+    QTransform tr;
+    tr.rotate(rotateVal);
+    basePath = tr.map(basePath);
+    topLinePath = tr.map(topLinePath);
+
+    QTransform t;
+    QPointF cP = basePath.boundingRect().center();
+    t.translate(cLineA.x() - cP.x(), cLineA.y() - cP.y());
+    basePath = t.map(basePath);
+    topLinePath = t.map(topLinePath);
+    QVector2D vec(topLinePath.pointAtPercent(0.0) - topLinePath.pointAtPercent(1.0));
+    vec = QVector2D(vec.y(), -vec.x()).normalized();
+    //move
+    qreal shorter = bounds.width();
+    if (shorter > bounds.height()) {
+        shorter = bounds.height();
+    }
+    int maxLines = centerLine.length() / (d->antiFakeLineWidth * intervalRate);
+    int halfLines = maxLines * 0.5;
+    if (maxLines < d->antiFakeLine) {
+        halfLines = (d->antiFakeLine * 0.5) + 1;
+    }
+    qreal xL = bounds.width();
+    qreal yL = bounds.height();
+    if (d->isAverageDistribute) {
+        qreal interval = centerLine.length() / (d->antiFakeLine + 1);
+        bool isOdd = true;//奇数
+        if (d->antiFakeLine % 2 == 0) {
+            isOdd = false;
+        }
+        for (int i = 0; i < d->antiFakeLine; i++) {
+            QPainterPath tempPath = basePath;
+            qreal val;
+            qreal multi = 0;
+            if (isOdd) {
+                if (i == 0) {
+                    path = path.united(tempPath);
+                    continue;
+                }
+
+                if (i % 2 == 0) {
+                    multi = -i / 2;
+                }
+                else {
+                    multi = i / 2 + 1;
+                }
+            }
+            else {
+                if (i == 0) {
+                    multi = -0.5;
+                }
+                else if (i == 1) {
+                    multi = 0.5;
+                }
+                else {
+                    if (i % 2 == 0) {
+                        multi = -(i / 2) - 0.5;
+                    }
+                    else {
+                        multi = (i / 2) + 0.5;
+                    }
+
+                }
+            }
+            val = multi * interval;
+            QPointF point(vec.x() * val, vec.y() * val);
+            QPointF c2 = tempPath.boundingRect().center();
+            QTransform tp;
+            tp.translate(point.x() - 0, point.y() - 0);
+
+            tempPath = tp.map(tempPath);
+            path = path.united(tempPath);
+        }
+    }
+    else {
+        QList<int> list;
+        std::uniform_int_distribution<int> u2(-halfLines, halfLines);
+        std::default_random_engine e2;
+        e2.seed(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+        for (int i = 0; i < d->antiFakeLine; i++) {
+            int rand = u2(e2);
+            for (int j = 0; j < list.size(); j++) {
+                int r = list[j];
+                while (r == rand) {
+                    rand = u2(e2);
+                }
+            }
+            list.append(rand);
+            qreal val = rand * d->antiFakeLineWidth * intervalRate;
+            QPainterPath tempPath = basePath;
+
+            QPointF point(vec.x() * val, vec.y() * val);
+            QPointF c2 = tempPath.boundingRect().center();
+            QTransform tp;
+            tp.translate(point.x() - 0, point.y() - 0);
+            tempPath = tp.map(tempPath);
+            //path.addPath(tempPath);
+            path = path.united(tempPath);
+        }
+    }
+
+    return path;
+}
+void LaserStampBase::stampBaseClone(LaserStampBase* cloneP)
+{
+    Q_D(LaserStampBase);
+    cloneP->setAntiFakePath(d->antiFakePath);
+    cloneP->setAntiFakeLine(d->antiFakeLine);
+    cloneP->setAntiFakeType(d->antiFakeType);
+    cloneP->setAntiFakeLineWidth(d->antiFakeLineWidth);
+    cloneP->setIsAverageDistribute(d->isAverageDistribute);
+    cloneP->setSurpassInner(d->surpassInner);
+    cloneP->setSurpassOuter(d->surpassOuter);
+    cloneP->setRandomMove(d->randomMove);
+}
+void LaserStampBase::stampBaseToJson(QJsonObject& object)
+{
+    Q_D(LaserStampBase);
+    object.insert("stampIntaglio", d->stampIntaglio);
+    object.insert("antiFakeType", d->antiFakeType);
+    object.insert("antiFakeLine", d->antiFakeLine);
+    object.insert("antiFakeLineWidth", d->antiFakeLineWidth);
+    object.insert("isAverageDistribute", d->isAverageDistribute);
+    object.insert("surpassInner", d->surpassInner);
+    object.insert("surpassOuter", d->surpassOuter);
+    object.insert("randomMove", d->randomMove);
+}
+class LaserStarPrivate : public LaserStampBasePrivate
 {
     Q_DECLARE_PUBLIC(LaserStar)
 public:
     LaserStarPrivate(LaserStar* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampBasePrivate(ptr)
     {        
     }
     qreal radius;
@@ -3154,10 +3726,10 @@ public:
 };
 
 LaserStar::LaserStar(LaserDocument * doc, QPoint centerPos, qreal radius, bool stampIntaglio, QTransform transform, int layerIndex)
-    : LaserShape(new LaserStarPrivate(this), doc, LPT_STAR, layerIndex, transform)
+    : LaserStampBase(new LaserStarPrivate(this), doc, LPT_STAR, stampIntaglio, transform, layerIndex)
 {
     Q_D(LaserStar);
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     d->radius = radius;
     d->centerPoint = centerPos;
     computePath();
@@ -3218,6 +3790,7 @@ QJsonObject LaserStar::toJson()
     object.insert("radius", d->radius);
     object.insert("layerIndex", layerIndex());
     object.insert("center", center);
+    stampBaseToJson(object);
     return object;
 }
 
@@ -3225,6 +3798,7 @@ LaserPrimitive * LaserStar::clone(QTransform t)
 {
     Q_D(LaserStar);
     LaserStar* star = new LaserStar(document(),d->centerPoint, d->radius, d->stampIntaglio, t, d->layerIndex);
+    stampBaseClone(star);
     return star;
 }
 
@@ -3277,6 +3851,7 @@ void LaserStar::computePath()
     d->path.lineTo(d->points[9]);
     d->path.closeSubpath();
     d->boundingRect = d->path.boundingRect().toRect();
+    d->originalPath = d->path;
 }
 
 qreal LaserStar::radius()
@@ -3349,17 +3924,12 @@ void LaserStar::setBoundingRectHeight(qreal height)
     computePath();
 }
 
-bool LaserStar::isStamepPrimitive()
-{
-    return true;
-}
-
-class LaserPartyEmblemPrivate : public LaserShapePrivate
+class LaserPartyEmblemPrivate : public LaserStampBasePrivate
 {
     Q_DECLARE_PUBLIC(LaserPartyEmblem)
 public:
     LaserPartyEmblemPrivate(LaserPartyEmblem* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampBasePrivate(ptr)
     {
     }
     qreal radius;
@@ -3367,10 +3937,10 @@ public:
 };
 LaserPartyEmblem::LaserPartyEmblem(LaserDocument* doc, QPoint centerPos, qreal radius, bool stampIntaglio, QTransform transform,
     int layerIndex) 
-    :LaserShape(new LaserPartyEmblemPrivate(this), doc, LPT_PARTYEMBLEM, layerIndex, transform)
+    :LaserStampBase(new LaserPartyEmblemPrivate(this), doc, LPT_PARTYEMBLEM, stampIntaglio, transform, layerIndex)
 {
     Q_D(LaserPartyEmblem);
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     d->centerPoint = centerPos;
     d->radius = radius;
     setTransform(transform);
@@ -3420,13 +3990,16 @@ QJsonObject LaserPartyEmblem::toJson()
     object.insert("radius", d->radius);
     object.insert("layerIndex", layerIndex());
     object.insert("center", center);
+    stampBaseToJson(object);
     return object;
 }
 
 LaserPrimitive* LaserPartyEmblem::clone(QTransform t)
 {
     Q_D(LaserPartyEmblem);
-    return new LaserPartyEmblem(d->doc, d->centerPoint, d->radius,d->stampIntaglio, t, d->layerIndex);
+    LaserPartyEmblem* p = new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, d->stampIntaglio, t, d->layerIndex);
+    stampBaseClone(p);
+    return p;
 }
 
 QVector<QLineF> LaserPartyEmblem::edges()
@@ -3527,6 +4100,7 @@ void LaserPartyEmblem::computePath()
     translateEnd.translate(d->centerPoint.x(), d->centerPoint.y());
     d->path = translateEnd.map(d->path);
     d->boundingRect = d->path.boundingRect().toRect();
+    d->originalPath = d->path;
 }
 
 qreal LaserPartyEmblem::radius()
@@ -3574,17 +4148,12 @@ void LaserPartyEmblem::setBoundingRectHeight(qreal height)
     computePath();
 }
 
-bool LaserPartyEmblem::isStamepPrimitive()
-{
-    return true;
-}
-
-class LaserRingPrivate : public LaserShapePrivate
+class LaserRingPrivate : public LaserStampBasePrivate
 {
     Q_DECLARE_PUBLIC(LaserRing)
 public:
     LaserRingPrivate(LaserRing* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampBasePrivate(ptr)
     {
     }
     qreal outerRadius;
@@ -3598,14 +4167,14 @@ public:
     bool isInner;//是否是内圈
 };
 LaserRing::LaserRing(LaserDocument* doc, QRectF outerRect, qreal width, bool stampIntaglio,QTransform transform, int layerIndex)
-    :LaserShape(new LaserRingPrivate(this), doc, LPT_RING, layerIndex, transform)
+    : LaserStampBase(new LaserRingPrivate(this), doc, LPT_RING, stampIntaglio, transform, layerIndex)
 {
     Q_D(LaserRing);
     if (width <= 0) {
         width = 1;
     }
     d->isInner = false;
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     d->width = qAbs(width);
     d->outerBounds = outerRect;
     d->innerBounds = QRectF(QPointF(outerRect.topLeft().x() + d->width, outerRect.topLeft().y() + d->width), 
@@ -3695,12 +4264,14 @@ QJsonObject LaserRing::toJson()
     object.insert("width", d->width);
     object.insert("layerIndex", layerIndex());
     object.insert("bounds", bounds);
+    stampBaseToJson(object);
     return object;
 }
 LaserPrimitive * LaserRing::clone(QTransform t)
 {
     Q_D(LaserRing);
     LaserRing* ring = new LaserRing(document(), d->outerBounds, d->width,d->stampIntaglio, t, d->layerIndex);
+    stampBaseClone(ring);
     return ring;
 }
 QVector<QLineF> LaserRing::edges()
@@ -3797,6 +4368,7 @@ void LaserRing::computePath()
     Q_D(LaserRing);
     d->path = d->outerPath - d->innerPath;
     d->boundingRect = d->path.boundingRect().toRect();
+    d->originalPath = d->path;
 }
 
 void LaserRing::setBoundingRectWidth(qreal width)
@@ -3825,17 +4397,12 @@ void LaserRing::setBoundingRectHeight(qreal height)
     computePath();
 }
 
-bool LaserRing::isStamepPrimitive()
-{
-    return true;
-}
-
-class LaserFramePrivate : public LaserShapePrivate
+class LaserFramePrivate : public LaserStampBasePrivate
 {
     Q_DECLARE_PUBLIC(LaserFrame)
 public:
     LaserFramePrivate(LaserFrame* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampBasePrivate(ptr)
     {
     }
     QRect outerRect;
@@ -3851,14 +4418,14 @@ public:
 
 LaserFrame::LaserFrame(LaserDocument* doc, QRect outerRect, qreal width, qreal cornnerRadilus, bool stampIntaglio,
     QTransform transform, int layerIndex, int cornerType)
-    :LaserShape(new LaserFramePrivate(this), doc, LPT_FRAME, layerIndex, transform)
+    : LaserStampBase(new LaserFramePrivate(this), doc, LPT_FRAME, stampIntaglio, transform, layerIndex)
 {
     Q_D(LaserFrame);
     if (width <= 0) {
         width = 1;
     }
     d->isInner = false;
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     d->needAuxiliaryLine = true;
     d->outerRect = outerRect;
     d->width = width;
@@ -3951,6 +4518,7 @@ QJsonObject LaserFrame::toJson()
     object.insert("bounds", bounds);
     object.insert("cornerType", d->cornerType);
     object.insert("cornerRadius", d->cornerRadius);
+    stampBaseToJson(object);
     return object;
 }
 LaserPrimitive * LaserFrame::clone(QTransform t)
@@ -3958,6 +4526,7 @@ LaserPrimitive * LaserFrame::clone(QTransform t)
     Q_D(LaserFrame);
     LaserFrame* frame = new LaserFrame(document(), d->outerRect, d->width, d->cornerRadius, d->stampIntaglio,
         t, d->layerIndex);
+    stampBaseClone(frame);
     return frame;
 }
 QVector<QLineF> LaserFrame::edges()
@@ -4077,6 +4646,7 @@ void LaserFrame::computePath()
     
     d->path = d->outerPath - d->innerPath;
     d->boundingRect = d->path.boundingRect().toRect();
+    d->originalPath = d->path;
 }
 bool LaserFrame::needAuxiliaryLine()
 {
@@ -4109,11 +4679,6 @@ void LaserFrame::setBoundingRectHeight(qreal height)
     computePath();
 }
 
-bool LaserFrame::isStamepPrimitive()
-{
-    return true;
-}
-
 QDebug operator<<(QDebug debug, const QRect& rect)
 {
     QDebugStateSaver saver(debug);
@@ -4121,12 +4686,12 @@ QDebug operator<<(QDebug debug, const QRect& rect)
         << ", " << rect.width() << "x" << rect.height() << "]";
     return debug;
 }
-class LaserStampTextPrivate : public LaserShapePrivate
+class LaserStampTextPrivate : public LaserStampBasePrivate
 {
     Q_DECLARE_PUBLIC(LaserStampText)
 public:
     LaserStampTextPrivate(LaserStampText* ptr)
-        : LaserShapePrivate(ptr)
+        : LaserStampBasePrivate(ptr)
     {
     }
     QString content;
@@ -4142,7 +4707,7 @@ public:
 };
 LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
     QSize size, qreal space, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family, qreal weight)
-    :LaserShape(ptr, doc, type, layerIndex, transform)
+    :LaserStampBase(ptr, doc, type, stampIntaglio, transform,layerIndex)
 {
     Q_D(LaserStampText);
     d->content = content;
@@ -4154,7 +4719,7 @@ LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,La
     d->uppercase = uppercase;
     d->family = family;
     d->fontPiexlSize = size.height();
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     setZValue(3);
 }
 
@@ -4284,11 +4849,6 @@ QSize LaserStampText::textSize()
     return d->size;
 }
 
-bool LaserStampText::isStamepPrimitive()
-{
-    return true;
-}
-
 class LaserCircleTextPrivate : public LaserStampTextPrivate
 {
     Q_DECLARE_PUBLIC(LaserCircleText)
@@ -4323,7 +4883,7 @@ LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bou
     Q_D(LaserCircleText);
     //d->content = content;
     d->offsetRotateAngle = 0;
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     d->circleBounds = bounds.toRect();
     //d->boundingRect = bounds.toRect();
     if (!isInit) {
@@ -4427,6 +4987,7 @@ void LaserCircleText::computeTextPath(qreal angle, QSize textSize, bool needInit
         index++;
     }
     d->boundingRect = d->path.boundingRect().toRect();
+    d->originalPath = d->path;
 }
 
 void LaserCircleText::translateText(QPointF& lastPoint, QPointF& curPoint, qreal interval, qreal index)
@@ -4871,7 +5432,8 @@ LaserPrimitive * LaserCircleText::clone(QTransform t)
 {
     Q_D(LaserCircleText);
     LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->stampIntaglio, d->family,d->space, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
-    return nullptr;
+    stampBaseClone(circleText);
+    return circleText;
 }
 
 QJsonObject LaserCircleText::toJson()
@@ -4905,6 +5467,7 @@ QJsonObject LaserCircleText::toJson()
     object.insert("family", d->family);
     object.insert("stampIntaglio", d->stampIntaglio);
     object.insert("space", d->space);
+    stampBaseToJson(object);
     return object;
 }
 
@@ -4932,7 +5495,6 @@ void LaserCircleText::setBoundingRectWidth(qreal width)
         width, d->circleBounds.height());
     QPainterPath p;
     p.addRect(d->circleBounds);
-    //d->path = p;
     computeTextPath(d->angle, d->size, false);
     LaserApplication::mainWindow->originalBoundsWidth()->setValue(d->circleBounds.width() * 0.001);
 }
@@ -4945,7 +5507,6 @@ void LaserCircleText::setBoundingRectHeight(qreal height)
         d->circleBounds.width(), height);
     QPainterPath p;
     p.addRect(d->circleBounds);
-    //d->path = p;
     computeTextPath(d->angle, d->size, false);
     LaserApplication::mainWindow->originalBoundsHeight()->setValue(d->circleBounds.height() * 0.001);
 }
@@ -5002,7 +5563,7 @@ LaserHorizontalText::LaserHorizontalText(LaserDocument* doc, QString content, QS
         content, transform, layerIndex, size, space, bold, italic, uppercase, stampIntaglio, family, weight)
 {
     Q_D(LaserHorizontalText);
-    d->stampIntaglio = stampIntaglio;
+    //d->stampIntaglio = stampIntaglio;
     setTransform(transform);
     d->center = center;
     computeTextPath();
@@ -5072,6 +5633,7 @@ void LaserHorizontalText::computeTextPathProcess()
         path = t1.map(path);
         d->path.addPath(path);
     }
+    
 }
 //在(0, 0)点调整好间距后(init的时候，单个字的path没有移动位置，最终位置是在all path后移动的)，再移动到位置
 void LaserHorizontalText::computeTextPath()
@@ -5081,6 +5643,7 @@ void LaserHorizontalText::computeTextPath()
     toCenter();
     d->boundingRect = d->path.boundingRect().toRect();  
     //d->originalBoundingRect = d->boundingRect;
+    d->originalPath = d->path;
 }
 
 void LaserHorizontalText::toCenter()
@@ -5101,6 +5664,7 @@ LaserPrimitive * LaserHorizontalText::clone(QTransform t)
 {
     Q_D(LaserHorizontalText);
     LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->center,d->bold,d->italic,d->uppercase,d->stampIntaglio,d->family, d->space, t, d->layerIndex);
+    stampBaseClone(hText);
     return hText;
 }
 
@@ -5131,6 +5695,7 @@ QJsonObject LaserHorizontalText::toJson()
     object.insert("italic", d->italic);
     object.insert("family", d->family);
     object.insert("stampIntaglio", d->stampIntaglio);
+    stampBaseToJson(object);
     return object;
 }
 
@@ -5291,6 +5856,7 @@ void LaserVerticalText::computeTextPathProcess()
         path = t1.map(path);
         d->path.addPath(path);
     }
+    
 }
 
 void LaserVerticalText::computeTextPath()
@@ -5299,6 +5865,7 @@ void LaserVerticalText::computeTextPath()
     computeTextPathProcess();
     toCenter();
     d->boundingRect = d->path.boundingRect().toRect();
+    d->originalPath = d->path;
 }
 
 void LaserVerticalText::toCenter()
@@ -5321,6 +5888,7 @@ LaserPrimitive * LaserVerticalText::clone(QTransform t)
 {
     Q_D(LaserVerticalText);
     LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->center,d->bold, d->italic,d->uppercase, d->stampIntaglio, d->family, d->space, t, d->layerIndex);
+    stampBaseClone(text);
     return text;
 }
 
@@ -5351,7 +5919,7 @@ QJsonObject LaserVerticalText::toJson()
     object.insert("italic", d->italic);
     object.insert("uppercase", d->uppercase);
     object.insert("family", d->family);
-    object.insert("stampIntaglio", d->stampIntaglio);
+    stampBaseToJson(object);
     return object;
 }
 
@@ -5425,5 +5993,3 @@ void LaserVerticalText::setTextWidth(qreal width)
     //d->center = QPointF(d->center.x() - diff * 0.5, d->center.y());
     computeTextPath();
 }
-
-

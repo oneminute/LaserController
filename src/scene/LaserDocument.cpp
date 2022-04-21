@@ -1245,6 +1245,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
                 bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 primitive = new LaserStar(this, center, radius, stampIntaglio, saveTransform, layerIndex);
+                stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserPartyEmblem") {
                 QJsonArray cArray = primitiveJson["center"].toArray();
@@ -1252,6 +1253,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
                 bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 primitive = new LaserPartyEmblem(this, center, radius, stampIntaglio, saveTransform, layerIndex);
+                stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserRing") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
@@ -1259,6 +1261,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
                 bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 primitive = new LaserRing(this, bounds, width, stampIntaglio, saveTransform, layerIndex);
+                stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserFrame") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
@@ -1268,6 +1271,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
                 bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 primitive = new LaserFrame(this, bounds, width, cornerRadius, stampIntaglio, saveTransform, layerIndex, cornerType);
+                stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserHorizontalText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1282,6 +1286,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 QString family = primitiveJson["family"].toString();
                 primitive = new LaserHorizontalText(this, content, size, bL, bold, italic, uppercase, stampIntaglio, family,space, saveTransform, layerIndex);
+                stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserVerticalText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1296,6 +1301,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QString family = primitiveJson["family"].toString();
                 bool fill = primitiveJson["stampIntaglio"].toBool();
                 primitive = new LaserVerticalText(this, content, size, bL, bold, italic, uppercase,fill,family, space, saveTransform, layerIndex);
+                stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserCircleText") {
                 QJsonArray sizeArray = primitiveJson["size"].toArray();
@@ -1313,6 +1319,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 qreal space = primitiveJson["space"].toDouble();
                 primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase, stampIntaglio,family, space, false, maxRadian, minRadian,size, saveTransform, layerIndex);
+                stampBaseLoad(primitive, primitiveJson);
             }
             
             if (primitive)
@@ -1370,6 +1377,25 @@ void LaserDocument::load(const QString& filename, QWidget* window)
     this->blockSignals(false);
     emit updateLayersStructure();
     open();
+}
+
+void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object) {
+    LaserStampBase* stampP = qgraphicsitem_cast<LaserStampBase*>(p);
+    if (!stampP)
+    {
+        return;
+    }
+    bool stampIntaglio = object["stampIntaglio"].toBool();
+    int antiFakeType = object["antiFakeType"].toInt();
+    int antiFakeLine = object["antiFakeLine"].toInt();
+    qreal antiFakeLineWidth = object["antiFakeLineWidth"].toDouble();
+    bool isAverageDistribute = object["isAverageDistribute"].toBool();
+    bool surpassOuter = object["surpassOuter"].toBool();
+    bool surpassInner = object["surpassInner"].toBool();
+    bool randomMove = object["randomMove"].toBool();
+    stampP->setStampIntaglio(stampIntaglio);
+    stampP->createAntiFakePath(antiFakeType, antiFakeLine, isAverageDistribute, antiFakeLineWidth,
+        surpassOuter, surpassInner, randomMove);
 }
 
 int LaserDocument::totalNodes()
@@ -1450,7 +1476,11 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
         image.fill(Qt::white);
         StampItem item;
         for (LaserPrimitive* p : layer->primitives()) {
-            if(!p->isStamepPrimitive()){
+            /*if (!p->isStamepPrimitive()) {
+                continue;
+            }*/
+            LaserStampBase* sp = qgraphicsitem_cast<LaserStampBase*>(p);
+            if (sp == nullptr) {
                 continue;
             }
             QPainter painter(&image);
@@ -1459,7 +1489,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             computeBoundsPath(p, item, layer->stampBoundingDistance());
             painter.setPen(Qt::NoPen);
             painter.setBrush(Qt::NoBrush);
-            int type = p->primitiveType();
+            int type = sp->primitiveType();
             qreal penSize = 1;
             if (type == LPT_HORIZONTALTEXT || type == LPT_VERTICALTEXT || type == LPT_CIRCLETEXT) {
                 LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(p);
@@ -1467,14 +1497,14 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             }
             QPen pen;
             pen.setWidthF(penSize);
-            if (!p->stampIntaglio()) {
+            if (!sp->stampIntaglio()) {
                 QPainterPath pPath;
 
                 if (type == LPT_FRAME) {
                     LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(p);
                     pPath = frame->outerPath();
                     painter.setBrush(Qt::black);
-                    pPath = p->sceneTransform().map(pPath);
+                    pPath = sp->sceneTransform().map(pPath);
                     pPath = t1.map(pPath);
                     pPath = t2.map(pPath);
                     painter.drawPath(pPath);
@@ -1484,17 +1514,17 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                     LaserRing* ring = qgraphicsitem_cast<LaserRing*>(p);
                     pPath = ring->outerPath();
                     painter.setBrush(Qt::black);
-                    pPath = p->sceneTransform().map(pPath);
+                    pPath = sp->sceneTransform().map(pPath);
                     pPath = t1.map(pPath);
                     pPath = t2.map(pPath);
                     painter.drawPath(pPath);
                 }
-                pPath = p->getPath();
+                pPath = sp->getPath();
                 pen.setColor(Qt::white);
                 
                 painter.setPen(pen);
                 painter.setBrush(Qt::white);
-                pPath = p->sceneTransform().map(pPath);
+                pPath = sp->sceneTransform().map(pPath);
                 pPath = t1.map(pPath);
                 pPath = t2.map(pPath);
                 painter.drawPath(pPath);
@@ -1506,8 +1536,8 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                 pen.setColor(Qt::black);
                 painter.setPen(pen);
                 painter.setBrush(Qt::black);
-                QPainterPath pPath = p->getPath();
-                pPath = p->sceneTransform().map(pPath);
+                QPainterPath pPath = sp->getPath();
+                pPath = sp->sceneTransform().map(pPath);
                 pPath = t1.map(pPath);
                 pPath = t2.map(pPath);
                 painter.drawPath(pPath);

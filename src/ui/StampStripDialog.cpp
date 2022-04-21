@@ -46,7 +46,8 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
         //修改
         QMap<QModelIndex, QString> preModelList = m_tablesModelList[m_preLayoutIndex];
         QMap<QModelIndex, QString> curModelList = m_tablesModelList[index];
-        m_viewItemModel->clear();
+        //m_viewItemModel->clear();
+        m_viewItemModel->removeRows(0, m_viewItemModel->rowCount());
         if (!curModelList.isEmpty()) {
             
             for (QMap<QModelIndex, QString>::iterator i = curModelList.begin(); i != curModelList.end(); i ++) {
@@ -119,6 +120,8 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
     //list
     m_viewItemModel = new QStandardItemModel();
     QHeaderView* head = new QHeaderView(Qt::Horizontal);
+    m_viewItemModel->setHorizontalHeaderItem(0, new QStandardItem(tr("content")));
+    m_viewItemModel->setHorizontalHeaderItem(1, new QStandardItem(tr("font")));
     //add defualt line
     m_ui->lineEdit->setText(m_defaultTexts[0]);
     QString curFontStr = m_ui->fontComboBox->currentText();
@@ -135,12 +138,11 @@ StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent)
         m_tablesModelList.append(map);
     }
     
-    QStringList hearderLabels;
-    hearderLabels.append(QString(tr("content")));
-    hearderLabels.append(QString(tr("font")));
+    //QStringList hearderLabels;
+    //hearderLabels.append(QString(tr("content")));
+    //hearderLabels.append(QString(tr("font")));
     //iStandardItemModel->setHorizontalHeaderLabels(hearderLabels);
-    m_viewItemModel->setHorizontalHeaderItem(0, new QStandardItem(tr("content")));
-    m_viewItemModel->setHorizontalHeaderItem(1, new QStandardItem(tr("font")));
+    
     //m_ui->tableView->setHorizontalHeader(head);
     m_ui->tableView->setModel(m_viewItemModel);
     QString headViewStr("QHeaderView::section{background-color:rgb(245, 245, 245);color:rgb(18, 18, 18);bold:true;}");

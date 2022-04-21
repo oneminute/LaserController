@@ -115,11 +115,7 @@ public:
     LaserDoubleSpinBox* originalBoundsWidth();
     LaserDoubleSpinBox* commonCornerRadius();
     LaserDoubleSpinBox* originalBoundsSize();
-    void createAntifakeLineByBounds(LaserPrimitive* p);
-    QPainterPath createCurveLine(QRectF bounds, qreal a, QLineF line);
-    QPainterPath transformAntifakeLineByBounds(LaserPrimitive* p, QPainterPath basePath, qreal intervalRate, qreal start, qreal end);
-    void createAntifakeLineByArc(LaserPrimitive* p, qreal lineWidthRate);
-    QPainterPath createBasePathByArc(LaserPrimitive* p, qreal borderWidth, QLineF& baseLine);
+    
 public slots:
     void handleSecurityException(int code, const QString& message);
     void onFontComboBoxHighLighted(int index);
@@ -168,6 +164,7 @@ protected:
     LaserStampText* shapePropertyTextFont(int fontProperty);
     //show shape properties
     void showShapePropertyPanel();
+    void setAntiFakePanelValue(LaserStampBase* p);
     void createPrimitivePropertiesPanel();
     //shape properties panel / dock panel
     void createPrimitiveLinePropertyPanel();
