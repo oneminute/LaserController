@@ -713,6 +713,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
                 QRect bounds(rect.center().x() - radius, rect.center().y() - radius,
                     radius * 2, radius * 2);
                 LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, stampIntaglio, m_scene->document(), QTransform(), m_layerIndex);
+                stampBitmap->computeImage();
                 stampList.append(stampBitmap);
             }
             

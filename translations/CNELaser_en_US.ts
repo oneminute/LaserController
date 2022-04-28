@@ -4501,7 +4501,7 @@ Would you like to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.ui" line="2016"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7840"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7839"/>
         <source>Parse Json</source>
         <translation></translation>
     </message>
@@ -5607,7 +5607,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location filename="../src/ui/LaserControllerWindow.cpp" line="5010"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7822"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7821"/>
         <source>Open Supported File</source>
         <translation></translation>
     </message>
@@ -5888,17 +5888,17 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7821"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7820"/>
         <source>Json (*.json);;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7943"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7942"/>
         <source>Camera Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="7951"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="7950"/>
         <source>Camera Disonnected</source>
         <translation></translation>
     </message>
@@ -6367,17 +6367,17 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1382"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1381"/>
         <source>Warning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1383"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1382"/>
         <source>Found unavailable primitives, count is %1. These primitives will not be loaded.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="1704"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="1703"/>
         <source>Untitled</source>
         <translation></translation>
     </message>

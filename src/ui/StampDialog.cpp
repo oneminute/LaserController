@@ -16,15 +16,7 @@ void StampDialog::okBtnAccept()
 {    
     QList<LaserPrimitive*>list = createStampPrimitive();
     bool bl = m_viewer->addPrimitiveAndExamRegionByBounds(list);
-    if (bl) {
-        for (LaserPrimitive* p : list) {
-            int type = p->primitiveType();
-            if (type == LPT_STAMPBITMAP) {
-                LaserStampBitmap* stampBitmap = qobject_cast<LaserStampBitmap*>(p);
-                stampBitmap->computeImage();
-            }
-        }
-    }
+    
     m_viewer->zoomToSelection();
 }
 
@@ -35,11 +27,7 @@ void StampDialog::previewBtnAccept()
     QList<LaserPrimitive*> list = createStampPrimitive();
     LaserPrimitiveGroup* group = new LaserPrimitiveGroup();
     for (LaserPrimitive* p : list) {
-        int type = p->primitiveType();
-        if (type == LPT_STAMPBITMAP) {
-            LaserStampBitmap* stampBitmap = qobject_cast<LaserStampBitmap*>(p);
-            stampBitmap->computeImage();
-        }
+        
         group->addToGroup(p);
     }
     m_preview->scene()->addItem(group);

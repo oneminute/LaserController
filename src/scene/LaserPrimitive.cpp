@@ -197,7 +197,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         }
     }
     else {
-        color = Qt::red;
+        color = Qt::transparent;
     }
 
     if (isSelected())
@@ -3871,12 +3871,14 @@ void LaserStar::draw(QPainter * painter)
     d->path.setFillRule(Qt::WindingFill);
     if (!d->stampIntaglio) {
         //painter->setBrush(QBrush(this->layer()->color()));
-        if (layer()) {
+
+        painter->setBrush(QBrush(d->doc->layers()[d->layerIndex]->color()));
+        /*if (layer()) {
             painter->setBrush(QBrush(this->layer()->color()));
         }
         else {
             painter->setBrush(QBrush(Qt::red));
-        }
+        }*/
         painter->drawPath(d->path);
         painter->setBrush(Qt::NoBrush);
     }
@@ -4075,12 +4077,13 @@ void LaserPartyEmblem::draw(QPainter* painter)
     Q_D(const LaserPartyEmblem);
     if (!d->stampIntaglio) {
         //painter->setBrush(QBrush(this->layer()->color()));
-        if (layer()) {
+        painter->setBrush(QBrush(d->doc->layers()[d->layerIndex]->color()));
+        /*(if (layer()) {
             painter->setBrush(QBrush(this->layer()->color()));
         }
         else {
             painter->setBrush(QBrush(Qt::red));
-        }
+        }*/
     }
     else {
         painter->setBrush(QBrush(Qt::white));
@@ -4318,10 +4321,12 @@ LaserRing::~LaserRing()
 void LaserRing::draw(QPainter * painter)
 {
     Q_D(LaserRing);
-    QColor color = Qt::red;
+    QColor color = d->doc->layers()[d->layerIndex]->color();
+    /*QColor color = Qt::red;
     if (layer()) {
         color = this->layer()->color();
-    }
+    }*/
+    
     if (!d->isInner) {
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
@@ -4565,10 +4570,11 @@ LaserFrame::~LaserFrame()
 void LaserFrame::draw(QPainter * painter)
 {
     Q_D(LaserFrame);
-    QColor color = Qt::red;
+    QColor color = d->doc->layers()[d->layerIndex]->color();
+    /*QColor color = Qt::red;
     if (layer()) {
         color = this->layer()->color();
-    }
+    }*/
     
     if (!d->isInner) {
         if (!d->stampIntaglio) {
@@ -4850,13 +4856,14 @@ void LaserStampText::draw(QPainter* painter)
     QColor color;
     if (!d->stampIntaglio) {
         //painter->setBrush(QBrush(this->layer()->color()));
-        if (layer()) {
+        /*if (layer()) {
             color = layer()->color();
             
         }
         else {
             color = Qt::red;
-        }
+        }*/
+        color = d->doc->layers()[d->layerIndex]->color();
     }
     else {
         color = Qt::white;
@@ -6170,12 +6177,7 @@ void LaserStampBitmap::computeImage(bool generateStamp)
                             col = Qt::black;
                         }
                         else {
-                            if (layer() != nullptr) {
-                                col = layer()->color();
-                            }
-                            else {
-                                col = Qt::red;
-                            }
+                            col = d->doc->layers()[d->layerIndex]->color();
                         }
                     }
                     else {
@@ -6201,12 +6203,7 @@ void LaserStampBitmap::computeImage(bool generateStamp)
                             col = Qt::white;
                         }
                         else {
-                            if (layer() != nullptr) {
-                                col = layer()->color();
-                            }
-                            else {
-                                col = Qt::red;
-                            }
+                            col = d->doc->layers()[d->layerIndex]->color();
                             
                         }
                     }

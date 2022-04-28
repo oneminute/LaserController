@@ -5725,7 +5725,7 @@ Would you like to overwrite it?</source>
         <translation>加载主窗口...</translation>
     </message>
     <message>
-        <location line="+472"/>
+        <location line="+471"/>
         <source>Json (*.json);;</source>
         <translation></translation>
     </message>
@@ -5744,7 +5744,7 @@ Would you like to overwrite it?</source>
         <translation type="vanished">激光偏移:</translation>
     </message>
     <message>
-        <location line="-4834"/>
+        <location line="-4833"/>
         <source>Red Light Alignment</source>
         <translation>红光校准</translation>
     </message>
@@ -6754,7 +6754,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1065"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="+1064"/>
         <source>Parse Json</source>
         <translation>解析Json文件</translation>
     </message>
@@ -7168,7 +7168,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation type="vanished">保存原点</translation>
     </message>
     <message>
-        <location filename="../src/ui/LaserControllerWindow.cpp" line="-7617"/>
+        <location filename="../src/ui/LaserControllerWindow.cpp" line="-7616"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
@@ -7290,12 +7290,12 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+2812"/>
+        <location line="+2811"/>
         <source>Open Supported File</source>
         <translation>打开支持的文件</translation>
     </message>
     <message>
-        <location line="-2771"/>
+        <location line="-2770"/>
         <source>Untitled - </source>
         <translation>未命名</translation>
     </message>
@@ -7984,7 +7984,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
         <translation>按层建立拓扑</translation>
     </message>
     <message>
-        <location line="+438"/>
+        <location line="+437"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
@@ -12411,7 +12411,7 @@ Do you want to delete it anyway?</source>
         <translation>多边形转换为加工点</translation>
     </message>
     <message>
-        <location filename="../src/scene/LaserDocument.cpp" line="-1228"/>
+        <location filename="../src/scene/LaserDocument.cpp" line="-1227"/>
         <source>%1 Engraving</source>
         <translation>%1导出雕刻数据</translation>
     </message>
@@ -16166,7 +16166,7 @@ Please choose a different file name.</source>
         <location line="+246"/>
         <location filename="../src/ui/StampCircleDialog.cpp" line="+395"/>
         <source>Preview</source>
-        <translation type="unfinished">预览</translation>
+        <translation>预览</translation>
     </message>
     <message>
         <location line="-263"/>
@@ -16468,7 +16468,7 @@ Please choose a different file name.</source>
         <location line="+91"/>
         <location filename="../src/ui/StampFrameDialog.cpp" line="+177"/>
         <source>Preview</source>
-        <translation>预览预览</translation>
+        <translation type="unfinished">预览</translation>
     </message>
     <message>
         <location line="-192"/>

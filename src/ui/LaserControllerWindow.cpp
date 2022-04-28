@@ -7622,10 +7622,9 @@ void LaserControllerWindow::onActionStampImport(bool checked)
     QRect bounds(c.x() - w * 0.5, c.y() - h * 0.5, w, h);
 
     LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, m_scene->document(), QTransform(), m_viewer->curLayerIndex());
+    stampBitmap->computeImage();
     bool result = m_viewer->addPrimitiveAndExamRegionByBounds(stampBitmap);
-    if (result) {
-        stampBitmap->computeImage();
-    }
+    
 }
 
 void LaserControllerWindow::onActionCreateNameStamp()      

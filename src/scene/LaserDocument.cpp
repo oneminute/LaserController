@@ -1322,7 +1322,13 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QString imgStr = primitiveJson["originalImage"].toString();
                 QByteArray array = QByteArray::fromBase64(imgStr.toLatin1());
                 QImage img = QImage::fromData(array, "tiff");
-                primitive = new LaserStampBitmap(img, bounds, false, this, saveTransform, layerIndex);
+                LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, this, saveTransform, layerIndex);
+                primitive = stampBitmap;
+                QString antiFakeImgStr = primitiveJson["antiFakeImage"].toString();
+                QByteArray antiFakeArray = QByteArray::fromBase64(antiFakeImgStr.toLatin1());
+                QImage antiFakeImage = QImage::fromData(antiFakeArray, "tiff");
+                stampBaseLoad(primitive, primitiveJson, false);
+                stampBitmap->setAntiFakeImage(antiFakeImage);
                 
             }
             
@@ -1352,14 +1358,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                         }
                     }
                 }
-                if (className == "LaserStampBitmap") {
-                    LaserStampBitmap* stampBitmap = qobject_cast<LaserStampBitmap*>(primitive);
-                    QString antiFakeImgStr = primitiveJson["antiFakeImage"].toString();
-                    QByteArray antiFakeArray = QByteArray::fromBase64(antiFakeImgStr.toLatin1());
-                    QImage antiFakeImage = QImage::fromData(antiFakeArray, "tiff");
-                    stampBaseLoad(primitive, primitiveJson, false);
-                    stampBitmap->setAntiFakeImage(antiFakeImage);
-                }
+                
             }
 		}
         if (layer.contains("visible")) {
