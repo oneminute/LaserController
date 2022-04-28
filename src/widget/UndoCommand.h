@@ -351,12 +351,18 @@ class LaserPrimitiveSpinBoxUndoCommand :public QUndoCommand {
 public:
     LaserPrimitiveSpinBoxUndoCommand(LaserViewer* viewer, LaserPrimitive* p, LaserDoubleSpinBox* spinBox,
         qreal lastValue, qreal value, int type, bool isRedo = false);
+    LaserPrimitiveSpinBoxUndoCommand(LaserViewer* viewer, LaserPrimitive* p, 
+        LaserDoubleSpinBox* spinBox1, LaserDoubleSpinBox* spinBox2,
+        qreal lastValue1, qreal lastValue2, qreal value1, qreal value2, int type, bool isRedo = false);
     ~LaserPrimitiveSpinBoxUndoCommand();
 private:
     LaserViewer* m_viewer;
-    LaserDoubleSpinBox* m_spinBox;
-    qreal m_redoValue;
-    qreal m_undoValue;
+    LaserDoubleSpinBox* m_spinBox1;
+    LaserDoubleSpinBox* m_spinBox2;
+    qreal m_redoValue1;
+    qreal m_redoValue2;
+    qreal m_undoValue1;
+    qreal m_undoValue2;
     int m_type;
     bool m_isRedo;
     LaserPrimitive* m_primitive;
@@ -364,6 +370,6 @@ private:
 protected:
     virtual void undo() override;
     virtual void redo() override;
-    void handle(qreal _v);
+    void handle(qreal _v1, qreal _v2);
 };
 #endif // UNDOCOMMAND_H

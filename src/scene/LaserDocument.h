@@ -159,7 +159,7 @@ public slots:
     void printOutline(OptimizeNode* node, int level);
     void save(const QString& filename, QWidget* window);
     void load(const QString& filename, QWidget* window);
-    void stampBaseLoad(LaserPrimitive* p, QJsonObject& object);
+    void stampBaseLoad(LaserPrimitive* p, QJsonObject& object, bool isLoadAntiFakePath = true);
     int totalNodes();
     void updateDocumentBounding();
     QList<StampItem> generateStampImages();

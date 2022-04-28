@@ -13,6 +13,7 @@
 #include"scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "util/Utils.h"
+#include <QFileDialog>
 
 StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* parent) 
    : StampDialog(scene, parent),
@@ -444,7 +445,15 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
     QPixmap partyEmblem(":/ui/icons/images/partyEmblem.png");
     m_ui->emblemComboBox->addItem(QIcon(starEmblem), tr("Star Emblem"));
     m_ui->emblemComboBox->addItem(QIcon(partyEmblem), tr("Party Emblem"));
+    m_ui->emblemComboBox->addItem(QIcon(), tr("Import Image"));
     m_ui->emblemComboBox->setItemDelegate(new QStyledItemDelegate());
+    connect(m_ui->emblemComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+        if (index == 2) {
+            QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.png)");           
+            m_importEmblemPath = name;
+            m_ui->emblemComboBox->setItemIcon(2, QIcon(name));
+        }
+    });
     //Embelm size
     m_ui->embleSizeSpinBox->setMaximum(DBL_MAX);
     m_ui->embleSizeSpinBox->setMinimum(0);
@@ -693,6 +702,20 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
         else if (emblemIndex == 1) {
             LaserPartyEmblem* party = new LaserPartyEmblem(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_layerIndex);
             stampList.append(party);
+        }
+        else if (emblemIndex == 2) {
+            QFile file(m_importEmblemPath);
+            file.open(QFile::ReadOnly);
+            QByteArray data = file.readAll();
+            QImage img;
+            bool bl = img.loadFromData(data);
+            if (bl) {
+                QRect bounds(rect.center().x() - radius, rect.center().y() - radius,
+                    radius * 2, radius * 2);
+                LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, stampIntaglio, m_scene->document(), QTransform(), m_layerIndex);
+                stampList.append(stampBitmap);
+            }
+            
         }
     }
 

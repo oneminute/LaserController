@@ -181,5 +181,6 @@
         <file>images/fingerprint.png</file>
         <file>images/start_stamp.png</file>
         <file>images/CNE_banner.png</file>
+		<file>images/stampImport.png</file>
     </qresource>
 </RCC>

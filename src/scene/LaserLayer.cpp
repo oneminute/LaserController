@@ -705,6 +705,10 @@ QJsonObject LaserLayer::toJson(QWidget* window)
             LaserCircleText* cText = qobject_cast<LaserCircleText*>(primitive);
             array.append(cText->toJson());
         }
+        else if (className == "LaserStampBitmap") {
+            LaserStampBitmap* stampBitmap = qobject_cast<LaserStampBitmap*>(primitive);
+            array.append(stampBitmap->toJson());
+        }
 		else {
 			QMessageBox::critical(window, "critical", "can't save, "+className+" can't to json.");
             break;

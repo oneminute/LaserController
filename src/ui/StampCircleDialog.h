@@ -47,6 +47,7 @@ private:
     };
     bool m_isEllipse;
     int m_layerIndex;
+    QString m_importEmblemPath;
 protected slots:
     virtual void accept();
 };
