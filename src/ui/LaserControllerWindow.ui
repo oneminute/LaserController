@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>1212</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -2023,6 +2023,18 @@
    </property>
    <property name="toolTip">
     <string>Clean Cache Files</string>
+   </property>
+  </action>
+  <action name="actionStampImport">
+   <property name="icon">
+    <iconset resource="../res/icons.qrc">
+     <normaloff>:/ui/icons/images/stampImport.png</normaloff>:/ui/icons/images/stampImport.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import</string>
+   </property>
+   <property name="toolTip">
+    <string>Import</string>
    </property>
   </action>
   <action name="actionBresenham">

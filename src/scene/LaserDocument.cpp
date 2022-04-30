@@ -1243,24 +1243,21 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QJsonArray cArray = primitiveJson["center"].toArray();
                 qreal radius = primitiveJson["radius"].toDouble();
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
-                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
-                primitive = new LaserStar(this, center, radius, stampIntaglio, saveTransform, layerIndex);
+                primitive = new LaserStar(this, center, radius, false, saveTransform, layerIndex);
                 stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserPartyEmblem") {
                 QJsonArray cArray = primitiveJson["center"].toArray();
                 qreal radius = primitiveJson["radius"].toDouble();
                 QPoint center(cArray[0].toInt(), cArray[1].toInt());
-                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
-                primitive = new LaserPartyEmblem(this, center, radius, stampIntaglio, saveTransform, layerIndex);
+                primitive = new LaserPartyEmblem(this, center, radius, false, saveTransform, layerIndex);
                 stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserRing") {
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 qreal width = primitiveJson["width"].toDouble();
                 QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
-                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
-                primitive = new LaserRing(this, bounds, width, stampIntaglio, saveTransform, layerIndex);
+                primitive = new LaserRing(this, bounds, width, false, saveTransform, layerIndex);
                 stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserFrame") {
@@ -1269,8 +1266,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 QRect bounds(boundsArray[0].toInt(), boundsArray[1].toInt(), boundsArray[2].toInt(), boundsArray[3].toInt());
                 int cornerType = primitiveJson["cornerType"].toInt();
                 qreal cornerRadius = primitiveJson["cornerRadius"].toDouble();
-                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
-                primitive = new LaserFrame(this, bounds, width, cornerRadius, stampIntaglio, saveTransform, layerIndex, cornerType);
+                primitive = new LaserFrame(this, bounds, width, cornerRadius, false, saveTransform, layerIndex, cornerType);
                 stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserHorizontalText") {
@@ -1283,9 +1279,8 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool bold = primitiveJson["bold"].toBool();
                 bool italic = primitiveJson["italic"].toBool();
                 bool uppercase = primitiveJson["uppercase"].toBool();
-                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 QString family = primitiveJson["family"].toString();
-                primitive = new LaserHorizontalText(this, content, size, bL, bold, italic, uppercase, stampIntaglio, family,space, saveTransform, layerIndex);
+                primitive = new LaserHorizontalText(this, content, size, bL, bold, italic, uppercase, false, family,space, saveTransform, layerIndex);
                 stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserVerticalText") {
@@ -1299,8 +1294,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool italic = primitiveJson["italic"].toBool();
                 bool uppercase = primitiveJson["uppercase"].toBool();
                 QString family = primitiveJson["family"].toString();
-                bool fill = primitiveJson["stampIntaglio"].toBool();
-                primitive = new LaserVerticalText(this, content, size, bL, bold, italic, uppercase,fill,family, space, saveTransform, layerIndex);
+                primitive = new LaserVerticalText(this, content, size, bL, bold, italic, uppercase,false,family, space, saveTransform, layerIndex);
                 stampBaseLoad(primitive, primitiveJson);
             }
             else if (className == "LaserCircleText") {
@@ -1316,10 +1310,26 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 bool italic = primitiveJson["italic"].toBool();
                 bool uppercase = primitiveJson["uppercase"].toBool();
                 QString family = primitiveJson["family"].toString();
-                bool stampIntaglio = primitiveJson["stampIntaglio"].toBool();
                 qreal space = primitiveJson["space"].toDouble();
-                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase, stampIntaglio,family, space, false, maxRadian, minRadian,size, saveTransform, layerIndex);
+                primitive = new LaserCircleText(this, content, bounds, angle, bold,italic, uppercase, false,family, space, false, maxRadian, minRadian,size, saveTransform, layerIndex);
                 stampBaseLoad(primitive, primitiveJson);
+            }
+            else if (className == "LaserStampBitmap"){
+                //bounds
+                QJsonArray boundsArray = primitiveJson["bounds"].toArray();
+                QRect bounds = QRect(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
+                //image
+                QString imgStr = primitiveJson["originalImage"].toString();
+                QByteArray array = QByteArray::fromBase64(imgStr.toLatin1());
+                QImage img = QImage::fromData(array, "tiff");
+                LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, this, saveTransform, layerIndex);
+                primitive = stampBitmap;
+                QString antiFakeImgStr = primitiveJson["antiFakeImage"].toString();
+                QByteArray antiFakeArray = QByteArray::fromBase64(antiFakeImgStr.toLatin1());
+                QImage antiFakeImage = QImage::fromData(antiFakeArray, "tiff");
+                stampBaseLoad(primitive, primitiveJson, false);
+                stampBitmap->setAntiFakeImage(antiFakeImage);
+                
             }
             
             if (primitive)
@@ -1348,6 +1358,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                         }
                     }
                 }
+                
             }
 		}
         if (layer.contains("visible")) {
@@ -1361,6 +1372,9 @@ void LaserDocument::load(const QString& filename, QWidget* window)
         if (layer.contains("type")) {
             d->layers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
         }
+        
+        
+        
 	}
     if (!unavailables.isEmpty())
     {
@@ -1379,7 +1393,7 @@ void LaserDocument::load(const QString& filename, QWidget* window)
     open();
 }
 
-void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object) {
+void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object, bool isLoadAntiFakePath) {
     LaserStampBase* stampP = qgraphicsitem_cast<LaserStampBase*>(p);
     if (!stampP)
     {
@@ -1394,8 +1408,57 @@ void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object) {
     bool surpassInner = object["surpassInner"].toBool();
     bool randomMove = object["randomMove"].toBool();
     stampP->setStampIntaglio(stampIntaglio);
-    stampP->createAntiFakePath(antiFakeType, antiFakeLine, isAverageDistribute, antiFakeLineWidth,
-        surpassOuter, surpassInner, randomMove);
+    if (isLoadAntiFakePath) {
+        stampP->createAntiFakePath(antiFakeType, antiFakeLine, isAverageDistribute, antiFakeLineWidth,
+            surpassOuter, surpassInner, randomMove);
+        //antiFakePath
+        QJsonObject antiFakePathData = object["antiFakePathData"].toObject();
+        QJsonArray boundsArray = antiFakePathData["bounds"].toArray();
+        QString type = antiFakePathData["type"].toString();
+        QRectF bounds(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
+        QJsonArray commonTransforms = antiFakePathData["commonTransforms"].toArray();
+        QJsonArray transforms = antiFakePathData["transforms"].toArray();
+        QPainterPath path, tPath;
+        if (type == "curve") {
+            qreal a = antiFakePathData["curveAmplitude"].toDouble();
+            QJsonArray baseLineTLArray = antiFakePathData["curveBaseLineTL"].toArray();
+            QJsonArray baseLineTRArray = antiFakePathData["curveBaseLineTR"].toArray();
+            QLineF baseLine(QPointF(baseLineTLArray[0].toDouble(), baseLineTLArray[1].toDouble()),
+                QPointF(baseLineTRArray[0].toDouble(), baseLineTRArray[1].toDouble()));
+            tPath = stampP->createCurveLine(bounds, a, baseLine);
+        }
+        else {
+            tPath.addRect(bounds);
+        }
+        for (int i = 0; i < transforms.size(); i++) {
+            QPainterPath tempPath = tPath;
+            for (int j = 0; j < commonTransforms.size(); j++) {
+                QJsonObject object1 = commonTransforms[j].toObject();
+
+                QString key = object1["key"].toString();
+                QJsonArray value = object1["value"].toArray();
+                QTransform t(value[0].toDouble(), value[1].toDouble(), value[2].toDouble(),
+                    value[3].toDouble(), value[4].toDouble(), value[5].toDouble(),
+                    value[6].toDouble(), value[7].toDouble(), value[8].toDouble());
+                tempPath = t.map(tempPath);
+
+            }
+            QJsonArray tMap = transforms[i].toArray();
+            for (int m = 0; m < tMap.size(); m++) {
+                QJsonObject object = tMap[m].toObject();
+                QString key = object["key"].toString();
+                QJsonArray value = object["value"].toArray();
+                QTransform t(value[0].toDouble(), value[1].toDouble(), value[2].toDouble(),
+                    value[3].toDouble(), value[4].toDouble(), value[5].toDouble(),
+                    value[6].toDouble(), value[7].toDouble(), value[8].toDouble());
+                tempPath = t.map(tempPath);
+
+            }
+            path = path.united(tempPath);
+        }
+        stampP->setAntiFakePath(path);
+    }
+    
 }
 
 int LaserDocument::totalNodes()

@@ -98,8 +98,8 @@ public:
 	bool showLaserPos() const;
 	void setShowLaserPos(bool laserPos);
 
-	void addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
-	void addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
+	bool addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
+	bool addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
 	
 private:
     void init();

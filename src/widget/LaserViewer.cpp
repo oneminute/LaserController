@@ -873,7 +873,7 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
         //如果是实心填充的图元，则不做判断
         if (ignoreFillSolid) {
             int type = primitive->primitiveType();
-            if (type == LPT_BITMAP || type == LPT_STAR || type == LPT_PARTYEMBLEM){
+            if (type == LPT_BITMAP || type == LPT_STAR || type == LPT_PARTYEMBLEM || type == LPT_STAMPBITMAP){
                 //|| type == LPT_RING || type == LPT_FRAME) {
                 result = nullptr;
                 return QLineF();
@@ -974,6 +974,12 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
             else if (LaserFrame* frame = qobject_cast<LaserFrame*> (primitive)) {
                 if (frame->getScenePath().contains(sceneMousePoint)) {
                     result = frame;
+                    return true;
+                }
+            }
+            else if (LaserStampBitmap* stampBitmap = qobject_cast<LaserStampBitmap*> (primitive)) {
+                if (stampBitmap->getScenePath().contains(sceneMousePoint)) {
+                    result = stampBitmap;
                     return true;
                 }
             }
@@ -4211,7 +4217,7 @@ void LaserViewer::setShowLaserPos(bool laserPos)
     m_showLaserPos = laserPos;
     viewport()->update();
 }
-void LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
+bool LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
 {
     //判断是否在4叉树的有效区域内
     if (m_scene->maxRegion().contains(primitive->sceneBoundingRect())) {
@@ -4221,15 +4227,17 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive)
         AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
         m_undoStack->push(addCmd);
         onReplaceGroup(primitive);
+        return true;
     }
     else {
         QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+        return false;
     }
 }
-void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent)
+bool LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent)
 {
     if (primitives.isEmpty()) {
-        return;
+        return false;
     }
     bool outRegion = false;
     for (LaserPrimitive* primitive : primitives) {
@@ -4241,7 +4249,7 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& prim
     }
     if (outRegion) {
         QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-        return;
+        return false;
     }
     else {
         QList<QGraphicsItem*> list;
@@ -4253,6 +4261,7 @@ void LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& prim
         onReplaceGroup(primitives);
 
     }
+    return true;
 }
 int LaserViewer::textAlignH()
 {

@@ -1,5 +1,8 @@
 #include "common.h"
 #include "common/Config.h"
+#include "LaserApplication.h" 
+#include "ui/LaserControllerWindow.h"
+#include "widget/LaserViewer.h"
 
 int Global::dpiX(96);
 int Global::dpiY(96);
@@ -62,6 +65,19 @@ qreal Global::sceneToMmH(int pixels)
 qreal Global::sceneToMmV(int pixels)
 {
 	return pixels * 25.4 / dpiY;
+}
+
+qreal Global::mmToPixel(qreal value)
+{
+	LaserViewer* v = LaserApplication::mainWindow->viewer();
+	
+	return value * 25400.0 / v->logicalDpiY();
+}
+
+qreal Global::pixelToMm(qreal value)
+{
+	LaserViewer* v = LaserApplication::mainWindow->viewer();
+	return value * v->logicalDpiY()/ 25.4;
 }
 
 qreal Global::convertUnit(qreal num, SizeUnit from, SizeUnit to, Qt::Orientation orientation)

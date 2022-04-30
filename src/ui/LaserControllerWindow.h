@@ -377,6 +377,7 @@ protected slots:
     void onActionHorizontalText(bool checked = false);
     void onActionVerticalText(bool checked = false);
     void onActionArcText(bool checked = false);
+    void onActionStampImport(bool checked = false);
     //create stamp
     void onActionCreateNameStamp();
     void onActionCreateStripStamp();
@@ -629,6 +630,7 @@ private:
     QGridLayout* m_ringPropertyLayout;
     QGridLayout* m_starPropertyLayout;
     QGridLayout* m_partyEmblePropertyLayout;
+    QGridLayout* m_stampBitmapPropertyLayout;
     QWidget* m_propertyPanelWidget;
     QWidget* m_rectPropertyWidget;
     QWidget* m_linePropertyWidget;
@@ -648,6 +650,7 @@ private:
     QWidget* m_ringWidget;
     QWidget* m_starWidget;
     QWidget* m_partyEmbleWidget;
+    QWidget* m_stampBitmapWidget;
     //anti-fake
     QLabel* m_aFLinesLabel;
     LaserDoubleSpinBox* m_aFLines;
@@ -660,6 +663,8 @@ private:
     QCheckBox* m_aFSurpassOuterCheckbox;
     QCheckBox* m_aFSurpassInnerCheckbox;
     QPushButton* m_aFAntifakeBtn;
+    //stampBitmap
+    QToolButton* m_lockSizeRatio;
     
     Qt::CheckState m_lastLockedState;
     ads::CDockWidget* m_propertyDockWidget;

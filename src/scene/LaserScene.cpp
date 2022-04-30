@@ -307,7 +307,8 @@ void LaserScene::findSelectedByLine(QRectF selection)
                     type == LPT_RING ||
                     type == LPT_CIRCLETEXT ||
                     type == LPT_HORIZONTALTEXT ||
-                    type == LPT_VERTICALTEXT){
+                    type == LPT_VERTICALTEXT ||
+                    type == LPT_STAMPBITMAP){
                     //图元的path与selection的边交叉
                     selectedByRegion(selection, primitive);
                 }

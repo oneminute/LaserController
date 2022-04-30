@@ -14,7 +14,9 @@ StampDialog::~StampDialog()
 
 void StampDialog::okBtnAccept()
 {    
-    m_viewer->addPrimitiveAndExamRegionByBounds(createStampPrimitive());
+    QList<LaserPrimitive*>list = createStampPrimitive();
+    bool bl = m_viewer->addPrimitiveAndExamRegionByBounds(list);
+    
     m_viewer->zoomToSelection();
 }
 
@@ -25,6 +27,7 @@ void StampDialog::previewBtnAccept()
     QList<LaserPrimitive*> list = createStampPrimitive();
     LaserPrimitiveGroup* group = new LaserPrimitiveGroup();
     for (LaserPrimitive* p : list) {
+        
         group->addToGroup(p);
     }
     m_preview->scene()->addItem(group);

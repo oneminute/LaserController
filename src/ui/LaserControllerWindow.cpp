@@ -281,6 +281,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     stampMenu->addAction(m_ui->actionHorizontalText);
     stampMenu->addAction(m_ui->actionVerticalText);
     stampMenu->addAction(m_ui->actionArcText);
+    stampMenu->addAction(m_ui->actionStampImport);
+
     m_toolButtonStampShapes->setMenu(stampMenu);
     
     connect(m_ui->actionStar, &QAction::triggered, this, &LaserControllerWindow::onActionStar);
@@ -291,6 +293,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionHorizontalText, &QAction::triggered, this, &LaserControllerWindow::onActionHorizontalText);
     connect(m_ui->actionVerticalText, &QAction::triggered, this, &LaserControllerWindow::onActionVerticalText);
     connect(m_ui->actionArcText, &QAction::triggered, this, &LaserControllerWindow::onActionArcText);
+    connect(m_ui->actionStampImport, &QAction::triggered, this, &LaserControllerWindow::onActionStampImport);
     //stamp
     m_createStampTb->setPopupMode(QToolButton::InstantPopup);
     m_createStampTb->setIcon(QIcon(":/ui/icons/images/createStamp.png"));
@@ -555,6 +558,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         }
         
     });
+    
 
 	m_propertyLayout->addWidget(m_posXLabel, 0, 0);
 	m_propertyLayout->addWidget(m_posYLabel, 1, 0);
@@ -3282,6 +3286,21 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_aFWidthLabel = new QLabel(tr("Line Width"));
     m_aFWidth = new LaserDoubleSpinBox();
     m_aFWidth->setValue(0.1);
+    //stampBitmap
+    m_lockSizeRatio = new QToolButton();
+    m_lockSizeRatio->setDefaultAction(m_ui->actionLock);
+    m_lockSizeRatio->setChecked(true);
+    m_lockSizeRatio->setIcon(QIcon(":/ui/icons/images/lock.png"));
+    m_lockSizeRatio->connect(m_lockSizeRatio, &QToolButton::triggered, this, [=] {
+        if (m_lockSizeRatio->isChecked()) {
+            m_lockSizeRatio->setChecked(false);
+            m_lockSizeRatio->setIcon(QIcon(":/ui/icons/images/lock.png"));
+        }
+        else {
+            m_lockSizeRatio->setChecked(true);
+            m_lockSizeRatio->setIcon(QIcon(":/ui/icons/images/unlock.png"));
+        }
+    });
     
     //width
     m_originalBoundsWidth->connect(m_originalBoundsWidth, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
@@ -3289,13 +3308,32 @@ void LaserControllerWindow::createShapePropertyDockPanel()
         if (firstPrimitive == nullptr) {
             return;
         }
+        qreal lastHeight = firstPrimitive->boundingRect().height();
         qreal lastWidth = firstPrimitive->boundingRect().width();
-        qreal w = m_originalBoundsWidth->value()*1000;
+        qreal h = m_originalBoundsHeight->value() * 1000;
+        qreal w = m_originalBoundsWidth->value() * 1000;
         if (w < 1) {
             w = 1;
             m_originalBoundsWidth->setValue(0.001);
         }
-        firstPrimitive->setBoundingRectWidth(w);
+        int type = firstPrimitive->primitiveType();
+        if (type == LPT_STAMPBITMAP) {
+            if (!m_lockSizeRatio->isChecked()) {
+                firstPrimitive->setBoundingRectWidth(w);
+            }
+            else {
+                qreal width = w;
+                qreal height = firstPrimitive->boundingRect().height();
+                qreal ratio = height / firstPrimitive->boundingRect().width();
+                height = ratio * width;
+                firstPrimitive->setBoundingRectHeight(height);
+                firstPrimitive->setBoundingRectWidth(width);
+                m_originalBoundsHeight->setValue(height * 0.001);
+            }
+        }
+        else {
+            firstPrimitive->setBoundingRectWidth(w);
+        }
         //判断是否在4叉树的有效区域内
         if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
             QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
@@ -3303,8 +3341,15 @@ void LaserControllerWindow::createShapePropertyDockPanel()
             firstPrimitive->setBoundingRectWidth(lastWidth);
         }
         else {
-            LaserPrimitiveSpinBoxUndoCommand* cmd = new LaserPrimitiveSpinBoxUndoCommand(
-                m_viewer, firstPrimitive, m_originalBoundsWidth, lastWidth, w, 0);
+            LaserPrimitiveSpinBoxUndoCommand* cmd;
+            if (type == LPT_STAMPBITMAP) {
+                cmd = new LaserPrimitiveSpinBoxUndoCommand(
+                    m_viewer, firstPrimitive, m_originalBoundsWidth, m_originalBoundsHeight, lastWidth, lastHeight, w, h, 4);
+            }
+            else {
+                cmd = new LaserPrimitiveSpinBoxUndoCommand(
+                    m_viewer, firstPrimitive, m_originalBoundsWidth, lastWidth, w, 0);
+            }
             m_viewer->undoStack()->push(cmd);
             m_scene->quadTreeNode()->upDatePrimitive(firstPrimitive);
         }
@@ -3316,21 +3361,51 @@ void LaserControllerWindow::createShapePropertyDockPanel()
             return;
         }
         qreal lastHeight = firstPrimitive->boundingRect().height();
+        qreal lastWidth = firstPrimitive->boundingRect().width();
         qreal h = m_originalBoundsHeight->value() * 1000;
+        qreal w = m_originalBoundsWidth->value() * 1000;
         if (h < 1) {
             h = 1;
             m_originalBoundsHeight->setValue(0.001);
         }
-        firstPrimitive->setBoundingRectHeight(h);
+        int type = firstPrimitive->primitiveType();
+        if (type == LPT_STAMPBITMAP) {
+            if (!m_lockSizeRatio->isChecked()) {
+                firstPrimitive->setBoundingRectHeight(h);
+            }
+            else {
+                qreal width = firstPrimitive->boundingRect().width();
+                qreal height = h;
+                qreal ratio = width / firstPrimitive->boundingRect().height();
+                width = ratio * height;
+                firstPrimitive->setBoundingRectHeight(height);
+                firstPrimitive->setBoundingRectWidth(width);
+                m_originalBoundsWidth->setValue(width * 0.001);
+            }
+        }
+        else {
+            firstPrimitive->setBoundingRectHeight(h);
+        }
+        
         //判断是否在4叉树的有效区域内
         if (!m_scene->maxRegion().contains(firstPrimitive->sceneBoundingRect())) {
             QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
             m_originalBoundsHeight->setValue(lastHeight * 0.001);
+            m_originalBoundsWidth->setValue(lastWidth * 0.001);
             firstPrimitive->setBoundingRectHeight(lastHeight);
+            firstPrimitive->setBoundingRectWidth(lastWidth);
         }
         else {
-            LaserPrimitiveSpinBoxUndoCommand* cmd = new LaserPrimitiveSpinBoxUndoCommand(
-                m_viewer, firstPrimitive, m_originalBoundsHeight, lastHeight, h, 1);
+            LaserPrimitiveSpinBoxUndoCommand* cmd;
+            if (type == LPT_STAMPBITMAP) {
+                cmd = new LaserPrimitiveSpinBoxUndoCommand(
+                    m_viewer, firstPrimitive, m_originalBoundsWidth, m_originalBoundsHeight, lastWidth, lastHeight, w, h, 4);
+            }
+            else {
+                cmd = new LaserPrimitiveSpinBoxUndoCommand(
+                    m_viewer, firstPrimitive, m_originalBoundsHeight, lastHeight, h, 1);
+            }
+            
             m_viewer->undoStack()->push(cmd);
             m_scene->quadTreeNode()->upDatePrimitive(firstPrimitive);
         }
@@ -3649,10 +3724,10 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
         return nullptr;
     }
     int type = firstPrimitive->primitiveType();
-    if (type == LPT_HORIZONTALTEXT || type == LPT_VERTICALTEXT || type == LPT_CIRCLETEXT 
-        || type == LPT_FRAME || type == LPT_RING || type == LPT_STAR || type == LPT_PARTYEMBLEM) {
-        LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(firstPrimitive);
-        LaserStampBase* stampBase = qgraphicsitem_cast<LaserStampBase*>(firstPrimitive);
+    LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(firstPrimitive);
+    LaserStampBase* stampBase = qgraphicsitem_cast<LaserStampBase*>(firstPrimitive);
+    if (text != nullptr || stampBase != nullptr) {
+        
         switch (fontProperty) {
             case 0: {
                 /*bool checked = m_textItalic->isChecked();
@@ -4064,6 +4139,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             break;
         }
         case LPT_BITMAP: {
+            
             m_bitmapPropertyLayout->setMargin(0);
             m_bitmapPropertyLayout->setSpacing(10);
             m_bitmapPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -4083,7 +4159,7 @@ void LaserControllerWindow::showShapePropertyPanel()
             m_propertyDockWidget->setWidget(m_bitmapPropertyWidget);
             //m_lockedLabel->setText("LPT_BITMAP");
             //original bounds
-            LaserBitmap* bitmap = qgraphicsitem_cast<LaserBitmap*>(list[0]);
+            LaserBitmap* bitmap = qgraphicsitem_cast<LaserBitmap*>(primitive);
             QRectF bounds = bitmap->bounds();
             m_originalBoundsWidth->setValue(bounds.width() * 0.001);
             m_originalBoundsHeight->setValue(bounds.height() * 0.001);
@@ -4437,6 +4513,38 @@ void LaserControllerWindow::showShapePropertyPanel()
             setAntiFakePanelValue(emblem);
             break;
         }
+        case LPT_STAMPBITMAP: {
+            LaserStampBitmap* bitmap = qgraphicsitem_cast<LaserStampBitmap*>(primitive);
+            m_stampBitmapPropertyLayout->setMargin(10);
+            m_stampBitmapPropertyLayout->setSpacing(10);
+            m_stampBitmapPropertyLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            m_stampBitmapPropertyLayout->addWidget(m_originalBoundsWidthLabel, 0, 0);
+            m_stampBitmapPropertyLayout->addWidget(m_originalBoundsWidth, 0, 1);
+            m_stampBitmapPropertyLayout->addWidget(m_originalBoundsHeightLabel, 1, 0);
+            m_stampBitmapPropertyLayout->addWidget(m_originalBoundsHeight, 1, 1);
+            
+            m_stampBitmapPropertyLayout->addWidget(m_lockSizeRatio, 0, 2, 2, 1);
+            m_stampBitmapPropertyLayout->addWidget(m_locked, 2, 0);
+            m_stampBitmapWidget->setLayout(m_stampBitmapPropertyLayout);
+            m_propertyDockWidget->setWidget(m_stampBitmapWidget);
+            //original bounds           
+            QRectF bounds = bitmap->boundingRect();
+            m_originalBoundsWidth->setValue(bounds.width() * 0.001);
+            m_originalBoundsHeight->setValue(bounds.height() * 0.001);
+            //anti-fake
+            QGroupBox* antiFakeB = new QGroupBox();
+            antiFakeB->setTitle(tr("anti-fake"));
+            QFormLayout* layoutAntiFake = new QFormLayout(antiFakeB);
+            antiFakeB->setLayout(layoutAntiFake);
+            layoutAntiFake->addRow(m_aFTypeLabel, m_aFType);
+            layoutAntiFake->addRow(m_aFLinesLabel, m_aFLines);
+            layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
+            layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
+            m_stampBitmapPropertyLayout->addWidget(antiFakeB, 3, 0, 1, 2);
+            //set value
+            setAntiFakePanelValue(bitmap);
+            break;
+        }
     }
 }
 
@@ -4512,6 +4620,9 @@ void LaserControllerWindow::createPrimitivePropertiesPanel()
     //party emble
     m_partyEmblePropertyLayout = new QGridLayout();
     m_partyEmbleWidget = new QWidget();
+    //stampBitmap
+    m_stampBitmapPropertyLayout = new QGridLayout();
+    m_stampBitmapWidget = new QWidget();
 }
 
 void LaserControllerWindow::createPrimitiveLinePropertyPanel()
@@ -7478,6 +7589,43 @@ void LaserControllerWindow::onActionArcText(bool checked)
         m_toolButtonStampShapes->setChecked(true);
         m_ui->actionArcText->setChecked(true);
     }
+}
+
+void LaserControllerWindow::onActionStampImport(bool checked)
+{
+    QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.png)");
+    //qDebug() << "name: " << name;
+    QFile file(name);
+    file.open(QFile::ReadOnly);
+    QByteArray data = file.readAll();
+    QImage img;
+    bool bl = img.loadFromData(data);
+    if (!bl) {
+        return;
+    }
+
+    QSize size = img.size();
+    qreal max = 10000;
+    qreal w, h;
+    qreal sH = size.height();
+    qreal sW = size.width();
+    if (size.width() > size.height()) {
+        w = max;
+        qreal r = sH / sW;
+        h = r * w;
+    }
+    else {
+        h = max;
+        qreal r = sW / sH;
+        w = r * h;
+    }
+    QPoint c = m_viewer->mapToScene(m_viewer->rect().center()).toPoint();
+    QRect bounds(c.x() - w * 0.5, c.y() - h * 0.5, w, h);
+
+    LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, m_scene->document(), QTransform(), m_viewer->curLayerIndex());
+    stampBitmap->computeImage();
+    bool result = m_viewer->addPrimitiveAndExamRegionByBounds(stampBitmap);
+    
 }
 
 void LaserControllerWindow::onActionCreateNameStamp()      

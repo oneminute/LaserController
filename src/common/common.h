@@ -107,6 +107,7 @@ enum LaserPrimitiveType
     LPT_CIRCLETEXT,
     LPT_HORIZONTALTEXT,
     LPT_VERTICALTEXT,
+    LPT_STAMPBITMAP,
 };
 
 enum LaserLayerType
@@ -404,6 +405,8 @@ public:
 	static qreal mmToSceneVF(qreal value);
     static qreal sceneToMmH(int pixels);
     static qreal sceneToMmV(int pixels);
+    static qreal mmToPixel(qreal value);
+    static qreal pixelToMm(qreal value);
 
 	static qreal convertUnit(qreal num, SizeUnit from, SizeUnit to, Qt::Orientation orientation = Qt::Horizontal);
 

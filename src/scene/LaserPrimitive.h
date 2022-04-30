@@ -486,10 +486,10 @@ public:
         int layerIndex, int antiFakeType = 0, int antiFakeLine = 0, bool isAverageDistribute = false, qreal lineWidth = 0,
         bool surpassOuter = false, bool surpassInner = false, bool randomMove = false);
     ~LaserStampBase();
-    void setAntiFakePath(QPainterPath path);
+    virtual void setAntiFakePath(QPainterPath path);
     void setFingerPrintPath(QPainterPath path);
     bool stampIntaglio();
-    void setStampIntaglio(bool bl);
+    virtual void setStampIntaglio(bool bl);
     int antiFakeType();
     void setAntiFakeType(int type);
     int antiFakeLine();
@@ -511,6 +511,7 @@ public:
     QPainterPath createBasePathByArc(qreal borderWidth, QLineF& baseLine);
     QPainterPath createCurveLine(QRectF bounds, qreal a, QLineF line);
     QPainterPath transformAntifakeLineByBounds(QPainterPath basePath, qreal intervalRate, qreal start, qreal end);
+    QPainterPath transformAntifakeLineByArc(QPainterPath basePath, QLineF baseLine, qreal lineWidthRate, qreal startPercent);
 protected:
     void stampBaseClone(LaserStampBase* sp);
     void stampBaseToJson(QJsonObject& object);
@@ -792,7 +793,32 @@ private:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
     Q_DISABLE_COPY(LaserVerticalText)
 };
+class LaserStampBitmapPrivate;
+class LaserStampBitmap : public LaserStampBase {
+    Q_OBJECT
+public:
+    LaserStampBitmap(const QImage& image, const QRect& bounds, bool stampIntaglio, LaserDocument* doc, QTransform transform = QTransform(),
+        int layerIndex = 0);
+    ~LaserStampBitmap();
+    void computeImage(bool generateStamp = false);
+    virtual void setStampIntaglio(bool bl);
+    virtual bool isClosed() const { return true; };
+    virtual LaserPrimitive* clone(QTransform t);
+    virtual QJsonObject toJson();
+    virtual void draw(QPainter* painter);
+    void setBounds(QRect bounds);
+    virtual void setBoundingRectWidth(qreal width);
+    virtual void setBoundingRectHeight(qreal height);
+    virtual void setAntiFakePath(QPainterPath path);
+    virtual void setAntiFakeImage(QImage image);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
+private:
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampBitmap)
+        Q_DISABLE_COPY(LaserStampBitmap)
+};
 
 QDebug operator<<(QDebug debug, const QRect& rect);
 
